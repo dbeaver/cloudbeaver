@@ -32,6 +32,8 @@ export const coreAuthenticationManifest: PluginManifest = {
     () => import('./UserDataService').then(m => m.UserDataService),
     () => import('./UserInfoResource').then(m => m.UserInfoResource),
     () => import('./UserMetaParametersResource').then(m => m.UserMetaParametersResource),
+    () => import('./UserInfoMetaParametersResource').then(m => m.UserInfoMetaParametersResource),
+    () => import('./UsersMetaDataResource').then(m => m.UsersMetaParametersResource),
     () => import('./UsersResource').then(m => m.UsersResource),
   ],
 };

@@ -130,10 +130,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     });
   }
 
-  async setMetaParameters(userId: string, parameters: Record<string, any>): Promise<void> {
-    await this.graphQLService.sdk.saveUserMetaParameters({ userId, parameters });
-  }
-
   async create({ userId, authRole }: UserCreateOptions): Promise<AdminUser> {
     const { user } = await this.graphQLService.sdk.createUser({
       userId,
@@ -303,7 +299,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   private getDefaultIncludes(): UserResourceIncludes {
     return {
       customIncludeOriginDetails: false,
-      includeMetaParameters: false,
     };
   }
 

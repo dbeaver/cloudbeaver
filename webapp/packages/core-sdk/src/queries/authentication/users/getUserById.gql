@@ -1,4 +1,4 @@
-query getAdminUserInfo($userId: ID!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+query getAdminUserInfo($userId: ID!, $customIncludeOriginDetails: Boolean!) {
   user: adminUserInfo(userId: $userId) {
     ...AdminUserInfo
   }

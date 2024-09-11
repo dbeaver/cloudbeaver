@@ -34,12 +34,7 @@ interface Props extends UserFormProps {
 export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCredentials({ formState, tabState, tabSelected, disabled }) {
   const translate = useTranslate();
   const editing = formState.mode === FormMode.Edit;
-  const userInfo = useResource(
-    UserFormInfoCredentials,
-    UsersResource,
-    { key: tabState.initialState.userId, includes: ['includeMetaParameters'] },
-    { active: tabSelected && editing },
-  );
+  const userInfo = useResource(UserFormInfoCredentials, UsersResource, tabState.initialState.userId, { active: tabSelected && editing });
   const authProvidersResource = useResource(UserFormInfoCredentials, AuthProvidersResource, null);
   const passwordValidationRef = usePasswordValidation();
 

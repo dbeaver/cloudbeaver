@@ -23,6 +23,8 @@ export * from './TeamsResource';
 export * from './UserDataService';
 export * from './UserInfoResource';
 export * from './UserMetaParametersResource';
+export * from './UserInfoMetaParametersResource';
+export * from './UsersMetaDataResource';
 export * from './UsersResource';
 export * from './TeamMetaParametersResource';
 export * from './TeamInfoMetaParametersResource';

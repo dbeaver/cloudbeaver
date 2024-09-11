@@ -1,0 +1,5 @@
+query getAdminUserMetaParameters($userId: ID!) {
+  user: adminUserInfo(userId: $userId) {
+    metaParameters
+  }
+}

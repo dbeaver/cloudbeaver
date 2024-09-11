@@ -283,7 +283,6 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     return {
       customIncludeOriginDetails: true,
       includeConfigurationParameters: false,
-      includeMetaParameters: false,
     };
   }
 }
