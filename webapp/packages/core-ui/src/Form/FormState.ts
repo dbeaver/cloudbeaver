@@ -21,8 +21,6 @@ import { formStateContext } from './formStateContext';
 import type { IFormPart } from './IFormPart';
 import type { IFormState } from './IFormState';
 
-type PartsValues = IFormPart<any>[];
-
 export class FormState<TState> implements IFormState<TState> {
   mode: FormMode;
   parts: MetadataMap<string, IFormPart<any>>;
@@ -96,7 +94,7 @@ export class FormState<TState> implements IFormState<TState> {
       setPartsState: action,
       setState: action,
       isChanged: computed,
-      partsValues: computed<PartsValues>({
+      partsValues: computed<IFormPart<any>[]>({
         equals: isArraysEqual,
       }),
       isError: computed,
