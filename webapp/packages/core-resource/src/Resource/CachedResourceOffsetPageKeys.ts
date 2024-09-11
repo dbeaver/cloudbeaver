@@ -101,19 +101,6 @@ export function isOffsetPageInRange({ pages, end }: ICachedResourceOffsetPage, i
   return false;
 }
 
-export function limitOffsetPages(pages: IResourceOffsetPage[], limit: number): IResourceOffsetPage[] {
-  const result: IResourceOffsetPage[] = [];
-
-  for (const page of pages) {
-    if (page.from >= limit) {
-      break;
-    }
-    result.push({ ...page, to: Math.min(limit, page.to) });
-  }
-
-  return result;
-}
-
 export function expandOffsetPageRange(
   pages: IResourceOffsetPage[],
   info: IOffsetPageInfo,

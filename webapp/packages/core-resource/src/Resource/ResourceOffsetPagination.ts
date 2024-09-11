@@ -51,7 +51,6 @@ export class ResourceOffsetPagination<TKey, TMetadata extends ICachedResourceMet
   }
 
   setPage(key: ResourceAlias<TKey, Readonly<ICachedResourceOffsetPageOptions>>, items: any[], hasNextPage: boolean) {
-    items = [...items];
     const offset = key.options.offset;
     const limit = offset + key.options.limit;
 

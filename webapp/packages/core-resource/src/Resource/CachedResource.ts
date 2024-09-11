@@ -350,17 +350,8 @@ export abstract class CachedResource<
   }
 
   markLoaded(param: ResourceKey<TKey>, includes?: TInclude): void {
-    // const pageKey = this.aliases.isAlias(param, CachedResourceOffsetPageKey) || this.aliases.isAlias(param, CachedResourceOffsetPageListKey);
-
     this.metadata.update(param, metadata => {
       metadata.loaded = true;
-
-      // if (pageKey) {
-      //   metadata.offsetPage = observable({
-      //     ...metadata.offsetPage,
-      //     pages: expandOffsetPageRange(metadata.offsetPage?.pages || [], pageKey.options, false),
-      //   });
-      // }
 
       if (includes) {
         this.commitIncludes(metadata, includes);
