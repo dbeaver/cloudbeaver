@@ -14,6 +14,8 @@
   },
   "dependencies": {
     "@cloudbeaver/core-di": "^0",
+    "@jest/globals": "^29",
+    "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
     "mobx": "^6",
     "react": "^18"
@@ -25,6 +27,8 @@
     "public/**/*"
   ],
   "devDependencies": {
+    "@jest/globals": "^29",
+    "@types/jest": "^29",
     "@types/react": "^18",
     "typescript": "^5"
   }

@@ -15,10 +15,10 @@ import { TreeDataContext } from './contexts/TreeDataContext';
 import { TreeDnDContext } from './contexts/TreeDnDContext';
 import { TreeVirtualizationContext } from './contexts/TreeVirtualizationContext';
 import type { INodeRenderer } from './INodeRenderer';
+import type { ITreeData } from './ITreeData';
 import { NodeChildren } from './NodeChildren';
 import { useNodeSizeCache } from './useNodeSizeCache';
 import { useTree } from './useTree';
-import type { ITreeData } from './useTreeData';
 import { useTreeDnD } from './useTreeDnD';
 import { useTreeVirtualization } from './useTreeVirtualization';
 

@@ -16,5 +16,6 @@ export const coreEventsManifest: PluginManifest = {
     () => import('./NotificationService').then(m => m.NotificationService),
     () => import('./ExceptionsCatcherService').then(m => m.ExceptionsCatcherService),
     () => import('./EventsSettingsService').then(m => m.EventsSettingsService),
+    () => import('./LocaleService').then(m => m.LocaleService),
   ],
 };

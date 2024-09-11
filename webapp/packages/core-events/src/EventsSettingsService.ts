@@ -8,6 +8,7 @@
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import {
   createSettingsAliasResolver,
+  ESettingsValueType,
   ROOT_SETTINGS_LAYER,
   SettingsManagerService,
   SettingsProvider,
@@ -15,6 +16,8 @@ import {
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
 import { schema } from '@cloudbeaver/core-utils';
+
+import { NOTIFICATIONS_SETTINGS_GROUP } from './NOTIFICATIONS_SETTINGS_GROUP';
 
 const settingsSchema = schema.object({
   'plugin.notifications.notificationsPool': schema.coerce.number().default(20),
@@ -56,16 +59,23 @@ export class EventsSettingsService extends Dependency {
     this.settingsManagerService.registerSettings(this.settings, () => [
       // {
       //   group: NOTIFICATIONS_SETTINGS_GROUP,
-      //   key: 'maxPersistentAllow',
+      //   key: 'plugin.notifications.maxPersistentAllow',
+      //   access: {
+      //     scope: ['client'],
+      //   },
       //   name: 'Max persistent notifications count',
       //   type: ESettingsValueType.Input,
       // },
-      // {
-      //   group: NOTIFICATIONS_SETTINGS_GROUP,
-      //   key: 'notificationsPool',
-      //   name: 'Max notifications count',
-      //   type: ESettingsValueType.Input,
-      // },
+      {
+        group: NOTIFICATIONS_SETTINGS_GROUP,
+        key: 'plugin.notifications.notificationsPool',
+        access: {
+          scope: ['client'],
+        },
+        name: 'core_events_notifications_settings_pool_size',
+        description: 'core_events_notifications_settings_pool_size_description',
+        type: ESettingsValueType.Input,
+      },
     ]);
   }
 }

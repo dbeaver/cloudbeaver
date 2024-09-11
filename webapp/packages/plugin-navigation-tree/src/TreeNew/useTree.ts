@@ -10,7 +10,7 @@ import { observable } from 'mobx';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 
 import type { INodeRenderer, NodeComponent } from './INodeRenderer';
-import type { ITreeData } from './useTreeData';
+import type { ITreeData } from './ITreeData';
 
 interface IOptions {
   data: ITreeData;

@@ -8,6 +8,7 @@
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import {
   createSettingsAliasResolver,
+  ESettingsValueType,
   ROOT_SETTINGS_LAYER,
   SettingsManagerService,
   SettingsProvider,
@@ -15,6 +16,8 @@ import {
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
+
+import { NAVIGATION_TREE_SETTINGS_GROUP } from './NAVIGATION_TREE_SETTINGS_GROUP';
 
 const settingsSchema = schema.object({
   'core.navigation-tree.childrenLimit': schema.coerce.number().min(10).max(1000).default(100),
@@ -61,27 +64,36 @@ export class NavTreeSettingsService extends Dependency {
 
   private registerSettings() {
     this.settingsManagerService.registerSettings(this.settings, () => [
-      // {
-      //   key: 'childrenLimit',
-      //   access: {
-      //     accessor: ['server'],
-      //   },
-      //   group: NAVIGATION_TREE_SETTINGS_GROUP,
-      //   name: 'Children limit',
-      //   type: ESettingsValueType.Input,
-      // },
-      // {
-      //   group: NAVIGATION_TREE_SETTINGS_GROUP,
-      //   key: 'editing',
-      //   name: 'Editing',
-      //   type: ESettingsValueType.Checkbox,
-      // },
-      // {
-      //   group: NAVIGATION_TREE_SETTINGS_GROUP,
-      //   key: 'deleting',
-      //   name: 'Deleting',
-      //   type: ESettingsValueType.Checkbox,
-      // },
+      {
+        key: 'core.navigation-tree.childrenLimit',
+        access: {
+          scope: ['server'],
+        },
+        group: NAVIGATION_TREE_SETTINGS_GROUP,
+        name: 'core_navigation_tree_settings_children_limit',
+        description: 'core_navigation_tree_settings_children_limit_description',
+        type: ESettingsValueType.Input,
+      },
+      {
+        group: NAVIGATION_TREE_SETTINGS_GROUP,
+        key: 'core.navigation-tree.editing',
+        access: {
+          scope: ['server'],
+        },
+        name: 'core_navigation_tree_settings_editing',
+        description: 'core_navigation_tree_settings_editing_description',
+        type: ESettingsValueType.Checkbox,
+      },
+      {
+        group: NAVIGATION_TREE_SETTINGS_GROUP,
+        key: 'core.navigation-tree.deleting',
+        access: {
+          scope: ['server'],
+        },
+        name: 'core_navigation_tree_settings_deleting',
+        description: 'core_navigation_tree_settings_deleting_description',
+        type: ESettingsValueType.Checkbox,
+      },
     ]);
   }
 }

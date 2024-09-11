@@ -7,26 +7,29 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container } from '@cloudbeaver/core-blocks';
+import { Container, useTranslate } from '@cloudbeaver/core-blocks';
 import {
   type ISettingDescription,
   type ISettingsSource,
   ROOT_SETTINGS_GROUP,
   type SettingsGroup as SettingsGroupType,
 } from '@cloudbeaver/core-settings';
-import type { ITreeData } from '@cloudbeaver/plugin-navigation-tree';
+import type { ITreeData, ITreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
+import { settingsFilter } from './settingsFilter';
 import { SettingsGroup } from './SettingsGroup';
 import { useTreeScrollSync } from './useTreeScrollSync';
 
 interface Props {
   treeData: ITreeData;
+  treeFilter: ITreeFilter;
   source: ISettingsSource;
   settings: Map<SettingsGroupType, ISettingDescription<any>[]>;
   onSettingsOpen?: (groupId: string) => void;
 }
 
-export const SettingsList = observer<Props>(function SettingsList({ treeData, source, settings, onSettingsOpen }) {
+export const SettingsList = observer<Props>(function SettingsList({ treeData, treeFilter, source, settings, onSettingsOpen }) {
+  const translate = useTranslate();
   const list = [];
   const groups = [...treeData.getChildren(treeData.rootId)];
   const ref = useTreeScrollSync(treeData, onSettingsOpen);
@@ -36,17 +39,17 @@ export const SettingsList = observer<Props>(function SettingsList({ treeData, so
     groups.splice(0, 1, ...treeData.getChildren(groupId));
 
     const group = ROOT_SETTINGS_GROUP.get(groupId)!;
-    const groupSettings = settings.get(group);
+    const groupSettings = settings.get(group)?.filter(settingsFilter(translate, treeFilter.filter));
 
     list.push({ group, settings: groupSettings || [] });
   }
 
   return (
-    <Container ref={ref} style={{ height: '100%' }} gap overflow>
+    <Container ref={ref} gap overflow>
       {list.map(({ group, settings }) => (
         <SettingsGroup key={group.id} group={group} source={source} settings={settings} />
       ))}
-      <div style={{ height: 'calc(100% - 100px)' }} hidden />
+      <div style={{ height: '25%' }} />
     </Container>
   );
 });

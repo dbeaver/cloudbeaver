@@ -50,6 +50,8 @@ export * from './TreeNew/contexts/TreeContext';
 export * from './TreeNew/contexts/TreeDataContext';
 export * from './TreeNew/NodeControlLazy';
 export * from './TreeNew/useTreeData';
+export * from './TreeNew/ITreeData';
+export * from './TreeNew/useTreeFilter';
 export * from './TreeNew/INode';
 
 export * from './NavigationTree/getNavigationTreeUserSettingsId';

@@ -16,6 +16,7 @@ import { rootNodeStateTransformer, rootNodeTransformer } from './DataTransformer
 import type { TreeDataTransformer } from './DataTransformers/TreeDataTransformer';
 import type { INode } from './INode';
 import type { INodeState } from './INodeState';
+import type { ITreeData } from './ITreeData';
 import type { TreeState } from './TreeState';
 import { useTreeState } from './useTreeState';
 
@@ -29,19 +30,6 @@ interface IOptions {
   childrenTransformers?: TreeDataTransformer<string[]>[];
   nodeTransformers?: TreeDataTransformer<INode>[];
   stateTransformers?: TreeDataTransformer<INodeState>[];
-}
-
-export interface ITreeData {
-  rootId: string;
-
-  getNode(id: string): INode;
-  getChildren: (node: string) => string[];
-  getState(id: string): Readonly<INodeState>;
-
-  updateAllState(state: Partial<INodeState>): void;
-  updateState(id: string, state: Partial<INodeState>): void;
-  load(nodeId: string, manual: boolean): Promise<void>;
-  update(): Promise<void>;
 }
 
 export function useTreeData(options: IOptions): ITreeData {
@@ -67,19 +55,23 @@ export function useTreeData(options: IOptions): ITreeData {
   const [nodeCache] = useState(
     () =>
       new MetadataMap<string, IComputedValue<INode>>(id =>
-        computed(() => applyTransforms(id, options.getNode(id), [rootNodeTransformer(options.rootId), ...(options.nodeTransformers || [])])),
+        computed(() =>
+          applyTransforms(treeData, id, options.getNode(id), [rootNodeTransformer(options.rootId), ...(options.nodeTransformers || [])]),
+        ),
       ),
   );
   const [childrenCache] = useState(
     () =>
       new MetadataMap<string, IComputedValue<string[]>>(id =>
-        computed(() => applyTransforms(id, options.getChildren(id), options.childrenTransformers)),
+        computed(() => applyTransforms(treeData, id, options.getChildren(id), options.childrenTransformers)),
       ),
   );
   const [stateCache] = useState(
     () =>
       new MetadataMap<string, IComputedValue<INodeState>>(id =>
-        computed(() => applyTransforms(id, state.getState(id), [rootNodeStateTransformer(options.rootId), ...(options.stateTransformers || [])])),
+        computed(() =>
+          applyTransforms(treeData, id, state.getState(id), [rootNodeStateTransformer(options.rootId), ...(options.stateTransformers || [])]),
+        ),
       ),
   );
 

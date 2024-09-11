@@ -46,7 +46,7 @@
     "@material/switch": "^4",
     "@material/theme": "^4",
     "@material/typography": "^4",
-    "@testing-library/jest-dom": "^6",
+    "@types/jest": "^29",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5"
   }

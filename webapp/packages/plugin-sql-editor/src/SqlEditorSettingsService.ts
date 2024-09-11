@@ -121,26 +121,36 @@ export class SqlEditorSettingsService extends Dependency {
 
     this.settingsManagerService.registerSettings(this.settings, () => {
       const settings: ISettingDescription<SqlEditorSettings>[] = [
-        // {
-        //   group: SQL_EDITOR_SETTINGS_GROUP,
-        //   key: 'disabled',
-        //   type: ESettingsValueType.Checkbox,
-        //   name: 'Disable SQL editor',
-        // },
-        // {
-        //   group: SQL_EDITOR_SETTINGS_GROUP,
-        //   key: 'maxFileSize',
-        //   type: ESettingsValueType.Input,
-        //   name: 'Max file size (KB)',
-        //   description: 'Max file size for SQL editor in kilobytes',
-        // },
-        // {
-        //   group: SQL_EDITOR_SETTINGS_GROUP,
-        //   key: 'autoSave',
-        //   type: ESettingsValueType.Checkbox,
-        //   name: 'Auto save',
-        //   description: 'Auto save SQL editor content',
-        // },
+        {
+          group: SQL_EDITOR_SETTINGS_GROUP,
+          key: 'plugin.sql-editor.disabled',
+          access: {
+            scope: ['server'],
+          },
+          type: ESettingsValueType.Checkbox,
+          name: 'plugin_sql_editor_settings_disable',
+          description: 'plugin_sql_editor_settings_disable_description',
+        },
+        {
+          group: SQL_EDITOR_SETTINGS_GROUP,
+          key: 'plugin.sql-editor.maxFileSize',
+          access: {
+            scope: ['client', 'server'],
+          },
+          type: ESettingsValueType.Input,
+          name: 'plugin_sql_editor_settings_import_max_size',
+          description: 'plugin_sql_editor_settings_import_max_size_description',
+        },
+        {
+          group: SQL_EDITOR_SETTINGS_GROUP,
+          key: 'plugin.sql-editor.autoSave',
+          access: {
+            scope: ['client'],
+          },
+          type: ESettingsValueType.Checkbox,
+          name: 'plugin_sql_editor_settings_auto_save',
+          description: 'plugin_sql_editor_settings_auto_save_description',
+        },
       ];
 
       if (!this.serverSettingsManagerService.providedSettings.has('sql.proposals.insert.table.alias')) {
