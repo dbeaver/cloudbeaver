@@ -78,7 +78,7 @@ export const Settings = observer<ISettingsProps>(function Settings({ source, acc
       <Group style={{ height: '100%', minWidth: '240px' }} box keepSize overflow>
         <SettingsGroups treeData={treeData} onClick={handleClick} />
       </Group>
-      <Container style={{ height: '100%' }} overflow vertical gap fill>
+      <Container style={{ height: '100%' }} overflow vertical gap noWrap>
         <Container gap keepSize>
           <Filter
             value={treeFilter.filter}
@@ -86,7 +86,9 @@ export const Settings = observer<ISettingsProps>(function Settings({ source, acc
             onChange={filter => treeFilter.setFilter(filter)}
           />
         </Container>
-        <SettingsList treeData={treeData} treeFilter={treeFilter} source={source} settings={settings.settings} />
+        <Container overflow vertical>
+          <SettingsList treeData={treeData} treeFilter={treeFilter} source={source} settings={settings.settings} />
+        </Container>
       </Container>
     </Container>
   );

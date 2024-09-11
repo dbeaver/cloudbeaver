@@ -21,14 +21,14 @@ export const UserProfileOptionsPanel = observer(function UserProfileOptionsPanel
   const styles = useS(style);
   const userProfileTabsService = useService(UserProfileTabsService);
   return (
-    <ColoredContainer className={s(styles, { userProfileOptionsPanel: true })} parent compact vertical noWrap maximum>
+    <ColoredContainer className={s(styles, { userProfileOptionsPanel: true })} overflow parent compact vertical noWrap maximum>
       <TabsState container={userProfileTabsService.tabContainer} lazy>
-        <Group box keepSize noWrap>
+        <Group overflow box keepSize noWrap>
           <SContext registry={tabsStyleRegistry}>
             <TabList underline />
           </SContext>
         </Group>
-        <Container vertical>
+        <Container overflow vertical noWrap>
           <TabPanelList />
         </Container>
       </TabsState>
