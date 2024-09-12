@@ -7,11 +7,12 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, Filter, Group, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, Filter, Group, s, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import { type ISettingsSource, ROOT_SETTINGS_GROUP, SettingsGroup } from '@cloudbeaver/core-settings';
 import { useTreeData, useTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
 import { getSettingGroupId } from './getSettingGroupId';
+import classes from './Settings.module.css';
 import { settingsFilter } from './settingsFilter';
 import { SettingsGroups } from './SettingsGroups/SettingsGroups';
 import { SettingsList } from './SettingsList';
@@ -75,10 +76,10 @@ export const Settings = observer<ISettingsProps>(function Settings({ source, acc
 
   return (
     <Container gap overflow noWrap>
-      <Group style={{ height: '100%', width: '240px' }} vertical box keepSize overflow>
+      <Group className={s(classes, { settingsGroups: true })} vertical box keepSize overflow>
         <SettingsGroups treeData={treeData} onClick={handleClick} />
       </Group>
-      <Container style={{ height: '100%' }} overflow vertical gap noWrap>
+      <Container className={s(classes, { settingsContainer: true })} overflow vertical gap noWrap>
         <Container gap keepSize>
           <Filter
             state={treeFilter}
