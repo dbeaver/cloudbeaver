@@ -17,18 +17,17 @@
 
 package io.cloudbeaver.server;
 
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.server.jobs.SessionStateJob;
 import io.cloudbeaver.server.jobs.WebDataSourceMonitorJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
 import io.cloudbeaver.service.session.WebSessionManager;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBFileController;
@@ -43,7 +42,6 @@ import org.jkiss.dbeaver.model.qm.QMRegistry;
 import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -71,8 +69,6 @@ public class CBPlatform extends BasePlatformImpl {
     private static final Log log = Log.getLog(CBPlatform.class);
     public static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
     public static final String TEMP_FILE_IMPORT_FOLDER = "temp-import-files";
-
-    public static final String WORK_DATA_FOLDER_NAME = ".work-data";
 
     @Nullable
     private static CBApplication<?> application = null;
@@ -106,7 +102,7 @@ public class CBPlatform extends BasePlatformImpl {
         SecurityProviderUtils.registerSecurityProvider();
 
         // Register properties adapter
-        this.workspace = new WebGlobalWorkspace(this, ResourcesPlugin.getWorkspace());
+        this.workspace = new WebGlobalWorkspace(this);
         this.workspace.initializeProjects();
 
         QMUtils.initApplication(this);
@@ -162,14 +158,6 @@ public class CBPlatform extends BasePlatformImpl {
         }
         DataSourceProviderRegistry.dispose();
 
-        if (workspace != null) {
-            try {
-                workspace.save(new VoidProgressMonitor());
-            } catch (DBException ex) {
-                log.error("Can't save workspace", ex); //$NON-NLS-1$
-            }
-        }
-
         // Remove temp folder
         if (tempFolder != null) {
 
@@ -222,7 +210,7 @@ public class CBPlatform extends BasePlatformImpl {
         if (tempFolder == null) {
             // Make temp folder
             monitor.subTask("Create temp folder");
-            tempFolder = workspace.getAbsolutePath().resolve(WORK_DATA_FOLDER_NAME);
+            tempFolder = workspace.getAbsolutePath().resolve(DBWConstants.WORK_DATA_FOLDER_NAME);
         }
         if (!Files.exists(tempFolder)) {
             try {

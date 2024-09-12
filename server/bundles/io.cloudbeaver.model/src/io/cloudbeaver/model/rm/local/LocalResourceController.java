@@ -37,6 +37,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
@@ -130,12 +131,7 @@ public class LocalResourceController implements RMController {
             if (project == null || refresh) {
                 SessionContextImpl sessionContext = new SessionContextImpl(null);
                 RMProject rmProject = makeProjectFromId(projectId, false);
-                project = new BaseWebProjectImpl(
-                    workspace,
-                    this,
-                    sessionContext,
-                    rmProject,
-                    (container) -> true);
+                project = new InternalWebProjectImpl(sessionContext, rmProject);
                 projectRegistries.put(projectId, project);
             }
             return project;
@@ -1288,5 +1284,22 @@ public class LocalResourceController implements RMController {
             rmProjectName.name.equals(userId);
     }
 
+
+    private class InternalWebProjectImpl extends BaseWebProjectImpl {
+        public InternalWebProjectImpl(SessionContextImpl sessionContext, RMProject rmProject) {
+            super(
+                LocalResourceController.this.workspace,
+                LocalResourceController.this,
+                sessionContext,
+                rmProject,
+                (container) -> true);
+        }
+
+        @NotNull
+        @Override
+        protected DBPDataSourceRegistry createDataSourceRegistry() {
+            return new DataSourceRegistry(this);
+        }
+    }
 
 }
