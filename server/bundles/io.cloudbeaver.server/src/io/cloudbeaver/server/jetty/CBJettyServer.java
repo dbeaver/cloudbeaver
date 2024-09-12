@@ -190,7 +190,7 @@ public class CBJettyServer {
         @NotNull ServletContextHandler servletContextHandler
     ) {
         // Init sessions persistence
-        CBSessionHandler sessionHandler = new CBSessionHandler(application);
+        SessionHandler sessionHandler = new SessionHandler();
         var maxIdleTime = application.getMaxSessionIdleTime();
         int intMaxIdleSeconds;
         if (maxIdleTime > Integer.MAX_VALUE) {
