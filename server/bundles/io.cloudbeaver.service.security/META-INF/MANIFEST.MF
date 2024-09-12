@@ -14,7 +14,8 @@ Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.dbeaver.model.sql.jdbc,
  org.jkiss.dbeaver.registry;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp;visibility:=reexport,
- io.cloudbeaver.model
+ io.cloudbeaver.model,
+ org.jkiss.dbeaver.db.internal
 Export-Package: io.cloudbeaver.auth.provider.local,
  io.cloudbeaver.auth.provider.rp,
  io.cloudbeaver.service.security,

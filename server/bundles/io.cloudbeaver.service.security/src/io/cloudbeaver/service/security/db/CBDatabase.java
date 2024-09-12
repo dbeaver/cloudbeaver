@@ -67,7 +67,7 @@ import java.util.stream.Collectors;
 /**
  * Database management
  */
-public class CBDatabase {
+public class CBDatabase extends InternalDB {
     private static final Log log = Log.getLog(CBDatabase.class);
 
     public static final String SCHEMA_CREATE_SQL_PATH = "db/cb_schema_create.sql";
