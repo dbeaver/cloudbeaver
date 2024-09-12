@@ -23,16 +23,23 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.util.Callback;
+import org.jkiss.code.NotNull;
 import org.jkiss.utils.IOUtils;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class ProxyResourceHandler extends Handler.Wrapper {
+    @NotNull
+    private final Path contentRoot;
+
+    public ProxyResourceHandler(@NotNull Path contentRoot) {
+        this.contentRoot = contentRoot;
+    }
 
     public boolean handle(Request request, Response response, Callback callback) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -40,8 +47,11 @@ public class ProxyResourceHandler extends Handler.Wrapper {
         if (!pathInContext.endsWith("index.html") && !pathInContext.endsWith("sso.html")) {
             return super.handle(request, response, callback);
         }
-        File file = new File(pathInContext);
-        try (InputStream fis = new FileInputStream(file)) {
+        if (pathInContext.startsWith("/")) {
+            pathInContext = pathInContext.substring(1);
+        }
+        var filePath = contentRoot.resolve(pathInContext);
+        try (InputStream fis = Files.newInputStream(filePath)) {
             IOUtils.copyStream(fis, baos);
         }
         String indexContents = baos.toString(StandardCharsets.UTF_8);

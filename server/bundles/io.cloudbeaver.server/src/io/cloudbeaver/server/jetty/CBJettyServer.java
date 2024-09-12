@@ -90,8 +90,9 @@ public class CBJettyServer {
 
             {
                 // Handler configuration
+                Path contentRootPath = Path.of(serverConfiguration.getContentRoot());
                 ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
-                servletContextHandler.setBaseResourceAsString(serverConfiguration.getContentRoot());
+                servletContextHandler.setBaseResourceAsPath(contentRootPath);
                 String rootURI = serverConfiguration.getRootURI();
                 servletContextHandler.setContextPath(rootURI);
 
@@ -99,7 +100,11 @@ public class CBJettyServer {
                 staticServletHolder.setInitParameter("dirAllowed", "false");
                 staticServletHolder.setInitParameter("cacheControl", "public, max-age=" + CBStaticServlet.STATIC_CACHE_SECONDS);
                 servletContextHandler.addServlet(staticServletHolder, "/");
-                servletContextHandler.insertHandler(new ProxyResourceHandler());
+                servletContextHandler.insertHandler(new ProxyResourceHandler(Path.of(serverConfiguration.getContentRoot())));
+
+                if (Files.isSymbolicLink(contentRootPath)) {
+                    servletContextHandler.addAliasCheck(new CBSymLinkContentAllowedAliasChecker(contentRootPath));
+                }
 
                 ServletHolder imagesServletHolder = new ServletHolder("images", new CBImageServlet());
                 servletContextHandler.addServlet(imagesServletHolder, serverConfiguration.getServicesURI() + "images/*");
