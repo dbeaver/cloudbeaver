@@ -24,12 +24,11 @@ import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.apache.commons.dbcp2.*;
-import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.db.internal.InternalDB;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
@@ -237,27 +236,6 @@ public class CBDatabase extends InternalDB {
         log.debug("\tManagement database connection established");
     }
 
-    protected PoolingDataSource<PoolableConnection> initConnectionPool(
-        DBPDriver driver,
-        String dbURL,
-        Properties dbProperties,
-        Driver driverInstance
-    ) throws SQLException, DBException {
-        // Create connection pool with custom connection factory
-        log.debug("\tInitiate connection pool with management database (" + driver.getFullName() + "; " + dbURL + ")");
-        DriverConnectionFactory conFactory = new DriverConnectionFactory(driverInstance, dbURL, dbProperties);
-        PoolableConnectionFactory pcf = new PoolableConnectionFactory(conFactory, null);
-        pcf.setValidationQuery(databaseConfiguration.getPool().getValidationQuery());
-
-        GenericObjectPoolConfig<PoolableConnection> config = new GenericObjectPoolConfig<>();
-        config.setMinIdle(databaseConfiguration.getPool().getMinIdleConnections());
-        config.setMaxIdle(databaseConfiguration.getPool().getMaxIdleConnections());
-        config.setMaxTotal(databaseConfiguration.getPool().getMaxConnections());
-        GenericObjectPool<PoolableConnection> connectionPool = new GenericObjectPool<>(pcf, config);
-        pcf.setPool(connectionPool);
-        return new PoolingDataSource<>(connectionPool);
-    }
-
     //TODO move out
     public void finishConfiguration(
         @NotNull String adminName,
@@ -349,17 +327,6 @@ public class CBDatabase extends InternalDB {
             userId,
             Arrays.stream(allTeams).map(SMTeam::getTeamId).toArray(String[]::new),
             userId);
-    }
-
-    public void shutdown() {
-        log.debug("Shutdown database");
-        if (cbDataSource != null) {
-            try {
-                cbDataSource.close();
-            } catch (SQLException e) {
-                log.error(e);
-            }
-        }
     }
 
     private class CBSchemaVersionManager implements SQLSchemaVersionManager {
@@ -557,33 +524,12 @@ public class CBDatabase extends InternalDB {
         }
     }
 
-    private String getCurrentInstanceId() throws IOException {
-        // 16 chars - workspace ID
-        String workspaceId = DBWorkbench.getPlatform().getWorkspace().getWorkspaceId();
-        if (workspaceId.length() > 16) {
-            workspaceId = workspaceId.substring(0, 16);
-        }
-
-        StringBuilder id = new StringBuilder(36);
-        id.append("000000000000"); // there was mac address, but it generates dynamically when docker is used
-        id.append(":").append(workspaceId).append(":");
-        while (id.length() < 36) {
-            id.append("X");
-        }
-        return id.toString();
-    }
-
     /**
      * Replaces all predefined prefixes in sql query.
      */
     @NotNull
     public String normalizeTableNames(@NotNull String sql) {
         return CommonUtils.normalizeTableNames(sql, databaseConfiguration.getSchema());
-    }
-
-    @NotNull
-    public SQLDialect getDialect() {
-        return dialect;
     }
 
     public static boolean isDefaultH2Configuration(WebDatabaseConfig databaseConfiguration) {
