@@ -7,12 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, s, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import { type ISettingDescription, type ISettingsSource, type SettingsGroup as SettingsGroupType } from '@cloudbeaver/core-settings';
 import type { ITreeData, ITreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
 import { getGroupsFromTree } from './getGroupsFromTree';
 import { SettingsGroup } from './SettingsGroup';
+import classes from './SettingsList.module.css';
 import { useTreeScrollSync } from './useTreeScrollSync';
 
 interface Props {
@@ -34,7 +35,7 @@ export const SettingsList = observer<Props>(function SettingsList({ treeData, tr
         <SettingsGroup key={group.id} group={group} source={source} settings={settings} treeFilter={treeFilter} />
       ))}
       {groups.length === 0 && <TextPlaceholder>{translate('plugin_settings_panel_no_settings')}</TextPlaceholder>}
-      <div style={{ height: '25%' }} />
+      <div className={s(classes, { spaceFill: true })} />
     </Container>
   );
 });
