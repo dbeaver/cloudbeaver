@@ -98,7 +98,7 @@ public class CBJettyServer {
                 ServletHolder staticServletHolder = new ServletHolder("static", new CBStaticServlet());
                 staticServletHolder.setInitParameter("dirAllowed", "false");
                 staticServletHolder.setInitParameter("cacheControl", "public, max-age=" + CBStaticServlet.STATIC_CACHE_SECONDS);
-                servletContextHandler.addServlet(staticServletHolder, "/*");
+                servletContextHandler.addServlet(staticServletHolder, "/");
                 servletContextHandler.insertHandler(new ProxyResourceHandler());
 
                 ServletHolder imagesServletHolder = new ServletHolder("images", new CBImageServlet());
