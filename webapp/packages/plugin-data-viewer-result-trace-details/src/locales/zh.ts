@@ -6,6 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 export default [
-  ['plugin_data_viewer_result_trace_details', 'Result details'],
-  ['plugin_data_viewer_result_trace_no_data_placeholder', 'No trace details were found'],
+  ['plugin_data_viewer_result_trace_details', '结果明细'],
+  ['plugin_data_viewer_result_trace_no_data_placeholder', '未找到跟踪详细信息'],
 ];
