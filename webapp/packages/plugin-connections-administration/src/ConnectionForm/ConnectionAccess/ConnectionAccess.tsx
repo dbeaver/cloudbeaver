@@ -63,7 +63,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
   }
 
   const loading = users.isLoading() || teams.isLoading() || state.state.loading;
-  const cloud = formState.info ? isCloudConnection(formState.info) : false;
+  const cloud = formState.info ? isCloudConnection(formState.originInfo) : false;
   const disabled = loading || !state.state.loaded || formState.disabled || cloud;
   let info: TLocalizationToken | null = null;
 

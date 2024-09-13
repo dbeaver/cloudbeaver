@@ -81,7 +81,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const service = useService(ConnectionFormService);
   const formRef = useRef<HTMLFormElement>(null);
   const translate = useTranslate();
-  const { info, config, availableDrivers, submittingTask: submittingHandlers, disabled } = state;
+  const { info, originInfo, config, availableDrivers, submittingTask: submittingHandlers, disabled } = state;
   const style = useS(styles);
   const tabsState = useContext(TabsContext);
   const isSharedProject = projectInfoResource.isProjectShared(state.projectId);
@@ -149,7 +149,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   });
 
   const edit = state.mode === 'edit';
-  const originLocal = !info || isLocalConnection(info);
+  const originLocal = !info || (originInfo && isLocalConnection(originInfo));
 
   const drivers = driverMap.resource.enabledDrivers.filter(({ id }) => availableDrivers.includes(id));
 

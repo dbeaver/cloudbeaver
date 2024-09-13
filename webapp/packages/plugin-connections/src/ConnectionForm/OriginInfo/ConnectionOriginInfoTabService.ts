@@ -41,19 +41,11 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
       tab: () => OriginInfoTab,
       panel: () => OriginInfo,
       stateGetter: () => () => ({}),
-      isHidden: (tabId, props) => (props?.state.info ? isLocalConnection(props.state.info) : true),
+      isHidden: (tabId, props) => (props?.state.originInfo ? isLocalConnection(props.state.originInfo) : true),
     });
-
-    this.connectionFormService.configureTask.addHandler(this.configure.bind(this));
 
     this.connectionFormService.actionsContainer.add(ConnectionFormAuthenticationAction, 0);
   }
 
   load(): void {}
-
-  private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
-    const configuration = contexts.getContext(connectionFormConfigureContext);
-
-    configuration.include('includeOrigin');
-  }
 }

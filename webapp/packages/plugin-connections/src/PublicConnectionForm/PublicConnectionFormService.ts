@@ -9,7 +9,13 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import {
+  ConnectionInfoOriginResource,
+  ConnectionInfoResource,
+  ConnectionsManagerService,
+  createConnectionParam,
+  IConnectionInfoParams,
+} from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -43,6 +49,7 @@ export class PublicConnectionFormService {
     private readonly authenticationService: AuthenticationService,
     private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
+    private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
   ) {
     this.formState = null;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
@@ -82,6 +89,7 @@ export class PublicConnectionFormService {
         this.projectInfoResource,
         this.connectionFormService,
         this.connectionInfoResource,
+        this.connectionInfoOriginResource,
       );
 
       this.formState.closeTask.addHandler(this.close.bind(this, true));

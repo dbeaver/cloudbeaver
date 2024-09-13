@@ -13,6 +13,7 @@ import {
   compareNewConnectionsInfo,
   Connection,
   ConnectionInfoActiveProjectKey,
+  ConnectionInfoOriginResource,
   ConnectionInfoResource,
   createConnectionParam,
   DatabaseConnection,
@@ -24,6 +25,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { isGlobalProject, isSharedProject, ProjectInfoResource, projectInfoSortByName } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
+import { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
 import { isArraysEqual, isDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
 
 @injectable()
@@ -66,6 +68,10 @@ export class ConnectionsAdministrationController {
       });
   }
 
+  get connectionsOrigins(): DatabaseConnectionOriginFragment[] {
+    return this.connectionInfoOriginResource.get(ConnectionInfoActiveProjectKey).filter(isDefined) ?? [];
+  }
+
   get itemsSelected(): boolean {
     return Array.from(this.selectedItems.values()).some(v => v);
   }
@@ -76,10 +82,12 @@ export class ConnectionsAdministrationController {
     private readonly commonDialogService: CommonDialogService,
     private readonly localizationService: LocalizationService,
     private readonly projectInfoResource: ProjectInfoResource,
+    private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
   ) {
     makeObservable(this, {
       isProcessing: observable,
       connections: computed<DatabaseConnection[]>({ equals: (a, b) => isArraysEqual(a, b) }),
+      connectionsOrigins: computed<DatabaseConnectionOriginFragment[]>({ equals: (a, b) => isArraysEqual(a, b) }),
       keys: computed<IConnectionInfoParams[]>({ equals: (a, b) => isArraysEqual(a, b, isObjectsEqual) }),
       itemsSelected: computed,
     });
@@ -91,7 +99,10 @@ export class ConnectionsAdministrationController {
     }
     this.isProcessing = true;
     try {
-      await this.connectionInfoResource.refresh(ConnectionInfoActiveProjectKey);
+      await Promise.all([
+        this.connectionInfoResource.refresh(ConnectionInfoActiveProjectKey),
+        this.connectionInfoOriginResource.refresh(ConnectionInfoActiveProjectKey),
+      ]);
       this.connectionInfoResource.cleanNewFlags();
       this.notificationService.logSuccess({ title: 'connections_administration_tools_refresh_success' });
     } catch (exception: any) {

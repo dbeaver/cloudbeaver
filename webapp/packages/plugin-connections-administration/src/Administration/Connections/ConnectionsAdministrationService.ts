@@ -15,11 +15,13 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
 
 import { CreateConnectionService } from './CreateConnectionService';
 
 export interface IConnectionDetailsPlaceholderProps {
   connection: DatabaseConnection;
+  connectionOrigin: DatabaseConnectionOriginFragment;
 }
 
 const ConnectionsAdministration = React.lazy(async () => {

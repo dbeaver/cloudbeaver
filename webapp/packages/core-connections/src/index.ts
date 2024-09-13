@@ -32,6 +32,8 @@ export * from './ConnectionFolderResource';
 export * from './ConnectionDialectResource';
 export * from './ConnectionInfoEventHandler';
 export * from './ConnectionInfoResource';
+export * from './ConnectionInfoOriginResource';
+export * from './ConnectionInfoOriginDetailsResource';
 export * from './CONNECTIONS_SETTINGS_GROUP';
 export * from './EConnectionFeature';
 export * from './ConnectionsSettingsService';

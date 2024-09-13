@@ -27,6 +27,7 @@ import {
 import { Connection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
+import { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
 
 import { getFilteredConnections } from './getFilteredConnections';
 import style from './GrantedConnectionsList.module.css';
@@ -36,12 +37,19 @@ import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem';
 
 interface Props {
   grantedConnections: Connection[];
+  connectionsOrigins: DatabaseConnectionOriginFragment[];
   disabled: boolean;
   onRevoke: (subjectIds: string[]) => void;
   onEdit: () => void;
 }
 
-export const GrantedConnectionList = observer<Props>(function GrantedConnectionList({ grantedConnections, disabled, onRevoke, onEdit }) {
+export const GrantedConnectionList = observer<Props>(function GrantedConnectionList({
+  connectionsOrigins,
+  grantedConnections,
+  disabled,
+  onRevoke,
+  onEdit,
+}) {
   const props = useObjectRef({ onRevoke, onEdit });
   const styles = useS(style);
   const translate = useTranslate();
@@ -51,7 +59,7 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
 
-  const connections = getFilteredConnections(grantedConnections, filterState.filterValue);
+  const connections = getFilteredConnections(grantedConnections, connectionsOrigins, filterState.filterValue);
   const keys = connections.map(connection => connection.id);
 
   const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));

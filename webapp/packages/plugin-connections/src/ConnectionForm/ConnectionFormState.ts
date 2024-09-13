@@ -7,7 +7,13 @@
  */
 import { action, computed, makeObservable, observable } from 'mobx';
 
-import { ConnectionInfoResource, createConnectionParam, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import {
+  ConnectionInfoOriginResource,
+  ConnectionInfoResource,
+  createConnectionParam,
+  DatabaseConnection,
+  IConnectionInfoParams,
+} from '@cloudbeaver/core-connections';
 import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
 import type { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { ResourceKeySimple } from '@cloudbeaver/core-resource';
@@ -56,6 +62,14 @@ export class ConnectionFormState implements IConnectionFormState {
     return this.resource.get(createConnectionParam(this.projectId, this.config.connectionId));
   }
 
+  get originInfo() {
+    if (!this.config.connectionId || this.projectId === null) {
+      return undefined;
+    }
+
+    return this.originResource.get(createConnectionParam(this.projectId, this.config.connectionId));
+  }
+
   get readonly(): boolean {
     if (this.stateInfo?.readonly) {
       return true;
@@ -96,6 +110,7 @@ export class ConnectionFormState implements IConnectionFormState {
     private readonly projectInfoResource: ProjectInfoResource,
     service: ConnectionFormService,
     resource: ConnectionInfoResource,
+    private readonly originResource: ConnectionInfoOriginResource,
   ) {
     this._id = uuid();
     this.initError = null;
@@ -165,6 +180,7 @@ export class ConnectionFormState implements IConnectionFormState {
       availableDrivers: computed,
       _availableDrivers: observable,
       info: computed,
+      originInfo: computed,
       statusMessage: observable,
       configured: observable,
       readonly: computed,

@@ -26,6 +26,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { Connection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
 
 import styles from './ConnectionList.module.css';
 import { getFilteredConnections } from './getFilteredConnections';
@@ -35,12 +36,13 @@ import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem';
 
 interface Props {
   connectionList: Connection[];
+  connectionsOrigins: DatabaseConnectionOriginFragment[];
   grantedSubjects: string[];
   disabled: boolean;
   onGrant: (subjectIds: string[]) => void;
 }
 
-export const ConnectionList = observer<Props>(function ConnectionList({ connectionList, grantedSubjects, disabled, onGrant }) {
+export const ConnectionList = observer<Props>(function ConnectionList({ connectionList, connectionsOrigins, grantedSubjects, disabled, onGrant }) {
   const props = useObjectRef({ onGrant });
   const style = useS(styles);
   const translate = useTranslate();
@@ -57,7 +59,7 @@ export const ConnectionList = observer<Props>(function ConnectionList({ connecti
     selectedSubjects.clear();
   }, []);
 
-  const connections = getFilteredConnections(connectionList, filterState.filterValue);
+  const connections = getFilteredConnections(connectionList, connectionsOrigins, filterState.filterValue);
   const keys = connections.map(connection => connection.id);
 
   return (

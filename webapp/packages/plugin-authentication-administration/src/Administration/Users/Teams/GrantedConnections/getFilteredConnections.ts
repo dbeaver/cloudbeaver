@@ -6,14 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 import { isCloudConnection } from '@cloudbeaver/core-connections';
-import type { DatabaseConnectionFragment } from '@cloudbeaver/core-sdk';
+import type { DatabaseConnectionFragment, DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
 
 /**
  * @param  {DatabaseConnectionFragment[]} connections
  * @param  {string} filter
  */
-export function getFilteredConnections(connections: DatabaseConnectionFragment[], filter: string): DatabaseConnectionFragment[] {
+export function getFilteredConnections(
+  connections: DatabaseConnectionFragment[],
+  connectionsOrigin: DatabaseConnectionOriginFragment[],
+  filter: string,
+): DatabaseConnectionFragment[] {
+  const connectionsOriginsMap = new Map<string, DatabaseConnectionOriginFragment>();
+
+  for (const connectionOrigin of connectionsOrigin) {
+    connectionsOriginsMap.set(connectionOrigin.id, connectionOrigin);
+  }
+
   return connections
-    .filter(connection => connection.name.toLowerCase().includes(filter.toLowerCase()) && !isCloudConnection(connection))
+    .filter(
+      connection => connection.name.toLowerCase().includes(filter.toLowerCase()) && !isCloudConnection(connectionsOriginsMap.get(connection.id)),
+    )
     .sort((a, b) => a.name.localeCompare(b.name));
 }

@@ -12,11 +12,11 @@ import { Tab, TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 
-export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = observer(function OriginInfoTab({ state: { info }, ...rest }) {
+export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = observer(function OriginInfoTab({ state: { originInfo }, ...rest }) {
   return (
     <Tab {...rest}>
       <TabTitle>
-        <Translate token={info?.origin?.displayName || 'Origin'} />
+        <Translate token={originInfo?.origin?.displayName || 'Origin'} />
       </TabTitle>
     </Tab>
   );

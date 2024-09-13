@@ -1,0 +1,8 @@
+fragment DatabaseConnectionOrigin on ConnectionInfo {
+  id
+  projectId
+  driverId
+  origin {
+    ...ObjectOriginInfo
+  }
+}

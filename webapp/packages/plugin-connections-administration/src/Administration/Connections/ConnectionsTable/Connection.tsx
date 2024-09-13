@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Loader, Placeholder, s, StaticImage, TableColumnValue, TableItem, TableItemExpand, TableItemSelect, useS } from '@cloudbeaver/core-blocks';
 import { DatabaseConnection, DBDriverResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsAdministrationService } from '../ConnectionsAdministrationService';
 import styles from './Connection.module.css';
@@ -18,10 +19,11 @@ import { ConnectionEdit } from './ConnectionEdit';
 interface Props {
   connectionKey: IConnectionInfoParams;
   connection: DatabaseConnection;
+  connectionOrigin: DatabaseConnectionOriginFragment;
   projectName?: string | null;
 }
 
-export const Connection = observer<Props>(function Connection({ connectionKey, connection, projectName }) {
+export const Connection = observer<Props>(function Connection({ connectionKey, connection, projectName, connectionOrigin }) {
   const driversResource = useService(DBDriverResource);
   const connectionsAdministrationService = useService(ConnectionsAdministrationService);
   const icon = driversResource.get(connection.driverId)?.icon;
@@ -52,7 +54,11 @@ export const Connection = observer<Props>(function Connection({ connectionKey, c
       )}
       <TableColumnValue flex>
         <Loader suspense small inline hideMessage>
-          <Placeholder container={connectionsAdministrationService.connectionDetailsPlaceholder} connection={connection} />
+          <Placeholder
+            container={connectionsAdministrationService.connectionDetailsPlaceholder}
+            connectionOrigin={connectionOrigin}
+            connection={connection}
+          />
         </Loader>
       </TableColumnValue>
     </TableItem>

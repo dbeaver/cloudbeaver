@@ -2,8 +2,6 @@ mutation createConnectionFromTemplate(
   $projectId: ID!
   $templateId: ID!
   $connectionName: String!
-  $includeOrigin: Boolean!
-  $customIncludeOriginDetails: Boolean!
   $includeAuthProperties: Boolean!
   $includeNetworkHandlersConfig: Boolean!
   $includeCredentialsSaved: Boolean!

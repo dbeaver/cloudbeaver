@@ -26,7 +26,12 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import {
+  ConnectionInfoActiveProjectKey,
+  ConnectionInfoOriginResource,
+  ConnectionInfoResource,
+  DBDriverResource,
+} from '@cloudbeaver/core-connections';
 import { useController, useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
@@ -60,6 +65,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
     key: ConnectionInfoActiveProjectKey,
     includes: ['customIncludeOptions'],
   });
+  useResource(ConnectionsAdministration, ConnectionInfoOriginResource, ConnectionInfoActiveProjectKey);
   useResource(ConnectionsAdministration, DBDriverResource, CachedMapAllKey);
 
   return (
@@ -112,6 +118,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
               <ConnectionsTable
                 keys={controller.keys}
                 connections={controller.connections}
+                connectionsOrigins={controller.connectionsOrigins}
                 selectedItems={controller.selectedItems}
                 expandedItems={controller.expandedItems}
               />

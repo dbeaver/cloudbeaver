@@ -20,10 +20,18 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { Connection, ConnectionInfoProjectKey, ConnectionInfoResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
+import {
+  Connection,
+  ConnectionInfoOriginResource,
+  ConnectionInfoProjectKey,
+  ConnectionInfoResource,
+  DBDriverResource,
+  isCloudConnection,
+} from '@cloudbeaver/core-connections';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { isGlobalProject, ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormProps } from '../ITeamFormProps';
@@ -49,10 +57,12 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
   useResource(GrantedConnections, DBDriverResource, CachedMapAllKey, { active: selected });
 
   const connectionsLoader = useResource(GrantedConnections, ConnectionInfoResource, globalConnectionsKey, { active: selected });
+  const connectionsOriginLoader = useResource(GrantedConnections, ConnectionInfoOriginResource, globalConnectionsKey, { active: selected });
 
   const connections = connectionsLoader.data as Connection[];
 
   const grantedConnections = getComputed(() => connections.filter(connection => state.state.grantedSubjects.includes(connection.id)));
+  const connectionsOrigins = (connectionsOriginLoader.data ?? []) as DatabaseConnectionOriginFragment[];
 
   useAutoLoad(GrantedConnections, state, selected && !loaded);
 
@@ -62,7 +72,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
 
   let info: TLocalizationToken | null = null;
 
-  const cloudExists = connections.some(isCloudConnection);
+  const cloudExists = connectionsOrigins.some(isCloudConnection);
 
   if (cloudExists) {
     info = 'cloud_connections_access_placeholder';
@@ -86,6 +96,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
               <Container gap overflow>
                 <GrantedConnectionList
                   grantedConnections={grantedConnections}
+                  connectionsOrigins={connectionsOrigins}
                   disabled={formState.disabled}
                   onEdit={state.edit}
                   onRevoke={state.revoke}
@@ -93,6 +104,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
                 {state.state.editing && (
                   <ConnectionList
                     connectionList={connections}
+                    connectionsOrigins={connectionsOrigins}
                     grantedSubjects={state.state.grantedSubjects}
                     disabled={formState.disabled}
                     onGrant={state.grant}
