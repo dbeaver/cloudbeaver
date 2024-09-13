@@ -20,3 +20,7 @@ const urlPattern = new RegExp(
 export function isValidUrl(value: string): boolean {
   return value.startsWith('https://') || value.startsWith('http://');
 }
+
+export function isValidWebsiteUrl(value: string): boolean {
+  return urlPattern.test(value);
+}
