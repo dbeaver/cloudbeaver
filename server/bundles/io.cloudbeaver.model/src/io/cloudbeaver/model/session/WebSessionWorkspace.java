@@ -17,8 +17,10 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.WebProjectImpl;
+import org.eclipse.core.runtime.IAdaptable;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
@@ -130,6 +132,11 @@ public class WebSessionWorkspace implements DBPWorkspace {
     @Override
     public void dispose() {
         clearProjects();
+    }
+
+    @Override
+    public DBPImage getResourceIcon(IAdaptable resourceAdapter) {
+        return null;
     }
 
     public void setActiveProject(DBPProject activeProject) {
