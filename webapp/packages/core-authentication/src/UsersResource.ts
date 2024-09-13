@@ -135,7 +135,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       userId,
       authRole,
       enabled: false,
-      ...this.getDefaultIncludes(),
       ...this.getIncludesMap(userId),
     });
 
@@ -247,7 +246,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       if (userId !== undefined) {
         const { user } = await this.graphQLService.sdk.getAdminUserInfo({
           userId,
-          ...this.getDefaultIncludes(),
           ...this.getIncludesMap(userId, includes),
         });
 
@@ -280,7 +278,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
             userIdMask,
             enabledState,
           },
-          ...this.getDefaultIncludes(),
           ...this.getIncludesMap(userId, includes),
         });
 
@@ -294,12 +291,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     this.set(key, usersList);
 
     return this.data;
-  }
-
-  private getDefaultIncludes(): UserResourceIncludes {
-    return {
-      customIncludeOriginDetails: false,
-    };
   }
 
   protected dataSet(key: string, value: AdminUserInfoFragment): void {

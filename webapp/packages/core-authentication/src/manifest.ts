@@ -34,6 +34,7 @@ export const coreAuthenticationManifest: PluginManifest = {
     () => import('./UserMetaParametersResource').then(m => m.UserMetaParametersResource),
     () => import('./UserInfoMetaParametersResource').then(m => m.UserInfoMetaParametersResource),
     () => import('./UsersMetaDataResource').then(m => m.UsersMetaParametersResource),
+    () => import('./UsersOriginDetailsResource').then(m => m.UsersOriginDetailsResource),
     () => import('./UsersResource').then(m => m.UsersResource),
   ],
 };

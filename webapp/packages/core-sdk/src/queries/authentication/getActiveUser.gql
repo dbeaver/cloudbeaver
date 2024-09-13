@@ -1,4 +1,4 @@
-query getActiveUser($includeConfigurationParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+query getActiveUser($includeConfigurationParameters: Boolean!) {
   user: activeUser {
     userId
     displayName

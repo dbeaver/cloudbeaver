@@ -1,4 +1,4 @@
-query createUser($userId: ID!, $enabled: Boolean!, $authRole: String, $customIncludeOriginDetails: Boolean!) {
+query createUser($userId: ID!, $enabled: Boolean!, $authRole: String) {
   user: createUser(userId: $userId, enabled: $enabled, authRole: $authRole) {
     ...AdminUserInfo
   }

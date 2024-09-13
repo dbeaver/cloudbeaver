@@ -1,4 +1,4 @@
-mutation updateUserPreferences($preferences: Object!, $includeConfigurationParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+mutation updateUserPreferences($preferences: Object!, $includeConfigurationParameters: Boolean!) {
   user: setUserPreferences(preferences: $preferences) {
     userId
     displayName

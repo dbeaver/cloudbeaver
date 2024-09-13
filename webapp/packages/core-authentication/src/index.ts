@@ -24,6 +24,7 @@ export * from './UserDataService';
 export * from './UserInfoResource';
 export * from './UserMetaParametersResource';
 export * from './UserInfoMetaParametersResource';
+export * from './UsersOriginDetailsResource';
 export * from './UsersMetaDataResource';
 export * from './UsersResource';
 export * from './TeamMetaParametersResource';
