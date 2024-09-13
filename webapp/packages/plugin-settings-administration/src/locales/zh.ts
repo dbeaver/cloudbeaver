@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 export default [
-  ['plugin_settings_administration_settings_save_success', 'Preferences saved successfully'],
-  ['plugin_settings_administration_settings_save_fail', 'Preferences save failed'],
-  ['plugin_settings_administration_drawer_item_title', 'Global Preferences'],
+  ['plugin_settings_administration_settings_save_success', '偏好设置保存成功'],
+  ['plugin_settings_administration_settings_save_fail', '偏好设置保存失败'],
+  ['plugin_settings_administration_drawer_item_title', '全局偏好设置'],
 ];

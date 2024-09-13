@@ -6,6 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 export default [
-  ['core_theming_settings_theme_name', 'Theme'],
-  ['core_theming_settings_theme_description', 'Application color theme'],
+  ['core_theming_settings_theme_name', '主题'],
+  ['core_theming_settings_theme_description', '应用程序的颜色风格'],
 ];
