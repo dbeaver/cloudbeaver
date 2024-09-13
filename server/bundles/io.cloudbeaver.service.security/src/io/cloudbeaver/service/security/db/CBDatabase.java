@@ -45,12 +45,9 @@ import org.jkiss.dbeaver.model.sql.SQLDialectSchemaController;
 import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
-import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.storage.H2Migrator;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
-import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.SecurityUtils;
@@ -79,6 +76,7 @@ public class CBDatabase extends InternalDB {
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
     private static final String V1_DB_NAME = "cb.h2.dat";
     private static final String V2_DB_NAME = "cb.h2v2.dat";
+    public static final String CB_SCHEMA_INFO_TABLE_NAME = "CB_SCHEMA_INFO";
 
     private final WebApplication application;
     private final WebDatabaseConfig databaseConfiguration;
@@ -90,6 +88,7 @@ public class CBDatabase extends InternalDB {
     private SQLDialect dialect;
 
     public CBDatabase(WebApplication application, WebDatabaseConfig databaseConfiguration) {
+        super(databaseConfiguration, application);
         this.application = application;
         this.databaseConfiguration = databaseConfiguration;
     }
@@ -118,11 +117,8 @@ public class CBDatabase extends InternalDB {
         if (CommonUtils.isEmpty(databaseConfiguration.getDriver())) {
             throw new DBException("No database driver configured for CloudBeaver database");
         }
-        var dataSourceProviderRegistry = DataSourceProviderRegistry.getInstance();
-        DBPDriver driver = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
-        if (driver == null) {
-            throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
-        }
+        var dataSourceProviderRegistry = getDataSourceProviderRegistry();
+        DBPDriver driver = findDriver(dataSourceProviderRegistry);
 
         LoggingProgressMonitor monitor = new LoggingProgressMonitor(log);
 
@@ -162,7 +158,7 @@ public class CBDatabase extends InternalDB {
             }
         }
 
-        String dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), SystemVariablesResolver.INSTANCE);
+        String dbURL = getDbURL();
         Properties dbProperties = new Properties();
         if (!CommonUtils.isEmpty(dbUser)) {
             dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_USER, dbUser);
@@ -181,12 +177,12 @@ public class CBDatabase extends InternalDB {
         }
 
         // reload the driver and url due to a possible configuration update
-        driver = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
+        driver = findDriver(dataSourceProviderRegistry);
         if (driver == null) {
             throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
         }
-        Driver driverInstance = driver.getDriverInstance(monitor);
-        dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), SystemVariablesResolver.INSTANCE);
+        Driver driverInstance = getDriverInstance(driver, monitor);
+        dbURL = getDbURL();
 
         try {
             this.cbDataSource = initConnectionPool(driver, dbURL, dbProperties, driverInstance);
@@ -199,17 +195,8 @@ public class CBDatabase extends InternalDB {
             DatabaseMetaData metaData = connection.getMetaData();
             log.debug("\tConnected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
 
-            if (dialect instanceof SQLDialectSchemaController && CommonUtils.isNotEmpty(schemaName)) {
-                var dialectSchemaController = (SQLDialectSchemaController) dialect;
-                var schemaExistQuery = dialectSchemaController.getSchemaExistQuery(schemaName);
-                boolean schemaExist = JDBCUtils.executeQuery(connection, schemaExistQuery) != null;
-                if (!schemaExist) {
-                    log.info("Schema " + schemaName + " not exist, create new one");
-                    String createSchemaQuery = dialectSchemaController.getCreateSchemaQuery(
-                        schemaName
-                    );
-                    JDBCUtils.executeStatement(connection, createSchemaQuery);
-                }
+            if (dialect instanceof SQLDialectSchemaController dialectSchemaController && CommonUtils.isNotEmpty(schemaName)) {
+                createSchemaIfNotExists(connection, dialectSchemaController, schemaName);
             }
             SQLSchemaManager schemaManager = new SQLSchemaManager(
                 "CB",
@@ -342,7 +329,7 @@ public class CBDatabase extends InternalDB {
             } catch (SQLException e) {
                 try {
                     Object legacyVersion = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
-                        normalizeTableNames("SELECT SCHEMA_VERSION FROM {table_prefix}CB_SERVER")));
+                        normalizeTableNames("SELECT SCHEMA_VERSION FROM {table_prefix}CB_SERVER"))); // may be remove?
                     // Table CB_SERVER exist - this is a legacy schema
                     return LEGACY_SCHEMA_VERSION;
                 } catch (SQLException ex) {
@@ -363,20 +350,8 @@ public class CBDatabase extends InternalDB {
             @NotNull Connection connection,
             @NotNull String schemaName,
             int version
-        ) throws DBException, SQLException {
-            var updateCount = JDBCUtils.executeUpdate(
-                connection,
-                normalizeTableNames("UPDATE {table_prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP"),
-                version
-            );
-            if (updateCount <= 0) {
-                JDBCUtils.executeSQL(
-                    connection,
-                    normalizeTableNames(
-                        "INSERT INTO {table_prefix}CB_SCHEMA_INFO (VERSION,UPDATE_TIME) VALUES(?,CURRENT_TIMESTAMP)"),
-                    version
-                );
-            }
+        ) throws SQLException {
+            upsertSchemaInfo(connection, CB_SCHEMA_INFO_TABLE_NAME, schemaName, version);
         }
 
         @Override
@@ -522,14 +497,6 @@ public class CBDatabase extends InternalDB {
                 dbStat.execute();
             }
         }
-    }
-
-    /**
-     * Replaces all predefined prefixes in sql query.
-     */
-    @NotNull
-    public String normalizeTableNames(@NotNull String sql) {
-        return CommonUtils.normalizeTableNames(sql, databaseConfiguration.getSchema());
     }
 
     public static boolean isDefaultH2Configuration(WebDatabaseConfig databaseConfiguration) {
