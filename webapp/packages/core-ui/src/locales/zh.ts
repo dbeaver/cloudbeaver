@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 export default [
-  ['plugin_resource_manager_administration_settings_enable', '启用SQL脚本管理器'],
-  ['plugin_resource_manager_administration_settings_enable_description', '启用SQL脚本管理器功能'],
+  ['core_ui_empty', 'Empty'],
+  ['core_ui_form_save_error', '保存表单出错'],
+  ['core_ui_switch_tab_error', '表单校验时无法切换标签'],
 ];
