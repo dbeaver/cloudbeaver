@@ -19,7 +19,6 @@ package io.cloudbeaver.utils;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebSessionProjectImpl;
-import io.cloudbeaver.WebSessionProjectImpl;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.session.WebSession;
@@ -115,7 +114,7 @@ public class WebDataSourceUtils {
 
     @Nullable
     public static DBPDataSourceContainer getLocalOrGlobalDataSource(
-        WebApplication application, WebSession webSession, @Nullable String projectId, String connectionId
+        WebSession webSession, @Nullable String projectId, String connectionId
     ) throws DBWebException {
         DBPDataSourceContainer dataSource = null;
         if (!CommonUtils.isEmpty(connectionId)) {
@@ -124,9 +123,13 @@ public class WebDataSourceUtils {
                 throw new DBWebException("Project '" + projectId + "' not found");
             }
             dataSource = project.getDataSourceRegistry().getDataSource(connectionId);
-            if (dataSource == null && (webSession.hasPermission(DBWConstants.PERMISSION_ADMIN) || application.isConfigurationMode())) {
+            if (dataSource == null &&
+                (webSession.hasPermission(DBWConstants.PERMISSION_ADMIN) || webSession.getApplication().isConfigurationMode())) {
                 // If called for new connection in admin mode then this connection may absent in session registry yet
-                dataSource = getGlobalDataSourceRegistry().getDataSource(connectionId);
+                project = webSession.getGlobalProject();
+                if (project != null) {
+                    dataSource = project.getDataSourceRegistry().getDataSource(connectionId);
+                }
             }
         }
         return dataSource;
