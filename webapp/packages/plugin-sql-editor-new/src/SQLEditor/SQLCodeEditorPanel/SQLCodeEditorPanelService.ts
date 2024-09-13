@@ -20,6 +20,7 @@ export class SQLCodeEditorPanelService {
       key: 'sql-editor',
       icon: '/icons/sql_script_sm.svg',
       name: 'sql_editor_script_editor',
+      title: 'sql_editor_script_editor_tooltip',
       isHidden: (_, props) => props?.data.dataSource?.hasFeature(ESqlDataSourceFeatures.script) !== true,
       panel: () => SQLCodeEditorPanel,
     });
