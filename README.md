@@ -5,7 +5,7 @@
 Cloud Database Manager - Community Edition.  
 CloudBeaver is a web server that provides a rich web interface. The server itself is a Java application, and the web part is written in TypeScript and React.  
 It is free to use and open-source (licensed under [Apache 2](https://github.com/dbeaver/cloudbeaver/blob/devel/LICENSE) license).  
-See out [WIKI](https://github.com/dbeaver/cloudbeaver/wiki) for more details.  
+See our [WIKI](https://github.com/dbeaver/cloudbeaver/wiki) for more details. 
 
 ![](https://github.com/dbeaver/cloudbeaver/wiki/images/demo_screenshot_1.png)
 
@@ -51,10 +51,9 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
   -    Updated Firebird driver to version 5.0.4
   -    DDL generation for Oracle Tablespaces was added (thanks to [pandya09](https://github.com/pandya09))
 
-## Contribution: help the Beaver!
+## Contribution
 As a community-driven open-source project, we warmly welcome contributions through GitHub pull requests. 
-To improve our localization files, please refer to our [article](https://github.com/dbeaver/cloudbeaver/wiki/CloudBeaver-localization).
 
-[We provide prizes](https://dbeaver.com/help-beaver/) to our top contributors after every major sprint!
+[We provide prizes](https://dbeaver.com/help-beaver/) to our top contributors after every major sprint.
 The most significant contribution to our code for the major release 24.2.0 was made by:
 1. [matthieukhl](https://github.com/matthieukhl)
