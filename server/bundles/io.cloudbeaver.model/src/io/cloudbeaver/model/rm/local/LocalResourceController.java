@@ -130,12 +130,7 @@ public class LocalResourceController implements RMController {
             if (project == null || refresh) {
                 SessionContextImpl sessionContext = new SessionContextImpl(null);
                 RMProject rmProject = makeProjectFromId(projectId, false);
-                project = new BaseWebProjectImpl(
-                    workspace,
-                    this,
-                    sessionContext,
-                    rmProject
-                );
+                project = new InternalWebProjectImpl(sessionContext, rmProject);
                 projectRegistries.put(projectId, project);
             }
             return project;
@@ -1288,5 +1283,21 @@ public class LocalResourceController implements RMController {
             rmProjectName.name.equals(userId);
     }
 
+
+    private class InternalWebProjectImpl extends BaseWebProjectImpl {
+        public InternalWebProjectImpl(SessionContextImpl sessionContext, RMProject rmProject) {
+            super(
+                LocalResourceController.this.workspace,
+                LocalResourceController.this,
+                sessionContext,
+                rmProject);
+        }
+
+        @NotNull
+        @Override
+        protected DBPDataSourceRegistry createDataSourceRegistry() {
+            return new DataSourceRegistry(this);
+        }
+    }
 
 }
