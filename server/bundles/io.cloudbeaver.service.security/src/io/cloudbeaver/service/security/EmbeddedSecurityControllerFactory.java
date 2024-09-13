@@ -81,7 +81,7 @@ public class EmbeddedSecurityControllerFactory<T extends WebAuthApplication> {
         try {
             database.initialize();
         } catch (DBException e) {
-            database.closeConnection();
+            database.shutdown();
             throw e;
         }
 

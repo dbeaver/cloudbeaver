@@ -319,13 +319,10 @@ public class CBDatabase extends InternalDB {
     private class CBSchemaVersionManager implements SQLSchemaVersionManager {
 
         @Override
-        public int getCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName)
-            throws DBException, SQLException {
+        public int getCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName) {
             // Check and update schema
             try {
-                int version = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
-                    normalizeTableNames("SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO")));
-                return version == 0 ? 1 : version;
+                return getVersionFromSchema(connection, "CB_SCHEMA_INFO", null);
             } catch (SQLException e) {
                 try {
                     Object legacyVersion = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
@@ -519,5 +516,21 @@ public class CBDatabase extends InternalDB {
 
     protected SMAdminController getAdminSecurityController() {
         return adminSecurityController;
+    }
+
+    @NotNull
+    public SQLDialect getDialect() {
+        return dialect;
+    }
+
+    public void shutdown() {
+        log.debug("Shutdown database");
+        if (cbDataSource != null) {
+            try {
+                cbDataSource.close();
+            } catch (SQLException e) {
+                log.error(e);
+            }
+        }
     }
 }
