@@ -65,7 +65,6 @@ export class UserProfileFormInfoPart extends FormPart<IUserProfileFormInfoState,
       userId: user?.userId || '',
       displayName: user?.displayName || '',
       authRole: user?.authRole ?? '',
-      // TODO why server returns it as empty object? requests goes correctly
       metaParameters: toJS(metaParameters || {}),
     });
   }
