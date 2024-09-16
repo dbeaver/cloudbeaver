@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { PasswordPolicyService, UserInfoMetaParametersResource, UserInfoResource, UserResourceIncludes } from '@cloudbeaver/core-authentication';
+import type { PasswordPolicyService, UserInfoMetaParametersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { FormPart, formValidationContext, IFormState } from '@cloudbeaver/core-ui';
 import { isValuesEqual, schemaValidationError } from '@cloudbeaver/core-utils';

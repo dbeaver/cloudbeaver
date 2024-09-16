@@ -207,10 +207,9 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     const metaParameters = toJS(this.state.metaParameters);
 
     if (this.state.userId) {
-      const user = this.usersResource.get(this.state.userId);
       const userMetaParameters = this.usersMetaParametersResource.get(this.state.userId);
 
-      if (user && isObjectsEqual(userMetaParameters, metaParameters)) {
+      if (userMetaParameters && isObjectsEqual(userMetaParameters, metaParameters)) {
         return;
       }
     }

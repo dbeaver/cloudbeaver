@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, isResourceAlias, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { TeamMetaParameter } from './TeamMetaParametersResource';
+import type { TeamMetaParameter } from './TeamMetaParametersResource';
 import { TeamsResource } from './TeamsResource';
 
 @injectable()
@@ -54,6 +54,10 @@ export class TeamInfoMetaParametersResource extends CachedMapResource<string, Te
     }
 
     return this.data;
+  }
+
+  async setMetaParameters(teamId: string, parameters: Record<string, any>): Promise<void> {
+    await this.graphQLService.sdk.saveTeamMetaParameters({ teamId, parameters });
   }
 
   protected validateKey(key: string): boolean {

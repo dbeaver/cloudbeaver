@@ -150,7 +150,6 @@ export class TeamFormState implements ITeamFormState {
       return;
     }
 
-    await this.resource.load(data.config.teamId);
-    await this.teamInfoMetaParametersResource.load(data.config.teamId);
+    await Promise.all([this.resource.load(data.config.teamId), this.teamInfoMetaParametersResource.load(data.config.teamId)]);
   }
 }

@@ -25,7 +25,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { isGlobalProject, isSharedProject, ProjectInfoResource, projectInfoSortByName } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
-import { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
+import type { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
 import { isArraysEqual, isDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
 
 @injectable()

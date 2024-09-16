@@ -10,7 +10,7 @@ import { CachedDataResource, ResourceKey } from '@cloudbeaver/core-resource';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { UserInfoResource } from './UserInfoResource';
-import { UserMetaParameter } from './UserMetaParametersResource';
+import type { UserMetaParameter } from './UserMetaParametersResource';
 
 @injectable()
 export class UserInfoMetaParametersResource extends CachedDataResource<UserMetaParameter | null> {

@@ -20,7 +20,7 @@ import {
 } from '@cloudbeaver/core-resource';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { UserMetaParameter } from './UserMetaParametersResource';
+import type { UserMetaParameter } from './UserMetaParametersResource';
 import { UsersResource, UsersResourceFilterKey } from './UsersResource';
 
 @injectable()
@@ -39,7 +39,6 @@ export class UsersMetaParametersResource extends CachedMapResource<string, UserM
     this.markOutdated(userId);
   }
 
-  // TODO after CB-5511 is merged. fix the logic according to the UsersResource loader
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, UserMetaParameter>> {
     const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
     const keys: string[] = [];

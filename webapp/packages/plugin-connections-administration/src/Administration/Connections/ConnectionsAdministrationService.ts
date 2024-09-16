@@ -15,7 +15,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
+import type { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
 
 import { CreateConnectionService } from './CreateConnectionService';
 

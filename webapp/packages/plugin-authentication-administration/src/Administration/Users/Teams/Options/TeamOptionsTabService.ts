@@ -7,7 +7,7 @@
  */
 import React from 'react';
 
-import { TeamsResource } from '@cloudbeaver/core-authentication';
+import { TeamInfoMetaParametersResource, TeamsResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
@@ -27,6 +27,7 @@ export class TeamOptionsTabService extends Bootstrap {
   constructor(
     private readonly teamFormService: TeamFormService,
     private readonly teamResource: TeamsResource,
+    private readonly teamsMetaParametersResource: TeamInfoMetaParametersResource,
     private readonly localizationService: LocalizationService,
   ) {
     super();
@@ -108,11 +109,18 @@ export class TeamOptionsTabService extends Bootstrap {
 
     try {
       if (create) {
-        const team = await this.teamResource.createTeam(config, metaParameters);
+        const [team] = await Promise.all([
+          this.teamResource.createTeam(config),
+          this.teamsMetaParametersResource.setMetaParameters(config.teamId, metaParameters),
+        ]);
+
         status.info('administration_teams_team_info_created');
         status.info(team.teamId);
       } else {
-        const team = await this.teamResource.updateTeam(config, metaParameters);
+        const [team] = await Promise.all([
+          this.teamResource.updateTeam(config),
+          this.teamsMetaParametersResource.setMetaParameters(config.teamId, metaParameters),
+        ]);
 
         status.info('administration_teams_team_info_updated');
         status.info(team.teamId);

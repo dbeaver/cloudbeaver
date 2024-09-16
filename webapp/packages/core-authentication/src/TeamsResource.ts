@@ -24,7 +24,7 @@ import {
 } from '@cloudbeaver/core-sdk';
 import { isArraysEqual, UndefinedToNull } from '@cloudbeaver/core-utils';
 
-import { TeamMetaParameter } from './TeamMetaParametersResource';
+import type { TeamMetaParameter } from './TeamMetaParametersResource';
 
 const NEW_TEAM_SYMBOL = Symbol('new-team');
 
@@ -40,10 +40,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     super();
   }
 
-  async createTeam(
-    { teamId, teamPermissions, teamName, description }: TeamInfo,
-    metaParameters: Record<string, TeamMetaParameter>,
-  ): Promise<TeamInfo> {
+  async createTeam({ teamId, teamPermissions, teamName, description }: TeamInfo): Promise<TeamInfo> {
     const response = await this.graphQLService.sdk.createTeam({
       teamId,
       teamName,
@@ -59,16 +56,12 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
 
     this.set(newTeam.teamId, newTeam);
 
-    await this.setMetaParameters(newTeam.teamId, metaParameters);
     await this.setSubjectPermissions(newTeam.teamId, teamPermissions);
 
     return this.get(teamId)!;
   }
 
-  async updateTeam(
-    { teamId, teamPermissions, teamName, description }: TeamInfo,
-    metaParameters: Record<string, TeamMetaParameter>,
-  ): Promise<TeamInfo> {
+  async updateTeam({ teamId, teamPermissions, teamName, description }: TeamInfo): Promise<TeamInfo> {
     const { team } = await this.graphQLService.sdk.updateTeam({
       teamId,
       teamName,
@@ -78,7 +71,6 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
 
     this.set(team.teamId, team);
 
-    await this.setMetaParameters(team.teamId, metaParameters);
     await this.setSubjectPermissions(team.teamId, teamPermissions);
 
     this.markOutdated(team.teamId);
@@ -123,10 +115,6 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
       // TODO: update permissions for team instead
       await this.loader(subjectId, []);
     }
-  }
-
-  async setMetaParameters(teamId: string, parameters: Record<string, any>): Promise<void> {
-    await this.graphQLService.sdk.saveTeamMetaParameters({ teamId, parameters });
   }
 
   protected async loader(originalKey: ResourceKey<string>, includes?: string[]): Promise<Map<string, TeamInfo>> {
