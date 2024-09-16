@@ -60,7 +60,7 @@ export default [
   ['administration_configuration_wizard_configuration_navigator_show_system_objects', '系统对象'],
   ['administration_configuration_wizard_configuration_navigator_show_utility_objects', '实用程序对象'],
 
-  ['administration_configuration_wizard_step_validation_message', 'Failed to proceed to the next step'],
+  ['administration_configuration_wizard_step_validation_message', '无法继续执行下一步'],
 
   ['administration_configuration_wizard_finish', '确认'],
   ['administration_configuration_wizard_finish_step_description', '确认'],
@@ -70,6 +70,6 @@ export default [
     '按完成按钮完成服务器配置。如果您想更改或添加某些内容，可以返回到前面的页面。\n配置完成后，所有输入的设置都将应用于您的CloudBeaver服务器。您将被重定向到主页面开始工作。\n您可以随时以管理员身份登录系统以更改服务器设置。',
   ],
 
-  ['administration_disabled_drivers_title', 'Disabled drivers'],
-  ['administration_disabled_drivers_search_placeholder', 'Search for the driver...'],
+  ['administration_disabled_drivers_title', '已禁用的驱动'],
+  ['administration_disabled_drivers_search_placeholder', '搜索驱动...'],
 ];
