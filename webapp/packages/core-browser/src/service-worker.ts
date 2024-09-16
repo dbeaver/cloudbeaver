@@ -111,14 +111,13 @@ registerRoute(
       new ExpirationPlugin({
         maxEntries: 1000,
         maxAgeSeconds: 7 * 24 * 60 * 60,
-        purgeOnQuotaError: true,
       }),
     ],
   }),
 );
 
 registerRoute(
-  ({ request }) => request.destination === 'image',
+  ({ request, url }) => url.origin === window.location.origin && request.destination === 'image',
   new CacheFirst({
     cacheName: 'images',
     plugins: [
@@ -128,7 +127,6 @@ registerRoute(
       new ExpirationPlugin({
         maxEntries: 1000,
         maxAgeSeconds: 7 * 24 * 60 * 60,
-        purgeOnQuotaError: true,
       }),
     ],
   }),
