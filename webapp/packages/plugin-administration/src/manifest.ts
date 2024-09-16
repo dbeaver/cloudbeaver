@@ -22,5 +22,7 @@ export const manifest: PluginManifest = {
     () => import('./AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService').then(m => m.AdministrationTopAppBarService),
     () => import('./AdministrationScreen/ConfigurationWizard/WizardTopAppBar/WizardTopAppBarService').then(m => m.WizardTopAppBarService),
     () => import('./Administration/AdministrationViewService').then(m => m.AdministrationViewService),
+    () => import('./ConfigurationWizard/ServerConfiguration/ServerConfigurationFormStateManager').then(m => m.ServerConfigurationFormStateManager),
+    () => import('./ConfigurationWizard/ServerConfiguration/ServerConfigurationFormService').then(m => m.ServerConfigurationFormService),
   ],
 };

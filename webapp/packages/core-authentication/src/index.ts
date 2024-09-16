@@ -28,3 +28,4 @@ export * from './TeamMetaParametersResource';
 export * from './AUTH_SETTINGS_GROUP';
 export * from './PasswordPolicyService';
 export * from './TeamRolesResource';
+export * from './ADMIN_USERNAME_MIN_LENGTH';
