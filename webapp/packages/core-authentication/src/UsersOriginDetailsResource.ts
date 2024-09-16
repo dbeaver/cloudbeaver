@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { runInAction } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import {
   CACHED_RESOURCE_DEFAULT_PAGE_LIMIT,
@@ -36,6 +38,7 @@ export class UsersOriginDetailsResource extends CachedMapResource<string, AdminO
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, AdminOriginDetailsFragment>> {
     const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
     const keys: string[] = [];
+    const pages: Parameters<typeof this.offsetPagination.setPage>[] = [];
 
     if (all) {
       throw new Error('Loading all users is prohibited');
@@ -90,11 +93,22 @@ export class UsersOriginDetailsResource extends CachedMapResource<string, AdminO
         userMetaParametersList.push(...users);
         keys.push(...users.map(user => user.userId));
 
-        this.offsetPagination.setPageEnd(CachedResourceOffsetPageListKey(offset, users.length).setTarget(filterKey), users.length === limit);
+        pages.push([
+          CachedResourceOffsetPageListKey(offset, users.length).setParent(filterKey!),
+          users.map(user => user.userId),
+          users.length === limit,
+        ]);
       }
     });
 
-    this.set(resourceKeyList(keys), userMetaParametersList);
+    const key = resourceKeyList(keys);
+
+    runInAction(() => {
+      this.set(key, userMetaParametersList);
+      for (const pageArgs of pages) {
+        this.offsetPagination.setPage(...pageArgs);
+      }
+    });
 
     return this.data;
   }
