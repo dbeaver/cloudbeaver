@@ -109,6 +109,14 @@ public class WebAuthProviderConfiguration {
         return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getAcsLink(getId(), config.getParameters()) : null;
     }
 
+    @Property
+    public String getEntityIdLink() throws  DBException {
+        SMAuthProvider<?> instance = providerDescriptor.getInstance();
+        return instance instanceof SMAuthProviderFederated
+            ? ((SMAuthProviderFederated) instance).getEntityIdLink(getId(), config.getParameters())
+            : null;
+    }
+
     @Override
     public String toString() {
         return getDisplayName();

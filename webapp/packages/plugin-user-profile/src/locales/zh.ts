@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 export default [
-  ['plugin_user_profile_account_title', 'Account'],
+  ['plugin_user_profile_account_title', '账户'],
   ['plugin_user_profile_menu', '简介'],
   ['plugin_user_profile_info', '信息'],
   ['plugin_user_profile_info_id', '用户ID'],
@@ -23,5 +23,5 @@ export default [
   ['plugin_user_profile_authentication_change_password_success', '密码更改成功'],
   ['plugin_user_profile_authentication_change_password_submit_label', '更改'],
   ['plugin_user_profile_authentication_change_password_passwords_not_match', '密码不匹配'],
-  ['plugin_user_profile_authentication_change_password_password_validation_error', 'Password validation failed'],
+  ['plugin_user_profile_authentication_change_password_password_validation_error', '密码校验失败'],
 ];

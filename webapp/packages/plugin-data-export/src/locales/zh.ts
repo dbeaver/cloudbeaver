@@ -1,5 +1,12 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
-  ['plugin_data_export_data_export_settings_group', 'Data export'],
+  ['plugin_data_export_data_export_settings_group', '数据导出'],
   ['data_transfer_dialog_title', '导出数据'],
   ['data_transfer_dialog_export', '导出'],
   ['data_transfer_dialog_export_tooltip', '将结果集导出为文件'],
@@ -13,7 +20,7 @@ export default [
   ['data_transfer_notification_delete', '删除'],
   ['data_transfer_exporting_table', '表：'],
   ['data_transfer_exporting_sql', 'SQL：'],
-  ['data_transfer_dialog_select_processor_fail', 'Failed to select processor'],
+  ['data_transfer_dialog_select_processor_fail', '选择处理器失败'],
 
-  ['data_transfer_output_settings_compress', 'Compression'],
+  ['data_transfer_output_settings_compress', '压缩'],
 ];
