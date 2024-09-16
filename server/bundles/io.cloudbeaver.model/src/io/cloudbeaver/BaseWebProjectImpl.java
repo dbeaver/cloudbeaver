@@ -16,23 +16,21 @@
  */
 package io.cloudbeaver;
 
-import org.eclipse.core.resources.IProject;
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
+import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMControllerProvider;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMUtils;
-import org.jkiss.dbeaver.registry.BaseProjectImpl;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.Pair;
 
 import java.nio.file.Path;
 import java.util.Collection;
 
-public class BaseWebProjectImpl extends BaseProjectImpl implements RMControllerProvider {
+public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMControllerProvider {
 
     @NotNull
     private final RMProject project;
@@ -89,12 +87,6 @@ public class BaseWebProjectImpl extends BaseProjectImpl implements RMControllerP
     @Override
     public Path getAbsolutePath() {
         return path;
-    }
-
-    @Nullable
-    @Override
-    public IProject getEclipseProject() {
-        return null;
     }
 
     @Override

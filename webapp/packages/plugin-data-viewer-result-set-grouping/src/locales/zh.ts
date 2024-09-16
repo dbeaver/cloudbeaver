@@ -1,14 +1,21 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
-  ['plugin_data_viewer_result_set_grouping_title', 'Grouping'],
-  ['plugin_data_viewer_result_set_grouping_placeholder', 'There is no data to show.\nDrag and drop a column from the result viewer to group values.'],
-  ['plugin_data_viewer_result_set_grouping_column_delete_tooltip', 'Remove grouping by selected columns'],
-  ['plugin_data_viewer_result_set_grouping_action_show_duplicates', 'Show duplicates'],
-  ['plugin_data_viewer_result_set_grouping_action_show_all', 'Show all'],
-  ['plugin_data_viewer_result_set_grouping_action_configure', 'Configure'],
-  ['plugin_data_viewer_result_set_grouping_action_configure_tooltip', 'Edit grouping configuration'],
-  ['plugin_data_viewer_result_set_grouping_grouping_configuration', 'Grouping configuration'],
-  ['plugin_data_viewer_result_set_grouping_grouping_columns', 'Columns'],
-  ['plugin_data_viewer_result_set_grouping_grouping_functions', 'Functions'],
-  ['plugin_data_viewer_result_set_grouping_grouping_columns_placeholder', 'Enter new column name'],
-  ['plugin_data_viewer_result_set_grouping_grouping_functions_placeholder', 'Enter function (e.g., SUM(salary), AVG(score))'],
+  ['plugin_data_viewer_result_set_grouping_title', '分组'],
+  ['plugin_data_viewer_result_set_grouping_placeholder', '无显示结果。\n从结果查看器中拖放列以对值进行分组。'],
+  ['plugin_data_viewer_result_set_grouping_column_delete_tooltip', '移除所选列分组'],
+  ['plugin_data_viewer_result_set_grouping_action_show_duplicates', '查看重复'],
+  ['plugin_data_viewer_result_set_grouping_action_show_all', '查看全部'],
+  ['plugin_data_viewer_result_set_grouping_action_configure', '配置'],
+  ['plugin_data_viewer_result_set_grouping_action_configure_tooltip', '编辑分组配置'],
+  ['plugin_data_viewer_result_set_grouping_grouping_configuration', '分组配置'],
+  ['plugin_data_viewer_result_set_grouping_grouping_columns', '列'],
+  ['plugin_data_viewer_result_set_grouping_grouping_functions', '函数'],
+  ['plugin_data_viewer_result_set_grouping_grouping_columns_placeholder', '输入新列名'],
+  ['plugin_data_viewer_result_set_grouping_grouping_functions_placeholder', '输入函数 (如 SUM(salary), AVG(score))'],
 ];
