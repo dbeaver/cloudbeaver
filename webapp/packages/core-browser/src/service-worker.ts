@@ -117,7 +117,7 @@ registerRoute(
 );
 
 registerRoute(
-  ({ request, url }) => url.origin === window.location.origin && request.destination === 'image',
+  ({ request, url }) => url.origin === self.location.origin && request.destination === 'image',
   new CacheFirst({
     cacheName: 'images',
     plugins: [
