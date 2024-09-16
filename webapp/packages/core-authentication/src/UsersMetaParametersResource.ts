@@ -27,8 +27,9 @@ export class UsersMetaParametersResource extends CachedMapResource<string, UserM
   }
 
   async setMetaParameters(userId: string, parameters: Record<string, any>): Promise<void> {
-    await this.graphQLService.sdk.saveUserMetaParameters({ userId, parameters });
-    this.markOutdated(userId);
+    await this.performUpdate(userId, undefined, async () => {
+      await this.graphQLService.sdk.saveUserMetaParameters({ userId, parameters });
+    });
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, UserMetaParameter>> {

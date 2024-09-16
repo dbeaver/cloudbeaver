@@ -24,8 +24,6 @@ import {
 } from '@cloudbeaver/core-sdk';
 import { isArraysEqual, UndefinedToNull } from '@cloudbeaver/core-utils';
 
-import type { TeamMetaParameter } from './TeamMetaParametersResource';
-
 const NEW_TEAM_SYMBOL = Symbol('new-team');
 
 export type TeamInfo = AdminTeamInfoFragment;
