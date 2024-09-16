@@ -34,7 +34,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.ee10.servlet.DefaultServlet;
-import org.eclipse.jetty.ee10.servlet.ResourceServlet;
+import org.eclipse.jetty.server.ResourceService;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
@@ -53,6 +53,12 @@ public class CBStaticServlet extends DefaultServlet {
     public static final int STATIC_CACHE_SECONDS = 60 * 60 * 24 * 3;
 
     private static final Log log = Log.getLog(CBStaticServlet.class);
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        this.getResourceService().setWelcomeMode(ResourceService.WelcomeMode.REDIRECT);
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

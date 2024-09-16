@@ -44,9 +44,14 @@ public class ProxyResourceHandler extends Handler.Wrapper {
     public boolean handle(Request request, Response response, Callback callback) throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         String pathInContext = Request.getPathInContext(request);
-        if (!pathInContext.endsWith("index.html") && !pathInContext.endsWith("sso.html")) {
+
+        if (pathInContext == null || !pathInContext.endsWith("index.html")
+            && !pathInContext.endsWith("sso.html")
+            && !pathInContext.endsWith("ssoError.html")
+        ) {
             return super.handle(request, response, callback);
         }
+
         if (pathInContext.startsWith("/")) {
             pathInContext = pathInContext.substring(1);
         }
