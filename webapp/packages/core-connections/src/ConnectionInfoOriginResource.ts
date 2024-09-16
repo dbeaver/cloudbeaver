@@ -38,6 +38,7 @@ export class ConnectionInfoOriginResource extends CachedMapResource<IConnectionI
     );
 
     this.sync(this.connectionInfoResource);
+    this.connectionInfoResource.onItemDelete.addHandler(this.delete.bind(this));
   }
 
   protected async loader(

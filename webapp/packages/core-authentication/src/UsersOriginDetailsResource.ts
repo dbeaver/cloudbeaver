@@ -8,21 +8,10 @@
 import { runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  CACHED_RESOURCE_DEFAULT_PAGE_LIMIT,
-  CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
-  CachedMapAllKey,
-  CachedMapResource,
-  CachedResourceOffsetPageKey,
-  CachedResourceOffsetPageListKey,
-  isResourceAlias,
-  ResourceKey,
-  resourceKeyList,
-  ResourceKeyUtils,
-} from '@cloudbeaver/core-resource';
+import { CachedMapAllKey, CachedMapResource, isResourceAlias, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { AdminOriginDetailsFragment, GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { UsersResource, UsersResourceFilterKey } from './UsersResource';
+import { UsersResource } from './UsersResource';
 
 @injectable()
 export class UsersOriginDetailsResource extends CachedMapResource<string, AdminOriginDetailsFragment> {
@@ -33,6 +22,7 @@ export class UsersOriginDetailsResource extends CachedMapResource<string, AdminO
     super();
 
     this.sync(this.usersResource);
+    this.usersResource.onItemDelete.addHandler(this.delete.bind(this));
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, AdminOriginDetailsFragment>> {
@@ -60,44 +50,6 @@ export class UsersOriginDetailsResource extends CachedMapResource<string, AdminO
 
         keys.push(userId);
         userMetaParametersList.push(user);
-      } else {
-        const pageKey =
-          this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
-        const filterKey = this.aliases.isAlias(originalKey, UsersResourceFilterKey);
-        let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
-        let limit = CACHED_RESOURCE_DEFAULT_PAGE_LIMIT;
-        let userIdMask: string | undefined;
-        let enabledState: boolean | undefined;
-
-        if (pageKey) {
-          offset = pageKey.options.offset;
-          limit = pageKey.options.limit;
-        }
-
-        if (filterKey) {
-          userIdMask = filterKey.options.userId;
-          enabledState = filterKey.options.enabledState;
-        }
-
-        const { users } = await this.graphQLService.sdk.getUsersOriginDetailsList({
-          page: {
-            offset,
-            limit,
-          },
-          filter: {
-            userIdMask,
-            enabledState,
-          },
-        });
-
-        userMetaParametersList.push(...users);
-        keys.push(...users.map(user => user.userId));
-
-        pages.push([
-          CachedResourceOffsetPageListKey(offset, users.length).setParent(filterKey!),
-          users.map(user => user.userId),
-          users.length === limit,
-        ]);
       }
     });
 

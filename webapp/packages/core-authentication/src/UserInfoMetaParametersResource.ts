@@ -13,23 +13,19 @@ import { UserInfoResource } from './UserInfoResource';
 import type { UserMetaParameter } from './UserMetaParametersResource';
 
 @injectable()
-export class UserInfoMetaParametersResource extends CachedDataResource<UserMetaParameter | null> {
+export class UserInfoMetaParametersResource extends CachedDataResource<UserMetaParameter | undefined> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly userInfoResource: UserInfoResource,
   ) {
-    super(() => null, undefined);
+    super(() => undefined, undefined);
 
     this.sync(this.userInfoResource);
   }
 
-  protected async loader(param: ResourceKey<void>): Promise<UserMetaParameter | null> {
-    try {
-      const { user } = await this.graphQLService.sdk.getActiveUserMetaParameters();
+  protected async loader(param: ResourceKey<void>): Promise<UserMetaParameter | undefined> {
+    const { user } = await this.graphQLService.sdk.getActiveUserMetaParameters();
 
-      return user?.metaParameters;
-    } catch (exception: any) {
-      return null;
-    }
+    return user?.metaParameters;
   }
 }

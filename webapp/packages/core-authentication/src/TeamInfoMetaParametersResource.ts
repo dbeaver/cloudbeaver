@@ -21,6 +21,7 @@ export class TeamInfoMetaParametersResource extends CachedMapResource<string, Te
     super();
 
     this.sync(this.teamsResource);
+    this.teamsResource.onItemDelete.addHandler(this.delete.bind(this));
   }
 
   protected async loader(param: ResourceKey<string>): Promise<Map<string, TeamMetaParameter>> {
@@ -57,7 +58,9 @@ export class TeamInfoMetaParametersResource extends CachedMapResource<string, Te
   }
 
   async setMetaParameters(teamId: string, parameters: Record<string, any>): Promise<void> {
-    await this.graphQLService.sdk.saveTeamMetaParameters({ teamId, parameters });
+    await this.performUpdate(teamId, [], async () => {
+      await this.graphQLService.sdk.saveTeamMetaParameters({ teamId, parameters });
+    });
   }
 
   protected validateKey(key: string): boolean {
