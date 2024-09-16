@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { runInAction } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import {
   CACHED_RESOURCE_DEFAULT_PAGE_LIMIT,
@@ -235,6 +237,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     }
 
     const usersList: AdminUser[] = [];
+    const pages: Parameters<typeof this.offsetPagination.setPage>[] = [];
 
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {
       let userId: string | undefined;
@@ -283,12 +286,21 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
         usersList.push(...users);
 
-        this.offsetPagination.setPageEnd(CachedResourceOffsetPageListKey(offset, users.length).setTarget(filterKey), users.length === limit);
+        pages.push([
+          CachedResourceOffsetPageListKey(offset, users.length).setParent(filterKey!),
+          users.map(user => user.userId),
+          users.length === limit,
+        ]);
       }
     });
 
     const key = resourceKeyList(usersList.map(user => user.userId));
-    this.set(key, usersList);
+    runInAction(() => {
+      this.set(key, usersList);
+      for (const pageArgs of pages) {
+        this.offsetPagination.setPage(...pageArgs);
+      }
+    });
 
     return this.data;
   }

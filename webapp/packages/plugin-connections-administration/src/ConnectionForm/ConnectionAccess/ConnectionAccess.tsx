@@ -43,7 +43,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
 
   useAutoLoad(ConnectionAccess, state, selected);
 
-  const users = useResource(ConnectionAccess, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setTarget(UsersResourceFilterKey()), {
+  const users = useResource(ConnectionAccess, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()), {
     active: selected,
   });
   const teams = useResource(ConnectionAccess, TeamsResource, CachedMapAllKey, { active: selected });

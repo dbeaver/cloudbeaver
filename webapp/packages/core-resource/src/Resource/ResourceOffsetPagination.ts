@@ -8,17 +8,20 @@
 import { observable } from 'mobx';
 
 import {
+  expandOffsetPageRange,
   ICachedResourceOffsetPage,
   type ICachedResourceOffsetPageOptions,
   isOffsetPageInRange,
-  limitOffsetPages,
 } from './CachedResourceOffsetPageKeys';
 import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
 import type { ResourceAlias } from './ResourceAlias';
 import type { ResourceMetadata } from './ResourceMetadata';
 
 export class ResourceOffsetPagination<TKey, TMetadata extends ICachedResourceMetadata> {
-  constructor(protected metadata: ResourceMetadata<TKey, TMetadata>) {
+  constructor(
+    protected metadata: ResourceMetadata<TKey, TMetadata>,
+    private readonly getStableKey: (key: TKey) => TKey,
+  ) {
     this.metadata = metadata;
   }
 
@@ -47,29 +50,35 @@ export class ResourceOffsetPagination<TKey, TMetadata extends ICachedResourceMet
     return pageInfo.end === undefined || to < pageInfo.end;
   }
 
-  setPageEnd(key: ResourceAlias<TKey, Readonly<ICachedResourceOffsetPageOptions>>, hasNextPage: boolean): void {
-    const count = key.options.offset + key.options.limit;
+  setPage(key: ResourceAlias<TKey, Readonly<ICachedResourceOffsetPageOptions>>, items: any[], hasNextPage: boolean) {
+    const offset = key.options.offset;
+    const limit = offset + key.options.limit;
 
     this.metadata.update(key as TKey, metadata => {
       let end = metadata.offsetPage?.end;
 
       if (hasNextPage) {
-        if (end !== undefined && end <= count) {
+        if (end !== undefined && end <= limit) {
           end = undefined;
         }
       } else {
-        end = count;
+        end = limit;
       }
 
-      metadata.offsetPage = observable({
-        pages: [],
-        ...metadata.offsetPage,
-        end,
-      });
-
-      if (!hasNextPage) {
-        metadata.offsetPage.pages = limitOffsetPages(metadata.offsetPage?.pages || [], count);
+      if (!metadata.offsetPage) {
+        metadata.offsetPage = observable({
+          pages: [],
+          end,
+        });
       }
+
+      metadata.offsetPage.end = end;
+
+      if (!metadata.offsetPage.pages) {
+        metadata.offsetPage.pages = [];
+      }
+
+      expandOffsetPageRange(metadata.offsetPage.pages, key.options, items.map(this.getStableKey), false, hasNextPage);
     });
   }
 }

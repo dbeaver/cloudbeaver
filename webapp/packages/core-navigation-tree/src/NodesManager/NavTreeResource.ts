@@ -17,6 +17,7 @@ import {
   CachedMapResource,
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
+  CachedResourceOffsetPageTargetKey,
   type ICachedResourceMetadata,
   isResourceAlias,
   isResourceKeyList,
@@ -463,6 +464,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     const pageKey =
       this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
     const allKey = this.aliases.isAlias(originalKey, CachedMapAllKey);
+    const pageTarget = this.aliases.isAlias(originalKey, CachedResourceOffsetPageTargetKey);
 
     if (allKey) {
       throw new Error('Loading all nodes is prohibited');
@@ -471,19 +473,27 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     const offset = pageKey?.options.offset ?? CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
     const limit = pageKey?.options.limit ?? this.childrenLimit;
     const values: NavNodeChildrenQuery[] = [];
+    const pages: Parameters<typeof this.offsetPagination.setPage>[] = [];
 
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {
-      const nodeId = pageKey?.target ?? key;
+      const nodeId = pageTarget?.options?.target ?? key;
       const navNodeChildren = await this.loadNodeChildren(nodeId, offset, limit);
       values.push(navNodeChildren);
 
-      this.offsetPagination.setPageEnd(
-        CachedResourceOffsetPageKey(offset, navNodeChildren.navNodeChildren.length).setTarget(nodeId),
+      pages.push([
+        CachedResourceOffsetPageKey(offset, navNodeChildren.navNodeChildren.length).setParent(CachedResourceOffsetPageTargetKey(nodeId)),
+        navNodeChildren.navNodeChildren.map(node => node.id),
         navNodeChildren.navNodeChildren.length === limit,
-      );
+      ]);
     });
 
-    this.setNavObject(values, offset, limit);
+    runInAction(() => {
+      this.setNavObject(values, offset, limit);
+
+      for (const pageArgs of pages) {
+        this.offsetPagination.setPage(...pageArgs);
+      }
+    });
 
     return this.data;
   }
