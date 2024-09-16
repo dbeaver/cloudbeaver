@@ -18,6 +18,7 @@ package io.cloudbeaver.utils;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.app.WebApplication;
@@ -117,7 +118,11 @@ public class WebDataSourceUtils {
     ) throws DBWebException {
         DBPDataSourceContainer dataSource = null;
         if (!CommonUtils.isEmpty(connectionId)) {
-            dataSource = webSession.getProjectById(projectId).getDataSourceRegistry().getDataSource(connectionId);
+            WebProjectImpl project = webSession.getProjectById(projectId);
+            if (project == null) {
+                throw new DBWebException("Project '" + projectId + "' not found");
+            }
+            dataSource = project.getDataSourceRegistry().getDataSource(connectionId);
             if (dataSource == null && (webSession.hasPermission(DBWConstants.PERMISSION_ADMIN) || application.isConfigurationMode())) {
                 // If called for new connection in admin mode then this connection may absent in session registry yet
                 dataSource = getGlobalDataSourceRegistry().getDataSource(connectionId);
