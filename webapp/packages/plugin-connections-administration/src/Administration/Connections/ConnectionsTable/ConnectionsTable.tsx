@@ -7,35 +7,27 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { getComputed, Table, TableBody, TableColumnHeader, TableHeader, TableSelect, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { DatabaseConnection, IConnectionInfoParams, serializeConnectionParam } from '@cloudbeaver/core-connections';
+import { Table, TableBody, TableColumnHeader, TableHeader, TableSelect, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { DBDriverResource, serializeConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { isGlobalProject, isSharedProject, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import { isGlobalProject, isSharedProject, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
 import { Connection } from './Connection';
+import { IConnectionsTableState } from './useConnectionsTable';
 
 interface Props {
-  keys: IConnectionInfoParams[];
-  connections: DatabaseConnection[];
-  selectedItems: Map<IConnectionInfoParams, boolean>;
-  expandedItems: Map<IConnectionInfoParams, boolean>;
+  state: IConnectionsTableState;
 }
 
-export const ConnectionsTable = observer<Props>(function ConnectionsTable({ keys, connections, selectedItems, expandedItems }) {
+export const ConnectionsTable = observer<Props>(function ConnectionsTable({ state }) {
   const translate = useTranslate();
   const projectService = useService(ProjectsService);
-  const projectsLoader = useResource(ConnectionsTable, ProjectInfoResource, CachedMapAllKey);
-  const displayProjects = getComputed(
-    () => projectService.activeProjects.filter(project => isGlobalProject(project) || isSharedProject(project)).length > 1,
-  );
-
-  function getProjectName(projectId: string) {
-    return displayProjects ? projectsLoader.resource.get(projectId)?.name ?? null : undefined;
-  }
+  const dbDriverResource = useResource(ConnectionsTable, DBDriverResource, CachedMapAllKey);
+  const shouldDisplayProjects = projectService.activeProjects.filter(project => isGlobalProject(project) || isSharedProject(project)).length > 1;
 
   return (
-    <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size="big">
+    <Table keys={state.keys} selectedItems={state.table.selected} expandedItems={state.table.expanded} size="big">
       <TableHeader fixed>
         <TableColumnHeader min flex centerContent>
           <TableSelect />
@@ -44,16 +36,17 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({ keys
         <TableColumnHeader min />
         <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_address')}</TableColumnHeader>
-        {displayProjects && <TableColumnHeader>{translate('connections_connection_project')}</TableColumnHeader>}
+        {shouldDisplayProjects && <TableColumnHeader>{translate('connections_connection_project')}</TableColumnHeader>}
         <TableColumnHeader />
       </TableHeader>
       <TableBody>
-        {connections.map((connection, i) => (
+        {state.connections.map((connection, i) => (
           <Connection
-            key={serializeConnectionParam(keys[i])}
-            connectionKey={keys[i]}
+            key={serializeConnectionParam(state.keys[i])}
+            connectionKey={state.keys[i]}
             connection={connection}
-            projectName={getProjectName(connection.projectId)}
+            shouldDisplayProject={shouldDisplayProjects}
+            icon={dbDriverResource.resource.get(connection.driverId)?.icon}
           />
         ))}
       </TableBody>

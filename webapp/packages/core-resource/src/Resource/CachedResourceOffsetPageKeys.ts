@@ -5,18 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { IResourceOffsetPage } from './OffsetPagination/IResourceOffsetPage';
+import { ResourceOffsetPage } from './OffsetPagination/ResourceOffsetPage';
+import { ResourceKey } from './ResourceKey';
 import { resourceKeyAliasFactory } from './ResourceKeyAlias';
 import { resourceKeyListAliasFactory } from './ResourceKeyListAlias';
 
 interface IOffsetPageInfo {
   offset: number;
   limit: number;
-}
-
-interface IResourceOffsetPage {
-  from: number;
-  to: number;
-  outdated: boolean;
 }
 
 export interface ICachedResourceOffsetPage {
@@ -31,6 +28,7 @@ export interface ICachedResourceOffsetPageOptions extends IOffsetPageInfo {}
 export const CACHED_RESOURCE_DEFAULT_PAGE_OFFSET = 0;
 export const CACHED_RESOURCE_DEFAULT_PAGE_LIMIT = 100;
 
+export const CachedResourceOffsetPageTargetKey = resourceKeyAliasFactory('@cached-resource/param-chain', <T>(target: ResourceKey<T>) => ({ target }));
 export const CachedResourceOffsetPageListKey = resourceKeyListAliasFactory<
   any,
   [offset: number, limit: number],
@@ -66,8 +64,10 @@ export function getNextPageOffset(info: ICachedResourceOffsetPage): number {
 }
 
 export function isOffsetPageOutdated(pages: IResourceOffsetPage[], info: IOffsetPageInfo): boolean {
-  for (const { from, to, outdated } of pages) {
-    if (outdated && info.offset >= from && info.offset + info.limit <= to) {
+  const from = info.offset;
+  const to = info.offset + info.limit;
+  for (const page of pages) {
+    if (page.isHasCommonSegment(from, to) && page.isOutdated()) {
       return true;
     }
   }
@@ -101,52 +101,48 @@ export function isOffsetPageInRange({ pages, end }: ICachedResourceOffsetPage, i
   return false;
 }
 
-export function limitOffsetPages(pages: IResourceOffsetPage[], limit: number): IResourceOffsetPage[] {
-  const result: IResourceOffsetPage[] = [];
+export function expandOffsetPageRange(
+  pages: IResourceOffsetPage[],
+  info: IOffsetPageInfo,
+  items: any[],
+  outdated: boolean,
+  hasNextPage: boolean,
+): void {
+  const from = info.offset;
+  const to = info.offset + info.limit;
 
+  let pageInserted = false;
   for (const page of pages) {
-    if (page.from >= limit) {
-      break;
-    }
-    result.push({ ...page, to: Math.min(limit, page.to) });
-  }
-
-  return result;
-}
-
-export function expandOffsetPageRange(pages: IResourceOffsetPage[], info: IOffsetPageInfo, outdated: boolean): IResourceOffsetPage[] {
-  pages = [...pages, { from: info.offset, to: info.offset + info.limit, outdated, end: false }].sort((a, b) => a.from - b.from);
-  const result: IResourceOffsetPage[] = [];
-  let previous: IResourceOffsetPage | undefined;
-
-  for (const { from, to, outdated } of pages) {
-    if (!previous) {
-      previous = { from, to, outdated };
+    if (page.to <= from) {
       continue;
     }
 
-    if (from <= previous.from + previous.to) {
-      if (previous.outdated === outdated) {
-        previous.to = Math.max(previous.to, to);
-      } else {
-        if (previous.from < from) {
-          result.push({ ...previous, to: from });
-        }
-        if (previous.to > to) {
-          result.push({ from, to, outdated });
-          previous = { ...previous, from: to };
-        } else {
-          previous = { from, to, outdated };
-        }
+    if (!hasNextPage) {
+      if (page.from >= to) {
+        pages.splice(pages.indexOf(page));
+        break;
       }
-    } else {
-      result.push(previous);
-      previous = { from, to, outdated };
+    }
+
+    if (page.from <= from && !pageInserted) {
+      if (page.from < from) {
+        page.setSize(page.from, from);
+        pages.splice(pages.indexOf(page) + 1, 0, new ResourceOffsetPage().setSize(from, to).update(from, items).setOutdated(outdated));
+      } else {
+        page.setSize(from, to).update(from, items).setOutdated(outdated);
+      }
+      pageInserted = true;
+      continue;
+    }
+
+    if (page.isInRange(from, to)) {
+      pages.splice(pages.indexOf(page), 1);
     }
   }
 
-  if (previous) {
-    result.push(previous);
+  const lastPage = pages[pages.length - 1];
+
+  if (!lastPage || lastPage.to <= from) {
+    pages.push(new ResourceOffsetPage().setSize(from, to).update(from, items).setOutdated(outdated));
   }
-  return result;
 }
