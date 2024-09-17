@@ -16,16 +16,16 @@
  */
 package io.cloudbeaver.server.jetty;
 
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.model.app.GQLApplicationAdapter;
 import jakarta.servlet.SessionCookieConfig;
 import org.eclipse.jetty.http.Syntax;
 import org.eclipse.jetty.server.session.SessionHandler;
 
 public class CBSessionHandler extends SessionHandler {
     private final CBCookieConfig cbCookieConfig;
-    private final CBApplication<?> application;
+    private final GQLApplicationAdapter application;
 
-    public CBSessionHandler(CBApplication<?> application) {
+    public CBSessionHandler(GQLApplicationAdapter application) {
         this.cbCookieConfig = new CBCookieConfig();
         this.application = application;
     }
