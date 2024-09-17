@@ -15,7 +15,13 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, CachedResourceOffsetPageKey, getNextPageOffset, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import {
+  CachedMapAllKey,
+  CachedResourceOffsetPageKey,
+  CachedResourceOffsetPageTargetKey,
+  getNextPageOffset,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-resource';
 import type { IDNDData } from '@cloudbeaver/core-ui';
 import { ILoadableState, MetadataMap, throttle } from '@cloudbeaver/core-utils';
 
@@ -231,12 +237,16 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       await navNodeInfoResource.load(nodeId);
 
-      const pageInfo = navTreeResource.offsetPagination.getPageInfo(CachedResourceOffsetPageKey(0, 0).setTarget(nodeId));
+      const pageInfo = navTreeResource.offsetPagination.getPageInfo(
+        CachedResourceOffsetPageKey(0, 0).setParent(CachedResourceOffsetPageTargetKey(nodeId)),
+      );
 
       if (pageInfo) {
         const lastOffset = getNextPageOffset(pageInfo);
         for (let offset = 0; offset < lastOffset; offset += navTreeResource.childrenLimit) {
-          await navTreeResource.load(CachedResourceOffsetPageKey(offset, navTreeResource.childrenLimit).setTarget(nodeId));
+          await navTreeResource.load(
+            CachedResourceOffsetPageKey(offset, navTreeResource.childrenLimit).setParent(CachedResourceOffsetPageTargetKey(nodeId)),
+          );
         }
       }
 
