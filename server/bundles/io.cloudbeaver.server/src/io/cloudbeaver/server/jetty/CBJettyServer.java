@@ -29,7 +29,6 @@ import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
 import org.eclipse.jetty.server.session.DefaultSessionIdManager;
 import org.eclipse.jetty.server.session.NullSessionDataStore;
-import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -184,7 +183,8 @@ public class CBJettyServer {
         @NotNull ServletContextHandler servletContextHandler
     ) {
         // Init sessions persistence
-        SessionHandler sessionHandler = new SessionHandler();
+        CBSessionHandler sessionHandler = new CBSessionHandler(application);
+        var maxIdleTime = application.getMaxSessionIdleTime();
         int intMaxIdleSeconds;
         if (maxIdleTime > Integer.MAX_VALUE) {
             log.warn("Max session idle time value is greater than Integer.MAX_VALUE. Integer.MAX_VALUE will be used instead");

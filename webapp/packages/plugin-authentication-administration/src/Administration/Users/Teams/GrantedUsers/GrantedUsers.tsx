@@ -30,7 +30,7 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
   const serverConfigResource = useResource(UserList, ServerConfigResource, undefined, { active: selected });
   const isDefaultTeam = formState.config.teamId === serverConfigResource.data?.defaultUserTeam;
 
-  const users = useResource(GrantedUsers, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setTarget(UsersResourceFilterKey()), {
+  const users = useResource(GrantedUsers, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()), {
     active: selected && !isDefaultTeam,
   });
 

@@ -6,6 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 export default [
-  ['core_plugin_interface_settings_group', 'Interface'],
-  ['core_plugin_root_settings_group', 'Settings'],
+  ['core_plugin_interface_settings_group', '界面'],
+  ['core_plugin_root_settings_group', '设置'],
 ];

@@ -28,5 +28,6 @@ query saveAuthProviderConfiguration(
     redirectLink
     metadataLink
     acsLink
+    entityIdLink
   }
 }

@@ -10,7 +10,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-Activator: io.cloudbeaver.server.CBPlatformActivator
 Bundle-ClassPath: .
 Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
- org.eclipse.core.resources;visibility:=reexport,
  org.apache.commons.jexl,
  org.jkiss.utils;visibility:=reexport,
  org.jkiss.dbeaver.model.sql;visibility:=reexport,
