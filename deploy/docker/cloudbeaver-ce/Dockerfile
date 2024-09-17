@@ -2,6 +2,10 @@ FROM dbeaver/base-java
 
 MAINTAINER DBeaver Corp, devops@dbeaver.com
 
+RUN set -eux; \
+    apt-get update; \
+    apt-get upgrade -y; 
+    
 COPY cloudbeaver /opt/cloudbeaver
 
 EXPOSE 8978
