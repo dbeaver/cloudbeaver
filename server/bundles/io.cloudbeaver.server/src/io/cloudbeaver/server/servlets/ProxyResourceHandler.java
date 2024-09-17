@@ -45,6 +45,10 @@ public class ProxyResourceHandler extends Handler.Wrapper {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         String pathInContext = Request.getPathInContext(request);
 
+        if ("/".equals(pathInContext)) {
+            pathInContext = "index.html";
+        }
+
         if (pathInContext == null || !pathInContext.endsWith("index.html")
             && !pathInContext.endsWith("sso.html")
             && !pathInContext.endsWith("ssoError.html")
