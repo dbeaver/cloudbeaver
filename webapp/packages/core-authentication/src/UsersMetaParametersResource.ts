@@ -5,8 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { runInAction } from 'mobx';
-
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, isResourceAlias, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
@@ -39,7 +37,6 @@ export class UsersMetaParametersResource extends CachedMapResource<string, UserM
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, UserMetaParameter>> {
     const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
     const keys: string[] = [];
-    const pages: Parameters<typeof this.offsetPagination.setPage>[] = [];
 
     if (all) {
       throw new Error('Loading all users is prohibited');
@@ -65,13 +62,7 @@ export class UsersMetaParametersResource extends CachedMapResource<string, UserM
     });
 
     const key = resourceKeyList(keys);
-
-    runInAction(() => {
-      this.set(key, userMetaParametersList);
-      for (const pageArgs of pages) {
-        this.offsetPagination.setPage(...pageArgs);
-      }
-    });
+    this.set(key, userMetaParametersList);
 
     return this.data;
   }
