@@ -16,10 +16,9 @@
  */
 package io.cloudbeaver.server;
 
-import org.eclipse.core.resources.ResourcesPlugin;
+import io.cloudbeaver.DBWConstants;
 import org.eclipse.core.runtime.Plugin;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
@@ -28,7 +27,6 @@ import org.jkiss.dbeaver.model.impl.app.DefaultCertificateStorage;
 import org.jkiss.dbeaver.model.qm.QMRegistry;
 import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.SecurityProviderUtils;
@@ -40,8 +38,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public abstract class BaseWebPlatform extends BasePlatformImpl {
-    private static final Log log = Log.getLog(BaseWebPlatform.class);
+public abstract class BaseGQLPlatform extends BasePlatformImpl {
+    private static final Log log = Log.getLog(BaseGQLPlatform.class);
     public static final String WORK_DATA_FOLDER_NAME = ".work-data";
 
     private Path tempFolder;
@@ -57,7 +55,7 @@ public abstract class BaseWebPlatform extends BasePlatformImpl {
         SecurityProviderUtils.registerSecurityProvider();
 
         // Register properties adapter
-        this.workspace = new WebGlobalWorkspace(this, ResourcesPlugin.getWorkspace());
+        this.workspace = new WebGlobalWorkspace(this);
         this.workspace.initializeProjects();
         QMUtils.initApplication(this);
 
@@ -97,7 +95,7 @@ public abstract class BaseWebPlatform extends BasePlatformImpl {
         if (tempFolder == null) {
             // Make temp folder
             monitor.subTask("Create temp folder");
-            tempFolder = workspace.getAbsolutePath().resolve(WORK_DATA_FOLDER_NAME);
+            tempFolder = workspace.getAbsolutePath().resolve(DBWConstants.WORK_DATA_FOLDER_NAME);
         }
         if (!Files.exists(tempFolder)) {
             try {
@@ -130,14 +128,6 @@ public abstract class BaseWebPlatform extends BasePlatformImpl {
             //queryManager = null;
         }
         DataSourceProviderRegistry.dispose();
-
-        if (workspace != null) {
-            try {
-                workspace.save(new VoidProgressMonitor());
-            } catch (DBException ex) {
-                log.error("Can't save workspace", ex); //$NON-NLS-1$
-            }
-        }
 
         // Remove temp folder
         if (tempFolder != null) {

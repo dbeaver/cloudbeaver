@@ -17,7 +17,6 @@
 
 package io.cloudbeaver.server;
 
-import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.AppWebSessionManager;
 import io.cloudbeaver.model.app.GQLApplicationAdapter;
@@ -37,7 +36,6 @@ import org.jkiss.dbeaver.model.connection.DBPDriverLibrary;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.IOUtils;
@@ -51,7 +49,7 @@ import java.util.stream.Collectors;
 /**
  * CBPlatform
  */
-public class CBPlatform extends BaseWebPlatform {
+public class CBPlatform extends BaseGQLPlatform {
 
     // The plug-in ID
     public static final String PLUGIN_ID = "io.cloudbeaver.server"; //$NON-NLS-1$
@@ -82,21 +80,6 @@ public class CBPlatform extends BaseWebPlatform {
         long startTime = System.currentTimeMillis();
         log.info("Initialize web platform...: ");
         this.preferenceStore = new CBPreferenceStore(this, WebPlatformActivator.getInstance().getPreferences());
-        // Register BC security provider
-        SecurityProviderUtils.registerSecurityProvider();
-
-        // Register properties adapter
-        this.workspace = new WebGlobalWorkspace(this);
-        this.workspace.initializeProjects();
-
-        QMUtils.initApplication(this);
-        this.queryManager = new QMRegistryImpl();
-
-        this.qmLogWriter = new QMLogFileWriter();
-        this.queryManager.registerMetaListener(qmLogWriter);
-
-        this.certificateStorage = new DefaultCertificateStorage(
-            WebPlatformActivator.getInstance().getStateLocation().toFile().toPath().resolve(DBConstants.CERTIFICATE_STORAGE_FOLDER));
         super.initialize();
         refreshApplicableDrivers();
 
@@ -136,26 +119,6 @@ public class CBPlatform extends BaseWebPlatform {
 
         super.dispose();
 
-        if (this.qmLogWriter != null) {
-            this.queryManager.unregisterMetaListener(qmLogWriter);
-            this.qmLogWriter.dispose();
-            this.qmLogWriter = null;
-        }
-        if (this.queryManager != null) {
-            this.queryManager.dispose();
-            //queryManager = null;
-        }
-        DataSourceProviderRegistry.dispose();
-
-        // Remove temp folder
-        if (tempFolder != null) {
-
-            if (!ContentUtils.deleteFileRecursive(tempFolder.toFile())) {
-                log.warn("Can't delete temp folder '" + tempFolder.toAbsolutePath() + "'");
-            }
-            tempFolder = null;
-        }
-
         CBPlatform.application = null;
         System.gc();
         log.debug("Shutdown completed in " + (System.currentTimeMillis() - startTime) + "ms");
@@ -176,42 +139,6 @@ public class CBPlatform extends BaseWebPlatform {
     @Override
     public DBPPreferenceStore getPreferenceStore() {
         return preferenceStore;
-    }
-
-    @NotNull
-    @Override
-    public DBACertificateStorage getCertificateStorage() {
-        return certificateStorage;
-    }
-
-    @NotNull
-    public Path getTempFolder(@NotNull DBRProgressMonitor monitor, @NotNull String name) {
-        if (tempFolder == null) {
-            // Make temp folder
-            monitor.subTask("Create temp folder");
-            tempFolder = workspace.getAbsolutePath().resolve(DBWConstants.WORK_DATA_FOLDER_NAME);
-        }
-        if (!Files.exists(tempFolder)) {
-            try {
-                Files.createDirectories(tempFolder);
-            } catch (IOException e) {
-                log.error("Can't create temp directory " + tempFolder, e);
-            }
-        }
-        Path folder = tempFolder.resolve(name);
-        if (!Files.exists(folder)) {
-            try {
-                Files.createDirectories(folder);
-            } catch (IOException e) {
-                log.error("Error creating temp folder '" + folder.toAbsolutePath() + "'", e);
-            }
-        }
-        return folder;
-    }
-
-    @Override
-    protected Plugin getProductPlugin() {
-        return WebPlatformActivator.getInstance();
     }
 
     @Override
