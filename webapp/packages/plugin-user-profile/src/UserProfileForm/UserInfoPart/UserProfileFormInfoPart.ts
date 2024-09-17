@@ -44,7 +44,7 @@ export class UserProfileFormInfoPart extends FormPart<IUserProfileFormInfoState,
     return this.loaded && this.userInfoResource.isLoaded(undefined, this.baseIncludes);
   }
 
-  isChanged(): boolean {
+  get isChanged(): boolean {
     if (!this.loaded) {
       return false;
     }
