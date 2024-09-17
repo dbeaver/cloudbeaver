@@ -34,7 +34,7 @@ export function useUsersTable(filters: IUserFilters) {
   const pagination = useOffsetPagination(UsersResource, {
     key: UsersResourceFilterKey(filters.search.toLowerCase(), filters.status === 'true' ? true : filters.status === 'false' ? false : undefined),
   });
-  const usersLoader = useResource(useUsersTable, usersResource, pagination.key);
+  const usersLoader = useResource(useUsersTable, usersResource, pagination.currentPage);
   const notificationService = useService(NotificationService);
   const commonDialogService = useService(CommonDialogService);
 
@@ -47,7 +47,10 @@ export function useUsersTable(filters: IUserFilters) {
       },
       get users() {
         const users = Array.from(
-          new Set([...this.usersLoader.resource.get(UsersResourceNewUsers), ...usersLoader.tryGetData.filter(isDefined).sort(compareUsers)]),
+          new Set([
+            ...this.usersLoader.resource.get(UsersResourceNewUsers),
+            ...usersResource.get(pagination.allPages).filter(isDefined).sort(compareUsers),
+          ]),
         );
         return filters.filterUsers(users.filter(isDefined));
       },
