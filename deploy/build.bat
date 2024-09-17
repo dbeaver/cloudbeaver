@@ -4,9 +4,6 @@ rem command line arguments
 SET CONFIGURATION_PATH=%1
 SET SAMPLE_DATABASE_PATH=%2
 
-IF "%CONFIGURATION_PATH%"=="" SET CONFIGURATION_PATH="..\config\sample-databases\DefaultConfiguration"
-echo "Configuration path=%CONFIGURATION_PATH%"
-
 echo Clone and build Cloudbeaver
 
 IF EXIST drivers rmdir /S /Q drivers
@@ -45,8 +42,8 @@ IF NOT "%SAMPLE_DATABASE_PATH%"=="" (
     xcopy /E /Q %SAMPLE_DATABASE_PATH% cloudbeaver\samples\db >NUL
 )
 copy ..\config\core\* cloudbeaver\conf >NUL
-copy %CONFIGURATION_PATH%\GlobalConfiguration\.dbeaver\data-sources.json cloudbeaver\conf\initial-data-sources.conf >NUL
-copy %CONFIGURATION_PATH%\*.conf cloudbeaver\conf >NUL
+copy ..\config\sample-databases\DefaultConfiguration\GlobalConfiguration\.dbeaver\data-sources.json cloudbeaver\conf\initial-data-sources.conf >NUL
+copy ..\config\sample-databases\DefaultConfiguration\*.conf cloudbeaver\conf >NUL
 
 move drivers cloudbeaver >NUL
 

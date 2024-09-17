@@ -50,13 +50,9 @@ else
   cp -rp "${SAMPLE_DATABASE_PATH}" cloudbeaver/samples/
 fi
 
-if [[ -z "$CONFIGURATION_PATH" ]]; then
-  CONFIGURATION_PATH="../config/sample-databases/DefaultConfiguration"
-fi
-
 cp -rp  ../config/core/* cloudbeaver/conf
-cp -rp "${CONFIGURATION_PATH}"/GlobalConfiguration/.dbeaver/data-sources.json cloudbeaver/conf/initial-data-sources.conf
-cp -p "${CONFIGURATION_PATH}"/*.conf cloudbeaver/conf/
+cp -rp ../config/sample-databases/DefaultConfiguration/GlobalConfiguration/.dbeaver/data-sources.json cloudbeaver/conf/initial-data-sources.conf
+cp -p ../config/sample-databases/DefaultConfiguration/*.conf cloudbeaver/conf/
 mv drivers cloudbeaver
 
 echo "End of backend build"
