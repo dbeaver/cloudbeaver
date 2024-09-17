@@ -29,6 +29,10 @@ export class UsersMetaParametersResource extends CachedMapResource<string, UserM
   async setMetaParameters(userId: string, parameters: Record<string, any>): Promise<void> {
     await this.performUpdate(userId, undefined, async () => {
       await this.graphQLService.sdk.saveUserMetaParameters({ userId, parameters });
+
+      if (this.data) {
+        this.data.set(userId, parameters as UserMetaParameter);
+      }
     });
   }
 

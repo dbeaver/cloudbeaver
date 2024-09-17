@@ -60,6 +60,10 @@ export class TeamInfoMetaParametersResource extends CachedMapResource<string, Te
   async setMetaParameters(teamId: string, parameters: Record<string, any>): Promise<void> {
     await this.performUpdate(teamId, [], async () => {
       await this.graphQLService.sdk.saveTeamMetaParameters({ teamId, parameters });
+
+      if (this.data) {
+        this.data.set(teamId, parameters as TeamMetaParameter);
+      }
     });
   }
 
