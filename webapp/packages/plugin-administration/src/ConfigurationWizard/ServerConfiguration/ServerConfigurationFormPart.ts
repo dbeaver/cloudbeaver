@@ -106,9 +106,11 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
   }
 
   protected override async loader() {
-    const config = await this.serverConfigResource.load();
-    const productInfo = await this.productInfoResource.load();
-    const defaultNavigatorSettings = await this.defaultNavigatorSettingsResource.load();
+    const [config, productInfo, defaultNavigatorSettings] = await Promise.all([
+      this.serverConfigResource.load(),
+      this.productInfoResource.load(),
+      this.defaultNavigatorSettingsResource.load(),
+    ]);
 
     let adminName: string | undefined;
     let adminPassword: string | undefined;
