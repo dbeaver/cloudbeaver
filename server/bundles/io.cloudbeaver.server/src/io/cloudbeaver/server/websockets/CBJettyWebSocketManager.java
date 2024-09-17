@@ -19,11 +19,14 @@ package io.cloudbeaver.server.websockets;
 import io.cloudbeaver.model.app.AppWebSessionManager;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebHeadlessSession;
+import io.cloudbeaver.model.session.WebHttpRequestInfo;
 import io.cloudbeaver.server.CBPlatform;
-import jakarta.servlet.http.HttpServletRequest;
-import org.eclipse.jetty.websocket.server.JettyServerUpgradeRequest;
-import org.eclipse.jetty.websocket.server.JettyServerUpgradeResponse;
-import org.eclipse.jetty.websocket.server.JettyWebSocketCreator;
+import io.cloudbeaver.service.session.WebSessionManager;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.util.Callback;
+import org.eclipse.jetty.websocket.server.ServerUpgradeRequest;
+import org.eclipse.jetty.websocket.server.ServerUpgradeResponse;
+import org.eclipse.jetty.websocket.server.WebSocketCreator;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -37,7 +40,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class CBJettyWebSocketManager implements JettyWebSocketCreator {
+public class CBJettyWebSocketManager implements WebSocketCreator {
     private static final Log log = Log.getLog(CBJettyWebSocketManager.class);
     private final Map<String, List<CBEventsWebSocket>> socketBySessionId = new ConcurrentHashMap<>();
     private final AppWebSessionManager webSessionManager;
@@ -50,17 +53,22 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
 
     @Nullable
     @Override
-    public Object createWebSocket(@NotNull JettyServerUpgradeRequest request, JettyServerUpgradeResponse resp) {
-        var httpRequest = request.getHttpServletRequest();
-        var webSession = webSessionManager.getOrRestoreSession(httpRequest);
+    public Object createWebSocket(@NotNull ServerUpgradeRequest request, ServerUpgradeResponse resp, Callback callback) {
+        var webSession = webSessionManager.getOrRestoreSession(request);
+        var requestInfo = new WebHttpRequestInfo(
+            request.getId(),
+            request.getAttribute("locale"),
+            Request.getRemoteAddr(request),
+            request.getHeaders().get("User-Agent")
+        );
         if (webSession != null) {
-            webSession.updateSessionParameters(httpRequest);
+            webSession.updateSessionParameters(requestInfo);
             // web client session
             return createNewEventsWebSocket(webSession);
         }
         // possible desktop client session
         try {
-            var headlessSession = createHeadlessSession(httpRequest);
+            var headlessSession = createHeadlessSession(request);
             if (headlessSession == null) {
                 log.debug("Couldn't create headless session");
                 return null;
@@ -85,21 +93,21 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
     }
 
     @Nullable
-    private WebHeadlessSession createHeadlessSession(@NotNull HttpServletRequest request) throws DBException {
-        var httpSession = request.getSession(false);
-        if (httpSession == null) {
+    private WebHeadlessSession createHeadlessSession(@NotNull Request request) throws DBException {
+        var requestSession = request.getSession(false);
+        if (requestSession == null) {
             log.debug("CloudBeaver web session not exist, try to create headless session");
         } else {
-            log.debug("CloudBeaver session not found with id " + httpSession.getId() + ", try to create headless session");
+            log.debug("CloudBeaver session not found with id " + requestSession.getId() + ", try to create headless session");
         }
-        return webSessionManager.getHeadlessSession(request, true);
+        return webSessionManager.getHeadlessSession(request, requestSession, true);
     }
 
     public void sendPing() {
         //remove expired sessions
         socketBySessionId.entrySet()
             .removeIf(entry -> {
-                    entry.getValue().removeIf(ws -> !ws.isConnected());
+                entry.getValue().removeIf(ws -> !ws.isOpen());
                     return webSessionManager.getSession(entry.getKey()) == null ||
                         entry.getValue().isEmpty();
                 }
@@ -114,7 +122,7 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
                     var webSockets = entry.getValue();
                     for (CBEventsWebSocket webSocket : webSockets) {
                         try {
-                            webSocket.getRemote().sendPing(
+                            webSocket.getSession().sendPing(
                                 ByteBuffer.wrap("cb-ping".getBytes(StandardCharsets.UTF_8)),
                                 webSocket.getCallback()
                             );

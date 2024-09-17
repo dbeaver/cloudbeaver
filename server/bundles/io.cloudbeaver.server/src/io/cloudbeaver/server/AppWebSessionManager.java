@@ -56,7 +56,7 @@ public interface AppWebSessionManager {
 
     WebSession getOrRestoreSession(HttpServletRequest httpRequest);
 
-    WebHeadlessSession getHeadlessSession(HttpServletRequest request, boolean create) throws DBException;
+    WebHeadlessSession getHeadlessSession(Request request, Session session, boolean create) throws DBException;
 
     boolean touchSession(HttpServletRequest request, HttpServletResponse response) throws DBWebException;
 }

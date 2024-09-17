@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2022 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package io.cloudbeaver.server.websockets;
 
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebHeadlessSession;
-import org.eclipse.jetty.websocket.api.WriteCallback;
+import org.eclipse.jetty.websocket.api.Callback;
 import org.jkiss.code.NotNull;
 
-public class WebSocketPingPongCallback implements WriteCallback {
+public class WebSocketPingPongCallback implements Callback {
     @NotNull
     private final BaseWebSession webSession;
 
@@ -30,7 +30,7 @@ public class WebSocketPingPongCallback implements WriteCallback {
     }
 
     @Override
-    public void writeSuccess() {
+    public void succeed() {
         if (webSession instanceof WebHeadlessSession) {
             webSession.touchSession();
         }

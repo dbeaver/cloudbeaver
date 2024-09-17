@@ -22,18 +22,18 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.service.WebServiceServletBase;
-import org.eclipse.jetty.server.Request;
-import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.Log;
-import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.IOUtils;
-
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+import org.eclipse.jetty.ee10.servlet.ServletContextRequest;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
+import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.IOUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -59,7 +59,7 @@ public class WebSQLResultServlet extends WebServiceServletBase {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
+        request.setAttribute(ServletContextRequest.MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
         String fileName = UUID.randomUUID().toString();
         for (Part part : request.getParts()) {
             part.write(WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER + "/" + fileName);
