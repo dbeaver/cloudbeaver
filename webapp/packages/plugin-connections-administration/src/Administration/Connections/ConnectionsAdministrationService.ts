@@ -19,7 +19,7 @@ import { CreateConnectionService } from './CreateConnectionService';
 
 export interface IConnectionDetailsPlaceholderProps {
   connection: DatabaseConnection;
-  connectionOrigin: DatabaseConnectionOriginFragment;
+  connectionOrigin?: DatabaseConnectionOriginFragment;
 }
 
 const ConnectionsAdministration = React.lazy(async () => {

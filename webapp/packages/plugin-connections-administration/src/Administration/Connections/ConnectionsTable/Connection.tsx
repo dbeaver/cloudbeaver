@@ -22,6 +22,7 @@ import {
 import { DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsAdministrationService } from '../ConnectionsAdministrationService';
 import styles from './Connection.module.css';
@@ -31,10 +32,11 @@ interface Props {
   connectionKey: IConnectionInfoParams;
   connection: DatabaseConnection;
   shouldDisplayProject: boolean;
+  connectionOrigin?: DatabaseConnectionOriginFragment;
   icon?: string;
 }
 
-export const Connection = observer<Props>(function Connection({ connectionKey, connection, shouldDisplayProject, icon }) {
+export const Connection = observer<Props>(function Connection({ connectionKey, connectionOrigin, connection, shouldDisplayProject, icon }) {
   const style = useS(styles);
   const connectionsAdministrationService = useService(ConnectionsAdministrationService);
   const projectInfoResource = useResource(Connection, ProjectInfoResource, connectionKey.projectId, { active: shouldDisplayProject });
