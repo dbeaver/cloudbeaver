@@ -9,11 +9,9 @@ import React from 'react';
 
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { ConfirmationDialog, PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, DatabaseConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { NotificationService } from '@cloudbeaver/core-events';
-import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
 
@@ -47,9 +45,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
 
   constructor(
     private readonly administrationItemService: AdministrationItemService,
-    private readonly notificationService: NotificationService,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly dbDriverResource: DBDriverResource,
     private readonly createConnectionService: CreateConnectionService,
     private readonly commonDialogService: CommonDialogService,
     private readonly serverConfigResource: ServerConfigResource,
@@ -77,7 +73,6 @@ export class ConnectionsAdministrationService extends Bootstrap {
       isHidden: () => this.serverConfigResource.distributed,
       getContentComponent: () => ConnectionsAdministration,
       getDrawerComponent: () => ConnectionsDrawerItem,
-      onActivate: this.loadConnections.bind(this),
       onDeActivate: this.refreshUserConnections.bind(this),
     });
     this.connectionDetailsPlaceholder.add(Origin, 0);
@@ -123,14 +118,5 @@ export class ConnectionsAdministrationService extends Bootstrap {
     });
 
     return result !== DialogueStateResult.Rejected;
-  }
-
-  private async loadConnections() {
-    try {
-      await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
-      await this.dbDriverResource.load(CachedMapAllKey);
-    } catch (exception: any) {
-      this.notificationService.logException(exception, 'Error occurred while loading connections');
-    }
   }
 }
