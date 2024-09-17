@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.app;
+package io.cloudbeaver.server;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.BaseWebSession;
@@ -22,6 +22,8 @@ import io.cloudbeaver.model.session.WebHeadlessSession;
 import io.cloudbeaver.model.session.WebSession;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Session;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -54,7 +56,7 @@ public interface AppWebSessionManager {
 
     Collection<BaseWebSession> getAllActiveSessions();
 
-    WebSession getOrRestoreSession(HttpServletRequest httpRequest);
+    WebSession getOrRestoreSession(Request httpRequest);
 
     WebHeadlessSession getHeadlessSession(Request request, Session session, boolean create) throws DBException;
 

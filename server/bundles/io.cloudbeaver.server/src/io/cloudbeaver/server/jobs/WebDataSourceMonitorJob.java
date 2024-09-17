@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.server.jobs;
 
-import io.cloudbeaver.model.app.AppWebSessionManager;
+import io.cloudbeaver.server.AppWebSessionManager;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;

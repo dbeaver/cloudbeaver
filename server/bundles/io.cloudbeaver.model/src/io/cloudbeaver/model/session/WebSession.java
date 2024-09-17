@@ -27,6 +27,7 @@ import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -126,17 +127,19 @@ public class WebSession extends BaseWebSession
     public WebSession(
         @NotNull WebHttpRequestInfo requestInfo,
         @NotNull WebAuthApplication application,
-        @NotNull HttpServletRequest request,
-        @NotNull WebApplication application,
         @NotNull Map<String, DBWSessionHandler> sessionHandlers
     ) throws DBException {
-        this(
-            request.getSession().getId(),
-            CommonUtils.toString(request.getSession().getAttribute(ATTR_LOCALE), null),
-            application,
-            sessionHandlers
-        );
-        updateSessionParameters(request);
+        super(requestInfo.getId(), application);
+        this.lastAccessTime = this.createTime;
+        setLocale(CommonUtils.toString(requestInfo.getLocale(), this.locale));
+        this.sessionHandlers = sessionHandlers;
+        //force authorization of anonymous session to avoid access error,
+        //because before authorization could be called by any request,
+        //but now 'updateInfo' is called only in special requests,
+        //and the order of requests is not guaranteed.
+        //look at CB-4747
+        refreshSessionAuth();
+        updateSessionParameters(requestInfo);
     }
 
     protected WebSession(
@@ -145,10 +148,8 @@ public class WebSession extends BaseWebSession
         @NotNull WebApplication application,
         @NotNull Map<String, DBWSessionHandler> sessionHandlers
     ) throws DBException {
-        super(requestInfo.getId(), application);
         super(id, application);
         this.lastAccessTime = this.createTime;
-        setLocale(CommonUtils.toString(requestInfo.getLocale(), this.locale));
         this.sessionHandlers = sessionHandlers;
         setLocale(locale);
         //force authorization of anonymous session to avoid access error,
@@ -157,7 +158,6 @@ public class WebSession extends BaseWebSession
         //and the order of requests is not guaranteed.
         //look at CB-4747
         refreshSessionAuth();
-        updateSessionParameters(requestInfo);
     }
 
     @Nullable

@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.app;
+package io.cloudbeaver.server;
 
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import org.jkiss.code.NotNull;
 

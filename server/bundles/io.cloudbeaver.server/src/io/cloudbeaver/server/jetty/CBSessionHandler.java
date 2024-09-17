@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.server.jetty;
 
-import io.cloudbeaver.model.app.GQLApplicationAdapter;
+import io.cloudbeaver.server.GQLApplicationAdapter;
 import jakarta.servlet.SessionCookieConfig;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.SessionHandler;

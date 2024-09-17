@@ -19,7 +19,6 @@ package io.cloudbeaver.server;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.BaseWebApplication;
-import io.cloudbeaver.model.app.GQLApplicationAdapter;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.registry.WebDriverRegistry;

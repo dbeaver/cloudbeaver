@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.server.jetty;
 
-import io.cloudbeaver.model.app.GQLApplicationAdapter;
+import io.cloudbeaver.server.GQLApplicationAdapter;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBServerConfig;
@@ -137,7 +137,12 @@ public class CBJettyServer {
                 );
                 servletContextHandler.insertHandler(webSocketHandler);
 
-                initSessionManager(this.application, server, servletContextHandler);
+                initSessionManager(
+                    this.application.getMaxSessionIdleTime(),
+                    this.application,
+                    server,
+                    servletContextHandler
+                );
 
                 server.setHandler(servletContextHandler);
 
@@ -192,8 +197,7 @@ public class CBJettyServer {
         @NotNull ServletContextHandler servletContextHandler
     ) {
         // Init sessions persistence
-        SessionHandler sessionHandler = new SessionHandler();
-        var maxIdleTime = application.getMaxSessionIdleTime();
+        CBSessionHandler sessionHandler = new CBSessionHandler(application);
         int intMaxIdleSeconds;
         if (maxIdleTime > Integer.MAX_VALUE) {
             log.warn("Max session idle time value is greater than Integer.MAX_VALUE. Integer.MAX_VALUE will be used instead");
