@@ -92,6 +92,12 @@ export abstract class CachedResource<
     this.aliases.add(CachedResourceListEmptyKey, () => resourceKeyList([]));
     this.aliases.add(CachedResourceOffsetPageTargetKey, key => key.options.target);
     this.aliases.add(CachedResourceOffsetPageKey, key => {
+      const pageTarget = key.find(CachedResourceOffsetPageTargetKey);
+
+      if (pageTarget) {
+        return pageTarget.options.target;
+      }
+
       const keys = [];
       const pageInfo = this.offsetPagination.getPageInfo(key);
 
@@ -329,6 +335,7 @@ export abstract class CachedResource<
     }
 
     const pageKey = this.aliases.isAlias(param, CachedResourceOffsetPageKey) || this.aliases.isAlias(param, CachedResourceOffsetPageListKey);
+
     if (pageKey) {
       const pageInfo = this.offsetPagination.getPageInfo(pageKey);
 

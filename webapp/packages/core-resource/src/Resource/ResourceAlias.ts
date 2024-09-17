@@ -42,6 +42,10 @@ export abstract class ResourceAlias<TKey, TOptions extends ResourceAliasOptions>
     return undefined;
   }
 
+  copy(): this {
+    return new (this.constructor as any)(this.id, this.options) as this;
+  }
+
   setParent(parent: ResourceAlias<TKey, any>): this {
     parent = this.parent ? this.parent.setParent(parent) : parent;
     const copy = new (this.constructor as any)(this.id, this.options, parent) as this;

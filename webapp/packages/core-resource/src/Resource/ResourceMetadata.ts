@@ -111,6 +111,8 @@ export class ResourceMetadata<TKey, TMetadata extends ICachedResourceMetadata> {
         if (this.some(param, predicate)) {
           result = true;
         }
+      } else if (predicate(this.get(param))) {
+        result = true;
       }
     }
 

@@ -115,13 +115,13 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
         const keys = dbObjects.map(dbObject => dbObject.id);
         this.set(resourceKeyList(keys), dbObjects);
 
-        this.offsetPagination.setPage(
-          CachedResourceOffsetPageKey(offset, limit).setParent(CachedResourceOffsetPageTargetKey(originalKey)),
-          keys,
-          this.navTreeResource.offsetPagination.hasNextPage(
-            CachedResourceOffsetPageKey(offset, limit).setParent(CachedResourceOffsetPageTargetKey(nodeId)),
-          ),
-        );
+        if (pageKey) {
+          this.offsetPagination.setPage(
+            pageKey,
+            keys,
+            this.navTreeResource.offsetPagination.hasNextPage(pageKey.copy().setParent(CachedResourceOffsetPageTargetKey(nodeId))),
+          );
+        }
       });
 
       return this.data;
