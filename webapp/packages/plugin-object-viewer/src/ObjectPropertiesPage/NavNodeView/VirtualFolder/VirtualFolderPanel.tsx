@@ -30,7 +30,7 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
     pageSize: tree.resource.childrenLimit,
   });
 
-  const dbObjectLoader = useResource(VirtualFolderPanel, DBObjectResource, pagination.key);
+  const dbObjectLoader = useResource(VirtualFolderPanel, DBObjectResource, pagination.currentPage);
 
   const { nodes, duplicates } = navNodeViewService.filterDuplicates(dbObjectLoader.data.filter(isDefined).map(node => node?.id) || []);
 

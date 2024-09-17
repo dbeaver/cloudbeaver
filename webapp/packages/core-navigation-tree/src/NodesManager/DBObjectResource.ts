@@ -14,6 +14,7 @@ import {
   CachedMapResource,
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
+  CachedResourceOffsetPageTargetKey,
   isResourceAlias,
   type ResourceKey,
   resourceKeyList,
@@ -47,7 +48,8 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
         const pageAlias = this.aliases.isAlias(nodeId, CachedResourceOffsetPageKey) || this.aliases.isAlias(nodeId, CachedResourceOffsetPageListKey);
 
         if (pageAlias) {
-          this.markOutdated(DBObjectParentKey(pageAlias.target));
+          const pageTarget = this.aliases.isAlias(nodeId, CachedResourceOffsetPageTargetKey);
+          this.markOutdated(DBObjectParentKey(pageTarget?.options.target));
         }
 
         if (!isResourceAlias(nodeId)) {
@@ -70,7 +72,9 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
       }
 
       if (parentKey) {
-        await this.navTreeResource.load(CachedResourceOffsetPageKey(offset, limit).setTarget(parentKey.options.parentId));
+        await this.navTreeResource.load(
+          CachedResourceOffsetPageKey(offset, limit).setParent(CachedResourceOffsetPageTargetKey(parentKey.options.parentId)),
+        );
         return;
       }
 
@@ -105,14 +109,21 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
 
     if (parentKey) {
       const nodeId = parentKey.options.parentId;
-      await this.loadFromChildren(nodeId, offset, limit);
+      const dbObjects = await this.loadFromChildren(nodeId, offset, limit);
 
       runInAction(() => {
-        this.offsetPagination.setPageEnd(
-          CachedResourceOffsetPageKey(offset, limit).setTarget(originalKey),
-          this.navTreeResource.offsetPagination.hasNextPage(CachedResourceOffsetPageKey(offset, limit).setTarget(nodeId)),
+        const keys = dbObjects.map(dbObject => dbObject.id);
+        this.set(resourceKeyList(keys), dbObjects);
+
+        this.offsetPagination.setPage(
+          CachedResourceOffsetPageKey(offset, limit).setParent(CachedResourceOffsetPageTargetKey(originalKey)),
+          keys,
+          this.navTreeResource.offsetPagination.hasNextPage(
+            CachedResourceOffsetPageKey(offset, limit).setParent(CachedResourceOffsetPageTargetKey(nodeId)),
+          ),
         );
       });
+
       return this.data;
     }
 
@@ -128,14 +139,14 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     return this.data;
   }
 
-  private async loadFromChildren(parentId: string, offset: number, limit: number) {
+  private async loadFromChildren(parentId: string, offset: number, limit: number): Promise<DBObject[]> {
     const { dbObjects } = await this.graphQLService.sdk.getChildrenDBObjectInfo({
       navNodeId: parentId,
       offset,
       limit,
     });
 
-    this.set(resourceKeyList(dbObjects.map(dbObject => dbObject.id)), dbObjects);
+    return dbObjects;
   }
 
   private async loadDBObjectInfo(navNodeId: string): Promise<DBObject> {
