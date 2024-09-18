@@ -23,6 +23,7 @@ import graphql.execution.instrumentation.SimplePerformantInstrumentation;
 import graphql.language.SourceLocation;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.PropertyDataFetcherHelper;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
@@ -77,6 +78,7 @@ public class GraphQLEndpoint extends HttpServlet {
     public GraphQLEndpoint() {
         GraphQLSchema schema = buildSchema();
 
+        PropertyDataFetcherHelper.setUseLambdaFactory(false);
         graphQL = GraphQL
             .newGraphQL(schema)
             .instrumentation(new SimplePerformantInstrumentation())

@@ -17,4 +17,5 @@ export default [
     'templates_administration_info_message',
     '管理员可在数据库连接模板中定义各种可重用的连接参数，之后用户可基于这些模板创建多个数据库连接。',
   ],
+  ['connections_administration_connection_create_error', 'Failed to create connection'],
 ];

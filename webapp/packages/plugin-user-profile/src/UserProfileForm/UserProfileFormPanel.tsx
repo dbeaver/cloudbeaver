@@ -39,7 +39,7 @@ export const UserProfileFormPanel: TabContainerPanelComponent = observer(functio
       async function closeHandler(_, contexts) {
         const context = contexts.getContext(userProfileContext);
 
-        if (state.isChanged() && !context.force) {
+        if (state.isChanged && !context.force) {
           const result = await commonDialogService.open(ConfirmationDialog, {
             title: 'connections_public_connection_edit_cancel_title',
             message: 'connections_public_connection_edit_cancel_message',

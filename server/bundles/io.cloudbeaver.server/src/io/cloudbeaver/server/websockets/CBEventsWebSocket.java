@@ -20,8 +20,8 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
+import org.eclipse.jetty.websocket.api.Callback;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.WriteCallback;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
@@ -36,7 +36,7 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
     @NotNull
     private final BaseWebSession webSession;
     @NotNull
-    private final WriteCallback callback;
+    private final Callback callback;
 
     public CBEventsWebSocket(@NotNull BaseWebSession webSession) {
         this.webSession = webSession;
@@ -45,8 +45,8 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
     }
 
     @Override
-    public void onWebSocketConnect(Session session) {
-        super.onWebSocketConnect(session);
+    public void onWebSocketOpen(Session session) {
+        super.onWebSocketOpen(session);
         this.webSession.addEventHandler(this);
         handleEvent(new WSSocketConnectedEvent(webSession.getApplication().getApplicationRunId()));
         log.debug("EventWebSocket connected to the " + webSession.getSessionId() + " session");
@@ -109,7 +109,7 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
         super.handleEvent(event);
     }
     @Override
-    protected void handleEventException(Exception e) {
+    protected void handleEventException(Throwable e) {
         super.handleEventException(e);
         webSession.addSessionError(e);
     }
@@ -120,7 +120,7 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
     }
 
     @NotNull
-    public WriteCallback getCallback() {
+    public Callback getCallback() {
         return callback;
     }
 }
