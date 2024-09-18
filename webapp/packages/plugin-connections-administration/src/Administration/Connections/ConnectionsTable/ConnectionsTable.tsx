@@ -12,6 +12,7 @@ import { ConnectionInfoOrigin, ConnectionInfoOriginResource, DBDriverResource, s
 import { useService } from '@cloudbeaver/core-di';
 import { isGlobalProject, isSharedProject, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { Connection } from './Connection';
 import { IConnectionsTableState } from './useConnectionsTable';
@@ -20,19 +21,27 @@ interface Props {
   state: IConnectionsTableState;
 }
 
+function getOriginsMap(origins: (ConnectionInfoOrigin | undefined)[]) {
+  const map = new Map<string, ConnectionInfoOrigin>();
+
+  for (const origin of origins) {
+    if (!isNotNullDefined(origin)) {
+      continue;
+    }
+
+    map.set(origin.id, origin);
+  }
+
+  return map;
+}
+
 export const ConnectionsTable = observer<Props>(function ConnectionsTable({ state }) {
   const translate = useTranslate();
   const projectService = useService(ProjectsService);
   const dbDriverResource = useResource(ConnectionsTable, DBDriverResource, CachedMapAllKey);
   const shouldDisplayProjects = projectService.activeProjects.filter(project => isGlobalProject(project) || isSharedProject(project)).length > 1;
   const connectionOriginResource = useResource(ConnectionsTable, ConnectionInfoOriginResource, CachedMapAllKey);
-  const connectionOriginsMap: Map<string, ConnectionInfoOrigin> = connectionOriginResource.data.reduce((acc, origin) => {
-    if (origin?.id) {
-      acc.set(origin.id, origin);
-    }
-
-    return acc;
-  }, new Map());
+  const connectionOriginsMap = getOriginsMap(connectionOriginResource.data);
 
   return (
     <Table keys={state.keys} selectedItems={state.table.selected} expandedItems={state.table.expanded} size="big">
