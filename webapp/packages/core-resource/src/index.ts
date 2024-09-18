@@ -18,6 +18,7 @@ export {
   getNextPageOffset,
   type ICachedResourceOffsetPageOptions,
 } from './Resource/CachedResourceOffsetPageKeys';
+export * from './Resource/getOffsetPageKeyInfo';
 export * from './Resource/CachedTreeResource/CachedTreeResource';
 export * from './Resource/CachedTreeResource/ICachedTreeMoveData';
 export * from './Resource/ICachedResourceMetadata';

@@ -12,12 +12,12 @@ import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutionContext, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import {
-  CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedMapAllKey,
   CachedMapResource,
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
   CachedResourceOffsetPageTargetKey,
+  getOffsetPageKeyInfo,
   type ICachedResourceMetadata,
   isResourceAlias,
   isResourceKeyList,
@@ -462,27 +462,23 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, string[]>> {
-    const pageListKey = this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
-    const pageKey = this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || pageListKey;
+    const { isPageListKey, pageTargetKey, offset, limit } = getOffsetPageKeyInfo(this, originalKey, undefined, this.childrenLimit);
     const allKey = this.aliases.isAlias(originalKey, CachedMapAllKey);
-    const pageTarget = this.aliases.isAlias(originalKey, CachedResourceOffsetPageTargetKey);
 
     if (allKey) {
       throw new Error('Loading all nodes is prohibited');
     }
 
-    const offset = pageKey?.options.offset ?? CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
-    const limit = pageKey?.options.limit ?? this.childrenLimit;
     const values: NavNodeChildrenQuery[] = [];
     const pages: Parameters<typeof this.offsetPagination.setPage>[] = [];
 
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {
-      const nodeId = pageTarget?.options?.target ?? key;
+      const nodeId = pageTargetKey ?? key;
       const navNodeChildren = await this.loadNodeChildren(nodeId, offset, limit);
       values.push(navNodeChildren);
 
       pages.push([
-        pageListKey
+        isPageListKey
           ? CachedResourceOffsetPageListKey(offset, navNodeChildren.navNodeChildren.length).setParent(CachedResourceOffsetPageTargetKey(nodeId))
           : CachedResourceOffsetPageKey(offset, navNodeChildren.navNodeChildren.length).setParent(CachedResourceOffsetPageTargetKey(nodeId)),
         navNodeChildren.navNodeChildren.map(node => node.id),
