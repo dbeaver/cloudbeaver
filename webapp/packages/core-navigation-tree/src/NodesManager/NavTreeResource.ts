@@ -275,9 +275,10 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
         parts.splice(parts.length - 1, 1, name);
         const path = parts.join('/');
 
-        this.markTreeOutdated(parentId);
+        this.markOutdated(parentId);
         this.markLoaded(node.id);
         this.onDataOutdated.execute(parentId);
+
         return path;
       } finally {
         this.markLoading(node.id, false);
