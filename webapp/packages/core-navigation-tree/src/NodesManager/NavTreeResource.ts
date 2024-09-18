@@ -461,8 +461,8 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, string[]>> {
-    const pageKey =
-      this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
+    const pageListKey = this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
+    const pageKey = this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || pageListKey;
     const allKey = this.aliases.isAlias(originalKey, CachedMapAllKey);
     const pageTarget = this.aliases.isAlias(originalKey, CachedResourceOffsetPageTargetKey);
 
@@ -481,7 +481,9 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       values.push(navNodeChildren);
 
       pages.push([
-        CachedResourceOffsetPageKey(offset, navNodeChildren.navNodeChildren.length).setParent(CachedResourceOffsetPageTargetKey(nodeId)),
+        pageListKey
+          ? CachedResourceOffsetPageListKey(offset, navNodeChildren.navNodeChildren.length).setParent(CachedResourceOffsetPageTargetKey(nodeId))
+          : CachedResourceOffsetPageKey(offset, navNodeChildren.navNodeChildren.length).setParent(CachedResourceOffsetPageTargetKey(nodeId)),
         navNodeChildren.navNodeChildren.map(node => node.id),
         navNodeChildren.navNodeChildren.length === limit,
       ]);

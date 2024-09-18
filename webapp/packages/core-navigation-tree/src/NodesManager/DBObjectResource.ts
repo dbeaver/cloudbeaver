@@ -99,8 +99,8 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     let limit = this.navTreeResource.childrenLimit;
     let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
     const parentKey = this.aliases.isAlias(originalKey, DBObjectParentKey);
-    const pageKey =
-      this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
+    const pageListKey = this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
+    const pageKey = this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || pageListKey;
 
     if (pageKey) {
       limit = pageKey.options.limit;
@@ -115,13 +115,13 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
         const keys = dbObjects.map(dbObject => dbObject.id);
         this.set(resourceKeyList(keys), dbObjects);
 
-        if (pageKey) {
-          this.offsetPagination.setPage(
-            pageKey,
-            keys,
-            this.navTreeResource.offsetPagination.hasNextPage(pageKey.copy().setParent(CachedResourceOffsetPageTargetKey(nodeId))),
-          );
-        }
+        this.offsetPagination.setPage(
+          pageListKey
+            ? CachedResourceOffsetPageListKey(offset, limit).setParent(parentKey || CachedResourceOffsetPageTargetKey(nodeId))
+            : CachedResourceOffsetPageKey(offset, limit).setParent(parentKey || CachedResourceOffsetPageTargetKey(nodeId)),
+          keys,
+          keys.length === limit,
+        );
       });
 
       return this.data;

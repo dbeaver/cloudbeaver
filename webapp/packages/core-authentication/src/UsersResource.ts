@@ -260,8 +260,8 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
         usersList.push(user);
       } else {
-        const pageKey =
-          this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
+        const pageListKey = this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
+        const pageKey = this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || pageListKey;
         const filterKey = this.aliases.isAlias(originalKey, UsersResourceFilterKey);
         let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
         let limit = CACHED_RESOURCE_DEFAULT_PAGE_LIMIT;
@@ -294,7 +294,9 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
         usersList.push(...users);
 
         pages.push([
-          CachedResourceOffsetPageListKey(offset, users.length).setParent(filterKey!),
+          pageListKey
+            ? CachedResourceOffsetPageListKey(offset, users.length).setParent(filterKey)
+            : CachedResourceOffsetPageKey(offset, users.length).setParent(filterKey),
           users.map(user => user.userId),
           users.length === limit,
         ]);
