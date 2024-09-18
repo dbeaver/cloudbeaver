@@ -8,13 +8,13 @@
 import type { DataContextGetter, IDataContext } from '@cloudbeaver/core-data-context';
 import type { ENotificationType } from '@cloudbeaver/core-events';
 import type { IExecutor } from '@cloudbeaver/core-executor';
-import type { ILoadableState, MetadataMap } from '@cloudbeaver/core-utils';
+import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { FormBaseService } from './FormBaseService';
 import type { FormMode } from './FormMode';
 import type { IFormPart } from './IFormPart';
 
-export interface IFormState<TState> extends ILoadableState {
+export interface IFormState<TState> {
   readonly id: string;
   readonly service: FormBaseService<TState>;
   readonly dataContext: IDataContext;
@@ -23,14 +23,13 @@ export interface IFormState<TState> extends ILoadableState {
   readonly parts: MetadataMap<string, any>;
   readonly state: TState;
   readonly isDisabled: boolean;
+  readonly exception: Error | (Error | null)[] | null;
 
   readonly promise: Promise<any> | null;
 
-  readonly exception: Error | (Error | null)[] | null;
   readonly statusMessage: string | string[] | null;
   readonly statusType: ENotificationType | null;
 
-  readonly configureTask: IExecutor<IFormState<TState>>;
   readonly formStateTask: IExecutor<TState>;
   readonly fillDefaultConfigTask: IExecutor<IFormState<TState>>;
   readonly submitTask: IExecutor<IFormState<TState>>;
@@ -39,20 +38,14 @@ export interface IFormState<TState> extends ILoadableState {
 
   setMode(mode: FormMode): this;
   setPartsState(state: MetadataMap<string, any>): this;
-  setException(exception: Error | (Error | null)[] | null): this;
   setState(state: TState): this;
 
   getPart<T extends IFormPart<any>>(getter: DataContextGetter<T>, init: (context: IDataContext, id: string) => T): T;
 
-  isLoading(): boolean;
-  isLoaded(): boolean;
-  isError(): boolean;
-  isOutdated(): boolean;
-  isCancelled(): boolean;
-  isChanged(): boolean;
+  isError: boolean;
+  isCancelled: boolean;
+  isChanged: boolean;
 
-  load(): Promise<void>;
-  reload(): Promise<void>;
   save(): Promise<boolean>;
   reset(): void;
   cancel(): void;
