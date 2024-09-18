@@ -22,17 +22,7 @@ interface Props {
 }
 
 function getOriginsMap(origins: (ConnectionInfoOrigin | undefined)[]) {
-  const map = new Map<string, ConnectionInfoOrigin>();
-
-  for (const origin of origins) {
-    if (!isNotNullDefined(origin)) {
-      continue;
-    }
-
-    map.set(origin.id, origin);
-  }
-
-  return map;
+  return new Map(origins.filter(isNotNullDefined).map(origin => [origin.id, origin]));
 }
 
 export const ConnectionsTable = observer<Props>(function ConnectionsTable({ state }) {
