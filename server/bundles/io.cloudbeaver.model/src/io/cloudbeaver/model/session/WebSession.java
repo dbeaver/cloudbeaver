@@ -33,7 +33,6 @@ import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -124,13 +123,13 @@ public class WebSession extends BaseWebSession
     private final Map<String, DBWSessionHandler> sessionHandlers;
 
     public WebSession(
-        @NotNull HttpServletRequest request,
+        @NotNull WebHttpRequestInfo requestInfo,
         @NotNull WebAuthApplication application,
         @NotNull Map<String, DBWSessionHandler> sessionHandlers
     ) throws DBException {
-        super(request.getSession().getId(), application);
+        super(requestInfo.getId(), application);
         this.lastAccessTime = this.createTime;
-        setLocale(CommonUtils.toString(request.getSession().getAttribute(ATTR_LOCALE), this.locale));
+        setLocale(CommonUtils.toString(requestInfo.getLocale(), this.locale));
         this.sessionHandlers = sessionHandlers;
         //force authorization of anonymous session to avoid access error,
         //because before authorization could be called by any request,
@@ -138,7 +137,7 @@ public class WebSession extends BaseWebSession
         //and the order of requests is not guaranteed.
         //look at CB-4747
         refreshSessionAuth();
-        updateSessionParameters(request);
+        updateSessionParameters(requestInfo);
     }
 
     @Nullable
@@ -558,9 +557,9 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public synchronized void updateSessionParameters(HttpServletRequest request) {
-        this.lastRemoteAddr = request.getRemoteAddr();
-        this.lastRemoteUserAgent = request.getHeader("User-Agent");
+    public synchronized void updateSessionParameters(WebHttpRequestInfo requestInfo) {
+        this.lastRemoteAddr = requestInfo.getLastRemoteAddress();
+        this.lastRemoteUserAgent = requestInfo.getLastRemoteUserAgent();
         this.cacheExpired = false;
     }
 

@@ -10,8 +10,10 @@ import type { ILoadableState } from '@cloudbeaver/core-utils';
 export interface IFormPart<TState> extends ILoadableState {
   readonly state: TState;
   readonly initialState: TState;
+  isSaving: boolean;
+  readonly isDisabled: boolean;
 
-  isChanged(): boolean;
+  readonly isChanged: boolean;
 
   load(): Promise<void>;
   reset(): void;

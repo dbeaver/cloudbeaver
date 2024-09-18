@@ -12,11 +12,12 @@ import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutionContext, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import {
-  CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedMapAllKey,
   CachedMapResource,
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
+  CachedResourceOffsetPageTargetKey,
+  getOffsetPageKeyInfo,
   type ICachedResourceMetadata,
   isResourceAlias,
   isResourceKeyList,
@@ -274,9 +275,10 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
         parts.splice(parts.length - 1, 1, name);
         const path = parts.join('/');
 
-        this.markTreeOutdated(parentId);
+        this.markOutdated(parentId);
         this.markLoaded(node.id);
         this.onDataOutdated.execute(parentId);
+
         return path;
       } finally {
         this.markLoading(node.id, false);
@@ -460,30 +462,37 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, string[]>> {
-    const pageKey =
-      this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
+    const { isPageListKey, pageTargetKey, offset, limit } = getOffsetPageKeyInfo(this, originalKey, undefined, this.childrenLimit);
     const allKey = this.aliases.isAlias(originalKey, CachedMapAllKey);
 
     if (allKey) {
       throw new Error('Loading all nodes is prohibited');
     }
 
-    const offset = pageKey?.options.offset ?? CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
-    const limit = pageKey?.options.limit ?? this.childrenLimit;
     const values: NavNodeChildrenQuery[] = [];
+    const pages: Parameters<typeof this.offsetPagination.setPage>[] = [];
 
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {
-      const nodeId = pageKey?.target ?? key;
+      const nodeId = pageTargetKey ?? key;
       const navNodeChildren = await this.loadNodeChildren(nodeId, offset, limit);
       values.push(navNodeChildren);
 
-      this.offsetPagination.setPageEnd(
-        CachedResourceOffsetPageKey(offset, navNodeChildren.navNodeChildren.length).setTarget(nodeId),
+      pages.push([
+        isPageListKey
+          ? CachedResourceOffsetPageListKey(offset, navNodeChildren.navNodeChildren.length).setParent(CachedResourceOffsetPageTargetKey(nodeId))
+          : CachedResourceOffsetPageKey(offset, navNodeChildren.navNodeChildren.length).setParent(CachedResourceOffsetPageTargetKey(nodeId)),
+        navNodeChildren.navNodeChildren.map(node => node.id),
         navNodeChildren.navNodeChildren.length === limit,
-      );
+      ]);
     });
 
-    this.setNavObject(values, offset, limit);
+    runInAction(() => {
+      this.setNavObject(values, offset, limit);
+
+      for (const pageArgs of pages) {
+        this.offsetPagination.setPage(...pageArgs);
+      }
+    });
 
     return this.data;
   }

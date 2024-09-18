@@ -16,7 +16,6 @@ export * from './DIService';
 export * from './injectable';
 export * from './PluginManifest';
 export * from './useService';
-export * from './useController';
 export * from './ITypedConstructor';
 export * from './isConstructor';
 export * from './IServiceProvider';
