@@ -42,16 +42,16 @@ export class NavigationTreeSettingsService extends Dependency {
 
   private registerSettings() {
     this.settingsManagerService.registerSettings(this.settings, () => [
-      {
-        group: NAVIGATION_TREE_SETTINGS_GROUP,
-        key: 'plugin.navigation-tree.disabled',
-        access: {
-          scope: ['server'],
-        },
-        type: ESettingsValueType.Checkbox,
-        name: 'plugin_navigation_tree_settings_disable',
-        description: 'plugin_navigation_tree_settings_disable_description',
-      },
+      // {
+      //   group: NAVIGATION_TREE_SETTINGS_GROUP,
+      //   key: 'plugin.navigation-tree.disabled',
+      //   access: {
+      //     scope: ['server'],
+      //   },
+      //   type: ESettingsValueType.Checkbox,
+      //   name: 'plugin_navigation_tree_settings_disable',
+      //   description: 'plugin_navigation_tree_settings_disable_description',
+      // },
     ]);
   }
 }

@@ -6,10 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
+import { SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
-
-import { CONNECTIONS_SETTINGS_GROUP } from './CONNECTIONS_SETTINGS_GROUP';
 
 const settingsSchema = schema.object({
   'core.connections.disabled': schemaExtra.stringedBoolean().default(false),
@@ -34,17 +32,17 @@ export class ConnectionsSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
-      {
-        group: CONNECTIONS_SETTINGS_GROUP,
-        key: 'core.connections.disabled',
-        access: {
-          scope: ['server'],
-        },
-        name: 'core_connections_settings_disable',
-        description: 'core_connections_settings_disable_description',
-        type: ESettingsValueType.Checkbox,
-      },
-    ]);
+    // this.settingsManagerService.registerSettings(this.settings, () => [
+    //   {
+    //     group: CONNECTIONS_SETTINGS_GROUP,
+    //     key: 'core.connections.disabled',
+    //     access: {
+    //       scope: ['server'],
+    //     },
+    //     name: 'core_connections_settings_disable',
+    //     description: 'core_connections_settings_disable_description',
+    //     type: ESettingsValueType.Checkbox,
+    //   },
+    // ]);
   }
 }

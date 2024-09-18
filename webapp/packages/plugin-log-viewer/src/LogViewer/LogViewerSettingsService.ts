@@ -65,26 +65,26 @@ export class LogViewerSettingsService extends Dependency {
 
   private registerSettings() {
     this.settingsManagerService.registerSettings(this.settings, () => [
-      {
-        group: LOG_VIEWER_SETTINGS_GROUP,
-        key: 'plugin.log-viewer.maxLogRecords',
-        access: {
-          scope: ['client'],
-        },
-        type: ESettingsValueType.Input,
-        name: 'plugin_log_viewer_settings_max_log_records',
-        description: 'plugin_log_viewer_settings_max_log_records_description',
-      },
-      {
-        group: LOG_VIEWER_SETTINGS_GROUP,
-        key: 'plugin.log-viewer.logBatchSize',
-        access: {
-          scope: ['client'],
-        },
-        type: ESettingsValueType.Input,
-        name: 'plugin_log_viewer_settings_log_batch_size',
-        description: 'plugin_log_viewer_settings_log_batch_size_description',
-      },
+      // {
+      //   group: LOG_VIEWER_SETTINGS_GROUP,
+      //   key: 'plugin.log-viewer.maxLogRecords',
+      //   access: {
+      //     scope: ['client'],
+      //   },
+      //   type: ESettingsValueType.Input,
+      //   name: 'plugin_log_viewer_settings_max_log_records',
+      //   description: 'plugin_log_viewer_settings_max_log_records_description',
+      // },
+      // {
+      //   group: LOG_VIEWER_SETTINGS_GROUP,
+      //   key: 'plugin.log-viewer.logBatchSize',
+      //   access: {
+      //     scope: ['client'],
+      //   },
+      //   type: ESettingsValueType.Input,
+      //   name: 'plugin_log_viewer_settings_log_batch_size',
+      //   description: 'plugin_log_viewer_settings_log_batch_size_description',
+      // },
       {
         key: 'plugin.log-viewer.disabled',
         access: {

@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { CONNECTIONS_SETTINGS_GROUP } from '@cloudbeaver/core-connections';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
+import { SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
@@ -34,17 +33,18 @@ export class PluginConnectionsSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
-      {
-        key: 'plugin.connections.hideConnectionViewForUsers',
-        type: ESettingsValueType.Checkbox,
-        access: {
-          scope: ['server'],
-        },
-        name: 'settings_connections_hide_connections_view_name',
-        description: 'settings_connections_hide_connections_view_description',
-        group: CONNECTIONS_SETTINGS_GROUP,
-      },
-    ]);
+    // todo: probably not working as a separate setting
+    // this.settingsManagerService.registerSettings(this.settings, () => [
+    //   {
+    //     key: 'plugin.connections.hideConnectionViewForUsers',
+    //     type: ESettingsValueType.Checkbox,
+    //     access: {
+    //       scope: ['server'],
+    //     },
+    //     name: 'settings_connections_hide_connections_view_name',
+    //     description: 'settings_connections_hide_connections_view_description',
+    //     group: CONNECTIONS_SETTINGS_GROUP,
+    //   },
+    // ]);
   }
 }
