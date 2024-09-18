@@ -6,21 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import type { DatabaseConnectionFragment, DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
+import type { DatabaseConnectionFragment, ObjectOriginInfoFragment } from '@cloudbeaver/core-sdk';
 
 export type DatabaseConnection = DatabaseConnectionFragment;
-export type DatabaseConnectionOrigin = DatabaseConnectionOriginFragment;
 
-export function isLocalConnection(connectionOrigin: DatabaseConnectionOrigin | DatabaseConnection): boolean {
-  if (!('origin' in connectionOrigin) || !connectionOrigin.origin) {
-    return true;
-  }
-  return connectionOrigin.origin.type === AUTH_PROVIDER_LOCAL_ID;
+export function isLocalConnection(origin: ObjectOriginInfoFragment): boolean {
+  return origin.type === AUTH_PROVIDER_LOCAL_ID;
 }
 
-export function isCloudConnection(connectionOrigin?: DatabaseConnectionOrigin): boolean {
-  if (!connectionOrigin?.origin) {
-    return false;
-  }
-  return connectionOrigin.origin.type === 'cloud';
+export function isCloudConnection(origin: ObjectOriginInfoFragment): boolean {
+  return origin.type === 'cloud';
 }

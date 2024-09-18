@@ -8,11 +8,10 @@
 import { observer } from 'mobx-react-lite';
 
 import { Table, TableBody, TableColumnHeader, TableHeader, TableSelect, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoOriginResource, DBDriverResource, serializeConnectionParam } from '@cloudbeaver/core-connections';
+import { ConnectionInfoOrigin, ConnectionInfoOriginResource, DBDriverResource, serializeConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { isGlobalProject, isSharedProject, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
 
 import { Connection } from './Connection';
 import { IConnectionsTableState } from './useConnectionsTable';
@@ -27,7 +26,7 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({ stat
   const dbDriverResource = useResource(ConnectionsTable, DBDriverResource, CachedMapAllKey);
   const shouldDisplayProjects = projectService.activeProjects.filter(project => isGlobalProject(project) || isSharedProject(project)).length > 1;
   const connectionOriginResource = useResource(ConnectionsTable, ConnectionInfoOriginResource, CachedMapAllKey);
-  const connectionOriginsMap: Map<string, DatabaseConnectionOriginFragment> = connectionOriginResource.data.reduce((acc, origin) => {
+  const connectionOriginsMap: Map<string, ConnectionInfoOrigin> = connectionOriginResource.data.reduce((acc, origin) => {
     if (origin?.id) {
       acc.set(origin.id, origin);
     }

@@ -1,7 +1,6 @@
 fragment DatabaseConnectionOriginDetails on ConnectionInfo {
   id
   projectId
-  driverId
   origin {
     ...OriginDetails
   }

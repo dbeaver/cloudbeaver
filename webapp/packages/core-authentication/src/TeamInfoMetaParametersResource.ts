@@ -38,6 +38,11 @@ export class TeamInfoMetaParametersResource extends CachedMapResource<string, Te
       const { teams } = await this.graphQLService.sdk.getTeamsListMetaParameters({
         teamId,
       });
+
+      if (!teams.length) {
+        throw new Error(`Team ${teamId} not found`);
+      }
+
       const metaParameters = teams[0].metaParameters;
 
       if (teamId) {

@@ -9,17 +9,16 @@ import React from 'react';
 
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { ConfirmationDialog, PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, DatabaseConnection } from '@cloudbeaver/core-connections';
+import { ConnectionInfoOrigin, ConnectionInfoResource, DatabaseConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import type { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
 
 import { CreateConnectionService } from './CreateConnectionService';
 
 export interface IConnectionDetailsPlaceholderProps {
   connection: DatabaseConnection;
-  connectionOrigin?: DatabaseConnectionOriginFragment;
+  connectionOrigin?: ConnectionInfoOrigin;
 }
 
 const ConnectionsAdministration = React.lazy(async () => {

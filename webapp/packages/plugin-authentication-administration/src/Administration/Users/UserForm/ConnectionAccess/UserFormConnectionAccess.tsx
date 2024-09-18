@@ -51,8 +51,10 @@ export const UserFormConnectionAccess: TabContainerPanelComponent<UserFormProps>
 
   const connections = connectionsLoader.data.filter(isDefined).sort(compareConnectionsInfo);
   const connectionsOrigins = connectionsOriginsLoader.data.filter(isDefined);
-  const cloudExists = connectionsOrigins.some(isCloudConnection);
-  const localConnectionsIds = new Set(connectionsOrigins.filter(connection => !isCloudConnection(connection)).map(connection => connection.id));
+  const cloudExists = connectionsOrigins.some(connectionOrigin => isCloudConnection(connectionOrigin.origin));
+  const localConnectionsIds = new Set(
+    connectionsOrigins.filter(connection => !isCloudConnection(connection.origin)).map(connection => connection.id),
+  );
   const localConnections = connections.filter(connection => localConnectionsIds.has(connection.id));
 
   useResource(

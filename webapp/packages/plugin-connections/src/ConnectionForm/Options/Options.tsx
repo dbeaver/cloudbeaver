@@ -149,7 +149,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   });
 
   const edit = state.mode === 'edit';
-  const originLocal = !info || (originInfo && isLocalConnection(originInfo));
+  const originLocal = !info || (originInfo?.origin && isLocalConnection(originInfo.origin));
 
   const drivers = driverMap.resource.enabledDrivers.filter(({ id }) => availableDrivers.includes(id));
 

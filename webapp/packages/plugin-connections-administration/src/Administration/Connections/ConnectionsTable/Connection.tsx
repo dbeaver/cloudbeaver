@@ -19,10 +19,9 @@ import {
   useResource,
   useS,
 } from '@cloudbeaver/core-blocks';
-import { DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ConnectionInfoOrigin, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
 
 import { ConnectionsAdministrationService } from '../ConnectionsAdministrationService';
 import styles from './Connection.module.css';
@@ -32,7 +31,7 @@ interface Props {
   connectionKey: IConnectionInfoParams;
   connection: DatabaseConnection;
   shouldDisplayProject: boolean;
-  connectionOrigin?: DatabaseConnectionOriginFragment;
+  connectionOrigin?: ConnectionInfoOrigin;
   icon?: string;
 }
 

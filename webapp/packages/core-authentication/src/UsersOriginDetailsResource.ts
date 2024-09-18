@@ -25,7 +25,7 @@ export class UsersOriginDetailsResource extends CachedMapResource<string, AdminO
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, AdminOriginDetailsFragment>> {
     const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
-    const keys: string[] = [];
+    const keys = resourceKeyList<string>([]);
 
     if (all) {
       throw new Error('Loading all users is prohibited');
@@ -50,8 +50,7 @@ export class UsersOriginDetailsResource extends CachedMapResource<string, AdminO
       }
     });
 
-    const key = resourceKeyList(keys);
-    this.set(key, userMetaParametersList);
+    this.set(keys, userMetaParametersList);
 
     return this.data;
   }

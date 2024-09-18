@@ -36,7 +36,7 @@ export class UsersMetaParametersResource extends CachedMapResource<string, UserM
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, UserMetaParameter>> {
     const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
-    const keys: string[] = [];
+    const keys = resourceKeyList<string>([]);
 
     if (all) {
       throw new Error('Loading all users is prohibited');
@@ -61,8 +61,7 @@ export class UsersMetaParametersResource extends CachedMapResource<string, UserM
       }
     });
 
-    const key = resourceKeyList(keys);
-    this.set(key, userMetaParametersList);
+    this.set(keys, userMetaParametersList);
 
     return this.data;
   }

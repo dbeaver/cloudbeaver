@@ -14,16 +14,13 @@ import { DatabaseConnectionOriginDetailsFragment, GraphQLService } from '@cloudb
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 
 import { CONNECTION_INFO_PARAM_SCHEMA, IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
-import {
-  ConnectionInfoActiveProjectKey,
-  ConnectionInfoProjectKey,
-  ConnectionInfoResource,
-  createConnectionParam,
-  isConnectionInfoParamEqual,
-} from './ConnectionInfoResource';
+import { ConnectionInfoResource, createConnectionParam, isConnectionInfoParamEqual } from './ConnectionInfoResource';
+import { parseConnectionKey } from './parseConnectionKey';
+
+export type ConnectionInfoOriginDetails = DatabaseConnectionOriginDetailsFragment;
 
 @injectable()
-export class ConnectionInfoOriginDetailsResource extends CachedMapResource<IConnectionInfoParams, DatabaseConnectionOriginDetailsFragment> {
+export class ConnectionInfoOriginDetailsResource extends CachedMapResource<IConnectionInfoParams, ConnectionInfoOriginDetails> {
   constructor(
     private readonly projectsService: ProjectsService,
     private readonly graphQLService: GraphQLService,
@@ -39,35 +36,25 @@ export class ConnectionInfoOriginDetailsResource extends CachedMapResource<IConn
     originalKey: ResourceKey<IConnectionInfoParams>,
     _: any,
     refresh?: boolean,
-  ): Promise<Map<IConnectionInfoParams, DatabaseConnectionOriginDetailsFragment>> {
-    const connectionsList: DatabaseConnectionOriginDetailsFragment[] = [];
-    const projectKey = this.aliases.isAlias(originalKey, ConnectionInfoProjectKey);
+  ): Promise<Map<IConnectionInfoParams, ConnectionInfoOriginDetails>> {
+    const connectionsList: ConnectionInfoOriginDetails[] = [];
     let removedConnections: IConnectionInfoParams[] = [];
-    let projectId: string | undefined;
-    let projectIds: string[] | undefined;
+    const parsed = parseConnectionKey({
+      originalKey,
+      aliases: this.aliases,
+      isOutdated: this.isOutdated.bind(this),
+      activeProjects: this.projectsService.activeProjects,
+      refresh,
+    });
 
-    if (projectKey) {
-      projectIds = projectKey.options.projectIds;
-    }
+    let { projectId } = parsed;
+    const { projectIds, key } = parsed;
 
-    if (this.aliases.isAlias(originalKey, ConnectionInfoActiveProjectKey)) {
-      projectIds = this.projectsService.activeProjects.map(project => project.id);
-    }
-
-    if (isResourceAlias(originalKey)) {
-      const key = this.aliases.transformToKey(originalKey);
-      const outdated = ResourceKeyUtils.filter(key, key => this.isOutdated(key));
-
-      if (!refresh && outdated.length === 1) {
-        originalKey = outdated[0]; // load only single connection
-      }
-    }
-
-    await ResourceKeyUtils.forEachAsync(originalKey, async key => {
+    await ResourceKeyUtils.forEachAsync(key, async connectionKey => {
       let connectionId: string | undefined;
-      if (!isResourceAlias(key)) {
-        projectId = key.projectId;
-        connectionId = key.connectionId;
+      if (!isResourceAlias(connectionKey)) {
+        projectId = connectionKey.projectId;
+        connectionId = connectionKey.connectionId;
       }
 
       const { connections } = await this.graphQLService.sdk.getUserConnectionsOriginDetails({
@@ -84,15 +71,15 @@ export class ConnectionInfoOriginDetailsResource extends CachedMapResource<IConn
     });
 
     runInAction(() => {
-      if (isResourceAlias(originalKey)) {
-        removedConnections = ResourceKeyUtils.toList(this.aliases.transformToKey(originalKey)).filter(
-          key => !connectionsList.some(connection => isConnectionInfoParamEqual(key, createConnectionParam(connection))),
+      if (isResourceAlias(key)) {
+        removedConnections = ResourceKeyUtils.toList(this.aliases.transformToKey(key)).filter(
+          filterKey => !connectionsList.some(connection => isConnectionInfoParamEqual(filterKey, createConnectionParam(connection))),
         );
       }
 
       this.delete(resourceKeyList(removedConnections));
-      const key = resourceKeyList(connectionsList.map(createConnectionParam));
-      this.set(key, connectionsList);
+      const keys = resourceKeyList(connectionsList.map(createConnectionParam));
+      this.set(keys, connectionsList);
     });
 
     return this.data;

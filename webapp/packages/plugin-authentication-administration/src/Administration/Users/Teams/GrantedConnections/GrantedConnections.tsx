@@ -22,6 +22,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import {
   Connection,
+  ConnectionInfoOrigin,
   ConnectionInfoOriginResource,
   ConnectionInfoProjectKey,
   ConnectionInfoResource,
@@ -31,7 +32,6 @@ import {
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { isGlobalProject, ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { DatabaseConnectionOriginFragment } from '@cloudbeaver/core-sdk';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormProps } from '../ITeamFormProps';
@@ -62,7 +62,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
   const connections = connectionsLoader.data as Connection[];
 
   const grantedConnections = getComputed(() => connections.filter(connection => state.state.grantedSubjects.includes(connection.id)));
-  const connectionsOrigins = (connectionsOriginLoader.data ?? []) as DatabaseConnectionOriginFragment[];
+  const connectionsOrigins = (connectionsOriginLoader.data ?? []) as ConnectionInfoOrigin[];
 
   useAutoLoad(GrantedConnections, state, selected && !loaded);
 
@@ -72,7 +72,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
 
   let info: TLocalizationToken | null = null;
 
-  const cloudExists = connectionsOrigins.some(isCloudConnection);
+  const cloudExists = connectionsOrigins.some(connectionOrigin => isCloudConnection(connectionOrigin.origin));
 
   if (cloudExists) {
     info = 'cloud_connections_access_placeholder';
