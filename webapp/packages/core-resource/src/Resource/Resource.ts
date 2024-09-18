@@ -40,7 +40,10 @@ export abstract class Resource<
   protected readonly logger: ResourceLogger;
   protected readonly metadata: ResourceMetadata<TKey, TMetadata>;
 
-  constructor(protected readonly defaultValue: () => TData, protected defaultIncludes: TInclude = [] as any) {
+  constructor(
+    protected readonly defaultValue: () => TData,
+    protected defaultIncludes: TInclude = [] as any,
+  ) {
     super();
     this.isKeyEqual = this.isKeyEqual.bind(this);
     this.isIntersect = this.isIntersect.bind(this);
@@ -96,7 +99,7 @@ export abstract class Resource<
       key = this.aliases.transformToAlias(key);
       nextKey = this.aliases.transformToAlias(nextKey);
 
-      return key.isEqual(nextKey) && this.isIntersect(key.target, nextKey.target);
+      return key.isEqual(nextKey);
     } else if (isResourceAlias(key) || isResourceAlias(nextKey)) {
       return true;
     }
@@ -123,7 +126,7 @@ export abstract class Resource<
       param = this.aliases.transformToAlias(param);
       second = this.aliases.transformToAlias(second);
 
-      return param.isEqual(second) && this.isEqual(param.target, second.target);
+      return param.isEqual(second);
     }
 
     if (isResourceAlias(param) || isResourceAlias(second)) {

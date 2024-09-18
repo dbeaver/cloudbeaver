@@ -59,7 +59,7 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
     },
   });
 
-  useAutoLoad(AdministrationUserForm, state);
+  useAutoLoad(AdministrationUserForm, [userFormInfoPart]);
 
   return (
     <Form context={form} disabled={state.isDisabled} contents focusFirstChild>
@@ -69,7 +69,7 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
             <Container fill>
               <StatusMessage
                 className={s(styles, { statusMessage: true })}
-                exception={getFirstException(state.exception)}
+                exception={getFirstException(userFormInfoPart.exception)}
                 type={state.statusType}
                 message={state.statusMessage}
               />
