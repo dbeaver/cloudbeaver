@@ -11,7 +11,7 @@ import { DefaultValueGetter, isPrimitive, MetadataMap } from '@cloudbeaver/core-
 
 import { CachedResourceOffsetPageKey, CachedResourceOffsetPageListKey } from './CachedResourceOffsetPageKeys';
 import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
-import { isResourceAlias } from './ResourceAlias';
+import { isResourceAlias, ResourceAlias } from './ResourceAlias';
 import type { ResourceAliases } from './ResourceAliases';
 import type { ResourceKey, ResourceKeyFlat } from './ResourceKey';
 import { isResourceKeyList, ResourceKeyList } from './ResourceKeyList';
@@ -111,6 +111,8 @@ export class ResourceMetadata<TKey, TMetadata extends ICachedResourceMetadata> {
         if (this.some(param, predicate)) {
           result = true;
         }
+      } else if (predicate(this.get(param))) {
+        result = true;
       }
     }
 
@@ -194,11 +196,11 @@ export class ResourceMetadata<TKey, TMetadata extends ICachedResourceMetadata> {
     if (isResourceAlias(key)) {
       key = this.aliases.transformToAlias(key);
 
-      if (this.aliases.isAlias(key, CachedResourceOffsetPageKey) || this.aliases.isAlias(key, CachedResourceOffsetPageListKey)) {
+      if (isResourceAlias(key, CachedResourceOffsetPageKey) || isResourceAlias(key, CachedResourceOffsetPageListKey)) {
         return this.getMetadataKeyRef(key.parent as any);
       }
 
-      return key.toString() as TKey;
+      return (key as ResourceAlias<TKey, any>).toString() as TKey;
     }
 
     if (isPrimitive(key)) {

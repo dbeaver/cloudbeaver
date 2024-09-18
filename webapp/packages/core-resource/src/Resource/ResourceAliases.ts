@@ -8,7 +8,7 @@
 import { toJS } from 'mobx';
 
 import { isResourceAlias, type ResourceAlias, ResourceAliasFactory, type ResourceAliasOptions } from './ResourceAlias';
-import type { ResourceKey } from './ResourceKey';
+import type { ResourceKey, ResourceKeySimple } from './ResourceKey';
 import type { ResourceKeyAlias } from './ResourceKeyAlias';
 import { isResourceKeyList, ResourceKeyList } from './ResourceKeyList';
 import type { ResourceKeyListAlias } from './ResourceKeyListAlias';
@@ -16,14 +16,25 @@ import type { ResourceLogger } from './ResourceLogger';
 
 export type IParamAlias<TKey> = {
   id: string;
-  getAlias: (param: ResourceAlias<TKey, any>) => ResourceKey<TKey>;
+  getAlias: ResourceAliasResolver<TKey, any>;
+  transformKey?: ResourceAliasKeyTransformer<TKey, any>;
 };
+
+export type ResourceAliasResolver<TKey, TOptions extends ResourceAliasOptions> = (param: ResourceAlias<TKey, TOptions>) => ResourceKey<TKey>;
+
+export type ResourceAliasKeyTransformer<TKey, TOptions extends ResourceAliasOptions> = <T extends ResourceKeySimple<TKey>>(
+  param: ResourceAlias<TKey, TOptions>,
+  key: T,
+) => T;
 
 export class ResourceAliases<TKey> {
   protected paramAliases: Array<IParamAlias<TKey>>;
   private captureAliasGetterExecution: boolean;
 
-  constructor(private readonly logger: ResourceLogger, private readonly validateKey: (key: TKey) => boolean) {
+  constructor(
+    private readonly logger: ResourceLogger,
+    private readonly validateKey: (key: TKey) => boolean,
+  ) {
     this.paramAliases = [];
 
     this.captureAliasGetterExecution = false;
@@ -52,21 +63,23 @@ export class ResourceAliases<TKey> {
 
   add<TOptions extends ResourceAliasOptions>(
     param: ResourceAlias<TKey, TOptions> | ResourceAliasFactory<TKey, TOptions>,
-    getAlias: (param: ResourceAlias<TKey, TOptions>) => ResourceKey<TKey>,
+    getAlias: ResourceAliasResolver<TKey, TOptions>,
+    transformKey?: ResourceAliasKeyTransformer<TKey, TOptions>,
   ): void {
-    this.paramAliases.push({ id: param.id, getAlias });
+    this.paramAliases.push({ id: param.id, getAlias, transformKey });
   }
 
   replace<TOptions extends ResourceAliasOptions>(
     param: ResourceAlias<TKey, TOptions> | ResourceAliasFactory<TKey, TOptions>,
-    getAlias: (param: ResourceAlias<TKey, TOptions>) => ResourceKey<TKey>,
+    getAlias: ResourceAliasResolver<TKey, TOptions>,
+    transformKey?: ResourceAliasKeyTransformer<TKey, TOptions>,
   ): void {
     const indexOf = this.paramAliases.findIndex(aliasInfo => aliasInfo.id === param.id);
 
     if (indexOf === -1) {
-      this.add(param, getAlias);
+      this.add(param, getAlias, transformKey);
     } else {
-      this.paramAliases.splice(indexOf, 1, { id: param.id, getAlias });
+      this.paramAliases.splice(indexOf, 1, { id: param.id, getAlias, transformKey });
     }
   }
 
@@ -111,6 +124,7 @@ export class ResourceAliases<TKey> {
   transformToKey(param: ResourceKey<TKey>): TKey | ResourceKeyList<TKey> {
     let deep = 0;
 
+    const transforms: Array<{ key: ResourceKeyAlias<TKey, any> | ResourceKeyListAlias<TKey, any>; alias: IParamAlias<TKey> }> = [];
     while (deep < 10) {
       if (!this.validateResourceKey(param)) {
         let paramString = JSON.stringify(toJS(param));
@@ -124,7 +138,15 @@ export class ResourceAliases<TKey> {
       if (isResourceAlias(param)) {
         for (const alias of this.paramAliases) {
           if (alias.id === param.id) {
-            param = this.captureGetAlias(alias, param);
+            transforms.push({ key: param, alias });
+            const nextParam = this.captureGetAlias(alias, param);
+
+            if (isResourceAlias(nextParam)) {
+              param = nextParam.setParent(param);
+            } else {
+              param = nextParam;
+            }
+
             deep++;
             break;
           }
@@ -141,6 +163,11 @@ export class ResourceAliases<TKey> {
     if (isResourceAlias(param)) {
       throw new Error(`Alias ${param.toString()} is not registered in ${this.logger.getName()}`);
     }
+
+    for (const { key, alias } of transforms) {
+      param = alias.transformKey ? alias.transformKey(key, param) : param;
+    }
+
     return param;
   }
 
