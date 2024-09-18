@@ -41,7 +41,7 @@ export class UserProfileFormAuthenticationPart extends FormPart<IUserProfileForm
     return this.loaded && this.userInfoResource.isLoaded(undefined) && this.userInfoMetaParametersResource.isLoaded(undefined);
   }
 
-  isChanged(): boolean {
+  get isChanged(): boolean {
     if (!this.loaded) {
       return false;
     }

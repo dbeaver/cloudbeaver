@@ -17,29 +17,31 @@
 package io.cloudbeaver.server.websockets;
 
 import com.google.gson.Gson;
-import org.eclipse.jetty.websocket.api.WebSocketAdapter;
+import org.eclipse.jetty.websocket.api.Callback;
+import org.eclipse.jetty.websocket.api.Session;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 
-import java.io.IOException;
-
-public class CBAbstractWebSocket extends WebSocketAdapter {
+public class CBAbstractWebSocket extends Session.Listener.AbstractAutoDemanding {
     private static final Log log = Log.getLog(CBAbstractWebSocket.class);
     protected static final Gson gson = WSUtils.gson;
 
     public void handleEvent(WSEvent event) {
-        if (isNotConnected()) {
+        if (!isOpen()) {
             return;
         }
-        try {
-            getRemote().sendString(gson.toJson(event));
-        } catch (IOException e) {
-            handleEventException(e);
-        }
+        Session session = getSession();
+        session.sendText(gson.toJson(event), new Callback() {
+            @Override
+            public void fail(Throwable e) {
+                handleEventException(e);
+            }
+        });
+
     }
 
-    protected void handleEventException(Exception e) {
+    protected void handleEventException(Throwable e) {
         log.error("Failed to send websocket message", e);
     }
 
