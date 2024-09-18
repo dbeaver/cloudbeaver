@@ -7,8 +7,9 @@
  */
 import { observable } from 'mobx';
 
-import { DefaultValueGetter, isNotNullDefined, isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
+import { DefaultValueGetter, isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
 
+import { CachedResourceOffsetPageKey, CachedResourceOffsetPageListKey } from './CachedResourceOffsetPageKeys';
 import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
 import { isResourceAlias } from './ResourceAlias';
 import type { ResourceAliases } from './ResourceAliases';
@@ -193,8 +194,8 @@ export class ResourceMetadata<TKey, TMetadata extends ICachedResourceMetadata> {
     if (isResourceAlias(key)) {
       key = this.aliases.transformToAlias(key);
 
-      if (isNotNullDefined(key.target)) {
-        return this.getMetadataKeyRef(key.target);
+      if (this.aliases.isAlias(key, CachedResourceOffsetPageKey) || this.aliases.isAlias(key, CachedResourceOffsetPageListKey)) {
+        return this.getMetadataKeyRef(key.parent as any);
       }
 
       return key.toString() as TKey;

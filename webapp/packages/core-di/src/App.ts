@@ -12,7 +12,7 @@ import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { Bootstrap } from './Bootstrap';
 import { Dependency } from './Dependency';
 import type { DIContainer } from './DIContainer';
-import type { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp';
+import type { IServiceCollection, IServiceConstructor } from './IApp';
 import { IDiWrapper, inversifyWrapper } from './inversifyWrapper';
 import { IServiceProvider } from './IServiceProvider';
 import type { PluginManifest } from './PluginManifest';
@@ -90,10 +90,6 @@ export class App {
 
   getServiceCollection(): IServiceCollection {
     return this.diWrapper.collection;
-  }
-
-  getServiceInjector(): IServiceInjector {
-    return this.diWrapper.injector;
   }
 
   // first phase register all dependencies

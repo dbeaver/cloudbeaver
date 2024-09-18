@@ -23,7 +23,7 @@ import { getFirstException, isContainsException } from '@cloudbeaver/core-utils'
 import {
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
-  expandOffsetPageRange,
+  CachedResourceOffsetPageTargetKey,
   isOffsetPageInRange,
   isOffsetPageOutdated,
 } from './CachedResourceOffsetPageKeys';
@@ -75,7 +75,7 @@ export abstract class CachedResource<
   constructor(defaultKey: ResourceKey<TKey>, defaultValue: () => TData, defaultIncludes: TInclude = [] as any) {
     super(defaultValue, defaultIncludes);
 
-    this.offsetPagination = new ResourceOffsetPagination(this.metadata);
+    this.offsetPagination = new ResourceOffsetPagination(this.metadata, this.getKeyRef.bind(this));
 
     this.loadingTask = this.loadingTask.bind(this);
 
@@ -90,8 +90,42 @@ export abstract class CachedResource<
 
     this.aliases.add(CachedResourceParamKey, () => defaultKey);
     this.aliases.add(CachedResourceListEmptyKey, () => resourceKeyList([]));
-    this.aliases.add(CachedResourceOffsetPageKey, key => key.target);
-    this.aliases.add(CachedResourceOffsetPageListKey, key => key.target ?? CachedResourceListEmptyKey);
+    this.aliases.add(CachedResourceOffsetPageTargetKey, key => key.options.target);
+    this.aliases.add(CachedResourceOffsetPageKey, key => {
+      const keys = [];
+      const pageInfo = this.offsetPagination.getPageInfo(key);
+
+      if (pageInfo) {
+        const from = key.options.offset;
+        const to = key.options.offset + key.options.limit;
+
+        for (const page of pageInfo.pages) {
+          if (page.isHasCommonSegment(from, to)) {
+            keys.push(...page.get(from, to));
+          }
+        }
+      }
+
+      // todo: return single element?
+      return resourceKeyList([...new Set(keys)]);
+    });
+    this.aliases.add(CachedResourceOffsetPageListKey, key => {
+      const keys = [];
+      const pageInfo = this.offsetPagination.getPageInfo(key);
+
+      if (pageInfo) {
+        const from = key.options.offset;
+        const to = key.options.offset + key.options.limit;
+
+        for (const page of pageInfo.pages) {
+          if (page.isHasCommonSegment(from, to)) {
+            keys.push(...page.get(from, to));
+          }
+        }
+      }
+
+      return resourceKeyList([...new Set(keys)]);
+    });
 
     // this.logger.spy(this.beforeLoad, 'beforeLoad');
     // this.logger.spy(this.onDataOutdated, 'onDataOutdated');
@@ -316,17 +350,8 @@ export abstract class CachedResource<
   }
 
   markLoaded(param: ResourceKey<TKey>, includes?: TInclude): void {
-    const pageKey = this.aliases.isAlias(param, CachedResourceOffsetPageKey) || this.aliases.isAlias(param, CachedResourceOffsetPageListKey);
-
     this.metadata.update(param, metadata => {
       metadata.loaded = true;
-
-      if (pageKey) {
-        metadata.offsetPage = observable({
-          ...metadata.offsetPage,
-          pages: expandOffsetPageRange(metadata.offsetPage?.pages || [], pageKey.options, false),
-        });
-      }
 
       if (includes) {
         this.commitIncludes(metadata, includes);
@@ -353,13 +378,17 @@ export abstract class CachedResource<
       metadata.outdated = false;
 
       if (pageKey) {
-        metadata.offsetPage = observable({
-          ...metadata.offsetPage,
-          pages: expandOffsetPageRange(metadata.offsetPage?.pages || [], pageKey.options, false),
+        const from = pageKey.options.offset;
+        const to = from + pageKey.options.limit;
+
+        metadata.offsetPage?.pages.forEach(page => {
+          if (page.isInRange(from, to)) {
+            page.setOutdated(false);
+          }
         });
       } else {
         metadata.offsetPage?.pages.forEach(page => {
-          page.outdated = false;
+          page.setOutdated(false);
         });
       }
     });
@@ -405,9 +434,13 @@ export abstract class CachedResource<
       metadata.outdated = false;
 
       if (pageKey) {
-        metadata.offsetPage = observable({
-          ...metadata.offsetPage,
-          pages: expandOffsetPageRange(metadata.offsetPage?.pages || [], pageKey.options, false),
+        const from = pageKey.options.offset;
+        const to = from + pageKey.options.limit;
+
+        metadata.offsetPage?.pages.forEach(page => {
+          if (page.isInRange(from, to)) {
+            page.setOutdated(false);
+          }
         });
       }
     });
@@ -541,13 +574,17 @@ export abstract class CachedResource<
       metadata.outdatedIncludes = observable([...metadata.includes]);
 
       if (pageKey) {
-        metadata.offsetPage = observable({
-          ...metadata.offsetPage,
-          pages: expandOffsetPageRange(metadata.offsetPage?.pages || [], pageKey.options, true),
+        const from = pageKey.options.offset;
+        const to = from + pageKey.options.limit;
+
+        metadata.offsetPage?.pages.forEach(page => {
+          if (page.isHasCommonSegment(from, to)) {
+            page.setOutdated(true);
+          }
         });
       } else {
         metadata.offsetPage?.pages.forEach(page => {
-          page.outdated = true;
+          page.setOutdated(true);
         });
       }
     });
@@ -559,7 +596,7 @@ export abstract class CachedResource<
         metadata.outdated = true;
         metadata.outdatedIncludes = observable([...metadata.includes]);
         metadata.offsetPage?.pages.forEach(page => {
-          page.outdated = true;
+          page.setOutdated(true);
         });
       });
     }
