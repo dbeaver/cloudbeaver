@@ -109,18 +109,14 @@ export class TeamOptionsTabService extends Bootstrap {
 
     try {
       if (create) {
-        const [team] = await Promise.all([
-          this.teamResource.createTeam(config),
-          this.teamsMetaParametersResource.setMetaParameters(config.teamId, metaParameters),
-        ]);
+        const team = await this.teamResource.createTeam(config);
+        await this.teamsMetaParametersResource.setMetaParameters(config.teamId, metaParameters);
 
         status.info('administration_teams_team_info_created');
         status.info(team.teamId);
       } else {
-        const [team] = await Promise.all([
-          this.teamResource.updateTeam(config),
-          this.teamsMetaParametersResource.setMetaParameters(config.teamId, metaParameters),
-        ]);
+        const team = await this.teamResource.updateTeam(config);
+        await this.teamsMetaParametersResource.setMetaParameters(config.teamId, metaParameters);
 
         status.info('administration_teams_team_info_updated');
         status.info(team.teamId);
