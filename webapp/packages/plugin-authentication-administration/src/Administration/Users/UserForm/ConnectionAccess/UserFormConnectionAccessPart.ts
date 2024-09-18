@@ -24,7 +24,7 @@ export class UserFormConnectionAccessPart extends FormPart<AdminConnectionGrantI
     super(formState, []);
   }
 
-  isChanged(): boolean {
+  get isChanged(): boolean {
     if (!this.loaded) {
       return false;
     }
