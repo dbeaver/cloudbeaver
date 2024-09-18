@@ -14,16 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server.websockets;
+package io.cloudbeaver.server.jetty;
 
-import org.eclipse.jetty.websocket.api.Session;
-import org.jkiss.dbeaver.model.websocket.event.session.WSAccessTokenExpiredEvent;
+import org.eclipse.jetty.server.AliasCheck;
+import org.eclipse.jetty.util.resource.Resource;
+import org.jkiss.code.NotNull;
 
-public class CBExpiredSessionWebSocket extends CBAbstractWebSocket {
+import java.nio.file.Path;
+
+public class CBSymLinkContentAllowedAliasChecker implements AliasCheck {
+    @NotNull
+    private final Path contentRootPath;
+
+    public CBSymLinkContentAllowedAliasChecker(@NotNull Path contentRootPath) {
+        this.contentRootPath = contentRootPath;
+    }
+
     @Override
-    public void onWebSocketOpen(Session session) {
-        super.onWebSocketOpen(session);
-        handleEvent(new WSAccessTokenExpiredEvent());
-        close();
+    public boolean checkAlias(String pathInContext, Resource resource) {
+        Path resourcePath = resource.getPath();
+        return resourcePath != null && resourcePath.startsWith(contentRootPath);
     }
 }

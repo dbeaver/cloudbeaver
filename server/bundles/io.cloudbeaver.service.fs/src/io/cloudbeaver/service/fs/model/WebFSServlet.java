@@ -27,7 +27,7 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
-import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.ee10.servlet.ServletContextRequest;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
@@ -79,7 +79,7 @@ public class WebFSServlet extends WebServiceServletBase {
 
     private void doPost(WebSession session, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
         // we need to set this attribute to get parts
-        request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, new MultipartConfigElement(""));
+        request.setAttribute(ServletContextRequest.MULTIPART_CONFIG_ELEMENT, new MultipartConfigElement(""));
         Map<String, Object> variables = getVariables(request);
         String parentNodePath = JSONUtils.getString(variables, "toParentNodePath");
         if (CommonUtils.isEmpty(parentNodePath)) {

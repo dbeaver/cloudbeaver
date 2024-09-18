@@ -33,7 +33,7 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
     pageSize: navTreeResource.resource.childrenLimit,
   });
 
-  const dbObjectLoader = useResource(ObjectPropertyTable, DBObjectResource, pagination.key);
+  const dbObjectLoader = useResource(ObjectPropertyTable, DBObjectResource, pagination.currentPage);
 
   const { nodes, duplicates } = navNodeViewService.filterDuplicates(dbObjectLoader.data.filter(isDefined).map(node => node?.id) || []);
 
