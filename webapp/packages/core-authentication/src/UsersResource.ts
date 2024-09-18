@@ -9,12 +9,11 @@ import { runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import {
-  CACHED_RESOURCE_DEFAULT_PAGE_LIMIT,
-  CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedMapAllKey,
   CachedMapResource,
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
+  getOffsetPageKeyInfo,
   isResourceAlias,
   type ResourceKey,
   resourceKeyList,
@@ -254,18 +253,10 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
         usersList.push(user);
       } else {
-        const pageKey =
-          this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
+        const { isPageListKey, offset, limit } = getOffsetPageKeyInfo(this, originalKey);
         const filterKey = this.aliases.isAlias(originalKey, UsersResourceFilterKey);
-        let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
-        let limit = CACHED_RESOURCE_DEFAULT_PAGE_LIMIT;
         let userIdMask: string | undefined;
         let enabledState: boolean | undefined;
-
-        if (pageKey) {
-          offset = pageKey.options.offset;
-          limit = pageKey.options.limit;
-        }
 
         if (filterKey) {
           userIdMask = filterKey.options.userId;
@@ -287,7 +278,9 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
         usersList.push(...users);
 
         pages.push([
-          CachedResourceOffsetPageListKey(offset, users.length).setParent(filterKey!),
+          isPageListKey
+            ? CachedResourceOffsetPageListKey(offset, users.length).setParent(filterKey)
+            : CachedResourceOffsetPageKey(offset, users.length).setParent(filterKey),
           users.map(user => user.userId),
           users.length === limit,
         ]);
