@@ -73,7 +73,7 @@ export const Settings = observer<ISettingsProps>(function Settings({ source, acc
 
   return (
     <Container gap overflow noWrap>
-      <Group className={s(classes, { settingsGroups: true })} vertical box keepSize overflow>
+      <Group className={s(classes, { settingsGroups: true })} vertical box keepSize overflow hidden>
         <SettingsGroups treeData={treeData} onClick={handleClick} />
       </Group>
       <Container className={s(classes, { settingsContainer: true })} overflow vertical gap noWrap>
