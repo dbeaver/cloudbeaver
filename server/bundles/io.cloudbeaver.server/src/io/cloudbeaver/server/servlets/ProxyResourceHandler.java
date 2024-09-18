@@ -16,8 +16,8 @@
  */
 package io.cloudbeaver.server.servlets;
 
+import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBServerConfig;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
