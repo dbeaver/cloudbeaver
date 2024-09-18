@@ -34,7 +34,7 @@ import { isResourceAlias } from './ResourceAlias';
 import { ResourceError } from './ResourceError';
 import type { ResourceKey, ResourceKeyFlat } from './ResourceKey';
 import { resourceKeyAlias } from './ResourceKeyAlias';
-import { resourceKeyList } from './ResourceKeyList';
+import { isResourceKeyList, resourceKeyList } from './ResourceKeyList';
 import { resourceKeyListAlias } from './ResourceKeyListAlias';
 import { ResourceOffsetPagination } from './ResourceOffsetPagination';
 
@@ -91,41 +91,58 @@ export abstract class CachedResource<
     this.aliases.add(CachedResourceParamKey, () => defaultKey);
     this.aliases.add(CachedResourceListEmptyKey, () => resourceKeyList([]));
     this.aliases.add(CachedResourceOffsetPageTargetKey, key => key.options.target);
-    this.aliases.add(CachedResourceOffsetPageKey, key => {
-      const keys = [];
-      const pageInfo = this.offsetPagination.getPageInfo(key);
+    this.aliases.add(
+      CachedResourceOffsetPageListKey,
+      key => key.parent! as any,
+      (param, key) => {
+        if (!isResourceKeyList(key)) {
+          return key as any;
+        }
 
-      if (pageInfo) {
-        const from = key.options.offset;
-        const to = key.options.offset + key.options.limit;
+        const keys = new Set<any>();
+        const pageInfo = this.offsetPagination.getPageInfo(param);
 
-        for (const page of pageInfo.pages) {
-          if (page.isHasCommonSegment(from, to)) {
-            keys.push(...page.get(from, to));
+        if (pageInfo) {
+          const from = param.options.offset;
+          const to = param.options.offset + param.options.limit;
+
+          for (const page of pageInfo.pages) {
+            if (page.isHasCommonSegment(from, to)) {
+              for (const pageKey of page.get(from, to)) {
+                keys.add(pageKey);
+              }
+            }
           }
         }
-      }
+        return resourceKeyList(key.filter(value => keys.has(value)));
+      },
+    );
+    this.aliases.add(
+      CachedResourceOffsetPageKey,
+      key => key.parent! as any,
+      (param, key) => {
+        if (!isResourceKeyList(key)) {
+          return key as any;
+        }
 
-      // todo: return single element?
-      return resourceKeyList([...new Set(keys)]);
-    });
-    this.aliases.add(CachedResourceOffsetPageListKey, key => {
-      const keys = [];
-      const pageInfo = this.offsetPagination.getPageInfo(key);
+        const keys = new Set<any>();
+        const pageInfo = this.offsetPagination.getPageInfo(param);
 
-      if (pageInfo) {
-        const from = key.options.offset;
-        const to = key.options.offset + key.options.limit;
+        if (pageInfo) {
+          const from = param.options.offset;
+          const to = param.options.offset + param.options.limit;
 
-        for (const page of pageInfo.pages) {
-          if (page.isHasCommonSegment(from, to)) {
-            keys.push(...page.get(from, to));
+          for (const page of pageInfo.pages) {
+            if (page.isHasCommonSegment(from, to)) {
+              for (const pageKey of page.get(from, to)) {
+                keys.add(pageKey);
+              }
+            }
           }
         }
-      }
-
-      return resourceKeyList([...new Set(keys)]);
-    });
+        return resourceKeyList(key.filter(value => keys.has(value)));
+      },
+    );
 
     // this.logger.spy(this.beforeLoad, 'beforeLoad');
     // this.logger.spy(this.onDataOutdated, 'onDataOutdated');
@@ -329,6 +346,7 @@ export abstract class CachedResource<
     }
 
     const pageKey = this.aliases.isAlias(param, CachedResourceOffsetPageKey) || this.aliases.isAlias(param, CachedResourceOffsetPageListKey);
+
     if (pageKey) {
       const pageInfo = this.offsetPagination.getPageInfo(pageKey);
 
