@@ -15,6 +15,7 @@ import {
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
   CachedResourceOffsetPageTargetKey,
+  getOffsetPageKeyInfo,
   isResourceAlias,
   type ResourceKey,
   resourceKeyList,
@@ -96,16 +97,8 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, DBObject>> {
-    let limit = this.navTreeResource.childrenLimit;
-    let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
     const parentKey = this.aliases.isAlias(originalKey, DBObjectParentKey);
-    const pageKey =
-      this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
-
-    if (pageKey) {
-      limit = pageKey.options.limit;
-      offset = pageKey.options.offset;
-    }
+    const { isPageListKey, offset, limit } = getOffsetPageKeyInfo(this, originalKey, undefined, this.navTreeResource.childrenLimit);
 
     if (parentKey) {
       const nodeId = parentKey.options.parentId;
@@ -116,11 +109,11 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
         this.set(resourceKeyList(keys), dbObjects);
 
         this.offsetPagination.setPage(
-          CachedResourceOffsetPageKey(offset, limit).setParent(CachedResourceOffsetPageTargetKey(originalKey)),
+          isPageListKey
+            ? CachedResourceOffsetPageListKey(offset, limit).setParent(parentKey || CachedResourceOffsetPageTargetKey(nodeId))
+            : CachedResourceOffsetPageKey(offset, limit).setParent(parentKey || CachedResourceOffsetPageTargetKey(nodeId)),
           keys,
-          this.navTreeResource.offsetPagination.hasNextPage(
-            CachedResourceOffsetPageKey(offset, limit).setParent(CachedResourceOffsetPageTargetKey(nodeId)),
-          ),
+          keys.length === limit,
         );
       });
 
