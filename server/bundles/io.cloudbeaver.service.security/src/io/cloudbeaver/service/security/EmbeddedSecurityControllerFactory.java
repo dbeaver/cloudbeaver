@@ -18,8 +18,9 @@ package io.cloudbeaver.service.security;
 
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.WebAuthApplication;
+import io.cloudbeaver.model.config.SMControllerConfiguration;
+import io.cloudbeaver.model.config.WebDatabaseConfig;
 import io.cloudbeaver.service.security.db.CBDatabase;
-import io.cloudbeaver.service.security.db.WebDatabaseConfig;
 import io.cloudbeaver.service.security.internal.ClearAuthAttemptInfoJob;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;

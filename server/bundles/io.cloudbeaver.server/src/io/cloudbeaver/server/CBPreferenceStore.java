@@ -187,10 +187,6 @@ public class CBPreferenceStore extends AbstractPreferenceStore {
         throw new RuntimeException("Not Implemented");
     }
 
-    public CBApplication getApp() {
-        return cbPlatform.getApplication();
-    }
-
     private Map<String, Object> productConf() {
         var app = cbPlatform.getApplication();
         return app.getProductConfiguration();

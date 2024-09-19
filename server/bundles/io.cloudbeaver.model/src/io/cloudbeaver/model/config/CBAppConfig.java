@@ -14,21 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server;
+package io.cloudbeaver.model.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.model.app.BaseAuthWebAppConfiguration;
+import com.google.gson.annotations.Expose;
+import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
+import io.cloudbeaver.model.app.BaseWebAppConfiguration;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.DBException;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -38,11 +36,15 @@ import java.util.*;
 /**
  * Application configuration
  */
-public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthConfiguration {
+public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfiguration {
     private static final Log log = Log.getLog(CBAppConfig.class);
     public static final DataSourceNavigatorSettings.Preset PRESET_WEB = new DataSourceNavigatorSettings.Preset("web", "Web", "Default view");
 
     public static final DataSourceNavigatorSettings DEFAULT_VIEW_SETTINGS = PRESET_WEB.getSettings();
+    private final Set<SMAuthProviderCustomConfiguration> authConfigurations;
+    // Legacy auth configs, left for backward compatibility
+    @Expose(serialize = false)
+    private final Map<String, SMAuthProviderCustomConfiguration> authConfiguration;
 
     private boolean supportsCustomConnections;
     private boolean supportsConnectionBrowser;
@@ -66,9 +68,14 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
     private DataSourceNavigatorSettings defaultNavigatorSettings;
 
     private final Map<String, Object> resourceQuotas;
+    private String defaultAuthProvider;
+    private String[] enabledAuthProviders;
 
     public CBAppConfig() {
-        super();
+        this.defaultAuthProvider = LocalAuthProviderConstants.PROVIDER_ID;
+        this.enabledAuthProviders = null;
+        this.authConfigurations = new LinkedHashSet<>();
+        this.authConfiguration = new LinkedHashMap<>();
         this.anonymousAccessEnabled = false;
         this.anonymousUserRole = DEFAULT_APP_ANONYMOUS_TEAM_NAME;
         this.anonymousUserTeam = DEFAULT_APP_ANONYMOUS_TEAM_NAME;
@@ -91,6 +98,10 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
 
     public CBAppConfig(CBAppConfig src) {
         super(src);
+        this.defaultAuthProvider = src.defaultAuthProvider;
+        this.enabledAuthProviders = src.enabledAuthProviders;
+        this.authConfigurations = new LinkedHashSet<>(src.authConfigurations);
+        this.authConfiguration = new LinkedHashMap<>(src.authConfiguration);
         this.anonymousAccessEnabled = src.anonymousAccessEnabled;
         this.anonymousUserRole = src.anonymousUserRole;
         this.anonymousUserTeam = src.anonymousUserTeam;
@@ -169,6 +180,10 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
         return enabledDrivers;
     }
 
+    public void setEnabledDrivers(String[] enabledDrivers) {
+        this.enabledDrivers = enabledDrivers;
+    }
+
     public String[] getDisabledDrivers() {
         return disabledDrivers;
     }
@@ -202,19 +217,6 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
 
     public Map<String, Object> getPluginConfig(@NotNull String pluginId) {
         return getPluginConfig(pluginId, false);
-    }
-
-    public <T> T getPluginOptions(@NotNull String pluginId, @NotNull String option, Class<T> theClass) throws DBException {
-        Map<String, Object> iamSettingsMap = CBPlatform.getInstance().getApplication().getAppConfiguration().getPluginOption(
-            pluginId, option);
-        if (CommonUtils.isEmpty(iamSettingsMap)) {
-            throw new DBException("Settings '" + option + "' not specified in plugin '" + pluginId + "' configuration");
-        }
-
-        Gson gson = new GsonBuilder().create();
-        return gson.fromJson(
-            gson.toJsonTree(iamSettingsMap),
-            theClass);
     }
 
     ////////////////////////////////////////////
@@ -264,43 +266,100 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
         return grantConnectionsAccessToAnonymousTeam;
     }
 
-
-    // we disable embedded drivers by default and enable it in enabled drivers list
-    // that's why we need so complicated logic for disabling drivers
-
-    public void updateDisabledDriversConfig(String[] disabledDriversConfig) {
-        Set<String> disabledIds = new LinkedHashSet<>(Arrays.asList(disabledDriversConfig));
-        Set<String> enabledIds = new LinkedHashSet<>(Arrays.asList(this.enabledDrivers));
-
-        // remove all disabled embedded drivers from enabled drivers list
-        enabledIds.removeAll(disabledIds);
-
-        // enable embedded driver if it is not in disabled drivers list
-        for (String driverId : this.disabledDrivers) {
-            if (disabledIds.contains(driverId)) {
-                // driver is also disabled
-                continue;
-            }
-            // driver is removed from disabled list
-            // we need to enable if it is embedded
-            try {
-                DBPDriver driver = WebServiceUtils.getDriverById(driverId);
-                if (driver.isEmbedded()) {
-                    enabledIds.add(driverId);
-                }
-            } catch (DBWebException e) {
-                log.error("Failed to find driver by id", e);
-            }
-        }
-        this.disabledDrivers = disabledDriversConfig;
-        this.enabledDrivers = enabledIds.toArray(String[]::new);
-    }
-
     public boolean isDriverForceEnabled(@NotNull String driverId) {
         return ArrayUtils.containsIgnoreCase(getEnabledDrivers(), driverId);
     }
 
     public boolean isSystemVariablesResolvingEnabled() {
         return systemVariablesResolvingEnabled;
+    }
+
+    @Override
+    public String getDefaultAuthProvider() {
+        return defaultAuthProvider;
+    }
+
+    public void setDefaultAuthProvider(String defaultAuthProvider) {
+        this.defaultAuthProvider = defaultAuthProvider;
+    }
+
+    @Override
+    public String[] getEnabledAuthProviders() {
+        if (enabledAuthProviders == null) {
+            // No config - enable all providers (+backward compatibility)
+            return WebAuthProviderRegistry.getInstance().getAuthProviders()
+                .stream().map(WebAuthProviderDescriptor::getId).toArray(String[]::new);
+        }
+        return enabledAuthProviders;
+    }
+
+    public void setEnabledAuthProviders(String[] enabledAuthProviders) {
+        this.enabledAuthProviders = enabledAuthProviders;
+    }
+
+    @Override
+    public boolean isAuthProviderEnabled(String id) {
+        var authProviderDescriptor = WebAuthProviderRegistry.getInstance().getAuthProvider(id);
+        if (authProviderDescriptor == null) {
+            return false;
+        }
+
+        if (!ArrayUtils.contains(getEnabledAuthProviders(), id)) {
+            return false;
+        }
+        if (!ArrayUtils.isEmpty(authProviderDescriptor.getRequiredFeatures())) {
+            for (String rf : authProviderDescriptor.getRequiredFeatures()) {
+                if (!isFeatureEnabled(rf)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    ////////////////////////////////////////////
+    // Auth provider configs
+    @Override
+    public Set<SMAuthProviderCustomConfiguration> getAuthCustomConfigurations() {
+        return authConfigurations;
+    }
+
+    @Override
+    @Nullable
+    public SMAuthProviderCustomConfiguration getAuthProviderConfiguration(@NotNull String id) {
+        synchronized (authConfigurations) {
+            return authConfigurations.stream().filter(c -> c.getId().equals(id)).findAny().orElse(null);
+        }
+    }
+
+    public void addAuthProviderConfiguration(@NotNull SMAuthProviderCustomConfiguration config) {
+        synchronized (authConfigurations) {
+            authConfigurations.removeIf(c -> c.getId().equals(config.getId()));
+            authConfigurations.add(config);
+        }
+    }
+
+    public void setAuthProvidersConfigurations(Collection<SMAuthProviderCustomConfiguration> authProviders) {
+        synchronized (authConfigurations) {
+            authConfigurations.clear();
+            authConfigurations.addAll(authProviders);
+        }
+    }
+
+    public boolean deleteAuthProviderConfiguration(@NotNull String id) {
+        synchronized (authConfigurations) {
+            return authConfigurations.removeIf(c -> c.getId().equals(id));
+        }
+    }
+
+    public void loadLegacyCustomConfigs() {
+        // Convert legacy map of configs into list
+        if (!authConfiguration.isEmpty()) {
+            for (Map.Entry<String, SMAuthProviderCustomConfiguration> entry : authConfiguration.entrySet()) {
+                entry.getValue().setId(entry.getKey());
+                authConfigurations.add(entry.getValue());
+            }
+            authConfiguration.clear();
+        }
     }
 }
