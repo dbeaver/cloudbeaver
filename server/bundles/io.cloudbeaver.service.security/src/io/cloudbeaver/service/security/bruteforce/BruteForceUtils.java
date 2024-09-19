@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.service.security.bruteforce;
 
-import io.cloudbeaver.service.security.SMControllerConfiguration;
+import io.cloudbeaver.model.config.SMControllerConfiguration;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;

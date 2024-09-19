@@ -16,9 +16,9 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
-import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.utils.CBModelConstants;
 import org.jkiss.code.NotNull;

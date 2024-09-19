@@ -59,7 +59,6 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     public static final String CLI_PARAM_WEB_CONFIG = "-web-config";
     public static final String LOGBACK_FILE_NAME = "logback.xml";
 
-
     private static final Log log = Log.getLog(BaseWebApplication.class);
 
     private String instanceId;

@@ -18,9 +18,9 @@ package io.cloudbeaver.model;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.utils.ConfigurationUtils;
-import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;

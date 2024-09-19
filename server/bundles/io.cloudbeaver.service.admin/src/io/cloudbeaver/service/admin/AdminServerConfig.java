@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.service.admin;
 
-import io.cloudbeaver.server.CBAppConfig;
+import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
