@@ -21,8 +21,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.model.app.BaseServerConfigurationController;
 import io.cloudbeaver.model.app.BaseWebApplication;
-import io.cloudbeaver.service.security.PasswordPolicyConfiguration;
-import io.cloudbeaver.service.security.SMControllerConfiguration;
+import io.cloudbeaver.model.config.CBAppConfig;
+import io.cloudbeaver.model.config.CBServerConfig;
+import io.cloudbeaver.model.config.PasswordPolicyConfiguration;
+import io.cloudbeaver.model.config.SMControllerConfiguration;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -158,7 +160,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
                     hostName = InetAddress.getLocalHost().getHostName();
                 } catch (UnknownHostException e) {
                     log.debug("Error resolving localhost address: " + e.getMessage());
-                    hostName = CBApplication.HOST_LOCALHOST;
+                    hostName = CBConstants.HOST_LOCALHOST;
                 }
             }
             config.setServerURL("http://" + hostName + ":" + config.getServerPort());
