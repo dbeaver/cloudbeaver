@@ -16,11 +16,11 @@
  */
 package io.cloudbeaver.server.websockets;
 
+import io.cloudbeaver.server.AppWebSessionManager;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebHeadlessSession;
 import io.cloudbeaver.model.session.WebHttpRequestInfo;
 import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.service.session.WebSessionManager;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.websocket.server.ServerUpgradeRequest;
@@ -42,9 +42,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class CBJettyWebSocketManager implements WebSocketCreator {
     private static final Log log = Log.getLog(CBJettyWebSocketManager.class);
     private final Map<String, List<CBEventsWebSocket>> socketBySessionId = new ConcurrentHashMap<>();
-    private final WebSessionManager webSessionManager;
+    private final AppWebSessionManager webSessionManager;
 
-    public CBJettyWebSocketManager(@NotNull WebSessionManager webSessionManager) {
+    public CBJettyWebSocketManager(@NotNull AppWebSessionManager webSessionManager) {
         this.webSessionManager = webSessionManager;
 
         new WebSocketPingPongJob(CBPlatform.getInstance(), this).scheduleMonitor();

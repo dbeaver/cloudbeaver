@@ -202,6 +202,9 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
 
     @Override
     public void addServlets(CBApplication application, DBWServletContext servletContext) throws DBException {
+        if(!application.isMultiuser()) {
+            return;
+        }
         servletContext.addServlet("adminLogs", new WebAdminLogsServlet(application), application.getServicesURI() + "logs/*");
     }
 
