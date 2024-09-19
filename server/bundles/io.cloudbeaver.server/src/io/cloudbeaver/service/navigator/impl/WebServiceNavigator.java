@@ -228,11 +228,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 filter.setExclude(exclude);
             }
             filter.setEnabled(true);
-            ((DBNDatabaseNode) node).setNodeFilter(
-                ((DBNDatabaseNode) node).getItemsMeta(), filter, true);
-            if (hasNodeEditPermission(webSession, node, ((WebProjectImpl) node.getOwnerProject()).getRmProject())) {
-                // Save settings
-                ((DBNDatabaseNode) node).getDataSourceContainer().persistConfiguration();
+            if (node instanceof DBNDatabaseNode dbNode) {
+                dbNode.setNodeFilter(dbNode.getItemsMeta(), filter, true);
+                if (hasNodeEditPermission(webSession, node, ((WebProjectImpl) node.getOwnerProject()).getRmProject())) {
+                    // Save settings
+                    dbNode.getDataSourceContainer().persistConfiguration();
+                }
             }
         } catch (DBException e) {
             if (e instanceof DBWebException) {
@@ -255,14 +256,14 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             if (node == null) {
                 throw new DBWebException("Navigator node '"  + nodePath + "' not found");
             }
-            if (node instanceof DBNDataSource) {
+            if (node instanceof DBNDataSource dbnDataSource) {
                 // Do not refresh entire tree - just clear child nodes
                 // Otherwise refresh may fail if navigator settings were changed.
-                DBPDataSource dataSource = ((DBNDataSource) node).getDataSource();
-                if (dataSource instanceof DBPRefreshableObject) {
-                    ((DBPRefreshableObject) dataSource).refreshObject(monitor);
+                DBPDataSource dataSource = dbnDataSource.getDataSource();
+                if (dataSource instanceof DBPRefreshableObject refreshableObject) {
+                    refreshableObject.refreshObject(monitor);
                 }
-                ((DBNDataSource) node).cleanupNode();
+                dbnDataSource.cleanupNode();
             } else if (node instanceof DBNLocalFolder) {
                 // Refresh can't be applied to the local folder node
                 return true;
@@ -425,7 +426,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         List<String> siblings = Arrays.stream(
             ((DBNLocalFolder) node).getLogicalParent().getChildren(session.getProgressMonitor()))
             .filter(n -> n instanceof DBNLocalFolder)
-            .map(DBNNode::getName).collect(Collectors.toList());
+            .map(DBNNode::getName).toList();
         if (siblings.contains(newName)) {
             throw new DBWebException("Name " + newName + " is unavailable or invalid");
         }

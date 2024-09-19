@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.server.jetty;
 
+import io.cloudbeaver.server.GQLApplicationAdapter;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.model.config.CBServerConfig;
@@ -117,11 +118,15 @@ public class CBJettyServer {
                 // Add extensions from services
 
                 CBJettyServletContext servletContext = new CBJettyServletContext(servletContextHandler);
-                for (DBWServiceBindingServlet wsd : WebServiceRegistry.getInstance().getWebServices(DBWServiceBindingServlet.class)) {
-                    try {
-                        wsd.addServlets(this.application, servletContext);
-                    } catch (DBException e) {
-                        log.error(e.getMessage(), e);
+                for (DBWServiceBindingServlet wsd : WebServiceRegistry.getInstance()
+                    .getWebServices(DBWServiceBindingServlet.class)
+                ) {
+                    if (wsd.isApplicable(this.application)) {
+                        try {
+                            wsd.addServlets(this.application, servletContext);
+                        } catch (DBException e) {
+                            log.error(e.getMessage(), e);
+                        }
                     }
                 }
 
@@ -136,7 +141,12 @@ public class CBJettyServer {
                 );
                 servletContextHandler.insertHandler(webSocketHandler);
 
-                initSessionManager(this.application, server, servletContextHandler);
+                initSessionManager(
+                    this.application.getMaxSessionIdleTime(),
+                    this.application,
+                    server,
+                    servletContextHandler
+                );
 
                 server.setHandler(servletContextHandler);
 
@@ -184,14 +194,14 @@ public class CBJettyServer {
         return sslConfiguration.isAbsolute() ? sslConfiguration : application.getHomeDirectory().resolve(sslConfiguration);
     }
 
-    private void initSessionManager(
-        @NotNull CBApplication<?> application,
+    public static void initSessionManager(
+        long maxIdleTime,
+        @NotNull GQLApplicationAdapter application,
         @NotNull Server server,
         @NotNull ServletContextHandler servletContextHandler
     ) {
         // Init sessions persistence
-        SessionHandler sessionHandler = new SessionHandler();
-        var maxIdleTime = application.getMaxSessionIdleTime();
+        CBSessionHandler sessionHandler = new CBSessionHandler(application);
         int intMaxIdleSeconds;
         if (maxIdleTime > Integer.MAX_VALUE) {
             log.warn("Max session idle time value is greater than Integer.MAX_VALUE. Integer.MAX_VALUE will be used instead");

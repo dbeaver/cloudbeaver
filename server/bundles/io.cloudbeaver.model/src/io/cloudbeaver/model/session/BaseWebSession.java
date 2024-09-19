@@ -51,14 +51,14 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @NotNull
     protected final WebUserContext userContext;
     @NotNull
-    protected final WebAuthApplication application;
+    protected final WebApplication application;
     protected volatile long lastAccessTime;
 
     private final List<CBWebSessionEventHandler> sessionEventHandlers = new CopyOnWriteArrayList<>();
     private WebSessionEventsFilter eventsFilter = new WebSessionEventsFilter();
     private final WebSessionWorkspace workspace;
 
-    public BaseWebSession(@NotNull String id, @NotNull WebAuthApplication application) throws DBException {
+    public BaseWebSession(@NotNull String id, @NotNull WebApplication application) throws DBException {
         this.id = id;
         this.application = application;
         this.createTime = System.currentTimeMillis();
@@ -232,6 +232,9 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
 
     @Property
     public long getRemainingTime() {
-        return application.getMaxSessionIdleTime() + lastAccessTime - System.currentTimeMillis();
+        if (application instanceof WebAuthApplication authApplication) {
+            return authApplication.getMaxSessionIdleTime() + lastAccessTime - System.currentTimeMillis();
+        }
+        return Integer.MAX_VALUE;
     }
 }

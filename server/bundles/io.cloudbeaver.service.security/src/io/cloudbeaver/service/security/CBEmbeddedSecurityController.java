@@ -531,14 +531,11 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             }
 
             readSubjectsMetas(dbCon, SMSubjectType.user, filter.getUserIdMask(), result);
-            StringBuilder teamsSql = new StringBuilder()
-                .append("SELECT USER_ID,TEAM_ID FROM {table_prefix}CB_USER_TEAM")
-                .append("\n")
-                .append("WHERE USER_ID IN (")
-                .append(SQLUtils.generateParamList(result.size()))
-                .append(")");
+            String teamsSql =
+                "SELECT USER_ID,TEAM_ID FROM {table_prefix}CB_USER_TEAM\n" +
+                "WHERE USER_ID IN (" + SQLUtils.generateParamList(result.size()) + ")";
             // Read teams
-            try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(teamsSql.toString()))) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(teamsSql))) {
                 int parameterIndex = 1;
                 for (String userId : result.keySet()) {
                     dbStat.setString(parameterIndex++, userId);
@@ -1037,7 +1034,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
     @NotNull
     @Override
-    public SMPropertyDescriptor[] getMetaParametersBySubjectType(SMSubjectType subjectType) throws DBException {
+    public SMPropertyDescriptor[] getMetaParametersBySubjectType(SMSubjectType subjectType) {
         // First add global metas
         List<DBPPropertyDescriptor> props = new ArrayList<>(
             WebMetaParametersRegistry.getInstance().getMetaParameters(subjectType));
@@ -1755,11 +1752,10 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 SMAuthConfigurationReference providerId = entry.getKey();
                 String authJson = gson.toJson(entry.getValue());
                 boolean configIdExist = providerId.getAuthProviderConfigurationId() != null;
-                var sqlBuilder = new StringBuilder();
-                sqlBuilder.append("UPDATE {table_prefix}CB_AUTH_ATTEMPT_INFO SET AUTH_STATE=? ")
-                    .append("WHERE AUTH_ID=? AND AUTH_PROVIDER_ID=? AND ")
-                    .append(configIdExist ? "AUTH_PROVIDER_CONFIGURATION_ID=?" : "AUTH_PROVIDER_CONFIGURATION_ID IS NULL");
-                try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder.toString()))) {
+                String sqlBuilder = "UPDATE {table_prefix}CB_AUTH_ATTEMPT_INFO SET AUTH_STATE=? " +
+                                    "WHERE AUTH_ID=? AND AUTH_PROVIDER_ID=? AND " +
+                                    (configIdExist ? "AUTH_PROVIDER_CONFIGURATION_ID=?" : "AUTH_PROVIDER_CONFIGURATION_ID IS NULL");
+                try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder))) {
                     dbStat.setString(1, authJson);
                     dbStat.setString(2, authId);
                     dbStat.setString(3, providerId.getAuthProviderId());
@@ -1849,16 +1845,14 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         if (authProviderConfiguration != null) {
                             WebAuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
                             var authProviderInstance = authProviderDescriptor.getInstance();
-                            if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
-                                signInLink = buildRedirectLink(((SMAuthProviderFederated) authProviderInstance).getRedirectLink(
+                            if (authProviderInstance instanceof SMAuthProviderFederated providerFederated) {
+                                signInLink = buildRedirectLink(providerFederated.getRedirectLink(
                                     authProviderConfiguration,
                                     Map.of()), authId);
-                                var userCustomSignOutLink =
-                                    ((SMAuthProviderFederated) authProviderInstance).getUserSignOutLink(
-                                        application.getAuthConfiguration()
-                                            .getAuthProviderConfiguration(authProviderConfiguration),
-                                        authProviderData);
-                                signOutLink = userCustomSignOutLink;
+                                signOutLink = providerFederated.getUserSignOutLink(
+                                    application.getAuthConfiguration()
+                                        .getAuthProviderConfiguration(authProviderConfiguration),
+                                    authProviderData);
                             }
 
                         }
@@ -1869,7 +1863,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
             if (smAuthStatus != SMAuthStatus.SUCCESS) {
                 return switch (smAuthStatus) {
-                    case IN_PROGRESS -> SMAuthInfo.inProgress(authId, signInLink, signOutLink, authData, isMainAuth, forceSessionsLogout);
+                    case IN_PROGRESS ->
+                        SMAuthInfo.inProgress(authId, signInLink, signOutLink, authData, isMainAuth, forceSessionsLogout);
                     case ERROR -> SMAuthInfo.error(authId, authError, isMainAuth, errorCode);
                     case EXPIRED -> SMAuthInfo.expired(authId, readExpiredData ? authData : Map.of(), isMainAuth);
                     default -> throw new SMException("Unknown auth status:" + smAuthStatus);
@@ -2257,10 +2252,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         String userId,
         SMTeam[] allTeams
     ) throws DBCException {
-        if (!(authProvider.getInstance() instanceof SMAuthProviderAssigner)) {
+        if (!(authProvider.getInstance() instanceof SMAuthProviderAssigner authProviderAssigner)) {
             return;
         }
-        SMAuthProviderAssigner authProviderAssigner = (SMAuthProviderAssigner) authProvider.getInstance();
 
         String externalTeamIdMetadataFieldName = authProviderAssigner.getExternalTeamIdMetadataFieldName();
         if (!CommonUtils.isEmpty(externalTeamIdMetadataFieldName)) {
@@ -3206,11 +3200,10 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     public Set<String> getFilteredSubjects(Set<String> allSubjects) {
         try (Connection dbCon = database.openConnection()) {
             Set<String> result = new HashSet<>();
-            var sqlBuilder = new StringBuilder("SELECT SUBJECT_ID FROM {table_prefix}CB_AUTH_SUBJECT U ")
-                .append("WHERE SUBJECT_ID IN (")
-                .append(SQLUtils.generateParamList(allSubjects.size()))
-                .append(")");
-            try (var dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder.toString()))) {
+            String sqlBuilder =
+                "SELECT SUBJECT_ID FROM {table_prefix}CB_AUTH_SUBJECT U " +
+                "WHERE SUBJECT_ID IN (" + SQLUtils.generateParamList(allSubjects.size()) + ")";
+            try (var dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder))) {
                 int parameterIndex = 1;
                 for (String subjectId : allSubjects) {
                     dbStat.setString(parameterIndex++, subjectId);

@@ -203,6 +203,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         return resource;
     }
 
+    @NotNull
     @Override
     public DBPProject getOwnerProject() {
         return getParentNode().getOwnerProject();
