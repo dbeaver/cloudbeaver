@@ -265,7 +265,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
             if (session == null) {
                 throw new DBWebExceptionAccessDenied("No open session - anonymous access restricted");
             }
-            if (!application.isConfigurationMode()) {
+            if (!application.isConfigurationMode() && application.isMultiuser()) {
                 if (webAction.authRequired() && !session.isAuthorizedInSecurityManager()) {
                     log.debug("Anonymous access to " + method.getName() + " restricted");
                     throw new DBWebExceptionAccessDenied("Anonymous access restricted");
