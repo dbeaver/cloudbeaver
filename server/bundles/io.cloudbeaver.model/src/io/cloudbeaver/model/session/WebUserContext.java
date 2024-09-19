@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
  * Web user context.
  * Contains user state and services based on available permissions
  */
+//TODO: split to authenticated and non authenticated context
 public class WebUserContext implements SMCredentialsProvider {
     private static final Log log = Log.getLog(WebUserContext.class);
 

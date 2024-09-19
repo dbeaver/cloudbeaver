@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.server.jetty;
 
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.GQLApplicationAdapter;
 import jakarta.servlet.SessionCookieConfig;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.SessionHandler;
@@ -28,9 +28,9 @@ import java.util.TreeMap;
 
 public class CBSessionHandler extends SessionHandler {
     private final CBCookieConfig cbCookieConfig;
-    private final CBApplication<?> application;
+    private final GQLApplicationAdapter application;
 
-    public CBSessionHandler(CBApplication<?> application) {
+    public CBSessionHandler(GQLApplicationAdapter application) {
         this.cbCookieConfig = new CBCookieConfig();
         this.application = application;
     }
