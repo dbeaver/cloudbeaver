@@ -296,9 +296,6 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
 
     @Override
     public void addServlets(WebApplication application, DBWServletContext servletContext) throws DBException {
-        if (!application.isMultiuser()) {
-            return;
-        }
         servletContext.addServlet(
             "sqlResultValueViewer",
             new WebSQLResultServlet(application, getServiceImpl()),
@@ -309,6 +306,11 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
             new WebSQLFileLoaderServlet(application),
             application.getServicesURI() + "resultset/blob/*"
         );
+    }
+
+    @Override
+    public boolean isApplicable(WebApplication application) {
+        return application.isMultiuser();
     }
 
     private static class WebSQLConfiguration {

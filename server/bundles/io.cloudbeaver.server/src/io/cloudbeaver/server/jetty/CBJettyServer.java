@@ -118,11 +118,15 @@ public class CBJettyServer {
                 // Add extensions from services
 
                 CBJettyServletContext servletContext = new CBJettyServletContext(servletContextHandler);
-                for (DBWServiceBindingServlet wsd : WebServiceRegistry.getInstance().getWebServices(DBWServiceBindingServlet.class)) {
-                    try {
-                        wsd.addServlets(this.application, servletContext);
-                    } catch (DBException e) {
-                        log.error(e.getMessage(), e);
+                for (DBWServiceBindingServlet wsd : WebServiceRegistry.getInstance()
+                    .getWebServices(DBWServiceBindingServlet.class)
+                ) {
+                    if (wsd.isApplicable(this.application)) {
+                        try {
+                            wsd.addServlets(this.application, servletContext);
+                        } catch (DBException e) {
+                            log.error(e.getMessage(), e);
+                        }
                     }
                 }
 

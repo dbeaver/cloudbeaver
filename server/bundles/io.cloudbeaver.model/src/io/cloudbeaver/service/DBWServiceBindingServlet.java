@@ -23,6 +23,9 @@ import org.jkiss.dbeaver.DBException;
  * Servlet service
  */
 public interface DBWServiceBindingServlet<APPLICATION extends WebApplication> extends DBWServiceBinding {
+    default boolean isApplicable(WebApplication application) {
+        return true;
+    }
 
     void addServlets(APPLICATION application, DBWServletContext servletContext) throws DBException;
 }
