@@ -1,13 +1,16 @@
-# CloudBeaver Community
+<img src="https://github.com/dbeaver/cloudbeaver/wiki/images/cloudbeaver-logo.png" align="right" width="250"/>
 
-<img src="https://github.com/dbeaver/cloudbeaver/wiki/images/cloudbeaver-logo.png" width="250"/>
+# CloudBeaver Community
 
 Cloud Database Manager - Community Edition.  
 CloudBeaver is a web server that provides a rich web interface. The server itself is a Java application, and the web part is written in TypeScript and React.  
 It is free to use and open-source (licensed under [Apache 2](https://github.com/dbeaver/cloudbeaver/blob/devel/LICENSE) license).  
 See our [WIKI](https://github.com/dbeaver/cloudbeaver/wiki) for more details. 
 
-![](https://github.com/dbeaver/cloudbeaver/wiki/images/demo_screenshot_1.png)
+<img src="https://github.com/dbeaver/cloudbeaver/wiki/images/connection-creation-demo.png" width="400"/>
+<img src="https://github.com/dbeaver/cloudbeaver/wiki/images/gis-demo.png" width="400"/>
+<img src="https://github.com/dbeaver/cloudbeaver/wiki/images/data-transfer-demo.png" width="400"/>
+<img src="https://github.com/dbeaver/cloudbeaver/wiki/images/sql-editor-demo.png" width="400"/>
 
 ## Run in Docker
 
@@ -54,6 +57,6 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 ## Contribution
 As a community-driven open-source project, we warmly welcome contributions through GitHub pull requests. 
 
-[We are happy to reward](https://dbeaver.com/help-beaver/) our most active contributors every major sprint.
+[We are happy to reward](https://dbeaver.com/help-dbeaver/) our most active contributors every major sprint.
 The most significant contribution to our code for the major release 24.2.0 was made by:
 1. [matthieukhl](https://github.com/matthieukhl)

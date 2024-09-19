@@ -19,8 +19,8 @@ package io.cloudbeaver.server.jetty;
 
 import io.cloudbeaver.service.DBWServletContext;
 import jakarta.servlet.http.HttpServlet;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
 
 public class CBJettyServletContext implements DBWServletContext {
     private final ServletContextHandler contextHandler;

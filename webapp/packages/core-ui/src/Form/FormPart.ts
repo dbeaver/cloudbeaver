@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable, toJS } from 'mobx';
+import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
 import { executorHandlerFilter, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
@@ -16,6 +16,7 @@ import type { IFormState } from './IFormState';
 export abstract class FormPart<TPartState, TFormState = any> implements IFormPart<TPartState> {
   state: TPartState;
   initialState: TPartState;
+  isSaving: boolean;
 
   exception: Error | null;
   promise: Promise<any> | null;
@@ -29,6 +30,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
   ) {
     this.initialState = initialState;
     this.state = toJS(this.initialState);
+    this.isSaving = false;
 
     this.exception = null;
     this.promise = null;
@@ -37,7 +39,6 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     this.loading = false;
 
     this.formState.submitTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.save.bind(this)));
-    this.formState.configureTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.configure.bind(this)));
     this.formState.formatTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.format.bind(this)));
     this.formState.validationTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.validate.bind(this)));
 
@@ -46,10 +47,17 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
       state: observable,
       exception: observable.ref,
       promise: observable.ref,
+      isSaving: observable.ref,
       loaded: observable,
       loading: observable,
       setInitialState: action,
+      isDisabled: computed,
+      isChanged: computed,
     });
+  }
+
+  get isDisabled(): boolean {
+    return this.isSaving || this.isLoading();
   }
 
   isLoading(): boolean {
@@ -68,7 +76,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     return this.exception !== null;
   }
 
-  isChanged(): boolean {
+  get isChanged(): boolean {
     if (!this.loaded || this.initialState === this.state) {
       return false;
     }
@@ -85,9 +93,11 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     try {
       await this.loader();
 
-      if (!this.isChanged()) {
+      if (!this.isChanged) {
         return;
       }
+
+      this.isSaving = true;
 
       await this.saveChanges(data, contexts);
       if (ExecutorInterrupter.isInterrupted(contexts)) {
@@ -100,6 +110,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
       this.exception = exception;
       throw exception;
     } finally {
+      this.isSaving = false;
       this.loading = false;
     }
   }
@@ -136,7 +147,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
   protected setInitialState(initialState: TPartState) {
     this.initialState = initialState;
 
-    if (this.isChanged()) {
+    if (this.isChanged) {
       return;
     }
 
@@ -147,7 +158,6 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     this.state = state;
   }
 
-  protected configure(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
   protected format(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
   protected validate(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
 
