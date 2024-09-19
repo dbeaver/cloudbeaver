@@ -46,6 +46,7 @@ import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
 import org.jkiss.dbeaver.registry.storage.H2Migrator;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
@@ -326,7 +327,7 @@ public class CBDatabase extends InternalDB {
             } catch (SQLException e) {
                 try {
                     Object legacyVersion = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
-                        normalizeTableNames("SELECT SCHEMA_VERSION FROM {table_prefix}CB_SERVER"))); // may be remove?
+                        normalizeTableNames("SELECT SCHEMA_VERSION FROM {table_prefix}CB_SERVER")));
                     // Table CB_SERVER exist - this is a legacy schema
                     return LEGACY_SCHEMA_VERSION;
                 } catch (SQLException ex) {
@@ -532,5 +533,21 @@ public class CBDatabase extends InternalDB {
                 log.error(e);
             }
         }
+    }
+
+    protected String getCurrentInstanceId() throws IOException {
+        // 16 chars - workspace ID
+        String workspaceId = DBWorkbench.getPlatform().getWorkspace().getWorkspaceId();
+        if (workspaceId.length() > 16) {
+            workspaceId = workspaceId.substring(0, 16);
+        }
+
+        StringBuilder id = new StringBuilder(36);
+        id.append("000000000000"); // there was mac address, but it generates dynamically when docker is used
+        id.append(":").append(workspaceId).append(":");
+        while (id.length() < 36) {
+            id.append("X");
+        }
+        return id.toString();
     }
 }
