@@ -41,7 +41,6 @@ import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
-import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
 import org.jkiss.dbeaver.registry.storage.H2Migrator;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -73,8 +72,8 @@ public class CBDatabase extends InternalDB {
     private static final String V1_DB_NAME = "cb.h2.dat";
     private static final String V2_DB_NAME = "cb.h2v2.dat";
     public static final String CB_SCHEMA_INFO_TABLE_NAME = "CB_SCHEMA_INFO";
-    public static final String MAC_ADDRESS = "macAddress";
-    public static final String HOST_NAME = "hostName";
+    private static final String MAC_ADDRESS = "macAddress";
+    private static final String HOST_NAME = "hostName";
 
     private final WebApplication application;
     private final WebDatabaseConfig databaseConfiguration;
@@ -187,7 +186,8 @@ public class CBDatabase extends InternalDB {
             log.debug("\tConnected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
 
             createSchema(driver, schemaName, connection);
-            SQLSchemaManager schemaManager = new SQLSchemaManager(
+
+            updateSchema(
                 "CB",
                 new ClassLoaderScriptSource(
                     CBDatabase.class.getClassLoader(),
@@ -201,9 +201,9 @@ public class CBDatabase extends InternalDB {
                 schemaName,
                 CURRENT_SCHEMA_VERSION,
                 0,
-                databaseConfiguration
+                databaseConfiguration,
+                monitor
             );
-            schemaManager.updateSchema(monitor);
 
             validateInstancePersistentState(connection);
         } catch (Exception e) {
@@ -498,18 +498,8 @@ public class CBDatabase extends InternalDB {
     protected SMAdminController getAdminSecurityController() {
         return adminSecurityController;
     }
-    public void shutdown() {
-        log.debug("Shutdown database");
-        if (getDbConnection() != null) {
-            try {
-                getDbConnection().close();
-            } catch (SQLException e) {
-                log.error(e);
-            }
-        }
-    }
 
-    protected String getCurrentInstanceId() throws IOException {
+    protected String getCurrentInstanceId() {
         // 16 chars - workspace ID
         String workspaceId = DBWorkbench.getPlatform().getWorkspace().getWorkspaceId();
         if (workspaceId.length() > 16) {
