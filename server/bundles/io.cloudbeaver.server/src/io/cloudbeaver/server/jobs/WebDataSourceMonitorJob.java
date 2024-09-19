@@ -16,9 +16,9 @@
  */
 package io.cloudbeaver.server.jobs;
 
+import io.cloudbeaver.server.AppWebSessionManager;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
@@ -34,14 +34,19 @@ import java.util.List;
  * Web data source monitor job.
  */
 public class WebDataSourceMonitorJob extends DataSourceMonitorJob {
+    private final AppWebSessionManager sessionManager;
 
-    public WebDataSourceMonitorJob(DBPPlatform platform) {
+    public WebDataSourceMonitorJob(
+        @NotNull DBPPlatform platform,
+        @NotNull AppWebSessionManager sessionManager
+    ) {
         super(platform);
+        this.sessionManager = sessionManager;
     }
 
     @Override
     protected void doJob() {
-        Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
+        Collection<BaseWebSession> allSessions = sessionManager.getAllActiveSessions();
         allSessions.parallelStream().forEach(s -> {
             checkDataSourceAliveInWorkspace(s.getWorkspace(), s.getLastAccessTimeMillis());
         });

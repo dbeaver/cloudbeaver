@@ -74,7 +74,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * This class controls all aspects of the application's execution
  */
-public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApplication implements WebAuthApplication {
+public abstract class CBApplication<T extends CBServerConfig> extends
+    BaseWebApplication implements WebAuthApplication, GQLApplicationAdapter {
 
     private static final Log log = Log.getLog(CBApplication.class);
 
