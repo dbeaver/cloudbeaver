@@ -40,22 +40,17 @@ import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
-import org.jkiss.dbeaver.model.sql.SQLDialect;
-import org.jkiss.dbeaver.model.sql.SQLDialectSchemaController;
 import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
 import org.jkiss.dbeaver.registry.storage.H2Migrator;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
-import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.SecurityUtils;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
@@ -78,15 +73,15 @@ public class CBDatabase extends InternalDB {
     private static final String V1_DB_NAME = "cb.h2.dat";
     private static final String V2_DB_NAME = "cb.h2v2.dat";
     public static final String CB_SCHEMA_INFO_TABLE_NAME = "CB_SCHEMA_INFO";
+    public static final String MAC_ADDRESS = "macAddress";
+    public static final String HOST_NAME = "hostName";
 
     private final WebApplication application;
     private final WebDatabaseConfig databaseConfiguration;
-    private PoolingDataSource<PoolableConnection> cbDataSource;
     private transient volatile Connection exclusiveConnection;
 
     private String instanceId;
     private SMAdminController adminSecurityController;
-    private SQLDialect dialect;
 
     public CBDatabase(WebApplication application, WebDatabaseConfig databaseConfiguration) {
         super(databaseConfiguration, application);
@@ -106,11 +101,7 @@ public class CBDatabase extends InternalDB {
         if (exclusiveConnection != null) {
             return exclusiveConnection;
         }
-        return cbDataSource.getConnection();
-    }
-
-    public PoolingDataSource<PoolableConnection> getConnectionPool() {
-        return cbDataSource;
+        return getDbConnection().getConnection();
     }
 
     public void initialize() throws DBException {
@@ -186,19 +177,16 @@ public class CBDatabase extends InternalDB {
         dbURL = getDbURL();
 
         try {
-            this.cbDataSource = initConnectionPool(driver, dbURL, dbProperties, driverInstance);
+            super.setDbConnection(initConnectionPool(driver, dbURL, dbProperties, driverInstance));
         } catch (SQLException e) {
             throw new DBException("Error initializing connection pool");
         }
-        dialect = driver.getScriptDialect().createInstance();
 
-        try (Connection connection = cbDataSource.getConnection()) {
+        try (Connection connection = getDbConnection().getConnection()) {
             DatabaseMetaData metaData = connection.getMetaData();
             log.debug("\tConnected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
 
-            if (dialect instanceof SQLDialectSchemaController dialectSchemaController && CommonUtils.isNotEmpty(schemaName)) {
-                createSchemaIfNotExists(connection, dialectSchemaController, schemaName);
-            }
+            createSchema(driver, schemaName, connection);
             SQLSchemaManager schemaManager = new SQLSchemaManager(
                 "CB",
                 new ClassLoaderScriptSource(
@@ -208,7 +196,7 @@ public class CBDatabase extends InternalDB {
                 ),
                 monitor1 -> connection,
                 new CBSchemaVersionManager(),
-                dialect,
+                getDialect(),
                 null,
                 schemaName,
                 CURRENT_SCHEMA_VERSION,
@@ -432,15 +420,7 @@ public class CBDatabase extends InternalDB {
     }
 
     private void checkInstanceRecord(Connection connection) throws SQLException, IOException {
-        String hostName;
-        try {
-            hostName = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            hostName = "localhost";
-        }
-
-        byte[] hardwareAddress = RuntimeUtils.getLocalMacAddress();
-        String macAddress = CommonUtils.toHexString(hardwareAddress);
+        Map<String, String> hostInfo = getHostInfo();
 
         instanceId = getCurrentInstanceId();
 
@@ -457,8 +437,8 @@ public class CBDatabase extends InternalDB {
                     "(INSTANCE_ID,MAC_ADDRESS,HOST_NAME,PRODUCT_NAME,PRODUCT_VERSION,UPDATE_TIME)" +
                     " VALUES(?,?,?,?,?,CURRENT_TIMESTAMP)"),
                 instanceId,
-                macAddress,
-                hostName,
+                hostInfo.get(MAC_ADDRESS),
+                hostInfo.get(HOST_NAME),
                 productName,
                 versionName);
         } else {
@@ -467,7 +447,7 @@ public class CBDatabase extends InternalDB {
                 normalizeTableNames("UPDATE {table_prefix}CB_INSTANCE " +
                     "SET HOST_NAME=?,PRODUCT_NAME=?,PRODUCT_VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP " +
                     "WHERE INSTANCE_ID=?"),
-                hostName,
+                hostInfo.get(HOST_NAME),
                 productName,
                 versionName,
                 instanceId);
@@ -518,17 +498,11 @@ public class CBDatabase extends InternalDB {
     protected SMAdminController getAdminSecurityController() {
         return adminSecurityController;
     }
-
-    @NotNull
-    public SQLDialect getDialect() {
-        return dialect;
-    }
-
     public void shutdown() {
         log.debug("Shutdown database");
-        if (cbDataSource != null) {
+        if (getDbConnection() != null) {
             try {
-                cbDataSource.close();
+                getDbConnection().close();
             } catch (SQLException e) {
                 log.error(e);
             }
