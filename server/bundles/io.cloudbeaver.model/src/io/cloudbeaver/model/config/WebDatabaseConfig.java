@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.security.db;
+package io.cloudbeaver.model.config;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.connection.InternalDatabaseConfig;
