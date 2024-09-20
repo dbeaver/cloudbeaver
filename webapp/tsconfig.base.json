@@ -13,6 +13,7 @@
     "allowArbitraryExtensions": true,
     // "baseUrl": ".",
     "jsx": "react-jsx",
+    "useDefineForClassFields": false, // leads to "TypeError: Cannot redefine property requestInfo" in QueryDataSource.ts
 
     /* Linting */
     "strict": true,
