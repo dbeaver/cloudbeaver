@@ -7,7 +7,7 @@
  */
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
-import { ResourceKey } from './ResourceKey';
+import type { ResourceKey } from './ResourceKey.js';
 
 export type ResourceAliasOptionsKey = string | number;
 export type ResourceAliasOptionsValueTypes = string | number | boolean | ResourceKey<unknown> | null | undefined;

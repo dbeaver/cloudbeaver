@@ -7,14 +7,14 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { filterLayoutFakeProps, getLayoutProps } from '../../Containers/filterLayoutFakeProps';
-import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps';
-import { s } from '../../s';
-import { useS } from '../../useS';
-import { Field } from '../Field';
-import { FieldLabel } from '../FieldLabel';
-import { isControlPresented } from '../isControlPresented';
-import { Checkbox, CheckboxBaseProps, CheckboxType, ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';
+import { filterLayoutFakeProps, getLayoutProps } from '../../Containers/filterLayoutFakeProps.js';
+import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps.js';
+import { s } from '../../s.js';
+import { useS } from '../../useS.js';
+import { Field } from '../Field.js';
+import { FieldLabel } from '../FieldLabel.js';
+import { isControlPresented } from '../isControlPresented.js';
+import { Checkbox, type CheckboxBaseProps, type CheckboxType, type ICheckboxControlledProps, type ICheckboxObjectProps } from './Checkbox.js';
 import fieldCheckboxStyles from './FieldCheckbox.module.css';
 
 export const FieldCheckbox: CheckboxType<ILayoutSizeProps> = observer(function FieldCheckbox({

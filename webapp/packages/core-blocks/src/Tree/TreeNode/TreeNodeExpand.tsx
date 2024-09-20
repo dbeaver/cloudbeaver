@@ -10,16 +10,16 @@ import { useContext } from 'react';
 
 import { EventContext } from '@cloudbeaver/core-events';
 
-import { Clickable } from '../../Clickable';
-import { getComputed } from '../../getComputed';
-import { Icon } from '../../Icon';
-import { Loader } from '../../Loader/Loader';
-import { useTranslate } from '../../localization/useTranslate';
-import { s } from '../../s';
-import { useS } from '../../useS';
-import { useStateDelay } from '../../useStateDelay';
-import { EventTreeNodeExpandFlag } from './EventTreeNodeExpandFlag';
-import { TreeNodeContext } from './TreeNodeContext';
+import { Clickable } from '../../Clickable.js';
+import { getComputed } from '../../getComputed.js';
+import { Icon } from '../../Icon.js';
+import { Loader } from '../../Loader/Loader.js';
+import { useTranslate } from '../../localization/useTranslate.js';
+import { s } from '../../s.js';
+import { useS } from '../../useS.js';
+import { useStateDelay } from '../../useStateDelay.js';
+import { EventTreeNodeExpandFlag } from './EventTreeNodeExpandFlag.js';
+import { TreeNodeContext } from './TreeNodeContext.js';
 import style from './TreeNodeExpand.module.css';
 
 interface Props {

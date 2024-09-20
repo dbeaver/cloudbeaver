@@ -7,7 +7,7 @@
  */
 import { uuid } from '@cloudbeaver/core-utils';
 
-import type { IMenuItem, IMenuItemEvents } from './IMenuItem';
+import type { IMenuItem, IMenuItemEvents } from './IMenuItem.js';
 
 export abstract class MenuItem implements IMenuItem {
   readonly id: string;

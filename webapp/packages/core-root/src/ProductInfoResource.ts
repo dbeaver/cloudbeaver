@@ -7,9 +7,9 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
-import { GraphQLService, ProductInfoFragment } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type ProductInfoFragment } from '@cloudbeaver/core-sdk';
 
-import { ServerConfigResource } from './ServerConfigResource';
+import { ServerConfigResource } from './ServerConfigResource.js';
 
 export type ProductInfo = ProductInfoFragment['productInfo'];
 

@@ -8,10 +8,10 @@
 import { observer } from 'mobx-react-lite';
 import type React from 'react';
 
-import { Icon } from './Icon';
-import { s } from './s';
+import { Icon } from './Icon.js';
+import { s } from './s.js';
 import classes from './TimerIcon.module.css';
-import { useS } from './useS';
+import { useS } from './useS.js';
 
 interface Props {
   state: 'play' | 'stop';

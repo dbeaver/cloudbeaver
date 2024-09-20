@@ -12,8 +12,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { CachedResourceOffsetPageKey, CachedResourceOffsetPageTargetKey, getNextPageOffset } from '@cloudbeaver/core-resource';
 
-import type { NavigationNodeRendererComponent } from '../NavigationNodeComponent';
-import { NAVIGATION_TREE_LIMIT } from './elementsTreeLimitFilter';
+import type { NavigationNodeRendererComponent } from '../NavigationNodeComponent.js';
+import { NAVIGATION_TREE_LIMIT } from './elementsTreeLimitFilter.js';
 import styles from './elementsTreeLimitRenderer.module.css';
 
 export function elementsTreeLimitRenderer(nodeId: string): NavigationNodeRendererComponent | undefined {

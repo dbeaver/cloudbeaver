@@ -13,13 +13,18 @@ import { getComputed, useCombinedHandler, useMouse, useObjectRef, useObservableR
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@cloudbeaver/core-utils';
 import { type CalculatedColumn, Cell, type CellRendererProps } from '@cloudbeaver/plugin-data-grid';
-import { DatabaseEditChangeType, IResultSetElementKey, IResultSetRowKey, isBooleanValuePresentationAvailable } from '@cloudbeaver/plugin-data-viewer';
+import {
+  DatabaseEditChangeType,
+  type IResultSetElementKey,
+  type IResultSetRowKey,
+  isBooleanValuePresentationAvailable,
+} from '@cloudbeaver/plugin-data-viewer';
 
-import { CellPosition, EditingContext } from '../../Editing/EditingContext';
-import { DataGridContext } from '../DataGridContext';
-import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
-import { TableDataContext } from '../TableDataContext';
-import { CellContext } from './CellContext';
+import { type CellPosition, EditingContext } from '../../Editing/EditingContext.js';
+import { DataGridContext } from '../DataGridContext.js';
+import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
+import { TableDataContext } from '../TableDataContext.js';
+import { CellContext } from './CellContext.js';
 
 export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown>>(function CellRenderer(props) {
   const { rowIdx, row, column, isCellSelected, onDoubleClick, selectCell } = props;

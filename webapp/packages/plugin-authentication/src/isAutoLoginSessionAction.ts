@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IAutoLoginSessionAction } from './IAutoLoginSessionAction';
+import type { IAutoLoginSessionAction } from './IAutoLoginSessionAction.js';
 
 export function isAutoLoginSessionAction(obj: any): obj is IAutoLoginSessionAction {
   return obj && 'action' in obj && obj.action === 'auto-login';

@@ -9,8 +9,8 @@ import { PasswordPolicyService } from '@cloudbeaver/core-authentication';
 import { useService } from '@cloudbeaver/core-di';
 import { PasswordPolicyResource } from '@cloudbeaver/core-root';
 
-import { useCustomInputValidation } from './FormControls/useCustomInputValidation';
-import { useResource } from './ResourcesHooks/useResource';
+import { useCustomInputValidation } from './FormControls/useCustomInputValidation.js';
+import { useResource } from './ResourcesHooks/useResource.js';
 
 export function usePasswordValidation() {
   useResource(usePasswordValidation, PasswordPolicyResource, undefined);

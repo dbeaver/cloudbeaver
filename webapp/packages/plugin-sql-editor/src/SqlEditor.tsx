@@ -11,16 +11,16 @@ import { Loader, Pane, ResizerControls, s, Split, useS, useSplitUserState } from
 import { useService } from '@cloudbeaver/core-di';
 import { CaptureView } from '@cloudbeaver/core-view';
 
-import type { ISqlEditorTabState } from './ISqlEditorTabState';
-import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
+import type { ISqlEditorTabState } from './ISqlEditorTabState.js';
+import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
 import style from './SqlEditor.module.css';
-import { SqlEditorLoader } from './SqlEditor/SqlEditorLoader';
-import { SqlEditorOpenOverlay } from './SqlEditorOpenOverlay';
-import { SqlEditorOverlay } from './SqlEditorOverlay';
-import { SqlEditorStatusBar } from './SqlEditorStatusBar';
-import { SqlEditorView } from './SqlEditorView';
-import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs';
-import { useDataSource } from './useDataSource';
+import { SqlEditorLoader } from './SqlEditor/SqlEditorLoader.js';
+import { SqlEditorOpenOverlay } from './SqlEditorOpenOverlay.js';
+import { SqlEditorOverlay } from './SqlEditorOverlay.js';
+import { SqlEditorStatusBar } from './SqlEditorStatusBar.js';
+import { SqlEditorView } from './SqlEditorView.js';
+import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs.js';
+import { useDataSource } from './useDataSource.js';
 
 export interface SqlEditorProps {
   state: ISqlEditorTabState;

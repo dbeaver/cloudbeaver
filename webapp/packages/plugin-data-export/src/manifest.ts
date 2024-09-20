@@ -13,12 +13,12 @@ export const dataExportManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./Bootstrap').then(m => m.Bootstrap),
-    () => import('./DataExportMenuService').then(m => m.DataExportMenuService),
-    () => import('./DataExportService').then(m => m.DataExportService),
-    () => import('./DataExportProcessService').then(m => m.DataExportProcessService),
-    () => import('./DataTransferProcessorsResource').then(m => m.DataTransferProcessorsResource),
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./Dialog/DefaultExportOutputSettingsResource').then(m => m.DefaultExportOutputSettingsResource),
+    () => import('./Bootstrap.js').then(m => m.Bootstrap),
+    () => import('./DataExportMenuService.js').then(m => m.DataExportMenuService),
+    () => import('./DataExportService.js').then(m => m.DataExportService),
+    () => import('./DataExportProcessService.js').then(m => m.DataExportProcessService),
+    () => import('./DataTransferProcessorsResource.js').then(m => m.DataTransferProcessorsResource),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./Dialog/DefaultExportOutputSettingsResource.js').then(m => m.DefaultExportOutputSettingsResource),
   ],
 };

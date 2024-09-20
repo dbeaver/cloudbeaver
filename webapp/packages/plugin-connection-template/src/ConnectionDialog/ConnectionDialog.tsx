@@ -25,10 +25,10 @@ import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ConnectionAuthenticationFormLoader } from '@cloudbeaver/plugin-connections';
 
 import style from './ConnectionDialog.module.css';
-import { ConnectionDialogFooter } from './ConnectionDialogFooter';
-import { ConnectionStep } from './EConnectionStep';
-import { TemplateConnectionSelector } from './TemplateConnectionSelector/TemplateConnectionSelector';
-import { useConnectionDialog } from './useConnectionDialog';
+import { ConnectionDialogFooter } from './ConnectionDialogFooter.js';
+import { ConnectionStep } from './EConnectionStep.js';
+import { TemplateConnectionSelector } from './TemplateConnectionSelector/TemplateConnectionSelector.js';
+import { useConnectionDialog } from './useConnectionDialog.js';
 
 export const ConnectionDialog: DialogComponent<null, null> = observer(function ConnectionDialog({ rejectDialog }) {
   const styles = useS(style);

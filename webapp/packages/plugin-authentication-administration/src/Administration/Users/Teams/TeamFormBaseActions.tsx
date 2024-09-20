@@ -8,10 +8,10 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { Button, PlaceholderComponent, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, type PlaceholderComponent, useTranslate } from '@cloudbeaver/core-blocks';
 
-import type { ITeamFormProps } from './ITeamFormProps';
-import { TeamFormActionsContext } from './TeamFormActionsContext';
+import type { ITeamFormProps } from './ITeamFormProps.js';
+import { TeamFormActionsContext } from './TeamFormActionsContext.js';
 
 export const TeamFormBaseActions: PlaceholderComponent<ITeamFormProps> = observer(function TeamFormBaseActions({ state, onCancel }) {
   const translate = useTranslate();

@@ -18,10 +18,8 @@ export class AdministrationTopAppBarBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.administrationTopAppBarService.placeholder.add(Logo, 0);
     this.wizardTopAppBarService.placeholder.add(Logo, 0);
   }
-
-  load(): void | Promise<void> {}
 }

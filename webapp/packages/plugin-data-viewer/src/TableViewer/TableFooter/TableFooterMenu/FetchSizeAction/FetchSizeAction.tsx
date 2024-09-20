@@ -10,10 +10,10 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Container, Form, getComputed, s, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ICustomMenuItemComponent } from '@cloudbeaver/core-view';
+import { type ICustomMenuItemComponent } from '@cloudbeaver/core-view';
 
-import { DATA_CONTEXT_DV_DDM } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
-import { DataViewerSettingsService } from '../../../../DataViewerSettingsService';
+import { DATA_CONTEXT_DV_DDM } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
+import { DataViewerSettingsService } from '../../../../DataViewerSettingsService.js';
 import styles from './FetchSizeAction.module.css';
 
 export const FetchSizeAction: ICustomMenuItemComponent = observer(function FetchSizeAction({ context }) {

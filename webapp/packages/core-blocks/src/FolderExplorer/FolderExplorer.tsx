@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { FolderExplorerContext, IFolderExplorerContext } from './FolderExplorerContext';
+import { FolderExplorerContext, type IFolderExplorerContext } from './FolderExplorerContext.js';
 
 interface Props {
   state: IFolderExplorerContext;

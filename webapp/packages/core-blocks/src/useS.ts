@@ -8,11 +8,11 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
-import { BaseStyles, ClassCollection, ComponentStyle, Style, ThemeSelector, ThemeService } from '@cloudbeaver/core-theming';
+import { type BaseStyles, type ClassCollection, type ComponentStyle, type Style, type ThemeSelector, ThemeService } from '@cloudbeaver/core-theming';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { SContextReact } from './SContext';
-import { useExecutor } from './useExecutor';
+import { SContextReact } from './SContext.js';
+import { useExecutor } from './useExecutor.js';
 
 const stylesCache = new MetadataMap<string, Map<ThemeSelector<any>, Promise<undefined | BaseStyles | BaseStyles[]>>>(() => new Map());
 

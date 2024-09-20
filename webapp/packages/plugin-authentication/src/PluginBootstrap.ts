@@ -11,7 +11,7 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 
-import { AuthenticationService } from './AuthenticationService';
+import { AuthenticationService } from './AuthenticationService.js';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -24,7 +24,7 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.menuService.addCreator({
       menus: [TOP_NAV_BAR_SETTINGS_MENU],
       getItems: (context, items) => {
@@ -63,7 +63,7 @@ export class PluginBootstrap extends Bootstrap {
 
         if (index > -1) {
           const item = items.splice(index, 1);
-          items.push(item[0]);
+          items.push(item[0]!);
         }
 
         return items;

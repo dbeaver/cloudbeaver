@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from '@jest/globals';
 
-import { getTextBetween } from './getTextBetween';
+import { getTextBetween } from './getTextBetween.js';
 
 describe('Get text between', () => {
   test('should return text between when arguments are valid', () => {

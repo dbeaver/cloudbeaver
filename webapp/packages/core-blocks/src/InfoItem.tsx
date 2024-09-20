@@ -9,11 +9,11 @@ import { observer } from 'mobx-react-lite';
 
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
-import { IconOrImage } from './IconOrImage';
+import { IconOrImage } from './IconOrImage.js';
 import style from './InfoItem.module.css';
-import { useTranslate } from './localization/useTranslate';
-import { s } from './s';
-import { useS } from './useS';
+import { useTranslate } from './localization/useTranslate.js';
+import { s } from './s.js';
+import { useS } from './useS.js';
 
 export interface IInfoItem {
   info: TLocalizationToken;

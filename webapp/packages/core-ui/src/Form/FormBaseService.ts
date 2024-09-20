@@ -7,14 +7,14 @@
  */
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, type IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
+import { ExecutorHandlersCollection, ExecutorInterrupter, type IExecutorHandler, type IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 import type { LocalizationService } from '@cloudbeaver/core-localization';
 
-import { TabsContainer } from '../Tabs/TabsContainer/TabsContainer';
-import { formStatusContext } from './formStatusContext';
-import { formValidationContext } from './formValidationContext';
-import type { IFormProps } from './IFormProps';
-import type { IFormState } from './IFormState';
+import { TabsContainer } from '../Tabs/TabsContainer/TabsContainer.js';
+import { formStatusContext } from './formStatusContext.js';
+import { formValidationContext } from './formValidationContext.js';
+import type { IFormProps } from './IFormProps.js';
+import type { IFormState } from './IFormState.js';
 
 export class FormBaseService<TState, TProps extends IFormProps<TState> = IFormProps<TState>> {
   readonly parts: TabsContainer<TProps>;
@@ -28,7 +28,11 @@ export class FormBaseService<TState, TProps extends IFormProps<TState> = IFormPr
   readonly onSubmit: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onState: IExecutorHandlersCollection<TState>;
 
-  constructor(private readonly localizationService: LocalizationService, private readonly notificationService: NotificationService, name: string) {
+  constructor(
+    private readonly localizationService: LocalizationService,
+    private readonly notificationService: NotificationService,
+    name: string,
+  ) {
     this.parts = new TabsContainer(name);
     this.actionsContainer = new PlaceholderContainer();
     this.onConfigure = new ExecutorHandlersCollection();

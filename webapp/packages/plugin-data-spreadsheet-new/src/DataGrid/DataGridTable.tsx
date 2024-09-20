@@ -17,34 +17,34 @@ import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import { type CellSelectArgs, DataGrid, type DataGridHandle, type Position } from '@cloudbeaver/plugin-data-grid';
 import {
   DATA_CONTEXT_DV_PRESENTATION,
-  DatabaseDataSelectActionsData,
+  type DatabaseDataSelectActionsData,
   DatabaseEditChangeType,
   DatabaseSelectAction,
   DataViewerPresentationType,
-  IDatabaseDataModel,
-  IDataPresentationProps,
-  IResultSetEditActionData,
-  IResultSetElementKey,
-  IResultSetPartialKey,
-  IResultSetRowKey,
+  type IDatabaseDataModel,
+  type IDataPresentationProps,
+  type IResultSetEditActionData,
+  type IResultSetElementKey,
+  type IResultSetPartialKey,
+  type IResultSetRowKey,
   ResultSetDataKeysUtils,
   ResultSetDataSource,
   ResultSetSelectAction,
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { CellPosition, EditingContext } from '../Editing/EditingContext';
-import { useEditing } from '../Editing/useEditing';
-import { CellRenderer } from './CellRenderer/CellRenderer';
-import { DataGridContext, IColumnResizeInfo, IDataGridContext } from './DataGridContext';
-import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
-import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext';
+import { type CellPosition, EditingContext } from '../Editing/EditingContext.js';
+import { useEditing } from '../Editing/useEditing.js';
+import { CellRenderer } from './CellRenderer/CellRenderer.js';
+import { DataGridContext, type IColumnResizeInfo, type IDataGridContext } from './DataGridContext.js';
+import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
+import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext.js';
 import classes from './DataGridTable.module.css';
-import { CellFormatter } from './Formatters/CellFormatter';
-import { TableDataContext } from './TableDataContext';
-import { useGridDragging } from './useGridDragging';
-import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy';
-import { useTableData } from './useTableData';
+import { CellFormatter } from './Formatters/CellFormatter.js';
+import { TableDataContext } from './TableDataContext.js';
+import { useGridDragging } from './useGridDragging.js';
+import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy.js';
+import { useTableData } from './useTableData.js';
 
 interface IInnerState {
   lastCount: number;
@@ -177,7 +177,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         const selectedElements = selectionAction.getSelectedElements();
 
         if (selectedElements.length > 0) {
-          key = selectedElements[0];
+          key = selectedElements[0]!;
         } else {
           key = { column: viewAction.columnKeys[0], row: viewAction.rowKeys[0] };
         }
@@ -267,7 +267,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
         if (filteredRows.length > 0) {
           const editor = tableData.editor;
-          const firstRow = filteredRows[0];
+          const firstRow = filteredRows[0]!;
           const editingState = tableData.editor.getElementState(firstRow);
 
           editor.delete(...filteredRows);
@@ -318,7 +318,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         return;
       }
 
-      const key = data.value[data.value.length - 1].key;
+      const key = data.value[data.value.length - 1]!.key;
 
       const idx = tableData.getColumnIndexFromColumnKey(key.column);
       const rowIdx = tableData.getRowIndexFromKey(key.row);

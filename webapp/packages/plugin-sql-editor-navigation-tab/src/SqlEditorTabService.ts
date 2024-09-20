@@ -19,9 +19,9 @@ import {
   ContainerResource,
   createConnectionParam,
   executionContextProvider,
-  ICatalogData,
-  IConnectionExecutorData,
-  IConnectionInfoParams,
+  type ICatalogData,
+  type IConnectionExecutorData,
+  type IConnectionInfoParams,
   objectCatalogProvider,
   objectCatalogSetter,
   objectSchemaProvider,
@@ -30,28 +30,28 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeInfoResource, NodeManagerUtils, objectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider, projectSetter, projectSetterState } from '@cloudbeaver/core-projects';
-import { resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import type { NavNodeInfoFragment } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
-import { ITab, ITabOptions, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
+import { type ITab, type ITabOptions, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
 import {
   ESqlDataSourceFeatures,
-  ISQLDatasourceUpdateData,
-  ISqlEditorTabState,
+  type ISQLDatasourceUpdateData,
+  type ISqlEditorTabState,
   SQL_EDITOR_TAB_STATE_SCHEMA,
   SqlDataSourceService,
   SqlEditorService,
   SqlResultTabsService,
 } from '@cloudbeaver/plugin-sql-editor';
 
-import { isSQLEditorTab } from './isSQLEditorTab';
-import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey';
+import { isSQLEditorTab } from './isSQLEditorTab.js';
+import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey.js';
 
-const SqlEditorPanel = importLazyComponent(() => import('./SqlEditorPanel').then(m => m.SqlEditorPanel));
-const SqlEditorTab = importLazyComponent(() => import('./SqlEditorTab').then(m => m.SqlEditorTab));
+const SqlEditorPanel = importLazyComponent(() => import('./SqlEditorPanel.js').then(m => m.SqlEditorPanel));
+const SqlEditorTab = importLazyComponent(() => import('./SqlEditorTab.js').then(m => m.SqlEditorTab));
 
 @injectable()
 export class SqlEditorTabService extends Bootstrap {
@@ -111,15 +111,13 @@ export class SqlEditorTabService extends Bootstrap {
     });
   }
 
-  register(): void {
+  override register(): void {
     this.sqlDataSourceService.onUpdate.addHandler(this.syncDatasourceUpdate.bind(this));
     this.connectionsManagerService.onDisconnect.addHandler(this.disconnectHandler.bind(this));
     this.connectionInfoResource.onItemDelete.addHandler(this.handleConnectionDelete.bind(this));
     this.connectionExecutionContextResource.onItemUpdate.addHandler(this.handleExecutionContextUpdate.bind(this));
     this.connectionExecutionContextResource.onItemDelete.addHandler(this.handleExecutionContextDelete.bind(this));
   }
-
-  load(): void {}
 
   createNewEditor(editorId: string, dataSourceKey: string, name?: string, source?: string, script?: string): ITabOptions<ISqlEditorTabState> | null {
     const order = this.getFreeEditorId();

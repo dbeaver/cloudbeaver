@@ -11,9 +11,9 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 
-const AdministrationScreen = importLazyComponent(() => import('./AdministrationScreen').then(m => m.AdministrationScreen));
+const AdministrationScreen = importLazyComponent(() => import('./AdministrationScreen.js').then(m => m.AdministrationScreen));
 const ConfigurationWizardScreen = importLazyComponent(() =>
-  import('./ConfigurationWizard/ConfigurationWizardScreen').then(m => m.ConfigurationWizardScreen),
+  import('./ConfigurationWizard/ConfigurationWizardScreen.js').then(m => m.ConfigurationWizardScreen),
 );
 
 @injectable()
@@ -26,7 +26,7 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     const canActivate = () => this.administrationScreenService.handleCanActivate.bind(this.administrationScreenService);
 
     this.screenService.create({
@@ -90,7 +90,7 @@ export class AdministrationScreenServiceBootstrap extends Bootstrap {
     });
   }
 
-  async load(): Promise<void> {
+  override async load(): Promise<void> {
     await this.serverConfigResource.load();
 
     if (

@@ -8,7 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { FormBaseService, IFormProps } from '@cloudbeaver/core-ui';
+import { FormBaseService, type IFormProps } from '@cloudbeaver/core-ui';
 
 export interface IUserFormState {
   userId: string | null;

@@ -11,9 +11,9 @@ import type { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 
-import { ConnectionFormService } from './ConnectionFormService';
-import { ConnectionFormState } from './ConnectionFormState';
-import type { IConnectionFormState } from './IConnectionFormProps';
+import { ConnectionFormService } from './ConnectionFormService.js';
+import { ConnectionFormState } from './ConnectionFormState.js';
+import type { IConnectionFormState } from './IConnectionFormProps.js';
 
 export function useConnectionFormState(resource: ConnectionInfoResource, configure?: (state: IConnectionFormState) => any): IConnectionFormState {
   const projectsService = useService(ProjectsService);

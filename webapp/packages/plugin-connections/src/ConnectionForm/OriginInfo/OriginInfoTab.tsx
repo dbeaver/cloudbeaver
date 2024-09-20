@@ -8,9 +8,9 @@
 import { observer } from 'mobx-react-lite';
 
 import { Translate } from '@cloudbeaver/core-blocks';
-import { Tab, TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
+import { Tab, type TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps';
+import type { IConnectionFormProps } from '../IConnectionFormProps.js';
 
 export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = observer(function OriginInfoTab({ state: { info }, ...rest }) {
   return (

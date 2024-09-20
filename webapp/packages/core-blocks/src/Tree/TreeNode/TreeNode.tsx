@@ -9,13 +9,13 @@ import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { forwardRef } from 'react';
 
-import { s } from '../../s';
-import { useObjectRef } from '../../useObjectRef';
-import { useObservableRef } from '../../useObservableRef';
-import { useS } from '../../useS';
-import type { ITreeNodeState } from './ITreeNodeState';
+import { s } from '../../s.js';
+import { useObjectRef } from '../../useObjectRef.js';
+import { useObservableRef } from '../../useObservableRef.js';
+import { useS } from '../../useS.js';
+import type { ITreeNodeState } from './ITreeNodeState.js';
 import style from './TreeNode.module.css';
-import { ITreeNodeContext, TreeNodeContext } from './TreeNodeContext';
+import { type ITreeNodeContext, TreeNodeContext } from './TreeNodeContext.js';
 
 interface Props extends ITreeNodeState {
   className?: string;

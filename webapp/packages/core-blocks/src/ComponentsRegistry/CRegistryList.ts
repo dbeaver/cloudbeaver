@@ -7,7 +7,7 @@
  */
 import React from 'react';
 
-import { IComponentsTreeNodeValidator } from './IComponentsTreeNodeValidator';
+import { type IComponentsTreeNodeValidator } from './IComponentsTreeNodeValidator.js';
 
 export type RegistryEntry<T extends React.FC<T>> = [T, IComponentsTreeNodeValidator<T>[]];
 export type CRegistryList = RegistryEntry<React.FC<any>>[];

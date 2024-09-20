@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Button, Container, useTranslate } from '@cloudbeaver/core-blocks';
 
-import { useAuthenticationAction } from './useAuthenticationAction';
+import { useAuthenticationAction } from './useAuthenticationAction.js';
 
 export type Props = {
   providerId: string;

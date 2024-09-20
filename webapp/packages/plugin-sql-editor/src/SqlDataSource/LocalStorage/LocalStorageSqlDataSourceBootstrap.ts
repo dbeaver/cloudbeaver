@@ -10,11 +10,11 @@ import { action, makeObservable, observable } from 'mobx';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { StorageService } from '@cloudbeaver/core-storage';
 
-import { createSqlDataSourceHistoryInitialState } from '../SqlDataSourceHistory/createSqlDataSourceHistoryInitialState';
-import { validateSqlDataSourceHistoryState } from '../SqlDataSourceHistory/validateSqlDataSourceHistoryState';
-import { ISqlDataSourceOptions, SqlDataSourceService } from '../SqlDataSourceService';
-import type { ILocalStorageSqlDataSourceState } from './ILocalStorageSqlDataSourceState';
-import { LocalStorageSqlDataSource } from './LocalStorageSqlDataSource';
+import { createSqlDataSourceHistoryInitialState } from '../SqlDataSourceHistory/createSqlDataSourceHistoryInitialState.js';
+import { validateSqlDataSourceHistoryState } from '../SqlDataSourceHistory/validateSqlDataSourceHistoryState.js';
+import { type ISqlDataSourceOptions, SqlDataSourceService } from '../SqlDataSourceService.js';
+import type { ILocalStorageSqlDataSourceState } from './ILocalStorageSqlDataSourceState.js';
+import { LocalStorageSqlDataSource } from './LocalStorageSqlDataSource.js';
 
 const localStorageKey = 'local-storage-sql-data-source';
 
@@ -65,15 +65,13 @@ export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
     );
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.sqlDataSourceService.register({
       key: LocalStorageSqlDataSource.key,
       getDataSource: (editorId, options) => new LocalStorageSqlDataSource(this.createState(editorId, options)),
       onDestroy: (_, editorId) => this.deleteState(editorId),
     });
   }
-
-  load(): void | Promise<void> {}
 
   private createState(editorId: string, options?: ISqlDataSourceOptions): ILocalStorageSqlDataSourceState {
     let state = this.dataSourceStateState.get(editorId);

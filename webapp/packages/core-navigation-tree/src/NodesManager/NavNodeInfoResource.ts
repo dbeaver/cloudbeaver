@@ -19,10 +19,10 @@ import {
   type ResourceKeySimple,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
-import { GraphQLService, NavNodeInfoFragment } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type NavNodeInfoFragment } from '@cloudbeaver/core-sdk';
 import { getPathParents, MetadataMap } from '@cloudbeaver/core-utils';
 
-import type { NavNode } from './EntityTypes';
+import type { NavNode } from './EntityTypes.js';
 
 type NavNodeInfo = NavNodeInfoFragment;
 
@@ -34,7 +34,10 @@ interface INodeMetadata extends ICachedResourceMetadata {
 
 @injectable()
 export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Record<string, unknown>, INodeMetadata> {
-  constructor(private readonly graphQLService: GraphQLService, appAuthService: AppAuthService) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    appAuthService: AppAuthService,
+  ) {
     super();
 
     makeObservable(this, {
@@ -179,13 +182,13 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
     });
   }
 
-  protected getDefaultMetadata(key: string, metadata: MetadataMap<string, INodeMetadata>): INodeMetadata {
+  protected override getDefaultMetadata(key: string, metadata: MetadataMap<string, INodeMetadata>): INodeMetadata {
     return Object.assign(super.getDefaultMetadata(key, metadata), {
       withDetails: false,
     });
   }
 
-  protected dataSet(key: string, value: NavNode): void {
+  protected override dataSet(key: string, value: NavNode): void {
     const currentValue = this.dataGet(key);
     super.dataSet(key, Object.assign(currentValue ?? {}, value));
   }

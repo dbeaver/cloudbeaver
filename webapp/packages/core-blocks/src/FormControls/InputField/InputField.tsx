@@ -8,11 +8,11 @@
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext } from 'react';
 
-import { useCombinedHandler } from '../../useCombinedHandler';
-import { FormContext } from '../FormContext';
-import { isFormStateControl } from '../isFormStateControl';
-import { InputFieldBase, type InputFieldBaseProps } from './InputFieldBase';
-import { InputFieldState, type InputFieldStateProps } from './InputFieldState';
+import { useCombinedHandler } from '../../useCombinedHandler.js';
+import { FormContext } from '../FormContext.js';
+import { isFormStateControl } from '../isFormStateControl.js';
+import { InputFieldBase, type InputFieldBaseProps } from './InputFieldBase.js';
+import { InputFieldState, type InputFieldStateProps } from './InputFieldState.js';
 
 interface InputFieldType {
   (props: InputFieldBaseProps & React.RefAttributes<HTMLInputElement>): React.ReactElement<any, any> | null;

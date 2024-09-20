@@ -8,8 +8,8 @@
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import type { WsSessionExpiredEvent } from '@cloudbeaver/core-sdk';
 
-import { ServerEventId, SessionEventSource } from './SessionEventSource';
-import { SessionExpireService } from './SessionExpireService';
+import { ServerEventId, SessionEventSource } from './SessionEventSource.js';
+import { SessionExpireService } from './SessionExpireService.js';
 
 @injectable()
 export class SessionExpireEventService extends Dependency {

@@ -9,7 +9,7 @@ import { useCallback } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
 
-import { DBDriverResource } from './DBDriverResource';
+import { DBDriverResource } from './DBDriverResource.js';
 
 export function useDBDriver(driverId: string) {
   const service = useService(DBDriverResource);

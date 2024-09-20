@@ -13,13 +13,13 @@ export const manifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./Screens/AppScreen/NavigationService').then(m => m.NavigationService),
-    () => import('./Screens/AppScreen/OptionsPanelService').then(m => m.OptionsPanelService),
-    () => import('./Clipboard/ClipboardBootstrap').then(m => m.ClipboardBootstrap),
-    () => import('./Clipboard/ClipboardService').then(m => m.ClipboardService),
-    () => import('./Tabs/TabsBootstrap').then(m => m.TabsBootstrap),
-    () => import('./SideBarPanel/SideBarPanelService').then(m => m.SideBarPanelService),
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./SideBarPanel/LeftBarPanelService').then(m => m.LeftBarPanelService),
+    () => import('./Screens/AppScreen/NavigationService.js').then(m => m.NavigationService),
+    () => import('./Screens/AppScreen/OptionsPanelService.js').then(m => m.OptionsPanelService),
+    () => import('./Clipboard/ClipboardBootstrap.js').then(m => m.ClipboardBootstrap),
+    () => import('./Clipboard/ClipboardService.js').then(m => m.ClipboardService),
+    () => import('./Tabs/TabsBootstrap.js').then(m => m.TabsBootstrap),
+    () => import('./SideBarPanel/SideBarPanelService.js').then(m => m.SideBarPanelService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./SideBarPanel/LeftBarPanelService.js').then(m => m.LeftBarPanelService),
   ],
 };

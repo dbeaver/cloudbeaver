@@ -21,11 +21,11 @@ import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
 
-import { DATA_CONTEXT_DDL_VIEWER_NODE } from '../DdlViewer/DATA_CONTEXT_DDL_VIEWER_NODE';
-import { DATA_CONTEXT_DDL_VIEWER_VALUE } from '../DdlViewer/DATA_CONTEXT_DDL_VIEWER_VALUE';
+import { DATA_CONTEXT_DDL_VIEWER_NODE } from '../DdlViewer/DATA_CONTEXT_DDL_VIEWER_NODE.js';
+import { DATA_CONTEXT_DDL_VIEWER_VALUE } from '../DdlViewer/DATA_CONTEXT_DDL_VIEWER_VALUE.js';
 import style from '../DdlViewer/DDLViewerTabPanel.module.css';
-import { MENU_DDL_VIEWER_FOOTER } from '../DdlViewer/MENU_DDL_VIEWER_FOOTER';
-import { ExtendedDDLResource } from './ExtendedDDLResource';
+import { MENU_DDL_VIEWER_FOOTER } from '../DdlViewer/MENU_DDL_VIEWER_FOOTER.js';
+import { ExtendedDDLResource } from './ExtendedDDLResource.js';
 
 export const ExtendedDDLViewerTabPanel: NavNodeTransformViewComponent = observer(function ExtendedDDLViewerTabPanel({ nodeId, folderId }) {
   const styles = useS(style);

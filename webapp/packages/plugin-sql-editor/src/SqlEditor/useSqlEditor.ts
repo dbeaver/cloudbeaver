@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, autorun, computed, IReactionDisposer, observable, runInAction, untracked } from 'mobx';
+import { action, autorun, computed, type IReactionDisposer, observable, runInAction, untracked } from 'mobx';
 import { useEffect } from 'react';
 
 import { ConfirmationDialog, useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
@@ -15,21 +15,21 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlCompletionProposal, SqlDialectInfo, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
-import { createLastPromiseGetter, debounceAsync, LastPromiseGetter, throttleAsync } from '@cloudbeaver/core-utils';
+import { createLastPromiseGetter, debounceAsync, type LastPromiseGetter, throttleAsync } from '@cloudbeaver/core-utils';
 
-import type { ISqlEditorTabState } from '../ISqlEditorTabState';
-import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
-import type { ISqlDataSource, ISqlEditorCursor } from '../SqlDataSource/ISqlDataSource';
-import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService';
-import { SqlDialectInfoService } from '../SqlDialectInfoService';
-import { SqlEditorService } from '../SqlEditorService';
-import { ISQLScriptSegment, SQLParser } from '../SQLParser';
-import { SqlExecutionPlanService } from '../SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
-import { OUTPUT_LOGS_TAB_ID } from '../SqlResultTabs/OutputLogs/OUTPUT_LOGS_TAB_ID';
-import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
-import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
-import type { ISQLEditorData } from './ISQLEditorData';
-import { SQLEditorModeContext } from './SQLEditorModeContext';
+import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
+import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures.js';
+import type { ISqlDataSource, ISqlEditorCursor } from '../SqlDataSource/ISqlDataSource.js';
+import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
+import { SqlDialectInfoService } from '../SqlDialectInfoService.js';
+import { SqlEditorService } from '../SqlEditorService.js';
+import { type ISQLScriptSegment, SQLParser } from '../SQLParser.js';
+import { SqlExecutionPlanService } from '../SqlResultTabs/ExecutionPlan/SqlExecutionPlanService.js';
+import { OUTPUT_LOGS_TAB_ID } from '../SqlResultTabs/OutputLogs/OUTPUT_LOGS_TAB_ID.js';
+import { SqlQueryService } from '../SqlResultTabs/SqlQueryService.js';
+import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService.js';
+import type { ISQLEditorData } from './ISQLEditorData.js';
+import { SQLEditorModeContext } from './SQLEditorModeContext.js';
 
 interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly sqlDialectInfoService: SqlDialectInfoService;
@@ -342,11 +342,11 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
             queries.map(query => query.query),
             {
               onQueryExecutionStart: (query, index) => {
-                const segment = queries[index];
+                const segment = queries[index]!;
                 this.onSegmentExecute.execute({ segment, type: 'start' });
               },
               onQueryExecuted: (query, index, success) => {
-                const segment = queries[index];
+                const segment = queries[index]!;
                 this.onSegmentExecute.execute({ segment, type: 'end' });
 
                 if (!success) {

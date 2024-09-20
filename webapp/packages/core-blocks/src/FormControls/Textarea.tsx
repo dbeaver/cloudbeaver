@@ -10,17 +10,17 @@ import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
 
 import { getTextFileReadingProcess } from '@cloudbeaver/core-utils';
 
-import { Button } from '../Button';
-import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
-import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import { useTranslate } from '../localization/useTranslate';
-import { s } from '../s';
-import { UploadArea } from '../UploadArea';
-import { useS } from '../useS';
-import { Field } from './Field';
-import { FieldDescription } from './FieldDescription';
-import { FieldLabel } from './FieldLabel';
-import { FormContext } from './FormContext';
+import { Button } from '../Button.js';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
+import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { s } from '../s.js';
+import { UploadArea } from '../UploadArea.js';
+import { useS } from '../useS.js';
+import { Field } from './Field.js';
+import { FieldDescription } from './FieldDescription.js';
+import { FieldLabel } from './FieldLabel.js';
+import { FormContext } from './FormContext.js';
 import textareaStyle from './Textarea.module.css';
 
 type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'style'> &

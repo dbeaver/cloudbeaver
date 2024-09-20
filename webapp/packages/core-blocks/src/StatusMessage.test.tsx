@@ -13,7 +13,7 @@ import { ENotificationType } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
-import { StatusMessage } from './StatusMessage';
+import { StatusMessage } from './StatusMessage.js';
 
 const app = createApp(coreLocalizationManifest, coreDialogsManifest);
 

@@ -7,7 +7,7 @@
  */
 import { describe, expect, it, jest } from '@jest/globals';
 
-import { LoadingError } from './LoadingError';
+import { LoadingError } from './LoadingError.js';
 
 describe('LoadingError', () => {
   it('should be instance of Error', () => {

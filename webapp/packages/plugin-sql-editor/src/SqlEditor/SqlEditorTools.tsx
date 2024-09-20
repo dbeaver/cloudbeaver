@@ -9,12 +9,12 @@ import { observer } from 'mobx-react-lite';
 
 import { ActionIconButton, getComputed, preventFocusHandler, s, UploadArea, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import type { ISqlEditorTabState } from '../ISqlEditorTabState';
-import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
-import type { ISQLEditorData } from './ISQLEditorData';
+import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
+import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures.js';
+import type { ISQLEditorData } from './ISQLEditorData.js';
 import style from './SqlEditorTools.module.css';
-import { SqlEditorToolsMenu } from './SqlEditorToolsMenu';
-import { useTools } from './useTools';
+import { SqlEditorToolsMenu } from './SqlEditorToolsMenu.js';
+import { useTools } from './useTools.js';
 
 interface Props {
   data: ISQLEditorData;

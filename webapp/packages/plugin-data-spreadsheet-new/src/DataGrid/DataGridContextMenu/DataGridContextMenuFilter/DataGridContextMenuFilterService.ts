@@ -7,14 +7,19 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ComputedContextMenuModel, DialogueStateResult, IContextMenuItem, IMenuContext } from '@cloudbeaver/core-dialogs';
+import {
+  CommonDialogService,
+  ComputedContextMenuModel,
+  DialogueStateResult,
+  type IContextMenuItem,
+  type IMenuContext,
+} from '@cloudbeaver/core-dialogs';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 import { replaceMiddle } from '@cloudbeaver/core-utils';
 import {
   DatabaseDataConstraintAction,
-  IDatabaseDataModel,
-  IDatabaseDataOptions,
-  IResultSetColumnKey,
+  type IDatabaseDataModel,
+  type IResultSetColumnKey,
   IS_NOT_NULL_ID,
   IS_NULL_ID,
   isFilterConstraint,
@@ -26,9 +31,9 @@ import {
   wrapOperationArgument,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridContextMenuService, IDataGridCellMenuContext } from '../DataGridContextMenuService';
+import { DataGridContextMenuService, type IDataGridCellMenuContext } from '../DataGridContextMenuService.js';
 
-const FilterCustomValueDialog = importLazyComponent(() => import('./FilterCustomValueDialog').then(m => m.FilterCustomValueDialog));
+const FilterCustomValueDialog = importLazyComponent(() => import('./FilterCustomValueDialog.js').then(m => m.FilterCustomValueDialog));
 
 @injectable()
 export class DataGridContextMenuFilterService {

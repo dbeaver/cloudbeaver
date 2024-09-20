@@ -7,7 +7,7 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { IResourceOffsetPage } from './IResourceOffsetPage';
+import { type IResourceOffsetPage } from './IResourceOffsetPage.js';
 
 export class ResourceOffsetPage implements IResourceOffsetPage {
   from: number;
