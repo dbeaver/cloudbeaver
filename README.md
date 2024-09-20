@@ -57,6 +57,6 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 ## Contribution
 As a community-driven open-source project, we warmly welcome contributions through GitHub pull requests. 
 
-[We are happy to reward](https://dbeaver.com/help-beaver/) our most active contributors every major sprint.
+[We are happy to reward](https://dbeaver.com/help-dbeaver/) our most active contributors every major sprint.
 The most significant contribution to our code for the major release 24.2.0 was made by:
 1. [matthieukhl](https://github.com/matthieukhl)

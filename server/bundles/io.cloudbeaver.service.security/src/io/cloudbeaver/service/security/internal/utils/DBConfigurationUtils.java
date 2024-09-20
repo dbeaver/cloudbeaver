@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.service.security.internal.utils;
 
-import io.cloudbeaver.service.security.db.WebDatabaseConfig;
+import io.cloudbeaver.model.config.WebDatabaseConfig;
 import org.jkiss.code.Nullable;
 import org.jkiss.utils.CommonUtils;
 
