@@ -7,7 +7,7 @@
  */
 import { useEffect, useState } from 'react';
 
-import type { ConnectionInfoOriginResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import type { ConnectionInfoOriginDetailsResource, ConnectionInfoOriginResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 
@@ -18,6 +18,7 @@ import type { IConnectionFormState } from './IConnectionFormProps';
 export function useConnectionFormState(
   resource: ConnectionInfoResource,
   originResource: ConnectionInfoOriginResource,
+  originDetailsResource: ConnectionInfoOriginDetailsResource,
   configure?: (state: IConnectionFormState) => any,
 ): IConnectionFormState {
   const projectsService = useService(ProjectsService);
@@ -25,7 +26,7 @@ export function useConnectionFormState(
 
   const service = useService(ConnectionFormService);
   const [state] = useState<IConnectionFormState>(() => {
-    const state = new ConnectionFormState(projectsService, projectInfoResource, service, resource, originResource);
+    const state = new ConnectionFormState(projectsService, projectInfoResource, service, resource, originResource, originDetailsResource);
     configure?.(state);
 
     state.load();

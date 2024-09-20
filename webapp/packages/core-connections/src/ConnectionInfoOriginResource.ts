@@ -97,6 +97,10 @@ export class ConnectionInfoOriginResource extends CachedMapResource<IConnectionI
     return this.data;
   }
 
+  isKeyEqual(param: IConnectionInfoParams, second: IConnectionInfoParams): boolean {
+    return isConnectionInfoParamEqual(param, second);
+  }
+
   protected validateKey(key: IConnectionInfoParams): boolean {
     const parse = CONNECTION_INFO_PARAM_SCHEMA.safeParse(toJS(key));
     if (!parse.success) {

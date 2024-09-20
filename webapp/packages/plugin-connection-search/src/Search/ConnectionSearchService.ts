@@ -9,6 +9,7 @@ import { makeObservable, observable } from 'mobx';
 
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import {
+  ConnectionInfoOriginDetailsResource,
   ConnectionInfoOriginResource,
   ConnectionInfoResource,
   ConnectionsManagerService,
@@ -46,6 +47,7 @@ export class ConnectionSearchService {
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
+    private readonly connectionInfoOriginDetailsResource: ConnectionInfoOriginDetailsResource,
   ) {
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
 
@@ -163,6 +165,7 @@ export class ConnectionSearchService {
         this.connectionFormService,
         this.connectionInfoResource,
         this.connectionInfoOriginResource,
+        this.connectionInfoOriginDetailsResource,
       );
 
       this.formState.closeTask.addHandler(this.goBack.bind(this));
