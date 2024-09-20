@@ -66,6 +66,9 @@ public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServ
 
     @Override
     public void addServlets(CBApplication application, DBWServletContext servletContext) throws DBException {
+        if (!application.isMultiuser()) {
+            return;
+        }
         servletContext.addServlet(
             "dataTransfer",
             new WebDataTransferServlet(application, getServiceImpl()),
