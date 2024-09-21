@@ -11,9 +11,9 @@ import { useContext } from 'react';
 import { useExecutor, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
-import { TabContext } from '../TabContext';
-import type { ITabData } from '../TabsContainer/ITabsContainer';
-import { TabsContext } from '../TabsContext';
+import { TabContext } from '../TabContext.js';
+import type { ITabData } from '../TabsContainer/ITabsContainer.js';
+import { TabsContext } from '../TabsContext.js';
 
 export function useTab(
   tabId?: string,

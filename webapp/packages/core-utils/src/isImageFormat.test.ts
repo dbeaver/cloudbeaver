@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from '@jest/globals';
 
-import { isImageFormat } from './isImageFormat';
+import { isImageFormat } from './isImageFormat.js';
 
 describe('Is image format', () => {
   test('should return "true" when link with ".jpeg" extension is passed', () => {

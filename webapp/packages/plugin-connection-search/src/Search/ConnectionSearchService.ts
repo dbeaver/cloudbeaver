@@ -12,13 +12,13 @@ import { ConnectionInfoResource, ConnectionsManagerService, createConnectionPara
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
-import { ConnectionFormService, ConnectionFormState, IConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormService, ConnectionFormState, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
-import { SearchDatabase } from './SearchDatabase';
+import { SearchDatabase } from './SearchDatabase.js';
 
 const formGetter = () => SearchDatabase;
 
@@ -163,7 +163,7 @@ export class ConnectionSearchService {
 
     this.formState
       .setOptions('create', 'public')
-      .setConfig(projects[0].id, {
+      .setConfig(projects[0]!.id, {
         ...this.connectionInfoResource.getEmptyConfig(),
         driverId: database.defaultDriver,
         host: database.host,

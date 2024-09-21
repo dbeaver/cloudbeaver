@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { isResultSetBinaryValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryValue';
-import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
-import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
-import { ITextValuePanelProps } from './TextValuePresentationService';
+import { isResultSetBinaryValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryValue.js';
+import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
+import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
+import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction.js';
+import { type ITextValuePanelProps } from './TextValuePresentationService.js';
 
 export function isBlobPresentationAvailable(context: ITextValuePanelProps | undefined): boolean {
   const source = context?.model.source;
@@ -24,7 +24,7 @@ export function isBlobPresentationAvailable(context: ITextValuePanelProps | unde
   if (activeElements.length > 0) {
     const view = source.getAction(context.resultIndex, ResultSetViewAction);
 
-    const firstSelectedCell = activeElements[0];
+    const firstSelectedCell = activeElements[0]!;
 
     const cellValue = view.getCellValue(firstSelectedCell);
 

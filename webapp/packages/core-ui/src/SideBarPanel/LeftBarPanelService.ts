@@ -7,7 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 
-import { TabsContainer } from '../Tabs/TabsContainer/TabsContainer';
+import { TabsContainer } from '../Tabs/TabsContainer/TabsContainer.js';
 
 @injectable()
 export class LeftBarPanelService {

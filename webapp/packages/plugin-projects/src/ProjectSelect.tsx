@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Combobox, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ProjectInfo, ProjectInfoResource, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
+import { type ProjectInfo, ProjectInfoResource, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
 interface Props {
@@ -44,7 +44,7 @@ export const ProjectSelect = observer(function ProjectSelect({
   const projectsLoader = useResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey, {
     onData: () => {
       if ((!value && possibleOptions.length > 0) || (value && !possibleOptions.includes(value))) {
-        onChange(possibleOptions[0]);
+        onChange(possibleOptions[0]!);
       }
     },
   });

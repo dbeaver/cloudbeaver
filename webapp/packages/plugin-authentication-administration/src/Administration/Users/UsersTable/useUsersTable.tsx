@@ -7,15 +7,15 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import { AdminUser, compareUsers, UsersResource, UsersResourceFilterKey, UsersResourceNewUsers } from '@cloudbeaver/core-authentication';
+import { type AdminUser, compareUsers, UsersResource, UsersResourceFilterKey, UsersResourceNewUsers } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialogDelete, TableState, useObservableRef, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
-import { ILoadableState, isArraysEqual, isDefined } from '@cloudbeaver/core-utils';
+import { type ILoadableState, isArraysEqual, isDefined } from '@cloudbeaver/core-utils';
 
-import type { IUserFilters } from './Filters/useUsersTableFilters';
+import type { IUserFilters } from './Filters/useUsersTableFilters.js';
 
 interface State {
   loading: boolean;
@@ -67,7 +67,7 @@ export function useUsersTable(filters: IUserFilters) {
           return;
         }
 
-        const deletionList = this.state.selectedList.filter(([_, value]) => value).map(([userId]) => userId);
+        const deletionList = this.state.selectedList.filter(([_, value]) => value).map(([userId]) => userId!);
         if (deletionList.length === 0) {
           return;
         }

@@ -68,7 +68,7 @@ import { userProfileSettingsPlugin } from '@cloudbeaver/plugin-user-profile-sett
 import version from '@cloudbeaver/plugin-version';
 import versionUpdate from '@cloudbeaver/plugin-version-update-administration';
 
-import { defaultProductManifest } from './manifest';
+import { defaultProductManifest } from './manifest.js';
 
 const PLUGINS: PluginManifest[] = [
   ssoPlugin,

@@ -10,20 +10,20 @@ import React, { forwardRef, useCallback, useLayoutEffect, useRef, useState } fro
 
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { filterLayoutFakeProps, getLayoutProps } from '../../Containers/filterLayoutFakeProps';
-import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps';
-import { Icon } from '../../Icon';
-import { Loader } from '../../Loader/Loader';
-import { useTranslate } from '../../localization/useTranslate';
-import { s } from '../../s';
-import { useCombinedHandler } from '../../useCombinedHandler';
-import { useCombinedRef } from '../../useCombinedRef';
-import { useS } from '../../useS';
-import { useStateDelay } from '../../useStateDelay';
-import { Field } from '../Field';
-import { FieldDescription } from '../FieldDescription';
-import { FieldLabel } from '../FieldLabel';
-import { useCapsLockTracker } from '../useCapsLockTracker';
+import { filterLayoutFakeProps, getLayoutProps } from '../../Containers/filterLayoutFakeProps.js';
+import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps.js';
+import { Icon } from '../../Icon.js';
+import { Loader } from '../../Loader/Loader.js';
+import { useTranslate } from '../../localization/useTranslate.js';
+import { s } from '../../s.js';
+import { useCombinedHandler } from '../../useCombinedHandler.js';
+import { useCombinedRef } from '../../useCombinedRef.js';
+import { useS } from '../../useS.js';
+import { useStateDelay } from '../../useStateDelay.js';
+import { Field } from '../Field.js';
+import { FieldDescription } from '../FieldDescription.js';
+import { FieldLabel } from '../FieldLabel.js';
+import { useCapsLockTracker } from '../useCapsLockTracker.js';
 import inputFieldStyle from './InputField.module.css';
 
 export type InputFieldBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'style' | 'ref'> &
@@ -138,13 +138,13 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
             </div>
           )}
           {passwordType && canShowPassword && (
-            <div title={translate('ui_reveal_password')} className={styles.iconContainer} onClick={revealPassword}>
-              <Icon name={passwordRevealed ? 'password-hide' : 'password-show'} viewBox="0 0 16 16" className={styles.icon} />
+            <div title={translate('ui_reveal_password')} className={styles['iconContainer']} onClick={revealPassword}>
+              <Icon name={passwordRevealed ? 'password-hide' : 'password-show'} viewBox="0 0 16 16" className={styles['icon']} />
             </div>
           )}
           {onCustomCopy && (
-            <div title={translate('ui_copy_to_clipboard')} className={styles.iconContainer} onClick={onCustomCopy}>
-              <Icon name="copy" viewBox="0 0 32 32" className={styles.icon} />
+            <div title={translate('ui_copy_to_clipboard')} className={styles['iconContainer']} onClick={onCustomCopy}>
+              <Icon name="copy" viewBox="0 0 32 32" className={styles['icon']} />
             </div>
           )}
           {icon && <div className={s(styles, { customIconContainer: true })}>{icon}</div>}

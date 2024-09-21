@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { TempMap } from './TempMap';
+import { TempMap } from './TempMap.js';
 
 describe('TempMap', () => {
   it('should create empty map', () => {

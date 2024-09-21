@@ -7,7 +7,7 @@
  */
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 
-import { cancellableTimeout } from './cancellableTimeout';
+import { cancellableTimeout } from './cancellableTimeout.js';
 
 jest.mock('./CancellablePromise', () => ({
   CancellablePromise: jest.fn().mockImplementation(() => ({

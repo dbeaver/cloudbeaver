@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ISqlDataSourceHistoryState } from './ISqlDataSourceHistoryState';
-import { validateSqlDataSourceHistoryData } from './validateSqlDataSourceHistoryData';
+import type { ISqlDataSourceHistoryState } from './ISqlDataSourceHistoryState.js';
+import { validateSqlDataSourceHistoryData } from './validateSqlDataSourceHistoryData.js';
 
 export function validateSqlDataSourceHistoryState(state: any): state is ISqlDataSourceHistoryState {
   return (

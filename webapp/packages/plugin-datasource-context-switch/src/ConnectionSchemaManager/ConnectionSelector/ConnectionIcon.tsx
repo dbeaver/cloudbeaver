@@ -7,13 +7,21 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ConnectionImageWithMask, ConnectionImageWithMaskSvgStyles, s, SContext, StyleRegistry, useResource, useS } from '@cloudbeaver/core-blocks';
+import {
+  ConnectionImageWithMask,
+  ConnectionImageWithMaskSvgStyles,
+  s,
+  SContext,
+  type StyleRegistry,
+  useResource,
+  useS,
+} from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
 import styles from './ConnectionIcon.module.css';
 import ConnectionImageWithMaskSvgBackgroundStyles from './ConnectionImageWithMask.module.css';
-import type { IConnectionSelectorExtraProps } from './IConnectionSelectorExtraProps';
+import type { IConnectionSelectorExtraProps } from './IConnectionSelectorExtraProps.js';
 
 export interface ConnectionIconProps extends IConnectionSelectorExtraProps {
   size?: number;

@@ -11,25 +11,28 @@ import { UsersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { FormMode } from '@cloudbeaver/core-ui';
 
-import { AdministrationUserFormService } from '../AdministrationUserFormService';
+import { AdministrationUserFormService } from '../AdministrationUserFormService.js';
 
 const UserFormOriginInfoPanel = React.lazy(async () => {
-  const { UserFormOriginInfoPanel } = await import('./UserFormOriginInfoPanel');
+  const { UserFormOriginInfoPanel } = await import('./UserFormOriginInfoPanel.js');
   return { default: UserFormOriginInfoPanel };
 });
 
 const UserFormOriginInfoTab = React.lazy(async () => {
-  const { UserFormOriginInfoTab } = await import('./UserFormOriginInfoTab');
+  const { UserFormOriginInfoTab } = await import('./UserFormOriginInfoTab.js');
   return { default: UserFormOriginInfoTab };
 });
 
 @injectable()
 export class UserFormOriginPartBootstrap extends Bootstrap {
-  constructor(private readonly administrationUserFormService: AdministrationUserFormService, private readonly usersResource: UsersResource) {
+  constructor(
+    private readonly administrationUserFormService: AdministrationUserFormService,
+    private readonly usersResource: UsersResource,
+  ) {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.administrationUserFormService.parts.add({
       key: 'origin',
       order: 2,
@@ -38,6 +41,4 @@ export class UserFormOriginPartBootstrap extends Bootstrap {
       tab: () => UserFormOriginInfoTab,
     });
   }
-
-  load(): void {}
 }

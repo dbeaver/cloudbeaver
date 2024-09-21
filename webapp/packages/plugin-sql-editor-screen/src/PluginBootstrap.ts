@@ -9,11 +9,11 @@ import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { MENU_TAB } from '@cloudbeaver/core-ui';
-import { ACTION_OPEN_IN_TAB, ActionService, IAction, KEY_BINDING_OPEN_IN_TAB, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_OPEN_IN_TAB, ActionService, type IAction, KEY_BINDING_OPEN_IN_TAB, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
-import { SqlEditorScreenService } from './Screen/SqlEditorScreenService';
+import { SqlEditorScreenService } from './Screen/SqlEditorScreenService.js';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -28,7 +28,7 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.actionService.addHandler({
       id: 'sql-editor-screen',
       actions: [ACTION_OPEN_IN_TAB],

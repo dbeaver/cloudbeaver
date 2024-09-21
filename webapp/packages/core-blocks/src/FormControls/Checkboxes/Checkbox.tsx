@@ -7,9 +7,9 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { isControlPresented } from '../isControlPresented';
-import { CheckboxMarkup, CheckboxMod } from './CheckboxMarkup';
-import { CheckboxOnChangeEvent, useCheckboxState } from './useCheckboxState';
+import { isControlPresented } from '../isControlPresented.js';
+import { CheckboxMarkup, type CheckboxMod } from './CheckboxMarkup.js';
+import { type CheckboxOnChangeEvent, useCheckboxState } from './useCheckboxState.js';
 
 export interface CheckboxBaseProps {
   caption?: string;

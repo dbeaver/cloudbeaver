@@ -11,9 +11,9 @@ import { useContext } from 'react';
 import { getComputed, IconOrImage, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { RenderHeaderCellProps } from '@cloudbeaver/plugin-data-grid';
 
-import { DataGridContext } from '../DataGridContext';
-import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
-import { TableDataContext } from '../TableDataContext';
+import { DataGridContext } from '../DataGridContext.js';
+import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
+import { TableDataContext } from '../TableDataContext.js';
 import style from './TableIndexColumnHeader.module.css';
 
 export const TableIndexColumnHeader = observer<RenderHeaderCellProps<any>>(function TableIndexColumnHeader(props) {

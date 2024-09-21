@@ -7,7 +7,7 @@
  */
 import type { IExecutor, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
-import { useExecutor } from './useExecutor';
+import { useExecutor } from './useExecutor.js';
 
 export function useFormValidator(
   validationTask: IExecutor<any> | IExecutorHandlersCollection<any>,

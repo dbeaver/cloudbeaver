@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { DIContainer } from './DIContainer';
-import type { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp';
+import { DIContainer } from './DIContainer.js';
+import type { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp.js';
 
 export interface IDiWrapper {
   injector: IServiceInjector;

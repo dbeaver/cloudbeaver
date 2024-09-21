@@ -20,12 +20,12 @@ import {
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
   DataViewerPresentationType,
   DataViewerService,
-  IDataContainerOptions,
+  type IDataContainerOptions,
   isResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
 
-const DataExportDialog = importLazyComponent(() => import('./Dialog/DataExportDialog').then(module => module.DataExportDialog));
+const DataExportDialog = importLazyComponent(() => import('./Dialog/DataExportDialog.js').then(module => module.DataExportDialog));
 
 @injectable()
 export class DataExportMenuService {

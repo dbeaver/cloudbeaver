@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { RouterService } from '@cloudbeaver/core-routing';
 
 @injectable()

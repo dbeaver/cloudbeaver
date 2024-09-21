@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-administration",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

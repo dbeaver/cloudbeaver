@@ -10,8 +10,8 @@ import { action, observable } from 'mobx';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
-import { EDataImportDialogStep } from './EDataImportDialogStep';
-import type { IDataImportDialogState } from './IDataImportDialogState';
+import { EDataImportDialogStep } from './EDataImportDialogStep.js';
+import type { IDataImportDialogState } from './IDataImportDialogState.js';
 
 interface IDialog {
   state: IDataImportDialogState;

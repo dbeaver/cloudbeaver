@@ -8,7 +8,7 @@
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 export class ResourceKeyList<TKey> extends Array<TKey> {
-  static get [Symbol.species]() {
+  static get [Symbol.species!]() {
     return Array;
   }
 
@@ -16,11 +16,11 @@ export class ResourceKeyList<TKey> extends Array<TKey> {
     return isArraysEqual(this, key, isEqual, true);
   }
 
-  includes(key: TKey, fromIndex?: number): boolean;
-  includes(key: TKey | ResourceKeyList<TKey>): boolean;
-  includes(key: TKey | ResourceKeyList<TKey>, isEqual: (keyA: TKey, keyB: TKey) => boolean): boolean;
-  includes(key: TKey | ResourceKeyList<TKey>, dynamic?: number | ((keyA: TKey, keyB: TKey) => boolean)): boolean;
-  includes(key: TKey | ResourceKeyList<TKey>, dynamic?: number | ((keyA: TKey, keyB: TKey) => boolean)): boolean {
+  override includes(key: TKey, fromIndex?: number): boolean;
+  override includes(key: TKey | ResourceKeyList<TKey>): boolean;
+  override includes(key: TKey | ResourceKeyList<TKey>, isEqual: (keyA: TKey, keyB: TKey) => boolean): boolean;
+  override includes(key: TKey | ResourceKeyList<TKey>, dynamic?: number | ((keyA: TKey, keyB: TKey) => boolean)): boolean;
+  override includes(key: TKey | ResourceKeyList<TKey>, dynamic?: number | ((keyA: TKey, keyB: TKey) => boolean)): boolean {
     let fromIndex = 0;
     let isEqual = (keyA: TKey, keyB: TKey) => keyA === keyB;
 
@@ -48,7 +48,7 @@ export class ResourceKeyList<TKey> extends Array<TKey> {
     return resourceKeyList(this.filter(param => param !== key));
   }
 
-  toString(): string {
+  override toString(): string {
     const list = this.map(s => {
       if (typeof s === 'symbol') {
         return s.toString();

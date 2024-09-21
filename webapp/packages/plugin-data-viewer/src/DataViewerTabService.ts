@@ -6,20 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, ConnectionsManagerService, IConnectionExecutorData } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionsManagerService, type IConnectionExecutorData } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { INodeNavigationData, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { type INodeNavigationData, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
-import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { DBObjectPageService, IObjectViewerTabState, isObjectViewerTab, ObjectPage, ObjectViewerTabService } from '@cloudbeaver/plugin-object-viewer';
+import { type ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
+import {
+  DBObjectPageService,
+  type IObjectViewerTabState,
+  isObjectViewerTab,
+  ObjectPage,
+  ObjectViewerTabService,
+} from '@cloudbeaver/plugin-object-viewer';
 
-import type { IDataViewerPageState } from './IDataViewerPageState';
-import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
+import type { IDataViewerPageState } from './IDataViewerPageState.js';
+import { TableViewerStorageService } from './TableViewer/TableViewerStorageService.js';
 
-const DataViewerTab = importLazyComponent(() => import('./DataViewerPage/DataViewerTab').then(module => module.DataViewerTab));
-const DataViewerPanel = importLazyComponent(() => import('./DataViewerPage/DataViewerPanel').then(module => module.DataViewerPanel));
+const DataViewerTab = importLazyComponent(() => import('./DataViewerPage/DataViewerTab.js').then(module => module.DataViewerTab));
+const DataViewerPanel = importLazyComponent(() => import('./DataViewerPage/DataViewerPanel.js').then(module => module.DataViewerPanel));
 
 @injectable()
 export class DataViewerTabService {

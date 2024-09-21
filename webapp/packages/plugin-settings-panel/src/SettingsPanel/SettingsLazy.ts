@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const Settings = importLazyComponent(() => import('./Settings').then(m => m.Settings));
+export const Settings = importLazyComponent(() => import('./Settings.js').then(m => m.Settings));

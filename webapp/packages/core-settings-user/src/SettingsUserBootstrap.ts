@@ -9,7 +9,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { SESSION_SETTINGS_LAYER } from '@cloudbeaver/core-root';
 import { SettingsResolverService } from '@cloudbeaver/core-settings';
 
-import { UserSettingsService } from './UserSettingsService';
+import { UserSettingsService } from './UserSettingsService.js';
 
 @injectable()
 export class SettingsUserBootstrap extends Bootstrap {
@@ -20,7 +20,7 @@ export class SettingsUserBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.settingsResolverService.addResolver(SESSION_SETTINGS_LAYER, this.userSettingsService);
   }
 }

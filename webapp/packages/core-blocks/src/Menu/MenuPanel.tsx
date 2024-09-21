@@ -7,13 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 import { Children, forwardRef } from 'react';
-import { Menu, MenuStateReturn } from 'reakit/Menu';
+import { Menu, type MenuStateReturn } from 'reakit';
 
-import { ErrorBoundary } from '../ErrorBoundary';
-import { getComputed } from '../getComputed';
-import { s } from '../s';
-import { useS } from '../useS';
-import { MenuEmptyItem } from './MenuEmptyItem';
+import { ErrorBoundary } from '../ErrorBoundary.js';
+import { getComputed } from '../getComputed.js';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
+import { MenuEmptyItem } from './MenuEmptyItem.js';
 import style from './MenuPanel.module.css';
 
 export interface IMenuPanelProps {

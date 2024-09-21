@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { type PlaceholderComponent, PlaceholderElement, Switch, useTranslate } from '@cloudbeaver/core-blocks';
+import { type PlaceholderComponent, type PlaceholderElement, Switch, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import type { IElementsTreeSettingsProps } from '@cloudbeaver/plugin-navigation-tree';

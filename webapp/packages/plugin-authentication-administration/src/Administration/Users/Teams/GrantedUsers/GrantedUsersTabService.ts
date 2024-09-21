@@ -11,15 +11,15 @@ import { TeamRolesResource, TeamsResource, UsersResource } from '@cloudbeaver/co
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { isArraysEqual, isObjectsEqual, MetadataValueGetter } from '@cloudbeaver/core-utils';
+import { isArraysEqual, isObjectsEqual, type MetadataValueGetter } from '@cloudbeaver/core-utils';
 
-import { teamContext } from '../Contexts/teamContext';
-import type { ITeamFormProps, ITeamFormSubmitData } from '../ITeamFormProps';
-import { TeamFormService } from '../TeamFormService';
-import type { IGrantedUsersTabState } from './IGrantedUsersTabState';
+import { teamContext } from '../Contexts/teamContext.js';
+import type { ITeamFormProps, ITeamFormSubmitData } from '../ITeamFormProps.js';
+import { TeamFormService } from '../TeamFormService.js';
+import type { IGrantedUsersTabState } from './IGrantedUsersTabState.js';
 
 const GrantedUsers = React.lazy(async () => {
-  const { GrantedUsers } = await import('./GrantedUsers');
+  const { GrantedUsers } = await import('./GrantedUsers.js');
   return { default: GrantedUsers };
 });
 
@@ -38,7 +38,7 @@ export class GrantedUsersTabService extends Bootstrap {
     this.key = 'granted-users';
   }
 
-  register(): void {
+  override register(): void {
     this.teamFormService.tabsContainer.add({
       key: this.key,
       name: 'administration_teams_team_granted_users_tab_title',
@@ -50,8 +50,6 @@ export class GrantedUsersTabService extends Bootstrap {
 
     this.teamFormService.afterFormSubmittingTask.addHandler(this.save.bind(this));
   }
-
-  load(): void {}
 
   private stateGetter(context: ITeamFormProps): MetadataValueGetter<string, IGrantedUsersTabState> {
     return () => ({

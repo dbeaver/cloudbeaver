@@ -9,11 +9,11 @@ import { toJS } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { DatabaseConnectionToolsFragment, GraphQLService } from '@cloudbeaver/core-sdk';
+import { type DatabaseConnectionToolsFragment, GraphQLService } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 
-import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
-import { ConnectionInfoResource, createConnectionParam, isConnectionInfoParamEqual } from './ConnectionInfoResource';
+import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA.js';
+import { ConnectionInfoResource, createConnectionParam, isConnectionInfoParamEqual } from './ConnectionInfoResource.js';
 
 export type ConnectionTools = DatabaseConnectionToolsFragment;
 
@@ -29,7 +29,7 @@ export class ConnectionToolsResource extends CachedMapResource<IConnectionInfoPa
     connectionInfoResource.onItemDelete.addHandler(this.delete.bind(this));
   }
 
-  isKeyEqual(param: IConnectionInfoParams, second: IConnectionInfoParams): boolean {
+  override isKeyEqual(param: IConnectionInfoParams, second: IConnectionInfoParams): boolean {
     return isConnectionInfoParamEqual(param, second);
   }
 

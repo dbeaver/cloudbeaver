@@ -7,9 +7,9 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { s } from './s';
+import { s } from './s.js';
 import style from './TextPlaceholder.module.css';
-import { useS } from './useS';
+import { useS } from './useS.js';
 
 interface Props {
   className?: string;

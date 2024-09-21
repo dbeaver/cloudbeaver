@@ -7,12 +7,12 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button } from './Button';
+import { Button } from './Button.js';
 import styles from './ErrorMessage.module.css';
-import { IconOrImage } from './IconOrImage';
-import { useTranslate } from './localization/useTranslate';
-import { s } from './s';
-import { useS } from './useS';
+import { IconOrImage } from './IconOrImage.js';
+import { useTranslate } from './localization/useTranslate.js';
+import { s } from './s.js';
+import { useS } from './useS.js';
 
 interface Props {
   hasDetails?: boolean;

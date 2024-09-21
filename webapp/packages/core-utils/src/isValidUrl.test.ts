@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from '@jest/globals';
 
-import { isValidUrl } from './isValidUrl';
+import { isValidUrl } from './isValidUrl.js';
 
 describe('Is valid url', () => {
   test('should return "true" when valid url with "http" protocol is passed', () => {

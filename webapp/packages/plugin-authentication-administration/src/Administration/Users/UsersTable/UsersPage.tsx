@@ -11,14 +11,14 @@ import { AuthRolesResource } from '@cloudbeaver/core-authentication';
 import { ColoredContainer, Container, Group, Placeholder, useAutoLoad, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService';
-import { CreateUser } from './CreateUser';
-import { CreateUserService } from './CreateUserService';
-import { UsersTableFilters } from './Filters/UsersTableFilters';
-import { useUsersTableFilters } from './Filters/useUsersTableFilters';
-import { UsersAdministrationToolsPanel } from './UsersAdministrationToolsPanel';
-import { UsersTable } from './UsersTable';
-import { useUsersTable } from './useUsersTable';
+import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService.js';
+import { CreateUser } from './CreateUser.js';
+import { CreateUserService } from './CreateUserService.js';
+import { UsersTableFilters } from './Filters/UsersTableFilters.js';
+import { useUsersTableFilters } from './Filters/useUsersTableFilters.js';
+import { UsersAdministrationToolsPanel } from './UsersAdministrationToolsPanel.js';
+import { UsersTable } from './UsersTable.js';
+import { useUsersTable } from './useUsersTable.js';
 
 interface Props {
   param?: string | null;

@@ -7,8 +7,8 @@
  */
 import { useLayoutEffect, useRef } from 'react';
 
-import { s } from '../../s';
-import { useS } from '../../useS';
+import { s } from '../../s.js';
+import { useS } from '../../useS.js';
 import CheckboxMarkupStyles from './CheckboxMarkup.module.css';
 
 export type CheckboxMod = 'primary' | 'surface' | 'small';

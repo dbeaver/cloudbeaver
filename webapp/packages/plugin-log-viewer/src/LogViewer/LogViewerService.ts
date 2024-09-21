@@ -11,7 +11,7 @@ import { UserDataService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
 
-import { LogViewerSettingsService } from './LogViewerSettingsService';
+import { LogViewerSettingsService } from './LogViewerSettingsService.js';
 
 const logViewerSettingsKey = 'log-viewer';
 

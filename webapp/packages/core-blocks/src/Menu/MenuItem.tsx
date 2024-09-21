@@ -7,15 +7,15 @@
  */
 import { observer } from 'mobx-react-lite';
 import React, { useContext } from 'react';
-import { MenuItem as ReakitMenuItem } from 'reakit/Menu';
-import type { CompositeItemOptions } from 'reakit/ts';
+import { MenuItem as ReakitMenuItem } from 'reakit';
+import type { CompositeItemOptions } from 'reakit';
 
-import { s } from '../s';
-import { useCombinedHandler } from '../useCombinedHandler';
-import { useS } from '../useS';
+import { s } from '../s.js';
+import { useCombinedHandler } from '../useCombinedHandler.js';
+import { useS } from '../useS.js';
 import style from './MenuItem.module.css';
-import { MenuStateContext } from './MenuStateContext';
-import type { ReakitProxyComponent, ReakitProxyComponentOptions } from './ReakitProxyComponent';
+import { MenuStateContext } from './MenuStateContext.js';
+import type { ReakitProxyComponent, ReakitProxyComponentOptions } from './ReakitProxyComponent.js';
 
 export type MenuItemOptions = CompositeItemOptions & {
   selected?: boolean;

@@ -14,7 +14,7 @@ import {
   EventTreeNodeSelectFlag,
   FolderExplorer,
   FolderExplorerPath,
-  PlaceholderElement,
+  type PlaceholderElement,
   s,
   Translate,
   TreeNodeNested,
@@ -25,22 +25,22 @@ import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { EObjectFeature, type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 
-import { useNavTreeDropBox } from '../useNavTreeDropBox';
+import { useNavTreeDropBox } from '../useNavTreeDropBox.js';
 import style from './ElementsTree.module.css';
-import { ElementsTreeContentLoader } from './ElementsTreeContentLoader';
-import { ElementsTreeContext, IElementsTreeContext } from './ElementsTreeContext';
-import { elementsTreeNameFilter } from './elementsTreeNameFilter';
-import { ElementsTreeTools } from './ElementsTreeTools/ElementsTreeTools';
-import type { IElementsTreeSettingsProps } from './ElementsTreeTools/NavigationTreeSettings/ElementsTreeSettingsService';
-import type { NavTreeControlComponent } from './NavigationNodeComponent';
-import { NavigationNodeNested } from './NavigationTreeNode/NavigationNode/NavigationNodeNested';
-import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement';
-import type { NavNodeFilterCompareFn } from './NavNodeFilterCompareFn';
-import { elementsTreeLimitFilter } from './NavTreeLimitFilter/elementsTreeLimitFilter';
-import { elementsTreeLimitRenderer } from './NavTreeLimitFilter/elementsTreeLimitRenderer';
-import { useDropOutside } from './useDropOutside';
-import { IElementsTreeOptions, useElementsTree } from './useElementsTree';
-import { useElementsTreeFolderExplorer } from './useElementsTreeFolderExplorer';
+import { ElementsTreeContentLoader } from './ElementsTreeContentLoader.js';
+import { ElementsTreeContext, type IElementsTreeContext } from './ElementsTreeContext.js';
+import { elementsTreeNameFilter } from './elementsTreeNameFilter.js';
+import { ElementsTreeTools } from './ElementsTreeTools/ElementsTreeTools.js';
+import type { IElementsTreeSettingsProps } from './ElementsTreeTools/NavigationTreeSettings/ElementsTreeSettingsService.js';
+import type { NavTreeControlComponent } from './NavigationNodeComponent.js';
+import { NavigationNodeNested } from './NavigationTreeNode/NavigationNode/NavigationNodeNested.js';
+import { NavigationNodeElement } from './NavigationTreeNode/NavigationNodeElement.js';
+import type { NavNodeFilterCompareFn } from './NavNodeFilterCompareFn.js';
+import { elementsTreeLimitFilter } from './NavTreeLimitFilter/elementsTreeLimitFilter.js';
+import { elementsTreeLimitRenderer } from './NavTreeLimitFilter/elementsTreeLimitRenderer.js';
+import { useDropOutside } from './useDropOutside.js';
+import { type IElementsTreeOptions, useElementsTree } from './useElementsTree.js';
+import { useElementsTreeFolderExplorer } from './useElementsTreeFolderExplorer.js';
 
 export interface ElementsTreeProps extends IElementsTreeOptions, React.PropsWithChildren {
   /** Specifies the root path for the tree. ROOT_NODE_PATH will be used if not defined */

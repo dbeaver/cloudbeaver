@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/core-client-activity",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

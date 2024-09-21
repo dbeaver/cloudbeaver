@@ -27,20 +27,20 @@ import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { CaptureView } from '@cloudbeaver/core-view';
 
-import { DatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction';
-import { IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions';
-import { DataPresentationService, DataPresentationType } from '../DataPresentationService';
-import { isResultSetDataModel } from '../ResultSet/isResultSetDataModel';
-import { DataPresentation } from './DataPresentation';
-import { DataViewerViewService } from './DataViewerViewService';
-import type { IDataTableActionsPrivate } from './IDataTableActions';
-import { TableError } from './TableError';
-import { TableFooter } from './TableFooter/TableFooter';
-import { TableHeader } from './TableHeader/TableHeader';
-import { TablePresentationBar } from './TablePresentationBar/TablePresentationBar';
-import { TableToolsPanel } from './TableToolsPanel';
+import { DatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';
+import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
+import { DataPresentationService, DataPresentationType } from '../DataPresentationService.js';
+import { isResultSetDataModel } from '../ResultSet/isResultSetDataModel.js';
+import { DataPresentation } from './DataPresentation.js';
+import { DataViewerViewService } from './DataViewerViewService.js';
+import type { IDataTableActionsPrivate } from './IDataTableActions.js';
+import { TableError } from './TableError.js';
+import { TableFooter } from './TableFooter/TableFooter.js';
+import { TableHeader } from './TableHeader/TableHeader.js';
+import { TablePresentationBar } from './TablePresentationBar/TablePresentationBar.js';
+import { TableToolsPanel } from './TableToolsPanel.js';
 import style from './TableViewer.module.css';
-import { TableViewerStorageService } from './TableViewerStorageService';
+import { TableViewerStorageService } from './TableViewerStorageService.js';
 
 export interface TableViewerProps {
   tableId: string;

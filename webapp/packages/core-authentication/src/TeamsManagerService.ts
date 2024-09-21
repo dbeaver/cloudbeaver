@@ -7,7 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 
-import { TeamsResource } from './TeamsResource';
+import { TeamsResource } from './TeamsResource.js';
 
 @injectable()
 export class TeamsManagerService {

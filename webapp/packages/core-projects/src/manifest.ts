@@ -13,9 +13,9 @@ export const manifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./ProjectsService').then(m => m.ProjectsService),
-    () => import('./ProjectInfoResource').then(m => m.ProjectInfoResource),
-    () => import('./ProjectInfoEventHandler').then(m => m.ProjectInfoEventHandler),
-    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./ProjectsService.js').then(m => m.ProjectsService),
+    () => import('./ProjectInfoResource.js').then(m => m.ProjectInfoResource),
+    () => import('./ProjectInfoEventHandler.js').then(m => m.ProjectInfoEventHandler),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
   ],
 };

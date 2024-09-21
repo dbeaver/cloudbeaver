@@ -8,7 +8,7 @@
 import type { NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT, ProjectsService } from '@cloudbeaver/core-projects';
 
-import type { IElementsTreeNodeExpandInfoGetter } from '../ElementsTree/useElementsTree';
+import type { IElementsTreeNodeExpandInfoGetter } from '../ElementsTree/useElementsTree.js';
 
 export function navigationTreeProjectsExpandStateGetter(
   navNodeInfoResource: NavNodeInfoResource,

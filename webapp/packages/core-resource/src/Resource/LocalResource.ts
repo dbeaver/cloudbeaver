@@ -7,7 +7,7 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { Executor, IExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
+import { Executor, type IExecutor, TaskScheduler } from '@cloudbeaver/core-executor';
 
 export abstract class LocalResource<TData, TParam> {
   data: TData;

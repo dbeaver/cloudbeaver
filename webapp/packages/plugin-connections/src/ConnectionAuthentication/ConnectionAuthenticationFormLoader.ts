@@ -8,5 +8,5 @@
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 export const ConnectionAuthenticationFormLoader = importLazyComponent(() =>
-  import('./ConnectionAuthenticationForm').then(m => m.ConnectionAuthenticationForm),
+  import('./ConnectionAuthenticationForm.js').then(m => m.ConnectionAuthenticationForm),
 );

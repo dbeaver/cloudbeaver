@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
-import type { ResourceAliases } from './ResourceAliases';
-import type { ResourceKey, ResourceKeyFlat } from './ResourceKey';
-import type { ResourceKeyList } from './ResourceKeyList';
-import type { ResourceUseTracker } from './ResourceUseTracker';
+import type { ICachedResourceMetadata } from './ICachedResourceMetadata.js';
+import type { ResourceAliases } from './ResourceAliases.js';
+import type { ResourceKey, ResourceKeyFlat } from './ResourceKey.js';
+import type { ResourceKeyList } from './ResourceKeyList.js';
+import type { ResourceUseTracker } from './ResourceUseTracker.js';
 
 export type CachedResourceData<TResource> = TResource extends IResource<infer T, any, any, any, any> ? T : never;
 export type CachedResourceKey<TResource> = TResource extends IResource<any, infer T, any, any, any> ? T : never;

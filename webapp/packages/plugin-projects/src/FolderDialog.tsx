@@ -28,11 +28,11 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
-import { ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { type ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { createPath, throttleAsync } from '@cloudbeaver/core-utils';
 
 import style from './FolderDialog.module.css';
-import { ProjectSelect } from './ProjectSelect';
+import { ProjectSelect } from './ProjectSelect.js';
 
 interface IFolderDialogState {
   value: string;

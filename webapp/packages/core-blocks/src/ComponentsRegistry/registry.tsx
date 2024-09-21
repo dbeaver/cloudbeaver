@@ -8,10 +8,10 @@
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext } from 'react';
 
-import { ComponentsRegistryContext } from './ComponentsRegistryContext';
-import { ComponentsTreeContext } from './ComponentsTreeContext';
-import { IComponentsTreeNode } from './IComponentsTreeNode';
-import { IComponentsTreeNodeValidator } from './IComponentsTreeNodeValidator';
+import { ComponentsRegistryContext } from './ComponentsRegistryContext.js';
+import { ComponentsTreeContext } from './ComponentsTreeContext.js';
+import { type IComponentsTreeNode } from './IComponentsTreeNode.js';
+import { type IComponentsTreeNodeValidator } from './IComponentsTreeNodeValidator.js';
 
 /**
  * experimental, can be changed
@@ -57,13 +57,13 @@ export function registry<T extends React.FC<any>>(component: T): T {
 
 function getComponent(context: IComponentsTreeNode<any>[], validators: IComponentsTreeNodeValidator<any>[]) {
   let position = 0;
-  let node = context[position];
+  let node = context[position]!;
   let lastValidator: IComponentsTreeNodeValidator<any> | null = null;
 
   for (const validator of validators) {
     lastValidator = validator;
     while (position < context.length) {
-      node = context[position++];
+      node = context[position++]!;
       if (node.component === lastValidator.component) {
         if (!lastValidator.validator(node.props) || (node.replacement !== null && node.replacement === lastValidator.replacement)) {
           return null;

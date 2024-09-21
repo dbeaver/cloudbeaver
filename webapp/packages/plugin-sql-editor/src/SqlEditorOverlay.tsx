@@ -34,10 +34,10 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 
-import type { ISqlEditorTabState } from './ISqlEditorTabState';
-import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
+import type { ISqlEditorTabState } from './ISqlEditorTabState.js';
+import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
 import style from './SqlEditorOverlay.module.css';
-import { SqlEditorService } from './SqlEditorService';
+import { SqlEditorService } from './SqlEditorService.js';
 
 interface Props {
   state: ISqlEditorTabState;

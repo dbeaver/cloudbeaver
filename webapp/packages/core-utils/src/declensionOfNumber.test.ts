@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from '@jest/globals';
 
-import { declensionOfNumber } from './declensionOfNumber';
+import { declensionOfNumber } from './declensionOfNumber.js';
 
 describe('Declension of number', () => {
   test('should return "Год" when "1" is passed', () => {

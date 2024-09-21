@@ -13,9 +13,9 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { TabsContainer } from '@cloudbeaver/core-ui';
-import { ConnectionFormService, ConnectionFormState, IConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormService, ConnectionFormState, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
-import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService';
+import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService.js';
 
 export interface ICreateMethodOptions {
   configurationWizard?: {
@@ -76,10 +76,10 @@ export class CreateConnectionService {
         return aPriority - bPriority;
       });
 
-      return sorted[0].key;
+      return sorted[0]!.key;
     }
 
-    return tabs[0].key;
+    return tabs[0]!.key;
   }
 
   setCreateMethod(method?: string | null): void {

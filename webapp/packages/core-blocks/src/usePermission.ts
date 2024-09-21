@@ -7,7 +7,7 @@
  */
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 
-import { useResource } from './ResourcesHooks/useResource';
+import { useResource } from './ResourcesHooks/useResource.js';
 
 export function usePermission(key: string): boolean {
   const sessionPermissionsResource = useResource(usePermission, SessionPermissionsResource, undefined);
