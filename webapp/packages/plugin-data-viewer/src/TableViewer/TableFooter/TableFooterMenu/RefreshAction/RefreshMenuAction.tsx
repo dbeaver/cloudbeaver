@@ -8,11 +8,11 @@
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useEffect } from 'react';
 
-import { CRegistryList, IComponentsTreeNodeValidator, TimerIcon, useParentProps } from '@cloudbeaver/core-blocks';
-import { MenuBarAction, MenuBarItem, MenuBarItemProps } from '@cloudbeaver/core-ui';
+import { type CRegistryList, type IComponentsTreeNodeValidator, TimerIcon, useParentProps } from '@cloudbeaver/core-blocks';
+import { MenuBarAction, MenuBarItem, type MenuBarItemProps } from '@cloudbeaver/core-ui';
 import { ACTION_REFRESH } from '@cloudbeaver/core-view';
 
-import { getRefreshState } from './getRefreshState';
+import { getRefreshState } from './getRefreshState.js';
 
 const RefreshMenuItem: typeof MenuBarItem = observer<MenuBarItemProps, HTMLButtonElement>(
   forwardRef(function RefreshMenuItem(props, ref) {

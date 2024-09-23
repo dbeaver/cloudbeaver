@@ -10,19 +10,19 @@ import React from 'react';
 import { TeamsResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { executorHandlerFilter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { AdminConnectionGrantInfo, GraphQLService } from '@cloudbeaver/core-sdk';
-import { isArraysEqual, MetadataValueGetter } from '@cloudbeaver/core-utils';
+import { type AdminConnectionGrantInfo, GraphQLService } from '@cloudbeaver/core-sdk';
+import { isArraysEqual, type MetadataValueGetter } from '@cloudbeaver/core-utils';
 
-import { teamContext } from '../Contexts/teamContext';
-import type { ITeamFormProps, ITeamFormSubmitData } from '../ITeamFormProps';
-import { TeamFormService } from '../TeamFormService';
-import type { IGrantedConnectionsTabState } from './IGrantedConnectionsTabState';
+import { teamContext } from '../Contexts/teamContext.js';
+import type { ITeamFormProps, ITeamFormSubmitData } from '../ITeamFormProps.js';
+import { TeamFormService } from '../TeamFormService.js';
+import type { IGrantedConnectionsTabState } from './IGrantedConnectionsTabState.js';
 
 const GrantedConnections = React.lazy(async () => {
-  const { GrantedConnections } = await import('./GrantedConnections');
+  const { GrantedConnections } = await import('./GrantedConnections.js');
   return { default: GrantedConnections };
 });
 
@@ -41,7 +41,7 @@ export class GrantedConnectionsTabService extends Bootstrap {
     this.key = 'granted-connections';
   }
 
-  register(): void {
+  override register(): void {
     this.teamFormService.tabsContainer.add({
       key: this.key,
       name: 'administration_teams_team_granted_connections_tab_title',
@@ -56,8 +56,6 @@ export class GrantedConnectionsTabService extends Bootstrap {
 
     this.teamFormService.configureTask.addHandler(() => this.projectInfoResource.load(CachedMapAllKey));
   }
-
-  load(): Promise<void> | void {}
 
   private isEnabled(): boolean {
     return this.projectInfoResource.values.some(isGlobalProject);

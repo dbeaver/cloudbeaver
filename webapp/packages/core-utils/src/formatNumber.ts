@@ -18,7 +18,7 @@ export function formatNumber(n: number, d: number) {
   const rounded = Math.round((n * power) / Math.pow(10, exponent)) / power;
 
   const units = ' kMBTPE';
-  const unit = units[exponent / 3];
+  const unit = units[exponent / 3]!;
 
   return rounded + unit;
 }

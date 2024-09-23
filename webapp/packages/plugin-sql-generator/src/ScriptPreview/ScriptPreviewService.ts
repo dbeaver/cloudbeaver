@@ -6,14 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { createConnectionParam, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GraphQLService, ResultDataFormat, UpdateResultsDataBatchScriptMutationVariables } from '@cloudbeaver/core-sdk';
+import { GraphQLService, ResultDataFormat, type UpdateResultsDataBatchScriptMutationVariables } from '@cloudbeaver/core-sdk';
 import { DocumentEditAction, type IDatabaseDataModel, ResultSetDataSource, ResultSetEditAction } from '@cloudbeaver/plugin-data-viewer';
 
-const ScriptPreviewDialog = importLazyComponent(() => import('./ScriptPreviewDialog').then(m => m.ScriptPreviewDialog));
+const ScriptPreviewDialog = importLazyComponent(() => import('./ScriptPreviewDialog.js').then(m => m.ScriptPreviewDialog));
 
 @injectable()
 export class ScriptPreviewService {

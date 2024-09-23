@@ -7,7 +7,7 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { ClipboardService } from './ClipboardService';
+import { ClipboardService } from './ClipboardService.js';
 
 @injectable()
 export class ClipboardBootstrap extends Bootstrap {
@@ -15,9 +15,7 @@ export class ClipboardBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {}
-
-  async load(): Promise<void> {
+  override async load(): Promise<void> {
     await this.clipboardService.tryActivateClipboard();
   }
 }

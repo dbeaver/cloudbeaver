@@ -11,10 +11,10 @@ import {
   ExecutionContext,
   Executor,
   ExecutorInterrupter,
-  IExecutionContextProvider,
-  IExecutor,
-  IExecutorHandler,
-  ISyncExecutor,
+  type IExecutionContextProvider,
+  type IExecutor,
+  type IExecutorHandler,
+  type ISyncExecutor,
   SyncExecutor,
   TaskScheduler,
 } from '@cloudbeaver/core-executor';
@@ -26,17 +26,17 @@ import {
   CachedResourceOffsetPageTargetKey,
   isOffsetPageInRange,
   isOffsetPageOutdated,
-} from './CachedResourceOffsetPageKeys';
-import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
-import type { IResource } from './IResource';
-import { Resource } from './Resource';
-import { isResourceAlias } from './ResourceAlias';
-import { ResourceError } from './ResourceError';
-import type { ResourceKey, ResourceKeyFlat } from './ResourceKey';
-import { resourceKeyAlias } from './ResourceKeyAlias';
-import { isResourceKeyList, resourceKeyList } from './ResourceKeyList';
-import { resourceKeyListAlias } from './ResourceKeyListAlias';
-import { ResourceOffsetPagination } from './ResourceOffsetPagination';
+} from './CachedResourceOffsetPageKeys.js';
+import type { ICachedResourceMetadata } from './ICachedResourceMetadata.js';
+import type { IResource } from './IResource.js';
+import { Resource } from './Resource.js';
+import { isResourceAlias } from './ResourceAlias.js';
+import { ResourceError } from './ResourceError.js';
+import type { ResourceKey, ResourceKeyFlat } from './ResourceKey.js';
+import { resourceKeyAlias } from './ResourceKeyAlias.js';
+import { isResourceKeyList, resourceKeyList } from './ResourceKeyList.js';
+import { resourceKeyListAlias } from './ResourceKeyListAlias.js';
+import { ResourceOffsetPagination } from './ResourceOffsetPagination.js';
 
 export interface IDataError<TKey> {
   param: ResourceKey<TKey>;
@@ -820,7 +820,7 @@ export abstract class CachedResource<
 
   private flushOutdatedWaitList(): void {
     for (let i = 0; i < this.outdateWaitList.length; i++) {
-      const key = this.outdateWaitList[i];
+      const key = this.outdateWaitList[i]!;
       this.markOutdatedSync(key);
     }
     this.outdateWaitList = [];

@@ -16,17 +16,17 @@ import {
   registry,
   s,
   SContext,
-  StyleRegistry,
+  type StyleRegistry,
   useAutoLoad,
   useS,
 } from '@cloudbeaver/core-blocks';
-import { IDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
+import { type IDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import {
   DATA_CONTEXT_MENU_NESTED,
   DATA_CONTEXT_SUBMENU_ITEM,
-  IMenuActionItem,
-  IMenuData,
-  IMenuItem,
+  type IMenuActionItem,
+  type IMenuData,
+  type IMenuItem,
   isMenuCustomItem,
   MenuActionItem,
   MenuBaseItem,
@@ -35,10 +35,10 @@ import {
   useMenu,
 } from '@cloudbeaver/core-view';
 
-import { ContextMenu } from '../ContextMenu';
-import type { IMenuBarNestedMenuSettings, IMenuBarProps } from './IMenuBarProps';
+import { ContextMenu } from '../ContextMenu.js';
+import type { IMenuBarNestedMenuSettings, IMenuBarProps } from './IMenuBarProps.js';
 import style from './MenuBar.module.css';
-import { MenuBarItem } from './MenuBarItem';
+import { MenuBarItem } from './MenuBarItem.js';
 
 const styleRegistry: StyleRegistry = [
   [

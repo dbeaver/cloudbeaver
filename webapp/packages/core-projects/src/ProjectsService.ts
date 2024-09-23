@@ -9,15 +9,15 @@ import { computed, makeObservable } from 'mobx';
 
 import { ANONYMOUS_USER_ID, UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, IExecutor, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, type IExecutor, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { DataSynchronizationService, ServerConfigResource, ServerEventId } from '@cloudbeaver/core-root';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-import { activeProjectsContext } from './activeProjectsContext';
-import { IProjectInfoEvent, ProjectInfoEventHandler } from './ProjectInfoEventHandler';
-import { ProjectInfo, ProjectInfoResource } from './ProjectInfoResource';
+import { activeProjectsContext } from './activeProjectsContext.js';
+import { type IProjectInfoEvent, ProjectInfoEventHandler } from './ProjectInfoEventHandler.js';
+import { type ProjectInfo, ProjectInfoResource } from './ProjectInfoResource.js';
 
 interface IActiveProjectData {
   projects: string[];

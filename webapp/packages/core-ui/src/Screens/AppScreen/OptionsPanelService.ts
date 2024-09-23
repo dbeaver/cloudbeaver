@@ -8,9 +8,9 @@
 import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, IExecutionContext, IExecutor, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, type IExecutionContext, type IExecutor, type IExecutorHandler } from '@cloudbeaver/core-executor';
 
-import { NavigationService } from './NavigationService';
+import { NavigationService } from './NavigationService.js';
 
 @injectable()
 export class OptionsPanelService {

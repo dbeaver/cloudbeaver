@@ -10,12 +10,12 @@ import { action, computed, observable } from 'mobx';
 import { AuthProviderService } from '@cloudbeaver/core-authentication';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import {
-  Connection,
+  type Connection,
   ConnectionInfoProjectKey,
   ConnectionInfoResource,
-  ConnectionInitConfig,
+  type ConnectionInitConfig,
   createConnectionParam,
-  DBDriver,
+  type DBDriver,
   DBDriverResource,
   USER_NAME_PROPERTY_ID,
 } from '@cloudbeaver/core-connections';
@@ -26,8 +26,8 @@ import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 import type { IConnectionAuthenticationConfig } from '@cloudbeaver/plugin-connections';
 
-import { TemplateConnectionsService } from '../TemplateConnectionsService';
-import { ConnectionStep } from './EConnectionStep';
+import { TemplateConnectionsService } from '../TemplateConnectionsService.js';
+import { ConnectionStep } from './EConnectionStep.js';
 
 interface IState {
   readonly networkHandlers: string[];

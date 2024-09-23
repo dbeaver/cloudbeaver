@@ -7,8 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { s } from '../s';
-import { useS } from '../useS';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
 import style from './ToolsPanel.module.css';
 
 type TType = 'primary' | 'secondary';

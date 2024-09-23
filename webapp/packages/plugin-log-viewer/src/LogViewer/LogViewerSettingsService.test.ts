@@ -9,30 +9,30 @@ import { expect, test } from '@jest/globals';
 
 import { coreAppManifest } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
-import { mockAuthentication } from '@cloudbeaver/core-authentication/dist/__custom_mocks__/mockAuthentication';
+import { mockAuthentication } from '@cloudbeaver/core-authentication/dist/__custom_mocks__/mockAuthentication.js';
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
-import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
-import '@cloudbeaver/core-root/dist/__custom_mocks__/expectWebsocketClosedMessage';
-import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
-import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
-import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig';
+import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint.js';
+import '@cloudbeaver/core-root/dist/__custom_mocks__/expectWebsocketClosedMessage.js';
+import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit.js';
+import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL.js';
+import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig.js';
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
 import {
   expectDeprecatedSettingMessage,
   expectNoDeprecatedSettingMessage,
-} from '@cloudbeaver/core-settings/dist/__custom_mocks__/expectDeprecatedSettingMessage';
+} from '@cloudbeaver/core-settings/dist/__custom_mocks__/expectDeprecatedSettingMessage.js';
 import { coreStorageManifest } from '@cloudbeaver/core-storage';
 import { coreViewManifest } from '@cloudbeaver/core-view';
 import toolsPanelPlugin from '@cloudbeaver/plugin-tools-panel';
 import { createApp } from '@cloudbeaver/tests-runner';
 
-import { logViewerPlugin } from '../manifest';
-import { LogViewerSettingsService } from './LogViewerSettingsService';
+import { logViewerPlugin } from '../manifest.js';
+import { LogViewerSettingsService } from './LogViewerSettingsService.js';
 
 const endpoint = createGQLEndpoint();
 const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));

@@ -45,7 +45,7 @@ export class UserSettingsService extends SettingsSource {
     );
   }
 
-  has(key: any): boolean {
+  override has(key: any): boolean {
     return this.getSource().has(key) || super.has(key);
   }
 
@@ -57,7 +57,7 @@ export class UserSettingsService extends SettingsSource {
     return this.getSource().get(key);
   }
 
-  clear(): void {
+  override clear(): void {
     this.update(() => {
       super.clear();
       this.settings.clear();

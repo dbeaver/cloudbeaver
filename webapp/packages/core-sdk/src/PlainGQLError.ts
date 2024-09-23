@@ -9,7 +9,7 @@ import type { ClientError } from 'graphql-request';
 
 import { getTextBetween } from '@cloudbeaver/core-utils';
 
-import { DetailsError } from './DetailsError';
+import { DetailsError } from './DetailsError.js';
 
 export class PlainGQLError extends DetailsError {
   response: ClientError['response'];
@@ -17,8 +17,8 @@ export class PlainGQLError extends DetailsError {
   constructor(clientError: ClientError) {
     let message = clientError.message;
 
-    if (typeof clientError.response.error === 'string') {
-      message = getTextBetween(clientError.response.error, '<title>', '</title>');
+    if (typeof clientError.response['error'] === 'string') {
+      message = getTextBetween(clientError.response['error'], '<title>', '</title>');
     }
 
     super(message, { cause: clientError });
@@ -27,7 +27,7 @@ export class PlainGQLError extends DetailsError {
     this.request = clientError.request;
   }
 
-  hasDetails(): boolean {
+  override hasDetails(): boolean {
     return false;
   }
 }

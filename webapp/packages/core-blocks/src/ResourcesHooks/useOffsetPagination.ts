@@ -16,15 +16,15 @@ import {
   CachedResourceOffsetPageListKey,
   CachedResourceOffsetPageTargetKey,
   getNextPageOffset,
-  ICachedResourceOffsetPageOptions,
+  type ICachedResourceOffsetPageOptions,
   isResourceAlias,
-  ResourceKey,
+  type ResourceKey,
   ResourceKeyAlias,
   ResourceKeyList,
   ResourceKeyListAlias,
 } from '@cloudbeaver/core-resource';
 
-import { useObservableRef } from '../useObservableRef';
+import { useObservableRef } from '../useObservableRef.js';
 
 interface IOptions<TKey extends ResourceKey<any>> {
   key: TKey;

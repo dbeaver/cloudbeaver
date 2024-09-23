@@ -11,13 +11,13 @@ export const objectViewerManifest: PluginManifest = {
   info: { name: 'Object Viewer Plugin' },
 
   providers: [
-    () => import('./ObjectViewerBootstrap').then(m => m.ObjectViewerBootstrap),
-    () => import('./ObjectPropertiesPage/NavNodeView/NavNodeMetadata/NavNodeMetadataViewBootstrap').then(m => m.NavNodeMetadataViewBootstrap),
-    () => import('./ObjectPropertiesPage/NavNodeView/VirtualFolder/VirtualFolderViewBootstrap').then(m => m.VirtualFolderViewBootstrap),
-    () => import('./ObjectPropertiesPage/ObjectPropertiesPageService').then(m => m.ObjectPropertiesPageService),
-    () => import('./ObjectViewerTabService').then(m => m.ObjectViewerTabService),
-    () => import('./ObjectPage/DBObjectPageService').then(m => m.DBObjectPageService),
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./ObjectPropertiesPage/ObjectPropertyTable/ObjectPropertyTableFooterService').then(m => m.ObjectPropertyTableFooterService),
+    () => import('./ObjectViewerBootstrap.js').then(m => m.ObjectViewerBootstrap),
+    () => import('./ObjectPropertiesPage/NavNodeView/NavNodeMetadata/NavNodeMetadataViewBootstrap.js').then(m => m.NavNodeMetadataViewBootstrap),
+    () => import('./ObjectPropertiesPage/NavNodeView/VirtualFolder/VirtualFolderViewBootstrap.js').then(m => m.VirtualFolderViewBootstrap),
+    () => import('./ObjectPropertiesPage/ObjectPropertiesPageService.js').then(m => m.ObjectPropertiesPageService),
+    () => import('./ObjectViewerTabService.js').then(m => m.ObjectViewerTabService),
+    () => import('./ObjectPage/DBObjectPageService.js').then(m => m.DBObjectPageService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./ObjectPropertiesPage/ObjectPropertyTable/ObjectPropertyTableFooterService.js').then(m => m.ObjectPropertyTableFooterService),
   ],
 };

@@ -12,19 +12,19 @@ import { MenuBarSmallItem, useExecutor, useS, useTranslate } from '@cloudbeaver/
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
-import { closeCompletion, IEditorRef, Prec, ReactCodemirrorPanel, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
+import { type TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
+import { closeCompletion, type IEditorRef, Prec, ReactCodemirrorPanel, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import type { ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
 
-import { ACTIVE_QUERY_EXTENSION } from '../ACTIVE_QUERY_EXTENSION';
-import { QUERY_STATUS_GUTTER_EXTENSION } from '../QUERY_STATUS_GUTTER_EXTENSION';
-import { SQLCodeEditorLoader } from '../SQLCodeEditor/SQLCodeEditorLoader';
-import { useSQLCodeEditor } from '../SQLCodeEditor/useSQLCodeEditor';
-import { useSqlDialectAutocompletion } from '../useSqlDialectAutocompletion';
-import { useSqlDialectExtension } from '../useSqlDialectExtension';
+import { ACTIVE_QUERY_EXTENSION } from '../ACTIVE_QUERY_EXTENSION.js';
+import { QUERY_STATUS_GUTTER_EXTENSION } from '../QUERY_STATUS_GUTTER_EXTENSION.js';
+import { SQLCodeEditorLoader } from '../SQLCodeEditor/SQLCodeEditorLoader.js';
+import { useSQLCodeEditor } from '../SQLCodeEditor/useSQLCodeEditor.js';
+import { useSqlDialectAutocompletion } from '../useSqlDialectAutocompletion.js';
+import { useSqlDialectExtension } from '../useSqlDialectExtension.js';
 import style from './SQLCodeEditorPanel.module.css';
-import { SqlEditorInfoBar } from './SqlEditorInfoBar';
-import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel';
+import { SqlEditorInfoBar } from './SqlEditorInfoBar.js';
+import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel.js';
 
 export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps> = observer(function SQLCodeEditorPanel({ data }) {
   const notificationService = useService(NotificationService);
@@ -101,7 +101,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   }
 
   return (
-    <div ref={dndBox.setRef} className={styles.box}>
+    <div ref={dndBox.setRef} className={styles['box']}>
       <SQLCodeEditorLoader
         ref={setEditorRef}
         getValue={() => data.value}
@@ -119,12 +119,12 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
       >
         {data.isIncomingChanges && (
           <>
-            <ReactCodemirrorPanel className={styles.reactCodemirrorPanel} top>
+            <ReactCodemirrorPanel className={styles['reactCodemirrorPanel']} top>
               <MenuBarSmallItem title={translate('plugin_sql_editor_new_merge_conflict_keep_current_tooltip')} onClick={keepCurrent}>
                 {translate('plugin_sql_editor_new_merge_conflict_keep_current_label')}
               </MenuBarSmallItem>
             </ReactCodemirrorPanel>
-            <ReactCodemirrorPanel className={styles.reactCodemirrorPanel} top incomingView>
+            <ReactCodemirrorPanel className={styles['reactCodemirrorPanel']} top incomingView>
               <MenuBarSmallItem title={translate('plugin_sql_editor_new_merge_conflict_accept_incoming_tooltip')} onClick={applyIncoming}>
                 {translate('plugin_sql_editor_new_merge_conflict_accept_incoming_label')}
               </MenuBarSmallItem>

@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { IResourceOffsetPage } from './OffsetPagination/IResourceOffsetPage';
-import { ResourceOffsetPage } from './OffsetPagination/ResourceOffsetPage';
-import { ResourceKey } from './ResourceKey';
-import { resourceKeyAliasFactory } from './ResourceKeyAlias';
-import { resourceKeyListAliasFactory } from './ResourceKeyListAlias';
+import type { IResourceOffsetPage } from './OffsetPagination/IResourceOffsetPage.js';
+import { ResourceOffsetPage } from './OffsetPagination/ResourceOffsetPage.js';
+import type { ResourceKey } from './ResourceKey.js';
+import { resourceKeyAliasFactory } from './ResourceKeyAlias.js';
+import { resourceKeyListAliasFactory } from './ResourceKeyListAlias.js';
 
 interface IOffsetPageInfo {
   offset: number;

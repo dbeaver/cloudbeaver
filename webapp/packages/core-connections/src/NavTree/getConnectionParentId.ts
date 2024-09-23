@@ -7,7 +7,7 @@
  */
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
 
-import { getConnectionFolderId } from './getConnectionFolderId';
+import { getConnectionFolderId } from './getConnectionFolderId.js';
 
 export function getConnectionParentId(projectId: string, folderId?: string): string {
   if (!folderId) {

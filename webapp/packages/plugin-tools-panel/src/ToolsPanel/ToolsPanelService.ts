@@ -10,7 +10,7 @@ import { computed, makeObservable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 
-import { ToolsPanelSettingsService } from '../ToolsPanelSettingsService';
+import { ToolsPanelSettingsService } from '../ToolsPanelSettingsService.js';
 
 @injectable()
 export class ToolsPanelService {

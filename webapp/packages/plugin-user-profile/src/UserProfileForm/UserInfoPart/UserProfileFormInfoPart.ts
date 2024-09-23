@@ -11,11 +11,11 @@ import type { UserInfoResource, UserResourceIncludes } from '@cloudbeaver/core-a
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { CachedResourceIncludeArgs } from '@cloudbeaver/core-resource';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
-import { FormPart, IFormState } from '@cloudbeaver/core-ui';
+import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import { isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 
-import type { IUserProfileFormState } from '../UserProfileFormService';
-import { type IUserProfileFormInfoState, USER_PROFILE_FORM_INFO_PART_STATE_SCHEMA } from './IUserProfileFormInfoState';
+import type { IUserProfileFormState } from '../UserProfileFormService.js';
+import { type IUserProfileFormInfoState, USER_PROFILE_FORM_INFO_PART_STATE_SCHEMA } from './IUserProfileFormInfoState.js';
 
 export class UserProfileFormInfoPart extends FormPart<IUserProfileFormInfoState, IUserProfileFormState> {
   private baseIncludes: CachedResourceIncludeArgs<AdminUserInfoFragment, UserResourceIncludes>;
@@ -32,19 +32,19 @@ export class UserProfileFormInfoPart extends FormPart<IUserProfileFormInfoState,
     this.baseIncludes = ['includeMetaParameters'];
   }
 
-  protected format(data: IFormState<IUserProfileFormState>, contexts: IExecutionContextProvider<IFormState<IUserProfileFormState>>): void {
+  protected override format(data: IFormState<IUserProfileFormState>, contexts: IExecutionContextProvider<IFormState<IUserProfileFormState>>): void {
     this.state = USER_PROFILE_FORM_INFO_PART_STATE_SCHEMA.parse(this.state);
   }
 
-  isOutdated(): boolean {
+  override isOutdated(): boolean {
     return this.userInfoResource.isOutdated(undefined, this.baseIncludes);
   }
 
-  isLoaded(): boolean {
+  override isLoaded(): boolean {
     return this.loaded && this.userInfoResource.isLoaded(undefined, this.baseIncludes);
   }
 
-  get isChanged(): boolean {
+  override get isChanged(): boolean {
     if (!this.loaded) {
       return false;
     }

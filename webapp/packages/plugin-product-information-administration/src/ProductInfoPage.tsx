@@ -7,13 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { type AdministrationItemContentComponent, AdministrationItemContentProps } from '@cloudbeaver/core-administration';
-import { s, SContext, StyleRegistry, ToolsPanel, useS } from '@cloudbeaver/core-blocks';
+import { type AdministrationItemContentComponent, type AdministrationItemContentProps } from '@cloudbeaver/core-administration';
+import { s, SContext, type StyleRegistry, ToolsPanel, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ITabData, TabList, TabPanelList, TabPanelStyles, TabsState, TabStyles, TabTitleStyles } from '@cloudbeaver/core-ui';
+import { type ITabData, TabList, TabPanelList, TabPanelStyles, TabsState, TabStyles, TabTitleStyles } from '@cloudbeaver/core-ui';
 
-import { ProductInfoNavigationService } from './ProductInfoNavigationService';
-import { ProductInfoService } from './ProductInfoService';
+import { ProductInfoNavigationService } from './ProductInfoNavigationService.js';
+import { ProductInfoService } from './ProductInfoService.js';
 import style from './shared/ProductInfoPage.module.css';
 import tabStyle from './shared/ProductInfoPageTab.module.css';
 import tabPanelStyle from './shared/ProductInfoPageTabPanel.module.css';

@@ -11,14 +11,14 @@ import { UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authent
 import { Container, Group, InfoItem, Loader, s, TextPlaceholder, useAutoLoad, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
-import type { ITeamFormProps } from '../ITeamFormProps';
-import { GrantedUserList } from './GrantedUserList';
+import type { ITeamFormProps } from '../ITeamFormProps.js';
+import { GrantedUserList } from './GrantedUserList.js';
 import style from './GrantedUsers.module.css';
-import type { IGrantedUser } from './IGrantedUser';
-import { useGrantedUsers } from './useGrantedUsers';
-import { UserList } from './UserList';
+import type { IGrantedUser } from './IGrantedUser.js';
+import { useGrantedUsers } from './useGrantedUsers.js';
+import { UserList } from './UserList.js';
 
 export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer(function GrantedUsers({ tabId, state: formState }) {
   const styles = useS(style);

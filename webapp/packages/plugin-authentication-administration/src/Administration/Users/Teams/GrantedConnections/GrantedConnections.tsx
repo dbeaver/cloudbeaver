@@ -20,17 +20,23 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { Connection, ConnectionInfoProjectKey, ConnectionInfoResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
+import {
+  type Connection,
+  ConnectionInfoProjectKey,
+  ConnectionInfoResource,
+  DBDriverResource,
+  isCloudConnection,
+} from '@cloudbeaver/core-connections';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
-import { isGlobalProject, ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { isGlobalProject, type ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
-import type { ITeamFormProps } from '../ITeamFormProps';
-import { ConnectionList } from './ConnectionList';
+import type { ITeamFormProps } from '../ITeamFormProps.js';
+import { ConnectionList } from './ConnectionList.js';
 import style from './GrantedConnections.module.css';
-import { GrantedConnectionList } from './GrantedConnectionsList';
-import { useGrantedConnections } from './useGrantedConnections';
+import { GrantedConnectionList } from './GrantedConnectionsList.js';
+import { useGrantedConnections } from './useGrantedConnections.js';
 
 export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = observer(function GrantedConnections({ tabId, state: formState }) {
   const styles = useS(style);

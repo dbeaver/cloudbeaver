@@ -11,11 +11,11 @@ import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { ServerEventId, SessionDataResource } from '@cloudbeaver/core-root';
-import { GraphQLService, LogEntry } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type LogEntry } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import { LogViewerSettingsService } from './LogViewer/LogViewerSettingsService';
-import { SessionLogsEventHandler } from './SessionLogsEventHandler';
+import { LogViewerSettingsService } from './LogViewer/LogViewerSettingsService.js';
+import { SessionLogsEventHandler } from './SessionLogsEventHandler.js';
 
 export interface ILogEntry extends LogEntry {
   id: string;

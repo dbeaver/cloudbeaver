@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { isPropertiesEqual } from './isPropertiesEqual';
+import { isPropertiesEqual } from './isPropertiesEqual.js';
 
 describe('isPropertiesEqual', () => {
   it('should return true if the two input objects have the same properties and property values, and false otherwise', () => {

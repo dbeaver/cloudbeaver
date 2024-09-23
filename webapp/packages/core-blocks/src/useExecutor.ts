@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 
 import type { IExecutor, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
-import { useObjectRef } from './useObjectRef';
+import { useObjectRef } from './useObjectRef.js';
 
 interface IUseExecutorOptions<T> {
   executor?: IExecutorHandlersCollection<T>;
@@ -35,7 +35,7 @@ export function useExecutor<T>(options: IUseExecutorOptions<T>): void {
 
     if (props.handlers) {
       for (let i = 0; i < props.handlers.length; i++) {
-        const handler: IExecutorHandler<T> = (data, contexts) => props.handlers?.[i](data, contexts);
+        const handler: IExecutorHandler<T> = (data, contexts) => props.handlers?.[i]?.(data, contexts);
         executor.addHandler(handler);
         handlers.push(handler);
       }
@@ -43,7 +43,7 @@ export function useExecutor<T>(options: IUseExecutorOptions<T>): void {
 
     if (props.postHandlers) {
       for (let i = 0; i < props.postHandlers.length; i++) {
-        const handler: IExecutorHandler<T> = (data, contexts) => props.postHandlers?.[i](data, contexts);
+        const handler: IExecutorHandler<T> = (data, contexts) => props.postHandlers?.[i]?.(data, contexts);
         executor.addPostHandler(handler);
         postHandlers.push(handler);
       }

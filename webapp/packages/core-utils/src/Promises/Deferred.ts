@@ -7,9 +7,9 @@
  */
 import { action, computed, makeObservable, observable } from 'mobx';
 
-import { errorOf } from '../errorOf';
-import { PromiseCancelledError } from './PromiseCancelledError';
-import { PromiseExecutor } from './PromiseExecutor';
+import { errorOf } from '../errorOf.js';
+import { PromiseCancelledError } from './PromiseCancelledError.js';
+import { PromiseExecutor } from './PromiseExecutor.js';
 
 export enum EDeferredState {
   'PENDING' = 'PENDING',

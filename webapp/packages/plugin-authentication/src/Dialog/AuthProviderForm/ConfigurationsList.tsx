@@ -8,7 +8,12 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { AuthProvider, AuthProviderConfiguration, AuthProvidersResource, comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
+import {
+  type AuthProvider,
+  type AuthProviderConfiguration,
+  AuthProvidersResource,
+  comparePublicAuthConfigurations,
+} from '@cloudbeaver/core-authentication';
 import {
   Button,
   Cell,
@@ -30,7 +35,7 @@ import type { ITask } from '@cloudbeaver/core-executor';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { ServerConfigurationAdministrationNavService } from '@cloudbeaver/plugin-administration';
 
-import { AuthenticationService } from '../../AuthenticationService';
+import { AuthenticationService } from '../../AuthenticationService.js';
 import styles from './ConfigurationsList.module.css';
 
 interface IProviderConfiguration {

@@ -14,17 +14,17 @@ import {
   AsyncTaskInfoService,
   GraphQLService,
   ResultDataFormat,
-  SqlExecuteInfo,
-  SqlQueryResults,
-  UpdateResultsDataBatchMutationVariables,
+  type SqlExecuteInfo,
+  type SqlQueryResults,
+  type UpdateResultsDataBatchMutationVariables,
 } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 import {
   DocumentEditAction,
-  IDatabaseDataOptions,
-  IDatabaseResultSet,
-  IRequestInfo,
-  IResultSetBlobValue,
+  type IDatabaseDataOptions,
+  type IDatabaseResultSet,
+  type IRequestInfo,
+  type IResultSetBlobValue,
   ResultSetDataSource,
   ResultSetEditAction,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -39,18 +39,18 @@ export interface IQueryRequestInfo extends IRequestInfo {
 
 export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOptions> extends ResultSetDataSource<TOptions> {
   currentTask: ITask<SqlExecuteInfo> | null;
-  requestInfo: IQueryRequestInfo;
+  override requestInfo: IQueryRequestInfo;
 
-  get canCancel(): boolean {
+  override get canCancel(): boolean {
     return this.currentTask?.cancellable || false;
   }
 
-  get cancelled(): boolean {
+  override get cancelled(): boolean {
     return this.currentTask?.cancelled || false;
   }
 
   constructor(
-    readonly serviceProvider: IServiceProvider,
+    override readonly serviceProvider: IServiceProvider,
     graphQLService: GraphQLService,
     asyncTaskInfoService: AsyncTaskInfoService,
   ) {
@@ -71,11 +71,11 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     });
   }
 
-  isDisabled(resultIndex?: number): boolean {
+  override isDisabled(resultIndex?: number): boolean {
     return super.isDisabled(resultIndex) || !this.executionContext?.context;
   }
 
-  async cancel(): Promise<void> {
+  override async cancel(): Promise<void> {
     await super.cancel();
     await this.currentTask?.cancel();
   }
@@ -153,7 +153,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     return prevResults;
   }
 
-  setOptions(options: TOptions): this {
+  override setOptions(options: TOptions): this {
     this.options = options;
     return this;
   }

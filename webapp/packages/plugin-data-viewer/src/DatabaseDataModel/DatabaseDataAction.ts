@@ -7,9 +7,9 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
-import type { IDatabaseDataResult } from './IDatabaseDataResult';
-import type { IDatabaseDataSource } from './IDatabaseDataSource';
+import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction.js';
+import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
+import type { IDatabaseDataSource } from './IDatabaseDataSource.js';
 
 export abstract class DatabaseDataAction<TOptions, TResult extends IDatabaseDataResult> implements IDatabaseDataAction<TOptions, TResult> {
   result!: TResult;

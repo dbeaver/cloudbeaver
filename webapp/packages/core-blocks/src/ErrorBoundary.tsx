@@ -5,15 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import React, { ErrorInfo, Suspense } from 'react';
+import React, { type ErrorInfo, Suspense } from 'react';
 
 import { errorOf, LoadingError } from '@cloudbeaver/core-utils';
 
-import { Button } from './Button';
-import { DisplayError } from './DisplayError';
+import { Button } from './Button.js';
+import { DisplayError } from './DisplayError.js';
 import style from './ErrorBoundary.module.css';
-import { ErrorContext, IExceptionContext } from './ErrorContext';
-import { ExceptionMessage } from './ExceptionMessage';
+import { ErrorContext, type IExceptionContext } from './ErrorContext.js';
+import { ExceptionMessage } from './ExceptionMessage.js';
 
 interface Props {
   simple?: boolean;
@@ -52,7 +52,7 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props
     this.componentDidCatch(exception);
   }
 
-  componentDidCatch(error: Error, errorInfo?: ErrorInfo): void {
+  override componentDidCatch(error: Error, errorInfo?: ErrorInfo): void {
     this.setState(state => {
       if (state.exceptions.some(data => data.error === error)) {
         return state;
@@ -69,7 +69,7 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props
     });
   }
 
-  render(): React.ReactElement<any, any> | null {
+  override render(): React.ReactElement<any, any> | null {
     const { root, inline, icon, children, className, onClose } = this.props;
 
     for (const errorData of this.state.exceptions) {
@@ -80,14 +80,14 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props
             <div>
               <p>Something went wrong.</p>
               {onClose && (
-                <div className={style.action}>
+                <div className={style['action']}>
                   <button type="button" onClick={onClose}>
                     Close
                   </button>
                 </div>
               )}
               {this.canRefresh && (
-                <div className={style.action}>
+                <div className={style['action']}>
                   <button type="button" onClick={this.refresh}>
                     Refresh
                   </button>
@@ -109,12 +109,12 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props
           <Suspense fallback={<>Loading...</>}>
             <DisplayError className={className} root={root} error={errorData.error} errorInfo={errorData.errorInfo}>
               {onClose && (
-                <div className={style.action}>
+                <div className={style['action']}>
                   <Button onClick={onClose}>Close</Button>
                 </div>
               )}
               {this.canRefresh && (
-                <div className={style.action}>
+                <div className={style['action']}>
                   <Button onClick={this.refresh}>Refresh</Button>
                 </div>
               )}

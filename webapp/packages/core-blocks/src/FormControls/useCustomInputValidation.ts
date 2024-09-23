@@ -9,9 +9,9 @@ import { useContext, useEffect, useRef } from 'react';
 
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 
-import { useTranslate } from '../localization/useTranslate';
-import { useExecutor } from '../useExecutor';
-import { FormContext } from './FormContext';
+import { useTranslate } from '../localization/useTranslate.js';
+import { useExecutor } from '../useExecutor.js';
+import { FormContext } from './FormContext.js';
 
 export function useCustomInputValidation<T = void>(validation: (value: T) => string | null): React.RefObject<HTMLInputElement> {
   const context = useContext(FormContext);

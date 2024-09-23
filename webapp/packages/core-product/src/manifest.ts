@@ -12,5 +12,5 @@ export const coreProductManifest: PluginManifest = {
     name: 'Core Product',
   },
 
-  providers: [() => import('./ProductSettingsService').then(m => m.ProductSettingsService)],
+  providers: [() => import('./ProductSettingsService.js').then(m => m.ProductSettingsService)],
 };

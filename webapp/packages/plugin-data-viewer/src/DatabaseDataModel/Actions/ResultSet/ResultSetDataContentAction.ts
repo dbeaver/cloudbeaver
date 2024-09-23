@@ -11,16 +11,16 @@ import { QuotasService, ServerResourceQuotasResource } from '@cloudbeaver/core-r
 import { GraphQLService, ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { bytesToSize, download, downloadFromURL, GlobalConstants, isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { DatabaseDataAction } from '../../DatabaseDataAction';
-import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
-import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
-import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import type { IResultSetDataContentAction } from './IResultSetDataContentAction';
-import type { IResultSetElementKey } from './IResultSetDataKey';
-import { isResultSetContentValue } from './isResultSetContentValue';
-import { ResultSetCacheAction } from './ResultSetCacheAction';
-import { ResultSetDataAction } from './ResultSetDataAction';
-import { IResultSetValue, ResultSetFormatAction } from './ResultSetFormatAction';
+import { DatabaseDataAction } from '../../DatabaseDataAction.js';
+import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
+import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
+import type { IResultSetDataContentAction } from './IResultSetDataContentAction.js';
+import type { IResultSetElementKey } from './IResultSetDataKey.js';
+import { isResultSetContentValue } from './isResultSetContentValue.js';
+import { ResultSetCacheAction } from './ResultSetCacheAction.js';
+import { ResultSetDataAction } from './ResultSetDataAction.js';
+import { type IResultSetValue, ResultSetFormatAction } from './ResultSetFormatAction.js';
 
 const RESULT_VALUE_PATH = 'sql-result-value';
 const CONTENT_CACHE_KEY = Symbol('content-cache-key');
@@ -181,7 +181,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     this.cache.deleteAll(CONTENT_CACHE_KEY);
   }
 
-  dispose(): void {
+  override dispose(): void {
     this.subscriptionDispose?.();
     this.clearCache();
   }

@@ -23,12 +23,18 @@ import {
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
 import { EAdminPermission, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { AdminConnectionGrantInfo, AdminUserInfo, AdminUserInfoFragment, GetUsersListQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
+import {
+  type AdminConnectionGrantInfo,
+  type AdminUserInfo,
+  type AdminUserInfoFragment,
+  type GetUsersListQueryVariables,
+  GraphQLService,
+} from '@cloudbeaver/core-sdk';
 
-import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
-import { AuthInfoService } from './AuthInfoService';
-import { AuthProviderService } from './AuthProviderService';
-import type { IAuthCredentials } from './IAuthCredentials';
+import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
+import { AuthInfoService } from './AuthInfoService.js';
+import { AuthProviderService } from './AuthProviderService.js';
+import type { IAuthCredentials } from './IAuthCredentials.js';
 
 const NEW_USER_SYMBOL = Symbol('new-user');
 
@@ -312,7 +318,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     };
   }
 
-  protected dataSet(key: string, value: AdminUserInfoFragment): void {
+  protected override dataSet(key: string, value: AdminUserInfoFragment): void {
     const oldValue = this.data.get(key);
     super.dataSet(key, { ...oldValue, ...value });
   }

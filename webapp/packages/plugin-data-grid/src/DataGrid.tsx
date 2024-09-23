@@ -16,6 +16,6 @@ import classes from './DataGrid.module.css';
 
 export const DataGrid = observer(
   forwardRef(function DataGrid(props, ref) {
-    return <ReactDataGrid {...props} ref={ref} className={clsx(classes.dataGrid, props.className)} />;
+    return <ReactDataGrid {...props} ref={ref} className={clsx(classes['dataGrid'], props.className)} />;
   }),
 ) as typeof ReactDataGrid;

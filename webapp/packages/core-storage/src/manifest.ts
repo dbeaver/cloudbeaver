@@ -12,5 +12,5 @@ export const coreStorageManifest: PluginManifest = {
     name: 'Core Storage',
   },
 
-  providers: [() => import('./StorageService').then(m => m.StorageService)],
+  providers: [() => import('./StorageService.js').then(m => m.StorageService)],
 };

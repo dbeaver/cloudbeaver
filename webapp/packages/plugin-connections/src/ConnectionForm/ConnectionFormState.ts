@@ -7,17 +7,17 @@
  */
 import { action, computed, makeObservable, observable } from 'mobx';
 
-import { ConnectionInfoResource, createConnectionParam, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
+import { ConnectionInfoResource, createConnectionParam, type DatabaseConnection, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { Executor, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import type { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { ResourceKeySimple } from '@cloudbeaver/core-resource';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { formStateContext, type IFormStateInfo } from '@cloudbeaver/core-ui';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
-import { connectionFormConfigureContext } from './connectionFormConfigureContext';
-import type { ConnectionFormService } from './ConnectionFormService';
-import type { ConnectionFormMode, ConnectionFormType, IConnectionFormState, IConnectionFormSubmitData } from './IConnectionFormProps';
+import { connectionFormConfigureContext } from './connectionFormConfigureContext.js';
+import type { ConnectionFormService } from './ConnectionFormService.js';
+import type { ConnectionFormMode, ConnectionFormType, IConnectionFormState, IConnectionFormSubmitData } from './IConnectionFormProps.js';
 
 export class ConnectionFormState implements IConnectionFormState {
   mode: ConnectionFormMode;

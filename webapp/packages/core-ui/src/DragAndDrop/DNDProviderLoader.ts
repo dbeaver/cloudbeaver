@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const DNDProvider = importLazyComponent(() => import('./DNDProvider').then(m => m.DNDProvider));
+export const DNDProvider = importLazyComponent(() => import('./DNDProvider.js').then(m => m.DNDProvider));

@@ -30,14 +30,14 @@ import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connect
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { isSafari } from '@cloudbeaver/core-utils';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps';
-import { authTypes } from './authTypes';
+import type { IConnectionFormProps } from '../IConnectionFormProps.js';
+import { authTypes } from './authTypes.js';
 import styles from './SSH.module.css';
-import { SSHKeyUploader } from './SSHKeyUploader';
+import { SSHKeyUploader } from './SSHKeyUploader.js';
 
 interface Props extends IConnectionFormProps {
   handlerState: NetworkHandlerConfigInput;
