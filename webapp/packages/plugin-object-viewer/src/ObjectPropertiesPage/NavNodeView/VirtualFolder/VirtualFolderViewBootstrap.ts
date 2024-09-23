@@ -10,10 +10,10 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
-import { VirtualFolderUtils } from './VirtualFolderUtils';
+import { VirtualFolderUtils } from './VirtualFolderUtils.js';
 
-const VirtualFolderTab = importLazyComponent(() => import('./VirtualFolderTab').then(m => m.VirtualFolderTab));
-const VirtualFolderPanel = importLazyComponent(() => import('./VirtualFolderPanel').then(m => m.VirtualFolderPanel));
+const VirtualFolderTab = importLazyComponent(() => import('./VirtualFolderTab.js').then(m => m.VirtualFolderTab));
+const VirtualFolderPanel = importLazyComponent(() => import('./VirtualFolderPanel.js').then(m => m.VirtualFolderPanel));
 
 @injectable()
 export class VirtualFolderViewBootstrap extends Bootstrap {
@@ -24,7 +24,7 @@ export class VirtualFolderViewBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.navNodeViewService.addTransform({
       order: 2,
       tab: (nodeId, folderId) => {
@@ -67,6 +67,4 @@ export class VirtualFolderViewBootstrap extends Bootstrap {
       },
     });
   }
-
-  load(): void {}
 }

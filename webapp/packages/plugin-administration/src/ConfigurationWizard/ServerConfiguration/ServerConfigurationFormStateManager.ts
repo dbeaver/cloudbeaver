@@ -9,8 +9,8 @@ import { makeObservable, observable } from 'mobx';
 
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 
-import { ServerConfigurationFormService } from './ServerConfigurationFormService';
-import { ServerConfigurationFormState } from './ServerConfigurationFormState';
+import { ServerConfigurationFormService } from './ServerConfigurationFormService.js';
+import { ServerConfigurationFormState } from './ServerConfigurationFormState.js';
 
 @injectable()
 export class ServerConfigurationFormStateManager {

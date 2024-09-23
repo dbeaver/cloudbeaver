@@ -18,7 +18,7 @@ import {
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridContextMenuService } from './DataGridContextMenuService';
+import { DataGridContextMenuService } from './DataGridContextMenuService.js';
 
 @injectable()
 export class DataGridContextMenuCellEditingService {

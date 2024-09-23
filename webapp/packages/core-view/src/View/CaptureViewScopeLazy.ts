@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const CaptureViewScope = importLazyComponent(() => import('./CaptureViewScope').then(m => m.CaptureViewScope));
+export const CaptureViewScope = importLazyComponent(() => import('./CaptureViewScope.js').then(m => m.CaptureViewScope));

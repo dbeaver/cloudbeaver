@@ -7,7 +7,7 @@
  */
 import type { SqlResultSet } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataResult } from './IDatabaseDataResult';
+import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 
 export interface IDatabaseResultSet extends IDatabaseDataResult {
   totalCount: number | null;

@@ -15,13 +15,13 @@ import {
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
   DatabaseEditAction,
   DataViewerPresentationType,
-  IDatabaseDataModel,
+  type IDatabaseDataModel,
   isResultSetDataSource,
   ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { ACTION_SQL_GENERATE } from './actions/ACTION_SQL_GENERATE';
-import { ScriptPreviewService } from './ScriptPreview/ScriptPreviewService';
+import { ACTION_SQL_GENERATE } from './actions/ACTION_SQL_GENERATE.js';
+import { ScriptPreviewService } from './ScriptPreview/ScriptPreviewService.js';
 
 @injectable()
 export class GeneratorMenuBootstrap extends Bootstrap {
@@ -33,7 +33,7 @@ export class GeneratorMenuBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.menuService.addCreator({
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],

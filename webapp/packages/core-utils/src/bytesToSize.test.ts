@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from '@jest/globals';
 
-import { bytesToSize } from './bytesToSize';
+import { bytesToSize } from './bytesToSize.js';
 
 describe('Bytes to size', () => {
   test('should return "n/a" when "0" bytes are passed', () => {

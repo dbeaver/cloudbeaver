@@ -7,7 +7,7 @@
  */
 import { errorOf } from '@cloudbeaver/core-utils';
 
-import { GQLError } from './GQLError';
+import { GQLError } from './GQLError.js';
 
 interface IGraphQLResponse<T> {
   data: T | null;

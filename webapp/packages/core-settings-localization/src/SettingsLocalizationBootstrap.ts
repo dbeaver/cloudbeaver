@@ -10,7 +10,7 @@ import { type IReactionDisposer, reaction } from 'mobx';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 
-import { SettingsLocalizationService } from './SettingsLocalizationService';
+import { SettingsLocalizationService } from './SettingsLocalizationService.js';
 
 @injectable()
 export class SettingsLocalizationBootstrap extends Bootstrap {
@@ -24,7 +24,7 @@ export class SettingsLocalizationBootstrap extends Bootstrap {
     this.changeLanguage = this.changeLanguage.bind(this);
   }
 
-  register(): void {
+  override register(): void {
     this.localizationService.onChange.addHandler(this.changeLanguage);
     this.reactionDisposer = reaction(
       () => this.settingsLocalizationService.language,
@@ -37,7 +37,7 @@ export class SettingsLocalizationBootstrap extends Bootstrap {
     );
   }
 
-  dispose(): void {
+  override dispose(): void {
     this.localizationService.onChange.removeHandler(this.changeLanguage);
     if (this.reactionDisposer) {
       this.reactionDisposer();

@@ -11,7 +11,7 @@ import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-d
 import { DefaultNavigatorSettingsResource, PasswordPolicyResource, ProductInfoResource, ServerConfigResource } from '@cloudbeaver/core-root';
 import type { IFormState } from '@cloudbeaver/core-ui';
 
-import { ServerConfigurationFormPart } from './ServerConfigurationFormPart';
+import { ServerConfigurationFormPart } from './ServerConfigurationFormPart.js';
 
 const DATA_CONTEXT_SERVER_CONFIGURATION_FORM_PART = createDataContext<ServerConfigurationFormPart>('Server Configuration form Part');
 

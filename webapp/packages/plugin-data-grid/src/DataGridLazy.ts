@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const DataGrid = importLazyComponent(() => import('./DataGrid').then(m => m.DataGrid));
+export const DataGrid = importLazyComponent(() => import('./DataGrid.js').then(m => m.DataGrid));

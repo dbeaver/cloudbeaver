@@ -8,10 +8,10 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { FormContext, GroupTitle, PlaceholderComponent, Switch, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { FormContext, GroupTitle, type PlaceholderComponent, Switch, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { FeaturesResource } from '@cloudbeaver/core-root';
 
-import type { IConfigurationPlaceholderProps } from '../ServerConfigurationService';
+import type { IConfigurationPlaceholderProps } from '../ServerConfigurationService.js';
 
 export const ServerConfigurationFeaturesForm: PlaceholderComponent<IConfigurationPlaceholderProps> = observer(
   function ServerConfigurationFeaturesForm({ state: { serverConfig }, configurationWizard }) {

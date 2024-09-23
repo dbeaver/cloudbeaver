@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const ContextMenu = importLazyComponent(() => import('./ContextMenu').then(m => m.ContextMenu));
+export const ContextMenu = importLazyComponent(() => import('./ContextMenu.js').then(m => m.ContextMenu));

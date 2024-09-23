@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef } from 'react';
 
-import { s, useS } from '../index';
+import { s, useS } from '../index.js';
 import SlideBoxStyles from './SlideBox.module.css';
 import SlideBoxElementStyles from './SlideElement.module.css';
 import SlideBoxOverlayStyles from './SlideOverlay.module.css';

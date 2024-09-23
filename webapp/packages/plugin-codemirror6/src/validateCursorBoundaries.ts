@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ISelection } from './IReactCodemirrorProps';
+import type { ISelection } from './IReactCodemirrorProps.js';
 
 export function validateCursorBoundaries(selection: ISelection, documentLength: number): ISelection {
   return {

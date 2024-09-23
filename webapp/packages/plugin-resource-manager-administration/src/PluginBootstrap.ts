@@ -8,7 +8,7 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ServerConfigurationService } from '@cloudbeaver/plugin-administration';
 
-import { ResourceManagerSettings } from './ResourceManagerSettings';
+import { ResourceManagerSettings } from './ResourceManagerSettings.js';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -16,9 +16,9 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.serverConfigurationService.pluginsContainer.add(ResourceManagerSettings, 0);
   }
 
-  async load(): Promise<void> {}
+  override async load(): Promise<void> {}
 }

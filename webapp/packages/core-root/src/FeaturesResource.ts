@@ -9,10 +9,10 @@ import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
-import { GraphQLService, WebFeatureSet } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type WebFeatureSet } from '@cloudbeaver/core-sdk';
 
-import { EAdminPermission } from './EAdminPermission';
-import { SessionPermissionsResource } from './SessionPermissionsResource';
+import { EAdminPermission } from './EAdminPermission.js';
+import { SessionPermissionsResource } from './SessionPermissionsResource.js';
 
 export type ApplicationFeature = WebFeatureSet;
 

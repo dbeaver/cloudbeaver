@@ -9,13 +9,13 @@ import { observer } from 'mobx-react-lite';
 
 import { ENotificationType } from '@cloudbeaver/core-events';
 
-import { IconOrImage } from './IconOrImage';
-import { Link } from './Link';
-import { useTranslate } from './localization/useTranslate';
-import { s } from './s';
+import { IconOrImage } from './IconOrImage.js';
+import { Link } from './Link.js';
+import { useTranslate } from './localization/useTranslate.js';
+import { s } from './s.js';
 import style from './StatusMessage.module.css';
-import { useErrorDetails } from './useErrorDetails';
-import { useS } from './useS';
+import { useErrorDetails } from './useErrorDetails.js';
+import { useS } from './useS.js';
 
 interface Props {
   message?: string | string[] | null;

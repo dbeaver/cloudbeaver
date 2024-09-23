@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { getProgressPercent } from './getProgressPercent';
+import { getProgressPercent } from './getProgressPercent.js';
 
 describe('getProgressPercent', () => {
   it('calculates the correct percentage', () => {

@@ -7,11 +7,12 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
-import { GraphQLService, ServerConfigFragment, ServerConfigInput } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type ServerConfigFragment, type ServerConfigInput } from '@cloudbeaver/core-sdk';
+import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-import { DataSynchronizationQueue } from './DataSynchronization/DataSynchronizationQueue';
-import { DataSynchronizationService } from './DataSynchronization/DataSynchronizationService';
-import { ServerConfigEventHandler } from './ServerConfigEventHandler';
+import { DataSynchronizationQueue } from './DataSynchronization/DataSynchronizationQueue.js';
+import { DataSynchronizationService } from './DataSynchronization/DataSynchronizationService.js';
+import { ServerConfigEventHandler } from './ServerConfigEventHandler.js';
 
 export const FEATURE_GIT_ID = 'git';
 

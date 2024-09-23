@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ITypedConstructor } from './ITypedConstructor';
+import type { ITypedConstructor } from './ITypedConstructor.js';
 
 /**
  * there are no way in js to check that function is constructor. So we expect that <T> is object, not function

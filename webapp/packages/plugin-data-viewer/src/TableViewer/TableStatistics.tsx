@@ -9,9 +9,9 @@ import { observer } from 'mobx-react-lite';
 
 import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet';
-import { isResultSetDataSource, ResultSetDataSource } from '../ResultSet/ResultSetDataSource';
+import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
+import { type IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet.js';
+import { isResultSetDataSource, ResultSetDataSource } from '../ResultSet/ResultSetDataSource.js';
 import classes from './TableStatistics.module.css';
 
 interface Props {

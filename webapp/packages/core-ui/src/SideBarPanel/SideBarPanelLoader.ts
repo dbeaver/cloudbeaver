@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const SideBarPanel = importLazyComponent(() => import('./SideBarPanel').then(m => m.SideBarPanel));
+export const SideBarPanel = importLazyComponent(() => import('./SideBarPanel.js').then(m => m.SideBarPanel));

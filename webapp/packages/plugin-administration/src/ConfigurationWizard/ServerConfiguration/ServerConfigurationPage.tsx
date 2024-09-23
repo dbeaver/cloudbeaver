@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
+import { type AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
 import {
   ColoredContainer,
   ConfirmationDialog,
@@ -32,16 +32,16 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
-import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm';
-import { ServerConfigurationFeaturesForm } from './Form/ServerConfigurationFeaturesForm';
-import { ServerConfigurationInfoForm } from './Form/ServerConfigurationInfoForm';
-import { ServerConfigurationNavigatorViewForm } from './Form/ServerConfigurationNavigatorViewForm';
-import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecurityForm';
-import { getServerConfigurationFormPart } from './getServerConfigurationFormPart';
-import { ServerConfigurationDriversForm } from './ServerConfigurationDriversForm';
-import { ServerConfigurationFormStateManager } from './ServerConfigurationFormStateManager';
+import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm.js';
+import { ServerConfigurationFeaturesForm } from './Form/ServerConfigurationFeaturesForm.js';
+import { ServerConfigurationInfoForm } from './Form/ServerConfigurationInfoForm.js';
+import { ServerConfigurationNavigatorViewForm } from './Form/ServerConfigurationNavigatorViewForm.js';
+import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecurityForm.js';
+import { getServerConfigurationFormPart } from './getServerConfigurationFormPart.js';
+import { ServerConfigurationDriversForm } from './ServerConfigurationDriversForm.js';
+import { ServerConfigurationFormStateManager } from './ServerConfigurationFormStateManager.js';
 import style from './ServerConfigurationPage.module.css';
-import { ServerConfigurationService } from './ServerConfigurationService';
+import { ServerConfigurationService } from './ServerConfigurationService.js';
 
 export const ServerConfigurationPage: AdministrationItemContentComponent = observer(function ServerConfigurationPage({ configurationWizard }) {
   const translate = useTranslate();

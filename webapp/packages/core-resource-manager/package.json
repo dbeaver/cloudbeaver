@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/core-resource-manager",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

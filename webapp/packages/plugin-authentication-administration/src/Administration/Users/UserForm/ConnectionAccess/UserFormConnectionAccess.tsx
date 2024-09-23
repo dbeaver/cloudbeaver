@@ -23,6 +23,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import {
   compareConnectionsInfo,
+  ConnectionInfoOriginResource,
   ConnectionInfoProjectKey,
   ConnectionInfoResource,
   DBDriverResource,
@@ -34,9 +35,9 @@ import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 import { isDefined } from '@cloudbeaver/core-utils';
 
-import type { UserFormProps } from '../AdministrationUserFormService';
-import type { UserFormConnectionAccessPart } from './UserFormConnectionAccessPart';
-import { UserFormConnectionTableItem } from './UserFormConnectionTableItem';
+import type { UserFormProps } from '../AdministrationUserFormService.js';
+import type { UserFormConnectionAccessPart } from './UserFormConnectionAccessPart.js';
+import { UserFormConnectionTableItem } from './UserFormConnectionTableItem.js';
 
 export const UserFormConnectionAccess: TabContainerPanelComponent<UserFormProps> = observer(function UserFormConnectionAccess({ tabId }) {
   const translate = useTranslate();
@@ -44,16 +45,17 @@ export const UserFormConnectionAccess: TabContainerPanelComponent<UserFormProps>
   const driversResource = useService(DBDriverResource);
   const tabState = useTabState<UserFormConnectionAccessPart>();
   const projectLoader = useResource(UserFormConnectionAccess, ProjectInfoResource, CachedMapAllKey, { active: tab.selected });
-  const connectionsLoader = useResource(
-    UserFormConnectionAccess,
-    ConnectionInfoResource,
-    ConnectionInfoProjectKey(...projectLoader.data.filter(isGlobalProject).map(project => project.id)),
-    { active: tab.selected },
-  );
+  const key = ConnectionInfoProjectKey(...projectLoader.data.filter(isGlobalProject).map(project => project.id));
+  const connectionsLoader = useResource(UserFormConnectionAccess, ConnectionInfoResource, key, { active: tab.selected });
+  const connectionsOriginsLoader = useResource(UserFormConnectionAccess, ConnectionInfoOriginResource, key, { active: tab.selected });
 
   const connections = connectionsLoader.data.filter(isDefined).sort(compareConnectionsInfo);
-  const cloudExists = connections.some(isCloudConnection);
-  const localConnections = connections.filter(connection => !isCloudConnection(connection));
+  const connectionsOrigins = connectionsOriginsLoader.data.filter(isDefined);
+  const cloudExists = connectionsOrigins.some(connectionOrigin => isCloudConnection(connectionOrigin.origin));
+  const localConnectionsIds = new Set(
+    connectionsOrigins.filter(connection => !isCloudConnection(connection.origin)).map(connection => connection.id),
+  );
+  const localConnections = connections.filter(connection => localConnectionsIds.has(connection.id));
 
   useResource(
     UserFormConnectionAccess,

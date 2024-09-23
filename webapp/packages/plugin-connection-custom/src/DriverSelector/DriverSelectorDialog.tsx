@@ -13,9 +13,9 @@ import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
-import { DriverSelector } from './DriverSelector';
+import { DriverSelector } from './DriverSelector.js';
 import styles from './DriverSelectorDialog.module.css';
-import { useDriverSelectorDialog } from './useDriverSelectorDialog';
+import { useDriverSelectorDialog } from './useDriverSelectorDialog.js';
 
 export const DriverSelectorDialog: DialogComponent<null> = observer(function DriverSelectorDialog({ rejectDialog }) {
   const translate = useTranslate();

@@ -1,15 +1,5 @@
-query createUser(
-  $userId: ID!
-  $enabled: Boolean!
-  $authRole: String
-  $includeMetaParameters: Boolean!
-  $customIncludeOriginDetails: Boolean!
-  ) {
-  user: createUser(
-    userId: $userId
-    enabled: $enabled
-    authRole: $authRole
-  ) {
+query createUser($userId: ID!, $enabled: Boolean!, $authRole: String) {
+  user: createUser(userId: $userId, enabled: $enabled, authRole: $authRole) {
     ...AdminUserInfo
   }
 }

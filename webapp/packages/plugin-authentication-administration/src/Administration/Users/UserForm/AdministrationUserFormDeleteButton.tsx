@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { UsersResource } from '@cloudbeaver/core-authentication';
-import { Button, ButtonProps, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, type ButtonProps, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
-import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService';
-import { DeleteUserDialog } from './DeleteUserDialog';
-import { DisableUserDialog } from './DisableUserDialog';
+import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService.js';
+import { DeleteUserDialog } from './DeleteUserDialog.js';
+import { DisableUserDialog } from './DisableUserDialog.js';
 
 interface Props extends ButtonProps {
   userId: string;

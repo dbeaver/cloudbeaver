@@ -8,7 +8,7 @@
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 
-import { ADMINISTRATION_ITEM_USER_CREATE_PARAM } from './ADMINISTRATION_ITEM_USER_CREATE_PARAM';
+import { ADMINISTRATION_ITEM_USER_CREATE_PARAM } from './ADMINISTRATION_ITEM_USER_CREATE_PARAM.js';
 
 export enum EUsersAdministrationSub {
   Users = 'users',

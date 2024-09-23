@@ -11,10 +11,10 @@ import { useCallback } from 'react';
 import { TextPlaceholder, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ObjectPagePanelComponent } from '@cloudbeaver/plugin-object-viewer';
 
-import type { IDataViewerPageState } from '../IDataViewerPageState';
-import { TableViewerLoader } from '../TableViewer/TableViewerLoader';
+import type { IDataViewerPageState } from '../IDataViewerPageState.js';
+import { TableViewerLoader } from '../TableViewer/TableViewerLoader.js';
 import classes from './DataViewerPanel.module.css';
-import { useDataViewerPanel } from './useDataViewerPanel';
+import { useDataViewerPanel } from './useDataViewerPanel.js';
 
 export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = observer(function DataViewerPanel({ tab, page }) {
   const translate = useTranslate();
@@ -63,7 +63,7 @@ export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = o
 
   return (
     <TableViewerLoader
-      className={classes.tableViewerLoader}
+      className={classes['tableViewerLoader']}
       tableId={tab.handlerState.tableId}
       resultIndex={pageState?.resultIndex}
       presentationId={pageState?.presentationId}

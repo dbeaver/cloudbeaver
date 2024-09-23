@@ -8,7 +8,7 @@
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import { FormState } from '@cloudbeaver/core-ui';
 
-import type { ServerConfigurationFormService } from './ServerConfigurationFormService';
+import type { ServerConfigurationFormService } from './ServerConfigurationFormService.js';
 
 export class ServerConfigurationFormState extends FormState<null> {
   constructor(serviceProvider: IServiceProvider, service: ServerConfigurationFormService) {

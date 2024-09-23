@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from '@jest/globals';
 
-import { isValuesEqual } from './isValuesEqual';
+import { isValuesEqual } from './isValuesEqual.js';
 
 describe('Is values equal', () => {
   test('should return "true" when the identical strings are passed', () => {

@@ -11,5 +11,5 @@ export const manifest: PluginManifest = {
   info: {
     name: 'GIS Viewer plugin',
   },
-  providers: [() => import('./GISViewerBootstrap').then(m => m.GISViewerBootstrap), () => import('./LocaleService').then(m => m.LocaleService)],
+  providers: [() => import('./GISViewerBootstrap.js').then(m => m.GISViewerBootstrap), () => import('./LocaleService.js').then(m => m.LocaleService)],
 };

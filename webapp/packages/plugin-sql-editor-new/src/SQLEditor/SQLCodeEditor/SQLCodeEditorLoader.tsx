@@ -12,7 +12,7 @@ import { ComplexLoader, createComplexLoader } from '@cloudbeaver/core-blocks';
 import type { IDefaultExtensions, IEditorProps, IEditorRef } from '@cloudbeaver/plugin-codemirror6';
 
 const loader = createComplexLoader(async function loader() {
-  const { SQLCodeEditor } = await import('./SQLCodeEditor');
+  const { SQLCodeEditor } = await import('./SQLCodeEditor.js');
   return { SQLCodeEditor };
 });
 

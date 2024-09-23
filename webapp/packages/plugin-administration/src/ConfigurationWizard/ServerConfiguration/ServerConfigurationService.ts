@@ -11,8 +11,8 @@ import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { formValidationContext } from '@cloudbeaver/core-ui';
 
-import { IServerConfigurationFormPartState } from './IServerConfigurationFormPartState';
-import { ServerConfigurationFormService } from './ServerConfigurationFormService';
+import type { IServerConfigurationFormPartState } from './IServerConfigurationFormPartState.js';
+import { ServerConfigurationFormService } from './ServerConfigurationFormService.js';
 
 export interface IConfigurationPlaceholderProps {
   configurationWizard: boolean;

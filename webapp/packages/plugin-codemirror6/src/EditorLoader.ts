@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const EditorLoader = importLazyComponent(() => import('./Editor').then(m => m.Editor));
+export const EditorLoader = importLazyComponent(() => import('./Editor.js').then(m => m.Editor));

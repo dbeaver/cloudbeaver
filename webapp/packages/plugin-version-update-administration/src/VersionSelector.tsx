@@ -11,10 +11,10 @@ import { useEffect, useState } from 'react';
 import { Combobox, Container, Group, GroupItem, GroupTitle, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { IVersion, VersionResource } from '@cloudbeaver/core-version';
+import { type IVersion, VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
-import { VersionInfo } from './VersionInfo';
+import { VersionInfo } from './VersionInfo.js';
 import styles from './VersionSelector.module.css';
 
 interface Props {

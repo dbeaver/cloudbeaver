@@ -9,7 +9,7 @@ import type { PropsWithChildren } from 'react';
 
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 
-import type { ITabData } from '../TabsContainer/ITabsContainer';
+import type { ITabData } from '../TabsContainer/ITabsContainer.js';
 
 export type TabProps = PropsWithChildren<{
   tabId: string;

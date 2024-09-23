@@ -12,8 +12,8 @@ import { useDrop } from 'react-dnd';
 import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 
-import { DND_ELEMENT_TYPE } from './DND_ELEMENT_TYPE';
-import type { DNDAcceptType } from './DNDAcceptType';
+import { DND_ELEMENT_TYPE } from './DND_ELEMENT_TYPE.js';
+import type { DNDAcceptType } from './DNDAcceptType.js';
 
 interface IState {
   isOver: boolean;

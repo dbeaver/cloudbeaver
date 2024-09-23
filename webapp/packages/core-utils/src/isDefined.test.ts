@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from '@jest/globals';
 
-import { isDefined } from './isDefined';
+import { isDefined } from './isDefined.js';
 
 describe('Is defined', () => {
   test('should return "true" when "\'0\'" is passed', () => {

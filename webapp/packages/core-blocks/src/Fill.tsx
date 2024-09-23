@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import style from './Fill.module.css';
-import { s } from './s';
-import { useS } from './useS';
+import { s } from './s.js';
+import { useS } from './useS.js';
 
 interface Props {
   className?: string;

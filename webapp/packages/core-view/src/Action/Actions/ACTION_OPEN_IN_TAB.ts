@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { createAction } from '../createAction';
+import { createAction } from '../createAction.js';
 
 export const ACTION_OPEN_IN_TAB = createAction('open-in-tab', {
   label: 'ui_open_in_tab',

@@ -5,10 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IMenuPanel } from '../IMenuPanel';
-import { ComputedMenuItemModel, IComputedMenuItemOptions } from '../models/ComputedMenuItemModel';
-import { ComputedMenuPanelModel } from '../models/ComputedMenuPanelModel';
-import { MenuOptionsStore } from '../models/MenuOptionsStore';
+import type { IMenuPanel } from '../IMenuPanel.js';
+import { ComputedMenuItemModel, type IComputedMenuItemOptions } from '../models/ComputedMenuItemModel.js';
+import { ComputedMenuPanelModel } from '../models/ComputedMenuPanelModel.js';
+import { MenuOptionsStore } from '../models/MenuOptionsStore.js';
 
 /**
  * this class allows to store IComputedMenuItemOptions in a tree structure

@@ -11,8 +11,8 @@ import { CommonDialogHeader, CommonDialogWrapper, useResource, useTranslate } fr
 import { ConnectionInfoResource, ConnectionPublicSecretsResource, DBDriverResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
-import { DatabaseCredentialsAuthDialog } from './DatabaseCredentialsAuthDialog/DatabaseCredentialsAuthDialog';
-import { DatabaseSecretAuthDialog } from './DatabaseSecretAuthDialog/DatabaseSecretAuthDialog';
+import { DatabaseCredentialsAuthDialog } from './DatabaseCredentialsAuthDialog/DatabaseCredentialsAuthDialog.js';
+import { DatabaseSecretAuthDialog } from './DatabaseSecretAuthDialog/DatabaseSecretAuthDialog.js';
 
 interface Payload {
   connection: IConnectionInfoParams;

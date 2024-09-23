@@ -7,18 +7,18 @@
  */
 import React from 'react';
 
-import { TeamsResource } from '@cloudbeaver/core-authentication';
+import { TeamInfoMetaParametersResource, TeamsResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 
-import { teamContext } from '../Contexts/teamContext';
-import type { ITeamFormFillConfigData, ITeamFormSubmitData } from '../ITeamFormProps';
-import { TeamFormService } from '../TeamFormService';
+import { teamContext } from '../Contexts/teamContext.js';
+import type { ITeamFormFillConfigData, ITeamFormSubmitData } from '../ITeamFormProps.js';
+import { TeamFormService } from '../TeamFormService.js';
 
 const TeamOptions = React.lazy(async () => {
-  const { TeamOptions } = await import('./TeamOptions');
+  const { TeamOptions } = await import('./TeamOptions.js');
   return { default: TeamOptions };
 });
 
@@ -27,12 +27,13 @@ export class TeamOptionsTabService extends Bootstrap {
   constructor(
     private readonly teamFormService: TeamFormService,
     private readonly teamResource: TeamsResource,
+    private readonly teamsMetaParametersResource: TeamInfoMetaParametersResource,
     private readonly localizationService: LocalizationService,
   ) {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.teamFormService.tabsContainer.add({
       key: 'options',
       name: 'ui_options',
@@ -48,8 +49,6 @@ export class TeamOptionsTabService extends Bootstrap {
 
     this.teamFormService.fillConfigTask.addHandler(this.fillConfig.bind(this));
   }
-
-  load(): void {}
 
   private async prepareConfig({ state }: ITeamFormSubmitData, contexts: IExecutionContextProvider<ITeamFormSubmitData>) {
     const config = contexts.getContext(teamContext);
@@ -74,7 +73,7 @@ export class TeamOptionsTabService extends Bootstrap {
 
       for (const key of Object.keys(config.metaParameters)) {
         if (typeof config.metaParameters[key] === 'string') {
-          config.metaParameters[key] = config.metaParameters[key].trim();
+          config.metaParameters[key] = (config.metaParameters[key] as any).trim();
         }
       }
     }
@@ -102,17 +101,20 @@ export class TeamOptionsTabService extends Bootstrap {
 
   private async save({ state }: ITeamFormSubmitData, contexts: IExecutionContextProvider<ITeamFormSubmitData>) {
     const status = contexts.getContext(this.teamFormService.configurationStatusContext);
-    const config = contexts.getContext(teamContext);
+    const { metaParameters, ...config } = contexts.getContext(teamContext);
 
     const create = state.mode === 'create';
 
     try {
       if (create) {
         const team = await this.teamResource.createTeam(config);
+        await this.teamsMetaParametersResource.setMetaParameters(config.teamId, metaParameters);
+
         status.info('administration_teams_team_info_created');
         status.info(team.teamId);
       } else {
         const team = await this.teamResource.updateTeam(config);
+        await this.teamsMetaParametersResource.setMetaParameters(config.teamId, metaParameters);
 
         status.info('administration_teams_team_info_updated');
         status.info(team.teamId);

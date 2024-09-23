@@ -11,7 +11,7 @@ import { renderHook } from '@testing-library/react';
 import * as coreDi from '@cloudbeaver/core-di';
 import * as coreUtils from '@cloudbeaver/core-utils';
 
-import { useClipboard } from './useClipboard';
+import { useClipboard } from './useClipboard.js';
 
 jest.mock('@cloudbeaver/core-utils', () => ({
   copyToClipboard: jest.fn(),

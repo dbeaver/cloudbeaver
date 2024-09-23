@@ -10,8 +10,8 @@ import { useState } from 'react';
 import { TableColumnValue, TableItem } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
-import { Expand } from '../Expand';
-import { getPropertyValue } from '../getPropertyValue';
+import { Expand } from '../Expand.js';
+import { getPropertyValue } from '../getPropertyValue.js';
 import classes from './PropertiesPanelItemsGroup.module.css';
 
 interface Props {
@@ -25,15 +25,15 @@ export const PropertiesPanelItemsGroup: React.FC<Props> = function PropertiesPan
   return (
     <>
       <TableItem item={`${name}_root`} selectDisabled>
-        <TableColumnValue className={classes.tableColumnValue} title={name}>
-          <div className={classes.control}>
-            <div className={classes.expandContainer}>
+        <TableColumnValue className={classes['tableColumnValue']} title={name}>
+          <div className={classes['control']}>
+            <div className={classes['expandContainer']}>
               <Expand expanded={expanded} onClick={() => setExpanded(!expanded)} />
             </div>
             {name}
           </div>
         </TableColumnValue>
-        <TableColumnValue className={classes.tableColumnValue} />
+        <TableColumnValue className={classes['tableColumnValue']} />
       </TableItem>
       {expanded &&
         properties.map(property => {
@@ -42,10 +42,10 @@ export const PropertiesPanelItemsGroup: React.FC<Props> = function PropertiesPan
           const value = getPropertyValue(property);
           return (
             <TableItem key={property.id} item={property.id} selectDisabled>
-              <TableColumnValue className={classes.tableColumnValue} title={tooltip}>
+              <TableColumnValue className={classes['tableColumnValue']} title={tooltip}>
                 {'\t\t' + name}
               </TableColumnValue>
-              <TableColumnValue className={classes.tableColumnValue} title={value}>
+              <TableColumnValue className={classes['tableColumnValue']} title={value}>
                 {value}
               </TableColumnValue>
             </TableItem>

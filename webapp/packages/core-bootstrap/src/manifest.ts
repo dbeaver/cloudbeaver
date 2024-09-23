@@ -14,7 +14,7 @@ import { coreBrowserCookiesManifest } from '@cloudbeaver/core-browser-cookies';
 import { coreBrowserSettingsManifest } from '@cloudbeaver/core-browser-settings';
 import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreConnectionsManifest } from '@cloudbeaver/core-connections';
-import { coreDIManifest, PluginManifest } from '@cloudbeaver/core-di';
+import { coreDIManifest, type PluginManifest } from '@cloudbeaver/core-di';
 import { coreDialogsManifest } from '@cloudbeaver/core-dialogs';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';

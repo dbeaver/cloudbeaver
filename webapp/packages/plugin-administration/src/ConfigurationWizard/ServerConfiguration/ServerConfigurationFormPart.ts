@@ -11,11 +11,11 @@ import { DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { DefaultNavigatorSettingsResource, PasswordPolicyResource, ProductInfoResource, ServerConfigResource } from '@cloudbeaver/core-root';
-import { FormPart, IFormState } from '@cloudbeaver/core-ui';
+import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
-import { MIN_SESSION_EXPIRE_TIME } from './Form/MIN_SESSION_EXPIRE_TIME';
-import { IServerConfigurationFormPartState } from './IServerConfigurationFormPartState';
+import { MIN_SESSION_EXPIRE_TIME } from './Form/MIN_SESSION_EXPIRE_TIME.js';
+import type { IServerConfigurationFormPartState } from './IServerConfigurationFormPartState.js';
 
 function DEFAULT_STATE_GETTER(): IServerConfigurationFormPartState {
   return {
@@ -51,15 +51,15 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
     super(formState, DEFAULT_STATE_GETTER());
   }
 
-  isOutdated(): boolean {
+  override isOutdated(): boolean {
     return super.isOutdated() || this.serverConfigResource.isOutdated() || this.defaultNavigatorSettingsResource.isOutdated();
   }
 
-  isLoaded(): boolean {
+  override isLoaded(): boolean {
     return super.isLoaded() && this.serverConfigResource.isLoaded() && this.defaultNavigatorSettingsResource.isLoaded();
   }
 
-  protected async validate(
+  protected override async validate(
     data: IFormState<IServerConfigurationFormPartState>,
     contexts: IExecutionContextProvider<IFormState<IServerConfigurationFormPartState>>,
   ) {
@@ -79,7 +79,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
     }
   }
 
-  protected format() {
+  protected override format() {
     if (this.state.serverConfig.adminName) {
       this.state.serverConfig.adminName = this.state.serverConfig.adminName.trim();
     }
@@ -128,7 +128,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
       serverConfig: {
         adminName,
         adminPassword,
-        serverName: config?.name ?? productInfo?.name ?? '',
+        serverName: config?.name || productInfo?.name,
         serverURL: this.administrationScreenService.isConfigurationMode && !config?.distributed ? window.location.origin : (config?.serverURL ?? ''),
         sessionExpireTime: config?.sessionExpireTime ?? MIN_SESSION_EXPIRE_TIME * 1000 * 60,
         adminCredentialsSaveEnabled: config?.adminCredentialsSaveEnabled ?? false,

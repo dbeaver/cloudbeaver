@@ -7,9 +7,9 @@
  */
 import { useContext } from 'react';
 
-import { IDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
+import { type IDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 
-import { CaptureViewContext } from './CaptureViewContext';
+import { CaptureViewContext } from './CaptureViewContext.js';
 
 export function useCaptureViewContext(capture: (context: IDataContext, id: string) => void): void {
   const context = useContext(CaptureViewContext);

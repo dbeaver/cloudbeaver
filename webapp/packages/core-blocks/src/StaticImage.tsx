@@ -7,9 +7,9 @@
  */
 import { GlobalConstants, isValidUrl } from '@cloudbeaver/core-utils';
 
-import { s } from './s';
+import { s } from './s.js';
 import style from './StaticImage.module.css';
-import { useS } from './useS';
+import { useS } from './useS.js';
 
 interface Props {
   icon?: string;

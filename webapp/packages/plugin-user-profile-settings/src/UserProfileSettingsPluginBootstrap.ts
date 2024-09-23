@@ -14,7 +14,7 @@ import { ACTION_SETTINGS, ActionService, MenuService } from '@cloudbeaver/core-v
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 import { UserProfileOptionsPanelService, UserProfileTabsService } from '@cloudbeaver/plugin-user-profile';
 
-const UserProfileSettings = importLazyComponent(() => import('./UserProfileSettings').then(module => module.UserProfileSettings));
+const UserProfileSettings = importLazyComponent(() => import('./UserProfileSettings.js').then(module => module.UserProfileSettings));
 
 const SETTINGS_TAB_ID = 'settings';
 
@@ -31,7 +31,7 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.userProfileOptionsPanelService.onClose.addHandler(async (data, context) => {
       if (!this.userSettingsService.isEdited()) {
         return;

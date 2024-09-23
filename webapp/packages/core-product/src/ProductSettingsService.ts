@@ -25,7 +25,7 @@ export class ProductSettingsService extends SettingsSource {
     });
   }
 
-  has(key: any): boolean {
+  override has(key: any): boolean {
     return this.settings.has(key) || super.has(key) || false;
   }
 
@@ -37,7 +37,7 @@ export class ProductSettingsService extends SettingsSource {
     return this.settings.get(key);
   }
 
-  setValue(key: any, value: any): void {
+  override setValue(key: any, value: any): void {
     this.update(() => {
       this.settings.set(key, value);
     });
@@ -53,7 +53,7 @@ export class ProductSettingsService extends SettingsSource {
     });
   }
 
-  clear(): void {
+  override clear(): void {
     this.update(() => {
       super.clear();
       this.settings.clear();

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { errorOf } from '../errorOf';
+import { errorOf } from '../errorOf.js';
 
 export class PromiseCancelledError extends Error {
   constructor(message?: string, options?: ErrorOptions) {

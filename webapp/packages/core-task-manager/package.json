@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/core-task-manager",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

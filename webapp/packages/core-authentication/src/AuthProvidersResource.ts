@@ -17,10 +17,10 @@ import {
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { AuthProviderConfigurationInfoFragment, AuthProviderInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
+import { type AuthProviderConfigurationInfoFragment, type AuthProviderInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { AuthConfigurationsResource } from './AuthConfigurationsResource';
-import { AuthSettingsService } from './AuthSettingsService';
+import { AuthConfigurationsResource } from './AuthConfigurationsResource.js';
+import { AuthSettingsService } from './AuthSettingsService.js';
 
 export type AuthProvider = NonNullable<AuthProviderInfoFragment>;
 export type AuthProviderConfiguration = NonNullable<AuthProviderConfigurationInfoFragment>;

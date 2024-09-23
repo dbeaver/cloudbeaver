@@ -7,17 +7,21 @@
  */
 import { useState } from 'react';
 
-import type { TeamsResource } from '@cloudbeaver/core-authentication';
+import type { TeamInfoMetaParametersResource, TeamsResource } from '@cloudbeaver/core-authentication';
 import { useService } from '@cloudbeaver/core-di';
 
-import type { ITeamFormState } from './ITeamFormProps';
-import { TeamFormService } from './TeamFormService';
-import { TeamFormState } from './TeamFormState';
+import type { ITeamFormState } from './ITeamFormProps.js';
+import { TeamFormService } from './TeamFormService.js';
+import { TeamFormState } from './TeamFormState.js';
 
-export function useTeamFormState(resource: TeamsResource, configure?: (state: ITeamFormState) => any): ITeamFormState {
+export function useTeamFormState(
+  resource: TeamsResource,
+  teamInfoMetaParametersResource: TeamInfoMetaParametersResource,
+  configure?: (state: ITeamFormState) => any,
+): ITeamFormState {
   const service = useService(TeamFormService);
   const [state] = useState<ITeamFormState>(() => {
-    const state = new TeamFormState(service, resource);
+    const state = new TeamFormState(service, resource, teamInfoMetaParametersResource);
     configure?.(state);
 
     state.load();

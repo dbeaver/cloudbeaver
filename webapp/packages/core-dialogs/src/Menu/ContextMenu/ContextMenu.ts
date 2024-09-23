@@ -8,12 +8,12 @@
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import type { IMenuPanel } from '../IMenuPanel';
-import { ComputedContextMenuModel } from '../models/ComputedContextMenuModel';
-import { ComputedMenuItemModel, IComputedMenuItemOptions } from '../models/ComputedMenuItemModel';
-import { MenuItemType, MenuOptionsStore } from '../models/MenuOptionsStore';
-import type { IContextMenuItem } from './IContextMenuItem';
-import type { IMenuContext } from './IMenuContext';
+import type { IMenuPanel } from '../IMenuPanel.js';
+import { ComputedContextMenuModel } from '../models/ComputedContextMenuModel.js';
+import { ComputedMenuItemModel, type IComputedMenuItemOptions } from '../models/ComputedMenuItemModel.js';
+import { type MenuItemType, MenuOptionsStore } from '../models/MenuOptionsStore.js';
+import type { IContextMenuItem } from './IContextMenuItem.js';
+import type { IMenuContext } from './IMenuContext.js';
 
 /**
  * this class allows to store IContextMenuItem in a tree structure
@@ -93,7 +93,10 @@ class ComputedMenuItemOptionsWithContext<T> implements IComputedMenuItemOptions 
   keepMenuOpen?: boolean;
   iconGetter?: () => string | undefined;
 
-  constructor(private readonly options: IContextMenuItem<T>, private readonly context: IMenuContext<T>) {
+  constructor(
+    private readonly options: IContextMenuItem<T>,
+    private readonly context: IMenuContext<T>,
+  ) {
     // doesn't depend on context
     this.title = options.title;
     this.tooltip = options.tooltip;
@@ -143,5 +146,8 @@ class ContextMenuPanel implements IMenuPanel {
 
   private items?: ComputedMenuItemModel[];
 
-  constructor(public id: string, private readonly itemsGetter: () => ComputedMenuItemModel[]) {}
+  constructor(
+    public id: string,
+    private readonly itemsGetter: () => ComputedMenuItemModel[],
+  ) {}
 }

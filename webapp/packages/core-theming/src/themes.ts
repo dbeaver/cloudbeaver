@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ITheme } from './ThemeService';
+import type { ITheme } from './ThemeService.js';
 
 const emptyTheme = {};
 
@@ -28,4 +28,4 @@ export const themes: ITheme[] = [
   },
 ];
 
-export const DEFAULT_THEME_ID = themes[0].id;
+export const DEFAULT_THEME_ID = themes[0]!.id;

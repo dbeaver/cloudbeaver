@@ -12,7 +12,7 @@ import { AuthRolesResource } from '@cloudbeaver/core-authentication';
 import { Combobox, Filter, Group, IconOrImage, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import styles from './UsersTableFilters.module.css';
-import { IUserFilters, USER_ROLE_ALL, USER_STATUSES } from './useUsersTableFilters';
+import { type IUserFilters, USER_ROLE_ALL, USER_STATUSES } from './useUsersTableFilters.js';
 
 interface Props {
   filters: IUserFilters;

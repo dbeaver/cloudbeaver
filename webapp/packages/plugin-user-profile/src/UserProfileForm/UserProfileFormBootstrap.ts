@@ -9,9 +9,9 @@ import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { UserProfileTabsService } from '../UserProfileTabsService';
+import { UserProfileTabsService } from '../UserProfileTabsService.js';
 
-const UserProfileFormPanel = importLazyComponent(() => import('./UserProfileFormPanel').then(module => module.UserProfileFormPanel));
+const UserProfileFormPanel = importLazyComponent(() => import('./UserProfileFormPanel.js').then(module => module.UserProfileFormPanel));
 
 @injectable()
 export class UserProfileFormBootstrap extends Bootstrap {
@@ -22,7 +22,7 @@ export class UserProfileFormBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.userProfileTabsService.tabContainer.add({
       key: 'account',
       name: 'plugin_user_profile_account_title',

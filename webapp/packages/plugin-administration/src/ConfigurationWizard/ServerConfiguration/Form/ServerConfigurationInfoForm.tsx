@@ -10,8 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { Group, GroupTitle, InputField, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
-import type { IServerConfigurationPageState } from '../IServerConfigurationPageState';
-import { MIN_SESSION_EXPIRE_TIME } from './MIN_SESSION_EXPIRE_TIME';
+import type { IServerConfigurationPageState } from '../IServerConfigurationPageState.js';
+import { MIN_SESSION_EXPIRE_TIME } from './MIN_SESSION_EXPIRE_TIME.js';
 
 interface Props {
   state: IServerConfigurationPageState;

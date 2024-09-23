@@ -12,14 +12,14 @@ import type { DBObject } from '@cloudbeaver/core-navigation-tree';
 import type { RenderHeaderCellProps } from '@cloudbeaver/plugin-data-grid';
 
 import classes from './HeaderRenderer.module.css';
-import { TableContext } from './TableContext';
+import { TableContext } from './TableContext.js';
 
 export const HeaderRenderer = observer<RenderHeaderCellProps<DBObject>>(function HeaderRenderer(props) {
   const tableContext = useContext(TableContext);
   const dataColumn = tableContext.tableData?.columns.find(column => column.key === props.column.key);
 
   return (
-    <div className={classes.header} title={dataColumn?.description}>
+    <div className={classes['header']} title={dataColumn?.description}>
       {props.column.name}
     </div>
   );
