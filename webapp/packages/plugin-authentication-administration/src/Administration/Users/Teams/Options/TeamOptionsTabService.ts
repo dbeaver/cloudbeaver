@@ -13,12 +13,12 @@ import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 
-import { teamContext } from '../Contexts/teamContext';
-import type { ITeamFormFillConfigData, ITeamFormSubmitData } from '../ITeamFormProps';
-import { TeamFormService } from '../TeamFormService';
+import { teamContext } from '../Contexts/teamContext.js';
+import type { ITeamFormFillConfigData, ITeamFormSubmitData } from '../ITeamFormProps.js';
+import { TeamFormService } from '../TeamFormService.js';
 
 const TeamOptions = React.lazy(async () => {
-  const { TeamOptions } = await import('./TeamOptions');
+  const { TeamOptions } = await import('./TeamOptions.js');
   return { default: TeamOptions };
 });
 
@@ -32,7 +32,7 @@ export class TeamOptionsTabService extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.teamFormService.tabsContainer.add({
       key: 'options',
       name: 'ui_options',
@@ -48,8 +48,6 @@ export class TeamOptionsTabService extends Bootstrap {
 
     this.teamFormService.fillConfigTask.addHandler(this.fillConfig.bind(this));
   }
-
-  load(): void {}
 
   private async prepareConfig({ state }: ITeamFormSubmitData, contexts: IExecutionContextProvider<ITeamFormSubmitData>) {
     const config = contexts.getContext(teamContext);

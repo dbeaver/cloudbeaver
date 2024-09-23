@@ -7,11 +7,11 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, Loader, s, TableItemExpandProps, useS } from '@cloudbeaver/core-blocks';
+import { Container, Loader, s, type TableItemExpandProps, useS } from '@cloudbeaver/core-blocks';
 import { FormMode } from '@cloudbeaver/core-ui';
 
-import { AdministrationUserForm } from '../UserForm/AdministrationUserForm';
-import { useAdministrationUserFormState } from './useAdministrationUserFormState';
+import { AdministrationUserForm } from '../UserForm/AdministrationUserForm.js';
+import { useAdministrationUserFormState } from './useAdministrationUserFormState.js';
 import style from './UserEdit.module.css';
 
 export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit({ item, onClose }) {

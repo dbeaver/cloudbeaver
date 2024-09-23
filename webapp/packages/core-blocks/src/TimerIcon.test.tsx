@@ -10,7 +10,7 @@ import { queryByAttribute, waitFor } from '@testing-library/react';
 
 import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
-import { TimerIcon } from './TimerIcon';
+import { TimerIcon } from './TimerIcon.js';
 
 const app = createApp();
 

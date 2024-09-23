@@ -10,9 +10,9 @@ import { makeObservable, observable } from 'mobx';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 
-import { AdministrationUserFormService } from '../UserForm/AdministrationUserFormService';
-import { AdministrationUserFormState } from '../UserForm/AdministrationUserFormState';
-import { UsersAdministrationNavigationService } from '../UsersAdministrationNavigationService';
+import { AdministrationUserFormService } from '../UserForm/AdministrationUserFormService.js';
+import { AdministrationUserFormState } from '../UserForm/AdministrationUserFormState.js';
+import { UsersAdministrationNavigationService } from '../UsersAdministrationNavigationService.js';
 
 export interface IToolsContainerProps {
   param: string | null | undefined;

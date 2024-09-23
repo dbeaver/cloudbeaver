@@ -8,32 +8,32 @@
 import { action, comparer, computed, observable, reaction, toJS, untracked } from 'mobx';
 import { useContext, useDeferredValue, useEffect, useState } from 'react';
 
-import { IServiceConstructor, useService } from '@cloudbeaver/core-di';
+import { type IServiceConstructor, useService } from '@cloudbeaver/core-di';
 import {
   CachedDataResource,
-  CachedDataResourceGetter,
+  type CachedDataResourceGetter,
   CachedMapResource,
-  CachedMapResourceGetter,
-  CachedMapResourceListGetter,
-  CachedMapResourceLoader,
-  CachedMapResourceValue,
-  CachedResourceContext,
-  CachedResourceData,
-  CachedResourceKey,
-  IResource,
+  type CachedMapResourceGetter,
+  type CachedMapResourceListGetter,
+  type CachedMapResourceLoader,
+  type CachedMapResourceValue,
+  type CachedResourceContext,
+  type CachedResourceData,
+  type CachedResourceKey,
+  type IResource,
   isResourceKeyList,
   isResourceKeyListAlias,
   Resource,
-  ResourceKey,
+  type ResourceKey,
   ResourceKeyList,
   ResourceKeyListAlias,
 } from '@cloudbeaver/core-resource';
-import { ILoadableState, isArraysEqual, isContainsException, LoadingError } from '@cloudbeaver/core-utils';
+import { type ILoadableState, isArraysEqual, isContainsException, LoadingError } from '@cloudbeaver/core-utils';
 
-import { ErrorContext } from '../ErrorContext';
-import { getComputed } from '../getComputed';
-import { useObjectRef } from '../useObjectRef';
-import { useObservableRef } from '../useObservableRef';
+import { ErrorContext } from '../ErrorContext.js';
+import { getComputed } from '../getComputed.js';
+import { useObjectRef } from '../useObjectRef.js';
+import { useObservableRef } from '../useObservableRef.js';
 
 export interface ResourceKeyWithIncludes<TKey, TIncludes> {
   readonly key: TKey | null;

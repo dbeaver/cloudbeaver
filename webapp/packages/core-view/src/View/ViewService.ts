@@ -9,8 +9,8 @@ import { computed, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 
-import type { IActiveView } from './IActiveView';
-import type { IView } from './IView';
+import type { IActiveView } from './IActiveView.js';
+import type { IView } from './IView.js';
 
 @injectable()
 export class ViewService {

@@ -7,14 +7,14 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
+import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { TabList, TabListStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 
-import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
-import { PresentationTab } from './PresentationTab';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
+import { DataPresentationService, DataPresentationType } from '../../DataPresentationService.js';
+import { PresentationTab } from './PresentationTab.js';
 import styles from './shared/TablePresentationBar.module.css';
 import TablePresentationBarTab from './shared/TablePresentationBarTab.module.css';
 import TablePresentationBarTabList from './shared/TablePresentationBarTabList.module.css';

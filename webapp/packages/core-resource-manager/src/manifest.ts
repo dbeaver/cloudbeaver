@@ -13,11 +13,11 @@ export const resourceManagerManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
-    () => import('./SharedProjectsResource').then(m => m.SharedProjectsResource),
-    () => import('./ProjectPermissionsResource').then(m => m.ProjectPermissionsResource),
-    () => import('./ResourceManagerEventHandler').then(m => m.ResourceManagerEventHandler),
-    () => import('./ResourceManagerResource').then(m => m.ResourceManagerResource),
-    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./PluginBootstrap.js').then(m => m.PluginBootstrap),
+    () => import('./SharedProjectsResource.js').then(m => m.SharedProjectsResource),
+    () => import('./ProjectPermissionsResource.js').then(m => m.ProjectPermissionsResource),
+    () => import('./ResourceManagerEventHandler.js').then(m => m.ResourceManagerEventHandler),
+    () => import('./ResourceManagerResource.js').then(m => m.ResourceManagerResource),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
   ],
 };

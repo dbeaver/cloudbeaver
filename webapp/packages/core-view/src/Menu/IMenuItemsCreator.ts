@@ -7,9 +7,9 @@
  */
 import type { DataContextGetter, IDataContextProvider } from '@cloudbeaver/core-data-context';
 
-import type { IAction } from '../Action/IAction';
-import type { IMenu } from './IMenu';
-import type { IMenuItem } from './MenuItem/IMenuItem';
+import type { IAction } from '../Action/IAction.js';
+import type { IMenu } from './IMenu.js';
+import type { IMenuItem } from './MenuItem/IMenuItem.js';
 
 export type MenuCreatorItem = IMenuItem | IAction | IMenu;
 

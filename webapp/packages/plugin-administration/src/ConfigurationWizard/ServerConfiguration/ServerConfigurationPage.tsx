@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { AdministrationItemContentComponent, ConfigurationWizardService } from '@cloudbeaver/core-administration';
+import { type AdministrationItemContentComponent, ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import {
   ColoredContainer,
   ConfirmationDialog,
@@ -30,14 +30,14 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { DefaultNavigatorSettingsResource, ServerConfigResource } from '@cloudbeaver/core-root';
 
-import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm';
-import { ServerConfigurationFeaturesForm } from './Form/ServerConfigurationFeaturesForm';
-import { ServerConfigurationInfoForm } from './Form/ServerConfigurationInfoForm';
-import { ServerConfigurationNavigatorViewForm } from './Form/ServerConfigurationNavigatorViewForm';
-import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecurityForm';
-import { ServerConfigurationDriversForm } from './ServerConfigurationDriversForm';
+import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm.js';
+import { ServerConfigurationFeaturesForm } from './Form/ServerConfigurationFeaturesForm.js';
+import { ServerConfigurationInfoForm } from './Form/ServerConfigurationInfoForm.js';
+import { ServerConfigurationNavigatorViewForm } from './Form/ServerConfigurationNavigatorViewForm.js';
+import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecurityForm.js';
+import { ServerConfigurationDriversForm } from './ServerConfigurationDriversForm.js';
 import style from './ServerConfigurationPage.module.css';
-import { ServerConfigurationService } from './ServerConfigurationService';
+import { ServerConfigurationService } from './ServerConfigurationService.js';
 
 export const ServerConfigurationPage: AdministrationItemContentComponent = observer(function ServerConfigurationPage({ configurationWizard }) {
   const translate = useTranslate();

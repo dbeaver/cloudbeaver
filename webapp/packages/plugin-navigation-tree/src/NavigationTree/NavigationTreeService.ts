@@ -11,24 +11,24 @@ import {
   ConnectionInfoResource,
   ConnectionsManagerService,
   createConnectionParam,
-  IConnectionInfoParams,
+  type IConnectionInfoParams,
   NavNodeExtensionsService,
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { EObjectFeature, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import {
   CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageTargetKey,
-  ResourceKey,
+  type ResourceKey,
   resourceKeyList,
 } from '@cloudbeaver/core-resource';
 import { MetadataMap } from '@cloudbeaver/core-utils';
-import { ACTION_COLLAPSE_ALL, ACTION_FILTER, IActiveView, View } from '@cloudbeaver/core-view';
+import { ACTION_COLLAPSE_ALL, ACTION_FILTER, type IActiveView, View } from '@cloudbeaver/core-view';
 
-import { ACTION_LINK_OBJECT } from './ElementsTree/ACTION_LINK_OBJECT';
-import type { ITreeNodeState } from './ElementsTree/useElementsTree';
+import { ACTION_LINK_OBJECT } from './ElementsTree/ACTION_LINK_OBJECT.js';
+import type { ITreeNodeState } from './ElementsTree/useElementsTree.js';
 
 export interface INavigationNodeSelectionData {
   id: ResourceKey<string>;

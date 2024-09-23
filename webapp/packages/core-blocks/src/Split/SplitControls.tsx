@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { s } from '../s';
-import { useObjectRef } from '../useObjectRef';
-import { useS } from '../useS';
+import { s } from '../s.js';
+import { useObjectRef } from '../useObjectRef.js';
+import { useS } from '../useS.js';
 import SplitControlsStyles from './SplitControls.module.css';
-import { useSplit } from './useSplit';
+import { useSplit } from './useSplit.js';
 
 export const SplitControls: React.FC = function SplitControls() {
   const split = useSplit();

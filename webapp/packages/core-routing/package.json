@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/core-routing",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

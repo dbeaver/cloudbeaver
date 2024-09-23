@@ -10,12 +10,12 @@ import { useContext } from 'react';
 
 import { EventContext } from '@cloudbeaver/core-events';
 
-import { Checkbox } from '../../FormControls/Checkboxes/Checkbox';
-import { Loader } from '../../Loader/Loader';
-import { s } from '../../s';
-import { useS } from '../../useS';
-import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
-import { TreeNodeContext } from './TreeNodeContext';
+import { Checkbox } from '../../FormControls/Checkboxes/Checkbox.js';
+import { Loader } from '../../Loader/Loader.js';
+import { s } from '../../s.js';
+import { useS } from '../../useS.js';
+import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag.js';
+import { TreeNodeContext } from './TreeNodeContext.js';
 import style from './TreeNodeSelect.module.css';
 
 interface Props {

@@ -11,7 +11,7 @@ import { PermissionsResource } from '@cloudbeaver/core-administration';
 import { FieldCheckbox, Group, GroupTitle, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
-import type { ITeamFormProps } from '../ITeamFormProps';
+import type { ITeamFormProps } from '../ITeamFormProps.js';
 
 export const Permissions = observer<ITeamFormProps>(function Permissions({ state }) {
   const translate = useTranslate();

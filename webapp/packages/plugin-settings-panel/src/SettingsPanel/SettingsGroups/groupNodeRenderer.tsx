@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { INodeRenderer, Node, NodeComponent } from '@cloudbeaver/plugin-navigation-tree';
+import { type INodeRenderer, Node, type NodeComponent } from '@cloudbeaver/plugin-navigation-tree';
 
-import { GroupNodeControl } from './GroupNodeControl';
+import { GroupNodeControl } from './GroupNodeControl.js';
 
 export const groupNodeRenderer: INodeRenderer = () => GroupNodeRenderer;
 

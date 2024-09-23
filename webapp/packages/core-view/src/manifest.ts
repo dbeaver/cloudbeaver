@@ -13,10 +13,10 @@ export const manifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./Action/ActionService').then(m => m.ActionService),
-    () => import('./Action/KeyBinding/KeyBindingService').then(m => m.KeyBindingService),
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./Menu/MenuService').then(m => m.MenuService),
-    () => import('./View/ViewService').then(m => m.ViewService),
+    () => import('./Action/ActionService.js').then(m => m.ActionService),
+    () => import('./Action/KeyBinding/KeyBindingService.js').then(m => m.KeyBindingService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./Menu/MenuService.js').then(m => m.MenuService),
+    () => import('./View/ViewService.js').then(m => m.ViewService),
   ],
 };

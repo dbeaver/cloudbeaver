@@ -7,9 +7,9 @@
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 
-import { DATA_CONTEXT_NAV_NODE } from './DATA_CONTEXT_NAV_NODE';
-import { DATA_CONTEXT_NAV_NODES } from './DATA_CONTEXT_NAV_NODES';
-import type { NavNode } from './EntityTypes';
+import { DATA_CONTEXT_NAV_NODE } from './DATA_CONTEXT_NAV_NODE.js';
+import { DATA_CONTEXT_NAV_NODES } from './DATA_CONTEXT_NAV_NODES.js';
+import type { NavNode } from './EntityTypes.js';
 
 export function getNodesFromContext(context: IDataContextProvider): NavNode[] {
   const node = context.get(DATA_CONTEXT_NAV_NODE);

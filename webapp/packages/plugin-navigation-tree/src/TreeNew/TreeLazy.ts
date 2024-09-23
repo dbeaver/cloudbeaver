@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const Tree = importLazyComponent(() => import('./Tree').then(m => m.Tree));
+export const Tree = importLazyComponent(() => import('./Tree.js').then(m => m.Tree));

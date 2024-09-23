@@ -121,7 +121,7 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
 
         popupContent += '<table>';
         for (let i = 0; i < associatedValues.length; i++) {
-          const { key, value } = associatedValues[i];
+          const { key, value } = associatedValues[i]!;
 
           if (value === undefined || typeof value === 'object') {
             continue;
@@ -141,7 +141,7 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
       geoJSONLayerRef.clearLayers();
 
       for (let i = 0; i < geoJSON.length; i++) {
-        geoJSONLayerRef.addData(geoJSON[i]);
+        geoJSONLayerRef.addData(geoJSON[i]!);
       }
 
       const bounds = geoJSONLayerRef.getBounds();

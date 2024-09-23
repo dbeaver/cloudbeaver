@@ -9,13 +9,13 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
-import { isResultSetDataSource } from '../../ResultSet/ResultSetDataSource';
-import { DataValuePanelService } from '../../TableViewer/ValuePanel/DataValuePanelService';
-import { isImageValuePresentationAvailable } from './isImageValuePresentationAvailable';
+import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
+import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction.js';
+import { isResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
+import { DataValuePanelService } from '../../TableViewer/ValuePanel/DataValuePanelService.js';
+import { isImageValuePresentationAvailable } from './isImageValuePresentationAvailable.js';
 
-const ImageValuePresentation = importLazyComponent(() => import('./ImageValuePresentation').then(module => module.ImageValuePresentation));
+const ImageValuePresentation = importLazyComponent(() => import('./ImageValuePresentation.js').then(module => module.ImageValuePresentation));
 
 @injectable()
 export class ImageValuePresentationBootstrap extends Bootstrap {
@@ -23,7 +23,7 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.dataValuePanelService.add({
       key: 'image-presentation',
       options: {
@@ -45,7 +45,7 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
         if (activeElements.length > 0) {
           const view = source.getAction(context.resultIndex, ResultSetViewAction);
 
-          const firstSelectedCell = activeElements[0];
+          const firstSelectedCell = activeElements[0]!;
 
           const cellValue = view.getCellValue(firstSelectedCell);
 

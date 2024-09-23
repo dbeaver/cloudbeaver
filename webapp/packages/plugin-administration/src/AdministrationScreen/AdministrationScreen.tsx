@@ -14,9 +14,9 @@ import { useService } from '@cloudbeaver/core-di';
 import { EAdminPermission } from '@cloudbeaver/core-root';
 import type { ScreenComponent } from '@cloudbeaver/core-routing';
 
-import { Administration } from '../Administration/Administration';
-import { AdministrationTopAppBar } from './AdministrationTopAppBar/AdministrationTopAppBar';
-import type { IAdministrationScreenParams } from './IAdministrationScreenParams';
+import { Administration } from '../Administration/Administration.js';
+import { AdministrationTopAppBar } from './AdministrationTopAppBar/AdministrationTopAppBar.js';
+import type { IAdministrationScreenParams } from './IAdministrationScreenParams.js';
 
 export const AdministrationScreen: ScreenComponent<IAdministrationScreenParams> = observer(function AdministrationScreen() {
   const administrationScreenService = useService(AdministrationScreenService);

@@ -5,18 +5,18 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Connection, ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
+import { type Connection, ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
-import { EObjectFeature, NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { EObjectFeature, type NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { ContainerDataSource } from './ContainerDataSource';
-import { DatabaseDataModel } from './DatabaseDataModel/DatabaseDataModel';
-import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel';
-import { DatabaseDataAccessMode } from './DatabaseDataModel/IDatabaseDataSource';
-import { DataViewerService } from './DataViewerService';
-import { DataViewerSettingsService } from './DataViewerSettingsService';
-import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
+import { ContainerDataSource } from './ContainerDataSource.js';
+import { DatabaseDataModel } from './DatabaseDataModel/DatabaseDataModel.js';
+import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel.js';
+import { DatabaseDataAccessMode } from './DatabaseDataModel/IDatabaseDataSource.js';
+import { DataViewerService } from './DataViewerService.js';
+import { DataViewerSettingsService } from './DataViewerSettingsService.js';
+import { TableViewerStorageService } from './TableViewer/TableViewerStorageService.js';
 
 @injectable()
 export class DataViewerTableService {

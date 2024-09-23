@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const SqlEditor = importLazyComponent(() => import('./SqlEditor').then(m => m.SqlEditor));
+export const SqlEditor = importLazyComponent(() => import('./SqlEditor.js').then(m => m.SqlEditor));

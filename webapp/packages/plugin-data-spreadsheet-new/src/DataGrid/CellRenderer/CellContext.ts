@@ -10,7 +10,7 @@ import { createContext } from 'react';
 import type { IMouseHook } from '@cloudbeaver/core-blocks';
 import type { DatabaseEditChangeType, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
-import type { CellPosition } from '../../Editing/EditingContext';
+import type { CellPosition } from '../../Editing/EditingContext.js';
 
 export interface ICellContext {
   mouse: IMouseHook<HTMLDivElement>;

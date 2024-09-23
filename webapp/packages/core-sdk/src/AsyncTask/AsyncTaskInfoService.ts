@@ -8,9 +8,9 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { cancellableTimeout } from '@cloudbeaver/core-utils';
 
-import { GraphQLService } from '../GraphQLService';
-import type { AsyncTaskInfo } from '../sdk';
-import { AsyncTask } from './AsyncTask';
+import { GraphQLService } from '../GraphQLService.js';
+import type { AsyncTaskInfo } from '../sdk.js';
+import { AsyncTask } from './AsyncTask.js';
 
 const DELAY_BETWEEN_TRIES = 250;
 

@@ -10,16 +10,16 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 
-import { DatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction';
-import { DatabaseMetadataAction } from '../DatabaseDataModel/Actions/DatabaseMetadataAction';
-import { DATA_CONTEXT_DV_DDM } from '../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
-import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';
-import { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import { IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions';
-import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from '../TableViewer/TableFooter/TableFooterMenu/DATA_VIEWER_DATA_MODEL_ACTIONS_MENU';
-import { ACTION_COUNT_TOTAL_ELEMENTS } from './ACTION_COUNT_TOTAL_ELEMENTS';
-import { isResultSetDataModel } from './isResultSetDataModel';
-import { ResultSetDataSource } from './ResultSetDataSource';
+import { DatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';
+import { DatabaseMetadataAction } from '../DatabaseDataModel/Actions/DatabaseMetadataAction.js';
+import { DATA_CONTEXT_DV_DDM } from '../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
+import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX.js';
+import { type IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
+import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
+import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from '../TableViewer/TableFooter/TableFooterMenu/DATA_VIEWER_DATA_MODEL_ACTIONS_MENU.js';
+import { ACTION_COUNT_TOTAL_ELEMENTS } from './ACTION_COUNT_TOTAL_ELEMENTS.js';
+import { isResultSetDataModel } from './isResultSetDataModel.js';
+import { ResultSetDataSource } from './ResultSetDataSource.js';
 
 interface IResultSetActionsMetadata {
   totalCount: {

@@ -10,7 +10,7 @@ import { useContext, useDeferredValue } from 'react';
 
 import { getComputed, TreeNodeExpand } from '@cloudbeaver/core-blocks';
 
-import { ElementsTreeContext } from '../../ElementsTreeContext';
+import { ElementsTreeContext } from '../../ElementsTreeContext.js';
 
 interface Props {
   nodeId: string;

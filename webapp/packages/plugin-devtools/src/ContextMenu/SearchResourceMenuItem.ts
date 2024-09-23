@@ -8,7 +8,7 @@
 import type { IContextMenuItemProps } from '@cloudbeaver/core-ui';
 import { MenuCustomItem } from '@cloudbeaver/core-view';
 
-import { SearchResourceMenuItemComponent } from './SearchResourceMenuItemComponent';
+import { SearchResourceMenuItemComponent } from './SearchResourceMenuItemComponent.js';
 
 export class SearchResourceMenuItem extends MenuCustomItem<IContextMenuItemProps> {
   constructor() {

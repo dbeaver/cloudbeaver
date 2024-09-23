@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-data-viewer-result-set-grouping",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

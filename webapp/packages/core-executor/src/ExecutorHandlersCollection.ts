@@ -7,9 +7,9 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import type { IAsyncContextLoader, IContextLoader, ISyncContextLoader } from './IExecutionContext';
-import type { IExecutorHandler } from './IExecutorHandler';
-import type { ExecutorDataFilter, ExecutorDataMap, IChainLink, IExecutorHandlersCollection } from './IExecutorHandlersCollection';
+import type { IAsyncContextLoader, IContextLoader, ISyncContextLoader } from './IExecutionContext.js';
+import type { IExecutorHandler } from './IExecutorHandler.js';
+import type { ExecutorDataFilter, ExecutorDataMap, IChainLink, IExecutorHandlersCollection } from './IExecutorHandlersCollection.js';
 
 export class ExecutorHandlersCollection<T = void, TResult = any | Promise<any>> implements IExecutorHandlersCollection<T, TResult> {
   handlers: Array<IExecutorHandler<T, TResult>>;

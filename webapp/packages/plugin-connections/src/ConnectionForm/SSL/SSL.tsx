@@ -30,8 +30,8 @@ import type { NetworkHandlerConfigInput, NetworkHandlerDescriptor } from '@cloud
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { isSafari } from '@cloudbeaver/core-utils';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps';
-import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR';
+import type { IConnectionFormProps } from '../IConnectionFormProps.js';
+import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR.js';
 import styles from './SSL.module.css';
 
 interface Props extends IConnectionFormProps {

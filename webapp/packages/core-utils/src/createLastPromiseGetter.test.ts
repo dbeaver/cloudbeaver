@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { createLastPromiseGetter } from './createLastPromiseGetter';
+import { createLastPromiseGetter } from './createLastPromiseGetter.js';
 
 describe('createLastPromiseGetter', () => {
   const getter = createLastPromiseGetter<number>();

@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { TableItemGroupContext } from './TableItemGroupContext';
+import { TableItemGroupContext } from './TableItemGroupContext.js';
 
 export interface TableItemGroupProps extends React.PropsWithChildren {
   expanded?: boolean;

@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 
 import { getComputed, useFolderExplorer } from '@cloudbeaver/core-blocks';
 
-import type { IElementsTreeSettings } from './useElementsTree';
+import type { IElementsTreeSettings } from './useElementsTree.js';
 
 export function useElementsTreeFolderExplorer(baseRoot: string, settings: IElementsTreeSettings | undefined) {
   const folderExplorer = useFolderExplorer(baseRoot, {

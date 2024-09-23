@@ -13,8 +13,8 @@ export const coreSettingsUserManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./UserSettingsService').then(m => m.UserSettingsService),
-    () => import('./SettingsUserBootstrap').then(m => m.SettingsUserBootstrap),
-    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./UserSettingsService.js').then(m => m.UserSettingsService),
+    () => import('./SettingsUserBootstrap.js').then(m => m.SettingsUserBootstrap),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
   ],
 };

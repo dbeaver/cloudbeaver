@@ -10,11 +10,11 @@ import { useContext } from 'react';
 
 import { TreeNode } from '@cloudbeaver/core-blocks';
 
-import { TreeContext } from './contexts/TreeContext';
-import { TreeDataContext } from './contexts/TreeDataContext';
-import type { NodeComponent } from './INodeRenderer';
-import { NodeControl } from './NodeControl';
-import { useNodeDnD } from './useNodeDnD';
+import { TreeContext } from './contexts/TreeContext.js';
+import { TreeDataContext } from './contexts/TreeDataContext.js';
+import type { NodeComponent } from './INodeRenderer.js';
+import { NodeControl } from './NodeControl.js';
+import { useNodeDnD } from './useNodeDnD.js';
 
 export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight, controlRenderer, childrenRenderer }) {
   const tree = useContext(TreeContext)!;

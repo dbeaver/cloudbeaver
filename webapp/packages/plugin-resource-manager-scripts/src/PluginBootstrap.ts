@@ -13,10 +13,10 @@ import { SideBarPanelService } from '@cloudbeaver/core-ui';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_TOOLS } from '@cloudbeaver/plugin-tools-panel';
 
-import { ACTION_RESOURCE_MANAGER_SCRIPTS } from './Actions/ACTION_RESOURCE_MANAGER_SCRIPTS';
-import { ResourceManagerScriptsService } from './ResourceManagerScriptsService';
+import { ACTION_RESOURCE_MANAGER_SCRIPTS } from './Actions/ACTION_RESOURCE_MANAGER_SCRIPTS.js';
+import { ResourceManagerScriptsService } from './ResourceManagerScriptsService.js';
 
-const ResourceManagerScripts = importLazyComponent(() => import('./ResourceManagerScripts').then(m => m.ResourceManagerScripts));
+const ResourceManagerScripts = importLazyComponent(() => import('./ResourceManagerScripts.js').then(m => m.ResourceManagerScripts));
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -30,7 +30,7 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.registerMenu();
     this.sideBarPanelService.tabsContainer.add({
       key: 'resource-manager-scripts-tab',

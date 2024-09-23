@@ -8,15 +8,22 @@
 import { computed, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { AutoRunningTask, ISyncExecutor, ITask, SyncExecutor, whileTask } from '@cloudbeaver/core-executor';
+import { AutoRunningTask, type ISyncExecutor, type ITask, SyncExecutor, whileTask } from '@cloudbeaver/core-executor';
 import { CachedDataResource, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { SessionResource } from '@cloudbeaver/core-root';
-import { AuthInfo, AuthLogoutQuery, AuthStatus, GetActiveUserQueryVariables, GraphQLService, UserInfo } from '@cloudbeaver/core-sdk';
+import {
+  type AuthInfo,
+  type AuthLogoutQuery,
+  AuthStatus,
+  type GetActiveUserQueryVariables,
+  GraphQLService,
+  type UserInfo,
+} from '@cloudbeaver/core-sdk';
 
-import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
-import { AuthProviderService } from './AuthProviderService';
-import type { ELMRole } from './ELMRole';
-import type { IAuthCredentials } from './IAuthCredentials';
+import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
+import { AuthProviderService } from './AuthProviderService.js';
+import type { ELMRole } from './ELMRole.js';
+import type { IAuthCredentials } from './IAuthCredentials.js';
 
 export type UserInfoIncludes = GetActiveUserQueryVariables;
 
@@ -269,7 +276,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     }
   }
 
-  protected setData(data: UserInfo | null): void {
+  protected override setData(data: UserInfo | null): void {
     const prevUserId = this.getId();
     super.setData(data);
     const currentUserId = this.getId();

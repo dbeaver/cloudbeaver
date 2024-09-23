@@ -8,7 +8,7 @@
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { renderHook } from '@testing-library/react';
 
-import { IScrollState, useControlledScroll } from './useControlledScroll';
+import { type IScrollState, useControlledScroll } from './useControlledScroll.js';
 
 describe('useControlledScroll', () => {
   let element: HTMLDivElement;

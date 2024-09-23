@@ -8,13 +8,13 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import type { TeamInfo, TeamsResource } from '@cloudbeaver/core-authentication';
-import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { teamFormConfigureContext } from './Contexts/teamFormConfigureContext';
-import { ITeamFormStateInfo, teamFormStateContext } from './Contexts/teamFormStateContext';
-import type { ITeamFormState, ITeamFormSubmitData, TeamFormMode } from './ITeamFormProps';
-import type { TeamFormService } from './TeamFormService';
+import { teamFormConfigureContext } from './Contexts/teamFormConfigureContext.js';
+import { type ITeamFormStateInfo, teamFormStateContext } from './Contexts/teamFormStateContext.js';
+import type { ITeamFormState, ITeamFormSubmitData, TeamFormMode } from './ITeamFormProps.js';
+import type { TeamFormService } from './TeamFormService.js';
 
 export class TeamFormState implements ITeamFormState {
   mode: TeamFormMode;

@@ -24,9 +24,9 @@ import {
 } from '@cloudbeaver/core-resource';
 import { DetailsError, GraphQLService } from '@cloudbeaver/core-sdk';
 
-import type { DBObject } from './EntityTypes';
-import { NavNodeInfoResource } from './NavNodeInfoResource';
-import { NavTreeResource } from './NavTreeResource';
+import type { DBObject } from './EntityTypes.js';
+import { NavNodeInfoResource } from './NavNodeInfoResource.js';
+import { NavTreeResource } from './NavTreeResource.js';
 
 export const DBObjectParentKey = resourceKeyListAliasFactory('@db-object/parent', (parentId: string) => ({ parentId }));
 

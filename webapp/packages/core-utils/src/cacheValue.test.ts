@@ -7,7 +7,7 @@
  */
 import { describe, expect, it, jest } from '@jest/globals';
 
-import { cacheValue } from './cacheValue';
+import { cacheValue } from './cacheValue.js';
 
 describe('cacheValue', () => {
   it('should return cached value', () => {

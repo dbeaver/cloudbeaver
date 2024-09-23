@@ -11,9 +11,9 @@ import { injectable } from '@cloudbeaver/core-di';
 import { PRODUCT_SETTINGS_LAYER } from '@cloudbeaver/core-product';
 import { createSettingsLayer, SettingsSource } from '@cloudbeaver/core-settings';
 
-import { EAdminPermission } from '../EAdminPermission';
-import { ServerConfigResource } from '../ServerConfigResource';
-import { SessionPermissionsResource } from '../SessionPermissionsResource';
+import { EAdminPermission } from '../EAdminPermission.js';
+import { ServerConfigResource } from '../ServerConfigResource.js';
+import { SessionPermissionsResource } from '../SessionPermissionsResource.js';
 
 export const SERVER_SETTINGS_LAYER = createSettingsLayer(PRODUCT_SETTINGS_LAYER, 'server');
 
@@ -38,7 +38,7 @@ export class ServerSettingsService extends SettingsSource {
     });
   }
 
-  has(key: any): boolean {
+  override has(key: any): boolean {
     return this.settings.has(key) || super.has(key);
   }
 
@@ -50,7 +50,7 @@ export class ServerSettingsService extends SettingsSource {
     return this.settings.get(key);
   }
 
-  clear(): void {
+  override clear(): void {
     this.update(() => {
       super.clear();
       this.settings.clear();

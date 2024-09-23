@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { TeamMetaParametersResource } from '@cloudbeaver/core-authentication';
 import { Group, GroupTitle, ObjectPropertyInfoForm, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 
-import type { ITeamFormState } from '../ITeamFormProps';
+import type { ITeamFormState } from '../ITeamFormProps.js';
 
 interface IProps {
   state: ITeamFormState;

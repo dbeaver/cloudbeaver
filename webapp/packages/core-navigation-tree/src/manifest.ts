@@ -13,12 +13,12 @@ export const coreNavigationTree: PluginManifest = {
   },
 
   providers: [
-    () => import('./NavTreeSettingsService').then(m => m.NavTreeSettingsService),
-    () => import('./NodesManager/NavNodeManagerService').then(m => m.NavNodeManagerService),
-    () => import('./NodesManager/DBObjectResource').then(m => m.DBObjectResource),
-    () => import('./NodesManager/NavNodeInfoResource').then(m => m.NavNodeInfoResource),
-    () => import('./NodesManager/NavTreeResource').then(m => m.NavTreeResource),
-    () => import('./NodesManager/ProjectsNavNodeService').then(m => m.ProjectsNavNodeService),
-    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./NavTreeSettingsService.js').then(m => m.NavTreeSettingsService),
+    () => import('./NodesManager/NavNodeManagerService.js').then(m => m.NavNodeManagerService),
+    () => import('./NodesManager/DBObjectResource.js').then(m => m.DBObjectResource),
+    () => import('./NodesManager/NavNodeInfoResource.js').then(m => m.NavNodeInfoResource),
+    () => import('./NodesManager/NavTreeResource.js').then(m => m.NavTreeResource),
+    () => import('./NodesManager/ProjectsNavNodeService.js').then(m => m.ProjectsNavNodeService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
   ],
 };

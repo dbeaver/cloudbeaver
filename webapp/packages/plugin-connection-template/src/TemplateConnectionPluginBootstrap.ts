@@ -14,11 +14,11 @@ import { CachedMapAllKey, getCachedDataResourceLoaderState, getCachedMapResource
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
-import { ACTION_CONNECTION_TEMPLATE } from './Actions/ACTION_CONNECTION_TEMPLATE';
-import { TemplateConnectionsResource } from './TemplateConnectionsResource';
-import { TemplateConnectionsService } from './TemplateConnectionsService';
+import { ACTION_CONNECTION_TEMPLATE } from './Actions/ACTION_CONNECTION_TEMPLATE.js';
+import { TemplateConnectionsResource } from './TemplateConnectionsResource.js';
+import { TemplateConnectionsService } from './TemplateConnectionsService.js';
 
-const ConnectionDialog = importLazyComponent(() => import('./ConnectionDialog/ConnectionDialog').then(m => m.ConnectionDialog));
+const ConnectionDialog = importLazyComponent(() => import('./ConnectionDialog/ConnectionDialog.js').then(m => m.ConnectionDialog));
 
 @injectable()
 export class TemplateConnectionPluginBootstrap extends Bootstrap {
@@ -35,7 +35,7 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.menuService.addCreator({
       menus: [MENU_CONNECTIONS],
       getItems: (context, items) => [...items, ACTION_CONNECTION_TEMPLATE],

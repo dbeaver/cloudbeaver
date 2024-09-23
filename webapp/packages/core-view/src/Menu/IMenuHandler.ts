@@ -8,8 +8,8 @@
 import type { DataContextGetter, IDataContextProvider } from '@cloudbeaver/core-data-context';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
-import type { IMenu } from './IMenu';
-import type { MenuSubMenuItemIconComponent } from './MenuItem/IMenuSubMenuItem';
+import type { IMenu } from './IMenu.js';
+import type { MenuSubMenuItemIconComponent } from './MenuItem/IMenuSubMenuItem.js';
 
 export interface IMenuHandler<TExtraProps = unknown> {
   id: string;

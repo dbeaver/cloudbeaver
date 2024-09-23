@@ -8,8 +8,8 @@
 import type { INodeNavigationContext } from '@cloudbeaver/core-navigation-tree';
 import type { ITab, ITabNavigationContext } from '@cloudbeaver/plugin-navigation-tabs';
 
-import type { IObjectViewerTabState } from './IObjectViewerTabState';
-import type { ObjectPage } from './ObjectPage/ObjectPage';
+import type { IObjectViewerTabState } from './IObjectViewerTabState.js';
+import type { ObjectPage } from './ObjectPage/ObjectPage.js';
 
 export interface IObjectViewerTabContext {
   isSupported: boolean;

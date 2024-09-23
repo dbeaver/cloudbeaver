@@ -10,8 +10,8 @@ import { useCallback } from 'react';
 
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 
-import type { IObjectViewerTabState } from '../IObjectViewerTabState';
-import type { ObjectPage } from './ObjectPage';
+import type { IObjectViewerTabState } from '../IObjectViewerTabState.js';
+import type { ObjectPage } from './ObjectPage.js';
 
 interface IProps {
   tab: ITab<IObjectViewerTabState>;

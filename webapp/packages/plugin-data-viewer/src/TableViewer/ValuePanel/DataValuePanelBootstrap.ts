@@ -9,12 +9,12 @@ import React from 'react';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { DatabaseDataResultAction } from '../../DatabaseDataModel/Actions/DatabaseDataResultAction';
-import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
-import { DataValuePanelService } from './DataValuePanelService';
+import { DatabaseDataResultAction } from '../../DatabaseDataModel/Actions/DatabaseDataResultAction.js';
+import { DataPresentationService, DataPresentationType } from '../../DataPresentationService.js';
+import { DataValuePanelService } from './DataValuePanelService.js';
 
 export const ValuePanel = React.lazy(async () => {
-  const { ValuePanel } = await import('./ValuePanel');
+  const { ValuePanel } = await import('./ValuePanel.js');
   return { default: ValuePanel };
 });
 
@@ -27,7 +27,7 @@ export class DataValuePanelBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.dataPresentationService.add({
       id: 'value-text-presentation',
       type: DataPresentationType.toolsPanel,

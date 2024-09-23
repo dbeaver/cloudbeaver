@@ -9,9 +9,9 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { CachedResource } from '@cloudbeaver/core-resource';
 
-import { ServerConfigResource } from './ServerConfigResource';
-import { ServerLicenseStatusResource } from './ServerLicenseStatusResource';
-import { SessionPermissionsResource } from './SessionPermissionsResource';
+import { ServerConfigResource } from './ServerConfigResource.js';
+import { ServerLicenseStatusResource } from './ServerLicenseStatusResource.js';
+import { SessionPermissionsResource } from './SessionPermissionsResource.js';
 
 export enum EPermission {}
 
