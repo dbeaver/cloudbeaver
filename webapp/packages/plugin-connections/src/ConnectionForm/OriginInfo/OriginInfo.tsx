@@ -53,7 +53,9 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   const providerLoader = useResource(OriginInfo, AuthProvidersResource, providerId);
   const connectionId = tab.selected && info ? createConnectionParam(info.projectId, info.id) : null;
 
-  const connectionOriginDetailsResource = useResource(OriginInfo, ConnectionInfoOriginDetailsResource, connectionId);
+  const connectionOriginDetailsResource = useResource(OriginInfo, ConnectionInfoOriginDetailsResource, connectionId, {
+    active: isAuthenticated,
+  });
   const connection = useResource(OriginInfo, resource, connectionId, {
     active: isAuthenticated,
     onData: connection => {

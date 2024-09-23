@@ -95,6 +95,7 @@ export class ConnectionFormState implements IConnectionFormState {
   }
 
   readonly resource: ConnectionInfoResource;
+  readonly originResource: ConnectionInfoOriginResource;
   readonly service: ConnectionFormService;
   readonly submittingTask: IExecutor<IConnectionFormSubmitData>;
   readonly closeTask: IExecutor;
@@ -110,12 +111,13 @@ export class ConnectionFormState implements IConnectionFormState {
     private readonly projectInfoResource: ProjectInfoResource,
     service: ConnectionFormService,
     resource: ConnectionInfoResource,
-    private readonly originResource: ConnectionInfoOriginResource,
+    originResource: ConnectionInfoOriginResource,
   ) {
     this._id = uuid();
     this.initError = null;
 
     this.resource = resource;
+    this.originResource = originResource;
     this.projectId = null;
     this.config = {};
     this._availableDrivers = [];
@@ -335,5 +337,6 @@ export class ConnectionFormState implements IConnectionFormState {
     }
 
     await data.resource.load(key, configuration.connectionIncludes);
+    await this.originResource.load(key);
   }
 }

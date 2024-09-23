@@ -7,7 +7,7 @@
  */
 import { useEffect, useState } from 'react';
 
-import type { ConnectionInfoOriginResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoOriginResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 
