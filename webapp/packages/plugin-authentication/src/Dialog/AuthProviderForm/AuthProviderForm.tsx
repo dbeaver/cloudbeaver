@@ -24,7 +24,7 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({ prov
     credentials.credentials = {};
   }
 
-  const profile = provider.credentialProfiles[credentials.profile as any as number];
+  const profile = provider.credentialProfiles[credentials.profile as any as number]!;
 
   return (
     <Group ref={elementRef} gap small center>

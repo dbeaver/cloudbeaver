@@ -12,8 +12,8 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { DetailsError } from '@cloudbeaver/core-sdk';
 import { errorOf, LoadingError } from '@cloudbeaver/core-utils';
 
-import { ErrorDetailsDialog } from './ErrorDetailsDialog/ErrorDetailsDialog';
-import { useTranslate } from './localization/useTranslate';
+import { ErrorDetailsDialog } from './ErrorDetailsDialog/ErrorDetailsDialog.js';
+import { useTranslate } from './localization/useTranslate.js';
 
 interface IErrorDetailsHook {
   name?: string;

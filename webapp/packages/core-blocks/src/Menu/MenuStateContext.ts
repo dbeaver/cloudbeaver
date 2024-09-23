@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { createContext } from 'react';
-import type { MenuStateReturn } from 'reakit/ts';
+import type { MenuStateReturn } from 'reakit';
 
 export type IMenuState = MenuStateReturn;
 

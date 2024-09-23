@@ -8,15 +8,15 @@
 import { makeObservable, observable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { ActionSnackbar, ActionSnackbarProps, PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { ActionSnackbar, type ActionSnackbarProps, PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { ENotificationType, INotification, NotificationService } from '@cloudbeaver/core-events';
-import { Executor, ExecutorInterrupter, IExecutor, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { ENotificationType, type INotification, NotificationService } from '@cloudbeaver/core-events';
+import { Executor, ExecutorInterrupter, type IExecutor, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import { DefaultNavigatorSettingsResource, ProductInfoResource, ServerConfigResource, SessionDataResource } from '@cloudbeaver/core-root';
 
-import { ADMINISTRATION_SERVER_CONFIGURATION_ITEM } from './ADMINISTRATION_SERVER_CONFIGURATION_ITEM';
-import type { IServerConfigurationPageState } from './IServerConfigurationPageState';
+import { ADMINISTRATION_SERVER_CONFIGURATION_ITEM } from './ADMINISTRATION_SERVER_CONFIGURATION_ITEM.js';
+import type { IServerConfigurationPageState } from './IServerConfigurationPageState.js';
 
 export interface IConfigurationPlaceholderProps {
   configurationWizard: boolean;

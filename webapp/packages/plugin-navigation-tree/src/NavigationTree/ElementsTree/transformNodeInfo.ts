@@ -7,8 +7,8 @@
  */
 import type { NavNode } from '@cloudbeaver/core-navigation-tree';
 
-import type { INavTreeNodeInfo } from './INavTreeNodeInfo';
-import type { IElementsTreeCustomNodeInfo } from './useElementsTree';
+import type { INavTreeNodeInfo } from './INavTreeNodeInfo.js';
+import type { IElementsTreeCustomNodeInfo } from './useElementsTree.js';
 
 export function transformNodeInfo(node: NavNode, transformers: IElementsTreeCustomNodeInfo[]): INavTreeNodeInfo {
   return transformers.reduce((info, transformer) => transformer(node.id, info), {

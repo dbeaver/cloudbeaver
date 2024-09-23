@@ -8,7 +8,7 @@
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import type { ILoadableState, MetadataMap, MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
 
-import type { TabProps } from '../Tab/TabProps';
+import type { TabProps } from '../Tab/TabProps.js';
 
 export interface ITabData<T = void> {
   tabId: string;

@@ -8,10 +8,10 @@
 import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
-import type { ISynchronizationMessage, ISynchronizationMessageResolveCallback } from './ISynchronizationMessage';
-import { SynchronizationMessage } from './SynchronizationMessage';
+import type { ISynchronizationMessage, ISynchronizationMessageResolveCallback } from './ISynchronizationMessage.js';
+import { SynchronizationMessage } from './SynchronizationMessage.js';
 
 @injectable()
 export class DataSynchronizationService {

@@ -45,7 +45,7 @@ export const GrantedUsersTableItem = observer<Props>(function GrantedUsersTableI
         <TableItemSelect disabled={disabled} />
       </TableColumnValue>
       <TableColumnValue>
-        <StaticImage className={classes.staticImage} icon={icon} title={iconTooltip} />
+        <StaticImage className={classes['staticImage']} icon={icon} title={iconTooltip} />
       </TableColumnValue>
       <TableColumnValue>{name}</TableColumnValue>
       {teamRoles.length > 0 && (

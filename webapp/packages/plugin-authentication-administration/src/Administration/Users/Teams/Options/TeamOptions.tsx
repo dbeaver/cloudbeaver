@@ -11,9 +11,9 @@ import { Container, Group, InputField, Textarea, useResource, useTranslate } fro
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
-import type { ITeamFormProps } from '../ITeamFormProps';
-import { Permissions } from './Permissions';
-import { TeamMetaParameters } from './TeamMetaParameters';
+import type { ITeamFormProps } from '../ITeamFormProps.js';
+import { Permissions } from './Permissions.js';
+import { TeamMetaParameters } from './TeamMetaParameters.js';
 
 export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(function TeamOptions({ state }) {
   const serverConfigResource = useResource(TeamOptions, ServerConfigResource, undefined);

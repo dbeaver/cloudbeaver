@@ -8,9 +8,9 @@
 import { Fill, PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
-import { AppStateMenu } from './AppStateMenu/AppStateMenu';
-import { Logo } from './Logo';
-import { MainMenu } from './MainMenu/MainMenu';
+import { AppStateMenu } from './AppStateMenu/AppStateMenu.js';
+import { Logo } from './Logo.js';
+import { MainMenu } from './MainMenu/MainMenu.js';
 
 @injectable()
 export class TopNavService {

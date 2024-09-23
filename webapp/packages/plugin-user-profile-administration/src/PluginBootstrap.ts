@@ -15,9 +15,7 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.administrationTopAppBarService.placeholder.add(UserMenu, 4);
   }
-
-  load(): void {}
 }

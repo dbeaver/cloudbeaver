@@ -7,6 +7,6 @@
  */
 import { createSettingsLayer } from '@cloudbeaver/core-settings';
 
-import { SERVER_SETTINGS_LAYER } from './ServerSettingsService';
+import { SERVER_SETTINGS_LAYER } from './ServerSettingsService.js';
 
 export const SESSION_SETTINGS_LAYER = createSettingsLayer(SERVER_SETTINGS_LAYER, 'session');

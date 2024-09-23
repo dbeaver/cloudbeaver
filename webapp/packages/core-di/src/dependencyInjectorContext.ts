@@ -7,7 +7,7 @@
  */
 import type { ISyncContextLoader } from '@cloudbeaver/core-executor';
 
-import type { IServiceConstructor } from './IApp';
+import type { IServiceConstructor } from './IApp.js';
 
 export const dependencyInjectorContext: ISyncContextLoader<<T>(ctor: IServiceConstructor<T>) => T> = function dependencyInjectorContext() {
   throw new Error('Implementation not provided \n Use addContextCreator to add addDIContext implementation to context');

@@ -8,8 +8,8 @@
 import { action, observable } from 'mobx';
 import { useLayoutEffect } from 'react';
 
-import { useObjectRef } from './useObjectRef';
-import { useObservableRef } from './useObservableRef';
+import { useObjectRef } from './useObjectRef.js';
+import { useObservableRef } from './useObservableRef.js';
 
 interface FocusOptions {
   autofocus?: boolean;

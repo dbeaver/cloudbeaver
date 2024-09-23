@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const DataImportDialogLazy = importLazyComponent(() => import('./DataImportDialog').then(m => m.DataImportDialog));
+export const DataImportDialogLazy = importLazyComponent(() => import('./DataImportDialog.js').then(m => m.DataImportDialog));

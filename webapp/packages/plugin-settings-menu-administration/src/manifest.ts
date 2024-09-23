@@ -9,5 +9,5 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 export const settingsMenuAdministrationPlugin: PluginManifest = {
   info: { name: 'Settings menu administration plugin' },
-  providers: [() => import('./PluginBootstrap').then(m => m.PluginBootstrap)],
+  providers: [() => import('./PluginBootstrap.js').then(m => m.PluginBootstrap)],
 };

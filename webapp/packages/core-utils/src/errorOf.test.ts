@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { errorOf } from './errorOf';
+import { errorOf } from './errorOf.js';
 
 describe('errorOf', () => {
   it('should return error of the specified type', () => {
@@ -24,7 +24,7 @@ describe('errorOf', () => {
   it('should return error of the specified type from the cause', () => {
     class TestError extends Error {}
     class AnotherError extends Error {
-      cause: Error;
+      override cause: Error;
 
       constructor(message: string, cause: Error) {
         super(message);

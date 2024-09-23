@@ -10,7 +10,7 @@ import { renderHook } from '@testing-library/react';
 
 import * as coreUtils from '@cloudbeaver/core-utils';
 
-import { useObjectRef } from './useObjectRef';
+import { useObjectRef } from './useObjectRef.js';
 
 jest.mock('@cloudbeaver/core-utils', () => ({
   bindFunctions: jest.fn(),

@@ -9,7 +9,7 @@ import type { Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 
-import { TemplateConnectionsResource } from './TemplateConnectionsResource';
+import { TemplateConnectionsResource } from './TemplateConnectionsResource.js';
 
 @injectable()
 export class TemplateConnectionsService {

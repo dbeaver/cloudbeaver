@@ -14,9 +14,9 @@ import { type DBObject, DBObjectParentKey, DBObjectResource, NavNodeInfoResource
 import { isDefined } from '@cloudbeaver/core-utils';
 import { type NavNodeTransformViewComponent, NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
-import { TableLoader } from '../../ObjectPropertyTable/Table/TableLoader';
+import { TableLoader } from '../../ObjectPropertyTable/Table/TableLoader.js';
 import classes from './VirtualFolderPanel.module.css';
-import { VirtualFolderUtils } from './VirtualFolderUtils';
+import { VirtualFolderUtils } from './VirtualFolderUtils.js';
 
 export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(function VirtualFolderPanel({ folderId, nodeId }) {
   const translate = useTranslate();
@@ -47,7 +47,7 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
       {objects.length === 0 ? (
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       ) : (
-        <div className={classes.tabWrapper}>
+        <div className={classes['tabWrapper']}>
           <TableLoader objects={objects} hasNextPage={pagination?.hasNextPage ?? false} loadMore={pagination.loadMore} />
         </div>
       )}

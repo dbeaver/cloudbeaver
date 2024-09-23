@@ -9,7 +9,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { TopNavService } from '@cloudbeaver/plugin-top-app-bar';
 
-const UserMenu = importLazyComponent(() => import('./UserMenu/UserMenu').then(m => m.UserMenu));
+const UserMenu = importLazyComponent(() => import('./UserMenu/UserMenu.js').then(m => m.UserMenu));
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -17,7 +17,7 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.topNavService.placeholder.add(UserMenu, 4);
   }
 }

@@ -5,19 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataAction } from '../DatabaseDataAction';
-import type { IDatabaseDataResult } from '../IDatabaseDataResult';
-import type { IDatabaseDataSource } from '../IDatabaseDataSource';
-import { databaseDataAction } from './DatabaseDataActionDecorator';
+import { DatabaseDataAction } from '../DatabaseDataAction.js';
+import type { IDatabaseDataResult } from '../IDatabaseDataResult.js';
+import type { IDatabaseDataSource } from '../IDatabaseDataSource.js';
+import { databaseDataAction } from './DatabaseDataActionDecorator.js';
 import type {
   DatabaseEditChangeType,
   IDatabaseDataEditAction,
   IDatabaseDataEditActionData,
   IDatabaseDataEditApplyActionData,
-} from './IDatabaseDataEditAction';
+} from './IDatabaseDataEditAction.js';
 
 @databaseDataAction()
 export abstract class DatabaseEditAction<TKey, TValue, TResult extends IDatabaseDataResult>

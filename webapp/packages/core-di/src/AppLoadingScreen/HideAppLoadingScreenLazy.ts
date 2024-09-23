@@ -7,4 +7,4 @@
  */
 import { lazy } from 'react';
 
-export const HideAppLoadingScreen = lazy(() => import('./HideAppLoadingScreen').then(m => ({ default: m.HideAppLoadingScreen })));
+export const HideAppLoadingScreen = lazy(() => import('./HideAppLoadingScreen.js').then(m => ({ default: m.HideAppLoadingScreen })));

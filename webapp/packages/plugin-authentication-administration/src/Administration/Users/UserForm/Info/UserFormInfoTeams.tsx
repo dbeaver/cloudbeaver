@@ -13,8 +13,8 @@ import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { isDefined } from '@cloudbeaver/core-utils';
 
-import type { UserFormProps } from '../AdministrationUserFormService';
-import type { UserFormInfoPart } from './UserFormInfoPart';
+import type { UserFormProps } from '../AdministrationUserFormService.js';
+import type { UserFormInfoPart } from './UserFormInfoPart.js';
 
 interface Props extends UserFormProps {
   tabState: UserFormInfoPart;

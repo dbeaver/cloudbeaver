@@ -10,10 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { ColoredContainer, Container, Group, ToolsAction, ToolsPanel, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { CreateTeam } from './CreateTeam';
-import { CreateTeamService } from './CreateTeamService';
-import { TeamsTable } from './TeamsTable/TeamsTable';
-import { useTeamsTable } from './TeamsTable/useTeamsTable';
+import { CreateTeam } from './CreateTeam.js';
+import { CreateTeamService } from './CreateTeamService.js';
+import { TeamsTable } from './TeamsTable/TeamsTable.js';
+import { useTeamsTable } from './TeamsTable/useTeamsTable.js';
 
 interface Props {
   param?: string | null;

@@ -7,7 +7,7 @@
  */
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 
-import type { IElementsTreeCustomNodeInfo } from './useElementsTree';
+import type { IElementsTreeCustomNodeInfo } from './useElementsTree.js';
 
 export function transformFilteredNodeInfo(navNodeInfoResource: NavNodeInfoResource): IElementsTreeCustomNodeInfo {
   return function transformFilteredNodeInfo(nodeId, info) {

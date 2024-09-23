@@ -7,7 +7,7 @@
  */
 import type { IExecutor } from '@cloudbeaver/core-executor';
 
-import type { IDatabaseDataResult } from './IDatabaseDataResult';
+import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 
 export enum DataUpdateType {
   delete,

@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 /// <reference lib="WebWorker" />
-import { Workbox, WorkboxLifecycleEvent, WorkboxMessageEvent } from 'workbox-window';
+import { Workbox, type WorkboxLifecycleEvent, type WorkboxMessageEvent } from 'workbox-window';
 
 import { Disposable, injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 export interface IUpdateData {
@@ -45,7 +45,7 @@ export class ServiceWorkerService extends Disposable {
     }
 
     try {
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env['NODE_ENV'] === 'development') {
         const registration = await navigator.serviceWorker.getRegistration(this.workerURL);
         registration?.unregister();
       } else {
@@ -87,7 +87,7 @@ export class ServiceWorkerService extends Disposable {
     }
   }
 
-  dispose(): void {
+  override dispose(): void {
     if (this.updateIntervalId) {
       clearInterval(this.updateIntervalId);
     }

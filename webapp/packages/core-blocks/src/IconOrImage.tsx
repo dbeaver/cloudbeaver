@@ -9,8 +9,8 @@ import { useMemo } from 'react';
 
 import { isValidUrl } from '@cloudbeaver/core-utils';
 
-import { Icon } from './Icon';
-import { StaticImage } from './StaticImage';
+import { Icon } from './Icon.js';
+import { StaticImage } from './StaticImage.js';
 
 export interface IconOrImageProps {
   icon: string;

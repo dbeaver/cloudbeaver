@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-browser",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

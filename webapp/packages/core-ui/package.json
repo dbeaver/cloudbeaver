@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/core-ui",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

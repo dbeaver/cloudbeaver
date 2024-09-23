@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { IScreen, ScreenService } from '@cloudbeaver/core-routing';
+import { type IScreen, ScreenService } from '@cloudbeaver/core-routing';
 
-import type { ISqlEditorScreenParams } from './ISqlEditorScreenParams';
-import { SqlEditorScreen } from './SqlEditorScreen';
+import type { ISqlEditorScreenParams } from './ISqlEditorScreenParams.js';
+import { SqlEditorScreen } from './SqlEditorScreen.js';
 
 @injectable()
 export class SqlEditorScreenService {

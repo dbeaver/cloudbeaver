@@ -10,10 +10,10 @@ import { forwardRef, useLayoutEffect } from 'react';
 
 import { uuid } from '@cloudbeaver/core-utils';
 
-import { s } from './s';
+import { s } from './s.js';
 import style from './UploadArea.module.css';
-import { useRefInherit } from './useRefInherit';
-import { useS } from './useS';
+import { useRefInherit } from './useRefInherit.js';
+import { useS } from './useS.js';
 
 interface Props extends Omit<React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, 'value'> {
   value?: FileList | null;

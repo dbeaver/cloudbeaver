@@ -7,8 +7,8 @@
  */
 import { useService } from '@cloudbeaver/core-di';
 
-import { TopNavBar } from './TopNavBar';
-import { TopNavService } from './TopNavService';
+import { TopNavBar } from './TopNavBar.js';
+import { TopNavService } from './TopNavService.js';
 
 interface Props {
   className?: string;

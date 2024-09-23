@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { Fragment } from 'react';
 
-import { AdminUserOrigin, UsersResource } from '@cloudbeaver/core-authentication';
+import { type AdminUserOrigin, UsersOriginDetailsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import {
   Button,
   Combobox,
@@ -23,9 +23,9 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { FormMode, TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
+import { FormMode, type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
-import type { UserFormProps } from '../AdministrationUserFormService';
+import type { UserFormProps } from '../AdministrationUserFormService.js';
 
 interface IState {
   selectedOrigin: string;
@@ -42,18 +42,17 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
   const localState = useTabState<IState>(() => ({
     selectedOrigin: '0',
   }));
-  const userInfoLoader = useResource(
-    UserFormOriginInfoPanel,
-    UsersResource,
-    { key: state.userId, includes: ['customIncludeOriginDetails'] },
-    {
-      active: editing,
-    },
-  );
+  const userInfoLoader = useResource(UserFormOriginInfoPanel, UsersResource, state.userId, {
+    active: editing,
+  });
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
   const origins = userInfoLoader.data?.origins ?? [];
   const origin: AdminUserOrigin | undefined = origins[localState.selectedOrigin as any];
+  const usersOriginDetailsResource = useResource(UserFormOriginInfoPanel, UsersOriginDetailsResource, state.userId, {
+    active: editing,
+  });
+  const originDetails = usersOriginDetailsResource.data?.origins?.[localState.selectedOrigin as any]?.details ?? [];
 
   const { selected } = useTab(tabId);
 
@@ -105,7 +104,7 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
             <Container gap>
               <Container gap keepSize>
                 <ObjectPropertyInfoForm
-                  properties={origin.details || empty}
+                  properties={originDetails || empty}
                   emptyPlaceholder="authentication_administration_user_auth_method_no_details"
                   readOnly
                   small

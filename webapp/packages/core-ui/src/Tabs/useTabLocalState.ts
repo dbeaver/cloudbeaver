@@ -9,8 +9,8 @@ import { useContext } from 'react';
 
 import type { MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
 
-import { TabContext } from './TabContext';
-import { TabsContext } from './TabsContext';
+import { TabContext } from './TabContext.js';
+import { TabsContext } from './TabsContext.js';
 
 export function useTabLocalState<T>(valueGetter?: MetadataValueGetter<string, T>, schema?: schema.AnyZodObject): T {
   const state = useContext(TabsContext);

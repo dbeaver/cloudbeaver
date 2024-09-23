@@ -15,7 +15,7 @@ import {
 } from '@cloudbeaver/core-settings';
 import { schema } from '@cloudbeaver/core-utils';
 
-import { DEFAULT_THEME_ID } from './themes';
+import { DEFAULT_THEME_ID } from './themes.js';
 
 const settingsSchema = schema.object({
   'core.theming.theme': schema.string().default(DEFAULT_THEME_ID),

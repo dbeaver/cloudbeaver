@@ -10,14 +10,14 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { EObjectFeature, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
-import { DDLViewerFooterService } from './DdlViewer/DDLViewerFooterService';
-import { NAV_NODE_DDL_ID } from './NAV_NODE_DDL_ID';
-import { NAV_NODE_EXTENDED_DDL_ID } from './NAV_NODE_EXTENDED_DDL_ID';
+import { DDLViewerFooterService } from './DdlViewer/DDLViewerFooterService.js';
+import { NAV_NODE_DDL_ID } from './NAV_NODE_DDL_ID.js';
+import { NAV_NODE_EXTENDED_DDL_ID } from './NAV_NODE_EXTENDED_DDL_ID.js';
 
-const DDLViewerTab = importLazyComponent(() => import('./DdlViewer/DDLViewerTab').then(m => m.DDLViewerTab));
-const DDLViewerTabPanel = importLazyComponent(() => import('./DdlViewer/DDLViewerTabPanel').then(m => m.DDLViewerTabPanel));
+const DDLViewerTab = importLazyComponent(() => import('./DdlViewer/DDLViewerTab.js').then(m => m.DDLViewerTab));
+const DDLViewerTabPanel = importLazyComponent(() => import('./DdlViewer/DDLViewerTabPanel.js').then(m => m.DDLViewerTabPanel));
 const ExtendedDDLViewerTabPanel = importLazyComponent(() =>
-  import('./ExtendedDDLViewer/ExtendedDDLViewerTabPanel').then(m => m.ExtendedDDLViewerTabPanel),
+  import('./ExtendedDDLViewer/ExtendedDDLViewerTabPanel.js').then(m => m.ExtendedDDLViewerTabPanel),
 );
 
 @injectable()
@@ -30,7 +30,7 @@ export class DdlViewerBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.navNodeViewService.addTransform({
       tab: (nodeId, folderId) => {
         if (folderId.startsWith(NAV_NODE_DDL_ID) || folderId.startsWith(NAV_NODE_EXTENDED_DDL_ID)) {
@@ -68,6 +68,4 @@ export class DdlViewerBootstrap extends Bootstrap {
 
     this.ddlViewerFooterService.register();
   }
-
-  load(): void {}
 }

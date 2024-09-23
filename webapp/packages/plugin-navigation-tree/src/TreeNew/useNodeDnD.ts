@@ -10,7 +10,7 @@ import { useContext } from 'react';
 import { useDataContext } from '@cloudbeaver/core-data-context';
 import { useDNDData } from '@cloudbeaver/core-ui';
 
-import { TreeDnDContext } from './contexts/TreeDnDContext';
+import { TreeDnDContext } from './contexts/TreeDnDContext.js';
 
 export function useNodeDnD(nodeId: string, onDragStart: () => void) {
   const treeDnD = useContext(TreeDnDContext)!;

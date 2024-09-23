@@ -7,11 +7,11 @@
  */
 import { makeAutoObservable } from 'mobx';
 
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
-import { createSqlDataSourceHistoryInitialState } from './createSqlDataSourceHistoryInitialState';
-import type { ISqlDataSourceHistory } from './ISqlDataSourceHistory';
-import type { ISqlDataSourceHistoryState } from './ISqlDataSourceHistoryState';
+import { createSqlDataSourceHistoryInitialState } from './createSqlDataSourceHistoryInitialState.js';
+import type { ISqlDataSourceHistory } from './ISqlDataSourceHistory.js';
+import type { ISqlDataSourceHistoryState } from './ISqlDataSourceHistoryState.js';
 
 const HOT_HISTORY_SIZE = 30;
 const COMPRESSED_HISTORY_DELAY = 5000;
@@ -31,7 +31,7 @@ export class SqlDataSourceHistory implements ISqlDataSourceHistory {
 
   add(value: string, source?: string): void {
     // skip history if value is the same as current
-    if (this.state.history[this.state.historyIndex].value === value) {
+    if (this.state.history[this.state.historyIndex]!.value === value) {
       return;
     }
 
@@ -49,7 +49,7 @@ export class SqlDataSourceHistory implements ISqlDataSourceHistory {
       return;
     }
     this.state.historyIndex--;
-    const value = this.state.history[this.state.historyIndex].value;
+    const value = this.state.history[this.state.historyIndex]!.value;
     this.onNavigate.execute(value);
   }
 
@@ -59,7 +59,7 @@ export class SqlDataSourceHistory implements ISqlDataSourceHistory {
     }
 
     this.state.historyIndex++;
-    const value = this.state.history[this.state.historyIndex].value;
+    const value = this.state.history[this.state.historyIndex]!.value;
     this.onNavigate.execute(value);
   }
 
@@ -74,8 +74,8 @@ export class SqlDataSourceHistory implements ISqlDataSourceHistory {
   private compressHistory(): void {
     if (this.state.history.length > HOT_HISTORY_SIZE) {
       for (let i = this.state.history.length - HOT_HISTORY_SIZE; i > 1; i--) {
-        const prevEntity = this.state.history[i - 1];
-        const entity = this.state.history[i];
+        const prevEntity = this.state.history[i - 1]!;
+        const entity = this.state.history[i]!;
 
         if (prevEntity.timestamp === -1) {
           break;

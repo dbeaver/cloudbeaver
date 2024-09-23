@@ -9,15 +9,15 @@ import { observer } from 'mobx-react-lite';
 
 import { Container, FieldCheckbox, Group, GroupTitle, Placeholder, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
-import { AdministrationUsersManagementService } from '../../../../AdministrationUsersManagementService';
-import type { UserFormProps } from '../AdministrationUserFormService';
-import { UserFormInfoCredentials } from './UserFormInfoCredentials';
-import { UserFormInfoMetaParameters } from './UserFormInfoMetaParameters';
-import type { UserFormInfoPart } from './UserFormInfoPart';
-import { UserFormInfoPartService } from './UserFormInfoPartService';
-import { UserFormInfoTeams } from './UserFormInfoTeams';
+import { AdministrationUsersManagementService } from '../../../../AdministrationUsersManagementService.js';
+import type { UserFormProps } from '../AdministrationUserFormService.js';
+import { UserFormInfoCredentials } from './UserFormInfoCredentials.js';
+import { UserFormInfoMetaParameters } from './UserFormInfoMetaParameters.js';
+import type { UserFormInfoPart } from './UserFormInfoPart.js';
+import { UserFormInfoPartService } from './UserFormInfoPartService.js';
+import { UserFormInfoTeams } from './UserFormInfoTeams.js';
 
 export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(function UserFormInfo({ tabId, formState }) {
   const translate = useTranslate();

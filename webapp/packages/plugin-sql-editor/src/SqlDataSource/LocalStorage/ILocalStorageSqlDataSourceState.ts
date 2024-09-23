@@ -7,7 +7,7 @@
  */
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 
-import type { ISqlDataSourceHistoryState } from '../SqlDataSourceHistory/ISqlDataSourceHistoryState';
+import type { ISqlDataSourceHistoryState } from '../SqlDataSourceHistory/ISqlDataSourceHistoryState.js';
 
 export interface ILocalStorageSqlDataSourceState {
   script: string;

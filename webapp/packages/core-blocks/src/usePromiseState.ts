@@ -9,9 +9,9 @@ import { computed, observable } from 'mobx';
 import { useEffect } from 'react';
 
 import { Task } from '@cloudbeaver/core-executor';
-import { ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
+import { type ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
 
-import { useObservableRef } from './useObservableRef';
+import { useObservableRef } from './useObservableRef.js';
 
 export function usePromiseState<T>(promise: Promise<T> | null): ILoadableState {
   const state = useObservableRef(

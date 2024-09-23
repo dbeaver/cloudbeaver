@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { uriToBlob } from './uriToBlob';
+import { uriToBlob } from './uriToBlob.js';
 
 describe('uriToBlob', () => {
   it('should convert a Data URI to a Blob object', () => {

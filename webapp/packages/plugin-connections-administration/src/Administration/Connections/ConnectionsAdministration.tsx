@@ -19,7 +19,7 @@ import {
   Loader,
   s,
   SContext,
-  StyleRegistry,
+  type StyleRegistry,
   ToolsAction,
   ToolsPanel,
   useS,
@@ -28,10 +28,10 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 
 import ConnectionsAdministrationStyle from './ConnectionsAdministration.module.css';
-import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable';
-import { useConnectionsTable } from './ConnectionsTable/useConnectionsTable';
-import { CreateConnection } from './CreateConnection/CreateConnection';
-import { CreateConnectionService } from './CreateConnectionService';
+import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable.js';
+import { useConnectionsTable } from './ConnectionsTable/useConnectionsTable.js';
+import { CreateConnection } from './CreateConnection/CreateConnection.js';
+import { CreateConnectionService } from './CreateConnectionService.js';
 
 const registry: StyleRegistry = [
   [
