@@ -7,7 +7,7 @@
  */
 import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
-import { executorHandlerFilter, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { Executor, executorHandlerFilter, ExecutorInterrupter, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import type { IFormPart } from './IFormPart.js';
@@ -23,6 +23,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
 
   protected loaded: boolean;
   protected loading: boolean;
+  readonly onLoaded: IExecutor<TPartState>;
 
   constructor(
     protected readonly formState: IFormState<TFormState>,
@@ -31,6 +32,8 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     this.initialState = initialState;
     this.state = toJS(this.initialState);
     this.isSaving = false;
+
+    this.onLoaded = new Executor(initialState);
 
     this.exception = null;
     this.promise = null;
@@ -41,6 +44,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     this.formState.submitTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.save.bind(this)));
     this.formState.formatTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.format.bind(this)));
     this.formState.validationTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.validate.bind(this)));
+    this.onLoaded.next(this.formState.formStateTask);
 
     makeObservable<this, 'loaded' | 'loading' | 'setInitialState'>(this, {
       initialState: observable,
@@ -127,6 +131,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
       await this.promise;
       this.loaded = true;
       this.exception = null;
+      await this.onLoaded.execute(this.initialState);
     } catch (exception: any) {
       this.exception = exception;
     } finally {
