@@ -9,9 +9,9 @@ import { observer } from 'mobx-react-lite';
 
 import { Container, Fill, s, ToolsPanel, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import styles from './TableFooter.module.css';
-import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
+import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu.js';
 
 interface Props {
   resultIndex: number;

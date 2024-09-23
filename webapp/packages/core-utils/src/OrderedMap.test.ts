@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { OrderedMap } from './OrderedMap';
+import { OrderedMap } from './OrderedMap.js';
 
 describe('OrderedMap', () => {
   it('should add and get items', () => {

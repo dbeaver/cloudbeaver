@@ -7,7 +7,7 @@
  */
 import { forwardRef } from 'react';
 
-import { s } from '../s';
+import { s } from '../s.js';
 import classes from './Flex.module.css';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {

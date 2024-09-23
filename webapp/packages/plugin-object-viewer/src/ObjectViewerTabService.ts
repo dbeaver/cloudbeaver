@@ -9,7 +9,6 @@ import { action, makeObservable, runInAction } from 'mobx';
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
-  Connection,
   ConnectionExecutionContextResource,
   ConnectionInfoActiveProjectKey,
   ConnectionInfoResource,
@@ -17,7 +16,7 @@ import {
   connectionProvider,
   createConnectionParam,
   executionContextProvider,
-  IConnectionInfoParams,
+  type IConnectionInfoParams,
   isConnectionInfoParamEqual,
   objectCatalogProvider,
   objectSchemaProvider,
@@ -26,7 +25,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider, ISyncContextLoader } from '@cloudbeaver/core-executor';
 import {
-  INavNodeRenameData,
+  type INavNodeRenameData,
   type INodeNavigationData,
   NavNodeManagerService,
   NavTreeResource,
@@ -34,17 +33,17 @@ import {
   objectNavNodeProvider,
 } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider } from '@cloudbeaver/core-projects';
-import { ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { ITab, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
+import { type ResourceKey, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { type ITab, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
 
-import type { IObjectViewerTabContext } from './IObjectViewerTabContext';
-import type { IObjectViewerTabState } from './IObjectViewerTabState';
-import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
-import type { ObjectPage } from './ObjectPage/ObjectPage';
-import { objectViewerTabHandlerKey } from './objectViewerTabHandlerKey';
+import type { IObjectViewerTabContext } from './IObjectViewerTabContext.js';
+import type { IObjectViewerTabState } from './IObjectViewerTabState.js';
+import { DBObjectPageService } from './ObjectPage/DBObjectPageService.js';
+import type { ObjectPage } from './ObjectPage/ObjectPage.js';
+import { objectViewerTabHandlerKey } from './objectViewerTabHandlerKey.js';
 
-const ObjectViewerPanel = importLazyComponent(() => import('./ObjectViewerPanel/ObjectViewerPanel').then(m => m.ObjectViewerPanel));
-const ObjectViewerTab = importLazyComponent(() => import('./ObjectViewerTab').then(m => m.ObjectViewerTab));
+const ObjectViewerPanel = importLazyComponent(() => import('./ObjectViewerPanel/ObjectViewerPanel.js').then(m => m.ObjectViewerPanel));
+const ObjectViewerTab = importLazyComponent(() => import('./ObjectViewerTab.js').then(m => m.ObjectViewerTab));
 
 @injectable()
 export class ObjectViewerTabService {

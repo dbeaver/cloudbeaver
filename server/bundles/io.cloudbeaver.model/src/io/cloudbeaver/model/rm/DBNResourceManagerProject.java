@@ -20,7 +20,6 @@ package io.cloudbeaver.model.rm;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBIcon;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.DBPObject;
@@ -37,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
-    private static final Log log = Log.getLog(DBNResourceManagerProject.class);
 
     private final RMProject project;
 
@@ -123,24 +121,18 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
         return this;
     }
 
-    @Override
-    public String toString() {
-        return getNodeDisplayName();
-    }
-
-
+    @NotNull
     @Override
     public DBPProject getOwnerProject() {
         List<? extends DBPProject> globalProjects = getModel().getModelProjects();
-        if (globalProjects == null) {
-            return null;
-        }
-        for (DBPProject modelProject : globalProjects) {
-            if (CommonUtils.equalObjects(modelProject.getId(), project.getId())) {
-                return modelProject;
+        if (globalProjects != null) {
+            for (DBPProject modelProject : globalProjects) {
+                if (CommonUtils.equalObjects(modelProject.getId(), project.getId())) {
+                    return modelProject;
+                }
             }
         }
-        return null;
+        throw new IllegalStateException("Project '" + project.getId() + "' not found in workspace");
     }
 
     @Nullable
@@ -148,4 +140,10 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
     public DBPObject getObjectDetails(@NotNull DBRProgressMonitor monitor, @NotNull SMSessionContext sessionContext, @NotNull Object dataSource) throws DBException {
         return project;
     }
+
+    @Override
+    public String toString() {
+        return getNodeDisplayName();
+    }
+
 }

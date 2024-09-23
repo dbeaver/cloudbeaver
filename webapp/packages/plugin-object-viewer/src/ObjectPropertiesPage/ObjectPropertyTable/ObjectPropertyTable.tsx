@@ -15,7 +15,7 @@ import { isDefined } from '@cloudbeaver/core-utils';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import styles from './ObjectPropertyTable.module.css';
-import { TableLoader } from './Table/TableLoader';
+import { TableLoader } from './Table/TableLoader.js';
 
 interface ObjectPropertyTableProps {
   objectId: string;

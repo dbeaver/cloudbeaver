@@ -9,16 +9,16 @@ import { computed, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { EAdminPermission, PermissionsService, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { RouterState, ScreenService } from '@cloudbeaver/core-routing';
+import { type RouterState, ScreenService } from '@cloudbeaver/core-routing';
 import { StorageService } from '@cloudbeaver/core-storage';
-import { DefaultValueGetter, GlobalConstants, MetadataMap, schema } from '@cloudbeaver/core-utils';
+import { type DefaultValueGetter, GlobalConstants, MetadataMap, schema } from '@cloudbeaver/core-utils';
 
-import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
-import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
-import type { IRouteParams } from '../AdministrationItem/IRouteParams';
-import { ADMINISTRATION_SCREEN_STATE_SCHEMA, type IAdministrationScreenInfo } from './IAdministrationScreenState';
+import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService.js';
+import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute.js';
+import type { IRouteParams } from '../AdministrationItem/IRouteParams.js';
+import { ADMINISTRATION_SCREEN_STATE_SCHEMA, type IAdministrationScreenInfo } from './IAdministrationScreenState.js';
 
 const ADMINISTRATION_INFO = 'administration_info';
 
@@ -228,7 +228,7 @@ export class AdministrationScreenService {
   }
 
   async handleCanDeActivate(fromState: RouterState, toState: RouterState): Promise<boolean> {
-    if (!fromState.params.item) {
+    if (!fromState.params['item']) {
       return true;
     }
 
@@ -243,7 +243,7 @@ export class AdministrationScreenService {
   }
 
   async handleCanActivate(toState: RouterState, fromState: RouterState): Promise<boolean> {
-    if (!toState.params.item) {
+    if (!toState.params['item']) {
       return false;
     }
 

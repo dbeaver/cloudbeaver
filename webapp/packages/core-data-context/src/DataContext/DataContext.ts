@@ -7,9 +7,9 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
-import type { DataContextGetter } from './DataContextGetter';
-import type { IDataContext } from './IDataContext';
-import type { IDataContextProvider } from './IDataContextProvider';
+import type { DataContextGetter } from './DataContextGetter.js';
+import type { IDataContext } from './IDataContext.js';
+import type { IDataContextProvider } from './IDataContextProvider.js';
 
 const NOT_FOUND = Symbol('not found');
 

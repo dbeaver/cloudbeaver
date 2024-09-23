@@ -9,13 +9,13 @@ import { observer } from 'mobx-react-lite';
 import React, { useContext } from 'react';
 
 import { AUTH_PROVIDER_LOCAL_ID, AuthProviderService, AuthProvidersResource, AuthSettingsService } from '@cloudbeaver/core-authentication';
-import { FormContext, Group, GroupTitle, PlaceholderComponent, Switch, useExecutor, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { FormContext, Group, GroupTitle, type PlaceholderComponent, Switch, useExecutor, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { isDefined } from '@cloudbeaver/core-utils';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
 
-import { ServerConfigurationAdminForm } from './ServerConfigurationAdminForm';
+import { ServerConfigurationAdminForm } from './ServerConfigurationAdminForm.js';
 
 export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceholderProps> = observer(function AuthenticationProviders({
   state: { serverConfig },

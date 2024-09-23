@@ -6,21 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { ReactNode, useContext, useState } from 'react';
+import { type ReactNode, useContext, useState } from 'react';
 
 import { blobToBase64, bytesToSize } from '@cloudbeaver/core-utils';
 
-import { Button } from '../Button';
-import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import { IconButton } from '../IconButton';
-import { useTranslate } from '../localization/useTranslate';
-import { s } from '../s';
-import { UploadArea } from '../UploadArea';
-import { useS } from '../useS';
-import { Field } from './Field';
-import { FieldDescription } from './FieldDescription';
-import { FieldLabel } from './FieldLabel';
-import { FormContext } from './FormContext';
+import { Button } from '../Button.js';
+import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
+import { IconButton } from '../IconButton.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { s } from '../s.js';
+import { UploadArea } from '../UploadArea.js';
+import { useS } from '../useS.js';
+import { Field } from './Field.js';
+import { FieldDescription } from './FieldDescription.js';
+import { FieldLabel } from './FieldLabel.js';
+import { FormContext } from './FormContext.js';
 import inputFileTextContentStyles from './InputFileTextContent.module.css';
 
 const DEFAULT_MAX_FILE_SIZE = 2048;

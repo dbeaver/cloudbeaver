@@ -7,20 +7,20 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { getComputed, s, SContext, StyleRegistry, TextPlaceholder, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, s, SContext, type StyleRegistry, TextPlaceholder, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ITabData, TabIconStyles, TabList, TabListStyles, TabPanel, TabsState, TabStyles } from '@cloudbeaver/core-ui';
+import { type ITabData, TabIconStyles, TabList, TabListStyles, TabPanel, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 
-import type { ISqlEditorTabState } from '../ISqlEditorTabState';
-import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
-import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService';
+import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
+import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures.js';
+import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
 import styles from './shared/SqlResultTabs.module.css';
 import SqlResultTabsTab from './shared/SqlResultTabsTab.module.css';
 import TabIconModuleStyles from './shared/SqlResultTabsTabIcon.module.css';
 import SqlResultTabsTabList from './shared/SqlResultTabsTabList.module.css';
-import { SqlResultPanel } from './SqlResultPanel';
-import { SqlResultTab } from './SqlResultTab';
-import { SqlResultTabsService } from './SqlResultTabsService';
+import { SqlResultPanel } from './SqlResultPanel.js';
+import { SqlResultTab } from './SqlResultTab.js';
+import { SqlResultTabsService } from './SqlResultTabsService.js';
 
 interface Props {
   state: ISqlEditorTabState;

@@ -8,7 +8,7 @@
 import { computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { IVersion, VersionResource, VersionService } from '@cloudbeaver/core-version';
+import { type IVersion, VersionResource, VersionService } from '@cloudbeaver/core-version';
 
 interface IInstructionProps {
   version: IVersion;

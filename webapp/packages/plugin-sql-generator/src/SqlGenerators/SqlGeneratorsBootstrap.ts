@@ -12,10 +12,10 @@ import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigat
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
-import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS';
-import { SqlGeneratorsResource } from './SqlGeneratorsResource';
+import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS.js';
+import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 
-const GeneratedSqlDialog = importLazyComponent(() => import('./GeneratedSqlDialog').then(m => m.GeneratedSqlDialog));
+const GeneratedSqlDialog = importLazyComponent(() => import('./GeneratedSqlDialog.js').then(m => m.GeneratedSqlDialog));
 
 @injectable()
 export class SqlGeneratorsBootstrap extends Bootstrap {
@@ -27,7 +27,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.menuService.setHandler({
       id: 'node-sql-generators',
       menus: [MENU_SQL_GENERATORS],

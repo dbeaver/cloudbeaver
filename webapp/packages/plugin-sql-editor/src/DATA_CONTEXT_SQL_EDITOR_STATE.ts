@@ -7,6 +7,6 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
-import type { ISqlEditorTabState } from './ISqlEditorTabState';
+import type { ISqlEditorTabState } from './ISqlEditorTabState.js';
 
 export const DATA_CONTEXT_SQL_EDITOR_STATE = createDataContext<ISqlEditorTabState>('sql-editor-state');

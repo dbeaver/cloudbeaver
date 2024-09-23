@@ -9,11 +9,11 @@ import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { GraphQLService, NavNodeInfoFragment } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type NavNodeInfoFragment } from '@cloudbeaver/core-sdk';
 import { isNull } from '@cloudbeaver/core-utils';
 
-import type { IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
-import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from './ConnectionInfoResource';
+import type { IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA.js';
+import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from './ConnectionInfoResource.js';
 
 export type ObjectContainer = NavNodeInfoFragment;
 export interface ICatalogData {
@@ -116,7 +116,7 @@ export class ContainerResource extends CachedMapResource<ObjectContainerParams, 
     return this.data;
   }
 
-  isKeyEqual(param: ObjectContainerParams, second: ObjectContainerParams): boolean {
+  override isKeyEqual(param: ObjectContainerParams, second: ObjectContainerParams): boolean {
     return param.projectId === second.projectId && param.connectionId === second.connectionId && param.catalogId === second.catalogId;
   }
 

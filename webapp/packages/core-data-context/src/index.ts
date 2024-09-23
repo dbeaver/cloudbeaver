@@ -5,13 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-export * from './DataContext/createDataContext';
-export * from './DataContext/DATA_CONTEXT_DI_PROVIDER';
-export * from './DataContext/DataContext';
-export * from './DataContext/dataContextAddDIProvider';
-export * from './DataContext/IDataContext';
-export * from './DataContext/IDataContextProvider';
-export * from './DataContext/useDataContext';
-export * from './DataContext/DataContextGetter';
-export * from './DataContext/useDataContextLink';
-export { coreDataContextManifest } from './manifest';
+export * from './DataContext/createDataContext.js';
+export * from './DataContext/DATA_CONTEXT_DI_PROVIDER.js';
+export * from './DataContext/DataContext.js';
+export * from './DataContext/dataContextAddDIProvider.js';
+export * from './DataContext/IDataContext.js';
+export * from './DataContext/IDataContextProvider.js';
+export * from './DataContext/useDataContext.js';
+export * from './DataContext/DataContextGetter.js';
+export * from './DataContext/useDataContextLink.js';
+export { coreDataContextManifest } from './manifest.js';

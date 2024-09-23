@@ -8,12 +8,12 @@
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { DataTransferParameters, GraphQLService } from '@cloudbeaver/core-sdk';
+import { type DataTransferParameters, GraphQLService } from '@cloudbeaver/core-sdk';
 import { Deferred, GlobalConstants, OrderedMap } from '@cloudbeaver/core-utils';
 
-import { ExportFromContainerProcess } from './ExportFromContainerProcess';
-import { ExportFromResultsProcess } from './ExportFromResultsProcess';
-import type { IExportContext } from './IExportContext';
+import { ExportFromContainerProcess } from './ExportFromContainerProcess.js';
+import { ExportFromResultsProcess } from './ExportFromResultsProcess.js';
+import type { IExportContext } from './IExportContext.js';
 
 interface Process {
   taskId: string;

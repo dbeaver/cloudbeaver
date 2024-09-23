@@ -8,9 +8,9 @@
 import { beforeEach, describe, expect, jest, test } from '@jest/globals';
 import { toJS } from 'mobx';
 
-import { CachedMapResource } from './CachedMapResource';
-import type { ResourceKey } from './ResourceKey';
-import { resourceKeyList } from './ResourceKeyList';
+import { CachedMapResource } from './CachedMapResource.js';
+import type { ResourceKey } from './ResourceKey.js';
+import { resourceKeyList } from './ResourceKeyList.js';
 
 interface IEntityData {
   id: string;

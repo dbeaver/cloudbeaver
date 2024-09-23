@@ -10,7 +10,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 export const settingsPanelPlugin: PluginManifest = {
   info: { name: 'Settings panel plugin' },
   providers: [
-    () => import('./SettingsPanelPluginBootstrap').then(m => m.SettingsPanelPluginBootstrap),
-    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./SettingsPanelPluginBootstrap.js').then(m => m.SettingsPanelPluginBootstrap),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
   ],
 };

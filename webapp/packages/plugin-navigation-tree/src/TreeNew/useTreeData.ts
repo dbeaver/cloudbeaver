@@ -5,19 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, IComputedValue, observable } from 'mobx';
+import { computed, type IComputedValue, observable } from 'mobx';
 import { useEffect, useState } from 'react';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { applyTransforms } from './DataTransformers/applyTransforms';
-import { rootNodeStateTransformer, rootNodeTransformer } from './DataTransformers/rootTransformers';
-import type { TreeDataTransformer } from './DataTransformers/TreeDataTransformer';
-import type { INode } from './INode';
-import type { INodeState } from './INodeState';
-import type { TreeState } from './TreeState';
-import { useTreeState } from './useTreeState';
+import { applyTransforms } from './DataTransformers/applyTransforms.js';
+import { rootNodeStateTransformer, rootNodeTransformer } from './DataTransformers/rootTransformers.js';
+import type { TreeDataTransformer } from './DataTransformers/TreeDataTransformer.js';
+import type { INode } from './INode.js';
+import type { INodeState } from './INodeState.js';
+import type { TreeState } from './TreeState.js';
+import { useTreeState } from './useTreeState.js';
 
 interface IOptions {
   rootId: string;

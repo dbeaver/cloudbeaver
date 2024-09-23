@@ -7,7 +7,7 @@
  */
 import { isValuesEqual } from '@cloudbeaver/core-utils';
 
-import type { ObjectPropertyInfo } from './sdk';
+import type { ObjectPropertyInfo } from './sdk.js';
 
 type RequiredObjectPropertyInfoFields = Pick<ObjectPropertyInfo, 'id' | 'defaultValue'>;
 

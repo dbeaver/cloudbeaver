@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { textToHex } from './textToHex';
+import { textToHex } from './textToHex.js';
 
 const value = 'test value';
 

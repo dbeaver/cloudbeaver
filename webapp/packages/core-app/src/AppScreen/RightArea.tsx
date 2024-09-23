@@ -23,7 +23,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
-import { AppScreenService } from './AppScreenService';
+import { AppScreenService } from './AppScreenService.js';
 import style from './RightArea.module.css';
 
 interface Props {

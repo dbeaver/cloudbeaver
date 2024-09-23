@@ -8,7 +8,7 @@
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
-import type { ITeamFormState } from '../ITeamFormProps';
+import type { ITeamFormState } from '../ITeamFormProps.js';
 
 export interface ITeamFormConfigureContext {
   readonly info: TeamInfo | undefined;

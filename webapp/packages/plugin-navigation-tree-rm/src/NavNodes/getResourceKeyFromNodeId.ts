@@ -14,7 +14,7 @@ export function getResourceKeyFromNodeId(nodeId: string): string | undefined {
   }
 
   const parts = getPathParts(nodeId.replace('//', '\\'));
-  const projectId = parts[1];
+  const projectId = parts[1]!;
   const path = createPath(...parts.slice(2, parts.length - 1));
   let name: string | undefined;
 

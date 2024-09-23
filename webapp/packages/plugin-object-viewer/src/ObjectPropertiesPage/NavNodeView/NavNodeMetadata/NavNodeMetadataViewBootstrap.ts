@@ -9,18 +9,21 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ENodeFeature, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
-import { NavNodeMetadataPanel } from './NavNodeMetadataPanel';
-import { NavNodeMetadataTab } from './NavNodeMetadataTab';
+import { NavNodeMetadataPanel } from './NavNodeMetadataPanel.js';
+import { NavNodeMetadataTab } from './NavNodeMetadataTab.js';
 
 const navNodeMetadataId = 'object-viewer://metadata';
 
 @injectable()
 export class NavNodeMetadataViewBootstrap extends Bootstrap {
-  constructor(private readonly navNodeViewService: NavNodeViewService, private readonly navNodeInfoResource: NavNodeInfoResource) {
+  constructor(
+    private readonly navNodeViewService: NavNodeViewService,
+    private readonly navNodeInfoResource: NavNodeInfoResource,
+  ) {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.navNodeViewService.addTransform({
       order: 1,
       tab: (nodeId, folderId) => {
@@ -47,6 +50,4 @@ export class NavNodeMetadataViewBootstrap extends Bootstrap {
       },
     });
   }
-
-  load(): void {}
 }

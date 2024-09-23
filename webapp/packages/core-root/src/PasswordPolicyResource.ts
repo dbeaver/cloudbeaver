@@ -7,9 +7,9 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
-import { GraphQLService, PasswordPolicyFragment } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type PasswordPolicyFragment } from '@cloudbeaver/core-sdk';
 
-import { ServerConfigResource } from './ServerConfigResource';
+import { ServerConfigResource } from './ServerConfigResource.js';
 
 export type PasswordPolicy = PasswordPolicyFragment['passwordPolicyConfiguration'];
 

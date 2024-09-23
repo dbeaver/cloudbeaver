@@ -5,6 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { importLazyComponent } from '../../importLazyComponent';
+import { importLazyComponent } from '../../importLazyComponent.js';
 
-export const ObjectPropertyInfoForm = importLazyComponent(() => import('./ObjectPropertyInfoForm').then(m => m.ObjectPropertyInfoForm));
+export const ObjectPropertyInfoForm = importLazyComponent(() => import('./ObjectPropertyInfoForm.js').then(m => m.ObjectPropertyInfoForm));

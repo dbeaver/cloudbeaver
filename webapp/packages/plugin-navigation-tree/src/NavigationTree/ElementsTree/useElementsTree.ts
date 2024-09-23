@@ -8,11 +8,19 @@
 import { action, autorun, computed, observable, runInAction } from 'mobx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { getComputed, IFolderExplorerContext, useExecutor, useObjectRef, useObservableRef, useResource, useUserData } from '@cloudbeaver/core-blocks';
+import {
+  getComputed,
+  type IFolderExplorerContext,
+  useExecutor,
+  useObjectRef,
+  useObservableRef,
+  useResource,
+  useUserData,
+} from '@cloudbeaver/core-blocks';
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorInterrupter, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import {
@@ -23,13 +31,13 @@ import {
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
 import type { IDNDData } from '@cloudbeaver/core-ui';
-import { ILoadableState, MetadataMap, throttle } from '@cloudbeaver/core-utils';
+import { type ILoadableState, MetadataMap, throttle } from '@cloudbeaver/core-utils';
 
-import { ElementsTreeService } from './ElementsTreeService';
-import type { IElementsTreeAction } from './IElementsTreeAction';
-import type { INavTreeNodeInfo } from './INavTreeNodeInfo';
-import type { NavigationNodeRendererComponent } from './NavigationNodeComponent';
-import { transformNodeInfo } from './transformNodeInfo';
+import { ElementsTreeService } from './ElementsTreeService.js';
+import type { IElementsTreeAction } from './IElementsTreeAction.js';
+import type { INavTreeNodeInfo } from './INavTreeNodeInfo.js';
+import type { NavigationNodeRendererComponent } from './NavigationNodeComponent.js';
+import { transformNodeInfo } from './transformNodeInfo.js';
 
 export type IElementsTreeCustomRenderer = (nodeId: string) => NavigationNodeRendererComponent | undefined;
 export type IElementsTreeCustomNodeInfo = (nodeId: string, info: INavTreeNodeInfo) => INavTreeNodeInfo;
@@ -261,7 +269,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         nodeId === options.root &&
         elementsTree.getNodeChildren(nodeId).length === 1
       ) {
-        const nextNode = elementsTree.getNodeChildren(nodeId)[0];
+        const nextNode = elementsTree.getNodeChildren(nodeId)[0]!;
 
         if (elementsTree.isNodeExpandable(nextNode) || elementsTree.isNodeExpanded(nextNode)) {
           options.folderExplorer.open(navNodeInfoResource.getParents(nextNode), nextNode);
@@ -282,7 +290,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         const pathIndex = folderExplorer.state.fullPath.indexOf(nodeId);
 
         if (pathIndex >= 0) {
-          folderExplorer.open(folderExplorer.state.fullPath.slice(0, pathIndex - 1), folderExplorer.state.fullPath[pathIndex - 1]);
+          folderExplorer.open(folderExplorer.state.fullPath.slice(0, pathIndex - 1), folderExplorer.state.fullPath[pathIndex - 1]!);
         }
       });
     },
@@ -583,7 +591,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
           });
 
           if (path.length > 0) {
-            await functionsRef.loadTree(path[0]);
+            await functionsRef.loadTree(path[0]!);
           }
         }
       },

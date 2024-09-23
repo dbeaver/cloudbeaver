@@ -12,10 +12,10 @@ import { getComputed, s, useS } from '@cloudbeaver/core-blocks';
 import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
 import { type IResultSetRowKey, isResultSetContentValue } from '@cloudbeaver/plugin-data-viewer';
 
-import { EditingContext } from '../../../Editing/EditingContext';
-import { CellContext } from '../../CellRenderer/CellContext';
-import { DataGridContext } from '../../DataGridContext';
-import { TableDataContext } from '../../TableDataContext';
+import { EditingContext } from '../../../Editing/EditingContext.js';
+import { CellContext } from '../../CellRenderer/CellContext.js';
+import { DataGridContext } from '../../DataGridContext.js';
+import { TableDataContext } from '../../TableDataContext.js';
 import style from './BlobFormatter.module.css';
 
 export const BlobFormatter = observer<RenderCellProps<IResultSetRowKey>>(function BlobFormatter({ column, row }) {

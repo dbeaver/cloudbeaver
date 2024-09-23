@@ -10,8 +10,8 @@ import { computed, makeObservable, observable } from 'mobx';
 import type { ITask, TaskScheduler } from '@cloudbeaver/core-executor';
 import type { AsyncTaskInfo, AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
-import type { ConnectionExecutionContextResource, IConnectionExecutionContextInfo } from './ConnectionExecutionContextResource';
-import type { IConnectionExecutionContext } from './IConnectionExecutionContext';
+import type { ConnectionExecutionContextResource, IConnectionExecutionContextInfo } from './ConnectionExecutionContextResource.js';
+import type { IConnectionExecutionContext } from './IConnectionExecutionContext.js';
 
 export interface IConnectionExecutionContextUpdateTaskInfo {
   name?: string;

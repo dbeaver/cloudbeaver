@@ -9,7 +9,7 @@ import type React from 'react';
 
 import type { NavNode } from '@cloudbeaver/core-navigation-tree';
 
-import type { INavTreeNodeInfo } from './INavTreeNodeInfo';
+import type { INavTreeNodeInfo } from './INavTreeNodeInfo.js';
 
 export type NavTreeNodeComponent = React.FC<{
   nodeId: string;

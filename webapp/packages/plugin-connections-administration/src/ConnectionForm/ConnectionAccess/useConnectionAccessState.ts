@@ -13,9 +13,9 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { DatabaseConnectionFragment } from '@cloudbeaver/core-sdk';
 import { useTabState } from '@cloudbeaver/core-ui';
-import { ILoadableState, isArraysEqual, isContainsException } from '@cloudbeaver/core-utils';
+import { type ILoadableState, isArraysEqual, isContainsException } from '@cloudbeaver/core-utils';
 
-import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
+import type { IConnectionAccessTabState } from './IConnectionAccessTabState.js';
 
 interface State extends ILoadableState {
   state: IConnectionAccessTabState;

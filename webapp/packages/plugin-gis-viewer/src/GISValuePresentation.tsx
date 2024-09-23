@@ -8,22 +8,22 @@
 import { observer } from 'mobx-react-lite';
 import proj4 from 'proj4';
 import { useCallback, useState } from 'react';
-import wellknown, { GeoJSONGeometry } from 'wellknown';
+import wellknown, { type GeoJSONGeometry } from 'wellknown';
 
 import { TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import {
-  IDatabaseDataModel,
-  IResultSetElementKey,
+  type IDatabaseDataModel,
+  type IResultSetElementKey,
   ResultSetDataKeysUtils,
   ResultSetDataSource,
   ResultSetSelectAction,
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { CrsInput } from './CrsInput';
+import { CrsInput } from './CrsInput.js';
 import classes from './GISValuePresentation.module.css';
-import { CrsKey, IAssociatedValue, IGeoJSONFeature, LeafletMap } from './LeafletMap';
-import { ResultSetGISAction } from './ResultSetGISAction';
+import { type CrsKey, type IAssociatedValue, type IGeoJSONFeature, LeafletMap } from './LeafletMap.js';
+import { ResultSetGISAction } from './ResultSetGISAction.js';
 
 proj4.defs('EPSG:3395', '+title=World Mercator +proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
 
@@ -153,11 +153,11 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
   }
 
   return (
-    <div className={classes.root}>
-      <div className={classes.map}>
+    <div className={classes['root']}>
+      <div className={classes['map']}>
         <LeafletMap key={currentCrs} geoJSON={parsedGISData} crsKey={currentCrs} getAssociatedValues={getAssociatedValues} />
       </div>
-      <div className={classes.toolbar}>
+      <div className={classes['toolbar']}>
         <CrsInput value={currentCrs} onChange={setCrs} />
       </div>
     </div>

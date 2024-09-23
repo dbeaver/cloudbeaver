@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { replaceSubstring } from './replaceSubstring';
+import { replaceSubstring } from './replaceSubstring.js';
 
 describe('replaceSubstring', () => {
   it('should replace a substring correctly', () => {

@@ -10,12 +10,12 @@ import { useContext } from 'react';
 
 import { EventContext } from '@cloudbeaver/core-events';
 
-import { Checkbox } from '../FormControls/Checkboxes/Checkbox';
-import { s } from '../s';
-import { useS } from '../useS';
-import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
-import { TableContext } from './TableContext';
-import { TableItemContext } from './TableItemContext';
+import { Checkbox } from '../FormControls/Checkboxes/Checkbox.js';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
+import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag.js';
+import { TableContext } from './TableContext.js';
+import { TableItemContext } from './TableItemContext.js';
 import styles from './TableItemSelect.module.css';
 
 interface Props {

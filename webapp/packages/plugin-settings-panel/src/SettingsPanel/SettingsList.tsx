@@ -16,8 +16,8 @@ import {
 } from '@cloudbeaver/core-settings';
 import type { ITreeData } from '@cloudbeaver/plugin-navigation-tree';
 
-import { SettingsGroup } from './SettingsGroup';
-import { useTreeScrollSync } from './useTreeScrollSync';
+import { SettingsGroup } from './SettingsGroup.js';
+import { useTreeScrollSync } from './useTreeScrollSync.js';
 
 interface Props {
   treeData: ITreeData;
@@ -32,7 +32,7 @@ export const SettingsList = observer<Props>(function SettingsList({ treeData, so
   const ref = useTreeScrollSync(treeData, onSettingsOpen);
 
   while (groups.length) {
-    const groupId = groups[0];
+    const groupId = groups[0]!;
     groups.splice(0, 1, ...treeData.getChildren(groupId));
 
     const group = ROOT_SETTINGS_GROUP.get(groupId)!;

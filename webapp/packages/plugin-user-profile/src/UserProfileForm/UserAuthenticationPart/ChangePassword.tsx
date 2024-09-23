@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Form, Group, GroupTitle, InputField, useCustomInputValidation, usePasswordValidation, useTranslate } from '@cloudbeaver/core-blocks';
 import { isValuesEqual } from '@cloudbeaver/core-utils';
 
-import type { IUserProfileFormAuthenticationState } from './IUserProfileFormAuthenticationState';
+import type { IUserProfileFormAuthenticationState } from './IUserProfileFormAuthenticationState.js';
 
 interface Props {
   state: IUserProfileFormAuthenticationState;

@@ -10,7 +10,7 @@ import { makeObservable, observable } from 'mobx';
 import { DetailsError, GQLError } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
-import { ENotificationType, IProcessNotificationState } from './INotification';
+import { ENotificationType, type IProcessNotificationState } from './INotification.js';
 
 export class ProcessNotificationController implements IProcessNotificationState {
   error: Error | null;

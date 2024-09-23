@@ -118,6 +118,9 @@ public class WebServiceBindingFS extends WebServiceBindingBase<DBWServiceFS> imp
 
     @Override
     public void addServlets(CBApplication application, DBWServletContext servletContext) throws DBException {
+        if (!application.isMultiuser()) {
+            return;
+        }
         servletContext.addServlet(
             "fileSystems",
             new WebFSServlet(application, getServiceImpl()),

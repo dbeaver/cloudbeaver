@@ -13,23 +13,22 @@ import {
   ACTION_COLLAPSE_ALL,
   ACTION_FILTER,
   ActionService,
-  DATA_CONTEXT_MENU,
   getBindingLabel,
-  IAction,
+  type IAction,
   KeyBindingService,
   MenuService,
 } from '@cloudbeaver/core-view';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 
-import { getNavigationTreeUserSettingsId } from '../../getNavigationTreeUserSettingsId';
-import { ACTION_LINK_OBJECT } from '../ACTION_LINK_OBJECT';
-import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE';
-import { KEY_BINDING_COLLAPSE_ALL } from '../KEY_BINDING_COLLAPSE_ALL';
-import { KEY_BINDING_LINK_OBJECT } from '../KEY_BINDING_LINK_OBJECT';
-import { MENU_ELEMENTS_TREE_TOOLS } from './MENU_ELEMENTS_TREE_TOOLS';
-import { createElementsTreeSettings, validateElementsTreeSettings } from './NavigationTreeSettings/createElementsTreeSettings';
-import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT';
-import { KEY_BINDING_ENABLE_FILTER } from './NavigationTreeSettings/KEY_BINDING_ENABLE_FILTER';
+import { getNavigationTreeUserSettingsId } from '../../getNavigationTreeUserSettingsId.js';
+import { ACTION_LINK_OBJECT } from '../ACTION_LINK_OBJECT.js';
+import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE.js';
+import { KEY_BINDING_COLLAPSE_ALL } from '../KEY_BINDING_COLLAPSE_ALL.js';
+import { KEY_BINDING_LINK_OBJECT } from '../KEY_BINDING_LINK_OBJECT.js';
+import { MENU_ELEMENTS_TREE_TOOLS } from './MENU_ELEMENTS_TREE_TOOLS.js';
+import { createElementsTreeSettings, validateElementsTreeSettings } from './NavigationTreeSettings/createElementsTreeSettings.js';
+import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT.js';
+import { KEY_BINDING_ENABLE_FILTER } from './NavigationTreeSettings/KEY_BINDING_ENABLE_FILTER.js';
 
 @injectable()
 export class ElementsTreeToolsMenuService {

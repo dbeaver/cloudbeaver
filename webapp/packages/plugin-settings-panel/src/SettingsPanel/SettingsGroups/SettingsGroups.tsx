@@ -7,9 +7,9 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ITreeData, Tree } from '@cloudbeaver/plugin-navigation-tree';
+import { type ITreeData, Tree } from '@cloudbeaver/plugin-navigation-tree';
 
-import { groupNodeRenderer } from './groupNodeRenderer';
+import { groupNodeRenderer } from './groupNodeRenderer.js';
 
 interface Props {
   treeData: ITreeData;

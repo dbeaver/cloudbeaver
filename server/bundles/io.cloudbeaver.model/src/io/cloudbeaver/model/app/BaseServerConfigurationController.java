@@ -18,6 +18,7 @@ package io.cloudbeaver.model.app;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.jkiss.code.NotNull;
 
 /**
  * Abstract class that contains methods for loading configuration with gson.
@@ -25,6 +26,7 @@ import com.google.gson.GsonBuilder;
 public abstract class BaseServerConfigurationController<T extends WebServerConfiguration>
     implements WebServerConfigurationController<T> {
 
+    @NotNull
     public Gson getGson() {
         return getGsonBuilder().create();
     }

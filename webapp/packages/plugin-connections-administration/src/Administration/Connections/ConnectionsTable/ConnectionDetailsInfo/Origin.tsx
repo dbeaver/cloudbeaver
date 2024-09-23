@@ -8,21 +8,21 @@
 import { observer } from 'mobx-react-lite';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { PlaceholderComponent, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
+import { type PlaceholderComponent, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
 
-import type { IConnectionDetailsPlaceholderProps } from '../../ConnectionsAdministrationService';
+import type { IConnectionDetailsPlaceholderProps } from '../../ConnectionsAdministrationService.js';
 import ConnectionDetailsStyles from './ConnectionDetailsStyles.module.css';
 
-export const Origin: PlaceholderComponent<IConnectionDetailsPlaceholderProps> = observer(function Origin({ connection }) {
-  const isLocal = connection.origin?.type === AUTH_PROVIDER_LOCAL_ID;
+export const Origin: PlaceholderComponent<IConnectionDetailsPlaceholderProps> = observer(function Origin({ connectionOrigin }) {
+  const isLocal = connectionOrigin?.origin?.type === AUTH_PROVIDER_LOCAL_ID;
   const style = useS(ConnectionDetailsStyles);
 
-  if (!connection.origin || isLocal) {
+  if (!connectionOrigin?.origin || isLocal) {
     return null;
   }
 
-  const icon = connection.origin.icon;
-  const title = connection.origin.displayName;
+  const icon = connectionOrigin.origin.icon;
+  const title = connectionOrigin.origin.displayName;
 
   return <StaticImage className={s(style, { staticImage: true })} icon={icon} title={title} />;
 });

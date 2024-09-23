@@ -8,10 +8,10 @@
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { DatabaseDataAction } from '../DatabaseDataAction';
-import type { IDatabaseDataSource } from '../IDatabaseDataSource';
-import { databaseDataAction } from './DatabaseDataActionDecorator';
-import type { IDatabaseDataMetadataAction } from './IDatabaseDataMetadataAction';
+import { DatabaseDataAction } from '../DatabaseDataAction.js';
+import type { IDatabaseDataSource } from '../IDatabaseDataSource.js';
+import { databaseDataAction } from './DatabaseDataActionDecorator.js';
+import type { IDatabaseDataMetadataAction } from './IDatabaseDataMetadataAction.js';
 
 @databaseDataAction()
 export class DatabaseMetadataAction<TKey> extends DatabaseDataAction<any, any> implements IDatabaseDataMetadataAction<TKey, any> {

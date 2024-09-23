@@ -10,9 +10,9 @@ import { forwardRef, useContext } from 'react';
 
 import { TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName } from '@cloudbeaver/core-blocks';
 
-import { TreeContext } from './contexts/TreeContext';
-import { TreeDataContext } from './contexts/TreeDataContext';
-import type { NodeControlComponent } from './INodeRenderer';
+import { TreeContext } from './contexts/TreeContext.js';
+import { TreeDataContext } from './contexts/TreeDataContext.js';
+import type { NodeControlComponent } from './INodeRenderer.js';
 
 export const NodeControl: NodeControlComponent = observer(
   forwardRef(function NodeControl({ nodeId }, ref) {

@@ -9,7 +9,7 @@ import { action } from 'mobx';
 
 import { LoadingError } from '@cloudbeaver/core-utils';
 
-import type { CachedResource } from './CachedResource';
+import type { CachedResource } from './CachedResource.js';
 
 export class ResourceError extends LoadingError {
   constructor(

@@ -10,11 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { s, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import type { IDataPresentationOptions } from '../DataPresentationService';
+import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
+import type { IDataPresentationOptions } from '../DataPresentationService.js';
 import styles from './DataPresentation.module.css';
-import type { IDataTableActions } from './IDataTableActions';
-import { TableStatistics } from './TableStatistics';
+import type { IDataTableActions } from './IDataTableActions.js';
+import { TableStatistics } from './TableStatistics.js';
 
 interface Props {
   model: IDatabaseDataModel;

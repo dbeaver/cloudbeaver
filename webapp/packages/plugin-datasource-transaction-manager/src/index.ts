@@ -5,6 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-export { datasourceTransactionManagerPlugin } from './manifest';
+export { datasourceTransactionManagerPlugin } from './manifest.js';
 
-export { TransactionManagerSettingsService } from './TransactionManagerSettingsService';
+export { TransactionManagerSettingsService } from './TransactionManagerSettingsService.js';

@@ -7,10 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { IconOrImage } from './IconOrImage';
+import { IconOrImage } from './IconOrImage.js';
 import style from './Link.module.css';
-import { s } from './s';
-import { useS } from './useS';
+import { s } from './s.js';
+import { useS } from './useS.js';
 
 interface Props extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   wrapper?: boolean;

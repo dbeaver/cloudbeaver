@@ -12,9 +12,9 @@ import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import type { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataSource } from '../DatabaseDataModel/DatabaseDataSource';
-import { IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions';
-import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet';
+import { DatabaseDataSource } from '../DatabaseDataModel/DatabaseDataSource.js';
+import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
+import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet.js';
 
 export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
   executionContext: IConnectionExecutionContext | null;
@@ -22,7 +22,7 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
   private keepExecutionContextOnDispose: boolean;
 
   constructor(
-    readonly serviceProvider: IServiceProvider,
+    override readonly serviceProvider: IServiceProvider,
     protected graphQLService: GraphQLService,
     protected asyncTaskInfoService: AsyncTaskInfoService,
   ) {
@@ -37,11 +37,11 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
     });
   }
 
-  isReadonly(resultIndex: number): boolean {
+  override isReadonly(resultIndex: number): boolean {
     return super.isReadonly(resultIndex) || !this.executionContext?.context || this.getResult(resultIndex)?.data?.hasRowIdentifier === false;
   }
 
-  async cancel(): Promise<void> {
+  override async cancel(): Promise<void> {
     await super.cancel();
     await this.cancelLoadTotalCount();
   }
@@ -97,12 +97,12 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
     return this.totalCountRequestTask;
   }
 
-  setResults(results: IDatabaseResultSet[]): this {
+  override setResults(results: IDatabaseResultSet[]): this {
     this.closeResults(this.results.filter(result => !results.some(r => r.id === result.id)));
     return super.setResults(results);
   }
 
-  async dispose(): Promise<void> {
+  override async dispose(): Promise<void> {
     await super.dispose();
     if (this.keepExecutionContextOnDispose) {
       await this.closeResults(this.results);
@@ -127,11 +127,11 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
 
     if (
       prevResults.length === 1 &&
-      prevResults[0].contextId === context.id &&
-      prevResults[0].connectionId === context.connectionId &&
-      prevResults[0].id !== null
+      prevResults[0]!.contextId === context.id &&
+      prevResults[0]!.connectionId === context.connectionId &&
+      prevResults[0]!.id !== null
     ) {
-      resultId = prevResults[0].id;
+      resultId = prevResults[0]!.id;
     }
 
     return resultId;

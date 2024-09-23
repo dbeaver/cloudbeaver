@@ -75,7 +75,7 @@ export class DevToolsService {
 
 function getDefaultDevToolsSettings(): IDevToolsSettings {
   return {
-    enabled: process.env.NODE_ENV === 'development',
+    enabled: process.env['NODE_ENV'] === 'development',
     distributed: false,
     configuration: false,
   };
