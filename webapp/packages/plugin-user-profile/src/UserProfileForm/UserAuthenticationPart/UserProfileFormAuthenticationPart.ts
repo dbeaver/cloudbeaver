@@ -5,10 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { PasswordPolicyService, UserInfoResource, UserResourceIncludes } from '@cloudbeaver/core-authentication';
+import type { PasswordPolicyService, UserInfoMetaParametersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { CachedResourceIncludeArgs } from '@cloudbeaver/core-resource';
-import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import { isValuesEqual, schemaValidationError } from '@cloudbeaver/core-utils';
 
@@ -19,18 +17,17 @@ import {
 } from './IUserProfileFormAuthenticationState.js';
 
 export class UserProfileFormAuthenticationPart extends FormPart<IUserProfileFormAuthenticationState, IUserProfileFormState> {
-  private baseIncludes: CachedResourceIncludeArgs<AdminUserInfoFragment, UserResourceIncludes>;
   constructor(
     formState: IFormState<IUserProfileFormState>,
     private readonly userInfoResource: UserInfoResource,
     private readonly passwordPolicyService: PasswordPolicyService,
+    private readonly userInfoMetaParametersResource: UserInfoMetaParametersResource,
   ) {
     super(formState, {
       oldPassword: '',
       password: '',
       repeatedPassword: '',
     });
-    this.baseIncludes = ['includeMetaParameters'];
   }
 
   protected override format(data: IFormState<IUserProfileFormState>, contexts: IExecutionContextProvider<IFormState<IUserProfileFormState>>): void {
@@ -40,11 +37,11 @@ export class UserProfileFormAuthenticationPart extends FormPart<IUserProfileForm
   }
 
   override isOutdated(): boolean {
-    return this.userInfoResource.isOutdated(undefined, this.baseIncludes);
+    return this.userInfoResource.isOutdated(undefined) || this.userInfoMetaParametersResource.isOutdated(undefined);
   }
 
   override isLoaded(): boolean {
-    return this.loaded && this.userInfoResource.isLoaded(undefined, this.baseIncludes);
+    return this.loaded && this.userInfoResource.isLoaded(undefined) && this.userInfoMetaParametersResource.isLoaded(undefined);
   }
 
   override get isChanged(): boolean {

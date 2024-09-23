@@ -28,9 +28,13 @@ export const coreAuthenticationManifest: PluginManifest = {
     () => import('./TeamsResource.js').then(m => m.TeamsResource),
     () => import('./TeamRolesResource.js').then(m => m.TeamRolesResource),
     () => import('./UserConfigurationBootstrap.js').then(m => m.UserConfigurationBootstrap),
+    () => import('./UserInfoMetaParametersResource.js').then(m => m.UserInfoMetaParametersResource),
     () => import('./UserDataService.js').then(m => m.UserDataService),
     () => import('./UserInfoResource.js').then(m => m.UserInfoResource),
+    () => import('./UsersOriginDetailsResource.js').then(m => m.UsersOriginDetailsResource),
     () => import('./UserMetaParametersResource.js').then(m => m.UserMetaParametersResource),
+    () => import('./UsersMetaParametersResource.js').then(m => m.UsersMetaParametersResource),
+    () => import('./TeamInfoMetaParametersResource.js').then(m => m.TeamInfoMetaParametersResource),
     () => import('./UsersResource.js').then(m => m.UsersResource),
   ],
 };

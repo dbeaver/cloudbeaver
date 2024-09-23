@@ -38,12 +38,11 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     super();
   }
 
-  async createTeam({ teamId, teamPermissions, teamName, description, metaParameters }: TeamInfo): Promise<TeamInfo> {
+  async createTeam({ teamId, teamPermissions, teamName, description }: TeamInfo): Promise<TeamInfo> {
     const response = await this.graphQLService.sdk.createTeam({
       teamId,
       teamName,
       description,
-      ...this.getDefaultIncludes(),
       ...this.getIncludesMap(teamId),
     });
 
@@ -55,24 +54,21 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
 
     this.set(newTeam.teamId, newTeam);
 
-    await this.setMetaParameters(newTeam.teamId, metaParameters);
     await this.setSubjectPermissions(newTeam.teamId, teamPermissions);
 
     return this.get(teamId)!;
   }
 
-  async updateTeam({ teamId, teamPermissions, teamName, description, metaParameters }: TeamInfo): Promise<TeamInfo> {
+  async updateTeam({ teamId, teamPermissions, teamName, description }: TeamInfo): Promise<TeamInfo> {
     const { team } = await this.graphQLService.sdk.updateTeam({
       teamId,
       teamName,
       description,
-      ...this.getDefaultIncludes(),
       ...this.getIncludesMap(teamId),
     });
 
     this.set(team.teamId, team);
 
-    await this.setMetaParameters(team.teamId, metaParameters);
     await this.setSubjectPermissions(team.teamId, teamPermissions);
 
     this.markOutdated(team.teamId);
@@ -123,10 +119,6 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     }
   }
 
-  async setMetaParameters(teamId: string, parameters: Record<string, any>): Promise<void> {
-    await this.graphQLService.sdk.saveTeamMetaParameters({ teamId, parameters });
-  }
-
   protected async loader(originalKey: ResourceKey<string>, includes?: string[]): Promise<Map<string, TeamInfo>> {
     const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
     const teamsList: TeamInfo[] = [];
@@ -140,7 +132,6 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
 
       const { teams } = await this.graphQLService.sdk.getTeamsList({
         teamId,
-        ...this.getDefaultIncludes(),
         ...this.getIncludesMap(teamId, includes),
       });
 
@@ -166,12 +157,6 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
   protected override dataSet(key: string, value: AdminTeamInfoFragment): void {
     const oldTeam = this.dataGet(key);
     super.dataSet(key, { ...oldTeam, ...value });
-  }
-
-  private getDefaultIncludes(): TeamResourceIncludes {
-    return {
-      includeMetaParameters: false,
-    };
   }
 
   protected validateKey(key: string): boolean {

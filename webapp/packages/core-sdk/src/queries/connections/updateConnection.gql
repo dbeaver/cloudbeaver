@@ -1,8 +1,6 @@
 mutation updateConnection(
   $projectId: ID!
   $config: ConnectionConfig!
-  $includeOrigin: Boolean!
-  $customIncludeOriginDetails: Boolean!
   $includeAuthProperties: Boolean!
   $includeNetworkHandlersConfig: Boolean!
   $includeCredentialsSaved: Boolean!
