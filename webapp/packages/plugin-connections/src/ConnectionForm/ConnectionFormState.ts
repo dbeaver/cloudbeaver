@@ -8,7 +8,6 @@
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import {
-  ConnectionInfoOriginDetailsResource,
   ConnectionInfoOriginResource,
   ConnectionInfoResource,
   createConnectionParam,
@@ -63,14 +62,6 @@ export class ConnectionFormState implements IConnectionFormState {
     return this.resource.get(createConnectionParam(this.projectId, this.config.connectionId));
   }
 
-  get originDetails() {
-    if (!this.config.connectionId || this.projectId === null) {
-      return undefined;
-    }
-
-    this.originDetailsResource.get(createConnectionParam(this.projectId, this.config.connectionId));
-  }
-
   get originInfo() {
     if (!this.config.connectionId || this.projectId === null) {
       return undefined;
@@ -120,7 +111,6 @@ export class ConnectionFormState implements IConnectionFormState {
     service: ConnectionFormService,
     resource: ConnectionInfoResource,
     private readonly originResource: ConnectionInfoOriginResource,
-    private readonly originDetailsResource: ConnectionInfoOriginDetailsResource,
   ) {
     this._id = uuid();
     this.initError = null;
@@ -191,7 +181,6 @@ export class ConnectionFormState implements IConnectionFormState {
       _availableDrivers: observable,
       info: computed,
       originInfo: computed,
-      originDetails: computed,
       statusMessage: observable,
       configured: observable,
       readonly: computed,
@@ -345,6 +334,6 @@ export class ConnectionFormState implements IConnectionFormState {
       return;
     }
 
-    Promise.all([data.resource.load(key, configuration.connectionIncludes), this.originResource.load(key), this.originDetailsResource.load(key)]);
+    await data.resource.load(key, configuration.connectionIncludes);
   }
 }

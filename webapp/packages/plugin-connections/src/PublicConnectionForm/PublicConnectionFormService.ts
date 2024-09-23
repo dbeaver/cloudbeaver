@@ -10,7 +10,6 @@ import { action, makeObservable, observable } from 'mobx';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
-  ConnectionInfoOriginDetailsResource,
   ConnectionInfoOriginResource,
   ConnectionInfoResource,
   ConnectionsManagerService,
@@ -51,7 +50,6 @@ export class PublicConnectionFormService {
     private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
-    private readonly connectionInfoOriginDetailsResource: ConnectionInfoOriginDetailsResource,
   ) {
     this.formState = null;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
@@ -92,7 +90,6 @@ export class PublicConnectionFormService {
         this.connectionFormService,
         this.connectionInfoResource,
         this.connectionInfoOriginResource,
-        this.connectionInfoOriginDetailsResource,
       );
 
       this.formState.closeTask.addHandler(this.close.bind(this, true));

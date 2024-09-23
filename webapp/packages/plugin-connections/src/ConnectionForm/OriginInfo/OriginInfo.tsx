@@ -21,7 +21,12 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { createConnectionParam, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import {
+  ConnectionInfoOriginDetailsResource,
+  createConnectionParam,
+  DatabaseAuthModelsResource,
+  DBDriverResource,
+} from '@cloudbeaver/core-connections';
 import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
@@ -29,7 +34,7 @@ import styles from './OriginInfo.module.css';
 
 export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = observer(function OriginInfo({
   tabId,
-  state: { info, resource, config, originDetails },
+  state: { info, resource, config },
 }) {
   const tab = useTab(tabId);
   const translate = useTranslate();
@@ -46,19 +51,14 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   const providerId = authModeLoader.data?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
   const isAuthenticated = userInfoLoader.resource.hasToken(providerId);
   const providerLoader = useResource(OriginInfo, AuthProvidersResource, providerId);
-  const connectionId =
-    tab.selected && info
-      ? createConnectionParam({
-          id: info.id,
-          projectId: info.projectId,
-        })
-      : null;
+  const connectionId = tab.selected && info ? createConnectionParam(info.projectId, info.id) : null;
 
+  const connectionOriginDetailsResource = useResource(OriginInfo, ConnectionInfoOriginDetailsResource, connectionId);
   const connection = useResource(OriginInfo, resource, connectionId, {
     active: isAuthenticated,
     onData: connection => {
       runInAction(() => {
-        if (!originDetails?.origin.details) {
+        if (!connectionOriginDetailsResource.data?.origin.details) {
           return;
         }
 
@@ -67,7 +67,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
           delete state[property];
         }
 
-        for (const property of originDetails.origin.details) {
+        for (const property of connectionOriginDetailsResource.data.origin.details) {
           state[property.id!] = property.value;
         }
       });
@@ -102,7 +102,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
     );
   }
 
-  if (!originDetails?.origin.details || originDetails?.origin.details.length === 0) {
+  if (!connectionOriginDetailsResource.data?.origin.details || connectionOriginDetailsResource.data?.origin.details.length === 0) {
     return (
       <ColoredContainer className={s(style, { coloredContainer: true })} parent>
         <TextPlaceholder>{translate('connections_administration_connection_no_information')}</TextPlaceholder>
@@ -113,7 +113,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   return (
     <ColoredContainer className={s(style, { coloredContainer: true })} parent>
       <Group large gap>
-        <ObjectPropertyInfoForm properties={originDetails?.origin.details} state={state} readOnly small autoHide />
+        <ObjectPropertyInfoForm properties={connectionOriginDetailsResource.data?.origin.details} state={state} readOnly small autoHide />
       </Group>
       <Loader key="overlay" className={s(style, { loader: true })} loading={connection.isLoading()} overlay />
     </ColoredContainer>
