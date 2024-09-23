@@ -11,9 +11,9 @@ import type { TeamInfo } from '@cloudbeaver/core-authentication';
 import { Loader, Placeholder, s, TableColumnValue, TableItem, TableItemExpand, TableItemSelect, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { TeamsAdministrationService } from '../TeamsAdministrationService';
+import { TeamsAdministrationService } from '../TeamsAdministrationService.js';
 import style from './Team.module.css';
-import { TeamEdit } from './TeamEdit';
+import { TeamEdit } from './TeamEdit.js';
 
 interface Props {
   team: TeamInfo;

@@ -11,10 +11,10 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ACTION_CREATE, ActionService, MenuService } from '@cloudbeaver/core-view';
 
-import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService';
-import { MENU_USERS_ADMINISTRATION } from '../../../Menus/MENU_USERS_ADMINISTRATION';
-import { ADMINISTRATION_ITEM_USER_CREATE_PARAM } from '../ADMINISTRATION_ITEM_USER_CREATE_PARAM';
-import { CreateUserService } from './CreateUserService';
+import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService.js';
+import { MENU_USERS_ADMINISTRATION } from '../../../Menus/MENU_USERS_ADMINISTRATION.js';
+import { ADMINISTRATION_ITEM_USER_CREATE_PARAM } from '../ADMINISTRATION_ITEM_USER_CREATE_PARAM.js';
+import { CreateUserService } from './CreateUserService.js';
 
 @injectable()
 export class CreateUserBootstrap extends Bootstrap {
@@ -28,7 +28,7 @@ export class CreateUserBootstrap extends Bootstrap {
     super();
   }
 
-  register() {
+  override register() {
     this.menuService.addCreator({
       menus: [MENU_USERS_ADMINISTRATION],
       getItems(context, items) {

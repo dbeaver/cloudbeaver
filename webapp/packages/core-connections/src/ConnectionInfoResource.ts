@@ -9,7 +9,7 @@ import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { ExecutorInterrupter, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import {
   CachedMapAllKey,
@@ -23,25 +23,25 @@ import {
   resourceKeyListAliasFactory,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
-import { DataSynchronizationService, NavigatorViewSettings, ServerEventId, SessionDataResource } from '@cloudbeaver/core-root';
+import { DataSynchronizationService, type NavigatorViewSettings, ServerEventId, SessionDataResource } from '@cloudbeaver/core-root';
 import {
-  AdminConnectionGrantInfo,
-  AdminConnectionSearchInfo,
-  ConnectionConfig,
-  GetUserConnectionsQueryVariables,
+  type AdminConnectionGrantInfo,
+  type AdminConnectionSearchInfo,
+  type ConnectionConfig,
+  type GetUserConnectionsQueryVariables,
   GraphQLService,
-  InitConnectionMutationVariables,
-  NavigatorSettingsInput,
-  TestConnectionMutation,
-  UserConnectionAuthPropertiesFragment,
+  type InitConnectionMutationVariables,
+  type NavigatorSettingsInput,
+  type TestConnectionMutation,
+  type UserConnectionAuthPropertiesFragment,
 } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 
-import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
-import { ConnectionInfoEventHandler, IConnectionInfoEvent } from './ConnectionInfoEventHandler';
-import type { DatabaseConnection } from './DatabaseConnection';
-import { DBDriverResource } from './DBDriverResource';
-import { parseConnectionKey } from './parseConnectionKey';
+import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA.js';
+import { ConnectionInfoEventHandler, type IConnectionInfoEvent } from './ConnectionInfoEventHandler.js';
+import type { DatabaseConnection } from './DatabaseConnection.js';
+import { DBDriverResource } from './DBDriverResource.js';
+import { parseConnectionKey } from './parseConnectionKey.js';
 
 export type Connection = DatabaseConnection & {
   authProperties?: UserConnectionAuthPropertiesFragment[];
@@ -481,7 +481,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     }
   }
 
-  isKeyEqual(param: IConnectionInfoParams, second: IConnectionInfoParams): boolean {
+  override isKeyEqual(param: IConnectionInfoParams, second: IConnectionInfoParams): boolean {
     return isConnectionInfoParamEqual(param, second);
   }
 
@@ -542,7 +542,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     return this.data;
   }
 
-  protected dataSet(key: IConnectionInfoParams, value: Connection): void {
+  protected override dataSet(key: IConnectionInfoParams, value: Connection): void {
     const oldConnection = this.dataGet(key);
     if (value.nodePath) {
       this.nodeIdMap.set(value.nodePath, key);
@@ -561,7 +561,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     }
   }
 
-  protected dataDelete(key: IConnectionInfoParams): void {
+  protected override dataDelete(key: IConnectionInfoParams): void {
     const connection = this.dataGet(key);
     if (connection?.nodePath) {
       this.nodeIdMap.delete(connection.nodePath);
@@ -569,7 +569,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     super.dataDelete(key);
   }
 
-  protected resetDataToDefault(): void {
+  protected override resetDataToDefault(): void {
     super.resetDataToDefault();
     this.nodeIdMap.clear();
   }

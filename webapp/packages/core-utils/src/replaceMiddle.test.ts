@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { replaceMiddle } from './replaceMiddle';
+import { replaceMiddle } from './replaceMiddle.js';
 
 describe('replaceMiddle', () => {
   it('should replace middle of string', () => {

@@ -10,7 +10,7 @@ import { useCallback } from 'react';
 
 import { Container, MenuBarSmallItem, s, Textarea, useClipboard, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import type { ILogEntry } from './ILogEntry';
+import type { ILogEntry } from './ILogEntry.js';
 import classes from './LogViewerInfoPanel.module.css';
 
 interface Props {

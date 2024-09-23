@@ -9,13 +9,13 @@ import { observable } from 'mobx';
 
 import {
   expandOffsetPageRange,
-  ICachedResourceOffsetPage,
+  type ICachedResourceOffsetPage,
   type ICachedResourceOffsetPageOptions,
   isOffsetPageInRange,
-} from './CachedResourceOffsetPageKeys';
-import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
-import type { ResourceAlias } from './ResourceAlias';
-import type { ResourceMetadata } from './ResourceMetadata';
+} from './CachedResourceOffsetPageKeys.js';
+import type { ICachedResourceMetadata } from './ICachedResourceMetadata.js';
+import type { ResourceAlias } from './ResourceAlias.js';
+import type { ResourceMetadata } from './ResourceMetadata.js';
 
 export class ResourceOffsetPagination<TKey, TMetadata extends ICachedResourceMetadata> {
   constructor(

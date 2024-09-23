@@ -8,10 +8,10 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { generateTabElement } from './generateTabElement';
-import { TabPanel } from './TabPanel';
-import type { ITabInfo } from './TabsContainer/ITabsContainer';
-import { TabsContext } from './TabsContext';
+import { generateTabElement } from './generateTabElement.js';
+import { TabPanel } from './TabPanel.js';
+import type { ITabInfo } from './TabsContainer/ITabsContainer.js';
+import { TabsContext } from './TabsContext.js';
 
 export interface TabPanelListProps {
   contents?: boolean;

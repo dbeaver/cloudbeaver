@@ -6,18 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 import {
-  AdministrationItemContentProps,
+  type AdministrationItemContentProps,
   AdministrationItemService,
   AdministrationItemType,
-  IAdministrationItem,
+  type IAdministrationItem,
 } from '@cloudbeaver/core-administration';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ServerLicenseStatusResource } from '@cloudbeaver/core-root';
-import { ITabInfoOptions, TabsContainer } from '@cloudbeaver/core-ui';
+import { type ITabInfoOptions, TabsContainer } from '@cloudbeaver/core-ui';
 
-const ProductInfoDrawerItem = importLazyComponent(() => import('./ProductInfoDrawerItem').then(m => m.ProductInfoDrawerItem));
-const ProductInfoPage = importLazyComponent(() => import('./ProductInfoPage').then(m => m.ProductInfoPage));
+const ProductInfoDrawerItem = importLazyComponent(() => import('./ProductInfoDrawerItem.js').then(m => m.ProductInfoDrawerItem));
+const ProductInfoPage = importLazyComponent(() => import('./ProductInfoPage.js').then(m => m.ProductInfoPage));
 
 @injectable()
 export class ProductInfoService extends Dependency {

@@ -7,12 +7,12 @@
  */
 import { forwardRef } from 'react';
 
-import { s } from '../s';
-import { useS } from '../useS';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
 import containerStyles from './Container.module.css';
-import { filterContainerFakeProps, getContainerProps } from './filterContainerFakeProps';
+import { filterContainerFakeProps, getContainerProps } from './filterContainerFakeProps.js';
 import style from './Group.module.css';
-import type { IContainerProps } from './IContainerProps';
+import type { IContainerProps } from './IContainerProps.js';
 import elementsSizeStyles from './shared/ElementsSize.module.css';
 
 interface Props extends IContainerProps {

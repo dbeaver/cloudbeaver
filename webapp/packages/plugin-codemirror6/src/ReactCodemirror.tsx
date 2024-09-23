@@ -6,18 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 import { MergeView } from '@codemirror/merge';
-import { Annotation, Compartment, EditorState, Extension, StateEffect, TransactionSpec } from '@codemirror/state';
+import { Annotation, Compartment, EditorState, type Extension, StateEffect, type TransactionSpec } from '@codemirror/state';
 import { EditorView, ViewUpdate } from '@codemirror/view';
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 
-import type { IEditorRef } from './IEditorRef';
-import type { IReactCodeMirrorProps } from './IReactCodemirrorProps';
-import { type IReactCodemirrorContext, ReactCodemirrorContext } from './ReactCodemirrorContext';
-import { useCodemirrorExtensions } from './useCodemirrorExtensions';
-import { validateCursorBoundaries } from './validateCursorBoundaries';
+import type { IEditorRef } from './IEditorRef.js';
+import type { IReactCodeMirrorProps } from './IReactCodemirrorProps.js';
+import { type IReactCodemirrorContext, ReactCodemirrorContext } from './ReactCodemirrorContext.js';
+import { useCodemirrorExtensions } from './useCodemirrorExtensions.js';
+import { validateCursorBoundaries } from './validateCursorBoundaries.js';
 
 const External = Annotation.define<boolean>();
 

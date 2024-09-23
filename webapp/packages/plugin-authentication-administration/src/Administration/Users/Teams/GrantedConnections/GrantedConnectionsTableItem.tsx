@@ -38,7 +38,7 @@ export const GrantedConnectionsTableItem = observer<Props>(function GrantedConne
         <TableItemSelect disabled={disabled} />
       </TableColumnValue>
       <TableColumnValue flex centerContent>
-        {icon && <StaticImage className={style.staticImage} icon={icon} title={iconTooltip} />}
+        {icon && <StaticImage className={style['staticImage']} icon={icon} title={iconTooltip} />}
       </TableColumnValue>
       <TableColumnValue title={name} ellipsis>
         {name}

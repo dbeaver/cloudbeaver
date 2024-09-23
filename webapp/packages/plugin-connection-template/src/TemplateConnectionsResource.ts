@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { AppAuthService } from '@cloudbeaver/core-authentication';
-import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { type Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { SessionDataResource } from '@cloudbeaver/core-root';

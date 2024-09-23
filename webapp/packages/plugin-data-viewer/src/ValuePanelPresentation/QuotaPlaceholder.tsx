@@ -11,10 +11,10 @@ import { Container, Link, s, usePermission, useS, useTranslate } from '@cloudbea
 import { EAdminPermission } from '@cloudbeaver/core-root';
 import { WebsiteLinks } from '@cloudbeaver/core-website';
 
-import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
-import { ResultSetDataContentAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
-import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import { ResultSetDataSource } from '../ResultSet/ResultSetDataSource';
+import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
+import { ResultSetDataContentAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.js';
+import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
+import { ResultSetDataSource } from '../ResultSet/ResultSetDataSource.js';
 import styles from './QuotaPlaceholder.module.css';
 
 interface Props {

@@ -8,28 +8,28 @@
 import { observable } from 'mobx';
 
 import {
-  Connection,
+  type Connection,
   ConnectionExecutionContextProjectKey,
   ConnectionExecutionContextResource,
   ConnectionExecutionContextService,
   ConnectionInfoResource,
   ConnectionsManagerService,
   createConnectionParam,
-  IConnectionExecutionContext,
-  IConnectionExecutionContextInfo,
-  IConnectionInfoParams,
+  type IConnectionExecutionContext,
+  type IConnectionExecutionContextInfo,
+  type IConnectionInfoParams,
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { FEATURE_GIT_ID, ServerConfigResource } from '@cloudbeaver/core-root';
-import { GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type SqlCompletionProposal, type SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
 
-import { getSqlEditorName } from './getSqlEditorName';
-import type { ISqlEditorTabState } from './ISqlEditorTabState';
-import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures';
-import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
-import { SqlEditorSettingsService } from './SqlEditorSettingsService';
+import { getSqlEditorName } from './getSqlEditorName.js';
+import type { ISqlEditorTabState } from './ISqlEditorTabState.js';
+import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures.js';
+import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
+import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
 
 export type SQLProposal = SqlCompletionProposal;
 

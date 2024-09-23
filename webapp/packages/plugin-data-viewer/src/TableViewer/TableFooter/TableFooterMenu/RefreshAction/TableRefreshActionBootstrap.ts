@@ -8,21 +8,23 @@
 import { observable } from 'mobx';
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { IDataContextProvider } from '@cloudbeaver/core-data-context';
+import { type IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { declensionOfNumber } from '@cloudbeaver/core-utils';
 import { ACTION_REFRESH, ActionService, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
-import { IDatabaseRefreshState } from '../../../../DatabaseDataModel/Actions/DatabaseRefreshAction';
-import { DATA_CONTEXT_DV_DDM } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
-import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';
-import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from '../DATA_VIEWER_DATA_MODEL_ACTIONS_MENU';
-import { getRefreshState } from './getRefreshState';
-import { MENU_DATA_VIEWER_AUTO_REFRESH } from './MENU_DATA_VIEWER_AUTO_REFRESH';
+import { type IDatabaseRefreshState } from '../../../../DatabaseDataModel/Actions/DatabaseRefreshAction.js';
+import { DATA_CONTEXT_DV_DDM } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
+import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX.js';
+import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from '../DATA_VIEWER_DATA_MODEL_ACTIONS_MENU.js';
+import { getRefreshState } from './getRefreshState.js';
+import { MENU_DATA_VIEWER_AUTO_REFRESH } from './MENU_DATA_VIEWER_AUTO_REFRESH.js';
 
-const AutoRefreshSettingsDialog = importLazyComponent(() => import('./AutoRefreshSettingsDialog').then(module => module.AutoRefreshSettingsDialog));
+const AutoRefreshSettingsDialog = importLazyComponent(() =>
+  import('./AutoRefreshSettingsDialog.js').then(module => module.AutoRefreshSettingsDialog),
+);
 
 const AUTO_REFRESH_INTERVALS = [5, 10, 15, 30, 60];
 
@@ -37,7 +39,7 @@ export class TableRefreshActionBootstrap extends Bootstrap {
     super();
   }
 
-  register() {
+  override register() {
     this.registerGeneralActions();
   }
 

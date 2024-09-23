@@ -8,11 +8,11 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { Checkbox } from '../FormControls/Checkboxes/Checkbox';
-import { useTranslate } from '../localization/useTranslate';
-import { s } from '../s';
-import { useS } from '../useS';
-import { TableContext } from './TableContext';
+import { Checkbox } from '../FormControls/Checkboxes/Checkbox.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
+import { TableContext } from './TableContext.js';
 import style from './TableSelect.module.css';
 
 interface Props {

@@ -19,10 +19,10 @@ import {
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
 import { SessionDataResource } from '@cloudbeaver/core-root';
-import { ConnectionFolderInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
+import { type ConnectionFolderInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { createConnectionFolderParam } from './createConnectionFolderParam';
-import { getConnectionFolderIdFromNodeId } from './NavTree/getConnectionFolderIdFromNodeId';
+import { createConnectionFolderParam } from './createConnectionFolderParam.js';
+import { getConnectionFolderIdFromNodeId } from './NavTree/getConnectionFolderIdFromNodeId.js';
 
 export type ConnectionFolder = ConnectionFolderInfoFragment;
 
@@ -131,7 +131,7 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
     return this.data;
   }
 
-  isKeyEqual(param: IConnectionFolderParam, second: IConnectionFolderParam): boolean {
+  override isKeyEqual(param: IConnectionFolderParam, second: IConnectionFolderParam): boolean {
     return param.projectId === second.projectId && param.folderId === second.folderId;
   }
 

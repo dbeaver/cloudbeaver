@@ -7,11 +7,14 @@
  */
 import type { PasswordPolicyService, UserInfoMetaParametersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { FormPart, formValidationContext, IFormState } from '@cloudbeaver/core-ui';
+import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import { isValuesEqual, schemaValidationError } from '@cloudbeaver/core-utils';
 
-import type { IUserProfileFormState } from '../UserProfileFormService';
-import { type IUserProfileFormAuthenticationState, USER_PROFILE_FORM_AUTHENTICATION_PART_STATE_SCHEMA } from './IUserProfileFormAuthenticationState';
+import type { IUserProfileFormState } from '../UserProfileFormService.js';
+import {
+  type IUserProfileFormAuthenticationState,
+  USER_PROFILE_FORM_AUTHENTICATION_PART_STATE_SCHEMA,
+} from './IUserProfileFormAuthenticationState.js';
 
 export class UserProfileFormAuthenticationPart extends FormPart<IUserProfileFormAuthenticationState, IUserProfileFormState> {
   constructor(
@@ -27,21 +30,21 @@ export class UserProfileFormAuthenticationPart extends FormPart<IUserProfileForm
     });
   }
 
-  protected format(data: IFormState<IUserProfileFormState>, contexts: IExecutionContextProvider<IFormState<IUserProfileFormState>>): void {
+  protected override format(data: IFormState<IUserProfileFormState>, contexts: IExecutionContextProvider<IFormState<IUserProfileFormState>>): void {
     const parsed = USER_PROFILE_FORM_AUTHENTICATION_PART_STATE_SCHEMA.safeParse(this.state);
 
     this.state = parsed.success ? parsed.data : this.initialState;
   }
 
-  isOutdated(): boolean {
+  override isOutdated(): boolean {
     return this.userInfoResource.isOutdated(undefined) || this.userInfoMetaParametersResource.isOutdated(undefined);
   }
 
-  isLoaded(): boolean {
+  override isLoaded(): boolean {
     return this.loaded && this.userInfoResource.isLoaded(undefined) && this.userInfoMetaParametersResource.isLoaded(undefined);
   }
 
-  get isChanged(): boolean {
+  override get isChanged(): boolean {
     if (!this.loaded) {
       return false;
     }
@@ -53,7 +56,7 @@ export class UserProfileFormAuthenticationPart extends FormPart<IUserProfileForm
     );
   }
 
-  protected validate(
+  protected override validate(
     data: IFormState<IUserProfileFormState>,
     contexts: IExecutionContextProvider<IFormState<IUserProfileFormState>>,
   ): void | Promise<void> {

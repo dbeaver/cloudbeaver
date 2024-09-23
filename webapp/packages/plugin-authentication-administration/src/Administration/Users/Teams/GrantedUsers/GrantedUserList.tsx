@@ -30,12 +30,12 @@ import { useService } from '@cloudbeaver/core-di';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
-import { getFilteredUsers } from './getFilteredUsers';
+import { getFilteredUsers } from './getFilteredUsers.js';
 import style from './GrantedUserList.module.css';
-import { GrantedUsersTableHeader, IFilterState } from './GrantedUsersTableHeader/GrantedUsersTableHeader';
-import { GrantedUsersTableInnerHeader } from './GrantedUsersTableHeader/GrantedUsersTableInnerHeader';
-import { GrantedUsersTableItem } from './GrantedUsersTableItem';
-import type { IGrantedUser } from './IGrantedUser';
+import { GrantedUsersTableHeader, type IFilterState } from './GrantedUsersTableHeader/GrantedUsersTableHeader.js';
+import { GrantedUsersTableInnerHeader } from './GrantedUsersTableHeader/GrantedUsersTableInnerHeader.js';
+import { GrantedUsersTableItem } from './GrantedUsersTableItem.js';
+import type { IGrantedUser } from './IGrantedUser.js';
 
 interface Props {
   grantedUsers: IGrantedUser[];

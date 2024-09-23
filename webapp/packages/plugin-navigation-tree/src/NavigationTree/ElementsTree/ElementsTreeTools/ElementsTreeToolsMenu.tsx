@@ -7,16 +7,16 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
+import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
-import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE';
-import type { IElementsTree } from '../useElementsTree';
+import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE.js';
+import type { IElementsTree } from '../useElementsTree.js';
 import elementsTreeMenuBarItemStyles from './ElementsTreeMenuBarItem.module.css';
 import style from './ElementsTreeToolsMenu.module.css';
-import { MENU_ELEMENTS_TREE_TOOLS } from './MENU_ELEMENTS_TREE_TOOLS';
+import { MENU_ELEMENTS_TREE_TOOLS } from './MENU_ELEMENTS_TREE_TOOLS.js';
 
 interface Props {
   tree: IElementsTree;
@@ -45,7 +45,7 @@ export const ElementsTreeToolsMenu = observer<Props>(function ElementsTreeToolsM
   return (
     <SContext registry={registry}>
       <div className={s(styles, { wrapper: true }, className)}>
-        <MenuBar className={s(elementsTreeMenuBarItemStyles, { toolsMenu: true }, menuBarStyles.floating)} menu={menu} />
+        <MenuBar className={s(elementsTreeMenuBarItemStyles, { toolsMenu: true }, menuBarStyles['floating'])} menu={menu} />
       </div>
     </SContext>
   );

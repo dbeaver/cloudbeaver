@@ -11,12 +11,12 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { isResultSetDataSource } from '../../ResultSet/ResultSetDataSource';
-import { DataValuePanelService } from '../../TableViewer/ValuePanel/DataValuePanelService';
-import { isBlobPresentationAvailable } from './isTextValuePresentationAvailable';
-import { TextValuePresentationService } from './TextValuePresentationService';
+import { isResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
+import { DataValuePanelService } from '../../TableViewer/ValuePanel/DataValuePanelService.js';
+import { isBlobPresentationAvailable } from './isTextValuePresentationAvailable.js';
+import { TextValuePresentationService } from './TextValuePresentationService.js';
 
-const TextValuePresentation = importLazyComponent(() => import('./TextValuePresentation').then(module => module.TextValuePresentation));
+const TextValuePresentation = importLazyComponent(() => import('./TextValuePresentation.js').then(module => module.TextValuePresentation));
 
 @injectable()
 export class TextValuePresentationBootstrap extends Bootstrap {
@@ -27,7 +27,7 @@ export class TextValuePresentationBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.dataValuePanelService.add({
       key: 'text-presentation',
       options: {

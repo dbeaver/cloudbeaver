@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { CachedDataResource, ResourceKey } from '@cloudbeaver/core-resource';
+import { CachedDataResource, type ResourceKey } from '@cloudbeaver/core-resource';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { UserInfoResource } from './UserInfoResource';
-import type { UserMetaParameter } from './UserMetaParametersResource';
+import { UserInfoResource } from './UserInfoResource.js';
+import type { UserMetaParameter } from './UserMetaParametersResource.js';
 
 @injectable()
 export class UserInfoMetaParametersResource extends CachedDataResource<UserMetaParameter | undefined> {

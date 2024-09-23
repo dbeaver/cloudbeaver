@@ -11,14 +11,14 @@ import { ExceptionsCatcherService } from '@cloudbeaver/core-events';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DataPresentationService } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService';
-import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService';
-import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService';
-import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService';
-import { DataGridContextMenuService } from './DataGrid/DataGridContextMenu/DataGridContextMenuService';
-import { DataGridSettingsService } from './DataGridSettingsService';
+import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService.js';
+import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService.js';
+import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService.js';
+import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService.js';
+import { DataGridContextMenuService } from './DataGrid/DataGridContextMenu/DataGridContextMenuService.js';
+import { DataGridSettingsService } from './DataGridSettingsService.js';
 
-const SpreadsheetGrid = importLazyComponent(() => import('./SpreadsheetGrid').then(m => m.SpreadsheetGrid));
+const SpreadsheetGrid = importLazyComponent(() => import('./SpreadsheetGrid.js').then(m => m.SpreadsheetGrid));
 
 @injectable()
 export class SpreadsheetBootstrap extends Bootstrap {
@@ -36,7 +36,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
     exceptionsCatcherService.ignore('ResizeObserver loop completed with undelivered notifications.'); // Produces by react-data-grid
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.dataPresentationService.add({
       id: 'spreadsheet_grid',
       dataFormat: ResultDataFormat.Resultset,
@@ -66,6 +66,4 @@ export class SpreadsheetBootstrap extends Bootstrap {
       },
     });
   }
-
-  load(): void | Promise<void> {}
 }

@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ConnectionImageWithMaskSvg } from './ConnectionImageWithMaskSvg';
-import { ConnectionMark } from './ConnectionMark';
+import { ConnectionImageWithMaskSvg } from './ConnectionImageWithMaskSvg.js';
+import { ConnectionMark } from './ConnectionMark.js';
 
 interface Props {
   icon?: string;

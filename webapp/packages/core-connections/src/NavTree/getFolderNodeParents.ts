@@ -8,13 +8,13 @@
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
 import { getPathParents } from '@cloudbeaver/core-utils';
 
-import { isFolderNodeId } from './isFolderNodeId';
+import { isFolderNodeId } from './isFolderNodeId.js';
 
 export function getFolderNodeParents(nodeId: string): string[] {
   if (isFolderNodeId(nodeId)) {
     const parents = getPathParents(nodeId);
 
-    return [parents[0], getProjectNodeId(parents[1].replace('folder://', '')), ...parents.slice(2)];
+    return [parents[0]!, getProjectNodeId(parents[1]!.replace('folder://', '')), ...parents.slice(2)];
   }
 
   return [];

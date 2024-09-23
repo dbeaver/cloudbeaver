@@ -28,7 +28,7 @@ export const UsersTableItem = observer<Props>(function UsersTableItem({ id, name
         <TableItemSelect disabled={disabled} />
       </TableColumnValue>
       <TableColumnValue>
-        <StaticImage className={style.staticImage} icon={icon} title={iconTooltip} />
+        <StaticImage className={style['staticImage']} icon={icon} title={iconTooltip} />
       </TableColumnValue>
       <TableColumnValue>{name}</TableColumnValue>
     </TableItem>

@@ -7,6 +7,6 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
-import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
+import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute.js';
 
 export const DATA_CONTEXT_ADMINISTRATION_ITEM_ROUTE = createDataContext<IAdministrationItemRoute>('AdministrationItemRoute');

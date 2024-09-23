@@ -13,7 +13,7 @@ export const coreBrowserSettingsManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./BrowserSettingsService').then(m => m.BrowserSettingsService),
-    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./BrowserSettingsService.js').then(m => m.BrowserSettingsService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
   ],
 };

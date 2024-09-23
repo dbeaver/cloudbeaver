@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 
-import { NAV_NODE_DDL_ID } from '../NAV_NODE_DDL_ID';
+import { NAV_NODE_DDL_ID } from '../NAV_NODE_DDL_ID.js';
 
 export const DDLViewerTab: NavNodeTransformViewComponent = observer(function DDLViewerTab({ folderId }) {
   const title = folderId.startsWith(NAV_NODE_DDL_ID) ? 'DDL' : 'Body';

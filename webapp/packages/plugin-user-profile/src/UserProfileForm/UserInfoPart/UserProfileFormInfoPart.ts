@@ -9,11 +9,11 @@ import { toJS } from 'mobx';
 
 import type { UserInfoMetaParametersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { FormPart, IFormState } from '@cloudbeaver/core-ui';
+import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import { isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 
-import type { IUserProfileFormState } from '../UserProfileFormService';
-import { type IUserProfileFormInfoState, USER_PROFILE_FORM_INFO_PART_STATE_SCHEMA } from './IUserProfileFormInfoState';
+import type { IUserProfileFormState } from '../UserProfileFormService.js';
+import { type IUserProfileFormInfoState, USER_PROFILE_FORM_INFO_PART_STATE_SCHEMA } from './IUserProfileFormInfoState.js';
 
 export class UserProfileFormInfoPart extends FormPart<IUserProfileFormInfoState, IUserProfileFormState> {
   constructor(
@@ -29,19 +29,19 @@ export class UserProfileFormInfoPart extends FormPart<IUserProfileFormInfoState,
     });
   }
 
-  protected format(data: IFormState<IUserProfileFormState>, contexts: IExecutionContextProvider<IFormState<IUserProfileFormState>>): void {
+  protected override format(data: IFormState<IUserProfileFormState>, contexts: IExecutionContextProvider<IFormState<IUserProfileFormState>>): void {
     this.state = USER_PROFILE_FORM_INFO_PART_STATE_SCHEMA.parse(this.state);
   }
 
-  isOutdated(): boolean {
+  override isOutdated(): boolean {
     return this.userInfoResource.isOutdated(undefined) || this.userInfoMetaParametersResource.isOutdated(undefined);
   }
 
-  isLoaded(): boolean {
+  override isLoaded(): boolean {
     return this.loaded && this.userInfoResource.isLoaded(undefined) && this.userInfoMetaParametersResource.isLoaded(undefined);
   }
 
-  get isChanged(): boolean {
+  override get isChanged(): boolean {
     if (!this.loaded) {
       return false;
     }

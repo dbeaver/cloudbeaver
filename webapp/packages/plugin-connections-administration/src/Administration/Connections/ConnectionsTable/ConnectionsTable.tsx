@@ -8,14 +8,14 @@
 import { observer } from 'mobx-react-lite';
 
 import { Table, TableBody, TableColumnHeader, TableHeader, TableSelect, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoOrigin, ConnectionInfoOriginResource, DBDriverResource, serializeConnectionParam } from '@cloudbeaver/core-connections';
+import { type ConnectionInfoOrigin, ConnectionInfoOriginResource, DBDriverResource, serializeConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { isGlobalProject, isSharedProject, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { Connection } from './Connection';
-import { IConnectionsTableState } from './useConnectionsTable';
+import { Connection } from './Connection.js';
+import { type IConnectionsTableState } from './useConnectionsTable.js';
 
 interface Props {
   state: IConnectionsTableState;
@@ -49,8 +49,8 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({ stat
       <TableBody>
         {state.connections.map((connection, i) => (
           <Connection
-            key={serializeConnectionParam(state.keys[i])}
-            connectionKey={state.keys[i]}
+            key={serializeConnectionParam(state.keys[i]!)}
+            connectionKey={state.keys[i]!}
             connection={connection}
             connectionOrigin={connectionOriginsMap.get(connection.id)}
             shouldDisplayProject={shouldDisplayProjects}

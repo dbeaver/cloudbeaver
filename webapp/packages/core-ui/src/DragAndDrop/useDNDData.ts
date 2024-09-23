@@ -11,7 +11,7 @@ import { useDrag } from 'react-dnd';
 import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 
-import { DND_ELEMENT_TYPE } from './DND_ELEMENT_TYPE';
+import { DND_ELEMENT_TYPE } from './DND_ELEMENT_TYPE.js';
 
 interface IState {
   isDragging: boolean;

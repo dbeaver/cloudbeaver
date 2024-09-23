@@ -9,9 +9,9 @@ import { observer } from 'mobx-react-lite';
 
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { BaseForm, IBaseFormSubmitInfo, IFormState } from '@cloudbeaver/core-ui';
+import { BaseForm, type IBaseFormSubmitInfo, type IFormState } from '@cloudbeaver/core-ui';
 
-import { IUserProfileFormState, UserProfileFormService } from './UserProfileFormService';
+import { type IUserProfileFormState, UserProfileFormService } from './UserProfileFormService.js';
 
 interface Props {
   state: IFormState<IUserProfileFormState>;

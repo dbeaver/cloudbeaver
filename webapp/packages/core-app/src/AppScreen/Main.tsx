@@ -12,7 +12,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { LeftBarPanelService, SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
 
 import style from './Main.module.css';
-import { RightArea } from './RightArea';
+import { RightArea } from './RightArea.js';
 
 export const Main = observer(function Main() {
   const styles = useS(style);

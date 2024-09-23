@@ -9,8 +9,8 @@ import { PasswordPolicyService, UserInfoMetaParametersResource, UserInfoResource
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
 import type { IFormState } from '@cloudbeaver/core-ui';
 
-import type { IUserProfileFormState } from '../UserProfileFormService';
-import { UserProfileFormAuthenticationPart } from './UserProfileFormAuthenticationPart';
+import type { IUserProfileFormState } from '../UserProfileFormService.js';
+import { UserProfileFormAuthenticationPart } from './UserProfileFormAuthenticationPart.js';
 
 const DATA_CONTEXT_USER_PROFILE_FORM_AUTHENTICATION_PART = createDataContext<UserProfileFormAuthenticationPart>('User Profile Form Info Part');
 

@@ -11,7 +11,7 @@ import { AppScreenService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 const NavigationTabsBar = React.lazy(async () => {
-  const { NavigationTabsBar } = await import('./NavigationTabs/NavigationTabsBar');
+  const { NavigationTabsBar } = await import('./NavigationTabs/NavigationTabsBar/index.js');
   return { default: NavigationTabsBar };
 });
 
@@ -21,9 +21,7 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.appScreenService.rightAreaTop.add(NavigationTabsBar);
   }
-
-  load(): void | Promise<void> {}
 }

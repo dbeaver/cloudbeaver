@@ -13,8 +13,8 @@ export const customConnectionPluginManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./CustomConnectionPluginBootstrap').then(m => m.CustomConnectionPluginBootstrap),
-    () => import('./CustomConnectionSettingsService').then(m => m.CustomConnectionSettingsService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./CustomConnectionPluginBootstrap.js').then(m => m.CustomConnectionPluginBootstrap),
+    () => import('./CustomConnectionSettingsService.js').then(m => m.CustomConnectionSettingsService),
   ],
 };

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Compartment, Extension } from '@codemirror/state';
+import { Compartment, type Extension } from '@codemirror/state';
 import { useState } from 'react';
 
 export function useCodemirrorExtensions(extensions?: Map<Compartment, Extension>, staticExtensions?: Extension): Map<Compartment, Extension> {

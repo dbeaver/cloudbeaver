@@ -10,8 +10,8 @@ import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-d
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { IFormState } from '@cloudbeaver/core-ui';
 
-import type { IUserFormState } from '../AdministrationUserFormService';
-import { UserFormInfoPart } from './UserFormInfoPart';
+import type { IUserFormState } from '../AdministrationUserFormService.js';
+import { UserFormInfoPart } from './UserFormInfoPart.js';
 
 const DATA_CONTEXT_USER_FORM_INFO_PART = createDataContext<UserFormInfoPart>('User Form Info Part');
 

@@ -7,9 +7,9 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import type { NavigationNodeComponent } from '../NavigationNodeComponent';
-import { NavigationNode } from './NavigationNode';
-import { NavigationNodeDragged } from './NavigationNodeDragged';
+import type { NavigationNodeComponent } from '../NavigationNodeComponent.js';
+import { NavigationNode } from './NavigationNode.js';
+import { NavigationNodeDragged } from './NavigationNodeDragged.js';
 
 export const NavigationNodeRenderer: NavigationNodeComponent = observer(function NavigationNodeRenderer({ dragging, ...rest }) {
   if (dragging) {

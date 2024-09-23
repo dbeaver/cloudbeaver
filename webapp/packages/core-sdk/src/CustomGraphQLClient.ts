@@ -5,13 +5,20 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import axios, { AxiosProgressEvent, AxiosResponse, CanceledError, isAxiosError, isCancel } from 'axios';
-import { resolveRequestDocument as analyzeDocument, ClientError, GraphQLClient, RequestDocument, RequestOptions, Variables } from 'graphql-request';
+import axios, { type AxiosProgressEvent, CanceledError, isAxiosError, isCancel } from 'axios';
+import {
+  resolveRequestDocument as analyzeDocument,
+  ClientError,
+  GraphQLClient,
+  type RequestDocument,
+  type RequestOptions,
+  type Variables,
+} from 'graphql-request';
 
-import { GQLError } from './GQLError';
-import type { IResponseInterceptor } from './IResponseInterceptor';
-import { PlainGQLError } from './PlainGQLError';
-import { ServerInternalError } from './ServerInternalError';
+import { GQLError } from './GQLError.js';
+import type { IResponseInterceptor } from './IResponseInterceptor.js';
+import { PlainGQLError } from './PlainGQLError.js';
+import { ServerInternalError } from './ServerInternalError.js';
 
 export type UploadProgressEvent = AxiosProgressEvent;
 
@@ -61,9 +68,9 @@ export class CustomGraphQLClient extends GraphQLClient {
     this.interceptors.push(interceptor);
   }
 
-  request<T = any, V = Variables>(document: RequestDocument, variables?: V, requestHeaders?: HeadersInit): Promise<T>;
-  request<T = any, V extends Variables = Variables>(options: RequestOptions<V>): Promise<T>;
-  request<T = any, V extends Variables = Variables>(
+  override request<T = any, V = Variables>(document: RequestDocument, variables?: V, requestHeaders?: HeadersInit): Promise<T>;
+  override request<T = any, V extends Variables = Variables>(options: RequestOptions<V>): Promise<T>;
+  override request<T = any, V extends Variables = Variables>(
     document: RequestDocument | RequestOptions<V>,
     variables?: V,
     requestHeaders?: HeadersInit,
@@ -102,7 +109,7 @@ export class CustomGraphQLClient extends GraphQLClient {
     this.blockRequestsReasonHandler();
     try {
       const requestOptions = parseRequestArgs(documentOrOptions, variables, requestHeaders);
-      const { query: expression, operationName } = analyzeDocument(requestOptions.document);
+      const { query: expression } = analyzeDocument(requestOptions.document);
 
       const response = await this.rawRequest<T, V>(expression, variables, requestHeaders);
 
@@ -176,38 +183,6 @@ export class CustomGraphQLClient extends GraphQLClient {
       }
 
       throw error;
-    }
-  }
-
-  private parseGQLResponse<T>(response: AxiosResponse<GqlResponse>, query: string, variables?: Variables): T {
-    const result = response.data;
-
-    const successfullyReceivedData = Array.isArray(result) ? !result.some(({ data }) => !data) : Boolean(result.data);
-
-    const successfullyPassedErrorPolicy = Array.isArray(result) || !result.errors || (Array.isArray(result.errors) && !result.errors.length);
-
-    if (response.status === 200 && successfullyPassedErrorPolicy && successfullyReceivedData) {
-      const data = result;
-      const dataEnvelope = data;
-
-      // @ts-expect-error TODO
-      return {
-        ...dataEnvelope,
-        headers: response.headers,
-        status: response.status,
-      };
-    } else {
-      const errorResult =
-        typeof result === 'string'
-          ? {
-              error: result,
-            }
-          : result;
-      throw new ClientError(
-        // @ts-expect-error TODO
-        { ...errorResult, status: response.status, headers: response.headers },
-        { query, variables },
-      );
     }
   }
 }

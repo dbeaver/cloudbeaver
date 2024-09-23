@@ -9,19 +9,19 @@ import { runInAction, toJS } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { CachedMapResource, isResourceAlias, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { DatabaseConnectionOriginFragment, GraphQLService } from '@cloudbeaver/core-sdk';
+import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { type DatabaseConnectionOriginFragment, GraphQLService } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 
-import { CONNECTION_INFO_PARAM_SCHEMA, IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
+import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA.js';
 import {
   ConnectionInfoActiveProjectKey,
   ConnectionInfoProjectKey,
   ConnectionInfoResource,
   createConnectionParam,
   isConnectionInfoParamEqual,
-} from './ConnectionInfoResource';
-import { parseConnectionKey } from './parseConnectionKey';
+} from './ConnectionInfoResource.js';
+import { parseConnectionKey } from './parseConnectionKey.js';
 
 export type ConnectionInfoOrigin = DatabaseConnectionOriginFragment;
 
@@ -97,7 +97,7 @@ export class ConnectionInfoOriginResource extends CachedMapResource<IConnectionI
     return this.data;
   }
 
-  isKeyEqual(param: IConnectionInfoParams, second: IConnectionInfoParams): boolean {
+  override isKeyEqual(param: IConnectionInfoParams, second: IConnectionInfoParams): boolean {
     return isConnectionInfoParamEqual(param, second);
   }
 

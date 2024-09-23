@@ -10,11 +10,11 @@ import { observable, toJS } from 'mobx';
 import type { AdminUser, AuthRolesResource, UserMetaParameter, UsersMetaParametersResource, UsersResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { ServerConfigResource } from '@cloudbeaver/core-root';
-import { FormMode, FormPart, formValidationContext, IFormState } from '@cloudbeaver/core-ui';
+import { FormMode, FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import { isArraysEqual, isDefined, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 
-import type { IUserFormState } from '../AdministrationUserFormService';
-import type { IUserFormInfoState } from './IUserFormInfoState';
+import type { IUserFormState } from '../AdministrationUserFormService.js';
+import type { IUserFormInfoState } from './IUserFormInfoState.js';
 
 const DEFAULT_ENABLED = true;
 
@@ -36,7 +36,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     });
   }
 
-  protected format(data: IFormState<IUserFormState>, contexts: IExecutionContextProvider<IFormState<IUserFormState>>): void | Promise<void> {
+  protected override format(data: IFormState<IUserFormState>, contexts: IExecutionContextProvider<IFormState<IUserFormState>>): void | Promise<void> {
     this.state.password = this.state.password.trim();
     const metaParameters = this.state.metaParameters;
 
@@ -53,7 +53,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     }
   }
 
-  isOutdated(): boolean {
+  override isOutdated(): boolean {
     if (this.formState.mode === FormMode.Edit && this.initialState.userId) {
       return this.usersResource.isOutdated(this.initialState.userId) || this.usersMetaParametersResource.isOutdated(this.initialState.userId);
     }
@@ -61,7 +61,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     return this.serverConfigResource.isOutdated() || this.authRolesResource.isOutdated();
   }
 
-  isLoaded(): boolean {
+  override isLoaded(): boolean {
     if (
       this.formState.mode === FormMode.Edit &&
       this.initialState.userId &&
@@ -74,7 +74,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     return this.loaded;
   }
 
-  get isChanged(): boolean {
+  override get isChanged(): boolean {
     if (!this.loaded) {
       return false;
     }

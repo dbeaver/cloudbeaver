@@ -12,10 +12,10 @@ import { Container, Group, TextPlaceholder, useTranslate } from '@cloudbeaver/co
 import { type ISettingsSource, ROOT_SETTINGS_GROUP } from '@cloudbeaver/core-settings';
 import { useTreeData } from '@cloudbeaver/plugin-navigation-tree';
 
-import { getSettingGroupId } from './getSettingGroupId';
-import { SettingsGroups } from './SettingsGroups/SettingsGroups';
-import { SettingsList } from './SettingsList';
-import { useSettings } from './useSettings';
+import { getSettingGroupId } from './getSettingGroupId.js';
+import { SettingsGroups } from './SettingsGroups/SettingsGroups.js';
+import { SettingsList } from './SettingsList.js';
+import { useSettings } from './useSettings.js';
 
 export interface ISettingsProps {
   source: ISettingsSource;

@@ -7,7 +7,7 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
-import type { IResultSetColumnKey } from '../IResultSetDataKey';
+import type { IResultSetColumnKey } from '../IResultSetDataKey.js';
 
 export const DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY = createDataContext<IResultSetColumnKey | null>(
   'data-viewer-database-data-model-result-set-column-key',

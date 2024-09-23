@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { CachedMapAllKey, CachedMapResource, isResourceAlias, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { AdminOriginDetailsFragment, GraphQLService } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { type AdminOriginDetailsFragment, GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { UsersResource } from './UsersResource';
+import { UsersResource } from './UsersResource.js';
 
 @injectable()
 export class UsersOriginDetailsResource extends CachedMapResource<string, AdminOriginDetailsFragment> {

@@ -12,8 +12,4 @@ export class PluginBootstrap extends Bootstrap {
   constructor() {
     super();
   }
-
-  register(): void {}
-
-  load(): void {}
 }

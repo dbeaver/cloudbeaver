@@ -7,7 +7,7 @@
  */
 import type { IServiceConstructor } from '@cloudbeaver/core-di';
 
-import type { IApplication } from './createApp';
+import type { IApplication } from './createApp.js';
 
 export function getService<T>(app: IApplication, ctor: IServiceConstructor<T>): T {
   return app.serviceProvider.getService(ctor);

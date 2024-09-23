@@ -20,7 +20,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
-import { User } from './User';
+import { User } from './User.js';
 
 interface Props {
   users: AdminUserInfoFragment[];

@@ -7,9 +7,9 @@
  */
 import { beforeEach, describe, expect, jest, test } from '@jest/globals';
 
-import type { ResourceKey } from '../ResourceKey';
-import { resourceKeyList } from '../ResourceKeyList';
-import { CachedTreeChildrenKey, CachedTreeResource, CachedTreeRootChildrenKey } from './CachedTreeResource';
+import type { ResourceKey } from '../ResourceKey.js';
+import { resourceKeyList } from '../ResourceKeyList.js';
+import { CachedTreeChildrenKey, CachedTreeResource, CachedTreeRootChildrenKey } from './CachedTreeResource.js';
 
 interface IMockDataEntity {
   name: string;
@@ -24,7 +24,7 @@ class TestTreeResource extends CachedTreeResource<IMockDataEntity> {
     return this.data;
   }
 
-  protected validateKey(key: string): boolean {
+  protected override validateKey(key: string): boolean {
     return typeof key === 'string';
   }
 }

@@ -5,6 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { importLazyComponent } from './importLazyComponent';
+import { importLazyComponent } from './importLazyComponent.js';
 
-export const Clickable = importLazyComponent(() => import('./Clickable').then(m => m.Clickable));
+export const Clickable = importLazyComponent(() => import('./Clickable.js').then(m => m.Clickable));

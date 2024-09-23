@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Group } from '@cloudbeaver/core-blocks';
 import type { NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
-import { NetworkHandlerAuthForm } from './NetworkHandlerAuthForm';
+import { NetworkHandlerAuthForm } from './NetworkHandlerAuthForm.js';
 
 interface Props {
   networkHandlers: string[];

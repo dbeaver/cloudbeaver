@@ -10,8 +10,8 @@ import { action, computed, makeObservable, observable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 
-import type { IObjectViewerTabState } from '../IObjectViewerTabState';
-import { ObjectPage, ObjectPageCallback, ObjectPageOptions } from './ObjectPage';
+import type { IObjectViewerTabState } from '../IObjectViewerTabState.js';
+import { ObjectPage, type ObjectPageCallback, type ObjectPageOptions } from './ObjectPage.js';
 
 @injectable()
 export class DBObjectPageService {

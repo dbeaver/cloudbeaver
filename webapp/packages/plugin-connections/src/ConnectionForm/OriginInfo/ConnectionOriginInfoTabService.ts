@@ -10,18 +10,18 @@ import React from 'react';
 import { isLocalConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { ConnectionFormService } from '../ConnectionFormService';
+import { ConnectionFormService } from '../ConnectionFormService.js';
 
 export const ConnectionFormAuthenticationAction = React.lazy(async () => {
-  const { ConnectionFormAuthenticationAction } = await import('./ConnectionFormAuthenticationAction');
+  const { ConnectionFormAuthenticationAction } = await import('./ConnectionFormAuthenticationAction.js');
   return { default: ConnectionFormAuthenticationAction };
 });
 export const OriginInfo = React.lazy(async () => {
-  const { OriginInfo } = await import('./OriginInfo');
+  const { OriginInfo } = await import('./OriginInfo.js');
   return { default: OriginInfo };
 });
 export const OriginInfoTab = React.lazy(async () => {
-  const { OriginInfoTab } = await import('./OriginInfoTab');
+  const { OriginInfoTab } = await import('./OriginInfoTab.js');
   return { default: OriginInfoTab };
 });
 
@@ -31,7 +31,7 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.connectionFormService.tabsContainer.add({
       key: 'origin',
       order: 3,
@@ -43,6 +43,4 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
 
     this.connectionFormService.actionsContainer.add(ConnectionFormAuthenticationAction, 0);
   }
-
-  load(): void {}
 }

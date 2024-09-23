@@ -16,13 +16,13 @@ import {
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
 import {
-  AdminConnectionGrantInfo,
-  AdminTeamInfoFragment,
-  AdminUserTeamGrantInfo,
-  GetTeamsListQueryVariables,
+  type AdminConnectionGrantInfo,
+  type AdminTeamInfoFragment,
+  type AdminUserTeamGrantInfo,
+  type GetTeamsListQueryVariables,
   GraphQLService,
 } from '@cloudbeaver/core-sdk';
-import { isArraysEqual, UndefinedToNull } from '@cloudbeaver/core-utils';
+import { isArraysEqual, type UndefinedToNull } from '@cloudbeaver/core-utils';
 
 const NEW_TEAM_SYMBOL = Symbol('new-team');
 
@@ -90,7 +90,11 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
 
   async loadGrantedUsers(teamId: string): Promise<UserTeamGrantInfo[]> {
     const { team } = await this.graphQLService.sdk.getTeamGrantedUsers({ teamId });
-    return team[0].grantedUsersInfo.map(user => ({ userId: user.userId, teamRole: user.teamRole ?? null }));
+
+    if (!team.length) {
+      throw new Error('Team not found');
+    }
+    return team[0]!.grantedUsersInfo.map(user => ({ userId: user.userId, teamRole: user.teamRole ?? null }));
   }
 
   async getSubjectConnectionAccess(subjectId: string): Promise<AdminConnectionGrantInfo[]> {
@@ -150,7 +154,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     }
   }
 
-  protected dataSet(key: string, value: AdminTeamInfoFragment): void {
+  protected override dataSet(key: string, value: AdminTeamInfoFragment): void {
     const oldTeam = this.dataGet(key);
     super.dataSet(key, { ...oldTeam, ...value });
   }

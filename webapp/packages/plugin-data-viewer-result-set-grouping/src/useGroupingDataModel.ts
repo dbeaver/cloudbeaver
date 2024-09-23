@@ -17,13 +17,13 @@ import {
   DatabaseDataAccessMode,
   DatabaseDataModel,
   DataViewerSettingsService,
-  IDatabaseDataModel,
+  type IDatabaseDataModel,
   ResultSetDataSource,
   TableViewerStorageService,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { GroupingDataSource } from './GroupingDataSource';
-import type { IGroupingQueryState } from './IGroupingQueryState';
+import { GroupingDataSource } from './GroupingDataSource.js';
+import type { IGroupingQueryState } from './IGroupingQueryState.js';
 
 export interface IGroupingDataModel {
   model: IDatabaseDataModel<GroupingDataSource>;

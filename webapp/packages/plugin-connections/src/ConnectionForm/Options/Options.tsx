@@ -32,7 +32,7 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { DatabaseAuthModelsResource, DBDriver, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
+import { DatabaseAuthModelsResource, type DBDriver, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
@@ -41,16 +41,16 @@ import { type TabContainerPanelComponent, TabsContext, useAuthenticationAction }
 import { EMPTY_ARRAY } from '@cloudbeaver/core-utils';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
-import { ConnectionAuthModelCredentialsForm } from '../ConnectionAuthModelCredentials/ConnectionAuthModelCredentialsForm';
-import { ConnectionAuthModelSelector } from '../ConnectionAuthModelCredentials/ConnectionAuthModelSelector';
-import { ConnectionFormService } from '../ConnectionFormService';
-import type { IConnectionFormProps } from '../IConnectionFormProps';
-import { CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID } from '../SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID';
-import { AdvancedPropertiesForm } from './AdvancedPropertiesForm';
+import { ConnectionAuthModelCredentialsForm } from '../ConnectionAuthModelCredentials/ConnectionAuthModelCredentialsForm.js';
+import { ConnectionAuthModelSelector } from '../ConnectionAuthModelCredentials/ConnectionAuthModelSelector.js';
+import { ConnectionFormService } from '../ConnectionFormService.js';
+import type { IConnectionFormProps } from '../IConnectionFormProps.js';
+import { CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID } from '../SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID.js';
+import { AdvancedPropertiesForm } from './AdvancedPropertiesForm.js';
 import styles from './Options.module.css';
-import { ParametersForm } from './ParametersForm';
-import { ProviderPropertiesForm } from './ProviderPropertiesForm';
-import { useOptions } from './useOptions';
+import { ParametersForm } from './ParametersForm.js';
+import { ProviderPropertiesForm } from './ProviderPropertiesForm.js';
+import { useOptions } from './useOptions.js';
 
 const PROFILE_AUTH_MODEL_ID = 'profile';
 

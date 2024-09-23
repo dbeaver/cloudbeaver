@@ -7,7 +7,7 @@
  */
 import type { IExtension } from '@cloudbeaver/core-extensions';
 
-import type { ITab } from './ITab';
+import type { ITab } from './ITab.js';
 
 export interface TabHandlerTabProps<T = any> {
   tab: ITab<T>;

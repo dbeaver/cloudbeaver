@@ -32,7 +32,7 @@ export function useDriverSelectorDialog(drivers: string[], onSelect?: () => void
           return;
         }
 
-        const state = await this.publicConnectionFormService.open(projects[0].id, { driverId }, this.drivers);
+        const state = await this.publicConnectionFormService.open(projects[0]!.id, { driverId }, this.drivers);
 
         if (state) {
           onSelect?.();

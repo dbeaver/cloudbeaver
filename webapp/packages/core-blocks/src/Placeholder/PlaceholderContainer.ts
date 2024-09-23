@@ -7,7 +7,7 @@
  */
 import { observable } from 'mobx';
 
-import { ILoadableState, uuid } from '@cloudbeaver/core-utils';
+import { type ILoadableState, uuid } from '@cloudbeaver/core-utils';
 
 export type PlaceholderComponent<T extends Record<string, any> = Record<string, any>> = React.FunctionComponent<T>;
 

@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { CachedMapAllKey, CachedMapResource, isResourceAlias, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { CachedMapAllKey, CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-import type { TeamMetaParameter } from './TeamMetaParametersResource';
-import { TeamsResource } from './TeamsResource';
+import type { TeamMetaParameter } from './TeamMetaParametersResource.js';
+import { TeamsResource } from './TeamsResource.js';
 
 @injectable()
 export class TeamInfoMetaParametersResource extends CachedMapResource<string, TeamMetaParameter> {
@@ -43,7 +43,7 @@ export class TeamInfoMetaParametersResource extends CachedMapResource<string, Te
         throw new Error(`Team ${teamId} not found`);
       }
 
-      const metaParameters = teams[0].metaParameters;
+      const metaParameters = teams[0]?.metaParameters;
 
       if (teamId) {
         teamsList.push([teamId, metaParameters]);

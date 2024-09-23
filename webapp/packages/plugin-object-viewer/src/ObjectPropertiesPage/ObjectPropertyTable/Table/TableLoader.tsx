@@ -7,10 +7,10 @@
  */
 import { ComplexLoader, createComplexLoader } from '@cloudbeaver/core-blocks';
 
-import type { TableProps } from './Table';
+import type { TableProps } from './Table.js';
 
 const loader = createComplexLoader(async function loader() {
-  const { Table } = await import('./Table');
+  const { Table } = await import('./Table.js');
   return { Table };
 });
 

@@ -5,21 +5,21 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { manifest } from './manifest';
+import { manifest } from './manifest.js';
 
 export default manifest;
 
-export * from './Administration/Users/UsersAdministrationNavigationService';
-export * from './Administration/Users/Teams/TeamFormService';
-export * from './Administration/Users/Teams/ITeamFormProps';
-export * from './Administration/Users/Teams/Contexts/teamContext';
-export * from './Administration/Users/UsersTable/CreateUserService';
-export * from './Administration/Users/UsersAdministrationService';
-export * from './Administration/Users/UserForm/AdministrationUserFormService';
-export * from './Administration/Users/UserForm/AdministrationUserFormState';
-export * from './Administration/Users/UserForm/Info/getUserFormInfoPart';
-export * from './Administration/Users/UserForm/Info/UserFormInfoPart';
-export * from './Administration/Users/UserForm/Info/UserFormInfoPartService';
-export * from './Menus/MENU_USERS_ADMINISTRATION';
-export * from './AdministrationUsersManagementService';
-export * from './externalUserProviderStatusContext';
+export * from './Administration/Users/UsersAdministrationNavigationService.js';
+export * from './Administration/Users/Teams/TeamFormService.js';
+export * from './Administration/Users/Teams/ITeamFormProps.js';
+export * from './Administration/Users/Teams/Contexts/teamContext.js';
+export * from './Administration/Users/UsersTable/CreateUserService.js';
+export * from './Administration/Users/UsersAdministrationService.js';
+export * from './Administration/Users/UserForm/AdministrationUserFormService.js';
+export * from './Administration/Users/UserForm/AdministrationUserFormState.js';
+export * from './Administration/Users/UserForm/Info/getUserFormInfoPart.js';
+export * from './Administration/Users/UserForm/Info/UserFormInfoPart.js';
+export * from './Administration/Users/UserForm/Info/UserFormInfoPartService.js';
+export * from './Menus/MENU_USERS_ADMINISTRATION.js';
+export * from './AdministrationUsersManagementService.js';
+export * from './externalUserProviderStatusContext.js';

@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { CachedMapAllKey, CachedMapResource, isResourceAlias, ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { CachedMapAllKey, CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-import type { UserMetaParameter } from './UserMetaParametersResource';
-import { UsersResource } from './UsersResource';
+import type { UserMetaParameter } from './UserMetaParametersResource.js';
+import { UsersResource } from './UsersResource.js';
 
 @injectable()
 export class UsersMetaParametersResource extends CachedMapResource<string, UserMetaParameter> {

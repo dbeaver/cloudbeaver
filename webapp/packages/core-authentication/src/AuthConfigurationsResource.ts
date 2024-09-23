@@ -18,9 +18,9 @@ import {
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
 import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
+import { type AdminAuthProviderConfiguration, type GetAuthProviderConfigurationsQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
 
-import type { AuthProviderConfiguration } from './AuthProvidersResource';
+import type { AuthProviderConfiguration } from './AuthProvidersResource.js';
 
 const NEW_CONFIGURATION_SYMBOL = Symbol('new-configuration');
 
@@ -106,7 +106,7 @@ export class AuthConfigurationsResource extends CachedMapResource<string, AuthCo
     return this.data;
   }
 
-  protected dataSet(key: string, value: AdminAuthProviderConfiguration): void {
+  protected override dataSet(key: string, value: AdminAuthProviderConfiguration): void {
     const oldConfiguration = this.dataGet(key);
     super.dataSet(key, { ...oldConfiguration, ...value });
   }

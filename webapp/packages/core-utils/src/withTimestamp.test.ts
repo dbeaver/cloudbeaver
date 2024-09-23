@@ -7,7 +7,7 @@
  */
 import { describe, expect, it, jest } from '@jest/globals';
 
-import { withTimestamp } from './withTimestamp';
+import { withTimestamp } from './withTimestamp.js';
 
 describe('withTimestamp', () => {
   it('should generate a value with timestamp at the end', () => {

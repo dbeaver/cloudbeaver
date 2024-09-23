@@ -14,15 +14,15 @@ import {
   ESettingsValueType,
   type ISettingDescription,
   ROOT_SETTINGS_GROUP,
-  SettingDescriptionTransformer,
+  type SettingDescriptionTransformer,
   type SettingsDescriptionGetter,
   type SettingsGroup,
   SettingsProvider,
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
-import { getPathParent, ILoadableState, schema } from '@cloudbeaver/core-utils';
+import { getPathParent, type ILoadableState, schema } from '@cloudbeaver/core-utils';
 
-import { ServerSettingsResource } from './ServerSettingsResource';
+import { ServerSettingsResource } from './ServerSettingsResource.js';
 
 @injectable()
 export class ServerSettingsManagerService {

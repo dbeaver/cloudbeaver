@@ -9,19 +9,19 @@ import { AdministrationItemService, AdministrationItemType, ConfigurationWizardS
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { ADMINISTRATION_SERVER_CONFIGURATION_ITEM } from './ServerConfiguration/ADMINISTRATION_SERVER_CONFIGURATION_ITEM';
-import { ServerConfigurationService } from './ServerConfiguration/ServerConfigurationService';
+import { ADMINISTRATION_SERVER_CONFIGURATION_ITEM } from './ServerConfiguration/ADMINISTRATION_SERVER_CONFIGURATION_ITEM.js';
+import { ServerConfigurationService } from './ServerConfiguration/ServerConfigurationService.js';
 
-const FinishPage = importLazyComponent(() => import('./Finish/FinishPage').then(m => m.FinishPage));
-const FinishPageDrawerItem = importLazyComponent(() => import('./Finish/FinishPageDrawerItem').then(m => m.FinishPageDrawerItem));
+const FinishPage = importLazyComponent(() => import('./Finish/FinishPage.js').then(m => m.FinishPage));
+const FinishPageDrawerItem = importLazyComponent(() => import('./Finish/FinishPageDrawerItem.js').then(m => m.FinishPageDrawerItem));
 const ServerConfigurationDrawerItem = importLazyComponent(() =>
-  import('./ServerConfiguration/ServerConfigurationDrawerItem').then(m => m.ServerConfigurationDrawerItem),
+  import('./ServerConfiguration/ServerConfigurationDrawerItem.js').then(m => m.ServerConfigurationDrawerItem),
 );
 const ServerConfigurationPage = importLazyComponent(() =>
-  import('./ServerConfiguration/ServerConfigurationPage').then(m => m.ServerConfigurationPage),
+  import('./ServerConfiguration/ServerConfigurationPage.js').then(m => m.ServerConfigurationPage),
 );
-const WelcomeDrawerItem = importLazyComponent(() => import('./Welcome/WelcomeDrawerItem').then(m => m.WelcomeDrawerItem));
-const WelcomePage = importLazyComponent(() => import('./Welcome/WelcomePage').then(m => m.WelcomePage));
+const WelcomeDrawerItem = importLazyComponent(() => import('./Welcome/WelcomeDrawerItem.js').then(m => m.WelcomeDrawerItem));
+const WelcomePage = importLazyComponent(() => import('./Welcome/WelcomePage.js').then(m => m.WelcomePage));
 
 @injectable()
 export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
@@ -33,7 +33,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.administrationItemService.create({
       name: 'welcome',
       type: AdministrationItemType.ConfigurationWizard,

@@ -10,7 +10,7 @@ import { useLayoutEffect, useState } from 'react';
 
 import { uuid } from '@cloudbeaver/core-utils';
 
-import type { IDataContext } from './IDataContext';
+import type { IDataContext } from './IDataContext.js';
 
 export function useDataContextLink(context: IDataContext | undefined, update: (context: IDataContext, id: string) => void): void {
   const [id] = useState(() => uuid());

@@ -22,9 +22,9 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
-import type { IResultSetGroupingData } from '../DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING';
+import type { IResultSetGroupingData } from '../DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING.js';
 import styles from './DVGroupingColumnEditorDialog.module.css';
-import { GroupingColumnEditorTable } from './GroupingColumnEditorTable';
+import { GroupingColumnEditorTable } from './GroupingColumnEditorTable.js';
 
 interface Payload {
   grouping: IResultSetGroupingData;

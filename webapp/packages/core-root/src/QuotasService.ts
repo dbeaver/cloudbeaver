@@ -7,7 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 
-import { ServerResourceQuotasResource } from './ServerResourceQuotasResource';
+import { ServerResourceQuotasResource } from './ServerResourceQuotasResource.js';
 
 interface IQuotas {
   dataExportFileSizeLimit: number;

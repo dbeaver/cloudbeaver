@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { isResourceAlias, ResourceAliases, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { ProjectInfo } from '@cloudbeaver/core-sdk';
+import { isResourceAlias, ResourceAliases, type ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { type ProjectInfo } from '@cloudbeaver/core-sdk';
 
-import { IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
-import { ConnectionInfoActiveProjectKey, ConnectionInfoProjectKey } from './ConnectionInfoResource';
+import { type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA.js';
+import { ConnectionInfoActiveProjectKey, ConnectionInfoProjectKey } from './ConnectionInfoResource.js';
 
 type Args = {
   originalKey: ResourceKey<IConnectionInfoParams>;
@@ -36,7 +36,7 @@ export function parseConnectionKey({ originalKey, aliases, isOutdated, activePro
     const key = aliases.transformToKey(originalKey);
     const outdated = ResourceKeyUtils.filter(key, key => isOutdated(key));
 
-    if (!refresh && outdated.length === 1) {
+    if (!refresh && outdated.length === 1 && outdated[0]) {
       originalKey = outdated[0]; // load only single connection
     }
   }

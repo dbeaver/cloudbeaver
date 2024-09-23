@@ -8,18 +8,18 @@
 import { action, computed, makeObservable, observable, runInAction } from 'mobx';
 
 import {
-  Connection,
+  type Connection,
   ConnectionInfoResource,
   ConnectionsManagerService,
   DBDriverResource,
-  IConnectionInfoParams,
-  IConnectionProvider,
-  IConnectionSetter,
-  IExecutionContextProvider,
-  IObjectCatalogProvider,
-  IObjectCatalogSetter,
-  IObjectSchemaProvider,
-  IObjectSchemaSetter,
+  type IConnectionInfoParams,
+  type IConnectionProvider,
+  type IConnectionSetter,
+  type IExecutionContextProvider,
+  type IObjectCatalogProvider,
+  type IObjectCatalogSetter,
+  type IObjectSchemaProvider,
+  type IObjectSchemaSetter,
   isConnectionProvider,
   isConnectionSetter,
   isExecutionContextProvider,
@@ -27,24 +27,24 @@ import {
   isObjectCatalogSetter,
   isObjectSchemaProvider,
   isObjectSchemaSetter,
-  IStructContainers,
-  ObjectContainer,
+  type IStructContainers,
+  type ObjectContainer,
   serializeConnectionParam,
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ExtensionUtils, IExtension } from '@cloudbeaver/core-extensions';
+import { ExtensionUtils, type IExtension } from '@cloudbeaver/core-extensions';
 import { type IDataContextActiveNode, type IObjectNavNodeProvider, isObjectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
 import {
-  IProjectProvider,
-  IProjectSetter,
-  IProjectSetterState,
+  type IProjectProvider,
+  type IProjectSetter,
+  type IProjectSetterState,
   isProjectProvider,
   isProjectSetter,
   isProjectSetterState,
 } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
+import { type ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 export interface IConnectionInfo {
   name?: string;

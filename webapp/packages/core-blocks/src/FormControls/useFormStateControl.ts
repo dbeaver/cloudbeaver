@@ -7,9 +7,9 @@
  */
 import { isNotNullDefined, isObject } from '@cloudbeaver/core-utils';
 
-import { useCombinedHandler } from '../useCombinedHandler';
-import type { IFormStateControl } from './IFormStateControl';
-import { isControlPresented } from './isControlPresented';
+import { useCombinedHandler } from '../useCombinedHandler.js';
+import type { IFormStateControl } from './IFormStateControl.js';
+import { isControlPresented } from './isControlPresented.js';
 
 export function useFormStateControl<TState extends Record<string, any>, TKey extends keyof TState>({
   name,

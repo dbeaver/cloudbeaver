@@ -9,7 +9,7 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { errorOf } from '@cloudbeaver/core-utils';
 
-import { DetailsError } from './DetailsError';
+import { DetailsError } from './DetailsError.js';
 
 export class GQLErrorCatcher {
   hasDetails = false;
