@@ -25,6 +25,11 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 24.2.1. 2024-09-23
+- Chinese localization has been improved (thanks to [cashlifei](https://github.com/cashlifei));
+- Environment variables configuration has been improved - now you can configure more variables on the initial stage of the Docker setup;
+- SQL Server driver has been updated to version 12.8.0.
+
 ### 24.2.0. 2024-09-02
 ### Changes since 24.1.0:
 - General:
