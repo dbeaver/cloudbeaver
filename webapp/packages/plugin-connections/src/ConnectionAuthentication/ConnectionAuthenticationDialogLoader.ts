@@ -8,5 +8,5 @@
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 export const ConnectionAuthenticationDialogLoader = importLazyComponent(() =>
-  import('./ConnectionAuthenticationDialog').then(module => module.ConnectionAuthenticationDialog),
+  import('./ConnectionAuthenticationDialog.js').then(module => module.ConnectionAuthenticationDialog),
 );

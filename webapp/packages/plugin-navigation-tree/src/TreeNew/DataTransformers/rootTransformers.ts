@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { INode } from '../INode';
-import type { INodeState } from '../INodeState';
-import type { TreeDataTransformer } from './TreeDataTransformer';
+import type { INode } from '../INode.js';
+import type { INodeState } from '../INodeState.js';
+import type { TreeDataTransformer } from './TreeDataTransformer.js';
 
 export function rootNodeStateTransformer(root: string): TreeDataTransformer<INodeState> {
   return function rootNodeStateTransformer(nodeId, data) {

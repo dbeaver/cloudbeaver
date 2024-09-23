@@ -12,7 +12,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { getPathName } from '@cloudbeaver/core-utils';
 
-import { getResourceNodeId } from './NavNodes/getResourceNodeId';
+import { getResourceNodeId } from './NavNodes/getResourceNodeId.js';
 
 @injectable()
 export class NavResourceNodeService {

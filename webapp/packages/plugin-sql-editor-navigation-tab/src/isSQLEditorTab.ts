@@ -8,7 +8,7 @@
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 import type { ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
-import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey';
+import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey.js';
 
 export function isSQLEditorTab(tab: ITab): tab is ITab<ISqlEditorTabState>;
 export function isSQLEditorTab(predicate: (tab: ITab<ISqlEditorTabState>) => boolean): (tab: ITab) => tab is ITab<ISqlEditorTabState>;

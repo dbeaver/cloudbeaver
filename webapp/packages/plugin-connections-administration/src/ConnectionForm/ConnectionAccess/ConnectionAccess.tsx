@@ -26,13 +26,13 @@ import {
 import { isCloudConnection } from '@cloudbeaver/core-connections';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
-import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import type { IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 
 import styles from './ConnectionAccess.module.css';
-import { ConnectionAccessGrantedList } from './ConnectionAccessGrantedList';
-import { ConnectionAccessList } from './ConnectionAccessList';
-import { useConnectionAccessState } from './useConnectionAccessState';
+import { ConnectionAccessGrantedList } from './ConnectionAccessGrantedList.js';
+import { ConnectionAccessList } from './ConnectionAccessList.js';
+import { useConnectionAccessState } from './useConnectionAccessState.js';
 
 export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAccess({ tabId, state: formState }) {
   const state = useConnectionAccessState(formState.info);
@@ -43,7 +43,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
 
   useAutoLoad(ConnectionAccess, state, selected);
 
-  const users = useResource(ConnectionAccess, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setTarget(UsersResourceFilterKey()), {
+  const users = useResource(ConnectionAccess, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()), {
     active: selected,
   });
   const teams = useResource(ConnectionAccess, TeamsResource, CachedMapAllKey, { active: selected });

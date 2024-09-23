@@ -7,7 +7,7 @@
  */
 import { describe, expect, it, jest } from '@jest/globals';
 
-import { getOS, OperatingSystem } from './getOS';
+import { getOS, OperatingSystem } from './getOS.js';
 
 describe('getOS', () => {
   it('should return windowsOS', () => {

@@ -9,14 +9,15 @@ import { action, computed, makeObservable, observable, runInAction } from 'mobx'
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, IExecutionContext, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, type IExecutionContext, type IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import {
-  CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedMapAllKey,
   CachedMapResource,
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
+  CachedResourceOffsetPageTargetKey,
+  getOffsetPageKeyInfo,
   type ICachedResourceMetadata,
   isResourceAlias,
   isResourceKeyList,
@@ -28,12 +29,12 @@ import {
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
 import { SessionDataResource } from '@cloudbeaver/core-root';
-import { DetailsError, NavNodeChildrenQuery as fake, GraphQLService } from '@cloudbeaver/core-sdk';
+import { DetailsError, type NavNodeChildrenQuery as fake, GraphQLService } from '@cloudbeaver/core-sdk';
 import { flat, getPathName, getPathParent, isDefined, isUndefined, MetadataMap } from '@cloudbeaver/core-utils';
 
-import { NavTreeSettingsService } from '../NavTreeSettingsService';
-import type { NavNode } from './EntityTypes';
-import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource';
+import { NavTreeSettingsService } from '../NavTreeSettingsService.js';
+import type { NavNode } from './EntityTypes.js';
+import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource.js';
 
 // TODO: so much dirty
 export interface NodePath {
@@ -274,9 +275,10 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
         parts.splice(parts.length - 1, 1, name);
         const path = parts.join('/');
 
-        this.markTreeOutdated(parentId);
+        this.markOutdated(parentId);
         this.markLoaded(node.id);
         this.onDataOutdated.execute(parentId);
+
         return path;
       } finally {
         this.markLoading(node.id, false);
@@ -341,7 +343,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     const deletedKeys: string[] = [];
 
     ResourceKeyUtils.forEach(keyObject, (key, i) => {
-      const values = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
+      const values = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i]!;
       const currentValue = this.data.get(key);
 
       if (currentValue) {
@@ -361,7 +363,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   unshiftToNode(key: ResourceKeyList<string>, value: string[][]): void;
   unshiftToNode(keyObject: ResourceKeySimple<string>, valueObject: string[] | string[][]): void {
     ResourceKeyUtils.forEach(keyObject, (key, i) => {
-      const values = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
+      const values = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i]!;
       const currentValue = this.data.get(key) || [];
 
       currentValue.unshift(...values);
@@ -376,7 +378,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   pushToNode(key: ResourceKeyList<string>, value: string[][]): void;
   pushToNode(keyObject: ResourceKeySimple<string>, valueObject: string[] | string[][]): void {
     ResourceKeyUtils.forEach(keyObject, (key, i) => {
-      const values = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
+      const values = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i]!;
       const currentValue = this.data.get(key) || [];
 
       currentValue.push(...values);
@@ -397,9 +399,9 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     this.onItemUpdate.execute(nodeId);
   }
 
-  set(key: string, value: string[]): void;
-  set(key: ResourceKeyList<string>, value: string[][]): void;
-  set(keyObject: ResourceKeySimple<string>, valueObject: string[] | string[][]): void {
+  override set(key: string, value: string[]): void;
+  override set(key: ResourceKeyList<string>, value: string[][]): void;
+  override set(keyObject: ResourceKeySimple<string>, valueObject: string[] | string[][]): void {
     const childrenToRemove: string[] = [];
     const children: string[] = [];
 
@@ -424,10 +426,10 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     super.set(keyObject, valueObject);
   }
 
-  delete(key: string): void;
-  delete(key: ResourceKeyList<string>): void;
-  delete(key: ResourceKeySimple<string>): void;
-  delete(key: ResourceKeySimple<string>): void {
+  override delete(key: string): void;
+  override delete(key: ResourceKeyList<string>): void;
+  override delete(key: ResourceKeySimple<string>): void;
+  override delete(key: ResourceKeySimple<string>): void {
     const items = resourceKeyList(this.getNestedChildren(key));
 
     if (items.length === 0) {
@@ -438,7 +440,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     this.navNodeInfoResource.delete(items.exclude(key));
   }
 
-  protected async preLoadData(key: ResourceKey<string>, contexts: IExecutionContext<ResourceKey<string>>): Promise<void> {
+  protected override async preLoadData(key: ResourceKey<string>, contexts: IExecutionContext<ResourceKey<string>>): Promise<void> {
     await ResourceKeyUtils.forEachAsync(key, async nodeId => {
       if (isResourceAlias(nodeId)) {
         return;
@@ -460,30 +462,37 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, string[]>> {
-    const pageKey =
-      this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
+    const { isPageListKey, pageTargetKey, offset, limit } = getOffsetPageKeyInfo(this, originalKey, undefined, this.childrenLimit);
     const allKey = this.aliases.isAlias(originalKey, CachedMapAllKey);
 
     if (allKey) {
       throw new Error('Loading all nodes is prohibited');
     }
 
-    const offset = pageKey?.options.offset ?? CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
-    const limit = pageKey?.options.limit ?? this.childrenLimit;
     const values: NavNodeChildrenQuery[] = [];
+    const pages: Parameters<typeof this.offsetPagination.setPage>[] = [];
 
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {
-      const nodeId = pageKey?.target ?? key;
+      const nodeId = pageTargetKey ?? key;
       const navNodeChildren = await this.loadNodeChildren(nodeId, offset, limit);
       values.push(navNodeChildren);
 
-      this.offsetPagination.setPageEnd(
-        CachedResourceOffsetPageKey(offset, navNodeChildren.navNodeChildren.length).setTarget(nodeId),
+      pages.push([
+        isPageListKey
+          ? CachedResourceOffsetPageListKey(offset, navNodeChildren.navNodeChildren.length).setParent(CachedResourceOffsetPageTargetKey(nodeId))
+          : CachedResourceOffsetPageKey(offset, navNodeChildren.navNodeChildren.length).setParent(CachedResourceOffsetPageTargetKey(nodeId)),
+        navNodeChildren.navNodeChildren.map(node => node.id),
         navNodeChildren.navNodeChildren.length === limit,
-      );
+      ]);
     });
 
-    this.setNavObject(values, offset, limit);
+    runInAction(() => {
+      this.setNavObject(values, offset, limit);
+
+      for (const pageArgs of pages) {
+        this.offsetPagination.setPage(...pageArgs);
+      }
+    });
 
     return this.data;
   }
@@ -575,7 +584,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     return { navNodeChildren, navNodeInfo, parentPath };
   }
 
-  protected getDefaultMetadata(key: string, metadata: MetadataMap<string, INodeMetadata>): INodeMetadata {
+  protected override getDefaultMetadata(key: string, metadata: MetadataMap<string, INodeMetadata>): INodeMetadata {
     return Object.assign(super.getDefaultMetadata(key, metadata), {
       withDetails: false,
     });

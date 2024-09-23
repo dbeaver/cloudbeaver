@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IAsyncContextLoader, IContextLoader, IExecutionContext, ISyncContextLoader } from './IExecutionContext';
+import type { IAsyncContextLoader, IContextLoader, IExecutionContext, ISyncContextLoader } from './IExecutionContext.js';
 
 export class ExecutionContext<TData> implements IExecutionContext<TData> {
   readonly contexts: Map<IContextLoader<any, TData>, any>;

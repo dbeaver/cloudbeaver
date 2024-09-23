@@ -14,10 +14,10 @@ import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/c
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
-import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM';
-import { CustomConnectionSettingsService } from './CustomConnectionSettingsService';
+import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM.js';
+import { CustomConnectionSettingsService } from './CustomConnectionSettingsService.js';
 
-const DriverSelectorDialog = importLazyComponent(() => import('./DriverSelector/DriverSelectorDialog').then(m => m.DriverSelectorDialog));
+const DriverSelectorDialog = importLazyComponent(() => import('./DriverSelector/DriverSelectorDialog.js').then(m => m.DriverSelectorDialog));
 
 @injectable()
 export class CustomConnectionPluginBootstrap extends Bootstrap {
@@ -32,7 +32,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.menuService.addCreator({
       menus: [MENU_CONNECTIONS],
       getItems: (context, items) => [...items, ACTION_CONNECTION_CUSTOM],

@@ -10,19 +10,18 @@ import React, { useCallback } from 'react';
 
 import { Checkbox, MenuItem, MenuItemCheckbox, MenuItemElement, MenuSeparator, useTranslate } from '@cloudbeaver/core-blocks';
 import {
-  IMenuData,
-  IMenuItem,
+  type IMenuData,
+  type IMenuItem,
   isMenuCustomItem,
   MenuActionItem,
   MenuBaseItem,
   MenuCheckboxItem,
-  MenuCustomItem,
   MenuSeparatorItem,
   MenuSubMenuItem,
 } from '@cloudbeaver/core-view';
 
-import { MenuActionElement } from './MenuActionElement';
-import { SubMenuElement } from './SubMenuElement';
+import { MenuActionElement } from './MenuActionElement.js';
+import { SubMenuElement } from './SubMenuElement.js';
 
 export interface IMenuItemRendererProps extends React.ButtonHTMLAttributes<any> {
   item: IMenuItem;

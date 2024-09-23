@@ -14,8 +14,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
-import { UserInfo } from '../UserInfo';
-import { MENU_USER_PROFILE } from './MENU_USER_PROFILE';
+import { UserInfo } from '../UserInfo.js';
+import { MENU_USER_PROFILE } from './MENU_USER_PROFILE.js';
 import style from './UserMenu.module.css';
 
 export const UserMenu = observer(function UserMenu() {

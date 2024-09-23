@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext, useLayoutEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 
-import { ReactCodemirrorContext } from './ReactCodemirrorContext';
+import { ReactCodemirrorContext } from './ReactCodemirrorContext.js';
 
 interface Props extends React.PropsWithChildren {
   className?: string;

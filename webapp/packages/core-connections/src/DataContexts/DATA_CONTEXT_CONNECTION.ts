@@ -7,6 +7,6 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
-import type { Connection } from '../ConnectionInfoResource';
+import type { Connection } from '../ConnectionInfoResource.js';
 
 export const DATA_CONTEXT_CONNECTION = createDataContext<Connection>('connection');

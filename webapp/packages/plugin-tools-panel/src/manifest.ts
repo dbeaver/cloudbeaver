@@ -10,9 +10,9 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 export const toolsPanelPlugin: PluginManifest = {
   info: { name: 'Tools panel plugin' },
   providers: [
-    () => import('./ToolsPanel/ToolsPanelService').then(m => m.ToolsPanelService),
-    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./ToolsPanelSettingsService').then(m => m.ToolsPanelSettingsService),
+    () => import('./ToolsPanel/ToolsPanelService.js').then(m => m.ToolsPanelService),
+    () => import('./PluginBootstrap.js').then(m => m.PluginBootstrap),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./ToolsPanelSettingsService.js').then(m => m.ToolsPanelSettingsService),
   ],
 };

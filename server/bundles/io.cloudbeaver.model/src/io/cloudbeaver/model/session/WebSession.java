@@ -24,13 +24,13 @@ import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebDataSourceUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -78,6 +78,7 @@ import java.util.stream.Collectors;
  * Web session.
  * Is the main source of data in web application
  */
+//TODO: split to authenticated and non authenticated context
 public class WebSession extends BaseWebSession
     implements SMSessionWithAuth, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
 
@@ -111,13 +112,13 @@ public class WebSession extends BaseWebSession
     private final Map<String, DBWSessionHandler> sessionHandlers;
 
     public WebSession(
-        @NotNull HttpServletRequest request,
+        @NotNull WebHttpRequestInfo requestInfo,
         @NotNull WebAuthApplication application,
         @NotNull Map<String, DBWSessionHandler> sessionHandlers
     ) throws DBException {
-        super(request.getSession().getId(), application);
+        super(requestInfo.getId(), application);
         this.lastAccessTime = this.createTime;
-        setLocale(CommonUtils.toString(request.getSession().getAttribute(ATTR_LOCALE), this.locale));
+        setLocale(CommonUtils.toString(requestInfo.getLocale(), this.locale));
         this.sessionHandlers = sessionHandlers;
         //force authorization of anonymous session to avoid access error,
         //because before authorization could be called by any request,
@@ -125,7 +126,25 @@ public class WebSession extends BaseWebSession
         //and the order of requests is not guaranteed.
         //look at CB-4747
         refreshSessionAuth();
-        updateSessionParameters(request);
+        updateSessionParameters(requestInfo);
+    }
+
+    protected WebSession(
+        @NotNull String id,
+        @Nullable String locale,
+        @NotNull WebApplication application,
+        @NotNull Map<String, DBWSessionHandler> sessionHandlers
+    ) throws DBException {
+        super(id, application);
+        this.lastAccessTime = this.createTime;
+        this.sessionHandlers = sessionHandlers;
+        setLocale(locale);
+        //force authorization of anonymous session to avoid access error,
+        //because before authorization could be called by any request,
+        //but now 'updateInfo' is called only in special requests,
+        //and the order of requests is not guaranteed.
+        //look at CB-4747
+        refreshSessionAuth();
     }
 
     @Nullable
@@ -420,9 +439,9 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public synchronized void updateSessionParameters(HttpServletRequest request) {
-        this.lastRemoteAddr = request.getRemoteAddr();
-        this.lastRemoteUserAgent = request.getHeader("User-Agent");
+    public synchronized void updateSessionParameters(WebHttpRequestInfo requestInfo) {
+        this.lastRemoteAddr = requestInfo.getLastRemoteAddress();
+        this.lastRemoteUserAgent = requestInfo.getLastRemoteUserAgent();
         this.cacheExpired = false;
     }
 

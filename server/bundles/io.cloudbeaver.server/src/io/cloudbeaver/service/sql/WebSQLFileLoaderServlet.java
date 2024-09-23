@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
@@ -29,7 +30,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.ee10.servlet.ServletContextRequest;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -60,7 +61,7 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
             .setPrettyPrinting()
             .create();
 
-    public WebSQLFileLoaderServlet(CBApplication application) {
+    public WebSQLFileLoaderServlet(WebApplication application) {
         super(application);
     }
 
@@ -84,7 +85,7 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
                 .resolve(session.getSessionId());
 
         MultipartConfigElement multiPartConfig = new MultipartConfigElement(tempFolder.toString());
-        request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, multiPartConfig);
+        request.setAttribute(ServletContextRequest.MULTIPART_CONFIG_ELEMENT, multiPartConfig);
 
         Map<String, Object> variables = gson.fromJson(request.getParameter(REQUEST_PARAM_VARIABLES), MAP_STRING_OBJECT_TYPE);
 

@@ -16,20 +16,20 @@
  */
 package io.cloudbeaver.server.jobs;
 
-import io.cloudbeaver.server.CBPlatform;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 public abstract class PeriodicSystemJob extends AbstractJob {
 
     @NotNull
-    protected final CBPlatform platform;
+    protected final DBPPlatform platform;
     private final long periodMs;
 
-    public PeriodicSystemJob(@NotNull String name, @NotNull CBPlatform platform, long periodMs) {
+    public PeriodicSystemJob(@NotNull String name, @NotNull DBPPlatform platform, long periodMs) {
         super(name);
         this.platform = platform;
         this.periodMs = periodMs;

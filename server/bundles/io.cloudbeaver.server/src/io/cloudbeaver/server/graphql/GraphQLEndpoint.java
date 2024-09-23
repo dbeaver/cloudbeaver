@@ -23,6 +23,7 @@ import graphql.execution.instrumentation.SimplePerformantInstrumentation;
 import graphql.language.SourceLocation;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.PropertyDataFetcherHelper;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
@@ -31,10 +32,12 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.HttpConstants;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.service.WebServiceBindingBase;
+import io.cloudbeaver.utils.WebAppUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -77,6 +80,7 @@ public class GraphQLEndpoint extends HttpServlet {
     public GraphQLEndpoint() {
         GraphQLSchema schema = buildSchema();
 
+        PropertyDataFetcherHelper.setUseLambdaFactory(false);
         graphQL = GraphQL
             .newGraphQL(schema)
             .instrumentation(new SimplePerformantInstrumentation())
@@ -122,7 +126,7 @@ public class GraphQLEndpoint extends HttpServlet {
     }
 
     private void setDevelHeaders(HttpServletRequest request, HttpServletResponse response) {
-        if (CBApplication.getInstance().isDevelMode()) {
+        if (WebAppUtils.getWebApplication().getServerConfiguration().isDevelMode()) {
             // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
             // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_HEADERS, "*");
             // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "*");
@@ -209,7 +213,7 @@ public class GraphQLEndpoint extends HttpServlet {
         if (path == null) {
             path = request.getServletPath();
         }
-        boolean develMode = CBApplication.getInstance().isDevelMode();
+        boolean develMode = WebAppUtils.getWebApplication().getServerConfiguration().isDevelMode();
 
         if (path.contentEquals("/schema.json") && develMode) {
             executeQuery(request, response, GraphQLConstants.SCHEMA_READ_QUERY, null, null);

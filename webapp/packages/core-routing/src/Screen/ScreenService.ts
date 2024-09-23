@@ -9,10 +9,10 @@ import { computed, makeObservable } from 'mobx';
 import type { SubscribeState } from 'router5';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 
-import { RouterService, RouterTransitionData } from '../RouterService';
-import type { IScreen, ScreenRoute } from './IScreen';
+import { RouterService, type RouterTransitionData } from '../RouterService.js';
+import type { IScreen, ScreenRoute } from './IScreen.js';
 
 @injectable()
 export class ScreenService {

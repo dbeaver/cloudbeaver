@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { DATA_CONTEXT_TAB_ID, useTab } from '@cloudbeaver/core-ui';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import type { TabHandlerPanelComponent } from '@cloudbeaver/plugin-navigation-tabs';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, ISqlEditorTabState, SqlEditor } from '@cloudbeaver/plugin-sql-editor';
+import { DATA_CONTEXT_SQL_EDITOR_STATE, type ISqlEditorTabState, SqlEditor } from '@cloudbeaver/plugin-sql-editor';
 
 export const SqlEditorPanel: TabHandlerPanelComponent<ISqlEditorTabState> = observer(function SqlEditorPanel({ tab }) {
   const baseTab = useTab(tab.id);

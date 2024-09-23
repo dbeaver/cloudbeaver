@@ -251,7 +251,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         }
 
         private void checkActionPermissions(@NotNull Method method, @NotNull WebAction webAction) throws DBWebException {
-            CBApplication<?> application = CBApplication.getInstance();
+            var application = CBPlatform.getInstance().getApplication();
             if (application.isInitializationMode() && webAction.initializationRequired()) {
                 String message = "Server initialization in progress: "
                     + String.join(",", application.getInitActions().values()) + ".\nDo not restart the server.";

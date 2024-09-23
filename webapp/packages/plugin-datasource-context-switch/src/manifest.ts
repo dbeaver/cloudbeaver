@@ -13,9 +13,9 @@ export const datasourceContextSwitchPluginManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
-    () => import('./ConnectionSchemaManager/ConnectionSchemaManagerService').then(m => m.ConnectionSchemaManagerService),
-    () => import('./ConnectionSchemaManager/ConnectionSchemaManagerBootstrap').then(m => m.ConnectionSchemaManagerBootstrap),
-    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./PluginBootstrap.js').then(m => m.PluginBootstrap),
+    () => import('./ConnectionSchemaManager/ConnectionSchemaManagerService.js').then(m => m.ConnectionSchemaManagerService),
+    () => import('./ConnectionSchemaManager/ConnectionSchemaManagerBootstrap.js').then(m => m.ConnectionSchemaManagerBootstrap),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
   ],
 };

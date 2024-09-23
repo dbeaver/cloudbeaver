@@ -7,7 +7,7 @@
  */
 import { describe, expect, it, jest } from '@jest/globals';
 
-import { getPathParent } from './getPathParent';
+import { getPathParent } from './getPathParent.js';
 
 jest.mock('./getPathParts', () => ({
   getPathParts: (path: string) => path.split('/'),

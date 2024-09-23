@@ -7,7 +7,7 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { NotificationService } from './NotificationService';
+import { NotificationService } from './NotificationService.js';
 
 @injectable()
 export class ExceptionsCatcherService extends Bootstrap {
@@ -20,12 +20,10 @@ export class ExceptionsCatcherService extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.baseCatcher = window.onerror;
     window.onerror = this.catcher;
   }
-
-  load(): void {}
 
   unsubscribe() {
     window.onerror = this.baseCatcher;

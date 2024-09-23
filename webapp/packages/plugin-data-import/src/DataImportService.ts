@@ -14,7 +14,7 @@ import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { getProgressPercent } from '@cloudbeaver/core-utils';
 
-import { DataImportSettingsService } from './DataImportSettingsService';
+import { DataImportSettingsService } from './DataImportSettingsService.js';
 
 @injectable()
 export class DataImportService {

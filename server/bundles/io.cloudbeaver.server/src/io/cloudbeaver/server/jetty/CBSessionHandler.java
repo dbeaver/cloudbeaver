@@ -16,16 +16,21 @@
  */
 package io.cloudbeaver.server.jetty;
 
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.GQLApplicationAdapter;
 import jakarta.servlet.SessionCookieConfig;
-import org.eclipse.jetty.http.Syntax;
-import org.eclipse.jetty.server.session.SessionHandler;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.SessionHandler;
+
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class CBSessionHandler extends SessionHandler {
     private final CBCookieConfig cbCookieConfig;
-    private final CBApplication<?> application;
+    private final GQLApplicationAdapter application;
 
-    public CBSessionHandler(CBApplication<?> application) {
+    public CBSessionHandler(GQLApplicationAdapter application) {
         this.cbCookieConfig = new CBCookieConfig();
         this.application = application;
     }
@@ -37,107 +42,147 @@ public class CBSessionHandler extends SessionHandler {
     }
 
 
-    //mostly copy of org.eclipse.jetty.server.session.CookieConfig but allows to use dynamic setSecure flag
+    //mostly copy of org.eclipse.jetty.ee10.servlet.CookieConfig but allows to use dynamic setSecure flag
     public final class CBCookieConfig implements SessionCookieConfig {
-        public CBCookieConfig() {
-        }
 
-        public String getComment() {
-            return CBSessionHandler.this._sessionComment;
-        }
-
-        public String getDomain() {
-            return CBSessionHandler.this._sessionDomain;
-        }
-
-        public int getMaxAge() {
-            return CBSessionHandler.this._maxCookieAge;
-        }
-
-        public String getName() {
-            return CBSessionHandler.this._sessionCookie;
-        }
-
-        public String getPath() {
-            return CBSessionHandler.this._sessionPath;
-        }
-
-        public boolean isHttpOnly() {
-            return CBSessionHandler.this._httpOnly;
-        }
-
+        @Override
         public boolean isSecure() {
             var serverUrl = CBSessionHandler.this.application.getServerURL();
             return serverUrl != null && serverUrl.startsWith("https://");
         }
 
+        @Override
+        public String getComment() {
+            return getSessionComment();
+        }
+
+        @Override
+        public String getDomain() {
+            return getSessionDomain();
+        }
+
+        @Override
+        public int getMaxAge() {
+            return getMaxCookieAge();
+        }
+
+        @Override
+        public void setAttribute(String name, String value) {
+            checkState();
+            String lcase = name.toLowerCase(Locale.ENGLISH);
+
+            switch (lcase) {
+                case "name" -> setName(value);
+                case "max-age" -> setMaxAge(value == null ? -1 : Integer.parseInt(value));
+                case "comment" -> setComment(value);
+                case "domain" -> setDomain(value);
+                case "httponly" -> setHttpOnly(Boolean.parseBoolean(value));
+                case "secure" -> setSecure(Boolean.parseBoolean(value));
+                case "path" -> setPath(value);
+                default -> setSessionCookieAttribute(name, value);
+            }
+        }
+
+        @Override
+        public String getAttribute(String name) {
+            String lcase = name.toLowerCase(Locale.ENGLISH);
+            return switch (lcase) {
+                case "name" -> getName();
+                case "max-age" -> Integer.toString(getMaxAge());
+                case "comment" -> getComment();
+                case "domain" -> getDomain();
+                case "httponly" -> String.valueOf(isHttpOnly());
+                case "secure" -> String.valueOf(isSecure());
+                case "path" -> getPath();
+                default -> getSessionCookieAttribute(name);
+            };
+        }
+
+        /**
+         * According to the SessionCookieConfig javadoc, the attributes must also include
+         * all values set by explicit setters.
+         *
+         * @see SessionCookieConfig
+         */
+        @Override
+        public Map<String, String> getAttributes() {
+            Map<String, String> specials = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            specials.put("name", getAttribute("name"));
+            specials.put("max-age", getAttribute("max-age"));
+            specials.put("comment", getAttribute("comment"));
+            specials.put("domain", getAttribute("domain"));
+            specials.put("httponly", getAttribute("httponly"));
+            specials.put("secure", getAttribute("secure"));
+            specials.put("path", getAttribute("path"));
+            specials.putAll(getSessionCookieAttributes());
+            return Collections.unmodifiableMap(specials);
+        }
+
+        @Override
+        public String getName() {
+            return getSessionCookie();
+        }
+
+        @Override
+        public String getPath() {
+            return getSessionPath();
+        }
+
+        @Override
+        public boolean isHttpOnly() {
+            return CBSessionHandler.this.isHttpOnly();
+        }
+
+        @Override
         public void setComment(String comment) {
-            if (CBSessionHandler.this._context != null && CBSessionHandler.this._context.getContextHandler()
-                .isAvailable()) {
-                throw new IllegalStateException("CookieConfig cannot be set after ServletContext is started");
-            } else {
-                CBSessionHandler.this._sessionComment = comment;
-            }
+            checkState();
+            CBSessionHandler.this.setSessionComment(comment);
         }
 
+        @Override
         public void setDomain(String domain) {
-            if (CBSessionHandler.this._context != null && CBSessionHandler.this._context.getContextHandler()
-                .isAvailable()) {
-                throw new IllegalStateException("CookieConfig cannot be set after ServletContext is started");
-            } else {
-                CBSessionHandler.this._sessionDomain = domain;
-            }
+            checkState();
+            CBSessionHandler.this.setSessionDomain(domain);
         }
 
+        @Override
         public void setHttpOnly(boolean httpOnly) {
-            if (CBSessionHandler.this._context != null && CBSessionHandler.this._context.getContextHandler()
-                .isAvailable()) {
-                throw new IllegalStateException("CookieConfig cannot be set after ServletContext is started");
-            } else {
-                CBSessionHandler.this._httpOnly = httpOnly;
-            }
+            checkState();
+            CBSessionHandler.this.setHttpOnly(httpOnly);
         }
 
+        @Override
         public void setMaxAge(int maxAge) {
-            if (CBSessionHandler.this._context != null && CBSessionHandler.this._context.getContextHandler()
-                .isAvailable()) {
-                throw new IllegalStateException("CookieConfig cannot be set after ServletContext is started");
-            } else {
-                CBSessionHandler.this._maxCookieAge = maxAge;
-            }
+            checkState();
+            CBSessionHandler.this.setMaxCookieAge(maxAge);
         }
 
+        @Override
         public void setName(String name) {
-            if (CBSessionHandler.this._context != null && CBSessionHandler.this._context.getContextHandler()
-                .isAvailable()) {
-                throw new IllegalStateException("CookieConfig cannot be set after ServletContext is started");
-            } else if ("".equals(name)) {
-                throw new IllegalArgumentException("Blank cookie name");
-            } else {
-                if (name != null) {
-                    Syntax.requireValidRFC2616Token(name, "Bad Session cookie name");
-                }
-
-                CBSessionHandler.this._sessionCookie = name;
-            }
+            checkState();
+            CBSessionHandler.this.setSessionCookie(name);
         }
 
+        @Override
         public void setPath(String path) {
-            if (CBSessionHandler.this._context != null && CBSessionHandler.this._context.getContextHandler()
-                .isAvailable()) {
-                throw new IllegalStateException("CookieConfig cannot be set after ServletContext is started");
-            } else {
-                CBSessionHandler.this._sessionPath = path;
-            }
+            checkState();
+            CBSessionHandler.this.setSessionPath(path);
         }
 
+        @Override
         public void setSecure(boolean secure) {
-            if (CBSessionHandler.this._context != null && CBSessionHandler.this._context.getContextHandler()
-                .isAvailable()) {
+            checkState();
+            CBSessionHandler.this.setSecureCookies(secure);
+        }
+
+        private void checkState() {
+            //It is allowable to call the CookieConfig.setXX methods after the SessionHandler has started,
+            //but before the context has fully started. Ie it is allowable for ServletContextListeners
+            //to call these methods in contextInitialized().
+            ServletContextHandler handler = ServletContextHandler.getCurrentServletContextHandler();
+            if (handler != null && handler.isAvailable())
                 throw new IllegalStateException("CookieConfig cannot be set after ServletContext is started");
-            } else {
-                CBSessionHandler.this._secureCookies = secure;
-            }
+
         }
     }
 

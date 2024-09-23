@@ -14,15 +14,15 @@ import { copyToClipboard } from '@cloudbeaver/core-utils';
 import {
   DatabaseSelectAction,
   DataViewerService,
-  IResultSetColumnKey,
-  IResultSetElementKey,
+  type IResultSetColumnKey,
+  type IResultSetElementKey,
   ResultSetDataKeysUtils,
   ResultSetSelectAction,
   useDataViewerCopyHandler,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
-import type { ITableData } from './TableDataContext';
+import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
+import type { ITableData } from './TableDataContext.js';
 
 const EVENT_KEY_CODE = {
   C: 'KeyC',
@@ -34,7 +34,7 @@ function getCellCopyValue(tableData: ITableData, key: IResultSetElementKey): str
 
 function getSelectedCellsValue(tableData: ITableData, selectedCells: Map<string, IResultSetElementKey[]>) {
   const orderedSelectedCells = new Map<string, IResultSetElementKey[]>(
-    [...selectedCells].sort((a, b) => tableData.getRowIndexFromKey(a[1][0].row) - tableData.getRowIndexFromKey(b[1][0].row)),
+    [...selectedCells].sort((a, b) => tableData.getRowIndexFromKey(a[1]![0]!.row) - tableData.getRowIndexFromKey(b[1]![0]!.row)),
   );
 
   const selectedColumns: IResultSetColumnKey[] = [];

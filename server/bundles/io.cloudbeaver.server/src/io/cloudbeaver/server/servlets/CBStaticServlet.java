@@ -20,37 +20,29 @@ import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
+import io.cloudbeaver.model.config.CBAppConfig;
+import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebServletHandlerDescriptor;
-import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.server.CBServerConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.http.HttpContent;
-import org.eclipse.jetty.http.HttpField;
-import org.eclipse.jetty.http.HttpHeader;
-import org.eclipse.jetty.server.ResourceService;
-import org.eclipse.jetty.servlet.DefaultServlet;
-import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.ee10.servlet.DefaultServlet;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.IOUtils;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Enumeration;
+import java.io.IOException;
 import java.util.Map;
 
 @WebServlet(urlPatterns = "/")
@@ -61,10 +53,6 @@ public class CBStaticServlet extends DefaultServlet {
     public static final int STATIC_CACHE_SECONDS = 60 * 60 * 24 * 3;
 
     private static final Log log = Log.getLog(CBStaticServlet.class);
-
-    public CBStaticServlet() {
-        super(makeResourceService());
-    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -187,48 +175,6 @@ public class CBStaticServlet extends DefaultServlet {
         }
 
         return false;
-    }
-
-    private static ResourceService makeResourceService() {
-        ResourceService resourceService = new ProxyResourceService();
-        resourceService.setCacheControl(new HttpField(HttpHeader.CACHE_CONTROL, "public, max-age=" + STATIC_CACHE_SECONDS));
-        return resourceService;
-    }
-
-
-    private static class ProxyResourceService extends ResourceService {
-        @Override
-        protected boolean sendData(HttpServletRequest request, HttpServletResponse response, boolean include, HttpContent content, Enumeration<String> reqRanges) throws IOException {
-            String resourceName = content.getResource().getName();
-            if (resourceName.endsWith("index.html") || resourceName.endsWith("sso.html")) {
-                return patchIndexHtml(response, content);
-            }
-            return super.sendData(request, response, include, content, reqRanges);
-        }
-
-        private boolean patchIndexHtml(HttpServletResponse response, HttpContent content) throws IOException {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Resource resource = content.getResource();
-            File file = resource.getFile();
-            try (InputStream fis = new FileInputStream(file)) {
-                IOUtils.copyStream(fis, baos);
-            }
-            String indexContents = baos.toString(StandardCharsets.UTF_8);
-            CBServerConfig serverConfig = CBApplication.getInstance().getServerConfiguration();
-            indexContents = indexContents
-                .replace("{ROOT_URI}", serverConfig.getRootURI())
-                .replace("{STATIC_CONTENT}", serverConfig.getStaticContent());
-            byte[] indexBytes = indexContents.getBytes(StandardCharsets.UTF_8);
-
-            putHeaders(response, content, indexBytes.length);
-            // Disable cache for index.html
-            response.setHeader(HttpHeader.CACHE_CONTROL.toString(), "no-cache, no-store, must-revalidate");
-            response.setHeader(HttpHeader.EXPIRES.toString(), "0");
-
-            response.getOutputStream().write(indexBytes);
-
-            return true;
-        }
     }
 
 }

@@ -12,7 +12,7 @@ export const administrationTopAppBarPlugin: PluginManifest = {
     name: 'Administration Top App Bar plugin',
   },
   providers: [
-    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
-    () => import('./TopNavBar/AdministrationTopAppBarBootstrap').then(m => m.AdministrationTopAppBarBootstrap),
+    () => import('./PluginBootstrap.js').then(m => m.PluginBootstrap),
+    () => import('./TopNavBar/AdministrationTopAppBarBootstrap.js').then(m => m.AdministrationTopAppBarBootstrap),
   ],
 };

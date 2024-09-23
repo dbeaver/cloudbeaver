@@ -7,32 +7,30 @@
  */
 import { action, computed, makeObservable, observable } from 'mobx';
 
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 
-type Key = string | string[];
-
-interface IData {
-  key: string;
+interface IData<Key> {
+  key: Key;
   value: boolean;
 }
 
-export class TableState {
-  readonly onExpand: IExecutor<IData>;
+export class TableState<K = string> {
+  readonly onExpand: IExecutor<IData<K>>;
 
-  selected: Map<string, boolean>;
-  expanded: Map<string, boolean>;
+  selected: Map<K, boolean>;
+  expanded: Map<K, boolean>;
 
   get itemsSelected(): boolean {
     return Array.from(this.selected.values()).some(v => v);
   }
 
-  get selectedList(): string[] {
+  get selectedList(): K[] {
     return Array.from(this.selected)
       .filter(([_, value]) => value)
       .map(([key]) => key);
   }
 
-  get expandedList(): string[] {
+  get expandedList(): K[] {
     return Array.from(this.expanded)
       .filter(([_, value]) => value)
       .map(([key]) => key);
@@ -41,8 +39,8 @@ export class TableState {
   constructor() {
     this.onExpand = new Executor();
 
-    this.selected = new Map();
-    this.expanded = new Map();
+    this.selected = new Map<K, boolean>();
+    this.expanded = new Map<K, boolean>();
 
     makeObservable(this, {
       selected: observable,
@@ -55,37 +53,33 @@ export class TableState {
     });
   }
 
-  unselect(key?: Key): Map<string, boolean> {
+  unselect(key?: K | K[]): Map<K, boolean> {
     if (key === undefined) {
       this.selected.clear();
     } else {
-      if (typeof key === 'string') {
-        this.selected.delete(key);
-      } else {
-        for (const id of key) {
-          this.selected.delete(id);
-        }
+      const keys = Array.isArray(key) ? key : [key];
+
+      for (const id of keys) {
+        this.selected.delete(id);
       }
     }
 
     return this.selected;
   }
 
-  expand(key: string, value: boolean) {
+  expand(key: K, value: boolean) {
     this.expanded.set(key, value);
     this.onExpand.execute({ key, value });
   }
 
-  collapse(key?: Key): Map<string, boolean> {
+  collapse(key?: K | K[]): Map<K, boolean> {
     if (key === undefined) {
       this.expanded.clear();
     } else {
-      if (typeof key === 'string') {
-        this.expanded.delete(key);
-      } else {
-        for (const id of key) {
-          this.expanded.delete(id);
-        }
+      const keys = Array.isArray(key) ? key : [key];
+
+      for (const id of keys) {
+        this.expanded.delete(id);
       }
     }
 

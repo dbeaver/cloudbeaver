@@ -9,15 +9,14 @@ import { observable, toJS } from 'mobx';
 
 import type { AdminUser, AuthRolesResource, UserResourceIncludes, UsersResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { CachedResourceIncludeArgs, getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
+import { type CachedResourceIncludeArgs } from '@cloudbeaver/core-resource';
 import type { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
-import { FormMode, FormPart, formValidationContext, IFormState } from '@cloudbeaver/core-ui';
+import { FormMode, FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import { isArraysEqual, isDefined, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
-import { DATA_CONTEXT_LOADABLE_STATE } from '@cloudbeaver/core-view';
 
-import type { IUserFormState } from '../AdministrationUserFormService';
-import type { IUserFormInfoState } from './IUserFormInfoState';
+import type { IUserFormState } from '../AdministrationUserFormService.js';
+import type { IUserFormInfoState } from './IUserFormInfoState.js';
 
 const DEFAULT_ENABLED = true;
 
@@ -40,7 +39,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     this.baseIncludes = ['includeMetaParameters'];
   }
 
-  protected format(data: IFormState<IUserFormState>, contexts: IExecutionContextProvider<IFormState<IUserFormState>>): void | Promise<void> {
+  protected override format(data: IFormState<IUserFormState>, contexts: IExecutionContextProvider<IFormState<IUserFormState>>): void | Promise<void> {
     this.state.password = this.state.password.trim();
     const metaParameters = this.state.metaParameters;
 
@@ -57,15 +56,15 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     }
   }
 
-  isOutdated(): boolean {
+  override isOutdated(): boolean {
     if (this.formState.mode === FormMode.Edit && this.initialState.userId) {
       return this.usersResource.isOutdated(this.initialState.userId, this.baseIncludes);
     }
 
-    return false;
+    return this.serverConfigResource.isOutdated() || this.authRolesResource.isOutdated();
   }
 
-  isLoaded(): boolean {
+  override isLoaded(): boolean {
     if (
       this.formState.mode === FormMode.Edit &&
       this.initialState.userId &&
@@ -77,7 +76,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     return this.loaded;
   }
 
-  isChanged(): boolean {
+  override get isChanged(): boolean {
     if (!this.loaded) {
       return false;
     }
@@ -137,14 +136,6 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
         validation.error('authentication_user_role_not_set');
       }
     }
-  }
-  protected override configure() {
-    const loadableStateContext = this.formState.dataContext.get(DATA_CONTEXT_LOADABLE_STATE)!;
-
-    loadableStateContext.getState('user-info', () => [
-      getCachedDataResourceLoaderState(this.serverConfigResource, () => undefined),
-      getCachedDataResourceLoaderState(this.authRolesResource, () => undefined),
-    ]);
   }
 
   private async updateCredentials() {
@@ -220,7 +211,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
 
   protected override async loader() {
     let user: AdminUser | null = null;
-    const serverConfig = await this.serverConfigResource.load();
+    const [serverConfig] = await Promise.all([this.serverConfigResource.load(), this.authRolesResource.load()]);
 
     if (this.formState.mode === FormMode.Edit && this.initialState.userId) {
       user = await this.usersResource.load(this.initialState.userId, this.baseIncludes);

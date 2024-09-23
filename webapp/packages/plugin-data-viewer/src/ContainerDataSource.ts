@@ -15,18 +15,18 @@ import {
   AsyncTaskInfoService,
   GraphQLService,
   ResultDataFormat,
-  SqlExecuteInfo,
-  SqlQueryResults,
-  UpdateResultsDataBatchMutationVariables,
+  type SqlExecuteInfo,
+  type SqlQueryResults,
+  type UpdateResultsDataBatchMutationVariables,
 } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import { DocumentEditAction } from './DatabaseDataModel/Actions/Document/DocumentEditAction';
-import type { IResultSetBlobValue } from './DatabaseDataModel/Actions/ResultSet/IResultSetBlobValue';
-import { ResultSetEditAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
-import type { IDatabaseDataOptions } from './DatabaseDataModel/IDatabaseDataOptions';
-import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
-import { ResultSetDataSource } from './ResultSet/ResultSetDataSource';
+import { DocumentEditAction } from './DatabaseDataModel/Actions/Document/DocumentEditAction.js';
+import type { IResultSetBlobValue } from './DatabaseDataModel/Actions/ResultSet/IResultSetBlobValue.js';
+import { ResultSetEditAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction.js';
+import type { IDatabaseDataOptions } from './DatabaseDataModel/IDatabaseDataOptions.js';
+import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet.js';
+import { ResultSetDataSource } from './ResultSet/ResultSetDataSource.js';
 
 export interface IDataContainerOptions extends IDatabaseDataOptions {
   containerNodePath: string;
@@ -35,11 +35,11 @@ export interface IDataContainerOptions extends IDatabaseDataOptions {
 export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptions> {
   currentTask: ITask<SqlExecuteInfo> | null;
 
-  get canCancel(): boolean {
+  override get canCancel(): boolean {
     return this.currentTask?.cancellable || false;
   }
 
-  get cancelled(): boolean {
+  override get cancelled(): boolean {
     return this.currentTask?.cancelled || false;
   }
 
@@ -60,11 +60,11 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     });
   }
 
-  isOutdated(): boolean {
+  override isOutdated(): boolean {
     return super.isOutdated() || !this.executionContext?.context;
   }
 
-  async cancel(): Promise<void> {
+  override async cancel(): Promise<void> {
     await super.cancel();
     await this.currentTask?.cancel();
   }
@@ -215,7 +215,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     return task;
   }
 
-  setExecutionContext(context: IConnectionExecutionContext | null): this {
+  override setExecutionContext(context: IConnectionExecutionContext | null): this {
     super.setExecutionContext(context);
 
     for (const result of this.results) {

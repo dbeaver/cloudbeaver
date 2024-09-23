@@ -10,9 +10,9 @@ import { useState } from 'react';
 import type { TeamsResource } from '@cloudbeaver/core-authentication';
 import { useService } from '@cloudbeaver/core-di';
 
-import type { ITeamFormState } from './ITeamFormProps';
-import { TeamFormService } from './TeamFormService';
-import { TeamFormState } from './TeamFormState';
+import type { ITeamFormState } from './ITeamFormProps.js';
+import { TeamFormService } from './TeamFormService.js';
+import { TeamFormState } from './TeamFormState.js';
 
 export function useTeamFormState(resource: TeamsResource, configure?: (state: ITeamFormState) => any): ITeamFormState {
   const service = useService(TeamFormService);

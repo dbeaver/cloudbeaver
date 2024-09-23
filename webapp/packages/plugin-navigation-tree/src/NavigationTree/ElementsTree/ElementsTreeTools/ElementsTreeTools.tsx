@@ -12,24 +12,24 @@ import {
   ActionIconButton,
   Fill,
   IconButtonStyles,
-  PlaceholderElement,
+  type PlaceholderElement,
   s,
   SContext,
-  StyleRegistry,
+  type StyleRegistry,
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
-import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE';
-import type { IElementsTree } from '../useElementsTree';
-import { ElementsTreeFilter } from './ElementsTreeFilter';
+import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE.js';
+import type { IElementsTree } from '../useElementsTree.js';
+import { ElementsTreeFilter } from './ElementsTreeFilter.js';
 import ElementsTreeToolsStyles from './ElementsTreeTools.module.css';
 import ElementsTreeToolsIconButtonStyles from './ElementsTreeToolsIconButton.module.css';
-import { ElementsTreeToolsMenu } from './ElementsTreeToolsMenu';
-import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT';
-import type { IElementsTreeSettingsProps } from './NavigationTreeSettings/ElementsTreeSettingsService';
-import { NavigationTreeSettings } from './NavigationTreeSettings/NavigationTreeSettings';
+import { ElementsTreeToolsMenu } from './ElementsTreeToolsMenu.js';
+import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT.js';
+import type { IElementsTreeSettingsProps } from './NavigationTreeSettings/ElementsTreeSettingsService.js';
+import { NavigationTreeSettings } from './NavigationTreeSettings/NavigationTreeSettings.js';
 
 const registry: StyleRegistry = [
   [

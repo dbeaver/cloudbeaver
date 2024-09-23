@@ -5,14 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { forwardRef, PropsWithChildren, ReactNode } from 'react';
+import { forwardRef, type PropsWithChildren, type ReactNode } from 'react';
 
-import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
+import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import tabPanelStyles from '../TabPanel.module.css';
-import type { ITabData } from '../TabsContainer/ITabsContainer';
-import { TabsState } from '../TabsState';
+import type { ITabData } from '../TabsContainer/ITabsContainer.js';
+import { TabsState } from '../TabsState.js';
 import styles from './shared/TabsBox.module.css';
 import moduleTabPanelStyles from './shared/TabsBoxTabPanel.module.css';
 

@@ -5,15 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ExecutionContext } from './ExecutionContext';
-import { executionExceptionContext } from './executionExceptionContext';
-import { ExecutorHandlersCollection } from './ExecutorHandlersCollection';
-import { ExecutorInterrupter, IExecutorInterrupter } from './ExecutorInterrupter';
-import type { IExecutionContext, IExecutionContextProvider } from './IExecutionContext';
-import type { IExecutor } from './IExecutor';
-import type { IExecutorHandler } from './IExecutorHandler';
-import type { ChainLinkType, IExecutorHandlersCollection } from './IExecutorHandlersCollection';
-import { BlockedExecution, TaskScheduler } from './TaskScheduler/TaskScheduler';
+import { ExecutionContext } from './ExecutionContext.js';
+import { executionExceptionContext } from './executionExceptionContext.js';
+import { ExecutorHandlersCollection } from './ExecutorHandlersCollection.js';
+import { ExecutorInterrupter, type IExecutorInterrupter } from './ExecutorInterrupter.js';
+import type { IExecutionContext, IExecutionContextProvider } from './IExecutionContext.js';
+import type { IExecutor } from './IExecutor.js';
+import type { IExecutorHandler } from './IExecutorHandler.js';
+import type { ChainLinkType, IExecutorHandlersCollection } from './IExecutorHandlersCollection.js';
+import { type BlockedExecution, TaskScheduler } from './TaskScheduler/TaskScheduler.js';
 
 export class Executor<T = void> extends ExecutorHandlersCollection<T> implements IExecutor<T> {
   get executing(): boolean {
@@ -161,7 +161,7 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
     return data;
   }
 
-  protected executeHandlerWithInitialData(handler: IExecutorHandler<T>) {
+  protected override executeHandlerWithInitialData(handler: IExecutorHandler<T>) {
     if (!this.initialDataGetter) {
       return;
     }

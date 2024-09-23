@@ -7,10 +7,10 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import type { ISettingChangeData, ISettingsSource } from './ISettingsSource';
+import type { ISettingChangeData, ISettingsSource } from './ISettingsSource.js';
 
 export abstract class SettingsSource implements ISettingsSource {
   readonly onChange: ISyncExecutor<ISettingChangeData>;

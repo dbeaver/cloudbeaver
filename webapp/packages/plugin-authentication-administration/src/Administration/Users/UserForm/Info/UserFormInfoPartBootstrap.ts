@@ -9,11 +9,11 @@ import React from 'react';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { AdministrationUserFormService } from '../AdministrationUserFormService';
-import { getUserFormInfoPart } from './getUserFormInfoPart';
+import { AdministrationUserFormService } from '../AdministrationUserFormService.js';
+import { getUserFormInfoPart } from './getUserFormInfoPart.js';
 
 const UserFormInfo = React.lazy(async () => {
-  const { UserFormInfo } = await import('./UserFormInfo');
+  const { UserFormInfo } = await import('./UserFormInfo.js');
   return { default: UserFormInfo };
 });
 
@@ -23,7 +23,7 @@ export class UserFormInfoPartBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.administrationUserFormService.parts.add({
       key: 'info',
       name: 'authentication_administration_user_info',
@@ -33,6 +33,4 @@ export class UserFormInfoPartBootstrap extends Bootstrap {
       stateGetter: props => () => getUserFormInfoPart(props.formState),
     });
   }
-
-  load(): void {}
 }

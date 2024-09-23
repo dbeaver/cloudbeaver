@@ -8,8 +8,8 @@
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { injectable } from '@cloudbeaver/core-di';
 
-import type { IAction } from '../../Action/IAction';
-import type { IKeyBindingHandler, IKeyBindingHandlerOptions } from './IKeyBindingHandler';
+import type { IAction } from '../../Action/IAction.js';
+import type { IKeyBindingHandler, IKeyBindingHandlerOptions } from './IKeyBindingHandler.js';
 
 @injectable()
 export class KeyBindingService {

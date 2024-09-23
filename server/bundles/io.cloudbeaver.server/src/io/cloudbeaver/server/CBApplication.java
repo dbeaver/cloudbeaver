@@ -21,12 +21,14 @@ import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
+import io.cloudbeaver.model.config.CBAppConfig;
+import io.cloudbeaver.model.config.CBServerConfig;
+import io.cloudbeaver.model.config.SMControllerConfiguration;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
-import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.eclipse.core.runtime.Platform;
@@ -74,7 +76,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * This class controls all aspects of the application's execution
  */
-public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApplication implements WebAuthApplication {
+public abstract class CBApplication<T extends CBServerConfig> extends
+    BaseWebApplication implements WebAuthApplication, GQLApplicationAdapter {
 
     private static final Log log = Log.getLog(CBApplication.class);
 
@@ -83,8 +86,6 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
      * In configuration mode sessions expire after a week
      */
     private static final long CONFIGURATION_MODE_SESSION_IDLE_TIME = 60 * 60 * 1000 * 24 * 7;
-    public static final String HOST_LOCALHOST = "localhost";
-    public static final String HOST_127_0_0_1 = "127.0.0.1";
 
 
     static {
@@ -221,9 +222,9 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
         if (CommonUtils.isEmpty(localHostAddress)) {
             localHostAddress = System.getProperty(CBConstants.VAR_CB_LOCAL_HOST_ADDR);
         }
-        if (CommonUtils.isEmpty(localHostAddress) || HOST_127_0_0_1.equals(localHostAddress) || "::0".equals(
+        if (CommonUtils.isEmpty(localHostAddress) || CBConstants.HOST_127_0_0_1.equals(localHostAddress) || "::0".equals(
             localHostAddress)) {
-            localHostAddress = HOST_LOCALHOST;
+            localHostAddress = CBConstants.HOST_LOCALHOST;
         }
 
         final Runtime runtime = Runtime.getRuntime();

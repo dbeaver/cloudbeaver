@@ -9,10 +9,10 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
-import { DefaultNavigatorSettingsFragment, GraphQLService, NavigatorSettingsInput } from '@cloudbeaver/core-sdk';
+import { type DefaultNavigatorSettingsFragment, GraphQLService, type NavigatorSettingsInput } from '@cloudbeaver/core-sdk';
 
-import { isNavigatorViewSettingsEqual } from './ConnectionNavigatorViewSettings';
-import { ServerConfigResource } from './ServerConfigResource';
+import { isNavigatorViewSettingsEqual } from './ConnectionNavigatorViewSettings.js';
+import { ServerConfigResource } from './ServerConfigResource.js';
 
 export type DefaultNavigatorSettings = DefaultNavigatorSettingsFragment['defaultNavigatorSettings'];
 

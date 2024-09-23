@@ -9,22 +9,22 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { executorHandlerFilter, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { executorHandlerFilter, ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { ResourceKey, ResourceKeySimple } from '@cloudbeaver/core-resource';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
-import { ConnectionFormService } from '../ConnectionForm/ConnectionFormService';
-import { ConnectionFormState } from '../ConnectionForm/ConnectionFormState';
-import type { IConnectionFormState } from '../ConnectionForm/IConnectionFormProps';
+import { ConnectionFormService } from '../ConnectionForm/ConnectionFormService.js';
+import { ConnectionFormState } from '../ConnectionForm/ConnectionFormState.js';
+import type { IConnectionFormState } from '../ConnectionForm/IConnectionFormProps.js';
 
-const PublicConnectionForm = importLazyComponent(() => import('./PublicConnectionForm').then(m => m.PublicConnectionForm));
+const PublicConnectionForm = importLazyComponent(() => import('./PublicConnectionForm.js').then(m => m.PublicConnectionForm));
 
 const formGetter = () => PublicConnectionForm;
 

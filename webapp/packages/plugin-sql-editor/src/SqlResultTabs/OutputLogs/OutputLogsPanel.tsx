@@ -11,11 +11,11 @@ import { Container, Group, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EditorLoader } from '@cloudbeaver/plugin-codemirror6';
 
-import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
-import { OutputLogsResource } from './OutputLogsResource';
-import { OutputLogsService } from './OutputLogsService';
-import { OutputLogsToolbar } from './OutputLogsToolbar';
-import { useOutputLogsPanelState } from './useOutputLogsPanelState';
+import type { ISqlEditorTabState } from '../../ISqlEditorTabState.js';
+import { OutputLogsResource } from './OutputLogsResource.js';
+import { OutputLogsService } from './OutputLogsService.js';
+import { OutputLogsToolbar } from './OutputLogsToolbar.js';
+import { useOutputLogsPanelState } from './useOutputLogsPanelState.js';
 
 interface Props {
   sqlEditorTabState: ISqlEditorTabState;

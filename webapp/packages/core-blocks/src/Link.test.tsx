@@ -10,7 +10,7 @@ import { cleanup, fireEvent, queryByAttribute, waitFor } from '@testing-library/
 
 import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
-import { Link } from './Link';
+import { Link } from './Link.js';
 
 const app = createApp();
 

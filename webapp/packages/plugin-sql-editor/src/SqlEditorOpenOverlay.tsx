@@ -19,7 +19,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 
-import type { ISqlDataSource } from './SqlDataSource/ISqlDataSource';
+import type { ISqlDataSource } from './SqlDataSource/ISqlDataSource.js';
 
 interface Props {
   dataSource: ISqlDataSource | undefined;

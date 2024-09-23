@@ -18,8 +18,8 @@ import {
   isResultSetDataModel,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataImportDialogLazy } from './DataImportDialog/DataImportDialogLazy';
-import { DataImportService } from './DataImportService';
+import { DataImportDialogLazy } from './DataImportDialog/DataImportDialogLazy.js';
+import { DataImportService } from './DataImportService.js';
 
 @injectable()
 export class DataImportBootstrap extends Bootstrap {
@@ -32,7 +32,7 @@ export class DataImportBootstrap extends Bootstrap {
     super();
   }
 
-  register() {
+  override register() {
     this.actionService.addHandler({
       id: 'data-import-base-handler',
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],

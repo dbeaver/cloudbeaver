@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { getPathParts } from './getPathParts';
+import { getPathParts } from './getPathParts.js';
 
 describe('getPathParts', () => {
   it('should return full parts', () => {

@@ -19,7 +19,7 @@ export class PluginBootstrap extends Bootstrap {
     this.reactionDisposer = null;
   }
 
-  register(): void {
+  override register(): void {
     this.reactionDisposer = autorun(() => schemaExtra.setLocale(this.localizationService.currentLanguage));
     this.localizationService.addProvider(async locale => {
       await schemaExtra.loadLocale(locale);
@@ -27,7 +27,7 @@ export class PluginBootstrap extends Bootstrap {
     });
   }
 
-  dispose(): void {
+  override dispose(): void {
     this.reactionDisposer?.();
   }
 }

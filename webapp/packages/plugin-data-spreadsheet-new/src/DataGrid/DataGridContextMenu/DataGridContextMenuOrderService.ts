@@ -9,17 +9,17 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   DatabaseDataConstraintAction,
   EOrder,
-  IDatabaseDataModel,
-  IDatabaseDataOptions,
-  IResultSetColumnKey,
+  type IDatabaseDataModel,
+  type IDatabaseDataOptions,
+  type IResultSetColumnKey,
   isResultSetDataModel,
   isResultSetDataSource,
-  Order,
+  type Order,
   ResultSetDataAction,
   ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridContextMenuService } from './DataGridContextMenuService';
+import { DataGridContextMenuService } from './DataGridContextMenuService.js';
 
 @injectable()
 export class DataGridContextMenuOrderService {

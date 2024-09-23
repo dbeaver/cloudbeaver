@@ -7,6 +7,6 @@
  */
 import { createContext } from 'react';
 
-import { IComponentsTreeNode } from './IComponentsTreeNode';
+import { type IComponentsTreeNode } from './IComponentsTreeNode.js';
 
 export const ComponentsTreeContext = createContext<Array<IComponentsTreeNode<any>>>([]);

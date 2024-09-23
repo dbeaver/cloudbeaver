@@ -111,7 +111,7 @@ public class WebNavigatorNodeInfo {
 
     @Property
     public String getProjectId() {
-        DBPProject ownerProject = node.getOwnerProject();
+        DBPProject ownerProject = node.getOwnerProjectOrNull();
         return ownerProject == null ? null : ownerProject.getId();
     }
 
@@ -119,11 +119,11 @@ public class WebNavigatorNodeInfo {
     @Deprecated
     public String getFullName() {
         String nodeName;
-        if (node instanceof DBNDatabaseNode && !(node instanceof DBNDataSource)) {
-            DBSObject object = ((DBNDatabaseNode) node).getObject();
+        if (node instanceof DBNDatabaseNode dbNode && !(node instanceof DBNDataSource)) {
+            DBSObject object = dbNode.getObject();
             nodeName = DBUtils.getObjectFullName(object, DBPEvaluationContext.UI);
-        } else if (node instanceof DBNDataSource) {
-            DBPDataSourceContainer object = ((DBNDataSource) node).getDataSourceContainer();
+        } else if (node instanceof DBNDataSource dataSource) {
+            DBPDataSourceContainer object = dataSource.getDataSourceContainer();
             nodeName = object.getName();
         } else {
             nodeName = node.getNodeTargetName();
@@ -235,7 +235,7 @@ public class WebNavigatorNodeInfo {
                 if (objectManager != null && objectManager.canDeleteObject(object)) {
                     features.add(NODE_FEATURE_CAN_DELETE);
                 }
-                if (objectManager instanceof DBEObjectRenamer && ((DBEObjectRenamer) objectManager).canRenameObject(object)) {
+                if (objectManager instanceof DBEObjectRenamer renamer && renamer.canRenameObject(object)) {
                     if (!object.getDataSource().getContainer().getNavigatorSettings().isShowOnlyEntities()) {
                         features.add(NODE_FEATURE_CAN_RENAME);
                     }
@@ -282,9 +282,10 @@ public class WebNavigatorNodeInfo {
 
     @Property
     public WebPropertyInfo[] getNodeDetails() throws DBWebException {
-        if (node instanceof DBPObjectWithDetails) {
+        if (node instanceof DBPObjectWithDetails objectWithDetails) {
             try {
-                DBPObject objectDetails = ((DBPObjectWithDetails) node).getObjectDetails(session.getProgressMonitor(), session.getSessionContext(), node);
+                DBPObject objectDetails = objectWithDetails.getObjectDetails(
+                    session.getProgressMonitor(), session.getSessionContext(), node);
                 if (objectDetails != null) {
                     return WebServiceUtils.getObjectProperties(session, objectDetails);
                 }
@@ -301,8 +302,8 @@ public class WebNavigatorNodeInfo {
 
     @Property
     public WebDatabaseObjectInfo getObject() {
-        if (node instanceof DBNDatabaseNode) {
-            DBSObject object = ((DBNDatabaseNode) node).getObject();
+        if (node instanceof DBNDatabaseNode dbNode) {
+            DBSObject object = dbNode.getObject();
             return object == null ? null : new WebDatabaseObjectInfo(session, object);
         }
         return null;
@@ -320,10 +321,10 @@ public class WebNavigatorNodeInfo {
 
     @Property
     public DBSObjectFilter getFilter() throws DBWebException {
-        if (!(node instanceof DBNDatabaseNode)) {
+        if (!(node instanceof DBNDatabaseNode dbNode)) {
             throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
         }
-        DBSObjectFilter filter = ((DBNDatabaseNode) node).getNodeFilter(((DBNDatabaseNode) node).getItemsMeta(), true);
+        DBSObjectFilter filter = dbNode.getNodeFilter(dbNode.getItemsMeta(), true);
         return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
     }
 

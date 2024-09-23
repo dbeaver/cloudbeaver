@@ -7,15 +7,15 @@
  */
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import React, { ButtonHTMLAttributes, forwardRef, useCallback, useEffect, useMemo } from 'react';
-import { Menu, MenuButton, MenuInitialState, MenuItem, MenuItemCheckbox, MenuItemRadio, MenuStateReturn, useMenuState } from 'reakit/Menu';
+import React, { type ButtonHTMLAttributes, forwardRef, useCallback, useEffect, useMemo } from 'react';
+import { Menu, MenuButton, type MenuInitialState, MenuItem, MenuItemCheckbox, MenuItemRadio, type MenuStateReturn, useMenuState } from 'reakit';
 
 import type { IMenuItem, IMenuPanel } from '@cloudbeaver/core-dialogs';
 
-import { s } from '../s';
-import { useObjectRef } from '../useObjectRef';
-import { useS } from '../useS';
-import { MenuPanelItem } from './MenuPanelItem';
+import { s } from '../s.js';
+import { useObjectRef } from '../useObjectRef.js';
+import { useS } from '../useS.js';
+import { MenuPanelItem } from './MenuPanelItem.js';
 import MenuPanelItemAndTriggerStyles from './shared/MenuPanelItemAndTrigger.module.css';
 
 export type MenuState = MenuStateReturn;

@@ -15,7 +15,7 @@ import { isDefined } from '@cloudbeaver/core-utils';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import styles from './ObjectPropertyTable.module.css';
-import { TableLoader } from './Table/TableLoader';
+import { TableLoader } from './Table/TableLoader.js';
 
 interface ObjectPropertyTableProps {
   objectId: string;
@@ -33,7 +33,7 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
     pageSize: navTreeResource.resource.childrenLimit,
   });
 
-  const dbObjectLoader = useResource(ObjectPropertyTable, DBObjectResource, pagination.key);
+  const dbObjectLoader = useResource(ObjectPropertyTable, DBObjectResource, pagination.currentPage);
 
   const { nodes, duplicates } = navNodeViewService.filterDuplicates(dbObjectLoader.data.filter(isDefined).map(node => node?.id) || []);
 

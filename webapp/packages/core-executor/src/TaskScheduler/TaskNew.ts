@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { CancelError } from './CancelError';
-import type { ITask, TaskCancelFn, TaskExecutor, TaskRejectFn, TaskResolveFn } from './ITaskNew';
+import { CancelError } from './CancelError.js';
+import type { ITask, TaskCancelFn, TaskExecutor, TaskRejectFn, TaskResolveFn } from './ITaskNew.js';
 
 export const NOOP: VoidFunction = Object.freeze(() => {});
 

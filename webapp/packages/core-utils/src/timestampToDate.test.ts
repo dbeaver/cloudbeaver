@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { timestampToDate } from './timestampToDate';
+import { timestampToDate } from './timestampToDate.js';
 
 describe('timestampToDate', () => {
   it('should convert timestamp to date', () => {

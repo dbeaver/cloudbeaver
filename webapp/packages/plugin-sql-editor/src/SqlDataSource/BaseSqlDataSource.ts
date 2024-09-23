@@ -8,15 +8,15 @@
 import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { isContainsException, isValuesEqual, staticImplements } from '@cloudbeaver/core-utils';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
-import type { QueryDataSource } from '../QueryDataSource';
-import { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
-import type { ISetScriptData, ISqlDataSource, ISqlDataSourceKey, ISqlEditorCursor } from './ISqlDataSource';
-import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory';
-import { SqlDataSourceHistory } from './SqlDataSourceHistory/SqlDataSourceHistory';
+import type { QueryDataSource } from '../QueryDataSource.js';
+import { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures.js';
+import type { ISetScriptData, ISqlDataSource, ISqlDataSourceKey, ISqlEditorCursor } from './ISqlDataSource.js';
+import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory.js';
+import { SqlDataSourceHistory } from './SqlDataSourceHistory/SqlDataSourceHistory.js';
 
 const SOURCE_HISTORY = 'history';
 

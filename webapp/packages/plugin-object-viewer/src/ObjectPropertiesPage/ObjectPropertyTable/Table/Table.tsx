@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 
-import { IScrollState, Link, s, useControlledScroll, useExecutor, useS, useTable, useTranslate } from '@cloudbeaver/core-blocks';
+import { type IScrollState, Link, s, useControlledScroll, useExecutor, useS, useTable, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
@@ -16,16 +16,16 @@ import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { isDefined, TextTools } from '@cloudbeaver/core-utils';
 import { DataGrid } from '@cloudbeaver/plugin-data-grid';
 
-import { getValue } from '../../helpers';
-import { ObjectPropertyTableFooter } from '../ObjectPropertyTableFooter';
-import { CellFormatter } from './CellFormatter';
-import type { IDataColumn } from './Column';
-import { ColumnIcon } from './Columns/ColumnIcon/ColumnIcon';
-import { ColumnSelect } from './Columns/ColumnSelect/ColumnSelect';
-import { HeaderRenderer } from './HeaderRenderer';
+import { getValue } from '../../helpers.js';
+import { ObjectPropertyTableFooter } from '../ObjectPropertyTableFooter.js';
+import { CellFormatter } from './CellFormatter.js';
+import type { IDataColumn } from './Column.js';
+import { ColumnIcon } from './Columns/ColumnIcon/ColumnIcon.js';
+import { ColumnSelect } from './Columns/ColumnSelect/ColumnSelect.js';
+import { HeaderRenderer } from './HeaderRenderer.js';
 import classes from './Table.module.css';
-import { TableContext } from './TableContext';
-import { useTableData } from './useTableData';
+import { TableContext } from './TableContext.js';
+import { useTableData } from './useTableData.js';
 
 const CELL_FONT = '400 12px Roboto';
 const COLUMN_FONT = '700 12px Roboto';
@@ -45,9 +45,9 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
   for (const row of rows.slice(0, 100)) {
     if (row.object?.properties) {
       for (let i = 0; i < row.object.properties.length; i++) {
-        const value = getValue(row.object.properties[i].value);
+        const value = getValue(row.object.properties[i]!.value);
 
-        if (value.length > rowStrings[i].length) {
+        if (value.length > rowStrings[i]!.length) {
           rowStrings[i] = value;
         }
       }
@@ -64,7 +64,7 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
     text: rowStrings,
   }).map(width => width + CELL_PADDING + CELL_BORDER);
 
-  const widthData = columnNames.map((_, i) => Math.max(columnsWidth[i], cellsWidth[i] ?? 0));
+  const widthData = columnNames.map((_, i) => Math.max(columnsWidth[i]!, cellsWidth[i] ?? 0));
 
   return widthData;
 }
@@ -94,7 +94,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
     name: property.displayName ?? '',
     description: property.description,
     columnDataIndex: null,
-    width: Math.min(300, measuredCells[index]),
+    width: Math.min(300, measuredCells[index]!),
     minWidth: 40,
     resizable: true,
     renderCell: props => <CellFormatter {...props} />,

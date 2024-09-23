@@ -24,15 +24,15 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { Connection, DBDriverResource } from '@cloudbeaver/core-connections';
+import { type Connection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
-import { getFilteredConnections } from './getFilteredConnections';
+import { getFilteredConnections } from './getFilteredConnections.js';
 import style from './GrantedConnectionsList.module.css';
-import { GrantedConnectionsTableHeader, IFilterState } from './GrantedConnectionsTableHeader/GrantedConnectionsTableHeader';
-import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHeader/GrantedConnectionsTableInnerHeader';
-import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem';
+import { GrantedConnectionsTableHeader, type IFilterState } from './GrantedConnectionsTableHeader/GrantedConnectionsTableHeader.js';
+import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHeader/GrantedConnectionsTableInnerHeader.js';
+import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem.js';
 
 interface Props {
   grantedConnections: Connection[];

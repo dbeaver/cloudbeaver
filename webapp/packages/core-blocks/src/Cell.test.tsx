@@ -10,7 +10,7 @@ import { cleanup, waitFor } from '@testing-library/react';
 
 import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
-import { Cell } from './Cell';
+import { Cell } from './Cell.js';
 
 const app = createApp();
 

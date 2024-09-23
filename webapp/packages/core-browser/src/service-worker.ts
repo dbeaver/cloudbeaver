@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
-import { cacheNames, clientsClaim, WorkboxPlugin } from 'workbox-core';
+import { cacheNames, clientsClaim, type WorkboxPlugin } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { addPlugins, matchPrecache, precacheAndRoute } from 'workbox-precaching';
-import { getOrCreatePrecacheController } from 'workbox-precaching/utils/getOrCreatePrecacheController';
+import { getOrCreatePrecacheController } from 'workbox-precaching/utils/getOrCreatePrecacheController.js';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst } from 'workbox-strategies';
 
@@ -68,7 +68,7 @@ function createUpdateProgressPlugin(): WorkboxPlugin {
   return {
     handlerWillStart: async ({ request, state }) => {
       if (state) {
-        state.originalRequest = request;
+        state['originalRequest'] = request;
       }
       if (hasPreviousCache === null) {
         hasPreviousCache = await caches.has(cacheNames.precache);
@@ -117,7 +117,7 @@ registerRoute(
 );
 
 registerRoute(
-  ({ request }) => request.destination === 'image',
+  ({ request, url }) => url.origin === self.location.origin && request.destination === 'image',
   new CacheFirst({
     cacheName: 'images',
     plugins: [
@@ -127,6 +127,7 @@ registerRoute(
       new ExpirationPlugin({
         maxEntries: 1000,
         maxAgeSeconds: 7 * 24 * 60 * 60,
+        purgeOnQuotaError: true,
       }),
     ],
   }),

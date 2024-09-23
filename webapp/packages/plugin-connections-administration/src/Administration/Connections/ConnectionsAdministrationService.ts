@@ -9,33 +9,31 @@ import React from 'react';
 
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { ConfirmationDialog, PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, type DatabaseConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { NotificationService } from '@cloudbeaver/core-events';
-import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
-import { CreateConnectionService } from './CreateConnectionService';
+import { CreateConnectionService } from './CreateConnectionService.js';
 
 export interface IConnectionDetailsPlaceholderProps {
   connection: DatabaseConnection;
 }
 
 const ConnectionsAdministration = React.lazy(async () => {
-  const { ConnectionsAdministration } = await import('./ConnectionsAdministration');
+  const { ConnectionsAdministration } = await import('./ConnectionsAdministration.js');
   return { default: ConnectionsAdministration };
 });
 const ConnectionsDrawerItem = React.lazy(async () => {
-  const { ConnectionsDrawerItem } = await import('./ConnectionsDrawerItem');
+  const { ConnectionsDrawerItem } = await import('./ConnectionsDrawerItem.js');
   return { default: ConnectionsDrawerItem };
 });
 const Origin = React.lazy(async () => {
-  const { Origin } = await import('./ConnectionsTable/ConnectionDetailsInfo/Origin');
+  const { Origin } = await import('./ConnectionsTable/ConnectionDetailsInfo/Origin.js');
   return { default: Origin };
 });
 const SSH = React.lazy(async () => {
-  const { SSH } = await import('./ConnectionsTable/ConnectionDetailsInfo/SSH');
+  const { SSH } = await import('./ConnectionsTable/ConnectionDetailsInfo/SSH.js');
   return { default: SSH };
 });
 
@@ -45,9 +43,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
 
   constructor(
     private readonly administrationItemService: AdministrationItemService,
-    private readonly notificationService: NotificationService,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly dbDriverResource: DBDriverResource,
     private readonly createConnectionService: CreateConnectionService,
     private readonly commonDialogService: CommonDialogService,
     private readonly serverConfigResource: ServerConfigResource,
@@ -55,7 +51,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.administrationItemService.create({
       name: 'connections',
       type: AdministrationItemType.Administration,
@@ -75,14 +71,11 @@ export class ConnectionsAdministrationService extends Bootstrap {
       isHidden: () => this.serverConfigResource.distributed,
       getContentComponent: () => ConnectionsAdministration,
       getDrawerComponent: () => ConnectionsDrawerItem,
-      onActivate: this.loadConnections.bind(this),
       onDeActivate: this.refreshUserConnections.bind(this),
     });
     this.connectionDetailsPlaceholder.add(Origin, 0);
     this.connectionDetailsPlaceholder.add(SSH, 2);
   }
-
-  load(): void | Promise<void> {}
 
   private async refreshUserConnections(configuration: boolean, outside: boolean, outsideAdminPage: boolean): Promise<void> {
     // TODO: we have to track users' leaving the page
@@ -121,14 +114,5 @@ export class ConnectionsAdministrationService extends Bootstrap {
     });
 
     return result !== DialogueStateResult.Rejected;
-  }
-
-  private async loadConnections() {
-    try {
-      await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
-      await this.dbDriverResource.load(CachedMapAllKey);
-    } catch (exception: any) {
-      this.notificationService.logException(exception, 'Error occurred while loading connections');
-    }
   }
 }

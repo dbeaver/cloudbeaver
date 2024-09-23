@@ -10,8 +10,8 @@ import { memo } from 'react';
 import { Loader, Placeholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { AppScreenService } from './AppScreenService';
-import { Main } from './Main';
+import { AppScreenService } from './AppScreenService.js';
+import { Main } from './Main.js';
 
 export const AppScreen = memo(function AppScreen() {
   const appScreenService = useService(AppScreenService);

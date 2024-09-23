@@ -14,8 +14,8 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ServerErrorType, ServerInternalError } from '@cloudbeaver/core-sdk';
 import { EDeferredState, errorOf } from '@cloudbeaver/core-utils';
 
-import { DataExportProcessService } from '../DataExportProcessService';
-import type { IExportNotification, IExportNotificationStatus } from './IExportNotification';
+import { DataExportProcessService } from '../DataExportProcessService.js';
+import type { IExportNotification, IExportNotificationStatus } from './IExportNotification.js';
 
 export function useExportNotification(notification: IExportNotification) {
   const dataExportProcessService = useService(DataExportProcessService);

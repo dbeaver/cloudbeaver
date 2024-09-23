@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-codemirror6",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

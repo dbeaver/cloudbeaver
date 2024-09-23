@@ -7,10 +7,10 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { uuid } from '@cloudbeaver/core-utils';
-import { IDatabaseDataModel, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
+import { type IDatabaseDataModel, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IResultGroup, IResultTab, ISqlEditorTabState, IStatisticsTab } from '../ISqlEditorTabState';
-import type { QueryDataSource } from '../QueryDataSource';
+import type { IResultGroup, IResultTab, ISqlEditorTabState, IStatisticsTab } from '../ISqlEditorTabState.js';
+import type { QueryDataSource } from '../QueryDataSource.js';
 
 @injectable()
 export class SqlQueryResultService {
@@ -172,13 +172,13 @@ export class SqlQueryResultService {
         return a.indexInResultSet - b.indexInResultSet;
       });
 
-    editorState.currentTabId = resultTab[0].tabId;
+    editorState.currentTabId = resultTab[0]!.tabId;
   }
 
   selectFirstResult(editorState: ISqlEditorTabState, groupId: string) {
     const mainTab = editorState.resultTabs.filter(resultTab => resultTab.groupId === groupId).sort((a, b) => a.indexInResultSet - b.indexInResultSet);
 
-    editorState.currentTabId = mainTab[0].tabId;
+    editorState.currentTabId = mainTab[0]!.tabId;
   }
 
   private createTabsForGroup(state: ISqlEditorTabState, group: IResultGroup, model: IDatabaseDataModel<QueryDataSource>, resultCount?: number) {
@@ -216,7 +216,7 @@ export class SqlQueryResultService {
       return;
     }
 
-    state.resultTabs[index] = { ...state.resultTabs[index], ...resultTab };
+    state.resultTabs[index] = { ...state.resultTabs[index]!, ...resultTab };
   }
 
   private createResultTab(state: ISqlEditorTabState, group: IResultGroup, indexInResultSet: number, results: number, resultCount?: number) {

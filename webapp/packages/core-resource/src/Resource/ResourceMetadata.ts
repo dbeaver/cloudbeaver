@@ -7,14 +7,15 @@
  */
 import { observable } from 'mobx';
 
-import { DefaultValueGetter, isNotNullDefined, isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
+import { type DefaultValueGetter, isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
 
-import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
-import { isResourceAlias } from './ResourceAlias';
-import type { ResourceAliases } from './ResourceAliases';
-import type { ResourceKey, ResourceKeyFlat } from './ResourceKey';
-import { isResourceKeyList, ResourceKeyList } from './ResourceKeyList';
-import { ResourceKeyUtils } from './ResourceKeyUtils';
+import { CachedResourceOffsetPageKey, CachedResourceOffsetPageListKey } from './CachedResourceOffsetPageKeys.js';
+import type { ICachedResourceMetadata } from './ICachedResourceMetadata.js';
+import { isResourceAlias, ResourceAlias } from './ResourceAlias.js';
+import type { ResourceAliases } from './ResourceAliases.js';
+import type { ResourceKey, ResourceKeyFlat } from './ResourceKey.js';
+import { isResourceKeyList, ResourceKeyList } from './ResourceKeyList.js';
+import { ResourceKeyUtils } from './ResourceKeyUtils.js';
 
 type MetadataCallback<TMetadata, TValue = void> = (metadata: TMetadata) => TValue;
 
@@ -110,6 +111,8 @@ export class ResourceMetadata<TKey, TMetadata extends ICachedResourceMetadata> {
         if (this.some(param, predicate)) {
           result = true;
         }
+      } else if (predicate(this.get(param))) {
+        result = true;
       }
     }
 
@@ -193,11 +196,11 @@ export class ResourceMetadata<TKey, TMetadata extends ICachedResourceMetadata> {
     if (isResourceAlias(key)) {
       key = this.aliases.transformToAlias(key);
 
-      if (isNotNullDefined(key.target)) {
-        return this.getMetadataKeyRef(key.target);
+      if (isResourceAlias(key, CachedResourceOffsetPageKey) || isResourceAlias(key, CachedResourceOffsetPageListKey)) {
+        return this.getMetadataKeyRef(key.parent as any);
       }
 
-      return key.toString() as TKey;
+      return (key as ResourceAlias<TKey, any>).toString() as TKey;
     }
 
     if (isPrimitive(key)) {
