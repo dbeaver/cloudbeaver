@@ -439,11 +439,6 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         return dataDir.toPath();
     }
 
-    @Override
-    public Path getWorkspaceDirectory() {
-        return Path.of(getServerConfiguration().getWorkspaceLocation());
-    }
-
     private void initializeSecurityController() throws DBException {
         securityController = createGlobalSecurityController();
     }

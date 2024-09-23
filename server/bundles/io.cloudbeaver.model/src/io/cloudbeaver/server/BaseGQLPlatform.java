@@ -17,6 +17,7 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.model.app.WebApplication;
 import org.eclipse.core.runtime.Plugin;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
@@ -55,7 +56,7 @@ public abstract class BaseGQLPlatform extends BasePlatformImpl {
         SecurityProviderUtils.registerSecurityProvider();
 
         // Register properties adapter
-        this.workspace = new WebGlobalWorkspace(this);
+        this.workspace = new WebGlobalWorkspace(this, (WebApplication) getApplication());
         this.workspace.initializeProjects();
         QMUtils.initApplication(this);
 

@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.model.app;
 
+import org.jkiss.code.NotNull;
+
 /**
  * Web server configuration.
  * Contains only server configuration properties.
@@ -25,6 +27,11 @@ public interface WebServerConfiguration {
 
     default String getRootURI() {
         return "";
+    }
+
+    @NotNull
+    default String getWorkspaceLocation() {
+        return "workspace";
     }
 
 }
