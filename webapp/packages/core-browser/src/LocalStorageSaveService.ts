@@ -5,13 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { entries, IReactionDisposer, keys, observable, ObservableMap, reaction, remove, runInAction, set, toJS } from 'mobx';
+import { entries, type IReactionDisposer, keys, observable, ObservableMap, reaction, remove, runInAction, set, toJS } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
-import { IndexedDB, type IndexedDBTable } from './IndexedDB/IndexedDB';
-import { IndexedDBService } from './IndexedDB/IndexedDBService';
+import { IndexedDB, type IndexedDBTable } from './IndexedDB/IndexedDB.js';
+import { IndexedDBService } from './IndexedDB/IndexedDBService.js';
 
 interface ILocalStorageElement<T extends Record<any, any> | Map<any, any>> {
   storeId: string;

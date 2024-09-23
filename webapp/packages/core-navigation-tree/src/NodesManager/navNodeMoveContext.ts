@@ -7,7 +7,7 @@
  */
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
-import type { INodeMoveData } from './NavNodeManagerService';
+import type { INodeMoveData } from './NavNodeManagerService.js';
 
 interface INavNodeMoveContext {
   canMove: boolean;

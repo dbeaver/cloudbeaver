@@ -18,7 +18,7 @@ import {
   PlaceholderContainer,
   s,
   SContext,
-  StyleRegistry,
+  type StyleRegistry,
   TopAppBar,
   useS,
 } from '@cloudbeaver/core-blocks';

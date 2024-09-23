@@ -9,8 +9,8 @@ import { useRef } from 'react';
 
 import { IServiceProvider, useService } from '@cloudbeaver/core-di';
 
-import { AdministrationUserFormService } from '../UserForm/AdministrationUserFormService';
-import { AdministrationUserFormState } from '../UserForm/AdministrationUserFormState';
+import { AdministrationUserFormService } from '../UserForm/AdministrationUserFormService.js';
+import { AdministrationUserFormState } from '../UserForm/AdministrationUserFormState.js';
 
 export function useAdministrationUserFormState(id: string | null, configure?: (state: AdministrationUserFormState) => any) {
   const service = useService(AdministrationUserFormService);

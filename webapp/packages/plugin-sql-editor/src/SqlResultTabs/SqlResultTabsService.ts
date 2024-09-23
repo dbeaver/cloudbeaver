@@ -9,11 +9,11 @@ import { action, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 
-import type { ISqlEditorResultTab, ISqlEditorTabState } from '../ISqlEditorTabState';
-import { SqlExecutionPlanService } from './ExecutionPlan/SqlExecutionPlanService';
-import { OutputLogsService } from './OutputLogs/OutputLogsService';
-import { SqlQueryResultService } from './SqlQueryResultService';
-import { SqlQueryService } from './SqlQueryService';
+import type { ISqlEditorResultTab, ISqlEditorTabState } from '../ISqlEditorTabState.js';
+import { SqlExecutionPlanService } from './ExecutionPlan/SqlExecutionPlanService.js';
+import { OutputLogsService } from './OutputLogs/OutputLogsService.js';
+import { SqlQueryResultService } from './SqlQueryResultService.js';
+import { SqlQueryService } from './SqlQueryService.js';
 
 @injectable()
 export class SqlResultTabsService {
@@ -89,7 +89,7 @@ export class SqlResultTabsService {
 
     if (state.currentTabId === tab.id) {
       if (state.tabs.length > 0) {
-        state.currentTabId = state.tabs[0].id;
+        state.currentTabId = state.tabs[0]!.id;
       } else {
         state.currentTabId = '';
       }

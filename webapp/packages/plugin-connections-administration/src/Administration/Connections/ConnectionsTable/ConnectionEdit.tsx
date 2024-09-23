@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 
 import { Loader, s, useS } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ConnectionFormLoader, useConnectionFormState } from '@cloudbeaver/plugin-connections';
 

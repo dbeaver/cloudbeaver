@@ -7,8 +7,8 @@
  */
 import type { graphql } from 'msw';
 
-import { mockOpenSession } from './resolvers/mockOpenSession';
-import { mockServerConfig } from './resolvers/mockServerConfig';
+import { mockOpenSession } from './resolvers/mockOpenSession.js';
+import { mockServerConfig } from './resolvers/mockServerConfig.js';
 
 export function mockAppInit(endpoint: ReturnType<typeof graphql.link>, productConfiguration?: Record<string, any>) {
   return [endpoint.query('serverConfig', mockServerConfig(productConfiguration)), endpoint.mutation('openSession', mockOpenSession)];

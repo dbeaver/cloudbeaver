@@ -13,10 +13,10 @@ export const sqlGeneratorPlugin: PluginManifest = {
   },
 
   providers: [
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./SqlGenerators/SqlGeneratorsBootstrap').then(m => m.SqlGeneratorsBootstrap),
-    () => import('./SqlGenerators/SqlGeneratorsResource').then(m => m.SqlGeneratorsResource),
-    () => import('./ScriptPreview/ScriptPreviewService').then(m => m.ScriptPreviewService),
-    () => import('./GeneratorMenuBootstrap').then(m => m.GeneratorMenuBootstrap),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./SqlGenerators/SqlGeneratorsBootstrap.js').then(m => m.SqlGeneratorsBootstrap),
+    () => import('./SqlGenerators/SqlGeneratorsResource.js').then(m => m.SqlGeneratorsResource),
+    () => import('./ScriptPreview/ScriptPreviewService.js').then(m => m.ScriptPreviewService),
+    () => import('./GeneratorMenuBootstrap.js').then(m => m.GeneratorMenuBootstrap),
   ],
 };

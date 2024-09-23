@@ -13,11 +13,11 @@ import { useService } from '@cloudbeaver/core-di';
 import { TabList, TabPanelList, TabPanelStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { DatabaseDataResultAction } from '../../DatabaseDataModel/Actions/DatabaseDataResultAction';
-import { DatabaseMetadataAction } from '../../DatabaseDataModel/Actions/DatabaseMetadataAction';
-import { DatabaseSelectAction } from '../../DatabaseDataModel/Actions/DatabaseSelectAction';
-import type { DataPresentationComponent } from '../../DataPresentationService';
-import { DataValuePanelService } from './DataValuePanelService';
+import { DatabaseDataResultAction } from '../../DatabaseDataModel/Actions/DatabaseDataResultAction.js';
+import { DatabaseMetadataAction } from '../../DatabaseDataModel/Actions/DatabaseMetadataAction.js';
+import { DatabaseSelectAction } from '../../DatabaseDataModel/Actions/DatabaseSelectAction.js';
+import type { DataPresentationComponent } from '../../DataPresentationService.js';
+import { DataValuePanelService } from './DataValuePanelService.js';
 import styles from './shared/ValuePanel.module.css';
 import ValuePanelEditorTabPanel from './shared/ValuePanelEditorTabPanel.module.css';
 import ValuePanelEditorTabs from './shared/ValuePanelEditorTabs.module.css';
@@ -63,7 +63,7 @@ export const ValuePanel: DataPresentationComponent = observer(function ValuePane
   const hasCurrentTabCells = currentTabId && displayed.some(tab => tab.key === currentTabId);
 
   if (displayed.length > 0 && !hasCurrentTabCells) {
-    currentTabId = displayed[0].key;
+    currentTabId = displayed[0]!.key;
   }
 
   return (

@@ -11,8 +11,8 @@ import { ROOT_SETTINGS_GROUP } from '@cloudbeaver/core-settings';
 import { throttle } from '@cloudbeaver/core-utils';
 import type { ITreeData } from '@cloudbeaver/plugin-navigation-tree';
 
-import { getSettingGroupIdFromElementId } from './getSettingGroupIdFromElementId';
-import { querySettingsGroups } from './querySettingsGroups';
+import { getSettingGroupIdFromElementId } from './getSettingGroupIdFromElementId.js';
+import { querySettingsGroups } from './querySettingsGroups.js';
 
 export function useTreeScrollSync(treeData: ITreeData, onSettingsOpen?: (groupId: string) => void): React.RefObject<HTMLDivElement> {
   const ref = useRef<HTMLDivElement>(null);

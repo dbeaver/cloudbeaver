@@ -7,7 +7,7 @@
  */
 import type { DialogComponent, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
-import { ConfirmationDialog, ConfirmationDialogPayload } from '../CommonDialog/ConfirmationDialog';
+import { ConfirmationDialog, type ConfirmationDialogPayload } from '../CommonDialog/ConfirmationDialog.js';
 
 export const ConfirmationDialogDelete: DialogComponent<ConfirmationDialogPayload, DialogueStateResult | string> = function ConfirmationDialogDelete({
   payload,

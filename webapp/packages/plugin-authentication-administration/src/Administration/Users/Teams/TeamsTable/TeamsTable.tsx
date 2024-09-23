@@ -12,7 +12,7 @@ import {
   ExceptionMessageStyles,
   Loader,
   SContext,
-  StyleRegistry,
+  type StyleRegistry,
   Table,
   TableBody,
   TableColumnHeader,
@@ -22,7 +22,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
-import { Team } from './Team';
+import { Team } from './Team.js';
 import teamsTableStyle from './TeamsTable.module.css';
 
 const registry: StyleRegistry = [

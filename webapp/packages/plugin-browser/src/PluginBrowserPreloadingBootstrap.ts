@@ -13,7 +13,7 @@ export class PluginBrowserPreloadingBootstrap extends Bootstrap {
   constructor(private readonly serviceWorkerService: ServiceWorkerService) {
     super();
   }
-  register(): void {
+  override register(): void {
     this.serviceWorkerService.onUpdate.addHandler(({ type, progress }) => {
       progress = progress || 0;
 

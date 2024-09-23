@@ -9,12 +9,12 @@ import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, PasswordPolicyService } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { PasswordPolicyResource, ServerConfigResource } from '@cloudbeaver/core-root';
 import {
-  ILoadConfigData,
-  IServerConfigSaveData,
+  type ILoadConfigData,
+  type IServerConfigSaveData,
   ServerConfigurationService,
   serverConfigValidationContext,
 } from '@cloudbeaver/plugin-administration';
@@ -33,12 +33,10 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.serverConfigurationService.validationTask.addHandler(this.validateForm);
     this.serverConfigurationService.loadConfigTask.addHandler(this.loadServerConfig);
   }
-
-  load(): void {}
 
   private readonly loadServerConfig: IExecutorHandler<ILoadConfigData> = async (data, contexts) => {
     if (!data.reset) {

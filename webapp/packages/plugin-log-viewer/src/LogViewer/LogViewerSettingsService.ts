@@ -17,7 +17,7 @@ import {
 } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
-import { LOG_VIEWER_SETTINGS_GROUP } from './LOG_VIEWER_SETTINGS_GROUP';
+import { LOG_VIEWER_SETTINGS_GROUP } from './LOG_VIEWER_SETTINGS_GROUP.js';
 
 const defaultSettings = schema.object({
   'plugin.log-viewer.maxLogRecords': schema.coerce.number().default(1000),

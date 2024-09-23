@@ -7,7 +7,7 @@
  */
 import { describe, expect, it, jest } from '@jest/globals';
 
-import { parseJSONFlat } from './parseJSONFlat';
+import { parseJSONFlat } from './parseJSONFlat.js';
 
 describe('parseJSONFlat', () => {
   it('should parse null values', () => {

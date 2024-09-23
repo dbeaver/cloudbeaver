@@ -13,7 +13,7 @@ export const coreDialogsManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./CommonDialog/CommonDialogService').then(m => m.CommonDialogService),
-    () => import('./Menu/ContextMenu/ContextMenuService').then(m => m.ContextMenuService),
+    () => import('./CommonDialog/CommonDialogService.js').then(m => m.CommonDialogService),
+    () => import('./Menu/ContextMenu/ContextMenuService.js').then(m => m.ContextMenuService),
   ],
 };

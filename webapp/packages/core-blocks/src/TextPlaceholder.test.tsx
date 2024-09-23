@@ -10,7 +10,7 @@ import { waitFor } from '@testing-library/react';
 
 import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
-import { TextPlaceholder } from './TextPlaceholder';
+import { TextPlaceholder } from './TextPlaceholder.js';
 
 const app = createApp();
 

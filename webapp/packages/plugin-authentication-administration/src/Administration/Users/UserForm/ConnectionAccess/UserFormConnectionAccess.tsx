@@ -34,9 +34,9 @@ import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 import { isDefined } from '@cloudbeaver/core-utils';
 
-import type { UserFormProps } from '../AdministrationUserFormService';
-import type { UserFormConnectionAccessPart } from './UserFormConnectionAccessPart';
-import { UserFormConnectionTableItem } from './UserFormConnectionTableItem';
+import type { UserFormProps } from '../AdministrationUserFormService.js';
+import type { UserFormConnectionAccessPart } from './UserFormConnectionAccessPart.js';
+import { UserFormConnectionTableItem } from './UserFormConnectionTableItem.js';
 
 export const UserFormConnectionAccess: TabContainerPanelComponent<UserFormProps> = observer(function UserFormConnectionAccess({ tabId }) {
   const translate = useTranslate();

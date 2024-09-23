@@ -7,10 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ITreeData, Tree } from '@cloudbeaver/plugin-navigation-tree';
+import { type ITreeData, Tree } from '@cloudbeaver/plugin-navigation-tree';
 
-import { groupNodeRenderer } from './groupNodeRenderer';
-import { SettingsGroupsEmpty } from './SettingsGroupsEmpty';
+import { groupNodeRenderer } from './groupNodeRenderer.js';
+import { SettingsGroupsEmpty } from './SettingsGroupsEmpty.js';
 
 interface Props {
   treeData: ITreeData;

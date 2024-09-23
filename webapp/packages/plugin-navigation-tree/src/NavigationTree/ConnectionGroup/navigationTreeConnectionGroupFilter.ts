@@ -8,7 +8,7 @@
 import { ENodeFeature, EObjectFeature, type NavNode, type NavNodeInfoResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
 
-import type { IElementsTreeFilter } from '../ElementsTree/useElementsTree';
+import type { IElementsTreeFilter } from '../ElementsTree/useElementsTree.js';
 
 export const NAVIGATION_TREE_CONNECTION_GROUPS = {
   unsorted: 'nav-tree://connection-group/unsorted',

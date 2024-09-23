@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/core-notifications",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

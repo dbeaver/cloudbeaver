@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const NodeControl = importLazyComponent(() => import('./NodeControl').then(m => m.NodeControl));
+export const NodeControl = importLazyComponent(() => import('./NodeControl.js').then(m => m.NodeControl));

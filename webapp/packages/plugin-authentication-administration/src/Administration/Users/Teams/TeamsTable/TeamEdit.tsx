@@ -12,8 +12,8 @@ import { TeamsResource } from '@cloudbeaver/core-authentication';
 import { Container, s, TableContext, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { TeamForm } from '../TeamForm';
-import { useTeamFormState } from '../useTeamFormState';
+import { TeamForm } from '../TeamForm.js';
+import { useTeamFormState } from '../useTeamFormState.js';
 import style from './TeamEdit.module.css';
 
 interface Props {

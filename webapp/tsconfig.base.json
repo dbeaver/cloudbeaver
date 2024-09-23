@@ -1,37 +1,45 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "allowUnreachableCode": false,
-    "allowSyntheticDefaultImports": true,
-    "allowJs": false,
-    "lib": ["dom", "ES2022"],
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "importsNotUsedAsValues": "error",
-    "forceConsistentCasingInFileNames": true,
-    "ignoreDeprecations": "5.0",
-    "jsx": "react-jsx",
     "target": "esnext",
-    "module": "esnext",
-    "moduleResolution": "Bundler",
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "noImplicitReturns": true,
+    "lib": ["dom", "ES2022"],
+    "module": "nodenext",
+    // "module": "esnext",
+    "skipLibCheck": true,
+
+    "moduleResolution": "NodeNext",
+    // "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "importHelpers": true,
+    "allowArbitraryExtensions": true,
+    // "baseUrl": ".",
+    "jsx": "react-jsx",
+    "useDefineForClassFields": false, // leads to "TypeError: Cannot redefine property requestInfo" in QueryDataSource.ts
+
+    /* Linting */
+    "strict": true,
+    // "noUnusedLocals": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "removeComments": false,
-    "preserveConstEnums": true,
-    "sourceMap": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "exactOptionalPropertyTypes": false,
+    "verbatimModuleSyntax": true,
+    "checkJs": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
     "strictNullChecks": true,
-    "isolatedModules": true,
-    "allowArbitraryExtensions": true,
-    "resolveJsonModule": true,
 
-    "useDefineForClassFields": false,
-    "esModuleInterop": true,
+    /* legacy decorators */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    /* Source maps */
+    "sourceMap": true,
 
     // project references
     "composite": true,
@@ -41,10 +49,6 @@
 
     "disableReferencedProjectLoad": true,
     "disableSolutionSearching": true,
-
-    // disable support of helpers
-    "noEmitHelpers": false,
-    "importHelpers": true,
 
     "types": ["reflect-metadata", "node", "@cloudbeaver/core-cli/global.d.ts"],
     "plugins": [

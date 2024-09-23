@@ -8,12 +8,12 @@
 import { observer } from 'mobx-react-lite';
 
 import { ColoredContainer, Container, Group, GroupTitle, InputField, Loader, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
-import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
-import type { UserProfileFormProps } from '../UserProfileFormService';
-import { UserActiveAuthMethods } from './UserActiveAuthMethods/UserActiveAuthMethods';
-import { UserProfileFormInfoMetaParameters } from './UserProfileFormInfoMetaParameters';
-import type { UserProfileFormInfoPart } from './UserProfileFormInfoPart';
+import type { UserProfileFormProps } from '../UserProfileFormService.js';
+import { UserActiveAuthMethods } from './UserActiveAuthMethods/UserActiveAuthMethods.js';
+import { UserProfileFormInfoMetaParameters } from './UserProfileFormInfoMetaParameters.js';
+import type { UserProfileFormInfoPart } from './UserProfileFormInfoPart.js';
 
 export const UserProfileFormInfo: TabContainerPanelComponent<UserProfileFormProps> = observer(function UserProfileFormInfo({ tabId }) {
   const translate = useTranslate();

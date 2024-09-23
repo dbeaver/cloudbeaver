@@ -10,8 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
 import { Group, GroupTitle, ObjectPropertyInfoForm, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 
-import type { UserFormProps } from '../AdministrationUserFormService';
-import type { UserFormInfoPart } from './UserFormInfoPart';
+import type { UserFormProps } from '../AdministrationUserFormService.js';
+import type { UserFormInfoPart } from './UserFormInfoPart.js';
 
 interface Props extends UserFormProps {
   tabState: UserFormInfoPart;

@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
+import { type AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
 import {
   Checkbox,
   Loader,
@@ -23,10 +23,10 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { clsx } from '@cloudbeaver/core-utils';
 
-import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService';
-import { UsersAdministrationService } from '../UsersAdministrationService';
+import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService.js';
+import { UsersAdministrationService } from '../UsersAdministrationService.js';
 import style from './User.module.css';
-import { UserEdit } from './UserEdit';
+import { UserEdit } from './UserEdit.js';
 
 interface Props {
   user: AdminUser;
@@ -68,11 +68,11 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
       <TableColumnValue centerContent flex expand>
         <TableItemExpand />
       </TableColumnValue>
-      <TableColumnValue className={style.expand} title={user.userId} expand ellipsis>
+      <TableColumnValue className={style['expand']} title={user.userId} expand ellipsis>
         {user.userId}
       </TableColumnValue>
       {displayAuthRole && (
-        <TableColumnValue className={style.expand} title={user.authRole} expand ellipsis>
+        <TableColumnValue className={style['expand']} title={user.authRole} expand ellipsis>
           {user.authRole}
         </TableColumnValue>
       )}
@@ -87,7 +87,7 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
           onChange={handleEnabledCheckboxChange}
         />
       </TableColumnValue>
-      <TableColumnValue className={clsx(style.gap, style.overflow)} flex ellipsis>
+      <TableColumnValue className={clsx(style['gap'], style['overflow'])} flex ellipsis>
         <Loader suspense small inline hideMessage>
           <Placeholder container={usersAdministrationService.userDetailsInfoPlaceholder} user={user} />
         </Loader>

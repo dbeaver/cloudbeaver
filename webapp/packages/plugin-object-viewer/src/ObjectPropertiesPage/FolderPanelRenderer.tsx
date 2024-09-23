@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeViewService, useNode } from '@cloudbeaver/plugin-navigation-tree';
 
-import { ObjectPropertyTable } from './ObjectPropertyTable/ObjectPropertyTable';
+import { ObjectPropertyTable } from './ObjectPropertyTable/ObjectPropertyTable.js';
 
 interface IFolderPanelRendererProps {
   nodeId: string;

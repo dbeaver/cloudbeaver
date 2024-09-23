@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ITreeData } from '../ITreeData';
-import type { TreeDataTransformer } from './TreeDataTransformer';
+import type { ITreeData } from '../ITreeData.js';
+import type { TreeDataTransformer } from './TreeDataTransformer.js';
 
 export function applyTransforms<T>(treeData: ITreeData, id: string, data: T, transformers?: TreeDataTransformer<T>[]) {
   if (!transformers) {

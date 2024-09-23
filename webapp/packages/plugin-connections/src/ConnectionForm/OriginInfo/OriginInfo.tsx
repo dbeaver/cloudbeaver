@@ -22,9 +22,9 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { createConnectionParam, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
-import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps';
+import type { IConnectionFormProps } from '../IConnectionFormProps.js';
 import styles from './OriginInfo.module.css';
 
 export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = observer(function OriginInfo({

@@ -21,8 +21,8 @@ export const ConnectionDialogFooter = observer<Props>(function ConnectionDialogF
   const styles = useS(style);
   const translate = useTranslate();
   return (
-    <div className={styles.controls}>
-      <div className={styles.fill} />
+    <div className={styles['controls']}>
+      <div className={styles['fill']} />
       <Button type="button" mod={['outlined']} disabled={isConnecting} onClick={onBack}>
         {translate('ui_stepper_back')}
       </Button>

@@ -11,11 +11,11 @@ import { ConnectionExecutionContextService } from '@cloudbeaver/core-connections
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
-import { AsyncTaskInfoService, GraphQLService, SqlExecutionPlan } from '@cloudbeaver/core-sdk';
+import { AsyncTaskInfoService, GraphQLService, type SqlExecutionPlan } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
-import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService';
+import type { ISqlEditorTabState } from '../../ISqlEditorTabState.js';
+import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService.js';
 
 interface IExecutionPlanData {
   task: ITask<SqlExecutionPlan>;
@@ -116,7 +116,7 @@ export class SqlExecutionPlanService {
     this.removeExecutionPlanTab(state, tabId);
 
     if (state.tabs.length > 0) {
-      state.currentTabId = state.tabs[0].id;
+      state.currentTabId = state.tabs[0]!.id;
     } else {
       state.currentTabId = '';
     }

@@ -10,7 +10,7 @@ import { ServerSettingsManagerService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
-  ISettingDescription,
+  type ISettingDescription,
   ROOT_SETTINGS_LAYER,
   SettingsManagerService,
   SettingsProvider,
@@ -19,7 +19,7 @@ import {
 } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
-import { SQL_EDITOR_SETTINGS_GROUP } from './SQL_EDITOR_SETTINGS_GROUP';
+import { SQL_EDITOR_SETTINGS_GROUP } from './SQL_EDITOR_SETTINGS_GROUP.js';
 
 const TABLE_ALIAS_OPTIONS = ['NONE', 'PLAIN', 'EXTENDED'] as const;
 

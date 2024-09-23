@@ -11,12 +11,12 @@ import { Container, Filter, Group, s, TextPlaceholder, useTranslate } from '@clo
 import { type ISettingsSource, ROOT_SETTINGS_GROUP, SettingsGroup } from '@cloudbeaver/core-settings';
 import { useTreeData, useTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
-import { getSettingGroupId } from './getSettingGroupId';
+import { getSettingGroupId } from './getSettingGroupId.js';
 import classes from './Settings.module.css';
-import { settingsFilter } from './settingsFilter';
-import { SettingsGroups } from './SettingsGroups/SettingsGroups';
-import { SettingsList } from './SettingsList';
-import { useSettings } from './useSettings';
+import { settingsFilter } from './settingsFilter.js';
+import { SettingsGroups } from './SettingsGroups/SettingsGroups.js';
+import { SettingsList } from './SettingsList.js';
+import { useSettings } from './useSettings.js';
 
 export interface ISettingsProps {
   source: ISettingsSource;

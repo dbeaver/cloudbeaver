@@ -7,6 +7,6 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
-import type { IFormState } from './IFormState';
+import type { IFormState } from './IFormState.js';
 
 export const DATA_CONTEXT_FORM_STATE = createDataContext<IFormState<any>>('Form State');

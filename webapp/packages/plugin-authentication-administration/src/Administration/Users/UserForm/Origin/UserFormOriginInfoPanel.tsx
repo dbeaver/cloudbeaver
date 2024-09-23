@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { Fragment } from 'react';
 
-import { AdminUserOrigin, UsersResource } from '@cloudbeaver/core-authentication';
+import { type AdminUserOrigin, UsersResource } from '@cloudbeaver/core-authentication';
 import {
   Button,
   Combobox,
@@ -23,9 +23,9 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { FormMode, TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
+import { FormMode, type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
-import type { UserFormProps } from '../AdministrationUserFormService';
+import type { UserFormProps } from '../AdministrationUserFormService.js';
 
 interface IState {
   selectedOrigin: string;

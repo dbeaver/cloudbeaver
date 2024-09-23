@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { useService } from '@cloudbeaver/core-di';
-import { LocalizationService, TranslateFn } from '@cloudbeaver/core-localization';
+import { LocalizationService, type TranslateFn } from '@cloudbeaver/core-localization';
 
 export function useTranslate(): TranslateFn {
   const localizationService = useService(LocalizationService);

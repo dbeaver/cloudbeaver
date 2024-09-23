@@ -7,8 +7,8 @@
  */
 import { computed, makeObservable, observable } from 'mobx';
 
-import type { ITask } from './ITask';
-import { Task } from './Task';
+import type { ITask } from './ITask.js';
+import { Task } from './Task.js';
 
 interface ITaskContainer<T, TValue> {
   readonly id: T;

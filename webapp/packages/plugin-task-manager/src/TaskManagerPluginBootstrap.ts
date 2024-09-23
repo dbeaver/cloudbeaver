@@ -7,8 +7,8 @@
  */
 import { ProcessSnackbar, type ProcessSnackbarProps } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { IProcessNotificationContainer, NotificationService } from '@cloudbeaver/core-events';
-import { ITaskDescriptor, TaskManagerService } from '@cloudbeaver/core-task-manager';
+import { type IProcessNotificationContainer, NotificationService } from '@cloudbeaver/core-events';
+import { type ITaskDescriptor, TaskManagerService } from '@cloudbeaver/core-task-manager';
 
 @injectable()
 export class TaskManagerPluginBootstrap extends Bootstrap {
@@ -21,7 +21,7 @@ export class TaskManagerPluginBootstrap extends Bootstrap {
     this.notification = null;
   }
 
-  register(): void {
+  override register(): void {
     this.taskManagerService.onDataUpdate.addHandler(this.updateNotification.bind(this));
   }
 

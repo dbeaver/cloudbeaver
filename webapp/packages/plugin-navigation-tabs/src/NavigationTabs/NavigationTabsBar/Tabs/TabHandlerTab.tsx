@@ -7,8 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { useTab } from './useTab';
-import { useTabHandler } from './useTabHandler';
+import { useTab } from './useTab.js';
+import { useTabHandler } from './useTabHandler.js';
 
 interface IProps {
   tabId: string;

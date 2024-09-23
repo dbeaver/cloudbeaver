@@ -9,7 +9,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
-const UpdateInstruction = importLazyComponent(() => import('./UpdateInstruction').then(m => m.UpdateInstruction));
+const UpdateInstruction = importLazyComponent(() => import('./UpdateInstruction.js').then(m => m.UpdateInstruction));
 
 @injectable()
 export class ProductBootstrap extends Bootstrap {
@@ -17,7 +17,7 @@ export class ProductBootstrap extends Bootstrap {
     super();
   }
 
-  register() {
+  override register() {
     this.versionUpdateService.registerVersionInstruction(() => UpdateInstruction);
   }
 }

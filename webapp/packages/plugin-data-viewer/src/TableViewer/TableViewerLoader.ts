@@ -8,6 +8,6 @@
 import React from 'react';
 
 export const TableViewerLoader = React.lazy(async () => {
-  const { TableViewer } = await import('./TableViewer');
+  const { TableViewer } = await import('./TableViewer.js');
   return { default: TableViewer };
 });

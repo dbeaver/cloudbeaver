@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-data-spreadsheet-new",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

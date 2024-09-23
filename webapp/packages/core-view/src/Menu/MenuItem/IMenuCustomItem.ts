@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { IDataContext } from '@cloudbeaver/core-data-context';
+import { type IDataContext } from '@cloudbeaver/core-data-context';
 
-import type { IMenuItem } from './IMenuItem';
+import type { IMenuItem } from './IMenuItem.js';
 
 interface IMenuCustomItemCommonProperties<TExtraProps = unknown> {
   hidden?: boolean;

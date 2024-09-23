@@ -10,12 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { getComputed, Group, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ISettingDescription, ISettingsSource, SettingsGroup as SettingsGroupType } from '@cloudbeaver/core-settings';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
-import { ITreeFilter } from '@cloudbeaver/plugin-navigation-tree';
+import type { ITreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
-import { getSettingGroupId } from './getSettingGroupId';
-import { Setting } from './Setting';
-import { settingsFilter } from './settingsFilter';
-import { SettingsGroupTitle } from './SettingsGroupTitle';
+import { getSettingGroupId } from './getSettingGroupId.js';
+import { Setting } from './Setting.js';
+import { settingsFilter } from './settingsFilter.js';
+import { SettingsGroupTitle } from './SettingsGroupTitle.js';
 
 interface Props {
   group: SettingsGroupType;

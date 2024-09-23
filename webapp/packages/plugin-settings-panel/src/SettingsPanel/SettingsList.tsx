@@ -11,10 +11,10 @@ import { Container, s, TextPlaceholder, useTranslate } from '@cloudbeaver/core-b
 import { type ISettingDescription, type ISettingsSource, type SettingsGroup as SettingsGroupType } from '@cloudbeaver/core-settings';
 import type { ITreeData, ITreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
-import { getGroupsFromTree } from './getGroupsFromTree';
-import { SettingsGroup } from './SettingsGroup';
+import { getGroupsFromTree } from './getGroupsFromTree.js';
+import { SettingsGroup } from './SettingsGroup.js';
 import classes from './SettingsList.module.css';
-import { useTreeScrollSync } from './useTreeScrollSync';
+import { useTreeScrollSync } from './useTreeScrollSync.js';
 
 interface Props {
   treeData: ITreeData;

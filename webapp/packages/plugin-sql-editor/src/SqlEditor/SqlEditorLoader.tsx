@@ -9,10 +9,10 @@ import { observer } from 'mobx-react-lite';
 
 import { ComplexLoader, createComplexLoader } from '@cloudbeaver/core-blocks';
 
-import type { ISqlEditorProps } from './ISqlEditorProps';
+import type { ISqlEditorProps } from './ISqlEditorProps.js';
 
 const loader = createComplexLoader(async function loader() {
-  const { SqlEditor } = await import('./SqlEditor');
+  const { SqlEditor } = await import('./SqlEditor.js');
   return { SqlEditor };
 });
 

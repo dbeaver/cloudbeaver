@@ -9,8 +9,8 @@ import { useContext } from 'react';
 
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 
-import { TabContext } from './TabContext';
-import { TabsContext } from './TabsContext';
+import { TabContext } from './TabContext.js';
+import { TabsContext } from './TabsContext.js';
 
 export function useTabState<T>(valueGetter?: MetadataValueGetter<string, T>): T {
   const state = useContext(TabsContext);

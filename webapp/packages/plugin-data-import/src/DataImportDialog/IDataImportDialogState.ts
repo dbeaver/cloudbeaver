@@ -7,7 +7,7 @@
  */
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
-import type { EDataImportDialogStep } from './EDataImportDialogStep';
+import type { EDataImportDialogStep } from './EDataImportDialogStep.js';
 
 export interface IDataImportDialogState {
   step: EDataImportDialogStep;

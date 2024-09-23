@@ -9,8 +9,8 @@ import { observable } from 'mobx';
 
 import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 
-import { TreeDataTransformer } from './DataTransformers/TreeDataTransformer';
-import type { ITreeData } from './ITreeData';
+import type { TreeDataTransformer } from './DataTransformers/TreeDataTransformer.js';
+import type { ITreeData } from './ITreeData.js';
 
 export interface ITreeFilterOptions {
   isNodeMatched?: (nodeId: string, filter: string, isMatched: boolean) => boolean;

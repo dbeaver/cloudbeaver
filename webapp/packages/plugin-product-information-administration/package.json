@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-product-information-administration",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

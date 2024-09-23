@@ -7,8 +7,8 @@
  */
 import { getPathParts } from '@cloudbeaver/core-utils';
 
-import type { ICachedResourceMetadata } from '../ICachedResourceMetadata';
-import type { ICachedTreeElement } from './ICachedTreeElement';
+import type { ICachedResourceMetadata } from '../ICachedResourceMetadata.js';
+import type { ICachedTreeElement } from './ICachedTreeElement.js';
 
 export function deleteTreeValue<TValue, TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata>(
   data: ICachedTreeElement<TValue, TMetadata>,
@@ -23,12 +23,12 @@ export function deleteTreeValue<TValue, TMetadata extends ICachedResourceMetadat
   let current = data;
 
   for (let i = 0; i < paths.length - 1; ++i) {
-    const key = paths[i];
+    const key = paths[i]!;
     const next = current.children[key];
     if (next === undefined) {
       return undefined;
     }
     current = next;
   }
-  delete current.children[paths[paths.length - 1]];
+  delete current.children[paths[paths.length - 1]!];
 }

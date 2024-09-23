@@ -8,7 +8,7 @@
 import { afterEach, describe, expect, test } from '@jest/globals';
 import { cleanup, render, screen } from '@testing-library/react';
 
-import { Icon } from './Icon';
+import { Icon } from './Icon.js';
 
 describe('Icon', () => {
   afterEach(() => {

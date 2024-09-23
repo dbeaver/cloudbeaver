@@ -7,7 +7,7 @@
  */
 import type { ISessionAction } from '@cloudbeaver/core-root';
 
-import { SESSION_ACTION_OPEN_SQL_EDITOR } from './SESSION_ACTION_OPEN_SQL_EDITOR';
+import { SESSION_ACTION_OPEN_SQL_EDITOR } from './SESSION_ACTION_OPEN_SQL_EDITOR.js';
 
 export interface ISessionActionOpenSQLEditor {
   action: typeof SESSION_ACTION_OPEN_SQL_EDITOR;

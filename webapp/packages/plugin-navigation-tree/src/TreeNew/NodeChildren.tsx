@@ -10,11 +10,11 @@ import { useContext, useId } from 'react';
 
 import { getComputed, TreeNodeNested } from '@cloudbeaver/core-blocks';
 
-import { NodeSizeCacheContext } from './contexts/NodeSizeCacheContext';
-import { TreeDataContext } from './contexts/TreeDataContext';
-import { TreeVirtualizationContext } from './contexts/TreeVirtualizationContext';
-import { NodeEmptyPlaceholderComponent } from './NodeEmptyPlaceholderComponent';
-import { NodeRenderer } from './NodeRenderer';
+import { NodeSizeCacheContext } from './contexts/NodeSizeCacheContext.js';
+import { TreeDataContext } from './contexts/TreeDataContext.js';
+import { TreeVirtualizationContext } from './contexts/TreeVirtualizationContext.js';
+import type { NodeEmptyPlaceholderComponent } from './NodeEmptyPlaceholderComponent.js';
+import { NodeRenderer } from './NodeRenderer.js';
 
 interface Props {
   nodeId: string;
@@ -51,7 +51,7 @@ const NodeChildrenObserved = observer<Props>(function NodeChildren({ nodeId, emp
     const elements = [];
 
     for (let i = 0; i < children.length; i++) {
-      const child = children[i];
+      const child = children[i]!;
       const size = sizeCache.getSize(child);
 
       if (offset + size < viewPortFrom) {

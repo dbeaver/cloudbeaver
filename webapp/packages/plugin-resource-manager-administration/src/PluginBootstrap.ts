@@ -7,11 +7,11 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { ILoadConfigData, ServerConfigurationService } from '@cloudbeaver/plugin-administration';
+import { type ILoadConfigData, ServerConfigurationService } from '@cloudbeaver/plugin-administration';
 
-import { ResourceManagerSettings } from './ResourceManagerSettings';
+import { ResourceManagerSettings } from './ResourceManagerSettings.js';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -25,12 +25,12 @@ export class PluginBootstrap extends Bootstrap {
     this.loadConfigHandler = this.loadConfigHandler.bind(this);
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.serverConfigurationService.pluginsContainer.add(ResourceManagerSettings, 0);
     this.serverConfigurationService.loadConfigTask.addHandler(this.loadConfigHandler);
   }
 
-  async load(): Promise<void> {}
+  override async load(): Promise<void> {}
 
   private async loadConfigHandler(data: ILoadConfigData, contexts: IExecutionContextProvider<ILoadConfigData>) {
     if (!data.reset) {

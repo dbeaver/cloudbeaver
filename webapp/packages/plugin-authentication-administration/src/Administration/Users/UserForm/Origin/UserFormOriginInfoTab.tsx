@@ -8,9 +8,9 @@
 import { observer } from 'mobx-react-lite';
 
 import { Translate } from '@cloudbeaver/core-blocks';
-import { Tab, TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
+import { Tab, type TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
 
-import type { UserFormProps } from '../AdministrationUserFormService';
+import type { UserFormProps } from '../AdministrationUserFormService.js';
 
 export const UserFormOriginInfoTab: TabContainerTabComponent<UserFormProps> = observer(function UserFormOriginInfoTab(props) {
   return (

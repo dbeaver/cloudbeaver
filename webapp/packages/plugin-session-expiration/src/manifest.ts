@@ -10,9 +10,9 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 export const sessionExpirationPlugin: PluginManifest = {
   info: { name: 'Session Expiration plugin' },
   providers: [
-    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
-    () => import('./SessionExpireDialog/SessionExpiredDialogBootstrap').then(m => m.SessionExpiredDialogBootstrap),
-    () => import('./SessionExpireWarningDialog/SessionExpireWarningDialogBootstrap').then(m => m.SessionExpireWarningDialogBootstrap),
-    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./PluginBootstrap.js').then(m => m.PluginBootstrap),
+    () => import('./SessionExpireDialog/SessionExpiredDialogBootstrap.js').then(m => m.SessionExpiredDialogBootstrap),
+    () => import('./SessionExpireWarningDialog/SessionExpireWarningDialogBootstrap.js').then(m => m.SessionExpireWarningDialogBootstrap),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
   ],
 };

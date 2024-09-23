@@ -7,9 +7,9 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { DataViewerTabService } from './DataViewerTabService';
-import { ResultSetTableFooterMenuService } from './ResultSet/ResultSetTableFooterMenuService';
-import { TableFooterMenuService } from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
+import { DataViewerTabService } from './DataViewerTabService.js';
+import { ResultSetTableFooterMenuService } from './ResultSet/ResultSetTableFooterMenuService.js';
+import { TableFooterMenuService } from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService.js';
 
 @injectable()
 export class DataViewerBootstrap extends Bootstrap {
@@ -21,7 +21,7 @@ export class DataViewerBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.dataViewerTabService.registerTabHandler();
     this.dataViewerTabService.register();
     this.tableFooterMenuService.register();

@@ -7,6 +7,6 @@
  */
 import { createContext } from 'react';
 
-import type { ITreeData } from '../ITreeData';
+import type { ITreeData } from '../ITreeData.js';
 
 export const TreeDataContext = createContext<ITreeData | undefined>(undefined);

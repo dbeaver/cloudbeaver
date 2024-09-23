@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const ToolsPanel = importLazyComponent(() => import('./ToolsPanel').then(module => module.ToolsPanel));
+export const ToolsPanel = importLazyComponent(() => import('./ToolsPanel.js').then(module => module.ToolsPanel));

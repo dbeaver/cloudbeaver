@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { base64ToBlob } from './base64ToBlob';
+import { base64ToBlob } from './base64ToBlob.js';
 
 const BASE_64_STRING =
   'iVBORw0KGgoAAAANSUhEUgAAAhAAAAEWCAIAAAC40zleAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAACydSURBVHhe7Z1rsF1VtecnkAcQkhgsjVJlW3xQEcWkeOV5njknhHhCUCAVIOQFQQIHbocgJCGPaum6RXjdEMWU3WmVRxQhXLttbt+riAKBW1QJlerYbW4CX/jiLZUqbvmlu/ph9xhzzNeaa+199pn7PPZa6/+rUTlzjTnmWHPD3uO/51p776n6lq';

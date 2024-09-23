@@ -7,8 +7,8 @@
  */
 import { useContext } from 'react';
 
-import type { IServiceConstructor } from './IApp';
-import { serviceProviderContext } from './ServiceProviderContext';
+import type { IServiceConstructor } from './IApp.js';
+import { serviceProviderContext } from './ServiceProviderContext.js';
 
 export function useService<T>(ctor: IServiceConstructor<T>): T;
 export function useService<T>(ctor: IServiceConstructor<T>, optional: true): T | undefined;

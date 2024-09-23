@@ -7,33 +7,33 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { ResultDataFormat, SqlResultRow, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { ResultDataFormat, type SqlResultRow, type UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 import { isNull } from '@cloudbeaver/core-utils';
 
-import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
-import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
-import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import { DatabaseEditAction } from '../DatabaseEditAction';
+import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
+import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
+import { DatabaseEditAction } from '../DatabaseEditAction.js';
 import {
   DatabaseEditChangeType,
-  IDatabaseDataEditActionData,
-  IDatabaseDataEditActionValue,
-  IDatabaseDataEditApplyActionData,
-  IDatabaseDataEditApplyActionUpdate,
-} from '../IDatabaseDataEditAction';
-import { compareResultSetRowKeys } from './compareResultSetRowKeys';
-import { createResultSetContentValue } from './createResultSetContentValue';
-import { createResultSetFileValue } from './createResultSetFileValue';
-import type { IResultSetBlobValue } from './IResultSetBlobValue';
-import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
-import { isResultSetBlobValue } from './isResultSetBlobValue';
-import { isResultSetComplexValue } from './isResultSetComplexValue';
-import { isResultSetContentValue } from './isResultSetContentValue';
-import { isResultSetFileValue } from './isResultSetFileValue';
-import { ResultSetDataAction } from './ResultSetDataAction';
-import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
-import type { IResultSetValue } from './ResultSetFormatAction';
+  type IDatabaseDataEditActionData,
+  type IDatabaseDataEditActionValue,
+  type IDatabaseDataEditApplyActionData,
+  type IDatabaseDataEditApplyActionUpdate,
+} from '../IDatabaseDataEditAction.js';
+import { compareResultSetRowKeys } from './compareResultSetRowKeys.js';
+import { createResultSetContentValue } from './createResultSetContentValue.js';
+import { createResultSetFileValue } from './createResultSetFileValue.js';
+import type { IResultSetBlobValue } from './IResultSetBlobValue.js';
+import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey.js';
+import { isResultSetBlobValue } from './isResultSetBlobValue.js';
+import { isResultSetComplexValue } from './isResultSetComplexValue.js';
+import { isResultSetContentValue } from './isResultSetContentValue.js';
+import { isResultSetFileValue } from './isResultSetFileValue.js';
+import { ResultSetDataAction } from './ResultSetDataAction.js';
+import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils.js';
+import type { IResultSetValue } from './ResultSetFormatAction.js';
 
 export interface IResultSetUpdate {
   row: IResultSetRowKey;
@@ -46,9 +46,9 @@ export type IResultSetEditActionData = IDatabaseDataEditActionData<IResultSetEle
 
 @databaseDataAction()
 export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey, IResultSetValue, IDatabaseResultSet> {
-  static dataFormat = [ResultDataFormat.Resultset];
+  static override dataFormat = [ResultDataFormat.Resultset];
 
-  readonly applyAction: ISyncExecutor<IDatabaseDataEditApplyActionData<IResultSetRowKey>>;
+  override readonly applyAction: ISyncExecutor<IDatabaseDataEditApplyActionData<IResultSetRowKey>>;
   private readonly editorData: Map<string, IResultSetUpdate>;
   private readonly data: ResultSetDataAction;
 
@@ -528,7 +528,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
     }
   }
 
-  updateResult(result: IDatabaseResultSet, index: number): void {
+  override updateResult(result: IDatabaseResultSet, index: number): void {
     super.updateResult(result, index);
 
     if (result.data?.singleEntity) {

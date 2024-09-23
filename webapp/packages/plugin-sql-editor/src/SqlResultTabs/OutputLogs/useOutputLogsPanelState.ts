@@ -10,8 +10,8 @@ import { action, computed, observable } from 'mobx';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import type { WsOutputLogInfo } from '@cloudbeaver/core-sdk';
 
-import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
-import type { IOutputLog } from './OutputLogsResource';
+import type { ISqlEditorTabState } from '../../ISqlEditorTabState.js';
+import type { IOutputLog } from './OutputLogsResource.js';
 
 export interface SqlOutputLogsPanelState {
   searchValue: string;

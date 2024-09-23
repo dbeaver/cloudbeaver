@@ -7,11 +7,11 @@
  */
 import { useContext } from 'react';
 
-import { IDataContext, useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
+import { type IDataContext, useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 
-import { CaptureViewContext } from './CaptureViewContext';
-import { DATA_CONTEXT_VIEW } from './DATA_CONTEXT_VIEW';
-import type { IView } from './IView';
+import { CaptureViewContext } from './CaptureViewContext.js';
+import { DATA_CONTEXT_VIEW } from './DATA_CONTEXT_VIEW.js';
+import type { IView } from './IView.js';
 
 export function useViewContext(view: IView<any>, parentContext: IDataContext | undefined): IDataContext {
   const context = useContext(CaptureViewContext);

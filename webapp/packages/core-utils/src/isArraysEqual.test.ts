@@ -7,7 +7,7 @@
  */
 import { describe, expect, jest, test } from '@jest/globals';
 
-import { isArraysEqual } from './isArraysEqual';
+import { isArraysEqual } from './isArraysEqual.js';
 
 describe('Is array equals', () => {
   test('should return "true" when arrays are the same', () => {

@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { INode } from './INode';
-import type { INodeState } from './INodeState';
+import type { INode } from './INode.js';
+import type { INodeState } from './INodeState.js';
 
 export interface ITreeData {
   rootId: string;
