@@ -152,6 +152,9 @@ public class WebServiceCore implements DBWServiceCore {
     public List<WebConnectionInfo> getTemplateConnections(
         @NotNull WebSession webSession, @Nullable String projectId
     ) throws DBWebException {
+        if (webSession.getApplication().isDistributed()) {
+            return List.of();
+        }
         List<WebConnectionInfo> result = new ArrayList<>();
         if (projectId == null) {
             for (WebSessionProjectImpl project : webSession.getAccessibleProjects()) {

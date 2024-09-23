@@ -230,7 +230,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             filter.setEnabled(true);
             if (node instanceof DBNDatabaseNode dbNode) {
                 dbNode.setNodeFilter(dbNode.getItemsMeta(), filter, true);
-                if (hasNodeEditPermission(webSession, node, ((WebProjectImpl) node.getOwnerProject()).getRmProject())) {
+                if (hasNodeEditPermission(webSession, node, ((WebProjectImpl) node.getOwnerProject()).getRMProject())) {
                     // Save settings
                     dbNode.getDataSourceContainer().persistConfiguration();
                 }
