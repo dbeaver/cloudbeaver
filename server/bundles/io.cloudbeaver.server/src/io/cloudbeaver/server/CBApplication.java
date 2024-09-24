@@ -232,7 +232,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
 
         Location instanceLoc = Platform.getInstanceLocation();
         try {
-            if (!instanceLoc.isSet()) {
+            if (!instanceLoc.isSet()) { // always false?
                 URL wsLocationURL = new URL(
                     "file",  //$NON-NLS-1$
                     null,
