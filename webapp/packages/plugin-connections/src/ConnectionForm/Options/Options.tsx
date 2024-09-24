@@ -220,7 +220,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 readOnly={readonly}
                 autoComplete={`section-${config.driverId || 'driver'} section-jdbc`}
               >
-                {translate('customConnection_url_JDBC')}
+                {translate('plugin_connections_connection_form_part_main_url_jdbc')}
               </InputField>
             )}
 
@@ -269,7 +269,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   tiny
                   fill
                 >
-                  {translate('customConnection_folder')}
+                  {translate('plugin_connections_connection_form_part_main_folder')}
                 </InputField>
               )}
             </Container>
