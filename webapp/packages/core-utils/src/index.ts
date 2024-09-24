@@ -56,6 +56,7 @@ export * from './TextTools.js';
 export * from './throttle.js';
 export * from './uuid_.js';
 export * from './isValidUrl.js';
+export * from './isValidServerUrl.js';
 export * from './isImageFormat.js';
 export * from './getCookies.js';
 export * from './getUniqueName.js';

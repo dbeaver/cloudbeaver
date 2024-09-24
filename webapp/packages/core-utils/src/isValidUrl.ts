@@ -17,12 +17,6 @@
 //   'i',
 // ); // fragment locator
 
-const serverUrlPattern = /^(https:\/\/)?(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(:\d+)?(\/.*)?$/i;
-
 export function isValidUrl(value: string): boolean {
   return value.startsWith('https://') || value.startsWith('http://');
-}
-
-export function isValidServerUrl(value: string): boolean {
-  return serverUrlPattern.test(value);
 }
