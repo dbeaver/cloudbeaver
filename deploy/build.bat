@@ -1,8 +1,6 @@
 @echo off
 
 rem command line arguments
-SET CONFIGURATION_PATH=%1
-SET SAMPLE_DATABASE_PATH=%2
 
 echo Clone and build Cloudbeaver
 
@@ -37,13 +35,9 @@ xcopy /E /Q ..\server\product\web-server\target\products\io.cloudbeaver.product\
 copy scripts\* cloudbeaver >NUL
 mkdir cloudbeaver\samples
 
-IF NOT "%SAMPLE_DATABASE_PATH%"=="" (
-    mkdir cloudbeaver\samples\db
-    xcopy /E /Q %SAMPLE_DATABASE_PATH% cloudbeaver\samples\db >NUL
-)
+
 copy ..\config\core\* cloudbeaver\conf >NUL
-copy ..\config\sample-databases\DefaultConfiguration\GlobalConfiguration\.dbeaver\data-sources.json cloudbeaver\conf\initial-data-sources.conf >NUL
-copy ..\config\sample-databases\DefaultConfiguration\*.conf cloudbeaver\conf >NUL
+copy ..\config\DefaultConfiguration\GlobalConfiguration\.dbeaver\data-sources.json cloudbeaver\conf\initial-data-sources.conf >NUL
 
 move drivers cloudbeaver >NUL
 

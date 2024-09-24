@@ -2,12 +2,6 @@
 set -Eeo pipefail
 set +u
 
-# #command line arguments
-# CONFIGURATION_PATH=${1-"../config/sample-databases/DefaultConfiguration"}
-# SAMPLE_DATABASE_PATH=${2-""}
-
-# echo $CONFIGURATION_PATH
-# echo $SAMPLE_DATABASE_PATH
 echo "Clone and build Cloudbeaver"
 
 rm -rf ./drivers
@@ -43,16 +37,8 @@ cp -rp ../server/product/web-server/target/products/io.cloudbeaver.product/all/a
 cp -p ./scripts/* ./cloudbeaver
 mkdir cloudbeaver/samples
 
-if [[ -z $SAMPLE_DATABASE_PATH  ]]; then
-  SAMPLE_DATABASE_PATH=""
-else
-  mkdir cloudbeaver/samples/db
-  cp -rp "${SAMPLE_DATABASE_PATH}" cloudbeaver/samples/
-fi
-
 cp -rp  ../config/core/* cloudbeaver/conf
-cp -rp ../config/sample-databases/DefaultConfiguration/GlobalConfiguration/.dbeaver/data-sources.json cloudbeaver/conf/initial-data-sources.conf
-cp -p ../config/sample-databases/DefaultConfiguration/*.conf cloudbeaver/conf/
+cp -rp ../config/GlobalConfiguration/.dbeaver/data-sources.json cloudbeaver/conf/initial-data-sources.conf
 mv drivers cloudbeaver
 
 echo "End of backend build"
