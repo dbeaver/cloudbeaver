@@ -19,7 +19,7 @@ import {
   useResource,
   useS,
 } from '@cloudbeaver/core-blocks';
-import { type DatabaseConnection, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { type ConnectionInfoOrigin, type DatabaseConnection, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 
@@ -31,10 +31,11 @@ interface Props {
   connectionKey: IConnectionInfoParams;
   connection: DatabaseConnection;
   shouldDisplayProject: boolean;
+  connectionOrigin?: ConnectionInfoOrigin;
   icon?: string;
 }
 
-export const Connection = observer<Props>(function Connection({ connectionKey, connection, shouldDisplayProject, icon }) {
+export const Connection = observer<Props>(function Connection({ connectionKey, connectionOrigin, connection, shouldDisplayProject, icon }) {
   const style = useS(styles);
   const connectionsAdministrationService = useService(ConnectionsAdministrationService);
   const projectInfoResource = useResource(Connection, ProjectInfoResource, connectionKey.projectId, { active: shouldDisplayProject });
@@ -66,7 +67,11 @@ export const Connection = observer<Props>(function Connection({ connectionKey, c
       )}
       <TableColumnValue flex>
         <Loader suspense small inline hideMessage>
-          <Placeholder container={connectionsAdministrationService.connectionDetailsPlaceholder} connection={connection} />
+          <Placeholder
+            container={connectionsAdministrationService.connectionDetailsPlaceholder}
+            connectionOrigin={connectionOrigin}
+            connection={connection}
+          />
         </Loader>
       </TableColumnValue>
     </TableItem>

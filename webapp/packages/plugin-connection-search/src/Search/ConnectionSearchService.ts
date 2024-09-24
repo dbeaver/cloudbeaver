@@ -8,7 +8,12 @@
 import { makeObservable, observable } from 'mobx';
 
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
+import {
+  ConnectionInfoOriginResource,
+  ConnectionInfoResource,
+  ConnectionsManagerService,
+  createConnectionParam,
+} from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -40,6 +45,7 @@ export class ConnectionSearchService {
     private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly connectionsManagerService: ConnectionsManagerService,
+    private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
   ) {
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
 
@@ -156,6 +162,7 @@ export class ConnectionSearchService {
         this.projectInfoResource,
         this.connectionFormService,
         this.connectionInfoResource,
+        this.connectionInfoOriginResource,
       );
 
       this.formState.closeTask.addHandler(this.goBack.bind(this));

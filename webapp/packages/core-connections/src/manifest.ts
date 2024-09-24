@@ -18,6 +18,8 @@ export const manifest: PluginManifest = {
     () => import('./ConnectionExecutionContext/ConnectionExecutionContextService.js').then(m => m.ConnectionExecutionContextService),
     () => import('./ConnectionsManagerService.js').then(m => m.ConnectionsManagerService),
     () => import('./ConnectionInfoResource.js').then(m => m.ConnectionInfoResource),
+    () => import('./ConnectionInfoOriginResource.js').then(m => m.ConnectionInfoOriginResource),
+    () => import('./ConnectionInfoOriginDetailsResource.js').then(m => m.ConnectionInfoOriginDetailsResource),
     () => import('./ConnectionToolsResource.js').then(m => m.ConnectionToolsResource),
     () => import('./ContainerResource.js').then(m => m.ContainerResource),
     () => import('./ConnectionsLocaleService.js').then(m => m.ConnectionsLocaleService),
