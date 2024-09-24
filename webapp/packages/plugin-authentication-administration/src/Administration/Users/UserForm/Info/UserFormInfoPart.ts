@@ -7,11 +7,9 @@
  */
 import { observable, toJS } from 'mobx';
 
-import type { AdminUser, AuthRolesResource, UserResourceIncludes, UsersResource } from '@cloudbeaver/core-authentication';
+import type { AdminUser, AuthRolesResource, UserMetaParameter, UsersMetaParametersResource, UsersResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { type CachedResourceIncludeArgs } from '@cloudbeaver/core-resource';
 import type { ServerConfigResource } from '@cloudbeaver/core-root';
-import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 import { FormMode, FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import { isArraysEqual, isDefined, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 
@@ -21,12 +19,12 @@ import type { IUserFormInfoState } from './IUserFormInfoState.js';
 const DEFAULT_ENABLED = true;
 
 export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormState> {
-  private baseIncludes: CachedResourceIncludeArgs<AdminUserInfoFragment, UserResourceIncludes>;
   constructor(
     private readonly authRolesResource: AuthRolesResource,
     private readonly serverConfigResource: ServerConfigResource,
     formState: IFormState<IUserFormState>,
     private readonly usersResource: UsersResource,
+    private readonly usersMetaParametersResource: UsersMetaParametersResource,
   ) {
     super(formState, {
       userId: formState.state.userId || '',
@@ -36,7 +34,6 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
       teams: [],
       authRole: '',
     });
-    this.baseIncludes = ['includeMetaParameters'];
   }
 
   protected override format(data: IFormState<IUserFormState>, contexts: IExecutionContextProvider<IFormState<IUserFormState>>): void | Promise<void> {
@@ -58,7 +55,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
 
   override isOutdated(): boolean {
     if (this.formState.mode === FormMode.Edit && this.initialState.userId) {
-      return this.usersResource.isOutdated(this.initialState.userId, this.baseIncludes);
+      return this.usersResource.isOutdated(this.initialState.userId) || this.usersMetaParametersResource.isOutdated(this.initialState.userId);
     }
 
     return this.serverConfigResource.isOutdated() || this.authRolesResource.isOutdated();
@@ -68,7 +65,8 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     if (
       this.formState.mode === FormMode.Edit &&
       this.initialState.userId &&
-      !this.usersResource.isLoaded(this.initialState.userId, this.baseIncludes)
+      !this.usersResource.isLoaded(this.initialState.userId) &&
+      !this.usersMetaParametersResource.isLoaded(this.initialState.userId)
     ) {
       return false;
     }
@@ -199,28 +197,32 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     const metaParameters = toJS(this.state.metaParameters);
 
     if (this.state.userId) {
-      const user = this.usersResource.get(this.state.userId);
+      const userMetaParameters = this.usersMetaParametersResource.get(this.state.userId);
 
-      if (user && isObjectsEqual(user.metaParameters, metaParameters)) {
+      if (userMetaParameters && isObjectsEqual(userMetaParameters, metaParameters)) {
         return;
       }
     }
 
-    await this.usersResource.setMetaParameters(this.state.userId, metaParameters);
+    await this.usersMetaParametersResource.setMetaParameters(this.state.userId, metaParameters);
   }
 
   protected override async loader() {
     let user: AdminUser | null = null;
+    let metaParameters: UserMetaParameter | object = {};
     const [serverConfig] = await Promise.all([this.serverConfigResource.load(), this.authRolesResource.load()]);
 
     if (this.formState.mode === FormMode.Edit && this.initialState.userId) {
-      user = await this.usersResource.load(this.initialState.userId, this.baseIncludes);
+      [user, metaParameters] = await Promise.all([
+        this.usersResource.load(this.initialState.userId),
+        this.usersMetaParametersResource.load(this.initialState.userId),
+      ]);
     }
 
     this.setInitialState({
       userId: user?.userId || this.formState.state.userId || '',
       enabled: user?.enabled ?? DEFAULT_ENABLED,
-      metaParameters: observable(user?.metaParameters || {}),
+      metaParameters: observable(metaParameters),
       teams: observable(user?.grantedTeams || [serverConfig?.defaultUserTeam].filter(isDefined)),
       password: '',
 

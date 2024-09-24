@@ -9,7 +9,7 @@ import React from 'react';
 
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { ConfirmationDialog, PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, type DatabaseConnection } from '@cloudbeaver/core-connections';
+import { type ConnectionInfoOrigin, ConnectionInfoResource, type DatabaseConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
@@ -18,6 +18,7 @@ import { CreateConnectionService } from './CreateConnectionService.js';
 
 export interface IConnectionDetailsPlaceholderProps {
   connection: DatabaseConnection;
+  connectionOrigin?: ConnectionInfoOrigin;
 }
 
 const ConnectionsAdministration = React.lazy(async () => {

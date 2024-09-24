@@ -137,16 +137,11 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     });
   }
 
-  async setMetaParameters(userId: string, parameters: Record<string, any>): Promise<void> {
-    await this.graphQLService.sdk.saveUserMetaParameters({ userId, parameters });
-  }
-
   async create({ userId, authRole }: UserCreateOptions): Promise<AdminUser> {
     const { user } = await this.graphQLService.sdk.createUser({
       userId,
       authRole,
       enabled: false,
-      ...this.getDefaultIncludes(),
       ...this.getIncludesMap(userId),
     });
 
@@ -259,7 +254,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       if (userId !== undefined) {
         const { user } = await this.graphQLService.sdk.getAdminUserInfo({
           userId,
-          ...this.getDefaultIncludes(),
           ...this.getIncludesMap(userId, includes),
         });
 
@@ -284,7 +278,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
             userIdMask,
             enabledState,
           },
-          ...this.getDefaultIncludes(),
           ...this.getIncludesMap(userId, includes),
         });
 
@@ -309,13 +302,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     });
 
     return this.data;
-  }
-
-  private getDefaultIncludes(): UserResourceIncludes {
-    return {
-      customIncludeOriginDetails: false,
-      includeMetaParameters: false,
-    };
   }
 
   protected override dataSet(key: string, value: AdminUserInfoFragment): void {

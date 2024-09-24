@@ -25,6 +25,7 @@ export * from './Resource/ICachedResourceMetadata.js';
 export * from './Resource/IResource.js';
 export * from './Resource/Resource.js';
 export * from './Resource/ResourceAlias.js';
+export * from './Resource/ResourceAliases.js';
 export * from './Resource/ResourceError.js';
 export * from './Resource/ResourceKey.js';
 export * from './Resource/ResourceKeyAlias.js';

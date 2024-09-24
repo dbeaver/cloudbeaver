@@ -24,7 +24,7 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { type Connection, DBDriverResource } from '@cloudbeaver/core-connections';
+import { type Connection, type ConnectionInfoOrigin, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
@@ -36,12 +36,19 @@ import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem.js';
 
 interface Props {
   grantedConnections: Connection[];
+  connectionsOrigins: ConnectionInfoOrigin[];
   disabled: boolean;
   onRevoke: (subjectIds: string[]) => void;
   onEdit: () => void;
 }
 
-export const GrantedConnectionList = observer<Props>(function GrantedConnectionList({ grantedConnections, disabled, onRevoke, onEdit }) {
+export const GrantedConnectionList = observer<Props>(function GrantedConnectionList({
+  connectionsOrigins,
+  grantedConnections,
+  disabled,
+  onRevoke,
+  onEdit,
+}) {
   const props = useObjectRef({ onRevoke, onEdit });
   const styles = useS(style);
   const translate = useTranslate();
@@ -51,7 +58,7 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
 
-  const connections = getFilteredConnections(grantedConnections, filterState.filterValue);
+  const connections = getFilteredConnections(grantedConnections, connectionsOrigins, filterState.filterValue);
   const keys = connections.map(connection => connection.id);
 
   const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));

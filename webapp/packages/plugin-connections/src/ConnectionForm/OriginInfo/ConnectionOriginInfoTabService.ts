@@ -9,11 +9,8 @@ import React from 'react';
 
 import { isLocalConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
-import { connectionFormConfigureContext } from '../connectionFormConfigureContext.js';
 import { ConnectionFormService } from '../ConnectionFormService.js';
-import type { IConnectionFormState } from '../IConnectionFormProps.js';
 
 export const ConnectionFormAuthenticationAction = React.lazy(async () => {
   const { ConnectionFormAuthenticationAction } = await import('./ConnectionFormAuthenticationAction.js');
@@ -41,17 +38,9 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
       tab: () => OriginInfoTab,
       panel: () => OriginInfo,
       stateGetter: () => () => ({}),
-      isHidden: (tabId, props) => (props?.state.info ? isLocalConnection(props.state.info) : true),
+      isHidden: (tabId, props) => (props?.state.originInfo ? isLocalConnection(props.state.originInfo.origin) : true),
     });
 
-    this.connectionFormService.configureTask.addHandler(this.configure.bind(this));
-
     this.connectionFormService.actionsContainer.add(ConnectionFormAuthenticationAction, 0);
-  }
-
-  private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
-    const configuration = contexts.getContext(connectionFormConfigureContext);
-
-    configuration.include('includeOrigin');
   }
 }

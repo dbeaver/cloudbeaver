@@ -1,0 +1,5 @@
+query getAdminUserOriginDetails($userId: ID!) {
+  user: adminUserInfo(userId: $userId) {
+    ...AdminOriginDetails
+  }
+}
