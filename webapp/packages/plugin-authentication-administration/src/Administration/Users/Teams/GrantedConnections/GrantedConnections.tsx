@@ -22,6 +22,8 @@ import {
 } from '@cloudbeaver/core-blocks';
 import {
   type Connection,
+  type ConnectionInfoOrigin,
+  ConnectionInfoOriginResource,
   ConnectionInfoProjectKey,
   ConnectionInfoResource,
   DBDriverResource,
@@ -55,10 +57,12 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
   useResource(GrantedConnections, DBDriverResource, CachedMapAllKey, { active: selected });
 
   const connectionsLoader = useResource(GrantedConnections, ConnectionInfoResource, globalConnectionsKey, { active: selected });
+  const connectionsOriginLoader = useResource(GrantedConnections, ConnectionInfoOriginResource, globalConnectionsKey, { active: selected });
 
   const connections = connectionsLoader.data as Connection[];
 
   const grantedConnections = getComputed(() => connections.filter(connection => state.state.grantedSubjects.includes(connection.id)));
+  const connectionsOrigins = (connectionsOriginLoader.data ?? []) as ConnectionInfoOrigin[];
 
   useAutoLoad(GrantedConnections, state, selected && !loaded);
 
@@ -68,7 +72,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
 
   let info: TLocalizationToken | null = null;
 
-  const cloudExists = connections.some(isCloudConnection);
+  const cloudExists = connectionsOrigins.some(connectionOrigin => isCloudConnection(connectionOrigin.origin));
 
   if (cloudExists) {
     info = 'cloud_connections_access_placeholder';
@@ -92,6 +96,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
               <Container gap overflow>
                 <GrantedConnectionList
                   grantedConnections={grantedConnections}
+                  connectionsOrigins={connectionsOrigins}
                   disabled={formState.disabled}
                   onEdit={state.edit}
                   onRevoke={state.revoke}
@@ -99,6 +104,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
                 {state.state.editing && (
                   <ConnectionList
                     connectionList={connections}
+                    connectionsOrigins={connectionsOrigins}
                     grantedSubjects={state.state.grantedSubjects}
                     disabled={formState.disabled}
                     onGrant={state.grant}

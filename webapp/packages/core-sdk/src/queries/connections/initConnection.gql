@@ -6,8 +6,6 @@ mutation initConnection(
   $saveCredentials: Boolean
   $sharedCredentials: Boolean
   $selectedSecretId: String
-  $includeOrigin: Boolean!
-  $customIncludeOriginDetails: Boolean!
   $includeAuthProperties: Boolean!
   $includeNetworkHandlersConfig: Boolean!
   $includeCredentialsSaved: Boolean!

@@ -1,11 +1,4 @@
-query authLogin(
-  $provider: ID!
-  $configuration: ID
-  $credentials: Object
-  $linkUser: Boolean
-  $customIncludeOriginDetails: Boolean!
-  $forceSessionsLogout: Boolean
-) {
+query authLogin($provider: ID!, $configuration: ID, $credentials: Object, $linkUser: Boolean, $forceSessionsLogout: Boolean) {
   authInfo: authLogin(
     provider: $provider
     configuration: $configuration

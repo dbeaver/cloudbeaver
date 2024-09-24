@@ -41,14 +41,13 @@ import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONN
 import { ConnectionInfoEventHandler, type IConnectionInfoEvent } from './ConnectionInfoEventHandler.js';
 import type { DatabaseConnection } from './DatabaseConnection.js';
 import { DBDriverResource } from './DBDriverResource.js';
+import { parseConnectionKey } from './parseConnectionKey.js';
 
 export type Connection = DatabaseConnection & {
   authProperties?: UserConnectionAuthPropertiesFragment[];
 };
 export type ConnectionInitConfig = Omit<
   InitConnectionMutationVariables,
-  | 'includeOrigin'
-  | 'customIncludeOriginDetails'
   | 'includeAuthProperties'
   | 'includeNetworkHandlersConfig'
   | 'includeAuthNeeded'
@@ -492,33 +491,24 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     refresh: boolean,
   ): Promise<Map<IConnectionInfoParams, Connection>> {
     const connectionsList: Connection[] = [];
-    const projectKey = this.aliases.isAlias(originalKey, ConnectionInfoProjectKey);
     let removedConnections: IConnectionInfoParams[] = [];
-    let projectId: string | undefined;
-    let projectIds: string[] | undefined;
 
-    if (projectKey) {
-      projectIds = projectKey.options.projectIds;
-    }
+    const parsed = parseConnectionKey({
+      originalKey,
+      aliases: this.aliases,
+      isOutdated: this.isOutdated.bind(this),
+      activeProjects: this.projectsService.activeProjects,
+      refresh,
+    });
 
-    if (this.aliases.isAlias(originalKey, ConnectionInfoActiveProjectKey)) {
-      projectIds = this.projectsService.activeProjects.map(project => project.id);
-    }
+    let { projectId } = parsed;
+    const { projectIds, key } = parsed;
 
-    if (isResourceAlias(originalKey)) {
-      const key = this.aliases.transformToKey(originalKey);
-      const outdated = ResourceKeyUtils.filter(key, key => this.isOutdated(key, includes));
-
-      if (!refresh && outdated.length === 1) {
-        originalKey = outdated[0]!; // load only single connection
-      }
-    }
-
-    await ResourceKeyUtils.forEachAsync(originalKey, async key => {
+    await ResourceKeyUtils.forEachAsync(key, async connectionKey => {
       let connectionId: string | undefined;
-      if (!isResourceAlias(key)) {
-        projectId = key.projectId;
-        connectionId = key.connectionId;
+      if (!isResourceAlias(connectionKey)) {
+        projectId = connectionKey.projectId;
+        connectionId = connectionKey.connectionId;
       }
 
       const { connections } = await this.graphQLService.sdk.getUserConnections({
@@ -526,7 +516,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
         connectionId,
         projectIds,
         ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(key, includes),
+        ...this.getIncludesMap(connectionKey, includes),
       });
 
       if (connectionId && !connections.some(connection => connection.id === connectionId)) {
@@ -537,15 +527,15 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     });
 
     runInAction(() => {
-      if (isResourceAlias(originalKey)) {
-        removedConnections = ResourceKeyUtils.toList(this.aliases.transformToKey(originalKey)).filter(
-          key => !connectionsList.some(connection => isConnectionInfoParamEqual(key, createConnectionParam(connection))),
+      if (isResourceAlias(key)) {
+        removedConnections = ResourceKeyUtils.toList(this.aliases.transformToKey(key)).filter(
+          filterKey => !connectionsList.some(connection => isConnectionInfoParamEqual(filterKey, createConnectionParam(connection))),
         );
       }
 
       this.delete(resourceKeyList(removedConnections));
-      const key = resourceKeyList(connectionsList.map(createConnectionParam));
-      this.set(key, connectionsList);
+      const keys = resourceKeyList(connectionsList.map(createConnectionParam));
+      this.set(keys, connectionsList);
     });
     this.sessionUpdate = false;
 
@@ -587,9 +577,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   private getDefaultIncludes(): ConnectionInfoIncludes {
     return {
       includeNetworkHandlersConfig: false,
-      customIncludeOriginDetails: false,
       includeAuthProperties: false,
-      includeOrigin: false,
       includeAuthNeeded: false,
       includeCredentialsSaved: false,
       includeProperties: false,
