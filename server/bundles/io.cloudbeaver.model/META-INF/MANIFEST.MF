@@ -10,7 +10,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Require-Bundle: org.jkiss.dbeaver.data.gis;visibility:=reexport,
  org.jkiss.dbeaver.model;visibility:=reexport,
- org.jkiss.dbeaver.model.rcp;visibility:=reexport,
  org.jkiss.dbeaver.model.sm;visibility:=reexport,
  org.jkiss.dbeaver.model.event;visibility:=reexport,
  org.jkiss.dbeaver.model.nio;visibility:=reexport,
