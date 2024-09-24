@@ -11,6 +11,7 @@ import type { IFormStateInfo } from './IFormStateInfo.js';
 
 export interface IFormStateContext extends IFormStateInfo {
   markEdited: () => void;
+  setOnShowDetails(onShowDetails: VoidFunction): void;
   setInfo(message: string): void;
   setError(message: string): void;
   setSuccess(message: string): void;
@@ -20,8 +21,12 @@ export interface IFormStateContext extends IFormStateInfo {
 
 export function formStateContext(): IFormStateContext {
   return {
+    onShowDetails: null,
     edited: false,
     disabled: false,
+    setOnShowDetails(onShowDetails) {
+      this.onShowDetails = onShowDetails;
+    },
     readonly: false,
     statusMessage: null,
     statusType: null,
