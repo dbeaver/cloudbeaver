@@ -197,12 +197,6 @@ export class FormState<TState> implements IFormState<TState> {
   private updateFormState(data: TState, contexts: IExecutionContextProvider<TState>): void {
     const context = contexts.getContext(formStateContext);
 
-    for (const part of this.parts.values()) {
-      if (!part.isLoaded()) {
-        return;
-      }
-    }
-
     if (this.mode === FormMode.Create) {
       context.markEdited();
     }
