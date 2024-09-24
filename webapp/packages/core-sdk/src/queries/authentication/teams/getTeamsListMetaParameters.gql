@@ -1,0 +1,5 @@
+query getTeamsListMetaParameters($teamId: ID) {
+  teams: listTeams(teamId: $teamId) {
+    ...AdminTeamInfoMetaParameters
+  }
+}

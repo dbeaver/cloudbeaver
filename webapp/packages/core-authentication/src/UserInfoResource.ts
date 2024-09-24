@@ -60,7 +60,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     private readonly authProviderService: AuthProviderService,
     private readonly sessionResource: SessionResource,
   ) {
-    super(() => null, undefined, ['customIncludeOriginDetails', 'includeConfigurationParameters']);
+    super(() => null, undefined, ['includeConfigurationParameters']);
 
     this.onUserChange = new SyncExecutor();
     this.onException = new SyncExecutor();
@@ -110,7 +110,6 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
       configuration: configurationId,
       credentials: processedCredentials,
       linkUser,
-      customIncludeOriginDetails: true,
       forceSessionsLogout,
     });
 
@@ -142,7 +141,6 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
             const { authInfo } = await this.graphQLService.sdk.getAuthStatus({
               authId,
               linkUser,
-              customIncludeOriginDetails: true,
             });
             return authInfo as AuthInfo;
           },
@@ -288,9 +286,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
 
   private getDefaultIncludes(): UserInfoIncludes {
     return {
-      customIncludeOriginDetails: true,
       includeConfigurationParameters: false,
-      includeMetaParameters: false,
     };
   }
 }
