@@ -13,9 +13,9 @@ import { Translate, usePermission, useResource } from '@cloudbeaver/core-blocks'
 import { useService } from '@cloudbeaver/core-di';
 import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 
-import { Administration } from '../../Administration/Administration';
-import { WizardStepper } from './WizardStepper';
-import { WizardTopAppBar } from './WizardTopAppBar/WizardTopAppBar';
+import { Administration } from '../../Administration/Administration.js';
+import { WizardStepper } from './WizardStepper.js';
+import { WizardTopAppBar } from './WizardTopAppBar/WizardTopAppBar.js';
 
 export const ConfigurationWizardScreen = observer(function ConfigurationWizardScreen() {
   useResource(ConfigurationWizardScreen, SessionPermissionsResource, undefined);

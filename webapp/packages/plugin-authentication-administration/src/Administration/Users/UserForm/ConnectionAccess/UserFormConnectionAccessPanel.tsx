@@ -10,9 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { Container, Group, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
-import type { UserFormProps } from '../AdministrationUserFormService';
-import { getUserFormInfoPart } from '../Info/getUserFormInfoPart';
-import { UserFormConnectionAccess } from './UserFormConnectionAccess';
+import type { UserFormProps } from '../AdministrationUserFormService.js';
+import { getUserFormInfoPart } from '../Info/getUserFormInfoPart.js';
+import { UserFormConnectionAccess } from './UserFormConnectionAccess.js';
 
 export const UserFormConnectionAccessPanel: TabContainerPanelComponent<UserFormProps> = observer(function UserFormConnectionAccessPanel({
   tabId,

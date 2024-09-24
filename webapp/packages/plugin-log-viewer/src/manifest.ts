@@ -10,11 +10,11 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 export const logViewerPlugin: PluginManifest = {
   info: { name: 'Log viewer plugin' },
   providers: [
-    () => import('./LogViewer/LogViewerBootstrap').then(m => m.LogViewerBootstrap),
-    () => import('./LogViewer/LogViewerService').then(m => m.LogViewerService),
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./LogViewer/LogViewerSettingsService').then(m => m.LogViewerSettingsService),
-    () => import('./SessionLogsResource').then(m => m.SessionLogsResource),
-    () => import('./SessionLogsEventHandler').then(m => m.SessionLogsEventHandler),
+    () => import('./LogViewer/LogViewerBootstrap.js').then(m => m.LogViewerBootstrap),
+    () => import('./LogViewer/LogViewerService.js').then(m => m.LogViewerService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./LogViewer/LogViewerSettingsService.js').then(m => m.LogViewerSettingsService),
+    () => import('./SessionLogsResource.js').then(m => m.SessionLogsResource),
+    () => import('./SessionLogsEventHandler.js').then(m => m.SessionLogsEventHandler),
   ],
 };

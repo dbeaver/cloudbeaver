@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/core-navigation-tree",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

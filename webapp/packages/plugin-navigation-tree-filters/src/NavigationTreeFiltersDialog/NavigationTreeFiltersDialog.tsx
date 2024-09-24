@@ -25,9 +25,9 @@ import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { type NavNode, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 
-import { FiltersTable } from './FiltersTable';
+import { FiltersTable } from './FiltersTable.js';
 import styles from './NavigationTreeFiltersDialog.module.css';
-import { useFilters } from './useFilters';
+import { useFilters } from './useFilters.js';
 
 interface Payload {
   node: NavNode;

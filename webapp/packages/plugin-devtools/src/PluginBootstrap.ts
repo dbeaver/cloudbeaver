@@ -5,26 +5,26 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { App, Bootstrap, injectable, IServiceConstructor, IServiceProvider } from '@cloudbeaver/core-di';
+import { App, Bootstrap, injectable, type IServiceConstructor, IServiceProvider } from '@cloudbeaver/core-di';
 import { CachedResource } from '@cloudbeaver/core-resource';
 import { EAdminPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { ActionService, DATA_CONTEXT_SUBMENU_ITEM, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 import { MENU_USER_PROFILE } from '@cloudbeaver/plugin-user-profile';
 
-import { ACTION_DEVTOOLS } from './actions/ACTION_DEVTOOLS';
-import { ACTION_DEVTOOLS_MODE_CONFIGURATION } from './actions/ACTION_DEVTOOLS_MODE_CONFIGURATION';
-import { ACTION_DEVTOOLS_MODE_DISTRIBUTED } from './actions/ACTION_DEVTOOLS_MODE_DISTRIBUTED';
-import { DATA_CONTEXT_MENU_SEARCH } from './ContextMenu/DATA_CONTEXT_MENU_SEARCH';
-import { SearchResourceMenuItem } from './ContextMenu/SearchResourceMenuItem';
-import { DevToolsService } from './DevToolsService';
-import { MENU_DEVTOOLS } from './menu/MENU_DEVTOOLS';
-import { MENU_PLUGIN } from './menu/MENU_PLUGIN';
-import { MENU_PLUGINS } from './menu/MENU_PLUGINS';
-import { MENU_RESOURCE } from './menu/MENU_RESOURCE';
-import { MENU_RESOURCES } from './menu/MENU_RESOURCES';
-import { PluginSubMenuItem } from './menu/PluginSubMenuItem';
-import { ResourceSubMenuItem } from './menu/ResourceSubMenuItem';
+import { ACTION_DEVTOOLS } from './actions/ACTION_DEVTOOLS.js';
+import { ACTION_DEVTOOLS_MODE_CONFIGURATION } from './actions/ACTION_DEVTOOLS_MODE_CONFIGURATION.js';
+import { ACTION_DEVTOOLS_MODE_DISTRIBUTED } from './actions/ACTION_DEVTOOLS_MODE_DISTRIBUTED.js';
+import { DATA_CONTEXT_MENU_SEARCH } from './ContextMenu/DATA_CONTEXT_MENU_SEARCH.js';
+import { SearchResourceMenuItem } from './ContextMenu/SearchResourceMenuItem.js';
+import { DevToolsService } from './DevToolsService.js';
+import { MENU_DEVTOOLS } from './menu/MENU_DEVTOOLS.js';
+import { MENU_PLUGIN } from './menu/MENU_PLUGIN.js';
+import { MENU_PLUGINS } from './menu/MENU_PLUGINS.js';
+import { MENU_RESOURCE } from './menu/MENU_RESOURCE.js';
+import { MENU_RESOURCES } from './menu/MENU_RESOURCES.js';
+import { PluginSubMenuItem } from './menu/PluginSubMenuItem.js';
+import { ResourceSubMenuItem } from './menu/ResourceSubMenuItem.js';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -39,7 +39,7 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.menuService.addCreator({
       menus: [TOP_NAV_BAR_SETTINGS_MENU],
       isApplicable: () => this.permissionsService.has(EAdminPermission.admin),

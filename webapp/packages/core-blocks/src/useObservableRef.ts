@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, AnnotationsMap, makeObservable, runInAction, untracked } from 'mobx';
+import { action, type AnnotationsMap, makeObservable, runInAction, untracked } from 'mobx';
 import { useLayoutEffect, useState } from 'react';
 
 import { bindFunctions } from '@cloudbeaver/core-utils';

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ExecutorInterrupter, type IExecutorHandler, ISyncExecutor } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, type IExecutorHandler, type ISyncExecutor } from '@cloudbeaver/core-executor';
 
 export enum ResourceLoggerLevel {
   None,

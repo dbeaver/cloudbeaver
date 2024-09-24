@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { forwardRef, ReactNode, useImperativeHandle } from 'react';
-import { Disclosure, DisclosureContent, DisclosureStateReturn, useDisclosureState } from 'reakit';
+import { forwardRef, type ReactNode, useImperativeHandle } from 'react';
+import { Disclosure, DisclosureContent, type DisclosureStateReturn, useDisclosureState } from 'reakit';
 
-import { IconOrImage } from '../IconOrImage';
-import { s } from '../s';
-import { useS } from '../useS';
+import { IconOrImage } from '../IconOrImage.js';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
 import style from './Expandable.module.css';
 
 export type ExpandableState = Pick<DisclosureStateReturn, 'setVisible' | 'show' | 'hide' | 'toggle' | 'visible'>;

@@ -10,12 +10,12 @@ import { forwardRef } from 'react';
 
 import { s, useS } from '@cloudbeaver/core-blocks';
 
-import type { IEditorProps } from './IEditorProps';
-import type { IEditorRef } from './IEditorRef';
-import { ReactCodemirror } from './ReactCodemirror';
-import { EDITOR_BASE_STYLES } from './theme';
-import { useCodemirrorExtensions } from './useCodemirrorExtensions';
-import { type IDefaultExtensions, useEditorDefaultExtensions } from './useEditorDefaultExtensions';
+import type { IEditorProps } from './IEditorProps.js';
+import type { IEditorRef } from './IEditorRef.js';
+import { ReactCodemirror } from './ReactCodemirror.js';
+import { EDITOR_BASE_STYLES } from './theme/index.js';
+import { useCodemirrorExtensions } from './useCodemirrorExtensions.js';
+import { type IDefaultExtensions, useEditorDefaultExtensions } from './useEditorDefaultExtensions.js';
 
 export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
   forwardRef(function Editor(

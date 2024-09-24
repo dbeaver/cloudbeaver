@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Container, IconOrImage, Link, s, TableColumnValue, TableItem, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { isSameDay } from '@cloudbeaver/core-utils';
 
-import type { ILogEntry } from './ILogEntry';
+import type { ILogEntry } from './ILogEntry.js';
 import classes from './LogEntry.module.css';
 
 interface Props {

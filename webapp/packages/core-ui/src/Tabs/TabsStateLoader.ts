@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const TabsState = importLazyComponent(() => import('./TabsState').then(m => m.TabsState));
+export const TabsState = importLazyComponent(() => import('./TabsState.js').then(m => m.TabsState));

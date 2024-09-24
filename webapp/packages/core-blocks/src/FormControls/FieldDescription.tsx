@@ -8,8 +8,8 @@
 import { observer } from 'mobx-react-lite';
 import type { PropsWithChildren } from 'react';
 
-import { s } from '../s';
-import { useS } from '../useS';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
 import fieldDescriptionStyles from './FieldDescription.module.css';
 
 interface Props {

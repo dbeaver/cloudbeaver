@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import type { ITaskDescriptor, ITaskDescriptorOptions } from './ITaskDescriptor';
+import type { ITaskDescriptor, ITaskDescriptorOptions } from './ITaskDescriptor.js';
 
 @injectable()
 export class TaskManagerService {

@@ -8,6 +8,6 @@
 import React from 'react';
 
 export const TreeNodeMenuLoader = React.lazy(async () => {
-  const { TreeNodeMenu } = await import('./TreeNodeMenu');
+  const { TreeNodeMenu } = await import('./TreeNodeMenu.js');
   return { default: TreeNodeMenu };
 });

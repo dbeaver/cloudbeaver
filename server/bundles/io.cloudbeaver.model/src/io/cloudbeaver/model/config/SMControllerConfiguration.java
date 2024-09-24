@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package io.cloudbeaver.service.security;
+package io.cloudbeaver.model.config;
 
 public class SMControllerConfiguration {
     //in minutes

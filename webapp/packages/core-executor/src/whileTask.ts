@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { AutoRunningTask } from './TaskScheduler/AutoRunningTask';
-import { CancelError } from './TaskScheduler/CancelError';
-import type { ITask } from './TaskScheduler/ITask';
-import { Task } from './TaskScheduler/Task';
-import { TimeoutError } from './TaskScheduler/TimeoutError';
+import { AutoRunningTask } from './TaskScheduler/AutoRunningTask.js';
+import { CancelError } from './TaskScheduler/CancelError.js';
+import type { ITask } from './TaskScheduler/ITask.js';
+import { Task } from './TaskScheduler/Task.js';
+import { TimeoutError } from './TaskScheduler/TimeoutError.js';
 
 export function whileTask<T>(
   callback: (value: T) => Promise<boolean> | boolean,

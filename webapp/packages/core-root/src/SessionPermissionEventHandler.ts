@@ -8,8 +8,8 @@
 import { injectable } from '@cloudbeaver/core-di';
 import type { CbSubjectPermissionUpdateEvent as ISessionPermissionEvent } from '@cloudbeaver/core-sdk';
 
-import { TopicEventHandler } from './ServerEventEmitter/TopicEventHandler';
-import { ISessionEvent, SessionEventId, SessionEventSource, SessionEventTopic } from './SessionEventSource';
+import { TopicEventHandler } from './ServerEventEmitter/TopicEventHandler.js';
+import { type ISessionEvent, type SessionEventId, SessionEventSource, SessionEventTopic } from './SessionEventSource.js';
 
 export type { ISessionPermissionEvent };
 

@@ -10,11 +10,11 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { type INodeNavigationData, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 
-import { DBObjectPageService } from '../ObjectPage/DBObjectPageService';
-import type { ObjectPage } from '../ObjectPage/ObjectPage';
-import { ObjectViewerTabService } from '../ObjectViewerTabService';
-import { ObjectPropertiesPagePanel } from './ObjectPropertiesPagePanel';
-import { ObjectPropertiesPageTab } from './ObjectPropertiesPageTab';
+import { DBObjectPageService } from '../ObjectPage/DBObjectPageService.js';
+import type { ObjectPage } from '../ObjectPage/ObjectPage.js';
+import { ObjectViewerTabService } from '../ObjectViewerTabService.js';
+import { ObjectPropertiesPagePanel } from './ObjectPropertiesPagePanel.js';
+import { ObjectPropertiesPageTab } from './ObjectPropertiesPageTab.js';
 
 @injectable()
 export class ObjectPropertiesPageService {

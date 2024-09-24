@@ -87,4 +87,6 @@ public class CBConstants {
 
     public static final String QUOTA_PROP_FILE_LIMIT = "dataExportFileSizeLimit";
     public static final String ADMIN_AUTO_GRANT = "auto-grant";
+    public static final String HOST_LOCALHOST = "localhost";
+    public static final String HOST_127_0_0_1 = "127.0.0.1";
 }

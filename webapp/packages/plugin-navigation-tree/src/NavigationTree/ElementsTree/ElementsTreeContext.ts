@@ -9,8 +9,8 @@ import { createContext } from 'react';
 
 import type { IFolderExplorerContext } from '@cloudbeaver/core-blocks';
 
-import type { NavTreeControlComponent } from './NavigationNodeComponent';
-import type { IElementsTree } from './useElementsTree';
+import type { NavTreeControlComponent } from './NavigationNodeComponent.js';
+import type { IElementsTree } from './useElementsTree.js';
 
 export interface IElementsTreeContext {
   tree: IElementsTree;

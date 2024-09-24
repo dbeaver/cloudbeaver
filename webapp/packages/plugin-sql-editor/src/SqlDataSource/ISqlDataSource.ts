@@ -10,9 +10,9 @@ import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
-import type { QueryDataSource } from '../QueryDataSource';
-import type { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
-import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory';
+import type { QueryDataSource } from '../QueryDataSource.js';
+import type { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures.js';
+import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory.js';
 
 export interface ISqlDataSourceKey {
   readonly key: string;

@@ -7,8 +7,8 @@
  */
 
 export function uriToBlob(uri: string): Blob {
-  const byteString = window.atob(uri.split(',')[1]);
-  const mimeString = uri.split(',')[0].split(':')[1].split(';')[0];
+  const byteString = window.atob(uri.split(',')[1]!);
+  const mimeString = uri.split(',')[0]?.split(':')[1]!.split(';')[0];
   const buffer = new ArrayBuffer(byteString.length);
   const view = new Uint8Array(buffer);
 

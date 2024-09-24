@@ -8,10 +8,10 @@
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { UserProfileFormService } from '../UserProfileFormService';
-import { getUserProfileFormInfoPart } from './getUserProfileFormInfoPart';
+import { UserProfileFormService } from '../UserProfileFormService.js';
+import { getUserProfileFormInfoPart } from './getUserProfileFormInfoPart.js';
 
-const UserProfileFormInfo = importLazyComponent(() => import('./UserProfileFormInfo').then(m => m.UserProfileFormInfo));
+const UserProfileFormInfo = importLazyComponent(() => import('./UserProfileFormInfo.js').then(m => m.UserProfileFormInfo));
 
 @injectable()
 export class UserProfileFormInfoPartBootstrap extends Bootstrap {
@@ -19,7 +19,7 @@ export class UserProfileFormInfoPartBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.userProfileFormService.parts.add({
       key: 'info',
       name: 'plugin_user_profile_info',

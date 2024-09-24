@@ -10,9 +10,9 @@ import { observer } from 'mobx-react-lite';
 import { Group, GroupTitle } from '@cloudbeaver/core-blocks';
 import type { ISettingDescription, ISettingsSource, SettingsGroup as SettingsGroupType } from '@cloudbeaver/core-settings';
 
-import { getSettingGroupId } from './getSettingGroupId';
-import { Setting } from './Setting';
-import { SettingsGroupTitle } from './SettingsGroupTitle';
+import { getSettingGroupId } from './getSettingGroupId.js';
+import { Setting } from './Setting.js';
+import { SettingsGroupTitle } from './SettingsGroupTitle.js';
 
 interface Props {
   group: SettingsGroupType;

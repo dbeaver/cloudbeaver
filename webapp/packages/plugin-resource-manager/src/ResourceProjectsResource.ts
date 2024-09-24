@@ -9,7 +9,7 @@ import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { SharedProjectsResource } from '@cloudbeaver/core-resource-manager';
-import { GraphQLService, RmProject } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type RmProject } from '@cloudbeaver/core-sdk';
 
 export type Project = Omit<RmProject, 'creator' | 'createTime' | 'canEditConnection' | 'canEditResource'>;
 

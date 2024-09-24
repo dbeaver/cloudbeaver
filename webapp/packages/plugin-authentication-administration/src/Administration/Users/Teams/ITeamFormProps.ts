@@ -5,18 +5,22 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { TeamInfo, TeamsResource } from '@cloudbeaver/core-authentication';
+import type { TeamInfo, TeamMetaParameter, TeamsResource } from '@cloudbeaver/core-authentication';
 import type { IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 export type TeamFormMode = 'edit' | 'create';
 
+export interface TeamInfoConfig extends TeamInfo {
+  metaParameters: Record<string, TeamMetaParameter>;
+}
+
 export interface ITeamFormState {
   mode: TeamFormMode;
-  config: TeamInfo;
+  config: TeamInfoConfig;
   partsState: MetadataMap<string, any>;
 
-  readonly info: TeamInfo | undefined;
+  readonly info: TeamInfoConfig | undefined;
   readonly statusMessage: string | null;
   readonly disabled: boolean;
   readonly readonly: boolean;

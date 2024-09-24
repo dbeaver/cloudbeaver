@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { GroupTitle, PlaceholderComponent, Switch, useTranslate } from '@cloudbeaver/core-blocks';
+import { GroupTitle, type PlaceholderComponent, Switch, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
 
 export const ResourceManagerSettings: PlaceholderComponent<IConfigurationPlaceholderProps> = observer(function ResourceManagerSettings({ state }) {

@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { StorageService } from '@cloudbeaver/core-storage';
 import { TempMap } from '@cloudbeaver/core-utils';
 
-import { UserInfoResource } from './UserInfoResource';
+import { UserInfoResource } from './UserInfoResource.js';
 
 @injectable()
 export class UserDataService {

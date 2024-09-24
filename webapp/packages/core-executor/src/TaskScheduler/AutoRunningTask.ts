@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ITask } from './ITask';
-import { Task } from './Task';
+import type { ITask } from './ITask.js';
+import { Task } from './Task.js';
 
 export class AutoRunningTask<TValue> extends Task<TValue> {
   constructor(task: () => Promise<TValue>, externalCancel?: () => Promise<void> | void) {

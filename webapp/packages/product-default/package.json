@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/product-default",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

@@ -7,6 +7,6 @@
  */
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 
-import { createDataContext } from './createDataContext';
+import { createDataContext } from './createDataContext.js';
 
 export const DATA_CONTEXT_DI_PROVIDER = createDataContext<IServiceProvider>('DI Provider');

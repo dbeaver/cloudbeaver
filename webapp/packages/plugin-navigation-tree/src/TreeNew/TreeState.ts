@@ -7,6 +7,6 @@
  */
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
-import type { INodeState } from './INodeState';
+import type { INodeState } from './INodeState.js';
 
 export type TreeState = MetadataMap<string, INodeState>;

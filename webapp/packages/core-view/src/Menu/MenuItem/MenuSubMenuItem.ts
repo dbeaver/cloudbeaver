@@ -5,10 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IMenu } from '../IMenu';
-import type { IMenuActionItem } from './IMenuActionItem';
-import type { IMenuSubMenuEvents, IMenuSubMenuItem, IMenuSubMenuItemOptions, MenuSubMenuItemIconComponent } from './IMenuSubMenuItem';
-import { MenuItem } from './MenuItem';
+import type { IMenu } from '../IMenu.js';
+import type { IMenuActionItem } from './IMenuActionItem.js';
+import type { IMenuSubMenuEvents, IMenuSubMenuItem, IMenuSubMenuItemOptions, MenuSubMenuItemIconComponent } from './IMenuSubMenuItem.js';
+import { MenuItem } from './MenuItem.js';
 
 export class MenuSubMenuItem<TExtraProps = unknown> extends MenuItem implements IMenuSubMenuItem<TExtraProps> {
   readonly menu: IMenu;
@@ -20,7 +20,7 @@ export class MenuSubMenuItem<TExtraProps = unknown> extends MenuItem implements 
    * experimental, can be changed
    */
   readonly action?: IMenuActionItem;
-  readonly events?: IMenuSubMenuEvents;
+  override readonly events?: IMenuSubMenuEvents;
   readonly hidden: boolean;
   readonly getExtraProps?: () => TExtraProps;
   readonly iconComponent?: () => MenuSubMenuItemIconComponent<TExtraProps>;

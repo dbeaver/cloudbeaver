@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IMenuCheckboxItem, IMenuCheckboxItemOptions } from './IMenuCheckboxItem';
-import type { IMenuItemEvents } from './IMenuItem';
-import { MenuItem } from './MenuItem';
+import type { IMenuCheckboxItem, IMenuCheckboxItemOptions } from './IMenuCheckboxItem.js';
+import type { IMenuItemEvents } from './IMenuItem.js';
+import { MenuItem } from './MenuItem.js';
 
 interface IMenuBaseItemPropertyGetters {
   isDisabled?: () => boolean;

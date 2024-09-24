@@ -19,11 +19,11 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
-import { DataImportFileSelector } from './DataImportFileSelector';
-import { EDataImportDialogStep } from './EDataImportDialogStep';
-import type { IDataImportDialogState } from './IDataImportDialogState';
-import { ImportProcessorList } from './ImportProcessorList';
-import { useDataImportDialog } from './useDataImportDialog';
+import { DataImportFileSelector } from './DataImportFileSelector.js';
+import { EDataImportDialogStep } from './EDataImportDialogStep.js';
+import type { IDataImportDialogState } from './IDataImportDialogState.js';
+import { ImportProcessorList } from './ImportProcessorList.js';
+import { useDataImportDialog } from './useDataImportDialog.js';
 
 export interface IDataImportDialogResult {
   file: File;

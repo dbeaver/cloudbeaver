@@ -7,25 +7,25 @@
  */
 import { action, makeObservable } from 'mobx';
 
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { getPathParent, ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { getPathParent, type ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
 
-import { CachedResource } from '../CachedResource';
-import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from '../CachedResourceIncludes';
-import type { ICachedResourceMetadata } from '../ICachedResourceMetadata';
-import type { ResourceKey, ResourceKeySimple } from '../ResourceKey';
-import { resourceKeyAlias, ResourceKeyAlias } from '../ResourceKeyAlias';
-import { isResourceKeyList, resourceKeyList, ResourceKeyList } from '../ResourceKeyList';
-import { ResourceKeyListAlias, resourceKeyListAlias, resourceKeyListAliasFactory } from '../ResourceKeyListAlias';
-import { ResourceKeyUtils } from '../ResourceKeyUtils';
-import { CachedTreeMetadata } from './CachedTreeMetadata';
-import { CachedTreeUseTracker } from './CachedTreeUseTracker';
-import { deleteTreeValue } from './deleteTreeValue';
-import { getTreeParents } from './getTreeParents';
-import { getTreeValue } from './getTreeValue';
-import type { ICachedTreeData } from './ICachedTreeData';
-import type { ICachedTreeElement } from './ICachedTreeElement';
-import type { ICachedTreeMoveData } from './ICachedTreeMoveData';
+import { CachedResource } from '../CachedResource.js';
+import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from '../CachedResourceIncludes.js';
+import type { ICachedResourceMetadata } from '../ICachedResourceMetadata.js';
+import type { ResourceKey, ResourceKeySimple } from '../ResourceKey.js';
+import { resourceKeyAlias, ResourceKeyAlias } from '../ResourceKeyAlias.js';
+import { isResourceKeyList, resourceKeyList, ResourceKeyList } from '../ResourceKeyList.js';
+import { ResourceKeyListAlias, resourceKeyListAlias, resourceKeyListAliasFactory } from '../ResourceKeyListAlias.js';
+import { ResourceKeyUtils } from '../ResourceKeyUtils.js';
+import { CachedTreeMetadata } from './CachedTreeMetadata.js';
+import { CachedTreeUseTracker } from './CachedTreeUseTracker.js';
+import { deleteTreeValue } from './deleteTreeValue.js';
+import { getTreeParents } from './getTreeParents.js';
+import { getTreeValue } from './getTreeValue.js';
+import type { ICachedTreeData } from './ICachedTreeData.js';
+import type { ICachedTreeElement } from './ICachedTreeElement.js';
+import type { ICachedTreeMoveData } from './ICachedTreeMoveData.js';
 
 export const CachedTreeRootValueKey = resourceKeyAlias('@cached-tree-resource/root-value');
 export const CachedTreeRootChildrenKey = resourceKeyListAlias('@cached-tree-resource/root-children');
@@ -43,8 +43,8 @@ export abstract class CachedTreeResource<
   readonly onItemUpdate: ISyncExecutor<ResourceKeySimple<string>>;
   readonly onItemDelete: ISyncExecutor<ResourceKeySimple<string>>;
   readonly onMove: ISyncExecutor<ICachedTreeMoveData>;
-  readonly useTracker: CachedTreeUseTracker<TValue, TMetadata>;
-  protected metadata: CachedTreeMetadata<TValue, TMetadata>;
+  override readonly useTracker: CachedTreeUseTracker<TValue, TMetadata>;
+  protected override metadata: CachedTreeMetadata<TValue, TMetadata>;
 
   constructor(defaultValue?: () => ICachedTreeData<TValue, TMetadata>, defaultIncludes?: CachedResourceIncludeArgs<TValue, TContext>) {
     super(
@@ -61,7 +61,7 @@ export abstract class CachedTreeResource<
               loading: false,
               outdated: false,
             },
-          } as any as ICachedTreeData<TValue, TMetadata>)),
+          }) as any as ICachedTreeData<TValue, TMetadata>),
       defaultIncludes,
     );
 
@@ -145,7 +145,7 @@ export abstract class CachedTreeResource<
       }
 
       for (let i = 0; i < key.length; i++) {
-        this.dataSet(this.getKeyRef(key[i]), (value as TValue[])[i]);
+        this.dataSet(this.getKeyRef(key[i]!), (value as TValue[])[i]!);
       }
     } else {
       this.dataSet(this.getKeyRef(key), value as TValue);
@@ -186,19 +186,19 @@ export abstract class CachedTreeResource<
     // this.markUpdated(key);
   }
 
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: string | ResourceKeyAlias<string, any>,
     includes?: T,
   ): Promise<CachedResourceValueIncludes<TValue, T>>;
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKeyList<string> | ResourceKeyListAlias<string, any> | void,
     includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>>>;
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<string>,
     includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>>;
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKey<string> | void,
     includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
@@ -209,19 +209,19 @@ export abstract class CachedTreeResource<
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
 
-  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: string | ResourceKeyAlias<string, any>,
     includes?: T,
   ): Promise<CachedResourceValueIncludes<TValue, T>>;
-  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKeyList<string> | ResourceKeyListAlias<string, any> | void,
     includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>>>;
-  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<string>,
     includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>>;
-  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKey<string> | void,
     includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {

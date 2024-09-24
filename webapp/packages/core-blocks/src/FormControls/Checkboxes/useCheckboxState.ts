@@ -8,8 +8,8 @@
 import { runInAction } from 'mobx';
 import { useContext, useState } from 'react';
 
-import { useObjectRef } from '../../useObjectRef';
-import { FormContext } from '../FormContext';
+import { useObjectRef } from '../../useObjectRef.js';
+import { FormContext } from '../FormContext.js';
 
 export type CheckboxOnChangeEvent<T> = (value: boolean, name: T) => void;
 

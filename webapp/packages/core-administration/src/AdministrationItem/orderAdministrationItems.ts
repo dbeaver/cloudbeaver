@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IAdministrationItem } from './IAdministrationItem';
+import type { IAdministrationItem } from './IAdministrationItem.js';
 
 export function orderAdministrationItems(configuration: boolean) {
   return (itemA: IAdministrationItem, itemB: IAdministrationItem): number => {

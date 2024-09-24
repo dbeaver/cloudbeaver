@@ -7,15 +7,15 @@
  */
 import { action, computed, observable, toJS } from 'mobx';
 
-import { TeamInfo, TeamsResource } from '@cloudbeaver/core-authentication';
+import { type TeamInfo, TeamsResource } from '@cloudbeaver/core-authentication';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { useTabState } from '@cloudbeaver/core-ui';
-import { ILoadableState, isArraysEqual, isObjectsEqual } from '@cloudbeaver/core-utils';
+import { type ILoadableState, isArraysEqual, isObjectsEqual } from '@cloudbeaver/core-utils';
 
-import type { TeamFormMode } from '../ITeamFormProps';
-import type { IGrantedUsersTabState } from './IGrantedUsersTabState';
+import type { TeamFormMode } from '../ITeamFormProps.js';
+import type { IGrantedUsersTabState } from './IGrantedUsersTabState.js';
 
 interface State extends ILoadableState {
   state: IGrantedUsersTabState;

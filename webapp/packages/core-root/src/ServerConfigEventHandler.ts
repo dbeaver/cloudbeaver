@@ -8,8 +8,8 @@
 import { injectable } from '@cloudbeaver/core-di';
 import type { CbConfigEvent as IServerConfigEvent } from '@cloudbeaver/core-sdk';
 
-import { TopicEventHandler } from './ServerEventEmitter/TopicEventHandler';
-import { ISessionEvent, SessionEventSource, SessionEventTopic } from './SessionEventSource';
+import { TopicEventHandler } from './ServerEventEmitter/TopicEventHandler.js';
+import { type ISessionEvent, SessionEventSource, SessionEventTopic } from './SessionEventSource.js';
 
 export { type IServerConfigEvent };
 

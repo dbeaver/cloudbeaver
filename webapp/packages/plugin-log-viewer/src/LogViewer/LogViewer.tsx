@@ -11,9 +11,9 @@ import { useCallback, useEffect } from 'react';
 import { Pane, ResizerControls, s, Split, TextPlaceholder, useS, useSplitUserState, useTranslate } from '@cloudbeaver/core-blocks';
 
 import style from './LogViewer.module.css';
-import { LogViewerInfoPanel } from './LogViewerInfoPanel';
-import { LogViewerTable } from './LogViewerTable';
-import { useLogViewer } from './useLogViewer';
+import { LogViewerInfoPanel } from './LogViewerInfoPanel.js';
+import { LogViewerTable } from './LogViewerTable.js';
+import { useLogViewer } from './useLogViewer.js';
 
 export const LogViewer = observer(function LogViewer() {
   const styles = useS(style);

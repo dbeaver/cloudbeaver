@@ -5,12 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { combineConfig, Compartment, EditorState, Extension, Facet, Range, SelectionRange, StateEffect, StateField } from '@codemirror/state';
+import { combineConfig, Compartment, EditorState, type Extension, Facet, Range, SelectionRange, StateEffect, StateField } from '@codemirror/state';
 import { Decoration, EditorView, ViewPlugin, ViewUpdate } from '@codemirror/view';
 
-import { Hyperlink, HyperlinkState } from './Hyperlink';
-import type { HyperlinkLoader } from './HyperlinkLoader';
-import type { IHyperlinkInfo } from './IHyperlinkInfo';
+import { Hyperlink, HyperlinkState } from './Hyperlink.js';
+import type { HyperlinkLoader } from './HyperlinkLoader.js';
+import type { IHyperlinkInfo } from './IHyperlinkInfo.js';
 
 export interface HyperlinksConfig {
   loadLinkInfo: HyperlinkLoader;

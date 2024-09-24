@@ -7,19 +7,19 @@
  */
 import { action, computed, makeObservable, observable } from 'mobx';
 
-import { DataContext, dataContextAddDIProvider, DataContextGetter, type IDataContext } from '@cloudbeaver/core-data-context';
+import { DataContext, dataContextAddDIProvider, type DataContextGetter, type IDataContext } from '@cloudbeaver/core-data-context';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ENotificationType } from '@cloudbeaver/core-events';
-import { Executor, ExecutorInterrupter, IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import { isArraysEqual, isNotNullDefined, MetadataMap, uuid } from '@cloudbeaver/core-utils';
 import { DATA_CONTEXT_LOADABLE_STATE, loadableStateContext } from '@cloudbeaver/core-view';
 
-import { DATA_CONTEXT_FORM_STATE } from './DATA_CONTEXT_FORM_STATE';
-import type { FormBaseService } from './FormBaseService';
-import { FormMode } from './FormMode';
-import { formStateContext } from './formStateContext';
-import type { IFormPart } from './IFormPart';
-import type { IFormState } from './IFormState';
+import { DATA_CONTEXT_FORM_STATE } from './DATA_CONTEXT_FORM_STATE.js';
+import type { FormBaseService } from './FormBaseService.js';
+import { FormMode } from './FormMode.js';
+import { formStateContext } from './formStateContext.js';
+import type { IFormPart } from './IFormPart.js';
+import type { IFormState } from './IFormState.js';
 
 export class FormState<TState> implements IFormState<TState> {
   mode: FormMode;

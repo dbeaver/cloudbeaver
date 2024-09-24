@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { getFirstException, ILoadableState, isContainsException, isLoadableStateHasException } from './ILoadableState';
+import { getFirstException, type ILoadableState, isContainsException, isLoadableStateHasException } from './ILoadableState.js';
 
 const getMockedLoadableState = (state: Partial<ILoadableState>): ILoadableState => ({
   exception: null,

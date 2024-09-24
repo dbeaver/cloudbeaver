@@ -37,7 +37,7 @@ export class PriorityQueue<T = number> {
   }
 
   peek(): T {
-    return this._heap[top];
+    return this._heap[top]!;
   }
 
   push(...values: T[]) {
@@ -69,11 +69,11 @@ export class PriorityQueue<T = number> {
   }
 
   private greater(i: number, j: number) {
-    return this._comparator(this._heap[i], this._heap[j]);
+    return this._comparator(this._heap[i]!, this._heap[j]!);
   }
 
   private swap(i: number, j: number) {
-    [this._heap[i], this._heap[j]] = [this._heap[j], this._heap[i]];
+    [this._heap[i], this._heap[j]] = [this._heap[j]!, this._heap[i]!];
   }
 
   private siftUp() {

@@ -7,7 +7,7 @@
  */
 import { beforeEach, describe, expect, jest, test } from '@jest/globals';
 
-import { CachedDataResource } from './CachedDataResource';
+import { CachedDataResource } from './CachedDataResource.js';
 
 interface IEntityData {
   id: string;

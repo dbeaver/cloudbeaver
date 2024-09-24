@@ -7,11 +7,11 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { s, SContext, StyleRegistry, ToolsAction, ToolsPanel, useTranslate } from '@cloudbeaver/core-blocks';
+import { s, SContext, type StyleRegistry, ToolsAction, ToolsPanel, useTranslate } from '@cloudbeaver/core-blocks';
 import { MenuBar, MenuBarItemStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
-import { MENU_USERS_ADMINISTRATION } from '../../../Menus/MENU_USERS_ADMINISTRATION';
+import { MENU_USERS_ADMINISTRATION } from '../../../Menus/MENU_USERS_ADMINISTRATION.js';
 import UsersAdministrationMenuBarItemStyles from './UsersAdministrationMenuBarItemStyles.module.css';
 import styles from './UsersAdministrationToolsPanel.module.css';
 

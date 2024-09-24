@@ -8,9 +8,9 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LeftBarPanelService } from '@cloudbeaver/core-ui';
 
-import { NavigationTreeSettingsService } from '../NavigationTreeSettingsService';
-import { ElementsTreeToolsMenuService } from './ElementsTree/ElementsTreeTools/ElementsTreeToolsMenuService';
-import { NavigationTreePanel } from './NavigationTreePanel';
+import { NavigationTreeSettingsService } from '../NavigationTreeSettingsService.js';
+import { ElementsTreeToolsMenuService } from './ElementsTree/ElementsTreeTools/ElementsTreeToolsMenuService.js';
+import { NavigationTreePanel } from './NavigationTreePanel.js';
 
 @injectable()
 export class NavigationTreeBootstrap extends Bootstrap {
@@ -22,7 +22,7 @@ export class NavigationTreeBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.elementsTreeToolsMenuService.register();
     this.leftBarPanelService.tabsContainer.add({
       key: 'navigation-tree-tab',
@@ -33,5 +33,5 @@ export class NavigationTreeBootstrap extends Bootstrap {
     });
   }
 
-  async load(): Promise<void> {}
+  override async load(): Promise<void> {}
 }

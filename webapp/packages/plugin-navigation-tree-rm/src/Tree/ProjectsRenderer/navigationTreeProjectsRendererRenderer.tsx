@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { getComputed, s, SContext, StyleRegistry, Translate, TreeNodeNestedMessage, useS } from '@cloudbeaver/core-blocks';
+import { getComputed, s, SContext, type StyleRegistry, Translate, TreeNodeNestedMessage, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
@@ -26,7 +26,7 @@ import {
 } from '@cloudbeaver/plugin-navigation-tree';
 import type { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
-import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
+import { NavigationNodeProjectControl } from './NavigationNodeProjectControl.js';
 import style from './NavigationTreeProjectsRendererRenderer.module.css';
 
 const registry: StyleRegistry = [

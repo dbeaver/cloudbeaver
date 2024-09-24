@@ -9,9 +9,9 @@ import { observer } from 'mobx-react-lite';
 
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
-import { DATA_CONTEXT_DV_DDM_RS_GROUPING } from './DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING';
-import type { IDVResultSetGroupingPresentationState } from './IDVResultSetGroupingPresentationState';
-import { useGroupingData } from './useGroupingData';
+import { DATA_CONTEXT_DV_DDM_RS_GROUPING } from './DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING.js';
+import type { IDVResultSetGroupingPresentationState } from './IDVResultSetGroupingPresentationState.js';
+import { useGroupingData } from './useGroupingData.js';
 
 interface Props {
   state: IDVResultSetGroupingPresentationState;

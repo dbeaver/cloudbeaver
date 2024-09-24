@@ -7,7 +7,7 @@
  */
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 
-import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
+import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
 
 export function isStringifiedBoolean(value: string): boolean {
   return ['false', 'true'].includes(value.toLowerCase());

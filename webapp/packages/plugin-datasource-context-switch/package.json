@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-datasource-context-switch",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

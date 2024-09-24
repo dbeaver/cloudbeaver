@@ -8,7 +8,7 @@
 import type { ServerConfigQuery } from '@cloudbeaver/core-sdk';
 import { WebsiteLinks } from '@cloudbeaver/core-website';
 
-import { defaultProductConfiguration } from './defaultProductConfiguration';
+import { defaultProductConfiguration } from './defaultProductConfiguration.js';
 
 export const defaultServerConfig: (productConfiguration?: Record<string, any>) => ServerConfigQuery = (
   productConfiguration = defaultProductConfiguration,
