@@ -94,8 +94,9 @@ public class WebDatabaseObjectInfo {
     @Property
     public WebPropertyInfo[] filterProperties(@Nullable WebPropertyFilter filter) {
         if (object instanceof DBPDataSourceContainer container && !isDataSourceEditable(container)) {
-            // If user cannot edit a connection, then no connection properties will be returned
-            return new WebPropertyInfo[0];
+            // If user cannot edit a connection, then return only name
+            filter = new WebPropertyFilter();
+            filter.setFeatures(List.of(DBConstants.PROP_FEATURE_NAME));
         }
         return WebServiceUtils.getObjectFilteredProperties(session, object, filter);
     }
