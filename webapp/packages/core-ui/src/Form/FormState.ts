@@ -44,6 +44,7 @@ export class FormState<TState> implements IFormState<TState> {
   readonly dataContext: IDataContext;
 
   readonly formStateTask: IExecutor<TState>;
+  readonly loadedStateTask: IExecutor<IFormState<TState>>;
   readonly submitTask: IExecutor<IFormState<TState>>;
   readonly formatTask: IExecutor<IFormState<TState>>;
   readonly validationTask: IExecutor<IFormState<TState>>;
@@ -64,6 +65,9 @@ export class FormState<TState> implements IFormState<TState> {
 
     this.formStateTask = new Executor<TState>(state, () => true);
     this.formStateTask.addCollection(service.onState).addPostHandler(this.updateFormState.bind(this));
+
+    this.loadedStateTask = new Executor(this as IFormState<TState>, () => true);
+    this.loadedStateTask.addCollection(service.onLoaded).next(this.formStateTask).addPostHandler(this.onLoadedHandler.bind(this));
 
     this.formatTask = new Executor(this as IFormState<TState>, () => true);
     this.formatTask.addCollection(service.onFormat);
@@ -177,6 +181,15 @@ export class FormState<TState> implements IFormState<TState> {
     } catch (exception: any) {}
 
     return false;
+  }
+
+  private onLoadedHandler(data: IFormState<TState>, contexts: IExecutionContextProvider<IFormState<TState>>): void {
+    for (const part of this.parts.values()) {
+      if (!part.isLoaded()) {
+        ExecutorInterrupter.interrupt(contexts);
+        return;
+      }
+    }
   }
 
   private updateFormState(data: TState, contexts: IExecutionContextProvider<TState>): void {
