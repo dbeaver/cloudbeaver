@@ -16,8 +16,6 @@
  */
 package io.cloudbeaver.server;
 
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Plugin;
 import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.impl.preferences.BundlePreferenceStore;
@@ -74,13 +72,6 @@ public class WebPlatformActivator extends Plugin {
 
     public DBPPreferenceStore getPreferences() {
         return preferences;
-    }
-
-    /**
-     * Returns the workspace instance.
-     */
-    public static IWorkspace getWorkspace() {
-        return ResourcesPlugin.getWorkspace();
     }
 
     protected void shutdownPlatform() {
