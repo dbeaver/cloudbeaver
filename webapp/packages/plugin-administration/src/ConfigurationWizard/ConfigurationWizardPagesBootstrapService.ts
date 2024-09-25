@@ -6,10 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { AdministrationItemService, AdministrationItemType, ConfigurationWizardService } from '@cloudbeaver/core-administration';
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { SessionDataResource } from '@cloudbeaver/core-root';
+import { formValidationContext } from '@cloudbeaver/core-ui';
 
 import { ADMINISTRATION_SERVER_CONFIGURATION_ITEM } from './ServerConfiguration/ADMINISTRATION_SERVER_CONFIGURATION_ITEM.js';
+import { ServerConfigurationFormStateManager } from './ServerConfiguration/ServerConfigurationFormStateManager.js';
 import { ServerConfigurationService } from './ServerConfiguration/ServerConfigurationService.js';
 
 const FinishPage = importLazyComponent(() => import('./Finish/FinishPage.js').then(m => m.FinishPage));
@@ -28,7 +32,10 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
   constructor(
     private readonly administrationItemService: AdministrationItemService,
     private readonly configurationWizardService: ConfigurationWizardService,
+    private readonly serverConfigurationFormStateManager: ServerConfigurationFormStateManager,
+    private readonly commonDialogService: CommonDialogService,
     private readonly serverConfigurationService: ServerConfigurationService,
+    private readonly sessionDataResource: SessionDataResource,
   ) {
     super();
   }
@@ -50,15 +57,51 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
       configurationWizardOptions: {
         description: 'administration_configuration_wizard_configuration_step_description',
         order: 1.5,
-        onLoad: this.serverConfigurationService.loadConfig.bind(this.serverConfigurationService),
-        isDone: this.serverConfigurationService.isDone.bind(this.serverConfigurationService),
-        onFinish: this.serverConfigurationService.saveConfiguration.bind(this.serverConfigurationService, false),
-        onConfigurationFinish: this.serverConfigurationService.saveConfiguration.bind(this.serverConfigurationService, true),
+        isDone: () => this.serverConfigurationService.isDone,
+        onFinish: async () => {
+          const state = this.serverConfigurationFormStateManager.formState;
+
+          if (state) {
+            const contexts = await state.validationTask.execute(state);
+            const validation = contexts.getContext(formValidationContext);
+
+            return validation.valid;
+          }
+
+          return true;
+        },
+        onConfigurationFinish: async () => {
+          await this.serverConfigurationFormStateManager.formState?.save();
+          await this.sessionDataResource.refresh();
+        },
+        onLoad: () => {
+          this.serverConfigurationFormStateManager.create();
+        },
       },
       order: 2,
-      onActivate: () => this.serverConfigurationService.activate(),
-      onDeActivate: this.serverConfigurationService.deactivate.bind(this.serverConfigurationService),
-      onLoad: this.serverConfigurationService.loadConfig.bind(this.serverConfigurationService, false),
+      onLoad: () => {
+        this.serverConfigurationFormStateManager.create();
+      },
+      canDeActivate: async configurationWizard => {
+        const state = this.serverConfigurationFormStateManager.formState;
+
+        if (state?.isSaving) {
+          return false;
+        }
+
+        if (!configurationWizard && state?.isChanged) {
+          const result = await this.commonDialogService.open(ConfirmationDialog, {
+            title: 'ui_save_reminder',
+            message: 'ui_are_you_sure',
+          });
+
+          if (result === DialogueStateResult.Rejected) {
+            return false;
+          }
+        }
+
+        return true;
+      },
       getContentComponent: () => ServerConfigurationPage,
       getDrawerComponent: () => ServerConfigurationDrawerItem,
     });

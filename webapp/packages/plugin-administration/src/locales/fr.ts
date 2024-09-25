@@ -24,6 +24,7 @@ export default [
   ['administration_configuration_wizard_configuration', 'Configuration du serveur'],
   ['administration_configuration_wizard_configuration_step_description', 'Configuration principale du serveur'],
   ['administration_configuration_wizard_configuration_title', 'Vous pouvez configurer ici les paramètres principaux du serveur.'],
+  ['administration_configuration_wizard_configuration_save_error', 'Failed to save server configuration'],
   [
     'administration_configuration_wizard_configuration_message',
     "Vous pourrez ajouter des services supplémentaires après la configuration du serveur.\nL'administrateur est un super utilisateur qui peut configurer le serveur, définir les connexions aux bases de données, gérer les autres utilisateurs et bien plus encore. Veuillez vous souvenir du mot de passe saisi. Il n'est pas possible de récupérer automatiquement le mot de passe de l'administrateur.",

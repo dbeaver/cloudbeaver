@@ -18,10 +18,6 @@ export const manifest: PluginManifest = {
     () => import('./AuthenticationLocaleService.js').then(m => m.AuthenticationLocaleService),
     () => import('./Administration/Users/UsersTable/CreateUserService.js').then(m => m.CreateUserService),
     () => import('./Administration/Users/UsersAdministrationNavigationService.js').then(m => m.UsersAdministrationNavigationService),
-    () =>
-      import('./Administration/ServerConfiguration/ServerConfigurationAuthenticationBootstrap.js').then(
-        m => m.ServerConfigurationAuthenticationBootstrap,
-      ),
     () => import('./Administration/Users/UserForm/AdministrationUserFormService.js').then(m => m.AdministrationUserFormService),
     () => import('./Administration/Users/Teams/TeamsAdministrationService.js').then(m => m.TeamsAdministrationService),
     () => import('./Administration/Users/Teams/CreateTeamService.js').then(m => m.CreateTeamService),
