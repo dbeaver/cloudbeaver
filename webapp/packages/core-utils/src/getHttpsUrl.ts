@@ -5,8 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-const SERVER_URL_REGEXP = /^(https?:\/\/)?(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(:\d+)?(\/.*)?$/i;
 
-export function isValidServerUrl(value: string): boolean {
-  return SERVER_URL_REGEXP.test(value);
+export function getHttpsUrl(url: string): string {
+  if (url.startsWith('http://')) {
+    return url.replace('http://', 'https://');
+  }
+
+  return url;
 }
