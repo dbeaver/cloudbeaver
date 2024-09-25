@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['administration_server_configuration_save_confirmation_title', 'Aggiornamento delle impostazioni del Server'],
   ['administration_server_configuration_save_confirmation_message', 'Stai per modificare impostazioni critiche. Sei sicuro?'],
@@ -17,6 +24,7 @@ export default [
   ['administration_configuration_wizard_configuration', 'Configurazione del Server'],
   ['administration_configuration_wizard_configuration_step_description', 'Configurazione del server principale'],
   ['administration_configuration_wizard_configuration_title', 'Puoi configurare i parametri del server principale qui.'],
+  ['administration_configuration_wizard_configuration_save_error', 'Failed to save server configuration'],
   [
     'administration_configuration_wizard_configuration_message',
     "L'amministratore è un super utente che può configurare server, impostare connessioni ai database, gestire altri utenti e molto di più. Si prega di ricordare la password inserita: non sarà possibile recuperarla in maniera automatica.",
