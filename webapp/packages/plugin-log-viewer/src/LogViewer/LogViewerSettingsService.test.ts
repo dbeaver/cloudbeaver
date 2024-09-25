@@ -53,19 +53,15 @@ const app = createApp(
 );
 
 const deprecatedSettings = {
-  'core.app.logViewer.refreshTimeout': 1,
   'core.app.logViewer.maxLogRecords': 2,
   'core.app.logViewer.logBatchSize': 3,
-  'core.app.logViewer.maxFailedRequests': 4,
   'core.app.logViewer.disabled': true,
 };
 
 const newSettings = {
   ...deprecatedSettings,
-  'plugin.log-viewer.refreshTimeout': 5,
   'plugin.log-viewer.maxLogRecords': 6,
   'plugin.log-viewer.logBatchSize': 7,
-  'plugin.log-viewer.maxFailedRequests': 8,
   'plugin.log-viewer.disabled': false,
 };
 
@@ -77,10 +73,8 @@ test('New settings override deprecated settings', async () => {
 
   await config.refresh();
 
-  expect(settings.refreshTimeout).toBe(5);
   expect(settings.maxLogRecords).toBe(6);
   expect(settings.logBatchSize).toBe(7);
-  expect(settings.maxFailedRequests).toBe(8);
   expect(settings.disabled).toBe(false);
   expectNoDeprecatedSettingMessage();
 });
@@ -93,10 +87,8 @@ test('Deprecated settings are used if new settings are not defined', async () =>
 
   await config.refresh();
 
-  expect(settings.refreshTimeout).toBe(1);
   expect(settings.maxLogRecords).toBe(2);
   expect(settings.logBatchSize).toBe(3);
-  expect(settings.maxFailedRequests).toBe(4);
   expect(settings.disabled).toBe(true);
   expectDeprecatedSettingMessage();
 });
