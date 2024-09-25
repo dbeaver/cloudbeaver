@@ -121,9 +121,9 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
         return this;
     }
 
-    @NotNull
+    @Nullable
     @Override
-    public DBPProject getOwnerProject() {
+    public DBPProject getOwnerProjectOrNull() {
         List<? extends DBPProject> globalProjects = getModel().getModelProjects();
         if (globalProjects != null) {
             for (DBPProject modelProject : globalProjects) {
@@ -132,7 +132,7 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
                 }
             }
         }
-        throw new IllegalStateException("Project '" + project.getId() + "' not found in workspace");
+        return null;
     }
 
     @Nullable
