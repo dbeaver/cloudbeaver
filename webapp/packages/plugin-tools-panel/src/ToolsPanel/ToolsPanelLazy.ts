@@ -5,9 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-.form {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
+export const ToolsPanel = importLazyComponent(() => import('./ToolsPanel.js').then(module => module.ToolsPanel));

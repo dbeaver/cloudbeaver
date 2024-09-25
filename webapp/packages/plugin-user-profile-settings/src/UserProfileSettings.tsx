@@ -50,8 +50,8 @@ export const UserProfileSettings = observer(function UserProfileSettings() {
 
   return (
     <Form context={form} contents>
-      <ColoredContainer parent compact vertical wrap gap>
-        <Group box keepSize>
+      <ColoredContainer parent overflow compact vertical noWrap gap>
+        <Group overflow box keepSize>
           <ToolsPanel rounded minHeight>
             <ToolsAction icon="admin-save" viewBox="0 0 24 24" disabled={!changed} onClick={() => form.submit()}>
               {translate('ui_processing_save')}
