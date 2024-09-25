@@ -29,14 +29,15 @@ export function useTreeFilter(options: ITreeFilterOptions = {}): Readonly<ITreeF
     () => ({
       filter: '',
       isNodeMatched(treeData: ITreeData, nodeId: string): boolean {
-        if (!this.filter) {
+        const filter = this.filter.trim();
+        if (!filter) {
           return true;
         }
 
-        let isNodeMatched = treeData.getNode(nodeId).name.toLowerCase().includes(this.filter.toLowerCase());
+        let isNodeMatched = treeData.getNode(nodeId).name.toLowerCase().includes(filter);
 
         if (options?.isNodeMatched) {
-          isNodeMatched = options.isNodeMatched(nodeId, this.filter, isNodeMatched);
+          isNodeMatched = options.isNodeMatched(nodeId, filter, isNodeMatched);
         }
 
         return isNodeMatched || treeData.getChildren(nodeId).length > 0;

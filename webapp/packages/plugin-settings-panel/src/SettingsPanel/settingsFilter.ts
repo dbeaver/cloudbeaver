@@ -9,6 +9,7 @@ import type { TranslateFn } from '@cloudbeaver/core-localization';
 import type { ISettingDescription } from '@cloudbeaver/core-settings';
 
 export function settingsFilter(translate: TranslateFn, filter: string) {
+  filter = filter.trim();
   return (setting: ISettingDescription<any>) =>
     translate(setting.name).toLowerCase().includes(filter.toLowerCase()) ||
     translate(setting.description)?.toLowerCase().includes(filter.toLowerCase());
