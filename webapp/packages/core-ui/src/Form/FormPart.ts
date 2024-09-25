@@ -7,7 +7,7 @@
  */
 import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
-import { executorHandlerFilter, ExecutorInterrupter, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
+import { executorHandlerFilter, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import type { IFormPart } from './IFormPart.js';
