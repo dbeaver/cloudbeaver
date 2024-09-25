@@ -36,23 +36,29 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
       icon: driver!.icon,
     }));
 
-  const handleSelect = useCallback((value: string) => {
-    if (serverConfig.disabledDrivers && !serverConfig.disabledDrivers.includes(value)) {
-      serverConfig.disabledDrivers.push(value);
-    }
-  }, []);
+  const handleSelect = useCallback(
+    (value: string) => {
+      if (serverConfig.disabledDrivers && !serverConfig.disabledDrivers.includes(value)) {
+        serverConfig.disabledDrivers.push(value);
+      }
+    },
+    [serverConfig.disabledDrivers],
+  );
 
-  const handleRemove = useCallback((id: string) => {
-    if (!serverConfig.disabledDrivers) {
-      return;
-    }
+  const handleRemove = useCallback(
+    (id: string) => {
+      if (!serverConfig.disabledDrivers) {
+        return;
+      }
 
-    const index = serverConfig.disabledDrivers.indexOf(id);
+      const index = serverConfig.disabledDrivers.indexOf(id);
 
-    if (index !== -1) {
-      serverConfig.disabledDrivers.splice(index, 1);
-    }
-  }, []);
+      if (index !== -1) {
+        serverConfig.disabledDrivers.splice(index, 1);
+      }
+    },
+    [serverConfig.disabledDrivers],
+  );
 
   return (
     <Group maximum gap>
