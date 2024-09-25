@@ -26,11 +26,12 @@ import { ErrorModel, type IErrorInfo } from './ErrorModel.js';
 
 function DisplayErrorInfo({ error }: { error: IErrorInfo }) {
   const styles = useS(style);
+  const translate = useTranslate();
 
   return (
     <>
       <div className={s(styles, { property: true })}>
-        {error.isHtml ? <Iframe srcDoc={error.message} /> : <div className={s(styles, { message: true })}>{error.message}</div>}
+        {error.isHtml ? <Iframe srcDoc={translate(error.message)} /> : <div className={s(styles, { message: true })}>{translate(error.message)}</div>}
       </div>
       {error.stackTrace && (
         <div className={s(styles, { property: true })}>
