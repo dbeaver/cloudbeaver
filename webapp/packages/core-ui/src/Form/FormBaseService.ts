@@ -20,7 +20,6 @@ export class FormBaseService<TState, TProps extends IFormProps<TState> = IFormPr
   readonly parts: TabsContainer<TProps>;
   readonly actionsContainer: PlaceholderContainer<TProps>;
 
-  readonly onPrepareConfig: IExecutorHandlersCollection<TState>;
   readonly onFormat: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onValidate: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onSubmit: IExecutorHandlersCollection<IFormState<TState>>;
@@ -34,15 +33,11 @@ export class FormBaseService<TState, TProps extends IFormProps<TState> = IFormPr
   ) {
     this.parts = new TabsContainer(name);
     this.actionsContainer = new PlaceholderContainer();
-    this.onPrepareConfig = new ExecutorHandlersCollection();
     this.onFormat = new ExecutorHandlersCollection();
     this.onValidate = new ExecutorHandlersCollection();
     this.onSubmit = new ExecutorHandlersCollection();
     this.onLoaded = new ExecutorHandlersCollection();
     this.onState = new ExecutorHandlersCollection();
-
-    this.onSubmit.before(this.onPrepareConfig);
-    this.onState.before(this.onPrepareConfig);
 
     this.onSubmit.addPostHandler(this.handleSubmittingStatus);
     this.onValidate.addPostHandler(this.handleValidation);
