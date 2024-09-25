@@ -31,7 +31,7 @@ function DisplayErrorInfo({ error }: { error: IErrorInfo }) {
   return (
     <>
       <div className={s(styles, { property: true })}>
-        {error.isHtml ? <Iframe srcDoc={translate(error.message)} /> : <div className={s(styles, { message: true })}>{translate(error.message)}</div>}
+        {error.isHtml ? <Iframe srcDoc={error.message} /> : <div className={s(styles, { message: true })}>{translate(error.message)}</div>}
       </div>
       {error.stackTrace && (
         <div className={s(styles, { property: true })}>
