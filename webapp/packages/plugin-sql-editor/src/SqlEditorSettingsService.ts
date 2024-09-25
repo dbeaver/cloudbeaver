@@ -135,7 +135,7 @@ export class SqlEditorSettingsService extends Dependency {
           group: SQL_EDITOR_SETTINGS_GROUP,
           key: 'plugin.sql-editor.maxFileSize',
           access: {
-            scope: ['client'],
+            scope: ['client', 'server'],
           },
           type: ESettingsValueType.Input,
           name: 'plugin_sql_editor_settings_import_max_size',

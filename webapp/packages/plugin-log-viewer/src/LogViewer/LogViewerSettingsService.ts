@@ -16,8 +16,7 @@ import {
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
-
-import { LOG_VIEWER_SETTINGS_GROUP } from './LOG_VIEWER_SETTINGS_GROUP.js';
+import { TOOLS_PANEL_SETTINGS_GROUP } from '@cloudbeaver/plugin-tools-panel';
 
 const defaultSettings = schema.object({
   'plugin.log-viewer.maxLogRecords': schema.coerce.number().default(1000),
@@ -90,7 +89,7 @@ export class LogViewerSettingsService extends Dependency {
         access: {
           scope: ['server'],
         },
-        group: LOG_VIEWER_SETTINGS_GROUP,
+        group: TOOLS_PANEL_SETTINGS_GROUP,
         type: ESettingsValueType.Checkbox,
         name: 'plugin_log_viewer_settings_disable',
         description: 'plugin_log_viewer_settings_disable_description',
