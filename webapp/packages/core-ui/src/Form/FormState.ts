@@ -27,7 +27,6 @@ export class FormState<TState> implements IFormState<TState> {
   state: TState;
 
   statusMessage: string | string[] | null;
-  onShowDetails: VoidFunction | null;
   statusType: ENotificationType | null;
 
   promise: Promise<any> | null;
@@ -59,7 +58,6 @@ export class FormState<TState> implements IFormState<TState> {
     this.parts = new MetadataMap<string, any>();
     this.state = state;
 
-    this.onShowDetails = null;
     this.statusMessage = null;
     this.statusType = null;
 
@@ -203,6 +201,5 @@ export class FormState<TState> implements IFormState<TState> {
 
     this.statusMessage = context.statusMessage;
     this.statusType = context.statusType;
-    this.onShowDetails = context.onShowDetails;
   }
 }
