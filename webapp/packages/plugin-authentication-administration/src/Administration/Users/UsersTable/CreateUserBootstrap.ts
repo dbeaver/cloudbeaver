@@ -41,11 +41,15 @@ export class CreateUserBootstrap extends Bootstrap {
       menus: [MENU_USERS_ADMINISTRATION],
       actions: [ACTION_CREATE],
       isHidden: (context, action) => {
-        if (action === ACTION_CREATE && !this.administrationUsersManagementService.externalUserProviderEnabled) {
-          return !this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);
+        if (
+          action === ACTION_CREATE &&
+          !this.administrationUsersManagementService.externalUserProviderEnabled &&
+          !this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID)
+        ) {
+          return true;
         }
 
-        return true;
+        return false;
       },
       isDisabled: (context, action) => {
         if (action === ACTION_CREATE) {
