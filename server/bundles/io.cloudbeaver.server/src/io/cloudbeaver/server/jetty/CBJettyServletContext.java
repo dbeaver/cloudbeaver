@@ -21,16 +21,27 @@ import io.cloudbeaver.service.DBWServletContext;
 import jakarta.servlet.http.HttpServlet;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.server.Server;
 
 public class CBJettyServletContext implements DBWServletContext {
+    private final Server server;
     private final ServletContextHandler contextHandler;
 
-    public CBJettyServletContext(ServletContextHandler contextHandler) {
+    public CBJettyServletContext(Server server, ServletContextHandler contextHandler) {
+        this.server = server;
         this.contextHandler = contextHandler;
     }
 
     @Override
     public void addServlet(String servletId, HttpServlet servlet, String mapping) {
         contextHandler.addServlet(new ServletHolder(servletId, servlet), mapping);
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public ServletContextHandler getContextHandler() {
+        return contextHandler;
     }
 }

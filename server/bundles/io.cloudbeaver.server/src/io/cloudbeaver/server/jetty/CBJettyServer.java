@@ -16,10 +16,10 @@
  */
 package io.cloudbeaver.server.jetty;
 
-import io.cloudbeaver.server.GQLApplicationAdapter;
+import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.model.config.CBServerConfig;
+import io.cloudbeaver.server.GQLApplicationAdapter;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
@@ -27,7 +27,10 @@ import io.cloudbeaver.server.servlets.CBStatusServlet;
 import io.cloudbeaver.server.servlets.ProxyResourceHandler;
 import io.cloudbeaver.server.websockets.CBJettyWebSocketManager;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
-import org.eclipse.jetty.ee10.servlet.*;
+import org.eclipse.jetty.ee10.servlet.ErrorPageErrorHandler;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.servlet.ServletMapping;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.session.DefaultSessionCache;
 import org.eclipse.jetty.session.DefaultSessionIdManager;
@@ -117,7 +120,7 @@ public class CBJettyServer {
 
                 // Add extensions from services
 
-                CBJettyServletContext servletContext = new CBJettyServletContext(servletContextHandler);
+                CBJettyServletContext servletContext = new CBJettyServletContext(server, servletContextHandler);
                 for (DBWServiceBindingServlet wsd : WebServiceRegistry.getInstance()
                     .getWebServices(DBWServiceBindingServlet.class)
                 ) {
