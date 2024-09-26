@@ -15,6 +15,7 @@ import { MENU_USER_PROFILE } from '@cloudbeaver/plugin-user-profile';
 import { ACTION_DEVTOOLS } from './actions/ACTION_DEVTOOLS.js';
 import { ACTION_DEVTOOLS_MODE_CONFIGURATION } from './actions/ACTION_DEVTOOLS_MODE_CONFIGURATION.js';
 import { ACTION_DEVTOOLS_MODE_DISTRIBUTED } from './actions/ACTION_DEVTOOLS_MODE_DISTRIBUTED.js';
+import { ACTION_DEVTOOLS_OVERRIDE } from './actions/ACTION_DEVTOOLS_OVERRIDE.js';
 import { DATA_CONTEXT_MENU_SEARCH } from './ContextMenu/DATA_CONTEXT_MENU_SEARCH.js';
 import { SearchResourceMenuItem } from './ContextMenu/SearchResourceMenuItem.js';
 import { DevToolsService } from './DevToolsService.js';
@@ -89,7 +90,14 @@ export class PluginBootstrap extends Bootstrap {
           ];
         }
 
-        return [new SearchResourceMenuItem(), ACTION_DEVTOOLS_MODE_DISTRIBUTED, ACTION_DEVTOOLS_MODE_CONFIGURATION, MENU_PLUGINS, ...items];
+        return [
+          new SearchResourceMenuItem(),
+          ACTION_DEVTOOLS_OVERRIDE,
+          ACTION_DEVTOOLS_MODE_DISTRIBUTED,
+          ACTION_DEVTOOLS_MODE_CONFIGURATION,
+          MENU_PLUGINS,
+          ...items,
+        ];
       },
     });
 
@@ -97,6 +105,7 @@ export class PluginBootstrap extends Bootstrap {
       id: 'devtools-mode-configuration',
       actions: [ACTION_DEVTOOLS_MODE_CONFIGURATION],
       isChecked: () => this.devToolsService.isConfiguration,
+      isDisabled: () => !this.devToolsService.isOverride,
       handler: () => {
         this.devToolsService.setConfigurationMode(!this.devToolsService.isConfiguration);
       },
@@ -106,8 +115,18 @@ export class PluginBootstrap extends Bootstrap {
       id: 'devtools-mode-distributed',
       actions: [ACTION_DEVTOOLS_MODE_DISTRIBUTED],
       isChecked: () => this.devToolsService.isDistributed,
+      isDisabled: () => !this.devToolsService.isOverride,
       handler: () => {
         this.devToolsService.setDistributedMode(!this.devToolsService.isDistributed);
+      },
+    });
+
+    this.actionService.addHandler({
+      id: 'devtools-override',
+      actions: [ACTION_DEVTOOLS_OVERRIDE],
+      isChecked: () => this.devToolsService.isOverride,
+      handler: () => {
+        this.devToolsService.setOverride(!this.devToolsService.isOverride);
       },
     });
 
