@@ -12,5 +12,6 @@ export interface IFormStateInfo {
   disabled: boolean;
   readonly: boolean;
   statusMessage: string | string[] | null;
+  onShowDetails: VoidFunction | null;
   statusType: ENotificationType | null;
 }

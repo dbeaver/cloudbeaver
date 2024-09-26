@@ -28,6 +28,7 @@ export interface IFormState<TState> {
   readonly promise: Promise<any> | null;
 
   readonly statusMessage: string | string[] | null;
+  readonly onShowDetails: VoidFunction | null;
   readonly statusType: ENotificationType | null;
 
   readonly loadedTask: IExecutor<IFormState<TState>>;
