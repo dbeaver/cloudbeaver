@@ -30,7 +30,7 @@ export const IconButton: React.FC<IconButtonProps> = observer(function IconButto
   const Button = tag ?? ReakitButton;
 
   return (
-    <Button {...rest} className={s(styles, { iconButton: true }, className)}>
+    <Button tabIndex={0} {...rest} className={s(styles, { iconButton: true }, className)}>
       <div className={s(styles, { iconBox: true })}>
         {img && <StaticImage className={s(styles, { staticImage: true })} icon={name} />}
         {!img && <Icon className={s(styles, { icon: true })} name={name} viewBox={viewBox} />}

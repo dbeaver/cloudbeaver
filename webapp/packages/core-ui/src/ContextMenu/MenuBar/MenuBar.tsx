@@ -18,6 +18,8 @@ import {
   SContext,
   type StyleRegistry,
   useAutoLoad,
+  useListKeyboardNavigation,
+  useMergeRefs,
   useS,
 } from '@cloudbeaver/core-blocks';
 import { type IDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
@@ -52,6 +54,8 @@ const styleRegistry: StyleRegistry = [
 
 export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(
   forwardRef(function MenuBar({ menu, nestedMenuSettings, rtl, className, ...props }, ref) {
+    const refNav = useListKeyboardNavigation();
+    const mergedRef = useMergeRefs(ref, refNav);
     const styles = useS(style);
     const items = menu.items;
     useAutoLoad(MenuBar, menu.loaders);
@@ -62,7 +66,7 @@ export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(
 
     return (
       <SContext registry={styleRegistry}>
-        <div ref={ref} className={s(styles, { menuBar: true }, className)} {...props}>
+        <div ref={mergedRef} className={s(styles, { menuBar: true }, className)} tabIndex={0} {...props}>
           <Loader suspense small>
             {items.map(item => (
               <MenuBarElement key={item.id} item={item} menuData={menu} nestedMenuSettings={nestedMenuSettings} rtl={rtl} />
