@@ -50,7 +50,10 @@ export * from './TreeNew/contexts/TreeContext.js';
 export * from './TreeNew/contexts/TreeDataContext.js';
 export * from './TreeNew/NodeControlLazy.js';
 export * from './TreeNew/useTreeData.js';
+export * from './TreeNew/ITreeData.js';
+export * from './TreeNew/useTreeFilter.js';
 export * from './TreeNew/INode.js';
+export * from './TreeNew/NodeEmptyPlaceholderComponent.js';
 
 export * from './NavigationTree/getNavigationTreeUserSettingsId.js';
 export * from './NodesManager/NavNodeView/IFolderTransform.js';

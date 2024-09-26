@@ -9,7 +9,6 @@ import { Dependency, injectable } from '@cloudbeaver/core-di';
 import {
   createSettingsAliasResolver,
   ROOT_SETTINGS_LAYER,
-  SettingsManagerService,
   SettingsProvider,
   SettingsProviderService,
   SettingsResolverService,
@@ -31,7 +30,6 @@ export class ResourceManagerSettingsService extends Dependency {
 
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
-    private readonly settingsManagerService: SettingsManagerService,
     private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
@@ -43,19 +41,5 @@ export class ResourceManagerSettingsService extends Dependency {
         'plugin.resource-manager.disabled': 'plugin_resource_manager.disabled',
       }),
     );
-
-    this.registerSettings();
-  }
-
-  private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
-      // {
-      //   group: RESOURCE_MANAGER_SETTINGS_GROUP,
-      //   key: 'disabled',
-      //   type: ESettingsValueType.Checkbox,
-      //   name: 'Disable resource manager',
-      //   description: 'use resourceManagerEnabled in server config instead',
-      // },
-    ]);
   }
 }

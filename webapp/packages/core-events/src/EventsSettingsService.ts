@@ -56,14 +56,21 @@ export class EventsSettingsService extends Dependency {
     this.settingsManagerService.registerSettings(this.settings, () => [
       // {
       //   group: NOTIFICATIONS_SETTINGS_GROUP,
-      //   key: 'maxPersistentAllow',
+      //   key: 'plugin.notifications.maxPersistentAllow',
+      //   access: {
+      //     scope: ['client'],
+      //   },
       //   name: 'Max persistent notifications count',
       //   type: ESettingsValueType.Input,
       // },
       // {
       //   group: NOTIFICATIONS_SETTINGS_GROUP,
-      //   key: 'notificationsPool',
-      //   name: 'Max notifications count',
+      //   key: 'plugin.notifications.notificationsPool',
+      //   access: {
+      //     scope: ['client'],
+      //   },
+      //   name: 'core_events_notifications_settings_pool_size',
+      //   description: 'core_events_notifications_settings_pool_size_description',
       //   type: ESettingsValueType.Input,
       // },
     ]);

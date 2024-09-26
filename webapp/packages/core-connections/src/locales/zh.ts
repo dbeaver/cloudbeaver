@@ -92,4 +92,7 @@ export default [
   ['connections_not_found', '未找到数据库连接'],
 
   ['cloud_connections_access_placeholder', '云连接对所有用户可见。可以在“AWS管理控制台”中配置访问管理。'],
+
+  ['core_connections_settings_disable', 'Disable'],
+  ['core_connections_settings_disable_description', 'Disable the ability to create new connections'],
 ];
