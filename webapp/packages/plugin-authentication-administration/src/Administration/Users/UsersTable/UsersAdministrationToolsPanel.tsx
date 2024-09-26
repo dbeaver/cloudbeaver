@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { s, SContext, type StyleRegistry, ToolsAction, ToolsPanel, useTranslate } from '@cloudbeaver/core-blocks';
+import { s, SContext, type StyleRegistry, ToolsAction, ToolsPanel, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
 import { MenuBar, MenuBarItemStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
@@ -32,6 +32,8 @@ const registry: StyleRegistry = [
 export const UsersAdministrationToolsPanel = observer<Props>(function UsersAdministrationToolsPanel({ onUpdate }) {
   const translate = useTranslate();
   const menu = useMenu({ menu: MENU_USERS_ADMINISTRATION });
+
+  useAutoLoad(UsersAdministrationToolsPanel, menu.loaders);
 
   return (
     <ToolsPanel className={s(styles, { toolsPanel: true })} rounded>

@@ -38,13 +38,14 @@ export class CreateUserBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'users-table-base',
+      menus: [MENU_USERS_ADMINISTRATION],
       actions: [ACTION_CREATE],
-      isActionApplicable: (context, action) => {
+      isHidden: (context, action) => {
         if (action === ACTION_CREATE && !this.administrationUsersManagementService.externalUserProviderEnabled) {
-          return this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);
+          return !this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);
         }
 
-        return false;
+        return true;
       },
       isDisabled: (context, action) => {
         if (action === ACTION_CREATE) {
