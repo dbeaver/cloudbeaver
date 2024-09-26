@@ -19,14 +19,16 @@ interface Props {
   resultIndex: number;
   simple: boolean;
   className?: string;
+  tabIndex?: number;
+  'data-table-header'?: boolean;
 }
 
-export const TableHeader = observer<Props>(function TableHeader({ model, resultIndex, simple, className }) {
+export const TableHeader = observer<Props>(function TableHeader({ model, resultIndex, simple, className, ...rest }) {
   const styles = useS(classes);
   const service = useService(TableHeaderService);
 
   return (
-    <header className={s(styles, { tableHeader: true }, className)}>
+    <header {...rest} className={s(styles, { tableHeader: true }, className)}>
       <Placeholder container={service.tableHeaderPlaceholder} model={model} resultIndex={resultIndex} simple={simple} />
     </header>
   );
