@@ -8,7 +8,8 @@
 import { computed, makeObservable } from 'mobx';
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
+import { NAVIGATION_TREE_SETTINGS_GROUP } from '@cloudbeaver/core-navigation-tree';
+import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
@@ -43,9 +44,13 @@ export class NavigationTreeSettingsService extends Dependency {
     this.settingsManagerService.registerSettings(this.settings, () => [
       // {
       //   group: NAVIGATION_TREE_SETTINGS_GROUP,
-      //   key: 'disabled',
+      //   key: 'plugin.navigation-tree.disabled',
+      //   access: {
+      //     scope: ['server'],
+      //   },
       //   type: ESettingsValueType.Checkbox,
-      //   name: 'Disable navigation tree',
+      //   name: 'plugin_navigation_tree_settings_disable',
+      //   description: 'plugin_navigation_tree_settings_disable_description',
       // },
     ]);
   }

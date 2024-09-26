@@ -10,3 +10,4 @@ export * from './LocalizationService.js';
 export * from './Locale.js';
 export * from './TLocalizationToken.js';
 export * from './DEFAULT_LOCALE.js';
+export * from './TranslateFn.js';

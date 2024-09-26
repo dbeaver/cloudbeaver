@@ -67,9 +67,6 @@ import java.net.NetworkInterface;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Path;
-import java.security.Permission;
-import java.security.Policy;
-import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -313,16 +310,6 @@ public abstract class CBApplication<T extends CBServerConfig> extends
                 grantAnonymousAccessToConnections(appConfiguration, CBConstants.ADMIN_AUTO_GRANT);
             }
             grantPermissionsToConnections();
-        }
-
-        if (getServerConfiguration().isEnableSecurityManager()) {
-            Policy.setPolicy(new Policy() {
-                @Override
-                public boolean implies(ProtectionDomain domain, Permission permission) {
-                    return true;
-                }
-            });
-            System.setSecurityManager(new SecurityManager());
         }
 
         eventController.scheduleCheckJob();

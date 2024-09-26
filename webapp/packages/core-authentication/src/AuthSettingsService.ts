@@ -34,7 +34,10 @@ export class AuthSettingsService {
   private registerSettings() {
     this.settingsManagerService.registerSettings(this.settings, () => [
       // {
-      //   key: 'disableAnonymousAccess',
+      //   key: 'core.authentication.disableAnonymousAccess',
+      //   access: {
+      //     scope: ['server'],
+      //   },
       //   type: ESettingsValueType.Checkbox,
       //   name: 'settings_authentication_disable_anonymous_access_name',
       //   description: 'settings_authentication_disable_anonymous_access_description',
