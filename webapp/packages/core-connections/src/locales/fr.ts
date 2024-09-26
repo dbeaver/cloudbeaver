@@ -108,4 +108,7 @@ export default [
     'cloud_connections_access_placeholder',
     'Les connexions cloud sont visibles par tous les utilisateurs. La gestion des accès peut être configurée dans la "AWS Management Console".',
   ],
+
+  ['core_connections_settings_disable', 'Disable'],
+  ['core_connections_settings_disable_description', 'Disable the ability to create new connections'],
 ];

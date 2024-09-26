@@ -10,7 +10,7 @@ import type { INodeState } from '../INodeState.js';
 import type { TreeDataTransformer } from './TreeDataTransformer.js';
 
 export function rootNodeStateTransformer(root: string): TreeDataTransformer<INodeState> {
-  return function rootNodeStateTransformer(nodeId, data) {
+  return function rootNodeStateTransformer(treeData, nodeId, data) {
     if (nodeId === root) {
       return {
         ...data,
@@ -23,7 +23,7 @@ export function rootNodeStateTransformer(root: string): TreeDataTransformer<INod
 }
 
 export function rootNodeTransformer(root: string): TreeDataTransformer<INode> {
-  return function rootNodeTransformer(nodeId, data) {
+  return function rootNodeTransformer(treeData, nodeId, data) {
     if (nodeId === root) {
       return {
         ...data,
