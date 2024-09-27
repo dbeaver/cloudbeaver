@@ -11,5 +11,5 @@ export function getHttpsUrl(url: string): string {
     return url.replace('http://', 'https://');
   }
 
-  return url;
+  return 'https://'.concat(url);
 }
