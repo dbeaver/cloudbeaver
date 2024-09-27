@@ -30,13 +30,7 @@ export class ResourceOffsetPagination<TKey, TMetadata extends ICachedResourceMet
       return undefined;
     }
 
-    const page = this.metadata.get(key as TKey).offsetPage;
-
-    if (!page || !isOffsetPageInRange(page, key.options)) {
-      return undefined;
-    }
-
-    return page;
+    return this.metadata.get(key as TKey).offsetPage;
   }
 
   hasNextPage(key: ResourceAlias<TKey, Readonly<ICachedResourceOffsetPageOptions>>): boolean {
