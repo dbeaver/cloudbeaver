@@ -60,7 +60,7 @@ const rowHeight = 25;
 const headerHeight = 28;
 const MAX_CELL_TEXT_SIZE = 100 * 1024;
 
-export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({ model, actions, resultIndex, simple, className }) {
+export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({ model, actions, resultIndex, simple, className, ...rest }) {
   const translate = useTranslate();
   const styles = useS(classes);
 
@@ -456,8 +456,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
           <TableDataContext.Provider value={tableData}>
             <div
               ref={setContainersRef}
-              className={s(styles, { container: true }, className)}
               tabIndex={-1}
+              {...rest}
+              className={s(styles, { container: true }, className)}
               onKeyDown={handleKeyDown}
               onMouseDown={onMouseDownHandler}
               onMouseMove={onMouseMoveHandler}

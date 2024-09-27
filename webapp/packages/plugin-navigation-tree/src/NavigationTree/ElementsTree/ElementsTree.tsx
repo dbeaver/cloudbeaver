@@ -19,6 +19,8 @@ import {
   Translate,
   TreeNodeNested,
   TreeNodeNestedMessage,
+  useListKeyboardNavigation,
+  useMergeRefs,
   useS,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -89,6 +91,8 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const [treeRootRef, setTreeRootRef] = useState<HTMLDivElement | null>(null);
   const folderExplorer = useElementsTreeFolderExplorer(baseRoot, settings);
+  const listRef = useListKeyboardNavigation('[data-tree-node-control][tabindex]:not(:disabled)');
+  const treeMergedRef = useMergeRefs<HTMLDivElement>(setTreeRootRef, listRef);
 
   const root = folderExplorer.state.folder;
 
@@ -162,7 +166,7 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
   return (
     <>
       <ElementsTreeTools tree={tree} settingsElements={settingsElements} />
-      <div ref={setTreeRootRef} className={s(styles, { treeBox: true })}>
+      <div ref={treeMergedRef} className={s(styles, { treeBox: true })}>
         <ElementsTreeContext.Provider value={context}>
           <div className={s(styles, { box: true }, className)}>
             <FolderExplorer state={folderExplorer}>
