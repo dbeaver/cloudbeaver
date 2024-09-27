@@ -97,7 +97,6 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
             </SContext>
           }
           tabList={navigation.tabIdList}
-          tabIndex={0}
           autoSelect
           enabledBaseActions
           onChange={handleTabChange}

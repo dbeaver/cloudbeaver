@@ -134,6 +134,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
             <MenuButton
               key={relativePosition ? 'link' : 'main'}
               ref={combinedRef}
+              tabIndex={0}
               className={s(styles, { menuButton: true }, className)}
               {...menu}
               visible={menuVisible}
@@ -168,6 +169,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
           <MenuButton
             key={relativePosition ? 'link' : 'main'}
             ref={combinedRef}
+            tabIndex={0}
             className={s(styles, { menuButton: true }, className)}
             {...menu}
             visible={menuVisible}

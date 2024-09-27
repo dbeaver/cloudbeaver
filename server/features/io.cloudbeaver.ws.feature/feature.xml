@@ -15,7 +15,6 @@
     </copyright>
 
     <requires>
-        <import plugin="org.eclipse.core.resources" version="0.0.0" match="greaterOrEqual"/>
         <import plugin="org.eclipse.core.runtime" version="3.7" match="greaterOrEqual"/>
         <!-- Equinox -->
         <import plugin="org.jkiss.dbeaver.launcher" version="0.0.0" match="greaterOrEqual"/>

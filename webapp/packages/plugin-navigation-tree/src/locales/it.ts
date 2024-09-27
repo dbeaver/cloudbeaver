@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['plugin_navigation_tree_explorer_tab_title', 'Explorer'],
   ['app_navigationTree_openNodeTab', 'Apri'],
@@ -33,4 +40,6 @@ export default [
   ['app_navigationTree_drop_here', 'Drop here...'],
   ['plugin_navigation_tree_settings_projects_description', 'Displays elements under project groups'],
   ['plugin_navigation_tree_settings_projects_title', 'Group by Project'],
+  ['plugin_navigation_tree_settings_disable', 'Disable'],
+  ['plugin_navigation_tree_settings_disable_description', 'Disable navigation tree for all users'],
 ];
