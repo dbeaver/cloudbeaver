@@ -127,6 +127,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
       await this.promise;
       this.loaded = true;
       this.exception = null;
+      await this.formState.loadedTask.execute(this.formState);
     } catch (exception: any) {
       this.exception = exception;
     } finally {

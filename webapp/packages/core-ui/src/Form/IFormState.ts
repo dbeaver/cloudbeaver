@@ -30,8 +30,8 @@ export interface IFormState<TState> {
   readonly statusMessage: string | string[] | null;
   readonly statusType: ENotificationType | null;
 
+  readonly loadedTask: IExecutor<IFormState<TState>>;
   readonly formStateTask: IExecutor<TState>;
-  readonly fillDefaultConfigTask: IExecutor<IFormState<TState>>;
   readonly submitTask: IExecutor<IFormState<TState>>;
   readonly formatTask: IExecutor<IFormState<TState>>;
   readonly validationTask: IExecutor<IFormState<TState>>;
