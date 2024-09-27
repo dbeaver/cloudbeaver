@@ -22,15 +22,12 @@ export default [
   ['plugin_connections_menu_connections_label', '连接'],
   ['plugin_connections_action_disconnect_all_label', '断开所有连接'],
   ['settings_connections', '连接'],
-  ['settings_connections_hide_connections_view_name', '仅对管理员显示连接'],
-  ['settings_connections_hide_connections_view_description', '仅对管理员显示连接'],
+  ['settings_connections_hide_connections_view_name', 'Hide connections'],
+  ['settings_connections_hide_connections_view_description', 'Connections will be hidden for all users except administrators'],
 
   ['connections_public_connection_ssl_enable', '启用 SSL'],
 
   ['plugin_connections_connection_form_shared_credentials_manage_info', '您可在此管理凭证 '],
   ['plugin_connections_connection_form_shared_credentials_manage_info_tab_link', '凭证页签'],
-  [
-    'plugin_connections_connection_auth_secret_description',
-    '有多个凭证可用于身份验证.\n请选择您要使用的凭证。',
-  ],
+  ['plugin_connections_connection_auth_secret_description', '有多个凭证可用于身份验证.\n请选择您要使用的凭证。'],
 ];

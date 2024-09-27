@@ -47,4 +47,10 @@ export default [
   ['plugin_sql_editor_action_overlay_title', 'Action requise'],
   ['plugin_sql_editor_overlay_description', "Veuillez rouvrir l'éditeur pour continuer à travailler."],
   ['plugin_sql_editor_action_close_query', 'Fermer toutes les requêtes du même type'],
+  ['plugin_sql_editor_settings_disable', 'Disable'],
+  ['plugin_sql_editor_settings_disable_description', 'Disable SQL editor for all users'],
+  ['plugin_sql_editor_settings_import_max_size', 'Import limit (KB)'],
+  ['plugin_sql_editor_settings_import_max_size_description', 'Maximum file size that can be imported in KB'],
+  ['plugin_sql_editor_settings_auto_save', 'Auto save'],
+  ['plugin_sql_editor_settings_auto_save_description', 'Automatically save the editor content'],
 ];

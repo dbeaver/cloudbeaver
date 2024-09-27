@@ -53,10 +53,11 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
   }
 
   protected async loader(): Promise<ILogEntry[]> {
-    const maxLogEntries = this.logViewerSettingsService.logBatchSize;
+    const maxLogRecords = this.logViewerSettingsService.maxLogRecords;
+    const batchSize = this.logViewerSettingsService.logBatchSize;
 
     const { log } = await this.graphQLService.sdk.readSessionLog({
-      maxEntries: maxLogEntries,
+      maxEntries: batchSize,
       clearEntries: true,
     });
 
@@ -68,8 +69,8 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
     runInAction(() => {
       this.data.unshift(...logs.reverse());
 
-      if (this.data.length > maxLogEntries) {
-        this.data.splice(maxLogEntries, this.data.length - maxLogEntries);
+      if (this.data.length > maxLogRecords) {
+        this.data.splice(maxLogRecords, this.data.length - maxLogRecords);
       }
     });
 
