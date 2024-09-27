@@ -12,7 +12,6 @@
 
 .tab {
   position: relative;
-  outline: none;
   font-weight: normal;
   cursor: pointer;
   padding: 0;
@@ -28,7 +27,7 @@
     border-top-color: var(--theme-negative);
     opacity: 1;
 
-    &:before {
+    &:not(:focus-visible):before {
       display: none;
     }
   }
