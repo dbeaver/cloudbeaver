@@ -7,6 +7,10 @@
  */
 
 export function getHttpsUrl(url: string): string {
+  if (url.startsWith('https://')) {
+    return url;
+  }
+
   if (url.startsWith('http://')) {
     return url.replace('http://', 'https://');
   }
