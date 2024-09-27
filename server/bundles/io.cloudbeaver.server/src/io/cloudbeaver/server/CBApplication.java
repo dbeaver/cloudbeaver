@@ -37,6 +37,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
@@ -53,19 +54,20 @@ import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -201,6 +203,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
             if (!loadServerConfiguration()) {
                 return;
             }
+
             if (CommonUtils.isEmpty(this.getAppConfiguration().getDefaultUserTeam())) {
                 throw new DBException("Default user team must be specified");
             }
@@ -208,6 +211,12 @@ public abstract class CBApplication<T extends CBServerConfig> extends
             log.error(e);
             return;
         }
+        // Set default preferences
+        PrefUtils.setDefaultPreferenceValue(DBWorkbench.getPlatform().getPreferenceStore(),
+            ModelPreferences.UI_DRIVERS_HOME,
+            getServerConfiguration().getDriversLocation());
+        CBPlatform.getInstance().refreshApplicableDrivers();
+
         refreshDisabledDriversConfig();
 
         configurationMode = CommonUtils.isEmpty(getServerConfiguration().getServerName());
@@ -303,7 +312,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
 
         if (configurationMode) {
             // Try to configure automatically
-            performAutoConfiguration(getMainConfigurationFilePath().toFile().getParentFile());
+            performAutoConfiguration(getMainConfigurationFilePath().getParent());
         } else if (!isMultiNode()) {
             var appConfiguration = getServerConfigurationController().getAppConfiguration();
             if (appConfiguration.isGrantConnectionsAccessToAnonymousTeam()) {
@@ -331,7 +340,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
      *
      * @param configPath
      */
-    protected void performAutoConfiguration(File configPath) {
+    protected void performAutoConfiguration(Path configPath) {
         String autoServerName = System.getenv(CBConstants.VAR_AUTO_CB_SERVER_NAME);
         String autoServerURL = System.getenv(CBConstants.VAR_AUTO_CB_SERVER_URL);
         String autoAdminName = System.getenv(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
@@ -340,11 +349,11 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         if (CommonUtils.isEmpty(autoServerName) || CommonUtils.isEmpty(autoAdminName) || CommonUtils.isEmpty(
             autoAdminPassword)) {
             // Try to load from auto config file
-            if (configPath.exists()) {
-                File autoConfigFile = new File(configPath, CBConstants.AUTO_CONFIG_FILE_NAME);
-                if (autoConfigFile.exists()) {
+            if (Files.exists(configPath)) {
+                Path autoConfigFile = configPath.resolve(CBConstants.AUTO_CONFIG_FILE_NAME);
+                if (Files.exists(autoConfigFile)) {
                     Properties autoProps = new Properties();
-                    try (InputStream is = new FileInputStream(autoConfigFile)) {
+                    try (InputStream is = Files.newInputStream(autoConfigFile)) {
                         autoProps.load(is);
 
                         autoServerName = autoProps.getProperty(CBConstants.VAR_AUTO_CB_SERVER_NAME);
@@ -352,7 +361,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
                         autoAdminName = autoProps.getProperty(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
                         autoAdminPassword = autoProps.getProperty(CBConstants.VAR_AUTO_CB_ADMIN_PASSWORD);
                     } catch (IOException e) {
-                        log.error("Error loading auto configuration file '" + autoConfigFile.getAbsolutePath() + "'",
+                        log.error("Error loading auto configuration file '" + autoConfigFile + "'",
                             e);
                     }
                 }

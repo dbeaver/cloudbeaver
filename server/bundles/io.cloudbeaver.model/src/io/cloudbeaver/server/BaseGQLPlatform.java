@@ -96,14 +96,8 @@ public abstract class BaseGQLPlatform extends BasePlatformImpl {
         if (tempFolder == null) {
             // Make temp folder
             monitor.subTask("Create temp folder");
-            tempFolder = workspace.getAbsolutePath().resolve(DBWConstants.WORK_DATA_FOLDER_NAME);
-        }
-        if (!Files.exists(tempFolder)) {
-            try {
-                Files.createDirectories(tempFolder);
-            } catch (IOException e) {
-                log.error("Can't create temp directory " + tempFolder, e);
-            }
+            //we do not use workspace because it can be in external file system
+            tempFolder = getApplication().getHomeDirectory().resolve(DBWConstants.WORK_DATA_FOLDER_NAME);
         }
         Path folder = tempFolder.resolve(name);
         if (!Files.exists(folder)) {
@@ -115,6 +109,9 @@ public abstract class BaseGQLPlatform extends BasePlatformImpl {
         }
         return folder;
     }
+
+    @NotNull
+    public abstract WebApplication getApplication();
 
     @Override
     public synchronized void dispose() {

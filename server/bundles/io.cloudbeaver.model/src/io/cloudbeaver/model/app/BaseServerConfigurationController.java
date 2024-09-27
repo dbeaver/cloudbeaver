@@ -54,31 +54,36 @@ public abstract class BaseServerConfigurationController<T extends WebServerConfi
 
 
     @NotNull
-    protected synchronized Path initWorkspacePath() throws DBException {
+    protected synchronized void initWorkspacePath() throws DBException {
         if (workspacePath != null) {
             log.warn("Workspace directory already initialized: " + workspacePath);
-            return workspacePath;
+            return;
         }
-        String workspaceLocation = getServerConfiguration().getWorkspaceLocation();
+        String workspaceLocation = getWorkspaceLocation();
         URI workspaceUri = URI.create(workspaceLocation);
         if (workspaceUri.getScheme() == null) {
             // default filesystem
-            return getHomeDirectory().resolve(workspaceLocation);
+            this.workspacePath = getHomeDirectory().resolve(workspaceLocation);
+        } else {
+            var externalFsProvider =
+                FileSystemProviderRegistry.getInstance().getFileSystemProviderBySchema(workspaceUri.getScheme());
+            if (externalFsProvider == null) {
+                throw new DBException("File system not found for scheme: " + workspaceUri.getScheme());
+            }
+            ClassLoader fsClassloader = externalFsProvider.getInstance().getClass().getClassLoader();
+            try (FileSystem externalFileSystem = FileSystems.newFileSystem(workspaceUri,
+                System.getenv(),
+                fsClassloader);) {
+                this.workspacePath = externalFileSystem.provider().getPath(workspaceUri);
+            } catch (Exception e) {
+                throw new DBException("Failed to initialize workspace path: " + workspaceUri, e);
+            }
         }
-
-        var externalFsProvider =
-            FileSystemProviderRegistry.getInstance().getFileSystemProviderBySchema(workspaceUri.getScheme());
-        if (externalFsProvider == null) {
-            throw new DBException("File system not found for scheme: " + workspaceUri.getScheme());
-        }
-        ClassLoader fsClassloader = externalFsProvider.getInstance().getClass().getClassLoader();
-        try (FileSystem externalFileSystem = FileSystems.newFileSystem(workspaceUri, System.getenv(), fsClassloader);) {
-            this.workspacePath = externalFileSystem.provider().getPath(workspaceUri);
-            return workspacePath;
-        } catch (Exception e) {
-            throw new DBException("Failed to initialize workspace path: " + workspaceUri, e);
-        }
+        log.info("Workspace path initialized: " + workspacePath);
     }
+
+    @NotNull
+    protected abstract String getWorkspaceLocation();
 
     @NotNull
     protected Path getHomeDirectory() {

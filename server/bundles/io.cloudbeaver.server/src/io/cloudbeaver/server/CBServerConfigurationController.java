@@ -30,16 +30,13 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.ContentUtils;
-import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
 
@@ -100,12 +97,12 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             log.debug("Runtime configuration [" + runtimeConfigPath.toAbsolutePath() + "]");
             loadConfiguration(runtimeConfigPath);
         }
+    }
 
-        // Set default preferences
-        PrefUtils.setDefaultPreferenceValue(DBWorkbench.getPlatform().getPreferenceStore(),
-            ModelPreferences.UI_DRIVERS_HOME,
-            getServerConfiguration().getDriversLocation());
-        CBPlatform.getInstance().refreshApplicableDrivers();
+    @NotNull
+    @Override
+    protected String getWorkspaceLocation() {
+        return getServerConfiguration().getWorkspaceLocation();
     }
 
     public void loadConfiguration(Path configPath) throws DBException {
