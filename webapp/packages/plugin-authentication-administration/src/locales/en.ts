@@ -95,6 +95,7 @@ export default [
   ['administration_identity_providers_wizard_description', 'Add identity providers'],
   ['administration_identity_providers_configuration_add', 'Configuration creation'],
   ['administration_identity_providers_choose_provider_placeholder', 'Select provider...'],
+  ['administration_identity_providers_choose_provider_placeholder_empty', 'No available providers'],
   ['administration_identity_providers_add_tooltip', 'Add new configuration'],
   ['administration_identity_providers_refresh_tooltip', 'Refresh configuration list'],
   ['administration_identity_providers_delete_tooltip', 'Delete selected configurations'],
