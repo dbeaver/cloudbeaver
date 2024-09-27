@@ -97,6 +97,7 @@ export default [
   ['administration_identity_providers_wizard_description', 'Добавьте провайдеры идентификации'],
   ['administration_identity_providers_configuration_add', 'Создание конфигурации'],
   ['administration_identity_providers_choose_provider_placeholder', 'Выберите провайдер...'],
+  ['administration_identity_providers_choose_provider_placeholder_empty', 'Нет доступных провайдеров'],
   ['administration_identity_providers_add_tooltip', 'Добавить новую конфигурацию'],
   ['administration_identity_providers_refresh_tooltip', 'Обновить список конфигураций'],
   ['administration_identity_providers_delete_tooltip', 'Удалить выбранные конфигурации'],

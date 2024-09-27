@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import type { HTMLAttributes } from 'react';
 
 import { CRegistry, s, useS } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
@@ -24,9 +25,10 @@ interface Props {
   model: IDatabaseDataModel;
   simple: boolean;
   className?: string;
+  role?: HTMLAttributes<HTMLDivElement>['role'];
 }
 
-export const TableFooterMenu = observer<Props>(function TableFooterMenu({ resultIndex, model, simple, className }) {
+export const TableFooterMenu = observer<Props>(function TableFooterMenu({ resultIndex, model, simple, role, className }) {
   const styles = useS(MenuBarStyles, MenuBarItemStyles);
   const menu = useMenu({ menu: DATA_VIEWER_DATA_MODEL_ACTIONS_MENU });
 
@@ -38,7 +40,7 @@ export const TableFooterMenu = observer<Props>(function TableFooterMenu({ result
 
   return (
     <CRegistry registry={REFRESH_MENU_ITEM_REGISTRY}>
-      <MenuBar menu={menu} className={s(styles, { floating: true, withLabel: true }, className)} />
+      <MenuBar menu={menu} className={s(styles, { floating: true, withLabel: true }, className)} role={role} />
     </CRegistry>
   );
 });
