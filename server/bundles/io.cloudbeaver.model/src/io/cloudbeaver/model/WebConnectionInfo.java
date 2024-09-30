@@ -445,10 +445,10 @@ public class WebConnectionInfo {
 
     private boolean hasProjectPermission(RMProjectPermission projectPermission) {
         DBPProject project = dataSourceContainer.getProject();
-        if (!(project instanceof WebProjectImpl)) {
+        if (!(project instanceof WebProjectImpl webProject)) {
             return false;
         }
-        return SMUtils.hasProjectPermission(session, ((WebProjectImpl) project).getRmProject(), projectPermission);
+        return SMUtils.hasProjectPermission(session, webProject.getRMProject(), projectPermission);
     }
 
     private boolean canViewReadOnlyConnections() {

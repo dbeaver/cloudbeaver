@@ -1291,8 +1291,7 @@ public class LocalResourceController implements RMController {
                 LocalResourceController.this.workspace,
                 LocalResourceController.this,
                 sessionContext,
-                rmProject,
-                (container) -> true);
+                rmProject);
         }
 
         @NotNull
