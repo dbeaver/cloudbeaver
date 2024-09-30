@@ -87,7 +87,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, DBDriv
 
   async addDriverLibraries(driverId: string, files: File[]) {
     await this.graphQLService.sdk.uploadDriverLibrary(driverId, files);
-    await this.refresh(driverId);
+    await this.markOutdated(driverId);
   }
 
   protected override dataSet(key: string, value: DBDriver): void {
