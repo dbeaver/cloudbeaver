@@ -55,6 +55,14 @@
     border-bottom-color: var(--theme-positive) !important;
   }
 
+  :global(.rdg-cell-custom-highlighted-row) {
+    background: var(--rdg-selected-row-color) !important;
+
+    &:global(.rdg-cell:first-child) {
+      background: var(--data-grid-cell-selection-background-color-focus) !important;
+    }
+  }
+
   :global(.rdg-cell-custom-selected) {
     box-shadow: none !important;
 

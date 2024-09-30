@@ -238,6 +238,10 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
     }
   }
 
+  function hasSelectedInRow(rowIdx: number) {
+    return props.selectionAction.getFocusedElement()?.row.index === rowIdx;
+  }
+
   return useObjectRef<IDataGridSelectionContext>(
     () => ({
       get selectedCells() {
@@ -246,6 +250,7 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
       select,
       selectColumn,
       selectTable,
+      hasSelectedInRow,
       isSelected,
       selectRange,
     }),

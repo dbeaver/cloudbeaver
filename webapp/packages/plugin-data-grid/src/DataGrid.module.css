@@ -42,10 +42,6 @@
     width: 100%;
     height: 100%;
   }
-
-  :global(.rdg-row:has(.rdg-cell[aria-selected='true'])) {
-    background-color: var(--rdg-selected-row-color) !important;
-  }
 }
 
 .dataGrid:focus-within {
