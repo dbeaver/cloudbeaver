@@ -16,11 +16,11 @@
  */
 package io.cloudbeaver.service.sql;
 
-import io.cloudbeaver.model.config.CBAppConfig;
+import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
-import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.utils.CBModelConstants;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.*;
@@ -151,9 +151,11 @@ public class WebSQLUtils {
         if (ContentUtils.isTextContent(value)) {
             String stringValue = ContentUtils.getContentStringValue(session.getProgressMonitor(), value);
             int textPreviewMaxLength = CommonUtils.toInt(
-                CBApplication.getInstance().getAppConfiguration().getResourceQuota(
-                    WebSQLConstants.QUOTA_PROP_TEXT_PREVIEW_MAX_LENGTH,
-                    WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH));
+                WebAppUtils.getWebApplication()
+                    .getAppConfiguration()
+                    .getResourceQuota(WebSQLConstants.QUOTA_PROP_TEXT_PREVIEW_MAX_LENGTH),
+                WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH
+            );
             if (stringValue != null && stringValue.length() > textPreviewMaxLength) {
                 stringValue =  stringValue.substring(0, textPreviewMaxLength);
             }
@@ -164,12 +166,11 @@ public class WebSQLUtils {
             if (binaryValue != null) {
                 byte[] previewValue = binaryValue;
                 // gets parameters from the configuration file
-                CBAppConfig config = CBApplication.getInstance().getAppConfiguration();
+                WebAppConfiguration config = WebAppUtils.getWebApplication().getAppConfiguration();
                 // the max length of the text preview
                 int textPreviewMaxLength = CommonUtils.toInt(
                     config.getResourceQuota(
-                        WebSQLConstants.QUOTA_PROP_TEXT_PREVIEW_MAX_LENGTH,
-                        WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH));
+                        WebSQLConstants.QUOTA_PROP_TEXT_PREVIEW_MAX_LENGTH), WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH);
                 if (previewValue.length > textPreviewMaxLength) {
                     previewValue = Arrays.copyOf(previewValue, textPreviewMaxLength);
                 }
@@ -177,8 +178,8 @@ public class WebSQLUtils {
                 // the max length of the binary preview
                 int binaryPreviewMaxLength = CommonUtils.toInt(
                     config.getResourceQuota(
-                        WebSQLConstants.QUOTA_PROP_BINARY_PREVIEW_MAX_LENGTH,
-                        WebSQLConstants.BINARY_PREVIEW_MAX_LENGTH));
+                        WebSQLConstants.QUOTA_PROP_BINARY_PREVIEW_MAX_LENGTH),
+                    WebSQLConstants.BINARY_PREVIEW_MAX_LENGTH);
                 byte[] inlineValue = binaryValue;
                 if (inlineValue.length > binaryPreviewMaxLength) {
                     inlineValue = Arrays.copyOf(inlineValue, textPreviewMaxLength);
@@ -214,9 +215,11 @@ public class WebSQLUtils {
      */
     public static Object serializeStringValue(Object value) {
         int textPreviewMaxLength = CommonUtils.toInt(
-            CBApplication.getInstance().getAppConfiguration().getResourceQuota(
-                WebSQLConstants.QUOTA_PROP_TEXT_PREVIEW_MAX_LENGTH,
-                WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH));
+            WebAppUtils.getWebApplication()
+                .getAppConfiguration()
+                .getResourceQuota(WebSQLConstants.QUOTA_PROP_TEXT_PREVIEW_MAX_LENGTH),
+            WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH
+        );
         String stringValue = value.toString();
         if (stringValue.length() < textPreviewMaxLength) {
             return value.toString();
