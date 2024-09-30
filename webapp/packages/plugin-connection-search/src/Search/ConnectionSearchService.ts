@@ -128,8 +128,8 @@ export class ConnectionSearchService {
     }
 
     const result = await this.commonDialogService.open(ConfirmationDialog, {
-      title: 'connections_public_connection_edit_cancel_title',
-      message: 'connections_public_connection_edit_cancel_message',
+      title: 'plugin_connections_connection_edit_cancel_title',
+      message: 'plugin_connections_connection_edit_cancel_message',
       confirmActionText: 'ui_processing_ok',
     });
 
