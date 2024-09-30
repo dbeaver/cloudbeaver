@@ -27,6 +27,7 @@ import io.cloudbeaver.server.servlets.CBStatusServlet;
 import io.cloudbeaver.server.servlets.ProxyResourceHandler;
 import io.cloudbeaver.server.websockets.CBJettyWebSocketManager;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
+import io.cloudbeaver.service.DBWServiceBindingWebSocket;
 import org.eclipse.jetty.ee10.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
@@ -120,13 +121,26 @@ public class CBJettyServer {
 
                 // Add extensions from services
 
-                CBJettyServletContext servletContext = new CBJettyServletContext(server, servletContextHandler);
+                CBJettyServletContext servletContext = new CBJettyServletContext(servletContextHandler);
                 for (DBWServiceBindingServlet wsd : WebServiceRegistry.getInstance()
                     .getWebServices(DBWServiceBindingServlet.class)
                 ) {
                     if (wsd.isApplicable(this.application)) {
                         try {
                             wsd.addServlets(this.application, servletContext);
+                        } catch (DBException e) {
+                            log.error(e.getMessage(), e);
+                        }
+                    }
+                }
+
+                CBJettyWebSocketContext webSocketContext = new CBJettyWebSocketContext(server, servletContextHandler);
+                for (DBWServiceBindingWebSocket wsb : WebServiceRegistry.getInstance()
+                    .getWebServices(DBWServiceBindingWebSocket.class)
+                ) {
+                    if (wsb.isApplicable(this.application)) {
+                        try {
+                            wsb.addWebSockets(this.application, webSocketContext);
                         } catch (DBException e) {
                             log.error(e.getMessage(), e);
                         }
@@ -160,6 +174,11 @@ public class CBJettyServer {
                 log.debug("Active servlets:"); //$NON-NLS-1$
                 for (ServletMapping sm : servletContextHandler.getServletHandler().getServletMappings()) {
                     log.debug("\t" + sm.getServletName() + ": " + Arrays.toString(sm.getPathSpecs())); //$NON-NLS-1$
+                }
+
+                log.debug("Active websocket mappings:");
+                for (String mapping : webSocketContext.getMappings()) {
+                    log.debug("\t" + mapping);
                 }
 
             }
