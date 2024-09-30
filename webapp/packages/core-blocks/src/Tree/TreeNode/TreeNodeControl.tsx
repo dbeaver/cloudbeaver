@@ -112,10 +112,11 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
     return (
       <div
         ref={ref}
-        tabIndex={0}
+        tabIndex={context.selected ? 0 : -1}
         title={title}
         aria-selected={context.selected}
         className={s(styles, { treeNodeControl: true }, className)}
+        data-tree-node-control
         onClick={handleClick}
         onMouseDown={handleMouseDown}
         onKeyDown={handleEnter}

@@ -17,7 +17,7 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -58,7 +58,9 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         this.contextInfo = contextInfo;
         this.dataContainer = dataContainer;
         this.dataFormat = dataFormat;
-        rowLimit = CBApplication.getInstance().getAppConfiguration().getResourceQuota(WebSQLConstants.QUOTA_PROP_ROW_LIMIT);
+        rowLimit = WebAppUtils.getWebApplication()
+            .getAppConfiguration()
+            .getResourceQuota(WebSQLConstants.QUOTA_PROP_ROW_LIMIT);
     }
 
     public WebSQLQueryResultSet getResultSet() {

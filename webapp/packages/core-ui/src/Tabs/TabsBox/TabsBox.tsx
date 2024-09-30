@@ -58,7 +58,7 @@ export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox
         enabledBaseActions={enabledBaseActions}
         onChange={onChange}
       >
-        <div ref={ref} className={s(style, { tabsBox: true }, className)} tabIndex={tabIndex}>
+        <div ref={ref} className={s(style, { tabsBox: true }, className)} tabIndex={tabIndex ?? -1}>
           {tabs && <div className={s(style, { tabs: true }, tabsClassName)}>{tabs}</div>}
           <div className={s(style, { tabPanels: true })}>{children}</div>
         </div>

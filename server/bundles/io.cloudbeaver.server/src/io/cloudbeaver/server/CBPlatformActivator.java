@@ -28,7 +28,7 @@ public class CBPlatformActivator extends WebPlatformActivator {
     protected void shutdownPlatform() {
         try {
             // Dispose core
-            if (DBWorkbench.getPlatform() instanceof CBPlatform cbPlatform) {
+            if (DBWorkbench.isPlatformStarted() && DBWorkbench.getPlatform() instanceof CBPlatform cbPlatform) {
                 cbPlatform.dispose();
             }
         } catch (Throwable e) {
