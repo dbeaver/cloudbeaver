@@ -23,11 +23,11 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
+import org.jkiss.utils.IOUtils;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
@@ -84,7 +84,7 @@ public class RMFileLockController {
                     .build();
                 Path projectLockFile = getProjectLockFilePath(projectId);
 
-                if (!lockFolderPath.getFileSystem().equals(FileSystems.getDefault())) {
+                if (!IOUtils.isFileFromDefaultFS(lockFolderPath)) {
                     // fake lock for external file system?
                     return new RMLock(projectLockFile);
                 }

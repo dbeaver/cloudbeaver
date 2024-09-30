@@ -34,6 +34,8 @@ import org.jkiss.dbeaver.runtime.SecurityProviderUtils;
 import org.jkiss.dbeaver.runtime.qm.QMLogFileWriter;
 import org.jkiss.dbeaver.runtime.qm.QMRegistryImpl;
 import org.jkiss.dbeaver.utils.ContentUtils;
+import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.StandardConstants;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,7 +43,7 @@ import java.nio.file.Path;
 
 public abstract class BaseGQLPlatform extends BasePlatformImpl {
     private static final Log log = Log.getLog(BaseGQLPlatform.class);
-    public static final String WORK_DATA_FOLDER_NAME = ".work-data";
+    public static final String BASE_TEMP_DIR = "dbeaver";
 
     private Path tempFolder;
 
@@ -93,11 +95,13 @@ public abstract class BaseGQLPlatform extends BasePlatformImpl {
 
     @NotNull
     public Path getTempFolder(@NotNull DBRProgressMonitor monitor, @NotNull String name) {
+
         if (tempFolder == null) {
-            // Make temp folder
-            monitor.subTask("Create temp folder");
-            //we do not use workspace because it can be in external file system
-            tempFolder = getApplication().getHomeDirectory().resolve(DBWConstants.WORK_DATA_FOLDER_NAME);
+            synchronized (this) {
+                if (tempFolder == null) {
+                    initTempFolder(monitor);
+                }
+            }
         }
         Path folder = tempFolder.resolve(name);
         if (!Files.exists(folder)) {
@@ -108,6 +112,18 @@ public abstract class BaseGQLPlatform extends BasePlatformImpl {
             }
         }
         return folder;
+    }
+
+    private void initTempFolder(@NotNull DBRProgressMonitor monitor) {
+        // Make temp folder
+        monitor.subTask("Create temp folder");
+        String sysTempFolder = System.getProperty(StandardConstants.ENV_TMP_DIR);
+        if (CommonUtils.isNotEmpty(sysTempFolder)) {
+            tempFolder = Path.of(sysTempFolder).resolve(BASE_TEMP_DIR).resolve(DBWConstants.WORK_DATA_FOLDER_NAME);
+        } else {
+            //we do not use workspace because it can be in external file system
+            tempFolder = getApplication().getHomeDirectory().resolve(DBWConstants.WORK_DATA_FOLDER_NAME);
+        }
     }
 
     @NotNull

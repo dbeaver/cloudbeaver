@@ -37,7 +37,7 @@ public abstract class BaseServerConfigurationController<T extends WebServerConfi
     @NotNull
     private final Path homeDirectory;
 
-    private Path workspacePath;
+    protected Path workspacePath;
 
     protected BaseServerConfigurationController(@NotNull Path homeDirectory) {
         this.homeDirectory = homeDirectory;

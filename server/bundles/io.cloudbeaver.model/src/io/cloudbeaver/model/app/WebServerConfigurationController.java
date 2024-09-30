@@ -44,4 +44,6 @@ public interface WebServerConfigurationController<T extends WebServerConfigurati
 
     @NotNull
     Gson getGson();
+
+    void validateFinalServerConfiguration() throws DBException;
 }

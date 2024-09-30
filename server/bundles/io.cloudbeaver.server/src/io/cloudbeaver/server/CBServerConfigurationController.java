@@ -30,15 +30,19 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.ContentUtils;
+import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.IOUtils;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -97,6 +101,11 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             log.debug("Runtime configuration [" + runtimeConfigPath.toAbsolutePath() + "]");
             loadConfiguration(runtimeConfigPath);
         }
+        // Set default preferences
+        PrefUtils.setDefaultPreferenceValue(DBWorkbench.getPlatform().getPreferenceStore(),
+            ModelPreferences.UI_DRIVERS_HOME,
+            getServerConfiguration().getDriversLocation());
+        validateFinalServerConfiguration();
     }
 
     @NotNull
@@ -147,7 +156,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         );
         // App config
         Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
-        validateConfiguration(appConfig);
+        preValidateAppConfiguration(appConfig);
         gson.fromJson(gson.toJson(appConfig), CBAppConfig.class);
         readProductConfiguration(serverConfig, gson);
     }
@@ -182,9 +191,10 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         return config;
     }
 
-    protected void validateConfiguration(Map<String, Object> appConfig) throws DBException {
+    protected void preValidateAppConfiguration(Map<String, Object> appConfig) throws DBException {
 
     }
+
 
     private void readExternalProperties(Map<String, Object> serverConfig) {
         String externalPropertiesFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_EXTERNAL_PROPERTIES);
@@ -248,21 +258,23 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             }
         }
 
-//        // Add product config from runtime
-//        File rtConfig = getRuntimeProductConfigFilePath().toFile();
-//        if (rtConfig.exists()) {
-//            log.debug("Load product runtime configuration from '" + rtConfig.getAbsolutePath() + "'");
-//            try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
-//                var runtimeProductSettings = JSONUtils.parseMap(gson, reader);
-//                var productSettings = serverConfiguration.getProductSettings();
-//                runtimeProductSettings.putAll(productSettings);
-//                Map<String, Object> flattenConfig = WebAppUtils.flattenMap(runtimeProductSettings);
-//                productSettings.clear();
-//                productSettings.putAll(flattenConfig);
-//            } catch (Exception e) {
-//                throw new DBException("Error reading product runtime configuration", e);
-//            }
-//        }
+        if (workspacePath != null && IOUtils.isFileFromDefaultFS(getWorkspacePath())) {
+            // Add product config from runtime
+            Path rtConfig = getRuntimeProductConfigFilePath();
+            if (Files.exists(rtConfig)) {
+                log.debug("Load product runtime configuration from '" + rtConfig + "'");
+                try (Reader reader = new InputStreamReader(Files.newInputStream(rtConfig), StandardCharsets.UTF_8)) {
+                    var runtimeProductSettings = JSONUtils.parseMap(gson, reader);
+                    var productSettings = serverConfiguration.getProductSettings();
+                    runtimeProductSettings.putAll(productSettings);
+                    Map<String, Object> flattenConfig = WebAppUtils.flattenMap(runtimeProductSettings);
+                    productSettings.clear();
+                    productSettings.putAll(flattenConfig);
+                } catch (Exception e) {
+                    throw new DBException("Error reading product runtime configuration", e);
+                }
+            }
+        }
     }
 
     protected Map<String, Object> readConnectionsPermissionsConfiguration(Path parentPath) {
@@ -633,5 +645,10 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     @Override
     public Map<String, Object> getOriginalConfigurationProperties() {
         return originalConfigurationProperties;
+    }
+
+    @Override
+    public void validateFinalServerConfiguration() throws DBException {
+
     }
 }

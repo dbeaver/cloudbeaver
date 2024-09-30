@@ -37,7 +37,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
@@ -54,7 +53,6 @@ import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
 import org.jkiss.dbeaver.utils.GeneralUtils;
-import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -211,11 +209,6 @@ public abstract class CBApplication<T extends CBServerConfig> extends
             log.error(e);
             return;
         }
-        // Set default preferences
-        PrefUtils.setDefaultPreferenceValue(DBWorkbench.getPlatform().getPreferenceStore(),
-            ModelPreferences.UI_DRIVERS_HOME,
-            getServerConfiguration().getDriversLocation());
-        CBPlatform.getInstance().refreshApplicableDrivers();
 
         refreshDisabledDriversConfig();
 
