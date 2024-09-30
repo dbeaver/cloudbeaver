@@ -60,6 +60,7 @@ export const UsersResourceNewUsers = resourceKeyListAlias('@users-resource/new-u
 interface UserCreateOptions {
   userId: string;
   authRole?: string;
+  enabled?: boolean;
 }
 
 @injectable()
@@ -137,11 +138,11 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     });
   }
 
-  async create({ userId, authRole }: UserCreateOptions): Promise<AdminUser> {
+  async create({ userId, authRole, enabled }: UserCreateOptions): Promise<AdminUser> {
     const { user } = await this.graphQLService.sdk.createUser({
       userId,
       authRole,
-      enabled: false,
+      enabled: enabled ?? false,
       ...this.getIncludesMap(userId),
     });
 
