@@ -15,7 +15,6 @@
   --rdg-row-hover-background-color: var(--theme-sub-secondary) !important;
   --rdg-cell-frozen-box-shadow: none !important;
   --rdg-selection-color: #0091ea !important;
-  --rdg-selected-row-color: var(--theme-secondary) !important;
 
   outline: 0 !important;
   height: 100% !important;
