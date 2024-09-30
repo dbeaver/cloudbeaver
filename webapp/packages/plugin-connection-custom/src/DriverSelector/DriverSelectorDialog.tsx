@@ -31,7 +31,7 @@ export const DriverSelectorDialog: DialogComponent<null> = observer(function Dri
 
   return (
     <CommonDialogWrapper size="large" autofocus={false} fixedSize>
-      <CommonDialogHeader title={translate('basicConnection_connectionDialog_newConnection')} />
+      <CommonDialogHeader title={translate('plugin_connections_new_connection_dialog_title')} />
       <CommonDialogBody noBodyPadding noOverflow>
         <DriverSelector className={s(style, { driverSelector: true })} drivers={enabledDrivers} onSelect={dialog.select} />
       </CommonDialogBody>

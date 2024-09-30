@@ -68,7 +68,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
             mod={['primary']}
             disabled={disabled || readonly}
           >
-            {translate('connections_public_connection_ssl_enable')}
+            {translate('plugin_connections_connection_ssl_enable')}
           </Switch>
           {isUncategorizedExists && (
             <ObjectPropertyInfoForm
