@@ -19,3 +19,4 @@ export * from './ConfigurationWizard/ServerConfiguration/Form/ServerConfiguratio
 export * from './ConfigurationWizard/ServerConfiguration/IServerConfigurationPageState.js';
 export * from './ConfigurationWizard/ServerConfiguration/ServerConfigurationService.js';
 export * from './ConfigurationWizard/ServerConfigurationAdministrationNavService.js';
+export * from './ConfigurationWizard/ServerConfiguration/ADMINISTRATION_SERVER_CONFIGURATION_ITEM.js';

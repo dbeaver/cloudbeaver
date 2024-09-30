@@ -71,7 +71,7 @@ public class ReverseProxyConfigurator implements DBWServiceServerConfigurator {
             smReverseProxyProviderConfiguration.setProvider(RPAuthProvider.AUTH_PROVIDER);
             smReverseProxyProviderConfiguration.setDisplayName("Reverse Proxy");
             smReverseProxyProviderConfiguration.setDescription(
-                "Automatically created provider after changing Reverse Proxy configuration way in 23.3.4 version"
+                "This provider was created automatically"
             );
             smReverseProxyProviderConfiguration .setIconURL("");
             Map<String, Object> parameters = new HashMap<>();
