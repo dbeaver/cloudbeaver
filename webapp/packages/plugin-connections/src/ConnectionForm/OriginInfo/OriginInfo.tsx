@@ -96,7 +96,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
     return (
       <ColoredContainer className={s(style, { coloredContainer: true })} parent>
         <TextPlaceholder>
-          {translate('connections_public_connection_cloud_auth_required', undefined, {
+          {translate('plugin_connections_connection_cloud_auth_required', undefined, {
             providerLabel: providerLoader.data?.label,
           })}
         </TextPlaceholder>

@@ -7,7 +7,6 @@
  */
 import React from 'react';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { FormMode } from '@cloudbeaver/core-ui';
 
@@ -25,10 +24,7 @@ const UserFormOriginInfoTab = React.lazy(async () => {
 
 @injectable()
 export class UserFormOriginPartBootstrap extends Bootstrap {
-  constructor(
-    private readonly administrationUserFormService: AdministrationUserFormService,
-    private readonly usersResource: UsersResource,
-  ) {
+  constructor(private readonly administrationUserFormService: AdministrationUserFormService) {
     super();
   }
 

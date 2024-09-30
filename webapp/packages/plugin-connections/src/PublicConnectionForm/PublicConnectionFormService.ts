@@ -190,8 +190,8 @@ export class PublicConnectionFormService {
     }
 
     const result = await this.commonDialogService.open(ConfirmationDialog, {
-      title: 'connections_public_connection_edit_cancel_title',
-      message: 'connections_public_connection_edit_cancel_message',
+      title: 'plugin_connections_connection_edit_cancel_title',
+      message: 'plugin_connections_connection_edit_cancel_message',
       confirmActionText: 'ui_processing_ok',
     });
 
@@ -200,8 +200,8 @@ export class PublicConnectionFormService {
 
   private async tryReconnect(connectionKey: IConnectionInfoParams) {
     const result = await this.commonDialogService.open(ConfirmationDialog, {
-      title: 'connections_public_connection_edit_reconnect_title',
-      message: 'connections_public_connection_edit_reconnect_message',
+      title: 'plugin_connections_connection_edit_reconnect_title',
+      message: 'plugin_connections_connection_edit_reconnect_message',
       confirmActionText: 'ui_reconnect',
     });
 
@@ -213,7 +213,7 @@ export class PublicConnectionFormService {
       await this.connectionInfoResource.close(connectionKey);
       await this.connectionsManagerService.requireConnection(connectionKey);
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'connections_public_connection_edit_reconnect_failed');
+      this.notificationService.logException(exception, 'plugin_connections_connection_edit_reconnect_failed');
     }
   }
 

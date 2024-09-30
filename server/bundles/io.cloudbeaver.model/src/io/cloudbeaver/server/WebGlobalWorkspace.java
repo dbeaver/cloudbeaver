@@ -17,6 +17,7 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.WebProjectImpl;
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.code.NotNull;
@@ -48,7 +49,10 @@ public class WebGlobalWorkspace extends BaseWorkspaceImpl {
     private WebGlobalProject globalProject;
 
     public WebGlobalWorkspace(DBPPlatform platform) {
-        super(platform, Path.of(getWorkspaceURI()));
+        super(platform,
+            platform.getApplication().isMultiuser()
+                ? Path.of(getWorkspaceURI())
+                : ((WebApplication) platform.getApplication()).getWorkspaceDirectory());
     }
 
     @NotNull

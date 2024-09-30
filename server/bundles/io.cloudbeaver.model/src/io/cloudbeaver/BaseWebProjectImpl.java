@@ -38,21 +38,18 @@ public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMCo
     @NotNull
     private final Path path;
     @NotNull
-    protected final DataSourceFilter dataSourceFilter;
     private final RMController resourceController;
 
     public BaseWebProjectImpl(
         @NotNull DBPWorkspace workspace,
         @NotNull RMController resourceController,
         @NotNull SMSessionContext sessionContext,
-        @NotNull RMProject project,
-        @NotNull DataSourceFilter dataSourceFilter
+        @NotNull RMProject project
     ) {
         super(workspace, sessionContext);
         this.resourceController = resourceController;
         this.path = RMUtils.getProjectPath(project);
         this.project = project;
-        this.dataSourceFilter = dataSourceFilter;
     }
 
     @NotNull
@@ -102,11 +99,6 @@ public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMCo
     @Override
     public boolean isUseSecretStorage() {
         return false;
-    }
-
-    @NotNull
-    public RMProject getRmProject() {
-        return this.project;
     }
 
     /**
