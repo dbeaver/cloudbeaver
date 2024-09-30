@@ -129,16 +129,11 @@ public class WebSession extends BaseWebSession
         @NotNull WebAuthApplication application,
         @NotNull Map<String, DBWSessionHandler> sessionHandlers
     ) throws DBException {
-        super(requestInfo.getId(), application);
-        this.lastAccessTime = this.createTime;
-        setLocale(CommonUtils.toString(requestInfo.getLocale(), this.locale));
-        this.sessionHandlers = sessionHandlers;
-        //force authorization of anonymous session to avoid access error,
-        //because before authorization could be called by any request,
-        //but now 'updateInfo' is called only in special requests,
-        //and the order of requests is not guaranteed.
-        //look at CB-4747
-        refreshSessionAuth();
+        this(requestInfo.getId(),
+            CommonUtils.toString(requestInfo.getLocale()),
+            application,
+            sessionHandlers
+        );
         updateSessionParameters(requestInfo);
     }
 
@@ -151,7 +146,7 @@ public class WebSession extends BaseWebSession
         super(id, application);
         this.lastAccessTime = this.createTime;
         this.sessionHandlers = sessionHandlers;
-        setLocale(locale);
+        setLocale(CommonUtils.toString(locale, this.locale));
         //force authorization of anonymous session to avoid access error,
         //because before authorization could be called by any request,
         //but now 'updateInfo' is called only in special requests,
@@ -431,7 +426,7 @@ public class WebSession extends BaseWebSession
     }
 
     @NotNull
-    private Set<String> readAccessibleConnectionIds() {
+    protected Set<String> readAccessibleConnectionIds() {
         try {
             return getSecurityController()
                 .getAllAvailableObjectsPermissions(SMObjectType.datasource)
@@ -493,7 +488,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    private synchronized void refreshAccessibleConnectionIds() {
+    protected synchronized void refreshAccessibleConnectionIds() {
         this.accessibleConnectionIds = readAccessibleConnectionIds();
     }
 
