@@ -98,7 +98,7 @@ public class WebSession extends BaseWebSession
     private String locale;
     private boolean cacheExpired;
 
-    private WebSessionGlobalProjectImpl globalProject;
+    protected WebSessionGlobalProjectImpl globalProject;
     private final List<WebServerMessage> sessionMessages = new ArrayList<>();
 
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
@@ -328,12 +328,10 @@ public class WebSession extends BaseWebSession
         return sessionProject;
     }
 
-    private WebSessionProjectImpl createGlobalProject(RMProject project) {
-        WebSessionProjectImpl sessionProject;
-        this.globalProject = new WebSessionGlobalProjectImpl(this, project);
+    protected WebSessionProjectImpl createGlobalProject(RMProject project) {
+        globalProject = new WebSessionGlobalProjectImpl(this, project);
         globalProject.refreshAccessibleConnectionIds();
-        sessionProject = globalProject;
-        return sessionProject;
+        return globalProject;
     }
 
     private void resetSessionCache() throws DBCException {
