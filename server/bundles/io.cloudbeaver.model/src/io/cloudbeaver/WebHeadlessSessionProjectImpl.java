@@ -31,7 +31,6 @@ public class WebHeadlessSessionProjectImpl extends WebProjectImpl {
             session.getUserContext().getRmController(),
             session.getSessionContext(),
             project,
-            dataSourceFilter,
             session.getUserContext().getPreferenceStore()
         );
     }
