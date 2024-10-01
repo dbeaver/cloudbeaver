@@ -87,9 +87,13 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
     { row, column, rowIdx, isCellSelected },
   );
 
+  const isDatabaseActionApplied = getComputed(() =>
+    [DatabaseEditChangeType.add, DatabaseEditChangeType.delete, DatabaseEditChangeType.update].includes(cellContext.editionState!),
+  );
+
   const classes = getComputed(() =>
     clsx({
-      'rdg-cell-custom-highlighted-row': cellContext.hasFocusedElementInRow,
+      'rdg-cell-custom-highlighted-row': cellContext.hasFocusedElementInRow && !isDatabaseActionApplied,
       'rdg-cell-custom-selected': cellContext.isSelected,
       'rdg-cell-custom-editing': cellContext.isEditing,
       'rdg-cell-custom-added': cellContext.editionState === DatabaseEditChangeType.add,

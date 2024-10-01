@@ -35,6 +35,7 @@ import {
 
 import { type CellPosition, EditingContext } from '../Editing/EditingContext.js';
 import { useEditing } from '../Editing/useEditing.js';
+import { DATA_GRID_BASE_STYLES } from '../theme/styles.js';
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
 import { DataGridContext, type IColumnResizeInfo, type IDataGridContext } from './DataGridContext.js';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
@@ -62,7 +63,7 @@ const MAX_CELL_TEXT_SIZE = 100 * 1024;
 
 export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({ model, actions, resultIndex, simple, className, ...rest }) {
   const translate = useTranslate();
-  const styles = useS(classes);
+  const styles = useS(classes, DATA_GRID_BASE_STYLES);
 
   const clipboardService = useService(ClipboardService);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
