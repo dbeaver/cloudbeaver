@@ -64,7 +64,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
   override register(): void {
     this.connectionFormService.tabsContainer.add({
       key: 'options',
-      name: 'customConnection_main',
+      name: 'plugin_connections_connection_form_part_main',
       order: 1,
       panel: () => Options,
     });
@@ -382,7 +382,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     if (!this.userInfoResource.hasToken(providerId)) {
       const provider = await this.authProvidersResource.load(providerId);
-      const message = this.localizationService.translate('connections_public_connection_cloud_auth_required', undefined, {
+      const message = this.localizationService.translate('plugin_connections_connection_cloud_auth_required', undefined, {
         providerLabel: provider.label,
       });
       stateContext.setInfo(message);

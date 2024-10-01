@@ -35,8 +35,8 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
   override register(): void {
     this.connectionFormService.tabsContainer.add({
       key: 'driver_properties',
-      name: 'customConnection_properties',
-      title: 'customConnection_properties',
+      name: 'plugin_connections_connection_form_part_properties',
+      title: 'plugin_connections_connection_form_part_properties',
       order: 2,
       panel: () => DriverPropertiesLoader,
       isDisabled: (tabId, props) => {
