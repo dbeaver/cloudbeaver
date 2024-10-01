@@ -52,8 +52,12 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
       get isSelected(): boolean {
         return selectionContext.isSelected(this.position.rowIdx, this.position.idx) || false;
       },
-      get hasSelectedInRow(): boolean {
-        return selectionContext.hasSelectedInRow(this.rowIdx);
+      get hasFocusedElementInRow(): boolean {
+        const focusedElement = this.focusedElementPosition;
+        return focusedElement?.rowIdx === this.position.rowIdx;
+      },
+      get focusedElementPosition() {
+        return selectionContext.getFocusedElementPosition();
       },
       get isFocused(): boolean {
         return this.isEditing ? false : this.isCellSelected;
@@ -73,7 +77,8 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
       isCellSelected: observable.ref,
       position: computed,
       cell: computed,
-      hasSelectedInRow: computed,
+      hasFocusedElementInRow: computed,
+      focusedElementPosition: computed,
       isEditing: computed,
       isSelected: computed,
       isFocused: computed,
@@ -84,7 +89,7 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
 
   const classes = getComputed(() =>
     clsx({
-      'rdg-cell-custom-highlighted-row': cellContext.hasSelectedInRow,
+      'rdg-cell-custom-highlighted-row': cellContext.hasFocusedElementInRow,
       'rdg-cell-custom-selected': cellContext.isSelected,
       'rdg-cell-custom-editing': cellContext.isEditing,
       'rdg-cell-custom-added': cellContext.editionState === DatabaseEditChangeType.add,

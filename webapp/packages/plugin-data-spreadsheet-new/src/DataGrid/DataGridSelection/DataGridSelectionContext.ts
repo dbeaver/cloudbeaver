@@ -17,7 +17,10 @@ export interface IDataGridSelectionContext {
   selectColumn: (colIdx: number, multiple: boolean) => void;
   selectTable: () => void;
   isSelected: (rowIdx: number, colIdx: number) => boolean;
-  hasSelectedInRow: (rowIdx: number) => boolean;
+  getFocusedElementPosition: () => {
+    rowIdx: number;
+    columnIdx: number;
+  } | null;
   selectRange: (startPosition: IDraggingPosition, lastPosition: IDraggingPosition, multiple: boolean, temporary: boolean) => void;
 }
 
