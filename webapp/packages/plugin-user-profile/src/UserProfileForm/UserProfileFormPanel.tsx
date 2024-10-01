@@ -41,8 +41,8 @@ export const UserProfileFormPanel: TabContainerPanelComponent = observer(functio
 
         if (state.isChanged && !context.force) {
           const result = await commonDialogService.open(ConfirmationDialog, {
-            title: 'connections_public_connection_edit_cancel_title',
-            message: 'connections_public_connection_edit_cancel_message',
+            title: 'plugin_connections_connection_edit_cancel_title',
+            message: 'plugin_connections_connection_edit_cancel_message',
             confirmActionText: 'ui_processing_ok',
           });
 

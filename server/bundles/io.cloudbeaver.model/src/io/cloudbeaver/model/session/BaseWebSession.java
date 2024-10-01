@@ -72,6 +72,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         return new WebUserContext(this.application, this.workspace);
     }
 
+    @NotNull
     public WebSessionWorkspace getWorkspace() {
         return workspace;
     }

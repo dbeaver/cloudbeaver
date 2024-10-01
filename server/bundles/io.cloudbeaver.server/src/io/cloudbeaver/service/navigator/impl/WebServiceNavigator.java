@@ -230,7 +230,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             filter.setEnabled(true);
             if (node instanceof DBNDatabaseNode dbNode) {
                 dbNode.setNodeFilter(dbNode.getItemsMeta(), filter, true);
-                if (hasNodeEditPermission(webSession, node, ((WebProjectImpl) node.getOwnerProject()).getRmProject())) {
+                if (hasNodeEditPermission(webSession, node, ((WebProjectImpl) node.getOwnerProject()).getRMProject())) {
                     // Save settings
                     dbNode.getDataSourceContainer().persistConfiguration();
                 }
@@ -571,7 +571,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
     private void checkProjectEditAccess(DBNNode node, WebSession session) throws DBException {
         BaseWebProjectImpl project = (BaseWebProjectImpl) node.getOwnerProject();
-        if (project == null || !hasNodeEditPermission(session, node, project.getRmProject())) {
+        if (project == null || !hasNodeEditPermission(session, node, project.getRMProject())) {
             throw new DBException("Access denied");
         }
     }

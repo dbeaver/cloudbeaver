@@ -88,7 +88,7 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
                 throw new IllegalArgumentException("Missing required parameters");
             }
 
-            WebConnectionInfo webConnectionInfo = session.getWebConnectionInfo(projectId, connectionId);
+            WebConnectionInfo webConnectionInfo = session.getAccessibleProjectById(projectId).getWebConnectionInfo(connectionId);
             WebSQLProcessor processor = WebServiceBindingSQL.getSQLProcessor(webConnectionInfo);
             WebSQLContextInfo webSQLContextInfo = processor.getContext(contextId);
 
