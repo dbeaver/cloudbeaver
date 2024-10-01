@@ -23,8 +23,7 @@ import org.jkiss.dbeaver.model.rm.RMProject;
 public class WebHeadlessSessionProjectImpl extends WebProjectImpl {
     public WebHeadlessSessionProjectImpl(
         @NotNull WebHeadlessSession session,
-        @NotNull RMProject project,
-        @NotNull DataSourceFilter dataSourceFilter
+        @NotNull RMProject project
     ) {
         super(
             session.getWorkspace(),
