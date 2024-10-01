@@ -46,7 +46,7 @@ export class ConnectionSSHTabService extends Bootstrap {
   override register(): void {
     this.connectionFormService.tabsContainer.add({
       key: 'ssh',
-      name: 'customConnection_main',
+      name: 'plugin_connections_connection_form_part_main',
       order: 3,
       tab: () => SSHTab,
       panel: () => SSHPanel,

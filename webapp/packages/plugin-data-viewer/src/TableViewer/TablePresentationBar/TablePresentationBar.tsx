@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import type { HTMLAttributes } from 'react';
 
 import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -19,7 +20,7 @@ import styles from './shared/TablePresentationBar.module.css';
 import TablePresentationBarTab from './shared/TablePresentationBarTab.module.css';
 import TablePresentationBarTabList from './shared/TablePresentationBarTabList.module.css';
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
   type: DataPresentationType;
   presentationId: string | null | undefined;
   dataFormat: ResultDataFormat;
@@ -46,6 +47,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
   className,
   onPresentationChange,
   onClose,
+  ...rest
 }) {
   const style = useS(styles);
   const dataPresentationService = useService(DataPresentationService);
@@ -66,7 +68,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
   }
 
   return (
-    <div className={s(style, { tableLeftBar: true }, className)}>
+    <div {...rest} className={s(style, { tableLeftBar: true }, className)}>
       <TabsState currentTabId={presentationId} autoSelect={main}>
         <SContext registry={tablePresentationBarRegistry}>
           <TabList className={s(style, { tabListFlexible: main })} aria-label="Data Presentations" vertical rotated>

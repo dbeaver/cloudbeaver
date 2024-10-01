@@ -97,6 +97,14 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
     }
   }
 
+  override get isChanged(): boolean {
+    if (this.loaded && this.administrationScreenService.isConfigurationMode) {
+      return true;
+    }
+
+    return super.isChanged;
+  }
+
   protected override async saveChanges() {
     if (!isObjectsEqual(this.state.navigatorConfig, this.initialState.navigatorConfig)) {
       await this.defaultNavigatorSettingsResource.save(this.state.navigatorConfig);

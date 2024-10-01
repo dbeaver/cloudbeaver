@@ -44,7 +44,7 @@ export class FormState<TState> implements IFormState<TState> {
   readonly dataContext: IDataContext;
 
   readonly formStateTask: IExecutor<TState>;
-  readonly fillDefaultConfigTask: IExecutor<IFormState<TState>>;
+  readonly loadedTask: IExecutor<IFormState<TState>>;
   readonly submitTask: IExecutor<IFormState<TState>>;
   readonly formatTask: IExecutor<IFormState<TState>>;
   readonly validationTask: IExecutor<IFormState<TState>>;
@@ -66,8 +66,8 @@ export class FormState<TState> implements IFormState<TState> {
     this.formStateTask = new Executor<TState>(state, () => true);
     this.formStateTask.addCollection(service.onState).addPostHandler(this.updateFormState.bind(this));
 
-    this.fillDefaultConfigTask = new Executor(this as IFormState<TState>, () => true);
-    this.fillDefaultConfigTask.addCollection(service.onFillDefaultConfig).next(this.formStateTask, form => form.state);
+    this.loadedTask = new Executor(this as IFormState<TState>, () => true);
+    this.loadedTask.addCollection(service.onLoaded).next(this.formStateTask).addPostHandler(this.onLoadedHandler.bind(this));
 
     this.formatTask = new Executor(this as IFormState<TState>, () => true);
     this.formatTask.addCollection(service.onFormat);
@@ -82,7 +82,7 @@ export class FormState<TState> implements IFormState<TState> {
     this.dataContext.set(DATA_CONTEXT_FORM_STATE, this, this.id);
     dataContextAddDIProvider(this.dataContext, serviceProvider, this.id);
 
-    makeObservable<this>(this, {
+    makeObservable<this, 'updateFormState'>(this, {
       mode: observable,
       parts: observable.ref,
       promise: observable.ref,
@@ -93,6 +93,7 @@ export class FormState<TState> implements IFormState<TState> {
       setMode: action,
       setPartsState: action,
       setState: action,
+      updateFormState: action,
       isChanged: computed,
       partsValues: computed<IFormPart<any>[]>({
         equals: isArraysEqual,
@@ -180,6 +181,15 @@ export class FormState<TState> implements IFormState<TState> {
     } catch (exception: any) {}
 
     return false;
+  }
+
+  private onLoadedHandler(data: IFormState<TState>, contexts: IExecutionContextProvider<IFormState<TState>>): void {
+    for (const part of this.parts.values()) {
+      if (!part.isLoaded()) {
+        ExecutorInterrupter.interrupt(contexts);
+        return;
+      }
+    }
   }
 
   private updateFormState(data: TState, contexts: IExecutionContextProvider<TState>): void {

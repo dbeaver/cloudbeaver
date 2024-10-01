@@ -43,7 +43,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
   return (
     <CommonDialogWrapper size="large" fixedSize={dialog.step === ConnectionStep.ConnectionTemplateSelect}>
       <CommonDialogHeader
-        title="basicConnection_connectionDialog_newConnection"
+        title="plugin_connections_new_connection_dialog_title"
         subTitle={subTitle}
         icon={dialog.driver?.icon}
         onReject={rejectDialog}
@@ -52,9 +52,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
         {dialog.step === ConnectionStep.ConnectionTemplateSelect && <TemplateConnectionSelector onSelect={dialog.selectTemplate} />}
         {dialog.step === ConnectionStep.Connection &&
           (!dialog.authModelId ? (
-            <center className={s(styles, { center: true })}>
-              {dialog.processing && translate('basicConnection_connectionDialog_connecting_message')}
-            </center>
+            <center className={s(styles, { center: true })}>{dialog.processing && translate('plugin_connection_template_connecting_message')}</center>
           ) : (
             <Form ref={focusedRef} className={s(styles, { submittingForm: true })} onSubmit={dialog.connect}>
               <ConnectionAuthenticationFormLoader

@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.server.events;
 
+import io.cloudbeaver.WebSessionGlobalProjectImpl;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -74,34 +75,34 @@ public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler
                     var webSession = (WebSession) activeUserSession;
                     var dataSources = List.of(objectId);
 
-                    var project = webSession.getProjectById(WebAppUtils.getGlobalProjectId());
+                    WebSessionGlobalProjectImpl project = webSession.getGlobalProject();
                     if (project == null) {
                         log.error("Project " + WebAppUtils.getGlobalProjectId() +
                             " is not found in session " + activeUserSession.getSessionId());
                         return;
                     }
                     if (WSEventType.OBJECT_PERMISSIONS_UPDATED.getEventId().equals(event.getId())) {
-                        isAccessibleNow = webSession.findWebConnectionInfo(project.getId(), objectId) != null;
+                        isAccessibleNow = project.findWebConnectionInfo(objectId) != null;
                         if (isAccessibleNow) {
                             return;
                         }
-                        webSession.addAccessibleConnectionToCache(objectId);
+                        project.addAccessibleConnectionToCache(objectId);
                         webSession.addSessionEvent(
                             WSDataSourceEvent.create(
                                 event.getSessionId(),
                                 event.getUserId(),
-                                WebAppUtils.getGlobalProjectId(),
+                                project.getId(),
                                 dataSources,
                                 WSDataSourceProperty.CONFIGURATION
                             )
                         );
                     } else if (WSEventType.OBJECT_PERMISSIONS_DELETED.getEventId().equals(event.getId())) {
-                        webSession.removeAccessibleConnectionFromCache(objectId);
+                        project.removeAccessibleConnectionFromCache(objectId);
                         webSession.addSessionEvent(
                             WSDataSourceEvent.delete(
                                 event.getSessionId(),
                                 event.getUserId(),
-                                WebAppUtils.getGlobalProjectId(),
+                                project.getId(),
                                 dataSources,
                                 WSDataSourceProperty.CONFIGURATION
                             )

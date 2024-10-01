@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { Fragment } from 'react';
 
@@ -17,13 +18,14 @@ import {
   Group,
   GroupItem,
   ObjectPropertyInfoForm,
+  useObservableRef,
   useResource,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { FormMode, type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
+import { FormMode, type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { UserFormProps } from '../AdministrationUserFormService.js';
 
@@ -39,9 +41,15 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
 }) {
   const translate = useTranslate();
   const editing = mode === FormMode.Edit;
-  const localState = useTabState<IState>(() => ({
-    selectedOrigin: '0',
-  }));
+  const localState = useObservableRef<IState>(
+    () => ({
+      selectedOrigin: '0',
+    }),
+    {
+      selectedOrigin: observable.ref,
+    },
+    false,
+  );
   const userInfoLoader = useResource(UserFormOriginInfoPanel, UsersResource, state.userId, {
     active: editing,
   });
