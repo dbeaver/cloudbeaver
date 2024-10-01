@@ -34,15 +34,15 @@ public class WebGlobalProject extends BaseProjectImpl {
 
     private static final Log log = Log.getLog(WebGlobalProject.class);
 
-    private final String projectId;
+    private final String projectName;
 
     public WebGlobalProject(
         @NotNull DBPWorkspace workspace,
         @Nullable SMSessionContext sessionContext,
-        @NotNull String projectId
+        @NotNull String projectName
     ) {
         super(workspace, sessionContext);
-        this.projectId = projectId;
+        this.projectName = projectName;
     }
 
     @Override
@@ -53,13 +53,13 @@ public class WebGlobalProject extends BaseProjectImpl {
     @NotNull
     @Override
     public String getName() {
-        return projectId;
+        return projectName;
     }
 
     @NotNull
     @Override
     public Path getAbsolutePath() {
-        return getWorkspace().getAbsolutePath().resolve(projectId);
+        return getWorkspace().getAbsolutePath().resolve(projectName);
     }
 
     @Override

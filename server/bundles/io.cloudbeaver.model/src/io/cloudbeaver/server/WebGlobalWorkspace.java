@@ -27,6 +27,7 @@ import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.app.BaseWorkspaceImpl;
+import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -82,7 +83,8 @@ public class WebGlobalWorkspace extends BaseWorkspaceImpl {
         globalProject = new WebGlobalProject(
             this,
             getAuthContext(),
-            WebAppUtils.getGlobalProjectId());
+            CommonUtils.notEmpty(WebAppUtils.getWebApplication().getDefaultProjectName())
+        );
         activeProject = globalProject;
     }
 
