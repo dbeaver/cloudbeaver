@@ -151,7 +151,7 @@ public class CBJettyServer {
                         wsContainer.setIdleTimeout(Duration.ofMinutes(5));
                         // Add websockets
                         wsContainer.addMapping(
-                            serverConfiguration.getServicesURI() + "ws/*",
+                            serverConfiguration.getServicesURI() + "ws",
                             new CBJettyWebSocketManager(this.application.getSessionManager())
                         );
                     }
