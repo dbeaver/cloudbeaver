@@ -109,6 +109,8 @@ public abstract class CBApplication<T extends CBServerConfig> extends
 
     private final Map<String, String> initActions = new ConcurrentHashMap<>();
 
+    private CBJettyServer jettyServer;
+
     public CBApplication() {
         this.homeDirectory = new File(initHomeFolder());
     }
@@ -468,7 +470,8 @@ public abstract class CBApplication<T extends CBServerConfig> extends
                 getServerPort(),
                 CommonUtils.isEmpty(getServerHost()) ? "all interfaces" : getServerHost())
         );
-        new CBJettyServer(this).runServer();
+        this.jettyServer = new CBJettyServer(this);
+        this.jettyServer.runServer();
     }
 
 
@@ -568,6 +571,9 @@ public abstract class CBApplication<T extends CBServerConfig> extends
 
         sendConfigChangedEvent(credentialsProvider);
         eventController.setForceSkipEvents(isConfigurationMode());
+        if (this.jettyServer != null) {
+            this.jettyServer.refreshJettyConfig();
+        }
     }
 
     protected abstract void finishSecurityServiceConfiguration(
