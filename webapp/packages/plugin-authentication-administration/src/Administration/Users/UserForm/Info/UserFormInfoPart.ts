@@ -94,6 +94,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
       const user = await this.usersResource.create({
         userId: this.state.userId,
         authRole: getTransformedAuthRole(this.state.authRole),
+        enabled: this.state.enabled,
       });
       this.initialState.userId = user.userId;
       this.formState.setMode(FormMode.Edit);
@@ -105,7 +106,9 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     await this.updateCredentials();
     await this.updateTeams();
     await this.updateAuthRole(); // we must update role before enabling user to prevent situation when user current role will reach the limit
-    await this.updateStatus();
+    if (this.formState.mode === FormMode.Edit) {
+      await this.updateStatus();
+    }
     await this.updateMetaParameters();
 
     this.usersResource.markOutdated(this.state.userId);
