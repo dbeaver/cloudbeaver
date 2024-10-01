@@ -80,7 +80,7 @@ public class WebAuthProviderConfiguration {
     }
 
     private String buildRedirectUrl(String baseUrl) {
-        return baseUrl + "?" + CBAuthConstants.CB_REDIRECT_URL_REQUEST_PARAM + "=" + WebAppUtils.getWebApplication().getServerURL();
+        return baseUrl + "?" + CBAuthConstants.CB_REDIRECT_URL_REQUEST_PARAM + "=" + WebAppUtils.getFullServerUrl();
     }
 
     @Property
