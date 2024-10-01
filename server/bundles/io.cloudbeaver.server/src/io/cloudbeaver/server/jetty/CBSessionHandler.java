@@ -26,10 +26,4 @@ public class CBSessionHandler extends SessionHandler {
     public CBSessionHandler(GQLApplicationAdapter application) {
         this.application = application;
     }
-
-    @Override
-    public boolean isSecureCookies() {
-        var serverUrl = this.application.getServerURL();
-        return serverUrl != null && serverUrl.startsWith("https://");
-    }
 }

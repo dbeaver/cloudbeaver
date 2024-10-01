@@ -235,6 +235,8 @@ public class CBJettyServer {
             && servletContextHandler.getSessionHandler() instanceof CBSessionHandler cbSessionHandler
         ) {
             cbSessionHandler.setMaxCookieAge((int) (application.getMaxSessionIdleTime() / 1000));
+            var serverUrl = this.application.getServerURL();
+            cbSessionHandler.setSecureCookies(serverUrl != null && serverUrl.startsWith("https://"));
         }
     }
 }
