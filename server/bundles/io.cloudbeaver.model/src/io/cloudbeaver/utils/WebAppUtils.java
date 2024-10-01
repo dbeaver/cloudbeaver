@@ -38,6 +38,8 @@ import org.jkiss.utils.CommonUtils;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class WebAppUtils {
     private static final Log log = Log.getLog(WebAppUtils.class);
@@ -267,6 +269,15 @@ public class WebAppUtils {
 
             flattenResult(result, prefix, key, value);
         }
+    }
+
+    @NotNull
+    public static String getFullServerUrl() {
+        WebApplication application = WebAppUtils.getWebApplication();
+        return Stream.of(application.getServerURL(), application.getRootURI())
+            .map(WebAppUtils::removeSideSlashes)
+            .filter(CommonUtils::isNotEmpty)
+            .collect(Collectors.joining("/"));
     }
 
 }
