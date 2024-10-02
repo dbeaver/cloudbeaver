@@ -109,7 +109,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
       const result = await this.commonDialogService.open(ConfirmationDialogDelete, {
         title: 'ui_data_delete_confirmation',
-        message: this.localizationService.translate('connections_public_connection_folder_delete_confirmation', undefined, { name: nodes }),
+        message: this.localizationService.translate('plugin_connections_connection_folder_delete_confirmation', undefined, { name: nodes }),
         confirmActionText: 'ui_delete',
       });
 
@@ -209,8 +209,8 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
       if (folderDuplicates.length > 0) {
         this.notificationService.logError({
-          title: 'connections_public_connection_folder_move_failed',
-          message: this.localizationService.translate('connections_public_connection_folder_move_duplication', undefined, {
+          title: 'plugin_connections_connection_folder_move_failed',
+          message: this.localizationService.translate('plugin_connections_connection_folder_move_duplication', undefined, {
             name: folderDuplicates.map(node => `"${node.name}"`).join(', '),
           }),
         });
@@ -233,7 +233,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
         this.connectionInfoResource.markOutdated(resourceKeyList(connections));
       } catch (exception: any) {
-        this.notificationService.logException(exception, 'connections_public_connection_folder_move_failed');
+        this.notificationService.logException(exception, 'plugin_connections_connection_folder_move_failed');
       }
     }
   }

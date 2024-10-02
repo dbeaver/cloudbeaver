@@ -54,10 +54,9 @@ public class LocalSessionHandler extends AbstractActionSessionHandler {
         String connectionId = action.getParameter(LocalServletHandler.PARAM_CONNECTION_ID);
         String connectionName = action.getParameter(LocalServletHandler.PARAM_CONNECTION_NAME);
         String connectionURL = action.getParameter(LocalServletHandler.PARAM_CONNECTION_URL);
-        Stream<WebConnectionInfo> stream = webSession.getConnections().stream();
-        if (projectId != null) {
-            stream = stream.filter(c -> c.getProjectId().equals(projectId));
-        }
+        Stream<WebConnectionInfo> stream = webSession.getAccessibleProjects().stream()
+            .filter(c -> projectId == null || c.getId().equals(projectId))
+            .flatMap(p -> p.getConnections().stream());
         if (connectionId != null) {
             stream = stream.filter(c -> c.getId().equals(connectionId));
         } else if (connectionName != null) {

@@ -14,26 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.cloudbeaver.service;
 
-package io.cloudbeaver.server;
+import org.eclipse.jetty.websocket.api.Configurable;
+import org.eclipse.jetty.websocket.server.WebSocketCreator;
+import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 
-import org.jkiss.dbeaver.runtime.DBWorkbench;
+import java.util.function.Function;
 
-/**
- * The activator class controls the plug-in life cycle
- */
-public class CBPlatformActivator extends WebPlatformActivator {
-
-    @Override
-    protected void shutdownPlatform() {
-        try {
-            // Dispose core
-            if (DBWorkbench.isPlatformStarted() && DBWorkbench.getPlatform() instanceof CBPlatform cbPlatform) {
-                cbPlatform.dispose();
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-            System.err.println("Internal error after shutdown process:" + e.getMessage()); //$NON-NLS-1$
-        }
-    }
+public interface DBWWebSocketContext {
+    void addWebSocket(@NotNull String mapping, @NotNull Function<Configurable, WebSocketCreator> configurator) throws DBException;
 }

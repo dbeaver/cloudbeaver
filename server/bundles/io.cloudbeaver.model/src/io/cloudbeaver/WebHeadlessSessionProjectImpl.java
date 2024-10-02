@@ -14,26 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.cloudbeaver;
 
-package io.cloudbeaver.server;
+import io.cloudbeaver.model.session.WebHeadlessSession;
+import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.rm.RMProject;
 
-import org.jkiss.dbeaver.runtime.DBWorkbench;
-
-/**
- * The activator class controls the plug-in life cycle
- */
-public class CBPlatformActivator extends WebPlatformActivator {
-
-    @Override
-    protected void shutdownPlatform() {
-        try {
-            // Dispose core
-            if (DBWorkbench.isPlatformStarted() && DBWorkbench.getPlatform() instanceof CBPlatform cbPlatform) {
-                cbPlatform.dispose();
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-            System.err.println("Internal error after shutdown process:" + e.getMessage()); //$NON-NLS-1$
-        }
+public class WebHeadlessSessionProjectImpl extends WebProjectImpl {
+    public WebHeadlessSessionProjectImpl(
+        @NotNull WebHeadlessSession session,
+        @NotNull RMProject project
+    ) {
+        super(
+            session.getWorkspace(),
+            session.getUserContext().getRmController(),
+            session.getSessionContext(),
+            project,
+            session.getUserContext().getPreferenceStore()
+        );
     }
 }
