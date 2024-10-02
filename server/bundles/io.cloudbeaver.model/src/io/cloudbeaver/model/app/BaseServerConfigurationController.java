@@ -22,6 +22,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.registry.fs.FileSystemProviderRegistry;
+import org.jkiss.utils.IOUtils;
 
 import java.net.URI;
 import java.nio.file.FileSystem;
@@ -41,6 +42,8 @@ public abstract class BaseServerConfigurationController<T extends WebServerConfi
 
     protected BaseServerConfigurationController(@NotNull Path homeDirectory) {
         this.homeDirectory = homeDirectory;
+        //default workspaceLocation
+        this.workspacePath = homeDirectory.resolve("workspace");
     }
 
     @NotNull
@@ -55,9 +58,8 @@ public abstract class BaseServerConfigurationController<T extends WebServerConfi
 
     @NotNull
     protected synchronized void initWorkspacePath() throws DBException {
-        if (workspacePath != null) {
+        if (workspacePath != null && !IOUtils.isFileFromDefaultFS(workspacePath)) {
             log.warn("Workspace directory already initialized: " + workspacePath);
-            return;
         }
         String workspaceLocation = getWorkspaceLocation();
         URI workspaceUri = URI.create(workspaceLocation);
