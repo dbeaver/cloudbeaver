@@ -15,6 +15,7 @@ export * from './Quadtree/index.js';
 
 export * from './underscore.js';
 
+export * from './removeProtocolFromUrl.js';
 export * from './emptyConstants.js';
 export * from './base64ToBlob.js';
 export * from './blobToBase64.js';
