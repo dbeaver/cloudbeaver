@@ -8,7 +8,7 @@
 .button {
   color: white;
   font-weight: 500;
-  background-color: #2a7cb4;
+  background-color: var(--theme-primary);
   padding: 5px 16px;
   border-radius: 4px;
   letter-spacing: 0.08929em;

@@ -13,7 +13,7 @@
   --data-grid-readonly-status-color: #e28835;
   --data-grid-cell-selection-background-color: rgba(150, 150, 150, 0.2);
   --data-grid-cell-selection-background-color-focus: rgba(0, 145, 234, 0.2);
-  --data-grid-index-cell-border-color: #2a7cb4;
+  --data-grid-index-cell-border-color: var(--theme-primary);
   --data-grid-selected-row-color: var(--theme-secondary) !important;
 
   composes: theme-typography--caption from global;
