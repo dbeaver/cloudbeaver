@@ -31,7 +31,7 @@ export class LocalizationService extends Bootstrap {
     const firstLanguage = this.supportedLanguages[0];
 
     if (!firstLanguage) {
-      throw new Error('No language is awailable');
+      throw new Error('No language is available');
     }
 
     return firstLanguage.isoCode;
