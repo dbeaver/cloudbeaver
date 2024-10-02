@@ -16,10 +16,10 @@
  */
 package io.cloudbeaver.server.jetty;
 
-import io.cloudbeaver.server.GQLApplicationAdapter;
+import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.model.config.CBServerConfig;
+import io.cloudbeaver.server.GQLApplicationAdapter;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
@@ -27,7 +27,11 @@ import io.cloudbeaver.server.servlets.CBStatusServlet;
 import io.cloudbeaver.server.servlets.ProxyResourceHandler;
 import io.cloudbeaver.server.websockets.CBJettyWebSocketManager;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
-import org.eclipse.jetty.ee10.servlet.*;
+import io.cloudbeaver.service.DBWServiceBindingWebSocket;
+import org.eclipse.jetty.ee10.servlet.ErrorPageErrorHandler;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.servlet.ServletMapping;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.session.DefaultSessionCache;
 import org.eclipse.jetty.session.DefaultSessionIdManager;
@@ -130,11 +134,24 @@ public class CBJettyServer {
                     }
                 }
 
+                CBJettyWebSocketContext webSocketContext = new CBJettyWebSocketContext(server, servletContextHandler);
+                for (DBWServiceBindingWebSocket wsb : WebServiceRegistry.getInstance()
+                    .getWebServices(DBWServiceBindingWebSocket.class)
+                ) {
+                    if (wsb.isApplicable(this.application)) {
+                        try {
+                            wsb.addWebSockets(this.application, webSocketContext);
+                        } catch (DBException e) {
+                            log.error(e.getMessage(), e);
+                        }
+                    }
+                }
+
                 WebSocketUpgradeHandler webSocketHandler = WebSocketUpgradeHandler.from(server, servletContextHandler, (wsContainer) -> {
                         wsContainer.setIdleTimeout(Duration.ofMinutes(5));
                         // Add websockets
                         wsContainer.addMapping(
-                            serverConfiguration.getServicesURI() + "ws/*",
+                            serverConfiguration.getServicesURI() + "ws",
                             new CBJettyWebSocketManager(this.application.getSessionManager())
                         );
                     }
@@ -157,6 +174,11 @@ public class CBJettyServer {
                 log.debug("Active servlets:"); //$NON-NLS-1$
                 for (ServletMapping sm : servletContextHandler.getServletHandler().getServletMappings()) {
                     log.debug("\t" + sm.getServletName() + ": " + Arrays.toString(sm.getPathSpecs())); //$NON-NLS-1$
+                }
+
+                log.debug("Active websocket mappings:");
+                for (String mapping : webSocketContext.getMappings()) {
+                    log.debug("\t" + mapping);
                 }
 
             }
