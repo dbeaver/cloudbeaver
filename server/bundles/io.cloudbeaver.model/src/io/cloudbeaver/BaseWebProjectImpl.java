@@ -23,7 +23,6 @@ import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMControllerProvider;
 import org.jkiss.dbeaver.model.rm.RMProject;
-import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.Pair;
 
@@ -44,11 +43,12 @@ public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMCo
         @NotNull DBPWorkspace workspace,
         @NotNull RMController resourceController,
         @NotNull SMSessionContext sessionContext,
-        @NotNull RMProject project
+        @NotNull RMProject project,
+        @NotNull Path path
     ) {
         super(workspace, sessionContext);
         this.resourceController = resourceController;
-        this.path = RMUtils.getProjectPath(project);
+        this.path = path;
         this.project = project;
     }
 
