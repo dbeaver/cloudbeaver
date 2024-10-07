@@ -25,6 +25,13 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 24.2.2. 2024-10-07
+- Schemas were added to the SQL autocompletion for PostgreSQL, H2, and SQL Server;
+- CloudBeaver can now correctly display negative dates for MySQL database;
+- A search option was added for preferences in the Administration part;
+- Keyboard navigation has been enhanced. You can now use the arrow keys to move through navigator tree elements and the tab key to switch between editors tabs;
+- Sample SQLite database was removed.
+
 ### 24.2.1. 2024-09-23
 - Chinese localization has been improved (thanks to [cashlifei](https://github.com/cashlifei));
 - Environment variables configuration has been improved - now you can configure more variables on the initial stage of the Docker setup;
