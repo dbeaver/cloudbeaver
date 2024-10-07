@@ -89,7 +89,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             connection.getDataSource().getSQLDialect(), connection.getDataSourceContainer().getPreferenceStore());
 
         ruleManager = new SQLRuleManager(syntaxManager);
-        ruleManager.loadRules(connection.getDataSource(), false);
+        ruleManager.loadRules(connection.getDataSourceContainer(), false);
     }
 
     void dispose() {
@@ -192,7 +192,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             document.set(sql);
 
             SQLParserContext parserContext = new SQLParserContext(
-                context.getDataSource(),
+                context.getDataSource().getContainer(),
                 syntaxManager,
                 ruleManager,
                 document);

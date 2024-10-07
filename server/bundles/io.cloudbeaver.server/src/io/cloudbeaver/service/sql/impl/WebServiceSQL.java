@@ -149,8 +149,9 @@ public class WebServiceSQL implements DBWServiceSQL {
             SQLScriptElement activeQuery;
 
             if (position != null) {
+                DBPDataSource source = sqlContext.getProcessor().getConnection().getDataSource();
                 SQLParserContext parserContext = new SQLParserContext(
-                    sqlContext.getProcessor().getConnection().getDataSource(),
+                    source != null ? source.getContainer() : null,
                     completionContext.getSyntaxManager(),
                     completionContext.getRuleManager(),
                     document);
