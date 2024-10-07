@@ -19,7 +19,6 @@ package io.cloudbeaver.server;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.utils.WebAppUtils;
-import org.eclipse.core.runtime.Platform;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -30,8 +29,6 @@ import org.jkiss.dbeaver.model.impl.app.BaseWorkspaceImpl;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -49,21 +46,14 @@ public class WebGlobalWorkspace extends BaseWorkspaceImpl {
     protected final Map<String, WebProjectImpl> projects = new LinkedHashMap<>();
     private WebGlobalProject globalProject;
 
-    public WebGlobalWorkspace(DBPPlatform platform) {
-        super(platform,
-            platform.getApplication().isMultiuser()
-                ? Path.of(getWorkspaceURI())
-                : ((WebApplication) platform.getApplication()).getWorkspaceDirectory());
-    }
+    private final WebApplication application;
 
-    @NotNull
-    private static URI getWorkspaceURI() {
-        String workspacePath = Platform.getInstanceLocation().getURL().toString();
-        try {
-            return new URI(workspacePath);
-        } catch (URISyntaxException e) {
-            throw new IllegalStateException("Workspace path is invalid: " + workspacePath, e);
-        }
+    public WebGlobalWorkspace(
+        @NotNull DBPPlatform platform,
+        @NotNull WebApplication application
+    ) {
+        super(platform, application.getWorkspaceDirectory());
+        this.application = application;
     }
 
     @Override

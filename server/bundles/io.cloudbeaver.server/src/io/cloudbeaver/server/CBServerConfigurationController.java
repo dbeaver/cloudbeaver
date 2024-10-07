@@ -42,6 +42,7 @@ import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.IOUtils;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -68,6 +69,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     private final Map<String, Object> originalConfigurationProperties = new LinkedHashMap<>();
 
     protected CBServerConfigurationController(@NotNull T serverConfiguration, @NotNull Path homeDirectory) {
+        super(homeDirectory);
         this.serverConfiguration = serverConfiguration;
         this.homeDirectory = homeDirectory;
     }
@@ -91,17 +93,25 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             loadConfiguration(configPath);
         }
 
+        initWorkspacePath();
+
         // Try to load configuration from runtime app config file
         Path runtimeConfigPath = getRuntimeAppConfigPath();
         if (Files.exists(runtimeConfigPath)) {
             log.debug("Runtime configuration [" + runtimeConfigPath.toAbsolutePath() + "]");
             loadConfiguration(runtimeConfigPath);
         }
-
         // Set default preferences
         PrefUtils.setDefaultPreferenceValue(DBWorkbench.getPlatform().getPreferenceStore(),
             ModelPreferences.UI_DRIVERS_HOME,
             getServerConfiguration().getDriversLocation());
+        validateFinalServerConfiguration();
+    }
+
+    @NotNull
+    @Override
+    protected String getWorkspaceLocation() {
+        return getServerConfiguration().getWorkspaceLocation();
     }
 
     public void loadConfiguration(Path configPath) throws DBException {
@@ -146,7 +156,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         );
         // App config
         Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
-        validateConfiguration(appConfig);
+        preValidateAppConfiguration(appConfig);
         gson.fromJson(gson.toJson(appConfig), CBAppConfig.class);
         readProductConfiguration(serverConfig, gson);
     }
@@ -169,7 +179,6 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         config.setContentRoot(WebAppUtils.getRelativePath(config.getContentRoot(), homeDirectory));
         config.setRootURI(readRootUri(config.getRootURI()));
         config.setDriversLocation(WebAppUtils.getRelativePath(config.getDriversLocation(), homeDirectory));
-        config.setWorkspaceLocation(WebAppUtils.getRelativePath(config.getWorkspaceLocation(), homeDirectory));
 
         String staticContentsFile = config.getStaticContent();
         if (!CommonUtils.isEmpty(staticContentsFile)) {
@@ -182,9 +191,10 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         return config;
     }
 
-    protected void validateConfiguration(Map<String, Object> appConfig) throws DBException {
+    protected void preValidateAppConfiguration(Map<String, Object> appConfig) throws DBException {
 
     }
+
 
     private void readExternalProperties(Map<String, Object> serverConfig) {
         String externalPropertiesFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_EXTERNAL_PROPERTIES);
@@ -248,19 +258,21 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             }
         }
 
-        // Add product config from runtime
-        File rtConfig = getRuntimeProductConfigFilePath().toFile();
-        if (rtConfig.exists()) {
-            log.debug("Load product runtime configuration from '" + rtConfig.getAbsolutePath() + "'");
-            try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
-                var runtimeProductSettings = JSONUtils.parseMap(gson, reader);
-                var productSettings = serverConfiguration.getProductSettings();
-                runtimeProductSettings.putAll(productSettings);
-                Map<String, Object> flattenConfig = WebAppUtils.flattenMap(runtimeProductSettings);
-                productSettings.clear();
-                productSettings.putAll(flattenConfig);
-            } catch (Exception e) {
-                throw new DBException("Error reading product runtime configuration", e);
+        if (workspacePath != null && IOUtils.isFileFromDefaultFS(getWorkspacePath())) {
+            // Add product config from runtime
+            Path rtConfig = getRuntimeProductConfigFilePath();
+            if (Files.exists(rtConfig)) {
+                log.debug("Load product runtime configuration from '" + rtConfig + "'");
+                try (Reader reader = new InputStreamReader(Files.newInputStream(rtConfig), StandardCharsets.UTF_8)) {
+                    var runtimeProductSettings = JSONUtils.parseMap(gson, reader);
+                    var productSettings = serverConfiguration.getProductSettings();
+                    runtimeProductSettings.putAll(productSettings);
+                    Map<String, Object> flattenConfig = WebAppUtils.flattenMap(runtimeProductSettings);
+                    productSettings.clear();
+                    productSettings.putAll(flattenConfig);
+                } catch (Exception e) {
+                    throw new DBException("Error reading product runtime configuration", e);
+                }
             }
         }
     }
@@ -307,7 +319,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     }
 
     public Map<String, Object> readConfigurationFile(Path path) throws DBException {
-        try (Reader reader = new InputStreamReader(new FileInputStream(path.toFile()), StandardCharsets.UTF_8)) {
+        try (Reader reader = new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8)) {
             return JSONUtils.parseMap(getGson(), reader);
         } catch (Exception e) {
             throw new DBException("Error parsing server configuration", e);
@@ -358,8 +370,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             ContentUtils.makeFileBackup(runtimeConfigPath);
         }
 
-        try (Writer out = new OutputStreamWriter(new FileOutputStream(runtimeConfigPath.toFile()),
-            StandardCharsets.UTF_8)) {
+        try (Writer out = new OutputStreamWriter(Files.newOutputStream(runtimeConfigPath), StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder()
                 .setLenient()
                 .setPrettyPrinting()
@@ -589,13 +600,15 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
     @NotNull
     public Path getDataDirectory(boolean create) {
-        File dataDir = new File(serverConfiguration.getWorkspaceLocation(), CBConstants.RUNTIME_DATA_DIR_NAME);
-        if (create && !dataDir.exists()) {
-            if (!dataDir.mkdirs()) {
-                log.error("Can't create data directory '" + dataDir.getAbsolutePath() + "'");
+        Path dataDir = getWorkspacePath().resolve(CBConstants.RUNTIME_DATA_DIR_NAME);
+        if (create && !Files.exists(dataDir)) {
+            try {
+                Files.createDirectories(dataDir);
+            } catch (Exception e) {
+                log.error("Can't create data directory '" + dataDir.toAbsolutePath() + "'");
             }
         }
-        return dataDir.toPath();
+        return dataDir;
     }
 
     public void saveProductConfiguration(Map<String, Object> productConfiguration) throws DBException {
@@ -632,5 +645,10 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     @Override
     public Map<String, Object> getOriginalConfigurationProperties() {
         return originalConfigurationProperties;
+    }
+
+    @Override
+    public void validateFinalServerConfiguration() throws DBException {
+
     }
 }
