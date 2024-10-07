@@ -57,7 +57,7 @@
     border-bottom-color: var(--theme-positive) !important;
   }
 
-  :global(.rdg-cell) {
+  :global(.rdg-cell:first-child) {
     border-left: 2px solid rgba(0, 0, 0, 0) !important;
   }
 
