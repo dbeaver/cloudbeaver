@@ -30,18 +30,22 @@ import org.jkiss.dbeaver.model.task.DBTTaskManager;
 import org.jkiss.dbeaver.registry.rm.DataSourceRegistryRM;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
+import java.nio.file.Path;
+
 public abstract class WebProjectImpl extends BaseWebProjectImpl {
     private static final Log log = Log.getLog(WebProjectImpl.class);
     @NotNull
     protected final DBPPreferenceStore preferenceStore;
+
     public WebProjectImpl(
         @NotNull DBPWorkspace workspace,
         @NotNull RMController resourceController,
         @NotNull SMSessionContext sessionContext,
         @NotNull RMProject project,
-        @NotNull DBPPreferenceStore preferenceStore
+        @NotNull DBPPreferenceStore preferenceStore,
+        @NotNull Path path
     ) {
-        super(workspace, resourceController, sessionContext, project);
+        super(workspace, resourceController, sessionContext, project, path);
         this.preferenceStore = preferenceStore;
     }
 
