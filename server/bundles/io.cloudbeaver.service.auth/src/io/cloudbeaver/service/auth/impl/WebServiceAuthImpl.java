@@ -189,7 +189,11 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     @Override
     public WebUserInfo activeUser(@NotNull WebSession webSession) throws DBWebException {
         if (webSession.getUser() == null) {
-            return null;
+            SMUser anonymous = new SMUser("anonymous", true, null);
+            anonymous.setUserTeams(
+                new String[]{webSession.getApplication().getAppConfiguration().getAnonymousUserTeam()}
+            );
+            return new WebUserInfo(webSession, new WebUser(anonymous));
         }
         try {
             // Read user from security controller. It will also read meta parameters
