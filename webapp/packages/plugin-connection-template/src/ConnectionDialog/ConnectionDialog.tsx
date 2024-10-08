@@ -14,6 +14,7 @@ import {
   CommonDialogWrapper,
   ErrorMessage,
   Form,
+  InfoItem,
   s,
   useAdministrationSettings,
   useErrorDetails,
@@ -38,7 +39,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
   const dialog = useConnectionDialog(rejectDialog);
   const errorDetails = useErrorDetails(dialog.connectException);
 
-  const subTitle = dialog.step === ConnectionStep.Connection ? dialog.template?.name : undefined;
+  const subTitle = dialog.step === ConnectionStep.Connection ? dialog.template?.name : translate('connections_templates_deprecated_message');
 
   return (
     <CommonDialogWrapper size="large" fixedSize={dialog.step === ConnectionStep.ConnectionTemplateSelect}>

@@ -16,6 +16,7 @@ import {
   GroupItem,
   GroupSubTitle,
   GroupTitle,
+  InfoItem,
   Loader,
   s,
   SContext,
@@ -57,7 +58,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
   return (
     <ColoredContainer vertical wrap parent gap>
       <Group keepSize dense>
-        <GroupSubTitle>{translate('templates_administration_info_message')}</GroupSubTitle>
+        <InfoItem info={translate('connections_templates_deprecated_message')} />
       </Group>
       <Group box keepSize>
         <ToolsPanel rounded>
@@ -65,7 +66,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
             title={translate('connections_administration_tools_add_tooltip')}
             icon="add"
             viewBox="0 0 24 24"
-            disabled={!!sub || state.loading}
+            disabled
             onClick={service.create}
           >
             {translate('ui_add')}
