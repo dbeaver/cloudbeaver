@@ -26,6 +26,7 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.core.DBWServiceCore;
 import io.cloudbeaver.service.security.SMUtils;
+import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import io.cloudbeaver.utils.WebEventUtils;
@@ -209,7 +210,7 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public String[] getSessionPermissions(@NotNull WebSession webSession) throws DBWebException {
-        if (CBApplication.getInstance().isConfigurationMode()) {
+        if (WebAppUtils.getWebApplication().isConfigurationMode()) {
             return new String[]{
                 DBWConstants.PERMISSION_ADMIN
             };
@@ -437,7 +438,7 @@ public class WebServiceCore implements DBWServiceCore {
         var rmProject = project.getRMProject();
         if (rmProject.getType() == RMProjectType.USER
             && !webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)
-            && !CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()
+            && !WebAppUtils.getWebApplication().getAppConfiguration().isSupportsCustomConnections()
         ) {
             throw new DBWebException("New connection create is restricted by server configuration");
         }
@@ -857,7 +858,7 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public List<WebProjectInfo> getProjects(@NotNull WebSession session) {
         var customConnectionsEnabled =
-            CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()
+            WebAppUtils.getWebApplication().getAppConfiguration().isSupportsCustomConnections()
                 || SMUtils.isRMAdmin(session);
         return session.getAccessibleProjects().stream()
             .map(pr -> new WebProjectInfo(session, pr, customConnectionsEnabled))
