@@ -21,6 +21,7 @@ import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
@@ -88,7 +89,8 @@ public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler
     ) {
         return (activeUserSession) -> {
             // we have accessible data sources only in web session
-            if (!(activeUserSession instanceof WebSession webSession)) {
+            // admins already have access for all shared connections
+            if (!(activeUserSession instanceof WebSession webSession) || SMUtils.isAdmin(webSession)) {
                 return;
             }
             if (!isAcceptableInSession(webSession, event)) {
