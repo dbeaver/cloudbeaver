@@ -27,10 +27,12 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,7 +51,24 @@ public class WebSessionProjectImpl extends WebProjectImpl {
             webSession.getRmController(),
             webSession.getSessionContext(),
             project,
-            webSession.getUserPreferenceStore()
+            webSession.getUserPreferenceStore(),
+            RMUtils.getProjectPath(project)
+        );
+        this.webSession = webSession;
+    }
+
+    public WebSessionProjectImpl(
+        @NotNull WebSession webSession,
+        @NotNull RMProject project,
+        @NotNull Path path
+    ) {
+        super(
+            webSession.getWorkspace(),
+            webSession.getRmController(),
+            webSession.getSessionContext(),
+            project,
+            webSession.getUserPreferenceStore(),
+            path
         );
         this.webSession = webSession;
     }
