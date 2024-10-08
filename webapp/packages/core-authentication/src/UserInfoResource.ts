@@ -55,6 +55,10 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     return this.data !== null;
   }
 
+  get isAnonymous() {
+    return !this.data || this.data.isAnonymous;
+  }
+
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly authProviderService: AuthProviderService,
@@ -73,7 +77,12 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
 
     makeObservable(this, {
       parametersAvailable: computed,
+      isAnonymous: computed,
     });
+  }
+
+  isAuthenticated(): this is { data: UserInfo } {
+    return !this.isAnonymous;
   }
 
   isLinked(provideId: string): boolean {

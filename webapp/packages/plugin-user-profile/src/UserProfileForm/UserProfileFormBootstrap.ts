@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { AuthInfoService } from '@cloudbeaver/core-authentication';
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
@@ -17,7 +17,7 @@ const UserProfileFormPanel = importLazyComponent(() => import('./UserProfileForm
 export class UserProfileFormBootstrap extends Bootstrap {
   constructor(
     private readonly userProfileTabsService: UserProfileTabsService,
-    private readonly authInfoService: AuthInfoService,
+    private readonly userInfoResource: UserInfoResource,
   ) {
     super();
   }
@@ -27,7 +27,7 @@ export class UserProfileFormBootstrap extends Bootstrap {
       key: 'account',
       name: 'plugin_user_profile_account_title',
       order: 1,
-      isHidden: () => this.authInfoService.isAnonymous,
+      isHidden: () => this.userInfoResource.isAnonymous,
       panel: () => UserProfileFormPanel,
     });
   }
