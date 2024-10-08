@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 export class WebsiteLinks {
-  static ROOT_PAGE = 'https://dbeaver.com/';
   static DATA_EDITOR_DOCUMENTATION_PAGE = 'https://dbeaver.com/docs/cloudbeaver/Data-editor/';
   static SQL_EDITOR_DOCUMENTATION_PAGE = 'https://dbeaver.com/docs/cloudbeaver/SQL-Editor/';
   static SERVER_CONFIGURATION_RESOURCE_QUOTAS_PAGE = 'https://dbeaver.com/docs/cloudbeaver/Server-configuration/#resource-quotas';
