@@ -107,6 +107,7 @@ export function useDatabaseCredentialsAuthDialog(
             }
           }
 
+          this.config.saveCredentials = connection.saveCredentials;
           this.connection = connection;
           this.driver = driver;
 
