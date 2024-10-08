@@ -27,6 +27,7 @@
 }
 
 .headerTitle {
+  font-size: 20px;
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
