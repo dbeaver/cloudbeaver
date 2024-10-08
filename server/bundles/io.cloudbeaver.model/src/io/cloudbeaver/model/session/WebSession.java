@@ -69,6 +69,7 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -297,7 +298,7 @@ public class WebSession extends BaseWebSession
             for (RMProject project : rmProjects) {
                 createWebProject(project);
             }
-            if (user == null) {
+            if (user == null && application.getAppConfiguration().isAnonymousAccessEnabled()) {
                 WebProjectImpl anonymousProject = createWebProject(RMUtils.createAnonymousProject());
                 anonymousProject.setInMemory(true);
             }
@@ -310,12 +311,12 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    private WebSessionProjectImpl createWebProject(RMProject project) {
+    private WebSessionProjectImpl createWebProject(RMProject project) throws DBException {
         WebSessionProjectImpl sessionProject;
         if (project.isGlobal()) {
             sessionProject = createGlobalProject(project);
         } else {
-            sessionProject = new WebSessionProjectImpl(this, project);
+            sessionProject = new WebSessionProjectImpl(this, project, getProjectPath(project));
         }
         // do not load data sources for anonymous project
         if (project.getType() == RMProjectType.USER && userContext.getUser() == null) {
@@ -326,6 +327,11 @@ public class WebSession extends BaseWebSession
             getWorkspace().setActiveProject(sessionProject);
         }
         return sessionProject;
+    }
+
+    @NotNull
+    protected Path getProjectPath(@NotNull RMProject project) throws DBException {
+        return RMUtils.getProjectPath(project);
     }
 
     protected WebSessionProjectImpl createGlobalProject(RMProject project) {

@@ -40,5 +40,10 @@ public interface WebServerConfigurationController<T extends WebServerConfigurati
     }
 
     @NotNull
+    Path getWorkspacePath();
+
+    @NotNull
     Gson getGson();
+
+    void validateFinalServerConfiguration() throws DBException;
 }
