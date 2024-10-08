@@ -41,6 +41,7 @@ export default [
   ['ui_error_message', 'Ошибка:'],
   ['ui_error_close', 'Закрыть'],
   ['ui_clear', 'Очистить'],
+  ['ui_clean', 'Очистить'],
   ['ui_remove', 'Убрать'],
   ['ui_close', 'Закрыть'],
   ['ui_open', 'Открыть'],

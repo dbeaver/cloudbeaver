@@ -19,6 +19,7 @@ package io.cloudbeaver;
 import io.cloudbeaver.model.session.WebHeadlessSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMUtils;
 
 public class WebHeadlessSessionProjectImpl extends WebProjectImpl {
     public WebHeadlessSessionProjectImpl(
@@ -30,7 +31,8 @@ public class WebHeadlessSessionProjectImpl extends WebProjectImpl {
             session.getUserContext().getRmController(),
             session.getSessionContext(),
             project,
-            session.getUserContext().getPreferenceStore()
+            session.getUserContext().getPreferenceStore(),
+            RMUtils.getProjectPath(project)
         );
     }
 }

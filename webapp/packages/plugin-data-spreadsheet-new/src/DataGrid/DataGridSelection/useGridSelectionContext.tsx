@@ -238,6 +238,19 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
     }
   }
 
+  function getFocusedElementPosition() {
+    const element = props.selectionAction.getFocusedElement();
+
+    if (!element) {
+      return null;
+    }
+
+    const column = props.tableData.getColumnIndexFromColumnKey(element.column);
+    const row = props.tableData.getRowIndexFromKey(element.row);
+
+    return { rowIdx: row, columnIdx: column };
+  }
+
   return useObjectRef<IDataGridSelectionContext>(
     () => ({
       get selectedCells() {
@@ -246,6 +259,7 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
       select,
       selectColumn,
       selectTable,
+      getFocusedElementPosition,
       isSelected,
       selectRange,
     }),
