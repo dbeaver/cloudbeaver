@@ -100,6 +100,4 @@ public class CBServerConfigurationControllerEmbedded<T extends CBServerConfig> e
         return gsonBuilder
             .registerTypeAdapter(WebDatabaseConfig.class, dbConfigCreator);
     }
-
-
 }
