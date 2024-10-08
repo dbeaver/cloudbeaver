@@ -7,12 +7,7 @@
  */
 import { observable } from 'mobx';
 
-import {
-  expandOffsetPageRange,
-  type ICachedResourceOffsetPage,
-  type ICachedResourceOffsetPageOptions,
-  isOffsetPageInRange,
-} from './CachedResourceOffsetPageKeys.js';
+import { expandOffsetPageRange, type ICachedResourceOffsetPage, type ICachedResourceOffsetPageOptions } from './CachedResourceOffsetPageKeys.js';
 import type { ICachedResourceMetadata } from './ICachedResourceMetadata.js';
 import type { ResourceAlias } from './ResourceAlias.js';
 import type { ResourceMetadata } from './ResourceMetadata.js';
