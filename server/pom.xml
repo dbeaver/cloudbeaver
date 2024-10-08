@@ -25,7 +25,6 @@
     <modules>
         <module>bundles</module>
         <module>features</module>
-        <module>test</module>
     </modules>
 
     <profiles>
@@ -34,6 +33,7 @@
             <id>full-build</id>
             <activation><property><name>!plain-api-server</name></property></activation>
             <modules>
+                <module>test</module>
                 <module>drivers</module>
                 <!-- Products -->
                 <module>product</module>
