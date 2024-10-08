@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.app;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 
 import java.util.Map;
 
@@ -28,6 +29,7 @@ public interface WebAppConfiguration {
 
     boolean isAnonymousAccessEnabled();
 
+    @Nullable
     <T> T getResourceQuota(String quotaId);
 
     String getDefaultUserTeam();
