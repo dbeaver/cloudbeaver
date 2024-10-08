@@ -14,7 +14,6 @@ import {
   ExceptionMessageStyles,
   Group,
   GroupItem,
-  GroupSubTitle,
   GroupTitle,
   InfoItem,
   Loader,
@@ -26,13 +25,11 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
 
 import ConnectionsAdministrationStyle from './ConnectionsAdministration.module.css';
 import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable.js';
 import { useConnectionsTable } from './ConnectionsTable/useConnectionsTable.js';
 import { CreateConnection } from './CreateConnection/CreateConnection.js';
-import { CreateConnectionService } from './CreateConnectionService.js';
 
 const registry: StyleRegistry = [
   [
@@ -51,7 +48,6 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
 }) {
   const style = useS(ConnectionsAdministrationStyle);
   const translate = useTranslate();
-  const service = useService(CreateConnectionService);
 
   const state = useConnectionsTable();
 
@@ -62,15 +58,6 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
       </Group>
       <Group box keepSize>
         <ToolsPanel rounded>
-          <ToolsAction
-            title={translate('connections_administration_tools_add_tooltip')}
-            icon="add"
-            viewBox="0 0 24 24"
-            disabled
-            onClick={service.create}
-          >
-            {translate('ui_add')}
-          </ToolsAction>
           <ToolsAction
             title={translate('connections_administration_tools_refresh_tooltip')}
             icon="refresh"
