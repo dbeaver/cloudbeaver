@@ -233,6 +233,12 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return BaseWorkspaceImpl.readWorkspaceIdProperty();
     }
 
+    @Override
+    public Path getWorkspaceDirectory() {
+        return getServerConfigurationController().getWorkspacePath();
+    }
+
+
     public String getApplicationId() {
         try {
             return getApplicationInstanceId();

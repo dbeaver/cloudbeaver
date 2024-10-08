@@ -63,9 +63,14 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         this.application = application;
         this.createTime = System.currentTimeMillis();
         this.lastAccessTime = this.createTime;
-        this.workspace = new WebSessionWorkspace(this);
+        this.workspace = createWebWorkspace();
         this.workspace.getAuthContext().addSession(this);
         this.userContext = createUserContext();
+    }
+
+    @NotNull
+    protected WebSessionWorkspace createWebWorkspace() {
+        return new WebSessionWorkspace(this);
     }
 
     protected WebUserContext createUserContext() throws DBException {
