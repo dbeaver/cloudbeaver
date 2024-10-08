@@ -433,7 +433,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                     throw new DBException("Resource '" + oldTargetPath + "' doesn't exists");
                 }
                 Path newTargetPath = getTargetPath(projectId, normalizedNewResourcePath);
-                validateResourcePath(newTargetPath.toString());
+                validateResourcePath(rootPath.relativize(newTargetPath).toString());
                 if (Files.exists(newTargetPath)) {
                     throw new DBException("Resource with name %s already exists".formatted(newTargetPath.getFileName()));
                 }
@@ -672,7 +672,7 @@ public class LocalResourceController extends BaseLocalResourceController {
             if (!targetPath.startsWith(projectPath)) {
                 throw new DBException("Invalid resource path");
             }
-            return WebAppUtils.getWebApplication().getHomeDirectory().relativize(targetPath);
+            return targetPath;
         } catch (InvalidPathException e) {
             throw new DBException("Resource path contains invalid characters");
         }
