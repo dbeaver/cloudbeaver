@@ -89,6 +89,7 @@
 
     &[data-embedded='true'] {
       &[aria-disabled='true'],
+      &[disabled],
       &:not([data-select='true'])[readonly] {
         @include mdc-theme-prop(border-color, background, false);
         @include mdc-theme-prop(background-color, input-background, false);
