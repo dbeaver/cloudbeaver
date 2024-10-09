@@ -15,6 +15,7 @@ export default [
   ['ui_stepper_next', 'Suivant'],
   ['ui_stepper_finish', 'Terminer'],
   ['ui_load_more', 'Charger plus'],
+  ['ui_processing_connecting', 'Connexion en cours...'],
   ['ui_processing_loading', 'Chargement...'],
   ['ui_processing_cancel', 'Annuler'],
   ['ui_processing_canceling', 'Annulation...'],

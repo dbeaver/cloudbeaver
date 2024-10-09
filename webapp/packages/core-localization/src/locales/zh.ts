@@ -15,6 +15,7 @@ export default [
   ['ui_stepper_next', '下一步'],
   ['ui_stepper_finish', '完成'],
   ['ui_load_more', 'Load more'],
+  ['ui_processing_connecting', '连接中...'],
   ['ui_processing_loading', '加载中...'],
   ['ui_processing_cancel', '取消'],
   ['ui_processing_canceling', '取消中...'],

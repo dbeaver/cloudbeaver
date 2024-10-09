@@ -281,9 +281,7 @@ export class ObjectViewerTabService {
 
   private getNavNode({ handlerState }: ITab<IObjectViewerTabState>) {
     if (handlerState.connectionKey) {
-      const connection = this.connectionInfoResource.get(handlerState.connectionKey);
-
-      if (!connection?.connected) {
+      if (!this.connectionInfoResource.isConnected(handlerState.connectionKey)) {
         return;
       }
     }

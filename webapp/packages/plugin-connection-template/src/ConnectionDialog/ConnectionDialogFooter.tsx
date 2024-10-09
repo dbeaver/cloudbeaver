@@ -27,7 +27,7 @@ export const ConnectionDialogFooter = observer<Props>(function ConnectionDialogF
         {translate('ui_stepper_back')}
       </Button>
       <Button type="button" mod={['unelevated']} disabled={isConnecting} onClick={onConnect}>
-        {isConnecting ? translate('plugin_connection_template_connecting') : translate('connections_connection_connect')}
+        {isConnecting ? translate('ui_processing_connecting') : translate('connections_connection_connect')}
       </Button>
     </div>
   );

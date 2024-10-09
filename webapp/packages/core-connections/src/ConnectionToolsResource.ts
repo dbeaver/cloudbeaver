@@ -21,7 +21,7 @@ export type ConnectionTools = DatabaseConnectionToolsFragment;
 export class ConnectionToolsResource extends CachedMapResource<IConnectionInfoParams, ConnectionTools> {
   constructor(
     private readonly graphQLService: GraphQLService,
-    connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super();
 
@@ -43,6 +43,10 @@ export class ConnectionToolsResource extends CachedMapResource<IConnectionInfoPa
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {
       const projectId = key.projectId;
       const connectionId = key.connectionId;
+
+      if (!this.connectionInfoResource.isConnected(key)) {
+        throw new Error(`Connection is not connected (${projectId}, ${connectionId})`);
+      }
 
       const { connections } = await this.graphQLService.sdk.getConnectionsTools({
         projectId,

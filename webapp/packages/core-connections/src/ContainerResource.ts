@@ -86,7 +86,7 @@ export class ContainerResource extends CachedMapResource<ObjectContainerParams, 
     );
     this.connectionInfoResource.onItemUpdate.addHandler(key =>
       ResourceKeyUtils.forEach(key, key => {
-        if (!this.connectionInfoResource.get(key)?.connected) {
+        if (!this.connectionInfoResource.isConnected(key)) {
           this.delete({ projectId: key.projectId, connectionId: key.connectionId });
         }
       }),

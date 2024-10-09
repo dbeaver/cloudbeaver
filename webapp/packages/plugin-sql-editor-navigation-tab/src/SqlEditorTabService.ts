@@ -184,9 +184,7 @@ export class SqlEditorTabService extends Bootstrap {
     const { projectId, connectionId, defaultCatalog, defaultSchema } = executionContext;
     const connectionKey = createConnectionParam(projectId, connectionId);
 
-    const connection = this.connectionInfoResource.get(connectionKey);
-
-    if (!connection?.connected) {
+    if (!this.connectionInfoResource.isConnected(connectionKey)) {
       return;
     }
 
