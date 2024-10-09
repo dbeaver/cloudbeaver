@@ -12,6 +12,7 @@
     border: none;
     margin: 0;
 
+    &[disabled],
     &[aria-disabled='true'] {
       opacity: 1;
     }

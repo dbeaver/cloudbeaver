@@ -8,6 +8,7 @@
 
 :disabled,
 [aria-disabled='true'] {
-  cursor: text;
   pointer-events: none;
+  cursor: default;
+  opacity: 0.5;
 }

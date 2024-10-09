@@ -77,7 +77,7 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
       }
 
       setPasswordRevealed(prev => !prev);
-    }, [rest.disabled]);
+    }, [rest.readOnly]);
 
     const handleChange = useCallback(
       (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,8 +124,6 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
             {...rest}
             type={passwordRevealed ? 'text' : rest.type}
             name={name}
-            disabled={false}
-            aria-disabled={rest.disabled}
             readOnly={rest.readOnly}
             value={uncontrolled ? undefined : value}
             defaultValue={defaultValue}
