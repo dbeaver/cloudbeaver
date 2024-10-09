@@ -51,7 +51,7 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({ prov
               type={parameter.encryption === 'none' ? 'text' : 'password'}
               name={parameter.id}
               state={credentials.credentials}
-              disabled={authenticate}
+              readOnly={authenticate}
               canShowPassword={false}
               autoComplete={`section-authentication section-${provider.id} ${configuration?.id ?? ''} ${parameter.id}`}
             >
