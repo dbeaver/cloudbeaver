@@ -53,7 +53,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
         tab.handlerState.tabTitle = data.name;
       });
     },
-    active: !connection.isLoading() && connection.data?.connected,
+    active: connection.data?.connected === true,
   });
 
   const pages = dbObjectPagesService.orderedPages;
