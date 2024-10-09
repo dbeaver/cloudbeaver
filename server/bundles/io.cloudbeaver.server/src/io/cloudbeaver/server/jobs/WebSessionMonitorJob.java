@@ -21,12 +21,12 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.runtime.PeriodicSystemJob;
+import org.jkiss.dbeaver.model.runtime.PeriodicJob;
 
 /**
  * WebSessionMonitorJob
  */
-public class WebSessionMonitorJob extends PeriodicSystemJob {
+public class WebSessionMonitorJob extends PeriodicJob {
     private static final Log log = Log.getLog(WebSessionMonitorJob.class);
     private static final int MONITOR_INTERVAL = 10000; // once per 10 seconds
     private final WebSessionManager sessionManager;

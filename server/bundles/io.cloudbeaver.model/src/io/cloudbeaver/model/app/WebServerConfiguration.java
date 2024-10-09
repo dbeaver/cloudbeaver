@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.app;
 
+import io.cloudbeaver.server.WebServerPreferenceStore;
 import org.jkiss.code.NotNull;
 
 import java.util.Map;
@@ -31,6 +32,9 @@ public interface WebServerConfiguration {
         return "";
     }
 
+    /**
+     * @return the setting values that will be used in {@link WebServerPreferenceStore}
+     */
     @NotNull
     default Map<String, Object> getProductSettings() {
         return Map.of();
