@@ -21,6 +21,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.runtime.PeriodicSystemJob;
 
 public class SessionStateJob extends PeriodicSystemJob {
     private static final Log log = Log.getLog(SessionStateJob.class);
