@@ -48,7 +48,7 @@
   justify-content: center;
 }
 
-.input[disabled] + .iconContainer {
+.input[aria-disabled='true'] + .iconContainer {
   cursor: auto;
   opacity: 0.8;
 }
