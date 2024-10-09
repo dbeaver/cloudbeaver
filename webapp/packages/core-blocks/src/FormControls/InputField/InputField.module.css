@@ -47,8 +47,7 @@
   align-items: center;
   justify-content: center;
 }
-.input[disabled] + .iconContainer,
-.input[aria-disabled='true'] + .iconContainer {
+.input[disabled] + .iconContainer {
   cursor: auto;
 }
 .input:not(:only-child) {
