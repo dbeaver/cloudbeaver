@@ -93,7 +93,6 @@
         box-shadow: 0 0 0 50px $input-background-disabled inset;
       }
     }
-
     &[data-embedded='true'] {
       &[disabled],
       &:not([data-select='true'])[readonly] {
