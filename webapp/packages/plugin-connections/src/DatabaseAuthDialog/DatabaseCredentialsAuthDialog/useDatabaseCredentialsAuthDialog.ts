@@ -96,7 +96,7 @@ export function useDatabaseCredentialsAuthDialog(
           for (const id of this.networkHandlers) {
             const handler = connection.networkHandlersConfig.find(handler => handler.id === id);
 
-            if (handler && (handler.userName || handler.authType !== NetworkHandlerAuthType.Password)) {
+            if (handler) {
               this.config.networkHandlersConfig.push({
                 id: handler.id,
                 authType: handler.authType,
