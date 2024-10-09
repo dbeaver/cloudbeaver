@@ -75,7 +75,8 @@
     }
 
     &:not([data-select='true'])[readonly],
-    &:not([data-select='true'])[aria-disabled='true'] {
+    &:not([data-select='true'])[aria-disabled='true'],
+    &:not([data-select='true'])[disabled] {
       @include mdc-theme-prop(color, input-color-readonly, false);
       @include mdc-theme-prop(border-color, input-border-readonly, false);
       @include mdc-theme-prop(background-color, input-background-readonly, false);
