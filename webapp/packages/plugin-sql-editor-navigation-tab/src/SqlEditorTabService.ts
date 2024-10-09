@@ -24,6 +24,7 @@ import {
   type IConnectionInfoParams,
   objectCatalogProvider,
   objectCatalogSetter,
+  objectLoaderProvider,
   objectSchemaProvider,
   objectSchemaSetter,
 } from '@cloudbeaver/core-connections';
@@ -33,7 +34,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeInfoResource, NodeManagerUtils, objectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider, projectSetter, projectSetterState } from '@cloudbeaver/core-projects';
-import { resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { getCachedMapResourceLoaderState, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import type { NavNodeInfoFragment } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { type ITab, type ITabOptions, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
@@ -95,6 +96,7 @@ export class SqlEditorTabService extends Bootstrap {
         projectProvider(this.getProjectId.bind(this)),
         connectionProvider(this.getConnectionId.bind(this)),
         objectCatalogProvider(this.getObjectCatalogId.bind(this)),
+        objectLoaderProvider(this.getObjectLoader.bind(this)),
         objectSchemaProvider(this.getObjectSchemaId.bind(this)),
         executionContextProvider(this.getExecutionContext.bind(this)),
         projectSetter(this.setProjectId.bind(this)),
@@ -208,8 +210,6 @@ export class SqlEditorTabService extends Bootstrap {
     }
 
     const parents = this.navNodeInfoResource.getParents(nodeId);
-
-    untracked(() => this.navNodeInfoResource.load(nodeId!));
 
     return {
       nodeId,
@@ -325,6 +325,34 @@ export class SqlEditorTabService extends Bootstrap {
     }
 
     return createConnectionParam(context.projectId, context.connectionId);
+  }
+
+  private getObjectLoader(tab: ITab<ISqlEditorTabState>) {
+    const executionContextComputed = computed(() => this.sqlDataSourceService.get(tab.handlerState.editorId)?.executionContext);
+
+    const connectionKeyComputed = computed(() => {
+      const executionContext = executionContextComputed.get();
+
+      if (!executionContext) {
+        return null;
+      }
+
+      return createConnectionParam(executionContext.projectId, executionContext.connectionId);
+    });
+
+    return [
+      getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKeyComputed.get()),
+      getCachedMapResourceLoaderState(this.connectionExecutionContextResource, () => executionContextComputed.get()?.id || null),
+      getCachedMapResourceLoaderState(this.containerResource, () => connectionKeyComputed.get()),
+      // TODO: maybe we need it for this.getNavNode to work properly, but it's seems working without it
+      // getCachedMapResourceLoaderState(this.navNodeInfoResource, () => {
+      //   if (this.containerResource.isLoadable(connectionKey)) {
+      //     return null;
+      //   }
+      //   console.log('node:', this.getNavNode(tab)?.nodeId || null);
+      //   return this.getNavNode(tab)?.nodeId || null;
+      // }),
+    ];
   }
 
   private getObjectCatalogId(tab: ITab<ISqlEditorTabState>) {

@@ -31,7 +31,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
 
     const menu = useRef<IMenuState>();
 
-    useAutoLoad({ name: `${ContextMenu.name}(${menuData.menu.id})` }, menuData.loaders, !lazy, menuVisible);
+    useAutoLoad({ name: `${ContextMenu.name}(${menuData.menu.id})` }, menuData.loaders, !lazy, menuVisible, true);
 
     const handlers = useObjectRef(
       () => ({

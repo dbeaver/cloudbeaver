@@ -8,6 +8,7 @@
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { GraphQLService, type NavNodeInfoFragment } from '@cloudbeaver/core-sdk';
 import { isNull } from '@cloudbeaver/core-utils';
@@ -40,12 +41,36 @@ interface ObjectContainerParams {
 export class ContainerResource extends CachedMapResource<ObjectContainerParams, IStructContainers> {
   constructor(
     private readonly graphQLService: GraphQLService,
+    private readonly navTreeResource: NavTreeResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
     appAuthService: AppAuthService,
   ) {
     super();
 
     appAuthService.requireAuthentication(this);
+    this.preloadResource(navTreeResource, key => {
+      if (isResourceAlias(key)) {
+        return '';
+      }
+      return ResourceKeyUtils.mapKey(
+        key,
+        key => this.connectionInfoResource.get(createConnectionParam(key.projectId, key.connectionId))?.nodePath || '',
+      );
+    });
+    this.navTreeResource.onDataOutdated.addHandler(key => {
+      ResourceKeyUtils.forEach(key, key => {
+        if (isResourceAlias(key)) {
+          return;
+        }
+        const connection = this.connectionInfoResource.getConnectionForNode(key);
+
+        if (!connection) {
+          return;
+        }
+
+        this.markOutdated(resourceKeyList(this.keys.filter(key => key.projectId === connection.projectId && key.connectionId === connection.id)));
+      });
+    });
     this.preloadResource(connectionInfoResource, () => ConnectionInfoActiveProjectKey);
     this.before(
       ExecutorInterrupter.interrupter(key => {
