@@ -155,7 +155,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     });
 
     if (!silent) {
-      this.markTreeOutdated(navNodeId);
+      this.markOutdated(navNodeId);
     }
     await this.onNodeRefresh.execute(navNodeId);
   }
