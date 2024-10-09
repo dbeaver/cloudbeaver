@@ -99,7 +99,7 @@ public class WebGlobalWorkspace extends BaseWorkspaceImpl {
     @Nullable
     @Override
     public BaseProjectImpl getProject(@NotNull String projectName) {
-        if (globalProject.getId().equals(projectName)) {
+        if (globalProject != null && globalProject.getId().equals(projectName)) {
             return globalProject;
         }
         return null;
