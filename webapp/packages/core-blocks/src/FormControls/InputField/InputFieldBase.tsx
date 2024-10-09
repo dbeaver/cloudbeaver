@@ -72,7 +72,7 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
     loading = useStateDelay(loading ?? false, 300);
 
     const revealPassword = useCallback(() => {
-      if (rest.disabled) {
+      if (rest.disabled || rest.readOnly) {
         return;
       }
 
@@ -93,7 +93,7 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
     const passwordType = rest.type === 'password';
     let uncontrolled = passwordType && !canShowPassword;
 
-    if (passwordType && !rest.readOnly && capsLock.warn) {
+    if (passwordType && !rest.readOnly && !rest.disabled && capsLock.warn) {
       description = translate('ui_capslock_on');
     }
 
@@ -124,6 +124,8 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
             {...rest}
             type={passwordRevealed ? 'text' : rest.type}
             name={name}
+            disabled={false}
+            readOnly={rest.readOnly || rest.disabled}
             value={uncontrolled ? undefined : value}
             defaultValue={defaultValue}
             className={s(styles, { input: true })}
