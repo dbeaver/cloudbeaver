@@ -12,8 +12,7 @@
     border: none;
     margin: 0;
 
-    &[disabled],
-    &[aria-disabled='true'] {
+    &[disabled] {
       opacity: 1;
     }
   }
@@ -74,9 +73,7 @@
       @include mdc-theme-prop(border-color, primary, false);
     }
 
-    &:not([data-select='true'])[readonly],
-    &:not([data-select='true'])[aria-disabled='true'],
-    &:not([data-select='true'])[disabled] {
+    &:not([data-select='true'])[readonly] {
       @include mdc-theme-prop(color, input-color-readonly, false);
       @include mdc-theme-prop(border-color, input-border-readonly, false);
       @include mdc-theme-prop(background-color, input-background-readonly, false);
@@ -86,9 +83,18 @@
         box-shadow: 0 0 0 50px $input-background-readonly inset;
       }
     }
+    &[disabled] {
+      @include mdc-theme-prop(color, input-color-disabled, false);
+      @include mdc-theme-prop(border-color, input-border-disabled, false);
+      @include mdc-theme-prop(background-color, input-background-disabled, false);
+      opacity: 1;
+      &:-internal-autofill-selected,
+      &:-internal-autofill-previewed {
+        box-shadow: 0 0 0 50px $input-background-disabled inset;
+      }
+    }
 
     &[data-embedded='true'] {
-      &[aria-disabled='true'],
       &[disabled],
       &:not([data-select='true'])[readonly] {
         @include mdc-theme-prop(border-color, background, false);
