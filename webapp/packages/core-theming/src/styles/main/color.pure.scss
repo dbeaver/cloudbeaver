@@ -9,4 +9,5 @@
 :disabled,
 [aria-disabled='true'] {
   cursor: text;
+  pointer-events: none;
 }

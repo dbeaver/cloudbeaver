@@ -12,7 +12,7 @@
     border: none;
     margin: 0;
 
-    &[disabled] {
+    &[aria-disabled='true'] {
       opacity: 1;
     }
   }
@@ -74,7 +74,7 @@
     }
 
     &:not([data-select='true'])[readonly],
-    &:not([data-select='true'])[disabled] {
+    &:not([data-select='true'])[aria-disabled='true'] {
       @include mdc-theme-prop(color, input-color-readonly, false);
       @include mdc-theme-prop(border-color, input-border-readonly, false);
       @include mdc-theme-prop(background-color, input-background-readonly, false);
@@ -86,7 +86,7 @@
     }
 
     &[data-embedded='true'] {
-      &[disabled],
+      &[aria-disabled='true'],
       &:not([data-select='true'])[readonly] {
         @include mdc-theme-prop(border-color, background, false);
         @include mdc-theme-prop(background-color, input-background, false);
