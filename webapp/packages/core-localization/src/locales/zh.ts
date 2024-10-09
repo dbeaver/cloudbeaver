@@ -42,7 +42,6 @@ export default [
   ['ui_error_message', '错误：'],
   ['ui_error_close', '关闭'],
   ['ui_clear', '清除'],
-  ['ui_clean', 'Clean'],
   ['ui_remove', '移除'],
   ['ui_close', '关闭'],
   ['ui_open', '打开'],

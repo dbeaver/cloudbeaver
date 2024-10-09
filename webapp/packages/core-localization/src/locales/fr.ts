@@ -43,7 +43,6 @@ export default [
   ['ui_error_message', 'Erreur :'],
   ['ui_error_close', 'Fermer'],
   ['ui_clear', 'Effacer'],
-  ['ui_clean', 'Clean'],
   ['ui_remove', 'Supprimer'],
   ['ui_close', 'Fermer'],
   ['ui_open', 'Ouvrir'],
