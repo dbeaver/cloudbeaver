@@ -16,7 +16,7 @@ import { UserInfoResource } from './UserInfoResource.js';
 @injectable()
 export class AppAuthService extends Bootstrap {
   get authenticated(): boolean {
-    return this.serverConfigResource.configurationMode || this.userInfoResource.hasAccess;
+    return this.serverConfigResource.configurationMode || this.userInfoResource.hasAccess();
   }
 
   get loaders(): ILoadableState[] {
@@ -56,7 +56,7 @@ export class AppAuthService extends Bootstrap {
 
     await this.userInfoResource.load();
 
-    return !this.serverConfigResource.configurationMode && !this.userInfoResource.hasAccess;
+    return !this.serverConfigResource.configurationMode && !this.userInfoResource.hasAccess();
   }
 
   async authUser(): Promise<boolean> {

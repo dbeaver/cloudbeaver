@@ -33,7 +33,7 @@ export class ProjectsService extends Dependency {
   get userProject(): ProjectInfo | undefined {
     let project: ProjectInfo | undefined;
 
-    if (this.userInfoResource.isData()) {
+    if (this.userInfoResource.data) {
       project = this.projectInfoResource.getUserProject(this.userInfoResource.data.userId);
     }
 

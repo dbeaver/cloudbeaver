@@ -41,7 +41,7 @@ export class ConnectionAuthService extends Dependency {
         connections: connectionInfoResource.values.filter(connection => connection.connected).map(createConnectionParam),
         state,
       }),
-      state => state === 'before' && userInfoResource.isAnonymous,
+      state => state === 'before' && userInfoResource.isAnonymous(),
     );
     this.authenticationService.onLogout.before(
       connectionsManagerService.onDisconnect,

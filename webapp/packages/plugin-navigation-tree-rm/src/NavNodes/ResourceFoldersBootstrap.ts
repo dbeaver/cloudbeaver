@@ -89,7 +89,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       isActionApplicable: context => {
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
 
-        if (!tree?.baseRoot.startsWith(RESOURCES_NODE_PATH) || !this.userInfoResource.isAuthenticated) {
+        if (!tree?.baseRoot.startsWith(RESOURCES_NODE_PATH) || !this.userInfoResource.isAuthenticated()) {
           return false;
         }
 

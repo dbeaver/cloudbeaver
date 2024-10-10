@@ -28,7 +28,7 @@ export class PluginBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [TOP_NAV_BAR_SETTINGS_MENU],
       getItems: (context, items) => {
-        if (this.serverConfigResource.enabledAuthProviders.length > 0 && this.userInfoResource.isAnonymous) {
+        if (this.serverConfigResource.enabledAuthProviders.length > 0 && this.userInfoResource.isAnonymous()) {
           return [
             ...items,
             new MenuBaseItem(
@@ -42,7 +42,7 @@ export class PluginBootstrap extends Bootstrap {
           ];
         }
 
-        if (this.userInfoResource.isAuthenticated) {
+        if (this.userInfoResource.isAuthenticated()) {
           return [
             ...items,
             new MenuBaseItem(

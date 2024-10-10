@@ -15,7 +15,7 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 @injectable()
 export class ResourceManagerService {
   get enabled() {
-    return !!this.serverConfigResource.data?.resourceManagerEnabled && this.userInfoResource.isAuthenticated;
+    return !!this.serverConfigResource.data?.resourceManagerEnabled && this.userInfoResource.isAuthenticated();
   }
 
   constructor(

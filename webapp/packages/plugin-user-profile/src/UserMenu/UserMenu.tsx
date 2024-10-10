@@ -27,7 +27,7 @@ export const UserMenu = observer(function UserMenu() {
     context.set(DATA_CONTEXT_USER, userInfoResource.data, id);
   });
 
-  if (!userInfoResource.isData() || !userInfoResource.isAuthenticated) {
+  if (!userInfoResource.isAuthenticated()) {
     return null;
   }
 

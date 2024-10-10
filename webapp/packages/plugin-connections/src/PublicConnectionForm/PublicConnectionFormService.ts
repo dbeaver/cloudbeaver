@@ -60,8 +60,9 @@ export class PublicConnectionFormService {
       executorHandlerFilter(
         () => !!this.formState && this.optionsPanelService.isOpen(formGetter),
         async (event, context) => {
-          if (event === 'before' && !this.userInfoResource.isData()) {
+          if (event === 'before' && this.userInfoResource.isAnonymous()) {
             const confirmed = await this.showUnsavedChangesDialog();
+
             if (!confirmed) {
               ExecutorInterrupter.interrupt(context);
             }
