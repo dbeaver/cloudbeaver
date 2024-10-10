@@ -2082,7 +2082,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         return finishAuthentication(authInfo, false, authInfo.isForceSessionsLogout());
     }
 
-    private SMAuthInfo finishAuthentication(
+    protected SMAuthInfo finishAuthentication(
         @NotNull SMAuthInfo authInfo,
         boolean isSyncAuth,
         boolean forceSessionsLogout
