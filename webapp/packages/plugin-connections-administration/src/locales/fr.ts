@@ -13,9 +13,5 @@ export default [
   ['plugin_connections_connection_edit_reconnect_failed', 'Échec de la reconnexion'],
 
   ['connections_administration_deactivate_message', 'Les paramètres de votre connexion seront perdus. Voulez-vous continuer ?'],
-  [
-    'templates_administration_info_message',
-    'Les modèles permettent aux administrateurs de définir divers paramètres de connexion réutilisables, permettant ensuite aux utilisateurs de créer plusieurs connexions basées sur ces modèles.',
-  ],
   ['connections_administration_connection_create_error', 'Failed to create connection'],
 ];
