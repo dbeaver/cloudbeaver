@@ -16,9 +16,7 @@ import { UserInfoResource } from './UserInfoResource.js';
 @injectable()
 export class AppAuthService extends Bootstrap {
   get authenticated(): boolean {
-    const user = this.userInfoResource.data;
-
-    return this.serverConfigResource.anonymousAccessEnabled || this.serverConfigResource.configurationMode || user !== null;
+    return this.serverConfigResource.configurationMode || this.userInfoResource.hasAccess;
   }
 
   get loaders(): ILoadableState[] {
@@ -56,9 +54,9 @@ export class AppAuthService extends Bootstrap {
       throw new Error("Can't configure Authentication");
     }
 
-    const user = await this.userInfoResource.load();
+    await this.userInfoResource.load();
 
-    return !this.serverConfigResource.configurationMode && !this.serverConfigResource.anonymousAccessEnabled && user === null;
+    return !this.serverConfigResource.configurationMode && !this.userInfoResource.hasAccess;
   }
 
   async authUser(): Promise<boolean> {

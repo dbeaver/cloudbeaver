@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable } from 'mobx';
 
-import { ANONYMOUS_USER_ID, UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type IExecutor, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
@@ -33,10 +33,8 @@ export class ProjectsService extends Dependency {
   get userProject(): ProjectInfo | undefined {
     let project: ProjectInfo | undefined;
 
-    if (this.userInfoResource.data) {
+    if (this.userInfoResource.isData()) {
       project = this.projectInfoResource.getUserProject(this.userInfoResource.data.userId);
-    } else {
-      project = this.projectInfoResource.get(ANONYMOUS_USER_ID);
     }
 
     return project;

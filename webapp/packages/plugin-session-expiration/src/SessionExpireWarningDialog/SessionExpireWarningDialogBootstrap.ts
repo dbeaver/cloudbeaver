@@ -38,7 +38,7 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
   }
 
   private handleSessionResourceDataUpdate(isValid?: boolean, remainingTime?: number) {
-    if (!this.serverConfigResource.anonymousAccessEnabled && !this.userInfoResource.data && !this.serverConfigResource.configurationMode) {
+    if (!this.serverConfigResource.configurationMode && !this.userInfoResource.hasAccess) {
       return;
     }
 

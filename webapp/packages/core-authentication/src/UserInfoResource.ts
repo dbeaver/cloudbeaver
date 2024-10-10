@@ -56,7 +56,15 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
   }
 
   get isAnonymous() {
-    return !this.data || this.data.isAnonymous;
+    return this.data?.isAnonymous === true;
+  }
+
+  get isAuthenticated() {
+    return !!this.data && !this.isAnonymous;
+  }
+
+  get hasAccess() {
+    return this.isAnonymous || this.isAuthenticated;
   }
 
   constructor(
@@ -81,8 +89,8 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     });
   }
 
-  isAuthenticated(): this is { data: UserInfo } {
-    return !this.isAnonymous;
+  isData(): this is { data: UserInfo } {
+    return !!this.data;
   }
 
   isLinked(provideId: string): boolean {

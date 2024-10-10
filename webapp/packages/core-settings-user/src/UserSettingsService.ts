@@ -65,7 +65,7 @@ export class UserSettingsService extends SettingsSource {
   }
 
   async save() {
-    if (this.userInfoResource.isAuthenticated()) {
+    if (this.userInfoResource.isAuthenticated) {
       await this.userInfoResource.updatePreferences(Object.fromEntries(this.changes));
     } else {
       this.update(() => {
@@ -94,13 +94,13 @@ export class UserSettingsService extends SettingsSource {
 
   private refreshConfig() {
     this.update(() => {
-      if (!this.userInfoResource.isAuthenticated()) {
+      if (!this.userInfoResource.isAuthenticated) {
         this.clear();
         this.lastConfig = null;
         return;
       }
 
-      if (this.userInfoResource.data.configurationParameters !== this.lastConfig) {
+      if (this.userInfoResource.isData() && this.userInfoResource.data.configurationParameters !== this.lastConfig) {
         this.clear();
         this.localSettings.clear();
         this.lastConfig = this.userInfoResource.data.configurationParameters;
@@ -121,7 +121,7 @@ export class UserSettingsService extends SettingsSource {
   }
 
   private getSource() {
-    if (this.userInfoResource.isAuthenticated()) {
+    if (this.userInfoResource.isAuthenticated) {
       return this.settings;
     }
 
