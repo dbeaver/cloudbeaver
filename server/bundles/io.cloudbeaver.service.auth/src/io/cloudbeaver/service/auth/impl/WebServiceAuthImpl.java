@@ -195,9 +195,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 return null;
             }
             SMUser anonymous = new SMUser("anonymous", true, null);
-            anonymous.setUserTeams(
-                new String[]{appConfiguration.getAnonymousUserTeam()}
-            );
             return new WebUserInfo(webSession, new WebUser(anonymous));
         }
         try {
