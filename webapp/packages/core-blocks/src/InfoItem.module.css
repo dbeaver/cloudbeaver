@@ -10,8 +10,15 @@
   align-items: center;
   flex: 0 0 auto;
 }
+
 .iconOrImage {
   width: 24px;
   height: 24px;
   margin-right: 16px;
+
+  &.compact {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+  }
 }

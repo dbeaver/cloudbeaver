@@ -67,10 +67,10 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
       </GroupTitle>
       {ssh && (
         <>
-          <InputField type="text" name="userName" state={state} disabled={disabled}>
+          <InputField type="text" name="userName" state={state} readOnly={disabled}>
             {translate(`connections_network_handler_${id}_user`, 'connections_network_handler_default_user')}
           </InputField>
-          <InputField type="password" name="password" canShowPassword={false} state={state} disabled={disabled}>
+          <InputField type="password" name="password" canShowPassword={false} state={state} readOnly={disabled}>
             {passwordLabel}
           </InputField>
         </>
