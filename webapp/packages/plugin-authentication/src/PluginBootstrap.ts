@@ -42,7 +42,7 @@ export class PluginBootstrap extends Bootstrap {
           ];
         }
 
-        if (!this.userInfoResource.isAnonymous) {
+        if (this.userInfoResource.isAuthenticated) {
           return [
             ...items,
             new MenuBaseItem(

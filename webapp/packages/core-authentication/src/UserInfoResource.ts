@@ -86,6 +86,8 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     makeObservable(this, {
       parametersAvailable: computed,
       isAnonymous: computed,
+      isAuthenticated: computed,
+      hasAccess: computed,
     });
   }
 
