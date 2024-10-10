@@ -72,12 +72,6 @@ export const Button = observer<ButtonProps>(function Button({
     ['click'],
   );
 
-  function handleEnter(event: React.KeyboardEvent<HTMLElement>) {
-    if (event.key === 'Enter') {
-      event.currentTarget.click();
-    }
-  }
-
   loading = state.loading || loading;
 
   if (loading) {
@@ -89,7 +83,6 @@ export const Button = observer<ButtonProps>(function Button({
     <Button
       role="button"
       tabIndex={0}
-      onKeyDown={handleEnter}
       {...rest}
       type={type}
       disabled={disabled}
