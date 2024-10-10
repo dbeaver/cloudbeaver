@@ -103,4 +103,5 @@ export default [
 
   ['core_connections_settings_disable', 'Отключить'],
   ['core_connections_settings_disable_description', 'Отключить возможность создания новых подключений'],
+  ['connections_templates_deprecated_message', 'Шаблоны подключений больше не поддерживаются и будут удалены в будущих релизах'],
 ];
