@@ -30,13 +30,13 @@ export const UserProfileFormInfo: TabContainerPanelComponent<UserProfileFormProp
         <Group form gap>
           <GroupTitle>{translate('plugin_user_profile_info')}</GroupTitle>
           <Container wrap gap>
-            <InputField type="text" name="userId" minLength={1} state={tabState.state} disabled={disabled} readOnly required tiny fill>
+            <InputField type="text" name="userId" minLength={1} state={tabState.state} readOnly required tiny fill>
               {translate('plugin_user_profile_info_id')}
             </InputField>
-            <InputField type="text" name="displayName" minLength={1} state={tabState.state} disabled={disabled} readOnly required tiny fill>
+            <InputField type="text" name="displayName" minLength={1} state={tabState.state} readOnly required tiny fill>
               {translate('plugin_user_profile_info_displayName')}
             </InputField>
-            <InputField type="text" name="authRole" state={tabState.state} disabled={disabled} autoHide readOnly tiny fill>
+            <InputField type="text" name="authRole" state={tabState.state} readOnly autoHide tiny fill>
               {translate('authentication_user_role')}
             </InputField>
           </Container>
