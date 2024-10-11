@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from '@jest/globals';
 
-import { expandOffsetPageRange } from './CachedResourceOffsetPageKeys.js';
+import { expandOffsetPageRange, getNextPageOffset, type ICachedResourceOffsetPage } from './CachedResourceOffsetPageKeys.js';
 import type { IResourceOffsetPage } from './OffsetPagination/IResourceOffsetPage.js';
 import { ResourceOffsetPage } from './OffsetPagination/ResourceOffsetPage.js';
 
@@ -106,6 +106,49 @@ describe('CachedResourceOffsetPageKeys', () => {
       expandOffsetPageRange(pages, { offset: randomPage.from, limit: randomPage.to - randomPage.from }, randomPage.items, false, false);
 
       expect(pages).toStrictEqual(initialPages);
+    });
+  });
+
+  describe('getNextPageOffset', () => {
+    test('should return next page offset', () => {
+      const randomPage = getRandomPage(0, 100, false);
+      const pageInfo: ICachedResourceOffsetPage = {
+        pages: [randomPage],
+      };
+      expect(getNextPageOffset(pageInfo)).toBe(100);
+    });
+    test('should return next page offset with multiple pages', () => {
+      const pages = [];
+      for (let i = 0; i < 10; i++) {
+        pages.push(getRandomPage(i * 100, 100, false));
+      }
+      const pageInfo: ICachedResourceOffsetPage = {
+        pages,
+      };
+      expect(getNextPageOffset(pageInfo)).toBe(1000);
+    });
+    test('should return next page offset with multiple pages with gaps', () => {
+      const pages = [];
+      for (let i = 0; i < 10; i++) {
+        pages.push(getRandomPage(i * 100, 100, false));
+      }
+      pages.push(getRandomPage(11 * 100, 100, false));
+      const pageInfo: ICachedResourceOffsetPage = {
+        pages,
+      };
+      expect(getNextPageOffset(pageInfo)).toBe(1000);
+    });
+    test('should return next page offset with end', () => {
+      const pages = [];
+      for (let i = 0; i < 10; i++) {
+        pages.push(getRandomPage(i * 100, 100, false));
+      }
+      pages.push(getRandomPage(10 * 100, 20, false));
+      const pageInfo: ICachedResourceOffsetPage = {
+        end: 1020,
+        pages,
+      };
+      expect(getNextPageOffset(pageInfo)).toBe(1020);
     });
   });
 });

@@ -41,17 +41,17 @@ export class ResourceOffsetPagination<TKey, TMetadata extends ICachedResourceMet
 
   setPage(key: ResourceAlias<TKey, Readonly<ICachedResourceOffsetPageOptions>>, items: any[], hasNextPage: boolean) {
     const offset = key.options.offset;
-    const limit = offset + key.options.limit;
+    const pageEnd = offset + items.length;
 
     this.metadata.update(key as TKey, metadata => {
       let end = metadata.offsetPage?.end;
 
       if (hasNextPage) {
-        if (end !== undefined && end <= limit) {
+        if (end !== undefined && end <= pageEnd) {
           end = undefined;
         }
       } else {
-        end = limit;
+        end = pageEnd;
       }
 
       if (!metadata.offsetPage) {

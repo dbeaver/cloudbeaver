@@ -60,7 +60,7 @@ export function getNextPageOffset(info: ICachedResourceOffsetPage): number {
     lastPage = page;
   }
 
-  return lastPage?.to ?? CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
+  return Math.min(info.end ?? Number.MAX_SAFE_INTEGER, lastPage?.to ?? CACHED_RESOURCE_DEFAULT_PAGE_OFFSET);
 }
 
 export function isOffsetPageOutdated(pages: IResourceOffsetPage[], info: IOffsetPageInfo): boolean {
