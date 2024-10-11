@@ -19,7 +19,7 @@
     @extend .mdc-radio__native-control;
 
     &:disabled {
-      opacity: 0 !important;
+      opacity: 0;
     }
   }
 
