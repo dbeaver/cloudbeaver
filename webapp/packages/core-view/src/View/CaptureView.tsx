@@ -7,11 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 
 import { s, useFocus, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { isObjectsEqual } from '@cloudbeaver/core-utils';
+import { isObjectsEqual, useHotkeys } from '@cloudbeaver/core-utils';
 
 import { ActionService } from '../Action/ActionService.js';
 import type { IActionItem } from '../Action/IActionItem.js';
