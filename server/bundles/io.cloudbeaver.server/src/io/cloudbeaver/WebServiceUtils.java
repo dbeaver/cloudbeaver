@@ -19,6 +19,7 @@ package io.cloudbeaver;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
+import com.google.gson.Strictness;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.WebPropertyInfo;
@@ -294,7 +295,7 @@ public class WebServiceUtils extends WebCommonUtils {
                 // Make new Gson parser with type adapters to deserialize into existing credentials
                 InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
                 Gson credGson = new GsonBuilder()
-                    .setLenient()
+                    .setStrictness(Strictness.LENIENT)
                     .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
                     .create();
 
