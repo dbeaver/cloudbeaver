@@ -18,7 +18,7 @@
     @extend .mdc-switch__native-control;
 
     &:disabled {
-      opacity: 0;
+      opacity: 0 !important;
     }
   }
   .theme-switch__track {
