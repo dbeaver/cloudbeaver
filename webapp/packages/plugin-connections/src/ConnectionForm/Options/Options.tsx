@@ -216,8 +216,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 type="text"
                 name="url"
                 state={config}
-                disabled={disabled}
-                readOnly={readonly}
+                readOnly={readonly || disabled}
                 autoComplete={`section-${config.driverId || 'driver'} section-jdbc`}
               >
                 {translate('plugin_connections_connection_form_part_main_url_jdbc')}
@@ -245,7 +244,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           </Group>
           <Group form gap>
             <Container wrap gap>
-              <InputField type="text" name="name" minLength={1} state={config} disabled={disabled} readOnly={readonly} required fill>
+              <InputField type="text" name="name" minLength={1} state={config} readOnly={readonly || disabled} required fill>
                 {translate('connections_connection_name')}
               </InputField>
               {!config.template && (
@@ -262,7 +261,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   type="text"
                   name="folder"
                   state={config}
-                  disabled={disabled}
                   autoComplete={`section-${config.driverId || 'driver'} section-folder`}
                   autoHide
                   readOnly
@@ -273,7 +271,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 </InputField>
               )}
             </Container>
-            <Textarea name="description" rows={3} state={config} disabled={disabled} readOnly={readonly}>
+            <Textarea name="description" rows={3} state={config} readOnly={readonly || disabled}>
               {translate('connections_connection_description')}
             </Textarea>
           </Group>

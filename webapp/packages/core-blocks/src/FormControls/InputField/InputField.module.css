@@ -47,10 +47,8 @@
   align-items: center;
   justify-content: center;
 }
-
 .input[disabled] + .iconContainer {
   cursor: auto;
-  opacity: 0.8;
 }
 .input:not(:only-child) {
   padding-right: 32px !important;
