@@ -48,6 +48,7 @@ export default [
   ['ui_errors_details', 'Dettagli'],
   ['ui_search', 'Cerca...'],
   ['ui_delete', 'Elimina'],
+  ['ui_deleting', 'Deleting...'],
   ['ui_add', 'Aggiungi'],
   ['ui_revert', 'Revert'],
   ['ui_undo', 'Undo'],
