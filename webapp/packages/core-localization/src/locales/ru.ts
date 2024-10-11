@@ -47,6 +47,7 @@ export default [
   ['ui_errors_details', 'Информация'],
   ['ui_search', 'Поиск...'],
   ['ui_delete', 'Удалить'],
+  ['ui_deleting', 'Удаляется...'],
   ['ui_add', 'Добавить'],
   ['ui_revert', 'Отменить изменения'],
   ['ui_undo', 'Отменить'],
