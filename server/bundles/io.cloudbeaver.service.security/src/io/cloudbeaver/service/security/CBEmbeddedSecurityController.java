@@ -1153,6 +1153,12 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
     }
 
+    @Nullable
+    @Override
+    public String[] getEnableFeatures() {
+        return application.getAppConfiguration().getEnabledFeatures();
+    }
+
     @NotNull
     private SMTeam fetchTeam(ResultSet dbResult) throws SQLException {
         return new SMTeam(

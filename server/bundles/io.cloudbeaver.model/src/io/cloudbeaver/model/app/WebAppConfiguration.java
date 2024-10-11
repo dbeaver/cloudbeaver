@@ -44,6 +44,8 @@ public interface WebAppConfiguration {
 
     boolean isFeatureEnabled(String id);
 
+    String[] getEnabledFeatures();
+
     default boolean isSupportsCustomConnections() {
         return true;
     }
