@@ -13,9 +13,5 @@ export default [
   ['plugin_connections_connection_edit_reconnect_failed', 'Failed to reconnect'],
 
   ['connections_administration_deactivate_message', "Your connection's settings will be lost. Do you want to continue?"],
-  [
-    'templates_administration_info_message',
-    'The templates enable administrators to define various reusable connection parameters, subsequently allowing users to create multiple connections based on these templates.',
-  ],
   ['connections_administration_connection_create_error', 'Failed to create connection'],
 ];

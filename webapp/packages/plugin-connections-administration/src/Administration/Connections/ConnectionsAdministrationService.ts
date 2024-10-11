@@ -69,13 +69,17 @@ export class ConnectionsAdministrationService extends Bootstrap {
           canDeActivate: this.canDeActivateCreate.bind(this),
         },
       ],
-      isHidden: () => this.serverConfigResource.distributed,
+      isHidden: () => this.serverConfigResource.distributed || !this.connectionInfoResource.values.some(connection => connection.template),
       getContentComponent: () => ConnectionsAdministration,
       getDrawerComponent: () => ConnectionsDrawerItem,
       onDeActivate: this.refreshUserConnections.bind(this),
     });
     this.connectionDetailsPlaceholder.add(Origin, 0);
     this.connectionDetailsPlaceholder.add(SSH, 2);
+  }
+
+  override async load(): Promise<void> {
+    await this.connectionInfoResource.load();
   }
 
   private async refreshUserConnections(configuration: boolean, outside: boolean, outsideAdminPage: boolean): Promise<void> {
