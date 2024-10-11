@@ -92,6 +92,7 @@ public class CBServerConfigurationControllerEmbedded<T extends CBServerConfig> e
         }
     }
 
+    @NotNull
     @Override
     protected GsonBuilder getGsonBuilder() {
         GsonBuilder gsonBuilder = super.getGsonBuilder();

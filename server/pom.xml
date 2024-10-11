@@ -33,10 +33,10 @@
             <id>full-build</id>
             <activation><property><name>!plain-api-server</name></property></activation>
             <modules>
-                <module>test</module>
                 <module>drivers</module>
                 <!-- Products -->
                 <module>product</module>
+                <module>test</module>
             </modules>
         </profile>
     </profiles>

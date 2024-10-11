@@ -26,19 +26,19 @@ export const ParametersForm = observer<Props>(function ParametersForm({ config, 
     <Container gap>
       {!embedded && (
         <Container wrap gap>
-          <InputField type="text" name="host" state={config} disabled={disabled} readOnly={readOnly || !originLocal} small required>
+          <InputField type="text" name="host" state={config} readOnly={readOnly || !originLocal || disabled} small required>
             {translate('plugin_connections_connection_form_part_main_custom_host')}
           </InputField>
-          <InputField type="number" name="port" state={config} disabled={disabled} readOnly={readOnly || !originLocal} tiny>
+          <InputField type="number" name="port" state={config} readOnly={readOnly || !originLocal || disabled} tiny>
             {translate('plugin_connections_connection_form_part_main_custom_port')}
           </InputField>
         </Container>
       )}
-      <InputField type="text" name="databaseName" state={config} disabled={disabled} readOnly={readOnly}>
+      <InputField type="text" name="databaseName" state={config} readOnly={readOnly || disabled}>
         {translate('plugin_connections_connection_form_part_main_custom_database')}
       </InputField>
       {requiresServerName && (
-        <InputField type="text" name="serverName" state={config} disabled={disabled} readOnly={readOnly} required>
+        <InputField type="text" name="serverName" state={config} readOnly={readOnly || disabled} required>
           {translate('plugin_connections_connection_form_part_main_custom_server_name')}
         </InputField>
       )}
