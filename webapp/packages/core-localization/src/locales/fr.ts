@@ -49,6 +49,7 @@ export default [
   ['ui_errors_details', 'Détails'],
   ['ui_search', 'Rechercher...'],
   ['ui_delete', 'Supprimer'],
+  ['ui_deleting', 'Deleting...'],
   ['ui_add', 'Ajouter'],
   ['ui_refresh', 'Actualiser'],
   ['ui_data_saving_error', 'Erreur de sauvegarde'],

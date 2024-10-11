@@ -51,6 +51,7 @@ public abstract class BaseServerConfigurationController<T extends WebServerConfi
         return getGsonBuilder().create();
     }
 
+    @NotNull
     protected abstract GsonBuilder getGsonBuilder();
 
     public abstract T getServerConfiguration();

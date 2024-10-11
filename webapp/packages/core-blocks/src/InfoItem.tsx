@@ -18,19 +18,20 @@ import { useS } from './useS.js';
 export interface IInfoItem {
   info: TLocalizationToken;
   icon?: string;
+  compact?: boolean;
 }
 
 interface Props extends IInfoItem {
   className?: string;
 }
 
-export const InfoItem = observer<Props>(function InfoItem({ info, icon = '/icons/info_icon.svg', className }) {
+export const InfoItem = observer<Props>(function InfoItem({ info, compact, icon = '/icons/info_icon.svg', className }) {
   const styles = useS(style);
 
   const translate = useTranslate();
   return (
     <div className={s(styles, { infoItem: true }, className)}>
-      <IconOrImage className={s(styles, { iconOrImage: true })} icon={icon} />
+      <IconOrImage className={s(styles, { iconOrImage: true, compact })} icon={icon} />
       {translate(info)}
     </div>
   );

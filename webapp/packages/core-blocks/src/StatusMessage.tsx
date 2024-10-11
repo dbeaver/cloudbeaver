@@ -22,10 +22,18 @@ interface Props {
   type?: ENotificationType | null;
   exception?: Error | null;
   className?: string;
+  multipleRows?: boolean;
   onShowDetails?: () => void;
 }
 
-export const StatusMessage = observer<Props>(function StatusMessage({ type, message, exception = null, className, onShowDetails }) {
+export const StatusMessage = observer<Props>(function StatusMessage({
+  type,
+  multipleRows = false,
+  message,
+  exception = null,
+  className,
+  onShowDetails,
+}) {
   const styles = useS(style);
   const translate = useTranslate();
   const errorDetails = useErrorDetails(exception);
@@ -51,13 +59,13 @@ export const StatusMessage = observer<Props>(function StatusMessage({ type, mess
   }
 
   return (
-    <div className={s(styles, { statusMessage: true }, className)}>
+    <div className={s(styles, { statusMessage: true, statusMessageExtended: !multipleRows }, className)}>
       {message && (
         <>
           <IconOrImage className={s(styles, { iconOrImage: true })} icon={icon} />
-          <div className={s(styles, { message: true })} title={message}>
+          <div className={s(styles, { message: !multipleRows })} title={message}>
             {onShowDetails ? (
-              <Link className={s(styles, { link: true })} onClick={onShowDetails}>
+              <Link className={s(styles, { link: !multipleRows })} onClick={onShowDetails}>
                 {message}
               </Link>
             ) : (
