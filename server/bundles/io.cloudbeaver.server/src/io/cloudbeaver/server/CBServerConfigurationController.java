@@ -16,10 +16,7 @@
  */
 package io.cloudbeaver.server;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
-import com.google.gson.Strictness;
+import com.google.gson.*;
 import io.cloudbeaver.model.app.BaseServerConfigurationController;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.config.CBAppConfig;
@@ -327,6 +324,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         }
     }
 
+    @NotNull
     protected GsonBuilder getGsonBuilder() {
         // Stupid way to populate existing objects but ok google (https://github.com/google/gson/issues/431)
         InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
@@ -338,6 +336,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             type -> securityManagerConfiguration.getPasswordPolicyConfiguration();
         return new GsonBuilder()
             .setStrictness(Strictness.LENIENT)
+            .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
             .registerTypeAdapter(getServerConfiguration().getClass(), serverConfigCreator)
             .registerTypeAdapter(CBAppConfig.class, appConfigCreator)
             .registerTypeAdapter(DataSourceNavigatorSettings.class, navSettingsCreator)
