@@ -110,8 +110,8 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
 
         this.offsetPagination.setPage(
           isPageListKey
-            ? CachedResourceOffsetPageListKey(offset, limit).setParent(parentKey || CachedResourceOffsetPageTargetKey(nodeId))
-            : CachedResourceOffsetPageKey(offset, limit).setParent(parentKey || CachedResourceOffsetPageTargetKey(nodeId)),
+            ? CachedResourceOffsetPageListKey(offset, keys.length).setParent(parentKey || CachedResourceOffsetPageTargetKey(nodeId))
+            : CachedResourceOffsetPageKey(offset, keys.length).setParent(parentKey || CachedResourceOffsetPageTargetKey(nodeId)),
           keys,
           keys.length === limit,
         );

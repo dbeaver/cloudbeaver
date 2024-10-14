@@ -23,13 +23,13 @@ export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(
   return (
     <Container overflow>
       <Group small gap>
-        <InputField name="teamId" state={state.config} readOnly={state.readonly || edit} disabled={state.disabled} required tiny fill>
+        <InputField name="teamId" state={state.config} readOnly={state.readonly || edit || state.disabled} required tiny fill>
           {translate('administration_teams_team_id')}
         </InputField>
-        <InputField name="teamName" state={state.config} readOnly={state.readonly} disabled={state.disabled} tiny fill>
+        <InputField name="teamName" state={state.config} readOnly={state.readonly || state.disabled} tiny fill>
           {translate('administration_teams_team_name')}
         </InputField>
-        <Textarea name="description" state={state.config} readOnly={state.readonly} disabled={state.disabled} tiny fill>
+        <Textarea name="description" state={state.config} readOnly={state.readonly || state.disabled} tiny fill>
           {translate('administration_teams_team_description')}
         </Textarea>
       </Group>
