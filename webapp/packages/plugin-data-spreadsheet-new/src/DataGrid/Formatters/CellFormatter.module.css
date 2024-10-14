@@ -10,7 +10,6 @@
   display: flex;
   overflow: hidden;
   box-sizing: border-box;
-  position: relative;
 }
 
 .container {
@@ -27,9 +26,4 @@
   &:empty {
     display: none;
   }
-}
-
-.cellMenu {
-  width: 25px;
-  height: 100%;
 }
