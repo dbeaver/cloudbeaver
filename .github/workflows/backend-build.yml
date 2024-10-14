@@ -27,9 +27,7 @@ jobs:
           java-version: "17"
           cache: maven
 
-      - uses: stCarolas/setup-maven@v5
-        with:
-          maven-version: 3.9.6
+      - uses: dbeaver/github-actions/install-maven@devel
 
       - name: Run build script
         run: ./build-backend.sh
