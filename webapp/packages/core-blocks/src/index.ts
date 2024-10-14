@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+export { useHotkeys } from 'react-hotkeys-hook';
+
 export * from './CommonDialog/CommonDialog/CommonDialogBody.js';
 export * from './CommonDialog/CommonDialog/CommonDialogFooter.js';
 export * from './CommonDialog/CommonDialog/CommonDialogHeader.js';

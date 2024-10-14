@@ -30,8 +30,7 @@
     "whatwg-mimetype": "^4",
     "zod": "^3",
     "zod-i18n-map": "^2",
-    "zod-validation-error": "^3",
-    "react-hotkeys-hook": "^4"
+    "zod-validation-error": "^3"
   },
   "peerDependencies": {},
   "devDependencies": {
