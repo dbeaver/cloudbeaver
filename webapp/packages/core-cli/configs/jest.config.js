@@ -11,9 +11,9 @@ const path = require('path');
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
   testEnvironment: require.resolve('../tests/test.environment.js'),
-  rootDir: path.resolve('./'),
+  rootDir: path.resolve('.'),
   moduleFileExtensions: ['js', 'jsx', 'json'],
-  testMatch: ['<rootDir>/packages/*/dist/?(*.)+(spec|test).js?(x)', '<rootDir>/dist/?(*.)+(spec|test).js?(x)'],
+  testMatch: ['<rootDir>/packages/*/dist/**/?(*.)+(spec|test).js?(x)', '<rootDir>/dist/**/?(*.)+(spec|test).js?(x)'],
   transformIgnorePatterns: [
     '\\.pnp\\.[^\\/]+$',
     'node_modules/(?!@ngrx|(?!deck.gl)|ng-dynamic)',
