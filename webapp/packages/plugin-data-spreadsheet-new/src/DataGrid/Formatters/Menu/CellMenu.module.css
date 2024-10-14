@@ -18,10 +18,15 @@
   position: absolute;
   top: 0px;
   right: 0px;
+  height: 100%;
 }
+
 .menuTrigger {
   padding: 1px 2px;
+  display: flex;
+  align-items: center;
   height: 100%;
+  justify-content: center;
 
   &:hover {
     background: none;
