@@ -24,7 +24,7 @@ describe('LocalizationService', () => {
     expect(service.supportedLanguages.length).toBeGreaterThan(0);
   });
 
-  it('should set supported languages and default to first supported language', () => {
+  it('should set supported languages', () => {
     const locales: ILocale[] = [
       { isoCode: 'de', name: 'German', nativeName: 'Deutsch' },
       { isoCode: 'es', name: 'Spanish', nativeName: 'Español' },
@@ -32,6 +32,15 @@ describe('LocalizationService', () => {
 
     service.setSupportedLanguages(locales);
     expect(service.supportedLanguages.length).toBe(2);
+  });
+
+  it('should set default to first supported language', () => {
+    const locales: ILocale[] = [
+      { isoCode: 'de', name: 'German', nativeName: 'Deutsch' },
+      { isoCode: 'es', name: 'Spanish', nativeName: 'Español' },
+    ];
+
+    service.setSupportedLanguages(locales);
     expect(service.currentLanguage).toBe('de');
   });
 
@@ -82,5 +91,28 @@ describe('LocalizationService', () => {
 
     const translation = service.translate(token, undefined, { name: 'John' });
     expect(translation).toBe('Welcome, John!');
+  });
+
+  it('should replace multiple args in the translation string', () => {
+    const token = 'greeting_message';
+    const translationString = 'Hello, {arg:firstName} {arg:lastName}!';
+    service['localeMap'].set('en', new Map([[token, translationString]]));
+    service.setLanguage('en');
+
+    const translation = service.translate(token, undefined, { firstName: 'John', lastName: 'Doe' });
+    expect(translation).toBe('Hello, John Doe!');
+  });
+
+  it('should return true for supported language', () => {
+    service.register();
+
+    expect(service.isLanguageSupported('en')).toBe(true);
+    expect(service.isLanguageSupported('ru')).toBe(true);
+  });
+
+  it('should return false for unsupported language', () => {
+    service.register();
+
+    expect(service.isLanguageSupported('n/a')).toBe(false);
   });
 });

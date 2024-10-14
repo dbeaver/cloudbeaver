@@ -7,7 +7,7 @@
  */
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 
-import { ClientActivityService } from './ClientActivityService.js';
+import { ClientActivityService, INACTIVE_PERIOD_TIME } from './ClientActivityService.js';
 
 jest.useFakeTimers();
 
@@ -39,7 +39,7 @@ describe('ClientActivityService', () => {
     clientActivityService.updateActivity();
     expect(clientActivityService.isActive).toBe(true);
 
-    jest.advanceTimersByTime(1000 * 60);
+    jest.advanceTimersByTime(INACTIVE_PERIOD_TIME);
 
     expect(clientActivityService.isActive).toBe(false);
   });
@@ -48,6 +48,8 @@ describe('ClientActivityService', () => {
     clientActivityService.updateActivity();
     expect(setTimeout).toHaveBeenCalledTimes(1);
 
+    jest.advanceTimersByTime(Math.random() * INACTIVE_PERIOD_TIME - 1);
+
     clientActivityService.updateActivity();
     expect(clearTimeout).toHaveBeenCalledTimes(1);
     expect(setTimeout).toHaveBeenCalledTimes(2);
@@ -55,6 +57,9 @@ describe('ClientActivityService', () => {
 
   it('should clear timer and reset activity when resetActivity is called', () => {
     clientActivityService.updateActivity();
+
+    jest.advanceTimersByTime(Math.random() * INACTIVE_PERIOD_TIME - 1);
+
     clientActivityService.resetActivity();
 
     expect(clientActivityService.isActive).toBe(false);
@@ -67,7 +72,7 @@ describe('ClientActivityService', () => {
     clientActivityService.updateActivity();
     expect(onActiveStateChangeSpy).toHaveBeenCalledWith(true);
 
-    jest.advanceTimersByTime(1000 * 60);
+    jest.advanceTimersByTime(INACTIVE_PERIOD_TIME);
     expect(onActiveStateChangeSpy).toHaveBeenCalledWith(false);
   });
 });

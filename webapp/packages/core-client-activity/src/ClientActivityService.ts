@@ -10,7 +10,7 @@ import { makeObservable, observable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 
-const INACTIVE_PERIOD_TIME = 1000 * 60;
+export const INACTIVE_PERIOD_TIME = 1000 * 60;
 
 @injectable()
 export class ClientActivityService {
