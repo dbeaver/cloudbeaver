@@ -100,6 +100,10 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
     contentRef.current?.scrollTo({ top: 0, left: 0 });
   }, [activeScreen?.item]);
 
+  function close() {
+    optionsPanelService.close();
+  }
+
   return (
     <CaptureView view={administrationViewService} className={s(styles, { captureView: true })}>
       <AdministrationCaptureViewContext />
@@ -120,7 +124,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
         <div ref={contentRef} className={s(styles, { contentContainer: true })}>
           {children}
           <SContext registry={adminPageRegistry}>
-            <SlideBox className={s(styles, { slideBox: true })} open={optionsPanelService.active}>
+            <SlideBox className={s(styles, { slideBox: true })} open={optionsPanelService.active} onClose={close}>
               <SlideElement className={s(styles, { slideElement: true })}>
                 <Loader className={s(styles, { loader: true })} suspense>
                   <div className={s(styles, { content: true })}>
@@ -132,7 +136,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
                 <div className={s(styles, { content: true })}>
                   <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
                 </div>
-                <SlideOverlay onClick={() => optionsPanelService.close()} />
+                <SlideOverlay onClick={close} />
               </SlideElement>
             </SlideBox>
           </SContext>
