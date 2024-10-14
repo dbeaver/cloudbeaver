@@ -1,40 +1,41 @@
-name: Check
+name: CI
 
 on:
-  push:
-    branches:
-      - devel
   pull_request:
-    branches:
-      - devel
+    branches: [devel]
+  push:
+    branches: [devel]
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-    inputs:
-      skip_cache:
-        description: "Skip cache restoration"
-        required: false
-        default: "false"
+concurrency:
+  group: |
+      # For pull requests, group by the pull request ID
+      ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) }}
+
+      # For pushes to main, group by the branch name (e.g., 'main')
+      ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'main-branch' }}
+  cancel-in-progress: true
 
 jobs:
-  call-backend-build:
-    name: Build
+  build-server:
+    name: Server
     uses: ./.github/workflows/backend-build.yml
+    secrets: inherit
 
-  call-frontend-build:
-    name: Build
+  build-frontend:
+    name: Frontend
     uses: ./.github/workflows/frontend-build.yml
-    with:
-      skip_cache: ${{ github.event.inputs.skip_cache }}
+    secrets: inherit
 
-  call-frontend-lint:
-    name: Lint
-    needs: call-frontend-build
-    uses: ./.github/workflows/frontend-lint.yml
-
-  call-backend-lint:
-    name: Lint
+  lint-server:
+    name: Server
     uses: ./.github/workflows/backend-lint.yml
+    secrets: inherit
+
+  lint-frontend:
+    name: Frontend
+    uses: ./.github/workflows/frontend-lint.yml
+    secrets: inherit
+
 
   # call-frontend-tests:
   #   name: Frontend Unit Tests
@@ -54,3 +55,4 @@ jobs:
   #   name: Run
   #   needs: [call-backend-build, call-frontend-build]
   #   uses: ./.github/workflows/docker-build-and-push.yml
+

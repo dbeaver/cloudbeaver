@@ -1,9 +1,6 @@
 name: Backend Lint
 
 on:
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
   # Allows you to reuse workflows by referencing their YAML files
   workflow_call:
     inputs:
@@ -13,7 +10,8 @@ on:
 
 jobs:
   lint:
-    name: Backend
+    name: Lint
+    timeout-minutes: 5
     runs-on: ubuntu-latest
 
     steps:
