@@ -19,19 +19,86 @@ package io.cloudbeaver.model.app;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.registry.fs.FileSystemProviderRegistry;
+import org.jkiss.utils.IOUtils;
+
+import java.net.URI;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 
 /**
  * Abstract class that contains methods for loading configuration with gson.
  */
 public abstract class BaseServerConfigurationController<T extends WebServerConfiguration>
     implements WebServerConfigurationController<T> {
+    private static final Log log = Log.getLog(BaseServerConfigurationController.class);
+    @NotNull
+    private final Path homeDirectory;
+
+    protected Path workspacePath;
+
+    protected BaseServerConfigurationController(@NotNull Path homeDirectory) {
+        this.homeDirectory = homeDirectory;
+        //default workspaceLocation
+        this.workspacePath = homeDirectory.resolve("workspace");
+    }
 
     @NotNull
     public Gson getGson() {
         return getGsonBuilder().create();
     }
 
+    @NotNull
     protected abstract GsonBuilder getGsonBuilder();
 
     public abstract T getServerConfiguration();
+
+
+    @NotNull
+    protected synchronized void initWorkspacePath() throws DBException {
+        if (workspacePath != null && !IOUtils.isFileFromDefaultFS(workspacePath)) {
+            log.warn("Workspace directory already initialized: " + workspacePath);
+        }
+        String workspaceLocation = getWorkspaceLocation();
+        URI workspaceUri = URI.create(workspaceLocation);
+        if (workspaceUri.getScheme() == null) {
+            // default filesystem
+            this.workspacePath = getHomeDirectory().resolve(workspaceLocation);
+        } else {
+            var externalFsProvider =
+                FileSystemProviderRegistry.getInstance().getFileSystemProviderBySchema(workspaceUri.getScheme());
+            if (externalFsProvider == null) {
+                throw new DBException("File system not found for scheme: " + workspaceUri.getScheme());
+            }
+            ClassLoader fsClassloader = externalFsProvider.getInstance().getClass().getClassLoader();
+            try (FileSystem externalFileSystem = FileSystems.newFileSystem(workspaceUri,
+                System.getenv(),
+                fsClassloader);) {
+                this.workspacePath = externalFileSystem.provider().getPath(workspaceUri);
+            } catch (Exception e) {
+                throw new DBException("Failed to initialize workspace path: " + workspaceUri, e);
+            }
+        }
+        log.info("Workspace path initialized: " + workspacePath);
+    }
+
+    @NotNull
+    protected abstract String getWorkspaceLocation();
+
+    @NotNull
+    protected Path getHomeDirectory() {
+        return homeDirectory;
+    }
+
+    @NotNull
+    @Override
+    public Path getWorkspacePath() {
+        if (workspacePath == null) {
+            throw new RuntimeException("Workspace path not initialized");
+        }
+        return workspacePath;
+    }
 }

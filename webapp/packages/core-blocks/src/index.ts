@@ -5,11 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+export { useHotkeys } from 'react-hotkeys-hook';
+
 export * from './CommonDialog/CommonDialog/CommonDialogBody.js';
 export * from './CommonDialog/CommonDialog/CommonDialogFooter.js';
 export * from './CommonDialog/CommonDialog/CommonDialogHeader.js';
 export * from './CommonDialog/CommonDialog/CommonDialogWrapper.js';
 export * from './CommonDialog/ConfirmationDialog.js';
+export { default as ConfirmationDialogStyles } from './CommonDialog/ConfirmationDialog.module.css';
 export * from './CommonDialog/ConfirmationDialogDelete.js';
 export * from './CommonDialog/RenameDialog.js';
 export * from './CommonDialog/DialogsPortal.js';

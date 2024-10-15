@@ -35,7 +35,7 @@ export const ChangePassword = observer<Props>(function ChangePassword({ state, d
           type="password"
           name="oldPassword"
           state={state}
-          disabled={disabled}
+          readOnly={disabled}
           mapValue={(value?: string) => value?.trim() ?? ''}
           small
           required
@@ -48,7 +48,7 @@ export const ChangePassword = observer<Props>(function ChangePassword({ state, d
           name="password"
           autoComplete="new-password"
           state={state}
-          disabled={disabled}
+          readOnly={disabled}
           mapValue={(value?: string) => value?.trim() ?? ''}
           small
           required
@@ -60,7 +60,7 @@ export const ChangePassword = observer<Props>(function ChangePassword({ state, d
           type="password"
           name="repeatedPassword"
           state={state}
-          disabled={disabled}
+          readOnly={disabled}
           mapValue={(value?: string) => value?.trim() ?? ''}
           small
           required

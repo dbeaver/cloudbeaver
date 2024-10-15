@@ -233,6 +233,12 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return BaseWorkspaceImpl.readWorkspaceIdProperty();
     }
 
+    @Override
+    public Path getWorkspaceDirectory() {
+        return getServerConfigurationController().getWorkspacePath();
+    }
+
+
     public String getApplicationId() {
         try {
             return getApplicationInstanceId();
@@ -251,5 +257,13 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     @Override
     public boolean isEnvironmentVariablesAccessible() {
         return false;
+    }
+
+    protected void closeResource(String name, Runnable closeFunction) {
+        try {
+            closeFunction.run();
+        } catch (Exception e) {
+            log.error("Failed close " + name, e);
+        }
     }
 }

@@ -24,7 +24,6 @@ import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.server.servlets.CBStatusServlet;
-import io.cloudbeaver.server.servlets.ProxyResourceHandler;
 import io.cloudbeaver.server.websockets.CBJettyWebSocketManager;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServiceBindingWebSocket;
@@ -61,6 +60,7 @@ public class CBJettyServer {
     }
 
     private final CBApplication<?> application;
+    private Server server;
 
     public CBJettyServer(@NotNull CBApplication<?> application) {
         this.application = application;
@@ -69,7 +69,6 @@ public class CBJettyServer {
     public void runServer() {
         try {
             CBServerConfig serverConfiguration = application.getServerConfiguration();
-            Server server;
             int serverPort = serverConfiguration.getServerPort();
             String serverHost = serverConfiguration.getServerHost();
             Path sslPath = getSslConfigurationPath();
@@ -101,11 +100,12 @@ public class CBJettyServer {
                 String rootURI = serverConfiguration.getRootURI();
                 servletContextHandler.setContextPath(rootURI);
 
-                ServletHolder staticServletHolder = new ServletHolder("static", new CBStaticServlet());
+                ServletHolder staticServletHolder = new ServletHolder(
+                    "static", new CBStaticServlet(Path.of(serverConfiguration.getContentRoot()))
+                );
                 staticServletHolder.setInitParameter("dirAllowed", "false");
                 staticServletHolder.setInitParameter("cacheControl", "public, max-age=" + CBStaticServlet.STATIC_CACHE_SECONDS);
                 servletContextHandler.addServlet(staticServletHolder, "/");
-                servletContextHandler.insertHandler(new ProxyResourceHandler(Path.of(serverConfiguration.getContentRoot())));
 
                 if (Files.isSymbolicLink(contentRootPath)) {
                     servletContextHandler.addAliasCheck(new CBSymLinkContentAllowedAliasChecker(contentRootPath));
@@ -198,7 +198,7 @@ public class CBJettyServer {
                     }
                 }
             }
-
+            refreshJettyConfig();
             server.start();
             server.join();
         } catch (Exception e) {
@@ -224,6 +224,7 @@ public class CBJettyServer {
     ) {
         // Init sessions persistence
         CBSessionHandler sessionHandler = new CBSessionHandler(application);
+        sessionHandler.setRefreshCookieAge(CBSessionHandler.ONE_MINUTE);
         int intMaxIdleSeconds;
         if (maxIdleTime > Integer.MAX_VALUE) {
             log.warn("Max session idle time value is greater than Integer.MAX_VALUE. Integer.MAX_VALUE will be used instead");
@@ -232,6 +233,7 @@ public class CBJettyServer {
         intMaxIdleSeconds = (int) (maxIdleTime / 1000);
         log.debug("Max http session idle time: " + intMaxIdleSeconds + "s");
         sessionHandler.setMaxInactiveInterval(intMaxIdleSeconds);
+        sessionHandler.setMaxCookieAge(intMaxIdleSeconds);
 
         DefaultSessionCache sessionCache = new DefaultSessionCache(sessionHandler);
         sessionCache.setSessionDataStore(new NullSessionDataStore());
@@ -241,6 +243,19 @@ public class CBJettyServer {
         DefaultSessionIdManager idMgr = new DefaultSessionIdManager(server);
         idMgr.setWorkerName(null);
         server.addBean(idMgr, true);
+    }
 
+    public synchronized void refreshJettyConfig() {
+        if (server == null) {
+            return;
+        }
+        log.info("Refreshing Jetty configuration");
+        if (server.getHandler() instanceof ServletContextHandler servletContextHandler
+            && servletContextHandler.getSessionHandler() instanceof CBSessionHandler cbSessionHandler
+        ) {
+            cbSessionHandler.setMaxCookieAge((int) (application.getMaxSessionIdleTime() / 1000));
+            var serverUrl = this.application.getServerURL();
+            cbSessionHandler.setSecureCookies(serverUrl != null && serverUrl.startsWith("https://"));
+        }
     }
 }

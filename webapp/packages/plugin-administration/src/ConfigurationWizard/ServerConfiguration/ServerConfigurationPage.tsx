@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { type AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
+import { type AdministrationItemContentComponent, ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import {
   ColoredContainer,
   ConfirmationDialog,
@@ -51,6 +51,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   const commonDialogService = useService(CommonDialogService);
   const notificationService = useService(NotificationService);
   const serverConfigurationFormStateManager = useService(ServerConfigurationFormStateManager);
+  const configurationWizardService = useService(ConfigurationWizardService);
 
   const formState = serverConfigurationFormStateManager.formState!;
   const part = getServerConfigurationFormPart(formState);
@@ -71,6 +72,11 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   const changed = part.isChanged;
 
   async function save() {
+    if (configurationWizard) {
+      configurationWizardService.next();
+      return;
+    }
+
     if (changed) {
       const result = await commonDialogService.open(ConfirmationDialog, {
         title: 'administration_server_configuration_save_confirmation_title',

@@ -8,4 +8,8 @@
 .menuWrapper {
   display: flex;
   height: 100%;
+
+  &.loader {
+    height: 100%;
+  }
 }

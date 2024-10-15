@@ -23,7 +23,6 @@ import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import java.io.File;
 import java.io.PrintStream;
 
 /**
@@ -33,7 +32,6 @@ public class WebPlatformActivator extends Plugin {
 
     // The shared instance
     private static WebPlatformActivator instance;
-    private static File configDir;
     private PrintStream debugWriter;
     private DBPPreferenceStore preferences;
 
