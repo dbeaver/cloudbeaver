@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.server;
 
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.impl.preferences.AbstractPreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
@@ -23,16 +24,12 @@ import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import java.io.IOException;
 import java.util.Map;
 
-public class CBPreferenceStore extends AbstractPreferenceStore {
-    @NotNull
-    private final CBPlatform cbPlatform;
+public class WebServerPreferenceStore extends AbstractPreferenceStore {
     private final DBPPreferenceStore parentStore;
 
-    public CBPreferenceStore(
-        @NotNull CBPlatform cbPlatform,
+    public WebServerPreferenceStore(
         @NotNull DBPPreferenceStore parentStore
     ) {
-        this.cbPlatform = cbPlatform;
         this.parentStore = parentStore;
     }
 
@@ -188,7 +185,7 @@ public class CBPreferenceStore extends AbstractPreferenceStore {
     }
 
     private Map<String, Object> productConf() {
-        var app = cbPlatform.getApplication();
-        return app.getProductConfiguration();
+        var app = WebAppUtils.getWebApplication();
+        return app.getServerConfiguration().getProductSettings();
     }
 }
