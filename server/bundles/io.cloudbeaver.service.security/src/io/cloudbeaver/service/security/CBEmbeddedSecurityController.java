@@ -2082,7 +2082,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         return finishAuthentication(authInfo, false, authInfo.isForceSessionsLogout());
     }
 
-    private SMAuthInfo finishAuthentication(
+    protected SMAuthInfo finishAuthentication(
         @NotNull SMAuthInfo authInfo,
         boolean isSyncAuth,
         boolean forceSessionsLogout
@@ -3134,7 +3134,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
     }
 
-    private WebAuthProviderDescriptor getAuthProvider(String authProviderId) throws DBCException {
+    protected WebAuthProviderDescriptor getAuthProvider(String authProviderId) throws DBCException {
         WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(authProviderId);
         if (authProvider == null) {
             throw new DBCException("Auth provider not found: " + authProviderId);
