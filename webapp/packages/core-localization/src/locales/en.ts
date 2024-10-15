@@ -15,6 +15,7 @@ export default [
   ['ui_stepper_next', 'Next'],
   ['ui_stepper_finish', 'Finish'],
   ['ui_load_more', 'Load more'],
+  ['ui_processing_connecting', 'Connecting...'],
   ['ui_processing_loading', 'Loading...'],
   ['ui_processing_cancel', 'Cancel'],
   ['ui_processing_canceling', 'Cancelling...'],

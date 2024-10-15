@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
-import { s, useS } from '@cloudbeaver/core-blocks';
+import { Loader, s, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
@@ -27,7 +27,9 @@ export const MainMenu = observer(function MainMenu() {
 
   return (
     <div className={s(styles, { menuWrapper: true })}>
-      <MenuBar menu={menu} nestedMenuSettings={{ modal: true }} />
+      <Loader className={s(styles, { loader: true }, 'secondary')} secondary suspense small inline>
+        <MenuBar menu={menu} nestedMenuSettings={{ modal: true }} />
+      </Loader>
     </div>
   );
 });
