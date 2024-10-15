@@ -197,7 +197,7 @@ export class ConnectionsManagerService {
       return;
     }
     const contexts = await this.onDisconnect.execute({
-      connections: [createConnectionParam(connection)],
+      connections: [key],
       state: 'before',
     });
 

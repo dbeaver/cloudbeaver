@@ -14,3 +14,7 @@
     display: none;
   }
 }
+
+.appStateMenu > .loader {
+  height: 100%;
+}
