@@ -2,7 +2,10 @@ name: CI
 
 on:
   pull_request:
-    branches: [devel]
+    types:
+      - opened
+      - synchronize
+      - reopened
   push:
     branches: [devel]
 
@@ -28,7 +31,7 @@ jobs:
 
   lint-server:
     name: Server
-    uses: ./.github/workflows/backend-lint.yml
+    uses: dbeaver/dbeaver-common/.github/workflows/java-checkstyle.yml@devel
     secrets: inherit
 
   lint-frontend:

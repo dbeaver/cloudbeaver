@@ -1,4 +1,4 @@
-name: Cleanup checks
+name: Cleanup
 
 on:
   pull_request:
@@ -9,25 +9,6 @@ on:
 
 jobs:
   delete-caches:
-    timeout-minutes: 5
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cleanup
-        run: |
-          gh extension install actions/gh-actions-cache
-
-          echo "Fetching list of cache keys"
-          cacheKeys=$(gh actions-cache list -R $REPO -B $BRANCH -L 100 | cut -f 1 )
-
-          # Setting this to not fail the workflow while deleting cache keys.
-          set +e
-          echo "Deleting caches..."
-          for cacheKey in $cacheKeys
-          do
-              gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
-          done
-          echo "Done"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          BRANCH: ${{ github.event_name == 'pull_request' && format('refs/pull/{0}/merge', github.event.pull_request.number) || 'refs/heads/main' }}
+    name: Cleanup
+    uses: dbeaver/dbeaver-common/.github/workflows/cleanup-caches.yml@devel
+    secrets: inherit
