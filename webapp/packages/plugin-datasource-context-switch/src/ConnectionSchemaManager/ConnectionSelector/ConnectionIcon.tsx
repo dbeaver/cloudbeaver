@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import {
   ConnectionImageWithMask,
   ConnectionImageWithMaskSvgStyles,
+  getComputed,
   s,
   SContext,
   type StyleRegistry,
@@ -47,9 +48,16 @@ export const ConnectionIcon = observer<ConnectionIconProps>(function ConnectionI
     return null;
   }
 
-  const driver = drivers.resource.get(connection.data.driverId);
+  const connected = getComputed(() => connection.data?.connected ?? false);
+  const driverIcon = getComputed(() => {
+    if (!connection.data?.driverId) {
+      return null;
+    }
 
-  if (!driver?.icon) {
+    return drivers.resource.get(connection.data.driverId)?.icon;
+  });
+
+  if (!driverIcon) {
     return null;
   }
 
@@ -58,8 +66,8 @@ export const ConnectionIcon = observer<ConnectionIconProps>(function ConnectionI
       <SContext registry={registry}>
         <ConnectionImageWithMask
           className={s(style, { connectionImageWithMask: true, small })}
-          icon={driver.icon}
-          connected={connection.data.connected}
+          icon={driverIcon}
+          connected={connected}
           maskId="connection-icon"
           size={size}
           paddingSize={0}
