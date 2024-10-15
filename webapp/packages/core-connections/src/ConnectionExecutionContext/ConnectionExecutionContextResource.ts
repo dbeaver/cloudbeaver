@@ -186,10 +186,10 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
       resourceKeyList(
         flat(
           ResourceKeyUtils.map(key, key =>
-            this.values.filter(context => {
-              const connection = this.connectionInfoResource.get(key);
-              return context.connectionId === key.connectionId && context.projectId === key.projectId && !connection?.connected;
-            }),
+            this.values.filter(
+              context =>
+                context.connectionId === key.connectionId && context.projectId === key.projectId && !this.connectionInfoResource.isConnected(key),
+            ),
           ),
         ).map(context => context.id),
       ),

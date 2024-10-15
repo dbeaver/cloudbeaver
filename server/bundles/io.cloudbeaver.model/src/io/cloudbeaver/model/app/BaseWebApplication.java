@@ -258,4 +258,12 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     public boolean isEnvironmentVariablesAccessible() {
         return false;
     }
+
+    protected void closeResource(String name, Runnable closeFunction) {
+        try {
+            closeFunction.run();
+        } catch (Exception e) {
+            log.error("Failed close " + name, e);
+        }
+    }
 }
