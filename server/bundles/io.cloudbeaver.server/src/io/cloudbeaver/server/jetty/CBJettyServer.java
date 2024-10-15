@@ -24,7 +24,6 @@ import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.server.servlets.CBStatusServlet;
-import io.cloudbeaver.server.servlets.ProxyResourceHandler;
 import io.cloudbeaver.server.websockets.CBJettyWebSocketManager;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServiceBindingWebSocket;
@@ -101,11 +100,12 @@ public class CBJettyServer {
                 String rootURI = serverConfiguration.getRootURI();
                 servletContextHandler.setContextPath(rootURI);
 
-                ServletHolder staticServletHolder = new ServletHolder("static", new CBStaticServlet());
+                ServletHolder staticServletHolder = new ServletHolder(
+                    "static", new CBStaticServlet(Path.of(serverConfiguration.getContentRoot()))
+                );
                 staticServletHolder.setInitParameter("dirAllowed", "false");
                 staticServletHolder.setInitParameter("cacheControl", "public, max-age=" + CBStaticServlet.STATIC_CACHE_SECONDS);
                 servletContextHandler.addServlet(staticServletHolder, "/");
-                servletContextHandler.insertHandler(new ProxyResourceHandler(Path.of(serverConfiguration.getContentRoot())));
 
                 if (Files.isSymbolicLink(contentRootPath)) {
                     servletContextHandler.addAliasCheck(new CBSymLinkContentAllowedAliasChecker(contentRootPath));

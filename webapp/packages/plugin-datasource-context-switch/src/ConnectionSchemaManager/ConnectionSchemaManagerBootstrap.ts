@@ -98,6 +98,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
         return [
           ...this.appAuthService.loaders,
+          ...this.connectionSchemaManagerService.currentObjectLoaders,
           getCachedMapResourceLoaderState(this.containerResource, () => ({
             ...activeConnectionKey,
             catalogId: this.connectionSchemaManagerService.activeObjectCatalogId,

@@ -58,7 +58,7 @@ export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(
     const mergedRef = useMergeRefs(ref, refNav);
     const styles = useS(style);
     const items = menu.items;
-    useAutoLoad(MenuBar, menu.loaders);
+    useAutoLoad(MenuBar, menu.loaders, true, false, true);
 
     if (!items.length) {
       return null;
@@ -67,7 +67,7 @@ export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(
     return (
       <SContext registry={styleRegistry}>
         <div ref={mergedRef} className={s(styles, { menuBar: true }, className)} tabIndex={0} {...props}>
-          <Loader suspense small>
+          <Loader suspense small inline>
             {items.map(item => (
               <MenuBarElement key={item.id} item={item} menuData={menu} nestedMenuSettings={nestedMenuSettings} rtl={rtl} />
             ))}

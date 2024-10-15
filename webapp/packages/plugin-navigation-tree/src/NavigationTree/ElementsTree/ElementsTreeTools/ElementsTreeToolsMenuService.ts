@@ -166,7 +166,7 @@ export class ElementsTreeToolsMenuService {
     state.filter = !state.filter;
   }
 
-  private elementsTreeActionHandler(contexts: IDataContextProvider, action: IAction) {
+  private async elementsTreeActionHandler(contexts: IDataContextProvider, action: IAction) {
     const tree = contexts.get(DATA_CONTEXT_ELEMENTS_TREE);
 
     if (tree === undefined) {
@@ -178,6 +178,9 @@ export class ElementsTreeToolsMenuService {
         tree.collapse();
         break;
       case ACTION_LINK_OBJECT: {
+        for (const loader of this.connectionSchemaManagerService.currentObjectLoaders) {
+          await loader.load();
+        }
         const navNode = this.connectionSchemaManagerService.activeNavNode;
 
         if (navNode?.path.includes(tree.baseRoot)) {

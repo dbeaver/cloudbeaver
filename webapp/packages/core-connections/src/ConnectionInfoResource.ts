@@ -15,6 +15,7 @@ import {
   CachedMapAllKey,
   CachedMapResource,
   type CachedResourceIncludeArgs,
+  type ICachedResourceMetadata,
   isResourceAlias,
   type ResourceKey,
   resourceKeyList,
@@ -76,8 +77,12 @@ export const DEFAULT_NAVIGATOR_VIEW_SETTINGS: NavigatorSettingsInput = {
   showUtilityObjects: false,
 };
 
+export interface IConnectionInfoMetadata extends ICachedResourceMetadata {
+  connecting?: boolean;
+}
+
 @injectable()
-export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoParams, Connection, ConnectionInfoIncludes> {
+export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoParams, Connection, ConnectionInfoIncludes, IConnectionInfoMetadata> {
   readonly onConnectionCreate: ISyncExecutor<Connection>;
   readonly onConnectionClose: ISyncExecutor<IConnectionInfoParams>;
 
@@ -237,6 +242,13 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     };
   }
 
+  isConnecting(key: IConnectionInfoParams): boolean;
+  isConnecting(key: ResourceKeyList<IConnectionInfoParams>): boolean;
+  isConnecting(key: ResourceKey<IConnectionInfoParams>): boolean;
+  isConnecting(key: ResourceKey<IConnectionInfoParams>): boolean {
+    return [this.metadata.get(key)].flat().some(connection => connection?.connecting ?? false);
+  }
+
   isConnected(key: IConnectionInfoParams): boolean;
   isConnected(key: ResourceKeyList<IConnectionInfoParams>): boolean;
   isConnected(key: ResourceKey<IConnectionInfoParams>): boolean;
@@ -390,13 +402,19 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     const key: IConnectionInfoParams = { projectId: config.projectId, connectionId: config.connectionId };
 
     await this.performUpdate(key, [], async () => {
-      const { connection } = await this.graphQLService.sdk.initConnection({
-        ...config,
-        ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(key),
-      });
-      this.set(createConnectionParam(connection), connection);
-      this.onDataOutdated.execute(key);
+      const metadata = this.metadata.get(key);
+      metadata.connecting = true;
+      try {
+        const { connection } = await this.graphQLService.sdk.initConnection({
+          ...config,
+          ...this.getDefaultIncludes(),
+          ...this.getIncludesMap(key),
+        });
+        this.set(createConnectionParam(connection), connection);
+        this.onDataOutdated.execute(key);
+      } finally {
+        metadata.connecting = false;
+      }
     });
 
     return this.get(key)!;
@@ -444,8 +462,10 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
         ...this.getIncludesMap(key),
       });
 
-      this.set(createConnectionParam(connection), connection);
-      this.onDataOutdated.execute(key);
+      runInAction(() => {
+        this.set(createConnectionParam(connection), connection);
+        this.onDataOutdated.execute(key);
+      });
     });
 
     return this.get(key)!;
