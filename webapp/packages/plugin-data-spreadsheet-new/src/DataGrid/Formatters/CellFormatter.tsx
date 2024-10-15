@@ -59,7 +59,6 @@ export const CellFormatter = observer<Props>(function CellFormatter({ className,
             spreadsheetActions={spreadsheetActions}
             resultIndex={context.resultIndex}
             simple={context.simple}
-            className={s(styles, { cellMenu: true })}
             onStateSwitch={setMenuVisible}
           />
         </div>

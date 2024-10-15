@@ -90,7 +90,7 @@ export class ObjectViewerTabService {
     this.navNodeManagerService.navigator.addPostHandler(this.navigationPostHandler.bind(this));
     this.connectionInfoResource.onItemUpdate.addHandler(this.updateConnectionTabs.bind(this));
     this.connectionInfoResource.onItemDelete.addHandler(this.closeConnectionTabs.bind(this));
-    this.navNodeManagerService.navTree.onItemDelete.addHandler(this.removeTabs.bind(this));
+    this.navTreeResource.onItemDelete.addHandler(this.removeTabs.bind(this));
     this.navTreeResource.onNodeRename.addHandler(this.handleNodeRename.bind(this));
   }
 
@@ -252,10 +252,9 @@ export class ObjectViewerTabService {
     });
   }
 
-  private async removeTabs(key: ResourceKey<string>) {
+  // this method must be synchronous with nav-tree update
+  private removeTabs(key: ResourceKey<string>) {
     const tabs: string[] = [];
-
-    await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
 
     ResourceKeyUtils.forEach(key, key => {
       const tab = this.navigationTabsService.findTab(isObjectViewerTab(tab => tab.handlerState.objectId === key));
@@ -282,9 +281,7 @@ export class ObjectViewerTabService {
 
   private getNavNode({ handlerState }: ITab<IObjectViewerTabState>) {
     if (handlerState.connectionKey) {
-      const connection = this.connectionInfoResource.get(handlerState.connectionKey);
-
-      if (!connection?.connected) {
+      if (!this.connectionInfoResource.isConnected(handlerState.connectionKey)) {
         return;
       }
     }
