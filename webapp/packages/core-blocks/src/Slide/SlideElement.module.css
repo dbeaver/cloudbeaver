@@ -11,11 +11,11 @@
   display: inline-block;
   vertical-align: top;
   white-space: normal;
-  transition: transform ease-in-out 0.4s;
+  transition: transform ease-in-out 0.3s;
   transform: translateX(-100%);
 
   &:first-child {
-    transition: width ease-in-out 0.4s;
+    transition: width ease-in-out 0.3s;
     width: 100%;
   }
 }
