@@ -16,6 +16,7 @@ export * from './extensions/IObjectCatalogProvider.js';
 export * from './extensions/IObjectCatalogSetter.js';
 export * from './extensions/IObjectSchemaProvider.js';
 export * from './extensions/IObjectSchemaSetter.js';
+export * from './extensions/IObjectLoaderProvider.js';
 export * from './extensions/IExecutionContextProvider.js';
 export * from './NavTree/ConnectionNavNodeService.js';
 export * from './NavTree/NavNodeExtensionsService.js';

@@ -126,7 +126,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       isActionApplicable: (context, action) => {
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
 
-        if (action !== ACTION_NEW_FOLDER || !this.userInfoResource.data || tree.baseRoot !== ROOT_NODE_PATH) {
+        if (action !== ACTION_NEW_FOLDER || !this.userInfoResource.isAuthenticated() || tree.baseRoot !== ROOT_NODE_PATH) {
           return false;
         }
 
