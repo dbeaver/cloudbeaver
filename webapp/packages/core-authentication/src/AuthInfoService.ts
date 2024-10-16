@@ -25,10 +25,6 @@ export class AuthInfoService {
     return this.userInfoResource.data;
   }
 
-  get isAnonymous(): boolean {
-    return !this.userInfoResource.data;
-  }
-
   constructor(
     private readonly userInfoResource: UserInfoResource,
     private readonly authProvidersResource: AuthProvidersResource,
