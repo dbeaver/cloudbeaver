@@ -38,7 +38,7 @@ describe('NodeManagerUtils', () => {
 
   describe('concatSchemaAndCatalog', () => {
     it('should concatenate schemaId and catalogId with "@" when both are provided', () => {
-      const result = NodeManagerUtils.concatSchemaAndCatalog('schema1', 'catalog1');
+      const result = NodeManagerUtils.concatSchemaAndCatalog('catalog1', 'schema1');
       expect(result).toBe('schema1@catalog1');
     });
 
