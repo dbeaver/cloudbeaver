@@ -5,14 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { runInAction } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import {
-  CACHED_RESOURCE_DEFAULT_PAGE_LIMIT,
-  CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedMapAllKey,
   CachedMapResource,
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
+  getOffsetPageKeyInfo,
   isResourceAlias,
   type ResourceKey,
   resourceKeyList,
@@ -22,12 +23,18 @@ import {
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
 import { EAdminPermission, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { AdminConnectionGrantInfo, AdminUserInfo, AdminUserInfoFragment, GetUsersListQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
+import {
+  type AdminConnectionGrantInfo,
+  type AdminUserInfo,
+  type AdminUserInfoFragment,
+  type GetUsersListQueryVariables,
+  GraphQLService,
+} from '@cloudbeaver/core-sdk';
 
-import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
-import { AuthInfoService } from './AuthInfoService';
-import { AuthProviderService } from './AuthProviderService';
-import type { IAuthCredentials } from './IAuthCredentials';
+import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
+import { AuthInfoService } from './AuthInfoService.js';
+import { AuthProviderService } from './AuthProviderService.js';
+import type { IAuthCredentials } from './IAuthCredentials.js';
 
 const NEW_USER_SYMBOL = Symbol('new-user');
 
@@ -53,6 +60,7 @@ export const UsersResourceNewUsers = resourceKeyListAlias('@users-resource/new-u
 interface UserCreateOptions {
   userId: string;
   authRole?: string;
+  enabled?: boolean;
 }
 
 @injectable()
@@ -130,16 +138,11 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     });
   }
 
-  async setMetaParameters(userId: string, parameters: Record<string, any>): Promise<void> {
-    await this.graphQLService.sdk.saveUserMetaParameters({ userId, parameters });
-  }
-
-  async create({ userId, authRole }: UserCreateOptions): Promise<AdminUser> {
+  async create({ userId, authRole, enabled }: UserCreateOptions): Promise<AdminUser> {
     const { user } = await this.graphQLService.sdk.createUser({
       userId,
       authRole,
-      enabled: false,
-      ...this.getDefaultIncludes(),
+      enabled: enabled ?? false,
       ...this.getIncludesMap(userId),
     });
 
@@ -218,13 +221,13 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     await this.refresh(userId);
   }
 
-  async delete(key: ResourceKeySimple<string>): Promise<void> {
+  async deleteUsers(key: ResourceKeySimple<string>): Promise<void> {
     await ResourceKeyUtils.forEachAsync(key, async key => {
       if (this.isActiveUser(key)) {
         throw new Error("You can't delete current logged user");
       }
       await this.graphQLService.sdk.deleteUser({ userId: key });
-      super.delete(key);
+      this.delete(key);
     });
   }
 
@@ -240,6 +243,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     }
 
     const usersList: AdminUser[] = [];
+    const pages: Parameters<typeof this.offsetPagination.setPage>[] = [];
 
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {
       let userId: string | undefined;
@@ -251,24 +255,15 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       if (userId !== undefined) {
         const { user } = await this.graphQLService.sdk.getAdminUserInfo({
           userId,
-          ...this.getDefaultIncludes(),
           ...this.getIncludesMap(userId, includes),
         });
 
         usersList.push(user);
       } else {
-        const pageKey =
-          this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
+        const { isPageListKey, offset, limit } = getOffsetPageKeyInfo(this, originalKey);
         const filterKey = this.aliases.isAlias(originalKey, UsersResourceFilterKey);
-        let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
-        let limit = CACHED_RESOURCE_DEFAULT_PAGE_LIMIT;
         let userIdMask: string | undefined;
         let enabledState: boolean | undefined;
-
-        if (pageKey) {
-          offset = pageKey.options.offset;
-          limit = pageKey.options.limit;
-        }
 
         if (filterKey) {
           userIdMask = filterKey.options.userId;
@@ -284,30 +279,33 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
             userIdMask,
             enabledState,
           },
-          ...this.getDefaultIncludes(),
           ...this.getIncludesMap(userId, includes),
         });
 
         usersList.push(...users);
 
-        this.offsetPagination.setPageEnd(CachedResourceOffsetPageListKey(offset, users.length).setTarget(filterKey), users.length === limit);
+        pages.push([
+          isPageListKey
+            ? CachedResourceOffsetPageListKey(offset, users.length).setParent(filterKey)
+            : CachedResourceOffsetPageKey(offset, users.length).setParent(filterKey),
+          users.map(user => user.userId),
+          users.length === limit,
+        ]);
       }
     });
 
     const key = resourceKeyList(usersList.map(user => user.userId));
-    this.set(key, usersList);
+    runInAction(() => {
+      this.set(key, usersList);
+      for (const pageArgs of pages) {
+        this.offsetPagination.setPage(...pageArgs);
+      }
+    });
 
     return this.data;
   }
 
-  private getDefaultIncludes(): UserResourceIncludes {
-    return {
-      customIncludeOriginDetails: false,
-      includeMetaParameters: false,
-    };
-  }
-
-  protected dataSet(key: string, value: AdminUserInfoFragment): void {
+  protected override dataSet(key: string, value: AdminUserInfoFragment): void {
     const oldValue = this.data.get(key);
     super.dataSet(key, { ...oldValue, ...value });
   }

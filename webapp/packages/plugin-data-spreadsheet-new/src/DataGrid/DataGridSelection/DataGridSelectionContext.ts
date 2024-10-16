@@ -9,7 +9,7 @@ import { createContext } from 'react';
 
 import type { IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IDraggingPosition } from '../useGridDragging';
+import type { IDraggingPosition } from '../useGridDragging.js';
 
 export interface IDataGridSelectionContext {
   selectedCells: Map<string, IResultSetElementKey[]>;
@@ -17,6 +17,10 @@ export interface IDataGridSelectionContext {
   selectColumn: (colIdx: number, multiple: boolean) => void;
   selectTable: () => void;
   isSelected: (rowIdx: number, colIdx: number) => boolean;
+  getFocusedElementPosition: () => {
+    rowIdx: number;
+    columnIdx: number;
+  } | null;
   selectRange: (startPosition: IDraggingPosition, lastPosition: IDraggingPosition, multiple: boolean, temporary: boolean) => void;
 }
 

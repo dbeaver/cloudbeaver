@@ -7,17 +7,23 @@
  */
 import { action, computed, makeObservable, observable } from 'mobx';
 
-import { ConnectionInfoResource, createConnectionParam, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
+import {
+  ConnectionInfoOriginResource,
+  ConnectionInfoResource,
+  createConnectionParam,
+  type DatabaseConnection,
+  type IConnectionInfoParams,
+} from '@cloudbeaver/core-connections';
+import { Executor, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import type { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { ResourceKeySimple } from '@cloudbeaver/core-resource';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { formStateContext, type IFormStateInfo } from '@cloudbeaver/core-ui';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
-import { connectionFormConfigureContext } from './connectionFormConfigureContext';
-import type { ConnectionFormService } from './ConnectionFormService';
-import type { ConnectionFormMode, ConnectionFormType, IConnectionFormState, IConnectionFormSubmitData } from './IConnectionFormProps';
+import { connectionFormConfigureContext } from './connectionFormConfigureContext.js';
+import type { ConnectionFormService } from './ConnectionFormService.js';
+import type { ConnectionFormMode, ConnectionFormType, IConnectionFormState, IConnectionFormSubmitData } from './IConnectionFormProps.js';
 
 export class ConnectionFormState implements IConnectionFormState {
   mode: ConnectionFormMode;
@@ -56,6 +62,14 @@ export class ConnectionFormState implements IConnectionFormState {
     return this.resource.get(createConnectionParam(this.projectId, this.config.connectionId));
   }
 
+  get originInfo() {
+    if (!this.config.connectionId || this.projectId === null) {
+      return undefined;
+    }
+
+    return this.originResource.get(createConnectionParam(this.projectId, this.config.connectionId));
+  }
+
   get readonly(): boolean {
     if (this.stateInfo?.readonly) {
       return true;
@@ -81,6 +95,7 @@ export class ConnectionFormState implements IConnectionFormState {
   }
 
   readonly resource: ConnectionInfoResource;
+  readonly originResource: ConnectionInfoOriginResource;
   readonly service: ConnectionFormService;
   readonly submittingTask: IExecutor<IConnectionFormSubmitData>;
   readonly closeTask: IExecutor;
@@ -96,11 +111,13 @@ export class ConnectionFormState implements IConnectionFormState {
     private readonly projectInfoResource: ProjectInfoResource,
     service: ConnectionFormService,
     resource: ConnectionInfoResource,
+    originResource: ConnectionInfoOriginResource,
   ) {
     this._id = uuid();
     this.initError = null;
 
     this.resource = resource;
+    this.originResource = originResource;
     this.projectId = null;
     this.config = {};
     this._availableDrivers = [];
@@ -165,6 +182,7 @@ export class ConnectionFormState implements IConnectionFormState {
       availableDrivers: computed,
       _availableDrivers: observable,
       info: computed,
+      originInfo: computed,
       statusMessage: observable,
       configured: observable,
       readonly: computed,
@@ -319,5 +337,6 @@ export class ConnectionFormState implements IConnectionFormState {
     }
 
     await data.resource.load(key, configuration.connectionIncludes);
+    await this.originResource.load(key);
   }
 }

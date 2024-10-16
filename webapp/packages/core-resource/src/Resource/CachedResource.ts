@@ -11,10 +11,10 @@ import {
   ExecutionContext,
   Executor,
   ExecutorInterrupter,
-  IExecutionContextProvider,
-  IExecutor,
-  IExecutorHandler,
-  ISyncExecutor,
+  type IExecutionContextProvider,
+  type IExecutor,
+  type IExecutorHandler,
+  type ISyncExecutor,
   SyncExecutor,
   TaskScheduler,
 } from '@cloudbeaver/core-executor';
@@ -23,20 +23,20 @@ import { getFirstException, isContainsException } from '@cloudbeaver/core-utils'
 import {
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
-  expandOffsetPageRange,
+  CachedResourceOffsetPageTargetKey,
   isOffsetPageInRange,
   isOffsetPageOutdated,
-} from './CachedResourceOffsetPageKeys';
-import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
-import type { IResource } from './IResource';
-import { Resource } from './Resource';
-import { isResourceAlias } from './ResourceAlias';
-import { ResourceError } from './ResourceError';
-import type { ResourceKey, ResourceKeyFlat } from './ResourceKey';
-import { resourceKeyAlias } from './ResourceKeyAlias';
-import { resourceKeyList } from './ResourceKeyList';
-import { resourceKeyListAlias } from './ResourceKeyListAlias';
-import { ResourceOffsetPagination } from './ResourceOffsetPagination';
+} from './CachedResourceOffsetPageKeys.js';
+import type { ICachedResourceMetadata } from './ICachedResourceMetadata.js';
+import type { IResource } from './IResource.js';
+import { Resource } from './Resource.js';
+import { isResourceAlias } from './ResourceAlias.js';
+import { ResourceError } from './ResourceError.js';
+import type { ResourceKey, ResourceKeyFlat } from './ResourceKey.js';
+import { resourceKeyAlias } from './ResourceKeyAlias.js';
+import { isResourceKeyList, resourceKeyList } from './ResourceKeyList.js';
+import { resourceKeyListAlias } from './ResourceKeyListAlias.js';
+import { ResourceOffsetPagination } from './ResourceOffsetPagination.js';
 
 export interface IDataError<TKey> {
   param: ResourceKey<TKey>;
@@ -75,7 +75,7 @@ export abstract class CachedResource<
   constructor(defaultKey: ResourceKey<TKey>, defaultValue: () => TData, defaultIncludes: TInclude = [] as any) {
     super(defaultValue, defaultIncludes);
 
-    this.offsetPagination = new ResourceOffsetPagination(this.metadata);
+    this.offsetPagination = new ResourceOffsetPagination(this.metadata, this.getKeyRef.bind(this));
 
     this.loadingTask = this.loadingTask.bind(this);
 
@@ -90,8 +90,59 @@ export abstract class CachedResource<
 
     this.aliases.add(CachedResourceParamKey, () => defaultKey);
     this.aliases.add(CachedResourceListEmptyKey, () => resourceKeyList([]));
-    this.aliases.add(CachedResourceOffsetPageKey, key => key.target);
-    this.aliases.add(CachedResourceOffsetPageListKey, key => key.target ?? CachedResourceListEmptyKey);
+    this.aliases.add(CachedResourceOffsetPageTargetKey, key => key.options.target);
+    this.aliases.add(
+      CachedResourceOffsetPageListKey,
+      key => key.parent! as any,
+      (param, key) => {
+        if (!isResourceKeyList(key)) {
+          return key as any;
+        }
+
+        const keys = new Set<any>();
+        const pageInfo = this.offsetPagination.getPageInfo(param);
+
+        if (pageInfo) {
+          const from = param.options.offset;
+          const to = param.options.offset + param.options.limit;
+
+          for (const page of pageInfo.pages) {
+            if (page.isHasCommonSegment(from, to)) {
+              for (const pageKey of page.get(from, to)) {
+                keys.add(pageKey);
+              }
+            }
+          }
+        }
+        return resourceKeyList(key.filter(value => keys.has(value)));
+      },
+    );
+    this.aliases.add(
+      CachedResourceOffsetPageKey,
+      key => key.parent! as any,
+      (param, key) => {
+        if (!isResourceKeyList(key)) {
+          return key as any;
+        }
+
+        const keys = new Set<any>();
+        const pageInfo = this.offsetPagination.getPageInfo(param);
+
+        if (pageInfo) {
+          const from = param.options.offset;
+          const to = param.options.offset + param.options.limit;
+
+          for (const page of pageInfo.pages) {
+            if (page.isHasCommonSegment(from, to)) {
+              for (const pageKey of page.get(from, to)) {
+                keys.add(pageKey);
+              }
+            }
+          }
+        }
+        return resourceKeyList(key.filter(value => keys.has(value)));
+      },
+    );
 
     // this.logger.spy(this.beforeLoad, 'beforeLoad');
     // this.logger.spy(this.onDataOutdated, 'onDataOutdated');
@@ -295,6 +346,7 @@ export abstract class CachedResource<
     }
 
     const pageKey = this.aliases.isAlias(param, CachedResourceOffsetPageKey) || this.aliases.isAlias(param, CachedResourceOffsetPageListKey);
+
     if (pageKey) {
       const pageInfo = this.offsetPagination.getPageInfo(pageKey);
 
@@ -316,17 +368,8 @@ export abstract class CachedResource<
   }
 
   markLoaded(param: ResourceKey<TKey>, includes?: TInclude): void {
-    const pageKey = this.aliases.isAlias(param, CachedResourceOffsetPageKey) || this.aliases.isAlias(param, CachedResourceOffsetPageListKey);
-
     this.metadata.update(param, metadata => {
       metadata.loaded = true;
-
-      if (pageKey) {
-        metadata.offsetPage = observable({
-          ...metadata.offsetPage,
-          pages: expandOffsetPageRange(metadata.offsetPage?.pages || [], pageKey.options, false),
-        });
-      }
 
       if (includes) {
         this.commitIncludes(metadata, includes);
@@ -353,13 +396,17 @@ export abstract class CachedResource<
       metadata.outdated = false;
 
       if (pageKey) {
-        metadata.offsetPage = observable({
-          ...metadata.offsetPage,
-          pages: expandOffsetPageRange(metadata.offsetPage?.pages || [], pageKey.options, false),
+        const from = pageKey.options.offset;
+        const to = from + pageKey.options.limit;
+
+        metadata.offsetPage?.pages.forEach(page => {
+          if (page.isInRange(from, to)) {
+            page.setOutdated(false);
+          }
         });
       } else {
         metadata.offsetPage?.pages.forEach(page => {
-          page.outdated = false;
+          page.setOutdated(false);
         });
       }
     });
@@ -405,9 +452,13 @@ export abstract class CachedResource<
       metadata.outdated = false;
 
       if (pageKey) {
-        metadata.offsetPage = observable({
-          ...metadata.offsetPage,
-          pages: expandOffsetPageRange(metadata.offsetPage?.pages || [], pageKey.options, false),
+        const from = pageKey.options.offset;
+        const to = from + pageKey.options.limit;
+
+        metadata.offsetPage?.pages.forEach(page => {
+          if (page.isInRange(from, to)) {
+            page.setOutdated(false);
+          }
         });
       }
     });
@@ -541,13 +592,17 @@ export abstract class CachedResource<
       metadata.outdatedIncludes = observable([...metadata.includes]);
 
       if (pageKey) {
-        metadata.offsetPage = observable({
-          ...metadata.offsetPage,
-          pages: expandOffsetPageRange(metadata.offsetPage?.pages || [], pageKey.options, true),
+        const from = pageKey.options.offset;
+        const to = from + pageKey.options.limit;
+
+        metadata.offsetPage?.pages.forEach(page => {
+          if (page.isHasCommonSegment(from, to)) {
+            page.setOutdated(true);
+          }
         });
       } else {
         metadata.offsetPage?.pages.forEach(page => {
-          page.outdated = true;
+          page.setOutdated(true);
         });
       }
     });
@@ -559,7 +614,7 @@ export abstract class CachedResource<
         metadata.outdated = true;
         metadata.outdatedIncludes = observable([...metadata.includes]);
         metadata.offsetPage?.pages.forEach(page => {
-          page.outdated = true;
+          page.setOutdated(true);
         });
       });
     }
@@ -765,7 +820,7 @@ export abstract class CachedResource<
 
   private flushOutdatedWaitList(): void {
     for (let i = 0; i < this.outdateWaitList.length; i++) {
-      const key = this.outdateWaitList[i];
+      const key = this.outdateWaitList[i]!;
       this.markOutdatedSync(key);
     }
     this.outdateWaitList = [];

@@ -17,6 +17,8 @@ import {
   s,
   Split,
   TextPlaceholder,
+  useListKeyboardNavigation,
+  useMergeRefs,
   useObjectRef,
   useObservableRef,
   useS,
@@ -27,20 +29,20 @@ import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { CaptureView } from '@cloudbeaver/core-view';
 
-import { DatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction';
-import { IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions';
-import { DataPresentationService, DataPresentationType } from '../DataPresentationService';
-import { isResultSetDataModel } from '../ResultSet/isResultSetDataModel';
-import { DataPresentation } from './DataPresentation';
-import { DataViewerViewService } from './DataViewerViewService';
-import type { IDataTableActionsPrivate } from './IDataTableActions';
-import { TableError } from './TableError';
-import { TableFooter } from './TableFooter/TableFooter';
-import { TableHeader } from './TableHeader/TableHeader';
-import { TablePresentationBar } from './TablePresentationBar/TablePresentationBar';
-import { TableToolsPanel } from './TableToolsPanel';
+import { DatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';
+import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
+import { DataPresentationService, DataPresentationType } from '../DataPresentationService.js';
+import { isResultSetDataModel } from '../ResultSet/isResultSetDataModel.js';
+import { DataPresentation } from './DataPresentation.js';
+import { DataViewerViewService } from './DataViewerViewService.js';
+import type { IDataTableActionsPrivate } from './IDataTableActions.js';
+import { TableError } from './TableError.js';
+import { TableFooter } from './TableFooter/TableFooter.js';
+import { TableHeader } from './TableHeader/TableHeader.js';
+import { TablePresentationBar } from './TablePresentationBar/TablePresentationBar.js';
+import { TableToolsPanel } from './TableToolsPanel.js';
 import style from './TableViewer.module.css';
-import { TableViewerStorageService } from './TableViewerStorageService';
+import { TableViewerStorageService } from './TableViewerStorageService.js';
 
 export interface TableViewerProps {
   tableId: string;
@@ -69,6 +71,10 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     const loading = dataModel?.isLoading() ?? true;
     const dataFormat = result?.dataFormat || ResultDataFormat.Resultset;
     const splitState = useSplitUserState('table-viewer');
+    const navRef = useListKeyboardNavigation(
+      '[data-presentation][tabindex]:not(:disabled), [data-presentation-tools][tabindex]:not(:disabled), [data-presentation-header][tabindex]:not(:disabled), [data-presentation-bar][tabindex]:not(:disabled)',
+    );
+    const mergedRef = useMergeRefs(ref, navRef);
 
     const localActions = useObjectRef({
       clearConstraints() {
@@ -201,7 +207,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
 
     return (
       <CaptureView className={s(styles, { captureView: true })} view={dataViewerView}>
-        <div ref={ref} className={s(styles, { tableViewer: true }, className)}>
+        <div ref={mergedRef} tabIndex={0} className={s(styles, { tableViewer: true }, className)}>
           <div className={s(styles, { tableContent: true })}>
             {!isStatistics && (
               <TablePresentationBar
@@ -212,11 +218,13 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
                 supportedDataFormat={dataModel.supportedDataFormats}
                 model={dataModel}
                 resultIndex={resultIndex}
+                tabIndex={0}
+                data-presentation-bar
                 onPresentationChange={dataTableActions.setPresentation}
               />
             )}
             <div className={s(styles, { tableData: true })}>
-              <TableHeader model={dataModel} resultIndex={resultIndex} simple={simple} />
+              <TableHeader model={dataModel} resultIndex={resultIndex} simple={simple} tabIndex={0} data-presentation-header />
               <Split
                 className={s(styles, { split: true, disabled: !valuePanelDisplayed })}
                 {...splitState}
@@ -227,7 +235,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
                 disableAutoMargin
               >
                 <Pane className={s(styles, { pane: true })}>
-                  <div className={s(styles, { paneContent: true, grid: true })}>
+                  <div className={s(styles, { paneContent: true, grid: true })} tabIndex={0} data-presentation>
                     <Loader className={s(styles, { loader: true })} suspense>
                       <DataPresentation
                         model={dataModel}
@@ -276,12 +284,14 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
                 supportedDataFormat={[dataFormat]}
                 model={dataModel}
                 resultIndex={resultIndex}
+                tabIndex={0}
+                data-presentation-bar
                 onPresentationChange={dataTableActions.setValuePresentation}
                 onClose={dataTableActions.closeValuePresentation}
               />
             )}
           </div>
-          <TableFooter model={dataModel} resultIndex={resultIndex} simple={simple} />
+          <TableFooter model={dataModel} resultIndex={resultIndex} simple={simple} tabIndex={0} data-presentation-tools />
         </div>
       </CaptureView>
     );

@@ -7,7 +7,7 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { UserInfoResource } from './UserInfoResource';
+import { UserInfoResource } from './UserInfoResource.js';
 
 @injectable()
 export class UserConfigurationBootstrap extends Bootstrap {
@@ -15,7 +15,7 @@ export class UserConfigurationBootstrap extends Bootstrap {
     super();
   }
 
-  async load(): Promise<void> {
+  override async load(): Promise<void> {
     await this.userInfoResource.load();
   }
 }

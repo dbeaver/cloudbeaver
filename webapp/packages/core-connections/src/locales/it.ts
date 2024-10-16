@@ -51,7 +51,7 @@ export default [
   ['connections_connection_edit_search_hosts', 'Host names'],
   ['connections_connection_address', 'Indirizzo'],
   ['connections_connection_folder', 'Folder'],
-  ['connections_connection_folder_validation', "Folder's name may not contain the following symbols / : \" \\ and can't start with a dot"],
+  ['connections_connection_folder_validation', "Folder's name may not contain the following symbols / : \" \\ ' <> | ? * and can't start with a dot"],
   ['connections_connection_name', 'Nome della connessione'],
   ['connections_connection_access_revoke', 'Revoca'],
   ['connections_connection_access_grant', 'Permetti'],
@@ -97,4 +97,8 @@ export default [
     'cloud_connections_access_placeholder',
     'Connessioni Cloud sono visibili a tutti gli utenti. Il gestore degli accessi può essere configurato in "AWS Management Console".',
   ],
+
+  ['core_connections_settings_disable', 'Disable'],
+  ['core_connections_settings_disable_description', 'Disable the ability to create new connections'],
+  ['connections_templates_deprecated_message', 'Template connections are deprecated and will be removed in future releases'],
 ];

@@ -7,7 +7,7 @@
  */
 import type { NavNode } from '@cloudbeaver/core-navigation-tree';
 
-import type { IElementsTree } from './useElementsTree';
+import type { IElementsTree } from './useElementsTree.js';
 
 export enum EEquality {
   none,

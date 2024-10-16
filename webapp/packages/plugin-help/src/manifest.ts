@@ -12,5 +12,5 @@ export const manifest: PluginManifest = {
     name: 'Help plugin',
   },
 
-  providers: [() => import('./PluginBootstrap').then(m => m.PluginBootstrap), () => import('./LocaleService').then(m => m.LocaleService)],
+  providers: [() => import('./PluginBootstrap.js').then(m => m.PluginBootstrap), () => import('./LocaleService.js').then(m => m.LocaleService)],
 };

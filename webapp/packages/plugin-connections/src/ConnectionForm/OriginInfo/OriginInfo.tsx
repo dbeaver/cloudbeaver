@@ -21,10 +21,15 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { createConnectionParam, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
-import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
+import {
+  ConnectionInfoOriginDetailsResource,
+  createConnectionParam,
+  DatabaseAuthModelsResource,
+  DBDriverResource,
+} from '@cloudbeaver/core-connections';
+import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps';
+import type { IConnectionFormProps } from '../IConnectionFormProps.js';
 import styles from './OriginInfo.module.css';
 
 export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = observer(function OriginInfo({
@@ -46,34 +51,30 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   const providerId = authModeLoader.data?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
   const isAuthenticated = userInfoLoader.resource.hasToken(providerId);
   const providerLoader = useResource(OriginInfo, AuthProvidersResource, providerId);
+  const connectionId = tab.selected && info ? createConnectionParam(info.projectId, info.id) : null;
 
-  const connection = useResource(
-    OriginInfo,
-    resource,
-    {
-      key: tab.selected && info ? createConnectionParam(info.projectId, info.id) : null,
-      includes: ['includeOrigin', 'customIncludeOriginDetails'] as const,
+  const connectionOriginDetailsResource = useResource(OriginInfo, ConnectionInfoOriginDetailsResource, connectionId, {
+    active: isAuthenticated,
+  });
+  const connection = useResource(OriginInfo, resource, connectionId, {
+    active: isAuthenticated,
+    onData: connection => {
+      runInAction(() => {
+        if (!connectionOriginDetailsResource.data?.origin.details) {
+          return;
+        }
+
+        for (const property of Object.keys(state)) {
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          delete state[property];
+        }
+
+        for (const property of connectionOriginDetailsResource.data.origin.details) {
+          state[property.id!] = property.value;
+        }
+      });
     },
-    {
-      active: isAuthenticated,
-      onData: connection => {
-        runInAction(() => {
-          if (!connection.origin.details) {
-            return;
-          }
-
-          for (const property of Object.keys(state)) {
-            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-            delete state[property];
-          }
-
-          for (const property of connection.origin.details) {
-            state[property.id!] = property.value;
-          }
-        });
-      },
-    },
-  );
+  });
 
   if (connection.isLoading()) {
     return (
@@ -95,7 +96,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
     return (
       <ColoredContainer className={s(style, { coloredContainer: true })} parent>
         <TextPlaceholder>
-          {translate('connections_public_connection_cloud_auth_required', undefined, {
+          {translate('plugin_connections_connection_cloud_auth_required', undefined, {
             providerLabel: providerLoader.data?.label,
           })}
         </TextPlaceholder>
@@ -103,7 +104,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
     );
   }
 
-  if (!connection.data?.origin.details || connection.data.origin.details.length === 0) {
+  if (!connectionOriginDetailsResource.data?.origin.details || connectionOriginDetailsResource.data?.origin.details.length === 0) {
     return (
       <ColoredContainer className={s(style, { coloredContainer: true })} parent>
         <TextPlaceholder>{translate('connections_administration_connection_no_information')}</TextPlaceholder>
@@ -114,7 +115,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   return (
     <ColoredContainer className={s(style, { coloredContainer: true })} parent>
       <Group large gap>
-        <ObjectPropertyInfoForm properties={connection.data.origin.details} state={state} readOnly small autoHide />
+        <ObjectPropertyInfoForm properties={connectionOriginDetailsResource.data?.origin.details} state={state} readOnly small autoHide />
       </Group>
       <Loader key="overlay" className={s(style, { loader: true })} loading={connection.isLoading()} overlay />
     </ColoredContainer>

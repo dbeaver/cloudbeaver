@@ -34,10 +34,10 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 
-import type { ISqlEditorTabState } from './ISqlEditorTabState';
-import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
+import type { ISqlEditorTabState } from './ISqlEditorTabState.js';
+import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
 import style from './SqlEditorOverlay.module.css';
-import { SqlEditorService } from './SqlEditorService';
+import { SqlEditorService } from './SqlEditorService.js';
 
 interface Props {
   state: ISqlEditorTabState;
@@ -94,7 +94,7 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
   }, [connected, initExecutionContext]);
 
   return (
-    <Overlay active={initExecutionContext && !connection.tryGetData?.connected}>
+    <Overlay active={initExecutionContext && !connected}>
       <OverlayHeader>
         <OverlayHeaderIcon icon={driver.tryGetData?.icon} />
         <OverlayHeaderTitle>{connection.tryGetData?.name}</OverlayHeaderTitle>

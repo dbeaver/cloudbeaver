@@ -10,10 +10,10 @@ import { useContext } from 'react';
 
 import { getComputed, TreeNode, useObjectRef } from '@cloudbeaver/core-blocks';
 
-import { ElementsTreeContext } from '../ElementsTreeContext';
-import type { NavigationNodeComponent } from '../NavigationNodeComponent';
-import { transformNodeInfo } from '../transformNodeInfo';
-import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders';
+import { ElementsTreeContext } from '../ElementsTreeContext.js';
+import type { NavigationNodeComponent } from '../NavigationNodeComponent.js';
+import { transformNodeInfo } from '../transformNodeInfo.js';
+import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders.js';
 
 export const NavigationNodeDragged: NavigationNodeComponent = observer(function NavigationNodeDragged({ node, className, control: externalControl }) {
   const contextRef = useObjectRef({

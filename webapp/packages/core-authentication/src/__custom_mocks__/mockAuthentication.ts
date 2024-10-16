@@ -7,7 +7,7 @@
  */
 import type { graphql } from 'msw';
 
-import { mockGetActiveUser } from './resolvers/mockGetActiveUser';
+import { mockGetActiveUser } from './resolvers/mockGetActiveUser.js';
 
 export function mockAuthentication(endpoint: ReturnType<typeof graphql.link>) {
   return [endpoint.query('getActiveUser', mockGetActiveUser)];

@@ -8,11 +8,11 @@
 import { UserDataService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 
-import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
-import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService';
-import { OUTPUT_LOG_TYPES } from './IOutputLogTypes';
-import { OUTPUT_LOGS_TAB_ID } from './OUTPUT_LOGS_TAB_ID';
-import type { IOutputLog } from './OutputLogsResource';
+import type { ISqlEditorTabState } from '../../ISqlEditorTabState.js';
+import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService.js';
+import { OUTPUT_LOG_TYPES } from './IOutputLogTypes.js';
+import { OUTPUT_LOGS_TAB_ID } from './OUTPUT_LOGS_TAB_ID.js';
+import type { IOutputLog } from './OutputLogsResource.js';
 
 const OUTPUT_LOGS_KEY = 'output_logs';
 

@@ -10,8 +10,8 @@ import { computed, makeObservable, observable } from 'mobx';
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import type { AsyncTaskInfo } from '../sdk';
-import { ServerInternalError } from '../ServerInternalError';
+import type { AsyncTaskInfo } from '../sdk.js';
+import { ServerInternalError } from '../ServerInternalError.js';
 
 export class AsyncTask {
   readonly id: string;

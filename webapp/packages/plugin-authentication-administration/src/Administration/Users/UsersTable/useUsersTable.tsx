@@ -7,15 +7,15 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import { AdminUser, compareUsers, UsersResource, UsersResourceFilterKey, UsersResourceNewUsers } from '@cloudbeaver/core-authentication';
+import { type AdminUser, compareUsers, UsersResource, UsersResourceFilterKey, UsersResourceNewUsers } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialogDelete, TableState, useObservableRef, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
-import { ILoadableState, isArraysEqual, isDefined } from '@cloudbeaver/core-utils';
+import { type ILoadableState, isArraysEqual, isDefined } from '@cloudbeaver/core-utils';
 
-import type { IUserFilters } from './Filters/useUsersTableFilters';
+import type { IUserFilters } from './Filters/useUsersTableFilters.js';
 
 interface State {
   loading: boolean;
@@ -34,7 +34,7 @@ export function useUsersTable(filters: IUserFilters) {
   const pagination = useOffsetPagination(UsersResource, {
     key: UsersResourceFilterKey(filters.search.toLowerCase(), filters.status === 'true' ? true : filters.status === 'false' ? false : undefined),
   });
-  const usersLoader = useResource(useUsersTable, usersResource, pagination.key);
+  const usersLoader = useResource(useUsersTable, usersResource, pagination.currentPage);
   const notificationService = useService(NotificationService);
   const commonDialogService = useService(CommonDialogService);
 
@@ -47,7 +47,10 @@ export function useUsersTable(filters: IUserFilters) {
       },
       get users() {
         const users = Array.from(
-          new Set([...this.usersLoader.resource.get(UsersResourceNewUsers), ...usersLoader.tryGetData.filter(isDefined).sort(compareUsers)]),
+          new Set([
+            ...this.usersLoader.resource.get(UsersResourceNewUsers),
+            ...usersResource.get(pagination.allPages).filter(isDefined).sort(compareUsers),
+          ]),
         );
         return filters.filterUsers(users.filter(isDefined));
       },
@@ -64,7 +67,7 @@ export function useUsersTable(filters: IUserFilters) {
           return;
         }
 
-        const deletionList = this.state.selectedList.filter(([_, value]) => value).map(([userId]) => userId);
+        const deletionList = this.state.selectedList.filter(([_, value]) => value).map(([userId]) => userId!);
         if (deletionList.length === 0) {
           return;
         }
@@ -85,7 +88,7 @@ export function useUsersTable(filters: IUserFilters) {
         this.loading = true;
 
         try {
-          await this.usersLoader.resource.delete(resourceKeyList(deletionList));
+          await this.usersLoader.resource.deleteUsers(resourceKeyList(deletionList));
           this.state.unselect();
 
           for (const id of deletionList) {

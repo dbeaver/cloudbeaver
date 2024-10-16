@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-navigation-tree",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -65,7 +66,7 @@
     "@cloudbeaver/plugin-navigation-tabs": "^0",
     "@cloudbeaver/tests-runner": "^0",
     "@jest/globals": "^29",
-    "@testing-library/jest-dom": "^6",
+    "@types/jest": "^29",
     "@types/react": "^18",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5"

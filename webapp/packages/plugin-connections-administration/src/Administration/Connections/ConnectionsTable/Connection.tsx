@@ -7,25 +7,40 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Loader, Placeholder, s, StaticImage, TableColumnValue, TableItem, TableItemExpand, TableItemSelect, useS } from '@cloudbeaver/core-blocks';
-import { DatabaseConnection, DBDriverResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import {
+  Loader,
+  Placeholder,
+  s,
+  StaticImage,
+  TableColumnValue,
+  TableItem,
+  TableItemExpand,
+  TableItemSelect,
+  useResource,
+  useS,
+} from '@cloudbeaver/core-blocks';
+import { type ConnectionInfoOrigin, type DatabaseConnection, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 
-import { ConnectionsAdministrationService } from '../ConnectionsAdministrationService';
+import { ConnectionsAdministrationService } from '../ConnectionsAdministrationService.js';
 import styles from './Connection.module.css';
-import { ConnectionEdit } from './ConnectionEdit';
+import { ConnectionEdit } from './ConnectionEdit.js';
 
 interface Props {
   connectionKey: IConnectionInfoParams;
   connection: DatabaseConnection;
-  projectName?: string | null;
+  shouldDisplayProject: boolean;
+  connectionOrigin?: ConnectionInfoOrigin;
+  icon?: string;
 }
 
-export const Connection = observer<Props>(function Connection({ connectionKey, connection, projectName }) {
-  const driversResource = useService(DBDriverResource);
-  const connectionsAdministrationService = useService(ConnectionsAdministrationService);
-  const icon = driversResource.get(connection.driverId)?.icon;
+export const Connection = observer<Props>(function Connection({ connectionKey, connectionOrigin, connection, shouldDisplayProject, icon }) {
   const style = useS(styles);
+  const connectionsAdministrationService = useService(ConnectionsAdministrationService);
+  const projectInfoResource = useResource(Connection, ProjectInfoResource, connectionKey.projectId, { active: shouldDisplayProject });
+
+  const projectName = shouldDisplayProject ? (projectInfoResource.data?.name ?? '') : undefined;
 
   return (
     <TableItem item={connectionKey} expandElement={ConnectionEdit}>
@@ -46,13 +61,17 @@ export const Connection = observer<Props>(function Connection({ connectionKey, c
         {connection.host && connection.port && `:${connection.port}`}
       </TableColumnValue>
       {projectName !== undefined && (
-        <TableColumnValue title={projectName ?? ''} className={s(style, { tableColumnValueExpand: true })} expand ellipsis>
+        <TableColumnValue title={projectName} className={s(style, { tableColumnValueExpand: true })} expand ellipsis>
           {projectName}
         </TableColumnValue>
       )}
       <TableColumnValue flex>
         <Loader suspense small inline hideMessage>
-          <Placeholder container={connectionsAdministrationService.connectionDetailsPlaceholder} connection={connection} />
+          <Placeholder
+            container={connectionsAdministrationService.connectionDetailsPlaceholder}
+            connectionOrigin={connectionOrigin}
+            connection={connection}
+          />
         </Loader>
       </TableColumnValue>
     </TableItem>

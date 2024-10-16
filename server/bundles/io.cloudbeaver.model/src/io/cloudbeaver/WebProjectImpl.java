@@ -26,22 +26,26 @@ import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.task.DBTTaskManager;
 import org.jkiss.dbeaver.registry.rm.DataSourceRegistryRM;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+
+import java.nio.file.Path;
 
 public abstract class WebProjectImpl extends BaseWebProjectImpl {
     private static final Log log = Log.getLog(WebProjectImpl.class);
     @NotNull
-    private final DBPPreferenceStore preferenceStore;
+    protected final DBPPreferenceStore preferenceStore;
+
     public WebProjectImpl(
         @NotNull DBPWorkspace workspace,
         @NotNull RMController resourceController,
         @NotNull SMSessionContext sessionContext,
         @NotNull RMProject project,
-        @NotNull DataSourceFilter dataSourceFilter,
-        @NotNull DBPPreferenceStore preferenceStore
+        @NotNull DBPPreferenceStore preferenceStore,
+        @NotNull Path path
     ) {
-        super(workspace, resourceController, sessionContext, project, dataSourceFilter);
+        super(workspace, resourceController, sessionContext, project, path);
         this.preferenceStore = preferenceStore;
     }
 
@@ -72,11 +76,22 @@ public abstract class WebProjectImpl extends BaseWebProjectImpl {
 
     @NotNull
     @Override
+    public DBTTaskManager getTaskManager() {
+        throw new IllegalStateException("Task manager not supported");
+    }
+
+    @NotNull
+    @Override
     protected DBPDataSourceRegistry createDataSourceRegistry() {
         return new WebDataSourceRegistryProxy(
             new DataSourceRegistryRM(this, getResourceController(), preferenceStore),
-            dataSourceFilter
+            getDataSourceFilter()
         );
+    }
+
+    @NotNull
+    public DataSourceFilter getDataSourceFilter() {
+        return (ds) -> true;
     }
 
 }

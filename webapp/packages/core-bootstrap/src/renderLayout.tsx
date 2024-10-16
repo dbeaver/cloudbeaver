@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { Suspense } from 'react';
-import { createRoot, Root } from 'react-dom/client';
+import { createRoot, type Root } from 'react-dom/client';
 
 import { BodyLazy } from '@cloudbeaver/core-app';
 import { DisplayError, ErrorBoundary, Loader, s } from '@cloudbeaver/core-blocks';

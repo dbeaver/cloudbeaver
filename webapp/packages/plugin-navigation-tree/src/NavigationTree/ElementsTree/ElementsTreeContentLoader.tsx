@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { getComputed, Loader, Translate, TreeNodeNestedMessage } from '@cloudbeaver/core-blocks';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
-import type { IElementsTreeContext } from './ElementsTreeContext';
+import type { IElementsTreeContext } from './ElementsTreeContext.js';
 
 interface Props {
   context: IElementsTreeContext;

@@ -1,16 +1,15 @@
-mutation updateUserPreferences(
-  $preferences: Object!
-  $includeMetaParameters: Boolean!
-  $includeConfigurationParameters: Boolean!
-  $customIncludeOriginDetails: Boolean!
-) {
+mutation updateUserPreferences($preferences: Object!, $includeConfigurationParameters: Boolean!) {
   user: setUserPreferences(preferences: $preferences) {
     userId
     displayName
     authRole
     linkedAuthProviders
-    metaParameters @include(if: $includeMetaParameters)
     configurationParameters @include(if: $includeConfigurationParameters)
+    teams {
+      teamId
+      teamName
+      teamRole
+    }
     authTokens {
       ...AuthToken
     }

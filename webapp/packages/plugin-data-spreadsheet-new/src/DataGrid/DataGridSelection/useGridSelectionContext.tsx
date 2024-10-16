@@ -10,16 +10,16 @@ import { useState } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import {
-  IResultSetColumnKey,
-  IResultSetElementKey,
-  IResultSetRowKey,
+  type IResultSetColumnKey,
+  type IResultSetElementKey,
+  type IResultSetRowKey,
   ResultSetDataKeysUtils,
   ResultSetSelectAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import type { ITableData } from '../TableDataContext';
-import type { IDraggingPosition } from '../useGridDragging';
-import type { IDataGridSelectionContext } from './DataGridSelectionContext';
+import type { ITableData } from '../TableDataContext.js';
+import type { IDraggingPosition } from '../useGridDragging.js';
+import type { IDataGridSelectionContext } from './DataGridSelectionContext.js';
 
 interface IGridSelectionState {
   range: boolean;
@@ -92,12 +92,12 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
       for (let rowIdx = firstRowIndex; rowIdx <= lastRowIndex; rowIdx++) {
         const row = props.tableData.getRow(rowIdx)!;
         const newElements = rowSelection
-          .filter(element => !rowsSelection[i].some(column => ResultSetDataKeysUtils.isEqual(column.column, element)))
+          .filter(element => !rowsSelection[i]!.some(column => ResultSetDataKeysUtils.isEqual(column.column, element)))
           .map<IResultSetElementKey>(column => ({ row, column }));
 
         temporarySelection.set(
           ResultSetDataKeysUtils.serialize(row),
-          [...rowsSelection[i], ...newElements].filter(column => {
+          [...rowsSelection[i]!, ...newElements].filter(column => {
             if (selected) {
               return !rowSelection.some(key => ResultSetDataKeysUtils.isEqual(key, column.column));
             }
@@ -238,6 +238,19 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
     }
   }
 
+  function getFocusedElementPosition() {
+    const element = props.selectionAction.getFocusedElement();
+
+    if (!element) {
+      return null;
+    }
+
+    const column = props.tableData.getColumnIndexFromColumnKey(element.column);
+    const row = props.tableData.getRowIndexFromKey(element.row);
+
+    return { rowIdx: row, columnIdx: column };
+  }
+
   return useObjectRef<IDataGridSelectionContext>(
     () => ({
       get selectedCells() {
@@ -246,6 +259,7 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
       select,
       selectColumn,
       selectTable,
+      getFocusedElementPosition,
       isSelected,
       selectRange,
     }),

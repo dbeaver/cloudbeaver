@@ -24,7 +24,7 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({ prov
     credentials.credentials = {};
   }
 
-  const profile = provider.credentialProfiles[credentials.profile as any as number];
+  const profile = provider.credentialProfiles[credentials.profile as any as number]!;
 
   return (
     <Group ref={elementRef} gap small center>
@@ -51,7 +51,7 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({ prov
               type={parameter.encryption === 'none' ? 'text' : 'password'}
               name={parameter.id}
               state={credentials.credentials}
-              disabled={authenticate}
+              readOnly={authenticate}
               canShowPassword={false}
               autoComplete={`section-authentication section-${provider.id} ${configuration?.id ?? ''} ${parameter.id}`}
             >

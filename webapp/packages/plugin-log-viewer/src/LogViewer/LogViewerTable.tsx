@@ -9,8 +9,8 @@ import { observer } from 'mobx-react-lite';
 
 import { Container, MenuBarSmallItem, s, Table, TableBody, TableColumnHeader, TableHeader, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import type { ILogEntry } from './ILogEntry';
-import { LogEntry } from './LogEntry';
+import type { ILogEntry } from './ILogEntry.js';
+import { LogEntry } from './LogEntry.js';
 import styles from './LogViewerTable.module.css';
 
 interface Props {

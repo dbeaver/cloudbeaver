@@ -5,10 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Fill, PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { Fill, importLazyComponent, PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
-import { ConfigurationWizardTitle } from './ConfigurationWizardTitle';
+const ConfigurationWizardTitle = importLazyComponent(() => import('./ConfigurationWizardTitle.js').then(m => m.ConfigurationWizardTitle));
 
 @injectable()
 export class WizardTopAppBarService {

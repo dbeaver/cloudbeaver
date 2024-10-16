@@ -5,20 +5,20 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { IDNDBox, useDNDBox } from '@cloudbeaver/core-ui';
+import { type IDNDBox, useDNDBox } from '@cloudbeaver/core-ui';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY,
-  IDatabaseDataModel,
-  IResultSetColumnKey,
+  type IDatabaseDataModel,
+  type IResultSetColumnKey,
   isResultSetDataSource,
   ResultSetDataAction,
   ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IGroupingQueryState } from './IGroupingQueryState';
-import type { IGroupingDataModel } from './useGroupingDataModel';
+import type { IGroupingQueryState } from './IGroupingQueryState.js';
+import type { IGroupingDataModel } from './useGroupingDataModel.js';
 
 interface IGroupingQueryResult {
   dndBox: IDNDBox;

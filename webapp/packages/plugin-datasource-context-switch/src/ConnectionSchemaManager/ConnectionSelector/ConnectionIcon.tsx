@@ -7,13 +7,22 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ConnectionImageWithMask, ConnectionImageWithMaskSvgStyles, s, SContext, StyleRegistry, useResource, useS } from '@cloudbeaver/core-blocks';
+import {
+  ConnectionImageWithMask,
+  ConnectionImageWithMaskSvgStyles,
+  getComputed,
+  s,
+  SContext,
+  type StyleRegistry,
+  useResource,
+  useS,
+} from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
 import styles from './ConnectionIcon.module.css';
 import ConnectionImageWithMaskSvgBackgroundStyles from './ConnectionImageWithMask.module.css';
-import type { IConnectionSelectorExtraProps } from './IConnectionSelectorExtraProps';
+import type { IConnectionSelectorExtraProps } from './IConnectionSelectorExtraProps.js';
 
 export interface ConnectionIconProps extends IConnectionSelectorExtraProps {
   size?: number;
@@ -39,9 +48,16 @@ export const ConnectionIcon = observer<ConnectionIconProps>(function ConnectionI
     return null;
   }
 
-  const driver = drivers.resource.get(connection.data.driverId);
+  const connected = getComputed(() => connection.data?.connected ?? false);
+  const driverIcon = getComputed(() => {
+    if (!connection.data?.driverId) {
+      return null;
+    }
 
-  if (!driver?.icon) {
+    return drivers.resource.get(connection.data.driverId)?.icon;
+  });
+
+  if (!driverIcon) {
     return null;
   }
 
@@ -50,8 +66,8 @@ export const ConnectionIcon = observer<ConnectionIconProps>(function ConnectionI
       <SContext registry={registry}>
         <ConnectionImageWithMask
           className={s(style, { connectionImageWithMask: true, small })}
-          icon={driver.icon}
-          connected={connection.data.connected}
+          icon={driverIcon}
+          connected={connected}
           maskId="connection-icon"
           size={size}
           paddingSize={0}

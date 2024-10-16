@@ -15,6 +15,7 @@ export default [
   ['ui_stepper_next', 'Avanti'],
   ['ui_stepper_finish', 'Termina'],
   ['ui_load_more', 'Load more'],
+  ['ui_processing_connecting', 'Collegamento...'],
   ['ui_processing_loading', 'Caricamento...'],
   ['ui_processing_cancel', 'Annulla'],
   ['ui_processing_canceling', 'Annullamento...'],
@@ -48,6 +49,7 @@ export default [
   ['ui_errors_details', 'Dettagli'],
   ['ui_search', 'Cerca...'],
   ['ui_delete', 'Elimina'],
+  ['ui_deleting', 'Deleting...'],
   ['ui_add', 'Aggiungi'],
   ['ui_revert', 'Revert'],
   ['ui_undo', 'Undo'],
@@ -122,6 +124,7 @@ export default [
   ['ui_test', 'Test'],
   ['ui_export', 'Export'],
   ['ui_you', 'You'],
+  ['ui_ms', 'ms'],
 
   ['root_permission_denied', 'Non hai i permessi'],
   ['app_root_session_expire_warning_title', 'La sessione sta per scadere'],

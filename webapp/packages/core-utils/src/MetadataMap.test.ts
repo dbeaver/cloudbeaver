@@ -8,7 +8,7 @@
 import { describe, expect, it } from '@jest/globals';
 import { z } from 'zod';
 
-import { MetadataMap } from './MetadataMap';
+import { MetadataMap } from './MetadataMap.js';
 
 describe('MetadataMap', () => {
   it('should create an empty map', () => {

@@ -9,13 +9,13 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { Button, getComputed, PlaceholderComponent, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, getComputed, type PlaceholderComponent, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
 
-import { ConnectionFormActionsContext } from './ConnectFormActionsContext';
-import type { IConnectionFormProps } from './IConnectionFormProps';
+import { ConnectionFormActionsContext } from './ConnectFormActionsContext.js';
+import type { IConnectionFormProps } from './IConnectionFormProps.js';
 
 export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormBaseActions({
   state,
@@ -52,11 +52,11 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
         </Button>
       )}
       {!disableTest && (
-        <Button type="button" disabled={state.disabled || !authorized} mod={['outlined']} loader onClick={actions.test}>
+        <Button type="button" disabled={state.disabled || !authorized} mod={['outlined']} loader onClick={actions['test']}>
           {translate('connections_connection_test')}
         </Button>
       )}
-      <Button type="button" disabled={state.disabled || state.readonly} mod={['unelevated']} loader onClick={actions.save}>
+      <Button type="button" disabled={state.disabled || state.readonly} mod={['unelevated']} loader onClick={actions['save']}>
         {translate(state.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_create')}
       </Button>
     </>

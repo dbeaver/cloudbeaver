@@ -11,13 +11,13 @@ import { ConfirmationDialogDelete, ProcessSnackbar } from '@cloudbeaver/core-blo
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
-import { ProjectInfo, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
+import { Executor, ExecutorInterrupter, type IExecutor } from '@cloudbeaver/core-executor';
+import { type ProjectInfo, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-import type { IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
-import { Connection, ConnectionInfoResource, createConnectionParam, isConnectionInfoParamEqual } from './ConnectionInfoResource';
-import { ContainerResource, IStructContainers, ObjectContainer } from './ContainerResource';
+import type { IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA.js';
+import { type Connection, ConnectionInfoResource, createConnectionParam, isConnectionInfoParamEqual } from './ConnectionInfoResource.js';
+import { ContainerResource, type IStructContainers, type ObjectContainer } from './ContainerResource.js';
 
 export interface IRequireConnectionExecutorData {
   key: IConnectionInfoParams;
@@ -197,7 +197,7 @@ export class ConnectionsManagerService {
       return;
     }
     const contexts = await this.onDisconnect.execute({
-      connections: [createConnectionParam(connection)],
+      connections: [key],
       state: 'before',
     });
 

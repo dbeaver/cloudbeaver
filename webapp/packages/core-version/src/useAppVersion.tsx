@@ -7,7 +7,7 @@
  */
 import { useService } from '@cloudbeaver/core-di';
 
-import { VersionService } from './VersionService';
+import { VersionService } from './VersionService.js';
 
 export function useAppVersion(short = false) {
   const versionService = useService(VersionService);

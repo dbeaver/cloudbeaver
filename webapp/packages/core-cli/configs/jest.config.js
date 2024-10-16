@@ -11,9 +11,9 @@ const path = require('path');
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
   testEnvironment: require.resolve('../tests/test.environment.js'),
-  rootDir: path.resolve('./'),
+  rootDir: path.resolve('.'),
   moduleFileExtensions: ['js', 'jsx', 'json'],
-  testMatch: ['<rootDir>/(packages/*/|)dist/?(*.)+(spec|test).js?(x)'],
+  testMatch: ['<rootDir>/packages/*/dist/**/?(*.)+(spec|test).js?(x)', '<rootDir>/dist/**/?(*.)+(spec|test).js?(x)'],
   transformIgnorePatterns: [
     '\\.pnp\\.[^\\/]+$',
     'node_modules/(?!@ngrx|(?!deck.gl)|ng-dynamic)',
@@ -23,7 +23,7 @@ module.exports = {
   moduleNameMapper: {
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': require.resolve('./__mocks__/fileMock.js'),
     '\\.(css|scss|less)$': require.resolve('./__mocks__/styleMock.js'),
-    '^dexie$': require.resolve('dexie'),
+    // '^dexie$': require.resolve('dexie'),
   },
   // passWithNoTests: true,
   setupFiles: [require.resolve('fake-indexeddb/auto'), require.resolve('../tests/setup.js')],

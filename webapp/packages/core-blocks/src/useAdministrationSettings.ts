@@ -7,8 +7,8 @@
  */
 import { EAdminPermission, ServerConfigResource } from '@cloudbeaver/core-root';
 
-import { useResource } from './ResourcesHooks/useResource';
-import { usePermission } from './usePermission';
+import { useResource } from './ResourcesHooks/useResource.js';
+import { usePermission } from './usePermission.js';
 
 interface IAdministrationSettings {
   credentialsSavingEnabled: boolean;

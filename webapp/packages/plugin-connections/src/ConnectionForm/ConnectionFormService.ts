@@ -11,15 +11,15 @@ import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
+import { ExecutorHandlersCollection, ExecutorInterrupter, type IExecutorHandler, type IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 
-import { ConnectionAuthenticationDialogLoader } from '../ConnectionAuthentication/ConnectionAuthenticationDialogLoader';
-import { ConnectionFormBaseActionsLoader } from './ConnectionFormBaseActionsLoader';
-import { connectionConfigContext } from './Contexts/connectionConfigContext';
-import { connectionCredentialsStateContext } from './Contexts/connectionCredentialsStateContext';
-import type { IConnectionFormFillConfigData, IConnectionFormProps, IConnectionFormState, IConnectionFormSubmitData } from './IConnectionFormProps';
+import { ConnectionAuthenticationDialogLoader } from '../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
+import { ConnectionFormBaseActionsLoader } from './ConnectionFormBaseActionsLoader.js';
+import { connectionConfigContext } from './Contexts/connectionConfigContext.js';
+import { connectionCredentialsStateContext } from './Contexts/connectionCredentialsStateContext.js';
+import type { IConnectionFormFillConfigData, IConnectionFormProps, IConnectionFormState, IConnectionFormSubmitData } from './IConnectionFormProps.js';
 
 export interface IConnectionFormValidation {
   valid: boolean;
@@ -112,7 +112,7 @@ export class ConnectionFormService {
       } else {
         this.notificationService.notify(
           {
-            title: status.messages[0],
+            title: status.messages[0]!,
             message: status.messages.slice(1).join('\n'),
           },
           status.saved ? ENotificationType.Success : ENotificationType.Error,

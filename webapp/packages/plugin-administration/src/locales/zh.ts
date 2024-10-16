@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['administration_server_configuration_save_confirmation_title', '服务器设置更新'],
   ['administration_server_configuration_save_confirmation_message', '即将更改关键设置。您确定吗？'],
@@ -14,6 +21,7 @@ export default [
   ['administration_configuration_wizard_configuration', '服务器配置'],
   ['administration_configuration_wizard_configuration_step_description', '主要的服务器配置'],
   ['administration_configuration_wizard_configuration_title', '您可以在这里配置主要的服务器参数'],
+  ['administration_configuration_wizard_configuration_save_error', 'Failed to save server configuration'],
   [
     'administration_configuration_wizard_configuration_message',
     '管理员是一个超级用户，可以配置服务器、设置数据库连接、管理其他用户等等。请记住输入的密码。无法自动恢复管理员密码。',
@@ -52,7 +60,7 @@ export default [
   ['administration_configuration_wizard_configuration_navigator_show_system_objects', '系统对象'],
   ['administration_configuration_wizard_configuration_navigator_show_utility_objects', '实用程序对象'],
 
-  ['administration_configuration_wizard_step_validation_message', 'Failed to proceed to the next step'],
+  ['administration_configuration_wizard_step_validation_message', '无法继续执行下一步'],
 
   ['administration_configuration_wizard_finish', '确认'],
   ['administration_configuration_wizard_finish_step_description', '确认'],
@@ -62,6 +70,6 @@ export default [
     '按完成按钮完成服务器配置。如果您想更改或添加某些内容，可以返回到前面的页面。\n配置完成后，所有输入的设置都将应用于您的CloudBeaver服务器。您将被重定向到主页面开始工作。\n您可以随时以管理员身份登录系统以更改服务器设置。',
   ],
 
-  ['administration_disabled_drivers_title', 'Disabled drivers'],
-  ['administration_disabled_drivers_search_placeholder', 'Search for the driver...'],
+  ['administration_disabled_drivers_title', '已禁用的驱动'],
+  ['administration_disabled_drivers_search_placeholder', '搜索驱动...'],
 ];

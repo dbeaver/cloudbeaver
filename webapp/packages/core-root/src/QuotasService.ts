@@ -7,7 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 
-import { ServerResourceQuotasResource } from './ServerResourceQuotasResource';
+import { ServerResourceQuotasResource } from './ServerResourceQuotasResource.js';
 
 interface IQuotas {
   dataExportFileSizeLimit: number;
@@ -52,7 +52,7 @@ export class QuotasService {
    * Quotas should be manually loaded from ServerResourceQuotasResource before using this method
    */
   getQuota(key: QuotaKey) {
-    const serverQuota = this.serverResourceQuotasResource.data?.resourceQuotas[key];
+    const serverQuota = this.serverResourceQuotasResource.data?.[key];
 
     if (isNumber(serverQuota)) {
       return serverQuota;

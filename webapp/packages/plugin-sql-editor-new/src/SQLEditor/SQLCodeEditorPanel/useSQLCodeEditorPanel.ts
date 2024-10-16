@@ -12,7 +12,7 @@ import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
 import { throttle } from '@cloudbeaver/core-utils';
 import type { ISQLEditorData } from '@cloudbeaver/plugin-sql-editor';
 
-import type { IEditor } from '../SQLCodeEditor/useSQLCodeEditor';
+import type { IEditor } from '../SQLCodeEditor/useSQLCodeEditor.js';
 
 interface State {
   highlightActiveQuery: () => void;

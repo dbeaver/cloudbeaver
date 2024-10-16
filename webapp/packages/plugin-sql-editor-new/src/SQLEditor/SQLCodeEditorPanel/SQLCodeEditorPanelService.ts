@@ -9,7 +9,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { ESqlDataSourceFeatures, SqlEditorModeService } from '@cloudbeaver/plugin-sql-editor';
 
-const SQLCodeEditorPanel = importLazyComponent(() => import('./SQLCodeEditorPanel').then(module => module.SQLCodeEditorPanel));
+const SQLCodeEditorPanel = importLazyComponent(() => import('./SQLCodeEditorPanel.js').then(module => module.SQLCodeEditorPanel));
 
 @injectable()
 export class SQLCodeEditorPanelService {

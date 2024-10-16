@@ -10,12 +10,12 @@ import { action, makeObservable, runInAction } from 'mobx';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { getDependingDataActions } from './Actions/DatabaseDataActionDecorator';
-import { isDatabaseDataAction } from './DatabaseDataAction';
-import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
-import type { IDatabaseDataActions } from './IDatabaseDataActions';
-import type { IDatabaseDataResult } from './IDatabaseDataResult';
-import type { IDatabaseDataSource } from './IDatabaseDataSource';
+import { getDependingDataActions } from './Actions/DatabaseDataActionDecorator.js';
+import { isDatabaseDataAction } from './DatabaseDataAction.js';
+import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction.js';
+import type { IDatabaseDataActions } from './IDatabaseDataActions.js';
+import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
+import type { IDatabaseDataSource } from './IDatabaseDataSource.js';
 
 type ActionsList<TOptions, TResult extends IDatabaseDataResult> = Array<IDatabaseDataAction<TOptions, TResult>>;
 
@@ -69,6 +69,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
 
         action = new Action(this.source, ...depends);
         action.updateResult(result, this.source.results.indexOf(result));
+        action.afterResultUpdate();
         this.actions.set(result.uniqueResultId, [...this.actions.get(result.uniqueResultId), action]);
       });
     }

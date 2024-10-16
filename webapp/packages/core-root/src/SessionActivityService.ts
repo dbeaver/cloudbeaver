@@ -8,7 +8,7 @@
 import { ClientActivityService } from '@cloudbeaver/core-client-activity';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 
-import { SessionResource } from './SessionResource';
+import { SessionResource } from './SessionResource.js';
 
 export const SESSION_TOUCH_TIME_PERIOD = 1000 * 60;
 

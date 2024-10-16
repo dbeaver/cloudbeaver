@@ -17,10 +17,10 @@ import {
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { AuthProviderConfigurationInfoFragment, AuthProviderInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
+import { type AuthProviderConfigurationInfoFragment, type AuthProviderInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { AuthConfigurationsResource } from './AuthConfigurationsResource';
-import { AuthSettingsService } from './AuthSettingsService';
+import { AuthConfigurationsResource } from './AuthConfigurationsResource.js';
 
 export type AuthProvider = NonNullable<AuthProviderInfoFragment>;
 export type AuthProviderConfiguration = NonNullable<AuthProviderConfigurationInfoFragment>;
@@ -31,8 +31,13 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
     return this.values.filter(provider => provider.configurable);
   }
 
+  get enabledConfigurableAuthProviders(): AuthProvider[] {
+    const enabledProviders = new Set(this.serverConfigResource.data?.enabledAuthProviders);
+
+    return this.configurable.filter(provider => enabledProviders.has(provider.id));
+  }
+
   constructor(
-    private readonly authSettingsService: AuthSettingsService,
     private readonly graphQLService: GraphQLService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly authConfigurationsResource: AuthConfigurationsResource,
@@ -64,7 +69,7 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   }
 
   getEnabledProviders(): AuthProvider[] {
-    return this.get(resourceKeyList(this.serverConfigResource.enabledAuthProviders)) as AuthProvider[];
+    return this.get(resourceKeyList(this.serverConfigResource.enabledAuthProviders)).filter(isNotNullDefined);
   }
 
   isEnabled(id: string): boolean {

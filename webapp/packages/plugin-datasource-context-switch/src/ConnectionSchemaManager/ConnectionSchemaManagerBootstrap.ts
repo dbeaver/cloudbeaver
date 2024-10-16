@@ -25,13 +25,15 @@ import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
-import { ConnectionSchemaManagerService } from './ConnectionSchemaManagerService';
-import type { IConnectionSelectorExtraProps } from './ConnectionSelector/IConnectionSelectorExtraProps';
-import { MENU_CONNECTION_DATA_CONTAINER_SELECTOR } from './MENU_CONNECTION_DATA_CONTAINER_SELECTOR';
-import { MENU_CONNECTION_SELECTOR } from './MENU_CONNECTION_SELECTOR';
+import { ConnectionSchemaManagerService } from './ConnectionSchemaManagerService.js';
+import type { IConnectionSelectorExtraProps } from './ConnectionSelector/IConnectionSelectorExtraProps.js';
+import { MENU_CONNECTION_DATA_CONTAINER_SELECTOR } from './MENU_CONNECTION_DATA_CONTAINER_SELECTOR.js';
+import { MENU_CONNECTION_SELECTOR } from './MENU_CONNECTION_SELECTOR.js';
 
-const ConnectionIcon = importLazyComponent(() => import('./ConnectionSelector/ConnectionIcon').then(module => module.ConnectionIcon));
-const ConnectionIconSmall = importLazyComponent(() => import('./ConnectionSelector/ConnectionIconSmall').then(module => module.ConnectionIconSmall));
+const ConnectionIcon = importLazyComponent(() => import('./ConnectionSelector/ConnectionIcon.js').then(module => module.ConnectionIcon));
+const ConnectionIconSmall = importLazyComponent(() =>
+  import('./ConnectionSelector/ConnectionIconSmall.js').then(module => module.ConnectionIconSmall),
+);
 
 @injectable()
 export class ConnectionSchemaManagerBootstrap extends Bootstrap {
@@ -54,7 +56,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.addTopAppMenuItems();
 
     this.connectionInfoResource.onDataUpdate.addHandler(
@@ -96,6 +98,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
         return [
           ...this.appAuthService.loaders,
+          ...this.connectionSchemaManagerService.currentObjectLoaders,
           getCachedMapResourceLoaderState(this.containerResource, () => ({
             ...activeConnectionKey,
             catalogId: this.connectionSchemaManagerService.activeObjectCatalogId,

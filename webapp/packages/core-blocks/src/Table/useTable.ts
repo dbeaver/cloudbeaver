@@ -7,9 +7,9 @@
  */
 import { useState } from 'react';
 
-import { TableState } from './TableState';
+import { TableState } from './TableState.js';
 
-export function useTable(): TableState {
-  const [table] = useState(() => new TableState());
+export function useTable<K = string>(): TableState<K> {
+  const [table] = useState(() => new TableState<K>());
   return table;
 }

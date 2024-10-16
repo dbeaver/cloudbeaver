@@ -9,11 +9,11 @@ import { observer } from 'mobx-react-lite';
 
 import { Loader, s, TextPlaceholder, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { IDatabaseDataModel, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
+import { type IDatabaseDataModel, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IStatisticsTab } from '../ISqlEditorTabState';
-import type { QueryDataSource } from '../QueryDataSource';
-import { SqlQueryService } from './SqlQueryService';
+import type { IStatisticsTab } from '../ISqlEditorTabState.js';
+import type { QueryDataSource } from '../QueryDataSource.js';
+import { SqlQueryService } from './SqlQueryService.js';
 import classes from './SqlScriptStatisticsPanel.module.css';
 
 interface IProps {
@@ -37,7 +37,7 @@ export const SqlScriptStatisticsPanel = observer<IProps>(function SqlScriptStati
     <div className={s(styles, { statistics: true })}>
       {translate('sql_editor_sql_execution_executed_queries')} {statistics.executedQueries} / {statistics.queries}
       <br />
-      {translate('data_viewer_statistics_duration')} {statistics.executeTime} ms
+      {translate('data_viewer_statistics_duration')} {statistics.executeTime} {translate('ui_ms')}
       <br />
       {translate('data_viewer_statistics_updated_rows')} {statistics.updatedRows}
       <br />

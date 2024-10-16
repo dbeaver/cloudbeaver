@@ -16,8 +16,8 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { isSharedProject, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
-import { ConnectionManualService } from './ConnectionManualService';
-import { DriverList } from './DriverList';
+import { ConnectionManualService } from './ConnectionManualService.js';
+import { DriverList } from './DriverList.js';
 
 export const CustomConnection = observer(function CustomConnection() {
   const projectsService = useService(ProjectsService);
@@ -36,7 +36,7 @@ export const CustomConnection = observer(function CustomConnection() {
     const shared = projectsService.activeProjects.filter(isSharedProject);
 
     if (shared.length > 0) {
-      connectionManualService.select(shared[0].id, driverId);
+      connectionManualService.select(shared[0]!.id, driverId);
     } else {
       notificationService.logError({
         title: 'core_projects_no_default_project',

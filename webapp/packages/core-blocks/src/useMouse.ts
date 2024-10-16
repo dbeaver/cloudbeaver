@@ -10,8 +10,8 @@ import { useEffect, useState } from 'react';
 
 import { throttle } from '@cloudbeaver/core-utils';
 
-import { useObjectRef } from './useObjectRef';
-import { useObservableRef } from './useObservableRef';
+import { useObjectRef } from './useObjectRef.js';
+import { useObservableRef } from './useObservableRef.js';
 
 interface IPoint {
   x: number;

@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { isPrimitive } from './isPrimitive';
+import { isPrimitive } from './isPrimitive.js';
 
 describe('isPrimitive', () => {
   it('should return true', () => {

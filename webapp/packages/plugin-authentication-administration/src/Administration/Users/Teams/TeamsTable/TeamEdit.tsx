@@ -8,12 +8,12 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
 
-import { TeamsResource } from '@cloudbeaver/core-authentication';
+import { TeamInfoMetaParametersResource, TeamsResource } from '@cloudbeaver/core-authentication';
 import { Container, s, TableContext, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { TeamForm } from '../TeamForm';
-import { useTeamFormState } from '../useTeamFormState';
+import { TeamForm } from '../TeamForm.js';
+import { useTeamFormState } from '../useTeamFormState.js';
 import style from './TeamEdit.module.css';
 
 interface Props {
@@ -23,13 +23,14 @@ interface Props {
 export const TeamEdit = observer<Props>(function TeamEdit({ item }) {
   const styles = useS(style);
   const resource = useService(TeamsResource);
+  const teamInfoMetaParametersResource = useService(TeamInfoMetaParametersResource);
   const tableContext = useContext(TableContext);
 
   const collapse = useCallback(() => {
     tableContext?.setItemExpand(item, false);
   }, [tableContext, item]);
 
-  const data = useTeamFormState(resource, state => state.setOptions('edit'));
+  const data = useTeamFormState(resource, teamInfoMetaParametersResource, state => state.setOptions('edit'));
 
   data.config.teamId = item;
 

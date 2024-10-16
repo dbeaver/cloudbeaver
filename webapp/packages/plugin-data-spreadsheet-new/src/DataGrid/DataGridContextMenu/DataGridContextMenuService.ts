@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { ContextMenuService, IContextMenuItem, IMenuPanel } from '@cloudbeaver/core-dialogs';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { ContextMenuService, type IContextMenuItem, type IMenuPanel } from '@cloudbeaver/core-dialogs';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import type { IDatabaseDataModel, IDataPresentationActions, IDataTableActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
 export interface IDataGridCellMenuContext {
@@ -65,6 +65,4 @@ export class DataGridContextMenuService {
   add(panelId: string, menuItem: IContextMenuItem<IDataGridCellMenuContext>): void {
     this.contextMenuService.addMenuItem(panelId, menuItem);
   }
-
-  register(): void {}
 }

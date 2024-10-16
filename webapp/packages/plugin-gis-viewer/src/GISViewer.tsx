@@ -8,7 +8,7 @@
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { type IDataValuePanelProps, isResultSetDataModel } from '@cloudbeaver/plugin-data-viewer';
 
-import { GISValuePresentation } from './GISValuePresentation';
+import { GISValuePresentation } from './GISValuePresentation.js';
 
 export const GISViewer: TabContainerPanelComponent<IDataValuePanelProps> = function GISViewer({ model: unknownModel, resultIndex }) {
   const model = unknownModel as any;

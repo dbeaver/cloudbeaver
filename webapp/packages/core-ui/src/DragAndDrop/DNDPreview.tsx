@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { ConnectDragPreview, DragPreviewImage } from 'react-dnd';
+import { type ConnectDragPreview, DragPreviewImage } from 'react-dnd';
 
-import type { IDNDData } from './useDNDData';
+import type { IDNDData } from './useDNDData.js';
 
 export interface DNDPreviewProps {
   src: string;

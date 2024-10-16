@@ -45,7 +45,7 @@ export class UserSettingsService extends SettingsSource {
     );
   }
 
-  has(key: any): boolean {
+  override has(key: any): boolean {
     return this.getSource().has(key) || super.has(key);
   }
 
@@ -57,7 +57,7 @@ export class UserSettingsService extends SettingsSource {
     return this.getSource().get(key);
   }
 
-  clear(): void {
+  override clear(): void {
     this.update(() => {
       super.clear();
       this.settings.clear();
@@ -65,7 +65,7 @@ export class UserSettingsService extends SettingsSource {
   }
 
   async save() {
-    if (this.userInfoResource.data) {
+    if (this.userInfoResource.isAuthenticated()) {
       await this.userInfoResource.updatePreferences(Object.fromEntries(this.changes));
     } else {
       this.update(() => {
@@ -94,7 +94,7 @@ export class UserSettingsService extends SettingsSource {
 
   private refreshConfig() {
     this.update(() => {
-      if (!this.userInfoResource.data) {
+      if (!this.userInfoResource.isAuthenticated()) {
         this.clear();
         this.lastConfig = null;
         return;
@@ -121,7 +121,7 @@ export class UserSettingsService extends SettingsSource {
   }
 
   private getSource() {
-    if (this.userInfoResource.data) {
+    if (this.userInfoResource.isAuthenticated()) {
       return this.settings;
     }
 

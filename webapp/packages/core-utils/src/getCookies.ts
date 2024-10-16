@@ -15,7 +15,7 @@ export function getCookies(): Cookies {
 
   return document.cookie.split('; ').reduce((cookies: Cookies, cookie: string) => {
     const [name, value] = cookie.split('=');
-    cookies[name] = value;
+    cookies[name!] = value;
 
     return cookies;
   }, {});

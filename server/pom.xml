@@ -19,18 +19,27 @@
 
     <properties>
         <dbeaver-product>CloudBeaver CE</dbeaver-product>
-        <dbeaver-version>24.1.5</dbeaver-version>
+        <dbeaver-version>24.2.4</dbeaver-version>
     </properties>
 
     <modules>
         <module>bundles</module>
         <module>features</module>
-        <module>drivers</module>
-        <module>test</module>
-
-        <!-- Products -->
-        <module>product</module>
     </modules>
+
+    <profiles>
+        <!-- plain CB build: do not build services, drivers and other components not required by plain server -->
+        <profile>
+            <id>full-build</id>
+            <activation><property><name>!plain-api-server</name></property></activation>
+            <modules>
+                <module>drivers</module>
+                <!-- Products -->
+                <module>product</module>
+                <module>test</module>
+            </modules>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>

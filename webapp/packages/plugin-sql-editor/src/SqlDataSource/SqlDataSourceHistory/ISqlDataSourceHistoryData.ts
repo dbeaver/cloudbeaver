@@ -8,5 +8,6 @@
 
 export interface ISqlDataSourceHistoryData {
   value: string;
+  timestamp: number;
   source?: string;
 }

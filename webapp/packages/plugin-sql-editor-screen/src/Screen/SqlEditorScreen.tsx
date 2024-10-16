@@ -12,15 +12,15 @@ import { Loader, TextPlaceholder, useObservableRef, useResource, useTranslate } 
 import {
   ConnectionExecutionContextResource,
   ConnectionExecutionContextService,
-  IConnectionExecutionContextInfo,
+  type IConnectionExecutionContextInfo,
 } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { ScreenComponent } from '@cloudbeaver/core-routing';
 import { uuid } from '@cloudbeaver/core-utils';
-import { ISqlEditorTabState, MemorySqlDataSource, SqlDataSourceService, SqlEditor, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
+import { type ISqlEditorTabState, MemorySqlDataSource, SqlDataSourceService, SqlEditor, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 
-import type { ISqlEditorScreenParams } from './ISqlEditorScreenParams';
+import type { ISqlEditorScreenParams } from './ISqlEditorScreenParams.js';
 
 export const SqlEditorScreen: ScreenComponent<ISqlEditorScreenParams> = observer(function SqlEditorScreen({ contextId }) {
   const translate = useTranslate();

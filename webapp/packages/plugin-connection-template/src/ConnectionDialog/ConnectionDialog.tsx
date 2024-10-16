@@ -14,6 +14,7 @@ import {
   CommonDialogWrapper,
   ErrorMessage,
   Form,
+  InfoItem,
   s,
   useAdministrationSettings,
   useErrorDetails,
@@ -25,10 +26,10 @@ import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ConnectionAuthenticationFormLoader } from '@cloudbeaver/plugin-connections';
 
 import style from './ConnectionDialog.module.css';
-import { ConnectionDialogFooter } from './ConnectionDialogFooter';
-import { ConnectionStep } from './EConnectionStep';
-import { TemplateConnectionSelector } from './TemplateConnectionSelector/TemplateConnectionSelector';
-import { useConnectionDialog } from './useConnectionDialog';
+import { ConnectionDialogFooter } from './ConnectionDialogFooter.js';
+import { ConnectionStep } from './EConnectionStep.js';
+import { TemplateConnectionSelector } from './TemplateConnectionSelector/TemplateConnectionSelector.js';
+import { useConnectionDialog } from './useConnectionDialog.js';
 
 export const ConnectionDialog: DialogComponent<null, null> = observer(function ConnectionDialog({ rejectDialog }) {
   const styles = useS(style);
@@ -38,12 +39,17 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
   const dialog = useConnectionDialog(rejectDialog);
   const errorDetails = useErrorDetails(dialog.connectException);
 
-  const subTitle = dialog.step === ConnectionStep.Connection ? dialog.template?.name : undefined;
+  const subTitle =
+    dialog.step === ConnectionStep.Connection ? (
+      dialog.template?.name
+    ) : (
+      <InfoItem info={translate('connections_templates_deprecated_message')} compact />
+    );
 
   return (
     <CommonDialogWrapper size="large" fixedSize={dialog.step === ConnectionStep.ConnectionTemplateSelect}>
       <CommonDialogHeader
-        title="basicConnection_connectionDialog_newConnection"
+        title="plugin_connections_new_connection_dialog_title"
         subTitle={subTitle}
         icon={dialog.driver?.icon}
         onReject={rejectDialog}
@@ -52,9 +58,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
         {dialog.step === ConnectionStep.ConnectionTemplateSelect && <TemplateConnectionSelector onSelect={dialog.selectTemplate} />}
         {dialog.step === ConnectionStep.Connection &&
           (!dialog.authModelId ? (
-            <center className={s(styles, { center: true })}>
-              {dialog.processing && translate('basicConnection_connectionDialog_connecting_message')}
-            </center>
+            <center className={s(styles, { center: true })}>{dialog.processing && translate('plugin_connection_template_connecting_message')}</center>
           ) : (
             <Form ref={focusedRef} className={s(styles, { submittingForm: true })} onSubmit={dialog.connect}>
               <ConnectionAuthenticationFormLoader

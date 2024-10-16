@@ -13,10 +13,11 @@ export const coreAdministrationManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./AdministrationItem/AdministrationItemService').then(m => m.AdministrationItemService),
-    () => import('./PermissionsResource').then(m => m.PermissionsResource),
-    () => import('./AdministrationScreen/AdministrationScreenService').then(m => m.AdministrationScreenService),
-    () => import('./AdministrationScreen/ConfigurationWizard/ConfigurationWizardService').then(m => m.ConfigurationWizardService),
-    () => import('./AdministrationLocaleService').then(m => m.AdministrationLocaleService),
+    () => import('./AdministrationItem/AdministrationItemService.js').then(m => m.AdministrationItemService),
+    () => import('./PermissionsResource.js').then(m => m.PermissionsResource),
+    () => import('./AdministrationScreen/AdministrationScreenService.js').then(m => m.AdministrationScreenService),
+    () => import('./AdministrationScreen/ConfigurationWizard/ConfigurationWizardService.js').then(m => m.ConfigurationWizardService),
+    () => import('./AdministrationScreen/ConfigurationWizard/ConfigurationWizardScreenService.js').then(m => m.ConfigurationWizardScreenService),
+    () => import('./AdministrationLocaleService.js').then(m => m.AdministrationLocaleService),
   ],
 };

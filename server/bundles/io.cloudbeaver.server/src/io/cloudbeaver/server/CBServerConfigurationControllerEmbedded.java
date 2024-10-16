@@ -19,7 +19,8 @@ package io.cloudbeaver.server;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
-import io.cloudbeaver.service.security.db.WebDatabaseConfig;
+import io.cloudbeaver.model.config.CBServerConfig;
+import io.cloudbeaver.model.config.WebDatabaseConfig;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -91,6 +92,7 @@ public class CBServerConfigurationControllerEmbedded<T extends CBServerConfig> e
         }
     }
 
+    @NotNull
     @Override
     protected GsonBuilder getGsonBuilder() {
         GsonBuilder gsonBuilder = super.getGsonBuilder();
@@ -99,6 +101,4 @@ public class CBServerConfigurationControllerEmbedded<T extends CBServerConfig> e
         return gsonBuilder
             .registerTypeAdapter(WebDatabaseConfig.class, dbConfigCreator);
     }
-
-
 }

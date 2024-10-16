@@ -8,7 +8,12 @@
 import { observer } from 'mobx-react-lite';
 import { useLayoutEffect, useRef } from 'react';
 
-import { AdministrationItemService, AdministrationScreenService, filterOnlyActive, IAdministrationItemRoute } from '@cloudbeaver/core-administration';
+import {
+  AdministrationItemService,
+  AdministrationScreenService,
+  filterOnlyActive,
+  type IAdministrationItemRoute,
+} from '@cloudbeaver/core-administration';
 import {
   Loader,
   s,
@@ -16,7 +21,7 @@ import {
   SlideBox,
   SlideElement,
   SlideOverlay,
-  StyleRegistry,
+  type StyleRegistry,
   ToolsActionStyles,
   ToolsPanelStyles,
   useS,
@@ -25,10 +30,10 @@ import { useService } from '@cloudbeaver/core-di';
 import { OptionsPanelService, TabList, TabListStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
-import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext';
-import { AdministrationViewService } from './AdministrationViewService';
-import { DrawerItem } from './DrawerItem';
-import { ItemContent } from './ItemContent';
+import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext.js';
+import { AdministrationViewService } from './AdministrationViewService.js';
+import { DrawerItem } from './DrawerItem.js';
+import { ItemContent } from './ItemContent.js';
 import style from './shared/Administration.module.css';
 import AdministrationStylesTab from './shared/AdministrationTab.module.css';
 import AdministrationStylesTabList from './shared/AdministrationTabList.module.css';
@@ -95,6 +100,10 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
     contentRef.current?.scrollTo({ top: 0, left: 0 });
   }, [activeScreen?.item]);
 
+  function close() {
+    optionsPanelService.close();
+  }
+
   return (
     <CaptureView view={administrationViewService} className={s(styles, { captureView: true })}>
       <AdministrationCaptureViewContext />
@@ -115,7 +124,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
         <div ref={contentRef} className={s(styles, { contentContainer: true })}>
           {children}
           <SContext registry={adminPageRegistry}>
-            <SlideBox className={s(styles, { slideBox: true })} open={optionsPanelService.active}>
+            <SlideBox className={s(styles, { slideBox: true })} open={optionsPanelService.active} onClose={close}>
               <SlideElement className={s(styles, { slideElement: true })}>
                 <Loader className={s(styles, { loader: true })} suspense>
                   <div className={s(styles, { content: true })}>
@@ -127,7 +136,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
                 <div className={s(styles, { content: true })}>
                   <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
                 </div>
-                <SlideOverlay onClick={() => optionsPanelService.close()} />
+                <SlideOverlay onClick={close} />
               </SlideElement>
             </SlideBox>
           </SContext>

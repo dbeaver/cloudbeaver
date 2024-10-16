@@ -15,6 +15,7 @@ export default [
   ['ui_stepper_next', 'Next'],
   ['ui_stepper_finish', 'Finish'],
   ['ui_load_more', 'Load more'],
+  ['ui_processing_connecting', 'Connecting...'],
   ['ui_processing_loading', 'Loading...'],
   ['ui_processing_cancel', 'Cancel'],
   ['ui_processing_canceling', 'Cancelling...'],
@@ -51,6 +52,7 @@ export default [
   ['ui_errors_details', 'Details'],
   ['ui_search', 'Search...'],
   ['ui_delete', 'Delete'],
+  ['ui_deleting', 'Deleting...'],
   ['ui_add', 'Add'],
   ['ui_revert', 'Revert'],
   ['ui_undo', 'Undo'],
@@ -132,6 +134,7 @@ export default [
   ['ui_test', 'Test'],
   ['ui_export', 'Export'],
   ['ui_you', 'You'],
+  ['ui_ms', 'ms'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],

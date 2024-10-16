@@ -23,7 +23,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
-import { AppScreenService } from './AppScreenService';
+import { AppScreenService } from './AppScreenService.js';
 import style from './RightArea.module.css';
 
 interface Props {
@@ -40,8 +40,12 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
 
   const toolsDisabled = appScreenService.rightAreaBottom.getDisplayed({}).length === 0;
 
+  function close() {
+    optionsPanelService.close();
+  }
+
   return (
-    <SlideBox open={optionsPanelService.active} className={s(styles, { slideBox: true }, className)}>
+    <SlideBox open={optionsPanelService.active} className={s(styles, { slideBox: true }, className)} onClose={close}>
       <SlideElement>
         <Loader className={s(styles, { loader: true })} suspense>
           <OptionsPanel />
@@ -61,7 +65,7 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
             </Loader>
           </Pane>
         </Split>
-        <SlideOverlay onClick={() => optionsPanelService.close()} />
+        <SlideOverlay onClick={close} />
       </SlideElement>
     </SlideBox>
   );

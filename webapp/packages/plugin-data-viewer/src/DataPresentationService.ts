@@ -5,14 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import type { HTMLAttributes } from 'react';
+
 import { injectable } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import type { TabProps } from '@cloudbeaver/core-ui';
 
-import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel';
-import type { IDataTableActions } from './TableViewer/IDataTableActions';
+import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel.js';
+import type { IDataTableActions } from './TableViewer/IDataTableActions.js';
 
-export interface IDataPresentationProps {
+export interface IDataPresentationProps extends HTMLAttributes<HTMLDivElement> {
   dataFormat: ResultDataFormat;
   model: IDatabaseDataModel;
   actions: IDataTableActions;

@@ -7,21 +7,20 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 
-import { s, useFocus, useS } from '@cloudbeaver/core-blocks';
+import { s, useFocus, useHotkeys, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
-import { ActionService } from '../Action/ActionService';
-import type { IActionItem } from '../Action/IActionItem';
-import { getCommonAndOSSpecificKeys } from '../Action/KeyBinding/getCommonAndOSSpecificKeys';
+import { ActionService } from '../Action/ActionService.js';
+import type { IActionItem } from '../Action/IActionItem.js';
+import { getCommonAndOSSpecificKeys } from '../Action/KeyBinding/getCommonAndOSSpecificKeys.js';
 import styles from './CaptureView.module.css';
-import { CaptureViewContext } from './CaptureViewContext';
-import type { IView } from './IView';
-import { parseHotkey } from './parseHotkey';
-import { useActiveView } from './useActiveView';
-import { useViewContext } from './useViewContext';
+import { CaptureViewContext } from './CaptureViewContext.js';
+import type { IView } from './IView.js';
+import { parseHotkey } from './parseHotkey.js';
+import { useActiveView } from './useActiveView.js';
+import { useViewContext } from './useViewContext.js';
 
 export interface ICaptureViewProps {
   view: IView<any>;

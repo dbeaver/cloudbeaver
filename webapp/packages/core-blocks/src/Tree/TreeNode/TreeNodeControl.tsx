@@ -10,13 +10,13 @@ import React, { forwardRef, useContext } from 'react';
 
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
-import { s } from '../../s';
-import { useS } from '../../useS';
-import { EventTreeNodeClickFlag } from './EventTreeNodeClickFlag';
-import { EventTreeNodeExpandFlag } from './EventTreeNodeExpandFlag';
-import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
-import type { ITreeNodeState } from './ITreeNodeState';
-import { TreeNodeContext } from './TreeNodeContext';
+import { s } from '../../s.js';
+import { useS } from '../../useS.js';
+import { EventTreeNodeClickFlag } from './EventTreeNodeClickFlag.js';
+import { EventTreeNodeExpandFlag } from './EventTreeNodeExpandFlag.js';
+import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag.js';
+import type { ITreeNodeState } from './ITreeNodeState.js';
+import { TreeNodeContext } from './TreeNodeContext.js';
 import style from './TreeNodeControl.module.css';
 
 const KEY = {
@@ -112,10 +112,11 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
     return (
       <div
         ref={ref}
-        tabIndex={0}
+        tabIndex={context.selected ? 0 : -1}
         title={title}
         aria-selected={context.selected}
         className={s(styles, { treeNodeControl: true }, className)}
+        data-tree-node-control
         onClick={handleClick}
         onMouseDown={handleMouseDown}
         onKeyDown={handleEnter}

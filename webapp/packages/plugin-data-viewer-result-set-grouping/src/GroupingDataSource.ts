@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
-import { IDataQueryOptions, QueryDataSource } from '@cloudbeaver/plugin-sql-editor';
+import { type IDataQueryOptions, QueryDataSource } from '@cloudbeaver/plugin-sql-editor';
 
 export interface IDataGroupingOptions extends IDataQueryOptions {
   query: string;
@@ -17,7 +17,7 @@ export interface IDataGroupingOptions extends IDataQueryOptions {
 }
 
 export class GroupingDataSource extends QueryDataSource<IDataGroupingOptions> {
-  async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
+  override async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
     await this.generateQuery();
     return await super.request(prevResults);
   }

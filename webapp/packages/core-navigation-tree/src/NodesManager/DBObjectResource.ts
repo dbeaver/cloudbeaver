@@ -14,6 +14,8 @@ import {
   CachedMapResource,
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
+  CachedResourceOffsetPageTargetKey,
+  getOffsetPageKeyInfo,
   isResourceAlias,
   type ResourceKey,
   resourceKeyList,
@@ -22,9 +24,9 @@ import {
 } from '@cloudbeaver/core-resource';
 import { DetailsError, GraphQLService } from '@cloudbeaver/core-sdk';
 
-import type { DBObject } from './EntityTypes';
-import { NavNodeInfoResource } from './NavNodeInfoResource';
-import { NavTreeResource } from './NavTreeResource';
+import type { DBObject } from './EntityTypes.js';
+import { NavNodeInfoResource } from './NavNodeInfoResource.js';
+import { NavTreeResource } from './NavTreeResource.js';
 
 export const DBObjectParentKey = resourceKeyListAliasFactory('@db-object/parent', (parentId: string) => ({ parentId }));
 
@@ -47,7 +49,8 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
         const pageAlias = this.aliases.isAlias(nodeId, CachedResourceOffsetPageKey) || this.aliases.isAlias(nodeId, CachedResourceOffsetPageListKey);
 
         if (pageAlias) {
-          this.markOutdated(DBObjectParentKey(pageAlias.target));
+          const pageTarget = this.aliases.isAlias(nodeId, CachedResourceOffsetPageTargetKey);
+          this.markOutdated(DBObjectParentKey(pageTarget?.options.target));
         }
 
         if (!isResourceAlias(nodeId)) {
@@ -70,7 +73,9 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
       }
 
       if (parentKey) {
-        await this.navTreeResource.load(CachedResourceOffsetPageKey(offset, limit).setTarget(parentKey.options.parentId));
+        await this.navTreeResource.load(
+          CachedResourceOffsetPageKey(offset, limit).setParent(CachedResourceOffsetPageTargetKey(parentKey.options.parentId)),
+        );
         return;
       }
 
@@ -92,27 +97,26 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, DBObject>> {
-    let limit = this.navTreeResource.childrenLimit;
-    let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
     const parentKey = this.aliases.isAlias(originalKey, DBObjectParentKey);
-    const pageKey =
-      this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
-
-    if (pageKey) {
-      limit = pageKey.options.limit;
-      offset = pageKey.options.offset;
-    }
+    const { isPageListKey, offset, limit } = getOffsetPageKeyInfo(this, originalKey, undefined, this.navTreeResource.childrenLimit);
 
     if (parentKey) {
       const nodeId = parentKey.options.parentId;
-      await this.loadFromChildren(nodeId, offset, limit);
+      const dbObjects = await this.loadFromChildren(nodeId, offset, limit);
 
       runInAction(() => {
-        this.offsetPagination.setPageEnd(
-          CachedResourceOffsetPageKey(offset, limit).setTarget(originalKey),
-          this.navTreeResource.offsetPagination.hasNextPage(CachedResourceOffsetPageKey(offset, limit).setTarget(nodeId)),
+        const keys = dbObjects.map(dbObject => dbObject.id);
+        this.set(resourceKeyList(keys), dbObjects);
+
+        this.offsetPagination.setPage(
+          isPageListKey
+            ? CachedResourceOffsetPageListKey(offset, keys.length).setParent(parentKey || CachedResourceOffsetPageTargetKey(nodeId))
+            : CachedResourceOffsetPageKey(offset, keys.length).setParent(parentKey || CachedResourceOffsetPageTargetKey(nodeId)),
+          keys,
+          keys.length === limit,
         );
       });
+
       return this.data;
     }
 
@@ -128,14 +132,14 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     return this.data;
   }
 
-  private async loadFromChildren(parentId: string, offset: number, limit: number) {
+  private async loadFromChildren(parentId: string, offset: number, limit: number): Promise<DBObject[]> {
     const { dbObjects } = await this.graphQLService.sdk.getChildrenDBObjectInfo({
       navNodeId: parentId,
       offset,
       limit,
     });
 
-    this.set(resourceKeyList(dbObjects.map(dbObject => dbObject.id)), dbObjects);
+    return dbObjects;
   }
 
   private async loadDBObjectInfo(navNodeId: string): Promise<DBObject> {

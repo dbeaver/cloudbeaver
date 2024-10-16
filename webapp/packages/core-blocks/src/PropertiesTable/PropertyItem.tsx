@@ -8,15 +8,17 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
-import { ShadowInput } from '../FormControls/ShadowInput';
-import { Icon } from '../Icon';
-import { IconOrImage } from '../IconOrImage';
-import { useTranslate } from '../localization/useTranslate';
-import { s } from '../s';
-import { useS } from '../useS';
-import type { IProperty } from './IProperty';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
+
+import { ShadowInput } from '../FormControls/ShadowInput.js';
+import { Icon } from '../Icon.js';
+import { IconOrImage } from '../IconOrImage.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
+import type { IProperty } from './IProperty.js';
 import classes from './PropertyItem.module.css';
-import { PropertyValueSelector } from './PropertyValueSelector';
+import { PropertyValueSelector } from './PropertyValueSelector.js';
 
 interface Props {
   property: IProperty;
@@ -53,7 +55,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
 
   const focus = menuOpen;
   const keyPlaceholder = String(property.keyPlaceholder);
-  const valuePlaceholder = String(property.valuePlaceholder);
+  const valuePlaceholder = isNotNullDefined(property.valuePlaceholder) ? String(property.valuePlaceholder) : '';
 
   return (
     <div className={s(styles, { container: true })}>

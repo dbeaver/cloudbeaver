@@ -8,7 +8,7 @@
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { s, SContext, StyleRegistry, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, s, SContext, type StyleRegistry, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
@@ -17,10 +17,10 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 import { ConnectionShieldLazy } from '@cloudbeaver/plugin-connections';
 import type { TabHandlerPanelComponent } from '@cloudbeaver/plugin-navigation-tabs';
 
-import type { IObjectViewerTabState } from '../IObjectViewerTabState';
-import { DBObjectPagePanel } from '../ObjectPage/DBObjectPagePanel';
-import { DBObjectPageService } from '../ObjectPage/DBObjectPageService';
-import { DBObjectPageTab } from '../ObjectPage/DBObjectPageTab';
+import type { IObjectViewerTabState } from '../IObjectViewerTabState.js';
+import { DBObjectPagePanel } from '../ObjectPage/DBObjectPagePanel.js';
+import { DBObjectPageService } from '../ObjectPage/DBObjectPageService.js';
+import { DBObjectPageTab } from '../ObjectPage/DBObjectPageTab.js';
 import styles from './shared/ObjectViewerPanel.module.css';
 import ObjectViewerPanelTab from './shared/ObjectViewerPanelTab.module.css';
 
@@ -53,7 +53,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
         tab.handlerState.tabTitle = data.name;
       });
     },
-    active: !connection.isLoading() && connection.data?.connected,
+    active: getComputed(() => !!connection.tryGetData?.connected),
   });
 
   const pages = dbObjectPagesService.orderedPages;
@@ -64,7 +64,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
 
   return (
     <ConnectionShieldLazy connectionKey={connectionKey}>
-      {node.data ? (
+      {node.tryGetData ? (
         <TabsBox
           currentTabId={tab.handlerState.pageId}
           tabsClassName={s(style, { tabs: true })}

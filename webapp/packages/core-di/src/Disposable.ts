@@ -7,7 +7,7 @@
  */
 import { preDestroy } from 'inversify';
 
-import { injectable } from './injectable';
+import { injectable } from './injectable.js';
 
 @injectable()
 export abstract class Disposable {

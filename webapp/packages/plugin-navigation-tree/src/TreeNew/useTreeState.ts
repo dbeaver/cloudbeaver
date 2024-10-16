@@ -11,8 +11,8 @@ import { useState } from 'react';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import type { INodeState } from './INodeState';
-import type { TreeState } from './TreeState';
+import type { INodeState } from './INodeState.js';
+import type { TreeState } from './TreeState.js';
 
 export interface ITreeState {
   getState(id: string): Readonly<INodeState>;

@@ -16,26 +16,30 @@
  */
 package io.cloudbeaver.server.jobs;
 
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.service.session.WebSessionManager;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.runtime.PeriodicJob;
 
 /**
  * WebSessionMonitorJob
  */
-public class WebSessionMonitorJob extends PeriodicSystemJob {
+public class WebSessionMonitorJob extends PeriodicJob {
     private static final Log log = Log.getLog(WebSessionMonitorJob.class);
     private static final int MONITOR_INTERVAL = 10000; // once per 10 seconds
+    private final WebSessionManager sessionManager;
 
-    public WebSessionMonitorJob(@NotNull CBPlatform platform) {
+    public WebSessionMonitorJob(@NotNull DBPPlatform platform, @NotNull WebSessionManager sessionManager) {
         super("Web session monitor", platform, MONITOR_INTERVAL);
+        this.sessionManager = sessionManager;
     }
 
     @Override
     protected void doJob(@NotNull DBRProgressMonitor monitor) {
         try {
-            platform.getSessionManager().expireIdleSessions();
+            sessionManager.expireIdleSessions();
         } catch (Exception e) {
             log.error("Error on expire idle sessions", e);
         }

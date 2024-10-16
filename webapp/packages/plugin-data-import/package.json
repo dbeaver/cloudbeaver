@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-data-import",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

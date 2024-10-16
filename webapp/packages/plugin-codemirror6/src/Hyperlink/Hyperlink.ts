@@ -7,7 +7,7 @@
  */
 import { RangeSet, RangeValue } from '@codemirror/state';
 
-import type { IHyperlinkInfo } from './IHyperlinkInfo';
+import type { IHyperlinkInfo } from './IHyperlinkInfo.js';
 
 export const enum HyperlinkState {
   Inactive,

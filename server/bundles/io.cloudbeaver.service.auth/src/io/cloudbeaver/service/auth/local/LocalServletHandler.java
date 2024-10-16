@@ -40,7 +40,7 @@ public class LocalServletHandler extends AbstractActionServletHandler {
 
     @Override
     public boolean handleRequest(Servlet servlet, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
-        if (URI_PREFIX.equals(WebAppUtils.removeSideSlashes(request.getPathInfo()))) {
+        if (URI_PREFIX.equals(WebAppUtils.removeSideSlashes(request.getServletPath()))) {
             try {
                 WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(request, response, true);
                 createActionFromParams(webSession, request, response);

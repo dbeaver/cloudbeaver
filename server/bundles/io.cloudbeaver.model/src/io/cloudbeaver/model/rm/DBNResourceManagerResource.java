@@ -203,9 +203,10 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         return resource;
     }
 
+    @Nullable
     @Override
-    public DBPProject getOwnerProject() {
-        return getParentNode().getOwnerProject();
+    public DBPProject getOwnerProjectOrNull() {
+        return getParentNode().getOwnerProjectOrNull();
     }
 
     public RMResource getResource() {

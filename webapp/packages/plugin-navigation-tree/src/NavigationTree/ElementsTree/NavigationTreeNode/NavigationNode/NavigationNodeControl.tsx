@@ -26,12 +26,12 @@ import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { getNodePlainName, type INodeActions, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 
-import type { NavTreeControlComponent } from '../../NavigationNodeComponent';
-import { TreeNodeMenuLoader } from '../TreeNodeMenu/TreeNodeMenuLoader';
-import { DATA_ATTRIBUTE_NODE_EDITING } from './DATA_ATTRIBUTE_NODE_EDITING';
+import type { NavTreeControlComponent } from '../../NavigationNodeComponent.js';
+import { TreeNodeMenuLoader } from '../TreeNodeMenu/TreeNodeMenuLoader.js';
+import { DATA_ATTRIBUTE_NODE_EDITING } from './DATA_ATTRIBUTE_NODE_EDITING.js';
 import style from './NavigationNodeControl.module.css';
-import { NavigationNodeExpand } from './NavigationNodeExpand';
-import { NavigationNodeEditorLoader } from './NavigationNodeLoaders';
+import { NavigationNodeExpand } from './NavigationNodeExpand.js';
+import { NavigationNodeEditorLoader } from './NavigationNodeLoaders.js';
 
 interface IEditingState {
   saving: boolean;

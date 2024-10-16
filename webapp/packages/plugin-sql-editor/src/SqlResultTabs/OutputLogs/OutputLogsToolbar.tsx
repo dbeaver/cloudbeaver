@@ -10,9 +10,9 @@ import React from 'react';
 
 import { Container, Filter, useTranslate } from '@cloudbeaver/core-blocks';
 
-import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
-import { OutputLogsMenu } from './OutputLogsMenu';
-import type { SqlOutputLogsPanelState } from './useOutputLogsPanelState';
+import type { ISqlEditorTabState } from '../../ISqlEditorTabState.js';
+import { OutputLogsMenu } from './OutputLogsMenu.js';
+import type { SqlOutputLogsPanelState } from './useOutputLogsPanelState.js';
 
 interface Props {
   state: SqlOutputLogsPanelState;

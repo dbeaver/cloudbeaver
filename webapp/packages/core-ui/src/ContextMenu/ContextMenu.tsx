@@ -8,11 +8,11 @@
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useRef, useState } from 'react';
 
-import { getComputed, IMenuState, Menu, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, type IMenuState, Menu, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { MenuActionItem } from '@cloudbeaver/core-view';
 
-import type { IContextMenuProps } from './IContextMenuProps';
-import { MenuItemRenderer } from './MenuItemRenderer';
+import type { IContextMenuProps } from './IContextMenuProps.js';
+import { MenuItemRenderer } from './MenuItemRenderer.js';
 
 // TODO the click doesn't work for React components as children
 export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
@@ -31,7 +31,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
 
     const menu = useRef<IMenuState>();
 
-    useAutoLoad({ name: `${ContextMenu.name}(${menuData.menu.id})` }, menuData.loaders, !lazy, menuVisible);
+    useAutoLoad({ name: `${ContextMenu.name}(${menuData.menu.id})` }, menuData.loaders, !lazy, menuVisible, true);
 
     const handlers = useObjectRef(
       () => ({

@@ -12,10 +12,10 @@ import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connect
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
-import { SSHKeyUploader } from '../ConnectionForm/SSH/SSHKeyUploader';
-import { PROPERTY_FEATURE_SECURED } from '../ConnectionForm/SSL/PROPERTY_FEATURE_SECURED';
+import { SSHKeyUploader } from '../ConnectionForm/SSH/SSHKeyUploader.js';
+import { PROPERTY_FEATURE_SECURED } from '../ConnectionForm/SSL/PROPERTY_FEATURE_SECURED.js';
 
 interface Props {
   id: string;
@@ -67,10 +67,10 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
       </GroupTitle>
       {ssh && (
         <>
-          <InputField type="text" name="userName" state={state} disabled={disabled}>
+          <InputField type="text" name="userName" state={state} readOnly={disabled}>
             {translate(`connections_network_handler_${id}_user`, 'connections_network_handler_default_user')}
           </InputField>
-          <InputField type="password" name="password" canShowPassword={false} state={state} disabled={disabled}>
+          <InputField type="password" name="password" canShowPassword={false} state={state} readOnly={disabled}>
             {passwordLabel}
           </InputField>
         </>

@@ -11,7 +11,7 @@
   &:global([aria-expanded='true']) {
     background: #338ecc;
   }
-  &:before {
+  &:not(:focus-visible):before {
     display: none;
   }
   &:disabled,

@@ -9,12 +9,12 @@ import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { injectable } from '@cloudbeaver/core-di';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { DATA_CONTEXT_MENU } from '../Menu/DATA_CONTEXT_MENU';
-import { ActionItem } from './ActionItem';
-import type { IAction } from './IAction';
-import type { IActionHandler, IActionHandlerOptions } from './IActionHandler';
-import type { IActionItem } from './IActionItem';
-import { KeyBindingService } from './KeyBinding/KeyBindingService';
+import { DATA_CONTEXT_MENU } from '../Menu/DATA_CONTEXT_MENU.js';
+import { ActionItem } from './ActionItem.js';
+import type { IAction } from './IAction.js';
+import type { IActionHandler, IActionHandlerOptions } from './IActionHandler.js';
+import type { IActionItem } from './IActionItem.js';
+import { KeyBindingService } from './KeyBinding/KeyBindingService.js';
 
 @injectable()
 export class ActionService {

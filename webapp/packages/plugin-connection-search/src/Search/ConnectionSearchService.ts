@@ -8,17 +8,22 @@
 import { makeObservable, observable } from 'mobx';
 
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
+import {
+  ConnectionInfoOriginResource,
+  ConnectionInfoResource,
+  ConnectionsManagerService,
+  createConnectionParam,
+} from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
-import { ConnectionFormService, ConnectionFormState, IConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormService, ConnectionFormState, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
-import { SearchDatabase } from './SearchDatabase';
+import { SearchDatabase } from './SearchDatabase.js';
 
 const formGetter = () => SearchDatabase;
 
@@ -40,6 +45,7 @@ export class ConnectionSearchService {
     private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly connectionsManagerService: ConnectionsManagerService,
+    private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
   ) {
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
 
@@ -122,8 +128,8 @@ export class ConnectionSearchService {
     }
 
     const result = await this.commonDialogService.open(ConfirmationDialog, {
-      title: 'connections_public_connection_edit_cancel_title',
-      message: 'connections_public_connection_edit_cancel_message',
+      title: 'plugin_connections_connection_edit_cancel_title',
+      message: 'plugin_connections_connection_edit_cancel_message',
       confirmActionText: 'ui_processing_ok',
     });
 
@@ -156,6 +162,7 @@ export class ConnectionSearchService {
         this.projectInfoResource,
         this.connectionFormService,
         this.connectionInfoResource,
+        this.connectionInfoOriginResource,
       );
 
       this.formState.closeTask.addHandler(this.goBack.bind(this));
@@ -163,7 +170,7 @@ export class ConnectionSearchService {
 
     this.formState
       .setOptions('create', 'public')
-      .setConfig(projects[0].id, {
+      .setConfig(projects[0]!.id, {
         ...this.connectionInfoResource.getEmptyConfig(),
         driverId: database.defaultDriver,
         host: database.host,

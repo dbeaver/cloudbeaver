@@ -8,11 +8,11 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { AuthRolesResource } from '@cloudbeaver/core-authentication';
-import { Combobox, Filter, Group, IconOrImage, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Filter, Group, IconOrImage, Loader, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import styles from './UsersTableFilters.module.css';
-import { IUserFilters, USER_ROLE_ALL, USER_STATUSES } from './useUsersTableFilters';
+import { UsersTableFiltersDetails } from './UsersTableFiltersDetails.js';
+import { type IUserFilters } from './useUsersTableFilters.js';
 
 interface Props {
   filters: IUserFilters;
@@ -21,7 +21,6 @@ interface Props {
 export const UsersTableFilters = observer<Props>(function UsersTableFilters({ filters }) {
   const translate = useTranslate();
   const style = useS(styles);
-  const authRolesResource = useResource(UsersTableFilters, AuthRolesResource, undefined);
 
   const [open, setOpen] = useState(false);
 
@@ -42,23 +41,9 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
       </div>
 
       {open && (
-        <Group box gap>
-          <Combobox
-            value={filters.status}
-            items={USER_STATUSES}
-            valueSelector={value => translate(value.label)}
-            keySelector={value => value.value}
-            keepSize
-            onSelect={filters.setStatus}
-          >
-            {translate('authentication_user_status')}
-          </Combobox>
-          {!!authRolesResource.data.length && (
-            <Combobox items={[...authRolesResource.data, USER_ROLE_ALL]} value={filters.role} keepSize onSelect={filters.setRole}>
-              {translate('authentication_user_role')}
-            </Combobox>
-          )}
-        </Group>
+        <Loader suspense inline>
+          <UsersTableFiltersDetails filters={filters} />
+        </Loader>
       )}
     </Group>
   );

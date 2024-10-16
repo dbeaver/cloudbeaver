@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { isPrimitive } from './isPrimitive';
+import { isPrimitive } from './isPrimitive.js';
 
 const isObjectEqual = <T>(a: T, b: T) => a === b;
 
@@ -17,8 +17,8 @@ export function isArraysEqual<T>(first: T[], second: T[], isEqual: (a: T, b: T) 
   const map = new Map<T, number>();
 
   for (let i = 0; i < first.length; i++) {
-    const currentFirst = first[i];
-    const currentSecond = second[i];
+    const currentFirst = first[i]!;
+    const currentSecond = second[i]!;
 
     if (order && !isEqual(currentFirst, currentSecond)) {
       return false;
@@ -32,12 +32,12 @@ export function isArraysEqual<T>(first: T[], second: T[], isEqual: (a: T, b: T) 
   }
 
   for (let i = 0; i < second.length; i++) {
-    const currentSecond = second[i];
+    const currentSecond = second[i]!;
     const isPrimitiveValue = isPrimitive(currentSecond);
 
     if (!isPrimitiveValue) {
       for (let j = 0; j < first.length; j++) {
-        if (isEqual(first[j], currentSecond)) {
+        if (isEqual(first[j]!, currentSecond)) {
           map.set(currentSecond, Number(map.get(currentSecond)) - 1);
           break;
         }

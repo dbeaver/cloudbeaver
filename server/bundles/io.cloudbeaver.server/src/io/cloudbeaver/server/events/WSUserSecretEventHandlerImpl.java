@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.server.events;
 
+import io.cloudbeaver.WebSessionProjectImpl;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
@@ -36,11 +37,16 @@ public class WSUserSecretEventHandlerImpl extends WSDefaultEventHandler<WSUserSe
 
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSUserSecretEvent event) {
-        if (!(activeUserSession instanceof WebSession)) {
+        if (!(activeUserSession instanceof WebSession webSession)) {
             activeUserSession.addSessionEvent(event);
             return;
         }
-        var connectionInfo = ((WebSession) activeUserSession).findWebConnectionInfo(event.getProjectId(), event.getDataSourceId());
+        WebSessionProjectImpl project = webSession.getProjectById(event.getProjectId());
+        if (project == null) {
+            log.debug("Project " + event.getDataSourceId() + " is not found in session " + webSession.getSessionId());
+            return;
+        }
+        var connectionInfo = project.findWebConnectionInfo(event.getDataSourceId());
         if (connectionInfo == null) {
             log.debug("Connection " + event.getDataSourceId() + " is not found in session " + activeUserSession.getSessionId());
             return;

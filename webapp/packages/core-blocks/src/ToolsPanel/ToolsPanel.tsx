@@ -6,13 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import type { HTMLAttributes } from 'react';
 
-import { s } from '../s';
-import { useS } from '../useS';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
 import style from './ToolsPanel.module.css';
 
 type TType = 'primary' | 'secondary';
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
   className?: string;
   type?: TType;
   center?: boolean;
@@ -29,8 +30,13 @@ export const ToolsPanel: React.FC<React.PropsWithChildren<Props>> = observer(fun
   minHeight,
   type = 'primary',
   bottomBorder = false,
+  ...rest
 }) {
   const styles = useS(style);
 
-  return <div className={s(styles, { toolsPanel: true, [type]: true, bottomBorder, minHeight, center, rounded }, className)}>{children}</div>;
+  return (
+    <div {...rest} className={s(styles, { toolsPanel: true, [type]: true, bottomBorder, minHeight, center, rounded }, className)}>
+      {children}
+    </div>
+  );
 });

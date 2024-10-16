@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/core-di",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -26,6 +27,7 @@
   "peerDependencies": {},
   "devDependencies": {
     "@jest/globals": "^29",
+    "@types/jest": "^29",
     "@types/react": "^18",
     "typescript": "^5"
   }

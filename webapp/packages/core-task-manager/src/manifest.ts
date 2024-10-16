@@ -12,5 +12,5 @@ export const coreTaskManagerManifest: PluginManifest = {
     name: 'Core Task Manager',
   },
 
-  providers: [() => import('./TaskManagerService').then(m => m.TaskManagerService)],
+  providers: [() => import('./TaskManagerService.js').then(m => m.TaskManagerService)],
 };

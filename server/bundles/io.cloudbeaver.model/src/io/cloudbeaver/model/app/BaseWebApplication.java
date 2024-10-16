@@ -16,13 +16,7 @@
  */
 package io.cloudbeaver.model.app;
 
-import io.cloudbeaver.DataSourceFilter;
-import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.WebSessionProjectImpl;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
-import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.WebGlobalWorkspace;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.jkiss.code.NotNull;
@@ -30,18 +24,16 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBFileController;
-import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
+import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
+import org.jkiss.dbeaver.model.impl.app.BaseWorkspaceImpl;
 import org.jkiss.dbeaver.model.rm.RMController;
-import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
-import org.jkiss.dbeaver.registry.BaseApplicationImpl;
-import org.jkiss.dbeaver.registry.BaseWorkspaceImpl;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
@@ -62,16 +54,9 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     public static final String CLI_PARAM_WEB_CONFIG = "-web-config";
     public static final String LOGBACK_FILE_NAME = "logback.xml";
 
-
     private static final Log log = Log.getLog(BaseWebApplication.class);
 
     private String instanceId;
-
-    @NotNull
-    @Override
-    public DBPWorkspace createWorkspace(@NotNull DBPPlatform platform, @NotNull IWorkspace eclipseWorkspace) {
-        return new WebGlobalWorkspace(platform, eclipseWorkspace);
-    }
 
     @Override
     public RMController createResourceController(
@@ -170,19 +155,6 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return Files.exists(customConfigPath) ? customConfigPath : configPath.resolve(fileName);
     }
 
-    @Override
-    public WebProjectImpl createProjectImpl(
-        @NotNull WebSession webSession,
-        @NotNull RMProject project,
-        @NotNull DataSourceFilter dataSourceFilter
-    ) {
-        return new WebSessionProjectImpl(
-            webSession,
-            project,
-            dataSourceFilter
-        );
-    }
-
     /**
      * There is no secret controller in base web app.
      * Method returns VoidSecretController instance.
@@ -261,6 +233,12 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return BaseWorkspaceImpl.readWorkspaceIdProperty();
     }
 
+    @Override
+    public Path getWorkspaceDirectory() {
+        return getServerConfigurationController().getWorkspacePath();
+    }
+
+
     public String getApplicationId() {
         try {
             return getApplicationInstanceId();
@@ -279,5 +257,13 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     @Override
     public boolean isEnvironmentVariablesAccessible() {
         return false;
+    }
+
+    protected void closeResource(String name, Runnable closeFunction) {
+        try {
+            closeFunction.run();
+        } catch (Exception e) {
+            log.error("Failed close " + name, e);
+        }
     }
 }

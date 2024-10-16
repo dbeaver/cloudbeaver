@@ -80,7 +80,7 @@ public class WebAuthProviderConfiguration {
     }
 
     private String buildRedirectUrl(String baseUrl) {
-        return baseUrl + "?" + CBAuthConstants.CB_REDIRECT_URL_REQUEST_PARAM + "=" + WebAppUtils.getWebApplication().getServerURL();
+        return baseUrl + "?" + CBAuthConstants.CB_REDIRECT_URL_REQUEST_PARAM + "=" + WebAppUtils.getFullServerUrl();
     }
 
     @Property
@@ -107,6 +107,14 @@ public class WebAuthProviderConfiguration {
     public String getAcsLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getAcsLink(getId(), config.getParameters()) : null;
+    }
+
+    @Property
+    public String getEntityIdLink() throws  DBException {
+        SMAuthProvider<?> instance = providerDescriptor.getInstance();
+        return instance instanceof SMAuthProviderFederated
+            ? ((SMAuthProviderFederated) instance).getEntityIdLink(getId(), config.getParameters())
+            : null;
     }
 
     @Override

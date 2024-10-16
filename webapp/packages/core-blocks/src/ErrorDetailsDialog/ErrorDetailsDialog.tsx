@@ -10,27 +10,28 @@ import { useCallback, useMemo } from 'react';
 
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
-import { Button } from '../Button';
-import { CommonDialogBody } from '../CommonDialog/CommonDialog/CommonDialogBody';
-import { CommonDialogFooter } from '../CommonDialog/CommonDialog/CommonDialogFooter';
-import { CommonDialogHeader } from '../CommonDialog/CommonDialog/CommonDialogHeader';
-import { CommonDialogWrapper } from '../CommonDialog/CommonDialog/CommonDialogWrapper';
-import { Textarea } from '../FormControls/Textarea';
-import { Iframe } from '../Iframe';
-import { useTranslate } from '../localization/useTranslate';
-import { s } from '../s';
-import { useClipboard } from '../useClipboard';
-import { useS } from '../useS';
+import { Button } from '../Button.js';
+import { CommonDialogBody } from '../CommonDialog/CommonDialog/CommonDialogBody.js';
+import { CommonDialogFooter } from '../CommonDialog/CommonDialog/CommonDialogFooter.js';
+import { CommonDialogHeader } from '../CommonDialog/CommonDialog/CommonDialogHeader.js';
+import { CommonDialogWrapper } from '../CommonDialog/CommonDialog/CommonDialogWrapper.js';
+import { Textarea } from '../FormControls/Textarea.js';
+import { Iframe } from '../Iframe.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { s } from '../s.js';
+import { useClipboard } from '../useClipboard.js';
+import { useS } from '../useS.js';
 import style from './ErrorDetailsDialog.module.css';
-import { ErrorModel, IErrorInfo } from './ErrorModel';
+import { ErrorModel, type IErrorInfo } from './ErrorModel.js';
 
 function DisplayErrorInfo({ error }: { error: IErrorInfo }) {
   const styles = useS(style);
+  const translate = useTranslate();
 
   return (
     <>
       <div className={s(styles, { property: true })}>
-        {error.isHtml ? <Iframe srcDoc={error.message} /> : <div className={s(styles, { message: true })}>{error.message}</div>}
+        {error.isHtml ? <Iframe srcDoc={error.message} /> : <div className={s(styles, { message: true })}>{translate(error.message)}</div>}
       </div>
       {error.stackTrace && (
         <div className={s(styles, { property: true })}>

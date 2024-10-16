@@ -13,9 +13,9 @@ export const sqlEditorPagePluginManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./Screen/SqlEditorScreenBootstrap').then(m => m.SqlEditorScreenBootstrap),
-    () => import('./Screen/SqlEditorScreenService').then(m => m.SqlEditorScreenService),
+    () => import('./PluginBootstrap.js').then(m => m.PluginBootstrap),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./Screen/SqlEditorScreenBootstrap.js').then(m => m.SqlEditorScreenBootstrap),
+    () => import('./Screen/SqlEditorScreenService.js').then(m => m.SqlEditorScreenService),
   ],
 };

@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { toSafeHtmlString } from './toSafeHtmlString';
+import { toSafeHtmlString } from './toSafeHtmlString.js';
 
 describe('toSafeHtmlString', () => {
   it('should make html string safe', () => {

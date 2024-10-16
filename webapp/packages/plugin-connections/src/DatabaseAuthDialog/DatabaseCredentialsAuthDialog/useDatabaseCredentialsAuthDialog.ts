@@ -10,18 +10,18 @@ import { action, computed, observable } from 'mobx';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import {
   ConnectionInfoResource,
-  ConnectionInitConfig,
-  DatabaseConnection,
-  DBDriver,
+  type ConnectionInitConfig,
+  type DatabaseConnection,
+  type DBDriver,
   DBDriverResource,
-  IConnectionInfoParams,
+  type IConnectionInfoParams,
   USER_NAME_PROPERTY_ID,
 } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
-import type { IConnectionAuthenticationConfig } from '../../ConnectionAuthentication/IConnectionAuthenticationConfig';
+import type { IConnectionAuthenticationConfig } from '../../ConnectionAuthentication/IConnectionAuthenticationConfig.js';
 
 interface IState extends ILoadableState {
   readonly authModelId: string | null;
@@ -107,6 +107,7 @@ export function useDatabaseCredentialsAuthDialog(
             }
           }
 
+          this.config.saveCredentials = connection.saveCredentials;
           this.connection = connection;
           this.driver = driver;
 

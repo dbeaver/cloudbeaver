@@ -13,6 +13,7 @@ export default [
   ['ui_dark_theme', 'Темная'],
   ['ui_stepper_back', 'Назад'],
   ['ui_load_more', 'Загрузить ещё'],
+  ['ui_processing_connecting', 'Подключение...'],
   ['ui_processing_loading', 'Загрузка...'],
   ['ui_processing_cancel', 'Отменить'],
   ['ui_processing_canceling', 'Отмена...'],
@@ -47,6 +48,7 @@ export default [
   ['ui_errors_details', 'Информация'],
   ['ui_search', 'Поиск...'],
   ['ui_delete', 'Удалить'],
+  ['ui_deleting', 'Удаляется...'],
   ['ui_add', 'Добавить'],
   ['ui_revert', 'Отменить изменения'],
   ['ui_undo', 'Отменить'],
@@ -128,6 +130,7 @@ export default [
   ['ui_test', 'Проверить'],
   ['ui_export', 'Экспорт'],
   ['ui_you', 'Вы'],
+  ['ui_ms', 'мс'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

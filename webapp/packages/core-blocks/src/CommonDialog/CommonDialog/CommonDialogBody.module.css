@@ -60,7 +60,9 @@
 }
 
 .dialogBodyContent {
+  composes: theme-typography--body1 from global;
   flex: 1;
+  letter-spacing: normal;
   position: relative;
   display: flex;
   flex-direction: column;

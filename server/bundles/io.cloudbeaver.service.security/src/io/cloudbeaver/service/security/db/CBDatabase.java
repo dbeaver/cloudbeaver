@@ -18,8 +18,10 @@ package io.cloudbeaver.service.security.db;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.Strictness;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
 import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.config.WebDatabaseConfig;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -300,7 +302,9 @@ public class CBDatabase {
         initialDataPath = WebAppUtils.getRelativePath(
             databaseConfiguration.getInitialDataConfiguration(), application.getHomeDirectory());
         try (Reader reader = new InputStreamReader(new FileInputStream(initialDataPath), StandardCharsets.UTF_8)) {
-            Gson gson = new GsonBuilder().setLenient().create();
+            Gson gson = new GsonBuilder()
+                .setStrictness(Strictness.LENIENT)
+                .create();
             return gson.fromJson(reader, CBDatabaseInitialData.class);
         } catch (Exception e) {
             throw new DBException("Error loading initial data configuration", e);

@@ -85,7 +85,7 @@ public class WebServiceSQL implements DBWServiceSQL {
             WebConnectionInfo webConnection = WebServiceBindingBase.getWebConnection(session, projectId, connectionId);
             conToRead.add(webConnection);
         } else {
-            conToRead.addAll(session.getConnections());
+            conToRead.addAll(session.getAccessibleProjects().stream().flatMap(p -> p.getConnections().stream()).toList());
         }
 
         List<WebSQLContextInfo> contexts = new ArrayList<>();

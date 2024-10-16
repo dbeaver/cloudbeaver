@@ -59,12 +59,15 @@ export default [
   ['connections_connection_folder', 'Dossier'],
   [
     'connections_connection_folder_validation',
-    'Le nom du dossier ne peut pas contenir les symboles suivants : / : " \\ et ne peut pas commencer par un point',
+    'Le nom du dossier ne peut pas contenir les symboles suivants / : " \\ \' <> | ? * et ne peut pas commencer par un point',
   ],
   ['connections_connection_name', 'Nom de la connexion'],
   ['connections_connection_access_user_or_team_name', "Nom de l'utilisateur ou de l'équipe"],
   ['connections_connection_access_filter_placeholder', "Rechercher un nom d'utilisateur ou d'équipe"],
-  ['connections_connection_access_admin_info', "Les administrateurs voient toutes les connexions à l'exception des connexions privées des autres utilisateurs."],
+  [
+    'connections_connection_access_admin_info',
+    "Les administrateurs voient toutes les connexions à l'exception des connexions privées des autres utilisateurs.",
+  ],
   ['connections_connection_description', 'Description'],
   ['connections_connection_project', 'Projet'],
   ['connections_connection_driver', 'Pilote'],
@@ -105,4 +108,8 @@ export default [
     'cloud_connections_access_placeholder',
     'Les connexions cloud sont visibles par tous les utilisateurs. La gestion des accès peut être configurée dans la "AWS Management Console".',
   ],
+
+  ['core_connections_settings_disable', 'Disable'],
+  ['core_connections_settings_disable_description', 'Disable the ability to create new connections'],
+  ['connections_templates_deprecated_message', 'Template connections are deprecated and will be removed in future releases'],
 ];

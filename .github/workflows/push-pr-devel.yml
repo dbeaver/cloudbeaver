@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+  push:
+    branches: [devel]
+
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'push-pr-devel' }}
+  cancel-in-progress: true
+
+jobs:
+  build-server:
+    name: Server
+    uses: ./.github/workflows/backend-build.yml
+    secrets: inherit
+
+  build-frontend:
+    name: Frontend
+    uses: ./.github/workflows/frontend-build.yml
+    secrets: inherit
+
+  lint-server:
+    name: Server
+    uses: dbeaver/dbeaver-common/.github/workflows/java-checkstyle.yml@devel
+    secrets: inherit
+
+  lint-frontend:
+    name: Frontend
+    uses: ./.github/workflows/frontend-lint.yml
+    secrets: inherit
+
+  # call-frontend-tests:
+  #   name: Frontend Unit Tests
+  #   needs: call-frontend-build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check if tests passed
+  #       if: ${{ needs.call-frontend-build.outputs.test-status != 'success' }}
+  #       run: |
+  #         echo "Tests failed"
+  #         exit 1
+  #     - name: Continue if tests passed
+  #       if: ${{ needs.call-frontend-build.outputs.test-status == 'success' }}
+  #       run: echo "Tests passed"
+
+  # call-docker-build-and-push:
+  #   name: Run
+  #   needs: [call-backend-build, call-frontend-build]
+  #   uses: ./.github/workflows/docker-build-and-push.yml

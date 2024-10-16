@@ -27,10 +27,10 @@ import {
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
 import styles from './ConnectionAccessList.module.css';
-import { ConnectionAccessTableHeader, IFilterState } from './ConnectionAccessTableHeader/ConnectionAccessTableHeader';
-import { ConnectionAccessTableInnerHeader } from './ConnectionAccessTableHeader/ConnectionAccessTableInnerHeader';
-import { ConnectionAccessTableItem } from './ConnectionAccessTableItem';
-import { getFilteredTeams, getFilteredUsers } from './getFilteredSubjects';
+import { ConnectionAccessTableHeader, type IFilterState } from './ConnectionAccessTableHeader/ConnectionAccessTableHeader.js';
+import { ConnectionAccessTableInnerHeader } from './ConnectionAccessTableHeader/ConnectionAccessTableInnerHeader.js';
+import { ConnectionAccessTableItem } from './ConnectionAccessTableItem.js';
+import { getFilteredTeams, getFilteredUsers } from './getFilteredSubjects.js';
 
 interface Props {
   userList: AdminUserInfoFragment[];

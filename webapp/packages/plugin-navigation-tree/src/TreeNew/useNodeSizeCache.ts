@@ -11,8 +11,8 @@ import { useState } from 'react';
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import type { ITree } from './useTree';
-import type { ITreeData } from './useTreeData';
+import type { ITreeData } from './ITreeData.js';
+import type { ITree } from './useTree.js';
 
 export interface INodeSizeCache {
   getSize(id: string): number;

@@ -9,9 +9,9 @@ import React, { useContext, useState } from 'react';
 
 import { Executor, ExecutorInterrupter, SyncExecutor } from '@cloudbeaver/core-executor';
 
-import { useExecutor } from '../useExecutor';
-import { useObjectRef } from '../useObjectRef';
-import { FormChangeHandler, FormContext, type IChangeData, type IFormContext } from './FormContext';
+import { useExecutor } from '../useExecutor.js';
+import { useObjectRef } from '../useObjectRef.js';
+import { type FormChangeHandler, FormContext, type IChangeData, type IFormContext } from './FormContext.js';
 
 interface IOptions {
   parent?: IFormContext;
@@ -83,19 +83,21 @@ export function useForm(options?: IOptions): IFormContext {
           this.parent.keyDown(event);
         } else if (event.key === 'Enter' && this.disableEnterSubmit === false) {
           event.preventDefault();
-          this.submit();
+          if (this.ref) {
+            this.ref?.requestSubmit();
+          } else {
+            this.submit();
+          }
         }
       },
       async submit(event) {
         if (this.parent) {
           await this.parent.submit(event);
-          this.ref?.reset();
         } else {
           event?.preventDefault();
 
           if (this.validate()) {
             await this.onSubmit.execute(event);
-            this.ref?.reset();
           }
         }
       },

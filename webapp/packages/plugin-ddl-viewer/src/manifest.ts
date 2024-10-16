@@ -13,9 +13,9 @@ export const manifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./DdlViewerBootstrap').then(m => m.DdlViewerBootstrap),
-    () => import('./DdlViewer/DDLViewerFooterService').then(m => m.DDLViewerFooterService),
-    () => import('./ExtendedDDLViewer/ExtendedDDLResource').then(m => m.ExtendedDDLResource),
-    () => import('./DdlViewer/DdlResource').then(m => m.DdlResource),
+    () => import('./DdlViewerBootstrap.js').then(m => m.DdlViewerBootstrap),
+    () => import('./DdlViewer/DDLViewerFooterService.js').then(m => m.DDLViewerFooterService),
+    () => import('./ExtendedDDLViewer/ExtendedDDLResource.js').then(m => m.ExtendedDDLResource),
+    () => import('./DdlViewer/DdlResource.js').then(m => m.DdlResource),
   ],
 };

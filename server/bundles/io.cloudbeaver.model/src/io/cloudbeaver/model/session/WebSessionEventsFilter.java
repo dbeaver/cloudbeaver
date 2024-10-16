@@ -50,6 +50,9 @@ public class WebSessionEventsFilter {
     }
 
     public boolean isEventAllowed(WSEvent event) {
+        if (event.isForceProcessed()) {
+            return true;
+        }
         if (!subscribedEventTopics.isEmpty() && !subscribedEventTopics.contains(event.getTopicId())
         ) {
             return false;

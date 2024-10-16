@@ -32,7 +32,11 @@ public class WSUserEventHandler<EVENT extends WSAbstractEvent> implements WSEven
         if (eventType == null) {
             return;
         }
-        WebSessionManager sessionManager = CBPlatform.getInstance().getSessionManager();
+        var appSessionManager = CBPlatform.getInstance().getSessionManager();
+        if (!(appSessionManager instanceof WebSessionManager)) {
+            return;
+        }
+        var sessionManager = (WebSessionManager) appSessionManager;
         switch (eventType) {
             case CLOSE_USER_SESSIONS:
                 if (event instanceof WSUserCloseSessionsEvent closeSessionsEvent) {

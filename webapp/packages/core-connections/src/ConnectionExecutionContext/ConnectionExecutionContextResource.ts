@@ -19,11 +19,11 @@ import {
   type ResourceKeySimple,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
-import { GraphQLService, SqlContextInfo } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type SqlContextInfo } from '@cloudbeaver/core-sdk';
 import { flat } from '@cloudbeaver/core-utils';
 
-import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA';
-import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '../ConnectionInfoResource';
+import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA.js';
+import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '../ConnectionInfoResource.js';
 
 export const ConnectionExecutionContextProjectKey = resourceKeyAliasFactory('@connection-folder/project', (projectId: string) => ({ projectId }));
 
@@ -186,10 +186,10 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
       resourceKeyList(
         flat(
           ResourceKeyUtils.map(key, key =>
-            this.values.filter(context => {
-              const connection = this.connectionInfoResource.get(key);
-              return context.connectionId === key.connectionId && context.projectId === key.projectId && !connection?.connected;
-            }),
+            this.values.filter(
+              context =>
+                context.connectionId === key.connectionId && context.projectId === key.projectId && !this.connectionInfoResource.isConnected(key),
+            ),
           ),
         ).map(context => context.id),
       ),
@@ -208,7 +208,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     );
   }
 
-  protected dataSet(key: string, value: IConnectionExecutionContextInfo): void {
+  protected override dataSet(key: string, value: IConnectionExecutionContextInfo): void {
     const oldContext = this.dataGet(key);
     super.dataSet(key, { ...oldContext, ...value });
   }

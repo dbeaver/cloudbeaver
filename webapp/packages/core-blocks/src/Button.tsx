@@ -9,12 +9,12 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import style from './Button.module.css';
-import { IconOrImage } from './IconOrImage';
-import { Loader } from './Loader/Loader';
-import { s } from './s';
-import { useObjectRef } from './useObjectRef';
-import { useObservableRef } from './useObservableRef';
-import { useS } from './useS';
+import { IconOrImage } from './IconOrImage.js';
+import { Loader } from './Loader/Loader.js';
+import { s } from './s.js';
+import { useObjectRef } from './useObjectRef.js';
+import { useObservableRef } from './useObservableRef.js';
+import { useS } from './useS.js';
 
 type ButtonMod = Array<'raised' | 'unelevated' | 'outlined' | 'secondary'>;
 
@@ -72,12 +72,6 @@ export const Button = observer<ButtonProps>(function Button({
     ['click'],
   );
 
-  function handleEnter(event: React.KeyboardEvent<HTMLElement>) {
-    if (event.key === 'Enter') {
-      event.currentTarget.click();
-    }
-  }
-
   loading = state.loading || loading;
 
   if (loading) {
@@ -89,7 +83,6 @@ export const Button = observer<ButtonProps>(function Button({
     <Button
       role="button"
       tabIndex={0}
-      onKeyDown={handleEnter}
       {...rest}
       type={type}
       disabled={disabled}

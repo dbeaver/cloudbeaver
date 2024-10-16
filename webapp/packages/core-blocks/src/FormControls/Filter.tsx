@@ -6,18 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { HTMLAttributes, useState } from 'react';
+import { type HTMLAttributes, useState } from 'react';
 
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { ActionIconButton } from '../ActionIconButton';
-import { Container } from '../Containers/Container';
-import type { IContainerProps } from '../Containers/IContainerProps';
-import { s } from '../s';
-import { useFocus } from '../useFocus';
-import { useS } from '../useS';
+import { ActionIconButton } from '../ActionIconButton.js';
+import { Container } from '../Containers/Container.js';
+import type { IContainerProps } from '../Containers/IContainerProps.js';
+import { s } from '../s.js';
+import { useFocus } from '../useFocus.js';
+import { useS } from '../useS.js';
 import filterStyle from './Filter.module.css';
-import { InputField } from './InputField/InputField';
+import { InputField } from './InputField/InputField.js';
 
 interface BaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'>, IContainerProps {
   placeholder?: string;
@@ -116,7 +116,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
         autoComplete="off"
         className={s(styles, { inputField: true })}
         placeholder={placeholder}
-        disabled={disabled}
+        readOnly={disabled}
         name={name}
         value={value}
         onChange={handleChange}

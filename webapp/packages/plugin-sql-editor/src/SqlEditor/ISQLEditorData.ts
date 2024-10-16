@@ -8,10 +8,10 @@
 import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
-import type { ISqlDataSource, ISqlEditorCursor } from '../SqlDataSource/ISqlDataSource';
-import type { SQLProposal } from '../SqlEditorService';
-import type { ISQLScriptSegment, SQLParser } from '../SQLParser';
-import type { ISQLEditorMode } from './SQLEditorModeContext';
+import type { ISqlDataSource, ISqlEditorCursor } from '../SqlDataSource/ISqlDataSource.js';
+import type { SQLProposal } from '../SqlEditorService.js';
+import type { ISQLScriptSegment, SQLParser } from '../SQLParser.js';
+import type { ISQLEditorMode } from './SQLEditorModeContext.js';
 
 export interface ISegmentExecutionData {
   segment: ISQLScriptSegment;
