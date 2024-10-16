@@ -1,6 +1,7 @@
 query getActiveUser($includeConfigurationParameters: Boolean!) {
   user: activeUser {
     userId
+    isAnonymous
     displayName
     authRole
     linkedAuthProviders

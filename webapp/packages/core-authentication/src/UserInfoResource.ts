@@ -76,6 +76,18 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     });
   }
 
+  isAnonymous(): this is { data: UserInfo } {
+    return this.data?.isAnonymous === true;
+  }
+
+  isAuthenticated(): this is { data: UserInfo } {
+    return !!this.data && !this.isAnonymous();
+  }
+
+  hasAccess(): this is { data: UserInfo } {
+    return this.isAnonymous() || this.isAuthenticated();
+  }
+
   isLinked(provideId: string): boolean {
     return this.data?.linkedAuthProviders.includes(provideId) || false;
   }

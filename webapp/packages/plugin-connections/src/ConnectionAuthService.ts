@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { AuthInfoService, AuthProviderService } from '@cloudbeaver/core-authentication';
+import { AuthProviderService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   type Connection,
@@ -28,7 +28,7 @@ export class ConnectionAuthService extends Dependency {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly authProviderService: AuthProviderService,
-    private readonly authInfoService: AuthInfoService,
+    private readonly userInfoResource: UserInfoResource,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly authenticationService: AuthenticationService,
   ) {
@@ -41,7 +41,7 @@ export class ConnectionAuthService extends Dependency {
         connections: connectionInfoResource.values.filter(connection => connection.connected).map(createConnectionParam),
         state,
       }),
-      state => state === 'before' && authInfoService.isAnonymous,
+      state => state === 'before' && userInfoResource.isAnonymous(),
     );
     this.authenticationService.onLogout.before(
       connectionsManagerService.onDisconnect,
