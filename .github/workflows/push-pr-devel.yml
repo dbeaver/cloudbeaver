@@ -10,12 +10,7 @@ on:
     branches: [devel]
 
 concurrency:
-  group: |
-      # For pull requests, group by the pull request ID
-      ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) }}
-
-      # For pushes to main, group by the branch name (e.g., 'main')
-      ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'main-branch' }}
+  group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && 'main-branch') || 'push-pr-devel' }}
   cancel-in-progress: true
 
 jobs:
@@ -39,7 +34,6 @@ jobs:
     uses: ./.github/workflows/frontend-lint.yml
     secrets: inherit
 
-
   # call-frontend-tests:
   #   name: Frontend Unit Tests
   #   needs: call-frontend-build
@@ -58,4 +52,3 @@ jobs:
   #   name: Run
   #   needs: [call-backend-build, call-frontend-build]
   #   uses: ./.github/workflows/docker-build-and-push.yml
-
