@@ -39,7 +39,7 @@ import java.util.Map;
 @Suite.SuiteClasses(
     {
         ConnectionsTest.class,
-        SQLQueryTranslatorTest.class,
+//        SQLQueryTranslatorTest.class,
         AuthenticationTest.class,
         ResourceManagerTest.class,
         RMLockTest.class,

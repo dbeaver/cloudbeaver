@@ -18,7 +18,6 @@
     </modules>
 
     <properties>
-        <!--        <debugArgs>-agentlib:jdwp=transport=dt_socket,server=y,address=localhost:15001,suspend=y</debugArgs>-->
         <debugArgs></debugArgs>
     </properties>
 
