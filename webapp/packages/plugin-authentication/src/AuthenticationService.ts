@@ -67,7 +67,7 @@ export class AuthenticationService extends Bootstrap {
     this.onLogin = new Executor();
 
     this.onLogout.before(this.navigationService.navigationTask);
-    this.onLogin.before(this.navigationService.navigationTask, undefined, () => authInfoService.isAnonymous);
+    this.onLogin.before(this.navigationService.navigationTask, undefined, () => userInfoResource.isAnonymous());
 
     this.authPromise = null;
     this.configureAuthProvider = null;
