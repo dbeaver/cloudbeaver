@@ -84,14 +84,18 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
         return resourceManagerEnabled;
     }
 
+    @Override
     public boolean isFeatureEnabled(String id) {
         return ArrayUtils.contains(getEnabledFeatures(), id);
     }
 
+    @Override
     public boolean isFeaturesEnabled(String[] features) {
         return ArrayUtils.containsAll(getEnabledFeatures(), features);
     }
 
+    @NotNull
+    @Override
     public String[] getEnabledFeatures() {
         if (enabledFeatures == null) {
             // No config - enable all features (+backward compatibility)
