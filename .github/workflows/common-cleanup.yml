@@ -1,57 +1,14 @@
-name: Cleanup checks
+name: Cleanup
 
 on:
   pull_request:
     types: [closed]
+  push:
+    branches:
+      - devel
 
 jobs:
   delete-caches:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cleanup
-        run: |
-          gh extension install actions/gh-actions-cache
-
-          echo "Fetching list of cache key"
-          cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH -L 100 | cut -f 1 )
-
-          ## Setting this to not fail the workflow while deleting cache keys. 
-          set +e
-          echo "Deleting caches..."
-          for cacheKey in $cacheKeysForPR
-          do
-              gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
-          done
-          echo "Done"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          BRANCH: refs/pull/${{ github.event.pull_request.number }}/merge
-
-  # delete-docker-image:
-  #   name: Delete Docker Image
-  #   if: github.event.pull_request.merged == true
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - name: Check out the repository
-  #       uses: actions/checkout@v4
-
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v3
-
-  #     - name: Determine Docker Image Tag
-  #       run: |
-  #         REPO_NAME=$(basename ${{ github.repository }})
-  #         IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$REPO_NAME
-  #         BRANCH_NAME=${{ github.event.pull_request.head.ref }}
-  #         TAG_NAME=$(echo $BRANCH_NAME | sed 's/[^a-zA-Z0-9._-]/-/g')
-  #         echo "image=$IMAGE_NAME:$TAG_NAME" >> $GITHUB_ENV
-
-  #     - name: Log in to GitHub Container Registry
-  #       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
-
-  #     - name: Delete Docker Image
-  #       run: |
-  #         docker rmi ${{ env.image }}
-  #         echo "Deleted image: ${{ env.image }}"
+    name: Cleanup
+    uses: dbeaver/dbeaver-common/.github/workflows/cleanup-caches.yml@devel
+    secrets: inherit

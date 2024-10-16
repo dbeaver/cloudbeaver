@@ -94,7 +94,7 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
   }, [connected, initExecutionContext]);
 
   return (
-    <Overlay active={initExecutionContext && !connection.tryGetData?.connected}>
+    <Overlay active={initExecutionContext && !connected}>
       <OverlayHeader>
         <OverlayHeaderIcon icon={driver.tryGetData?.icon} />
         <OverlayHeaderTitle>{connection.tryGetData?.name}</OverlayHeaderTitle>

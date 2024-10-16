@@ -18,6 +18,7 @@ package io.cloudbeaver.server.actions;
 
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWServletHandler;
+import io.cloudbeaver.utils.WebAppUtils;
 import jakarta.servlet.Servlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,7 +44,7 @@ public abstract class AbstractActionServletHandler implements DBWServletHandler 
         action.saveInSession(session);
 
         // Redirect to home
-        response.sendRedirect("/");
+        response.sendRedirect(WebAppUtils.getWebApplication().getServerConfiguration().getRootURI());
     }
 
     protected abstract String getActionConsole();
