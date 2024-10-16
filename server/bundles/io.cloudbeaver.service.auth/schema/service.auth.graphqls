@@ -137,6 +137,9 @@ type UserInfo {
     configurationParameters: Object!
     # User teams
     teams: [UserTeamInfo!]!
+
+    @since(version: "24.2.3")
+    isAnonymous: Boolean!
 }
 
 type UserTeamInfo {
