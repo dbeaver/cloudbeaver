@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable } from 'mobx';
 
-import { AuthInfoService } from '@cloudbeaver/core-authentication';
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import type { ProjectInfo } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
@@ -15,11 +15,11 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 @injectable()
 export class ResourceManagerService {
   get enabled() {
-    return !!this.serverConfigResource.data?.resourceManagerEnabled && !!this.authInfoService.userInfo;
+    return !!this.serverConfigResource.data?.resourceManagerEnabled && this.userInfoResource.isAuthenticated();
   }
 
   constructor(
-    private readonly authInfoService: AuthInfoService,
+    private readonly userInfoResource: UserInfoResource,
     private readonly serverConfigResource: ServerConfigResource,
   ) {
     makeObservable(this, {

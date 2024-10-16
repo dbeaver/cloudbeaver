@@ -46,6 +46,6 @@
     "*.css": "postcss"
   },
 
-  "java.checkstyle.configuration": "${workspaceFolder}/../dbeaver/dbeaver-checkstyle-config.xml",
+  "java.checkstyle.configuration": "${workspaceFolder}/../dbeaver-common/.github/dbeaver-checkstyle-config.xml",
   "java.checkstyle.version": "10.12.0"
 }

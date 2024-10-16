@@ -82,7 +82,7 @@ export class UserProfileOptionsPanelService {
       return;
     }
 
-    if (this.userInfoResource.data === null) {
+    if (!this.userInfoResource.hasAccess()) {
       this.close(true);
     }
   }

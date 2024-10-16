@@ -142,7 +142,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 return result.subList(offset, result.size());
             }
         } catch (DBException e) {
-            throw new DBWebException(e);
+            throw new DBWebException(e.getMessage(), e);
         }
     }
 
