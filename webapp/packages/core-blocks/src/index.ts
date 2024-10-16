@@ -245,6 +245,7 @@ export * from './Snackbars/SnackbarMarkups/SnackbarBody.js';
 export * from './Snackbars/SnackbarMarkups/SnackbarFooter.js';
 export * from './Snackbars/Snackbar.js';
 export * from './Snackbars/ActionSnackbar.js';
+export * from './Snackbars/RedirectSnackbar.js';
 export * from './Snackbars/ProcessSnackbar.js';
 export * from './useUserData.js';
 export * from './useListKeyboardNavigation.js';
