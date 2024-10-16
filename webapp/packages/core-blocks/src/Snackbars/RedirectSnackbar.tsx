@@ -8,8 +8,16 @@
 import { observer } from 'mobx-react-lite';
 import type React from 'react';
 
-import { Container, Link, SnackbarBody, SnackbarContent, SnackbarStatus, SnackbarWrapper, Text, useTranslate } from '@cloudbeaver/core-blocks';
 import type { INotificationExtraProps, NotificationComponent } from '@cloudbeaver/core-events';
+
+import { Container } from '../Containers/Container.js';
+import { Link } from '../Link.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { Text } from '../Text.js';
+import { SnackbarBody } from './SnackbarMarkups/SnackbarBody.js';
+import { SnackbarContent } from './SnackbarMarkups/SnackbarContent.js';
+import { SnackbarStatus } from './SnackbarMarkups/SnackbarStatus.js';
+import { SnackbarWrapper } from './SnackbarMarkups/SnackbarWrapper.js';
 
 export interface RedirectSnackbarProps extends INotificationExtraProps {
   link: React.ComponentProps<typeof Link>;
