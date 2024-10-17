@@ -11,7 +11,7 @@ Bundle-ClassPath: .
 Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.dbeaver.model.jdbc,
  org.jkiss.dbeaver.model.sql,
- org.jkiss.dbeaver.model.sql.jdbc,
+ org.jkiss.dbeaver.model.sql.jdbc;visibility:=reexport,
  org.jkiss.dbeaver.registry;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp;visibility:=reexport,
  io.cloudbeaver.model
