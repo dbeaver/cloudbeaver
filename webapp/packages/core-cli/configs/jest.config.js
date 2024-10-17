@@ -13,7 +13,10 @@ module.exports = {
   testEnvironment: require.resolve('../tests/test.environment.js'),
   rootDir: path.resolve('.'),
   moduleFileExtensions: ['js', 'jsx', 'json'],
-  testMatch: ['<rootDir>/packages/*/dist/**/?(*.)+(spec|test).js?(x)', '<rootDir>/dist/**/?(*.)+(spec|test).js?(x)'],
+  testMatch: [
+    '<rootDir>/packages/*/dist/**/?(*.)+(spec|test).js?(x)', // unix
+    '<rootDir>\\packages\\*\\dist\\**?(*.)+(spec|test).js?(x)', // windows
+  ],
   transformIgnorePatterns: [
     '\\.pnp\\.[^\\/]+$',
     'node_modules/(?!@ngrx|(?!deck.gl)|ng-dynamic)',
