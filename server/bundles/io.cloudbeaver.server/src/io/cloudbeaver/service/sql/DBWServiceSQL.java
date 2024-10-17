@@ -27,6 +27,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.trace.DBCTraceProperty;
+import org.jkiss.dbeaver.model.qm.QMTransactionLogInfo;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 
 import java.util.List;
@@ -202,4 +203,10 @@ public interface DBWServiceSQL extends DBWService {
     WebAsyncTaskInfo asyncSqlCommitTransaction(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo sqlContext);
+
+    @WebAction
+    QMTransactionLogInfo getTransactionLogInfo(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo sqlContext
+    );
 }
