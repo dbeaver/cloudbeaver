@@ -45,7 +45,7 @@ echo "Build static content"
 
 mkdir .\cloudbeaver\web
 
-cd ..\..\cloudbeaver\webapp
+cd ..\webapp
 
 call yarn
 cd .\packages\product-default
