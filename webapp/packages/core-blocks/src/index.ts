@@ -219,7 +219,6 @@ export * from './useClipboard.js';
 export * from './useCombinedHandler.js';
 export * from './useCombinedRef.js';
 export * from './useExecutor.js';
-export * from './useFn.js';
 export * from './useFocus.js';
 export * from './useFormValidator.js';
 export * from './ResourcesHooks/useOffsetPagination.js';

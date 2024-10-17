@@ -7,8 +7,6 @@
  */
 import { action, computed, makeObservable, observable } from 'mobx';
 
-import { errorOf } from '../errorOf.js';
-import { PromiseCancelledError } from './PromiseCancelledError.js';
 import { PromiseExecutor } from './PromiseExecutor.js';
 
 export enum EDeferredState {
@@ -109,22 +107,5 @@ export class Deferred<T> {
     if (this.state === EDeferredState.CANCELLING) {
       this.state = EDeferredState.PENDING;
     }
-  }
-}
-
-export class DeferredFromPromise<T> extends Deferred<T> {
-  constructor(promise: Promise<T>) {
-    super();
-    promise.then(
-      value => this.toResolved(value),
-      err => {
-        const promiseCancelledError = errorOf(err, PromiseCancelledError);
-        if (promiseCancelledError) {
-          this.toCancelled(promiseCancelledError.cause);
-        } else {
-          this.toRejected(err);
-        }
-      },
-    );
   }
 }
