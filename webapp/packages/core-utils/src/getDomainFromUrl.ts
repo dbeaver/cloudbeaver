@@ -11,7 +11,6 @@ export function getDomainFromUrl(url: string): string {
     const urlObject = new URL(url);
     return urlObject.hostname;
   } catch (e) {
-    console.error('Invalid URL:', e);
     return '';
   }
 }
