@@ -14,8 +14,12 @@ module.exports = {
   rootDir: path.resolve('.'),
   moduleFileExtensions: ['js', 'jsx', 'json'],
   testMatch: [
-    '<rootDir>/packages/*/dist/**/?(*.)+(spec|test).js?(x)', // unix
-    '<rootDir>\\packages\\*\\dist\\**?(*.)+(spec|test).js?(x)', // windows
+    // unix
+    '<rootDir>/packages/*/dist/**/?(*.)+(spec|test).js?(x)',
+    '<rootDir>/dist/**/?(*.)+(spec|test).js?(x)',
+    // windows
+    '<rootDir>\\packages\\*\\dist\\**?(*.)+(spec|test).js?(x)',
+    '<rootDir>\\dist\\**?(*.)+(spec|test).js?(x)',
   ],
   transformIgnorePatterns: [
     '\\.pnp\\.[^\\/]+$',
