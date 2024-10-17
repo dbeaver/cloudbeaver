@@ -16,15 +16,19 @@
  */
 package io.cloudbeaver.service.data.transfer.impl;
 
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
 import java.util.Map;
 
 public class WebDataTransferOutputSettings {
     private final boolean insertBom;
+    @Nullable
     private final String encoding;
+    @Nullable
     private final String timestampPattern;
     private final boolean compress;
+    @Nullable
     private final String fileName;
 
     public WebDataTransferOutputSettings(Map<String, Object> outputSettings) {
@@ -35,7 +39,13 @@ public class WebDataTransferOutputSettings {
         this.fileName = JSONUtils.getString(outputSettings, "fileName");
     }
 
-    public WebDataTransferOutputSettings(boolean insertBom, String encoding, String timestampPattern, boolean compress, String fileName) {
+    public WebDataTransferOutputSettings(
+        boolean insertBom,
+        @Nullable String encoding,
+        @Nullable String timestampPattern,
+        boolean compress,
+        @Nullable String fileName
+    ) {
         this.insertBom = insertBom;
         this.encoding = encoding;
         this.timestampPattern = timestampPattern;
@@ -47,10 +57,12 @@ public class WebDataTransferOutputSettings {
         return insertBom;
     }
 
+    @Nullable
     public String getEncoding() {
         return encoding;
     }
 
+    @Nullable
     public String getTimestampPattern() {
         return timestampPattern;
     }
@@ -59,6 +71,7 @@ public class WebDataTransferOutputSettings {
         return compress;
     }
 
+    @Nullable
     public String getFileName() {
         return fileName;
     }

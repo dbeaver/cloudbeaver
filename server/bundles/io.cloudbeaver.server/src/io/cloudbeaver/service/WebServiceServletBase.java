@@ -20,16 +20,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
-import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.data.json.JSONUtils;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
+
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Map;

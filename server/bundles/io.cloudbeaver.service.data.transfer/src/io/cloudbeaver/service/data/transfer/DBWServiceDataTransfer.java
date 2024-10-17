@@ -28,6 +28,7 @@ import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.sql.WebSQLResultsInfo;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -37,18 +38,22 @@ import java.util.List;
  */
 public interface DBWServiceDataTransfer extends DBWService {
 
+    @NotNull
     @WebAction
-    List<WebDataTransferStreamProcessor> getAvailableStreamProcessors(WebSession session) throws DBWebException;
+    List<WebDataTransferStreamProcessor> getAvailableStreamProcessors(@NotNull WebSession session) throws DBWebException;
 
+    @NotNull
     @WebAction
-    List<WebDataTransferStreamProcessor> getAvailableImportStreamProcessors(WebSession session) throws DBWebException;
+    List<WebDataTransferStreamProcessor> getAvailableImportStreamProcessors(@NotNull WebSession session) throws DBWebException;
 
+    @NotNull
     @WebAction
     WebAsyncTaskInfo dataTransferExportDataFromContainer(
-        WebSQLProcessor sqlProcessor,
-        String containerNodePath,
-        WebDataTransferParameters parameters) throws DBWebException;
+        @NotNull WebSQLProcessor sqlProcessor,
+        @NotNull String containerNodePath,
+        @NotNull WebDataTransferParameters parameters) throws DBWebException;
 
+    @NotNull
     @WebAction
     WebAsyncTaskInfo asyncImportDataContainer(
         @NotNull String processorId,
@@ -56,14 +61,17 @@ public interface DBWServiceDataTransfer extends DBWService {
         @NotNull WebSQLResultsInfo webSQLResultsInfo,
         @NotNull WebSession webSession) throws DBWebException;
 
+    @NotNull
     @WebAction
     WebAsyncTaskInfo dataTransferExportDataFromResults(
-        WebSQLContextInfo sqlContextInfo,
-        String resultsId,
-        WebDataTransferParameters parameters) throws DBWebException;
+        @NotNull WebSQLContextInfo sqlContextInfo,
+        @NotNull String resultsId,
+        @NotNull WebDataTransferParameters parameters) throws DBWebException;
 
+    @Nullable
     @WebAction
-    Boolean dataTransferRemoveDataFile(WebSession session, String dataFileId) throws DBWebException;
+    Boolean dataTransferRemoveDataFile(@NotNull WebSession session, @NotNull String dataFileId) throws DBWebException;
 
+    @NotNull
     WebDataTransferDefaultExportSettings defaultExportSettings();
 }
