@@ -18,7 +18,7 @@ jobs:
       - name: Clone Deps Repositories
         uses: dbeaver/github-actions/clone-repositories@devel
         with:
-          project_deps_path: './cloudbeaver/project.deps'
+          project_deps_path: "./cloudbeaver/project.deps"
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -34,9 +34,9 @@ jobs:
         shell: bash
         working-directory: ./cloudbeaver/deploy
 
-      - name: Archive build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-build-artifacts
-          path: cloudbeaver/deploy/cloudbeaver
-          if-no-files-found: error
+      # - name: Archive build artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: backend-build-artifacts
+      #     path: cloudbeaver/deploy/cloudbeaver
+      #     if-no-files-found: error
