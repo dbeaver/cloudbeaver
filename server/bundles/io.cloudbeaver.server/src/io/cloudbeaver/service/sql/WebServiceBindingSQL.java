@@ -230,6 +230,11 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                 getService(env).asyncSqlRollbackTransaction(
                     getWebSession(env),
                     getSQLContext(env)
+                ))
+            .dataFetcher("getTransactionLogInfo", env ->
+                getService(env).getTransactionLogInfo(
+                    getWebSession(env),
+                    getSQLContext(env)
                 ));
     }
 

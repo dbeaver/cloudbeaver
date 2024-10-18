@@ -330,6 +330,12 @@ extend type Mutation {
         dataFormat: ResultDataFormat
     ): AsyncTaskInfo!
 
+    getTransactionLogInfo(
+        projectId: ID!,
+        connectionId: ID!,
+        contextId: ID!
+    ): TransactionLogInfos
+
     # Close results (free resources)
     sqlResultClose(projectId: ID, connectionId: ID!, contextId: ID!, resultId: ID!): Boolean!
 

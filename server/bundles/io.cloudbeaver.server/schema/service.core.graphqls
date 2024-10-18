@@ -71,6 +71,20 @@ type AsyncTaskInfo {
     taskResult: Object
 }
 
+type TransactionLogInfos {
+    count: Int
+    transactionLogInfos: [ TransactionLogInfoItem ]
+}
+
+type TransactionLogInfoItem {
+    time: DateTime
+    type: String
+    queryString: String
+    durationMs: Int
+    rows: Int
+    result: String
+}
+
 # Various server errors descriptor
 
 type ServerError {
