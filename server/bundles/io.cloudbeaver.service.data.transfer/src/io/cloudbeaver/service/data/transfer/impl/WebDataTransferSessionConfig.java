@@ -16,6 +16,9 @@
  */
 package io.cloudbeaver.service.data.transfer.impl;
 
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +29,8 @@ public class WebDataTransferSessionConfig {
     public WebDataTransferSessionConfig() {
     }
 
-    public WebDataTransferTaskConfig getTask(String dataFileId) {
+    @Nullable
+    public WebDataTransferTaskConfig getTask(@NotNull String dataFileId) {
         return tasks.get(dataFileId);
     }
 

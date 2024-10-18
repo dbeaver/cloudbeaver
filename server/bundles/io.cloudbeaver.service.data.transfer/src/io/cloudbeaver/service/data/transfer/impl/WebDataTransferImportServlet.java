@@ -35,6 +35,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
@@ -50,21 +51,19 @@ import java.util.UUID;
 public class WebDataTransferImportServlet extends WebServiceServletBase {
 
     private static final Log log = Log.getLog(WebDataTransferImportServlet.class);
-    public static final String ECLIPSE_JETTY_MULTIPART_CONFIG = "org.eclipse.jetty.multipartConfig";
+    private static final String ECLIPSE_JETTY_MULTIPART_CONFIG = "org.eclipse.jetty.multipartConfig";
+    private final DBWServiceDataTransfer dbwServiceDataTransfer;
 
-    DBWServiceDataTransfer dbwServiceDataTransfer;
-
-
-    public WebDataTransferImportServlet(CBApplication application, DBWServiceDataTransfer dbwServiceDataTransfer) {
+    public WebDataTransferImportServlet(@NotNull CBApplication<?> application, @NotNull DBWServiceDataTransfer dbwServiceDataTransfer) {
         super(application);
         this.dbwServiceDataTransfer = dbwServiceDataTransfer;
     }
 
     @Override
     protected void processServiceRequest(
-            WebSession session,
-            HttpServletRequest request,
-            HttpServletResponse response
+        WebSession session,
+        HttpServletRequest request,
+        HttpServletResponse response
     ) throws IOException, DBWebException {
         if (!session.isAuthorizedInSecurityManager()) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Import for users only");
@@ -108,7 +107,7 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
             }
 
             WebAsyncTaskInfo asyncImportDataContainer =
-                    dbwServiceDataTransfer.asyncImportDataContainer(processorId, filePath, webSQLResultsInfo, session);
+                dbwServiceDataTransfer.asyncImportDataContainer(processorId, filePath, webSQLResultsInfo, session);
             response.setContentType(CBConstants.APPLICATION_JSON);
             Map<String, Object> parameters = new LinkedHashMap<>();
             parameters.put("id", asyncImportDataContainer.getId());

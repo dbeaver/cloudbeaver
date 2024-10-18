@@ -23,6 +23,7 @@ import io.cloudbeaver.service.WebServiceServletBase;
 import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.tools.transfer.registry.DataTransferProcessorDescriptor;
@@ -34,15 +35,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 
 public class WebDataTransferServlet extends WebServiceServletBase {
 
     private static final Log log = Log.getLog(WebDataTransferServlet.class);
 
+    @NotNull
     private final DBWServiceDataTransfer dtManager;
 
-    public WebDataTransferServlet(CBApplication application, DBWServiceDataTransfer dtManager) {
+    public WebDataTransferServlet(@NotNull CBApplication<?> application, @NotNull DBWServiceDataTransfer dtManager) {
         super(application);
         this.dtManager = dtManager;
     }

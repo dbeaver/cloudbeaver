@@ -28,10 +28,12 @@ import java.util.stream.Collectors;
 
 public class WebDataTransferStreamProcessor {
 
+    @NotNull
     private final WebSession session;
+    @NotNull
     private final DataTransferProcessorDescriptor processor;
 
-    public WebDataTransferStreamProcessor(WebSession session, DataTransferProcessorDescriptor processor) {
+    public WebDataTransferStreamProcessor(@NotNull WebSession session, @NotNull DataTransferProcessorDescriptor processor) {
         this.session = session;
         this.processor = processor;
     }
