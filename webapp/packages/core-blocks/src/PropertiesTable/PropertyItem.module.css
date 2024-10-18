@@ -56,6 +56,11 @@
   display: flex;
 }
 
+.remove,
+.select {
+  margin: 0 2px;
+}
+
 .container:hover .remove {
   opacity: 1;
 }
@@ -106,7 +111,6 @@
 .button,
 .propertyValueSelector {
   composes: theme-form-element-radius from global;
-  margin: 2px;
   overflow: hidden;
 }
 
