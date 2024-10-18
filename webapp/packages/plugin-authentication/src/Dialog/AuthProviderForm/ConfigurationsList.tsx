@@ -17,6 +17,7 @@ import {
 import {
   Button,
   Cell,
+  Clickable,
   Container,
   Filter,
   getComputed,
@@ -150,13 +151,15 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
           const title = `${configuration.displayName}\n${configuration.description || ''}`;
           return (
             <Link key={configuration.id} title={title} wrapper onClick={() => login(false, provider, configuration)}>
-              <Cell
-                className={s(style, { cell: true })}
-                before={icon ? <IconOrImage className={s(style, { iconOrImage: true })} icon={icon} /> : undefined}
-                description={configuration.description}
-              >
-                {configuration.displayName}
-              </Cell>
+              <Clickable as="div">
+                <Cell
+                  className={s(style, { cell: true })}
+                  before={icon ? <IconOrImage className={s(style, { iconOrImage: true })} icon={icon} /> : undefined}
+                  description={configuration.description}
+                >
+                  {configuration.displayName}
+                </Cell>
+              </Clickable>
             </Link>
           );
         })}
