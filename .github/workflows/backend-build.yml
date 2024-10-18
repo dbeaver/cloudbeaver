@@ -6,6 +6,7 @@ on:
 
 jobs:
   build-backend:
+    if: github.event.pull_request.draft != true
     name: Build
     timeout-minutes: 10
     runs-on: ubuntu-latest
