@@ -3070,7 +3070,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     }
 
     public void shutdown() {
-        database.shutdown();
+        database.closeConnection();
     }
 
     public void finishConfiguration(
