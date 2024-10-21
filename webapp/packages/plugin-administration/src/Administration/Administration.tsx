@@ -35,7 +35,6 @@ import { CaptureView } from '@cloudbeaver/core-view';
 import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext.js';
 import { AdministrationViewService } from './AdministrationViewService.js';
 import { DrawerItem } from './DrawerItem.js';
-import { reduceLoaders } from './getLoaders.js';
 import { ItemContent } from './ItemContent.js';
 import style from './shared/Administration.module.css';
 import AdministrationStylesTab from './shared/AdministrationTab.module.css';
@@ -98,7 +97,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
   const OptionsPanel = optionsPanelService.getPanelComponent();
   const visibleItems = administrationItemService.getActiveItems(configurationWizard);
   const onlyActiveItem = administrationItemService.items.find(filterOnlyActive(configurationWizard));
-  const loaders = administrationItemService.items.reduce<ILoadableState[]>(reduceLoaders, []);
+  const loaders = administrationItemService.items.reduce<ILoadableState[]>((acc, item) => [...acc, item.getLoader?.() || []].flat(), []);
 
   useAutoLoad(Administration, loaders);
 

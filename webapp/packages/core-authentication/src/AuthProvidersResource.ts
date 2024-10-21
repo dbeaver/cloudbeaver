@@ -92,7 +92,7 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, AuthProvider>> {
-    await this.serverConfigResource.load();
+    this.preloadResource(this.serverConfigResource, () => undefined);
 
     const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
 
