@@ -41,22 +41,35 @@ copy ..\config\DefaultConfiguration\GlobalConfiguration\.dbeaver\data-sources.js
 
 move drivers cloudbeaver >NUL
 
-echo Build static content
+echo "Build static content"
 
-cd ..\
+mkdir .\cloudbeaver\web
 
-cd ..\cloudbeaver\webapp
+cd ..\webapp
 
 call yarn
-call yarn lerna bootstrap
-call yarn lerna run bundle --no-bail --stream --scope=@cloudbeaver/product-default &::-- -- --env source-map
+cd .\packages\product-default
+call yarn run bundle
+
+if %ERRORLEVEL% neq 0 (
+    echo 'Application build failed'
+    exit /b %ERRORLEVEL%
+)
+
+cd ..\..\
+call yarn test
+
+if %ERRORLEVEL% neq 0 (
+    echo 'Frontend tests failed'
+    exit /b %ERRORLEVEL%
+)
 
 cd ..\deploy
 
-echo Copy static content
+echo "Copy static content"
 
 xcopy /E /Q ..\webapp\packages\product-default\lib cloudbeaver\web >NUL
 
-echo Cloudbeaver is ready. Run run-server.bat in cloudbeaver folder to start the server.
+echo "Cloudbeaver is ready. Run run-server.bat in cloudbeaver folder to start the server."
 
 pause
