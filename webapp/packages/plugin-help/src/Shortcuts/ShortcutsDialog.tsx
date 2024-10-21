@@ -20,7 +20,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
-import { WebsiteLinks } from '@cloudbeaver/core-website';
+import { WebsiteLinks } from '@cloudbeaver/core-links';
 
 import { Shortcut } from './Shortcut.js';
 import { DATA_VIEWER_SHORTCUTS, NAVIGATION_TREE_SHORTCUTS, SQL_EDITOR_SHORTCUTS } from './SHORTCUTS_DATA.js';

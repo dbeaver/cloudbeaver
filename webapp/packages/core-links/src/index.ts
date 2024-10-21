@@ -6,4 +6,5 @@
  * you may not use this file except in compliance with the License.
  */
 export * from './WebsiteLinks.js';
+export * from './GithubLinks.js';
 export * from './manifest.js';

@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { WebsiteLinks } from '@cloudbeaver/core-links';
 import type { ServerConfigQuery } from '@cloudbeaver/core-sdk';
-import { WebsiteLinks } from '@cloudbeaver/core-website';
 
 import { defaultProductConfiguration } from './defaultProductConfiguration.js';
 

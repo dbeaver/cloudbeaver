@@ -8,8 +8,8 @@
 import { observer } from 'mobx-react-lite';
 
 import { Container, Link, s, usePermission, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { WebsiteLinks } from '@cloudbeaver/core-links';
 import { EAdminPermission } from '@cloudbeaver/core-root';
-import { WebsiteLinks } from '@cloudbeaver/core-website';
 
 import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
 import { ResultSetDataContentAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.js';

@@ -25,10 +25,10 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import { GithubLinks, WebsiteLinks } from '@cloudbeaver/core-links';
 import { ProductInfoResource } from '@cloudbeaver/core-root';
 import { ThemeService } from '@cloudbeaver/core-theming';
 import { useAppVersion } from '@cloudbeaver/core-version';
-import { WebsiteLinks } from '@cloudbeaver/core-website';
 
 import ProductInfoDialogStyles from './ProductInfoDialog.module.css';
 
@@ -75,7 +75,7 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(function P
                       Site{' '}
                     </Link>
                     or
-                    <Link href={WebsiteLinks.GITHUB_REPOSITORY_PAGE} target="_blank" rel="noopener noreferrer">
+                    <Link href={GithubLinks.CLOUDBEAVER_REPO} target="_blank" rel="noopener noreferrer">
                       {' '}
                       Github
                     </Link>

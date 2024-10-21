@@ -19,8 +19,6 @@ export class WebsiteLinks {
   static TEAM_ARCHIVE = 'https://dbeaver.com/downloads-team';
   static CONTACT_PAGE = 'https://dbeaver.com/contact/';
 
-  static GITHUB_REPOSITORY_PAGE = 'https://github.com/dbeaver/cloudbeaver';
-
   static getTeamArchiveById(id: string) {
     return `${WebsiteLinks.TEAM_ARCHIVE}/${id}`;
   }

@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/core-website",
+  "name": "@cloudbeaver/core-links",
   "type": "module",
   "sideEffects": [
     "src/**/*.css",
