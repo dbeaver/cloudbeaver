@@ -25,6 +25,15 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 24.2.3. 2024-10-21
+- Important update:
+  -    Connections Templates feature is declared as obsolete and will be removed in future releases.
+- General:
+  -    Data editor enhancements: Rows with focused cells are specially marked to make it easier to locate a position in large tables;
+  -    DB2i driver has been updated to version 20.0.7;
+  -    The URL mode for PostgreSQL now supports connecting to multiple databases;
+  -    The issue with displaying BLOB data types in DuckDB has been resolved.
+
 ### 24.2.2. 2024-10-07
 - Schemas were added to the SQL autocompletion for PostgreSQL, H2, and SQL Server;
 - CloudBeaver can now correctly display negative dates for MySQL database;
