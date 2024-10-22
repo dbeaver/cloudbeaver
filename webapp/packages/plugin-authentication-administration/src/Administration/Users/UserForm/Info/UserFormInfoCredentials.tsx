@@ -54,7 +54,16 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
   return (
     <Container gap vertical>
       <GroupTitle keepSize>{translate('authentication_user_credentials')}</GroupTitle>
-      <InputField type="text" name="userId" state={tabState.state} readOnly={editing || disabled} keepSize tiny required>
+      <InputField
+        description={!editing ? translate('authentication_user_name_description') : undefined}
+        type="text"
+        name="userId"
+        state={tabState.state}
+        readOnly={editing || disabled}
+        keepSize
+        tiny
+        required
+      >
         {translate('authentication_user_name')}
       </InputField>
       {local && (
