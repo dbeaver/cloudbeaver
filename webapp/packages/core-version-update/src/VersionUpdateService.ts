@@ -12,6 +12,7 @@ import { type IVersion, VersionResource, VersionService } from '@cloudbeaver/cor
 
 interface IInstructionProps {
   version: IVersion;
+  link: string;
   containerId?: string;
   className?: string;
 }

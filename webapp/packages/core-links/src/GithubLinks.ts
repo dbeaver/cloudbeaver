@@ -7,14 +7,15 @@
  */
 export class GithubLinks {
   static CLOUDBEAVER_REPO = 'https://github.com/dbeaver/cloudbeaver';
-  static EE_DEPLOY_REPO = 'https://github.com/dbeaver/cloudbeaver-deploy';
-  static TE_DEPLOY_REPO = 'https://github.com/dbeaver/team-edition-deploy';
 
-  getDeployRepo(distributed: boolean) {
+  static EE_DEPLOY_UPDATE = 'https://github.com/dbeaver/cloudbeaver-deploy?tab=readme-ov-file#updating-the-cluster';
+  static TE_DEPLOY_UPDATE = 'https://github.com/dbeaver/team-edition-deploy?tab=readme-ov-file#server-version-update';
+
+  static getDeployUpdateLink(distributed: boolean) {
     if (distributed) {
-      return GithubLinks.TE_DEPLOY_REPO;
+      return GithubLinks.TE_DEPLOY_UPDATE;
     }
 
-    return GithubLinks.EE_DEPLOY_REPO;
+    return GithubLinks.EE_DEPLOY_UPDATE;
   }
 }
