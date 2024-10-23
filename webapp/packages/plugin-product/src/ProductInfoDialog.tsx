@@ -25,7 +25,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
-import { GithubLinks, WebsiteLinks } from '@cloudbeaver/core-links';
+import { GITHUB_LINKS, WEBSITE_LINKS } from '@cloudbeaver/core-links';
 import { ProductInfoResource } from '@cloudbeaver/core-root';
 import { ThemeService } from '@cloudbeaver/core-theming';
 import { useAppVersion } from '@cloudbeaver/core-version';
@@ -70,12 +70,12 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(function P
                 <FormFieldDescription className={s(styles, { formFieldDescription: true })} label={translate('app_product_info_contacts')}>
                   <div className={s(styles, { contactsInfo: true })}>
                     You can contact us via our
-                    <Link href={WebsiteLinks.CONTACT_PAGE} target="_blank" rel="noopener noreferrer">
+                    <Link href={WEBSITE_LINKS.CONTACT_PAGE} target="_blank" rel="noopener noreferrer">
                       {' '}
                       Site{' '}
                     </Link>
                     or
-                    <Link href={GithubLinks.CLOUDBEAVER_REPO} target="_blank" rel="noopener noreferrer">
+                    <Link href={GITHUB_LINKS.CLOUDBEAVER_REPO} target="_blank" rel="noopener noreferrer">
                       {' '}
                       Github
                     </Link>

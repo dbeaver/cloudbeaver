@@ -5,17 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-export class GithubLinks {
-  static CLOUDBEAVER_REPO = 'https://github.com/dbeaver/cloudbeaver';
+export const GITHUB_LINKS = {
+  CLOUDBEAVER_REPO: 'https://github.com/dbeaver/cloudbeaver',
+  EE_DEPLOY_UPDATE: 'https://github.com/dbeaver/cloudbeaver-deploy?tab=readme-ov-file#updating-the-cluster',
+  TE_DEPLOY_UPDATE: 'https://github.com/dbeaver/team-edition-deploy?tab=readme-ov-file#server-version-update',
 
-  static EE_DEPLOY_UPDATE = 'https://github.com/dbeaver/cloudbeaver-deploy?tab=readme-ov-file#updating-the-cluster';
-  static TE_DEPLOY_UPDATE = 'https://github.com/dbeaver/team-edition-deploy?tab=readme-ov-file#server-version-update';
-
-  static getDeployUpdateLink(distributed: boolean) {
+  getDeployUpdateLink(distributed: boolean) {
     if (distributed) {
-      return GithubLinks.TE_DEPLOY_UPDATE;
+      return GITHUB_LINKS.TE_DEPLOY_UPDATE;
     }
 
-    return GithubLinks.EE_DEPLOY_UPDATE;
-  }
-}
+    return GITHUB_LINKS.EE_DEPLOY_UPDATE;
+  },
+};

@@ -9,18 +9,14 @@ import { Link, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { InstructionComponent } from './VersionUpdateService.js';
 
-const SPLITTER = '*splitter*';
-
 export const BaseUpdateInstruction: InstructionComponent = function UpdateInstruction({ version, containerId, link, className }) {
   const translate = useTranslate();
-  const mainText = translate('version_update_instruction').split(SPLITTER)[0]?.trim();
-  const linkText = translate('version_update_instruction').split(SPLITTER)[1]?.trim();
 
   return (
     <div className={className}>
-      {mainText}{' '}
+      {translate('version_update_instruction')}{' '}
       <Link href={link} target="_blank" rel="noopener noreferrer" inline indicator>
-        {linkText}
+        {translate('version_update_instruction_link')}
       </Link>
     </div>
   );

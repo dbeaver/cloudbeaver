@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { Container, Link, s, usePermission, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { WebsiteLinks } from '@cloudbeaver/core-links';
+import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 import { EAdminPermission } from '@cloudbeaver/core-root';
 
 import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
@@ -46,7 +46,7 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
         &nbsp;
         <span className={s(style, { limitWord: true })}>
           {admin ? (
-            <Link title={limitInfo?.limitWithSize} href={WebsiteLinks.SERVER_CONFIGURATION_RESOURCE_QUOTAS_PAGE} target="_blank" indicator>
+            <Link title={limitInfo?.limitWithSize} href={WEBSITE_LINKS.SERVER_CONFIGURATION_RESOURCE_QUOTAS_PAGE} target="_blank" indicator>
               {translate('ui_limit')}
             </Link>
           ) : (

@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 
 import { Combobox, Container, Group, GroupItem, GroupTitle, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { GithubLinks } from '@cloudbeaver/core-links';
+import { GITHUB_LINKS } from '@cloudbeaver/core-links';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { type IVersion, VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
@@ -56,7 +56,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
         {version && Instruction && (
           <GroupItem>
             <Instruction
-              link={GithubLinks.getDeployUpdateLink(!!serverConfigResource.data?.distributed)}
+              link={GITHUB_LINKS.getDeployUpdateLink(!!serverConfigResource.data?.distributed)}
               className={s(style, { instruction: true })}
               version={version}
               containerId={serverConfigResource.data?.containerId}
