@@ -10,6 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import {
   createResultSetBlobValue,
+  DataViewerContextMenuService,
   DataViewerService,
   isResultSetDataSource,
   ResultSetDataContentAction,
@@ -18,24 +19,22 @@ import {
   ResultSetFormatAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridContextMenuService } from './DataGridContextMenuService.js';
-
 @injectable()
 export class DataGridContextMenuSaveContentService {
   constructor(
-    private readonly dataGridContextMenuService: DataGridContextMenuService,
+    private readonly dataViewerContextMenuService: DataViewerContextMenuService,
     private readonly notificationService: NotificationService,
     private readonly dataViewerService: DataViewerService,
   ) {}
 
   register(): void {
-    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
+    this.dataViewerContextMenuService.add(this.dataViewerContextMenuService.getMenuToken(), {
       id: 'menuContentDownload',
       order: 4,
       title: 'ui_download',
       icon: '/icons/export.svg',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       onClick: async context => {
         const source = context.data.model.source as unknown as ResultSetDataSource;
@@ -59,13 +58,13 @@ export class DataGridContextMenuSaveContentService {
         return context.data.model.isLoading() || content.isLoading(context.data.key);
       },
     });
-    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
+    this.dataViewerContextMenuService.add(this.dataViewerContextMenuService.getMenuToken(), {
       id: 'menuContentUpload',
       order: 5,
       title: 'ui_upload',
       icon: '/icons/import.svg',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       onClick: async context => {
         selectFiles(files => {

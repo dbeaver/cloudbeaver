@@ -8,7 +8,11 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, type IContextMenuItem, type IMenuPanel } from '@cloudbeaver/core-dialogs';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
-import type { IDatabaseDataModel, IDataPresentationActions, IDataTableActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
+
+import type { IResultSetElementKey } from './DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
+import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel.js';
+import type { IDataPresentationActions } from './TableViewer/IDataPresentationActions.js';
+import type { IDataTableActions } from './TableViewer/IDataTableActions.js';
 
 export interface IDataGridCellMenuContext {
   model: IDatabaseDataModel;
@@ -20,17 +24,18 @@ export interface IDataGridCellMenuContext {
 }
 
 @injectable()
-export class DataGridContextMenuService {
+export class DataViewerContextMenuService {
   onRootMenuOpen: IExecutor<IDataGridCellMenuContext>;
-  static cellContext = 'data-grid-cell-context-menu';
-  private static readonly menuToken = 'dataGridCell';
+
+  static cellContext = 'data-viewer-cell-context-menu';
+  private static readonly menuToken = 'data-viewer-context-menu';
 
   constructor(private readonly contextMenuService: ContextMenuService) {
     this.onRootMenuOpen = new Executor();
   }
 
   getMenuToken(): string {
-    return DataGridContextMenuService.menuToken;
+    return DataViewerContextMenuService.menuToken;
   }
 
   constructMenuWithContext(
@@ -44,7 +49,7 @@ export class DataGridContextMenuService {
     return this.contextMenuService.createContextMenu<IDataGridCellMenuContext>(
       {
         menuId: this.getMenuToken(),
-        contextType: DataGridContextMenuService.cellContext,
+        contextType: DataViewerContextMenuService.cellContext,
         data: { model, actions, spreadsheetActions, resultIndex, key, simple },
       },
       this.getMenuToken(),

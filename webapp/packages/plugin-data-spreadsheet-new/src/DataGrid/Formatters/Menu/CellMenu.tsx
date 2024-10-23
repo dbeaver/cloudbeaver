@@ -10,9 +10,14 @@ import { observer } from 'mobx-react-lite';
 import { Icon, MenuPanelItemAndTriggerStyles, MenuTrigger, s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import type { IDatabaseDataModel, IDataPresentationActions, IDataTableActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
+import {
+  DataViewerContextMenuService,
+  type IDatabaseDataModel,
+  type IDataPresentationActions,
+  type IDataTableActions,
+  type IResultSetElementKey,
+} from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridContextMenuService } from '../../DataGridContextMenu/DataGridContextMenuService.js';
 import styles from './CellMenu.module.css';
 
 interface Props {
@@ -49,16 +54,16 @@ export const CellMenu = observer<Props>(function CellMenu({
   onStateSwitch,
 }) {
   const style = useS(styles);
-  const dataGridContextMenuService = useService(DataGridContextMenuService);
+  const dataViewerContextMenuService = useService(DataViewerContextMenuService);
 
-  const panel = dataGridContextMenuService.constructMenuWithContext(model, actions, spreadsheetActions, resultIndex, cellKey, simple);
+  const panel = dataViewerContextMenuService.constructMenuWithContext(model, actions, spreadsheetActions, resultIndex, cellKey, simple);
 
   if (!panel.menuItems.length || panel.menuItems.every(item => item.isHidden)) {
     return null;
   }
 
   function handleClick() {
-    dataGridContextMenuService.openMenu(model, actions, spreadsheetActions, resultIndex, cellKey, simple);
+    dataViewerContextMenuService.openMenu(model, actions, spreadsheetActions, resultIndex, cellKey, simple);
     onClick?.();
   }
 

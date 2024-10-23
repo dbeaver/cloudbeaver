@@ -8,6 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import {
   DatabaseDataConstraintAction,
+  DataViewerContextMenuService,
   EOrder,
   type IDatabaseDataModel,
   type IDatabaseDataOptions,
@@ -19,13 +20,11 @@ import {
   ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridContextMenuService } from './DataGridContextMenuService.js';
-
 @injectable()
 export class DataGridContextMenuOrderService {
   private static readonly menuOrderToken = 'menuOrder';
 
-  constructor(private readonly dataGridContextMenuService: DataGridContextMenuService) {}
+  constructor(private readonly dataViewerContextMenuService: DataViewerContextMenuService) {}
 
   getMenuOrderToken(): string {
     return DataGridContextMenuOrderService.menuOrderToken;
@@ -50,14 +49,14 @@ export class DataGridContextMenuOrderService {
   }
 
   register(): void {
-    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
+    this.dataViewerContextMenuService.add(this.dataViewerContextMenuService.getMenuToken(), {
       id: this.getMenuOrderToken(),
       order: 1,
       title: 'data_grid_table_order',
       icon: 'order-arrow-unknown',
       isPanel: true,
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden(context) {
         const source = context.data.model.source as unknown as ResultSetDataSource;
@@ -65,12 +64,12 @@ export class DataGridContextMenuOrderService {
         return !constraints.supported || context.data.model.isDisabled(context.data.resultIndex);
       },
     });
-    this.dataGridContextMenuService.add(this.getMenuOrderToken(), {
+    this.dataViewerContextMenuService.add(this.getMenuOrderToken(), {
       id: 'asc',
       type: 'radio',
       title: 'ASC',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isDisabled: context => context.data.model.isLoading(),
       onClick: async context => {
@@ -86,12 +85,12 @@ export class DataGridContextMenuOrderService {
         return !!resultColumn && constraints.getOrder(resultColumn.position) === EOrder.asc;
       },
     });
-    this.dataGridContextMenuService.add(this.getMenuOrderToken(), {
+    this.dataViewerContextMenuService.add(this.getMenuOrderToken(), {
       id: 'desc',
       type: 'radio',
       title: 'DESC',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isDisabled: context => context.data.model.isLoading(),
       onClick: async context => {
@@ -107,12 +106,12 @@ export class DataGridContextMenuOrderService {
         return !!resultColumn && constraints.getOrder(resultColumn.position) === EOrder.desc;
       },
     });
-    this.dataGridContextMenuService.add(this.getMenuOrderToken(), {
+    this.dataViewerContextMenuService.add(this.getMenuOrderToken(), {
       id: 'disableOrder',
       type: 'radio',
       title: 'data_grid_table_disable_order',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isDisabled: context => context.data.model.isLoading(),
       onClick: async context => {
@@ -128,11 +127,11 @@ export class DataGridContextMenuOrderService {
         return !!resultColumn && constraints.getOrder(resultColumn.position) === null;
       },
     });
-    this.dataGridContextMenuService.add(this.getMenuOrderToken(), {
+    this.dataViewerContextMenuService.add(this.getMenuOrderToken(), {
       id: 'disableOrders',
       title: 'data_grid_table_disable_all_orders',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden: context => {
         const source = context.data.model.source as unknown as ResultSetDataSource;

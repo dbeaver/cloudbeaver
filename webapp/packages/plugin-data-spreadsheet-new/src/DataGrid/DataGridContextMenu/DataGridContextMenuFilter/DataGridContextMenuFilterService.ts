@@ -18,7 +18,9 @@ import { ClipboardService } from '@cloudbeaver/core-ui';
 import { replaceMiddle } from '@cloudbeaver/core-utils';
 import {
   DatabaseDataConstraintAction,
+  DataViewerContextMenuService,
   type IDatabaseDataModel,
+  type IDataGridCellMenuContext,
   type IResultSetColumnKey,
   IS_NOT_NULL_ID,
   IS_NULL_ID,
@@ -31,8 +33,6 @@ import {
   wrapOperationArgument,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridContextMenuService, type IDataGridCellMenuContext } from '../DataGridContextMenuService.js';
-
 const FilterCustomValueDialog = importLazyComponent(() => import('./FilterCustomValueDialog.js').then(m => m.FilterCustomValueDialog));
 
 @injectable()
@@ -40,11 +40,11 @@ export class DataGridContextMenuFilterService {
   private static readonly menuFilterToken = 'menuFilter';
 
   constructor(
-    private readonly dataGridContextMenuService: DataGridContextMenuService,
+    private readonly dataViewerContextMenuService: DataViewerContextMenuService,
     private readonly commonDialogService: CommonDialogService,
     private readonly clipboardService: ClipboardService,
   ) {
-    this.dataGridContextMenuService.onRootMenuOpen.addHandler(this.getClipboardValue.bind(this));
+    this.dataViewerContextMenuService.onRootMenuOpen.addHandler(this.getClipboardValue.bind(this));
   }
 
   getMenuFilterToken(): string {
@@ -120,14 +120,14 @@ export class DataGridContextMenuFilterService {
   }
 
   register(): void {
-    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
+    this.dataViewerContextMenuService.add(this.dataViewerContextMenuService.getMenuToken(), {
       id: this.getMenuFilterToken(),
       order: 2,
       title: 'data_grid_table_filter',
       icon: 'filter',
       isPanel: true,
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden(context) {
         if (context.data.model.isDisabled(context.data.resultIndex)) {
@@ -139,13 +139,13 @@ export class DataGridContextMenuFilterService {
         return !constraints.supported;
       },
     });
-    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
+    this.dataViewerContextMenuService.add(this.dataViewerContextMenuService.getMenuToken(), {
       id: 'deleteFiltersAndOrders',
       order: 3,
       title: 'data_grid_table_delete_filters_and_orders',
       icon: 'erase',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden(context) {
         if (context.data.model.isDisabled(context.data.resultIndex)) {
@@ -166,13 +166,13 @@ export class DataGridContextMenuFilterService {
         });
       },
     });
-    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
+    this.dataViewerContextMenuService.add(this.getMenuFilterToken(), {
       id: 'clipboardValue',
       order: 0,
       title: 'ui_clipboard',
       icon: 'filter-clipboard',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden: context => {
         if (!this.clipboardService.clipboardAvailable || this.clipboardService.state === 'denied') {
@@ -188,7 +188,7 @@ export class DataGridContextMenuFilterService {
       panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
         id: 'clipboardValuePanel',
         menuItemsGetter: context => {
-          if (context.contextType !== DataGridContextMenuService.cellContext) {
+          if (context.contextType !== DataViewerContextMenuService.cellContext) {
             return [];
           }
 
@@ -214,13 +214,13 @@ export class DataGridContextMenuFilterService {
         },
       }),
     });
-    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
+    this.dataViewerContextMenuService.add(this.getMenuFilterToken(), {
       id: 'cellValue',
       order: 1,
       title: 'data_grid_table_filter_cell_value',
       icon: 'filter',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden: context => {
         const { model, resultIndex, key } = context.data;
@@ -244,13 +244,13 @@ export class DataGridContextMenuFilterService {
         },
       }),
     });
-    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
+    this.dataViewerContextMenuService.add(this.getMenuFilterToken(), {
       id: 'customValue',
       order: 2,
       title: 'data_grid_table_filter_custom_value',
       icon: 'filter-custom',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden: context => {
         const { model, resultIndex, key } = context.data;
@@ -309,12 +309,12 @@ export class DataGridContextMenuFilterService {
         },
       }),
     });
-    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
+    this.dataViewerContextMenuService.add(this.getMenuFilterToken(), {
       id: 'isNullValue',
       order: 3,
       icon: 'filter',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden: context => {
         const source = context.data.model.source as unknown as ResultSetDataSource;
@@ -338,12 +338,12 @@ export class DataGridContextMenuFilterService {
         );
       },
     });
-    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
+    this.dataViewerContextMenuService.add(this.getMenuFilterToken(), {
       id: 'isNotNullValue',
       order: 4,
       icon: 'filter',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden: context => {
         const source = context.data.model.source as unknown as ResultSetDataSource;
@@ -367,12 +367,12 @@ export class DataGridContextMenuFilterService {
         );
       },
     });
-    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
+    this.dataViewerContextMenuService.add(this.getMenuFilterToken(), {
       id: 'deleteFilter',
       order: 5,
       icon: 'filter-reset',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden: context => {
         const { model, resultIndex, key } = context.data;
@@ -406,13 +406,13 @@ export class DataGridContextMenuFilterService {
         });
       },
     });
-    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
+    this.dataViewerContextMenuService.add(this.getMenuFilterToken(), {
       id: 'deleteAllFilters',
       order: 6,
       icon: 'filter-reset-all',
       title: 'data_grid_table_filter_reset_all_filters',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden: context => {
         const { model, resultIndex } = context.data;

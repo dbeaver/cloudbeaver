@@ -68,6 +68,7 @@ export * from './DatabaseDataModel/IDatabaseResultSet.js';
 export * from './DatabaseDataModel/Order.js';
 export * from './DataViewerService.js';
 export * from './useDataViewerModel.js';
+export * from './DataViewerContextMenuService.js';
 
 // All Services and Components that is provided by this plugin should be exported here
 export * from './TableViewer/TableViewerStorageService.js';
