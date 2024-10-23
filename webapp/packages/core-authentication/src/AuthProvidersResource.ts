@@ -44,7 +44,6 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   ) {
     super();
 
-    this.preloadResource(this.serverConfigResource, () => undefined);
     this.sync(
       serverConfigResource,
       () => {},
