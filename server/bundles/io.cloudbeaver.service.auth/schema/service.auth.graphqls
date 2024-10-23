@@ -148,6 +148,13 @@ type UserTeamInfo {
     teamRole: String
 }
 
+type APITokenInfo @since(version: "24.2.4") {
+    tokenName: String!
+    token: String
+    periodDays: Int!
+    createTime: DateTime!
+}
+
 extend type Query {
 
     # Authorize user using specified auth provider. If linkUser=true then associates new
@@ -173,6 +180,9 @@ extend type Query {
 
     listUserProfileProperties: [ObjectPropertyInfo!]!
 
+    @since(version: "24.2.4")
+    authListAPITokens: [APITokenInfo!]!
+
 }
 
 
@@ -182,5 +192,8 @@ extend type Mutation {
     setUserConfigurationParameter(name: String!, value: Object): Boolean!
     # Updates user preferences
     setUserPreferences(preferences: Object!): UserInfo! @since(version: "24.0.1")
+
+    authCreateAPIToken(tokenName: String!, periodDays: Int!): APITokenInfo! @since(version: "24.2.4")
+    authDeleteAPIToken(tokenName: String!): Boolean! @since(version: "24.2.4")
 
 }

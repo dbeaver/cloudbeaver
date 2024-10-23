@@ -24,6 +24,7 @@ import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.security.SMAPIToken;
 
 import java.util.Map;
 
@@ -75,5 +76,14 @@ public interface DBWServiceAuth extends DBWService {
         @NotNull WebSession webSession,
         @NotNull Map<String, Object> parameters
     ) throws DBWebException;
+
+    @WebAction
+    SMAPIToken[] getAPITokens(@NotNull WebSession webSession) throws DBWebException;
+
+    @WebAction
+    SMAPIToken createAPIToken(@NotNull WebSession webSession, @NotNull String tokenName, int period) throws DBWebException;
+
+    @WebAction
+    boolean deleteAPIToken(@NotNull WebSession webSession, @NotNull String tokenName) throws DBWebException;
 
 }

@@ -69,6 +69,8 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
             ))
             .dataFetcher("listUserProfileProperties",
                 env -> getService(env).listUserProfileProperties(getWebSession(env)))
+            .dataFetcher("authListAPITokens",
+                env -> getService(env).getAPITokens(getWebSession(env)))
         ;
         model.getMutationType()
             .dataFetcher("setUserConfigurationParameter",
@@ -78,6 +80,16 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
             .dataFetcher("setUserPreferences",
                 env -> getService(env).setUserConfigurationParameters(getWebSession(env),
                     env.getArgument("preferences")))
+            .dataFetcher("authCreateAPIToken",
+                env -> getService(env).createAPIToken(
+                    getWebSession(env),
+                    env.getArgument("tokenName"),
+                    env.getArgument("periodDays")))
+            .dataFetcher("authDeleteAPIToken",
+                env -> getService(env).deleteAPIToken(
+                    getWebSession(env),
+                    env.getArgument("tokenName"))
+            )
         ;
     }
 }
