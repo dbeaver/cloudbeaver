@@ -20,6 +20,7 @@ export {
   format,
   scaleBand,
   max,
+  min,
   scaleLinear,
   interpolateRound,
   axisBottom,
@@ -27,7 +28,20 @@ export {
   scaleOrdinal,
   pie,
   arc,
+  scalePoint,
   schemeTableau10,
   sum,
 } from 'd3';
-export type { Selection, ZoomBehavior, Line, DragBehavior, SubjectPosition, PieArcDatum, ScaleOrdinal } from 'd3';
+export type {
+  Selection,
+  ZoomBehavior,
+  Line,
+  DragBehavior,
+  SubjectPosition,
+  PieArcDatum,
+  ScaleOrdinal,
+  Axis,
+  NumberValue,
+  ScaleLinear,
+  ScaleBand,
+} from 'd3';
