@@ -14,7 +14,7 @@ import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel.
 import type { IDataPresentationActions } from './TableViewer/IDataPresentationActions.js';
 import type { IDataTableActions } from './TableViewer/IDataTableActions.js';
 
-export interface IDataGridCellMenuContext {
+export interface IDataViewerContextMenu {
   model: IDatabaseDataModel;
   actions: IDataTableActions;
   spreadsheetActions: IDataPresentationActions<IResultSetElementKey>;
@@ -25,7 +25,7 @@ export interface IDataGridCellMenuContext {
 
 @injectable()
 export class DataViewerContextMenuService {
-  onRootMenuOpen: IExecutor<IDataGridCellMenuContext>;
+  onRootMenuOpen: IExecutor<IDataViewerContextMenu>;
 
   static cellContext = 'data-viewer-cell-context-menu';
   private static readonly menuToken = 'data-viewer-context-menu';
@@ -46,7 +46,7 @@ export class DataViewerContextMenuService {
     key: IResultSetElementKey,
     simple: boolean,
   ): IMenuPanel {
-    return this.contextMenuService.createContextMenu<IDataGridCellMenuContext>(
+    return this.contextMenuService.createContextMenu<IDataViewerContextMenu>(
       {
         menuId: this.getMenuToken(),
         contextType: DataViewerContextMenuService.cellContext,
@@ -67,7 +67,7 @@ export class DataViewerContextMenuService {
     this.onRootMenuOpen.execute({ model, actions, spreadsheetActions, resultIndex, key, simple });
   }
 
-  add(panelId: string, menuItem: IContextMenuItem<IDataGridCellMenuContext>): void {
+  add(panelId: string, menuItem: IContextMenuItem<IDataViewerContextMenu>): void {
     this.contextMenuService.addMenuItem(panelId, menuItem);
   }
 }

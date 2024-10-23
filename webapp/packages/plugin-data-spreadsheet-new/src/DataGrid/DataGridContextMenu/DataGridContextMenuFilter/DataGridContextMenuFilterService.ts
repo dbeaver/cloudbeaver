@@ -20,7 +20,7 @@ import {
   DatabaseDataConstraintAction,
   DataViewerContextMenuService,
   type IDatabaseDataModel,
-  type IDataGridCellMenuContext,
+  type IDataViewerContextMenu,
   type IResultSetColumnKey,
   IS_NOT_NULL_ID,
   IS_NULL_ID,
@@ -82,11 +82,11 @@ export class DataGridContextMenuFilterService {
   }
 
   private getGeneralizedMenuItems(
-    context: IMenuContext<IDataGridCellMenuContext>,
+    context: IMenuContext<IDataViewerContextMenu>,
     value: any | (() => any),
     icon: string,
-    isHidden?: (context: IMenuContext<IDataGridCellMenuContext>) => boolean,
-  ): Array<IContextMenuItem<IDataGridCellMenuContext>> {
+    isHidden?: (context: IMenuContext<IDataViewerContextMenu>) => boolean,
+  ): Array<IContextMenuItem<IDataViewerContextMenu>> {
     const { model, resultIndex, key } = context.data;
     const source = model.source as unknown as ResultSetDataSource;
     const data = source.getAction(resultIndex, ResultSetDataAction);
@@ -185,7 +185,7 @@ export class DataGridContextMenuFilterService {
 
         return supportedOperations.length === 0;
       },
-      panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
+      panel: new ComputedContextMenuModel<IDataViewerContextMenu>({
         id: 'clipboardValuePanel',
         menuItemsGetter: context => {
           if (context.contextType !== DataViewerContextMenuService.cellContext) {
@@ -232,7 +232,7 @@ export class DataGridContextMenuFilterService {
 
         return value === undefined || supportedOperations.length === 0 || format.isNull(key);
       },
-      panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
+      panel: new ComputedContextMenuModel<IDataViewerContextMenu>({
         id: 'cellValuePanel',
         menuItemsGetter: context => {
           const { model, resultIndex, key } = context.data;
@@ -261,7 +261,7 @@ export class DataGridContextMenuFilterService {
 
         return cellValue === undefined || supportedOperations.length === 0;
       },
-      panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
+      panel: new ComputedContextMenuModel<IDataViewerContextMenu>({
         id: 'customValuePanel',
         menuItemsGetter: context => {
           const { model, resultIndex, key } = context.data;
