@@ -29,7 +29,7 @@ export default [
   ['authentication_identity_provider_dialog_subtitle', 'Choisissez la configuration avec laquelle vous souhaitez vous connecter'],
 
   ['authentication_user_name', "Nom d'utilisateur"],
-  ['authentication_user_name_description', 'Will be saved in lowercase'],
+  ['authentication_user_name_description', "User's identifiers are stored in lowercase"],
   ['authentication_user_role', 'Rôle'],
   ['authentication_user_credentials', 'Identifiants'],
   ['authentication_user_meta_parameters', 'Paramètres'],

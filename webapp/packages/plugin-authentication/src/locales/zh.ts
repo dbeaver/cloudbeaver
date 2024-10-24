@@ -26,7 +26,7 @@ export default [
   ['authentication_identity_provider_dialog_subtitle', '选择您要用于登录的配置'],
 
   ['authentication_user_name', '用户名称'],
-  ['authentication_user_name_description', 'Will be saved in lowercase'],
+  ['authentication_user_name_description', "User's identifiers are stored in lowercase"],
   ['authentication_user_role', 'Role'],
   ['authentication_user_credentials', '凭据'],
   ['authentication_user_meta_parameters', '参数'],
