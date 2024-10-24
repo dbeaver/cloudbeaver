@@ -10,12 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Icon, MenuPanelItemAndTriggerStyles, MenuTrigger, s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import {
-  type IDatabaseDataModel,
-  type IDataPresentationActions,
-  type IDataTableActions,
-  type IResultSetElementKey,
-} from '@cloudbeaver/plugin-data-viewer';
+import type { IDatabaseDataModel, IDataPresentationActions, IDataTableActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from '../../DataGridContextMenu/DataGridContextMenuService.js';
 import styles from './CellMenu.module.css';

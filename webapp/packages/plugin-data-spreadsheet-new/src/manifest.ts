@@ -13,6 +13,7 @@ export const dataSpreadsheetNewManifest: PluginManifest = {
     () => import('./SpreadsheetBootstrap.js').then(m => m.SpreadsheetBootstrap),
     () => import('./DataGridSettingsService.js').then(m => m.DataGridSettingsService),
     () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./DataGrid/DataGridContextMenu/DataGridContextMenuService.js').then(m => m.DataGridContextMenuService),
     () => import('./DataGrid/DataGridContextMenu/DataGridContextMenuOrderService.js').then(m => m.DataGridContextMenuOrderService),
     () =>
       import('./DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService.js').then(
@@ -20,6 +21,5 @@ export const dataSpreadsheetNewManifest: PluginManifest = {
       ),
     () => import('./DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService.js').then(m => m.DataGridContextMenuCellEditingService),
     () => import('./DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService.js').then(m => m.DataGridContextMenuSaveContentService),
-    () => import('./DataGrid/DataGridContextMenu/DataGridContextMenuService.js').then(m => m.DataGridContextMenuService),
   ],
 };

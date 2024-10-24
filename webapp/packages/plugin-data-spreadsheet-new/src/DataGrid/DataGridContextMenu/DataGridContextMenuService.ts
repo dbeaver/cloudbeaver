@@ -22,7 +22,6 @@ export interface IDataGridCellMenuContext {
 @injectable()
 export class DataGridContextMenuService {
   onRootMenuOpen: IExecutor<IDataGridCellMenuContext>;
-
   static cellContext = 'data-grid-cell-context-menu';
   private static readonly menuToken = 'dataGridCell';
 
