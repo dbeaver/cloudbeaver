@@ -35,10 +35,7 @@ import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 class WebSQLQueryDataReceiver implements DBDDataReceiver {
@@ -170,8 +167,9 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
 
         webResultSet.setSingleEntity(isSingleEntity);
 
-        DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
-        webResultSet.setHasRowIdentifier(rowIdentifier != null && rowIdentifier.isValidIdentifier());
+        Set<DBDRowIdentifier> rowIdentifiers = resultsInfo.getRowIdentifiers();
+        boolean hasRowIdentifier = rowIdentifiers.stream().allMatch(DBDRowIdentifier::isValidIdentifier);
+        webResultSet.setHasRowIdentifier(!rowIdentifiers.isEmpty() && hasRowIdentifier);
     }
 
     private void convertComplexValuesToRelationalView(DBCSession session) {
