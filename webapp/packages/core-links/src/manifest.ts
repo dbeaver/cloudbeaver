@@ -7,9 +7,9 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-export const coreWebsiteManifest: PluginManifest = {
+export const coreLinksManifest: PluginManifest = {
   info: {
-    name: 'Core Website',
+    name: 'Core Links',
   },
 
   providers: [],

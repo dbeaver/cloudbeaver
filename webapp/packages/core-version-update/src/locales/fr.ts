@@ -14,4 +14,6 @@ export default [
   ['version_update_versions_refresh_fail', 'Échec du rafraîchissement de la liste des versions'],
   ['version_update_how_to_update', 'Comment mettre à jour'],
   ['version_update_info', 'Info'],
+  ['version_update_instruction', 'To update version, please follow'],
+  ['version_update_instruction_link', 'the instructions'],
 ];

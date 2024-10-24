@@ -19,6 +19,9 @@
       "path": "../core-connections/tsconfig.json"
     },
     {
+      "path": "../core-data-context/tsconfig.json"
+    },
+    {
       "path": "../core-di/tsconfig.json"
     },
     {
