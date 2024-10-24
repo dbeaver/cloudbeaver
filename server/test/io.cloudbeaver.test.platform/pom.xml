@@ -13,4 +13,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>eclipse-test-plugin</packaging>
 
+    <properties>
+        <!--        <debugArgs>-agentlib:jdwp=transport=dt_socket,server=y,address=localhost:15001,suspend=y</debugArgs>-->
+    </properties>
 </project>
