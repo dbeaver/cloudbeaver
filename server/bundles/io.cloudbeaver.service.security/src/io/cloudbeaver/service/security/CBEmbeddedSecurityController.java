@@ -39,7 +39,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPPage;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.exec.DBCFeatureNotSupportedException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
@@ -3059,24 +3058,6 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error reading granted object permissions ", e);
         }
-    }
-
-    // API Tokens
-    @NotNull
-    @Override
-    public List<SMAPIToken> getCurrentUserAPITokens() throws DBException {
-        throw new DBCFeatureNotSupportedException();
-    }
-
-    @NotNull
-    @Override
-    public SMAPIToken createAPIToken(@NotNull String tokenName, @Nullable Integer period) throws DBException {
-        throw new DBCFeatureNotSupportedException();
-    }
-
-    @Override
-    public void deleteAPIToken(@NotNull String tokenName) throws DBException {
-        throw new DBCFeatureNotSupportedException();
     }
 
     private static void appendStringParameters(StringBuilder sql, @NotNull Collection<String> subjectIds) {
