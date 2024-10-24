@@ -44,7 +44,6 @@ import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.auth.SMSessionExternal;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
-import org.jkiss.dbeaver.model.security.SMAPIToken;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
 import org.jkiss.dbeaver.model.security.exception.SMTooManySessionsException;
@@ -309,33 +308,5 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         } catch (DBException e) {
             throw new DBWebException("Error setting user parameters", e);
         }
-    }
-
-    @Override
-    public SMAPIToken[] getAPITokens(@NotNull WebSession webSession) throws DBWebException {
-        try {
-            return webSession.getSecurityController().getAPITokens().toArray(SMAPIToken[]::new);
-        } catch (DBException e) {
-            throw new DBWebException("Error reading API tokens", e);
-        }
-    }
-
-    @Override
-    public SMAPIToken createAPIToken(@NotNull WebSession webSession, @NotNull String tokenName, int period) throws DBWebException {
-        try {
-            return webSession.getSecurityController().createAPIToken(tokenName, period);
-        } catch (DBException e) {
-            throw new DBWebException("Error creating API token", e);
-        }
-    }
-
-    @Override
-    public boolean deleteAPIToken(@NotNull WebSession webSession, @NotNull String tokenName) throws DBWebException {
-        try {
-            webSession.getSecurityController().deleteAPIToken(tokenName);
-        } catch (DBException e) {
-            throw new DBWebException("Error deleting API token", e);
-        }
-        return true;
     }
 }

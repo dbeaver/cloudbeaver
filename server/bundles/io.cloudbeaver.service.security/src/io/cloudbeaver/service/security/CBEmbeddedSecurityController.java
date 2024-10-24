@@ -3064,19 +3064,13 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     // API Tokens
     @NotNull
     @Override
-    public String getUserIdFromAPIToken(@NotNull String token) throws DBException {
+    public List<SMAPIToken> getCurrentUserAPITokens() throws DBException {
         throw new DBCFeatureNotSupportedException();
     }
 
     @NotNull
     @Override
-    public List<SMAPIToken> getAPITokens() throws DBException {
-        throw new DBCFeatureNotSupportedException();
-    }
-
-    @NotNull
-    @Override
-    public SMAPIToken createAPIToken(@NotNull String tokenName, int period) throws DBException {
+    public SMAPIToken createAPIToken(@NotNull String tokenName, @Nullable Integer period) throws DBException {
         throw new DBCFeatureNotSupportedException();
     }
 
