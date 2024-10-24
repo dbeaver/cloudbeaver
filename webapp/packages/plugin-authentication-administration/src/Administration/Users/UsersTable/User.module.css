@@ -16,3 +16,7 @@
 .overflow {
   overflow: auto !important;
 }
+
+.name {
+  cursor: pointer;
+}

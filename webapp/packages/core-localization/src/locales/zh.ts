@@ -142,4 +142,5 @@ export default [
   ['app_root_quota_exceeded', '超出配额'],
   ['app_root_event_permissions_changed_message', '您的权限已修改'],
   ['core_eventsLog_dbeaverErrorDetails', '错误详情'],
+  ['ui_not_found', 'Not found'],
 ];

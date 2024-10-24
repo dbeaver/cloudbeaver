@@ -131,6 +131,7 @@ export default [
   ['ui_export', 'Экспорт'],
   ['ui_you', 'Вы'],
   ['ui_ms', 'мс'],
+  ['ui_not_found', 'Не найдено'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],
