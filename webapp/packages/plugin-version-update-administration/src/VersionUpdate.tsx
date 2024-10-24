@@ -32,13 +32,13 @@ export const VersionUpdate: TabContainerPanelComponent<AdministrationItemContent
 
   return (
     <ColoredContainer className={s(style, { coloredContainer: true })} wrap gap overflow parent>
-      {/* <VersionChecker /> */}
-      {/* {versions.length > 0 && ( */}
-      {/* <> */}
-      {GeneralInstructions && <GeneralInstructions />}
-      <VersionSelector versions={versions} />
-      {/* </> */}
-      {/* )} */}
+      <VersionChecker />
+      {versions.length > 0 && (
+        <>
+          {GeneralInstructions && <GeneralInstructions />}
+          <VersionSelector versions={versions} />
+        </>
+      )}
     </ColoredContainer>
   );
 });

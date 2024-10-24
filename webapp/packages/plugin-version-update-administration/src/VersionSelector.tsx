@@ -53,12 +53,12 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
         >
           {translate('plugin_version_update_administration_version_selector_label')}
         </Combobox>
-        {Instruction && (
+        {version && Instruction && (
           <GroupItem>
             <Instruction
               link={GITHUB_LINKS.getDeployUpdateLink(!!serverConfigResource.data?.distributed)}
               className={s(style, { instruction: true })}
-              version={version!}
+              version={version}
               containerId={serverConfigResource.data?.containerId}
             />
           </GroupItem>
