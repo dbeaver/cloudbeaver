@@ -128,7 +128,7 @@ export class DataGridContextMenuCellEditingService {
       onClick(context) {
         const source = context.data.model.source as unknown as ResultSetDataSource;
         const editor = source.getAction(context.data.resultIndex, ResultSetEditAction);
-        editor.duplicateRow(context.data.key.row);
+        editor.duplicateRow(context.data.key);
       },
     });
     this.dataGridContextMenuService.add(this.getMenuEditingToken(), {
