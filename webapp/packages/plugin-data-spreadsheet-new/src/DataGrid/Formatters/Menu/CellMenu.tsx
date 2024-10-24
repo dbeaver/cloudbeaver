@@ -54,16 +54,16 @@ export const CellMenu = observer<Props>(function CellMenu({
   onStateSwitch,
 }) {
   const style = useS(styles);
-  const dataViewerContextMenuService = useService(DataGridContextMenuService);
+  const dataGridContextMenuService = useService(DataGridContextMenuService);
 
-  const panel = dataViewerContextMenuService.constructMenuWithContext(model, actions, spreadsheetActions, resultIndex, cellKey, simple);
+  const panel = dataGridContextMenuService.constructMenuWithContext(model, actions, spreadsheetActions, resultIndex, cellKey, simple);
 
   if (!panel.menuItems.length || panel.menuItems.every(item => item.isHidden)) {
     return null;
   }
 
   function handleClick() {
-    dataViewerContextMenuService.openMenu(model, actions, spreadsheetActions, resultIndex, cellKey, simple);
+    dataGridContextMenuService.openMenu(model, actions, spreadsheetActions, resultIndex, cellKey, simple);
     onClick?.();
   }
 

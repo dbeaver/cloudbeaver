@@ -24,14 +24,14 @@ import { DataGridContextMenuService } from './DataGridContextMenuService.js';
 export class DataGridContextMenuCellEditingService {
   private static readonly menuEditingToken = 'menuEditing';
 
-  constructor(private readonly dataViewerContextMenuService: DataGridContextMenuService) {}
+  constructor(private readonly dataGridContextMenuService: DataGridContextMenuService) {}
 
   getMenuEditingToken(): string {
     return DataGridContextMenuCellEditingService.menuEditingToken;
   }
 
   register(): void {
-    this.dataViewerContextMenuService.add(this.dataViewerContextMenuService.getMenuToken(), {
+    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
       id: this.getMenuEditingToken(),
       order: 4,
       title: 'data_grid_table_editing',
@@ -44,7 +44,7 @@ export class DataGridContextMenuCellEditingService {
         return context.data.model.isDisabled(context.data.resultIndex) || context.data.model.isReadonly(context.data.resultIndex);
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuEditingToken(), {
+    this.dataGridContextMenuService.add(this.getMenuEditingToken(), {
       id: 'open_inline_editor',
       order: 0,
       title: 'data_grid_table_editing_open_inline_editor',
@@ -72,7 +72,7 @@ export class DataGridContextMenuCellEditingService {
         context.data.spreadsheetActions.edit(context.data.key);
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuEditingToken(), {
+    this.dataGridContextMenuService.add(this.getMenuEditingToken(), {
       id: 'set_to_null',
       order: 1,
       title: 'data_grid_table_editing_set_to_null',
@@ -93,7 +93,7 @@ export class DataGridContextMenuCellEditingService {
         source.getAction(context.data.resultIndex, ResultSetEditAction).set(context.data.key, null);
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuEditingToken(), {
+    this.dataGridContextMenuService.add(this.getMenuEditingToken(), {
       id: 'row_add',
       order: 5,
       icon: '/icons/data_add_sm.svg',
@@ -112,7 +112,7 @@ export class DataGridContextMenuCellEditingService {
         editor.addRow(context.data.key.row);
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuEditingToken(), {
+    this.dataGridContextMenuService.add(this.getMenuEditingToken(), {
       id: 'row_add_copy',
       order: 5.5,
       icon: '/icons/data_add_copy_sm.svg',
@@ -131,7 +131,7 @@ export class DataGridContextMenuCellEditingService {
         editor.duplicateRow(context.data.key.row);
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuEditingToken(), {
+    this.dataGridContextMenuService.add(this.getMenuEditingToken(), {
       id: 'row_delete',
       order: 6,
       icon: '/icons/data_delete_sm.svg',
@@ -156,7 +156,7 @@ export class DataGridContextMenuCellEditingService {
         editor.deleteRow(context.data.key.row);
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuEditingToken(), {
+    this.dataGridContextMenuService.add(this.getMenuEditingToken(), {
       id: 'row_delete_selected',
       order: 6.1,
       icon: '/icons/data_delete_sm.svg',
@@ -188,7 +188,7 @@ export class DataGridContextMenuCellEditingService {
         editor.delete(...selectedElements);
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuEditingToken(), {
+    this.dataGridContextMenuService.add(this.getMenuEditingToken(), {
       id: 'row_revert',
       order: 7,
       icon: '/icons/data_revert_sm.svg',
@@ -207,7 +207,7 @@ export class DataGridContextMenuCellEditingService {
         editor.revert(context.data.key);
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuEditingToken(), {
+    this.dataGridContextMenuService.add(this.getMenuEditingToken(), {
       id: 'row_revert_selected',
       order: 7.1,
       icon: '/icons/data_revert_sm.svg',

@@ -28,7 +28,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
     private readonly dataGridContextMenuSortingService: DataGridContextMenuOrderService,
     private readonly dataGridContextMenuFilterService: DataGridContextMenuFilterService,
     private readonly dataGridContextMenuCellEditingService: DataGridContextMenuCellEditingService,
-    private readonly dataViewerContextMenuService: DataGridContextMenuService,
+    private readonly dataGridContextMenuService: DataGridContextMenuService,
     private readonly dataGridContextMenuSaveContentService: DataGridContextMenuSaveContentService,
     exceptionsCatcherService: ExceptionsCatcherService,
   ) {
@@ -50,7 +50,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
     this.dataGridContextMenuCellEditingService.register();
     this.dataGridContextMenuSaveContentService.register();
 
-    this.dataViewerContextMenuService.add(this.dataViewerContextMenuService.getMenuToken(), {
+    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
       id: 'view_value_panel',
       isPresent(context) {
         return context.contextType === DataGridContextMenuService.cellContext;

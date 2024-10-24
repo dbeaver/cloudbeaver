@@ -40,11 +40,11 @@ export class DataGridContextMenuFilterService {
   private static readonly menuFilterToken = 'menuFilter';
 
   constructor(
-    private readonly dataViewerContextMenuService: DataGridContextMenuService,
+    private readonly dataGridContextMenuService: DataGridContextMenuService,
     private readonly commonDialogService: CommonDialogService,
     private readonly clipboardService: ClipboardService,
   ) {
-    this.dataViewerContextMenuService.onRootMenuOpen.addHandler(this.getClipboardValue.bind(this));
+    this.dataGridContextMenuService.onRootMenuOpen.addHandler(this.getClipboardValue.bind(this));
   }
 
   getMenuFilterToken(): string {
@@ -120,7 +120,7 @@ export class DataGridContextMenuFilterService {
   }
 
   register(): void {
-    this.dataViewerContextMenuService.add(this.dataViewerContextMenuService.getMenuToken(), {
+    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
       id: this.getMenuFilterToken(),
       order: 2,
       title: 'data_grid_table_filter',
@@ -139,7 +139,7 @@ export class DataGridContextMenuFilterService {
         return !constraints.supported;
       },
     });
-    this.dataViewerContextMenuService.add(this.dataViewerContextMenuService.getMenuToken(), {
+    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
       id: 'deleteFiltersAndOrders',
       order: 3,
       title: 'data_grid_table_delete_filters_and_orders',
@@ -166,7 +166,7 @@ export class DataGridContextMenuFilterService {
         });
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuFilterToken(), {
+    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
       id: 'clipboardValue',
       order: 0,
       title: 'ui_clipboard',
@@ -214,7 +214,7 @@ export class DataGridContextMenuFilterService {
         },
       }),
     });
-    this.dataViewerContextMenuService.add(this.getMenuFilterToken(), {
+    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
       id: 'cellValue',
       order: 1,
       title: 'data_grid_table_filter_cell_value',
@@ -244,7 +244,7 @@ export class DataGridContextMenuFilterService {
         },
       }),
     });
-    this.dataViewerContextMenuService.add(this.getMenuFilterToken(), {
+    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
       id: 'customValue',
       order: 2,
       title: 'data_grid_table_filter_custom_value',
@@ -309,7 +309,7 @@ export class DataGridContextMenuFilterService {
         },
       }),
     });
-    this.dataViewerContextMenuService.add(this.getMenuFilterToken(), {
+    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
       id: 'isNullValue',
       order: 3,
       icon: 'filter',
@@ -338,7 +338,7 @@ export class DataGridContextMenuFilterService {
         );
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuFilterToken(), {
+    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
       id: 'isNotNullValue',
       order: 4,
       icon: 'filter',
@@ -367,7 +367,7 @@ export class DataGridContextMenuFilterService {
         );
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuFilterToken(), {
+    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
       id: 'deleteFilter',
       order: 5,
       icon: 'filter-reset',
@@ -406,7 +406,7 @@ export class DataGridContextMenuFilterService {
         });
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuFilterToken(), {
+    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
       id: 'deleteAllFilters',
       order: 6,
       icon: 'filter-reset-all',

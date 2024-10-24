@@ -25,7 +25,7 @@ import { DataGridContextMenuService } from './DataGridContextMenuService.js';
 export class DataGridContextMenuOrderService {
   private static readonly menuOrderToken = 'menuOrder';
 
-  constructor(private readonly dataViewerContextMenuService: DataGridContextMenuService) {}
+  constructor(private readonly dataGridContextMenuService: DataGridContextMenuService) {}
 
   getMenuOrderToken(): string {
     return DataGridContextMenuOrderService.menuOrderToken;
@@ -50,7 +50,7 @@ export class DataGridContextMenuOrderService {
   }
 
   register(): void {
-    this.dataViewerContextMenuService.add(this.dataViewerContextMenuService.getMenuToken(), {
+    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
       id: this.getMenuOrderToken(),
       order: 1,
       title: 'data_grid_table_order',
@@ -65,7 +65,7 @@ export class DataGridContextMenuOrderService {
         return !constraints.supported || context.data.model.isDisabled(context.data.resultIndex);
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuOrderToken(), {
+    this.dataGridContextMenuService.add(this.getMenuOrderToken(), {
       id: 'asc',
       type: 'radio',
       title: 'ASC',
@@ -86,7 +86,7 @@ export class DataGridContextMenuOrderService {
         return !!resultColumn && constraints.getOrder(resultColumn.position) === EOrder.asc;
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuOrderToken(), {
+    this.dataGridContextMenuService.add(this.getMenuOrderToken(), {
       id: 'desc',
       type: 'radio',
       title: 'DESC',
@@ -107,7 +107,7 @@ export class DataGridContextMenuOrderService {
         return !!resultColumn && constraints.getOrder(resultColumn.position) === EOrder.desc;
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuOrderToken(), {
+    this.dataGridContextMenuService.add(this.getMenuOrderToken(), {
       id: 'disableOrder',
       type: 'radio',
       title: 'data_grid_table_disable_order',
@@ -128,7 +128,7 @@ export class DataGridContextMenuOrderService {
         return !!resultColumn && constraints.getOrder(resultColumn.position) === null;
       },
     });
-    this.dataViewerContextMenuService.add(this.getMenuOrderToken(), {
+    this.dataGridContextMenuService.add(this.getMenuOrderToken(), {
       id: 'disableOrders',
       title: 'data_grid_table_disable_all_orders',
       isPresent(context) {

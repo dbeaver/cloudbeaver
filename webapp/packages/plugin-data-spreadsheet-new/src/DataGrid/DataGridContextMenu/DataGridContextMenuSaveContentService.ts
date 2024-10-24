@@ -23,13 +23,13 @@ import { DataGridContextMenuService } from './DataGridContextMenuService.js';
 @injectable()
 export class DataGridContextMenuSaveContentService {
   constructor(
-    private readonly dataViewerContextMenuService: DataGridContextMenuService,
+    private readonly dataGridContextMenuService: DataGridContextMenuService,
     private readonly notificationService: NotificationService,
     private readonly dataViewerService: DataViewerService,
   ) {}
 
   register(): void {
-    this.dataViewerContextMenuService.add(this.dataViewerContextMenuService.getMenuToken(), {
+    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
       id: 'menuContentDownload',
       order: 4,
       title: 'ui_download',
@@ -59,7 +59,7 @@ export class DataGridContextMenuSaveContentService {
         return context.data.model.isLoading() || content.isLoading(context.data.key);
       },
     });
-    this.dataViewerContextMenuService.add(this.dataViewerContextMenuService.getMenuToken(), {
+    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
       id: 'menuContentUpload',
       order: 5,
       title: 'ui_upload',
