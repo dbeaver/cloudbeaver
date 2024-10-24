@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.service.data.transfer.impl;
 
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 
 import java.io.IOException;
@@ -26,32 +28,39 @@ public class WebDataTransferTaskConfig {
 
     private static final Log log = Log.getLog(WebDataTransferTaskConfig.class);
 
-    private Path dataFile;
-    private WebDataTransferParameters parameters;
+    @NotNull
+    private final Path dataFile;
+    @NotNull
+    private final WebDataTransferParameters parameters;
+    @Nullable
     private String exportFileName;
 
-    public WebDataTransferTaskConfig(Path dataFile, WebDataTransferParameters parameters) {
+    public WebDataTransferTaskConfig(@NotNull Path dataFile, @NotNull WebDataTransferParameters parameters) {
         this.dataFile = dataFile;
         this.parameters = parameters;
     }
 
+    @NotNull
     public Path getDataFile() {
         return dataFile;
     }
 
+    @NotNull
     public String getDataFileId() {
         return dataFile.getFileName().toString();
     }
 
+    @NotNull
     public WebDataTransferParameters getParameters() {
         return parameters;
     }
 
+    @Nullable
     public String getExportFileName() {
         return exportFileName;
     }
 
-    public void setExportFileName(String exportFileName) {
+    public void setExportFileName(@NotNull String exportFileName) {
         this.exportFileName = exportFileName;
     }
 

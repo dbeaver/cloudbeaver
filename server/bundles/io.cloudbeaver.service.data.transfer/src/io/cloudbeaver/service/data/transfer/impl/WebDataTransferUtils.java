@@ -28,23 +28,28 @@ import java.util.Map;
 class WebDataTransferUtils {
 
     private static final Log log = Log.getLog(WebDataTransferUtils.class);
-    public static final String EXTENSION = "extension";
+    private static final String EXTENSION = "extension";
 
-
-    public static String getProcessorFileExtension(DataTransferProcessorDescriptor processor) {
-        DBPPropertyDescriptor extProperty = processor.getProperty("extension");
+    @NotNull
+    public static String getProcessorFileExtension(@NotNull DataTransferProcessorDescriptor processor) {
+        DBPPropertyDescriptor extProperty = processor.getProperty(EXTENSION);
         String ext = extProperty == null ? processor.getAppFileExtension() : CommonUtils.toString(extProperty.getDefaultValue(), null);
         return CommonUtils.isEmpty(ext) ? "data" : ext;
     }
 
-    public static String getProcessorFileExtension(DataTransferProcessorDescriptor processor, Map<String, Object> processorProperties) {
-        if (processorProperties != null && processorProperties.get(EXTENSION) != null) {
+    @NotNull
+    public static String getProcessorFileExtension(
+        @NotNull DataTransferProcessorDescriptor processor,
+        @NotNull Map<String, Object> processorProperties
+    ) {
+        if (processorProperties.get(EXTENSION) != null) {
             return CommonUtils.toString(processorProperties.get(EXTENSION), "data");
         }
 
         return getProcessorFileExtension(processor);
     }
 
+    @NotNull
     public static String normalizeFileName(
         @NotNull String fileName,
         @NotNull WebDataTransferOutputSettings outputSettings
@@ -52,7 +57,12 @@ class WebDataTransferUtils {
         return outputSettings.isCompress() ? fileName + ".zip" : fileName;
     }
 
-    public static WebDataTransferSessionConfig getSessionDataTransferConfig(WebSession session) {
-        return session.getAttribute("dataTransfer", x -> new WebDataTransferSessionConfig(), WebDataTransferSessionConfig::deleteExportFiles);
+    @NotNull
+    public static WebDataTransferSessionConfig getSessionDataTransferConfig(@NotNull WebSession session) {
+        return session.getAttribute(
+            "dataTransfer",
+            x -> new WebDataTransferSessionConfig(),
+            WebDataTransferSessionConfig::deleteExportFiles
+        );
     }
 }

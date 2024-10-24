@@ -102,6 +102,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         return GraphQLEndpoint.getBindingContext(env);
     }
 
+    @NotNull
     protected static WebSession getWebSession(DataFetchingEnvironment env) throws DBWebException {
         return CBPlatform.getInstance().getSessionManager().getWebSession(
             getServletRequest(env), getServletResponse(env));
