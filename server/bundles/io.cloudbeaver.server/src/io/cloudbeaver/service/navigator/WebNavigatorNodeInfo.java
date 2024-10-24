@@ -324,8 +324,14 @@ public class WebNavigatorNodeInfo {
         if (!(node instanceof DBNDatabaseNode dbNode)) {
             throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
         }
-        DBSObjectFilter filter = dbNode.getNodeFilter(dbNode.getItemsMeta(), true);
-        return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
+        try {
+            DBSObjectFilter filter = dbNode.getNodeFilter(
+                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
+                true);
+            return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
+        } catch (DBException e) {
+            throw new DBWebException(e);
+        }
     }
 
     @Override
