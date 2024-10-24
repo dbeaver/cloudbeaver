@@ -49,7 +49,7 @@ export const ConnectionAccessList = observer<Props>(function ConnectionAccessLis
 
   const teams = getFilteredTeams(teamList, filterState.filterValue);
   const users = getFilteredUsers(userList, filterState.filterValue);
-  const keys = teams.map(team => team.teamId).concat(users.map(user => user.userId));
+  const keys = teamList.map(team => team.teamId).concat(userList.map(user => user.userId));
 
   const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 

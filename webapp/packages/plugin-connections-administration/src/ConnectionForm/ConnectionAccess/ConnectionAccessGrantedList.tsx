@@ -63,7 +63,7 @@ export const ConnectionAccessGrantedList = observer<Props>(function ConnectionAc
 
   const teams = getFilteredTeams(grantedTeams, filterState.filterValue);
   const users = getFilteredUsers(grantedUsers, filterState.filterValue);
-  const keys = teams.map(team => team.teamId).concat(users.map(user => user.userId));
+  const keys = grantedTeams.map(team => team.teamId).concat(grantedUsers.map(user => user.userId));
 
   let tableInfoText: TLocalizationToken = 'connections_connection_access_admin_info';
   if (!keys.length) {
