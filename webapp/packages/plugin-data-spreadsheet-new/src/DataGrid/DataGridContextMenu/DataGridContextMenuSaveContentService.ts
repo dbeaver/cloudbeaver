@@ -10,7 +10,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import {
   createResultSetBlobValue,
-  DataViewerContextMenuService,
   DataViewerService,
   isResultSetDataSource,
   ResultSetDataContentAction,
@@ -19,10 +18,12 @@ import {
   ResultSetFormatAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
+import { DataGridContextMenuService } from './DataGridContextMenuService.js';
+
 @injectable()
 export class DataGridContextMenuSaveContentService {
   constructor(
-    private readonly dataViewerContextMenuService: DataViewerContextMenuService,
+    private readonly dataViewerContextMenuService: DataGridContextMenuService,
     private readonly notificationService: NotificationService,
     private readonly dataViewerService: DataViewerService,
   ) {}
@@ -34,7 +35,7 @@ export class DataGridContextMenuSaveContentService {
       title: 'ui_download',
       icon: '/icons/export.svg',
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       onClick: async context => {
         const source = context.data.model.source as unknown as ResultSetDataSource;
@@ -64,7 +65,7 @@ export class DataGridContextMenuSaveContentService {
       title: 'ui_upload',
       icon: '/icons/import.svg',
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       onClick: async context => {
         selectFiles(files => {

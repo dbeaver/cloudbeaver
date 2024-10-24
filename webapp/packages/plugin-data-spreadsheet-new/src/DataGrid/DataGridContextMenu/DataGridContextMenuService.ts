@@ -8,13 +8,9 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { ContextMenuService, type IContextMenuItem, type IMenuPanel } from '@cloudbeaver/core-dialogs';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
+import type { IDatabaseDataModel, IDataPresentationActions, IDataTableActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IResultSetElementKey } from './DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
-import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel.js';
-import type { IDataPresentationActions } from './TableViewer/IDataPresentationActions.js';
-import type { IDataTableActions } from './TableViewer/IDataTableActions.js';
-
-export interface IDataViewerContextMenu {
+export interface IDataGridCellMenuContext {
   model: IDatabaseDataModel;
   actions: IDataTableActions;
   spreadsheetActions: IDataPresentationActions<IResultSetElementKey>;
@@ -24,18 +20,18 @@ export interface IDataViewerContextMenu {
 }
 
 @injectable()
-export class DataViewerContextMenuService {
-  onRootMenuOpen: IExecutor<IDataViewerContextMenu>;
+export class DataGridContextMenuService {
+  onRootMenuOpen: IExecutor<IDataGridCellMenuContext>;
 
-  static cellContext = 'data-viewer-cell-context-menu';
-  private static readonly menuToken = 'data-viewer-context-menu';
+  static cellContext = 'data-grid-cell-context-menu';
+  private static readonly menuToken = 'dataGridCell';
 
   constructor(private readonly contextMenuService: ContextMenuService) {
     this.onRootMenuOpen = new Executor();
   }
 
   getMenuToken(): string {
-    return DataViewerContextMenuService.menuToken;
+    return DataGridContextMenuService.menuToken;
   }
 
   constructMenuWithContext(
@@ -46,10 +42,10 @@ export class DataViewerContextMenuService {
     key: IResultSetElementKey,
     simple: boolean,
   ): IMenuPanel {
-    return this.contextMenuService.createContextMenu<IDataViewerContextMenu>(
+    return this.contextMenuService.createContextMenu<IDataGridCellMenuContext>(
       {
         menuId: this.getMenuToken(),
-        contextType: DataViewerContextMenuService.cellContext,
+        contextType: DataGridContextMenuService.cellContext,
         data: { model, actions, spreadsheetActions, resultIndex, key, simple },
       },
       this.getMenuToken(),
@@ -67,7 +63,7 @@ export class DataViewerContextMenuService {
     this.onRootMenuOpen.execute({ model, actions, spreadsheetActions, resultIndex, key, simple });
   }
 
-  add(panelId: string, menuItem: IContextMenuItem<IDataViewerContextMenu>): void {
+  add(panelId: string, menuItem: IContextMenuItem<IDataGridCellMenuContext>): void {
     this.contextMenuService.addMenuItem(panelId, menuItem);
   }
 }

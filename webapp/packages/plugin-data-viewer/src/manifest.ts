@@ -33,7 +33,6 @@ export const dataViewerManifest: PluginManifest = {
     () => import('./DataViewerService.js').then(m => m.DataViewerService),
     () => import('./ResultSet/ResultSetTableFooterMenuService.js').then(m => m.ResultSetTableFooterMenuService),
     () => import('./TableViewer/DataViewerViewService.js').then(m => m.DataViewerViewService),
-    () => import('./DataViewerContextMenuService.js').then(m => m.DataViewerContextMenuService),
     () =>
       import('./TableViewer/TableFooter/TableFooterMenu/FetchSizeAction/TableFetchSizeActionBootstrap.js').then(m => m.TableFetchSizeActionBootstrap),
   ],

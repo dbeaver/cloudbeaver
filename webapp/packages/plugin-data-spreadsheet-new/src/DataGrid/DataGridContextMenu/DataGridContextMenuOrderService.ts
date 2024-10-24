@@ -8,7 +8,6 @@
 import { injectable } from '@cloudbeaver/core-di';
 import {
   DatabaseDataConstraintAction,
-  DataViewerContextMenuService,
   EOrder,
   type IDatabaseDataModel,
   type IDatabaseDataOptions,
@@ -20,11 +19,13 @@ import {
   ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
+import { DataGridContextMenuService } from './DataGridContextMenuService.js';
+
 @injectable()
 export class DataGridContextMenuOrderService {
   private static readonly menuOrderToken = 'menuOrder';
 
-  constructor(private readonly dataViewerContextMenuService: DataViewerContextMenuService) {}
+  constructor(private readonly dataViewerContextMenuService: DataGridContextMenuService) {}
 
   getMenuOrderToken(): string {
     return DataGridContextMenuOrderService.menuOrderToken;
@@ -56,7 +57,7 @@ export class DataGridContextMenuOrderService {
       icon: 'order-arrow-unknown',
       isPanel: true,
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden(context) {
         const source = context.data.model.source as unknown as ResultSetDataSource;
@@ -69,7 +70,7 @@ export class DataGridContextMenuOrderService {
       type: 'radio',
       title: 'ASC',
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isDisabled: context => context.data.model.isLoading(),
       onClick: async context => {
@@ -90,7 +91,7 @@ export class DataGridContextMenuOrderService {
       type: 'radio',
       title: 'DESC',
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isDisabled: context => context.data.model.isLoading(),
       onClick: async context => {
@@ -111,7 +112,7 @@ export class DataGridContextMenuOrderService {
       type: 'radio',
       title: 'data_grid_table_disable_order',
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isDisabled: context => context.data.model.isLoading(),
       onClick: async context => {
@@ -131,7 +132,7 @@ export class DataGridContextMenuOrderService {
       id: 'disableOrders',
       title: 'data_grid_table_disable_all_orders',
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden: context => {
         const source = context.data.model.source as unknown as ResultSetDataSource;

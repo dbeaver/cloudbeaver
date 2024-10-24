@@ -8,7 +8,6 @@
 import { injectable } from '@cloudbeaver/core-di';
 import {
   DatabaseEditChangeType,
-  DataViewerContextMenuService,
   isBooleanValuePresentationAvailable,
   isResultSetDataSource,
   ResultSetDataContentAction,
@@ -19,11 +18,13 @@ import {
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
+import { DataGridContextMenuService } from './DataGridContextMenuService.js';
+
 @injectable()
 export class DataGridContextMenuCellEditingService {
   private static readonly menuEditingToken = 'menuEditing';
 
-  constructor(private readonly dataViewerContextMenuService: DataViewerContextMenuService) {}
+  constructor(private readonly dataViewerContextMenuService: DataGridContextMenuService) {}
 
   getMenuEditingToken(): string {
     return DataGridContextMenuCellEditingService.menuEditingToken;
@@ -37,7 +38,7 @@ export class DataGridContextMenuCellEditingService {
       icon: 'edit',
       isPanel: true,
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext;
+        return context.contextType === DataGridContextMenuService.cellContext;
       },
       isHidden(context) {
         return context.data.model.isDisabled(context.data.resultIndex) || context.data.model.isReadonly(context.data.resultIndex);
@@ -49,7 +50,7 @@ export class DataGridContextMenuCellEditingService {
       title: 'data_grid_table_editing_open_inline_editor',
       icon: 'edit',
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden(context) {
         const source = context.data.model.source as unknown as ResultSetDataSource;
@@ -76,7 +77,7 @@ export class DataGridContextMenuCellEditingService {
       order: 1,
       title: 'data_grid_table_editing_set_to_null',
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden(context) {
         const { key, model, resultIndex } = context.data;
@@ -98,7 +99,7 @@ export class DataGridContextMenuCellEditingService {
       icon: '/icons/data_add_sm.svg',
       title: 'data_grid_table_editing_row_add',
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden(context) {
         const source = context.data.model.source as unknown as ResultSetDataSource;
@@ -117,7 +118,7 @@ export class DataGridContextMenuCellEditingService {
       icon: '/icons/data_add_copy_sm.svg',
       title: 'data_grid_table_editing_row_add_copy',
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden(context) {
         const source = context.data.model.source as unknown as ResultSetDataSource;
@@ -136,7 +137,7 @@ export class DataGridContextMenuCellEditingService {
       icon: '/icons/data_delete_sm.svg',
       title: 'data_grid_table_editing_row_delete',
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden(context) {
         const source = context.data.model.source as unknown as ResultSetDataSource;
@@ -161,7 +162,7 @@ export class DataGridContextMenuCellEditingService {
       icon: '/icons/data_delete_sm.svg',
       title: 'data_viewer_action_edit_delete',
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden(context) {
         const source = context.data.model.source as unknown as ResultSetDataSource;
@@ -193,7 +194,7 @@ export class DataGridContextMenuCellEditingService {
       icon: '/icons/data_revert_sm.svg',
       title: 'data_grid_table_editing_row_revert',
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden(context) {
         const source = context.data.model.source as unknown as ResultSetDataSource;
@@ -212,7 +213,7 @@ export class DataGridContextMenuCellEditingService {
       icon: '/icons/data_revert_sm.svg',
       title: 'data_viewer_action_edit_revert',
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       isHidden(context) {
         const source = context.data.model.source as unknown as ResultSetDataSource;

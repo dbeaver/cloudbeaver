@@ -20,5 +20,6 @@ export const dataSpreadsheetNewManifest: PluginManifest = {
       ),
     () => import('./DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService.js').then(m => m.DataGridContextMenuCellEditingService),
     () => import('./DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService.js').then(m => m.DataGridContextMenuSaveContentService),
+    () => import('./DataGrid/DataGridContextMenu/DataGridContextMenuService.js').then(m => m.DataGridContextMenuService),
   ],
 };

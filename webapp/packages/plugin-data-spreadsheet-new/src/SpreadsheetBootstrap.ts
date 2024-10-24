@@ -9,12 +9,13 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ExceptionsCatcherService } from '@cloudbeaver/core-events';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { DataPresentationService, DataViewerContextMenuService } from '@cloudbeaver/plugin-data-viewer';
+import { DataPresentationService } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService.js';
 import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService.js';
 import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService.js';
 import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService.js';
+import { DataGridContextMenuService } from './DataGrid/DataGridContextMenu/DataGridContextMenuService.js';
 import { DataGridSettingsService } from './DataGridSettingsService.js';
 
 const SpreadsheetGrid = importLazyComponent(() => import('./SpreadsheetGrid.js').then(m => m.SpreadsheetGrid));
@@ -27,7 +28,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
     private readonly dataGridContextMenuSortingService: DataGridContextMenuOrderService,
     private readonly dataGridContextMenuFilterService: DataGridContextMenuFilterService,
     private readonly dataGridContextMenuCellEditingService: DataGridContextMenuCellEditingService,
-    private readonly dataViewerContextMenuService: DataViewerContextMenuService,
+    private readonly dataViewerContextMenuService: DataGridContextMenuService,
     private readonly dataGridContextMenuSaveContentService: DataGridContextMenuSaveContentService,
     exceptionsCatcherService: ExceptionsCatcherService,
   ) {
@@ -52,7 +53,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
     this.dataViewerContextMenuService.add(this.dataViewerContextMenuService.getMenuToken(), {
       id: 'view_value_panel',
       isPresent(context) {
-        return context.contextType === DataViewerContextMenuService.cellContext;
+        return context.contextType === DataGridContextMenuService.cellContext;
       },
       isHidden(context) {
         return context.data.actions.valuePresentationId === 'value-text-presentation' || context.data.simple;
