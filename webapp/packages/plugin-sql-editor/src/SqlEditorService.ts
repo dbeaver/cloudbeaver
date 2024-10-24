@@ -82,17 +82,6 @@ export class SqlEditorService {
     return result.scriptInfo;
   }
 
-  async parseSQLQuery(projectId: string, connectionId: string, script: string, position: number) {
-    const result = await this.graphQLService.sdk.parseSQLQuery({
-      projectId,
-      connectionId,
-      script,
-      position,
-    });
-
-    return result.queryInfo;
-  }
-
   async getAutocomplete(
     projectId: string,
     connectionId: string,

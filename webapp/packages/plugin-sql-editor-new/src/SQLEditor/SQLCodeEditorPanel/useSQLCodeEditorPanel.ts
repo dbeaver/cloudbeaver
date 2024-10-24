@@ -25,8 +25,7 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
     () => ({
       highlightActiveQuery() {
         this.editor.clearActiveQueryHighlight();
-
-        const segment = this.data.activeSegment;
+        const segment = this.data.getLastResolvedSegment(this.data.cursor.begin, this.data.cursor.end);
 
         if (segment) {
           this.editor.highlightActiveQuery(segment.begin, segment.end);
@@ -44,12 +43,17 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
   );
 
   const updateHighlight = useCallback(
-    throttle(() => state.highlightActiveQuery(), 1000),
+    throttle(() => state.highlightActiveQuery(), 300),
     [state],
   );
 
   useExecutor({
     executor: data.onUpdate,
+    handlers: [updateHighlight],
+  });
+
+  useExecutor({
+    executor: data.dataSource?.onUpdate,
     handlers: [updateHighlight],
   });
 
