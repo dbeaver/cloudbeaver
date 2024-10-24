@@ -13,3 +13,4 @@ export * from './UserProfileTabsService.js';
 export * from './UserProfileOptionsPanelService.js';
 export * from './UserMenu/MENU_USER_PROFILE.js';
 export * from './UserMenu/UserMenuLazy.js';
+export * from './UserProfileForm/UserProfileFormService.js';
