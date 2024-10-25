@@ -63,6 +63,10 @@ export class UserProfileFormAuthenticationPart extends FormPart<IUserProfileForm
     const state = USER_PROFILE_FORM_AUTHENTICATION_PART_STATE_SCHEMA.safeParse(this.state);
     const validation = contexts.getContext(formValidationContext);
 
+    if (!this.isChanged) {
+      return;
+    }
+
     if (!state.success) {
       validation.error(schemaValidationError(state.error, { prefix: null }).toString());
       return;
@@ -77,6 +81,10 @@ export class UserProfileFormAuthenticationPart extends FormPart<IUserProfileForm
   }
 
   protected async saveChanges(): Promise<void> {
+    if (!this.isChanged) {
+      return;
+    }
+
     await this.userInfoResource.updateLocalPassword(this.state.oldPassword, this.state.password);
   }
 
