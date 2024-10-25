@@ -32,8 +32,8 @@
   },
   "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/core-links": "^0",
     "@cloudbeaver/core-sdk": "^0",
-    "@cloudbeaver/core-website": "^0",
     "@cloudbeaver/tests-runner": "^0",
     "@jest/globals": "^29",
     "@types/jest": "^29",

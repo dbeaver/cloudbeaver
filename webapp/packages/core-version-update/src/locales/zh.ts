@@ -14,4 +14,6 @@ export default [
   ['version_update_versions_refresh_fail', '版本列表刷新失败'],
   ['version_update_how_to_update', '如何升级'],
   ['version_update_info', '信息'],
+  ['version_update_instruction', 'To update version, please follow'],
+  ['version_update_instruction_link', 'the instructions'],
 ];
