@@ -59,7 +59,7 @@ export const ConnectionList = observer<Props>(function ConnectionList({ connecti
   }, []);
 
   const connections = getFilteredConnections(connectionList, connectionsOrigins, filterState.filterValue);
-  const keys = connections.map(connection => connection.id);
+  const keys = connectionList.map(connection => connection.id);
 
   return (
     <Group className={s(style, { group: true })} box border medium overflow vertical>

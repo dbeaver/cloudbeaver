@@ -56,7 +56,7 @@ export const UserList = observer<Props>(function UserList({ userList, grantedUse
   const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 
   const users = getFilteredUsers(userList, filterState.filterValue);
-  const keys = users.map(user => user.userId);
+  const keys = userList.map(user => user.userId);
 
   const grant = useCallback(() => {
     props.onGrant(getSelectedItems(selectedSubjects));
