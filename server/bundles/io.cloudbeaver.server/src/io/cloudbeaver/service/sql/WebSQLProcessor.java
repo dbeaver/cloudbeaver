@@ -40,6 +40,7 @@ import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlannerConfiguration;
 import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
 import org.jkiss.dbeaver.model.impl.DefaultServerOutputReader;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.*;
@@ -950,7 +951,11 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     @NotNull
     public <T> T getDataContainerByNodePath(DBRProgressMonitor monitor, @NotNull String containerPath, Class<T> type) throws DBException {
-        DBNNode node = webSession.getNavigatorModel().getNodeByPath(monitor, containerPath);
+        DBNModel navigatorModel = webSession.getNavigatorModel();
+        if (navigatorModel == null) {
+            throw new DBWebException("Navigator model is not found in session");
+        }
+        DBNNode node = navigatorModel.getNodeByPath(monitor, containerPath);
         if (node == null) {
             throw new DBWebException("Container node '" + containerPath + "' not found");
         }

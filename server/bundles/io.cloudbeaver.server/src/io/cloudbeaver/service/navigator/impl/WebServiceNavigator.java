@@ -83,7 +83,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
             DBNNode[] nodeChildren;
             boolean isRootPath = CommonUtils.isEmpty(parentPath) || "/".equals(parentPath) || ROOT_DATABASES.equals(parentPath);
-            DBNModel navigatorModel = session.getNavigatorModel();
+            DBNModel navigatorModel = getNavigatorModel(session);
             Set<String> applicableDrivers = WebServiceUtils.getApplicableDriversIds();
             if (isRootPath) {
                 DBNRoot rootNode = navigatorModel.getRoot();
@@ -155,7 +155,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
-            DBNModel navigatorModel = session.getNavigatorModel();
+            DBNModel navigatorModel = getNavigatorModel(session);
             DBNNode node = navigatorModel.getNodeByPath(monitor, nodePath);
             if (node == null) {
                 throw new DBWebException("Node '" + nodePath + "' not found");
@@ -198,7 +198,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
-            DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, nodePath);
+            DBNNode node = getNavigatorModel(session).getNodeByPath(monitor, nodePath);
             if (node == null) {
                 throw new DBWebException("Navigator node '"  + nodePath + "' not found");
             }
@@ -217,7 +217,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         try {
             DBRProgressMonitor monitor = webSession.getProgressMonitor();
 
-            DBNNode node = webSession.getNavigatorModel().getNodeByPath(monitor, nodePath);
+            DBNNode node = getNavigatorModel(webSession).getNodeByPath(monitor, nodePath);
             if (node == null) {
                 throw new DBWebException("Navigator node '"  + nodePath + "' not found");
             }
@@ -256,7 +256,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
-            DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, nodePath);
+            DBNNode node = getNavigatorModel(session).getNodeByPath(monitor, nodePath);
             if (node == null) {
                 throw new DBWebException("Navigator node '"  + nodePath + "' not found");
             }
@@ -380,8 +380,8 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     }
 
     @Nullable
-    protected WebNavigatorNodeInfo getNodeFromObject(WebSession session, DBSObject object){
-        DBNModel navigatorModel = session.getNavigatorModel();
+    protected WebNavigatorNodeInfo getNodeFromObject(WebSession session, DBSObject object) throws DBWebException {
+        DBNModel navigatorModel = getNavigatorModel(session);
         DBRProgressMonitor monitor = session.getProgressMonitor();
         DBNNode node = navigatorModel.getNodeByObject(monitor, object, false);
 
@@ -397,7 +397,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
 
-            DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, nodePath);
+            DBNNode node = getNavigatorModel(session).getNodeByPath(monitor, nodePath);
             if (node == null) {
                 throw new DBWebException("Navigator node '"  + nodePath + "' not found");
             }
@@ -503,7 +503,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             boolean containsFolderNodes = false;
             Map<DBNNode, DBEObjectMaker> nodes = new LinkedHashMap<>();
             for (String path : nodePaths) {
-                DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, path);
+                DBNNode node = getNavigatorModel(session).getNodeByPath(monitor, path);
                 if (node == null) {
                     throw new DBWebException("Navigator node '"  + path + "' not found");
                 }
@@ -598,9 +598,10 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
             DBNNode folderNode;
-            folderNode = session.getNavigatorModel().getNodeByPath(monitor, folderNodePath);
+            DBNModel navigatorModel = getNavigatorModel(session);
+            folderNode = navigatorModel.getNodeByPath(monitor, folderNodePath);
             for (String path : nodePaths) {
-                DBNNode node = session.getNavigatorModel().getNodeByPath(monitor, path);
+                DBNNode node = navigatorModel.getNodeByPath(monitor, path);
                 if (node == null) {
                     throw new DBWebException("Navigator node '"  + path + "' not found");
                 }
@@ -693,5 +694,13 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             executionContext = DBUtils.getDefaultContext(object.getDataSource(), true);
         }
         return executionContext;
+    }
+
+    private DBNModel getNavigatorModel(@NotNull WebSession webSession) throws DBWebException {
+        DBNModel model = webSession.getNavigatorModel();
+        if (model == null) {
+            throw new DBWebException("Navigator model is not found in session");
+        }
+        return model;
     }
 }

@@ -49,6 +49,9 @@ public class FSUtils {
         DBRProgressMonitor monitor = webSession.getProgressMonitor();
 
         DBNModel navigatorModel = webSession.getNavigatorModel();
+        if (navigatorModel == null) {
+            throw new DBWebException("Navigator model is not found in session");
+        }
         DBNNode node = navigatorModel.getNodeByPath(monitor, nodePath);
         if (!(node instanceof DBNPathBase dbnPath)) {
             throw new DBWebException("Node '" + nodePath + "' is not found in File Systems");

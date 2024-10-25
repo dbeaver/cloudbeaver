@@ -399,6 +399,7 @@ public class WebSession extends BaseWebSession
         this.locale = locale != null ? locale : Locale.getDefault().getLanguage();
     }
 
+    @Nullable
     public DBNModel getNavigatorModel() {
         return navigatorModel;
     }

@@ -335,8 +335,12 @@ public class WebServiceUtils extends WebCommonUtils {
         return container.getName() + " [" + container.getId() + "]";
     }
 
-    public static void updateConfigAndRefreshDatabases(WebSession session, String projectId) {
-        DBNProject projectNode = session.getNavigatorModel().getRoot().getProjectNode(session.getProjectById(projectId));
+    public static void updateConfigAndRefreshDatabases(WebSession session, String projectId) throws DBWebException {
+        DBNModel navigatorModel = session.getNavigatorModel();
+        if (navigatorModel == null) {
+            throw new DBWebException("Navigator model is not found in session");
+        }
+        DBNProject projectNode = navigatorModel.getRoot().getProjectNode(session.getProjectById(projectId));
         DBNModel.updateConfigAndRefreshDatabases(projectNode.getDatabases());
     }
 
