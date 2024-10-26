@@ -8,4 +8,5 @@
 
 export enum EAdminPermission {
   admin = 'admin',
+  developer = 'database-developer',
 }
