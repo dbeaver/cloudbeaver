@@ -12,7 +12,6 @@ import {
   ConfirmationDialog,
   GroupTitle,
   Loader,
-  s,
   type TableItemExpandProps,
   useExecutor,
   useTranslate,

@@ -67,11 +67,11 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
           <TableItemSelect />
         </TableColumnValue>
       )}
-      <TableColumnValue className={style['name']} title={user.userId} expand ellipsis onClick={() => usersTableOptionsPanelService.open(user.userId)}>
+      <TableColumnValue title={user.userId} ellipsis onClick={() => usersTableOptionsPanelService.open(user.userId)}>
         <Link>{user.userId}</Link>
       </TableColumnValue>
       {displayAuthRole && (
-        <TableColumnValue className={style['expand']} title={user.authRole} expand ellipsis>
+        <TableColumnValue title={user.authRole} ellipsis>
           {user.authRole}
         </TableColumnValue>
       )}
