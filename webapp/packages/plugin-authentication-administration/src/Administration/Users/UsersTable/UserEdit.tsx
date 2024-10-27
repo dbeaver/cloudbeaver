@@ -15,7 +15,6 @@ import {
   s,
   type TableItemExpandProps,
   useExecutor,
-  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -25,12 +24,10 @@ import { FormMode } from '@cloudbeaver/core-ui';
 
 import { AdministrationUserForm } from '../UserForm/AdministrationUserForm.js';
 import { useAdministrationUserFormState } from './useAdministrationUserFormState.js';
-import style from './UserEdit.module.css';
 import { UsersTableOptionsPanelService } from './UsersTableOptionsPanelService.js';
 
 export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit({ item, onClose }) {
   const translate = useTranslate();
-  const styles = useS(style);
   const usersTableOptionsPanelService = useService(UsersTableOptionsPanelService);
   const commonDialogService = useService(CommonDialogService);
   const state = useAdministrationUserFormState(item, state => state.setMode(FormMode.Edit));
@@ -42,7 +39,7 @@ export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit
         if (state.isChanged) {
           const result = await commonDialogService.open(ConfirmationDialog, {
             title: 'core_blocks_confirmation_dialog_title',
-            message: 'administration_drivers_driver_unsaved_changes',
+            message: 'ui_save_reminder',
             confirmActionText: 'ui_close',
           });
 
@@ -55,9 +52,10 @@ export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit
   });
 
   return (
-    <ColoredContainer className={s(styles, { box: true })} vertical parent noWrap surface gap compact>
+    <ColoredContainer vertical parent noWrap surface gap compact>
       <GroupTitle header onClose={usersTableOptionsPanelService.close}>
-        {`${translate('ui_edit')}${state.state.userId ? ` "${state.state.userId}"` : ''}`}
+        {translate('ui_edit')}
+        {state.state.userId ? ` "${state.state.userId}"` : ''}
       </GroupTitle>
       <Loader suspense>
         <AdministrationUserForm state={state} onClose={onClose} />

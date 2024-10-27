@@ -6,37 +6,37 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext } from 'react';
 
 import { TeamInfoMetaParametersResource, TeamsResource } from '@cloudbeaver/core-authentication';
-import { Container, s, TableContext, useS } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { TeamForm } from '../TeamForm.js';
 import { useTeamFormState } from '../useTeamFormState.js';
-import style from './TeamEdit.module.css';
+import { TeamsTableOptionsPanelService } from './TeamsTableOptionsPanelService.js';
 
 interface Props {
   item: string;
+  onClose: () => void;
 }
 
 export const TeamEdit = observer<Props>(function TeamEdit({ item }) {
-  const styles = useS(style);
+  const translate = useTranslate();
   const resource = useService(TeamsResource);
   const teamInfoMetaParametersResource = useService(TeamInfoMetaParametersResource);
-  const tableContext = useContext(TableContext);
-
-  const collapse = useCallback(() => {
-    tableContext?.setItemExpand(item, false);
-  }, [tableContext, item]);
+  const teamsTableOptionsPanelService = useService(TeamsTableOptionsPanelService);
 
   const data = useTeamFormState(resource, teamInfoMetaParametersResource, state => state.setOptions('edit'));
 
   data.config.teamId = item;
 
   return (
-    <Container className={s(styles, { box: true })} parent vertical>
-      <TeamForm state={data} onCancel={collapse} />
-    </Container>
+    <ColoredContainer parent vertical noWrap surface gap compact>
+      <GroupTitle header onClose={teamsTableOptionsPanelService.close}>
+        {translate('ui_edit')}
+        {data.config.teamName ? ` "${data.config.teamName}"` : ''}
+      </GroupTitle>
+      <TeamForm state={data} onCancel={teamsTableOptionsPanelService.close} />
+    </ColoredContainer>
   );
 });
