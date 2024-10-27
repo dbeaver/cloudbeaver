@@ -42,6 +42,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
+import org.jkiss.dbeaver.utils.MimeTypes;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -225,6 +226,7 @@ public class CBStaticServlet extends DefaultServlet {
 
         // Disable cache for index.html
         response.setHeader(HttpHeader.CACHE_CONTROL.toString(), "no-cache, no-store, must-revalidate");
+        response.setHeader(HttpHeader.CONTENT_TYPE.toString(), MimeTypes.TEXT_HTML);
         response.setHeader(HttpHeader.EXPIRES.toString(), "0");
         response.getOutputStream().write(ByteBuffer.wrap(indexBytes));
     }

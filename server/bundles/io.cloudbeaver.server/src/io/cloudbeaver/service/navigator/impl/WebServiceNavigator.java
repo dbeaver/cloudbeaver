@@ -19,7 +19,6 @@ package io.cloudbeaver.service.navigator.impl;
 
 import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebCommandContext;
 import io.cloudbeaver.model.WebConnectionInfo;
@@ -43,6 +42,8 @@ import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContextDefaults;
 import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.navigator.meta.DBXTreeItem;
+import org.jkiss.dbeaver.model.rm.RMControllerProvider;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -229,8 +230,11 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             }
             filter.setEnabled(true);
             if (node instanceof DBNDatabaseNode dbNode) {
-                dbNode.setNodeFilter(dbNode.getItemsMeta(), filter, true);
-                if (hasNodeEditPermission(webSession, node, ((WebProjectImpl) node.getOwnerProject()).getRMProject())) {
+                DBXTreeItem itemsMeta = DBNUtils.getValidItemsMeta(webSession.getProgressMonitor(), dbNode);
+                dbNode.setNodeFilter(itemsMeta, filter, true);
+                if (node.getOwnerProject() instanceof RMControllerProvider rmControllerProvider &&
+                    hasNodeEditPermission(webSession, node, rmControllerProvider.getRMProject())
+                ) {
                     // Save settings
                     dbNode.getDataSourceContainer().persistConfiguration();
                 }

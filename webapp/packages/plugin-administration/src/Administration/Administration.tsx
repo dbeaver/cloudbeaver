@@ -24,10 +24,12 @@ import {
   type StyleRegistry,
   ToolsActionStyles,
   ToolsPanelStyles,
+  useAutoLoad,
   useS,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { OptionsPanelService, TabList, TabListStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
+import type { ILoadableState } from '@cloudbeaver/core-utils';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext.js';
@@ -95,6 +97,9 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
   const OptionsPanel = optionsPanelService.getPanelComponent();
   const visibleItems = administrationItemService.getActiveItems(configurationWizard);
   const onlyActiveItem = administrationItemService.items.find(filterOnlyActive(configurationWizard));
+  const loaders = administrationItemService.items.reduce<ILoadableState[]>((acc, item) => [...acc, item.getLoader?.() || []].flat(), []);
+
+  useAutoLoad(Administration, loaders);
 
   useLayoutEffect(() => {
     contentRef.current?.scrollTo({ top: 0, left: 0 });

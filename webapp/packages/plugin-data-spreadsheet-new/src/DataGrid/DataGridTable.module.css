@@ -57,15 +57,17 @@
     border-bottom-color: var(--theme-positive) !important;
   }
 
-  :global(.rdg-cell:first-child) {
-    border-left: 2px solid rgba(0, 0, 0, 0) !important;
-  }
-
   :global(.rdg-cell-custom-highlighted-row) {
     background: var(--data-grid-selected-row-color) !important;
 
-    &:global(.rdg-cell:first-child) {
-      border-left: 2px solid var(--data-grid-index-cell-border-color) !important;
+    &:global(.rdg-cell:first-child::before) {
+      position: absolute;
+      content: '';
+      top: 0;
+      left: 0;
+      width: 2px;
+      height: 100%;
+      background-color: var(--data-grid-index-cell-border-color);
     }
   }
 

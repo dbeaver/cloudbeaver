@@ -7,6 +7,9 @@
   },
   "references": [
     {
+      "path": "../core-blocks/tsconfig.json"
+    },
+    {
       "path": "../core-di/tsconfig.json"
     },
     {

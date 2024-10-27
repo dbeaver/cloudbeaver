@@ -59,7 +59,7 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
 
   const connections = getFilteredConnections(grantedConnections, connectionsOrigins, filterState.filterValue);
-  const keys = connections.map(connection => connection.id);
+  const keys = grantedConnections.map(connection => connection.id);
 
   const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 
