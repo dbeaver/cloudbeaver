@@ -2,6 +2,7 @@
 scalar Object
 # Date/Time
 scalar DateTime
+scalar Date
 
 input PageInput {
     limit: Int
