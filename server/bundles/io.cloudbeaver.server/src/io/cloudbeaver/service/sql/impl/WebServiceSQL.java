@@ -242,10 +242,7 @@ public class WebServiceSQL implements DBWServiceSQL {
     private List<DBSObject> getObjectListFromNodeIds(@NotNull WebSession session, @NotNull List<String> nodePathList) throws DBWebException {
         try {
             List<DBSObject> objectList = new ArrayList<>(nodePathList.size());
-            DBNModel navigatorModel = session.getNavigatorModel();
-            if (navigatorModel == null) {
-                throw new DBException("Navigator model is not found in session");
-            }
+            DBNModel navigatorModel = session.getNavigatorModelOrThrow();
             for (String nodePath : nodePathList) {
                 DBNNode node = navigatorModel.getNodeByPath(session.getProgressMonitor(), nodePath);
                 if (node == null) {

@@ -25,7 +25,6 @@ import io.cloudbeaver.service.fs.model.FSFileSystem;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystem;
 import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystems;
@@ -52,11 +51,7 @@ public class WebServiceFS implements DBWServiceFS {
             if (project == null) {
                 throw new DBException(MessageFormat.format("Project ''{0}'' is not found in session", projectId));
             }
-            DBNModel navigatorModel = webSession.getNavigatorModel();
-            if (navigatorModel == null) {
-                throw new DBException("Navigator model is not found in session");
-            }
-            DBNProject projectNode = navigatorModel.getRoot().getProjectNode(project);
+            DBNProject projectNode = webSession.getNavigatorModelOrThrow().getRoot().getProjectNode(project);
             if (projectNode == null) {
                 throw new DBException(MessageFormat.format("Project ''{0}'' is not found in navigator model", projectId));
             }
@@ -83,11 +78,7 @@ public class WebServiceFS implements DBWServiceFS {
         @NotNull String nodePath
     ) throws DBWebException {
         try {
-            DBNModel navigatorModel = webSession.getNavigatorModel();
-            if (navigatorModel == null) {
-                throw new DBException("Navigator model is not found in session");
-            }
-            var node = navigatorModel.getNodeByPath(webSession.getProgressMonitor(), nodePath);
+            var node = webSession.getNavigatorModelOrThrow().getNodeByPath(webSession.getProgressMonitor(), nodePath);
             if (!(node instanceof DBNFileSystem fs)) {
                 throw new DBException(MessageFormat.format("Node ''{0}'' is not File System", nodePath));
             }

@@ -404,6 +404,12 @@ public class WebSession extends BaseWebSession
         return navigatorModel;
     }
 
+    public DBNModel getNavigatorModelOrThrow() throws DBWebException {
+        if (navigatorModel != null) {
+            return navigatorModel;
+        }
+        throw new DBWebException("Navigator model is not found in session");
+    }
     /**
      * Returns and clears progress messages
      */

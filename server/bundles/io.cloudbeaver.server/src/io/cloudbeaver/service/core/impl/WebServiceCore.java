@@ -639,10 +639,7 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull WebConnectionConfig config
     ) throws DBWebException {
         try {
-            DBNModel navigatorModel = webSession.getNavigatorModel();
-            if (navigatorModel == null) {
-                throw new DBWebException("Navigator model is not found in session");
-            }
+            DBNModel navigatorModel = webSession.getNavigatorModelOrThrow();
             WebSessionProjectImpl project = getProjectById(webSession, projectId);
             DBPDataSourceRegistry dataSourceRegistry = project.getDataSourceRegistry();
 
