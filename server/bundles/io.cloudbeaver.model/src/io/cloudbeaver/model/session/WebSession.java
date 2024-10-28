@@ -404,6 +404,7 @@ public class WebSession extends BaseWebSession
         return navigatorModel;
     }
 
+    @NotNull
     public DBNModel getNavigatorModelOrThrow() throws DBWebException {
         if (navigatorModel != null) {
             return navigatorModel;
