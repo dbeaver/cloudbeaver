@@ -838,7 +838,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         @NotNull String authProviderId,
         @NotNull Map<String, Object> credentials
     ) throws DBException {
-        var existUserByCredentials = findUserByCredentials(getAuthProvider(authProviderId), credentials);
+        var existUserByCredentials = findUserByCredentials(getAuthProvider(authProviderId), credentials, false);
         if (existUserByCredentials != null && !existUserByCredentials.equals(userId)) {
             throw new DBException("Another user is already linked to the specified credentials");
         }
@@ -906,7 +906,11 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     }
 
     @Nullable
-    private String findUserByCredentials(WebAuthProviderDescriptor authProvider, Map<String, Object> authParameters) throws DBCException {
+    private String findUserByCredentials(
+        @NotNull WebAuthProviderDescriptor authProvider,
+        @NotNull Map<String, Object> authParameters,
+        boolean onlyActive // throws exception if user is inactive
+    ) throws DBCException {
         Map<String, Object> identCredentials = new LinkedHashMap<>();
         String[] propNames = authParameters.keySet().toArray(new String[0]);
         for (AuthPropertyDescriptor prop : authProvider.getCredentialParameters(propNames)) {
@@ -961,7 +965,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         }
                     }
 
-                    if (userId != null && !isActive) {
+                    if (userId != null && onlyActive && !isActive) {
                         throw new DBCException("User account is locked");
                     }
 
@@ -2405,7 +2409,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     ) throws DBException {
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
 
-        String userId = findUserByCredentials(authProvider, userCredentials);
+        String userId = findUserByCredentials(authProvider, userCredentials, true);
         String userIdFromCredentials;
         try {
             userIdFromCredentials = smAuthProviderInstance.validateLocalAuth(progressMonitor, this, providerConfig, userCredentials, null);
@@ -3134,6 +3138,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
     }
 
+    @NotNull
     protected WebAuthProviderDescriptor getAuthProvider(String authProviderId) throws DBCException {
         WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(authProviderId);
         if (authProvider == null) {
