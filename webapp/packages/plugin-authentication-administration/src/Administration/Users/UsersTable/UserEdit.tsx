@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import {
   ColoredContainer,
   ConfirmationDialog,
+  GroupBack,
   GroupTitle,
   Loader,
   type TableItemExpandProps,
@@ -52,9 +53,11 @@ export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit
 
   return (
     <ColoredContainer vertical parent noWrap surface gap compact>
-      <GroupTitle header onClose={usersTableOptionsPanelService.close}>
-        {translate('ui_edit')}
-        {state.state.userId ? ` "${state.state.userId}"` : ''}
+      <GroupTitle header>
+        <GroupBack onClick={usersTableOptionsPanelService.close}>
+          {translate('ui_edit')}
+          {state.state.userId ? ` "${state.state.userId}"` : ''}
+        </GroupBack>
       </GroupTitle>
       <Loader suspense>
         <AdministrationUserForm state={state} onClose={onClose} />

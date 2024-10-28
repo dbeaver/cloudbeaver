@@ -161,6 +161,7 @@ export * from './Containers/GroupClose.js';
 export * from './Containers/GroupItem.js';
 export * from './Containers/GroupSubTitle.js';
 export * from './Containers/GroupTitle.js';
+export * from './Containers/GroupBack.js';
 export * from './Containers/ColoredContainer.js';
 export * from './Containers/IContainerProps.js';
 export * from './Containers/ILayoutSizeProps.js';

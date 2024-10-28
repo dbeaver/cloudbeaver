@@ -25,7 +25,3 @@
     z-index: 1;
   }
 }
-
-.closeButton {
-  transform: rotate(90deg);
-}

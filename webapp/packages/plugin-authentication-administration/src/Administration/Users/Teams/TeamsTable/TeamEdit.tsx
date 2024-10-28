@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { TeamInfoMetaParametersResource, TeamsResource } from '@cloudbeaver/core-authentication';
-import { ColoredContainer, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, GroupBack, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { TeamForm } from '../TeamForm.js';
@@ -32,9 +32,11 @@ export const TeamEdit = observer<Props>(function TeamEdit({ item }) {
 
   return (
     <ColoredContainer parent vertical noWrap surface gap compact>
-      <GroupTitle header onClose={teamsTableOptionsPanelService.close}>
-        {translate('ui_edit')}
-        {data.config.teamName ? ` "${data.config.teamName}"` : ''}
+      <GroupTitle header>
+        <GroupBack onClick={teamsTableOptionsPanelService.close}>
+          {translate('ui_edit')}
+          {data.config.teamName ? ` "${data.config.teamName}"` : ''}
+        </GroupBack>
       </GroupTitle>
       <TeamForm state={data} onCancel={teamsTableOptionsPanelService.close} />
     </ColoredContainer>
