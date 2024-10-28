@@ -8,3 +8,4 @@
 export { manifest as coreVersionUpdateManifest } from './manifest.js';
 
 export * from './VersionUpdateService.js';
+export * from './BaseUpdateInstruction.js';
