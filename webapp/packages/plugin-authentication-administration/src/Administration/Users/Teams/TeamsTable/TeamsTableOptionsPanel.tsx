@@ -17,9 +17,9 @@ export const TeamsTableOptionsPanel = observer(function TeamsTableOptionsPanel()
   const translate = useTranslate();
   const teamsTableOptionsPanelService = useService(TeamsTableOptionsPanelService);
 
-  if (!teamsTableOptionsPanelService.teamId) {
+  if (!teamsTableOptionsPanelService.itemId) {
     return <TextPlaceholder>{translate('ui_not_found')}</TextPlaceholder>;
   }
 
-  return <TeamEdit item={teamsTableOptionsPanelService.teamId} onClose={teamsTableOptionsPanelService.close} />;
+  return <TeamEdit item={teamsTableOptionsPanelService.itemId} onClose={teamsTableOptionsPanelService.close} />;
 });

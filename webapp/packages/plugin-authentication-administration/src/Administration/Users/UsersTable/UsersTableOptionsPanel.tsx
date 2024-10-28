@@ -17,9 +17,9 @@ export const UsersTableOptionsPanel = observer(function UsersTableOptionsPanel()
   const translate = useTranslate();
   const usersTableOptionsPanelService = useService(UsersTableOptionsPanelService);
 
-  if (!usersTableOptionsPanelService.userId) {
+  if (!usersTableOptionsPanelService.itemId) {
     return <TextPlaceholder>{translate('ui_not_found')}</TextPlaceholder>;
   }
 
-  return <UserEdit item={usersTableOptionsPanelService.userId} onClose={usersTableOptionsPanelService.close} />;
+  return <UserEdit item={usersTableOptionsPanelService.itemId} onClose={usersTableOptionsPanelService.close} />;
 });
