@@ -8,7 +8,8 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
-import { OptionsPanelService } from '@cloudbeaver/core-ui';
+
+import type { OptionsPanelService } from './OptionsPanelService.js';
 
 export abstract class BaseOptionsPanelService<T> {
   itemId: T | null;
