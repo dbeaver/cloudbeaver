@@ -12,7 +12,7 @@ import { s } from '../s.js';
 import { useS } from '../useS.js';
 import classes from './GroupBack.module.css';
 
-export const GroupBack: React.FC<React.HTMLAttributes<HTMLDivElement>> = function GroupBack({ className, children, ...rest }) {
+export const GroupBack: React.FC<React.HTMLAttributes<HTMLButtonElement>> = function GroupBack({ className, children, ...rest }) {
   const translate = useTranslate();
   const styles = useS(classes);
 

@@ -21,16 +21,11 @@ export const GroupTitle: React.FC<Props & ILayoutSizeProps & React.HTMLAttribute
   sticky,
   header,
   className,
-  children,
   ...rest
 }) {
   const style = useS(styles, elementsSizeStyles);
   const divProps = filterLayoutFakeProps(rest);
   const layoutProps = getLayoutProps(rest);
 
-  return (
-    <h2 tabIndex={-1} {...divProps} className={s(style, { groupTitle: true, sticky, header, ...layoutProps }, className)}>
-      {children}
-    </h2>
-  );
+  return <h2 tabIndex={-1} {...divProps} className={s(style, { groupTitle: true, sticky, header, ...layoutProps }, className)} />;
 };
