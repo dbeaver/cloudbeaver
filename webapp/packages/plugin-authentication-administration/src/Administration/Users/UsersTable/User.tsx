@@ -67,7 +67,7 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
         </TableColumnValue>
       )}
       <TableColumnValue title={user.userId} ellipsis onClick={() => usersTableOptionsPanelService.open(user.userId)}>
-        <Link>{user.userId}</Link>
+        <Link truncate>{user.userId}</Link>
       </TableColumnValue>
       {displayAuthRole && (
         <TableColumnValue title={user.authRole} ellipsis>

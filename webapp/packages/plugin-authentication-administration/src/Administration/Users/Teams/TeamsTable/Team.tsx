@@ -30,7 +30,7 @@ export const Team = observer<Props>(function Team({ team }) {
         <TableItemSelect />
       </TableColumnValue>
       <TableColumnValue title={team.teamId} ellipsis onClick={() => teamsTableOptionsPanelService.open(team.teamId)}>
-        <Link>{team.teamId}</Link>
+        <Link truncate>{team.teamId}</Link>
       </TableColumnValue>
       <TableColumnValue title={team.teamName} ellipsis>
         {team.teamName || ''}

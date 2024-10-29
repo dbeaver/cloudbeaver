@@ -14,6 +14,7 @@ import {
   GroupTitle,
   Loader,
   type TableItemExpandProps,
+  Text,
   useExecutor,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
@@ -55,8 +56,10 @@ export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit
     <ColoredContainer vertical parent noWrap surface gap compact>
       <GroupTitle header>
         <GroupBack onClick={usersTableOptionsPanelService.close}>
-          {translate('ui_edit')}
-          {state.state.userId ? ` "${state.state.userId}"` : ''}
+          <Text truncate>
+            {translate('ui_edit')}
+            {state.state.userId ? ` "${state.state.userId}"` : ''}
+          </Text>
         </GroupBack>
       </GroupTitle>
       <Loader suspense>
