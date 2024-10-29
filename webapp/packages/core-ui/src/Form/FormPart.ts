@@ -143,7 +143,6 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
 
   reset() {
     this.setState(toJS(this.initialState));
-    this.exception = null;
   }
 
   protected setInitialState(initialState: TPartState) {
