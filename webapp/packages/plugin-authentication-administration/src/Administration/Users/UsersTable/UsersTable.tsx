@@ -11,17 +11,20 @@ import {
   Button,
   Flex,
   Loader,
+  s,
   Table,
   TableBody,
   TableColumnHeader,
   TableColumnValue,
   TableHeader,
   TableItem,
+  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
 import { User } from './User.js';
+import classes from './UsersTable.module.css';
 
 interface Props {
   users: AdminUserInfoFragment[];
@@ -45,6 +48,7 @@ export const UsersTable = observer<Props>(function UsersTable({
   const translate = useTranslate();
   const keys = users.map(user => user.userId);
   const colSpan = displayAuthRole ? 6 : 5;
+  const styles = useS(classes);
 
   return (
     <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size="big">
@@ -52,7 +56,7 @@ export const UsersTable = observer<Props>(function UsersTable({
         <TableColumnHeader>
           <Flex align="center" gap="xs">
             {translate('authentication_user_name')}
-            <Loader loading={loading} small inline />
+            <Loader className={s(styles, { loader: true, hidden: !loading })} small inline />
           </Flex>
         </TableColumnHeader>
         {displayAuthRole && <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>}
