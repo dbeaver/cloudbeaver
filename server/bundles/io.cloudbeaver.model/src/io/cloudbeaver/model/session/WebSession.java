@@ -399,10 +399,18 @@ public class WebSession extends BaseWebSession
         this.locale = locale != null ? locale : Locale.getDefault().getLanguage();
     }
 
+    @Nullable
     public DBNModel getNavigatorModel() {
         return navigatorModel;
     }
 
+    @NotNull
+    public DBNModel getNavigatorModelOrThrow() throws DBWebException {
+        if (navigatorModel != null) {
+            return navigatorModel;
+        }
+        throw new DBWebException("Navigator model is not found in session");
+    }
     /**
      * Returns and clears progress messages
      */

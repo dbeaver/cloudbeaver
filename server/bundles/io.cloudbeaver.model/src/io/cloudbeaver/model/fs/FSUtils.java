@@ -48,7 +48,7 @@ public class FSUtils {
     public static DBNPathBase getNodeByPath(@NotNull WebSession webSession, @NotNull String nodePath) throws DBException {
         DBRProgressMonitor monitor = webSession.getProgressMonitor();
 
-        DBNModel navigatorModel = webSession.getNavigatorModel();
+        DBNModel navigatorModel = webSession.getNavigatorModelOrThrow();
         DBNNode node = navigatorModel.getNodeByPath(monitor, nodePath);
         if (!(node instanceof DBNPathBase dbnPath)) {
             throw new DBWebException("Node '" + nodePath + "' is not found in File Systems");
