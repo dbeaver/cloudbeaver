@@ -639,7 +639,7 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull WebConnectionConfig config
     ) throws DBWebException {
         try {
-            DBNModel navigatorModel = webSession.getNavigatorModel();
+            DBNModel navigatorModel = webSession.getNavigatorModelOrThrow();
             WebSessionProjectImpl project = getProjectById(webSession, projectId);
             DBPDataSourceRegistry dataSourceRegistry = project.getDataSourceRegistry();
 

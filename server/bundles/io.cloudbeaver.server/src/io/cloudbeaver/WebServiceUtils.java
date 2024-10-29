@@ -335,8 +335,8 @@ public class WebServiceUtils extends WebCommonUtils {
         return container.getName() + " [" + container.getId() + "]";
     }
 
-    public static void updateConfigAndRefreshDatabases(WebSession session, String projectId) {
-        DBNProject projectNode = session.getNavigatorModel().getRoot().getProjectNode(session.getProjectById(projectId));
+    public static void updateConfigAndRefreshDatabases(WebSession session, String projectId) throws DBWebException {
+        DBNProject projectNode = session.getNavigatorModelOrThrow().getRoot().getProjectNode(session.getProjectById(projectId));
         DBNModel.updateConfigAndRefreshDatabases(projectNode.getDatabases());
     }
 

@@ -51,7 +51,7 @@ public class WebServiceFS implements DBWServiceFS {
             if (project == null) {
                 throw new DBException(MessageFormat.format("Project ''{0}'' is not found in session", projectId));
             }
-            DBNProject projectNode = webSession.getNavigatorModel().getRoot().getProjectNode(project);
+            DBNProject projectNode = webSession.getNavigatorModelOrThrow().getRoot().getProjectNode(project);
             if (projectNode == null) {
                 throw new DBException(MessageFormat.format("Project ''{0}'' is not found in navigator model", projectId));
             }
@@ -78,7 +78,7 @@ public class WebServiceFS implements DBWServiceFS {
         @NotNull String nodePath
     ) throws DBWebException {
         try {
-            var node = webSession.getNavigatorModel().getNodeByPath(webSession.getProgressMonitor(), nodePath);
+            var node = webSession.getNavigatorModelOrThrow().getNodeByPath(webSession.getProgressMonitor(), nodePath);
             if (!(node instanceof DBNFileSystem fs)) {
                 throw new DBException(MessageFormat.format("Node ''{0}'' is not File System", nodePath));
             }

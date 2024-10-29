@@ -950,7 +950,7 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     @NotNull
     public <T> T getDataContainerByNodePath(DBRProgressMonitor monitor, @NotNull String containerPath, Class<T> type) throws DBException {
-        DBNNode node = webSession.getNavigatorModel().getNodeByPath(monitor, containerPath);
+        DBNNode node = webSession.getNavigatorModelOrThrow().getNodeByPath(monitor, containerPath);
         if (node == null) {
             throw new DBWebException("Container node '" + containerPath + "' not found");
         }
