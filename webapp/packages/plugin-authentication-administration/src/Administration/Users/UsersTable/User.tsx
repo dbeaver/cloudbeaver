@@ -61,7 +61,6 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
 
   return (
     <TableItem item={user.userId} selectDisabled={!selectable}>
-      <TableColumnValue />
       {selectable && (
         <TableColumnValue centerContent flex>
           <TableItemSelect />

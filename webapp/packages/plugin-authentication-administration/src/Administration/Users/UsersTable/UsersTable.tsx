@@ -9,6 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import {
   Button,
+  Flex,
   Loader,
   Table,
   TableBody,
@@ -48,10 +49,12 @@ export const UsersTable = observer<Props>(function UsersTable({
   return (
     <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size="big">
       <TableHeader fixed>
-        <TableColumnHeader min>
-          <Loader loading={loading} small />
+        <TableColumnHeader>
+          <Flex align="center" gap="xs">
+            {translate('authentication_user_name')}
+            <Loader loading={loading} small inline />
+          </Flex>
         </TableColumnHeader>
-        <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
         {displayAuthRole && <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>}
         <TableColumnHeader>{translate('authentication_user_team')}</TableColumnHeader>
         <TableColumnHeader min>{translate('authentication_user_enabled')}</TableColumnHeader>
