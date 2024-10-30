@@ -135,6 +135,7 @@ export default [
   ['ui_export', 'Export'],
   ['ui_you', 'You'],
   ['ui_ms', 'ms'],
+  ['ui_not_found', 'Not found'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],

@@ -129,6 +129,7 @@ export default [
   ['ui_export', 'Exporter'],
   ['ui_you', 'Vous'],
   ['ui_ms', 'ms'],
+  ['ui_not_found', 'Not found'],
 
   ['root_permission_denied', "Vous n'avez pas les permissions"],
   ['root_permission_no_permission', "Vous n'avez pas la permission pour cette action"],

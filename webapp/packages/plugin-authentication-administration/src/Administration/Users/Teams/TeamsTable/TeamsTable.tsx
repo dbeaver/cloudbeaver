@@ -54,7 +54,6 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams, state, se
             <TableColumnHeader min flex centerContent>
               <TableSelect />
             </TableColumnHeader>
-            <TableColumnHeader min />
             <TableColumnHeader>{translate('administration_teams_team_id')}</TableColumnHeader>
             <TableColumnHeader>{translate('administration_teams_team_name')}</TableColumnHeader>
             <TableColumnHeader>{translate('administration_teams_team_description')}</TableColumnHeader>

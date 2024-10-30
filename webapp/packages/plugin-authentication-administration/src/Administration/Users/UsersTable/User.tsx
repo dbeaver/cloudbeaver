@@ -10,11 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { type AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
 import {
   Checkbox,
+  Link,
   Loader,
   Placeholder,
   TableColumnValue,
   TableItem,
-  TableItemExpand,
   TableItemSelect,
   useAutoLoad,
   useTranslate,
@@ -26,7 +26,7 @@ import { clsx } from '@cloudbeaver/core-utils';
 import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService.js';
 import { UsersAdministrationService } from '../UsersAdministrationService.js';
 import style from './User.module.css';
-import { UserEdit } from './UserEdit.js';
+import { UsersTableOptionsPanelService } from './UsersTableOptionsPanelService.js';
 
 interface Props {
   user: AdminUser;
@@ -39,6 +39,7 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
   const usersService = useService(UsersResource);
   const notificationService = useService(NotificationService);
   const administrationUsersManagementService = useService(AdministrationUsersManagementService);
+  const usersTableOptionsPanelService = useService(UsersTableOptionsPanelService);
   const translate = useTranslate();
 
   useAutoLoad(User, administrationUsersManagementService.loaders);
@@ -59,20 +60,17 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
   const teams = user.grantedTeams.join(', ');
 
   return (
-    <TableItem item={user.userId} expandElement={UserEdit} selectDisabled={!selectable}>
+    <TableItem item={user.userId} selectDisabled={!selectable}>
       {selectable && (
         <TableColumnValue centerContent flex>
           <TableItemSelect />
         </TableColumnValue>
       )}
-      <TableColumnValue centerContent flex expand>
-        <TableItemExpand />
-      </TableColumnValue>
-      <TableColumnValue className={style['expand']} title={user.userId} expand ellipsis>
-        {user.userId}
+      <TableColumnValue title={user.userId} ellipsis onClick={() => usersTableOptionsPanelService.open(user.userId)}>
+        <Link truncate>{user.userId}</Link>
       </TableColumnValue>
       {displayAuthRole && (
-        <TableColumnValue className={style['expand']} title={user.authRole} expand ellipsis>
+        <TableColumnValue title={user.authRole} ellipsis>
           {user.authRole}
         </TableColumnValue>
       )}

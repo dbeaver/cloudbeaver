@@ -125,6 +125,7 @@ export default [
   ['ui_export', 'Export'],
   ['ui_you', 'You'],
   ['ui_ms', 'ms'],
+  ['ui_not_found', 'Not found'],
 
   ['root_permission_denied', 'Non hai i permessi'],
   ['app_root_session_expire_warning_title', 'La sessione sta per scadere'],
