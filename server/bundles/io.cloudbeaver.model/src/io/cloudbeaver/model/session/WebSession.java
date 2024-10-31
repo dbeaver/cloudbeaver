@@ -26,6 +26,8 @@ import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.app.ServletAuthApplication;
+import io.cloudbeaver.model.session.monitor.TaskProgressMonitor;
+import io.cloudbeaver.model.session.monitor.TaskWithEventsProgressMonitor;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -57,7 +59,6 @@ import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
@@ -548,6 +549,10 @@ public class WebSession extends BaseWebSession
     }
 
     public WebAsyncTaskInfo createAndRunAsyncTask(String taskName, WebAsyncTaskProcessor<?> runnable) {
+        return createAndRunAsyncTask(taskName, runnable, false);
+    }
+
+    public WebAsyncTaskInfo createAndRunAsyncTask(String taskName, WebAsyncTaskProcessor<?> runnable, boolean sendEvent) {
         int taskId = TASK_ID.incrementAndGet();
         WebAsyncTaskInfo asyncTask = getAsyncTask(String.valueOf(taskId), taskName, true);
 
@@ -556,7 +561,10 @@ public class WebSession extends BaseWebSession
             protected IStatus run(DBRProgressMonitor monitor) {
                 int curTaskCount = taskCount.incrementAndGet();
 
-                TaskProgressMonitor taskMonitor = new TaskProgressMonitor(monitor, asyncTask);
+                DBRProgressMonitor taskMonitor = sendEvent ?
+                    new TaskWithEventsProgressMonitor(monitor, WebSession.this, asyncTask) :
+                    new TaskProgressMonitor(monitor, asyncTask);
+
                 try {
                     Number queryLimit = application.getAppConfiguration().getResourceQuota(WebSQLConstants.QUOTA_PROP_QUERY_LIMIT);
                     if (queryLimit != null && curTaskCount > queryLimit.intValue()) {
@@ -985,27 +993,6 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    private static class TaskProgressMonitor extends ProxyProgressMonitor {
-
-        private final WebAsyncTaskInfo asyncTask;
-
-        public TaskProgressMonitor(DBRProgressMonitor original, WebAsyncTaskInfo asyncTask) {
-            super(original);
-            this.asyncTask = asyncTask;
-        }
-
-        @Override
-        public void beginTask(String name, int totalWork) {
-            super.beginTask(name, totalWork);
-            asyncTask.setStatus(name);
-        }
-
-        @Override
-        public void subTask(String name) {
-            super.subTask(name);
-            asyncTask.setStatus(name);
-        }
-    }
 
     private record PersistentAttribute(Object value) {
     }
