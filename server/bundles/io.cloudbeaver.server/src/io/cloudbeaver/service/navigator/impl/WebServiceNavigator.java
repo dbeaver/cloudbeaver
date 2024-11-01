@@ -271,7 +271,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             } else if (node instanceof DBNLocalFolder) {
                 // Refresh can't be applied to the local folder node
             } else if (node instanceof DBNRoot) {
-                if(recursive != null && recursive) {
+                if (recursive != null && recursive) {
                     node.refreshNode(monitor, this);
                 }
             } else {
