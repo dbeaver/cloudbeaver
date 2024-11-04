@@ -64,7 +64,7 @@ public class WebServiceBindingNavigator extends WebServiceBindingBase<DBWService
 
             ));
         model.getMutationType()
-            .dataFetcher("navRefreshNode", env -> getService(env).refreshNavigatorNode(
+            .dataFetcher("navReloadNode", env -> getService(env).refreshNavigatorNode(
                 getWebSession(env),
                 env.getArgument("nodePath"),
                 true

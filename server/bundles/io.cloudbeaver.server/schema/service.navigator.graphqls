@@ -135,7 +135,7 @@ extend type Query {
 
     navNodeInfo( nodePath: ID! ): NavigatorNodeInfo!
 
-    navRefreshNode( nodePath: ID! ): Boolean @deprecated # Use same method from Mutation (24.2.4)
+    navRefreshNode( nodePath: ID! ): Boolean @deprecated # Use navReloadNode method from Mutation (24.2.4)
 
     # contextId currently not using
     navGetStructContainers( projectId: ID, connectionId: ID!, contextId: ID, catalog: ID ): DatabaseStructContainers!
@@ -144,7 +144,7 @@ extend type Query {
 
 extend type Mutation {
 
-    navRefreshNode( nodePath: ID! ): NavigatorNodeInfo!
+    navReloadNode( nodePath: ID! ): NavigatorNodeInfo!
 
     # Rename node and returns new node name
     navRenameNode( nodePath: ID!, newName: String! ): String
