@@ -22,7 +22,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.websocket.event.session.WSSessionSubTaskInfoEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSessionTaskInfoEvent;
 
 import java.util.ArrayList;
@@ -62,7 +61,14 @@ public class TaskWithEventsProgressMonitor extends TaskProgressMonitor {
         } else {
             ProgressState progressState = states.get(states.size() - 1);
             progressState.subTask = name;
-            webSession.addSessionEvent(WSSessionSubTaskInfoEvent.start(progressState.id, name));
+            webSession.addSessionEvent(
+                WSSessionTaskInfoEvent.update(
+                    progressState.id,
+                    name,
+                    progressState.progress,
+                    progressState.totalWork
+                )
+            );
         }
     }
 
@@ -74,7 +80,12 @@ public class TaskWithEventsProgressMonitor extends TaskProgressMonitor {
         } else {
             ProgressState progressState = states.get(states.size() - 1);
             progressState.progress += work;
-            webSession.addSessionEvent(WSSessionSubTaskInfoEvent.finish(progressState.id, progressState.subTask));
+            webSession.addSessionEvent(WSSessionTaskInfoEvent.update(
+                progressState.id,
+                progressState.taskName,
+                progressState.progress,
+                progressState.totalWork
+            ));
         }
     }
 
@@ -85,7 +96,7 @@ public class TaskWithEventsProgressMonitor extends TaskProgressMonitor {
         } else {
             ProgressState progressState = states.get(states.size() - 1);
             states.remove(states.size() - 1);
-            webSession.addSessionEvent(WSSessionTaskInfoEvent.finish(progressState.id));
+            webSession.addSessionEvent(WSSessionTaskInfoEvent.finish(progressState.id, progressState.progress));
         }
         super.done();
         // Restore previous state
