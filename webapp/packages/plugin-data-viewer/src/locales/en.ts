@@ -70,8 +70,6 @@ export default [
   ['settings_data_editor_disable_data_copy_description', 'Disable copying of data in Data Viewer for non-admin users'],
   ['settings_data_editor_disable_data_export_name', 'Disable Export'],
   ['settings_data_editor_disable_data_export_description', 'Disable exporting of data in Data Viewer for non-admin users'],
-  ['settings_data_editor_fetch_min_name', 'Minimum fetch size'],
-  ['settings_data_editor_fetch_min_description', 'Minimum number of rows to fetch'],
   ['settings_data_editor_fetch_max_name', 'Maximum fetch size'],
   ['settings_data_editor_fetch_max_description', 'Maximum number of rows to fetch'],
   ['settings_data_editor_fetch_default_name', 'Default fetch size'],
