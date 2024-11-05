@@ -53,7 +53,7 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
     this.userProfileTabsService.tabContainer.add({
       key: SETTINGS_TAB_ID,
       name: 'plugin_user_profile_settings_tab_label',
-      order: 2,
+      order: 3,
       panel: () => UserProfileSettings,
     });
 

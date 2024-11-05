@@ -23,13 +23,14 @@ import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.PeriodicJob;
 
+import java.time.Duration;
+
 public class SessionStateJob extends PeriodicJob {
     private static final Log log = Log.getLog(SessionStateJob.class);
-    private static final int PERIOD_MS = 30_000; // once per 30 seconds
     private final WebSessionManager sessionManager;
 
     public SessionStateJob(@NotNull DBPPlatform platform, WebSessionManager sessionManager) {
-        super("Session state sender", platform, PERIOD_MS);
+        super("Session state sender", platform, Duration.ofSeconds(30));
         this.sessionManager = sessionManager;
     }
 
