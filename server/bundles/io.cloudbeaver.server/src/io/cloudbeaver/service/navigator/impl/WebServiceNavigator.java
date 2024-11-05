@@ -248,9 +248,10 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     }
 
     @Override
-    public boolean refreshNavigatorNode(
+    public WebNavigatorNodeInfo refreshNavigatorNode(
         @NotNull WebSession session,
-        @NotNull String nodePath
+        @NotNull String nodePath,
+        @Nullable Boolean recursive
     ) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
@@ -269,11 +270,14 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 dbnDataSource.cleanupNode();
             } else if (node instanceof DBNLocalFolder) {
                 // Refresh can't be applied to the local folder node
-                return true;
+            } else if (node instanceof DBNRoot) {
+                if (recursive != null && recursive) {
+                    node.refreshNode(monitor, this);
+                }
             } else {
                 node.refreshNode(monitor, this);
             }
-            return true;
+            return new WebNavigatorNodeInfo(session, node);
         } catch (DBException e) {
             throw new DBWebException("Error refreshing navigator node '"  + nodePath + "'", e);
         }
