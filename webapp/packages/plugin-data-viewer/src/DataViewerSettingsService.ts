@@ -21,7 +21,7 @@ import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 import { DATA_EDITOR_SETTINGS_GROUP } from './DATA_EDITOR_SETTINGS_GROUP.js';
 
-const FETCH_MIN = 100;
+const FETCH_MIN = 10;
 const FETCH_MAX = 5000;
 const DEFAULT_FETCH_SIZE = 200;
 

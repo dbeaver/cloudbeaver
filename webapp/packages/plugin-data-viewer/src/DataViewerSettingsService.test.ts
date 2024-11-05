@@ -135,7 +135,7 @@ describe('DataViewerSettingsService.getDefaultRowsCount', () => {
   });
 
   test('should return valid minimal value', () => {
-    expect(settingsService.getDefaultRowsCount(10)).toBe(100);
+    expect(settingsService.getDefaultRowsCount(10)).toBe(10);
   });
 
   test('should return valid maximal value', () => {
