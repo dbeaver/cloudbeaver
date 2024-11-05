@@ -57,7 +57,7 @@ type NavigatorNodeInfo {
     # Node ID - generally a full path to the node from root of tree
     id: ID!
     # Node URI - a unique path to a node including all parent nodes
-    # uri: ID! @since(version: "23.3.1")
+    uri: ID! @since(version: "23.3.1")
     # Node human readable name
     name: String
     #Node full name
@@ -135,7 +135,7 @@ extend type Query {
 
     navNodeInfo( nodePath: ID! ): NavigatorNodeInfo!
 
-    navRefreshNode( nodePath: ID! ): Boolean
+    navRefreshNode( nodePath: ID! ): Boolean @deprecated # Use navReloadNode method from Mutation (24.2.4)
 
     # contextId currently not using
     navGetStructContainers( projectId: ID, connectionId: ID!, contextId: ID, catalog: ID ): DatabaseStructContainers!
@@ -143,6 +143,8 @@ extend type Query {
 }
 
 extend type Mutation {
+
+    navReloadNode( nodePath: ID! ): NavigatorNodeInfo!
 
     # Rename node and returns new node name
     navRenameNode( nodePath: ID!, newName: String! ): String
