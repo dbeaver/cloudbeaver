@@ -61,7 +61,8 @@ public class WebGlobalWorkspace extends BaseWorkspaceImpl {
         initializeWorkspaceSession();
 
         // Load global project
-        Path globalProjectPath = getAbsolutePath().resolve(WebAppUtils.getGlobalProjectId());
+        String defaultProjectName = WebAppUtils.getWebApplication().getDefaultProjectName();
+        Path globalProjectPath = getAbsolutePath().resolve(defaultProjectName);
         if (!Files.exists(globalProjectPath)) {
             try {
                 Files.createDirectories(globalProjectPath);
@@ -73,7 +74,7 @@ public class WebGlobalWorkspace extends BaseWorkspaceImpl {
         globalProject = new WebGlobalProject(
             this,
             getAuthContext(),
-            CommonUtils.notEmpty(WebAppUtils.getWebApplication().getDefaultProjectName())
+            CommonUtils.notEmpty(defaultProjectName)
         );
         activeProject = globalProject;
     }
