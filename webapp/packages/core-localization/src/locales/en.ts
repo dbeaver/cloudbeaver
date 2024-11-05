@@ -40,6 +40,7 @@ export default [
   ['ui_custom', 'Custom'],
   ['ui_configure', 'Configure'],
   ['ui_apply', 'Apply'],
+  ['ui_cancel', 'Cancel'],
   ['ui_reject', 'Reject'],
   ['ui_ignore', 'Ignore'],
   ['ui_unexpected_error', 'Unexpected error'],

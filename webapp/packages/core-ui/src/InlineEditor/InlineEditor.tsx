@@ -143,7 +143,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
             </EditorAction>
           )}
           {!hideCancel && onReject && (
-            <EditorAction title={translate('ui_reject')} disabled={disabled} onClick={onReject}>
+            <EditorAction title={translate('ui_cancel')} disabled={disabled} onClick={onReject}>
               <Icon className={s(style, { icon: true })} name="reject" viewBox="0 0 11 11" />
             </EditorAction>
           )}
