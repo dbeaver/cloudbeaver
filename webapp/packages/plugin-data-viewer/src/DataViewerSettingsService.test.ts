@@ -121,7 +121,6 @@ describe('DataViewerSettingsService.getDefaultRowsCount', () => {
 
   beforeAll(async () => {
     settingsService = await setupSettingsService({
-      'plugin.data-viewer.fetchMin': '200',
       'plugin.data-viewer.fetchMax': '1000',
       'plugin.data-viewer.fetchDefault': '300',
     });
@@ -136,7 +135,7 @@ describe('DataViewerSettingsService.getDefaultRowsCount', () => {
   });
 
   test('should return valid minimal value', () => {
-    expect(settingsService.getDefaultRowsCount(10)).toBe(200);
+    expect(settingsService.getDefaultRowsCount(10)).toBe(10);
   });
 
   test('should return valid maximal value', () => {
