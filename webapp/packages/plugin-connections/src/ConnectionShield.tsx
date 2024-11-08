@@ -23,7 +23,7 @@ export const ConnectionShield = observer<PropsWithChildren<IConnectionShieldProp
   const notificationService = useService(NotificationService);
 
   const connection = useResource(ConnectionShield, ConnectionInfoResource, connectionKey);
-  const connecting = getComputed(() => connectionKey && connection.resource.isConnecting(connectionKey));
+  const connecting = getComputed(() => (connectionKey && connection.resource.isConnecting(connectionKey)) || connection.loading);
   const isConnectionReady = getComputed(() => !connecting && connection.data?.connected && connection.loaded && !connection.outdated);
 
   async function handleConnect() {
