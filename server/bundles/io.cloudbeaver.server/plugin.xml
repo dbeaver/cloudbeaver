@@ -77,7 +77,7 @@
 
     <extension point="org.jkiss.dbeaver.settings">
         <propertyGroup id="log" label="Logger">
-            <property id="log.on.show.variables" label="Show all variables in log"
+            <property id="log.debug" label="Show all variables in log"
                       type="boolean" scopes="global"
                       description="Show in logs all variables in graphql endpoints"/>
         </propertyGroup>

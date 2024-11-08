@@ -45,7 +45,7 @@ public class GraphQLLoggerUtil {
         StringBuilder loggerMessage = new StringBuilder(" [user: ").append(userId)
             .append(", sessionId: ").append(sessionId).append("]");
 
-        if (CBPlatform.getInstance().getPreferenceStore().getBoolean("log.on.show.variables") && variables != null) {
+        if (CBPlatform.getInstance().getPreferenceStore().getBoolean("log.debug") && variables != null) {
             loggerMessage.append(" [variables] ");
             String parsedVariables = parseVarialbes(variables);
             if (CommonUtils.isNotEmpty(parsedVariables)) {
