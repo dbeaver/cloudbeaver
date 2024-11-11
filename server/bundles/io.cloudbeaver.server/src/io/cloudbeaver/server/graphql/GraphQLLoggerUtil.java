@@ -27,25 +27,30 @@ import java.util.Set;
 
 public class GraphQLLoggerUtil {
 
-    private static final Set<String> PROHIBITED_VARIABLES = GraphQLProhibitedVariables.getAllProhibitedVariables();
+    private static final Set<String> PROHIBITED_VARIABLES =
+        Set.of("password", "config", "parameters", "settings", "licenseText", "credentials", "username");
 
     public static String getUserId(HttpServletRequest request) {
         String userId = null;
-        WebSession session = (WebSession) CBApplication.getInstance().getSessionManager().getSession(request.getSession().getId());
-        if (session != null) {
-            userId = session.getUserContext().getUserId();
-            if (userId == null && session.getUserContext().isAuthorizedInSecurityManager()) {
-                userId = "anonymous";
+        if (request.getSession() != null) {
+            WebSession session =
+                (WebSession) CBApplication.getInstance().getSessionManager().getSession(request.getSession().getId());
+            if (session != null) {
+                userId = session.getUserContext().getUserId();
+                if (userId == null && session.getUserContext().isAuthorizedInSecurityManager()) {
+                    userId = "anonymous";
+                }
             }
         }
         return userId;
+
     }
 
     public static String buildLoggerMessage(String sessionId, String userId, Map<String, Object> variables) {
         StringBuilder loggerMessage = new StringBuilder(" [user: ").append(userId)
             .append(", sessionId: ").append(sessionId).append("]");
 
-        if (CBPlatform.getInstance().getPreferenceStore().getBoolean("log.debug") && variables != null) {
+        if (CBPlatform.getInstance().getPreferenceStore().getBoolean("log.api.graphql.debug") && variables != null) {
             loggerMessage.append(" [variables] ");
             String parsedVariables = parseVarialbes(variables);
             if (CommonUtils.isNotEmpty(parsedVariables)) {
