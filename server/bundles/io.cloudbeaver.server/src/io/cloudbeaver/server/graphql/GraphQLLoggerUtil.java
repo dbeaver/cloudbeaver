@@ -27,6 +27,7 @@ import java.util.Set;
 
 public class GraphQLLoggerUtil {
 
+    public static final String LOG_API_GRAPHQL_DEBUG_PARAMETER = "log.api.graphql.debug";
     private static final Set<String> PROHIBITED_VARIABLES =
         Set.of("password", "config", "parameters", "settings", "licenseText", "credentials", "username");
 
@@ -50,7 +51,9 @@ public class GraphQLLoggerUtil {
         StringBuilder loggerMessage = new StringBuilder(" [user: ").append(userId)
             .append(", sessionId: ").append(sessionId).append("]");
 
-        if (CBPlatform.getInstance().getPreferenceStore().getBoolean("log.api.graphql.debug") && variables != null) {
+        if (CBPlatform.getInstance().getPreferenceStore().getBoolean(LOG_API_GRAPHQL_DEBUG_PARAMETER)
+                && variables != null
+        ) {
             loggerMessage.append(" [variables] ");
             String parsedVariables = parseVarialbes(variables);
             if (CommonUtils.isNotEmpty(parsedVariables)) {
