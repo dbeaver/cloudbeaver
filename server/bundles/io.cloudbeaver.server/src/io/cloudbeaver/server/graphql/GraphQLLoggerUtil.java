@@ -68,6 +68,7 @@ public class GraphQLLoggerUtil {
             Object value = entry.getValue();
 
             if (PROHIBITED_VARIABLES.contains(key)) {
+                result.append(key).append(": ").append("******** ");
                 continue;
             }
 
