@@ -116,6 +116,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     ///////////////////////////////////////////
     // Users
 
+    /**
+     * Creates user. Saves user id in database in lower-case.
+     */
     @Override
     public void createUser(
         @NotNull String userId,
@@ -126,6 +129,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         if (CommonUtils.isEmpty(userId)) {
             throw new DBCException("Empty user name is not allowed");
         }
+        userId = userId.toLowerCase(); // creating new users only with lowercase
         if (isSubjectExists(userId)) {
             throw new DBCException("User or team '" + userId + "' already exists");
         }
@@ -140,6 +144,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
     }
 
+    /**
+     * Creates user. Saves user id in database as it is.
+     */
     public void createUser(
         @NotNull Connection dbCon,
         @NotNull String userId,
@@ -910,20 +917,38 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         @NotNull WebAuthProviderDescriptor authProvider,
         @NotNull Map<String, Object> authParameters,
         boolean onlyActive // throws exception if user is inactive
+    ) throws DBException {
+        String userId = findUserByCredentials(authProvider, authParameters, onlyActive, false);
+        if (userId == null && authProvider.isCaseInsensitive()) {
+            // try to find user id with lower case is auth provider is case-insensitive
+            return findUserByCredentials(authProvider, authParameters, onlyActive, true);
+        }
+        return userId;
+    }
+
+    @Nullable
+    private String findUserByCredentials(
+        @NotNull WebAuthProviderDescriptor authProvider,
+        @NotNull Map<String, Object> authParameters,
+        boolean onlyActive,
+        boolean isCaseInsensitive
     ) throws DBCException {
-        Map<String, Object> identCredentials = new LinkedHashMap<>();
+        Map<String, String> identCredentials = new LinkedHashMap<>();
         String[] propNames = authParameters.keySet().toArray(new String[0]);
         for (AuthPropertyDescriptor prop : authProvider.getCredentialParameters(propNames)) {
             if (prop.isIdentifying()) {
                 String propId = CommonUtils.toString(prop.getId());
-                Object paramValue = authParameters.get(propId);
-                if (paramValue == null) {
+                if (authParameters.get(propId) == null) {
                     throw new DBCException("Authentication parameter '" + prop.getId() + "' is missing");
                 }
                 if (prop.getEncryption() == AuthPropertyEncryption.hash) {
                     throw new DBCException("Hash encryption can't be used in identifying credentials");
                 }
-                identCredentials.put(propId, paramValue);
+                String paramValue = CommonUtils.toString(authParameters.get(propId));
+                identCredentials.put(
+                    propId,
+                    isCaseInsensitive ? paramValue.toLowerCase() : paramValue
+                );
             }
         }
         if (identCredentials.isEmpty()) {
@@ -947,9 +972,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(sql.toString()))) {
                 dbStat.setString(1, authProvider.getId());
                 int param = 2;
-                for (Map.Entry<String, Object> credEntry : identCredentials.entrySet()) {
+                for (Map.Entry<String, String> credEntry : identCredentials.entrySet()) {
                     dbStat.setString(param++, credEntry.getKey());
-                    dbStat.setString(param++, CommonUtils.toString(credEntry.getValue()));
+                    dbStat.setString(param++, credEntry.getValue());
                 }
 
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -980,6 +1005,15 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     @Override
     public Map<String, Object> getUserCredentials(String userId, String authProviderId) throws DBCException {
         WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
+        Map<String, Object> creds = getUserCredentials(authProvider, userId);
+        if (creds.isEmpty() && authProvider.isCaseInsensitive()) {
+            return getUserCredentials(authProvider, userId.toLowerCase());
+        }
+        return creds;
+    }
+
+    @NotNull
+    private Map<String, Object> getUserCredentials(WebAuthProviderDescriptor authProvider, String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames("SELECT CRED_ID,CRED_VALUE FROM {table_prefix}CB_USER_CREDENTIALS\n" +
@@ -990,7 +1024,6 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     Map<String, Object> credentials = new LinkedHashMap<>();
-
                     while (dbResult.next()) {
                         credentials.put(dbResult.getString(1), dbResult.getString(2));
                     }
@@ -1182,6 +1215,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         if (CommonUtils.isEmpty(teamId)) {
             throw new DBCException("Empty team name is not allowed");
         }
+        teamId = teamId.toLowerCase();
         if (isSubjectExists(teamId)) {
             throw new DBCException("User or team '" + teamId + "' already exists");
         }
@@ -2427,13 +2461,20 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 return null;
             }
 
-            userId = userIdFromCredentials;
+            userId = authProvider.isCaseInsensitive() ? userIdFromCredentials.toLowerCase() : userIdFromCredentials;
             if (!isSubjectExists(userId)) {
-                createUser(userId,
-                    Map.of(),
-                    true,
-                    resolveUserAuthRole(null, authRole)
-                );
+                log.debug("Create user: " + userId);
+                try (Connection dbCon = database.openConnection()) {
+                    createUser(
+                        dbCon,
+                        userId,
+                        Map.of(),
+                        true,
+                        resolveUserAuthRole(null, authRole)
+                    );
+                } catch (SQLException e) {
+                    throw new DBException("Error saving user in database", e);
+                }
             }
             setUserCredentials(userId, authProvider.getId(), userCredentials);
         } else if (userId == null) {
