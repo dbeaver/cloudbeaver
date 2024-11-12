@@ -34,6 +34,8 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
       teams: [],
       authRole: '',
     });
+
+    this.disableUser = this.disableUser.bind(this);
   }
 
   protected override format(data: IFormState<IUserFormState>, contexts: IExecutionContextProvider<IFormState<IUserFormState>>): void | Promise<void> {
@@ -72,6 +74,12 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     }
 
     return this.loaded;
+  }
+
+  async disableUser() {
+    await this.usersResource.enableUser(this.state.userId, false, true);
+    this.state.enabled = false;
+    this.initialState.enabled = false;
   }
 
   override get isChanged(): boolean {
