@@ -11,7 +11,7 @@ import type { IExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
 export type FormChangeValues = string | number | boolean | FileList | null | undefined;
 export type FormChangeHandler = (value: FormChangeValues, name: string | undefined) => void;
-type KeyHandler = (event: React.KeyboardEvent<HTMLInputElement>) => void;
+type KeyHandler = (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 
 export interface IChangeData {
   value: FormChangeValues;

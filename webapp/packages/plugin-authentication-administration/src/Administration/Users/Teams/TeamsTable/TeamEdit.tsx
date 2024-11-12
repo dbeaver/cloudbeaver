@@ -31,7 +31,7 @@ export const TeamEdit = observer<Props>(function TeamEdit({ item }) {
   data.config.teamId = item;
 
   return (
-    <ColoredContainer parent vertical noWrap surface gap compact>
+    <ColoredContainer aria-label={translate('plugin_authentication_administration_team_form_edit_label')} parent vertical noWrap surface gap compact>
       <GroupTitle header>
         <GroupBack onClick={teamsTableOptionsPanelService.close}>
           <Text truncate>
