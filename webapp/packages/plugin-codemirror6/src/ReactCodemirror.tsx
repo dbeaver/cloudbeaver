@@ -13,6 +13,7 @@ import { forwardRef, useImperativeHandle, useLayoutEffect, useMemo, useRef, useS
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 
+import { hasInsertProperty } from './hasInsertProperty.js';
 import type { IEditorRef } from './IEditorRef.js';
 import type { IReactCodeMirrorProps } from './IReactCodemirrorProps.js';
 import { type IReactCodemirrorContext, ReactCodemirrorContext } from './ReactCodemirrorContext.js';
@@ -192,8 +193,15 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
           }
         }
 
-        if (cursor && isCursorInDoc && (view.state.selection.main.anchor !== cursor.anchor || view.state.selection.main.head !== cursor.head)) {
+        if (cursor && isCursorInDoc) {
           transaction.selection = cursor;
+        }
+
+        if (hasInsertProperty(transaction.changes) && !transaction.selection) {
+          transaction.selection = {
+            anchor: transaction.changes.insert?.length ?? 0,
+            head: transaction.changes.insert?.length ?? 0,
+          };
         }
 
         if (transaction.changes || transaction.selection) {
