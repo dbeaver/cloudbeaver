@@ -296,6 +296,11 @@ public class WebDatabaseDriverInfo {
     }
 
     @Property
+    public boolean isDriverInstalled() {
+        return driver.needsExternalDependencies();
+    }
+
+    @Property
     public boolean getUseCustomPage() {
         return !ArrayUtils.isEmpty(driver.getMainPropertyDescriptors());
     }

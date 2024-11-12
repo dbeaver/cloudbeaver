@@ -270,6 +270,7 @@ type DriverInfo {
 
     configurationTypes: [DriverConfigurationType]!
 
+    driverInstalled: Boolean!
     driverLibraries: [DriverLibraryInfo!]!
 }
 
