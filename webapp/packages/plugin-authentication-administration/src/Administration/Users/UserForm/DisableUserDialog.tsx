@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
 import {
   Button,
   CommonDialogBody,
@@ -18,7 +17,6 @@ import {
   Fill,
   s,
   Text,
-  useResource,
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
@@ -31,17 +29,17 @@ import classes from './DisableUserDialog.module.css';
 interface IPayload {
   userId: string;
   onDelete: () => void;
+  disableUser: () => Promise<void>;
 }
 
 export const DisableUserDialog: DialogComponent<IPayload> = observer(function DisableUserDialog(props) {
   const translate = useTranslate();
   const styles = useS(classes);
   const notificationService = useService(NotificationService);
-  const usersResource = useResource(DisableUserDialog, UsersResource, null);
 
   async function disableHandler() {
     try {
-      await usersResource.resource.enableUser(props.payload.userId, false);
+      await props.payload.disableUser();
       notificationService.logSuccess({ title: 'authentication_administration_users_disable_user_success', message: props.payload.userId });
       props.resolveDialog();
     } catch (exception: any) {
