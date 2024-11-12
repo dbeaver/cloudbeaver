@@ -7,7 +7,7 @@ RUN apt-get update; \
     
 COPY cloudbeaver /opt/cloudbeaver
 
-COPY ./deploy/docker/cloudbeaver-ce/upgrade.sh /opt/cloudbeaver/upgrade.sh
+COPY docker/cloudbeaver-ce/upgrade.sh /opt/cloudbeaver/upgrade.sh
 RUN chmod +x /opt/cloudbeaver/upgrade.sh
 
 EXPOSE 8978
