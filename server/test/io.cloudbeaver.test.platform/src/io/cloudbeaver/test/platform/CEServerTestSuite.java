@@ -101,11 +101,18 @@ public class CEServerTestSuite {
     }
 
     public static Map<String, Object> authenticateTestUser(@NotNull WebGQLClient client) throws Exception {
+        return authenticateTestUser(client, TEST_CREDENTIALS);
+    }
+
+    public static Map<String, Object> authenticateTestUser(
+        @NotNull WebGQLClient client,
+        @NotNull Map<String, Object> credentials
+    ) throws Exception {
         return client.sendQuery(
             WebGQLClient.GQL_AUTHENTICATE,
             Map.of(
                 "provider", LocalAuthProvider.PROVIDER_ID,
-                "credentials", TEST_CREDENTIALS
+                "credentials", credentials
             )
         );
     }

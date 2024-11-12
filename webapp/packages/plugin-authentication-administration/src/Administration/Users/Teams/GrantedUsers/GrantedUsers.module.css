@@ -17,6 +17,10 @@
   overflow: auto !important;
 }
 
+.placeholder {
+  margin: 0 !important;
+}
+
 .loader {
   z-index: 2;
 }
