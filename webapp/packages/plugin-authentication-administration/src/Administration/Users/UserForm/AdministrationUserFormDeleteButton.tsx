@@ -17,9 +17,15 @@ import { DisableUserDialog } from './DisableUserDialog.js';
 interface Props extends ButtonProps {
   userId: string;
   enabled: boolean;
+  disableUser: () => Promise<void>;
 }
 
-export const AdministrationUserFormDeleteButton: React.FC<Props> = function AdministrationUserFormDeleteButton({ userId, enabled, ...rest }) {
+export const AdministrationUserFormDeleteButton: React.FC<Props> = function AdministrationUserFormDeleteButton({
+  userId,
+  enabled,
+  disableUser,
+  ...rest
+}) {
   const translate = useTranslate();
   const commonDialogService = useService(CommonDialogService);
   const administrationUsersManagementService = useService(AdministrationUsersManagementService);
@@ -43,6 +49,7 @@ export const AdministrationUserFormDeleteButton: React.FC<Props> = function Admi
       await commonDialogService.open(DisableUserDialog, {
         userId,
         onDelete: openUserDeleteDialog,
+        disableUser: disableUser,
       });
     } else {
       await openUserDeleteDialog();

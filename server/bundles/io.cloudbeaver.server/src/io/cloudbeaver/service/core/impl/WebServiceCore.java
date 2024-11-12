@@ -99,6 +99,7 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public List<WebNetworkHandlerDescriptor> getNetworkHandlers(@NotNull WebSession webSession) {
         return NetworkHandlerRegistry.getInstance().getDescriptors().stream()
+            .filter(d -> !d.isDesktopHandler())
             .map(d -> new WebNetworkHandlerDescriptor(webSession, d)).collect(Collectors.toList());
     }
 

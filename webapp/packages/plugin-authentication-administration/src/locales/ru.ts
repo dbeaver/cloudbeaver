@@ -150,4 +150,7 @@ export default [
     'plugin_authentication_administration_team_user_team_role_supervisor_description',
     'Супервайзеры могут просматривать выполненные запросы своей команды',
   ],
+
+  ['plugin_authentication_administration_team_form_edit_label', 'Форма редактирования команды'],
+  ['plugin_authentication_administration_user_form_edit_label', 'Форма редактирования пользователя'],
 ];

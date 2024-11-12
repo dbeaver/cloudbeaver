@@ -53,7 +53,7 @@ export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit
   });
 
   return (
-    <ColoredContainer vertical parent noWrap surface gap compact>
+    <ColoredContainer aria-label={translate('plugin_authentication_administration_user_form_edit_label')} vertical parent noWrap surface gap compact>
       <GroupTitle header>
         <GroupBack onClick={usersTableOptionsPanelService.close}>
           <Text truncate>

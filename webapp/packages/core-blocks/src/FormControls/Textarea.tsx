@@ -16,6 +16,7 @@ import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
 import { useTranslate } from '../localization/useTranslate.js';
 import { s } from '../s.js';
 import { UploadArea } from '../UploadArea.js';
+import { useCombinedHandler } from '../useCombinedHandler.js';
 import { useS } from '../useS.js';
 import { Field } from './Field.js';
 import { FieldDescription } from './FieldDescription.js';
@@ -63,6 +64,7 @@ export const Textarea: TextareaType = observer(function Textarea({
   embedded,
   cursorInitiallyAtEnd,
   uploadable,
+  onKeyDown,
   onChange = () => {},
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
@@ -72,6 +74,7 @@ export const Textarea: TextareaType = observer(function Textarea({
   rest = filterLayoutFakeProps(rest);
   const styles = useS(textareaStyle);
   const context = useContext(FormContext);
+  const handleKeyDown = useCombinedHandler(onKeyDown, context?.keyDown);
 
   const handleChange = useCallback(
     (value: string) => {
@@ -110,6 +113,7 @@ export const Textarea: TextareaType = observer(function Textarea({
         value={value ?? ''}
         name={name}
         data-embedded={embedded}
+        onKeyDown={handleKeyDown}
         onChange={event => handleChange(event.target.value)}
       />
       {description && <FieldDescription>{description}</FieldDescription>}
