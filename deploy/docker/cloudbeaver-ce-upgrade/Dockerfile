@@ -1,0 +1,16 @@
+FROM dbeaver/base-java
+
+MAINTAINER DBeaver Corp, devops@dbeaver.com
+
+RUN apt-get update; \
+    apt-get upgrade -y; 
+    
+COPY cloudbeaver /opt/cloudbeaver
+
+COPY /deploy/docker/cloudbeaver-ce-upgrade/upgrade.sh /opt/cloudbeaver/upgrade.sh
+RUN chmod +x /opt/cloudbeaver/upgrade.sh
+
+EXPOSE 8978
+RUN find /opt/cloudbeaver -type d -exec chmod 775 {} \;
+WORKDIR /opt/cloudbeaver/
+ENTRYPOINT ["/upgrade.sh"]
