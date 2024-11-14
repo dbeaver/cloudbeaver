@@ -55,9 +55,11 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
 
   if (isDefaultTeam) {
     return (
-      <Container className={s(styles, { box: true })} parent gap vertical>
-        <Group className={s(styles, { placeholderBox: true })} keepSize large>
-          <TextPlaceholder>{translate('plugin_authentication_administration_team_default_users_tooltip')}</TextPlaceholder>
+      <Container>
+        <Group large>
+          <TextPlaceholder className={s(styles, { placeholder: true })}>
+            {translate('plugin_authentication_administration_team_default_users_tooltip')}
+          </TextPlaceholder>
         </Group>
       </Container>
     );
@@ -66,10 +68,12 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
   return (
     <Loader className={s(styles, { loader: true })} state={[state.state]}>
       {() => (
-        <Container className={s(styles, { box: true })} parent gap vertical>
+        <Container className={s(styles, { box: true })} parent={!!users.resource.values.length} gap vertical>
           {!users.resource.values.length ? (
-            <Group className={s(styles, { placeholderBox: true })} keepSize large>
-              <TextPlaceholder>{translate('administration_teams_team_granted_users_empty')}</TextPlaceholder>
+            <Group large>
+              <TextPlaceholder className={s(styles, { placeholder: true })}>
+                {translate('administration_teams_team_granted_users_empty')}
+              </TextPlaceholder>
             </Group>
           ) : (
             <>
