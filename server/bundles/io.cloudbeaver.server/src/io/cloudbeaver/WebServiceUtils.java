@@ -40,10 +40,12 @@ import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
+import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -136,10 +138,13 @@ public class WebServiceUtils extends WebCommonUtils {
         ((DataSourceDescriptor)newDataSource).setTemplate(config.isTemplate());
 
         // Set default navigator settings
-        DataSourceNavigatorSettings navSettings = new DataSourceNavigatorSettings(
-            CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
-        //navSettings.setShowSystemObjects(false);
-        ((DataSourceDescriptor)newDataSource).setNavigatorSettings(navSettings);
+        DBPApplication application = BaseApplicationImpl.getInstance();
+        if (application instanceof CBApplication<?> cbApp) {
+            DataSourceNavigatorSettings navSettings = new DataSourceNavigatorSettings(
+                cbApp.getAppConfiguration().getDefaultNavigatorSettings());
+            //navSettings.setShowSystemObjects(false);
+            ((DataSourceDescriptor) newDataSource).setNavigatorSettings(navSettings);
+        }
 
         saveAuthProperties(
             newDataSource,
