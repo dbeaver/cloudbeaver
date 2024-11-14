@@ -13,6 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { Executor } from '@cloudbeaver/core-executor';
 import { ClipboardService } from '@cloudbeaver/core-ui';
+import { throttle } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import { type CellSelectArgs, DataGrid, type DataGridHandle, type Position } from '@cloudbeaver/plugin-data-grid';
 import {
@@ -52,8 +53,8 @@ interface IInnerState {
 }
 
 function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
-  const target = event.target as HTMLDivElement;
-  return target.clientHeight + target.scrollTop + 100 > target.scrollHeight;
+  const { clientHeight, scrollTop, scrollHeight } = event.target as HTMLDivElement;
+  return clientHeight + scrollTop + 100 > scrollHeight;
 }
 
 const rowHeight = 25;
@@ -410,23 +411,21 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   };
 
   const handleScroll = useCallback(
-    async (event: React.UIEvent<HTMLDivElement>) => {
-      const target = event.target as HTMLDivElement;
-      const toBottom = target.scrollTop > innerState.lastScrollTop;
+    throttle(async (event: React.UIEvent<HTMLDivElement>) => {
+      const scrollTop = (event.target as HTMLDivElement).scrollTop;
+      const toBottom = scrollTop > innerState.lastScrollTop;
 
-      innerState.lastScrollTop = target.scrollTop;
+      innerState.lastScrollTop = scrollTop;
 
-      if (!toBottom || !isAtBottom(event)) {
-        return;
+      if (toBottom && isAtBottom(event)) {
+        const result = model.source.getResult(resultIndex);
+        if (result?.loadedFully) {
+          return;
+        }
+
+        await model.requestDataPortion(0, model.countGain + model.source.count);
       }
-
-      const result = model.source.getResult(resultIndex);
-      if (result?.loadedFully) {
-        return;
-      }
-
-      await model.requestDataPortion(0, model.countGain + model.source.count);
-    },
+    }, 200),
     [model, resultIndex],
   );
 
