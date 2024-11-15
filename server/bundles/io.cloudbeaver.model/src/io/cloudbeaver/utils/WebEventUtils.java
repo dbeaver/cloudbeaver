@@ -20,6 +20,7 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEvent;
@@ -45,6 +46,10 @@ public class WebEventUtils {
         WSDataSourceProperty property
     ) {
         if (project == null) {
+            return;
+        }
+        WSEventController eventController = WebAppUtils.getWebApplication().getEventController();
+        if (eventController == null) {
             return;
         }
         WSEvent event = null;
@@ -80,7 +85,7 @@ public class WebEventUtils {
         if (event == null) {
             return;
         }
-        WebAppUtils.getWebApplication().getEventController().addEvent(event);
+        eventController.addEvent(event);
     }
 
     public static void addNavigatorNodeUpdatedEvent(
