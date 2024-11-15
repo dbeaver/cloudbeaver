@@ -76,7 +76,7 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebServerConfig getServerConfig() {
-        return new WebServerConfig(CBApplication.getInstance());
+        return new WebServerConfig(WebAppUtils.getWebApplication());
     }
 
     @Override
