@@ -87,6 +87,11 @@ public class WebDatabaseDriverInfo {
     }
 
     @Property
+    public String getDriverId() {
+        return driver.getId();
+    }
+
+    @Property
     public String getProviderId() {
         return driver.getProviderId();
     }
