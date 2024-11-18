@@ -59,7 +59,7 @@ export default [
   ['administration_configuration_wizard_configuration_security_admin_credentials', 'Save credentials'],
   [
     'administration_configuration_wizard_configuration_security_admin_credentials_description',
-    'Allow to save credentials for pre-configured database',
+    'Allow to save credentials for pre-configured databases',
   ],
   ['administration_configuration_wizard_configuration_security_public_credentials', 'Save users credentials'],
   ['administration_configuration_wizard_configuration_security_public_credentials_description', 'Allow to save credentials for non-admin users'],
