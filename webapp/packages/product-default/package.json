@@ -52,6 +52,7 @@
     "@cloudbeaver/plugin-devtools": "^0",
     "@cloudbeaver/plugin-gis-viewer": "^0",
     "@cloudbeaver/plugin-help": "^0",
+    "@cloudbeaver/plugin-holidays": "^0",
     "@cloudbeaver/plugin-localization": "^0",
     "@cloudbeaver/plugin-log-viewer": "^0",
     "@cloudbeaver/plugin-navigation-tabs": "^0",

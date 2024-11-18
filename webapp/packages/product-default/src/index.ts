@@ -31,6 +31,7 @@ import ddlViewer from '@cloudbeaver/plugin-ddl-viewer';
 import devTools from '@cloudbeaver/plugin-devtools';
 import gisViewer from '@cloudbeaver/plugin-gis-viewer';
 import help from '@cloudbeaver/plugin-help';
+import holidaysPlugin from '@cloudbeaver/plugin-holidays';
 import localization from '@cloudbeaver/plugin-localization';
 import logViewer from '@cloudbeaver/plugin-log-viewer';
 import { navigationTabsPlugin } from '@cloudbeaver/plugin-navigation-tabs';
@@ -129,6 +130,7 @@ const PLUGINS: PluginManifest[] = [
   taskManagerPluginManifest,
   settingsAdministrationPlugin,
   userProfileSettingsPlugin,
+  holidaysPlugin,
   // must be las one to override all
   defaultProductManifest,
 ];
