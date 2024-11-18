@@ -77,4 +77,10 @@ public class WebProductInfo {
         return CommonUtils.notEmpty(product.getProperty("versionUpdateURL"));
     }
 
+    @Property
+    public String getProductPurchaseURL() {
+        IProduct product = Platform.getProduct();
+        return CommonUtils.notEmpty(product.getProperty("productPurchaseURL"));
+    }
+
 }
