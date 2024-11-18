@@ -24,7 +24,7 @@ function addSnowFlakes(flakes: Flake[], width: number, count: number = 1) {
   for (let i = 0; i < count; i++) {
     const x = Math.floor(Math.random() * width),
       y = 0,
-      size = Math.random() * 3 + 2,
+      size = Math.random() * 4 + 2,
       speed = Math.random() * 1 + 0.33,
       opacity = Math.random() * 0.5 + 0.3;
 
@@ -52,10 +52,12 @@ function respawnFlake(flake: Flake, width: number) {
   flake.opacity = Math.random() * 0.5 + 0.3;
 }
 
-const MIN_EFFECTIVE_DISTANCE = 450;
+const MIN_EFFECTIVE_DISTANCE = 250;
 const FRAME_DURATION = 1000 / 60; // 60 FPS
 const FLAKE_ADDING_INTERVAL = 100; //ms
 const SNOWFALL_TIMEOUT = 60000; // 1 minute
+const BASE_FLAKES_COUNT = 250;
+const BASE_CANVAS_AREA = 1920 * 1080;
 
 export class Christmas {
   private isResizing = false;
@@ -81,10 +83,8 @@ export class Christmas {
   }
 
   calculateMaxFlakesCount(width: number, height: number) {
-    const baseFlakesCount = 330;
-    const baseArea = 1920 * 1080;
     const currentArea = width * height;
-    this.maxFlakesCount = Math.round((currentArea / baseArea) * baseFlakesCount);
+    this.maxFlakesCount = Math.round((currentArea / BASE_CANVAS_AREA) * BASE_FLAKES_COUNT);
   }
 
   createCanvas() {
@@ -194,14 +194,14 @@ export class Christmas {
       const dist = Math.sqrt(dx * dx + dy * dy);
 
       if (dist < MIN_EFFECTIVE_DISTANCE && dist > 20 && this.isMouseMoving) {
-        const force = MIN_EFFECTIVE_DISTANCE / ((dist * dist) / 5);
+        const force = MIN_EFFECTIVE_DISTANCE / ((dist * dist) / 10);
 
         const xcomp = (x - x2) / dist;
         const ycomp = (y - y2) / dist;
         const deltaV = force / 2;
 
-        flake.velX += deltaV * xcomp;
-        flake.velY += deltaV * ycomp;
+        flake.velX += deltaV * xcomp * Math.random() * 0.8;
+        flake.velY += deltaV * ycomp * Math.random() * 0.8;
       } else {
         if (flake.velY < flake.speed) {
           flake.velY = flake.speed;
@@ -209,12 +209,12 @@ export class Christmas {
         flake.velX += Math.cos((flake.step += Math.random() * 0.03)) * flake.stepSize;
       }
 
-      flake.velY = Math.min(flake.velY, 5);
+      flake.velY = Math.min(flake.velY, 3);
 
       flake.velX *= 0.98;
       flake.velY *= 0.99;
 
-      this.ctx.fillStyle = flake.velY > 2 ? 'rgba(187,238,255,1)' : 'rgba(153,204,255,' + flake.opacity + ')';
+      this.ctx.fillStyle = flake.velY > 1.8 ? 'rgba(187,238,255,1)' : 'rgba(153,204,255,' + flake.opacity + ')';
       flake.y += flake.velY;
       flake.x += flake.velX;
 
