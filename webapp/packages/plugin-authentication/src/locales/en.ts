@@ -26,6 +26,7 @@ export default [
   ['authentication_identity_provider_dialog_subtitle', 'Choose configuration you want to sign in with'],
 
   ['authentication_user_name', 'Username'],
+  ['authentication_user_name_description', "User's identifier is stored in lowercase"],
   ['authentication_user_role', 'Role'],
   ['authentication_user_credentials', 'Credentials'],
   ['authentication_user_meta_parameters', 'Parameters'],

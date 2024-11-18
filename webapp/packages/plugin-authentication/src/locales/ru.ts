@@ -26,6 +26,7 @@ export default [
   ['authentication_identity_provider_dialog_subtitle', 'Выберите конфигурацию с помощью которой вы хотите войти'],
 
   ['authentication_user_name', 'Имя'],
+  ['authentication_user_name_description', 'Идентификатор пользователя хранится в нижнем регистре'],
   ['authentication_user_role', 'Роль'],
   ['authentication_user_credentials', 'Учетные данные'],
   ['authentication_user_meta_parameters', 'Параметры'],
