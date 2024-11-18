@@ -17,6 +17,7 @@ type Flake = {
   angle: number;
   velY: any;
   velX: number;
+  shape: number;
   opacity: number;
 };
 
@@ -24,12 +25,13 @@ function addSnowFlakes(flakes: Flake[], width: number, count: number = 1) {
   for (let i = 0; i < count; i++) {
     const x = Math.floor(Math.random() * width),
       y = 0,
-      size = Math.random() * 4 + 2,
+      size = Math.random() * 5 + 2.5,
       speed = Math.random() * 1 + 0.33,
       opacity = Math.random() * 0.5 + 0.3;
 
     flakes.push({
       speed: speed,
+      shape: Math.floor(Math.random() * 5 + 5),
       velY: speed,
       velX: 0,
       x: x,
@@ -144,6 +146,34 @@ export class Christmas {
     }
   };
 
+  drawSnowflake(flake: Flake) {
+    if (!this.ctx) {
+      return;
+    }
+
+    const { x, y, size, opacity, velY, shape } = flake;
+
+    this.ctx.save();
+    this.ctx.translate(x, y);
+    this.ctx.rotate(flake.angle);
+    this.ctx.strokeStyle = velY > 1.8 ? 'rgba(187,238,255,1)' : 'rgba(153,204,255,' + opacity + ')';
+    this.ctx.lineWidth = 2;
+
+    for (let i = 0; i < shape; i++) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(0, 0);
+      this.ctx.lineTo(0, -size);
+      this.ctx.moveTo(0, -size / 2);
+      this.ctx.lineTo(size / 4, -size / 2.5);
+      this.ctx.moveTo(0, -size / 2);
+      this.ctx.lineTo(-size / 4, -size / 2.5);
+      this.ctx.stroke();
+      this.ctx.rotate(Math.PI / (shape / 2));
+    }
+
+    this.ctx.restore();
+  }
+
   snow = (timestamp: number) => {
     if (!this.ctx || !this.canvas) {
       return;
@@ -214,7 +244,6 @@ export class Christmas {
       flake.velX *= 0.98;
       flake.velY *= 0.99;
 
-      this.ctx.fillStyle = flake.velY > 1.8 ? 'rgba(187,238,255,1)' : 'rgba(153,204,255,' + flake.opacity + ')';
       flake.y += flake.velY;
       flake.x += flake.velX;
 
@@ -228,9 +257,7 @@ export class Christmas {
         }
       }
 
-      this.ctx.beginPath();
-      this.ctx.arc(flake.x, flake.y, flake.size, 0, Math.PI * 2);
-      this.ctx.fill();
+      this.drawSnowflake(flake);
     }
 
     requestAnimationFrame(this.snow);
