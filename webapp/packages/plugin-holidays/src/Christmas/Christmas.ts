@@ -43,8 +43,9 @@ function addSnowFlakes(flakes: Flake[], width: number, count: number = 1) {
   }
 }
 
-function respawnFlake(flake: Flake) {
+function respawnFlake(flake: Flake, width: number) {
   flake.y = 0;
+  flake.x = Math.floor(Math.random() * width);
   flake.speed = Math.random() * 0.5 + 0.4;
   flake.velY = flake.speed;
   flake.velX = 0;
@@ -219,11 +220,11 @@ export class Christmas {
 
       if (this.isSnowFalling && !this.isResizing) {
         if (flake.y >= this.canvas.height || flake.y <= 0) {
-          respawnFlake(flake);
+          respawnFlake(flake, this.canvas.width);
         }
 
         if (flake.x >= this.canvas.width || flake.x <= 0) {
-          respawnFlake(flake);
+          respawnFlake(flake, this.canvas.width);
         }
       }
 
