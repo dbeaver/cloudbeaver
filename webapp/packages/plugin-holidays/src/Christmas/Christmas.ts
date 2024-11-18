@@ -68,6 +68,7 @@ export class Christmas {
   private canvas: HTMLCanvasElement | null = null;
   private maxFlakesCount = 0;
   private stopTimeoutId: number | undefined = undefined;
+  private _isRunning = false;
   public isSnowFalling = false;
 
   constructor() {
@@ -89,7 +90,6 @@ export class Christmas {
     this.canvas = document.createElement('canvas');
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
-    this.canvas.id = 'christmas';
     this.canvas.style.position = 'fixed';
     this.canvas.style.top = '0';
     this.canvas.style.left = '0';
@@ -167,6 +167,7 @@ export class Christmas {
         document.body.removeChild(this.canvas);
         this.canvas = null;
         this.ctx = null;
+        this._isRunning = false;
       }
       return;
     }
@@ -247,7 +248,10 @@ export class Christmas {
     window?.addEventListener('mousemove', this.onMouseMove);
     window.addEventListener('resize', this.onResize);
 
-    this.snow(this.lastFrameTime);
+    if (!this._isRunning) {
+      this._isRunning = true;
+      this.snow(this.lastFrameTime);
+    }
   });
 
   stop = action(() => {
