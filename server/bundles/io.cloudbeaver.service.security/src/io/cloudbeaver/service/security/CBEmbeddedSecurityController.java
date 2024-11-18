@@ -851,8 +851,13 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
         List<String[]> transformedCredentials;
         WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
+        if (authProvider.isCaseInsensitive() && !isSubjectExists(userId) && isSubjectExists(userId.toLowerCase())) {
+            log.warn("User with id '" + userId + "' not found, credentials will be set for the user: " + userId.toLowerCase());
+            userId = userId.toLowerCase();
+        }
         try {
             SMAuthCredentialsProfile credProfile = getCredentialProfileByParameters(authProvider, credentials.keySet());
+            String finalUserId = userId;
             transformedCredentials = credentials.entrySet().stream().map(cred -> {
                 String propertyName = cred.getKey();
                 AuthPropertyDescriptor property = credProfile.getCredentialParameter(propertyName);
@@ -860,7 +865,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     return null;
                 }
                 String encodedValue = CommonUtils.toString(cred.getValue());
-                encodedValue = property.getEncryption().encrypt(userId, encodedValue);
+                encodedValue = property.getEncryption().encrypt(finalUserId, encodedValue);
                 return new String[]{propertyName, encodedValue};
             }).toList();
         } catch (Exception e) {
