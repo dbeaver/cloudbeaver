@@ -54,6 +54,7 @@ function respawnFlake(flake: Flake) {
 const MIN_EFFECTIVE_DISTANCE = 450;
 const FRAME_DURATION = 1000 / 60; // 60 FPS
 const FLAKE_ADDING_INTERVAL = 100; //ms
+const SNOWFALL_TIMEOUT = 60000; // 1 minute
 
 export class Christmas {
   private isResizing = false;
@@ -66,6 +67,7 @@ export class Christmas {
   private ctx: CanvasRenderingContext2D | null = null;
   private canvas: HTMLCanvasElement | null = null;
   private maxFlakesCount = 0;
+  private stopTimeoutId: number | undefined = undefined;
   public isSnowFalling = false;
 
   constructor() {
@@ -84,11 +86,15 @@ export class Christmas {
   }
 
   createCanvas() {
-    import('./Christmas.module.css');
     this.canvas = document.createElement('canvas');
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
     this.canvas.id = 'christmas';
+    this.canvas.style.position = 'fixed';
+    this.canvas.style.top = '0';
+    this.canvas.style.left = '0';
+    this.canvas.style.pointerEvents = 'none';
+    this.canvas.style.zIndex = '1';
     document.body.appendChild(this.canvas);
     this.ctx = this.canvas.getContext('2d');
   }
@@ -195,11 +201,13 @@ export class Christmas {
         flake.velX += deltaV * xcomp;
         flake.velY += deltaV * ycomp;
       } else {
-        if (flake.velY <= flake.speed) {
+        if (flake.velY < flake.speed) {
           flake.velY = flake.speed;
         }
         flake.velX += Math.cos((flake.step += Math.random() * 0.03)) * flake.stepSize;
       }
+
+      flake.velY = Math.min(flake.velY, 5);
 
       flake.velX *= 0.98;
       flake.velY *= 0.99;
@@ -233,7 +241,7 @@ export class Christmas {
       this.createCanvas();
     }
 
-    setTimeout(this.autoStop, 60000);
+    this.stopTimeoutId = window.setTimeout(this.autoStop, SNOWFALL_TIMEOUT);
 
     document?.addEventListener('mouseleave', this.onMouseLeave);
     window?.addEventListener('mousemove', this.onMouseMove);
@@ -247,5 +255,6 @@ export class Christmas {
     window.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('mouseleave', this.onMouseLeave);
     this.isSnowFalling = false;
+    clearTimeout(this.stopTimeoutId);
   });
 }

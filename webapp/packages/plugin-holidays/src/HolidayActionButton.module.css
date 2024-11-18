@@ -1,0 +1,26 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.holidayButton {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    filter 0.3s,
+    transform 0.3s ease-in-out;
+}
+
+.buttonActive {
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9));
+  transform: rotate(240deg);
+}

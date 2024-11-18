@@ -13,7 +13,6 @@ export const holidaysPlugin: PluginManifest = {
   },
   providers: [
     () => import('./HolidaysService.js').then(m => m.HolidaysService),
-    () => import('./Christmas/Christmas.js').then(m => m.Christmas),
     () => import('./Christmas/ChristmasService.js').then(m => m.ChristmasService),
   ],
 };

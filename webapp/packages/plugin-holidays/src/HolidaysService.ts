@@ -5,22 +5,29 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { AdministrationTopAppBarService } from '@cloudbeaver/plugin-administration';
+import { TopNavService } from '@cloudbeaver/plugin-top-app-bar';
 
 import type { IHoliday } from './IHoliday.js';
 
+const HolidayButton = importLazyComponent(() => import('./HolidayActionButton.js').then(m => m.HolidayActionButton));
+
 @injectable()
-export class HolidaysService {
+export class HolidaysService extends Bootstrap {
   private readonly holidays: IHoliday[] = [];
 
-  constructor() {}
-
-  celebrate() {
-    this.holiday?.startCelebration();
+  constructor(
+    private readonly topNavService: TopNavService,
+    private readonly administrationTopAppBarService: AdministrationTopAppBarService,
+  ) {
+    super();
   }
 
-  stopCelebration() {
-    this.holiday?.stopCelebration();
+  override register() {
+    this.topNavService.placeholder.add(HolidayButton, 4);
+    this.administrationTopAppBarService.placeholder.add(HolidayButton, 4);
   }
 
   addHoliday(holiday: IHoliday) {
@@ -29,13 +36,5 @@ export class HolidaysService {
 
   get holiday(): IHoliday | undefined {
     return this.holidays.find(holiday => holiday.isHoliday);
-  }
-
-  get isHoliday() {
-    return !!this.holiday;
-  }
-
-  get isCelebrating() {
-    return this.holiday?.isCelebrating;
   }
 }

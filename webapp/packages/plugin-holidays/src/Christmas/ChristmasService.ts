@@ -7,23 +7,22 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import type { HolidaysService } from '../HolidaysService.js';
+import { HolidaysService } from '../HolidaysService.js';
 import type { IHoliday } from '../IHoliday.js';
-import type { Christmas } from './Christmas.js';
+import { Christmas } from './Christmas.js';
 
 @injectable()
 export class ChristmasService extends Bootstrap implements IHoliday {
-  public name = 'Christmas';
-  public logoSrc = '/icons/logo_christmas.svg';
-  public iconSrc = '/icons/icon_christmas_action.svg';
-  public startDate = new Date(new Date().getFullYear(), 11, 1);
+  private readonly christmas: Christmas;
+  public name = 'Merry Christmas';
+  public logoSrc = '/icons/logo-christmas.svg';
+  public iconSrc = '/icons/christmas-action.svg';
+  public startDate = new Date(new Date().getFullYear(), 9, 1);
   public endDate = new Date(new Date().getFullYear(), 0, 7);
 
-  constructor(
-    private readonly holidayService: HolidaysService,
-    private readonly christmas: Christmas,
-  ) {
+  constructor(private readonly holidayService: HolidaysService) {
     super();
+    this.christmas = new Christmas();
   }
 
   override register(): void {
@@ -41,6 +40,7 @@ export class ChristmasService extends Bootstrap implements IHoliday {
   }
 
   startCelebration(): void {
+    console.log(this.christmas);
     this.christmas.start();
   }
 
