@@ -88,6 +88,9 @@
       "path": "../plugin-help/tsconfig.json"
     },
     {
+      "path": "../plugin-holidays/tsconfig.json"
+    },
+    {
       "path": "../plugin-localization/tsconfig.json"
     },
     {
