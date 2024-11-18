@@ -100,7 +100,7 @@ public class RPSessionHandler implements DBWSessionHandler {
         String fullName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_FULL_NAME), RPAuthProvider.X_FULL_NAME));
         String logoutUrl =  null;
         String teamDelimiter = DEFAULT_TEAM_DELIMITER;
-        if (configuration != null ) {
+        if (configuration != null) {
             logoutUrl = configuration.getParameter(RPConstants.PARAM_LOGOUT_URL);
             teamDelimiter = resolveParam(JSONUtils.getString(configuration.getParameters(),
                 RPConstants.PARAM_TEAM_DELIMITER), DEFAULT_TEAM_DELIMITER);
