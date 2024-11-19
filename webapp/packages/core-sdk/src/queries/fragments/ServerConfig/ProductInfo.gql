@@ -8,5 +8,6 @@ fragment ProductInfo on ServerConfig {
     buildTime
     releaseTime
     licenseInfo
+    productPurchaseURL
   }
 }
