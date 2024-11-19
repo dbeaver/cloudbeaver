@@ -41,7 +41,7 @@ export default [
   ['administration_configuration_wizard_configuration_security_public_credentials', 'Позволить сохранять приватные данные для пользователей'],
   [
     'administration_configuration_wizard_configuration_security_admin_credentials_description',
-    'Позволяет сохранять приватные данные для предварительно настроенных баз данных',
+    'Позволяет сохранять приватные данные для настроенных подключений',
   ],
   [
     'administration_configuration_wizard_configuration_security_public_credentials_description',
