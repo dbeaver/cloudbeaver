@@ -64,6 +64,9 @@
       "path": "../plugin-administration/tsconfig.json"
     },
     {
+      "path": "../plugin-holidays/tsconfig.json"
+    },
+    {
       "path": "../plugin-settings-menu/tsconfig.json"
     },
     {
