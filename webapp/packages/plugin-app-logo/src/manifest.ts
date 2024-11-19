@@ -7,9 +7,9 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-export const administrationTopAppBarPlugin: PluginManifest = {
+export const appLogoPlugin: PluginManifest = {
   info: {
-    name: 'Administration Top App Bar plugin',
+    name: 'App Logo plugin',
   },
   providers: [() => import('./PluginBootstrap.js').then(m => m.PluginBootstrap)],
 };

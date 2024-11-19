@@ -7,7 +7,16 @@
   },
   "references": [
     {
+      "path": "../core-blocks/tsconfig.json"
+    },
+    {
       "path": "../core-di/tsconfig.json"
+    },
+    {
+      "path": "../plugin-administration/tsconfig.json"
+    },
+    {
+      "path": "../plugin-top-app-bar/tsconfig.json"
     }
   ],
   "include": [

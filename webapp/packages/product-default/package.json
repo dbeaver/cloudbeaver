@@ -31,6 +31,7 @@
     "@cloudbeaver/core-localization": "^0",
     "@cloudbeaver/core-version-update": "^0",
     "@cloudbeaver/plugin-administration": "^0",
+    "@cloudbeaver/plugin-app-logo": "^0",
     "@cloudbeaver/plugin-authentication": "^0",
     "@cloudbeaver/plugin-authentication-administration": "^0",
     "@cloudbeaver/plugin-browser": "^0",
@@ -89,6 +90,7 @@
     "@cloudbeaver/plugin-user-profile-settings": "^0",
     "@cloudbeaver/plugin-version": "^0",
     "@cloudbeaver/plugin-version-update-administration": "^0",
+    "@cloudveaver/plugin-app-logo": "*",
     "react": "^18",
     "reflect-metadata": "^0"
   },

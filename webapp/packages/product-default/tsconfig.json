@@ -25,6 +25,9 @@
       "path": "../plugin-administration/tsconfig.json"
     },
     {
+      "path": "../plugin-app-logo/tsconfig.json"
+    },
+    {
       "path": "../plugin-authentication-administration/tsconfig.json"
     },
     {
