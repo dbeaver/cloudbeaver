@@ -211,7 +211,7 @@ export class PublicConnectionFormService {
     }
 
     try {
-      await this.connectionInfoResource.close(connectionKey);
+      await this.connectionsManagerService.closeConnectionAsync(connectionKey);
       await this.connectionsManagerService.requireConnection(connectionKey);
     } catch (exception: any) {
       this.notificationService.logException(exception, 'plugin_connections_connection_edit_reconnect_failed');
