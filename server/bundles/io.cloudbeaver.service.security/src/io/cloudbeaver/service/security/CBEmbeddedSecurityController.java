@@ -2786,6 +2786,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         Set<String> filteredSubjects = getFilteredSubjects(subjectIds);
         try (Connection dbCon = database.openConnection();
              JDBCTransaction txn = new JDBCTransaction(dbCon);
+             PreparedStatement checkStat = dbCon.prepareStatement(database.normalizeTableNames(
+                 "SELECT 1 FROM {table_prefix}CB_OBJECT_PERMISSIONS " +
+                     "WHERE OBJECT_ID = ? AND OBJECT_TYPE = ? AND SUBJECT_ID = ? AND PERMISSION = ?"));
              PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
                  "INSERT INTO {table_prefix}CB_OBJECT_PERMISSIONS" +
                      "(OBJECT_ID,OBJECT_TYPE,GRANT_TIME,GRANTED_BY,SUBJECT_ID,PERMISSION) "
@@ -2802,7 +2805,16 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         continue;
                     }
                     dbStat.setString(5, subjectId);
+                    checkStat.setString(1, objectId);
+                    checkStat.setString(2, objectType.name());
+                    checkStat.setString(3, subjectId);
                     for (String permission : permissions) {
+                        checkStat.setString(4, permission);
+                        try (ResultSet rs = checkStat.executeQuery()) {
+                            if (rs.next()) {
+                                continue;
+                            }
+                        }
                         dbStat.setString(6, permission);
                         dbStat.execute();
                     }
