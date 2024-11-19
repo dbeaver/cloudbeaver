@@ -22,7 +22,6 @@ import graphql.GraphQLError;
 import graphql.language.SourceLocation;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.sql.SQLState;
-import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.PrintWriter;
@@ -100,7 +99,7 @@ public class DBWebException extends DBException implements GraphQLError {
     @Override
     public Map<String, Object> getExtensions() {
         StringWriter buf = new StringWriter();
-        GeneralUtils.getRootCause(this).printStackTrace(new PrintWriter(buf, true));
+        CommonUtils.getRootCause(this).printStackTrace(new PrintWriter(buf, true));
 
         Map<String, Object> extensions = new LinkedHashMap<>();
         String stString = buf.toString();

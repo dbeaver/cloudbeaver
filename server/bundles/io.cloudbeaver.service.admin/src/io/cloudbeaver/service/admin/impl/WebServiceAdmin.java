@@ -161,12 +161,13 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (userName.isEmpty()) {
             throw new DBWebException("Empty user name");
         }
-        webSession.addInfoMessage("Create new user - " + userName);
+        String userId = userName.toLowerCase();
+        webSession.addInfoMessage("Create new user - " + userId);
 
         try {
             var securityController = webSession.getAdminSecurityController();
-            securityController.createUser(userName, Map.of(), enabled, authRole);
-            var smUser = securityController.getUserById(userName);
+            securityController.createUser(userId, Map.of(), enabled, authRole);
+            var smUser = securityController.getUserById(userId);
             return new AdminUserInfo(webSession, new WebUser(smUser));
         } catch (Exception e) {
             throw new DBWebException("Error creating new user", e);

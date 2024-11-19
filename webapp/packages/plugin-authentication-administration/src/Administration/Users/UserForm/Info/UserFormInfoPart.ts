@@ -34,6 +34,8 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
       teams: [],
       authRole: '',
     });
+
+    this.disableUser = this.disableUser.bind(this);
   }
 
   protected override format(data: IFormState<IUserFormState>, contexts: IExecutionContextProvider<IFormState<IUserFormState>>): void | Promise<void> {
@@ -74,6 +76,12 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     return this.loaded;
   }
 
+  async disableUser() {
+    await this.usersResource.enableUser(this.state.userId, false, true);
+    this.state.enabled = false;
+    this.initialState.enabled = false;
+  }
+
   override get isChanged(): boolean {
     if (!this.loaded) {
       return false;
@@ -96,6 +104,8 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
         authRole: getTransformedAuthRole(this.state.authRole),
         enabled: this.state.enabled,
       });
+      // userId is modified by backend and may not match value we sent, so we need to update the state
+      this.state.userId = user.userId;
       this.initialState.userId = user.userId;
       this.formState.setMode(FormMode.Edit);
     }

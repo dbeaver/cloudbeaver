@@ -529,7 +529,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         }
 
         if (isConfigurationMode()) {
-            finishSecurityServiceConfiguration(adminName, adminPassword, authInfoList);
+            finishSecurityServiceConfiguration(adminName.toLowerCase(), adminPassword, authInfoList);
         }
 
         // Save runtime configuration
