@@ -7,7 +7,7 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
-import { debounce } from '@cloudbeaver/core-utils';
+import { debounce, throttle } from '@cloudbeaver/core-utils';
 
 type Flake = {
   x: number;
@@ -56,7 +56,7 @@ function respawnFlake(flake: Flake, width: number) {
   flake.opacity = Math.random() * 0.5 + 0.3;
 }
 
-const MIN_EFFECTIVE_DISTANCE = 250;
+const MIN_EFFECTIVE_DISTANCE = 300;
 const FRAME_DURATION = 1000 / 60; // 60 FPS
 const FLAKE_ADDING_INTERVAL = 100; //ms
 const SNOWFALL_TIMEOUT = 60000; // 1 minute
@@ -68,12 +68,13 @@ export class Christmas {
   private flakes: Flake[] = [];
   private lastFrameTime = 0;
   private lastFlakeTime = 0;
-  private mX = -300;
-  private mY = -300;
+  private mX = -MIN_EFFECTIVE_DISTANCE;
+  private mY = -MIN_EFFECTIVE_DISTANCE;
   private ctx: CanvasRenderingContext2D | null = null;
   private canvas: HTMLCanvasElement | null = null;
   private maxFlakesCount = 0;
   private stopTimeoutId: number | undefined = undefined;
+  private mouseMovingTimeoutId: number | undefined = undefined;
   private _isRunning = false;
   public isSnowFalling = false;
 
@@ -103,14 +104,16 @@ export class Christmas {
     this.ctx = this.canvas.getContext('2d');
   }
 
-  handleMouseMove = () => {
-    if (!this.isMouseMoving) {
-      this.isMouseMoving = true;
-      setTimeout(() => {
-        this.isMouseMoving = false;
-      }, 200);
+  handleMouseMove = throttle(() => {
+    this.isMouseMoving = true;
+
+    if (this.mouseMovingTimeoutId) {
+      clearTimeout(this.mouseMovingTimeoutId);
     }
-  };
+    this.mouseMovingTimeoutId = window.setTimeout(() => {
+      this.isMouseMoving = false;
+    }, 100);
+  }, 60);
 
   onResize = debounce(() => {
     this.calculateMaxFlakesCount(window.innerWidth, window.innerHeight);
@@ -127,8 +130,8 @@ export class Christmas {
   };
 
   onMouseLeave = () => {
-    this.mX = -300;
-    this.mY = -300;
+    this.mX = -MIN_EFFECTIVE_DISTANCE;
+    this.mY = -MIN_EFFECTIVE_DISTANCE;
   };
 
   autoStop = () => {

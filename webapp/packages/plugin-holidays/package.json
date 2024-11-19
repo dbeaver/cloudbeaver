@@ -20,6 +20,7 @@
   "dependencies": {
     "@cloudbeaver/core-blocks": "^0",
     "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-utils": "^0",
     "@cloudbeaver/plugin-administration": "^0",
     "@cloudbeaver/plugin-top-app-bar": "^0",
     "mobx": "^6",
