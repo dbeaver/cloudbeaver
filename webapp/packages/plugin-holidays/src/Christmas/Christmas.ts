@@ -190,7 +190,7 @@ export class Christmas {
     }
 
     if (!this.isSnowFalling && this.flakes.length > 0) {
-      this.flakes.pop();
+      this.flakes.length = this.flakes.length - Math.ceil(this.flakes.length / 100);
     }
 
     if (!this.isSnowFalling && this.flakes.length === 0) {
