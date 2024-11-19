@@ -7,6 +7,8 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
+import { debounce } from '@cloudbeaver/core-utils';
+
 type Flake = {
   x: number;
   y: number;
@@ -62,7 +64,6 @@ const BASE_FLAKES_COUNT = 250;
 const BASE_CANVAS_AREA = 1920 * 1080;
 
 export class Christmas {
-  private isResizing = false;
   private isMouseMoving = false;
   private flakes: Flake[] = [];
   private lastFrameTime = 0;
@@ -102,15 +103,6 @@ export class Christmas {
     this.ctx = this.canvas.getContext('2d');
   }
 
-  handleResize = () => {
-    if (!this.isResizing) {
-      this.isResizing = true;
-      setTimeout(() => {
-        this.isResizing = false;
-      }, 600);
-    }
-  };
-
   handleMouseMove = () => {
     if (!this.isMouseMoving) {
       this.isMouseMoving = true;
@@ -120,14 +112,13 @@ export class Christmas {
     }
   };
 
-  onResize = () => {
-    this.handleResize();
+  onResize = debounce(() => {
     this.calculateMaxFlakesCount(window.innerWidth, window.innerHeight);
     if (this.canvas) {
       this.canvas.width = window.innerWidth;
       this.canvas.height = window.innerHeight;
     }
-  };
+  }, 500);
 
   onMouseMove = (e: MouseEvent) => {
     this.handleMouseMove();
@@ -179,12 +170,7 @@ export class Christmas {
       return;
     }
 
-    if (
-      this.isSnowFalling &&
-      !this.isResizing &&
-      this.flakes.length < this.maxFlakesCount &&
-      timestamp - this.lastFlakeTime > FLAKE_ADDING_INTERVAL
-    ) {
+    if (this.isSnowFalling && this.flakes.length < this.maxFlakesCount && timestamp - this.lastFlakeTime > FLAKE_ADDING_INTERVAL) {
       addSnowFlakes(this.flakes, this.canvas.width, 2);
       this.lastFlakeTime = timestamp;
     }
@@ -247,7 +233,7 @@ export class Christmas {
       flake.y += flake.velY;
       flake.x += flake.velX;
 
-      if (this.isSnowFalling && !this.isResizing) {
+      if (this.isSnowFalling) {
         if (flake.y >= this.canvas.height || flake.y <= 0) {
           respawnFlake(flake, this.canvas.width);
         }
