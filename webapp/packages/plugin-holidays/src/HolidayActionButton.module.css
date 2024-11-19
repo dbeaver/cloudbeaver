@@ -22,5 +22,5 @@
 
 .buttonActive {
   filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9));
-  transform: rotate(240deg);
+  transform: rotate(180deg);
 }
