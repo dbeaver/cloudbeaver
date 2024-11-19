@@ -70,7 +70,10 @@ public class GraphQLLoggerUtil {
             String key = entry.getKey();
             Object value = entry.getValue();
 
-            if (PROHIBITED_VARIABLES.contains(key)) {
+            boolean isProhibited = PROHIBITED_VARIABLES.stream()
+                .anyMatch(prohibitedKey -> key.toLowerCase().contains(prohibitedKey.toLowerCase()));
+
+            if (isProhibited) {
                 result.append(key).append(": ").append("******** ");
                 continue;
             }
