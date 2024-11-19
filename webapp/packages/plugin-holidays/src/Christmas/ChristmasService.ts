@@ -15,8 +15,8 @@ import { Christmas } from './Christmas.js';
 export class ChristmasService extends Bootstrap implements IHoliday {
   private readonly christmas: Christmas;
   public name = 'Merry Christmas';
-  public logoSrc = '/icons/logo-christmas.svg';
-  public iconSrc = '/icons/christmas-action.svg';
+  public logoSrc = '/icons/christmas_logo.svg';
+  public iconSrc = '/icons/christmas_action.svg';
   public startDate = new Date(new Date().getFullYear(), 9, 1);
   public endDate = new Date(new Date().getFullYear(), 0, 7);
 
