@@ -7,4 +7,6 @@
  */
 import { holidaysPlugin } from './manifest.js';
 
+export * from './HolidaysService.js';
+
 export default holidaysPlugin;
