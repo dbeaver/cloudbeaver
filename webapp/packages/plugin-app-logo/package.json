@@ -37,6 +37,7 @@
     "@cloudbeaver/core-version": "^0",
     "@cloudbeaver/core-view": "^0",
     "@cloudbeaver/plugin-administration": "^0",
+    "@cloudbeaver/plugin-holidays": "^0",
     "@cloudbeaver/plugin-settings-menu": "^0",
     "@cloudbeaver/plugin-top-app-bar": "^0",
     "mobx": "^6",
