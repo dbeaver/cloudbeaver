@@ -41,7 +41,7 @@ function addSnowFlakes(flakes: Flake[], width: number, count: number = 1) {
       size: size,
       stepSize: Math.random() / 30,
       step: 0,
-      angle: 180,
+      angle: Math.random() < 0.5 ? 1 : -1,
       opacity: opacity,
     });
   }
@@ -166,6 +166,9 @@ export class Christmas {
     }
 
     this.ctx.restore();
+
+    const addAngle = 0.1 / shape + 0.02 * velY;
+    flake.angle = flake.angle > 0 ? flake.angle + addAngle : flake.angle - addAngle;
   }
 
   snow = (timestamp: number) => {
