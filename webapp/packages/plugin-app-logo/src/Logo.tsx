@@ -28,5 +28,5 @@ export const Logo = observer(function Logo() {
 
   const title = isSameVersion ? backendVersionTitle : commonVersionTitle;
 
-  return <AppLogo title={title} iconSrc={holiday?.logoSrc ?? undefined} onClick={() => screenService.navigateToRoot()} />;
+  return <AppLogo title={title} iconSrc={holiday?.logoSrc} onClick={() => screenService.navigateToRoot()} />;
 });
