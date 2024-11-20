@@ -75,7 +75,7 @@ export class Christmas {
   private maxFlakesCount = 0;
   private stopTimeoutId: number | undefined = undefined;
   private mouseMovingTimeoutId: number | undefined = undefined;
-  private _isRunning = false;
+  private isRunning = false;
   public isSnowFalling = false;
 
   constructor() {
@@ -209,7 +209,7 @@ export class Christmas {
       document.body.removeChild(this.canvas);
       this.canvas = null;
       this.ctx = null;
-      this._isRunning = false;
+      this.isRunning = false;
     }
   }
 
@@ -273,8 +273,8 @@ export class Christmas {
     window.addEventListener('mousemove', this.onMouseMove);
     window.addEventListener('resize', this.onResize);
 
-    if (!this._isRunning) {
-      this._isRunning = true;
+    if (!this.isRunning) {
+      this.isRunning = true;
       this.snow.call(this, this.lastFrameTime);
     }
   }
