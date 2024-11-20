@@ -25,10 +25,10 @@
       "path": "../plugin-administration/tsconfig.json"
     },
     {
-      "path": "../plugin-app-logo/tsconfig.json"
+      "path": "../plugin-app-logo-administration/tsconfig.json"
     },
     {
-      "path": "../plugin-app-logo-administration/tsconfig.json"
+      "path": "../plugin-app-logo/tsconfig.json"
     },
     {
       "path": "../plugin-authentication-administration/tsconfig.json"
@@ -92,6 +92,9 @@
     },
     {
       "path": "../plugin-help/tsconfig.json"
+    },
+    {
+      "path": "../plugin-holidays-administration/tsconfig.json"
     },
     {
       "path": "../plugin-holidays/tsconfig.json"
@@ -205,6 +208,16 @@
       "path": "../plugin-version/tsconfig.json"
     }
   ],
-  "include": ["__custom_mocks__/**/*", "src/**/*", "src/**/*.json", "src/**/*.css", "src/**/*.scss"],
-  "exclude": ["**/node_modules", "lib/**/*", "dist/**/*"]
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "lib/**/*",
+    "dist/**/*"
+  ]
 }

@@ -16,9 +16,6 @@
       "path": "../core-utils/tsconfig.json"
     },
     {
-      "path": "../plugin-administration/tsconfig.json"
-    },
-    {
       "path": "../plugin-top-app-bar/tsconfig.json"
     }
   ],
