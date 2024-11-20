@@ -5,10 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { holidaysPlugin } from './manifest.js';
+import { holidaysAdministrationPlugin } from './manifest.js';
 
-export * from './HolidaysService.js';
-export * from './HolidayActionButton.js';
-
-export { holidaysPlugin };
-export default holidaysPlugin;
+export { holidaysAdministrationPlugin };
+export default holidaysAdministrationPlugin;

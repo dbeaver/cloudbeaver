@@ -7,7 +7,6 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { AdministrationTopAppBarService } from '@cloudbeaver/plugin-administration';
 import { TopNavService } from '@cloudbeaver/plugin-top-app-bar';
 
 import type { IHoliday } from './IHoliday.js';
@@ -18,16 +17,12 @@ const HolidayButton = importLazyComponent(() => import('./HolidayActionButton.js
 export class HolidaysService extends Bootstrap {
   private readonly holidays: IHoliday[] = [];
 
-  constructor(
-    private readonly topNavService: TopNavService,
-    private readonly administrationTopAppBarService: AdministrationTopAppBarService,
-  ) {
+  constructor(private readonly topNavService: TopNavService) {
     super();
   }
 
   override register() {
     this.topNavService.placeholder.add(HolidayButton, 4);
-    this.administrationTopAppBarService.placeholder.add(HolidayButton, 4);
   }
 
   addHoliday(holiday: IHoliday) {

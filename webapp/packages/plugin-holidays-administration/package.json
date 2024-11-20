@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-holidays",
+  "name": "@cloudbeaver/plugin-holidays-administration",
   "type": "module",
   "sideEffects": [
     "src/**/*.css",
@@ -20,16 +20,11 @@
   "dependencies": {
     "@cloudbeaver/core-blocks": "^0",
     "@cloudbeaver/core-di": "^0",
-    "@cloudbeaver/core-utils": "^0",
-    "@cloudbeaver/plugin-top-app-bar": "^0",
-    "mobx": "^6",
-    "mobx-react-lite": "^4",
-    "react": "^18"
+    "@cloudbeaver/plugin-holidays": "^0",
+    "@cloudbeaver/plugin-administration": "^0"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/react": "*",
-    "typescript": "^5",
-    "typescript-plugin-css-modules": "^5"
+    "typescript": "^5"
   }
 }
