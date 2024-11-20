@@ -7,7 +7,7 @@
  */
 import { computed, observable } from 'mobx';
 
-import { useAutoLoad, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useAutoLoad, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type ISettingDescription, ROOT_SETTINGS_GROUP, SettingsGroup, SettingsManagerService } from '@cloudbeaver/core-settings';
 
@@ -18,6 +18,7 @@ interface ISettings {
 
 export function useSettings(accessor?: string[]): ISettings {
   const settingsManagerService = useService(SettingsManagerService);
+  const translate = useTranslate();
 
   useAutoLoad(useSettings, settingsManagerService.loaders);
 
@@ -27,7 +28,13 @@ export function useSettings(accessor?: string[]): ISettings {
         const map = new Map();
         const settings = this.settingsManagerService.activeSettings
           .filter(setting => accessor?.some(value => setting.access.scope.includes(value)))
-          .sort((a, b) => a.name.localeCompare(b.name));
+          .sort((a, b) => {
+            if (a.type === b.type) {
+              return translate(a.name).localeCompare(translate(b.name));
+            } else {
+              return a.type - b.type;
+            }
+          });
 
         for (const setting of settings) {
           map.set(setting.group, [...(map.get(setting.group) || []), setting]);
@@ -47,7 +54,9 @@ export function useSettings(accessor?: string[]): ISettings {
         return groups;
       },
       groupChildren(id: string) {
-        return (ROOT_SETTINGS_GROUP.get(id)?.subGroups || []).filter(group => this.groups.has(group)).sort((a, b) => a.name.localeCompare(b.name));
+        return (ROOT_SETTINGS_GROUP.get(id)?.subGroups || [])
+          .filter(group => this.groups.has(group))
+          .sort((a, b) => translate(a.name).localeCompare(translate(b.name)));
       },
     }),
     {
