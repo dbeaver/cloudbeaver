@@ -2,10 +2,9 @@ FROM dbeaver/base-java
 
 MAINTAINER DBeaver Corp, devops@dbeaver.com
 
-RUN useradd -m -s /bin/bash dbeaver && \ 
-    apt-get update; \
-    apt-get upgrade -y; 
-    
+RUN apt-get update && \
+    apt-get upgrade -y 
+
 COPY cloudbeaver /opt/cloudbeaver
 COPY scripts/launch-product.sh /opt/cloudbeaver/launch-product.sh
 RUN chmod +x /opt/cloudbeaver/launch-product.sh
