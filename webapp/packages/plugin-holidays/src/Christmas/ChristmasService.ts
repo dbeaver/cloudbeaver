@@ -17,7 +17,7 @@ export class ChristmasService extends Bootstrap implements IHoliday {
   public name = 'Merry Christmas';
   public logoSrc = '/icons/christmas_logo.svg';
   public iconSrc = '/icons/christmas_action.svg';
-  public startDate = new Date(new Date().getFullYear(), 10, 12); // December, 12
+  public startDate = new Date(new Date().getFullYear(), 11, 12); // December, 12
   public endDate = new Date(new Date().getFullYear(), 0, 7); // January, 7
 
   constructor(private readonly holidayService: HolidaysService) {
@@ -29,21 +29,21 @@ export class ChristmasService extends Bootstrap implements IHoliday {
     this.holidayService.addHoliday(this);
   }
 
-  get isCelebrating() {
+  get isEffectsActive() {
     return this.christmas.isSnowFalling;
   }
 
-  get isHoliday() {
+  get isOngoingHoliday() {
     const now = new Date();
 
     return now >= this.startDate || now <= this.endDate;
   }
 
-  startCelebration(): void {
+  startEffects(): void {
     this.christmas.start();
   }
 
-  stopCelebration(): void {
+  stopEffects(): void {
     this.christmas.stop();
   }
 }

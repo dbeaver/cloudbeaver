@@ -30,6 +30,6 @@ export class HolidaysService extends Bootstrap {
   }
 
   get holiday(): IHoliday | undefined {
-    return this.holidays.find(holiday => holiday.isHoliday);
+    return this.holidays.find(holiday => holiday.isOngoingHoliday);
   }
 }

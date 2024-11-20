@@ -17,10 +17,10 @@ export const HolidayActionButton = observer(function HolidayActionButton() {
   const { holiday } = useService(HolidaysService);
 
   function handleHolidayActionButtonClick() {
-    if (holiday?.isCelebrating) {
-      holiday.stopCelebration();
+    if (holiday?.isEffectsActive) {
+      holiday.stopEffects();
     } else {
-      holiday?.startCelebration();
+      holiday?.startEffects();
     }
   }
 
@@ -30,7 +30,7 @@ export const HolidayActionButton = observer(function HolidayActionButton() {
 
   return (
     <button
-      className={s(holidayStyles, { holidayButton: true, buttonActive: holiday.isCelebrating })}
+      className={s(holidayStyles, { holidayButton: true, buttonActive: holiday.isEffectsActive })}
       title={holiday.name}
       onClick={handleHolidayActionButtonClick}
     >

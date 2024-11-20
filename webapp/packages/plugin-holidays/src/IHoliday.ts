@@ -8,12 +8,11 @@
 export interface IHoliday {
   startDate: Date;
   endDate: Date;
-  isHoliday: boolean;
+  isOngoingHoliday: boolean;
   name: string;
   logoSrc: string;
   iconSrc: string;
-  activeIconSrc?: string;
-  isCelebrating: boolean;
-  startCelebration(): void;
-  stopCelebration(): void;
+  isEffectsActive: boolean;
+  startEffects(): void;
+  stopEffects(): void;
 }
