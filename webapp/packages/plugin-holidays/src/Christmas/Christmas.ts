@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import { debounce, throttle } from '@cloudbeaver/core-utils';
 
@@ -81,8 +81,6 @@ export class Christmas {
   constructor() {
     makeObservable(this, {
       isSnowFalling: observable,
-      start: action,
-      stop: action,
     });
   }
 
@@ -134,11 +132,11 @@ export class Christmas {
     this.mY = -MIN_EFFECTIVE_DISTANCE;
   };
 
-  autoStop = () => {
+  autoStop() {
     if (this.isSnowFalling) {
-      this.stop();
+      this.stop.call(this);
     }
-  };
+  }
 
   drawSnowflake(flake: Flake) {
     if (!this.ctx) {
@@ -171,7 +169,51 @@ export class Christmas {
     flake.angle = flake.angle > 0 ? flake.angle + addAngle : flake.angle - addAngle;
   }
 
-  snow = (timestamp: number) => {
+  applyForces(flake: Flake) {
+    const x = this.mX;
+    const y = this.mY;
+    const x2 = flake.x;
+    const y2 = flake.y;
+
+    const dx = x2 - x;
+    const dy = y2 - y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist < MIN_EFFECTIVE_DISTANCE && dist > 20 && this.isMouseMoving) {
+      const force = MIN_EFFECTIVE_DISTANCE / ((dist * dist) / 10);
+
+      const xcomp = (x - x2) / dist;
+      const ycomp = (y - y2) / dist;
+      const deltaV = force / 2;
+
+      flake.velX += deltaV * xcomp * Math.random() * 0.8;
+      flake.velY += deltaV * ycomp * Math.random() * 0.8;
+    } else {
+      if (flake.velY < flake.speed) {
+        flake.velY = flake.speed;
+      }
+      flake.velX += Math.cos((flake.step += Math.random() * 0.03)) * flake.stepSize;
+    }
+
+    flake.velY = Math.min(flake.velY, 3);
+
+    flake.velX *= 0.98;
+    flake.velY *= 0.99;
+
+    flake.y += flake.velY;
+    flake.x += flake.velX;
+  }
+
+  clean() {
+    if (this.canvas) {
+      document.body.removeChild(this.canvas);
+      this.canvas = null;
+      this.ctx = null;
+      this._isRunning = false;
+    }
+  }
+
+  snow(timestamp: number) {
     if (!this.ctx || !this.canvas) {
       return;
     }
@@ -186,17 +228,12 @@ export class Christmas {
     }
 
     if (!this.isSnowFalling && this.flakes.length === 0) {
-      if (this.canvas) {
-        document.body.removeChild(this.canvas);
-        this.canvas = null;
-        this.ctx = null;
-        this._isRunning = false;
-      }
+      this.clean();
       return;
     }
 
     if (timestamp - this.lastFrameTime < FRAME_DURATION) {
-      requestAnimationFrame(this.snow);
+      requestAnimationFrame(this.snow.bind(this));
       return;
     }
     this.lastFrameTime = timestamp;
@@ -204,40 +241,8 @@ export class Christmas {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     for (let i = 0; i < this.flakes.length; i++) {
-      const flake = this.flakes[i]!;
-
-      const x = this.mX;
-      const y = this.mY;
-      const x2 = flake.x;
-      const y2 = flake.y;
-
-      const dx = x2 - x;
-      const dy = y2 - y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist < MIN_EFFECTIVE_DISTANCE && dist > 20 && this.isMouseMoving) {
-        const force = MIN_EFFECTIVE_DISTANCE / ((dist * dist) / 10);
-
-        const xcomp = (x - x2) / dist;
-        const ycomp = (y - y2) / dist;
-        const deltaV = force / 2;
-
-        flake.velX += deltaV * xcomp * Math.random() * 0.8;
-        flake.velY += deltaV * ycomp * Math.random() * 0.8;
-      } else {
-        if (flake.velY < flake.speed) {
-          flake.velY = flake.speed;
-        }
-        flake.velX += Math.cos((flake.step += Math.random() * 0.03)) * flake.stepSize;
-      }
-
-      flake.velY = Math.min(flake.velY, 3);
-
-      flake.velX *= 0.98;
-      flake.velY *= 0.99;
-
-      flake.y += flake.velY;
-      flake.x += flake.velX;
+      const flake = this.flakes[i] as Flake;
+      this.applyForces(flake);
 
       if (this.isSnowFalling) {
         if (flake.y >= this.canvas.height || flake.y <= 0) {
@@ -252,10 +257,10 @@ export class Christmas {
       this.drawSnowflake(flake);
     }
 
-    requestAnimationFrame(this.snow);
-  };
+    requestAnimationFrame(this.snow.bind(this));
+  }
 
-  start = action(() => {
+  start() {
     this.calculateMaxFlakesCount(window.innerWidth, window.innerHeight);
     this.isSnowFalling = true;
     if (!this.canvas) {
@@ -264,21 +269,21 @@ export class Christmas {
 
     this.stopTimeoutId = window.setTimeout(this.autoStop, SNOWFALL_TIMEOUT);
 
-    document?.addEventListener('mouseleave', this.onMouseLeave);
-    window?.addEventListener('mousemove', this.onMouseMove);
+    document.addEventListener('mouseleave', this.onMouseLeave);
+    window.addEventListener('mousemove', this.onMouseMove);
     window.addEventListener('resize', this.onResize);
 
     if (!this._isRunning) {
       this._isRunning = true;
-      this.snow(this.lastFrameTime);
+      this.snow.call(this, this.lastFrameTime);
     }
-  });
+  }
 
-  stop = action(() => {
+  stop() {
     window.removeEventListener('resize', this.onResize);
     window.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('mouseleave', this.onMouseLeave);
     this.isSnowFalling = false;
     clearTimeout(this.stopTimeoutId);
-  });
+  }
 }
