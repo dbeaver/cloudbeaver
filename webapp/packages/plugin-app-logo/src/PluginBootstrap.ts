@@ -6,24 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { AdministrationTopAppBarService, WizardTopAppBarService } from '@cloudbeaver/plugin-administration';
 import { TopNavService } from '@cloudbeaver/plugin-top-app-bar';
 
 import { Logo } from './Logo.js';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
-  constructor(
-    private readonly topNavService: TopNavService,
-    private readonly administrationTopAppBarService: AdministrationTopAppBarService,
-    private readonly wizardTopAppBarService: WizardTopAppBarService,
-  ) {
+  constructor(private readonly topNavService: TopNavService) {
     super();
   }
 
   override register() {
     this.topNavService.placeholder.add(Logo, 0);
-    this.administrationTopAppBarService.placeholder.add(Logo, 0);
-    this.wizardTopAppBarService.placeholder.add(Logo, 0);
   }
 }

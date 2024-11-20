@@ -11,6 +11,7 @@ import { bootstrap } from '@cloudbeaver/core-bootstrap';
 import type { PluginManifest } from '@cloudbeaver/core-di';
 import administration from '@cloudbeaver/plugin-administration';
 import appLogoPlugin from '@cloudbeaver/plugin-app-logo';
+import appLogoPluginAdministration from '@cloudbeaver/plugin-app-logo-administration';
 import authentication from '@cloudbeaver/plugin-authentication';
 import authenticationAdministration from '@cloudbeaver/plugin-authentication-administration';
 import { browserPlugin } from '@cloudbeaver/plugin-browser';
@@ -133,6 +134,7 @@ const PLUGINS: PluginManifest[] = [
   userProfileSettingsPlugin,
   holidaysPlugin,
   appLogoPlugin,
+  appLogoPluginAdministration,
   // must be las one to override all
   defaultProductManifest,
 ];

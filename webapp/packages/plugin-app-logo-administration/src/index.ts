@@ -5,10 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { appLogoPlugin } from './manifest.js';
+import { appLogoAdministrationPlugin } from './manifest.js';
 
 export * from './PluginBootstrap.js';
-export * from './Logo.js';
 
-export { appLogoPlugin };
-export default appLogoPlugin;
+export { appLogoAdministrationPlugin };
+export default appLogoAdministrationPlugin;

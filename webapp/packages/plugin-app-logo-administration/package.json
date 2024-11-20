@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-app-logo",
+  "name": "@cloudbeaver/plugin-app-logo-administration",
   "type": "module",
   "sideEffects": [
     "src/**/*.css",
@@ -18,22 +18,12 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-blocks": "^0",
     "@cloudbeaver/core-di": "^0",
-    "@cloudbeaver/core-root": "^0",
-    "@cloudbeaver/core-routing": "^0",
-    "@cloudbeaver/core-version": "^0",
-    "@cloudbeaver/core-view": "^0",
-    "@cloudbeaver/plugin-holidays": "^0",
-    "@cloudbeaver/plugin-top-app-bar": "^0",
-    "mobx": "^6",
-    "mobx-react-lite": "^4",
-    "react": "^18"
+    "@cloudbeaver/plugin-administration": "^0",
+    "@cloudbeaver/plugin-app-logo": "^0"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/react": "^18",
-    "typescript": "^5",
-    "typescript-plugin-css-modules": "^5"
+    "typescript": "^5"
   }
 }

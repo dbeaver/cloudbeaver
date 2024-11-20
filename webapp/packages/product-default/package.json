@@ -90,6 +90,7 @@
     "@cloudbeaver/plugin-user-profile-settings": "^0",
     "@cloudbeaver/plugin-version": "^0",
     "@cloudbeaver/plugin-version-update-administration": "^0",
+    "@cloudbeaver/plugin-app-logo-administration": "^0",
     "react": "^18",
     "reflect-metadata": "^0"
   },
