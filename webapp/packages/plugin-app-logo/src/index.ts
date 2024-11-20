@@ -7,7 +7,6 @@
  */
 import { appLogoPlugin } from './manifest.js';
 
-export * from './PluginBootstrap.js';
 export * from './Logo.js';
 
 export { appLogoPlugin };

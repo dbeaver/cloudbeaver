@@ -7,7 +7,5 @@
  */
 import { appLogoAdministrationPlugin } from './manifest.js';
 
-export * from './PluginBootstrap.js';
-
 export { appLogoAdministrationPlugin };
 export default appLogoAdministrationPlugin;
