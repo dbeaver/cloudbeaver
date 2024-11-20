@@ -26,6 +26,9 @@ export class HolidaysService extends Bootstrap {
   }
 
   addHoliday(holiday: IHoliday) {
+    if (this.holidays.find(h => h.name === holiday.name)) {
+      throw new Error(`Holiday with name ${holiday.name} already exists`);
+    }
     this.holidays.push(holiday);
   }
 
