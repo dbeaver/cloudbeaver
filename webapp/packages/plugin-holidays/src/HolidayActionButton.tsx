@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { s } from '@cloudbeaver/core-blocks';
+import { IconButton, s } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import holidayStyles from './HolidayActionButton.module.css';
@@ -29,12 +29,12 @@ export const HolidayActionButton = observer(function HolidayActionButton() {
   }
 
   return (
-    <button
+    <IconButton
       className={s(holidayStyles, { holidayButton: true, buttonActive: holiday.isEffectsActive })}
       title={holiday.name}
+      name={holiday.iconSrc}
+      img
       onClick={handleHolidayActionButtonClick}
-    >
-      <img width={24} height={24} src={holiday.iconSrc} />
-    </button>
+    />
   );
 });
