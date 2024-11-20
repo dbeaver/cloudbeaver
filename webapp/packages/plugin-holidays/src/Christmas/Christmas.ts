@@ -267,7 +267,7 @@ export class Christmas {
       this.createCanvas();
     }
 
-    this.stopTimeoutId = window.setTimeout(this.autoStop, SNOWFALL_TIMEOUT);
+    this.stopTimeoutId = window.setTimeout(this.autoStop.bind(this), SNOWFALL_TIMEOUT);
 
     document.addEventListener('mouseleave', this.onMouseLeave);
     window.addEventListener('mousemove', this.onMouseMove);
