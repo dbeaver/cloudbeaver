@@ -4,8 +4,8 @@ MAINTAINER DBeaver Corp, devops@dbeaver.com
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-ENV DBEAVER_GID=21001
-ENV DBEAVER_UID=21001
+ENV DBEAVER_GID=8978
+ENV DBEAVER_UID=8978
 
 RUN groupadd -g $DBEAVER_GID dbeaver
 RUN useradd -G dbeaver -m -u $DBEAVER_UID -s /bin/bash dbeaver
