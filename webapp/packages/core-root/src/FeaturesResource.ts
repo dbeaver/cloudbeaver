@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { makeObservable, observable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
@@ -19,6 +19,11 @@ export type ApplicationFeature = WebFeatureSet;
 @injectable()
 export class FeaturesResource extends CachedDataResource<ApplicationFeature[]> {
   private baseFeatures: string[];
+
+  get features(): ApplicationFeature[] {
+    return this.data.slice().sort(sortFeature);
+  }
+
   constructor(
     private readonly graphQLService: GraphQLService,
     permissionsResource: SessionPermissionsResource,
@@ -30,6 +35,7 @@ export class FeaturesResource extends CachedDataResource<ApplicationFeature[]> {
 
     makeObservable<this, 'baseFeatures'>(this, {
       baseFeatures: observable,
+      features: computed,
     });
   }
 
@@ -46,4 +52,8 @@ export class FeaturesResource extends CachedDataResource<ApplicationFeature[]> {
 
     return features;
   }
+}
+
+export function sortFeature(a: ApplicationFeature, b: ApplicationFeature): number {
+  return a.label.localeCompare(b.label);
 }
