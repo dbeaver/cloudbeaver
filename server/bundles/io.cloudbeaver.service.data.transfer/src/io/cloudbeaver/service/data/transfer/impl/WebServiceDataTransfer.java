@@ -362,7 +362,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                     processorInstance,
                     properties);
             DatabaseMappingContainer databaseMappingContainer =
-                new DatabaseMappingContainer(databaseConsumerSettings, producer.getDatabaseObject());
+                new DatabaseMappingContainer(monitor, databaseConsumerSettings, producer.getDatabaseObject(), consumer.getTargetObject());
             databaseMappingContainer.getAttributeMappings(monitor);
             databaseMappingContainer.setTarget(dataContainer);
             consumer.setContainerMapping(databaseMappingContainer);

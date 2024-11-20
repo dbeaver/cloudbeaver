@@ -25,7 +25,7 @@ import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 
 public class CBAbstractWebSocket extends Session.Listener.AbstractAutoDemanding {
     private static final Log log = Log.getLog(CBAbstractWebSocket.class);
-    protected static final Gson gson = WSUtils.gson;
+    protected static final Gson gson = WSUtils.clientGson;
 
     public void handleEvent(WSEvent event) {
         if (!isOpen()) {
