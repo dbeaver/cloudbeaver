@@ -16,21 +16,25 @@ import { HolidaysService } from './HolidaysService.js';
 export const HolidayActionButton = observer(function HolidayActionButton() {
   const { holiday } = useService(HolidaysService);
 
-  const handleButtonClick = () => {
+  function handleHolidayActionButtonClick() {
     if (holiday?.isCelebrating) {
       holiday.stopCelebration();
     } else {
       holiday?.startCelebration();
     }
-  };
+  }
 
-  return holiday ? (
+  if (!holiday) {
+    return null;
+  }
+
+  return (
     <button
       className={s(holidayStyles, { holidayButton: true, buttonActive: holiday.isCelebrating })}
       title={holiday.name}
-      onClick={handleButtonClick}
+      onClick={handleHolidayActionButtonClick}
     >
       <img width={24} height={24} src={holiday.iconSrc} />
     </button>
-  ) : null;
+  );
 });
