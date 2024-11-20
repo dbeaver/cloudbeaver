@@ -28,6 +28,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.List;
 
 public class RMVirtualFileSystem extends AbstractVirtualFileSystem {
     @NotNull
@@ -83,7 +84,7 @@ public class RMVirtualFileSystem extends AbstractVirtualFileSystem {
 
     @NotNull
     @Override
-    public DBFVirtualFileSystemRoot[] getRootFolders(DBRProgressMonitor monitor) throws DBException {
-        return new RMVirtualFileSystemRoot[]{new RMVirtualFileSystemRoot(this, rmProject, rmNioFileSystemProvider)};
+    public List<? extends DBFVirtualFileSystemRoot> getRootFolders(DBRProgressMonitor monitor) throws DBException {
+        return List.of(new RMVirtualFileSystemRoot(this, rmProject, rmNioFileSystemProvider));
     }
 }
