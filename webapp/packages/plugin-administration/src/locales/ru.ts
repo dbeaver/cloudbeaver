@@ -41,11 +41,11 @@ export default [
   ['administration_configuration_wizard_configuration_security_public_credentials', 'Позволить сохранять приватные данные для пользователей'],
   [
     'administration_configuration_wizard_configuration_security_admin_credentials_description',
-    'Позволяет сохранять приватные данные, такие как пароли и SSH ключи',
+    'Позволяет сохранять приватные данные для настроенных подключений',
   ],
   [
     'administration_configuration_wizard_configuration_security_public_credentials_description',
-    'Пользователи будут иметь возможность сохранять приватные данные, такие как пароли и SSH ключи',
+    'Позволяет сохранять приватные данные (такие как пароли и SSH ключи) для пользователей, не являющихся администраторами',
   ],
 
   ['administration_disabled_drivers_title', 'Отключенные драйверы'],
