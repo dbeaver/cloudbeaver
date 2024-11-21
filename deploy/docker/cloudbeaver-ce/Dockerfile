@@ -14,7 +14,6 @@ RUN groupadd -g $DBEAVER_GID dbeaver && \
 COPY cloudbeaver /opt/cloudbeaver
 COPY scripts/launch-product.sh /opt/cloudbeaver/launch-product.sh
 
-# Variables DBEAVER_<UID|GID> are inherited from the dbeaver/base-java image
 RUN chown -R $DBEAVER_UID:$DBEAVER_GID /opt/cloudbeaver
 
 EXPOSE 8978
