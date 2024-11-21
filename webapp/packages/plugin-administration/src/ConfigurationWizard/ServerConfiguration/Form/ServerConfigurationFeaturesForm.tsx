@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { FormContext, GroupTitle, type PlaceholderComponent, Switch, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { FeaturesResource } from '@cloudbeaver/core-root';
+import { FeaturesResource, sortFeature } from '@cloudbeaver/core-root';
 
 import type { IConfigurationPlaceholderProps } from '../ServerConfigurationService.js';
 
@@ -23,15 +23,16 @@ export const ServerConfigurationFeaturesForm: PlaceholderComponent<IConfiguratio
 
     const featuresResource = useResource(ServerConfigurationFeaturesForm, FeaturesResource, configurationWizard ? null : undefined);
     const translate = useTranslate();
+    const features = featuresResource.data.slice().sort(sortFeature);
 
-    if (configurationWizard || featuresResource.resource.features.length === 0) {
+    if (configurationWizard || features.length === 0) {
       return null;
     }
 
     return (
       <>
         <GroupTitle>{translate('administration_configuration_wizard_configuration_services_group')}</GroupTitle>
-        {featuresResource.resource.features.map(feature => (
+        {features.map(feature => (
           <Switch
             key={feature.id}
             value={feature.id}
