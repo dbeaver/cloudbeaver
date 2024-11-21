@@ -104,6 +104,8 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
         authRole: getTransformedAuthRole(this.state.authRole),
         enabled: this.state.enabled,
       });
+      // userId is modified by backend and may not match value we sent, so we need to update the state
+      this.state.userId = user.userId;
       this.initialState.userId = user.userId;
       this.formState.setMode(FormMode.Edit);
     }

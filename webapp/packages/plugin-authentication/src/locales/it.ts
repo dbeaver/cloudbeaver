@@ -20,6 +20,7 @@ export default [
   ['authentication_auth_additional', 'Additional'],
   ['authentication_request_token', 'Autenticazione addizionale richiesta'],
   ['authentication_user_name', 'Nome utente'],
+  ['authentication_user_name_description', "User's identifier is stored in lowercase"],
   ['authentication_user_role', 'Role'],
   ['authentication_user_credentials', 'Credenziali'],
   ['authentication_user_meta_parameters', 'Parameters'],

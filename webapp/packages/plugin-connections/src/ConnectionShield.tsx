@@ -23,10 +23,11 @@ export const ConnectionShield = observer<PropsWithChildren<IConnectionShieldProp
   const notificationService = useService(NotificationService);
 
   const connection = useResource(ConnectionShield, ConnectionInfoResource, connectionKey);
-  const connecting = getComputed(() => connectionKey && connection.resource.isConnecting(connectionKey));
+  const connecting = getComputed(() => (connectionKey && connection.resource.isConnecting(connectionKey)) || connection.loading);
+  const isConnectionReady = getComputed(() => !connecting && connection.data?.connected && connection.loaded && !connection.outdated);
 
   async function handleConnect() {
-    if (connecting || !connection.data || !connectionKey) {
+    if (isConnectionReady || !connection.data || !connectionKey) {
       return;
     }
 
@@ -37,11 +38,11 @@ export const ConnectionShield = observer<PropsWithChildren<IConnectionShieldProp
     }
   }
 
-  if (getComputed(() => connection.data && !connection.data.connected)) {
-    if (connecting) {
-      return <Loader message="ui_processing_connecting" />;
-    }
+  if (connecting) {
+    return <Loader message="ui_processing_connecting" />;
+  }
 
+  if (!isConnectionReady) {
     return (
       <TextPlaceholder>
         <Button type="button" mod={['unelevated']} onClick={handleConnect}>
