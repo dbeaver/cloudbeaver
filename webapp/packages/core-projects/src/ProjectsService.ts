@@ -107,7 +107,7 @@ export class ProjectsService extends Dependency {
     this.getActiveProjectTask = new SyncExecutor();
     this.onActiveProjectChange = new Executor();
 
-    this.onActiveProjectChange.before(navigationService.navigationTask);
+    this.onActiveProjectChange.before(navigationService.navigationTask, undefined, data => !isArraysEqual(data.projects, this.activeProjectIds));
 
     this.userInfoResource.onUserChange.addHandler(() => {
       this.onActiveProjectChange.execute({
