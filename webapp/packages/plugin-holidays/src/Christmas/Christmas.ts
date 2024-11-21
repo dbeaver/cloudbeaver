@@ -79,17 +79,20 @@ export class Christmas {
   public isSnowFalling = false;
 
   constructor() {
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.onMouseLeave = this.onMouseLeave.bind(this);
+
     makeObservable(this, {
       isSnowFalling: observable,
     });
   }
 
-  calculateMaxFlakesCount(width: number, height: number) {
+  private calculateMaxFlakesCount(width: number, height: number) {
     const currentArea = width * height;
     this.maxFlakesCount = Math.round((currentArea / BASE_CANVAS_AREA) * BASE_FLAKES_COUNT);
   }
 
-  createCanvas() {
+  private createCanvas() {
     this.canvas = document.createElement('canvas');
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight;
@@ -102,7 +105,7 @@ export class Christmas {
     this.ctx = this.canvas.getContext('2d');
   }
 
-  handleMouseMove = throttle(() => {
+  private setMouseMoving() {
     this.isMouseMoving = true;
 
     if (this.mouseMovingTimeoutId) {
@@ -111,34 +114,38 @@ export class Christmas {
     this.mouseMovingTimeoutId = window.setTimeout(() => {
       this.isMouseMoving = false;
     }, 100);
-  }, 60);
+  }
 
-  onResize = debounce(() => {
+  private setMouseMovingThrottled = throttle(this.setMouseMoving.bind(this), 60);
+
+  private onResize() {
     this.calculateMaxFlakesCount(window.innerWidth, window.innerHeight);
     if (this.canvas) {
       this.canvas.width = window.innerWidth;
       this.canvas.height = window.innerHeight;
     }
-  }, 500);
+  }
 
-  onMouseMove = (e: MouseEvent) => {
-    this.handleMouseMove();
+  private onResizeDebounced = debounce(this.onResize.bind(this), 500);
+
+  private onMouseMove(e: MouseEvent) {
+    this.setMouseMovingThrottled();
     this.mX = e.clientX;
     this.mY = e.clientY;
-  };
+  }
 
-  onMouseLeave = () => {
+  private onMouseLeave() {
     this.mX = -MIN_EFFECTIVE_DISTANCE;
     this.mY = -MIN_EFFECTIVE_DISTANCE;
-  };
+  }
 
-  autoStop() {
+  private autoStop() {
     if (this.isSnowFalling) {
       this.stop.call(this);
     }
   }
 
-  drawSnowflake(flake: Flake) {
+  private drawSnowflake(flake: Flake) {
     if (!this.ctx) {
       return;
     }
@@ -169,7 +176,7 @@ export class Christmas {
     flake.angle = flake.angle > 0 ? flake.angle + addAngle : flake.angle - addAngle;
   }
 
-  applyForces(flake: Flake) {
+  private applyForces(flake: Flake) {
     const x = this.mX;
     const y = this.mY;
     const x2 = flake.x;
@@ -204,7 +211,7 @@ export class Christmas {
     flake.x += flake.velX;
   }
 
-  clean() {
+  private clean() {
     if (this.canvas) {
       document.body.removeChild(this.canvas);
       this.canvas = null;
@@ -213,51 +220,56 @@ export class Christmas {
     }
   }
 
-  snow(timestamp: number) {
-    if (!this.ctx || !this.canvas) {
-      return;
-    }
-
+  private adjustFlakesCount(timestamp: number) {
     if (this.isSnowFalling && this.flakes.length < this.maxFlakesCount && timestamp - this.lastFlakeTime > FLAKE_ADDING_INTERVAL) {
-      addSnowFlakes(this.flakes, this.canvas.width, 2);
+      addSnowFlakes(this.flakes, this.canvas!.width, 2);
       this.lastFlakeTime = timestamp;
     }
 
     if (!this.isSnowFalling && this.flakes.length > 0) {
       this.flakes.length = this.flakes.length - Math.ceil(this.flakes.length / 100);
     }
+  }
+
+  private handleFlakeRespawn(flake: Flake) {
+    if (this.isSnowFalling) {
+      if (flake.y >= this.canvas!.height || flake.y <= 0) {
+        respawnFlake(flake, this.canvas!.width);
+      }
+
+      if (flake.x >= this.canvas!.width || flake.x <= 0) {
+        respawnFlake(flake, this.canvas!.width);
+      }
+    }
+  }
+
+  private renderSnow(timestamp: number) {
+    if (!this.ctx || !this.canvas) {
+      return;
+    }
+    // Skip frame, keep 60 FPS
+    if (timestamp - this.lastFrameTime < FRAME_DURATION) {
+      requestAnimationFrame(this.renderSnow.bind(this));
+      return;
+    }
+    this.lastFrameTime = timestamp;
+    this.adjustFlakesCount(timestamp);
 
     if (!this.isSnowFalling && this.flakes.length === 0) {
       this.clean();
       return;
     }
 
-    if (timestamp - this.lastFrameTime < FRAME_DURATION) {
-      requestAnimationFrame(this.snow.bind(this));
-      return;
-    }
-    this.lastFrameTime = timestamp;
-
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     for (let i = 0; i < this.flakes.length; i++) {
       const flake = this.flakes[i] as Flake;
       this.applyForces(flake);
-
-      if (this.isSnowFalling) {
-        if (flake.y >= this.canvas.height || flake.y <= 0) {
-          respawnFlake(flake, this.canvas.width);
-        }
-
-        if (flake.x >= this.canvas.width || flake.x <= 0) {
-          respawnFlake(flake, this.canvas.width);
-        }
-      }
-
+      this.handleFlakeRespawn(flake);
       this.drawSnowflake(flake);
     }
 
-    requestAnimationFrame(this.snow.bind(this));
+    requestAnimationFrame(this.renderSnow.bind(this));
   }
 
   start() {
@@ -271,16 +283,16 @@ export class Christmas {
 
     document.addEventListener('mouseleave', this.onMouseLeave);
     window.addEventListener('mousemove', this.onMouseMove);
-    window.addEventListener('resize', this.onResize);
+    window.addEventListener('resize', this.onResizeDebounced);
 
     if (!this.isRunning) {
       this.isRunning = true;
-      this.snow.call(this, this.lastFrameTime);
+      this.renderSnow.call(this, this.lastFrameTime);
     }
   }
 
   stop() {
-    window.removeEventListener('resize', this.onResize);
+    window.removeEventListener('resize', this.onResizeDebounced);
     window.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('mouseleave', this.onMouseLeave);
     this.isSnowFalling = false;
