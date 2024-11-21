@@ -4,12 +4,6 @@ MAINTAINER DBeaver Corp, devops@dbeaver.com
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-ENV DBEAVER_GID=8978
-ENV DBEAVER_UID=8978
-
-RUN groupadd -g $DBEAVER_GID dbeaver
-RUN useradd -g $DBEAVER_GID -M -u $DBEAVER_UID -s /bin/bash dbeaver
-
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
