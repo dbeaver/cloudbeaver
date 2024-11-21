@@ -11,5 +11,5 @@ export const appLogoPlugin: PluginManifest = {
   info: {
     name: 'App Logo plugin',
   },
-  providers: [() => import('./PluginBootstrap.js').then(m => m.PluginBootstrap)],
+  providers: [() => import('./PluginBootstrap.js').then(m => m.AppLogoPluginBootstrap)],
 };

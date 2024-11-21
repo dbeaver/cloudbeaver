@@ -11,7 +11,7 @@ import { TopNavService } from '@cloudbeaver/plugin-top-app-bar';
 import { Logo } from './Logo.js';
 
 @injectable()
-export class PluginBootstrap extends Bootstrap {
+export class AppLogoPluginBootstrap extends Bootstrap {
   constructor(private readonly topNavService: TopNavService) {
     super();
   }

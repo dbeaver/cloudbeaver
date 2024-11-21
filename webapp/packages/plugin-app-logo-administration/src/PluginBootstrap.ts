@@ -10,7 +10,7 @@ import { AdministrationTopAppBarService, WizardTopAppBarService } from '@cloudbe
 import { Logo } from '@cloudbeaver/plugin-app-logo';
 
 @injectable()
-export class PluginBootstrap extends Bootstrap {
+export class AppLogoAdministrationPluginBootstrap extends Bootstrap {
   constructor(
     private readonly administrationTopAppBarService: AdministrationTopAppBarService,
     private readonly wizardTopAppBarService: WizardTopAppBarService,

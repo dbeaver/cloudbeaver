@@ -11,5 +11,5 @@ export const appLogoAdministrationPlugin: PluginManifest = {
   info: {
     name: 'App Logo Administration plugin',
   },
-  providers: [() => import('./PluginBootstrap.js').then(m => m.PluginBootstrap)],
+  providers: [() => import('./PluginBootstrap.js').then(m => m.AppLogoAdministrationPluginBootstrap)],
 };
