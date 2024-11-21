@@ -28,7 +28,7 @@
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/react": "*",
+    "@types/react": "^18",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5"
   }
