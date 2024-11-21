@@ -32,19 +32,32 @@ public class GraphQLLoggerUtil {
         Set.of("password", "config", "parameters", "settings", "licenseText", "credentials", "username");
 
     public static String getUserId(HttpServletRequest request) {
-        String userId = null;
-        if (request.getSession() != null) {
-            WebSession session =
-                (WebSession) CBApplication.getInstance().getSessionManager().getSession(request.getSession().getId());
-            if (session != null) {
-                userId = session.getUserContext().getUserId();
-                if (userId == null && session.getUserContext().isAuthorizedInSecurityManager()) {
-                    userId = "anonymous";
-                }
-            }
+        WebSession session = getWebSession(request);
+        if (session == null) {
+            return null;
+        }
+        String userId = session.getUserContext().getUserId();
+        if (userId == null && session.getUserContext().isAuthorizedInSecurityManager()) {
+            return "anonymous";
         }
         return userId;
+    }
 
+    public static String getSessionId(HttpServletRequest request) {
+        WebSession session = getWebSession(request);
+        if (session == null) {
+            return null;
+        }
+        return session.getUserContext().getSmSessionId();
+    }
+
+    private static WebSession getWebSession(HttpServletRequest request) {
+        if (request.getSession() == null) {
+            return null;
+        }
+        return (WebSession) CBApplication.getInstance()
+            .getSessionManager()
+            .getSession(request.getSession().getId());
     }
 
     public static String buildLoggerMessage(String sessionId, String userId, Map<String, Object> variables) {

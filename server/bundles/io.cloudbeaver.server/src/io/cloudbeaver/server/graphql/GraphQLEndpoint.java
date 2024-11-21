@@ -249,7 +249,7 @@ public class GraphQLEndpoint extends HttpServlet {
 //                    apiCall += " (" + variables + ")";
 //                }
 //            }
-            String sessionId = request.getSession().getId();
+            String sessionId = GraphQLLoggerUtil.getSessionId(request);
             String userId = GraphQLLoggerUtil.getUserId(request);
             String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, variables);
             if (apiCall != null) {
