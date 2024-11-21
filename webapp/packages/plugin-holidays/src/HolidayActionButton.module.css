@@ -10,13 +10,6 @@ button.holidayButton {
   width: 48px;
   margin: 0;
   padding: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: transparent;
-  border: none;
-  color: inherit;
-  cursor: pointer;
 }
 
 .holidayButton img {
