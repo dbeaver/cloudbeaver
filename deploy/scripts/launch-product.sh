@@ -8,4 +8,4 @@
 chown -R $DBEAVER_UID:$DBEAVER_GID $PWD
 
 # Execute run-server.sh as the dbeaver user with the JAVA_HOME and PATH environment variables
-exec su $DBEAVER_UID -c "JAVA_HOME=$JAVA_HOME PATH=$PATH ./run-server.sh"
+exec su dbeaver -c "JAVA_HOME=$JAVA_HOME PATH=$PATH ./run-server.sh"
