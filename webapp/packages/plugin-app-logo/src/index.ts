@@ -7,7 +7,7 @@
  */
 import { appLogoPlugin } from './manifest.js';
 
-export * from './Logo.js';
+export * from './LogoLazy.js';
 
 export { appLogoPlugin };
 export default appLogoPlugin;

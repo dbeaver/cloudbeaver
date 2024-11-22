@@ -5,11 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { AdministrationTopAppBarService } from '@cloudbeaver/plugin-administration';
-
-const HolidayButton = importLazyComponent(() => import('@cloudbeaver/plugin-holidays').then(m => m.HolidayActionButton));
+import { HolidayActionButtonLazy } from '@cloudbeaver/plugin-holidays';
 
 @injectable()
 export class HolidayAdministrationBootstrap extends Bootstrap {
@@ -18,6 +16,6 @@ export class HolidayAdministrationBootstrap extends Bootstrap {
   }
 
   override register() {
-    this.administrationTopAppBarService.placeholder.add(HolidayButton, 4);
+    this.administrationTopAppBarService.placeholder.add(HolidayActionButtonLazy, 4);
   }
 }
