@@ -218,9 +218,9 @@ type DriverInfo {
     iconBig: String
 
     # Driver ID. It is unique within provider
-    driverId: ID
+    driverId: ID!
     # Driver provider ID. It is globally unique
-    providerId: ID
+    providerId: ID!
     # Driver Java class name
     driverClassName: String
     defaultHost: String
