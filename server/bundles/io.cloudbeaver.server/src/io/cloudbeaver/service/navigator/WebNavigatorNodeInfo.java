@@ -229,7 +229,7 @@ public class WebNavigatorNodeInfo {
         if (node instanceof DBNDatabaseNode) {
             boolean canEditDatasources = hasNodePermission(RMProjectPermission.DATA_SOURCES_EDIT);
             DBSObject object = ((DBNDatabaseNode) node).getObject();
-            if (object != null && canEditDatasources) {
+            if (object != null && canEditDatasources && !DBUtils.isReadOnly(object)) {
                 DBEObjectMaker objectManager = DBWorkbench.getPlatform().getEditorsRegistry().getObjectManager(
                     object.getClass(), DBEObjectMaker.class);
                 if (objectManager != null && objectManager.canDeleteObject(object)) {
