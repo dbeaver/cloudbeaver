@@ -5,10 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { TopNavService } from '@cloudbeaver/plugin-top-app-bar';
 
-import { Logo } from './Logo.js';
+const Logo = importLazyComponent(() => import('./Logo.js').then(m => m.Logo));
 
 @injectable()
 export class AppLogoPluginBootstrap extends Bootstrap {

@@ -18,6 +18,7 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
+    "@cloudbeaver/core-blocks": "^0",
     "@cloudbeaver/core-di": "^0",
     "@cloudbeaver/plugin-administration": "^0",
     "@cloudbeaver/plugin-app-logo": "^0"

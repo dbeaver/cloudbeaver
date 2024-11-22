@@ -5,9 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { AdministrationTopAppBarService, WizardTopAppBarService } from '@cloudbeaver/plugin-administration';
-import { Logo } from '@cloudbeaver/plugin-app-logo';
+
+const Logo = importLazyComponent(() => import('@cloudbeaver/plugin-app-logo').then(m => m.Logo));
 
 @injectable()
 export class AppLogoAdministrationPluginBootstrap extends Bootstrap {
