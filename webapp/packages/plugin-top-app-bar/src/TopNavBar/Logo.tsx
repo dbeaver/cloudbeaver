@@ -7,6 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
+import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AppLogo, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ProductInfoResource } from '@cloudbeaver/core-root';
@@ -16,6 +17,7 @@ import { useAppVersion } from '@cloudbeaver/core-version';
 export const Logo = observer(function Logo() {
   const productInfoResource = useResource(Logo, ProductInfoResource, undefined);
   const screenService = useService(ScreenService);
+  const administrationScreenService = useService(AdministrationScreenService);
   const { backendVersion, frontendVersion } = useAppVersion(true);
 
   const isSameVersion = backendVersion === frontendVersion;
@@ -26,5 +28,5 @@ export const Logo = observer(function Logo() {
 
   const title = isSameVersion ? backendVersionTitle : commonVersionTitle;
 
-  return <AppLogo title={title} onClick={() => screenService.navigateToRoot()} />;
+  return <AppLogo title={title} onClick={administrationScreenService.isConfigurationMode ? undefined : () => screenService.navigateToRoot()} />;
 });
