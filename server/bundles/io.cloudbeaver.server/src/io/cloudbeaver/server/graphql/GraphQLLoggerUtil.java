@@ -16,10 +16,12 @@
  */
 package io.cloudbeaver.server.graphql;
 
+import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import jakarta.servlet.http.HttpServletRequest;
+import org.jkiss.code.Nullable;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.Map;
@@ -51,13 +53,18 @@ public class GraphQLLoggerUtil {
         return session.getUserContext().getSmSessionId();
     }
 
+    @Nullable
     private static WebSession getWebSession(HttpServletRequest request) {
         if (request.getSession() == null) {
             return null;
         }
-        return (WebSession) CBApplication.getInstance()
-            .getSessionManager()
-            .getSession(request.getSession().getId());
+
+        if (BaseWebApplication.getInstance() instanceof CBApplication<?> cbApp) {
+            return (WebSession)cbApp.getSessionManager()
+                .getSession(request.getSession().getId());
+        } else {
+            return null;
+        }
     }
 
     public static String buildLoggerMessage(String sessionId, String userId, Map<String, Object> variables) {
