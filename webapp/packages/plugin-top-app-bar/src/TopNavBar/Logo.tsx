@@ -27,5 +27,5 @@ export const Logo = observer(function Logo() {
 
   const title = isSameVersion ? backendVersionTitle : commonVersionTitle;
 
-  return <AppLogo title={title} onClick={permissionsService.publicDisabled ? undefined : () => screenService.navigateToRoot()} />;
+  return <AppLogo title={title} onClick={permissionsService.publicDisabled ? undefined : screenService.navigateToRoot} />;
 });
