@@ -20,6 +20,7 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { type AuthProviderConfigurationInfoFragment, type AuthProviderInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
+import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
 import { AuthConfigurationsResource } from './AuthConfigurationsResource.js';
 
 export type AuthProvider = NonNullable<AuthProviderInfoFragment>;
@@ -131,4 +132,16 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   protected validateKey(key: string): boolean {
     return typeof key === 'string';
   }
+}
+
+export function sortProvider(a: AuthProvider, b: AuthProvider): number {
+  if (a.id === AUTH_PROVIDER_LOCAL_ID) {
+    return 1;
+  }
+
+  if (b.id === AUTH_PROVIDER_LOCAL_ID) {
+    return -1;
+  }
+
+  return a.label.localeCompare(b.label);
 }
