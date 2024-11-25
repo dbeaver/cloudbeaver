@@ -17,8 +17,8 @@ export class ChristmasService extends Bootstrap implements IHoliday {
   public name = 'Merry Christmas';
   public logoSrc = '/icons/christmas_logo.svg';
   public iconSrc = '/icons/christmas_action.svg';
-  public startDate = new Date(new Date().getFullYear(), 11, 12); // December, 12
-  public endDate = new Date(new Date().getFullYear(), 0, 7); // January, 7
+  public startDate = new Date(new Date().getFullYear(), 11, 12); // Since December, 12, 00:00:00
+  public endDate = new Date(new Date().getFullYear(), 0, 8); // Before January, 7 23:59:59
 
   constructor(private readonly holidayService: HolidaysService) {
     super();
