@@ -10,7 +10,6 @@ import { useEffect, useState } from 'react';
 
 import { Combobox, Container, Group, GroupItem, GroupTitle, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { GITHUB_LINKS } from '@cloudbeaver/core-links';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { type IVersion, VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
@@ -39,6 +38,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
 
   const version = versions.find(v => v.number === selected);
   const Instruction = versionUpdateService.versionInstructionGetter?.();
+  const instructionLink = versionUpdateService.instructionLink;
 
   return (
     <Container gap>
@@ -56,7 +56,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
         {version && Instruction && (
           <GroupItem>
             <Instruction
-              link={GITHUB_LINKS.getDeployUpdateLink(!!serverConfigResource.data?.distributed)}
+              link={instructionLink}
               className={s(style, { instruction: true })}
               version={version}
               containerId={serverConfigResource.data?.containerId}

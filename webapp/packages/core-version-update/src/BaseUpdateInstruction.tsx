@@ -12,6 +12,10 @@ import type { InstructionComponent } from './VersionUpdateService.js';
 export const BaseUpdateInstruction: InstructionComponent = function UpdateInstruction({ version, containerId, link, className }) {
   const translate = useTranslate();
 
+  if (!link) {
+    return <div className={className}>{translate('version_update_instruction_link_not_provided')}</div>;
+  }
+
   return (
     <div className={className}>
       {translate('version_update_instruction')}{' '}

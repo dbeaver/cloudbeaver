@@ -5,14 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, makeObservable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { type IVersion, VersionResource, VersionService } from '@cloudbeaver/core-version';
 
 interface IInstructionProps {
   version: IVersion;
-  link: string;
+  link: string | null;
   containerId?: string;
   className?: string;
 }
@@ -23,6 +23,7 @@ export type InstructionComponent = React.FunctionComponent<IInstructionProps>;
 export class VersionUpdateService {
   generalInstructionsGetter: (() => React.FC) | null = null;
   versionInstructionGetter: (() => InstructionComponent) | null;
+  instructionLink: string | null;
 
   get newVersionAvailable() {
     if (!this.versionService.current || !this.versionResource.latest) {
@@ -37,10 +38,16 @@ export class VersionUpdateService {
     private readonly versionResource: VersionResource,
   ) {
     this.versionInstructionGetter = null;
+    this.instructionLink = null;
 
     makeObservable(this, {
       newVersionAvailable: computed,
+      instructionLink: observable.ref,
     });
+  }
+
+  registerInstructionLink(link: string): void {
+    this.instructionLink = link;
   }
 
   registerVersionInstruction(componentGetter: () => InstructionComponent): void {
