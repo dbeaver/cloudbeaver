@@ -93,7 +93,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       get cursorSegment(): ISQLScriptSegment | undefined {
-        return this.parser.getSegment(this.cursor.begin, -1);
+        return this.parser.getSegment(this.cursor.anchor, -1);
       },
 
       get readonly(): boolean {
@@ -123,7 +123,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       get cursor(): ISqlEditorCursor {
-        return this.dataSource?.cursor ?? { begin: 0, end: 0 };
+        return this.dataSource?.cursor ?? { anchor: 0, head: 0 };
       },
 
       get value(): string {
@@ -437,7 +437,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
         await data.updateParserScripts();
 
-        if (!projectId || !connectionId || this.cursor.begin !== this.cursor.end) {
+        if (!projectId || !connectionId || this.cursor.anchor !== this.cursor.head) {
           return this.getSubQuery();
         }
 
@@ -445,7 +445,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return this.activeSegment;
         }
 
-        const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, this.value, this.cursor.begin);
+        const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, this.value, this.cursor.anchor);
 
         if (result.end === 0 && result.start === 0) {
           return;
@@ -509,7 +509,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     handlers: [
       function setScript({ script }) {
         // ensure that cursor is in script boundaries
-        data.setCursor(data.cursor.begin, data.cursor.end);
+        data.setCursor(data.cursor.anchor, data.cursor.head);
         data.parser.setScript(script);
         data.updateParserScriptsDebounced().catch(() => {});
         data.onUpdate.execute();
