@@ -21,6 +21,7 @@ import io.cloudbeaver.auth.SMTokenCredentialProvider;
 import io.cloudbeaver.model.session.*;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
+import io.cloudbeaver.server.AppWebSessionManager;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
@@ -315,6 +316,14 @@ public class CBSessionManager implements WebAppSessionManager {
             var existSession = sessionMap.get(sessionId);
 
             if (existSession instanceof WebHeadlessSession) {
+                var creds = existSession.getUserContext().getActiveUserCredentials();
+                if (creds == null || !smAccessToken.equals(creds.getSmAccessToken())) {
+                    existSession.getUserContext().refresh(
+                        smAccessToken,
+                        null,
+                        authPermissions
+                    );
+                }
                 return (WebHeadlessSession) existSession;
             }
             if (existSession != null) {

@@ -132,4 +132,6 @@ export default [
     'administration_teams_delete_confirmation_users_note',
     "Notez que les utilisateurs perdront leur affiliation à l'équipe et toutes les permissions associées",
   ],
+  ['plugin_authentication_administration_team_form_edit_label', 'Team editing form'],
+  ['plugin_authentication_administration_user_form_edit_label', 'User editing form'],
 ];

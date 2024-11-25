@@ -25,6 +25,18 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 24.2.5. 2024-11-18
+- Updated user storage mechanism: New user logins are now stored in lowercase to prevent duplicate entries (e.g., "ADMIN" and "admin"). Note: This update does not affect previously created user logins;
+- A new setting in Global Preferences was added to restrict data import for non-admin users.
+
+### 24.2.4. 2024-11-04
+- General:
+  -    Data export: Added the ability to export JSON values as embedded JSON;
+  -    Brazilian Portuguese localization was enhanced (thanks to [brlarini](https://github.com/brlarini));
+  -    Fixed a proxy issue that excluded the Content-Type header in responses.
+- Administration:
+  -    Refreshed design for the User and Teams tab in the Administration panel;
+  -    Added an ability to change a user password even if the user is disabled in a system.
 ### 24.2.3. 2024-10-21
 - Important update:
   -    Connections Templates feature is declared as obsolete and will be removed in future releases.

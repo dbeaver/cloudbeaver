@@ -17,8 +17,8 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.model.app.ServletApplication;
-import io.cloudbeaver.utils.ServletAppUtils;
+import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -46,11 +46,11 @@ public class WebGlobalWorkspace extends BaseWorkspaceImpl {
     protected final Map<String, WebProjectImpl> projects = new LinkedHashMap<>();
     private WebGlobalProject globalProject;
 
-    private final ServletApplication application;
+    private final WebApplication application;
 
     public WebGlobalWorkspace(
         @NotNull DBPPlatform platform,
-        @NotNull ServletApplication application
+        @NotNull WebApplication application
     ) {
         super(platform, application.getWorkspaceDirectory());
         this.application = application;
@@ -61,19 +61,22 @@ public class WebGlobalWorkspace extends BaseWorkspaceImpl {
         initializeWorkspaceSession();
 
         // Load global project
-        Path globalProjectPath = getAbsolutePath().resolve(ServletAppUtils.getGlobalProjectId());
-        if (!Files.exists(globalProjectPath)) {
-            try {
-                Files.createDirectories(globalProjectPath);
-            } catch (IOException e) {
-                log.error("Error creating global project path: " + globalProject, e);
+        String defaultProjectName = WebAppUtils.getWebApplication().getDefaultProjectName();
+        if (CommonUtils.isNotEmpty(defaultProjectName)) {
+            Path globalProjectPath = getAbsolutePath().resolve(defaultProjectName);
+            if (!Files.exists(globalProjectPath)) {
+                try {
+                    Files.createDirectories(globalProjectPath);
+                } catch (IOException e) {
+                    log.error("Error creating global project path: " + globalProject, e);
+                }
             }
         }
 
         globalProject = new WebGlobalProject(
             this,
             getAuthContext(),
-            CommonUtils.notEmpty(ServletAppUtils.getServletApplication().getDefaultProjectName())
+            CommonUtils.notEmpty(defaultProjectName)
         );
         activeProject = globalProject;
     }

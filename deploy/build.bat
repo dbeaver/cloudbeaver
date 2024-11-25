@@ -20,6 +20,8 @@ echo Pull dbeaver platform
 
 IF NOT EXIST dbeaver git clone https://github.com/dbeaver/dbeaver.git
 IF NOT EXIST dbeaver-common git clone https://github.com/dbeaver/dbeaver-common.git
+IF NOT EXIST dbeaver-jdbc-libsql git clone https://github.com/dbeaver/dbeaver-jdbc-libsql.git
+
 cd cloudbeaver\deploy
 
 echo Build cloudbeaver server

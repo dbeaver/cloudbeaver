@@ -38,6 +38,8 @@ export default [
   ['ui_custom', 'Custom'],
   ['ui_configure', 'Configure'],
   ['ui_apply', 'Applica'],
+  ['ui_cancel', 'Annulla'],
+  ['ui_reject', 'Reject'],
   ['ui_ignore', 'Ignore'],
   ['ui_error', 'Errore'],
   ['ui_error_message', 'Errore:'],

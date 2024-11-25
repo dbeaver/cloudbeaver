@@ -118,6 +118,7 @@ type ProductInfo {
     licenseInfo: String
 
     latestVersionInfo: String
+    productPurchaseURL: String
 }
 
 type ServerConfig {

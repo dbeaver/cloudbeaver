@@ -4,6 +4,7 @@
 <plugin>
     <extension point="org.jkiss.dbeaver.auth.provider">
         <authProvider id="local" label="Local"
+                caseInsensitive="true"
                 description="Local name/password based authentication"
                 class="io.cloudbeaver.auth.provider.local.LocalAuthProvider"
                 icon="platform:/plugin/org.jkiss.dbeaver.model/icons/tree/key.png">

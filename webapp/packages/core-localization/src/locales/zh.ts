@@ -38,6 +38,8 @@ export default [
   ['ui_custom', '个性化'],
   ['ui_configure', '配置'],
   ['ui_apply', '应用'],
+  ['ui_cancel', 'Cancel'],
+  ['ui_reject', 'Reject'],
   ['ui_ignore', '忽略'],
   ['ui_error', '错误'],
   ['ui_error_message', '错误：'],

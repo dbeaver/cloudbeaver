@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.security.db;
 
 import org.jkiss.dbeaver.model.security.user.SMTeam;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ class CBDatabaseInitialData {
     private List<SMTeam> teams;
 
     public String getAdminName() {
-        return adminName;
+        return CommonUtils.isEmpty(adminName) ? null : adminName.toLowerCase();
     }
 
     public String getAdminPassword() {

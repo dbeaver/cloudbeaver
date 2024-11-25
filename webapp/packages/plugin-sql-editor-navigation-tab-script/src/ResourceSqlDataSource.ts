@@ -37,7 +37,7 @@ interface IResourceActions {
 }
 
 const VALUE_SYNC_DELAY = 1 * 1000;
-const DIFFERENT_PROJECT_MESSAGE_DISPLAY_DELAY = 4 * 1000;
+const MESSAGE_DISPLAY_DELAY = 4 * 1000;
 
 export class ResourceSqlDataSource extends BaseSqlDataSource {
   static override key = 'resource';
@@ -374,7 +374,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
         if (isNotNullDefined(projectId) && resourceProjectId !== projectId && resourceProjectId !== userProjectId) {
           this.message = 'plugin_sql_editor_navigation_tab_script_state_different_project';
 
-          await new Promise(resolve => setTimeout(resolve, DIFFERENT_PROJECT_MESSAGE_DISPLAY_DELAY));
+          await new Promise(resolve => setTimeout(resolve, MESSAGE_DISPLAY_DELAY));
           return;
         }
 
@@ -384,6 +384,9 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
           this.setExecutionContext(executionContext);
           this.setBaseExecutionContext(this.executionContext);
+        } else {
+          this.message = 'plugin_sql_editor_navigation_tab_script_state_readonly';
+          await new Promise(resolve => setTimeout(resolve, MESSAGE_DISPLAY_DELAY));
         }
       } finally {
         this.message = undefined;

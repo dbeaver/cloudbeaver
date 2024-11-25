@@ -309,5 +309,4 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             throw new DBWebException("Error setting user parameters", e);
         }
     }
-
 }
