@@ -12,7 +12,7 @@ import { ColoredContainer, s, useResource, useS } from '@cloudbeaver/core-blocks
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { VersionResource, VersionService } from '@cloudbeaver/core-version';
+import { type IVersion, VersionResource, VersionService } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
 import { VersionChecker } from './VersionChecker.js';
@@ -28,17 +28,19 @@ export const VersionUpdate: TabContainerPanelComponent<AdministrationItemContent
   });
 
   const GeneralInstructions = versionUpdateService.generalInstructionsGetter?.();
-  const versions = versionResource.resource.values.filter(v => versionService.greaterOrEqual(v.number, versionService.current));
+  const versions: IVersion[] = [
+    {
+      number: '1.0.0',
+      date: '2024-01-01',
+      releaseNotes: 'Release notes',
+    },
+  ];
 
   return (
     <ColoredContainer className={s(style, { coloredContainer: true })} wrap gap overflow parent>
       <VersionChecker />
-      {versions.length > 0 && (
-        <>
-          {GeneralInstructions && <GeneralInstructions />}
-          <VersionSelector versions={versions} />
-        </>
-      )}
+      {GeneralInstructions && <GeneralInstructions />}
+      <VersionSelector versions={versions} />
     </ColoredContainer>
   );
 });
