@@ -302,7 +302,7 @@ public class WebDatabaseDriverInfo {
 
     @Property
     public boolean isDriverInstalled() {
-        return driver.needsExternalDependencies();
+        return !driver.needsExternalDependencies(webSession.getProgressMonitor());
     }
 
     @Property
