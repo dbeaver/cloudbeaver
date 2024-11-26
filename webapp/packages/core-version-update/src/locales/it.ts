@@ -16,4 +16,5 @@ export default [
   ['version_update_info', 'Info'],
   ['version_update_instruction', 'To update version, please follow'],
   ['version_update_instruction_link', 'the instructions'],
+  ['version_update_instruction_link_not_provided', 'Instructions link is not provided. Please contact support.'],
 ];
