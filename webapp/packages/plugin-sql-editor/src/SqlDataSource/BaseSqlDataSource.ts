@@ -96,7 +96,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     this.message = undefined;
     this.outdated = true;
     this.editing = true;
-    this.innerCursorState = { begin: 0, end: 0 };
+    this.innerCursorState = { anchor: 0, head: 0 };
     this.history = new SqlDataSourceHistory();
     this.onUpdate = new SyncExecutor();
     this.onSetScript = new SyncExecutor();
@@ -232,17 +232,14 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     return this.features.includes(feature);
   }
 
-  setCursor(begin: number, end = begin): void {
-    if (begin > end) {
-      throw new Error('Cursor begin can not be greater than the end of it');
-    }
-
+  setCursor(anchor: number, head = anchor): void {
     const scriptLength = this.script.length;
 
     this.innerCursorState = Object.freeze({
-      begin: Math.min(begin, scriptLength),
-      end: Math.min(end, scriptLength),
+      anchor: Math.min(anchor, scriptLength),
+      head: Math.min(head, scriptLength),
     });
+
     this.onUpdate.execute();
   }
 

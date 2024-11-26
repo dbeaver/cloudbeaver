@@ -11,7 +11,6 @@ export * from './TopNavBar/AppStateMenu/AppStateMenu.js';
 export * from './TopNavBar/AppStateMenu/MENU_APP_STATE.js';
 export * from './TopNavBar/MainMenu/MENU_APP_ACTIONS.js';
 export * from './TopNavBar/TopNavService.js';
-export * from './TopNavBar/Logo.js';
 export * from './TopNavBar/TopNavBar.js';
 export { default as TopMenuWrapperStyles } from './TopNavBar/shared/TopMenuWrapper.module.css';
 

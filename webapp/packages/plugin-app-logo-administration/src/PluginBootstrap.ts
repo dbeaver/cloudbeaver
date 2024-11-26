@@ -7,10 +7,10 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { AdministrationTopAppBarService, WizardTopAppBarService } from '@cloudbeaver/plugin-administration';
-import { Logo } from '@cloudbeaver/plugin-top-app-bar';
+import { LogoLazy } from '@cloudbeaver/plugin-app-logo';
 
 @injectable()
-export class AdministrationTopAppBarBootstrap extends Bootstrap {
+export class AppLogoAdministrationPluginBootstrap extends Bootstrap {
   constructor(
     private readonly administrationTopAppBarService: AdministrationTopAppBarService,
     private readonly wizardTopAppBarService: WizardTopAppBarService,
@@ -18,8 +18,8 @@ export class AdministrationTopAppBarBootstrap extends Bootstrap {
     super();
   }
 
-  override register(): void | Promise<void> {
-    this.administrationTopAppBarService.placeholder.add(Logo, 0);
-    this.wizardTopAppBarService.placeholder.add(Logo, 0);
+  override register() {
+    this.administrationTopAppBarService.placeholder.add(LogoLazy, 0);
+    this.wizardTopAppBarService.placeholder.add(LogoLazy, 0);
   }
 }
