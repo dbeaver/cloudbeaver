@@ -19,6 +19,7 @@ export type ApplicationFeature = WebFeatureSet;
 @injectable()
 export class FeaturesResource extends CachedDataResource<ApplicationFeature[]> {
   private baseFeatures: string[];
+
   constructor(
     private readonly graphQLService: GraphQLService,
     permissionsResource: SessionPermissionsResource,
@@ -46,4 +47,8 @@ export class FeaturesResource extends CachedDataResource<ApplicationFeature[]> {
 
     return features;
   }
+}
+
+export function sortFeature(a: ApplicationFeature, b: ApplicationFeature): number {
+  return a.label.localeCompare(b.label);
 }

@@ -106,8 +106,8 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         ref={setEditorRef}
         getValue={() => data.value}
         cursor={{
-          anchor: data.cursor.begin,
-          head: data.cursor.end,
+          anchor: data.cursor.anchor,
+          head: data.cursor.head,
         }}
         incomingValue={data.incomingValue}
         extensions={extensions}
@@ -115,7 +115,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         autoFocus
         lineNumbers
         onChange={panel.onQueryChange}
-        onCursorChange={selection => panel.onCursorChange(selection.from, selection.to)}
+        onCursorChange={selection => panel.onCursorChange(selection.anchor, selection.head)}
       >
         {data.isIncomingChanges && (
           <>
