@@ -7,7 +7,5 @@
  */
 import { administrationTopAppBarPlugin } from './manifest.js';
 
-export * from './TopNavBar/AdministrationTopAppBarBootstrap.js';
-
 export { administrationTopAppBarPlugin };
 export default administrationTopAppBarPlugin;

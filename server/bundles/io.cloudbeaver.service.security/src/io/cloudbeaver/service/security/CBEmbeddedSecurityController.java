@@ -2654,7 +2654,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         Set<SMAuthProviderCustomConfiguration> customConfigurations = appConfiguration.getAuthCustomConfigurations();
         List<SMAuthProviderDescriptor> providers = WebAuthProviderRegistry.getInstance().getAuthProviders().stream()
             .filter(ap ->
-                !ap.isTrusted() &&
+                !ap.isTrusted() && !ap.isAuthHidden() &&
                     appConfiguration.isAuthProviderEnabled(ap.getId()) &&
                     (!ap.isConfigurable() || hasProviderConfiguration(ap, customConfigurations)))
             .map(WebAuthProviderDescriptor::createDescriptorBean).toList();

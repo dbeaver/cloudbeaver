@@ -32,6 +32,8 @@ export class ScreenService {
     this.routerService.subscribe(this.onRouteChange.bind(this));
     this.routerService.transitionTask.addHandler(this.routeTransition.bind(this));
 
+    this.navigateToRoot = this.navigateToRoot.bind(this);
+
     makeObservable(this, {
       screen: computed,
     });

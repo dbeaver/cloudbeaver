@@ -110,7 +110,7 @@ export default [
   ['ui_close_others', 'Закрыть другие'],
   ['ui_close_all_to_the_right', 'Закрыть все справа'],
   ['ui_close_all_to_the_left', 'Закрыть все слева'],
-  ['ui_or', 'Или'],
+  ['ui_or', 'или'],
   ['ui_download', 'Cкачать'],
   ['ui_download_file', 'Скачать файл'],
   ['ui_upload', 'Загрузить'],
