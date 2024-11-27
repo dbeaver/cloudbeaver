@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.app;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 
@@ -44,4 +45,10 @@ public interface WebAppConfiguration extends ServletAppConfiguration {
     default String[] getEnabledAuthProviders() {
         return new String[0];
     }
+
+    @NotNull
+    String[] getEnabledDrivers();
+
+    @NotNull
+    String[] getDisabledDrivers();
 }

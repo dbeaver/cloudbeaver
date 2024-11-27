@@ -33,9 +33,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @WebServlet(urlPatterns = "/status")
-public class CBStatusServlet extends DefaultServlet {
+public class WebStatusServlet extends DefaultServlet {
 
-    private static final Log log = Log.getLog(CBStatusServlet.class);
+    private static final Log log = Log.getLog(WebStatusServlet.class);
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

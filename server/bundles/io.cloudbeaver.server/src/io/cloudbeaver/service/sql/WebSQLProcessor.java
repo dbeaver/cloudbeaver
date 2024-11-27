@@ -20,7 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
 import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
@@ -1149,7 +1149,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         if (cellRow instanceof Map<?, ?>) {
             Map<String, Object> variables = (Map<String, Object>) cellRow;
             if (variables.get(FILE_ID) != null) {
-                Path path = CBPlatform.getInstance()
+                Path path = WebAppUtils.getWebPlatform()
                     .getTempFolder(webSession.getProgressMonitor(), TEMP_FILE_FOLDER)
                     .resolve(webSession.getSessionId())
                     .resolve(variables.get(FILE_ID).toString());

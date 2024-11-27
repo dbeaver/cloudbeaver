@@ -17,7 +17,7 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.server.CBConstants;
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
@@ -36,7 +36,8 @@ import java.text.SimpleDateFormat;
 
 public class WebSQLDataLOBReceiver extends WebSQLCellValueReceiver {
     private static final Log log = Log.getLog(WebSQLDataLOBReceiver.class);
-    public static final Path DATA_EXPORT_FOLDER = CBPlatform.getInstance().getTempFolder(new VoidProgressMonitor(), "sql-lob-files");
+    public static final Path DATA_EXPORT_FOLDER = WebAppUtils.getWebPlatform().getTempFolder(new VoidProgressMonitor(), "sql-lob" +
+        "-files");
     private final String tableName;
 
     WebSQLDataLOBReceiver(String tableName, DBSDataContainer dataContainer, int rowIndex) {

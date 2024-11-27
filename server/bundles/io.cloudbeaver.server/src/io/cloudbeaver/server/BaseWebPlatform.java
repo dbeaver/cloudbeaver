@@ -53,7 +53,7 @@ public abstract class BaseWebPlatform extends BasePlatformImpl {
     private QMRegistryImpl queryManager;
     private QMLogFileWriter qmLogWriter;
     private DBACertificateStorage certificateStorage;
-    private WebGlobalWorkspace workspace;
+    private ServerGlobalWorkspace workspace;
 
     @Override
     protected synchronized void initialize() {
@@ -61,7 +61,7 @@ public abstract class BaseWebPlatform extends BasePlatformImpl {
         SecurityProviderUtils.registerSecurityProvider();
 
         // Register properties adapter
-        this.workspace = new WebGlobalWorkspace(this, getApplication());
+        this.workspace = new ServerGlobalWorkspace(this, getApplication());
         this.workspace.initializeProjects();
         QMUtils.initApplication(this);
 

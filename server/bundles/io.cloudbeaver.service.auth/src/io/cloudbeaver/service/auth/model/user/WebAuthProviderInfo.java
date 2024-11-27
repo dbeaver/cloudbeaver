@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.user;
+package io.cloudbeaver.service.auth.model.user;
 
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.auth.provisioning.SMProvisioner;
-import io.cloudbeaver.model.config.CBAppConfig;
+import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.WebAppUtils;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.SMAuthCredentialsProfile;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
@@ -65,8 +65,8 @@ public class WebAuthProviderInfo {
     }
 
     public boolean isDefaultProvider() {
-        if (CBPlatform.getInstance().getApplication().getAppConfiguration() instanceof CBAppConfig cbAppConfig) {
-            return descriptor.getId().equals(cbAppConfig.getDefaultAuthProvider());
+        if (WebAppUtils.getWebApplication().getAppConfiguration() instanceof WebAuthConfiguration authConfiguration) {
+            return descriptor.getId().equals(authConfiguration.getDefaultAuthProvider());
         }
         return false;
     }

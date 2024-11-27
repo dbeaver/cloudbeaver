@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.server.jobs;
 
+import io.cloudbeaver.server.WebAppSessionManager;
+import io.cloudbeaver.service.session.CBSessionManager;
 import io.cloudbeaver.service.session.WebSessionManager;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
@@ -30,9 +32,9 @@ import java.time.Duration;
  */
 public class WebSessionMonitorJob extends PeriodicJob {
     private static final Log log = Log.getLog(WebSessionMonitorJob.class);
-    private final WebSessionManager sessionManager;
+    private final CBSessionManager sessionManager;
 
-    public WebSessionMonitorJob(@NotNull DBPPlatform platform, @NotNull WebSessionManager sessionManager) {
+    public WebSessionMonitorJob(@NotNull DBPPlatform platform, @NotNull CBSessionManager sessionManager) {
         super("Web session monitor", platform, Duration.ofSeconds(10));
         this.sessionManager = sessionManager;
     }

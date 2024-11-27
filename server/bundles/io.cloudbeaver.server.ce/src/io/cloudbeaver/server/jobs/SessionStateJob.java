@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.server.jobs;
 
-import io.cloudbeaver.service.session.WebSessionManager;
+import io.cloudbeaver.service.session.CBSessionManager;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
@@ -27,9 +27,9 @@ import java.time.Duration;
 
 public class SessionStateJob extends PeriodicJob {
     private static final Log log = Log.getLog(SessionStateJob.class);
-    private final WebSessionManager sessionManager;
+    private final CBSessionManager sessionManager;
 
-    public SessionStateJob(@NotNull DBPPlatform platform, WebSessionManager sessionManager) {
+    public SessionStateJob(@NotNull DBPPlatform platform, CBSessionManager sessionManager) {
         super("Session state sender", platform, Duration.ofSeconds(30));
         this.sessionManager = sessionManager;
     }

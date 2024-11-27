@@ -21,7 +21,6 @@ import io.cloudbeaver.auth.SMTokenCredentialProvider;
 import io.cloudbeaver.model.session.*;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
-import io.cloudbeaver.server.AppWebSessionManager;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;

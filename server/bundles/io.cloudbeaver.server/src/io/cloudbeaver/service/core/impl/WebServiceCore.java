@@ -76,6 +76,11 @@ public class WebServiceCore implements DBWServiceCore {
     private static final Log log = Log.getLog(WebServiceCore.class);
 
     @Override
+    public WebServerConfig getServerConfig() {
+        return new WebServerConfig(WebAppUtils.getWebApplication());
+    }
+
+    @Override
     public List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, String driverId) {
         List<WebDatabaseDriverInfo> result = new ArrayList<>();
         for (DBPDriver driver : WebAppUtils.getWebPlatform().getApplicableDrivers()) {
@@ -135,7 +140,7 @@ public class WebServiceCore implements DBWServiceCore {
 
         for (DBPDataSourceContainer ds : dsRegistry.getDataSources()) {
             if (ds.isTemplate()) {
-                if (CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver())) {
+                if (WebAppUtils.getWebPlatform().getApplicableDrivers().contains(ds.getDriver())) {
                     result.add(new WebDataSourceConfig(ds));
                 } else {
                     log.debug("Template datasource '" + ds.getName() + "' ignored - driver is not applicable");
@@ -174,7 +179,7 @@ public class WebServiceCore implements DBWServiceCore {
         for (DBPDataSourceContainer ds : registry.getDataSources()) {
             if (ds.isTemplate() &&
                 project.getDataSourceFilter().filter(ds) &&
-                CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver())) {
+                WebAppUtils.getWebPlatform().getApplicableDrivers().contains(ds.getDriver())) {
                 result.add(new WebConnectionInfo(webSession, ds));
             }
         }
@@ -262,7 +267,7 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public boolean closeSession(HttpServletRequest request) throws DBWebException {
         try {
-            var baseWebSession = CBPlatform.getInstance().getSessionManager().closeSession(request);
+            var baseWebSession = WebAppUtils.getWebPlatform().getSessionManager().closeSession(request);
             if (baseWebSession instanceof WebSession webSession) {
                 for (WebSessionHandlerDescriptor hd : WebHandlerRegistry.getInstance().getSessionHandlers()) {
                     try {
@@ -283,14 +288,14 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     @Deprecated
     public boolean touchSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException {
-        return CBPlatform.getInstance().getSessionManager().touchSession(request, response);
+        return WebAppUtils.getWebPlatform().getSessionManager().touchSession(request, response);
     }
 
     @Override
     @Deprecated
     public WebSession updateSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response)
         throws DBWebException {
-        var sessionManager = CBPlatform.getInstance().getSessionManager();
+        var sessionManager = WebAppUtils.getWebPlatform().getSessionManager();
         sessionManager.touchSession(request, response);
         return sessionManager.getWebSession(request, response, true);
     }
@@ -298,7 +303,7 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public boolean refreshSessionConnections(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response)
         throws DBWebException {
-        WebSession session = CBPlatform.getInstance().getSessionManager().getWebSession(request, response);
+        WebSession session = WebAppUtils.getWebPlatform().getSessionManager().getWebSession(request, response);
         if (session == null) {
             return false;
         } else {

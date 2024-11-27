@@ -24,7 +24,7 @@ import io.cloudbeaver.server.WebApplication;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
-import io.cloudbeaver.server.servlets.CBStatusServlet;
+import io.cloudbeaver.server.servlets.WebStatusServlet;
 import io.cloudbeaver.server.websockets.CBJettyWebSocketManager;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServiceBindingWebSocket;
@@ -116,7 +116,7 @@ public class CBJettyServer {
                 ServletHolder imagesServletHolder = new ServletHolder("images", new CBImageServlet());
                 servletContextHandler.addServlet(imagesServletHolder, serverConfiguration.getServicesURI() + "images/*");
 
-                servletContextHandler.addServlet(new ServletHolder("status", new CBStatusServlet()), "/status");
+                servletContextHandler.addServlet(new ServletHolder("status", new WebStatusServlet()), "/status");
 
                 servletContextHandler.addServlet(new ServletHolder("graphql", new GraphQLEndpoint()), serverConfiguration.getServicesURI() + "gql/*");
                 servletContextHandler.addEventListener(new CBServerContextListener(application));
@@ -137,7 +137,7 @@ public class CBJettyServer {
                 }
 
                 CBJettyWebSocketContext webSocketContext = new CBJettyWebSocketContext(server, servletContextHandler);
-                for (DBWServiceBindingWebSocket wsb : WebServiceRegistry.getInstance()
+                for (DBWServiceBindingWebSocket<CBApplication> wsb : WebServiceRegistry.getInstance()
                     .getWebServices(DBWServiceBindingWebSocket.class)
                 ) {
                     if (wsb.isApplicable(this.application)) {

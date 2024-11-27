@@ -17,8 +17,7 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.model.app.ServletApplication;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -39,18 +38,18 @@ import java.util.Map;
 /**
  * Web global workspace.
  */
-public class WebGlobalWorkspace extends BaseWorkspaceImpl {
+public class ServerGlobalWorkspace extends BaseWorkspaceImpl {
 
-    private static final Log log = Log.getLog(WebGlobalWorkspace.class);
+    private static final Log log = Log.getLog(ServerGlobalWorkspace.class);
 
     protected final Map<String, WebProjectImpl> projects = new LinkedHashMap<>();
     private WebGlobalProject globalProject;
 
-    private final WebApplication application;
+    private final ServletApplication application;
 
-    public WebGlobalWorkspace(
+    public ServerGlobalWorkspace(
         @NotNull DBPPlatform platform,
-        @NotNull WebApplication application
+        @NotNull ServletApplication application
     ) {
         super(platform, application.getWorkspaceDirectory());
         this.application = application;
@@ -61,7 +60,7 @@ public class WebGlobalWorkspace extends BaseWorkspaceImpl {
         initializeWorkspaceSession();
 
         // Load global project
-        String defaultProjectName = WebAppUtils.getWebApplication().getDefaultProjectName();
+        String defaultProjectName = application.getDefaultProjectName();
         if (CommonUtils.isNotEmpty(defaultProjectName)) {
             Path globalProjectPath = getAbsolutePath().resolve(defaultProjectName);
             if (!Files.exists(globalProjectPath)) {
