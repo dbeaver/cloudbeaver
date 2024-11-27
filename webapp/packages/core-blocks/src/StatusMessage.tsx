@@ -66,10 +66,10 @@ export const StatusMessage = observer<Props>(function StatusMessage({
           <div className={s(styles, { message: !multipleRows })} title={message}>
             {onShowDetails ? (
               <Link className={s(styles, { link: !multipleRows })} onClick={onShowDetails}>
-                {message}
+                {translate(message)}
               </Link>
             ) : (
-              message
+              translate(message)
             )}
           </div>
         </>

@@ -17,6 +17,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
   state: TPartState;
   initialState: TPartState;
   isSaving: boolean;
+  saved: boolean;
 
   exception: Error | null;
   promise: Promise<any> | null;
@@ -31,6 +32,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     this.initialState = initialState;
     this.state = toJS(this.initialState);
     this.isSaving = false;
+    this.saved = false;
 
     this.exception = null;
     this.promise = null;
@@ -88,6 +90,8 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     if (this.loading) {
       return;
     }
+
+    this.saved = false;
     this.loading = true;
 
     try {
@@ -106,7 +110,9 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
 
       this.loaded = false;
       this.exception = null;
+      this.saved = true;
     } catch (exception: any) {
+      this.saved = false;
       this.exception = exception;
       throw exception;
     } finally {
