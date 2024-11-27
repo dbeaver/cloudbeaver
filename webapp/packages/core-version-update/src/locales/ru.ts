@@ -16,4 +16,5 @@ export default [
   ['version_update_info', 'Информация'],
   ['version_update_instruction', 'Чтобы обновить версию, следуйте'],
   ['version_update_instruction_link', 'инструкциям'],
+  ['version_update_instruction_link_not_provided', 'Ссылка на инструкции не предоставлена. Обратитесь в службу поддержки.'],
 ];

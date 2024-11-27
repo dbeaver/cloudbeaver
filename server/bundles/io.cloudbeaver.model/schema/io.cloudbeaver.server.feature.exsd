@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<schema targetNamespace="org.jkiss.dbeaver.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="io.cloudbeaver.model" id="io.cloudbeaver.server.feature" name="Web features"/>
+      </appInfo>
+      <documentation>
+         Web feature
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="feature"/>
+         </sequence>
+      </complexType>
+   </element>
+
+   <element name="feature">
+      <annotation>
+         <documentation>
+            Web service description
+         </documentation>
+      </annotation>
+   </element>
+
+
+</schema>
