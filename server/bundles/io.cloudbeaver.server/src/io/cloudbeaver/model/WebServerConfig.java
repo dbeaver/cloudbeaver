@@ -28,6 +28,7 @@ import org.jkiss.dbeaver.registry.language.PlatformLanguageDescriptor;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,7 @@ public class WebServerConfig {
 
     @Property
     public String getName() {
-        return application.getServerConfiguration().getServerName();
+        return CommonUtils.notEmpty(application.getServerConfiguration().getServerName());
     }
 
     @Property
