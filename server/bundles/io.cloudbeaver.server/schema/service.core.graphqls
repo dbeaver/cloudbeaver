@@ -157,6 +157,7 @@ type ServerConfig {
 
     enabledFeatures: [ID!]!
     disabledBetaFeatures: [ID!] @since(version: "24.0.5")
+    serverFeatures: [ID!] @since(version: "24.3.0")
     enabledAuthProviders: [ID!]!
     supportedLanguages: [ ServerLanguage! ]!
     services: [ WebServiceConfig ]

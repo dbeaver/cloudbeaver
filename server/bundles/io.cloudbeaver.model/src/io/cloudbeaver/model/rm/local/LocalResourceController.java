@@ -437,6 +437,9 @@ public class LocalResourceController extends BaseLocalResourceController {
                 if (Files.exists(newTargetPath)) {
                     throw new DBException("Resource with name %s already exists".formatted(newTargetPath.getFileName()));
                 }
+                if (!Files.exists(newTargetPath.getParent())) {
+                    throw new DBException("Resource %s doesn't exists".formatted(newTargetPath.getParent().getFileName()));
+                }
                 try {
                     Files.move(oldTargetPath, newTargetPath);
                 } catch (IOException e) {

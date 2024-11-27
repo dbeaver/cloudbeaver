@@ -108,7 +108,7 @@ export default [
   ['ui_close_others', 'Fermer les autres'],
   ['ui_close_all_to_the_right', 'Fermer tout à droite'],
   ['ui_close_all_to_the_left', 'Fermer tout à gauche'],
-  ['ui_or', 'Ou'],
+  ['ui_or', 'ou'],
   ['ui_download', 'Télécharger'],
   ['ui_download_file', 'Télécharger le fichier'],
   ['ui_upload', 'Importer'],
