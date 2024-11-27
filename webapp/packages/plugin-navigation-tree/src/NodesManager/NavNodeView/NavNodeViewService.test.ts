@@ -18,7 +18,6 @@ import { coreDialogsManifest } from '@cloudbeaver/core-dialogs';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { coreNavigationTree } from '@cloudbeaver/core-navigation-tree';
-import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreProjectsManifest } from '@cloudbeaver/core-projects';
 import { coreRootManifest } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint.js';
@@ -29,7 +28,6 @@ import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
 import { coreStorageManifest } from '@cloudbeaver/core-storage';
-import { coreThemingManifest } from '@cloudbeaver/core-theming';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreViewManifest } from '@cloudbeaver/core-view';
 import { datasourceContextSwitchPluginManifest } from '@cloudbeaver/plugin-datasource-context-switch';
@@ -45,7 +43,6 @@ const app = createApp(
   navigationTreePlugin,
   coreLocalizationManifest,
   coreEventsManifest,
-  coreProductManifest,
   coreRootManifest,
   coreSDKManifest,
   coreBrowserManifest,
@@ -63,7 +60,6 @@ const app = createApp(
   navigationTabsPlugin,
   coreNavigationTree,
   coreAppManifest,
-  coreThemingManifest,
   coreClientActivityManifest,
 );
 
