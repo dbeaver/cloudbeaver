@@ -18,6 +18,8 @@ package io.cloudbeaver.server;
 
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
+import io.cloudbeaver.model.CBWebServerConfig;
+import io.cloudbeaver.model.WebServerConfig;
 import io.cloudbeaver.model.app.BaseServletApplication;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
@@ -764,5 +766,10 @@ public abstract class CBApplication<T extends CBServerConfig> extends
 
     public Map<String, String> getInitActions() {
         return Map.copyOf(initActions);
+    }
+
+    @Override
+    public WebServerConfig getWebServerConfig() {
+        return new CBWebServerConfig(this);
     }
 }

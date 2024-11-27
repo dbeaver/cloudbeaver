@@ -252,7 +252,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
         return null;
     }
 
-    public abstract WebServerConfigurationController getServerConfigurationController();
+    public abstract ServletServerConfigurationController getServerConfigurationController();
 
     @Override
     public boolean isEnvironmentVariablesAccessible() {

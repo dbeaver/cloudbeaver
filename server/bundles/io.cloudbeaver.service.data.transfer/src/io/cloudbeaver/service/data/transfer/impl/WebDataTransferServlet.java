@@ -18,7 +18,7 @@ package io.cloudbeaver.service.data.transfer.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.WebApplication;
 import io.cloudbeaver.service.WebServiceServletBase;
 import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,7 +42,7 @@ public class WebDataTransferServlet extends WebServiceServletBase {
 
     private final DBWServiceDataTransfer dtManager;
 
-    public WebDataTransferServlet(CBApplication application, DBWServiceDataTransfer dtManager) {
+    public WebDataTransferServlet(WebApplication application, DBWServiceDataTransfer dtManager) {
         super(application);
         this.dtManager = dtManager;
     }

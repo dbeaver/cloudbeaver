@@ -16,36 +16,34 @@
  */
 package io.cloudbeaver.model.app;
 
-import io.cloudbeaver.server.WebServerPreferenceStore;
+import com.google.gson.Gson;
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 
+import java.nio.file.Path;
 import java.util.Map;
 
 /**
- * Web server configuration.
- * Contains only server configuration properties.
+ * Server configuration controller.
+ * Works with app server configuration (loads, updates)
  */
-public interface WebServerConfiguration {
-    boolean isDevelMode();
-
-    default String getRootURI() {
-        return "";
-    }
+public interface ServletServerConfigurationController<T extends ServletServerConfiguration> {
 
     /**
-     * @return the setting values that will be used in {@link WebServerPreferenceStore}
+     * Loads server configuration.
      */
+    void loadServerConfiguration(Path configPath) throws DBException;
+
     @NotNull
-    default Map<String, Object> getProductSettings() {
+    default Map<String, Object> getOriginalConfigurationProperties() {
         return Map.of();
     }
 
-    @Nullable
-    String getServerName();
+    @NotNull
+    Path getWorkspacePath();
 
-    @Nullable
-    String getServerURL();
+    @NotNull
+    Gson getGson();
 
-    long getMaxSessionIdleTime();
+    void validateFinalServerConfiguration() throws DBException;
 }

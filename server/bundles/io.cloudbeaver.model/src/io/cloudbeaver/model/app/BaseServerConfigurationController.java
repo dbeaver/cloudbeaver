@@ -32,8 +32,8 @@ import java.nio.file.Path;
 /**
  * Abstract class that contains methods for loading configuration with gson.
  */
-public abstract class BaseServerConfigurationController<T extends WebServerConfiguration>
-    implements WebServerConfigurationController<T> {
+public abstract class BaseServerConfigurationController<T extends ServletServerConfiguration>
+    implements ServletServerConfigurationController<T> {
     private static final Log log = Log.getLog(BaseServerConfigurationController.class);
     @NotNull
     private final Path homeDirectory;

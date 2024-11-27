@@ -44,7 +44,7 @@ public interface ServletApplication extends DBPApplication {
 
     ServletAppConfiguration getAppConfiguration();
 
-    WebServerConfiguration getServerConfiguration();
+    ServletServerConfiguration getServerConfiguration();
 
     Path getDataDirectory(boolean create);
 

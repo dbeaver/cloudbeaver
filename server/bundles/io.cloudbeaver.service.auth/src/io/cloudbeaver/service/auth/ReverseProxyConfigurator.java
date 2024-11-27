@@ -20,7 +20,7 @@ import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.model.app.ServletAppConfiguration;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.app.ServletAuthApplication;
-import io.cloudbeaver.model.app.WebServerConfiguration;
+import io.cloudbeaver.model.app.ServletServerConfiguration;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import org.jkiss.code.NotNull;
@@ -39,7 +39,7 @@ public class ReverseProxyConfigurator implements DBWServiceServerConfigurator {
     public void configureServer(
         @NotNull ServletApplication application,
         @Nullable WebSession session,
-        @NotNull WebServerConfiguration serverConfiguration,
+        @NotNull ServletServerConfiguration serverConfiguration,
         @NotNull ServletAppConfiguration appConfig
     ) throws DBException {
     }

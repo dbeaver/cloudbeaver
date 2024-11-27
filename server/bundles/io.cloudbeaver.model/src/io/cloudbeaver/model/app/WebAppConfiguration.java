@@ -20,6 +20,8 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 
+import java.util.Map;
+
 /**
  * Application configuration
  */
@@ -34,10 +36,6 @@ public interface WebAppConfiguration extends ServletAppConfiguration {
 
     boolean isAdminCredentialsSaveEnabled();
 
-    default boolean isRedirectOnFederatedAuth() {
-        return false;
-    }
-
     default String[] getDisabledBetaFeatures() {
         return new String[0];
     }
@@ -51,4 +49,6 @@ public interface WebAppConfiguration extends ServletAppConfiguration {
 
     @NotNull
     String[] getDisabledDrivers();
+
+    Map<String, Object> getResourceQuotas();
 }

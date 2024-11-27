@@ -16,9 +16,7 @@
  */
 package io.cloudbeaver.server.jobs;
 
-import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.service.session.CBSessionManager;
-import io.cloudbeaver.service.session.WebSessionManager;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;

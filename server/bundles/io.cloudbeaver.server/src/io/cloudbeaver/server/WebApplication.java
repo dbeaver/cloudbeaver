@@ -16,11 +16,12 @@
  */
 package io.cloudbeaver.server;
 
+import io.cloudbeaver.model.WebServerConfig;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.app.WebAppConfiguration;
+import io.cloudbeaver.model.app.WebServerConfiguration;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 
 import java.net.InetAddress;
 import java.util.List;
@@ -30,6 +31,8 @@ import java.util.Map;
  * Base interface for applications with web ui
  */
 public interface WebApplication extends ServletApplication {
+    WebServerConfiguration getServerConfiguration();
+
     WebAppSessionManager getSessionManager();
 
     WebDriverRegistry getDriverRegistry();
@@ -47,10 +50,6 @@ public interface WebApplication extends ServletApplication {
 
     String getLicenseStatus();
 
-    @Nullable
-    default String getContainerId() {
-        return null;
-    }
+    WebServerConfig getWebServerConfig();
 
-    String getLocalHostAddress();
 }

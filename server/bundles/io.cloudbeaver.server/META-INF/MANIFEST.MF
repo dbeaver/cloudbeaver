@@ -22,6 +22,7 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  io.cloudbeaver.service.security;visibility:=reexport
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.model,
+ io.cloudbeaver.model.app,
  io.cloudbeaver.model.user,
  io.cloudbeaver.registry,
  io.cloudbeaver.server.events,
@@ -34,7 +35,6 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.server.websockets,
  io.cloudbeaver.service,
  io.cloudbeaver.service.navigator,
- io.cloudbeaver.service.session,
  io.cloudbeaver.service.sql
 Import-Package: org.slf4j
 Automatic-Module-Name: io.cloudbeaver.server

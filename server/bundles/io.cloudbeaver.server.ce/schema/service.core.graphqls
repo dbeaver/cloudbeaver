@@ -1,8 +1,4 @@
-type ServerConfig {
-    name: String!
-    version: String!
-    workspaceId: ID!
-
+extend type ServerConfig {
     serverURL: String!
     rootURI: String!
     hostName: String! @deprecated # use container id instead
@@ -10,47 +6,11 @@ type ServerConfig {
     defaultAuthRole: String
     defaultUserTeam: String # [23.2.2]
 
-    anonymousAccessEnabled: Boolean!
-    supportsCustomConnections: Boolean!
-    supportsConnectionBrowser: Boolean!
-    supportsWorkspaces: Boolean!
-    resourceManagerEnabled: Boolean!
-
-    publicCredentialsSaveEnabled: Boolean!
-    adminCredentialsSaveEnabled: Boolean!
-
-    licenseRequired: Boolean!
-    licenseValid: Boolean!
-    licenseStatus: String @since(version: "24.1.5")
-
     sessionExpireTime: Int!
     localHostAddress: String
 
-    configurationMode: Boolean!
-    #    initializationMode: Boolean! @since(version: "24.1.5")
-    developmentMode: Boolean!
     redirectOnFederatedAuth: Boolean!
-    distributed: Boolean!
-
-    enabledFeatures: [ID!]!
-    disabledBetaFeatures: [ID!] @since(version: "24.0.5")
     enabledAuthProviders: [ID!]!
-    supportedLanguages: [ ServerLanguage! ]!
-    services: [ WebServiceConfig ]
-    productConfiguration: Object!
-    productInfo: ProductInfo!
-    defaultNavigatorSettings: NavigatorSettings!
-    disabledDrivers: [ID!]!
-    resourceQuotas: Object!
     passwordPolicyConfiguration: PasswordPolicyConfig! @since(version: "23.3.3")
-}
-
-extend type Query {
-    # Returns server config
-    serverConfig: ServerConfig!
-}
-
-extend type Mutation {
-    fakeFunctionCE: Object # it's needed because of types generation bug
 }
 

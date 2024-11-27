@@ -18,7 +18,7 @@ package io.cloudbeaver.service;
 
 import io.cloudbeaver.model.app.ServletAppConfiguration;
 import io.cloudbeaver.model.app.ServletApplication;
-import io.cloudbeaver.model.app.WebServerConfiguration;
+import io.cloudbeaver.model.app.ServletServerConfiguration;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -32,7 +32,7 @@ public interface DBWServiceServerConfigurator extends DBWServiceBinding {
     void configureServer(
         @NotNull ServletApplication application,
         @Nullable WebSession session,
-        @NotNull WebServerConfiguration serverConfiguration,
+        @NotNull ServletServerConfiguration serverConfiguration,
         @NotNull ServletAppConfiguration appConfig
     ) throws DBException;
 

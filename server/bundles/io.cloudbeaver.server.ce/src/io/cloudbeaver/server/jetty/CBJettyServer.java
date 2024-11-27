@@ -160,7 +160,7 @@ public class CBJettyServer {
                 );
                 servletContextHandler.insertHandler(webSocketHandler);
 
-                initSessionManager(
+                JettyUtils.initSessionManager(
                     this.application.getMaxSessionIdleTime(),
                     this.application,
                     server,
@@ -216,35 +216,6 @@ public class CBJettyServer {
         }
         var sslConfiguration = Path.of(sslConfigurationPath);
         return sslConfiguration.isAbsolute() ? sslConfiguration : application.getHomeDirectory().resolve(sslConfiguration);
-    }
-
-    public static void initSessionManager(
-        long maxIdleTime,
-        @NotNull WebApplication application,
-        @NotNull Server server,
-        @NotNull ServletContextHandler servletContextHandler
-    ) {
-        // Init sessions persistence
-        CBSessionHandler sessionHandler = new CBSessionHandler(application);
-        sessionHandler.setRefreshCookieAge(CBSessionHandler.ONE_MINUTE);
-        int intMaxIdleSeconds;
-        if (maxIdleTime > Integer.MAX_VALUE) {
-            log.warn("Max session idle time value is greater than Integer.MAX_VALUE. Integer.MAX_VALUE will be used instead");
-            maxIdleTime = Integer.MAX_VALUE;
-        }
-        intMaxIdleSeconds = (int) (maxIdleTime / 1000);
-        log.debug("Max http session idle time: " + intMaxIdleSeconds + "s");
-        sessionHandler.setMaxInactiveInterval(intMaxIdleSeconds);
-        sessionHandler.setMaxCookieAge(intMaxIdleSeconds);
-
-        DefaultSessionCache sessionCache = new DefaultSessionCache(sessionHandler);
-        sessionCache.setSessionDataStore(new NullSessionDataStore());
-        sessionHandler.setSessionCache(sessionCache);
-        servletContextHandler.setSessionHandler(sessionHandler);
-
-        DefaultSessionIdManager idMgr = new DefaultSessionIdManager(server);
-        idMgr.setWorkerName(null);
-        server.addBean(idMgr, true);
     }
 
     public synchronized void refreshJettyConfig() {
