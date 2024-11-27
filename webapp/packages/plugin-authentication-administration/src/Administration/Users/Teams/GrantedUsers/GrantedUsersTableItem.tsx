@@ -49,7 +49,7 @@ export const GrantedUsersTableItem = observer<Props>(function GrantedUsersTableI
       </TableColumnValue>
       <TableColumnValue>{name}</TableColumnValue>
       {teamRoles.length > 0 && (
-        <TableColumnValue title={translate('plugin_authentication_administration_team_user_team_role_supervisor_description')}>
+        <TableColumnValue title={translate('plugin_authentication_administration_team_user_team_role_supervisor_description')} centerContent flex>
           <Checkbox
             checked={teamRole === USER_TEAM_ROLE_SUPERVISOR}
             onChange={value => onTeamRoleAssign(id, value ? USER_TEAM_ROLE_SUPERVISOR : null)}
