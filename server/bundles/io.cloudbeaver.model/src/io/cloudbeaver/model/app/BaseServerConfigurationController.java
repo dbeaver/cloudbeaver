@@ -43,7 +43,7 @@ public abstract class BaseServerConfigurationController<T extends ServletServerC
     protected BaseServerConfigurationController(@NotNull Path homeDirectory) {
         this.homeDirectory = homeDirectory;
         //default workspaceLocation
-        this.workspacePath = null;
+        this.workspacePath = homeDirectory.resolve("workspace");
     }
 
     @NotNull
