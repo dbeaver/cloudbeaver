@@ -126,10 +126,6 @@ export class FormState<TState> implements IFormState<TState> {
     return this.partsValues.some(part => part.isChanged);
   }
 
-  get hasSomeSavedParts(): boolean {
-    return this.partsValues.some(part => part.saved && !part.isError());
-  }
-
   getPart<T extends IFormPart<any>>(getter: DataContextGetter<T>, init: (context: IDataContext, id: string) => T): T {
     return this.parts.get(getter.id, () => {
       if (this.dataContext.has(getter)) {
