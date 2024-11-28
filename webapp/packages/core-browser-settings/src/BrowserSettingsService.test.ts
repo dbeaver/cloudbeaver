@@ -7,7 +7,6 @@
  */
 import { expect, test } from '@jest/globals';
 
-import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
@@ -30,7 +29,6 @@ import { coreBrowserSettingsManifest } from './manifest.js';
 const endpoint = createGQLEndpoint();
 const server = mockGraphQL(...mockAppInit(endpoint));
 const app = createApp(
-  coreBrowserManifest,
   coreBrowserSettingsManifest,
   coreRootManifest,
   coreSDKManifest,
