@@ -84,13 +84,13 @@ public class CBPlatform extends BaseWebPlatform {
     }
 
     protected void scheduleServerJobs() {
-        new WebSessionMonitorJob(this, getSessionManager())
+        new WebSessionMonitorJob(this, application.getSessionManager())
             .scheduleMonitor();
 
-        new SessionStateJob(this, getSessionManager())
+        new SessionStateJob(this, application.getSessionManager())
             .scheduleMonitor();
 
-        new WebDataSourceMonitorJob(this, getSessionManager())
+        new WebDataSourceMonitorJob(this, application.getSessionManager())
             .scheduleMonitor();
 
         new AbstractJob("Delete temp folder") {
@@ -120,7 +120,7 @@ public class CBPlatform extends BaseWebPlatform {
 
     @NotNull
     @Override
-    public WebApplication getApplication() {
+    public CBApplication<?> getApplication() {
         return application;
     }
 
@@ -138,10 +138,6 @@ public class CBPlatform extends BaseWebPlatform {
     @Override
     public boolean isShuttingDown() {
         return false;
-    }
-
-    public CBSessionManager getSessionManager() {
-        return application.getSessionManager();
     }
 
     public void refreshApplicableDrivers() {

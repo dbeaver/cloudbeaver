@@ -22,7 +22,7 @@ import io.cloudbeaver.model.CBWebServerConfig;
 import io.cloudbeaver.model.WebServerConfig;
 import io.cloudbeaver.model.app.BaseServletApplication;
 import io.cloudbeaver.model.app.ServletAuthApplication;
-import io.cloudbeaver.model.app.WebAuthConfiguration;
+import io.cloudbeaver.model.app.ServletAuthConfiguration;
 import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.model.config.SMControllerConfiguration;
@@ -177,7 +177,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
     }
 
     @Override
-    public WebAuthConfiguration getAuthConfiguration() {
+    public ServletAuthConfiguration getAuthConfiguration() {
         return getAppConfiguration();
     }
 

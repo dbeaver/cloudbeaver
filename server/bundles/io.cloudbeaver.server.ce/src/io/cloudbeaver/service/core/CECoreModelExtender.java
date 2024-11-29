@@ -20,6 +20,9 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 
+/**
+ * extends the base gql model, to avoid unnecessary fields in other applications
+ */
 public class CECoreModelExtender extends WebServiceBindingBase<DBWVoidService> {
     public CECoreModelExtender() {
         super(DBWVoidService.class, new DBWVoidService(), "schema/service.core.graphqls");

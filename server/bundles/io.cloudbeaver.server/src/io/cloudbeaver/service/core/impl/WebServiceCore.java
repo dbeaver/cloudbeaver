@@ -267,7 +267,7 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public boolean closeSession(HttpServletRequest request) throws DBWebException {
         try {
-            var baseWebSession = WebAppUtils.getWebPlatform().getSessionManager().closeSession(request);
+            var baseWebSession = WebAppUtils.getWebApplication().getSessionManager().closeSession(request);
             if (baseWebSession instanceof WebSession webSession) {
                 for (WebSessionHandlerDescriptor hd : WebHandlerRegistry.getInstance().getSessionHandlers()) {
                     try {
@@ -288,14 +288,14 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     @Deprecated
     public boolean touchSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException {
-        return WebAppUtils.getWebPlatform().getSessionManager().touchSession(request, response);
+        return WebAppUtils.getWebApplication().getSessionManager().touchSession(request, response);
     }
 
     @Override
     @Deprecated
     public WebSession updateSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response)
         throws DBWebException {
-        var sessionManager = WebAppUtils.getWebPlatform().getSessionManager();
+        var sessionManager = WebAppUtils.getWebApplication().getSessionManager();
         sessionManager.touchSession(request, response);
         return sessionManager.getWebSession(request, response, true);
     }
@@ -303,7 +303,7 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public boolean refreshSessionConnections(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response)
         throws DBWebException {
-        WebSession session = WebAppUtils.getWebPlatform().getSessionManager().getWebSession(request, response);
+        WebSession session = WebAppUtils.getWebApplication().getSessionManager().getWebSession(request, response);
         if (session == null) {
             return false;
         } else {

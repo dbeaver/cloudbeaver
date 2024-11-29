@@ -21,7 +21,7 @@ import io.cloudbeaver.auth.CBAuthConstants;
 import org.jkiss.dbeaver.DBException;
 
 public interface ServletAuthApplication extends ServletApplication {
-    WebAuthConfiguration getAuthConfiguration();
+    ServletAuthConfiguration getAuthConfiguration();
 
     String getAuthServiceURL();
 

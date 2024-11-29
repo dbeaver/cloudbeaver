@@ -19,7 +19,7 @@ package io.cloudbeaver.service.auth.model.user;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.auth.provisioning.SMProvisioner;
-import io.cloudbeaver.model.app.WebAuthConfiguration;
+import io.cloudbeaver.model.app.ServletAuthConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.server.CBApplication;
@@ -65,7 +65,7 @@ public class WebAuthProviderInfo {
     }
 
     public boolean isDefaultProvider() {
-        if (WebAppUtils.getWebApplication().getAppConfiguration() instanceof WebAuthConfiguration authConfiguration) {
+        if (WebAppUtils.getWebApplication().getAppConfiguration() instanceof ServletAuthConfiguration authConfiguration) {
             return descriptor.getId().equals(authConfiguration.getDefaultAuthProvider());
         }
         return false;

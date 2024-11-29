@@ -346,7 +346,7 @@ public class WebServiceUtils extends WebCommonUtils {
         List<WebAuthProviderDescriptor> result = new ArrayList<>();
         String[] authProviders = null;
         try {
-            authProviders = ServletAppUtils.getWebAuthApplication().getAuthConfiguration().getEnabledAuthProviders();
+            authProviders = ServletAppUtils.getAuthApplication().getAuthConfiguration().getEnabledAuthProviders();
         } catch (DBException e) {
             log.error(e.getMessage(), e);
             return List.of();

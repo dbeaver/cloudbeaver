@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.auth.local;
 
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.actions.AbstractActionServletHandler;
 import io.cloudbeaver.utils.ServletAppUtils;
@@ -42,7 +43,7 @@ public class LocalServletHandler extends AbstractActionServletHandler {
     public boolean handleRequest(Servlet servlet, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
         if (URI_PREFIX.equals(ServletAppUtils.removeSideSlashes(request.getServletPath()))) {
             try {
-                WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(request, response, true);
+                WebSession webSession = CBApplication.getInstance().getSessionManager().getWebSession(request, response, true);
                 createActionFromParams(webSession, request, response);
                 return true;
             } catch (Exception e) {

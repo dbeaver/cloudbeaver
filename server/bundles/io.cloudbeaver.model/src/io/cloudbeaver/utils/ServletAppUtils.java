@@ -59,7 +59,7 @@ public class ServletAppUtils {
         return (ServletApplication) DBWorkbench.getPlatform().getApplication();
     }
 
-    public static ServletAuthApplication getWebAuthApplication() throws DBException {
+    public static ServletAuthApplication getAuthApplication() throws DBException {
         ServletApplication application = getServletApplication();
         if (!ServletAuthApplication.class.isAssignableFrom(application.getClass())) {
             throw new DBException("The current application doesn't contain authorization configuration");
@@ -169,7 +169,7 @@ public class ServletAppUtils {
 
     @NotNull
     public static StringBuilder getAuthApiPrefix(String serviceId) throws DBException {
-        return getAuthApiPrefix(getWebAuthApplication(), serviceId);
+        return getAuthApiPrefix(getAuthApplication(), serviceId);
     }
 
     @NotNull

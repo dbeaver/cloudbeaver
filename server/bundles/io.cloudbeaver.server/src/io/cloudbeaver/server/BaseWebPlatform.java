@@ -132,8 +132,6 @@ public abstract class BaseWebPlatform extends BasePlatformImpl {
     @NotNull
     public abstract WebApplication getApplication();
 
-    public abstract WebAppSessionManager getSessionManager();
-
     protected abstract void scheduleServerJobs();
 
     @Override

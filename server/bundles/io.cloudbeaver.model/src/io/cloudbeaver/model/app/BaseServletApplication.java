@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Web application
+ * Servlet application
  */
 public abstract class BaseServletApplication extends BaseApplicationImpl implements ServletApplication {
 

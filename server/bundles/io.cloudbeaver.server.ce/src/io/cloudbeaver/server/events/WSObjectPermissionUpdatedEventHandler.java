@@ -66,7 +66,7 @@ public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler
             return;
         }
         log.debug(event.getTopicId() + " event handled");
-        Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
+        Collection<BaseWebSession> allSessions = CBApplication.getInstance().getSessionManager().getAllActiveSessions();
         for (var activeUserSession : allSessions) {
             if (!isAcceptableInSession(activeUserSession, event)) {
                 log.debug("Cannot handle %s event '%s' in session %s".formatted(

@@ -20,7 +20,7 @@ package io.cloudbeaver.model.session;
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
-import io.cloudbeaver.model.app.WebAuthConfiguration;
+import io.cloudbeaver.model.app.ServletAuthConfiguration;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
@@ -127,7 +127,7 @@ public class WebSessionAuthProcessor {
 
                 DBWUserIdentity userIdentity = null;
                 var providerConfigId = authConfiguration.getAuthProviderConfigurationId();
-                var providerConfig = ServletAppUtils.getWebAuthApplication()
+                var providerConfig = ServletAppUtils.getAuthApplication()
                     .getAuthConfiguration()
                     .getAuthProviderConfiguration(providerConfigId);
                 if (authProviderExternal != null) {
@@ -194,7 +194,7 @@ public class WebSessionAuthProcessor {
     }
 
     private boolean isProviderEnabled(@NotNull String providerId) {
-        WebAuthConfiguration appConfiguration = (WebAuthConfiguration) ServletAppUtils.getServletApplication()
+        ServletAuthConfiguration appConfiguration = (ServletAuthConfiguration) ServletAppUtils.getServletApplication()
             .getAppConfiguration();
         return appConfiguration.isAuthProviderEnabled(providerId);
     }

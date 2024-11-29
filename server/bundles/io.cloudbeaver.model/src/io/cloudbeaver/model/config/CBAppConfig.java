@@ -20,7 +20,7 @@ import com.google.gson.annotations.Expose;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
 import io.cloudbeaver.model.app.BaseWebAppConfiguration;
 import io.cloudbeaver.model.app.WebAppConfiguration;
-import io.cloudbeaver.model.app.WebAuthConfiguration;
+import io.cloudbeaver.model.app.ServletAuthConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import org.jkiss.code.NotNull;
@@ -37,7 +37,7 @@ import java.util.*;
 /**
  * Application configuration
  */
-public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfiguration, WebAppConfiguration {
+public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthConfiguration, WebAppConfiguration {
     private static final Log log = Log.getLog(CBAppConfig.class);
 
     public static final DataSourceNavigatorSettings DEFAULT_VIEW_SETTINGS = PRESET_WEB.getSettings();
@@ -162,6 +162,7 @@ public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfi
         return redirectOnFederatedAuth;
     }
 
+    @NotNull
     public String[] getEnabledDrivers() {
         return enabledDrivers;
     }
@@ -170,6 +171,7 @@ public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfi
         this.enabledDrivers = enabledDrivers;
     }
 
+    @NotNull
     public String[] getDisabledDrivers() {
         return disabledDrivers;
     }

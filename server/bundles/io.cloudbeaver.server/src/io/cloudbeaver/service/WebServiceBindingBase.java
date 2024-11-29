@@ -104,12 +104,12 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     }
 
     protected static WebSession getWebSession(DataFetchingEnvironment env) throws DBWebException {
-        return WebAppUtils.getWebPlatform().getSessionManager().getWebSession(
+        return WebAppUtils.getWebApplication().getSessionManager().getWebSession(
             getServletRequest(env), getServletResponse(env));
     }
 
     protected static WebSession getWebSession(DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
-        return WebAppUtils.getWebPlatform().getSessionManager().getWebSession(
+        return WebAppUtils.getWebApplication().getSessionManager().getWebSession(
             getServletRequest(env), getServletResponse(env), errorOnNotFound);
     }
 
@@ -127,12 +127,12 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
      */
     @Nullable
     public static WebSession findWebSession(DataFetchingEnvironment env) {
-        return WebAppUtils.getWebPlatform().getSessionManager().findWebSession(
+        return WebAppUtils.getWebApplication().getSessionManager().findWebSession(
             getServletRequest(env));
     }
 
     public static WebSession findWebSession(DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
-        return WebAppUtils.getWebPlatform().getSessionManager().findWebSession(
+        return WebAppUtils.getWebApplication().getSessionManager().findWebSession(
             getServletRequest(env), errorOnNotFound);
     }
 

@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * Application authentication configuration
  */
-public interface WebAuthConfiguration {
+public interface ServletAuthConfiguration {
 
     String getDefaultAuthProvider();
 

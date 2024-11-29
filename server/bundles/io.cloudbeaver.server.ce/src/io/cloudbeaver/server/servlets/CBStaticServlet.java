@@ -83,7 +83,7 @@ public class CBStaticServlet extends DefaultServlet {
         }
         String uri = request.getPathInfo();
         try {
-            WebSession webSession = CBPlatform.getInstance().getSessionManager().getWebSession(
+            WebSession webSession = CBApplication.getInstance().getSessionManager().getWebSession(
                 request, response, false);
             performAutoLoginIfNeeded(request, webSession);
             WebActionParameters webActionParameters = WebActionParameters.fromSession(webSession, false);
