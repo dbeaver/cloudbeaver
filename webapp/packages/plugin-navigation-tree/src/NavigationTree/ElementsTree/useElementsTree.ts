@@ -217,10 +217,10 @@ export function useElementsTree(options: IOptions): IElementsTree {
     },
 
     async loadNode(nodeId: string) {
-      await projectInfoResource.waitLoad();
-      await connectionInfoResource.waitLoad();
-      await navTreeResource.waitLoad();
-      await navNodeInfoResource.waitLoad();
+      await projectInfoResource.waitLoad(CachedMapAllKey);
+      await connectionInfoResource.waitLoad(ConnectionInfoActiveProjectKey);
+      await navTreeResource.waitLoad(nodeId);
+      await navNodeInfoResource.waitLoad(nodeId);
 
       const expanded = elementsTree.isNodeExpanded(nodeId, true);
       if (!expanded && nodeId !== options.root) {

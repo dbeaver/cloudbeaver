@@ -48,7 +48,7 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
       }
 
       if (!model) {
-        await connectionInfoResource.waitLoad();
+        await connectionInfoResource.waitLoad(tab.handlerState.connectionKey!);
         const connectionInfo = connectionInfoResource.get(tab.handlerState.connectionKey!);
 
         if (!connectionInfo) {

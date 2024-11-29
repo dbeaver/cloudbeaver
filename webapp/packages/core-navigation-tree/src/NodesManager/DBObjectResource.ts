@@ -60,7 +60,7 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     });
 
     this.beforeLoad.addHandler(async (originalKey, context) => {
-      await this.navTreeResource.waitLoad();
+      await this.navTreeResource.waitLoad(originalKey);
       const parentKey = this.aliases.isAlias(originalKey, DBObjectParentKey);
       const pageKey =
         this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);

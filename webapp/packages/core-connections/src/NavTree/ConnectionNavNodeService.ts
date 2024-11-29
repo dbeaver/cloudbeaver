@@ -198,7 +198,7 @@ export class ConnectionNavNodeService extends Dependency {
 
     const parentId = getConnectionParentId(connection.projectId, connection.folder);
 
-    await this.navTreeResource.waitLoad();
+    await this.navTreeResource.waitLoad(parentId);
     if (!this.navTreeResource.has(parentId)) {
       return;
     }
@@ -210,7 +210,7 @@ export class ConnectionNavNodeService extends Dependency {
     }
 
     const connectionNode = await this.navNodeInfoResource.load(connection.nodePath);
-    await this.navTreeResource.waitLoad();
+    await this.navTreeResource.waitLoad(parentId);
 
     this.navNodeInfoResource.setParent(connection.nodePath, parentId);
 

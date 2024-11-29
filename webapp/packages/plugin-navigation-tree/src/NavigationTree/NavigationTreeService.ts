@@ -98,7 +98,7 @@ export class NavigationTreeService extends View<string> {
       }
     }
 
-    await this.navTreeResource.waitLoad();
+    await this.navTreeResource.waitLoad(id);
 
     if (tryConnect && this.navTreeResource.getException(id)) {
       this.navTreeResource.markOutdated(id);

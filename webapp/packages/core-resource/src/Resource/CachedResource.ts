@@ -333,11 +333,11 @@ export abstract class CachedResource<
   }
 
   /**
-   * Return promise that will be resolved when resource will finish loading pending requests.
+   * Return promise that will be resolved when resource will finish loading pending request.
    * Will be resolved immediately if resource is not loading.
    */
-  waitLoad(): Promise<void> {
-    return this.scheduler.wait();
+  waitLoad(id: ResourceKey<TKey>): Promise<void> {
+    return this.scheduler.waitRelease(id);
   }
 
   isOutdated(param?: ResourceKey<TKey>, includes?: TInclude): boolean {
