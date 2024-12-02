@@ -87,6 +87,11 @@ public class WebDatabaseDriverInfo {
     }
 
     @Property
+    public String getDriverId() {
+        return driver.getId();
+    }
+
+    @Property
     public String getProviderId() {
         return driver.getProviderId();
     }
@@ -293,6 +298,11 @@ public class WebDatabaseDriverInfo {
         return driver.getDriverLibraries().stream()
             .map(dbpDriverLibrary -> new WebDriverLibraryInfo(webSession, dbpDriverLibrary))
             .toArray(WebDriverLibraryInfo[]::new);
+    }
+
+    @Property
+    public boolean isDriverInstalled() {
+        return !driver.needsExternalDependencies(webSession.getProgressMonitor());
     }
 
     @Property
