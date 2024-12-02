@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { AdministrationScreenService, IAdministrationItemRoute } from '@cloudbeaver/core-administration';
+import { AdministrationScreenService, type IAdministrationItemRoute } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
-import { IActiveView, View } from '@cloudbeaver/core-view';
+import { type IActiveView, View } from '@cloudbeaver/core-view';
 
 @injectable()
 export class AdministrationViewService extends View<IAdministrationItemRoute | null> {

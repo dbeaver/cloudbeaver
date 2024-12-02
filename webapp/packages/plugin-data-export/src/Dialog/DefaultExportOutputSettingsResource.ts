@@ -7,7 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
-import { DataTransferDefaultExportSettings, GraphQLService } from '@cloudbeaver/core-sdk';
+import { type DataTransferDefaultExportSettings, GraphQLService } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class DefaultExportOutputSettingsResource extends CachedDataResource<DataTransferDefaultExportSettings | null> {

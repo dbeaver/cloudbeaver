@@ -5,6 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { EventContext } from './EventContext';
+import { EventContext } from './EventContext.js';
 
 export const EventStopPropagationFlag = EventContext.create('stopPropagation');

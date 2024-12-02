@@ -7,14 +7,14 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button } from './Button';
+import { Button } from './Button.js';
 import style from './ExceptionMessage.module.css';
-import { Icon } from './Icon';
-import { IconOrImage } from './IconOrImage';
-import { useTranslate } from './localization/useTranslate';
-import { s } from './s';
-import { useErrorDetails } from './useErrorDetails';
-import { useS } from './useS';
+import { Icon } from './Icon.js';
+import { IconOrImage } from './IconOrImage.js';
+import { useTranslate } from './localization/useTranslate.js';
+import { s } from './s.js';
+import { useErrorDetails } from './useErrorDetails.js';
+import { useS } from './useS.js';
 
 interface Props {
   exception?: Error | null;

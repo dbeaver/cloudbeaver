@@ -10,8 +10,8 @@ import { computed, makeObservable, observable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import type { ILoadableState, schema } from '@cloudbeaver/core-utils';
 
-import type { SettingsProvider } from '../SettingsProvider';
-import type { ISettingDescription, SettingsDescriptionGetter } from './ISettingDescription';
+import type { SettingsProvider } from '../SettingsProvider.js';
+import type { ISettingDescription, SettingsDescriptionGetter } from './ISettingDescription.js';
 
 interface SettingsProviderItem<T extends schema.SomeZodObject = any> {
   settingsGetter: SettingsDescriptionGetter<schema.infer<T>>;

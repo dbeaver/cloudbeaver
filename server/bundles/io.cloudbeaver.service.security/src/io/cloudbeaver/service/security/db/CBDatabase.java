@@ -18,6 +18,7 @@ package io.cloudbeaver.service.security.db;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.Strictness;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.config.WebDatabaseConfig;
@@ -66,7 +67,7 @@ public class CBDatabase extends InternalDB {
     public static final String SCHEMA_UPDATE_SQL_PATH = "db/cb_schema_update_";
 
     private static final int LEGACY_SCHEMA_VERSION = 1;
-    private static final int CURRENT_SCHEMA_VERSION = 21;
+    private static final int CURRENT_SCHEMA_VERSION = 22;
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
@@ -255,7 +256,9 @@ public class CBDatabase extends InternalDB {
         initialDataPath = WebAppUtils.getRelativePath(
             databaseConfiguration.getInitialDataConfiguration(), application.getHomeDirectory());
         try (Reader reader = new InputStreamReader(new FileInputStream(initialDataPath), StandardCharsets.UTF_8)) {
-            Gson gson = new GsonBuilder().setLenient().create();
+            Gson gson = new GsonBuilder()
+                .setStrictness(Strictness.LENIENT)
+                .create();
             return gson.fromJson(reader, CBDatabaseInitialData.class);
         } catch (Exception e) {
             throw new DBException("Error loading initial data configuration", e);

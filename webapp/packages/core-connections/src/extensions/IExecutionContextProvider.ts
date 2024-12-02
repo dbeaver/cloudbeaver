@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { createExtension, IExtension, isExtension } from '@cloudbeaver/core-extensions';
+import { createExtension, type IExtension, isExtension } from '@cloudbeaver/core-extensions';
 
-import type { IConnectionExecutionContextInfo } from '../ConnectionExecutionContext/ConnectionExecutionContextResource';
+import type { IConnectionExecutionContextInfo } from '../ConnectionExecutionContext/ConnectionExecutionContextResource.js';
 
 const EXECUTION_CONTEXT_PROVIDER_SYMBOL = Symbol('@extension/ExecutionContextProvider');
 

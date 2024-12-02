@@ -8,10 +8,11 @@
 import { useEffect, useRef } from 'react';
 
 import { ROOT_SETTINGS_GROUP } from '@cloudbeaver/core-settings';
+import { throttle } from '@cloudbeaver/core-utils';
 import type { ITreeData } from '@cloudbeaver/plugin-navigation-tree';
 
-import { getSettingGroupIdFromElementId } from './getSettingGroupIdFromElementId';
-import { querySettingsGroups } from './querySettingsGroups';
+import { getSettingGroupIdFromElementId } from './getSettingGroupIdFromElementId.js';
+import { querySettingsGroups } from './querySettingsGroups.js';
 
 export function useTreeScrollSync(treeData: ITreeData, onSettingsOpen?: (groupId: string) => void): React.RefObject<HTMLDivElement> {
   const ref = useRef<HTMLDivElement>(null);
@@ -23,7 +24,7 @@ export function useTreeScrollSync(treeData: ITreeData, onSettingsOpen?: (groupId
       return;
     }
 
-    function syncScroll(e: Event) {
+    const syncScroll = throttle(function syncScroll(e: { target: Element | EventTarget | null }) {
       const container = e.target as HTMLDivElement;
 
       const elements = querySettingsGroups(container);
@@ -49,11 +50,20 @@ export function useTreeScrollSync(treeData: ITreeData, onSettingsOpen?: (groupId
         }
         onSettingsOpen?.(groupId);
       }
-    }
+    }, 50);
+
+    const resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        syncScroll({ target: entry.target });
+      }
+    });
+
+    resizeObserver.observe(element);
 
     element.addEventListener('scroll', syncScroll);
 
     return () => {
+      resizeObserver.disconnect();
       element.removeEventListener('scroll', syncScroll);
     };
   });

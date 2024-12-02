@@ -13,8 +13,8 @@ export const manifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./VersionService').then(m => m.VersionService),
-    () => import('./VersionResource').then(m => m.VersionResource),
-    () => import('./VersionLocaleService').then(m => m.VersionLocaleService),
+    () => import('./VersionService.js').then(m => m.VersionService),
+    () => import('./VersionResource.js').then(m => m.VersionResource),
+    () => import('./VersionLocaleService.js').then(m => m.VersionLocaleService),
   ],
 };

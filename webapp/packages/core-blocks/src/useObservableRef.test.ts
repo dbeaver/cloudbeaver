@@ -11,7 +11,7 @@ import { action, computed, isObservable, observable, runInAction } from 'mobx';
 
 import * as coreUtils from '@cloudbeaver/core-utils';
 
-import { useObservableRef } from './useObservableRef';
+import { useObservableRef } from './useObservableRef.js';
 
 jest.mock('@cloudbeaver/core-utils', () => ({
   bindFunctions: jest.fn(),

@@ -11,7 +11,7 @@ import { Icon } from '@cloudbeaver/core-blocks';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
-import { TOP_NAV_BAR_SETTINGS_MENU } from './TOP_NAV_BAR_SETTINGS_MENU';
+import { TOP_NAV_BAR_SETTINGS_MENU } from './TOP_NAV_BAR_SETTINGS_MENU.js';
 
 export const SettingsMenu = observer(function SettingsMenu() {
   const menu = useMenu({ menu: TOP_NAV_BAR_SETTINGS_MENU });

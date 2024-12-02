@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { GroupTitle, type PlaceholderComponent, Switch, useTranslate } from '@cloudbeaver/core-blocks';
 
-import type { IElementsTreeSettingsProps } from './ElementsTreeSettingsService';
+import type { IElementsTreeSettingsProps } from './ElementsTreeSettingsService.js';
 
 export const ElementsTreeBaseSettingsForm: PlaceholderComponent<IElementsTreeSettingsProps> = observer(function ElementsTreeBaseSettingsForm({
   tree: { root, settings },

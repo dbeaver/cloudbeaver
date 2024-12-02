@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { filterLayoutFakeProps, getLayoutProps } from './filterLayoutFakeProps';
-import type { IContainerProps } from './IContainerProps';
+import { filterLayoutFakeProps, getLayoutProps } from './filterLayoutFakeProps.js';
+import type { IContainerProps } from './IContainerProps.js';
 
 export function filterContainerFakeProps<T extends IContainerProps>(props: T): Omit<T, keyof IContainerProps> {
   const { hideEmpty, flexStart, flexEnd, baseline, center, vertical, wrap, overflow, parent, gap, grid, dense, compact, ...rest } =

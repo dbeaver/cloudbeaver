@@ -12,11 +12,11 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
-import { MENU_TOOLS } from './Menu/MENU_TOOLS';
-import { ToolsPanelService } from './ToolsPanel/ToolsPanelService';
+import { MENU_TOOLS } from './Menu/MENU_TOOLS.js';
+import { ToolsPanelService } from './ToolsPanel/ToolsPanelService.js';
 
 const ToolsPanel = React.lazy(async () => {
-  const { ToolsPanel } = await import('./ToolsPanel/ToolsPanel');
+  const { ToolsPanel } = await import('./ToolsPanel/ToolsPanel.js');
   return { default: ToolsPanel };
 });
 
@@ -30,7 +30,7 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.appScreenService.rightAreaBottom.add(
       ToolsPanel,
       undefined,

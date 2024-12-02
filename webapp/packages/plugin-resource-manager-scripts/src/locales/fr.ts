@@ -18,4 +18,6 @@ export default [
     'plugin_resource_manager_scripts_save_script_project_restriction_description',
     'Le projet du script ne peut pas être différent de celui de la connexion',
   ],
+  ['plugin_resource_manager_scripts_disable', 'Disable scripts'],
+  ['plugin_resource_manager_scripts_disable_description', 'Disable scripts explorer for all users'],
 ];

@@ -8,7 +8,7 @@
 import type { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { CachedResourceOffsetPageKey, CachedResourceOffsetPageTargetKey } from '@cloudbeaver/core-resource';
 
-import type { IElementsTreeFilter } from '../useElementsTree';
+import type { IElementsTreeFilter } from '../useElementsTree.js';
 
 export const NAVIGATION_TREE_LIMIT = {
   limit: 'nav-tree://limit',

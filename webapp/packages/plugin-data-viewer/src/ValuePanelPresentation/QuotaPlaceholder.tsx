@@ -8,13 +8,13 @@
 import { observer } from 'mobx-react-lite';
 
 import { Container, Link, s, usePermission, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 import { EAdminPermission } from '@cloudbeaver/core-root';
-import { WebsiteLinks } from '@cloudbeaver/core-website';
 
-import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
-import { ResultSetDataContentAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
-import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import { ResultSetDataSource } from '../ResultSet/ResultSetDataSource';
+import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
+import { ResultSetDataContentAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.js';
+import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
+import { ResultSetDataSource } from '../ResultSet/ResultSetDataSource.js';
 import styles from './QuotaPlaceholder.module.css';
 
 interface Props {
@@ -46,7 +46,7 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
         &nbsp;
         <span className={s(style, { limitWord: true })}>
           {admin ? (
-            <Link title={limitInfo?.limitWithSize} href={WebsiteLinks.SERVER_CONFIGURATION_RESOURCE_QUOTAS_PAGE} target="_blank" indicator>
+            <Link title={limitInfo?.limitWithSize} href={WEBSITE_LINKS.SERVER_CONFIGURATION_RESOURCE_QUOTAS_PAGE} target="_blank" indicator>
               {translate('ui_limit')}
             </Link>
           ) : (

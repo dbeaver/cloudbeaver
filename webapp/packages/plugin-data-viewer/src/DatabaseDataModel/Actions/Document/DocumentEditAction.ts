@@ -7,20 +7,20 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { ResultDataFormat, SqlResultRow, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
+import { ResultDataFormat, type SqlResultRow, type UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
-import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
-import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import { DatabaseEditAction } from '../DatabaseEditAction';
-import { DatabaseEditChangeType } from '../IDatabaseDataEditAction';
-import { DocumentDataAction } from './DocumentDataAction';
-import type { IDatabaseDataDocument } from './IDatabaseDataDocument';
-import type { IDocumentElementKey } from './IDocumentElementKey';
+import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
+import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
+import { DatabaseEditAction } from '../DatabaseEditAction.js';
+import { DatabaseEditChangeType } from '../IDatabaseDataEditAction.js';
+import { DocumentDataAction } from './DocumentDataAction.js';
+import type { IDatabaseDataDocument } from './IDatabaseDataDocument.js';
+import type { IDocumentElementKey } from './IDocumentElementKey.js';
 
 @databaseDataAction()
 export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, IDatabaseDataDocument, IDatabaseResultSet> {
-  static dataFormat = [ResultDataFormat.Document];
+  static override dataFormat = [ResultDataFormat.Document];
 
   readonly editedElements: Map<number, IDatabaseDataDocument>;
   private readonly data: DocumentDataAction;
@@ -168,7 +168,7 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
     });
   }
 
-  dispose(): void {
+  override dispose(): void {
     this.clear();
   }
 

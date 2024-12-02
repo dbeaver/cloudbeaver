@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { createContext } from 'react';
-import type { TabStateReturn } from 'reakit/Tab';
+import type { TabStateReturn } from 'reakit';
 
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { MetadataMap, MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
 
-import type { ITabData, ITabInfo, ITabsContainer } from './TabsContainer/ITabsContainer';
+import type { ITabData, ITabInfo, ITabsContainer } from './TabsContainer/ITabsContainer.js';
 
 export type TabDirection = 'left' | 'right';
 

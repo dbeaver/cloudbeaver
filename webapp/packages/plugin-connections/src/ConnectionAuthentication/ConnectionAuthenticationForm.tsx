@@ -23,8 +23,8 @@ import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
-import type { IConnectionAuthenticationConfig } from './IConnectionAuthenticationConfig';
-import { NetworkHandlers } from './NetworkHandlers';
+import type { IConnectionAuthenticationConfig } from './IConnectionAuthenticationConfig.js';
+import { NetworkHandlers } from './NetworkHandlers.js';
 
 export interface ConnectionAuthenticationFormProps {
   config: Partial<IConnectionAuthenticationConfig>;

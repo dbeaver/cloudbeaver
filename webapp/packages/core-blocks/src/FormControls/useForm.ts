@@ -9,9 +9,9 @@ import React, { useContext, useState } from 'react';
 
 import { Executor, ExecutorInterrupter, SyncExecutor } from '@cloudbeaver/core-executor';
 
-import { useExecutor } from '../useExecutor';
-import { useObjectRef } from '../useObjectRef';
-import { FormChangeHandler, FormContext, type IChangeData, type IFormContext } from './FormContext';
+import { useExecutor } from '../useExecutor.js';
+import { useObjectRef } from '../useObjectRef.js';
+import { type FormChangeHandler, FormContext, type IChangeData, type IFormContext } from './FormContext.js';
 
 interface IOptions {
   parent?: IFormContext;
@@ -78,10 +78,17 @@ export function useForm(options?: IOptions): IFormContext {
           this.onChange.execute({ value, name });
         }
       },
-      keyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+      keyDown(event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) {
+        const isCtrlEnterSubmit =
+          event.key === 'Enter' &&
+          (event.ctrlKey || event.metaKey) &&
+          this.disableEnterSubmit === false &&
+          event.target instanceof HTMLTextAreaElement;
+        const isEnterSubmit = event.key === 'Enter' && this.disableEnterSubmit === false && event.target instanceof HTMLInputElement;
+
         if (this.parent) {
           this.parent.keyDown(event);
-        } else if (event.key === 'Enter' && this.disableEnterSubmit === false) {
+        } else if (isCtrlEnterSubmit || isEnterSubmit) {
           event.preventDefault();
           if (this.ref) {
             this.ref?.requestSubmit();

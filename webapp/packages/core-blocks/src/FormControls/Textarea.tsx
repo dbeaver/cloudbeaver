@@ -10,17 +10,18 @@ import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
 
 import { getTextFileReadingProcess } from '@cloudbeaver/core-utils';
 
-import { Button } from '../Button';
-import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
-import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import { useTranslate } from '../localization/useTranslate';
-import { s } from '../s';
-import { UploadArea } from '../UploadArea';
-import { useS } from '../useS';
-import { Field } from './Field';
-import { FieldDescription } from './FieldDescription';
-import { FieldLabel } from './FieldLabel';
-import { FormContext } from './FormContext';
+import { Button } from '../Button.js';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
+import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { s } from '../s.js';
+import { UploadArea } from '../UploadArea.js';
+import { useCombinedHandler } from '../useCombinedHandler.js';
+import { useS } from '../useS.js';
+import { Field } from './Field.js';
+import { FieldDescription } from './FieldDescription.js';
+import { FieldLabel } from './FieldLabel.js';
+import { FormContext } from './FormContext.js';
 import textareaStyle from './Textarea.module.css';
 
 type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'style'> &
@@ -63,6 +64,7 @@ export const Textarea: TextareaType = observer(function Textarea({
   embedded,
   cursorInitiallyAtEnd,
   uploadable,
+  onKeyDown,
   onChange = () => {},
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
@@ -72,6 +74,7 @@ export const Textarea: TextareaType = observer(function Textarea({
   rest = filterLayoutFakeProps(rest);
   const styles = useS(textareaStyle);
   const context = useContext(FormContext);
+  const handleKeyDown = useCombinedHandler(onKeyDown, context?.keyDown);
 
   const handleChange = useCallback(
     (value: string) => {
@@ -110,6 +113,7 @@ export const Textarea: TextareaType = observer(function Textarea({
         value={value ?? ''}
         name={name}
         data-embedded={embedded}
+        onKeyDown={handleKeyDown}
         onChange={event => handleChange(event.target.value)}
       />
       {description && <FieldDescription>{description}</FieldDescription>}

@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const UserMenu = importLazyComponent(() => import('./UserMenu').then(m => m.UserMenu));
+export const UserMenu = importLazyComponent(() => import('./UserMenu.js').then(m => m.UserMenu));

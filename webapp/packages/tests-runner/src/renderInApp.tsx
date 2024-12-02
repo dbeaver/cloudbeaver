@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import '@testing-library/jest-dom/jest-globals';
-import { queries, Queries, render, RenderOptions, RenderResult } from '@testing-library/react';
+import { queries, type Queries, render, type RenderOptions, type RenderResult } from '@testing-library/react';
 import { Suspense } from 'react';
 
-import { IServiceProvider, ServiceProviderContext } from '@cloudbeaver/core-di';
+import { type IServiceProvider, ServiceProviderContext } from '@cloudbeaver/core-di';
 
-import type { IApplication } from './createApp';
+import type { IApplication } from './createApp.js';
 
 function ApplicationWrapper(serviceInjector: IServiceProvider): React.FC<React.PropsWithChildren> {
   return ({ children }) => (

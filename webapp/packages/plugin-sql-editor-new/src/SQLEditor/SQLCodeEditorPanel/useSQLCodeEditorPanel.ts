@@ -12,12 +12,12 @@ import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
 import { throttle } from '@cloudbeaver/core-utils';
 import type { ISQLEditorData } from '@cloudbeaver/plugin-sql-editor';
 
-import type { IEditor } from '../SQLCodeEditor/useSQLCodeEditor';
+import type { IEditor } from '../SQLCodeEditor/useSQLCodeEditor.js';
 
 interface State {
   highlightActiveQuery: () => void;
   onQueryChange: (query: string) => void;
-  onCursorChange: (begin: number, end?: number) => void;
+  onCursorChange: (anchor: number, head?: number) => void;
 }
 
 export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
@@ -35,8 +35,8 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
       onQueryChange(query: string) {
         this.data.setScript(query);
       },
-      onCursorChange(begin: number, end?: number) {
-        this.data.setCursor(begin, end);
+      onCursorChange(anchor: number, head?: number) {
+        this.data.setCursor(anchor, head);
       },
     }),
     { onQueryChange: action.bound, onCursorChange: action.bound },

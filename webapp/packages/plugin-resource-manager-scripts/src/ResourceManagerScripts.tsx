@@ -11,7 +11,7 @@ import { Flex, useTranslate } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { ResourceManagerTree } from '@cloudbeaver/plugin-navigation-tree-rm';
 
-import { SCRIPTS_TYPE_ID } from './SCRIPTS_TYPE_ID';
+import { SCRIPTS_TYPE_ID } from './SCRIPTS_TYPE_ID.js';
 
 export const ResourceManagerScripts: TabContainerPanelComponent = observer(function ResourceManagerScripts() {
   const translate = useTranslate();

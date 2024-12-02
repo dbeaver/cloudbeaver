@@ -6,16 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React from 'react';
 
-import { Container, Group, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
-import { type ISettingsSource, ROOT_SETTINGS_GROUP } from '@cloudbeaver/core-settings';
-import { useTreeData } from '@cloudbeaver/plugin-navigation-tree';
+import { Container, Filter, Group, s, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
+import { type ISettingsSource, ROOT_SETTINGS_GROUP, SettingsGroup } from '@cloudbeaver/core-settings';
+import { useTreeData, useTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
-import { getSettingGroupId } from './getSettingGroupId';
-import { SettingsGroups } from './SettingsGroups/SettingsGroups';
-import { SettingsList } from './SettingsList';
-import { useSettings } from './useSettings';
+import { getSettingGroupId } from './getSettingGroupId.js';
+import classes from './Settings.module.css';
+import { settingsFilter } from './settingsFilter.js';
+import { SettingsGroups } from './SettingsGroups/SettingsGroups.js';
+import { SettingsList } from './SettingsList.js';
+import { useSettings } from './useSettings.js';
 
 export interface ISettingsProps {
   source: ISettingsSource;
@@ -26,21 +27,36 @@ export const Settings = observer<ISettingsProps>(function Settings({ source, acc
   const translate = useTranslate();
   const settings = useSettings(accessor);
 
+  function filterExistsGroups(group: SettingsGroup) {
+    return settings.groups.has(group);
+  }
+
+  const treeFilter = useTreeFilter({
+    isNodeMatched(nodeId, filter) {
+      const group = ROOT_SETTINGS_GROUP.get(nodeId)!;
+      const groupSettings = settings.settings.get(group);
+
+      if (!groupSettings) {
+        return false;
+      }
+
+      return groupSettings.some(settingsFilter(translate, filter));
+    },
+  });
+
   const treeData = useTreeData({
     rootId: ROOT_SETTINGS_GROUP.id,
+    childrenTransformers: [treeFilter.transformer],
     getNode(id) {
       const group = ROOT_SETTINGS_GROUP.get(id);
 
       return {
         name: translate(group!.name),
-        leaf: !group?.subGroups.length,
+        leaf: !group?.subGroups.filter(filterExistsGroups).length,
       };
     },
     getChildren(id) {
-      return (ROOT_SETTINGS_GROUP.get(id)?.subGroups || [])
-        .filter(group => settings.groups.has(group))
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map(group => group.id);
+      return (ROOT_SETTINGS_GROUP.get(id)?.subGroups || []).filter(filterExistsGroups).map(group => group.id);
     },
     load() {
       return Promise.resolve();
@@ -57,11 +73,21 @@ export const Settings = observer<ISettingsProps>(function Settings({ source, acc
 
   return (
     <Container gap overflow noWrap>
-      <Group style={{ height: '100%', minWidth: '240px' }} box keepSize overflow hidden>
+      <Group className={s(classes, { settingsGroups: true })} vertical box keepSize overflow hidden>
         <SettingsGroups treeData={treeData} onClick={handleClick} />
       </Group>
-      <Container style={{ height: '100%' }} fill>
-        <SettingsList treeData={treeData} source={source} settings={settings.settings} />
+      <Container className={s(classes, { settingsContainer: true })} overflow vertical gap noWrap>
+        <Container gap keepSize>
+          <Filter
+            state={treeFilter}
+            name="filter"
+            placeholder={translate('plugin_settings_panel_search')}
+            onChange={filter => treeFilter.setFilter(filter)}
+          />
+        </Container>
+        <Container overflow vertical>
+          <SettingsList treeData={treeData} treeFilter={treeFilter} source={source} settings={settings.settings} />
+        </Container>
       </Container>
     </Container>
   );

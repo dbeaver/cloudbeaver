@@ -8,7 +8,7 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals';
 import { act, renderHook } from '@testing-library/react';
 
-import { useStateDelay } from './useStateDelay';
+import { useStateDelay } from './useStateDelay.js';
 
 interface IHookProps {
   value: boolean;

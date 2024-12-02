@@ -12,13 +12,13 @@ import { getComputed, s, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
 import type { IDataPresentationActions, IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 
-import { EditingContext } from '../../Editing/EditingContext';
-import { CellContext } from '../CellRenderer/CellContext';
-import { DataGridContext } from '../DataGridContext';
-import { TableDataContext } from '../TableDataContext';
+import { EditingContext } from '../../Editing/EditingContext.js';
+import { CellContext } from '../CellRenderer/CellContext.js';
+import { DataGridContext } from '../DataGridContext.js';
+import { TableDataContext } from '../TableDataContext.js';
 import style from './CellFormatter.module.css';
-import { CellFormatterFactory } from './CellFormatterFactory';
-import { CellMenu } from './Menu/CellMenu';
+import { CellFormatterFactory } from './CellFormatterFactory.js';
+import { CellMenu } from './Menu/CellMenu.js';
 
 interface Props extends RenderCellProps<IResultSetRowKey> {
   className?: string;

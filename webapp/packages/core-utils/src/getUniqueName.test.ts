@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from '@jest/globals';
 
-import { getUniqueName } from './getUniqueName';
+import { getUniqueName } from './getUniqueName.js';
 
 describe('Get unique name', () => {
   test('should return "name (1)" when "name" is passed and "name" is presented', () => {

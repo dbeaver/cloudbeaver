@@ -130,8 +130,7 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
       labelTooltip={description}
       value={value}
       description={description}
-      disabled={disabled}
-      readOnly={readOnly}
+      readOnly={readOnly || disabled}
       small
       onChange={handleChange}
     >

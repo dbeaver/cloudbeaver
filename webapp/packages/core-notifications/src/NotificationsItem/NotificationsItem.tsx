@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Snackbar, useErrorDetails } from '@cloudbeaver/core-blocks';
 import { ENotificationType, type INotification } from '@cloudbeaver/core-events';
 
-import { FADE_TIMEOUT } from './FADE_TIMEOUT';
+import { FADE_TIMEOUT } from './FADE_TIMEOUT.js';
 
 interface Props {
   notification: INotification<any>;

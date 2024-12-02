@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { formatNumber } from './formatNumber';
+import { formatNumber } from './formatNumber.js';
 
 describe('formatNumber', () => {
   it('should not format number', () => {

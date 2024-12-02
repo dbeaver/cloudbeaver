@@ -7,8 +7,8 @@
  */
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
-import type { ESettingsValueType } from './ESettingsValueType';
-import type { SettingsGroup } from './SettingsGroup';
+import type { ESettingsValueType } from './ESettingsValueType.js';
+import type { SettingsGroup } from './SettingsGroup.js';
 
 export interface ISettingAccess {
   scope: string[];

@@ -10,11 +10,10 @@ import { computed, observable } from 'mobx';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import type { Column } from '@cloudbeaver/plugin-data-grid';
 import {
-  DatabaseDataConstraintAction,
-  IDatabaseDataModel,
-  IResultSetColumnKey,
-  IResultSetElementKey,
-  IResultSetRowKey,
+  type IDatabaseDataModel,
+  type IResultSetColumnKey,
+  type IResultSetElementKey,
+  type IResultSetRowKey,
   ResultSetDataAction,
   ResultSetDataContentAction,
   ResultSetDataKeysUtils,
@@ -24,11 +23,11 @@ import {
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { IndexFormatter } from './Formatters/IndexFormatter';
-import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';
-import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader';
-import type { ITableData } from './TableDataContext';
-import { useTableDataMeasurements } from './useTableDataMeasurements';
+import { IndexFormatter } from './Formatters/IndexFormatter.js';
+import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
+import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
+import type { ITableData } from './TableDataContext.js';
+import { useTableDataMeasurements } from './useTableDataMeasurements.js';
 
 export const indexColumn: Column<IResultSetRowKey, any> = {
   key: 'index',
@@ -90,7 +89,7 @@ export function useTableData(
 
         let left = 0;
         for (let i = 0; i < columnIndex; i++) {
-          const column = this.columns[i];
+          const column = this.columns[i]!;
           left += column.width as number;
         }
 
@@ -126,9 +125,9 @@ export function useTableData(
       getRowIndexFromKey(rowKey) {
         return this.rows.findIndex(row => ResultSetDataKeysUtils.isEqual(rowKey, row));
       },
-      getColumnsInRange(startIndex, endIndex) {
+      getColumnsInRange(startIndex, endIndex): Column<IResultSetRowKey, any>[] {
         if (startIndex === endIndex) {
-          return [this.columns[startIndex]];
+          return [this.columns[startIndex]!];
         }
 
         const firstIndex = Math.min(startIndex, endIndex);

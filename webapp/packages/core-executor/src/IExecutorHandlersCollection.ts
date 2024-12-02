@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IAsyncContextLoader, IContextLoader, IExecutionContextProvider, ISyncContextLoader } from './IExecutionContext';
-import type { IExecutorHandler } from './IExecutorHandler';
+import type { IAsyncContextLoader, IContextLoader, IExecutionContextProvider, ISyncContextLoader } from './IExecutionContext.js';
+import type { IExecutorHandler } from './IExecutorHandler.js';
 
 export type ExecutorDataFilter<T> = (data: T, contexts: IExecutionContextProvider<T>) => boolean;
 export type ExecutorDataMap<T, TNext> = (data: T, contexts: IExecutionContextProvider<T>) => TNext;

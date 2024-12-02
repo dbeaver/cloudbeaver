@@ -14,7 +14,7 @@ import {
   CommonDialogHeader,
   CommonDialogWrapper,
   ErrorMessage,
-  IProperty,
+  type IProperty,
   PropertiesTable,
   s,
   useErrorDetails,
@@ -22,11 +22,11 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { DataTransferOutputSettings, DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
-import { ITabData, Tab, TabList, TabsState, TabTitle } from '@cloudbeaver/core-ui';
+import { type ITabData, Tab, TabList, TabsState, TabTitle } from '@cloudbeaver/core-ui';
 
-import { OutputOptionsForm } from './OutputOptionsForm';
+import { OutputOptionsForm } from './OutputOptionsForm.js';
 import style from './ProcessorConfigureDialog.module.css';
-import { ProcessorConfigureDialogFooter } from './ProcessorConfigureDialogFooter';
+import { ProcessorConfigureDialogFooter } from './ProcessorConfigureDialogFooter.js';
 
 interface Props {
   processor: DataTransferProcessorInfo;

@@ -7,6 +7,6 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
-import type { IElementsTree } from './useElementsTree';
+import type { IElementsTree } from './useElementsTree.js';
 
 export const DATA_CONTEXT_ELEMENTS_TREE = createDataContext<IElementsTree | undefined>('elements-tree');

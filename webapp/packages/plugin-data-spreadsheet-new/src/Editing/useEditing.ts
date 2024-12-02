@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import type { CellPosition, IEditingContext } from './EditingContext';
+import type { CellPosition, IEditingContext } from './EditingContext.js';
 
 interface IEditingState {
   editing: boolean;

@@ -7,6 +7,6 @@
  */
 import { createContext } from 'react';
 
-import type { ITreeDnD } from '../useTreeDnD';
+import type { ITreeDnD } from '../useTreeDnD.js';
 
 export const TreeDnDContext = createContext<ITreeDnD | undefined>(undefined);

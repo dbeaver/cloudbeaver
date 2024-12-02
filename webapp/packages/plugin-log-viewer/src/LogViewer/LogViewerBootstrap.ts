@@ -10,10 +10,10 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_TOOLS, ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
 
-import { ACTION_LOG_VIEWER_ENABLE } from '../Actions/ACTION_LOG_VIEWER_ENABLE';
-import { LogViewerService } from './LogViewerService';
+import { ACTION_LOG_VIEWER_ENABLE } from '../Actions/ACTION_LOG_VIEWER_ENABLE.js';
+import { LogViewerService } from './LogViewerService.js';
 
-const LogViewer = importLazyComponent(() => import('./LogViewer').then(m => m.LogViewer));
+const LogViewer = importLazyComponent(() => import('./LogViewer.js').then(m => m.LogViewer));
 
 @injectable()
 export class LogViewerBootstrap extends Bootstrap {
@@ -26,7 +26,7 @@ export class LogViewerBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.menuService.addCreator({
       menus: [MENU_TOOLS],
       getItems: (context, items) => [...items, ACTION_LOG_VIEWER_ENABLE],

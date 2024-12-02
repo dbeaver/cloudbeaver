@@ -8,9 +8,9 @@
 import type { DataContextGetter, IDataContextProvider } from '@cloudbeaver/core-data-context';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
-import type { IMenu } from '../Menu/IMenu';
-import type { IAction } from './IAction';
-import type { IActionInfo } from './IActionInfo';
+import type { IMenu } from '../Menu/IMenu.js';
+import type { IAction } from './IAction.js';
+import type { IActionInfo } from './IActionInfo.js';
 
 export interface IActionHandler {
   id: string;

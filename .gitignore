@@ -40,6 +40,9 @@ server/test/io.cloudbeaver.test.platform/workspace/.data/
 .classpath
 .settings/
 
+## Eclipse PDE
+*.product.launch
+
 workspace-dev-ce/
 deploy/cloudbeaver
 server/**/target

@@ -13,12 +13,12 @@ import { usePopper } from 'react-popper';
 import { s, useS } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { InlineEditor } from '@cloudbeaver/core-ui';
-import { RenderEditCellProps } from '@cloudbeaver/plugin-data-grid';
+import { type RenderEditCellProps } from '@cloudbeaver/plugin-data-grid';
 import type { IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 
 import style from './CellEditor.module.css';
-import { DataGridContext, IColumnResizeInfo } from './DataGridContext';
-import { TableDataContext } from './TableDataContext';
+import { DataGridContext, type IColumnResizeInfo } from './DataGridContext.js';
+import { TableDataContext } from './TableDataContext.js';
 
 export interface IEditorRef {
   focus: () => void;
@@ -112,7 +112,7 @@ export const CellEditor = observer<Pick<RenderEditCellProps<IResultSetRowKey>, '
       >
         {editorPortal &&
           createPortal(
-            <div ref={setPopperRef} className={s(styles, { editor: true })} style={popper.styles.popper} {...popper.attributes.popper}>
+            <div ref={setPopperRef} className={s(styles, { editor: true })} style={popper.styles['popper']} {...popper.attributes['popper']}>
               <InlineEditor
                 ref={inputRef}
                 value={value}

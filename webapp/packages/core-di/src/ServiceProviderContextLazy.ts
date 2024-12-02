@@ -7,4 +7,4 @@
  */
 import { lazy } from 'react';
 
-export const ServiceProviderContext = lazy(() => import('./ServiceProviderContext').then(m => ({ default: m.ServiceProviderContext })));
+export const ServiceProviderContext = lazy(() => import('./ServiceProviderContext.js').then(m => ({ default: m.ServiceProviderContext })));

@@ -14,13 +14,13 @@ import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { useDNDData } from '@cloudbeaver/core-ui';
 
-import { useNavTreeDropBox } from '../../useNavTreeDropBox';
-import type { NavigationNodeComponent } from '../NavigationNodeComponent';
+import { useNavTreeDropBox } from '../../useNavTreeDropBox.js';
+import type { NavigationNodeComponent } from '../NavigationNodeComponent.js';
 import style from './NavigationNode.module.css';
-import { DATA_ATTRIBUTE_NODE_EDITING } from './NavigationNode/DATA_ATTRIBUTE_NODE_EDITING';
-import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
-import { NavigationNodeControlRenderer } from './NavigationNodeControlRenderer';
-import { useNavigationNode } from './useNavigationNode';
+import { DATA_ATTRIBUTE_NODE_EDITING } from './NavigationNode/DATA_ATTRIBUTE_NODE_EDITING.js';
+import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested.js';
+import { NavigationNodeControlRenderer } from './NavigationNodeControlRenderer.js';
+import { useNavigationNode } from './useNavigationNode.js';
 
 export const NavigationNode: NavigationNodeComponent = observer(function NavigationNode({
   node,

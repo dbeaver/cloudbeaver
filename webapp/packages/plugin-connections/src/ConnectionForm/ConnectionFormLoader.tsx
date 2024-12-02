@@ -8,6 +8,6 @@
 import React from 'react';
 
 export const ConnectionFormLoader = React.lazy(async () => {
-  const { ConnectionForm } = await import('./ConnectionForm');
+  const { ConnectionForm } = await import('./ConnectionForm.js');
   return { default: ConnectionForm };
 });

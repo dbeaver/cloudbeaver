@@ -9,12 +9,12 @@ import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { executorHandlerFilter, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { executorHandlerFilter, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
-import { DatabaseEditAction } from './DatabaseDataModel/Actions/DatabaseEditAction';
-import type { IRequestEventData } from './DatabaseDataModel/IDatabaseDataModel';
-import { DatabaseDataSourceOperation } from './DatabaseDataModel/IDatabaseDataSource';
-import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
+import { DatabaseEditAction } from './DatabaseDataModel/Actions/DatabaseEditAction.js';
+import type { IRequestEventData } from './DatabaseDataModel/IDatabaseDataModel.js';
+import { DatabaseDataSourceOperation } from './DatabaseDataModel/IDatabaseDataSource.js';
+import { TableViewerStorageService } from './TableViewer/TableViewerStorageService.js';
 
 @injectable()
 export class DataViewerDataChangeConfirmationService {

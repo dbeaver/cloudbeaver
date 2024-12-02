@@ -8,8 +8,8 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { SettingsManagerService, SettingsResolverService } from '@cloudbeaver/core-settings';
 
-import { ServerSettingsManagerService } from './Settings/ServerSettingsManagerService';
-import { SERVER_SETTINGS_LAYER, ServerSettingsService } from './Settings/ServerSettingsService';
+import { ServerSettingsManagerService } from './Settings/ServerSettingsManagerService.js';
+import { SERVER_SETTINGS_LAYER, ServerSettingsService } from './Settings/ServerSettingsService.js';
 
 @injectable()
 export class RootBootstrap extends Bootstrap {
@@ -22,7 +22,7 @@ export class RootBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.settingsManagerService.registerSettings(
       this.serverSettingsManagerService.settingsProvider,
       this.serverSettingsManagerService.getSettingsGetter(),

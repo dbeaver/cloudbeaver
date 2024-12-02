@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const DNDPreview = importLazyComponent(() => import('./DNDPreview').then(m => m.DNDPreview));
+export const DNDPreview = importLazyComponent(() => import('./DNDPreview.js').then(m => m.DNDPreview));

@@ -6,17 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React from 'react';
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-import type { ISqlEditorTabState } from '../ISqlEditorTabState';
+import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
 import classes from './SqlResultPanel.module.css';
 
-const SqlExecutionPlanPanel = importLazyComponent(() => import('./ExecutionPlan/SqlExecutionPlanPanel').then(module => module.SqlExecutionPlanPanel));
-const OutputLogsPanel = importLazyComponent(() => import('./OutputLogs/OutputLogsPanel').then(module => module.OutputLogsPanel));
-const SqlResultSetPanel = importLazyComponent(() => import('./SqlResultSetPanel').then(module => module.SqlResultSetPanel));
-const SqlScriptStatisticsPanel = importLazyComponent(() => import('./SqlScriptStatisticsPanel').then(module => module.SqlScriptStatisticsPanel));
+const SqlExecutionPlanPanel = importLazyComponent(() =>
+  import('./ExecutionPlan/SqlExecutionPlanPanel.js').then(module => module.SqlExecutionPlanPanel),
+);
+const OutputLogsPanel = importLazyComponent(() => import('./OutputLogs/OutputLogsPanel.js').then(module => module.OutputLogsPanel));
+const SqlResultSetPanel = importLazyComponent(() => import('./SqlResultSetPanel.js').then(module => module.SqlResultSetPanel));
+const SqlScriptStatisticsPanel = importLazyComponent(() => import('./SqlScriptStatisticsPanel.js').then(module => module.SqlScriptStatisticsPanel));
 
 interface Props {
   state: ISqlEditorTabState;
@@ -28,7 +29,7 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, i
 
   if (resultTab) {
     return (
-      <div className={classes.resultPanel}>
+      <div className={classes['resultPanel']}>
         <SqlResultSetPanel resultTab={resultTab} state={state} />
       </div>
     );
@@ -38,7 +39,7 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, i
 
   if (executionPlanTab) {
     return (
-      <div className={classes.resultPanel}>
+      <div className={classes['resultPanel']}>
         <SqlExecutionPlanPanel executionPlanTab={executionPlanTab} />
       </div>
     );
@@ -48,7 +49,7 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, i
 
   if (statisticsTab) {
     return (
-      <div className={classes.resultPanel}>
+      <div className={classes['resultPanel']}>
         <SqlScriptStatisticsPanel tab={statisticsTab} />
       </div>
     );
@@ -56,7 +57,7 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, i
 
   if (state.outputLogsTab) {
     return (
-      <div className={classes.resultPanel}>
+      <div className={classes['resultPanel']}>
         <OutputLogsPanel sqlEditorTabState={state} />
       </div>
     );

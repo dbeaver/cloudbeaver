@@ -100,4 +100,8 @@ export default [
   ['connections_not_found', 'Подключения к базам данных не найдены'],
 
   ['cloud_connections_access_placeholder', 'Облачные подключения видны всем пользователям. Вы можете настроить доступ в "Консоль Управления AWS".'],
+
+  ['core_connections_settings_disable', 'Отключить'],
+  ['core_connections_settings_disable_description', 'Отключить возможность создания новых подключений'],
+  ['connections_templates_deprecated_message', 'Шаблоны подключений больше не поддерживаются и будут удалены в будущих релизах'],
 ];

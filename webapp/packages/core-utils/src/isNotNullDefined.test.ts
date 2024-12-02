@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { isNotNullDefined } from './isNotNullDefined';
+import { isNotNullDefined } from './isNotNullDefined.js';
 
 describe('isNotNullDefined', () => {
   it('should return true', () => {

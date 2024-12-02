@@ -1,11 +1,6 @@
 @echo off
 
 rem command line arguments
-SET CONFIGURATION_PATH=%1
-SET SAMPLE_DATABASE_PATH=%2
-
-IF "%CONFIGURATION_PATH%"=="" SET CONFIGURATION_PATH="..\config\sample-databases\DefaultConfiguration"
-echo "Configuration path=%CONFIGURATION_PATH%"
 
 echo Clone and build Cloudbeaver
 
@@ -25,6 +20,8 @@ echo Pull dbeaver platform
 
 IF NOT EXIST dbeaver git clone https://github.com/dbeaver/dbeaver.git
 IF NOT EXIST dbeaver-common git clone https://github.com/dbeaver/dbeaver-common.git
+IF NOT EXIST dbeaver-jdbc-libsql git clone https://github.com/dbeaver/dbeaver-jdbc-libsql.git
+
 cd cloudbeaver\deploy
 
 echo Build cloudbeaver server
@@ -40,32 +37,41 @@ xcopy /E /Q ..\server\product\web-server\target\products\io.cloudbeaver.product\
 copy scripts\* cloudbeaver >NUL
 mkdir cloudbeaver\samples
 
-IF NOT "%SAMPLE_DATABASE_PATH%"=="" (
-    mkdir cloudbeaver\samples\db
-    xcopy /E /Q %SAMPLE_DATABASE_PATH% cloudbeaver\samples\db >NUL
-)
+
 copy ..\config\core\* cloudbeaver\conf >NUL
-copy %CONFIGURATION_PATH%\GlobalConfiguration\.dbeaver\data-sources.json cloudbeaver\conf\initial-data-sources.conf >NUL
-copy %CONFIGURATION_PATH%\*.conf cloudbeaver\conf >NUL
+copy ..\config\DefaultConfiguration\GlobalConfiguration\.dbeaver\data-sources.json cloudbeaver\conf\initial-data-sources.conf >NUL
 
 move drivers cloudbeaver >NUL
 
-echo Build static content
+echo "Build static content"
 
-cd ..\
+mkdir .\cloudbeaver\web
 
-cd ..\cloudbeaver\webapp
+cd ..\webapp
 
 call yarn
-call yarn lerna bootstrap
-call yarn lerna run bundle --no-bail --stream --scope=@cloudbeaver/product-default &::-- -- --env source-map
+cd .\packages\product-default
+call yarn run bundle
+
+if %ERRORLEVEL% neq 0 (
+    echo 'Application build failed'
+    exit /b %ERRORLEVEL%
+)
+
+cd ..\..\
+call yarn test
+
+if %ERRORLEVEL% neq 0 (
+    echo 'Frontend tests failed'
+    exit /b %ERRORLEVEL%
+)
 
 cd ..\deploy
 
-echo Copy static content
+echo "Copy static content"
 
 xcopy /E /Q ..\webapp\packages\product-default\lib cloudbeaver\web >NUL
 
-echo Cloudbeaver is ready. Run run-server.bat in cloudbeaver folder to start the server.
+echo "Cloudbeaver is ready. Run run-server.bat in cloudbeaver folder to start the server."
 
 pause

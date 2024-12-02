@@ -24,7 +24,7 @@ export const DataSynchronizationNotificationMessages = observer<DataSynchronizat
     const style = useS(styles);
 
     return (
-      <div key={messages[0].label} className={s(style, { messageContent: true })}>
+      <div key={messages[0]!.label} className={s(style, { messageContent: true })}>
         {message}
       </div>
     );

@@ -61,6 +61,7 @@ type AuthProviderInfo {
     defaultProvider: Boolean!
     trusted: Boolean!
     private: Boolean!
+    authHidden: Boolean! @since(version: "24.2.4")
     supportProvisioning: Boolean!
 
     # Configurable providers must be configured first. See configurations field.
@@ -137,6 +138,9 @@ type UserInfo {
     configurationParameters: Object!
     # User teams
     teams: [UserTeamInfo!]!
+
+    @since(version: "24.2.3")
+    isAnonymous: Boolean!
 }
 
 type UserTeamInfo {

@@ -9,5 +9,5 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 export const productPlugin: PluginManifest = {
   info: { name: 'Product plugin' },
-  providers: [() => import('./ProductBootstrap').then(m => m.ProductBootstrap), () => import('./LocaleService').then(m => m.LocaleService)],
+  providers: [() => import('./ProductBootstrap.js').then(m => m.ProductBootstrap), () => import('./LocaleService.js').then(m => m.LocaleService)],
 };

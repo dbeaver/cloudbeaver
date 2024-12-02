@@ -9,16 +9,16 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState } from 'react';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Loader, s, SContext, StyleRegistry, TextPlaceholder, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Loader, s, SContext, type StyleRegistry, TextPlaceholder, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ITabData, TabPanel, TabsBox, TabStyles } from '@cloudbeaver/core-ui';
+import { type ITabData, TabPanel, TabsBox, TabStyles } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
-import { NavigationTabsService } from '../NavigationTabsService';
+import { NavigationTabsService } from '../NavigationTabsService.js';
 import styles from './shared/NavigationTabsBar.module.css';
 import NavigationTabsBarTab from './shared/NavigationTabsBarTab.module.css';
-import { TabHandlerPanel } from './Tabs/TabHandlerPanel';
-import { TabHandlerTab } from './Tabs/TabHandlerTab';
+import { TabHandlerPanel } from './Tabs/TabHandlerPanel.js';
+import { TabHandlerTab } from './Tabs/TabHandlerTab.js';
 
 interface Props {
   className?: string;
@@ -97,7 +97,6 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
             </SContext>
           }
           tabList={navigation.tabIdList}
-          tabIndex={0}
           autoSelect
           enabledBaseActions
           onChange={handleTabChange}

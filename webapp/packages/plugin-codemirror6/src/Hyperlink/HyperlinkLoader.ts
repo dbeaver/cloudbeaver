@@ -7,6 +7,6 @@
  */
 import type { SelectionRange } from '@codemirror/state';
 
-import type { IHyperlinkInfo } from './IHyperlinkInfo';
+import type { IHyperlinkInfo } from './IHyperlinkInfo.js';
 
 export type HyperlinkLoader = (pos: SelectionRange) => Promise<IHyperlinkInfo | null>;

@@ -8,11 +8,11 @@
 import { makeObservable, observable } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
-import { NetworkError } from './NetworkError';
+import { NetworkError } from './NetworkError.js';
 
 @injectable()
 export class NetworkStateService extends Bootstrap {
@@ -35,7 +35,7 @@ export class NetworkStateService extends Bootstrap {
     });
   }
 
-  register(): void {
+  override register(): void {
     this.networkState = window.navigator.onLine;
 
     window.addEventListener('online', () => this.setState(true));
@@ -43,8 +43,6 @@ export class NetworkStateService extends Bootstrap {
 
     this.graphQLService.registerInterceptor(this.sessionExpiredInterceptor.bind(this));
   }
-
-  load(): void {}
 
   private setState(state: boolean) {
     if (this.networkState === state) {

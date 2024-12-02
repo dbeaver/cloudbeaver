@@ -12,7 +12,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { ServerConfigResource, SESSION_EXPIRE_MIN_TIME, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-const SessionExpireWarningDialog = importLazyComponent(() => import('./SessionExpireWarningDialog').then(m => m.SessionExpireWarningDialog));
+const SessionExpireWarningDialog = importLazyComponent(() => import('./SessionExpireWarningDialog.js').then(m => m.SessionExpireWarningDialog));
 @injectable()
 export class SessionExpireWarningDialogBootstrap extends Bootstrap {
   private dialogInternalPromise: Promise<DialogueStateResult | null> | null;
@@ -28,7 +28,7 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
     this.dialogInternalPromise = null;
   }
 
-  register(): void {
+  override register(): void {
     this.sessionExpireService.onSessionExpire.addHandler(this.close.bind(this));
     this.sessionResource.onDataUpdate.addHandler(() => {
       const { valid, remainingTime } = this.sessionResource.data || {};
@@ -37,10 +37,8 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
     });
   }
 
-  load(): void {}
-
   private handleSessionResourceDataUpdate(isValid?: boolean, remainingTime?: number) {
-    if (!this.serverConfigResource.anonymousAccessEnabled && !this.userInfoResource.data && !this.serverConfigResource.configurationMode) {
+    if (!this.serverConfigResource.configurationMode && !this.userInfoResource.hasAccess()) {
       return;
     }
 

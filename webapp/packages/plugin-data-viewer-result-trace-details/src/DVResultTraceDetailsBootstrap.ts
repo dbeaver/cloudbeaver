@@ -11,7 +11,7 @@ import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { DataPresentationService, DataPresentationType } from '@cloudbeaver/plugin-data-viewer';
 
 const DVResultTraceDetailsPresentation = importLazyComponent(() =>
-  import('./DVResultTraceDetailsPresentation').then(module => module.DVResultTraceDetailsPresentation),
+  import('./DVResultTraceDetailsPresentation.js').then(module => module.DVResultTraceDetailsPresentation),
 );
 
 @injectable()
@@ -20,7 +20,7 @@ export class DVResultTraceDetailsBootstrap extends Bootstrap {
     super();
   }
 
-  register() {
+  override register() {
     this.dataPresentationService.add({
       id: 'result-trace-details-presentation',
       type: DataPresentationType.toolsPanel,

@@ -7,7 +7,7 @@
  */
 import { describe, expect, it, jest } from '@jest/globals';
 
-import { svgToDataUri } from './svgToDataUri';
+import { svgToDataUri } from './svgToDataUri.js';
 
 jest.mock('./utf8ToBase64', () => ({
   utf8ToBase64: jest.fn((str: string) => str),

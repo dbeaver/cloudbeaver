@@ -7,7 +7,7 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { IResourceOffsetPage } from './IResourceOffsetPage';
+import { type IResourceOffsetPage } from './IResourceOffsetPage.js';
 
 export class ResourceOffsetPage implements IResourceOffsetPage {
   from: number;
@@ -37,8 +37,14 @@ export class ResourceOffsetPage implements IResourceOffsetPage {
     return this.outdated;
   }
 
-  isHasCommonSegment(from: number, to: number): boolean {
-    return !(to < this.from || this.to <= from);
+  isHasCommonSegment(segment: IResourceOffsetPage): boolean;
+  isHasCommonSegment(from: number, to: number): boolean;
+  isHasCommonSegment(from: number | IResourceOffsetPage, to?: number): boolean {
+    if (to === undefined) {
+      to = (from as IResourceOffsetPage).to;
+      from = (from as IResourceOffsetPage).from;
+    }
+    return !(to < this.from || this.to <= (from as number));
   }
 
   isInRange(from: number, to: number): boolean {

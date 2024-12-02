@@ -8,7 +8,7 @@
 import { observable } from 'mobx';
 
 import { createDataContext } from '@cloudbeaver/core-data-context';
-import { flat, ILoadableState } from '@cloudbeaver/core-utils';
+import { flat, type ILoadableState } from '@cloudbeaver/core-utils';
 
 interface ILoadableStateContext {
   readonly loaders: ILoadableState[];

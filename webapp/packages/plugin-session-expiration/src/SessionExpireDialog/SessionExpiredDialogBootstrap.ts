@@ -12,7 +12,7 @@ import { ENotificationType, NotificationService } from '@cloudbeaver/core-events
 import { SessionExpireService } from '@cloudbeaver/core-root';
 import { RouterService } from '@cloudbeaver/core-routing';
 
-import { SessionExpiredDialog } from './SessionExpiredDialog';
+import { SessionExpiredDialog } from './SessionExpiredDialog.js';
 
 @injectable()
 export class SessionExpiredDialogBootstrap extends Bootstrap {
@@ -25,11 +25,9 @@ export class SessionExpiredDialogBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.sessionExpireService.onSessionExpire.addPostHandler(this.handleSessionExpired.bind(this));
   }
-
-  load(): void | Promise<void> {}
 
   private async handleSessionExpired(): Promise<void> {
     const state = await this.commonDialogService.open(SessionExpiredDialog, null);

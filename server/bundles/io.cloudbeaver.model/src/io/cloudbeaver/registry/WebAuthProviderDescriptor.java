@@ -54,6 +54,8 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private final boolean configurable;
     private final boolean trusted;
     private final boolean isPrivate;
+    private final boolean isAuthHidden;
+    private final boolean isCaseInsensitive;
     private final String[] requiredFeatures;
     private final boolean isRequired;
     private final String[] types;
@@ -67,6 +69,8 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         this.trusted = CommonUtils.toBoolean(cfg.getAttribute("trusted"));
         this.isPrivate = CommonUtils.toBoolean(cfg.getAttribute("private"));
         this.isRequired = CommonUtils.toBoolean(cfg.getAttribute("required"));
+        this.isAuthHidden = CommonUtils.toBoolean(cfg.getAttribute("authHidden"));
+        this.isCaseInsensitive = CommonUtils.toBoolean(cfg.getAttribute("caseInsensitive"));
 
         for (IConfigurationElement cfgElement : cfg.getChildren("configuration")) {
             List<WebAuthProviderProperty> properties = WebAuthProviderRegistry.readProperties(cfgElement);
@@ -124,6 +128,14 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
     public boolean isRequired() {
         return isRequired;
+    }
+
+    public boolean isAuthHidden() {
+        return isAuthHidden;
+    }
+
+    public boolean isCaseInsensitive() {
+        return isCaseInsensitive;
     }
 
     public List<WebAuthProviderProperty> getConfigurationParameters() {

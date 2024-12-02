@@ -7,7 +7,7 @@
  */
 import { action, computed, makeObservable, observable } from 'mobx';
 
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 
 interface IData<Key> {
   key: Key;

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Combobox, Container, FieldCheckbox, Loader, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import type { DataTransferOutputSettings } from '@cloudbeaver/core-sdk';
 
-import { DefaultExportOutputSettingsResource } from './DefaultExportOutputSettingsResource';
+import { DefaultExportOutputSettingsResource } from './DefaultExportOutputSettingsResource.js';
 
 interface Props {
   outputSettings: Partial<DataTransferOutputSettings>;

@@ -9,9 +9,9 @@ import { action } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 
-import type { IResultSetGroupingData } from './DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING';
-import { DEFAULT_GROUPING_QUERY_OPERATION } from './DEFAULT_GROUPING_QUERY_OPERATION';
-import type { IDVResultSetGroupingPresentationState } from './IDVResultSetGroupingPresentationState';
+import type { IResultSetGroupingData } from './DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING.js';
+import { DEFAULT_GROUPING_QUERY_OPERATION } from './DEFAULT_GROUPING_QUERY_OPERATION.js';
+import type { IDVResultSetGroupingPresentationState } from './IDVResultSetGroupingPresentationState.js';
 
 export interface IPrivateGroupingData extends IResultSetGroupingData {
   state: IDVResultSetGroupingPresentationState;

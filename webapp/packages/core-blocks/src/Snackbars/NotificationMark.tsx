@@ -9,7 +9,7 @@ import type { HTMLProps } from 'react';
 
 import { ENotificationType } from '@cloudbeaver/core-events';
 
-import { IconOrImage } from '../IconOrImage';
+import { IconOrImage } from '../IconOrImage.js';
 
 type IconProps = HTMLProps<HTMLDivElement> & {
   type: ENotificationType;

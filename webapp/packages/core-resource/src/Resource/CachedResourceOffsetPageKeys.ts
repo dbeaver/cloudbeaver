@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { IResourceOffsetPage } from './OffsetPagination/IResourceOffsetPage';
-import { ResourceOffsetPage } from './OffsetPagination/ResourceOffsetPage';
-import { ResourceKey } from './ResourceKey';
-import { resourceKeyAliasFactory } from './ResourceKeyAlias';
-import { resourceKeyListAliasFactory } from './ResourceKeyListAlias';
+import type { IResourceOffsetPage } from './OffsetPagination/IResourceOffsetPage.js';
+import { ResourceOffsetPage } from './OffsetPagination/ResourceOffsetPage.js';
+import type { ResourceKey } from './ResourceKey.js';
+import { resourceKeyAliasFactory } from './ResourceKeyAlias.js';
+import { resourceKeyListAliasFactory } from './ResourceKeyListAlias.js';
 
 interface IOffsetPageInfo {
   offset: number;
@@ -60,7 +60,7 @@ export function getNextPageOffset(info: ICachedResourceOffsetPage): number {
     lastPage = page;
   }
 
-  return lastPage?.to ?? CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
+  return Math.min(info.end ?? Number.MAX_SAFE_INTEGER, lastPage?.to ?? CACHED_RESOURCE_DEFAULT_PAGE_OFFSET);
 }
 
 export function isOffsetPageOutdated(pages: IResourceOffsetPage[], info: IOffsetPageInfo): boolean {
@@ -98,7 +98,7 @@ export function isOffsetPageInRange({ pages, end }: ICachedResourceOffsetPage, i
       return true;
     }
   }
-  return false;
+  return end !== undefined && end <= infoTo;
 }
 
 export function expandOffsetPageRange(
@@ -108,41 +108,64 @@ export function expandOffsetPageRange(
   outdated: boolean,
   hasNextPage: boolean,
 ): void {
-  const from = info.offset;
-  const to = info.offset + info.limit;
+  const initialFrom = info.offset;
+  const initialTo = info.offset + info.limit;
 
-  let pageInserted = false;
-  for (const page of pages) {
-    if (page.to <= from) {
-      continue;
-    }
+  const newPage = new ResourceOffsetPage().setSize(initialFrom, initialTo).update(info.offset, items).setOutdated(outdated);
 
-    if (!hasNextPage) {
-      if (page.from >= to) {
-        pages.splice(pages.indexOf(page));
-        break;
-      }
-    }
+  const mergedPages: IResourceOffsetPage[] = [];
+  let i = 0;
 
-    if (page.from <= from && !pageInserted) {
-      if (page.from < from) {
-        page.setSize(page.from, from);
-        pages.splice(pages.indexOf(page) + 1, 0, new ResourceOffsetPage().setSize(from, to).update(from, items).setOutdated(outdated));
-      } else {
-        page.setSize(from, to).update(from, items).setOutdated(outdated);
-      }
-      pageInserted = true;
-      continue;
-    }
-
-    if (page.isInRange(from, to)) {
-      pages.splice(pages.indexOf(page), 1);
-    }
+  // Add all pages before the newPage
+  while (i < pages.length && pages[i]!.to <= newPage.from) {
+    mergedPages.push(pages[i]!);
+    i++;
   }
 
-  const lastPage = pages[pages.length - 1];
-
-  if (!lastPage || lastPage.to <= from) {
-    pages.push(new ResourceOffsetPage().setSize(from, to).update(from, items).setOutdated(outdated));
+  // Adjust overlapping existing pages
+  while (i < pages.length && pages[i]!.from < newPage.to) {
+    const current = pages[i]!;
+    // If existing page starts before newPage
+    if (current.from < newPage.from) {
+      // Adjust the existing page to end at newPage.from
+      current.setSize(current.from, newPage.from);
+      if (current.to - current.from > 0) {
+        mergedPages.push(current);
+      }
+    }
+    // If existing page ends after newPage
+    if (current.to > newPage.to) {
+      // Adjust the existing page to start at newPage.to
+      current.setSize(newPage.to, current.to);
+      // Since we need to remove pages after newPage when hasNextPage is false,
+      // we only include this adjusted page if hasNextPage is true
+      if (hasNextPage && current.to - current.from > 0) {
+        mergedPages.push(current);
+      }
+    }
+    i++;
   }
+
+  // Add the newPage
+  mergedPages.push(newPage);
+
+  // Add the remaining pages after newPage if hasNextPage is true
+  if (hasNextPage) {
+    while (i < pages.length) {
+      mergedPages.push(pages[i]!);
+      i++;
+    }
+  } else {
+    // Since hasNextPage is false, we remove all pages after newPage
+    // No action needed here as we simply don't add them
+  }
+
+  // Remove zero-length ranges
+  const filteredPages = mergedPages.filter(range => range.to - range.from > 0);
+
+  // Sort the filtered pages
+  const sortedPages = filteredPages.sort((a, b) => a.from - b.from);
+
+  // Replace pages with the merged and sorted pages
+  pages.splice(0, pages.length, ...sortedPages);
 }

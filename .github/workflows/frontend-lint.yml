@@ -1,20 +1,25 @@
 name: Frontend Lint
 
 on:
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
   # Allows you to reuse workflows by referencing their YAML files
   workflow_call:
 
 jobs:
   lint:
-    name: Frontend
+    name: Lint
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
 
+    defaults:
+      run:
+        working-directory: ./webapp
+        
     steps:
       - uses: actions/checkout@v4
 
+      - run: corepack enable
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -29,17 +34,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node_modules-
 
-      - name: yarn install --frozen-lockfile
-        uses: borales/actions-yarn@v5
-        with:
-          dir: webapp
-          cmd: install
-
-      - name: Lint
-        uses: reviewdog/action-eslint@v1
-        with:
-          reporter: github-pr-review
-          filter_mode: file
-          workdir: webapp
-          fail_on_error: true
-          eslint_flags: "--ext .ts,.tsx"
+      - run: |
+          yarn install --immutable
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          FILES=$(git diff --name-only 'origin/${{ github.base_ref }}' ${{ github.sha }} -- . | sed 's|^webapp/||')
+          if [ -n "$FILES" ]; then
+            yarn lint --pass-on-no-patterns --no-error-on-unmatched-pattern $FILES
+          else
+            echo "No files to lint"
+          fi

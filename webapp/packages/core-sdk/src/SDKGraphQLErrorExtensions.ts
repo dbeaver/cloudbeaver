@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { GraphQLErrorExtensions } from 'graphql';
+import type { GraphQLErrorExtensions } from 'graphql';
 
 export interface SDKGraphQLErrorExtensions extends GraphQLErrorExtensions {
   stackTrace?: string;

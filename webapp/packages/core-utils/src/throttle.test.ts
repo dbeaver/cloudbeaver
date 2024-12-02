@@ -7,7 +7,7 @@
  */
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 
-import { throttle } from './throttle';
+import { throttle } from './throttle.js';
 
 describe('throttle', () => {
   beforeEach(() => {
@@ -58,10 +58,10 @@ describe('throttle', () => {
 
     expect(callback).toHaveBeenCalledTimes(2);
 
-    expect(callback.mock.calls[0][0]).toBe(1);
-    expect(callback.mock.calls[0][1]).toBe(2);
+    expect(callback.mock.calls[0]?.[0]).toBe(1);
+    expect(callback.mock.calls[0]?.[1]).toBe(2);
 
-    expect(callback.mock.calls[1][0]).toBe(4);
-    expect(callback.mock.calls[1][1]).toBe(5);
+    expect(callback.mock.calls[1]?.[0]).toBe(4);
+    expect(callback.mock.calls[1]?.[1]).toBe(5);
   });
 });

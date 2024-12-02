@@ -7,22 +7,22 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Menu, MenuButton, MenuItem, useMenuState } from 'reakit/Menu';
+import { Menu, MenuButton, MenuItem, useMenuState } from 'reakit';
 
-import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
-import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import { getComputed } from '../getComputed';
-import { Icon } from '../Icon';
-import { IconOrImage } from '../IconOrImage';
-import { Loader } from '../Loader/Loader';
-import { useTranslate } from '../localization/useTranslate';
-import { s } from '../s';
-import { useS } from '../useS';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
+import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
+import { getComputed } from '../getComputed.js';
+import { Icon } from '../Icon.js';
+import { IconOrImage } from '../IconOrImage.js';
+import { Loader } from '../Loader/Loader.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
 import comboboxStyles from './Combobox.module.css';
-import { Field } from './Field';
-import { FieldDescription } from './FieldDescription';
-import { FieldLabel } from './FieldLabel';
-import { FormContext } from './FormContext';
+import { Field } from './Field.js';
+import { FieldDescription } from './FieldDescription.js';
+import { FieldLabel } from './FieldLabel.js';
+import { FormContext } from './FormContext.js';
 
 export type ComboboxBaseProps<TKey, TValue> = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -299,7 +299,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           onClick={handleClick}
           {...rest}
         />
-        <MenuButton {...menu} disabled={readOnly || disabled || hideMenu} className={styles.menuButton}>
+        <MenuButton {...menu} disabled={readOnly || disabled || hideMenu} className={styles['menuButton']}>
           <Icon name="arrow" viewBox="0 0 16 16" className={s(styles, { icon: true, focus })} />
         </MenuButton>
         <Menu {...menu} ref={menuRef} aria-label={propertyName} className={s(styles, { menu: true })} modal>

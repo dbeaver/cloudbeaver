@@ -12,5 +12,5 @@ export const coreLocalizationManifest: PluginManifest = {
     name: 'Core Localization',
   },
 
-  providers: [() => import('./LocalizationService').then(m => m.LocalizationService)],
+  providers: [() => import('./LocalizationService.js').then(m => m.LocalizationService)],
 };

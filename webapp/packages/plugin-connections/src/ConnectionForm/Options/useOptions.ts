@@ -8,13 +8,13 @@
 import { runInAction } from 'mobx';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
-import { DBDriver, DBDriverResource, isJDBCConnection } from '@cloudbeaver/core-connections';
+import { type DBDriver, DBDriverResource, isJDBCConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 
-import type { IConnectionFormState } from '../IConnectionFormProps';
-import { getConnectionName } from './getConnectionName';
-import { getDefaultConfigurationType } from './getDefaultConfigurationType';
+import type { IConnectionFormState } from '../IConnectionFormProps.js';
+import { getConnectionName } from './getConnectionName.js';
+import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 
 export function useOptions(state: IConnectionFormState) {
   const dbDriverResource = useService(DBDriverResource);

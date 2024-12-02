@@ -7,10 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Group, Loader, Placeholder, PlaceholderElement, s, useS } from '@cloudbeaver/core-blocks';
+import { Group, Loader, Placeholder, type PlaceholderElement, s, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { ElementsTreeSettingsService, IElementsTreeSettingsProps } from './ElementsTreeSettingsService';
+import { ElementsTreeSettingsService, type IElementsTreeSettingsProps } from './ElementsTreeSettingsService.js';
 import NavigationTreeSettingsStyles from './NavigationTreeSettings.module.css';
 
 interface Props extends IElementsTreeSettingsProps {

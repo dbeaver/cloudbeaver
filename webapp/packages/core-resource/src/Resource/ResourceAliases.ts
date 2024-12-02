@@ -7,12 +7,12 @@
  */
 import { toJS } from 'mobx';
 
-import { isResourceAlias, type ResourceAlias, ResourceAliasFactory, type ResourceAliasOptions } from './ResourceAlias';
-import type { ResourceKey, ResourceKeySimple } from './ResourceKey';
-import type { ResourceKeyAlias } from './ResourceKeyAlias';
-import { isResourceKeyList, ResourceKeyList } from './ResourceKeyList';
-import type { ResourceKeyListAlias } from './ResourceKeyListAlias';
-import type { ResourceLogger } from './ResourceLogger';
+import { isResourceAlias, type ResourceAlias, type ResourceAliasFactory, type ResourceAliasOptions } from './ResourceAlias.js';
+import type { ResourceKey, ResourceKeySimple } from './ResourceKey.js';
+import type { ResourceKeyAlias } from './ResourceKeyAlias.js';
+import { isResourceKeyList, ResourceKeyList } from './ResourceKeyList.js';
+import type { ResourceKeyListAlias } from './ResourceKeyListAlias.js';
+import type { ResourceLogger } from './ResourceLogger.js';
 
 export type IParamAlias<TKey> = {
   id: string;

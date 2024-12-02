@@ -8,9 +8,14 @@
 import { action, observable } from 'mobx';
 import { useContext, useEffect } from 'react';
 
-import { useObservableRef } from '../useObservableRef';
-import { useUserData } from '../useUserData';
-import { FolderExplorerContext, IFolderExplorerContext, IFolderExplorerOptions, IFolderExplorerState } from './FolderExplorerContext';
+import { useObservableRef } from '../useObservableRef.js';
+import { useUserData } from '../useUserData.js';
+import {
+  FolderExplorerContext,
+  type IFolderExplorerContext,
+  type IFolderExplorerOptions,
+  type IFolderExplorerState,
+} from './FolderExplorerContext.js';
 
 export function useFolderExplorer(root: string, options: IFolderExplorerOptions = {}): IFolderExplorerContext {
   const context = useContext(FolderExplorerContext);

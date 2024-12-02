@@ -7,7 +7,7 @@
  */
 import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 
-import type { ISqlDataSourceHistoryState } from './ISqlDataSourceHistoryState';
+import type { ISqlDataSourceHistoryState } from './ISqlDataSourceHistoryState.js';
 
 export interface ISqlDataSourceHistory {
   readonly state: ISqlDataSourceHistoryState;

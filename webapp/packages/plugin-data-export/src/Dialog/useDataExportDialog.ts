@@ -7,17 +7,17 @@
  */
 import { action, computed, observable, toJS } from 'mobx';
 
-import { IProperty, useObservableRef } from '@cloudbeaver/core-blocks';
+import { type IProperty, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import type { DataTransferOutputSettings, DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
-import { DataExportService } from '../DataExportService';
-import { DataTransferProcessorsResource } from '../DataTransferProcessorsResource';
-import type { IExportContext } from '../IExportContext';
-import { DefaultExportOutputSettingsResource } from './DefaultExportOutputSettingsResource';
-import { EDataExportStep } from './EDataExportStep';
+import { DataExportService } from '../DataExportService.js';
+import { DataTransferProcessorsResource } from '../DataTransferProcessorsResource.js';
+import type { IExportContext } from '../IExportContext.js';
+import { DefaultExportOutputSettingsResource } from './DefaultExportOutputSettingsResource.js';
+import { EDataExportStep } from './EDataExportStep.js';
 
 interface State {
   readonly properties: IProperty[];

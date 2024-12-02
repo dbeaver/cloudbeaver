@@ -36,10 +36,6 @@ fragment DatabaseConnection on ConnectionInfo {
   features
   supportedDataFormats
 
-  origin @include(if: $includeOrigin) {
-    ...ObjectOriginInfo
-  }
-
   authNeeded @include(if: $includeAuthNeeded)
   authModel
 

@@ -7,15 +7,15 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 
-import { Bootstrap } from './Bootstrap';
-import { Dependency } from './Dependency';
-import type { DIContainer } from './DIContainer';
-import type { IServiceCollection, IServiceConstructor } from './IApp';
-import { IDiWrapper, inversifyWrapper } from './inversifyWrapper';
-import { IServiceProvider } from './IServiceProvider';
-import type { PluginManifest } from './PluginManifest';
+import { Bootstrap } from './Bootstrap.js';
+import { Dependency } from './Dependency.js';
+import type { DIContainer } from './DIContainer.js';
+import type { IServiceCollection, IServiceConstructor } from './IApp.js';
+import { type IDiWrapper, inversifyWrapper } from './inversifyWrapper.js';
+import { IServiceProvider } from './IServiceProvider.js';
+import type { PluginManifest } from './PluginManifest.js';
 
 export interface IStartData {
   restart: boolean;

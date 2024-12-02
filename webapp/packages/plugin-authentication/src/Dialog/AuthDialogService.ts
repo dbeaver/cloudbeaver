@@ -8,8 +8,8 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
-import type { IAuthOptions } from '../IAuthOptions';
-import { AuthDialog } from './AuthDialog';
+import type { IAuthOptions } from '../IAuthOptions.js';
+import { AuthDialog } from './AuthDialog.js';
 
 @injectable()
 export class AuthDialogService {

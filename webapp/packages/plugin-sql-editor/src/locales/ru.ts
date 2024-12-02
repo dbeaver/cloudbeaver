@@ -43,4 +43,10 @@ export default [
   ['plugin_sql_editor_action_overlay_title', 'Требуется действие'],
   ['plugin_sql_editor_action_overlay_description', 'Пожалуйста, перезапустите редактор для продолжения работы.'],
   ['plugin_sql_editor_action_close_group', 'Закрыть все из этого запроса'],
+  ['plugin_sql_editor_settings_disable', 'Отключить'],
+  ['plugin_sql_editor_settings_disable_description', 'Отключить SQL редактор для всех пользователей'],
+  ['plugin_sql_editor_settings_import_max_size', 'Лимит импорта (КБ)'],
+  ['plugin_sql_editor_settings_import_max_size_description', 'Максимальный размер файла, который можно импортировать в КБ'],
+  ['plugin_sql_editor_settings_auto_save', 'Автосохранение'],
+  ['plugin_sql_editor_settings_auto_save_description', 'Автоматически сохранять содержимое редактора'],
 ];

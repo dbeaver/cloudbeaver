@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/core-navigation-tree",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -50,7 +51,7 @@
     "@cloudbeaver/core-view": "^0",
     "@cloudbeaver/tests-runner": "^0",
     "@jest/globals": "^29",
-    "@testing-library/jest-dom": "^6",
+    "@types/jest": "^29",
     "typescript": "^5"
   }
 }

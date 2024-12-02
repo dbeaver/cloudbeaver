@@ -7,7 +7,6 @@
  */
 
 .tabPanel {
-  outline: none;
   position: relative;
 
   &:not(.contents) {

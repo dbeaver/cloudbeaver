@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-data-viewer",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -26,6 +27,7 @@
     "@cloudbeaver/core-dialogs": "^0",
     "@cloudbeaver/core-events": "^0",
     "@cloudbeaver/core-executor": "^0",
+    "@cloudbeaver/core-links": "^0",
     "@cloudbeaver/core-localization": "^0",
     "@cloudbeaver/core-navigation-tree": "^0",
     "@cloudbeaver/core-resource": "^0",
@@ -35,7 +37,6 @@
     "@cloudbeaver/core-ui": "^0",
     "@cloudbeaver/core-utils": "^0",
     "@cloudbeaver/core-view": "^0",
-    "@cloudbeaver/core-website": "^0",
     "@cloudbeaver/plugin-codemirror6": "^0",
     "@cloudbeaver/plugin-navigation-tabs": "^0",
     "@cloudbeaver/plugin-object-viewer": "^0",
@@ -69,7 +70,7 @@
     "@cloudbeaver/plugin-object-viewer": "^0",
     "@cloudbeaver/tests-runner": "^0",
     "@jest/globals": "^29",
-    "@testing-library/jest-dom": "^6",
+    "@types/jest": "^29",
     "@types/react": "^18",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5"

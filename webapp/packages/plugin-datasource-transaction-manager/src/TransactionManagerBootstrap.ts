@@ -13,8 +13,8 @@ import {
   ConnectionInfoResource,
   ConnectionsManagerService,
   createConnectionParam,
-  IConnectionExecutionContextUpdateTaskInfo,
-  IConnectionExecutorData,
+  type IConnectionExecutionContextUpdateTaskInfo,
+  type IConnectionExecutorData,
   isConnectionInfoParamEqual,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -28,10 +28,10 @@ import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
-import { ACTION_DATASOURCE_TRANSACTION_COMMIT } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT';
-import { ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE';
-import { ACTION_DATASOURCE_TRANSACTION_ROLLBACK } from './actions/ACTION_DATASOURCE_TRANSACTION_ROLLBACK';
-import { TransactionManagerSettingsService } from './TransactionManagerSettingsService';
+import { ACTION_DATASOURCE_TRANSACTION_COMMIT } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT.js';
+import { ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE.js';
+import { ACTION_DATASOURCE_TRANSACTION_ROLLBACK } from './actions/ACTION_DATASOURCE_TRANSACTION_ROLLBACK.js';
+import { TransactionManagerSettingsService } from './TransactionManagerSettingsService.js';
 
 @injectable()
 export class TransactionManagerBootstrap extends Bootstrap {
@@ -52,7 +52,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
     super();
   }
 
-  register() {
+  override register() {
     this.connectionsManagerService.onDisconnect.addHandler(this.disconnectHandler.bind(this));
 
     this.menuService.addCreator({

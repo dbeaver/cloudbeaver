@@ -7,18 +7,18 @@
  */
 import { action, computed, entries, keys, makeObservable, values } from 'mobx';
 
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { ILoadableState, isArraysEqual, isContainsException } from '@cloudbeaver/core-utils';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type ILoadableState, isArraysEqual, isContainsException } from '@cloudbeaver/core-utils';
 
-import { CachedResource } from './CachedResource';
-import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
-import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
-import type { CachedResourceKey } from './IResource';
-import type { ResourceKey, ResourceKeySimple } from './ResourceKey';
-import type { ResourceKeyAlias } from './ResourceKeyAlias';
-import { isResourceKeyList, resourceKeyList, ResourceKeyList } from './ResourceKeyList';
-import { ResourceKeyListAlias, resourceKeyListAlias } from './ResourceKeyListAlias';
-import { ResourceKeyUtils } from './ResourceKeyUtils';
+import { CachedResource } from './CachedResource.js';
+import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes.js';
+import type { ICachedResourceMetadata } from './ICachedResourceMetadata.js';
+import type { CachedResourceKey } from './IResource.js';
+import type { ResourceKey, ResourceKeySimple } from './ResourceKey.js';
+import type { ResourceKeyAlias } from './ResourceKeyAlias.js';
+import { isResourceKeyList, resourceKeyList, ResourceKeyList } from './ResourceKeyList.js';
+import { ResourceKeyListAlias, resourceKeyListAlias } from './ResourceKeyListAlias.js';
+import { ResourceKeyUtils } from './ResourceKeyUtils.js';
 
 export type CachedMapResourceKey<TResource> = CachedResourceKey<TResource>;
 export type CachedMapResourceValue<TResource> = TResource extends CachedResource<Map<any, infer T>, any, any, any, any> ? T : never;
@@ -129,7 +129,7 @@ export abstract class CachedMapResource<
       }
 
       for (let i = 0; i < key.length; i++) {
-        this.dataSet(this.getKeyRef(key[i]), (value as TValue[])[i]);
+        this.dataSet(this.getKeyRef(key[i]!), (value as TValue[])[i]!);
       }
     } else {
       this.dataSet(this.getKeyRef(key), value as TValue);
@@ -162,19 +162,19 @@ export abstract class CachedMapResource<
     this.markUpdated(key);
   }
 
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: TKey | ResourceKeyAlias<TKey, any>,
     includes?: T,
   ): Promise<CachedResourceValueIncludes<TValue, T>>;
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKeyList<TKey> | ResourceKeyListAlias<TKey, any> | void,
     includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>>>;
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<TKey>,
     includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>>;
-  async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKey<TKey> | void,
     includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
@@ -185,19 +185,19 @@ export abstract class CachedMapResource<
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
 
-  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: TKey | ResourceKeyAlias<TKey, any>,
     includes?: T,
   ): Promise<CachedResourceValueIncludes<TValue, T>>;
-  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKeyList<TKey> | ResourceKeyListAlias<TKey, any> | void,
     includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>>>;
-  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key: ResourceKey<TKey>,
     includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>>;
-  async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
+  override async load<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(
     key?: ResourceKey<TKey> | void,
     includes?: T,
   ): Promise<Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>> {
@@ -208,7 +208,7 @@ export abstract class CachedMapResource<
     return this.get(key) as Array<CachedResourceValueIncludes<TValue, T>> | CachedResourceValueIncludes<TValue, T>;
   }
 
-  getKeyRef(key: TKey): TKey {
+  override getKeyRef(key: TKey): TKey {
     if (this.keys.includes(key)) {
       return key;
     }

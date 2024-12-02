@@ -8,8 +8,8 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 
-import { NAV_NODE_TYPE_RM_PROJECT } from './NAV_NODE_TYPE_RM_PROJECT';
-import { RESOURCES_NODE_PATH } from './RESOURCES_NODE_PATH';
+import { NAV_NODE_TYPE_RM_PROJECT } from './NAV_NODE_TYPE_RM_PROJECT.js';
+import { RESOURCES_NODE_PATH } from './RESOURCES_NODE_PATH.js';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -17,10 +17,9 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.addRmProjectIds();
   }
-  load(): void | Promise<void> {}
 
   private addRmProjectIds() {
     this.projectsNavNodeService.addProjectType(NAV_NODE_TYPE_RM_PROJECT);

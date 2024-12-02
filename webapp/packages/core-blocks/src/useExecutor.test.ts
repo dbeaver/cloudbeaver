@@ -10,8 +10,8 @@ import { renderHook } from '@testing-library/react';
 
 import type { IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
-import { useExecutor } from './useExecutor';
-import { useObjectRef } from './useObjectRef';
+import { useExecutor } from './useExecutor.js';
+import { useObjectRef } from './useObjectRef.js';
 
 jest.mock('./useObjectRef', () => ({
   useObjectRef: jest.fn(obj => obj),

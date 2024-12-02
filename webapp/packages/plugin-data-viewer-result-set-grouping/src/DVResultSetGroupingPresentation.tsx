@@ -10,14 +10,14 @@ import { observer } from 'mobx-react-lite';
 import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { CaptureViewScope } from '@cloudbeaver/core-view';
-import { DataPresentationComponent, isResultSetDataModel, TableViewerLoader } from '@cloudbeaver/plugin-data-viewer';
+import { type DataPresentationComponent, isResultSetDataModel, TableViewerLoader } from '@cloudbeaver/plugin-data-viewer';
 
-import { DEFAULT_GROUPING_QUERY_OPERATION } from './DEFAULT_GROUPING_QUERY_OPERATION';
+import { DEFAULT_GROUPING_QUERY_OPERATION } from './DEFAULT_GROUPING_QUERY_OPERATION.js';
 import styles from './DVResultSetGroupingPresentation.module.css';
-import { DVResultSetGroupingPresentationContext } from './DVResultSetGroupingPresentationContext';
-import type { IDVResultSetGroupingPresentationState } from './IDVResultSetGroupingPresentationState';
-import { useGroupingDataModel } from './useGroupingDataModel';
-import { useGroupingDnDColumns } from './useGroupingDnDColumns';
+import { DVResultSetGroupingPresentationContext } from './DVResultSetGroupingPresentationContext.js';
+import type { IDVResultSetGroupingPresentationState } from './IDVResultSetGroupingPresentationState.js';
+import { useGroupingDataModel } from './useGroupingDataModel.js';
+import { useGroupingDnDColumns } from './useGroupingDnDColumns.js';
 
 export const DVResultSetGroupingPresentation: DataPresentationComponent = observer(function DVResultSetGroupingPresentation({
   model: unknownModel,

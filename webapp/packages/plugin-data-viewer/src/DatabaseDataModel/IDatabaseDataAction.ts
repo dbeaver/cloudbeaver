@@ -7,8 +7,8 @@
  */
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataResult } from './IDatabaseDataResult';
-import type { IDatabaseDataSource } from './IDatabaseDataSource';
+import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
+import type { IDatabaseDataSource } from './IDatabaseDataSource.js';
 
 type AbstractConstructorFunction<
   TOptions,

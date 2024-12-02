@@ -34,9 +34,9 @@ $input-color-readonly: darken($input-color, 5%);
 $input-border: #585958;
 $input-border-disabled: darken($input-border, 10%);
 $input-border-readonly: darken($input-border, 5%);
-$input-background: $mdc-theme-secondary;
-$input-background-disabled: $input-background;
-$input-background-readonly: $input-background;
+$input-background: $mdc-theme-surface;
+$input-background-disabled: #3e3e3e;
+$input-background-readonly: #3e3e3e;
 
 $mdc-theme-text-colors: (
   dark: (

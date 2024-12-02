@@ -7,7 +7,7 @@
  */
 import { beforeAll, describe, expect, it, jest } from '@jest/globals';
 
-import { copyToClipboard } from './copyToClipboard';
+import { copyToClipboard } from './copyToClipboard.js';
 
 describe('copyToClipboard', () => {
   beforeAll(() => {

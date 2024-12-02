@@ -69,6 +69,9 @@ public class WebUserInfo {
 
     @Property
     public List<String> getLinkedAuthProviders() throws DBWebException {
+        if (isAnonymous()) {
+            return List.of();
+        }
         if (linkedProviders == null) {
             try {
                 linkedProviders = session.getSecurityController().getCurrentUserLinkedProviders();
@@ -103,5 +106,10 @@ public class WebUserInfo {
         } else {
             return List.of();
         }
+    }
+
+    @Property
+    public boolean isAnonymous() {
+        return session.getUser() == null;
     }
 }

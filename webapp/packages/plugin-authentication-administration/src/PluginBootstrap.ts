@@ -12,7 +12,7 @@ import { ServerConfigurationAdministrationNavService, ServerConfigurationService
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 const AuthenticationProviders = React.lazy(async () => {
-  const { AuthenticationProviders } = await import('./Administration/ServerConfiguration/AuthenticationProviders');
+  const { AuthenticationProviders } = await import('./Administration/ServerConfiguration/AuthenticationProviders.js');
   return { default: AuthenticationProviders };
 });
 
@@ -26,10 +26,8 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.serverConfigurationService.configurationContainer.add(AuthenticationProviders, 0);
     this.authenticationService.setConfigureAuthProvider(() => this.serverConfigurationAdministrationNavService.navToSettings());
   }
-
-  load(): void | Promise<void> {}
 }

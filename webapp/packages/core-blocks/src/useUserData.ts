@@ -10,8 +10,8 @@ import { useEffect, useRef } from 'react';
 import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { useService } from '@cloudbeaver/core-di';
 
-import { useResource } from './ResourcesHooks/useResource';
-import { useObjectRef } from './useObjectRef';
+import { useResource } from './ResourcesHooks/useResource.js';
+import { useObjectRef } from './useObjectRef.js';
 
 export function useUserData<T extends Record<any, any>>(
   key: string,

@@ -13,12 +13,12 @@ import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import type { RenderHeaderCellProps } from '@cloudbeaver/plugin-data-grid';
 import { DatabaseDataConstraintAction, isResultSetDataModel, ResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridContext } from '../DataGridContext';
-import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
-import { TableDataContext } from '../TableDataContext';
-import { OrderButton } from './OrderButton';
+import { DataGridContext } from '../DataGridContext.js';
+import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
+import { TableDataContext } from '../TableDataContext.js';
+import { OrderButton } from './OrderButton.js';
 import style from './TableColumnHeader.module.css';
-import { useTableColumnDnD } from './useTableColumnDnD';
+import { useTableColumnDnD } from './useTableColumnDnD.js';
 
 export const TableColumnHeader = observer<RenderHeaderCellProps<any>>(function TableColumnHeader({ column: calculatedColumn }) {
   const dataGridContext = useContext(DataGridContext);

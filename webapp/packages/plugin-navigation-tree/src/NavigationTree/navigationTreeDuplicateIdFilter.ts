@@ -7,8 +7,8 @@
  */
 import { untracked } from 'mobx';
 
-import type { NavNodeViewService } from '../NodesManager/NavNodeView/NavNodeViewService';
-import type { IElementsTreeFilter } from './ElementsTree/useElementsTree';
+import type { NavNodeViewService } from '../NodesManager/NavNodeView/NavNodeViewService.js';
+import type { IElementsTreeFilter } from './ElementsTree/useElementsTree.js';
 
 export function navigationTreeDuplicateFilter(navNodeViewService: NavNodeViewService): IElementsTreeFilter {
   return (tree, filter, node, children) => {

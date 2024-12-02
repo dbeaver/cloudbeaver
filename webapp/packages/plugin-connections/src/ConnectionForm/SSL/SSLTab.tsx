@@ -10,10 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { Translate, useResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { Tab, TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
+import { Tab, type TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps';
-import { getSSLDriverHandler } from './getSSLDriverHandler';
+import type { IConnectionFormProps } from '../IConnectionFormProps.js';
+import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 
 export const SSLTab: TabContainerTabComponent<IConnectionFormProps> = observer(function SSLTab(props) {
   const networkHandlerResource = useResource(SSLTab, NetworkHandlerResource, CachedMapAllKey);

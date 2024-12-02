@@ -7,8 +7,8 @@
  */
 import { describe, expect, it, jest } from '@jest/globals';
 
-import { CancellablePromise } from './CancellablePromise';
-import { PromiseCancelledError } from './PromiseCancelledError';
+import { CancellablePromise } from './CancellablePromise.js';
+import { PromiseCancelledError } from './PromiseCancelledError.js';
 
 describe('CancellablePromise', () => {
   jest.mock('./PromiseCancelledError', () => ({

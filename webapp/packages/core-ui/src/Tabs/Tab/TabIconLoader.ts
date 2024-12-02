@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const TabIcon = importLazyComponent(() => import('./TabIcon').then(m => m.TabIcon));
+export const TabIcon = importLazyComponent(() => import('./TabIcon.js').then(m => m.TabIcon));

@@ -7,6 +7,6 @@
  */
 import { createContext } from 'react';
 
-import { IComponentsTreeNodeValidator } from './IComponentsTreeNodeValidator';
+import { type IComponentsTreeNodeValidator } from './IComponentsTreeNodeValidator.js';
 
 export const ComponentsRegistryContext = createContext<Map<React.FC<any>, IComponentsTreeNodeValidator<any>[][]>>(new Map());

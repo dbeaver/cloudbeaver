@@ -11,7 +11,7 @@ import { DATA_CONTEXT_NAV_NODES, ENodeFeature, NavTreeResource, NavTreeSettingsS
 import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { ACTION_DELETE, ActionService, MenuService } from '@cloudbeaver/core-view';
 
-import { MENU_OBJECT_VIEWER_FOOTER } from './MENU_OBJECT_VIEWER_FOOTER';
+import { MENU_OBJECT_VIEWER_FOOTER } from './MENU_OBJECT_VIEWER_FOOTER.js';
 
 @injectable()
 export class ObjectPropertyTableFooterService {

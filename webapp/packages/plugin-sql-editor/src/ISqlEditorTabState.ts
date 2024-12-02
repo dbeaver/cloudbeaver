@@ -7,7 +7,7 @@
  */
 import { schema } from '@cloudbeaver/core-utils';
 
-import { OUTPUT_LOG_TYPES } from './SqlResultTabs/OutputLogs/IOutputLogTypes';
+import { OUTPUT_LOG_TYPES } from './SqlResultTabs/OutputLogs/IOutputLogTypes.js';
 
 export const RESULT_TAB_SCHEMA = schema.object({
   tabId: schema.string(),

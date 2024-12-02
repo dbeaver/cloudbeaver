@@ -10,11 +10,11 @@ import type React from 'react';
 
 import { ENotificationType } from '@cloudbeaver/core-events';
 
-import { AppRefreshButton } from './AppRefreshButton';
+import { AppRefreshButton } from './AppRefreshButton.js';
 import style from './DisplayError.module.css';
-import { s } from './s';
-import { NotificationMark } from './Snackbars/NotificationMark';
-import { useS } from './useS';
+import { s } from './s.js';
+import { NotificationMark } from './Snackbars/NotificationMark.js';
+import { useS } from './useS.js';
 
 interface Props {
   root?: boolean;

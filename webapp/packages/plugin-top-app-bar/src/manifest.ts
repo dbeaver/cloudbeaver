@@ -11,5 +11,8 @@ export const topAppBarPlugin: PluginManifest = {
   info: {
     name: 'Top App Bar plugin',
   },
-  providers: [() => import('./PluginBootstrap').then(m => m.PluginBootstrap), () => import('./TopNavBar/TopNavService').then(m => m.TopNavService)],
+  providers: [
+    () => import('./PluginBootstrap.js').then(m => m.PluginBootstrap),
+    () => import('./TopNavBar/TopNavService.js').then(m => m.TopNavService),
+  ],
 };

@@ -9,9 +9,9 @@ import { computed, makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 
-import { BaseSqlDataSource } from '../BaseSqlDataSource';
-import { ESqlDataSourceFeatures } from '../ESqlDataSourceFeatures';
-import type { ILocalStorageSqlDataSourceState } from './ILocalStorageSqlDataSourceState';
+import { BaseSqlDataSource } from '../BaseSqlDataSource.js';
+import { ESqlDataSourceFeatures } from '../ESqlDataSourceFeatures.js';
+import type { ILocalStorageSqlDataSourceState } from './ILocalStorageSqlDataSourceState.js';
 
 export class LocalStorageSqlDataSource extends BaseSqlDataSource {
   get baseScript(): string {
@@ -22,7 +22,7 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
     return this.state.executionContext;
   }
 
-  static key = 'local-storage';
+  static override key = 'local-storage';
 
   get name(): string | null {
     return this.state.name ?? null;
@@ -36,15 +36,15 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
     return this.state.executionContext;
   }
 
-  get features(): ESqlDataSourceFeatures[] {
+  override get features(): ESqlDataSourceFeatures[] {
     return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable, ESqlDataSourceFeatures.setName];
   }
 
-  get isSaved(): boolean {
+  override get isSaved(): boolean {
     return true;
   }
 
-  get projectId(): string | null {
+  override get projectId(): string | null {
     // we will be able to attach any connection from any project
     return null;
   }
@@ -62,11 +62,11 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
     });
   }
 
-  isReadonly(): boolean {
+  override isReadonly(): boolean {
     return false;
   }
 
-  setName(name: string | null): void {
+  override setName(name: string | null): void {
     this.state.name = name ?? undefined;
     super.setName(name);
   }
@@ -75,12 +75,12 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
     return true;
   }
 
-  setScript(script: string): void {
+  override setScript(script: string): void {
     this.state.script = script;
     super.setScript(script);
   }
 
-  setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
+  override setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
     this.state.executionContext = executionContext;
     super.setExecutionContext(executionContext);
   }

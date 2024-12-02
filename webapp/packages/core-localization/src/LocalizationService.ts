@@ -5,15 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { IReactionDisposer, makeObservable, observable, reaction } from 'mobx';
+import { type IReactionDisposer, makeObservable, observable, reaction } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 
-import { DEFAULT_LOCALE } from './DEFAULT_LOCALE';
-import type { ILocale } from './ILocale';
-import type { ILocaleProvider } from './ILocaleProvider';
-import type { TLocalizationToken } from './TLocalizationToken';
+import { DEFAULT_LOCALE } from './DEFAULT_LOCALE.js';
+import type { ILocale } from './ILocale.js';
+import type { ILocaleProvider } from './ILocaleProvider.js';
+import type { TLocalizationToken } from './TLocalizationToken.js';
 
 @injectable()
 export class LocalizationService extends Bootstrap {
@@ -28,7 +28,14 @@ export class LocalizationService extends Bootstrap {
       return DEFAULT_LOCALE.isoCode;
     }
 
-    return this.supportedLanguages[0].isoCode;
+    const firstLanguage = this.supportedLanguages[0];
+
+    if (!firstLanguage) {
+      //@TODO do not throw error in getter
+      throw new Error('No language is available');
+    }
+
+    return firstLanguage.isoCode;
   }
 
   supportedLanguages: ILocale[];
@@ -103,7 +110,7 @@ export class LocalizationService extends Bootstrap {
     return token;
   };
 
-  register(): void {
+  override register(): void {
     this.setSupportedLanguages([
       {
         isoCode: 'en',
@@ -134,7 +141,7 @@ export class LocalizationService extends Bootstrap {
     this.addProvider(this.coreProvider.bind(this));
   }
 
-  async load(): Promise<void> {
+  override async load(): Promise<void> {
     this.reactionDisposer = reaction(
       () => this.currentLanguage,
       lang => {
@@ -145,7 +152,7 @@ export class LocalizationService extends Bootstrap {
     await this.loadLocale(this.currentLanguage);
   }
 
-  dispose(): void {
+  override dispose(): void {
     if (this.reactionDisposer) {
       this.reactionDisposer();
     }
@@ -173,15 +180,15 @@ export class LocalizationService extends Bootstrap {
   private async coreProvider(locale: string) {
     switch (locale) {
       case 'ru':
-        return (await import('./locales/ru')).default;
+        return (await import('./locales/ru.js')).default;
       case 'it':
-        return (await import('./locales/it')).default;
+        return (await import('./locales/it.js')).default;
       case 'zh':
-        return (await import('./locales/zh')).default;
+        return (await import('./locales/zh.js')).default;
       case 'fr':
-        return (await import('./locales/fr')).default;
+        return (await import('./locales/fr.js')).default;
       default:
-        return (await import('./locales/en')).default;
+        return (await import('./locales/en.js')).default;
     }
   }
 
@@ -193,7 +200,7 @@ export class LocalizationService extends Bootstrap {
 
     for (const provider of this.localeProviders) {
       for (const [key, value] of await provider(localeKey)) {
-        locale.set(key, value);
+        locale.set(key!, value!);
       }
     }
     this.localeMap.set(localeKey, locale);

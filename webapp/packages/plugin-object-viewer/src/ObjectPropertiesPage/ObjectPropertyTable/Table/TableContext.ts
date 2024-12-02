@@ -9,7 +9,7 @@ import { createContext } from 'react';
 
 import type { TableState } from '@cloudbeaver/core-blocks';
 
-import type { ITableData } from './useTableData';
+import type { ITableData } from './useTableData.js';
 
 interface ITableContext {
   tableData: ITableData | null;

@@ -11,7 +11,7 @@ import { useContext } from 'react';
 import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
 import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 
-import { CellContext } from '../CellRenderer/CellContext';
+import { CellContext } from '../CellRenderer/CellContext.js';
 
 export const IndexFormatter: React.FC<RenderCellProps<IResultSetRowKey>> = observer(function IndexFormatter(props) {
   const context = useContext(CellContext);

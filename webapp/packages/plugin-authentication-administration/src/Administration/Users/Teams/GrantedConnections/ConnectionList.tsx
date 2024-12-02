@@ -24,23 +24,24 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { Connection, DBDriverResource } from '@cloudbeaver/core-connections';
+import { type Connection, type ConnectionInfoOrigin, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 
 import styles from './ConnectionList.module.css';
-import { getFilteredConnections } from './getFilteredConnections';
-import { GrantedConnectionsTableHeader, IFilterState } from './GrantedConnectionsTableHeader/GrantedConnectionsTableHeader';
-import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHeader/GrantedConnectionsTableInnerHeader';
-import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem';
+import { getFilteredConnections } from './getFilteredConnections.js';
+import { GrantedConnectionsTableHeader, type IFilterState } from './GrantedConnectionsTableHeader/GrantedConnectionsTableHeader.js';
+import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHeader/GrantedConnectionsTableInnerHeader.js';
+import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem.js';
 
 interface Props {
   connectionList: Connection[];
+  connectionsOrigins: ConnectionInfoOrigin[];
   grantedSubjects: string[];
   disabled: boolean;
   onGrant: (subjectIds: string[]) => void;
 }
 
-export const ConnectionList = observer<Props>(function ConnectionList({ connectionList, grantedSubjects, disabled, onGrant }) {
+export const ConnectionList = observer<Props>(function ConnectionList({ connectionList, connectionsOrigins, grantedSubjects, disabled, onGrant }) {
   const props = useObjectRef({ onGrant });
   const style = useS(styles);
   const translate = useTranslate();
@@ -57,8 +58,8 @@ export const ConnectionList = observer<Props>(function ConnectionList({ connecti
     selectedSubjects.clear();
   }, []);
 
-  const connections = getFilteredConnections(connectionList, filterState.filterValue);
-  const keys = connections.map(connection => connection.id);
+  const connections = getFilteredConnections(connectionList, connectionsOrigins, filterState.filterValue);
+  const keys = connectionList.map(connection => connection.id);
 
   return (
     <Group className={s(style, { group: true })} box border medium overflow vertical>

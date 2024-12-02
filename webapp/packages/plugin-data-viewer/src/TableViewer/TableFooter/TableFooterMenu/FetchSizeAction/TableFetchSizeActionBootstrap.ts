@@ -9,11 +9,11 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { MenuCustomItem, MenuService } from '@cloudbeaver/core-view';
 
-import { DATA_CONTEXT_DV_DDM } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
-import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';
-import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from '../DATA_VIEWER_DATA_MODEL_ACTIONS_MENU';
+import { DATA_CONTEXT_DV_DDM } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
+import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX.js';
+import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from '../DATA_VIEWER_DATA_MODEL_ACTIONS_MENU.js';
 
-const FetchSizeAction = importLazyComponent(() => import('./FetchSizeAction').then(module => module.FetchSizeAction));
+const FetchSizeAction = importLazyComponent(() => import('./FetchSizeAction.js').then(module => module.FetchSizeAction));
 
 @injectable()
 export class TableFetchSizeActionBootstrap extends Bootstrap {
@@ -21,7 +21,7 @@ export class TableFetchSizeActionBootstrap extends Bootstrap {
     super();
   }
 
-  register() {
+  override register() {
     this.registerGeneralActions();
   }
 

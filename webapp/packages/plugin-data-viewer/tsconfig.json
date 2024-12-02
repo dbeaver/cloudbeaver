@@ -55,6 +55,9 @@
       "path": "../core-executor/tsconfig.json"
     },
     {
+      "path": "../core-links/tsconfig.json"
+    },
+    {
       "path": "../core-localization/tsconfig.json"
     },
     {
@@ -110,9 +113,6 @@
     },
     {
       "path": "../core-view/tsconfig.json"
-    },
-    {
-      "path": "../core-website/tsconfig.json"
     },
     {
       "path": "../plugin-codemirror6/tsconfig.json"

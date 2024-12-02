@@ -10,9 +10,9 @@ import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-d
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import type { IFormState } from '@cloudbeaver/core-ui';
 
-import type { IUserFormState } from '../AdministrationUserFormService';
-import { getUserFormInfoPart } from '../Info/getUserFormInfoPart';
-import { UserFormConnectionAccessPart } from './UserFormConnectionAccessPart';
+import type { IUserFormState } from '../AdministrationUserFormService.js';
+import { getUserFormInfoPart } from '../Info/getUserFormInfoPart.js';
+import { UserFormConnectionAccessPart } from './UserFormConnectionAccessPart.js';
 
 const DATA_CONTEXT_USER_FORM_CONNECTION_ACCESS_PART = createDataContext<UserFormConnectionAccessPart>('User Form Connection Access Part');
 

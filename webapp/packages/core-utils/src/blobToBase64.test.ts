@@ -7,7 +7,7 @@
  */
 import { describe, expect, it, jest } from '@jest/globals';
 
-import { blobToBase64 } from './blobToBase64';
+import { blobToBase64 } from './blobToBase64.js';
 
 describe('blobToBase64', () => {
   it('converts blob to base64', async () => {

@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Container } from '../Containers/Container';
-import { Filter } from '../FormControls/Filter';
-import { useTranslate } from '../localization/useTranslate';
-import { s } from '../s';
-import { useS } from '../useS';
+import { Container } from '../Containers/Container.js';
+import { Filter } from '../FormControls/Filter.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
 import style from './ItemList.module.css';
 
 interface IProps {

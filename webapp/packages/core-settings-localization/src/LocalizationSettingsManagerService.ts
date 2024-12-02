@@ -9,7 +9,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ESettingsValueType, INTERFACE_SETTINGS_GROUP, SettingsManagerService } from '@cloudbeaver/core-settings';
 
-import { SettingsLocalizationService } from './SettingsLocalizationService';
+import { SettingsLocalizationService } from './SettingsLocalizationService.js';
 
 @injectable()
 export class LocalizationSettingsManagerService extends Bootstrap {
@@ -21,7 +21,7 @@ export class LocalizationSettingsManagerService extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.registerSettings();
   }
 

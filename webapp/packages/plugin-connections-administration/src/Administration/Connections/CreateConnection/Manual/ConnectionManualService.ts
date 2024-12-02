@@ -8,7 +8,7 @@
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 
-import { CreateConnectionService } from '../../CreateConnectionService';
+import { CreateConnectionService } from '../../CreateConnectionService.js';
 
 @injectable()
 export class ConnectionManualService {

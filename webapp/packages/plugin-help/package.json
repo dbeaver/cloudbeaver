@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-help",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -23,11 +24,11 @@
     "@cloudbeaver/core-di": "^0",
     "@cloudbeaver/core-dialogs": "^0",
     "@cloudbeaver/core-events": "^0",
+    "@cloudbeaver/core-links": "^0",
     "@cloudbeaver/core-localization": "^0",
     "@cloudbeaver/core-routing": "^0",
     "@cloudbeaver/core-utils": "^0",
     "@cloudbeaver/core-view": "^0",
-    "@cloudbeaver/core-website": "^0",
     "@cloudbeaver/plugin-navigation-tree": "^0",
     "@cloudbeaver/plugin-sql-editor": "^0",
     "@cloudbeaver/plugin-top-app-bar": "^0",

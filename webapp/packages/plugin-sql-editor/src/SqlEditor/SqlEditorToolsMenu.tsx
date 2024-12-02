@@ -12,11 +12,11 @@ import { type IDataContext, useDataContextLink } from '@cloudbeaver/core-data-co
 import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
-import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../DATA_CONTEXT_SQL_EDITOR_STATE';
-import type { ISqlEditorTabState } from '../ISqlEditorTabState';
-import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA';
-import type { ISQLEditorData } from './ISQLEditorData';
-import { SQL_EDITOR_TOOLS_MENU } from './SQL_EDITOR_TOOLS_MENU';
+import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../DATA_CONTEXT_SQL_EDITOR_STATE.js';
+import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
+import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA.js';
+import type { ISQLEditorData } from './ISQLEditorData.js';
+import { SQL_EDITOR_TOOLS_MENU } from './SQL_EDITOR_TOOLS_MENU.js';
 import SqlEditorActionsMenuBarStyles from './SqlEditorActionsMenuBar.module.css';
 import SqlEditorActionsMenuBarItemStyles from './SqlEditorActionsMenuBarItem.module.css';
 

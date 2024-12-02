@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const ConnectionShieldLazy = importLazyComponent(() => import('./ConnectionShield').then(m => m.ConnectionShield));
+export const ConnectionShieldLazy = importLazyComponent(() => import('./ConnectionShield.js').then(m => m.ConnectionShield));

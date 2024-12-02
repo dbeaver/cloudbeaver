@@ -13,7 +13,7 @@ export const navigationTreeFiltersPlugin: PluginManifest = {
   },
 
   providers: [
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./NavigationTreeFiltersBootstrap').then(m => m.NavigationTreeFiltersBootstrap),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./NavigationTreeFiltersBootstrap.js').then(m => m.NavigationTreeFiltersBootstrap),
   ],
 };

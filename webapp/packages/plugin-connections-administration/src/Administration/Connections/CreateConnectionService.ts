@@ -8,14 +8,14 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoOriginResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { TabsContainer } from '@cloudbeaver/core-ui';
-import { ConnectionFormService, ConnectionFormState, IConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormService, ConnectionFormState, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
-import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService';
+import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService.js';
 
 export interface ICreateMethodOptions {
   configurationWizard?: {
@@ -38,6 +38,7 @@ export class CreateConnectionService {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
+    private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
   ) {
     this.data = null;
     this.tabsContainer = new TabsContainer('Connection Creation mode');
@@ -76,10 +77,10 @@ export class CreateConnectionService {
         return aPriority - bPriority;
       });
 
-      return sorted[0].key;
+      return sorted[0]!.key;
     }
 
-    return tabs[0].key;
+    return tabs[0]!.key;
   }
 
   setCreateMethod(method?: string | null): void {
@@ -109,7 +110,13 @@ export class CreateConnectionService {
   }
 
   setConnectionTemplate(projectId: string, config: ConnectionConfig, availableDrivers: string[]): void {
-    this.data = new ConnectionFormState(this.projectsService, this.projectInfoResource, this.connectionFormService, this.connectionInfoResource);
+    this.data = new ConnectionFormState(
+      this.projectsService,
+      this.projectInfoResource,
+      this.connectionFormService,
+      this.connectionInfoResource,
+      this.connectionInfoOriginResource,
+    );
 
     this.data.closeTask.addHandler(this.cancelCreate.bind(this));
 

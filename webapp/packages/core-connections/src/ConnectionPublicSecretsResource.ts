@@ -8,18 +8,18 @@
 import { toJS } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { CachedMapResource, isResourceAlias, ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { GraphQLService, SecretInfo } from '@cloudbeaver/core-sdk';
+import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { GraphQLService, type SecretInfo } from '@cloudbeaver/core-sdk';
 import { isDefined, schemaValidationError } from '@cloudbeaver/core-utils';
 
-import { CONNECTION_INFO_PARAM_SCHEMA, IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
+import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA.js';
 import {
   ConnectionInfoActiveProjectKey,
   ConnectionInfoProjectKey,
   ConnectionInfoResource,
   createConnectionParam,
   isConnectionInfoParamEqual,
-} from './ConnectionInfoResource';
+} from './ConnectionInfoResource.js';
 
 export type PublicSecretInfo = SecretInfo;
 
@@ -71,7 +71,7 @@ export class ConnectionPublicSecretsResource extends CachedMapResource<IConnecti
       if (connections.length === 0) {
         throw new Error('Connection not found');
       }
-      const connection = connections[0];
+      const connection = connections[0]!;
 
       this.set(key, connection.sharedSecrets);
     });
@@ -79,7 +79,7 @@ export class ConnectionPublicSecretsResource extends CachedMapResource<IConnecti
     return this.data;
   }
 
-  isKeyEqual(param: IConnectionInfoParams, second: IConnectionInfoParams): boolean {
+  override isKeyEqual(param: IConnectionInfoParams, second: IConnectionInfoParams): boolean {
     return isConnectionInfoParamEqual(param, second);
   }
 

@@ -2,12 +2,6 @@
 set -Eeo pipefail
 set +u
 
-# #command line arguments
-# CONFIGURATION_PATH=${1-"../config/sample-databases/DefaultConfiguration"}
-# SAMPLE_DATABASE_PATH=${2-""}
-
-# echo $CONFIGURATION_PATH
-# echo $SAMPLE_DATABASE_PATH
 echo "Clone and build Cloudbeaver"
 
 rm -rf ./drivers
@@ -24,6 +18,7 @@ cd ../..
 echo "Pull dbeaver platform"
 [ ! -d dbeaver ] && git clone --depth 1 https://github.com/dbeaver/dbeaver.git
 [ ! -d dbeaver-common ] && git clone --depth 1 https://github.com/dbeaver/dbeaver-common.git
+[ ! -d dbeaver-jdbc-libsql ] && git clone --depth 1 https://github.com/dbeaver/dbeaver-jdbc-libsql.git
 
 
 cd cloudbeaver/deploy
@@ -43,20 +38,8 @@ cp -rp ../server/product/web-server/target/products/io.cloudbeaver.product/all/a
 cp -p ./scripts/* ./cloudbeaver
 mkdir cloudbeaver/samples
 
-if [[ -z $SAMPLE_DATABASE_PATH  ]]; then
-  SAMPLE_DATABASE_PATH=""
-else
-  mkdir cloudbeaver/samples/db
-  cp -rp "${SAMPLE_DATABASE_PATH}" cloudbeaver/samples/
-fi
-
-if [[ -z "$CONFIGURATION_PATH" ]]; then
-  CONFIGURATION_PATH="../config/sample-databases/DefaultConfiguration"
-fi
-
 cp -rp  ../config/core/* cloudbeaver/conf
-cp -rp "${CONFIGURATION_PATH}"/GlobalConfiguration/.dbeaver/data-sources.json cloudbeaver/conf/initial-data-sources.conf
-cp -p "${CONFIGURATION_PATH}"/*.conf cloudbeaver/conf/
+cp -rp ../config/GlobalConfiguration/.dbeaver/data-sources.json cloudbeaver/conf/initial-data-sources.conf
 mv drivers cloudbeaver
 
 echo "End of backend build"

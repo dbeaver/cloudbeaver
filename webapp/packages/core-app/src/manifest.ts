@@ -13,8 +13,8 @@ export const coreAppManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./AppScreen/AppScreenService').then(m => m.AppScreenService),
-    () => import('./AppScreen/AppScreenBootstrap').then(m => m.AppScreenBootstrap),
-    () => import('./AppLocaleService').then(m => m.AppLocaleService),
+    () => import('./AppScreen/AppScreenService.js').then(m => m.AppScreenService),
+    () => import('./AppScreen/AppScreenBootstrap.js').then(m => m.AppScreenBootstrap),
+    () => import('./AppLocaleService.js').then(m => m.AppLocaleService),
   ],
 };

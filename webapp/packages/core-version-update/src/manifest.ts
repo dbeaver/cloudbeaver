@@ -13,7 +13,7 @@ export const manifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./VersionUpdateService').then(m => m.VersionUpdateService),
-    () => import('./LocaleService').then(m => m.VersionUpdateLocaleService),
+    () => import('./VersionUpdateService.js').then(m => m.VersionUpdateService),
+    () => import('./LocaleService.js').then(m => m.VersionUpdateLocaleService),
   ],
 };

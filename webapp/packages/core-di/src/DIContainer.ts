@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Container, interfaces } from 'inversify';
+import { Container, type interfaces } from 'inversify';
 
-import type { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp';
+import type { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp.js';
 
 function logger(planAndResolve: interfaces.Next): interfaces.Next {
   return (args: interfaces.NextArgs) => {
@@ -34,7 +34,7 @@ function logger(planAndResolve: interfaces.Next): interfaces.Next {
       if (index !== -1) {
         metadata = Reflect.getMetadata('design:paramtypes', dep) || [];
         serviceName = dep.name;
-        notFoundElement = metadata[index];
+        notFoundElement = metadata[index]!;
       } else {
         index = metadata.indexOf(notFoundElement);
       }

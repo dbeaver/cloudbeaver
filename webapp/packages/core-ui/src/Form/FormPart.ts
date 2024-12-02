@@ -10,8 +10,8 @@ import { action, computed, makeObservable, observable, toJS } from 'mobx';
 import { executorHandlerFilter, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
-import type { IFormPart } from './IFormPart';
-import type { IFormState } from './IFormState';
+import type { IFormPart } from './IFormPart.js';
+import type { IFormState } from './IFormState.js';
 
 export abstract class FormPart<TPartState, TFormState = any> implements IFormPart<TPartState> {
   state: TPartState;
@@ -127,6 +127,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
       await this.promise;
       this.loaded = true;
       this.exception = null;
+      await this.formState.loadedTask.execute(this.formState);
     } catch (exception: any) {
       this.exception = exception;
     } finally {

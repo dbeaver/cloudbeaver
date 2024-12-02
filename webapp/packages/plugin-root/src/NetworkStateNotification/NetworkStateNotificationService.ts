@@ -6,23 +6,24 @@
  * you may not use this file except in compliance with the License.
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { INotification, NotificationService } from '@cloudbeaver/core-events';
+import { type INotification, NotificationService } from '@cloudbeaver/core-events';
 import { NetworkStateService } from '@cloudbeaver/core-root';
 
 @injectable()
 export class NetworkStateNotificationService extends Bootstrap {
   private activeNotification: INotification | null;
 
-  constructor(private readonly notificationService: NotificationService, private readonly networkStateService: NetworkStateService) {
+  constructor(
+    private readonly notificationService: NotificationService,
+    private readonly networkStateService: NetworkStateService,
+  ) {
     super();
     this.activeNotification = null;
   }
 
-  register(): void {
+  override register(): void {
     this.networkStateService.networkStateExecutor.addHandler(this.handleNetworkStateChange.bind(this));
   }
-
-  load(): void | Promise<void> {}
 
   private handleNetworkStateChange(state: boolean): void {
     if (!state) {

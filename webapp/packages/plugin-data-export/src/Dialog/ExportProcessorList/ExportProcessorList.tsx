@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { ItemList } from '@cloudbeaver/core-blocks';
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
-import { ProcessorItem } from './ProcessorItem';
+import { ProcessorItem } from './ProcessorItem.js';
 
 interface Props {
   processors: DataTransferProcessorInfo[];

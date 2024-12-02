@@ -7,9 +7,9 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-import { versionUpdatePlugin } from './manifest';
+import { versionUpdatePlugin } from './manifest.js';
 
-const VersionUpdate = importLazyComponent(() => import('./VersionUpdate').then(m => m.VersionUpdate));
+const VersionUpdate = importLazyComponent(() => import('./VersionUpdate.js').then(m => m.VersionUpdate));
 
 export { VersionUpdate };
 

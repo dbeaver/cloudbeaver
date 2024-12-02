@@ -12,7 +12,7 @@ import {
   ExceptionMessageStyles,
   Loader,
   SContext,
-  StyleRegistry,
+  type StyleRegistry,
   Table,
   TableBody,
   TableColumnHeader,
@@ -22,7 +22,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
-import { Team } from './Team';
+import { Team } from './Team.js';
 import teamsTableStyle from './TeamsTable.module.css';
 
 const registry: StyleRegistry = [
@@ -54,7 +54,6 @@ export const TeamsTable = observer<Props>(function TeamsTable({ teams, state, se
             <TableColumnHeader min flex centerContent>
               <TableSelect />
             </TableColumnHeader>
-            <TableColumnHeader min />
             <TableColumnHeader>{translate('administration_teams_team_id')}</TableColumnHeader>
             <TableColumnHeader>{translate('administration_teams_team_name')}</TableColumnHeader>
             <TableColumnHeader>{translate('administration_teams_team_description')}</TableColumnHeader>

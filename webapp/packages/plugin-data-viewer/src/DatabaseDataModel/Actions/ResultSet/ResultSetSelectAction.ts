@@ -5,33 +5,33 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, IReactionDisposer, makeObservable, observable, reaction, toJS } from 'mobx';
+import { action, computed, type IReactionDisposer, makeObservable, observable, reaction, toJS } from 'mobx';
 
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
-import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
-import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import { DatabaseSelectAction } from '../DatabaseSelectAction';
-import { DatabaseEditChangeType, IDatabaseDataEditActionData, IDatabaseDataEditApplyActionData } from '../IDatabaseDataEditAction';
-import type { DatabaseDataSelectActionsData } from '../IDatabaseDataSelectAction';
-import type { IResultSetColumnKey, IResultSetElementKey, IResultSetPartialKey, IResultSetRowKey } from './IResultSetDataKey';
-import { ResultSetDataAction } from './ResultSetDataAction';
-import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
-import { ResultSetEditAction } from './ResultSetEditAction';
-import type { IResultSetValue } from './ResultSetFormatAction';
-import { ResultSetViewAction } from './ResultSetViewAction';
+import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
+import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
+import { DatabaseSelectAction } from '../DatabaseSelectAction.js';
+import { DatabaseEditChangeType, type IDatabaseDataEditActionData, type IDatabaseDataEditApplyActionData } from '../IDatabaseDataEditAction.js';
+import type { DatabaseDataSelectActionsData } from '../IDatabaseDataSelectAction.js';
+import type { IResultSetColumnKey, IResultSetElementKey, IResultSetPartialKey, IResultSetRowKey } from './IResultSetDataKey.js';
+import { ResultSetDataAction } from './ResultSetDataAction.js';
+import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils.js';
+import { ResultSetEditAction } from './ResultSetEditAction.js';
+import type { IResultSetValue } from './ResultSetFormatAction.js';
+import { ResultSetViewAction } from './ResultSetViewAction.js';
 
 @databaseDataAction()
 export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseResultSet> {
-  static dataFormat = [ResultDataFormat.Resultset];
+  static override dataFormat = [ResultDataFormat.Resultset];
 
   get elements(): IResultSetElementKey[] {
     return Array.from(this.selectedElements.values()).flat();
   }
 
-  readonly actions: ISyncExecutor<DatabaseDataSelectActionsData<IResultSetPartialKey>>;
+  override readonly actions: ISyncExecutor<DatabaseDataSelectActionsData<IResultSetPartialKey>>;
   readonly selectedElements: Map<string, IResultSetElementKey[]>;
 
   private focusedElement: IResultSetElementKey | null;
@@ -78,7 +78,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
 
           if (!current.some(key => ResultSetDataKeysUtils.isEqual(key, focus.row))) {
             for (let index = focusIndex; index >= 0; index--) {
-              const previousElement = previous[index];
+              const previousElement = previous[index]!;
               const row = current.find(key => ResultSetDataKeysUtils.isEqual(key, previousElement));
 
               if (row) {
@@ -87,7 +87,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
               }
             }
             for (let index = focusIndex; index <= previous.length; index++) {
-              const nextElement = previous[index];
+              const nextElement = previous[index]!;
               const row = current.find(key => ResultSetDataKeysUtils.isEqual(key, nextElement));
 
               if (row) {
@@ -96,7 +96,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
               }
             }
 
-            this.focus({ ...this.focusedElement, row: current[current.length - 1] });
+            this.focus({ ...this.focusedElement, row: current[current.length - 1]! });
           }
         }
       },
@@ -287,11 +287,11 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     });
   }
 
-  afterResultUpdate(): void {
+  override afterResultUpdate(): void {
     this.validateSelection();
   }
 
-  dispose(): void {
+  override dispose(): void {
     this.validationDisposer();
   }
 
@@ -353,7 +353,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
           if (data.revert) {
             // this.focus({ ...data.value.key, row: this.view.getShift(data.value.key.row) });
           } else if (data.value.length > 0) {
-            this.focus(data.value[data.value.length - 1].key);
+            this.focus(data.value[data.value.length - 1]!.key);
           }
           this.clear();
         }
@@ -361,13 +361,13 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
 
       case DatabaseEditChangeType.delete:
         if (data.value && data.value.length > 0) {
-          this.focus(data.value[0].key);
+          this.focus(data.value[0]!.key);
           this.clear();
         }
         break;
       case DatabaseEditChangeType.update:
         if (data.value && data.value.length > 0) {
-          this.focus(data.value[data.value.length - 1].key);
+          this.focus(data.value[data.value.length - 1]!.key);
         }
         break;
     }

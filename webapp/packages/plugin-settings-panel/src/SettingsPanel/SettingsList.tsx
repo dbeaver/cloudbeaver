@@ -7,46 +7,35 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container } from '@cloudbeaver/core-blocks';
-import {
-  type ISettingDescription,
-  type ISettingsSource,
-  ROOT_SETTINGS_GROUP,
-  type SettingsGroup as SettingsGroupType,
-} from '@cloudbeaver/core-settings';
-import type { ITreeData } from '@cloudbeaver/plugin-navigation-tree';
+import { Container, s, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
+import { type ISettingDescription, type ISettingsSource, type SettingsGroup as SettingsGroupType } from '@cloudbeaver/core-settings';
+import type { ITreeData, ITreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
-import { SettingsGroup } from './SettingsGroup';
-import { useTreeScrollSync } from './useTreeScrollSync';
+import { getGroupsFromTree } from './getGroupsFromTree.js';
+import { SettingsGroup } from './SettingsGroup.js';
+import classes from './SettingsList.module.css';
+import { useTreeScrollSync } from './useTreeScrollSync.js';
 
 interface Props {
   treeData: ITreeData;
+  treeFilter: ITreeFilter;
   source: ISettingsSource;
   settings: Map<SettingsGroupType, ISettingDescription<any>[]>;
   onSettingsOpen?: (groupId: string) => void;
 }
 
-export const SettingsList = observer<Props>(function SettingsList({ treeData, source, settings, onSettingsOpen }) {
-  const list = [];
-  const groups = [...treeData.getChildren(treeData.rootId)];
+export const SettingsList = observer<Props>(function SettingsList({ treeData, treeFilter, source, settings, onSettingsOpen }) {
+  const translate = useTranslate();
   const ref = useTreeScrollSync(treeData, onSettingsOpen);
-
-  while (groups.length) {
-    const groupId = groups[0];
-    groups.splice(0, 1, ...treeData.getChildren(groupId));
-
-    const group = ROOT_SETTINGS_GROUP.get(groupId)!;
-    const groupSettings = settings.get(group);
-
-    list.push({ group, settings: groupSettings || [] });
-  }
+  const groups = Array.from(getGroupsFromTree(treeData, treeData.getChildren(treeData.rootId)));
 
   return (
-    <Container ref={ref} style={{ height: '100%' }} gap overflow>
-      {list.map(({ group, settings }) => (
-        <SettingsGroup key={group.id} group={group} source={source} settings={settings} />
+    <Container ref={ref} gap overflow>
+      {groups.map(group => (
+        <SettingsGroup key={group.id} group={group} source={source} settings={settings} treeFilter={treeFilter} />
       ))}
-      <div style={{ height: 'calc(100% - 100px)' }} hidden />
+      {groups.length === 0 && <TextPlaceholder>{translate('plugin_settings_panel_no_settings')}</TextPlaceholder>}
+      <div className={s(classes, { spaceFill: true })} />
     </Container>
   );
 });

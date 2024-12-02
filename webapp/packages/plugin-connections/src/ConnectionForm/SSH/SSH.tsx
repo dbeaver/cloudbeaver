@@ -30,14 +30,14 @@ import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connect
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { isSafari } from '@cloudbeaver/core-utils';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps';
-import { authTypes } from './authTypes';
+import type { IConnectionFormProps } from '../IConnectionFormProps.js';
+import { authTypes } from './authTypes.js';
 import styles from './SSH.module.css';
-import { SSHKeyUploader } from './SSHKeyUploader';
+import { SSHKeyUploader } from './SSHKeyUploader.js';
 
 interface Props extends IConnectionFormProps {
   handlerState: NetworkHandlerConfigInput;
@@ -109,10 +109,10 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
             {translate('connections_network_handler_ssh_tunnel_auth_type')}
           </Combobox>
           <Container wrap gap>
-            <InputField type="text" name="host" state={handlerState.properties} disabled={disabled || !enabled} readOnly={readonly} required small>
+            <InputField type="text" name="host" state={handlerState.properties} readOnly={readonly || disabled || !enabled} required small>
               {translate('connections_network_handler_ssh_tunnel_host')}
             </InputField>
-            <InputField type="number" name="port" state={handlerState.properties} disabled={disabled || !enabled} readOnly={readonly} required tiny>
+            <InputField type="number" name="port" state={handlerState.properties} readOnly={readonly || disabled || !enabled} required tiny>
               {translate('connections_network_handler_ssh_tunnel_port')}
             </InputField>
           </Container>
@@ -121,8 +121,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
               type="text"
               name="userName"
               state={handlerState}
-              disabled={disabled || !enabled}
-              readOnly={readonly}
+              readOnly={readonly || disabled || !enabled}
               required={handlerState.savePassword}
               tiny
               fill
@@ -134,8 +133,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
               name="password"
               autoComplete={isSafari ? 'section-connection-ssh-authentication section-ssh password' : 'new-password'}
               state={handlerState}
-              disabled={disabled || !enabled}
-              readOnly={readonly}
+              readOnly={readonly || disabled || !enabled}
               required={!passwordSaved && !keyAuth && handlerState.savePassword}
               description={passwordSaved ? translate('ui_processing_saved') : undefined}
               tiny
@@ -171,8 +169,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
                   type="number"
                   name="aliveInterval"
                   state={handlerState.properties}
-                  disabled={disabled || !enabled}
-                  readOnly={readonly}
+                  readOnly={readonly || disabled || !enabled}
                   labelTooltip={aliveIntervalLabel}
                   tiny
                 >
@@ -182,8 +179,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
                   type="number"
                   name="sshConnectTimeout"
                   state={handlerState.properties}
-                  disabled={disabled || !enabled}
-                  readOnly={readonly}
+                  readOnly={readonly || disabled || !enabled}
                   labelTooltip={connectTimeoutLabel}
                   tiny
                 >

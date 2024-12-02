@@ -11,5 +11,5 @@ export const devToolsPlugin: PluginManifest = {
   info: {
     name: 'DevTools plugin',
   },
-  providers: [() => import('./PluginBootstrap').then(m => m.PluginBootstrap), () => import('./DevToolsService').then(m => m.DevToolsService)],
+  providers: [() => import('./PluginBootstrap.js').then(m => m.PluginBootstrap), () => import('./DevToolsService.js').then(m => m.DevToolsService)],
 };

@@ -16,9 +16,6 @@
  */
 package io.cloudbeaver.model.app;
 
-import io.cloudbeaver.DataSourceFilter;
-import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBFileController;
@@ -27,7 +24,6 @@ import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.rm.RMController;
-import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
@@ -57,12 +53,6 @@ public interface WebApplication extends DBPApplication {
     Path getHomeDirectory();
 
     boolean isMultiNode();
-
-    WebProjectImpl createProjectImpl(
-        @NotNull WebSession webSession,
-        @NotNull RMProject project,
-        @NotNull DataSourceFilter dataSourceFilter
-    );
 
     SMController createSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 

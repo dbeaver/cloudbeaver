@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/core-client-activity",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -14,7 +15,8 @@
     "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "yarn run clean && typescript-resolve-references"
+    "update-ts-references": "yarn run clean && typescript-resolve-references",
+    "test": "core-cli-test"
   },
   "dependencies": {
     "@cloudbeaver/core-di": "^0",
@@ -23,6 +25,8 @@
   },
   "peerDependencies": {},
   "devDependencies": {
+    "@jest/globals": "^29",
+    "@types/jest": "^29",
     "typescript": "^5"
   }
 }

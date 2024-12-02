@@ -49,10 +49,7 @@ export default [
 
   ['authentication_administration_user_delete_credentials_error', '删除用户凭证失败'],
   ['authentication_administration_user_delete_credentials_success', '用户凭证已移除'],
-  [
-    'authentication_administration_user_delete_credentials_confirmation_message',
-    '确定要从“{arg：userId}”中删除“{arg：originName}”身份验证方法吗?',
-  ],
+  ['authentication_administration_user_delete_credentials_confirmation_message', '确定要从“{arg：userId}”中删除“{arg：originName}”身份验证方法吗?'],
 
   ['administration_configuration_wizard_configuration_admin', '管理员凭据'],
   ['administration_configuration_wizard_configuration_admin_name', '登录'],
@@ -91,6 +88,7 @@ export default [
   ['administration_identity_providers_wizard_description', '添加身份提供者'],
   ['administration_identity_providers_configuration_add', '创建配置'],
   ['administration_identity_providers_choose_provider_placeholder', '选择提供者...'],
+  ['administration_identity_providers_choose_provider_placeholder_empty', 'No available providers'],
   ['administration_identity_providers_add_tooltip', '添加新配置'],
   ['administration_identity_providers_refresh_tooltip', '刷新配置列表'],
   ['administration_identity_providers_delete_tooltip', '删除选中配置'],
@@ -123,4 +121,7 @@ export default [
   ['plugin_authentication_administration_team_default_users_tooltip', 'Default team. Contains all users'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'Supervisor'],
   ['plugin_authentication_administration_team_user_team_role_supervisor_description', 'Supervisors can view their team’s executed queries'],
+
+  ['plugin_authentication_administration_team_form_edit_label', 'Team editing form'],
+  ['plugin_authentication_administration_user_form_edit_label', 'User editing form'],
 ];

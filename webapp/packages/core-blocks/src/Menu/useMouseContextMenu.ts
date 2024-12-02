@@ -7,7 +7,7 @@
  */
 import { observable } from 'mobx';
 
-import { useObservableRef } from '../useObservableRef';
+import { useObservableRef } from '../useObservableRef.js';
 
 export interface IContextMenuPosition {
   x: number;

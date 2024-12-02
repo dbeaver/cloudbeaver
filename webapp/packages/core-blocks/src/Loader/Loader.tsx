@@ -9,17 +9,17 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { Suspense, useContext, useEffect, useRef, useState } from 'react';
 
-import { ILoadableState, uuid } from '@cloudbeaver/core-utils';
+import { type ILoadableState, uuid } from '@cloudbeaver/core-utils';
 
-import { Button } from '../Button';
-import { ErrorBoundary } from '../ErrorBoundary';
-import { ExceptionMessage } from '../ExceptionMessage';
-import { Translate } from '../localization/Translate';
-import { s } from '../s';
-import { StaticImage } from '../StaticImage';
-import { useS } from '../useS';
+import { Button } from '../Button.js';
+import { ErrorBoundary } from '../ErrorBoundary.js';
+import { ExceptionMessage } from '../ExceptionMessage.js';
+import { Translate } from '../localization/Translate.js';
+import { s } from '../s.js';
+import { StaticImage } from '../StaticImage.js';
+import { useS } from '../useS.js';
 import styles from './Loader.module.css';
-import { ILoaderContext, LoaderContext } from './LoaderContext';
+import { type ILoaderContext, LoaderContext } from './LoaderContext.js';
 
 type LoaderState =
   | ILoadableState
@@ -101,7 +101,7 @@ export const Loader = observer<Props>(function Loader({
     state = Array.isArray(state) ? state : [state];
 
     for (let i = 0; i < state.length; i++) {
-      const element = state[i];
+      const element = state[i]!;
 
       if ('isLoaded' in element && 'isLoading' in element) {
         if (i === 0 && loadingUndefined) {

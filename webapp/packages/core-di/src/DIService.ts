@@ -7,10 +7,10 @@
  */
 import type { IExecutorHandlersCollection, ISyncContextLoader } from '@cloudbeaver/core-executor';
 
-import { dependencyInjectorContext } from './dependencyInjectorContext';
-import type { IServiceConstructor } from './IApp';
-import { injectable } from './injectable';
-import { IServiceProvider } from './IServiceProvider';
+import { dependencyInjectorContext } from './dependencyInjectorContext.js';
+import type { IServiceConstructor } from './IApp.js';
+import { injectable } from './injectable.js';
+import { IServiceProvider } from './IServiceProvider.js';
 
 @injectable()
 export class DIService {

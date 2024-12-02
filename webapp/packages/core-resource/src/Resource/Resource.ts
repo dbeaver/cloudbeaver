@@ -10,17 +10,17 @@ import { makeObservable, observable, toJS } from 'mobx';
 import { Dependency } from '@cloudbeaver/core-di';
 import { isContainsException, isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
 
-import { CachedResourceParamKey } from './CachedResource';
-import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
-import type { IResource } from './IResource';
-import { isResourceAlias } from './ResourceAlias';
-import { ResourceAliases } from './ResourceAliases';
-import type { ResourceKey, ResourceKeyFlat } from './ResourceKey';
-import { isResourceKeyList, type ResourceKeyList } from './ResourceKeyList';
-import { ResourceKeyUtils } from './ResourceKeyUtils';
-import { ResourceLogger } from './ResourceLogger';
-import { ResourceMetadata } from './ResourceMetadata';
-import { ResourceUseTracker } from './ResourceUseTracker';
+import { CachedResourceParamKey } from './CachedResource.js';
+import type { ICachedResourceMetadata } from './ICachedResourceMetadata.js';
+import type { IResource } from './IResource.js';
+import { isResourceAlias } from './ResourceAlias.js';
+import { ResourceAliases } from './ResourceAliases.js';
+import type { ResourceKey, ResourceKeyFlat } from './ResourceKey.js';
+import { isResourceKeyList, type ResourceKeyList } from './ResourceKeyList.js';
+import { ResourceKeyUtils } from './ResourceKeyUtils.js';
+import { ResourceLogger } from './ResourceLogger.js';
+import { ResourceMetadata } from './ResourceMetadata.js';
+import { ResourceUseTracker } from './ResourceUseTracker.js';
 
 export abstract class Resource<
     TData,

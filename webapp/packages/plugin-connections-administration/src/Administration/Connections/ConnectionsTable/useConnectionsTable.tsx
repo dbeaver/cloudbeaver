@@ -11,11 +11,11 @@ import { ConfirmationDialogDelete, TableState, useObservableRef, useResource, us
 import {
   compareConnectionsInfo,
   compareNewConnectionsInfo,
-  Connection,
+  type Connection,
   ConnectionInfoActiveProjectKey,
   ConnectionInfoResource,
   createConnectionParam,
-  IConnectionInfoParams,
+  type IConnectionInfoParams,
 } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';

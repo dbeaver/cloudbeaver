@@ -8,11 +8,11 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { AutoRunningTask, type ITask } from '@cloudbeaver/core-executor';
 import { WindowsService } from '@cloudbeaver/core-routing';
-import { AuthInfo, AuthStatus, UserInfo } from '@cloudbeaver/core-sdk';
+import { type AuthInfo, AuthStatus, type UserInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import { AuthProviderConfiguration, AuthProvidersResource } from './AuthProvidersResource';
-import { type ILoginOptions, UserInfoResource } from './UserInfoResource';
+import { type AuthProviderConfiguration, AuthProvidersResource } from './AuthProvidersResource.js';
+import { type ILoginOptions, UserInfoResource } from './UserInfoResource.js';
 
 export interface IUserAuthConfiguration {
   providerId: string;
@@ -23,10 +23,6 @@ export interface IUserAuthConfiguration {
 export class AuthInfoService {
   get userInfo(): UserInfo | null {
     return this.userInfoResource.data;
-  }
-
-  get isAnonymous(): boolean {
-    return !this.userInfoResource.data;
   }
 
   constructor(

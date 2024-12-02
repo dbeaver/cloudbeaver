@@ -7,7 +7,7 @@
  */
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
-import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from './DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
+import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from './DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID.js';
 
 interface Props {
   resourceTypeId?: string;

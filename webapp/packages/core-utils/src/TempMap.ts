@@ -7,8 +7,8 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
-import { cacheValue, ICachedValueObject } from './cacheValue';
-import { combineITerableIterators } from './combineITerableIterators';
+import { cacheValue, type ICachedValueObject } from './cacheValue.js';
+import { combineITerableIterators } from './combineITerableIterators.js';
 
 export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
   get size(): number {

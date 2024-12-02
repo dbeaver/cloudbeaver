@@ -8,7 +8,7 @@
 import type { IServiceConstructor } from '@cloudbeaver/core-di';
 import { MenuSubMenuItem } from '@cloudbeaver/core-view';
 
-import { MENU_RESOURCE } from './MENU_RESOURCE';
+import { MENU_RESOURCE } from './MENU_RESOURCE.js';
 
 export class ResourceSubMenuItem extends MenuSubMenuItem {
   readonly resource: IServiceConstructor<any>;

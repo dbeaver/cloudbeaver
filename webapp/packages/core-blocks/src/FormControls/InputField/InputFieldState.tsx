@@ -8,9 +8,9 @@
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef } from 'react';
 
-import type { IFormStateControl } from '../IFormStateControl';
-import { useFormStateControl } from '../useFormStateControl';
-import { InputFieldBase, InputFieldBaseProps } from './InputFieldBase';
+import type { IFormStateControl } from '../IFormStateControl.js';
+import { useFormStateControl } from '../useFormStateControl.js';
+import { InputFieldBase, type InputFieldBaseProps } from './InputFieldBase.js';
 
 export type InputFieldStateProps<TState extends Record<string, any>, TKey extends keyof TState> = Omit<InputFieldBaseProps, 'value'> &
   IFormStateControl<TState, TKey>;

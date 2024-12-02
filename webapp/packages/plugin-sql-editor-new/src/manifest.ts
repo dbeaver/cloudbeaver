@@ -13,8 +13,8 @@ export const sqlEditorNewPlugin: PluginManifest = {
   },
 
   providers: [
-    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
-    () => import('./SQLEditor/SQLCodeEditorPanel/SQLCodeEditorPanelService').then(m => m.SQLCodeEditorPanelService),
-    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./PluginBootstrap.js').then(m => m.PluginBootstrap),
+    () => import('./SQLEditor/SQLCodeEditorPanel/SQLCodeEditorPanelService.js').then(m => m.SQLCodeEditorPanelService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
   ],
 };

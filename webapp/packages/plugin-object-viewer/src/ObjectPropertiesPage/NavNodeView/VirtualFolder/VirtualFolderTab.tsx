@@ -8,7 +8,7 @@
 import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 
-import { VirtualFolderUtils } from './VirtualFolderUtils';
+import { VirtualFolderUtils } from './VirtualFolderUtils.js';
 
 export const VirtualFolderTab: NavNodeTransformViewComponent = function VirtualFolderTab({ folderId }) {
   const nodeType = VirtualFolderUtils.getNodeType(folderId);

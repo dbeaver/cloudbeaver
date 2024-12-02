@@ -9,21 +9,21 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { IconOrImage, s, useTranslate } from '@cloudbeaver/core-blocks';
-import { Connection, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
+import { type Connection, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
-import { ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
+import { type ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs';
 import {
   DATA_CONTEXT_SQL_EDITOR_STATE,
   ESqlDataSourceFeatures,
   getSqlEditorName,
-  ISqlEditorTabState,
+  type ISqlEditorTabState,
   SqlDataSourceService,
 } from '@cloudbeaver/plugin-sql-editor';
 
-import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
+import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB.js';
 import sqlEditorTabStyles from './SqlEditorTab.module.css';
 
 export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer(function SqlEditorTab({ tab, onSelect, onClose }) {

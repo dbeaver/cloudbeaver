@@ -11,7 +11,7 @@ import { useStateDelay } from '@cloudbeaver/core-blocks';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { ENodeMoveType, type NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { IDNDBox, useDNDBox } from '@cloudbeaver/core-ui';
+import { type IDNDBox, useDNDBox } from '@cloudbeaver/core-ui';
 import { throttleAsync } from '@cloudbeaver/core-utils';
 
 interface INodeState {

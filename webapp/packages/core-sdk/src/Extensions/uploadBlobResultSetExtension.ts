@@ -7,7 +7,7 @@
  */
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
-import type { CustomGraphQLClient, UploadProgressEvent } from '../CustomGraphQLClient';
+import type { CustomGraphQLClient, UploadProgressEvent } from '../CustomGraphQLClient.js';
 
 export interface IUploadBlobResultSetExtension {
   uploadBlobResultSet: (fileId: string, data: Blob, onUploadProgress?: (event: UploadProgressEvent) => void) => Promise<void>;

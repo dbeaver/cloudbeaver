@@ -7,27 +7,33 @@
  */
 import { computed, makeObservable, observable } from 'mobx';
 
-import type { TeamInfo, TeamsResource } from '@cloudbeaver/core-authentication';
-import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
+import type { TeamInfo, TeamInfoMetaParametersResource, TeamsResource } from '@cloudbeaver/core-authentication';
+import { Executor, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { teamFormConfigureContext } from './Contexts/teamFormConfigureContext';
-import { ITeamFormStateInfo, teamFormStateContext } from './Contexts/teamFormStateContext';
-import type { ITeamFormState, ITeamFormSubmitData, TeamFormMode } from './ITeamFormProps';
-import type { TeamFormService } from './TeamFormService';
+import { teamFormConfigureContext } from './Contexts/teamFormConfigureContext.js';
+import { type ITeamFormStateInfo, teamFormStateContext } from './Contexts/teamFormStateContext.js';
+import type { ITeamFormState, ITeamFormSubmitData, TeamFormMode, TeamInfoConfig } from './ITeamFormProps.js';
+import type { TeamFormService } from './TeamFormService.js';
 
 export class TeamFormState implements ITeamFormState {
   mode: TeamFormMode;
-  config: TeamInfo;
+  config: TeamInfoConfig;
   statusMessage: string | null;
   configured: boolean;
   partsState: MetadataMap<string, any>;
 
-  get info(): TeamInfo | undefined {
+  get info(): TeamInfoConfig | undefined {
     if (!this.config.teamId) {
       return undefined;
     }
-    return this.resource.get(this.config.teamId);
+    const info = this.resource.get(this.config.teamId) ?? {};
+    const meta = this.teamInfoMetaParametersResource.get(this.config.teamId) ?? {};
+
+    return {
+      ...info,
+      metaParameters: meta,
+    } as TeamInfoConfig;
   }
 
   get loading(): boolean {
@@ -43,6 +49,7 @@ export class TeamFormState implements ITeamFormState {
   }
 
   readonly resource: TeamsResource;
+  readonly teamInfoMetaParametersResource: TeamInfoMetaParametersResource;
 
   readonly service: TeamFormService;
   readonly submittingTask: IExecutor<ITeamFormSubmitData>;
@@ -51,8 +58,9 @@ export class TeamFormState implements ITeamFormState {
   private readonly loadTeamTask: IExecutor<ITeamFormState>;
   private readonly formStateTask: IExecutor<ITeamFormState>;
 
-  constructor(service: TeamFormService, resource: TeamsResource) {
+  constructor(service: TeamFormService, resource: TeamsResource, teamInfoMetaParametersResource: TeamInfoMetaParametersResource) {
     this.resource = resource;
+    this.teamInfoMetaParametersResource = teamInfoMetaParametersResource;
     this.config = {
       teamId: '',
       teamPermissions: [],
@@ -110,7 +118,7 @@ export class TeamFormState implements ITeamFormState {
     return this;
   }
 
-  setConfig(config: TeamInfo): this {
+  setConfig(config: TeamInfoConfig): this {
     this.config = config;
     return this;
   }
@@ -142,6 +150,6 @@ export class TeamFormState implements ITeamFormState {
       return;
     }
 
-    await this.resource.load(data.config.teamId, ['includeMetaParameters']);
+    await Promise.all([this.resource.load(data.config.teamId), this.teamInfoMetaParametersResource.load(data.config.teamId)]);
   }
 }

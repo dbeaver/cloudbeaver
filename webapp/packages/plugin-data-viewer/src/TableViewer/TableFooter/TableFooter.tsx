@@ -6,25 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import type { HTMLAttributes } from 'react';
 
 import { Container, Fill, s, ToolsPanel, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import styles from './TableFooter.module.css';
-import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
+import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu.js';
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
   resultIndex: number;
   model: IDatabaseDataModel;
   simple: boolean;
 }
 
-export const TableFooter = observer<Props>(function TableFooter({ resultIndex, model, simple }) {
+export const TableFooter = observer<Props>(function TableFooter({ resultIndex, model, simple, ...rest }) {
   const translate = useTranslate();
   const style = useS(styles);
 
   return (
-    <ToolsPanel type="secondary" center minHeight>
+    <ToolsPanel type="secondary" role="toolbar" center minHeight {...rest}>
       <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} />
       {model.source.requestInfo.requestMessage && (
         <>

@@ -7,6 +7,6 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
-import type { NavNode } from './EntityTypes';
+import type { NavNode } from './EntityTypes.js';
 
 export const DATA_CONTEXT_NAV_NODES = createDataContext<() => NavNode[]>('nav-nodes');

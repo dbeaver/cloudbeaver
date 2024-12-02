@@ -42,4 +42,6 @@ export default [
   ['app_navigationTree_drop_here', '拖动至此...'],
   ['plugin_navigation_tree_settings_projects_description', '在项目分组下显示'],
   ['plugin_navigation_tree_settings_projects_title', '项目分组'],
+  ['plugin_navigation_tree_settings_disable', 'Disable'],
+  ['plugin_navigation_tree_settings_disable_description', 'Disable navigation tree for all users'],
 ];

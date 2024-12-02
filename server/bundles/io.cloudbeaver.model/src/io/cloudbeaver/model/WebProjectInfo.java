@@ -53,11 +53,13 @@ public class WebProjectInfo {
     }
 
     @Property
-    public boolean isGlobal() { return project.getRmProject().isGlobal(); }
+    public boolean isGlobal() {
+        return project.getRMProject().isGlobal();
+    }
 
     @Property
     public boolean isShared() {
-        return project.getRmProject().isShared();
+        return project.getRMProject().isShared();
     }
 
     @Property
@@ -72,7 +74,7 @@ public class WebProjectInfo {
 
     @Property
     public boolean isCanEditDataSources() {
-        if (project.getRmProject().getType() == RMProjectType.USER && !customPrivateConnectionsEnabled) {
+        if (project.getRMProject().getType() == RMProjectType.USER && !customPrivateConnectionsEnabled) {
             return false;
         }
         return hasDataSourcePermission(RMProjectPermission.DATA_SOURCES_EDIT);
@@ -94,12 +96,12 @@ public class WebProjectInfo {
     }
 
     private boolean hasDataSourcePermission(RMProjectPermission permission) {
-        return SMUtils.hasProjectPermission(session, project.getRmProject(), permission);
+        return SMUtils.hasProjectPermission(session, project.getRMProject(), permission);
     }
 
     @Property
     public RMResourceType[] getResourceTypes() {
-        RMResourceType[] resourceTypes = project.getRmProject().getResourceTypes();
+        RMResourceType[] resourceTypes = project.getRMProject().getResourceTypes();
 
         if(resourceTypes == null) {
             return ArrayUtils.toArray(RMResourceType.class, new ArrayList<>());

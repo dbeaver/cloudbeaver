@@ -5,13 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
-import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import { s } from '../s';
-import { useS } from '../useS';
-import { Field } from './Field';
-import { FieldDescription } from './FieldDescription';
-import { FieldLabel } from './FieldLabel';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
+import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
+import { Field } from './Field.js';
+import { FieldDescription } from './FieldDescription.js';
+import { FieldLabel } from './FieldLabel.js';
 import style from './FormFieldDescription.module.css';
 
 interface Props extends ILayoutSizeProps {

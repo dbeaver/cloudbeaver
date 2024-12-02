@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, IReactionDisposer, observable, reaction } from 'mobx';
+import { action, type IReactionDisposer, observable, reaction } from 'mobx';
 
-import { useObservableRef } from './useObservableRef';
+import { useObservableRef } from './useObservableRef.js';
 
 interface IObservedValueMetadata<TArgs, TValue> {
   reaction: IReactionDisposer | null;

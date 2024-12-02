@@ -59,17 +59,14 @@ import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.Permission;
-import java.security.Policy;
-import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -111,6 +108,8 @@ public abstract class CBApplication<T extends CBServerConfig> extends
     private WebSessionManager sessionManager;
 
     private final Map<String, String> initActions = new ConcurrentHashMap<>();
+
+    private CBJettyServer jettyServer;
 
     public CBApplication() {
         this.homeDirectory = new File(initHomeFolder());
@@ -204,6 +203,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
             if (!loadServerConfiguration()) {
                 return;
             }
+
             if (CommonUtils.isEmpty(this.getAppConfiguration().getDefaultUserTeam())) {
                 throw new DBException("Default user team must be specified");
             }
@@ -211,6 +211,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
             log.error(e);
             return;
         }
+
         refreshDisabledDriversConfig();
 
         configurationMode = CommonUtils.isEmpty(getServerConfiguration().getServerName());
@@ -232,7 +233,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
 
         Location instanceLoc = Platform.getInstanceLocation();
         try {
-            if (!instanceLoc.isSet()) {
+            if (!instanceLoc.isSet()) { // always false?
                 URL wsLocationURL = new URL(
                     "file",  //$NON-NLS-1$
                     null,
@@ -306,23 +307,13 @@ public abstract class CBApplication<T extends CBServerConfig> extends
 
         if (configurationMode) {
             // Try to configure automatically
-            performAutoConfiguration(getMainConfigurationFilePath().toFile().getParentFile());
+            performAutoConfiguration(getMainConfigurationFilePath().getParent());
         } else if (!isMultiNode()) {
             var appConfiguration = getServerConfigurationController().getAppConfiguration();
             if (appConfiguration.isGrantConnectionsAccessToAnonymousTeam()) {
                 grantAnonymousAccessToConnections(appConfiguration, CBConstants.ADMIN_AUTO_GRANT);
             }
             grantPermissionsToConnections();
-        }
-
-        if (getServerConfiguration().isEnableSecurityManager()) {
-            Policy.setPolicy(new Policy() {
-                @Override
-                public boolean implies(ProtectionDomain domain, Permission permission) {
-                    return true;
-                }
-            });
-            System.setSecurityManager(new SecurityManager());
         }
 
         eventController.scheduleCheckJob();
@@ -344,7 +335,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
      *
      * @param configPath
      */
-    protected void performAutoConfiguration(File configPath) {
+    protected void performAutoConfiguration(Path configPath) {
         String autoServerName = System.getenv(CBConstants.VAR_AUTO_CB_SERVER_NAME);
         String autoServerURL = System.getenv(CBConstants.VAR_AUTO_CB_SERVER_URL);
         String autoAdminName = System.getenv(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
@@ -353,11 +344,11 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         if (CommonUtils.isEmpty(autoServerName) || CommonUtils.isEmpty(autoAdminName) || CommonUtils.isEmpty(
             autoAdminPassword)) {
             // Try to load from auto config file
-            if (configPath.exists()) {
-                File autoConfigFile = new File(configPath, CBConstants.AUTO_CONFIG_FILE_NAME);
-                if (autoConfigFile.exists()) {
+            if (Files.exists(configPath)) {
+                Path autoConfigFile = configPath.resolve(CBConstants.AUTO_CONFIG_FILE_NAME);
+                if (Files.exists(autoConfigFile)) {
                     Properties autoProps = new Properties();
-                    try (InputStream is = new FileInputStream(autoConfigFile)) {
+                    try (InputStream is = Files.newInputStream(autoConfigFile)) {
                         autoProps.load(is);
 
                         autoServerName = autoProps.getProperty(CBConstants.VAR_AUTO_CB_SERVER_NAME);
@@ -365,7 +356,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
                         autoAdminName = autoProps.getProperty(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
                         autoAdminPassword = autoProps.getProperty(CBConstants.VAR_AUTO_CB_ADMIN_PASSWORD);
                     } catch (IOException e) {
-                        log.error("Error loading auto configuration file '" + autoConfigFile.getAbsolutePath() + "'",
+                        log.error("Error loading auto configuration file '" + autoConfigFile + "'",
                             e);
                     }
                 }
@@ -452,11 +443,6 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         return dataDir.toPath();
     }
 
-    @Override
-    public Path getWorkspaceDirectory() {
-        return Path.of(getServerConfiguration().getWorkspaceLocation());
-    }
-
     private void initializeSecurityController() throws DBException {
         securityController = createGlobalSecurityController();
     }
@@ -481,7 +467,8 @@ public abstract class CBApplication<T extends CBServerConfig> extends
                 getServerPort(),
                 CommonUtils.isEmpty(getServerHost()) ? "all interfaces" : getServerHost())
         );
-        new CBJettyServer(this).runServer();
+        this.jettyServer = new CBJettyServer(this);
+        this.jettyServer.runServer();
     }
 
 
@@ -542,7 +529,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         }
 
         if (isConfigurationMode()) {
-            finishSecurityServiceConfiguration(adminName, adminPassword, authInfoList);
+            finishSecurityServiceConfiguration(adminName.toLowerCase(), adminPassword, authInfoList);
         }
 
         // Save runtime configuration
@@ -581,6 +568,9 @@ public abstract class CBApplication<T extends CBServerConfig> extends
 
         sendConfigChangedEvent(credentialsProvider);
         eventController.setForceSkipEvents(isConfigurationMode());
+        if (this.jettyServer != null) {
+            this.jettyServer.refreshJettyConfig();
+        }
     }
 
     protected abstract void finishSecurityServiceConfiguration(

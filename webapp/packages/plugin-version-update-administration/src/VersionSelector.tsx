@@ -11,10 +11,10 @@ import { useEffect, useState } from 'react';
 import { Combobox, Container, Group, GroupItem, GroupTitle, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { IVersion, VersionResource } from '@cloudbeaver/core-version';
+import { type IVersion, VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
-import { VersionInfo } from './VersionInfo';
+import { VersionInfo } from './VersionInfo.js';
 import styles from './VersionSelector.module.css';
 
 interface Props {
@@ -38,6 +38,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
 
   const version = versions.find(v => v.number === selected);
   const Instruction = versionUpdateService.versionInstructionGetter?.();
+  const instructionLink = versionUpdateService.instructionLink;
 
   return (
     <Container gap>
@@ -54,7 +55,12 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
         </Combobox>
         {version && Instruction && (
           <GroupItem>
-            <Instruction className={s(style, { instruction: true })} version={version} containerId={serverConfigResource.data?.containerId} />
+            <Instruction
+              link={instructionLink}
+              className={s(style, { instruction: true })}
+              version={version}
+              containerId={serverConfigResource.data?.containerId}
+            />
           </GroupItem>
         )}
         <GroupTitle>{translate('plugin_version_update_administration_recommendations_label')}</GroupTitle>

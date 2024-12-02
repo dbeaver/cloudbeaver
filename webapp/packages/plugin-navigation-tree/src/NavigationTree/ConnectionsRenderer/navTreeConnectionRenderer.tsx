@@ -12,10 +12,10 @@ import { NAV_NODE_TYPE_CONNECTION } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 
-import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent';
-import { NavigationNodeRendererLoader } from '../ElementsTree/NavigationTreeNode/NavigationNodeRendererLoader';
-import type { IElementsTreeCustomRenderer } from '../ElementsTree/useElementsTree';
-import { ConnectionNavNodeControl } from './ConnectionNavNodeControl';
+import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent.js';
+import { NavigationNodeRendererLoader } from '../ElementsTree/NavigationTreeNode/NavigationNodeRendererLoader.js';
+import type { IElementsTreeCustomRenderer } from '../ElementsTree/useElementsTree.js';
+import { ConnectionNavNodeControl } from './ConnectionNavNodeControl.js';
 
 export function navTreeConnectionRenderer(navNodeInfoResource: NavNodeInfoResource): IElementsTreeCustomRenderer {
   return nodeId => {

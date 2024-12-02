@@ -40,16 +40,16 @@ import {
   RESOURCES_NODE_PATH,
 } from '@cloudbeaver/core-resource-manager';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
-import { ACTION_NEW_FOLDER, ActionService, IAction, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
-import { NavResourceNodeService } from '../NavResourceNodeService';
-import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../Tree/DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
-import { getResourceKeyFromNodeId } from './getResourceKeyFromNodeId';
-import { getResourceNodeId } from './getResourceNodeId';
-import { getRmProjectNodeId } from './getRmProjectNodeId';
+import { NavResourceNodeService } from '../NavResourceNodeService.js';
+import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../Tree/DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID.js';
+import { getResourceKeyFromNodeId } from './getResourceKeyFromNodeId.js';
+import { getResourceNodeId } from './getResourceNodeId.js';
+import { getRmProjectNodeId } from './getRmProjectNodeId.js';
 
 interface ITargetNode {
   projectId: string;
@@ -80,7 +80,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.syncNavTree();
 
     this.actionService.addHandler({
@@ -89,7 +89,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       isActionApplicable: context => {
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
 
-        if (!tree?.baseRoot.startsWith(RESOURCES_NODE_PATH) || !this.userInfoResource.data) {
+        if (!tree?.baseRoot.startsWith(RESOURCES_NODE_PATH) || !this.userInfoResource.isAuthenticated()) {
           return false;
         }
 
@@ -247,7 +247,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       const editableProjects = this.projectsService.activeProjects.filter(project => project.canEditResources);
 
       if (editableProjects.length > 0) {
-        const project = editableProjects[0];
+        const project = editableProjects[0]!;
 
         return {
           projectId: project.id,
@@ -258,7 +258,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       return;
     }
 
-    const targetFolder = selected[0];
+    const targetFolder = selected[0]!;
     const parentIds = [...this.navNodeInfoResource.getParents(targetFolder), targetFolder];
     const parents = this.navNodeInfoResource.get(resourceKeyList(parentIds));
     const projectNode = parents.find(parent => parent?.nodeType === NAV_NODE_TYPE_RM_PROJECT);

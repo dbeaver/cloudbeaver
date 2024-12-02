@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
+import { type ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
 
-import { CachedResource, CachedResourceParamKey } from './CachedResource';
-import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
-import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
+import { CachedResource, CachedResourceParamKey } from './CachedResource.js';
+import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes.js';
+import type { ICachedResourceMetadata } from './ICachedResourceMetadata.js';
 
 export type CachedDataResourceData<TResource> = TResource extends CachedDataResource<infer T, any, any> ? T : never;
 export type CachedDataResourceKey<TResource> = TResource extends CachedDataResource<any, infer T, any> ? T : never;
@@ -35,7 +35,10 @@ export abstract class CachedDataResource<
     super(defaultKey, defaultValue, defaultIncludes);
   }
 
-  async refresh<T extends CachedResourceIncludeArgs<TData, TContext> = []>(param: TKey, context?: T): Promise<CachedResourceValueIncludes<TData, T>> {
+  override async refresh<T extends CachedResourceIncludeArgs<TData, TContext> = []>(
+    param: TKey,
+    context?: T,
+  ): Promise<CachedResourceValueIncludes<TData, T>> {
     if (param === undefined) {
       param = CachedResourceParamKey as TKey;
     }
@@ -43,7 +46,10 @@ export abstract class CachedDataResource<
     return this.data as CachedResourceValueIncludes<TData, T>;
   }
 
-  async load<T extends CachedResourceIncludeArgs<TData, TContext> = []>(param: TKey, context?: T): Promise<CachedResourceValueIncludes<TData, T>> {
+  override async load<T extends CachedResourceIncludeArgs<TData, TContext> = []>(
+    param: TKey,
+    context?: T,
+  ): Promise<CachedResourceValueIncludes<TData, T>> {
     if (param === undefined) {
       param = CachedResourceParamKey as TKey;
     }

@@ -42,4 +42,6 @@ export default [
   ['app_navigationTree_drop_here', 'Déposer ici...'],
   ['plugin_navigation_tree_settings_projects_description', 'Affiche les éléments sous les groupes de projets'],
   ['plugin_navigation_tree_settings_projects_title', 'Grouper par projet'],
+  ['plugin_navigation_tree_settings_disable', 'Disable'],
+  ['plugin_navigation_tree_settings_disable_description', 'Disable navigation tree for all users'],
 ];

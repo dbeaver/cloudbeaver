@@ -13,9 +13,9 @@ export const coreSettingsLocalizationManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./SettingsLocalizationService').then(m => m.SettingsLocalizationService),
-    () => import('./LocalizationSettingsManagerService').then(m => m.LocalizationSettingsManagerService),
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./SettingsLocalizationBootstrap').then(m => m.SettingsLocalizationBootstrap),
+    () => import('./SettingsLocalizationService.js').then(m => m.SettingsLocalizationService),
+    () => import('./LocalizationSettingsManagerService.js').then(m => m.LocalizationSettingsManagerService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./SettingsLocalizationBootstrap.js').then(m => m.SettingsLocalizationBootstrap),
   ],
 };

@@ -7,8 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { s } from '../s';
-import { useS } from '../useS';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
 import style from './Overlay.module.css';
 
 interface Props {

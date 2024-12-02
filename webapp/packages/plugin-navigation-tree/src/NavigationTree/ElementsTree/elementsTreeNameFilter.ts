@@ -9,8 +9,8 @@ import type { NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver
 import { resourceKeyList } from '@cloudbeaver/core-resource';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { EEquality, NavNodeFilterCompareFn } from './NavNodeFilterCompareFn';
-import type { IElementsTree, IElementsTreeFilter, ITreeNodeState } from './useElementsTree';
+import { EEquality, type NavNodeFilterCompareFn } from './NavNodeFilterCompareFn.js';
+import type { IElementsTree, IElementsTreeFilter, ITreeNodeState } from './useElementsTree.js';
 
 function isDefined<T>(val: T | undefined | null): val is T {
   return val !== undefined && val !== null;

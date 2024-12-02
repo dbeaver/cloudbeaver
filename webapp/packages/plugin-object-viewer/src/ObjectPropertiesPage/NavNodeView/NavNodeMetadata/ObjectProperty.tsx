@@ -7,10 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { FieldCheckbox, ILayoutSizeProps, InputField } from '@cloudbeaver/core-blocks';
+import { FieldCheckbox, type ILayoutSizeProps, InputField } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
-import { additionalProps, filterProperty, getValue, matchType } from '../../helpers';
+import { additionalProps, filterProperty, getValue, matchType } from '../../helpers.js';
 
 interface Props extends ILayoutSizeProps {
   objectProperty?: ObjectPropertyInfo;

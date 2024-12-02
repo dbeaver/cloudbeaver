@@ -5,15 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { CachedResource } from './CachedResource';
+import { CachedResource } from './CachedResource.js';
 import {
   CACHED_RESOURCE_DEFAULT_PAGE_LIMIT,
   CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
   CachedResourceOffsetPageTargetKey,
-} from './CachedResourceOffsetPageKeys';
-import { CachedResourceKey } from './IResource';
+} from './CachedResourceOffsetPageKeys.js';
+import type { CachedResourceKey } from './IResource.js';
 
 interface IOffsetPageKeyInfo {
   limit: number;

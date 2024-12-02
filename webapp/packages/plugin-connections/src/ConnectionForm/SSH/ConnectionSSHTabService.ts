@@ -11,27 +11,30 @@ import React from 'react';
 import { DBDriverResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { DriverConfigurationType, NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import { DriverConfigurationType, NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { formStateContext } from '@cloudbeaver/core-ui';
 
-import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
-import { ConnectionFormService } from '../ConnectionFormService';
-import { connectionConfigContext } from '../Contexts/connectionConfigContext';
-import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
-import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
+import { connectionFormConfigureContext } from '../connectionFormConfigureContext.js';
+import { ConnectionFormService } from '../ConnectionFormService.js';
+import { connectionConfigContext } from '../Contexts/connectionConfigContext.js';
+import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
+import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps.js';
 
 export const SSHTab = React.lazy(async () => {
-  const { SSHTab } = await import('./SSHTab');
+  const { SSHTab } = await import('./SSHTab.js');
   return { default: SSHTab };
 });
 export const SSHPanel = React.lazy(async () => {
-  const { SSHPanel } = await import('./SSHPanel');
+  const { SSHPanel } = await import('./SSHPanel.js');
   return { default: SSHPanel };
 });
 
 @injectable()
 export class ConnectionSSHTabService extends Bootstrap {
-  constructor(private readonly connectionFormService: ConnectionFormService, private readonly dbDriverResource: DBDriverResource) {
+  constructor(
+    private readonly connectionFormService: ConnectionFormService,
+    private readonly dbDriverResource: DBDriverResource,
+  ) {
     super();
 
     makeObservable<this, 'fillConfig' | 'prepareConfig'>(this, {
@@ -40,10 +43,10 @@ export class ConnectionSSHTabService extends Bootstrap {
     });
   }
 
-  register(): void {
+  override register(): void {
     this.connectionFormService.tabsContainer.add({
       key: 'ssh',
-      name: 'customConnection_main',
+      name: 'plugin_connections_connection_form_part_main',
       order: 3,
       tab: () => SSHTab,
       panel: () => SSHPanel,
@@ -69,8 +72,6 @@ export class ConnectionSSHTabService extends Bootstrap {
 
     this.connectionFormService.fillConfigTask.addHandler(this.fillConfig.bind(this));
   }
-
-  load(): void {}
 
   private fillConfig({ state, updated }: IConnectionFormFillConfigData, contexts: IExecutionContextProvider<IConnectionFormFillConfigData>) {
     if (!updated) {

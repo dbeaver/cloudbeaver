@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable, observable } from 'mobx';
 
-import type { ITask } from './ITask';
+import type { ITask } from './ITask.js';
 
 export class Task<TValue> implements ITask<TValue> {
   cancelled: boolean;

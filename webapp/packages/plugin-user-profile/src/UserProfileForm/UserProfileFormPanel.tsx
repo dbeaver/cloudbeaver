@@ -12,13 +12,13 @@ import { ConfirmationDialog, useExecutor } from '@cloudbeaver/core-blocks';
 import { IServiceProvider, useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { FormMode, TabContainerPanelComponent } from '@cloudbeaver/core-ui';
+import { FormMode, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
-import { userProfileContext } from '../userProfileContext';
-import { UserProfileOptionsPanelService } from '../UserProfileOptionsPanelService';
-import { UserProfileForm } from './UserProfileForm';
-import { UserProfileFormService } from './UserProfileFormService';
-import { UserProfileFormState } from './UserProfileFormState';
+import { userProfileContext } from '../userProfileContext.js';
+import { UserProfileOptionsPanelService } from '../UserProfileOptionsPanelService.js';
+import { UserProfileForm } from './UserProfileForm.js';
+import { UserProfileFormService } from './UserProfileFormService.js';
+import { UserProfileFormState } from './UserProfileFormState.js';
 
 export const UserProfileFormPanel: TabContainerPanelComponent = observer(function UserProfileFormPanel({ tabId }) {
   const serviceProvider = useService(IServiceProvider);
@@ -41,8 +41,8 @@ export const UserProfileFormPanel: TabContainerPanelComponent = observer(functio
 
         if (state.isChanged && !context.force) {
           const result = await commonDialogService.open(ConfirmationDialog, {
-            title: 'connections_public_connection_edit_cancel_title',
-            message: 'connections_public_connection_edit_cancel_message',
+            title: 'plugin_connections_connection_edit_cancel_title',
+            message: 'plugin_connections_connection_edit_cancel_message',
             confirmActionText: 'ui_processing_ok',
           });
 

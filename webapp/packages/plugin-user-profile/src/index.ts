@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { userProfilePlugin } from './manifest';
+import { userProfilePlugin } from './manifest.js';
 
 export default userProfilePlugin;
 
-export * from './UserProfileTabsService';
-export * from './UserProfileOptionsPanelService';
-export * from './UserMenu/MENU_USER_PROFILE';
-export * from './UserMenu/UserMenuLazy';
+export * from './UserProfileTabsService.js';
+export * from './UserProfileOptionsPanelService.js';
+export * from './UserMenu/MENU_USER_PROFILE.js';
+export * from './UserMenu/UserMenuLazy.js';

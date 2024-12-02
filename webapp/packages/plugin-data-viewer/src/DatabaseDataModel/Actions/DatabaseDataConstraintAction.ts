@@ -7,15 +7,15 @@
  */
 import { computed, makeObservable } from 'mobx';
 
-import { DataTypeLogicalOperation, ResultDataFormat, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
+import { type DataTypeLogicalOperation, ResultDataFormat, type SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataAction } from '../DatabaseDataAction';
-import type { IDatabaseDataOptions } from '../IDatabaseDataOptions';
-import type { IDatabaseDataSource } from '../IDatabaseDataSource';
-import type { IDatabaseResultSet } from '../IDatabaseResultSet';
-import { EOrder, Order } from '../Order';
-import { databaseDataAction } from './DatabaseDataActionDecorator';
-import type { IDatabaseDataConstraintAction } from './IDatabaseDataConstraintAction';
+import { DatabaseDataAction } from '../DatabaseDataAction.js';
+import type { IDatabaseDataOptions } from '../IDatabaseDataOptions.js';
+import type { IDatabaseDataSource } from '../IDatabaseDataSource.js';
+import type { IDatabaseResultSet } from '../IDatabaseResultSet.js';
+import { EOrder, type Order } from '../Order.js';
+import { databaseDataAction } from './DatabaseDataActionDecorator.js';
+import type { IDatabaseDataConstraintAction } from './IDatabaseDataConstraintAction.js';
 
 export const IS_NULL_ID = 'IS_NULL';
 export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
@@ -252,7 +252,7 @@ export class DatabaseDataConstraintAction
     return currentConstraint.orderAsc ? EOrder.asc : EOrder.desc;
   }
 
-  updateResults(results: IDatabaseResultSet[]): void {
+  override updateResults(results: IDatabaseResultSet[]): void {
     const nextResult = results[this.resultIndex];
     if (!this.source.options || results.length !== this.source.results.length || !nextResult) {
       return;

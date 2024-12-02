@@ -8,15 +8,15 @@
 import { computed, makeObservable } from 'mobx';
 
 import { UserDataService } from '@cloudbeaver/core-authentication';
-import { IConnectionExecutionContextInfo, NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
+import { type IConnectionExecutionContextInfo, NOT_INITIALIZED_CONTEXT_ID } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import type { ProjectInfo } from '@cloudbeaver/core-projects';
 import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
-import { ResourceManagerScriptsSettingsService } from './ResourceManagerScriptsSettingsService';
-import { SCRIPTS_TYPE_ID } from './SCRIPTS_TYPE_ID';
+import { ResourceManagerScriptsSettingsService } from './ResourceManagerScriptsSettingsService.js';
+import { SCRIPTS_TYPE_ID } from './SCRIPTS_TYPE_ID.js';
 
 const queryResourceManagerScriptsSettingsKey = 'resource-manager-scripts';
 

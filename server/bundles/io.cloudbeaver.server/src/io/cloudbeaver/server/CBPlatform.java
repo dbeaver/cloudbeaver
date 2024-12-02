@@ -59,7 +59,7 @@ public class CBPlatform extends BaseGQLPlatform {
     @Nullable
     private static GQLApplicationAdapter application = null;
 
-    private CBPreferenceStore preferenceStore;
+    private WebServerPreferenceStore preferenceStore;
     protected final List<DBPDriver> applicableDrivers = new ArrayList<>();
 
     public static CBPlatform getInstance() {
@@ -77,7 +77,7 @@ public class CBPlatform extends BaseGQLPlatform {
     protected synchronized void initialize() {
         long startTime = System.currentTimeMillis();
         log.info("Initialize web platform...: ");
-        this.preferenceStore = new CBPreferenceStore(this, WebPlatformActivator.getInstance().getPreferences());
+        this.preferenceStore = new WebServerPreferenceStore(WebPlatformActivator.getInstance().getPreferences());
         super.initialize();
         refreshApplicableDrivers();
 

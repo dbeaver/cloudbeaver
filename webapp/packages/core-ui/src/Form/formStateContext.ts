@@ -7,7 +7,7 @@
  */
 import { ENotificationType } from '@cloudbeaver/core-events';
 
-import type { IFormStateInfo } from './IFormStateInfo';
+import type { IFormStateInfo } from './IFormStateInfo.js';
 
 export interface IFormStateContext extends IFormStateInfo {
   markEdited: () => void;

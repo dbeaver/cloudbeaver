@@ -16,22 +16,22 @@ import type { NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { formStateContext } from '@cloudbeaver/core-ui';
 import { isNotNullDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
 
-import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
-import { ConnectionFormService } from '../ConnectionFormService';
-import { connectionConfigContext } from '../Contexts/connectionConfigContext';
-import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
-import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
-import { getSSLDefaultConfig } from './getSSLDefaultConfig';
-import { getSSLDriverHandler } from './getSSLDriverHandler';
-import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED';
-import { SSL_CODE_NAME } from './SSL_CODE_NAME';
+import { connectionFormConfigureContext } from '../connectionFormConfigureContext.js';
+import { ConnectionFormService } from '../ConnectionFormService.js';
+import { connectionConfigContext } from '../Contexts/connectionConfigContext.js';
+import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
+import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps.js';
+import { getSSLDefaultConfig } from './getSSLDefaultConfig.js';
+import { getSSLDriverHandler } from './getSSLDriverHandler.js';
+import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED.js';
+import { SSL_CODE_NAME } from './SSL_CODE_NAME.js';
 
 export const SSLTab = React.lazy(async () => {
-  const { SSLTab } = await import('./SSLTab');
+  const { SSLTab } = await import('./SSLTab.js');
   return { default: SSLTab };
 });
 export const SSLPanel = React.lazy(async () => {
-  const { SSLPanel } = await import('./SSLPanel');
+  const { SSLPanel } = await import('./SSLPanel.js');
   return { default: SSLPanel };
 });
 
@@ -50,7 +50,7 @@ export class ConnectionSSLTabService extends Bootstrap {
     });
   }
 
-  register(): void {
+  override register(): void {
     this.connectionFormService.tabsContainer.add({
       key: 'ssl',
       order: 4,
@@ -75,8 +75,6 @@ export class ConnectionSSLTabService extends Bootstrap {
 
     this.connectionFormService.fillConfigTask.addHandler(this.fillConfig.bind(this));
   }
-
-  load(): void {}
 
   private async fillConfig({ state, updated }: IConnectionFormFillConfigData, contexts: IExecutionContextProvider<IConnectionFormFillConfigData>) {
     if (!updated || !state.config.driverId) {

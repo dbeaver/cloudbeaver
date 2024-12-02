@@ -7,7 +7,7 @@
  */
 import { describe, it } from '@jest/globals';
 
-import { isSameDay } from './isSameDay';
+import { isSameDay } from './isSameDay.js';
 
 describe('isSameDay', () => {
   it('should be same day', () => {

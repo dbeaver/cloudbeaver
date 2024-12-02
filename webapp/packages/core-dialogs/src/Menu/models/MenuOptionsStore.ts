@@ -8,7 +8,7 @@
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { OrderedMap } from '@cloudbeaver/core-utils';
 
-import type { IMenuPanel } from '../IMenuPanel';
+import type { IMenuPanel } from '../IMenuPanel.js';
 
 const DEFAULT_ITEM_ORDER = 100;
 

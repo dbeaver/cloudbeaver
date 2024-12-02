@@ -13,9 +13,9 @@ export const sqlEditorTabPluginManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./SqlEditorBootstrap').then(m => m.SqlEditorBootstrap),
-    () => import('./SqlEditorTabService').then(m => m.SqlEditorTabService),
-    () => import('./SqlEditorNavigatorService').then(m => m.SqlEditorNavigatorService),
-    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./SqlEditorBootstrap.js').then(m => m.SqlEditorBootstrap),
+    () => import('./SqlEditorTabService.js').then(m => m.SqlEditorTabService),
+    () => import('./SqlEditorNavigatorService.js').then(m => m.SqlEditorNavigatorService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
   ],
 };

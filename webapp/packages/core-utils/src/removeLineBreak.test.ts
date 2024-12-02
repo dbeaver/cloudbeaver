@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { removeLineBreak } from './removeLineBreak';
+import { removeLineBreak } from './removeLineBreak.js';
 
 describe('removeLineBreak', () => {
   it('should remove line break characters from a string', () => {

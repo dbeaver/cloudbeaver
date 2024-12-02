@@ -8,13 +8,13 @@
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
-import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
-import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
-import type { IResultSetValue, ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
-import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource';
-import { TextValuePresentationService } from './TextValuePresentationService';
+import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
+import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
+import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue.js';
+import type { IResultSetValue, ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
+import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
+import { TextValuePresentationService } from './TextValuePresentationService.js';
 
 interface Args {
   resultIndex: number;
@@ -70,7 +70,7 @@ export function useAutoContentType({ dataFormat, model, formatAction, resultInde
   }
 
   if (activeTabs.length > 0 && !activeTabs.some(tab => tab.key === currentContentType)) {
-    currentContentType = activeTabs[0].key;
+    currentContentType = activeTabs[0]!.key;
   }
 
   return currentContentType;

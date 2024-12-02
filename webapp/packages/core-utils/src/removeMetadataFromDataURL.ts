@@ -8,12 +8,12 @@
 
 const dataUrlFilter = /data:(.*?)\/(.*?);base64,(.*)/;
 
-export function removeMetadataFromDataURL(base64: string) {
+export function removeMetadataFromDataURL(base64: string): string {
   const matches = base64.match(dataUrlFilter);
 
   if (!matches) {
     return base64;
   }
 
-  return matches[3];
+  return matches[3]!;
 }

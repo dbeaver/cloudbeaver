@@ -8,6 +8,6 @@
 import React from 'react';
 
 export const ElementsTreeLoader = React.lazy(async () => {
-  const { ElementsTree } = await import('./ElementsTree');
+  const { ElementsTree } = await import('./ElementsTree.js');
   return { default: ElementsTree };
 });

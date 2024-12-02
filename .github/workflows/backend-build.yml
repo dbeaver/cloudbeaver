@@ -1,20 +1,24 @@
 name: Backend Build
 
 on:
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
   # Allows you to reuse workflows by referencing their YAML files
   workflow_call:
 
 jobs:
   build-backend:
-    name: Backend
+    name: Build
+    timeout-minutes: 10
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          path: cloudbeaver
+
+      - name: Clone Deps Repositories
+        uses: dbeaver/github-actions/clone-repositories@devel
+        with:
+          project_deps_path: "./cloudbeaver/project.deps"
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -23,34 +27,16 @@ jobs:
           java-version: "17"
           cache: maven
 
-      - uses: stCarolas/setup-maven@v5
-        with:
-          maven-version: 3.9.0
-
-      - name: Give permissions
-        run: |
-          sudo chmod 777 ../
-        shell: bash
-
-      - name: Determine branches
-        id: determine-branch
-        run: |
-          echo "pr_branch=${{ github.head_ref }}" >> $GITHUB_ENV
-          echo "base_branch=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
-  
-      - name: Clone dbeaver/dbeaver
-        id: clone-repo
-        run: |
-          git clone -b ${{ env.pr_branch }} https://github.com/dbeaver/dbeaver.git ../dbeaver || git clone -b ${{ env.base_branch }} https://github.com/dbeaver/dbeaver.git ../dbeaver
+      - uses: dbeaver/github-actions/install-maven@devel
 
       - name: Run build script
         run: ./build-backend.sh
         shell: bash
-        working-directory: ./deploy
+        working-directory: ./cloudbeaver/deploy
 
-      - name: Archive build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-build-artifacts
-          path: deploy/cloudbeaver
-          if-no-files-found: error
+      # - name: Archive build artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: backend-build-artifacts
+      #     path: cloudbeaver/deploy/cloudbeaver
+      #     if-no-files-found: error

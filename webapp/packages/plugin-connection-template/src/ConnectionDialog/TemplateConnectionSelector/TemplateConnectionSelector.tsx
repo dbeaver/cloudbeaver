@@ -14,9 +14,9 @@ import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
-import { TemplateConnectionsResource } from '../../TemplateConnectionsResource';
-import { TemplateConnectionsService } from '../../TemplateConnectionsService';
-import { TemplateConnectionItem } from './TemplateConnectionItem';
+import { TemplateConnectionsResource } from '../../TemplateConnectionsResource.js';
+import { TemplateConnectionsService } from '../../TemplateConnectionsService.js';
+import { TemplateConnectionItem } from './TemplateConnectionItem.js';
 
 interface Props {
   className?: string;

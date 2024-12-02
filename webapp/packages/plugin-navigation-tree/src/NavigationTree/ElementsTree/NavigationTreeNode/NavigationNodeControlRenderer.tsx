@@ -12,11 +12,11 @@ import { getComputed, s, TreeNodeContext, useMergeRefs, useObjectRef, useS } fro
 import { useService } from '@cloudbeaver/core-di';
 import { type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 
-import { ElementsTreeContext } from '../ElementsTreeContext';
-import type { NavTreeControlComponent } from '../NavigationNodeComponent';
-import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders';
+import { ElementsTreeContext } from '../ElementsTreeContext.js';
+import type { NavTreeControlComponent } from '../NavigationNodeComponent.js';
+import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders.js';
 import style from './NavigationNodeControlRenderer.module.css';
-import type { INavigationNode } from './useNavigationNode';
+import type { INavigationNode } from './useNavigationNode.js';
 
 interface Props {
   node: NavNode;

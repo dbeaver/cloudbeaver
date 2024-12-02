@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const BodyLazy = importLazyComponent(() => import('./Body').then(m => m.Body));
+export const BodyLazy = importLazyComponent(() => import('./Body.js').then(m => m.Body));

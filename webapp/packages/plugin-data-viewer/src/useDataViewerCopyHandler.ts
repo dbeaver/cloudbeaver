@@ -10,7 +10,7 @@ import type React from 'react';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
-import { DataViewerService } from './DataViewerService';
+import { DataViewerService } from './DataViewerService.js';
 
 export function useDataViewerCopyHandler() {
   const notificationService = useService(NotificationService);

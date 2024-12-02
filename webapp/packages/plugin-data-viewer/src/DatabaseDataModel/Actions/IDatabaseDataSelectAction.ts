@@ -7,8 +7,8 @@
  */
 import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 
-import type { IDatabaseDataAction } from '../IDatabaseDataAction';
-import type { IDatabaseDataResult } from '../IDatabaseDataResult';
+import type { IDatabaseDataAction } from '../IDatabaseDataAction.js';
+import type { IDatabaseDataResult } from '../IDatabaseDataResult.js';
 
 export type DatabaseDataSelectActionsData<TKey> =
   | {

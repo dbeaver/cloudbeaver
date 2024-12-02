@@ -7,7 +7,7 @@
  */
 import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
 
-import type { IKeyBinding } from './IKeyBinding';
+import type { IKeyBinding } from './IKeyBinding.js';
 
 export function getCommonAndOSSpecificKeys(keyBinding: IKeyBinding | undefined): string[] {
   if (keyBinding === undefined) {

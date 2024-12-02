@@ -7,9 +7,9 @@
  */
 import { observable } from 'mobx';
 
-import type { IAction } from '../Action/IAction';
-import type { IActiveView } from './IActiveView';
-import type { IView } from './IView';
+import type { IAction } from '../Action/IAction.js';
+import type { IActiveView } from './IActiveView.js';
+import type { IView } from './IView.js';
 
 export abstract class View<T> implements IView<T> {
   readonly parent: IView<T> | null;

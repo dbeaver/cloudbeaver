@@ -8,24 +8,24 @@
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useContext, useEffect, useState } from 'react';
 
-import { Button } from '../Button';
-import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
-import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import { useTranslate } from '../localization/useTranslate';
-import { s } from '../s';
-import { Tag } from '../Tags/Tag';
-import { Tags } from '../Tags/Tags';
-import { UploadArea } from '../UploadArea';
-import { useCombinedHandler } from '../useCombinedHandler';
-import { useRefInherit } from '../useRefInherit';
-import { useS } from '../useS';
-import { useStateDelay } from '../useStateDelay';
-import { Field } from './Field';
-import { FieldDescription } from './FieldDescription';
-import { FieldLabel } from './FieldLabel';
-import { FormContext } from './FormContext';
+import { Button } from '../Button.js';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
+import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { s } from '../s.js';
+import { Tag } from '../Tags/Tag.js';
+import { Tags } from '../Tags/Tags.js';
+import { UploadArea } from '../UploadArea.js';
+import { useCombinedHandler } from '../useCombinedHandler.js';
+import { useRefInherit } from '../useRefInherit.js';
+import { useS } from '../useS.js';
+import { useStateDelay } from '../useStateDelay.js';
+import { Field } from './Field.js';
+import { FieldDescription } from './FieldDescription.js';
+import { FieldLabel } from './FieldLabel.js';
+import { FormContext } from './FormContext.js';
 import InputFilesStyles from './InputFiles.module.css';
-import { isControlPresented } from './isControlPresented';
+import { isControlPresented } from './isControlPresented.js';
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'style'> &
   ILayoutSizeProps & {
@@ -142,7 +142,7 @@ export const InputFiles: InputFilesType = observer(
       const dt = new DataTransfer();
 
       for (let i = 0; i < value.length; i++) {
-        const file = value[i];
+        const file = value[i]!;
         if (index !== i) {
           dt.items.add(file);
         }

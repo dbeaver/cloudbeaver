@@ -7,6 +7,6 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
-import type { IMenu } from './IMenu';
+import type { IMenu } from './IMenu.js';
 
 export const DATA_CONTEXT_MENU = createDataContext<IMenu>('menu');

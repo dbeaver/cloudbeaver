@@ -13,15 +13,18 @@ import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isObjectPropertyInfoStateEqual } from '@cloudbeaver/core-sdk';
 import { formStateContext } from '@cloudbeaver/core-ui';
 
-import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
-import { ConnectionFormService } from '../ConnectionFormService';
-import { connectionConfigContext } from '../Contexts/connectionConfigContext';
-import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
-import { DriverPropertiesLoader } from './DriverPropertiesLoader';
+import { connectionFormConfigureContext } from '../connectionFormConfigureContext.js';
+import { ConnectionFormService } from '../ConnectionFormService.js';
+import { connectionConfigContext } from '../Contexts/connectionConfigContext.js';
+import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps.js';
+import { DriverPropertiesLoader } from './DriverPropertiesLoader.js';
 
 @injectable()
 export class ConnectionDriverPropertiesTabService extends Bootstrap {
-  constructor(private readonly connectionFormService: ConnectionFormService, private readonly dbDriverResource: DBDriverResource) {
+  constructor(
+    private readonly connectionFormService: ConnectionFormService,
+    private readonly dbDriverResource: DBDriverResource,
+  ) {
     super();
 
     makeObservable<this, 'fillConfig'>(this, {
@@ -29,11 +32,11 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
     });
   }
 
-  register(): void {
+  override register(): void {
     this.connectionFormService.tabsContainer.add({
       key: 'driver_properties',
-      name: 'customConnection_properties',
-      title: 'customConnection_properties',
+      name: 'plugin_connections_connection_form_part_properties',
+      title: 'plugin_connections_connection_form_part_properties',
       order: 2,
       panel: () => DriverPropertiesLoader,
       isDisabled: (tabId, props) => {
@@ -52,8 +55,6 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
 
     this.connectionFormService.configureTask.addHandler(this.configure.bind(this));
   }
-
-  load(): void {}
 
   private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const configuration = contexts.getContext(connectionFormConfigureContext);

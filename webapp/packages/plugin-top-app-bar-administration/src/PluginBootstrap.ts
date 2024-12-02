@@ -8,7 +8,7 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { AdministrationTopAppBarService } from '@cloudbeaver/plugin-administration';
 
-import { AdminTopNavBar } from './TopNavBar/AdminTopNavBar';
+import { AdminTopNavBar } from './TopNavBar/AdminTopNavBar.js';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -16,9 +16,7 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.administrationTopAppBarService.navBarPlaceholder.add(AdminTopNavBar);
   }
-
-  load(): void | Promise<void> {}
 }

@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const InlineEditor = importLazyComponent(() => import('./InlineEditor').then(m => m.InlineEditor));
+export const InlineEditor = importLazyComponent(() => import('./InlineEditor.js').then(m => m.InlineEditor));

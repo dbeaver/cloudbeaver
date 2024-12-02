@@ -6,14 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { Portal } from 'reakit/Portal';
+import { Portal } from 'reakit';
 
 import { s, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
 import styles from './Notifications.module.css';
-import { NotificationsItem } from './NotificationsItem/NotificationsItem';
+import { NotificationsItem } from './NotificationsItem/NotificationsItem.js';
 
 export const Notifications = observer(function Notifications() {
   const notificationService = useService(NotificationService);

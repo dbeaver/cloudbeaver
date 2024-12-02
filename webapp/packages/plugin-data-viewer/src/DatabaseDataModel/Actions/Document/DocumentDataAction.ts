@@ -9,16 +9,16 @@ import { computed, makeObservable } from 'mobx';
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
-import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
-import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import { DatabaseDataResultAction } from '../DatabaseDataResultAction';
-import type { IDatabaseDataDocument } from './IDatabaseDataDocument';
-import type { IDocumentElementKey } from './IDocumentElementKey';
+import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
+import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
+import { DatabaseDataResultAction } from '../DatabaseDataResultAction.js';
+import type { IDatabaseDataDocument } from './IDatabaseDataDocument.js';
+import type { IDocumentElementKey } from './IDocumentElementKey.js';
 
 @databaseDataAction()
 export class DocumentDataAction extends DatabaseDataResultAction<IDocumentElementKey, IDatabaseResultSet> {
-  static dataFormat = [ResultDataFormat.Document];
+  static override dataFormat = [ResultDataFormat.Document];
 
   get documents(): IDatabaseDataDocument[] {
     return this.result.data?.rowsWithMetaData?.map(row => row.data[0]) || [];
@@ -60,7 +60,7 @@ export class DocumentDataAction extends DatabaseDataResultAction<IDocumentElemen
 
   set(index: number, value: IDatabaseDataDocument): void {
     if (this.result.data?.rowsWithMetaData) {
-      const row = this.result.data.rowsWithMetaData[index];
+      const row = this.result.data.rowsWithMetaData[index]!;
 
       if (row.data) {
         row.data[0] = value;

@@ -37,7 +37,7 @@ import {
   MenuService,
 } from '@cloudbeaver/core-view';
 
-import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS';
+import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS.js';
 
 export interface INodeMenuData {
   node: NavNode;
@@ -60,7 +60,7 @@ export class NavNodeContextMenuService extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.navTreeResource.beforeNodeDelete.addPostHandler(async (data, contexts) => {
       if (ExecutorInterrupter.isInterrupted(contexts)) {
         return;

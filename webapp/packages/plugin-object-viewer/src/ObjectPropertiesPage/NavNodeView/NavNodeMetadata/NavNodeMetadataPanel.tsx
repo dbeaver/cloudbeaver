@@ -7,7 +7,7 @@
  */
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 
-import { ObjectProperties } from './ObjectProperties';
+import { ObjectProperties } from './ObjectProperties.js';
 
 export const NavNodeMetadataPanel: NavNodeTransformViewComponent = function NavNodeMetadataPanel({ nodeId }) {
   return <ObjectProperties objectId={nodeId} />;

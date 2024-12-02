@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { utf8ToBase64 } from './utf8ToBase64';
+import { utf8ToBase64 } from './utf8ToBase64.js';
 
 describe('utf8ToBase64', () => {
   it('should convert utf8 to base64', () => {

@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { combineITerableIterators } from './combineITerableIterators';
+import { combineITerableIterators } from './combineITerableIterators.js';
 
 describe('combineIterableIterators', () => {
   it('should return an iterator that combines the values of the given iterators', () => {

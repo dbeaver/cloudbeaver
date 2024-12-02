@@ -7,12 +7,12 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, type IExecutor } from '@cloudbeaver/core-executor';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import type { IDatabaseDataModel, IRequestEventData } from './IDatabaseDataModel';
-import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
+import type { IDatabaseDataModel, IRequestEventData } from './IDatabaseDataModel.js';
+import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource.js';
 
 export class DatabaseDataModel<TSource extends IDatabaseDataSource<any, any> = IDatabaseDataSource> implements IDatabaseDataModel<TSource> {
   id: string;

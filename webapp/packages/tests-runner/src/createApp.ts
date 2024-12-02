@@ -8,9 +8,9 @@
 import { afterAll, beforeAll } from '@jest/globals';
 import { configure } from 'mobx';
 
-import { App, IServiceProvider, PluginManifest } from '@cloudbeaver/core-di';
+import { App, IServiceProvider, type PluginManifest } from '@cloudbeaver/core-di';
 
-import './__custom_mocks__/mockKnownConsoleMessages';
+import './__custom_mocks__/mockKnownConsoleMessages.js';
 
 export interface IApplication {
   app: App;

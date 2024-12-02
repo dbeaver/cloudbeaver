@@ -7,20 +7,20 @@
  */
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataAction } from '../../DatabaseDataAction';
-import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
-import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
-import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import { DatabaseEditChangeType } from '../IDatabaseDataEditAction';
-import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction';
-import type { IResultSetComplexValue } from './IResultSetComplexValue';
-import type { IResultSetColumnKey, IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey';
-import { isResultSetComplexValue } from './isResultSetComplexValue';
-import { isResultSetContentValue } from './isResultSetContentValue';
-import { isResultSetFileValue } from './isResultSetFileValue';
-import { isResultSetGeometryValue } from './isResultSetGeometryValue';
-import { ResultSetEditAction } from './ResultSetEditAction';
-import { ResultSetViewAction } from './ResultSetViewAction';
+import { DatabaseDataAction } from '../../DatabaseDataAction.js';
+import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
+import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
+import { DatabaseEditChangeType } from '../IDatabaseDataEditAction.js';
+import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction.js';
+import type { IResultSetComplexValue } from './IResultSetComplexValue.js';
+import type { IResultSetColumnKey, IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey.js';
+import { isResultSetComplexValue } from './isResultSetComplexValue.js';
+import { isResultSetContentValue } from './isResultSetContentValue.js';
+import { isResultSetFileValue } from './isResultSetFileValue.js';
+import { isResultSetGeometryValue } from './isResultSetGeometryValue.js';
+import { ResultSetEditAction } from './ResultSetEditAction.js';
+import { ResultSetViewAction } from './ResultSetViewAction.js';
 
 export type IResultSetValue =
   | string
@@ -141,7 +141,7 @@ export class ResultSetFormatAction
 
     for (let rowIndex = offset; rowIndex < offset + count; rowIndex++) {
       for (let columnIndex = 0; columnIndex < columns.length; columnIndex++) {
-        const key = { row: this.view.rowKeys[rowIndex], column: columns[columnIndex] };
+        const key = { row: this.view.rowKeys[rowIndex]!, column: columns[columnIndex]! };
         const displayString = this.getDisplayString(key);
         const current = cells[columnIndex] ?? '';
 

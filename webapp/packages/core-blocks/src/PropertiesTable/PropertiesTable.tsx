@@ -9,20 +9,20 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo, useState } from 'react';
 
-import { Button } from '../Button';
+import { Button } from '../Button.js';
 import ButtonStyles from '../Button.module.css';
-import { Filter } from '../FormControls/Filter';
+import { Filter } from '../FormControls/Filter.js';
 import InputFieldStyles from '../FormControls/InputField/InputField.module.css';
-import { useTranslate } from '../localization/useTranslate';
-import { s } from '../s';
-import { SContext, StyleRegistry } from '../SContext';
-import { useObjectRef } from '../useObjectRef';
-import { useS } from '../useS';
-import type { IProperty } from './IProperty';
+import { useTranslate } from '../localization/useTranslate.js';
+import { s } from '../s.js';
+import { SContext, type StyleRegistry } from '../SContext.js';
+import { useObjectRef } from '../useObjectRef.js';
+import { useS } from '../useS.js';
+import type { IProperty } from './IProperty.js';
 import styles from './PropertiesTable.module.css';
 import PropertiesTableAddButtonStyles from './PropertiesTableAddButtonStyles.module.css';
 import PropertiesTableInputStyles from './PropertiesTableInputStyles.module.css';
-import { PropertyItem } from './PropertyItem';
+import { PropertyItem } from './PropertyItem.js';
 
 type PropertiesState = Record<string, string | null>;
 
@@ -86,7 +86,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
       const isUnique = properties.filter(({ key }) => key === property.key).length === 1;
 
       if (propertiesState[property.key] !== undefined && isUnique) {
-        propertiesState[key] = propertiesState[property.key];
+        propertiesState[key] = propertiesState[property.key]!;
         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete propertiesState[property.key];
       }

@@ -10,8 +10,8 @@ import { useMemo } from 'react';
 
 import { EditorLoader, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 
-import { useDataViewerCopyHandler } from '../../useDataViewerCopyHandler';
-import { getTypeExtension } from './getTypeExtension';
+import { useDataViewerCopyHandler } from '../../useDataViewerCopyHandler.js';
+import { getTypeExtension } from './getTypeExtension.js';
 
 interface Props {
   contentType: string;

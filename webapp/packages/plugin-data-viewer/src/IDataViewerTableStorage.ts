@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel';
-import { IDatabaseDataSource } from './DatabaseDataModel/IDatabaseDataSource';
+import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel.js';
+import { type IDatabaseDataSource } from './DatabaseDataModel/IDatabaseDataSource.js';
 
 export interface IDataViewerTableStorage {
   has(tableId: string): boolean;

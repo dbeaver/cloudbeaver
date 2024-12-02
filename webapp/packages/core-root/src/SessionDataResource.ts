@@ -8,7 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 
-import { SessionResource } from './SessionResource';
+import { SessionResource } from './SessionResource.js';
 
 @injectable()
 export class SessionDataResource extends CachedDataResource<null> {

@@ -23,12 +23,18 @@ import {
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
 import { EAdminPermission, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { AdminConnectionGrantInfo, AdminUserInfo, AdminUserInfoFragment, GetUsersListQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
+import {
+  type AdminConnectionGrantInfo,
+  type AdminUserInfo,
+  type AdminUserInfoFragment,
+  type GetUsersListQueryVariables,
+  GraphQLService,
+} from '@cloudbeaver/core-sdk';
 
-import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
-import { AuthInfoService } from './AuthInfoService';
-import { AuthProviderService } from './AuthProviderService';
-import type { IAuthCredentials } from './IAuthCredentials';
+import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
+import { AuthInfoService } from './AuthInfoService.js';
+import { AuthProviderService } from './AuthProviderService.js';
+import type { IAuthCredentials } from './IAuthCredentials.js';
 
 const NEW_USER_SYMBOL = Symbol('new-user');
 
@@ -54,6 +60,7 @@ export const UsersResourceNewUsers = resourceKeyListAlias('@users-resource/new-u
 interface UserCreateOptions {
   userId: string;
   authRole?: string;
+  enabled?: boolean;
 }
 
 @injectable()
@@ -131,16 +138,11 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     });
   }
 
-  async setMetaParameters(userId: string, parameters: Record<string, any>): Promise<void> {
-    await this.graphQLService.sdk.saveUserMetaParameters({ userId, parameters });
-  }
-
-  async create({ userId, authRole }: UserCreateOptions): Promise<AdminUser> {
+  async create({ userId, authRole, enabled }: UserCreateOptions): Promise<AdminUser> {
     const { user } = await this.graphQLService.sdk.createUser({
       userId,
       authRole,
-      enabled: false,
-      ...this.getDefaultIncludes(),
+      enabled: enabled ?? false,
       ...this.getIncludesMap(userId),
     });
 
@@ -253,7 +255,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       if (userId !== undefined) {
         const { user } = await this.graphQLService.sdk.getAdminUserInfo({
           userId,
-          ...this.getDefaultIncludes(),
           ...this.getIncludesMap(userId, includes),
         });
 
@@ -278,7 +279,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
             userIdMask,
             enabledState,
           },
-          ...this.getDefaultIncludes(),
           ...this.getIncludesMap(userId, includes),
         });
 
@@ -305,14 +305,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     return this.data;
   }
 
-  private getDefaultIncludes(): UserResourceIncludes {
-    return {
-      customIncludeOriginDetails: false,
-      includeMetaParameters: false,
-    };
-  }
-
-  protected dataSet(key: string, value: AdminUserInfoFragment): void {
+  protected override dataSet(key: string, value: AdminUserInfoFragment): void {
     const oldValue = this.data.get(key);
     super.dataSet(key, { ...oldValue, ...value });
   }

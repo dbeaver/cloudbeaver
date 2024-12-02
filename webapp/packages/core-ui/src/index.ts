@@ -5,56 +5,56 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-export * from './Clipboard/ClipboardBootstrap';
-export * from './Clipboard/ClipboardService';
+export * from './Clipboard/ClipboardBootstrap.js';
+export * from './Clipboard/ClipboardService.js';
 
-export * from './ContextMenu/ContextMenuLazy';
-export * from './ContextMenu/IContextMenuItemProps';
-export * from './ContextMenu/MenuBar/MenuBarLazy';
-export * from './ContextMenu/MenuBar/MenuBarItemLoader';
+export * from './ContextMenu/ContextMenuLazy.js';
+export * from './ContextMenu/IContextMenuItemProps.js';
+export * from './ContextMenu/MenuBar/MenuBarLazy.js';
+export * from './ContextMenu/MenuBar/MenuBarItemLoader.js';
 export { default as MenuBarStyles } from './ContextMenu/MenuBar/MenuBar.module.css';
 export { default as MenuBarItemStyles } from './ContextMenu/MenuBar/MenuBarItem.module.css';
 
-export * from './DragAndDrop/DND_ELEMENT_TYPE';
-export * from './DragAndDrop/DND_NATIVE_TYPE';
-export * from './DragAndDrop/DNDAcceptType';
-export * from './DragAndDrop/DNDPreviewLoader';
-export * from './DragAndDrop/DNDProviderLoader';
-export * from './DragAndDrop/useDNDBox';
-export * from './DragAndDrop/useDNDData';
+export * from './DragAndDrop/DND_ELEMENT_TYPE.js';
+export * from './DragAndDrop/DND_NATIVE_TYPE.js';
+export * from './DragAndDrop/DNDAcceptType.js';
+export * from './DragAndDrop/DNDPreviewLoader.js';
+export * from './DragAndDrop/DNDProviderLoader.js';
+export * from './DragAndDrop/useDNDBox.js';
+export * from './DragAndDrop/useDNDData.js';
 
-export * from './Form/Components/IBaseFormProps';
-export * from './Form/Components/BaseFormLazy';
-export * from './Form/DATA_CONTEXT_FORM_STATE';
-export * from './Form/FormBaseService';
-export * from './Form/FormMode';
-export * from './Form/FormState';
-export * from './Form/FormPart';
-export * from './Form/formStateContext';
-export * from './Form/formStatusContext';
-export * from './Form/formValidationContext';
-export * from './Form/IFormPart';
-export * from './Form/IFormProps';
-export * from './Form/IFormState';
-export * from './Form/IFormStateInfo';
+export * from './Form/Components/IBaseFormProps.js';
+export * from './Form/Components/BaseFormLazy.js';
+export * from './Form/DATA_CONTEXT_FORM_STATE.js';
+export * from './Form/FormBaseService.js';
+export * from './Form/FormMode.js';
+export * from './Form/FormState.js';
+export * from './Form/FormPart.js';
+export * from './Form/formStateContext.js';
+export * from './Form/formStatusContext.js';
+export * from './Form/formValidationContext.js';
+export * from './Form/IFormPart.js';
+export * from './Form/IFormProps.js';
+export * from './Form/IFormState.js';
+export * from './Form/IFormStateInfo.js';
 
-export * from './InlineEditor/InlineEditorLoader';
+export * from './InlineEditor/InlineEditorLoader.js';
 
-export * from './Screens/AppScreen/NavigationService';
-export * from './Screens/AppScreen/OptionsPanelService';
+export * from './Screens/AppScreen/NavigationService.js';
+export * from './Screens/AppScreen/OptionsPanelService.js';
 
-export * from './Tabs/ITab';
-export * from './Tabs/TabContext';
-export * from './Tabs/TabListLoader';
-export * from './Tabs/TabPanelLoader';
-export * from './Tabs/TabPanelListLoader';
-export * from './Tabs/TabPanelProps';
-export * from './Tabs/TabsContainer/ITabsContainer';
-export * from './Tabs/TabsContainer/TabsContainer';
-export * from './Tabs/TabsContext';
-export * from './Tabs/TabsStateLoader';
-export * from './Tabs/useTabState';
-export * from './Tabs/useTabLocalState';
+export * from './Tabs/ITab.js';
+export * from './Tabs/TabContext.js';
+export * from './Tabs/TabListLoader.js';
+export * from './Tabs/TabPanelLoader.js';
+export * from './Tabs/TabPanelListLoader.js';
+export * from './Tabs/TabPanelProps.js';
+export * from './Tabs/TabsContainer/ITabsContainer.js';
+export * from './Tabs/TabsContainer/TabsContainer.js';
+export * from './Tabs/TabsContext.js';
+export * from './Tabs/TabsStateLoader.js';
+export * from './Tabs/useTabState.js';
+export * from './Tabs/useTabLocalState.js';
 export { default as TabStyles } from './Tabs/Tab/Tab.module.css';
 export { default as TabTitleStyles } from './Tabs/Tab/TabTitle.module.css';
 export { default as TabVerticalRotatedStyles } from './Tabs/Tab/TabVerticalRotated.module.css';
@@ -70,25 +70,26 @@ export { default as TabBigUnderlineStyles } from './Tabs/Tab/TabBigUnderlineStyl
 export { default as TabTitleBigUnderlineStyles } from './Tabs/Tab/TabTitleBigUnderlineStyles.module.css';
 export { default as TabIconStyles } from './Tabs/Tab/TabIcon.module.css';
 
-export * from './Tabs/Tab/DATA_CONTEXT_TAB_ID';
-export * from './Tabs/Tab/DATA_CONTEXT_TABS_CONTEXT';
-export * from './Tabs/Tab/MENU_TAB';
+export * from './Tabs/Tab/DATA_CONTEXT_TAB_ID.js';
+export * from './Tabs/Tab/DATA_CONTEXT_TABS_CONTEXT.js';
+export * from './Tabs/Tab/MENU_TAB.js';
 
-export * from './Tabs/Tab/TabLoader';
-export * from './Tabs/Tab/TabDefaultLoader';
-export * from './Tabs/Tab/TabIconLoader';
-export * from './Tabs/Tab/TabProps';
-export * from './Tabs/Tab/TabTitleLoader';
-export * from './Tabs/Tab/useTab';
-export * from './Tabs/TabsBootstrap';
+export * from './Tabs/Tab/TabLoader.js';
+export * from './Tabs/Tab/TabDefaultLoader.js';
+export * from './Tabs/Tab/TabIconLoader.js';
+export * from './Tabs/Tab/TabProps.js';
+export * from './Tabs/Tab/TabTitleLoader.js';
+export * from './Tabs/Tab/useTab.js';
+export * from './Tabs/TabsBootstrap.js';
 
-export * from './Tabs/TabsBox/TabsBoxLoader';
+export * from './Tabs/TabsBox/TabsBoxLoader.js';
 
-export * from './SideBarPanel/LeftBarPanelService';
-export * from './SideBarPanel/SideBarPanelLoader';
-export * from './SideBarPanel/SideBarPanelService';
+export * from './SideBarPanel/LeftBarPanelService.js';
+export * from './SideBarPanel/SideBarPanelLoader.js';
+export * from './SideBarPanel/SideBarPanelService.js';
 
-export * from './AuthenticationProviderLoader';
-export * from './useAuthenticationAction';
+export * from './AuthenticationProviderLoader.js';
+export * from './useAuthenticationAction.js';
+export * from './Screens/AppScreen/BaseOptionsPanelService.js';
 
-export { manifest as coreUIManifest } from './manifest';
+export { manifest as coreUIManifest } from './manifest.js';

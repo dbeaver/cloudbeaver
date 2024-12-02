@@ -10,13 +10,13 @@ import React from 'react';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
+import { ExecutorHandlersCollection, ExecutorInterrupter, type IExecutorHandler, type IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 
-import type { ITeamFormFillConfigData, ITeamFormProps, ITeamFormState, ITeamFormSubmitData } from './ITeamFormProps';
+import type { ITeamFormFillConfigData, ITeamFormProps, ITeamFormState, ITeamFormSubmitData } from './ITeamFormProps.js';
 
 const TeamFormBaseActions = React.lazy(async () => {
-  const { TeamFormBaseActions } = await import('./TeamFormBaseActions');
+  const { TeamFormBaseActions } = await import('./TeamFormBaseActions.js');
   return { default: TeamFormBaseActions };
 });
 
@@ -110,7 +110,7 @@ export class TeamFormService {
       } else {
         this.notificationService.notify(
           {
-            title: status.messages[0],
+            title: status.messages[0]!,
             message: status.messages.slice(1).join('\n'),
           },
           status.saved ? ENotificationType.Success : ENotificationType.Error,

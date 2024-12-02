@@ -1,10 +1,10 @@
-query getActiveUser($includeMetaParameters: Boolean!, $includeConfigurationParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+query getActiveUser($includeConfigurationParameters: Boolean!) {
   user: activeUser {
     userId
+    isAnonymous
     displayName
     authRole
     linkedAuthProviders
-    metaParameters @include(if: $includeMetaParameters)
     configurationParameters @include(if: $includeConfigurationParameters)
     teams {
       teamId

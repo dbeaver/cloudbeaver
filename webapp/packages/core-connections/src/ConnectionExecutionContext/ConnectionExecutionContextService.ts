@@ -11,9 +11,9 @@ import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA';
-import { ConnectionExecutionContext } from './ConnectionExecutionContext';
-import { ConnectionExecutionContextResource } from './ConnectionExecutionContextResource';
+import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA.js';
+import { ConnectionExecutionContext } from './ConnectionExecutionContext.js';
+import { ConnectionExecutionContextResource } from './ConnectionExecutionContextResource.js';
 
 @injectable()
 export class ConnectionExecutionContextService {

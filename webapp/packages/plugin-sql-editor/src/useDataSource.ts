@@ -9,8 +9,8 @@ import { useEffect } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
 
-import type { ISqlDataSource } from './SqlDataSource/ISqlDataSource';
-import { SqlEditorService } from './SqlEditorService';
+import type { ISqlDataSource } from './SqlDataSource/ISqlDataSource.js';
+import { SqlEditorService } from './SqlEditorService.js';
 
 export function useDataSource(dataSource?: ISqlDataSource) {
   const sqlEditorService = useService(SqlEditorService);

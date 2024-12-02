@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from '@jest/globals';
 
-import { isMapsEqual } from './isMapsEqual';
+import { isMapsEqual } from './isMapsEqual.js';
 
 describe('Is maps equal', () => {
   test('should return "true" when equal Maps are passed', () => {

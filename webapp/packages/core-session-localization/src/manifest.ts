@@ -12,5 +12,5 @@ export const coreSessionLocalization: PluginManifest = {
     name: 'Core Session Localization',
   },
 
-  providers: [() => import('./SessionLocalizationService').then(m => m.SessionLocalizationService)],
+  providers: [() => import('./SessionLocalizationService.js').then(m => m.SessionLocalizationService)],
 };

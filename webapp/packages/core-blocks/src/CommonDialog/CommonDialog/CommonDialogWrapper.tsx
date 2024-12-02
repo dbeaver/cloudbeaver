@@ -7,13 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useContext, useEffect } from 'react';
-import { Dialog, useDialogState } from 'reakit/Dialog';
+import { Dialog, useDialogState } from 'reakit';
 
-import { Loader } from '../../Loader/Loader';
-import { s } from '../../s';
-import { useFocus } from '../../useFocus';
-import { useS } from '../../useS';
-import { DialogContext } from '../DialogContext';
+import { Loader } from '../../Loader/Loader.js';
+import { s } from '../../s.js';
+import { useFocus } from '../../useFocus.js';
+import { useS } from '../../useS.js';
+import { DialogContext } from '../DialogContext.js';
 import styles from './CommonDialogWrapper.module.css';
 
 export interface CommonDialogWrapperProps {

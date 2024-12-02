@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
-import { getCommonAndOSSpecificKeys, IKeyBinding, KEY_BINDING_OPEN_IN_TAB, KEY_BINDING_REDO, KEY_BINDING_UNDO } from '@cloudbeaver/core-view';
+import { getCommonAndOSSpecificKeys, type IKeyBinding, KEY_BINDING_OPEN_IN_TAB, KEY_BINDING_REDO, KEY_BINDING_UNDO } from '@cloudbeaver/core-view';
 import { KEY_BINDING_COLLAPSE_ALL, KEY_BINDING_ENABLE_FILTER, KEY_BINDING_LINK_OBJECT } from '@cloudbeaver/plugin-navigation-tree';
 import {
   KEY_BINDING_SQL_EDITOR_EXECUTE,
@@ -16,7 +16,7 @@ import {
   KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN,
 } from '@cloudbeaver/plugin-sql-editor';
 
-import type { IShortcut } from './IShortcut';
+import type { IShortcut } from './IShortcut.js';
 
 export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
   {

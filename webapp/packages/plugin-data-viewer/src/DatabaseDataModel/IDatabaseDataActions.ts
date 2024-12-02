@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
-import type { IDatabaseDataResult } from './IDatabaseDataResult';
+import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction.js';
+import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 
 export interface IDatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> {
   tryGet: <T extends IDatabaseDataAction<TOptions, TResult>>(

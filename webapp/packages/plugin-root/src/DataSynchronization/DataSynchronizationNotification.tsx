@@ -19,12 +19,12 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ENotificationType, NotificationComponentProps } from '@cloudbeaver/core-events';
+import { ENotificationType, type NotificationComponentProps } from '@cloudbeaver/core-events';
 import { DataSynchronizationService } from '@cloudbeaver/core-root';
 import { groupBy, objectValues } from '@cloudbeaver/core-utils';
 
 import styles from './DataSynchronizationNotification.module.css';
-import { DataSynchronizationNotificationMessages } from './DataSynchronizationNotificationMessages';
+import { DataSynchronizationNotificationMessages } from './DataSynchronizationNotificationMessages.js';
 
 export const DataSynchronizationNotification = observer<NotificationComponentProps>(function DataSynchronizationNotification({ notification }) {
   const dataSynchronizationService = useService(DataSynchronizationService);

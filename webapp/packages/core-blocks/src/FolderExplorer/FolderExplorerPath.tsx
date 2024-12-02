@@ -8,11 +8,11 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { s } from '../s';
-import { useS } from '../useS';
-import { FolderExplorerContext } from './FolderExplorerContext';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
+import { FolderExplorerContext } from './FolderExplorerContext.js';
 import style from './FolderExplorerPath.module.css';
-import { FolderName } from './FolderName';
+import { FolderName } from './FolderName.js';
 
 interface Props {
   getName?: (folder: string) => string;
@@ -37,7 +37,7 @@ export const FolderExplorerPath = observer<Props>(function FolderExplorerPath({ 
   let skipTitle = '';
 
   for (let i = 0; i < context.state.fullPath.length; i++) {
-    const folder = context.state.fullPath[i];
+    const folder = context.state.fullPath[i]!;
     const path = context.state.fullPath.slice(0, i);
     const skipFolder = !canSkip || canSkip(folder);
 

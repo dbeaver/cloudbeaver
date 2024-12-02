@@ -33,14 +33,18 @@ export class PluginConnectionsSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
-      // {
-      //   key: 'hideConnectionViewForUsers',
-      //   type: ESettingsValueType.Checkbox,
-      //   name: 'settings_connections_hide_connections_view_name',
-      //   description: 'settings_connections_hide_connections_view_description',
-      //   group: CONNECTIONS_SETTINGS_GROUP,
-      // },
-    ]);
+    // todo: probably not working as a separate setting
+    // this.settingsManagerService.registerSettings(this.settings, () => [
+    //   {
+    //     key: 'plugin.connections.hideConnectionViewForUsers',
+    //     type: ESettingsValueType.Checkbox,
+    //     access: {
+    //       scope: ['server'],
+    //     },
+    //     name: 'plugin_connections_settings_hide_connections_view_name',
+    //     description: 'plugin_connections_settings_hide_connections_view_description',
+    //     group: CONNECTIONS_SETTINGS_GROUP,
+    //   },
+    // ]);
   }
 }

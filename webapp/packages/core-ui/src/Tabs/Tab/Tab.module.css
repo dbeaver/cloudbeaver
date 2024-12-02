@@ -12,7 +12,6 @@
 
 .tab {
   position: relative;
-  outline: none;
   font-weight: normal;
   cursor: pointer;
   padding: 0;
@@ -20,15 +19,15 @@
   background: initial;
 
   height: 32px;
-  border-top: solid 2px transparent;
+  border-bottom: solid 2px transparent;
 
   &:global([aria-selected='true']) {
     font-weight: 500;
     cursor: auto;
-    border-top-color: var(--theme-negative);
+    border-bottom-color: var(--theme-primary);
     opacity: 1;
 
-    &:before {
+    &:not(:focus-visible):before {
       display: none;
     }
   }

@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-connection-search",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

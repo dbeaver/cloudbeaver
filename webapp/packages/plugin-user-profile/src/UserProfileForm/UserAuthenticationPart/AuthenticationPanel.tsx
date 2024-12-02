@@ -8,11 +8,11 @@
 import { observer } from 'mobx-react-lite';
 
 import { ColoredContainer, Container, useAutoLoad } from '@cloudbeaver/core-blocks';
-import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
-import type { UserProfileFormProps } from '../UserProfileFormService';
-import { ChangePassword } from './ChangePassword';
-import type { UserProfileFormAuthenticationPart } from './UserProfileFormAuthenticationPart';
+import type { UserProfileFormProps } from '../UserProfileFormService.js';
+import { ChangePassword } from './ChangePassword.js';
+import type { UserProfileFormAuthenticationPart } from './UserProfileFormAuthenticationPart.js';
 
 export const AuthenticationPanel: TabContainerPanelComponent<UserProfileFormProps> = observer(function AuthenticationPanel({ tabId }) {
   const tab = useTab(tabId);

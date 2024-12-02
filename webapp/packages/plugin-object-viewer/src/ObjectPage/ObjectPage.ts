@@ -9,7 +9,7 @@ import { makeObservable, observable } from 'mobx';
 
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 
-import type { IObjectViewerTabState } from '../IObjectViewerTabState';
+import type { IObjectViewerTabState } from '../IObjectViewerTabState.js';
 
 export interface ObjectPageTabProps<T = unknown> {
   tab: ITab<IObjectViewerTabState>;

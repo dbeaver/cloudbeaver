@@ -12,7 +12,7 @@ import { Checkbox, getComputed, s, useS } from '@cloudbeaver/core-blocks';
 import type { DBObject } from '@cloudbeaver/core-navigation-tree';
 import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
 
-import { TableContext } from '../../TableContext';
+import { TableContext } from '../../TableContext.js';
 import style from './SelectorFormatter.module.css';
 
 export const SelectorFormatter = observer<RenderCellProps<DBObject>>(function SelectorFormatter(props) {

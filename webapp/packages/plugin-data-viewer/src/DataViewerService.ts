@@ -9,7 +9,7 @@ import type { Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 
-import { DataViewerSettingsService } from './DataViewerSettingsService';
+import { DataViewerSettingsService } from './DataViewerSettingsService.js';
 
 @injectable()
 export class DataViewerService {

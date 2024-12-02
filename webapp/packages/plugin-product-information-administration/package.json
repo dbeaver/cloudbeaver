@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-product-information-administration",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -22,10 +23,10 @@
     "@cloudbeaver/core-di": "^0",
     "@cloudbeaver/core-localization": "^0",
     "@cloudbeaver/core-resource": "^0",
+    "@cloudbeaver/core-root": "^0",
     "@cloudbeaver/core-ui": "^0",
     "@cloudbeaver/core-version": "^0",
     "@cloudbeaver/core-version-update": "^0",
-    "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^18"
   },

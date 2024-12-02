@@ -10,7 +10,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { NavNode } from '@cloudbeaver/core-navigation-tree';
 
-import { NavigationTreeService } from './NavigationTreeService';
+import { NavigationTreeService } from './NavigationTreeService.js';
 
 interface INavigationTree {
   navigationTreeService: NavigationTreeService;

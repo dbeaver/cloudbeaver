@@ -30,8 +30,8 @@ import type { NetworkHandlerConfigInput, NetworkHandlerDescriptor } from '@cloud
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { isSafari } from '@cloudbeaver/core-utils';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps';
-import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR';
+import type { IConnectionFormProps } from '../IConnectionFormProps.js';
+import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR.js';
 import styles from './SSL.module.css';
 
 interface Props extends IConnectionFormProps {
@@ -68,7 +68,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
             mod={['primary']}
             disabled={disabled || readonly}
           >
-            {translate('connections_public_connection_ssl_enable')}
+            {translate('plugin_connections_connection_ssl_enable')}
           </Switch>
           {isUncategorizedExists && (
             <ObjectPropertyInfoForm

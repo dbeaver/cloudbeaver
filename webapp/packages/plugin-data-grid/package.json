@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-data-grid",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

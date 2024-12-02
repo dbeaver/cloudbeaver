@@ -9,8 +9,8 @@ import { observer } from 'mobx-react-lite';
 
 import { s, useS } from '@cloudbeaver/core-blocks';
 
-import type { ObjectPagePanelComponent } from '../ObjectPage/ObjectPage';
-import { ObjectFolders } from './ObjectFolders';
+import type { ObjectPagePanelComponent } from '../ObjectPage/ObjectPage.js';
+import { ObjectFolders } from './ObjectFolders.js';
 import classes from './ObjectPropertiesPagePanel.module.css';
 
 export const ObjectPropertiesPagePanel: ObjectPagePanelComponent = observer(function ObjectPropertiesPagePanel({ tab }) {

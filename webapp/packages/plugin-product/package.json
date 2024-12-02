@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-product",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -20,12 +21,12 @@
     "@cloudbeaver/core-blocks": "^0",
     "@cloudbeaver/core-di": "^0",
     "@cloudbeaver/core-dialogs": "^0",
+    "@cloudbeaver/core-links": "^0",
     "@cloudbeaver/core-localization": "^0",
     "@cloudbeaver/core-root": "^0",
     "@cloudbeaver/core-theming": "^0",
     "@cloudbeaver/core-version": "^0",
     "@cloudbeaver/core-view": "^0",
-    "@cloudbeaver/core-website": "^0",
     "@cloudbeaver/plugin-settings-menu": "^0",
     "mobx-react-lite": "^4",
     "react": "^18"

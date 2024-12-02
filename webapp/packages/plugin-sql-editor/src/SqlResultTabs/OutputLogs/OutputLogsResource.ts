@@ -11,8 +11,8 @@ import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { ServerEventId } from '@cloudbeaver/core-root';
 import type { CbDatabaseOutputLogEvent, WsOutputLogInfo } from '@cloudbeaver/core-sdk';
 
-import type { IOutputLogType } from './IOutputLogTypes';
-import { OutputLogsEventHandler } from './OutputLogsEventHandler';
+import type { IOutputLogType } from './IOutputLogTypes.js';
+import { OutputLogsEventHandler } from './OutputLogsEventHandler.js';
 
 export interface IOutputLog extends WsOutputLogInfo {
   severity?: IOutputLogType;

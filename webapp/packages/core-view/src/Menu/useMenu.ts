@@ -10,14 +10,14 @@ import { computed, observable } from 'mobx';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
-import { flat, ILoadableState } from '@cloudbeaver/core-utils';
+import { flat, type ILoadableState } from '@cloudbeaver/core-utils';
 
-import type { IMenu } from './IMenu';
-import type { IMenuHandler } from './IMenuHandler';
-import type { MenuCreatorItem } from './IMenuItemsCreator';
-import type { IMenuItem } from './MenuItem/IMenuItem';
-import { MenuService } from './MenuService';
-import { useMenuContext } from './useMenuContext';
+import type { IMenu } from './IMenu.js';
+import type { IMenuHandler } from './IMenuHandler.js';
+import type { MenuCreatorItem } from './IMenuItemsCreator.js';
+import type { IMenuItem } from './MenuItem/IMenuItem.js';
+import { MenuService } from './MenuService.js';
+import { useMenuContext } from './useMenuContext.js';
 
 export interface IMenuData {
   menu: IMenu;

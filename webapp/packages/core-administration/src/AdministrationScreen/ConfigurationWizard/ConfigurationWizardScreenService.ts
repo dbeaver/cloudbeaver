@@ -9,8 +9,8 @@ import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 
-import { AdministrationScreenService } from '../AdministrationScreenService';
-import { ConfigurationWizardService } from './ConfigurationWizardService';
+import { AdministrationScreenService } from '../AdministrationScreenService.js';
+import { ConfigurationWizardService } from './ConfigurationWizardService.js';
 
 @injectable()
 export class ConfigurationWizardScreenService extends Dependency {

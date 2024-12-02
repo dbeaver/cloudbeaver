@@ -10,7 +10,7 @@ import { ServerSettingsManagerService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
-  ISettingDescription,
+  type ISettingDescription,
   ROOT_SETTINGS_LAYER,
   SettingsManagerService,
   SettingsProvider,
@@ -19,7 +19,7 @@ import {
 } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
-import { DATA_EDITOR_SETTINGS_GROUP } from './DATA_EDITOR_SETTINGS_GROUP';
+import { DATA_EDITOR_SETTINGS_GROUP } from './DATA_EDITOR_SETTINGS_GROUP.js';
 
 const FETCH_MIN = 10;
 const FETCH_MAX = 5000;
@@ -28,7 +28,6 @@ const DEFAULT_FETCH_SIZE = 200;
 const defaultSettings = schema.object({
   'plugin.data-viewer.disableEdit': schemaExtra.stringedBoolean().default(false),
   'plugin.data-viewer.disableCopyData': schemaExtra.stringedBoolean().default(false),
-  'plugin.data-viewer.fetchMin': schema.coerce.number().min(FETCH_MIN).default(DEFAULT_FETCH_SIZE),
   'plugin.data-viewer.fetchMax': schema.coerce.number().min(FETCH_MIN).default(FETCH_MAX),
   'resultset.maxrows': schema.coerce.number().min(FETCH_MIN).max(FETCH_MAX).default(DEFAULT_FETCH_SIZE),
   'plugin.data-viewer.export.disabled': schemaExtra.stringedBoolean().default(false),
@@ -55,7 +54,7 @@ export class DataViewerSettingsService extends Dependency {
   }
 
   get minFetchSize(): number {
-    return this.settings.getValue('plugin.data-viewer.fetchMin');
+    return FETCH_MIN;
   }
 
   get defaultFetchSize(): number {
@@ -78,7 +77,6 @@ export class DataViewerSettingsService extends Dependency {
       createSettingsAliasResolver(this.settingsResolverService, this.settings, {
         'plugin.data-viewer.disableEdit': 'core.app.dataViewer.disableEdit',
         'plugin.data-viewer.disableCopyData': 'core.app.dataViewer.disableCopyData',
-        'plugin.data-viewer.fetchMin': 'core.app.dataViewer.fetchMin',
         'plugin.data-viewer.fetchMax': 'core.app.dataViewer.fetchMax',
         'plugin.data-viewer.export.disabled': 'plugin.data-export.disabled',
         'resultset.maxrows': 'core.app.dataViewer.fetchDefault',
@@ -135,16 +133,6 @@ export class DataViewerSettingsService extends Dependency {
           type: ESettingsValueType.Checkbox,
           name: 'settings_data_editor_disable_data_copy_name',
           description: 'settings_data_editor_disable_data_copy_description',
-          group: DATA_EDITOR_SETTINGS_GROUP,
-        },
-        {
-          key: 'plugin.data-viewer.fetchMin',
-          access: {
-            scope: ['server'],
-          },
-          type: ESettingsValueType.Input,
-          name: 'settings_data_editor_fetch_min_name',
-          description: 'settings_data_editor_fetch_min_description',
           group: DATA_EDITOR_SETTINGS_GROUP,
         },
         {

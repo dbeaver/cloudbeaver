@@ -10,8 +10,8 @@ import { observable } from 'mobx';
 import type { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import type { ITab, ITabOptions } from './ITab';
-import type { NavigationTabsService } from './NavigationTabsService';
+import type { ITab, ITabOptions } from './ITab.js';
+import type { NavigationTabsService } from './NavigationTabsService.js';
 
 export interface ITabNavigationContext {
   readonly isNewlyCreated: boolean;

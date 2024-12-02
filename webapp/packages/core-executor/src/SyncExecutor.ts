@@ -5,14 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ExecutionContext } from './ExecutionContext';
-import { executionExceptionContext } from './executionExceptionContext';
-import { ExecutorHandlersCollection } from './ExecutorHandlersCollection';
-import { ExecutorInterrupter, IExecutorInterrupter } from './ExecutorInterrupter';
-import type { IExecutionContext, IExecutionContextProvider } from './IExecutionContext';
-import type { IExecutorHandler } from './IExecutorHandler';
-import type { ChainLinkType, IExecutorHandlersCollection } from './IExecutorHandlersCollection';
-import type { ISyncExecutor } from './ISyncExecutor';
+import { ExecutionContext } from './ExecutionContext.js';
+import { executionExceptionContext } from './executionExceptionContext.js';
+import { ExecutorHandlersCollection } from './ExecutorHandlersCollection.js';
+import { ExecutorInterrupter, type IExecutorInterrupter } from './ExecutorInterrupter.js';
+import type { IExecutionContext, IExecutionContextProvider } from './IExecutionContext.js';
+import type { IExecutorHandler } from './IExecutorHandler.js';
+import type { ChainLinkType, IExecutorHandlersCollection } from './IExecutorHandlersCollection.js';
+import type { ISyncExecutor } from './ISyncExecutor.js';
 
 export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implements ISyncExecutor<T> {
   constructor(private readonly defaultData: T | null = null) {
@@ -141,7 +141,7 @@ export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implem
     return data;
   }
 
-  protected executeHandlerWithInitialData(handler: IExecutorHandler<T>) {
+  protected override executeHandlerWithInitialData(handler: IExecutorHandler<T>) {
     if (!this.initialDataGetter) {
       return;
     }

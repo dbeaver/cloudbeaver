@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IResultSetComplexValue } from './IResultSetComplexValue';
+import type { IResultSetComplexValue } from './IResultSetComplexValue.js';
 
 export function isResultSetComplexValue(value: any): value is IResultSetComplexValue {
   return value !== null && typeof value === 'object' && '$type' in value && typeof value.$type === 'string';

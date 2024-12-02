@@ -8,16 +8,14 @@
 import { Fill, PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
-import { AppStateMenu } from './AppStateMenu/AppStateMenu';
-import { Logo } from './Logo';
-import { MainMenu } from './MainMenu/MainMenu';
+import { AppStateMenu } from './AppStateMenu/AppStateMenu.js';
+import { MainMenu } from './MainMenu/MainMenu.js';
 
 @injectable()
 export class TopNavService {
   readonly placeholder = new PlaceholderContainer();
 
   constructor() {
-    this.placeholder.add(Logo, 0);
     this.placeholder.add(MainMenu, 1);
     this.placeholder.add(Fill, 3);
     this.placeholder.add(AppStateMenu);

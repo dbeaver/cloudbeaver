@@ -11,8 +11,8 @@ import { forwardRef, useContext, useDeferredValue, useMemo } from 'react';
 import { getComputed, s, TreeNodeNested, TreeNodeNestedMessage, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-import { ElementsTreeContext } from '../../ElementsTreeContext';
-import type { NavTreeNodeComponent } from '../../NavigationNodeComponent';
+import { ElementsTreeContext } from '../../ElementsTreeContext.js';
+import type { NavTreeNodeComponent } from '../../NavigationNodeComponent.js';
 import style from './NavigationNodeNested.module.css';
 
 interface Props {

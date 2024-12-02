@@ -7,13 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Icon } from '../Icon';
-import { IconOrImage } from '../IconOrImage';
-import { Loader } from '../Loader/Loader';
-import { useTranslate } from '../localization/useTranslate';
-import { s } from '../s';
-import { useS } from '../useS';
-import { useStateDelay } from '../useStateDelay';
+import { Icon } from '../Icon.js';
+import { IconOrImage } from '../IconOrImage.js';
+import { Loader } from '../Loader/Loader.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
+import { useStateDelay } from '../useStateDelay.js';
 import style from './MenuItemElement.module.css';
 
 interface IMenuItemElementProps {

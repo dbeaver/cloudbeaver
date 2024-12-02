@@ -7,8 +7,8 @@
  */
 import React, { memo, useContext } from 'react';
 
-import { ComponentsRegistryContext } from './ComponentsRegistryContext';
-import { CRegistryList } from './CRegistryList';
+import { ComponentsRegistryContext } from './ComponentsRegistryContext.js';
+import { type CRegistryList } from './CRegistryList.js';
 
 export interface CRegistryProps extends React.PropsWithChildren {
   registry: CRegistryList;

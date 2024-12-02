@@ -7,10 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container } from '../Containers/Container';
-import { ITag, Tag } from '../Tags/Tag';
-import { Tags } from '../Tags/Tags';
-import { Combobox, ComboboxBaseProps } from './Combobox';
+import { Container } from '../Containers/Container.js';
+import { type ITag, Tag } from '../Tags/Tag.js';
+import { Tags } from '../Tags/Tags.js';
+import { Combobox, type ComboboxBaseProps } from './Combobox.js';
 
 interface IItemValue {
   id: string;

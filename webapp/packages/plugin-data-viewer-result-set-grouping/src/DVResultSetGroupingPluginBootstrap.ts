@@ -19,24 +19,24 @@ import {
   DataPresentationService,
   DataPresentationType,
   DataViewerPresentationType,
-  IDatabaseDataModel,
+  type IDatabaseDataModel,
   isResultSetDataSource,
   ResultSetDataAction,
   ResultSetDataSource,
   ResultSetSelectAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { ACTION_DATA_VIEWER_GROUPING_CLEAR } from './Actions/ACTION_DATA_VIEWER_GROUPING_CLEAR';
-import { ACTION_DATA_VIEWER_GROUPING_CONFIGURE } from './Actions/ACTION_DATA_VIEWER_GROUPING_CONFIGURE';
-import { ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN } from './Actions/ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN';
-import { ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES } from './Actions/ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES';
-import { DATA_CONTEXT_DV_DDM_RS_GROUPING } from './DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING';
+import { ACTION_DATA_VIEWER_GROUPING_CLEAR } from './Actions/ACTION_DATA_VIEWER_GROUPING_CLEAR.js';
+import { ACTION_DATA_VIEWER_GROUPING_CONFIGURE } from './Actions/ACTION_DATA_VIEWER_GROUPING_CONFIGURE.js';
+import { ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN } from './Actions/ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN.js';
+import { ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES } from './Actions/ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES.js';
+import { DATA_CONTEXT_DV_DDM_RS_GROUPING } from './DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING.js';
 
 const DVGroupingColumnEditorDialog = importLazyComponent(() =>
-  import('./DVGroupingColumnEditorDialog/DVGroupingColumnEditorDialog').then(module => module.DVGroupingColumnEditorDialog),
+  import('./DVGroupingColumnEditorDialog/DVGroupingColumnEditorDialog.js').then(module => module.DVGroupingColumnEditorDialog),
 );
 const DVResultSetGroupingPresentation = importLazyComponent(() =>
-  import('./DVResultSetGroupingPresentation').then(module => module.DVResultSetGroupingPresentation),
+  import('./DVResultSetGroupingPresentation.js').then(module => module.DVResultSetGroupingPresentation),
 );
 
 @injectable()
@@ -50,7 +50,7 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.registerPresentation();
     this.registerActions();
   }

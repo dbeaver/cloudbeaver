@@ -12,5 +12,5 @@ export const coreBrowserCookiesManifest: PluginManifest = {
     name: 'Core Browser Cookies',
   },
 
-  providers: [() => import('./CookiesService').then(m => m.CookiesService)],
+  providers: [() => import('./CookiesService.js').then(m => m.CookiesService)],
 };

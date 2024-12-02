@@ -10,12 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { useResource } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
-import type { IExportContext } from '../IExportContext';
-import { DefaultExportOutputSettingsResource } from './DefaultExportOutputSettingsResource';
-import { EDataExportStep } from './EDataExportStep';
-import { ProcessorConfigureDialog } from './ProcessorConfigureDialog';
-import { ProcessorSelectDialog } from './ProcessorSelectDialog';
-import { useDataExportDialog } from './useDataExportDialog';
+import type { IExportContext } from '../IExportContext.js';
+import { DefaultExportOutputSettingsResource } from './DefaultExportOutputSettingsResource.js';
+import { EDataExportStep } from './EDataExportStep.js';
+import { ProcessorConfigureDialog } from './ProcessorConfigureDialog.js';
+import { ProcessorSelectDialog } from './ProcessorSelectDialog.js';
+import { useDataExportDialog } from './useDataExportDialog.js';
 
 export const DataExportDialog: DialogComponent<IExportContext> = observer(function DataExportDialog({ payload, rejectDialog }) {
   useResource(DataExportDialog, DefaultExportOutputSettingsResource, undefined, { forceSuspense: true });

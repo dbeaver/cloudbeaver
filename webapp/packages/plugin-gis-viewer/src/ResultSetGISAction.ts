@@ -11,13 +11,13 @@ import {
   DatabaseDataAction,
   type IDatabaseDataSource,
   type IDatabaseResultSet,
-  IResultSetElementKey,
-  IResultSetGeometryValue,
+  type IResultSetElementKey,
+  type IResultSetGeometryValue,
   isResultSetGeometryValue,
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IDatabaseDataGISAction } from './IDatabaseDataGISAction';
+import type { IDatabaseDataGISAction } from './IDatabaseDataGISAction.js';
 
 @databaseDataAction()
 export class ResultSetGISAction

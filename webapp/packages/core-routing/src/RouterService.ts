@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import { makeObservable, observable, runInAction } from 'mobx';
-import createRouter, { Router, State, SubscribeFn, SubscribeState } from 'router5';
+import { createRouter, type Router, type State, type SubscribeFn, type SubscribeState } from 'router5';
 import browserPlugin from 'router5-plugin-browser';
-import type { DoneFn } from 'router5/dist/types/base';
+import type { DoneFn } from 'router5/dist/types/base.js';
 
 import { App, Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, type IExecutor } from '@cloudbeaver/core-executor';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 export type RouterState = State;
@@ -67,7 +67,7 @@ export class RouterService extends Bootstrap {
     return this.router.subscribe(subscriber);
   }
 
-  load(): void {
+  override load(): void {
     this.start();
   }
 
@@ -89,7 +89,7 @@ export class RouterService extends Bootstrap {
     }
 
     this.router.usePlugin(
-      browserPlugin({
+      (browserPlugin as any)({
         useHash: true,
         base: root,
       }),

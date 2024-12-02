@@ -12,10 +12,10 @@ import { DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-conn
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { TabContainerTabComponent } from '@cloudbeaver/core-ui';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps';
-import { getSSLDefaultConfig } from './getSSLDefaultConfig';
-import { getSSLDriverHandler } from './getSSLDriverHandler';
-import { SSL } from './SSL';
+import type { IConnectionFormProps } from '../IConnectionFormProps.js';
+import { getSSLDefaultConfig } from './getSSLDefaultConfig.js';
+import { getSSLDriverHandler } from './getSSLDriverHandler.js';
+import { SSL } from './SSL.js';
 
 export const SSLPanel: TabContainerTabComponent<IConnectionFormProps> = observer(function SSLPanel(props) {
   const networkHandlerResource = useResource(SSLPanel, NetworkHandlerResource, CachedMapAllKey);

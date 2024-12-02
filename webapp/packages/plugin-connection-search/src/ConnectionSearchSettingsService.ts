@@ -5,8 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { CONNECTIONS_SETTINGS_GROUP } from '@cloudbeaver/core-connections';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
+import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const settings = schema.object({
@@ -32,12 +33,16 @@ export class ConnectionSearchSettingsService extends Dependency {
 
   private registerSettings() {
     this.settingsManagerService.registerSettings(this.settings, () => [
-      // {
-      //   group: CONNECTIONS_SETTINGS_GROUP,
-      //   key: 'disabled',
-      //   type: ESettingsValueType.Checkbox,
-      //   name: 'Disable connection search',
-      // },
+      {
+        group: CONNECTIONS_SETTINGS_GROUP,
+        key: 'plugin.connection-search.disabled',
+        access: {
+          scope: ['server'],
+        },
+        type: ESettingsValueType.Checkbox,
+        name: 'plugin_connection_search_settings_disable',
+        description: 'plugin_connection_search_settings_disable_description',
+      },
     ]);
   }
 }

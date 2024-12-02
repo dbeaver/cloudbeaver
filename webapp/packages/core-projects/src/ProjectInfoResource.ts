@@ -9,9 +9,9 @@ import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authenticati
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
 import { PermissionsService } from '@cloudbeaver/core-root';
-import { GraphQLService, RmResourceType, ProjectInfo as SchemaProjectInfo } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type RmResourceType, type ProjectInfo as SchemaProjectInfo } from '@cloudbeaver/core-sdk';
 
-import { createResourceOfType } from './createResourceOfType';
+import { createResourceOfType } from './createResourceOfType.js';
 
 export type ProjectInfo = SchemaProjectInfo;
 export type ProjectInfoResourceType = RmResourceType;

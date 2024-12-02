@@ -115,7 +115,7 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
               name="name"
               state={state}
               error={!state.valid}
-              disabled={state.projectId === null}
+              readOnly={state.projectId === null}
               description={errorMessage}
               onChange={state.validate}
             >

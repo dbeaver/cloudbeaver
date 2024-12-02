@@ -7,8 +7,8 @@
  */
 import { createPath, getPathParts } from '@cloudbeaver/core-utils';
 
-import type { ICachedResourceMetadata } from '../ICachedResourceMetadata';
-import type { ICachedTreeElement } from './ICachedTreeElement';
+import type { ICachedResourceMetadata } from '../ICachedResourceMetadata.js';
+import type { ICachedTreeElement } from './ICachedTreeElement.js';
 
 export function getTreeValue<TValue, TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata>(
   data: ICachedTreeElement<TValue, TMetadata>,
@@ -32,7 +32,7 @@ export function getTreeValue<TValue, TMetadata extends ICachedResourceMetadata =
   let currentNodePath = '';
 
   for (let i = 0; i < paths.length; ++i) {
-    const key = paths[i];
+    const key = paths[i]!;
     currentNodePath = createPath(currentNodePath, key);
     let next = current.children[key];
     if (next === undefined) {

@@ -7,17 +7,17 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useLayoutEffect, useMemo, useRef } from 'react';
-import { DialogBackdrop } from 'reakit/Dialog';
+import { DialogBackdrop } from 'reakit';
 
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogInternal } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, type DialogInternal } from '@cloudbeaver/core-dialogs';
 
-import { ErrorBoundary } from '../ErrorBoundary';
-import { Loader } from '../Loader/Loader';
-import { s } from '../s';
-import { useObjectRef } from '../useObjectRef';
-import { useS } from '../useS';
-import { DialogContext, IDialogContext } from './DialogContext';
+import { ErrorBoundary } from '../ErrorBoundary.js';
+import { Loader } from '../Loader/Loader.js';
+import { s } from '../s.js';
+import { useObjectRef } from '../useObjectRef.js';
+import { useS } from '../useS.js';
+import { DialogContext, type IDialogContext } from './DialogContext.js';
 import style from './DialogsPortal.module.css';
 
 export const DialogsPortal = observer(function DialogsPortal() {

@@ -5,10 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import type { schema } from '@cloudbeaver/core-utils';
 
-import type { ISettingChangeData, ISettingsSource } from './ISettingsSource';
+import type { ISettingChangeData, ISettingsSource } from './ISettingsSource.js';
 
 export class SettingsProvider<TSchema extends schema.SomeZodObject = any> implements ISettingsSource {
   readonly onChange: ISyncExecutor<ISettingChangeData<keyof schema.infer<TSchema>>>;
@@ -52,7 +52,7 @@ export class SettingsProvider<TSchema extends schema.SomeZodObject = any> implem
     }
 
     if (key in this.schema.shape) {
-      const schema = this.schema.shape[key as any];
+      const schema = this.schema.shape[key as any]!;
       const result = schema.safeParse(value);
 
       if (result.success) {

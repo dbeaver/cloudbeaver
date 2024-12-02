@@ -10,8 +10,8 @@ import { useEffect } from 'react';
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import type { IView } from './IView';
-import { ViewService } from './ViewService';
+import type { IView } from './IView.js';
+import { ViewService } from './ViewService.js';
 
 interface IViewController {
   focusView: () => void;

@@ -1,9 +1,6 @@
 name: Frontend Build
 
 on:
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
   # Allows you to reuse workflows by referencing their YAML files
   workflow_call:
     outputs:
@@ -20,8 +17,11 @@ on:
 
 jobs:
   frontend-build:
-    name: Frontend
+    name: Build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
 
     outputs:
       build-status: ${{ steps.build.outcome }}
@@ -34,6 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - run: corepack enable
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -58,34 +59,18 @@ jobs:
 
       - name: yarn clean
         if: env.skip_cache == 'true'
-        uses: borales/actions-yarn@v5
-        with:
-          dir: webapp
-          cmd: clean
+        run: yarn clear
 
-      - name: yarn install --frozen-lockfile
-        uses: borales/actions-yarn@v5
-        with:
-          dir: webapp
-          cmd: install
+      - run: yarn install --immutable
 
-      - name: build
-        id: build
-        uses: borales/actions-yarn@v5
-        with:
-          dir: webapp/packages/product-default
-          cmd: bundle
+      - run: yarn bundle
+        working-directory: ./webapp/packages/product-default
 
-      - name: test
-        id: test
-        uses: borales/actions-yarn@v5
-        with:
-          dir: webapp
-          cmd: test
+      - run: yarn test
 
-      - name: Archive build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build-artifacts
-          path: webapp/packages/product-default/lib
-          if-no-files-found: error
+      # - name: Archive build artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: frontend-build-artifacts
+      #     path: webapp/packages/product-default/lib
+      #     if-no-files-found: error

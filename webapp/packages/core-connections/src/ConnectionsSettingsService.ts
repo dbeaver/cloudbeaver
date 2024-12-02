@@ -32,13 +32,17 @@ export class ConnectionsSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
-      // {
-      //   group: CONNECTIONS_SETTINGS_GROUP,
-      //   key: 'disabled',
-      //   name: 'Disable',
-      //   type: ESettingsValueType.Checkbox,
-      // },
-    ]);
+    // this.settingsManagerService.registerSettings(this.settings, () => [
+    //   {
+    //     group: CONNECTIONS_SETTINGS_GROUP,
+    //     key: 'core.connections.disabled',
+    //     access: {
+    //       scope: ['server'],
+    //     },
+    //     name: 'core_connections_settings_disable',
+    //     description: 'core_connections_settings_disable_description',
+    //     type: ESettingsValueType.Checkbox,
+    //   },
+    // ]);
   }
 }

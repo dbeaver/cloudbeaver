@@ -10,12 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { Button, Container, Form, getComputed, s, StatusMessage, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
-import { TabList } from '../../Tabs/TabList';
-import { TabPanelList } from '../../Tabs/TabPanelList';
-import { TabsState } from '../../Tabs/TabsState';
-import { FormMode } from '../FormMode';
+import { TabList } from '../../Tabs/TabList.js';
+import { TabPanelList } from '../../Tabs/TabPanelList.js';
+import { TabsState } from '../../Tabs/TabsState.js';
+import { FormMode } from '../FormMode.js';
 import style from './BaseForm.module.css';
-import type { IBaseFormProps } from './IBaseFormProps';
+import type { IBaseFormProps } from './IBaseFormProps.js';
 
 export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ service, state, onClose, onSubmit }) {
   const styles = useS(style);

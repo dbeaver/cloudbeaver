@@ -7,12 +7,12 @@
  */
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { IExecutor } from '@cloudbeaver/core-executor';
-import { TLocalizationToken } from '@cloudbeaver/core-localization';
+import { type TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
-import type { IDatabaseDataActions } from './IDatabaseDataActions';
-import type { IDatabaseDataResult } from './IDatabaseDataResult';
+import type { IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction.js';
+import type { IDatabaseDataActions } from './IDatabaseDataActions.js';
+import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 
 export enum DatabaseDataSourceOperation {
   /** Abstract operation with data, should not lead to data lost */

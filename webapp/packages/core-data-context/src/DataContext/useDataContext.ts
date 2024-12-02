@@ -7,9 +7,9 @@
  */
 import { useLayoutEffect, useState } from 'react';
 
-import { DataContext } from './DataContext';
-import type { IDataContext } from './IDataContext';
-import type { IDataContextProvider } from './IDataContextProvider';
+import { DataContext } from './DataContext.js';
+import type { IDataContext } from './IDataContext.js';
+import type { IDataContextProvider } from './IDataContextProvider.js';
 
 export function useDataContext(fallback?: IDataContextProvider): IDataContext {
   const [context] = useState(() => new DataContext());

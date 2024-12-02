@@ -9,10 +9,10 @@ import { observable } from 'mobx';
 
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataAction } from '../DatabaseDataAction';
-import type { IDatabaseDataResult } from '../IDatabaseDataResult';
-import type { IDatabaseDataSource } from '../IDatabaseDataSource';
-import { databaseDataAction } from './DatabaseDataActionDecorator';
+import { DatabaseDataAction } from '../DatabaseDataAction.js';
+import type { IDatabaseDataResult } from '../IDatabaseDataResult.js';
+import type { IDatabaseDataSource } from '../IDatabaseDataSource.js';
+import { databaseDataAction } from './DatabaseDataActionDecorator.js';
 
 export interface IDatabaseRefreshState {
   interval: number;
@@ -71,7 +71,7 @@ export class DatabaseRefreshAction<TResult extends IDatabaseDataResult> extends 
     this.state.paused = false;
   }
 
-  dispose(): void {
+  override dispose(): void {
     this.stopTimer();
   }
 

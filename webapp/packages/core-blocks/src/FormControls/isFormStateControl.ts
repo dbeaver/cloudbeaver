@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IFormStateControl } from './IFormStateControl';
+import type { IFormStateControl } from './IFormStateControl.js';
 
 export function isFormStateControl<TState extends Record<string, any>, TKey extends keyof TState>(
   props: any,

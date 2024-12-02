@@ -8,20 +8,20 @@
 import { action, makeObservable, observable, toJS } from 'mobx';
 
 import type { IServiceProvider } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, IExecutor, ITask, Task } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, type IExecutor, type ITask, Task } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataActions } from './DatabaseDataActions';
-import type { IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
-import type { IDatabaseDataActions } from './IDatabaseDataActions';
-import type { IDatabaseDataResult } from './IDatabaseDataResult';
+import { DatabaseDataActions } from './DatabaseDataActions.js';
+import type { IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction.js';
+import type { IDatabaseDataActions } from './IDatabaseDataActions.js';
+import type { IDatabaseDataResult } from './IDatabaseDataResult.js';
 import {
   DatabaseDataAccessMode,
   DatabaseDataSourceOperation,
-  IDatabaseDataSource,
-  IDatabaseDataSourceOperationEvent,
-  IRequestInfo,
-} from './IDatabaseDataSource';
+  type IDatabaseDataSource,
+  type IDatabaseDataSourceOperationEvent,
+  type IRequestInfo,
+} from './IDatabaseDataSource.js';
 
 export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseDataResult> implements IDatabaseDataSource<TOptions, TResult> {
   access: DatabaseDataAccessMode;
@@ -118,7 +118,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       if (!this.hasResult(resultIndex)) {
         return undefined;
       }
-      return this.actions.tryGet(this.results[resultIndex], action);
+      return this.actions.tryGet(this.results[resultIndex]!, action);
     }
 
     return this.actions.tryGet(resultIndex, action);
@@ -131,7 +131,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       if (!this.hasResult(resultIndex)) {
         throw new Error('Result index out of range');
       }
-      return this.actions.get(this.results[resultIndex], action);
+      return this.actions.get(this.results[resultIndex]!, action);
     }
 
     return this.actions.get(resultIndex, action);
@@ -150,7 +150,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       if (!this.hasResult(resultIndex)) {
         return undefined;
       }
-      return this.actions.getImplementation(this.results[resultIndex], action);
+      return this.actions.getImplementation(this.results[resultIndex]!, action);
     }
 
     return this.actions.getImplementation(resultIndex, action);
@@ -168,7 +168,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   getResult(index: number): TResult | null {
     if (this.results.length > index) {
-      return this.results[index];
+      return this.results[index]!;
     }
 
     return null;
@@ -246,7 +246,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.supportedDataFormats = dataFormats;
 
     if (!this.supportedDataFormats.includes(this.dataFormat)) {
-      this.dataFormat = dataFormats[0]; // set's default format based on supported list, but maybe should be moved to separate method
+      this.dataFormat = dataFormats[0]!; // set's default format based on supported list, but maybe should be moved to separate method
     }
     return this;
   }

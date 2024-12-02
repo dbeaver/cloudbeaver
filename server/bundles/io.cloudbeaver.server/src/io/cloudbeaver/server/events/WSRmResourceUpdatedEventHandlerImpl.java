@@ -53,13 +53,13 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSAbstractProjectEventH
         if (eventType == WSEventType.RM_RESOURCE_CREATED) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_ADD,
-                    project.getRmProject(),
+                    project.getRMProject(),
                     resourcePath)
             );
         } else if (eventType == WSEventType.RM_RESOURCE_DELETED) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_DELETE,
-                    project.getRmProject(),
+                    project.getRMProject(),
                     resourcePath)
             );
         }

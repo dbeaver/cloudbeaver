@@ -8,7 +8,7 @@
 import { Fill, importLazyComponent, PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
-const ConfigurationWizardTitle = importLazyComponent(() => import('./ConfigurationWizardTitle').then(m => m.ConfigurationWizardTitle));
+const ConfigurationWizardTitle = importLazyComponent(() => import('./ConfigurationWizardTitle.js').then(m => m.ConfigurationWizardTitle));
 
 @injectable()
 export class WizardTopAppBarService {

@@ -11,14 +11,14 @@ import { UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authent
 import { Container, Group, InfoItem, Loader, s, TextPlaceholder, useAutoLoad, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
-import type { ITeamFormProps } from '../ITeamFormProps';
-import { GrantedUserList } from './GrantedUserList';
+import type { ITeamFormProps } from '../ITeamFormProps.js';
+import { GrantedUserList } from './GrantedUserList.js';
 import style from './GrantedUsers.module.css';
-import type { IGrantedUser } from './IGrantedUser';
-import { useGrantedUsers } from './useGrantedUsers';
-import { UserList } from './UserList';
+import type { IGrantedUser } from './IGrantedUser.js';
+import { useGrantedUsers } from './useGrantedUsers.js';
+import { UserList } from './UserList.js';
 
 export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer(function GrantedUsers({ tabId, state: formState }) {
   const styles = useS(style);
@@ -55,9 +55,11 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
 
   if (isDefaultTeam) {
     return (
-      <Container className={s(styles, { box: true })} parent gap vertical>
-        <Group className={s(styles, { placeholderBox: true })} keepSize large>
-          <TextPlaceholder>{translate('plugin_authentication_administration_team_default_users_tooltip')}</TextPlaceholder>
+      <Container>
+        <Group large>
+          <TextPlaceholder className={s(styles, { placeholder: true })}>
+            {translate('plugin_authentication_administration_team_default_users_tooltip')}
+          </TextPlaceholder>
         </Group>
       </Container>
     );
@@ -66,10 +68,12 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
   return (
     <Loader className={s(styles, { loader: true })} state={[state.state]}>
       {() => (
-        <Container className={s(styles, { box: true })} parent gap vertical>
+        <Container className={s(styles, { box: true })} parent={!!users.resource.values.length} gap vertical>
           {!users.resource.values.length ? (
-            <Group className={s(styles, { placeholderBox: true })} keepSize large>
-              <TextPlaceholder>{translate('administration_teams_team_granted_users_empty')}</TextPlaceholder>
+            <Group large>
+              <TextPlaceholder className={s(styles, { placeholder: true })}>
+                {translate('administration_teams_team_granted_users_empty')}
+              </TextPlaceholder>
             </Group>
           ) : (
             <>

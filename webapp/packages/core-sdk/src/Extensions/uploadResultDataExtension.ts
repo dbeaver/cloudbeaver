@@ -7,8 +7,8 @@
  */
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
-import type { CustomGraphQLClient, UploadProgressEvent } from '../CustomGraphQLClient';
-import type { AsyncTaskInfo } from '../sdk';
+import type { CustomGraphQLClient, UploadProgressEvent } from '../CustomGraphQLClient.js';
+import type { AsyncTaskInfo } from '../sdk.js';
 
 export interface IUploadResultDataExtension {
   uploadResultData: (

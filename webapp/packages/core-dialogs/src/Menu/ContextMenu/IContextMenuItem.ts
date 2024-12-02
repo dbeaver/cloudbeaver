@@ -7,8 +7,8 @@
  */
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
-import type { IMenuItemOptions } from '../models/MenuOptionsStore';
-import type { IMenuContext } from './IMenuContext';
+import type { IMenuItemOptions } from '../models/MenuOptionsStore.js';
+import type { IMenuContext } from './IMenuContext.js';
 
 /**
  * Options allow to create context menu item

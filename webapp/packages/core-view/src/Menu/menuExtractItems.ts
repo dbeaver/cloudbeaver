@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IAction } from '../Action/IAction';
-import type { MenuCreatorItem } from './IMenuItemsCreator';
-import type { IMenuItem } from './MenuItem/IMenuItem';
+import type { IAction } from '../Action/IAction.js';
+import type { MenuCreatorItem } from './IMenuItemsCreator.js';
+import type { IMenuItem } from './MenuItem/IMenuItem.js';
 
 type MenuItem = IMenuItem | IAction;
 

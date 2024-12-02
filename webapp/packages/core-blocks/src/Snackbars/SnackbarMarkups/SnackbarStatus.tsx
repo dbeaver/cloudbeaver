@@ -7,10 +7,10 @@
  */
 import { ENotificationType } from '@cloudbeaver/core-events';
 
-import { Loader } from '../../Loader/Loader';
-import { s } from '../../s';
-import { useS } from '../../useS';
-import { NotificationMark } from '../NotificationMark';
+import { Loader } from '../../Loader/Loader.js';
+import { s } from '../../s.js';
+import { useS } from '../../useS.js';
+import { NotificationMark } from '../NotificationMark.js';
 import style from './SnackbarStatus.module.css';
 
 interface SnackbarStatusProps {
@@ -22,7 +22,7 @@ export const SnackbarStatus: React.FC<SnackbarStatusProps> = function SnackbarSt
   const styles = useS(style);
   return status === ENotificationType.Loading ? (
     <div className={s(styles, { loaderContainer: true }, className)}>
-      <Loader className={styles.loader} hideMessage />
+      <Loader className={styles['loader']} hideMessage />
     </div>
   ) : (
     <NotificationMark className={s(styles, { notificationMark: true }, className)} type={status} />

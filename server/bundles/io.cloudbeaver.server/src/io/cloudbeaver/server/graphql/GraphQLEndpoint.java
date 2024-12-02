@@ -31,8 +31,6 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
-import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.HttpConstants;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
@@ -53,22 +51,20 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class GraphQLEndpoint extends HttpServlet {
 
     private static final Log log = Log.getLog(GraphQLEndpoint.class);
 
+    private static final boolean DEBUG = true;
+
     private static final String HEADER_ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
     private static final String HEADER_ACCESS_CONTROL_ALLOW_HEADERS = "Access-Control-Allow-Headers";
     private static final String HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials";
 
     private static final String CORE_SCHEMA_FILE_NAME = "schema/schema.graphqls";
-
     private final GraphQL graphQL;
 
     private static final Gson gson = new GsonBuilder()
@@ -253,8 +249,13 @@ public class GraphQLEndpoint extends HttpServlet {
 //                    apiCall += " (" + variables + ")";
 //                }
 //            }
+            String sessionId = GraphQLLoggerUtil.getSessionId(request);
+            String userId = GraphQLLoggerUtil.getUserId(request);
+            String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, variables);
             if (apiCall != null) {
-                log.debug("API > " + apiCall);
+                log.debug("API > " + apiCall + loggerMessage);
+            } else if (DEBUG) {
+                log.debug("API > " + query + loggerMessage);
             }
         }
         ExecutionInput executionInput = contextBuilder.build();

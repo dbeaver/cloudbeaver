@@ -11,9 +11,9 @@ import { EventTableItemSelectionFlag, TableColumnValue, TableItem } from '@cloud
 import { EventContext } from '@cloudbeaver/core-events';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
-import type { IExecutionPlanNode } from './ExecutionPlanTreeContext';
-import { Expand } from './Expand';
-import { getPropertyValue } from './getPropertyValue';
+import type { IExecutionPlanNode } from './ExecutionPlanTreeContext.js';
+import { Expand } from './Expand.js';
+import { getPropertyValue } from './getPropertyValue.js';
 import classes from './NestedNode.module.css';
 
 interface Props {
@@ -40,12 +40,12 @@ export const NestedNode: React.FC<Props> = function NestedNode({ columns, node, 
           const property = node.properties.find(property => property.id === column.id);
           const value = property ? getPropertyValue(property) : '';
           return (
-            <TableColumnValue key={`${property?.id}_${depth}`} title={value || undefined} className={classes.tableColumnValue}>
-              <div className={classes.control}>
+            <TableColumnValue key={`${property?.id}_${depth}`} title={value || undefined} className={classes['tableColumnValue']}>
+              <div className={classes['control']}>
                 {idx === 0 && (
                   <>
                     <span>{`${'\t'.repeat(depth)}`}</span>
-                    <div className={classes.expandContainer}>{hasChildren && <Expand expanded={expanded} onClick={expand} />}</div>
+                    <div className={classes['expandContainer']}>{hasChildren && <Expand expanded={expanded} onClick={expand} />}</div>
                   </>
                 )}
                 {value}

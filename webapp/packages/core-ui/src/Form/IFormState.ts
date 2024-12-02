@@ -10,9 +10,9 @@ import type { ENotificationType } from '@cloudbeaver/core-events';
 import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
-import type { FormBaseService } from './FormBaseService';
-import type { FormMode } from './FormMode';
-import type { IFormPart } from './IFormPart';
+import type { FormBaseService } from './FormBaseService.js';
+import type { FormMode } from './FormMode.js';
+import type { IFormPart } from './IFormPart.js';
 
 export interface IFormState<TState> {
   readonly id: string;
@@ -30,8 +30,8 @@ export interface IFormState<TState> {
   readonly statusMessage: string | string[] | null;
   readonly statusType: ENotificationType | null;
 
+  readonly loadedTask: IExecutor<IFormState<TState>>;
   readonly formStateTask: IExecutor<TState>;
-  readonly fillDefaultConfigTask: IExecutor<IFormState<TState>>;
   readonly submitTask: IExecutor<IFormState<TState>>;
   readonly formatTask: IExecutor<IFormState<TState>>;
   readonly validationTask: IExecutor<IFormState<TState>>;

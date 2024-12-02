@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { ClickableOptions, Clickable as MantineClickable } from 'reakit';
+import { type ClickableOptions, Clickable as ReakitClickable } from 'reakit';
 
-import type { ReakitProxyComponent, ReakitProxyComponentOptions } from './Menu/ReakitProxyComponent';
+import type { ReakitProxyComponent, ReakitProxyComponentOptions } from './Menu/ReakitProxyComponent.js';
 
 export const Clickable: ReakitProxyComponent<'button', ClickableOptions> = observer<ReakitProxyComponentOptions<'button', ClickableOptions>>(
   function Clickable({ children, ...rest }) {
-    const Component = MantineClickable;
+    const Component = ReakitClickable;
 
     return <Component {...rest}>{children}</Component>;
   },

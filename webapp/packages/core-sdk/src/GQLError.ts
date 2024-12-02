@@ -9,7 +9,7 @@
 /// <reference path="types.d.ts" />
 import { ClientError } from 'graphql-request';
 
-import { DetailsError } from './DetailsError';
+import { DetailsError } from './DetailsError.js';
 
 export class GQLError extends DetailsError {
   response: ClientError['response'];
@@ -20,8 +20,8 @@ export class GQLError extends DetailsError {
   constructor(clientError: ClientError) {
     let message = clientError.message;
 
-    if (typeof clientError.response.error === 'string') {
-      message = clientError.response.error;
+    if (typeof clientError.response['error'] === 'string') {
+      message = clientError.response['error'];
     } else if (clientError.response.errors && clientError.response.errors.length > 0) {
       message = clientError.response.errors.map(e => e.message).join('\n');
     } else {
@@ -33,7 +33,7 @@ export class GQLError extends DetailsError {
     this.response = clientError.response;
     this.request = clientError.request;
 
-    if (typeof clientError.response.error === 'string') {
+    if (typeof clientError.response['error'] === 'string') {
       this.isTextBody = true;
     } else {
       const firstError = clientError.response.errors?.[0];
@@ -41,7 +41,7 @@ export class GQLError extends DetailsError {
     }
   }
 
-  hasDetails(): boolean {
+  override hasDetails(): boolean {
     return this.response.errors?.some(error => !!error.extensions) || false;
   }
 }

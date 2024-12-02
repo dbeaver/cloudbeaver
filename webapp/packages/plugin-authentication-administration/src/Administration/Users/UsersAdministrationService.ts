@@ -8,26 +8,26 @@
 import React from 'react';
 
 import { AdministrationItemService } from '@cloudbeaver/core-administration';
-import { AdminUser, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { type AdminUser, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { CreateTeamService } from './Teams/CreateTeamService';
-import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
-import { CreateUserService } from './UsersTable/CreateUserService';
+import { CreateTeamService } from './Teams/CreateTeamService.js';
+import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService.js';
+import { CreateUserService } from './UsersTable/CreateUserService.js';
 
 const UserCredentialsList = React.lazy(async () => {
-  const { UserCredentialsList } = await import('./UsersTable/UserCredentialsList');
+  const { UserCredentialsList } = await import('./UsersTable/UserCredentialsList.js');
   return { default: UserCredentialsList };
 });
 
 const UsersDrawerItem = React.lazy(async () => {
-  const { UsersDrawerItem } = await import('./UsersDrawerItem');
+  const { UsersDrawerItem } = await import('./UsersDrawerItem.js');
   return { default: UsersDrawerItem };
 });
 
 const UsersAdministration = React.lazy(async () => {
-  const { UsersAdministration } = await import('./UsersAdministration');
+  const { UsersAdministration } = await import('./UsersAdministration.js');
   return { default: UsersAdministration };
 });
 
@@ -49,7 +49,7 @@ export class UsersAdministrationService extends Bootstrap {
     super();
   }
 
-  register() {
+  override register() {
     this.administrationItemService.create({
       name: UsersAdministrationNavigationService.ItemName,
       order: 4,
@@ -77,8 +77,6 @@ export class UsersAdministrationService extends Bootstrap {
     });
     this.userDetailsInfoPlaceholder.add(UserCredentialsList, 0);
   }
-
-  load(): void | Promise<void> {}
 
   private async cancelCreate(param: string | null, configurationWizard: boolean, outside: boolean) {
     if (param === 'create') {

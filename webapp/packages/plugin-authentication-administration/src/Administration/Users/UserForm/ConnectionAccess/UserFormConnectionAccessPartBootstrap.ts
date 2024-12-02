@@ -11,11 +11,11 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
-import { AdministrationUserFormService } from '../AdministrationUserFormService';
-import { getUserFormConnectionAccessPart } from './getUserFormConnectionAccessPart';
+import { AdministrationUserFormService } from '../AdministrationUserFormService.js';
+import { getUserFormConnectionAccessPart } from './getUserFormConnectionAccessPart.js';
 
 const UserFormConnectionAccessPanel = React.lazy(async () => {
-  const { UserFormConnectionAccessPanel } = await import('./UserFormConnectionAccessPanel');
+  const { UserFormConnectionAccessPanel } = await import('./UserFormConnectionAccessPanel.js');
   return { default: UserFormConnectionAccessPanel };
 });
 
@@ -28,7 +28,7 @@ export class UserFormConnectionAccessPartBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.administrationUserFormService.parts.add({
       key: 'connections_access',
       name: 'authentication_administration_user_connections_access',
@@ -40,6 +40,4 @@ export class UserFormConnectionAccessPartBootstrap extends Bootstrap {
       getLoader: () => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
     });
   }
-
-  load(): void {}
 }

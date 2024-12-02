@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/core-localization",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -24,6 +25,8 @@
   },
   "peerDependencies": {},
   "devDependencies": {
+    "@jest/globals": "^29",
+    "@types/jest": "^29",
     "typescript": "^5"
   }
 }

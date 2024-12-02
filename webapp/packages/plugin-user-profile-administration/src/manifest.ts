@@ -12,5 +12,5 @@ export const userProfileAdministrationPlugin: PluginManifest = {
     name: 'User profile administration plugin',
   },
 
-  providers: [() => import('./PluginBootstrap').then(m => m.PluginBootstrap)],
+  providers: [() => import('./PluginBootstrap.js').then(m => m.PluginBootstrap)],
 };

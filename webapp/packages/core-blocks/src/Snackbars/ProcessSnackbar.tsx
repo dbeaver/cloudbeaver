@@ -8,18 +8,18 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 
-import { ENotificationType, INotificationProcessExtraProps, NotificationComponent } from '@cloudbeaver/core-events';
+import { ENotificationType, type INotificationProcessExtraProps, type NotificationComponent } from '@cloudbeaver/core-events';
 
-import { Button } from '../Button';
-import { useTranslate } from '../localization/useTranslate';
-import { useActivationDelay } from '../useActivationDelay';
-import { useErrorDetails } from '../useErrorDetails';
-import { useStateDelay } from '../useStateDelay';
-import { SnackbarBody } from './SnackbarMarkups/SnackbarBody';
-import { SnackbarContent } from './SnackbarMarkups/SnackbarContent';
-import { SnackbarFooter } from './SnackbarMarkups/SnackbarFooter';
-import { SnackbarStatus } from './SnackbarMarkups/SnackbarStatus';
-import { SnackbarWrapper } from './SnackbarMarkups/SnackbarWrapper';
+import { Button } from '../Button.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { useActivationDelay } from '../useActivationDelay.js';
+import { useErrorDetails } from '../useErrorDetails.js';
+import { useStateDelay } from '../useStateDelay.js';
+import { SnackbarBody } from './SnackbarMarkups/SnackbarBody.js';
+import { SnackbarContent } from './SnackbarMarkups/SnackbarContent.js';
+import { SnackbarFooter } from './SnackbarMarkups/SnackbarFooter.js';
+import { SnackbarStatus } from './SnackbarMarkups/SnackbarStatus.js';
+import { SnackbarWrapper } from './SnackbarMarkups/SnackbarWrapper.js';
 
 export interface ProcessSnackbarProps extends INotificationProcessExtraProps {
   closeDelay?: number;

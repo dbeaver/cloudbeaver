@@ -12,5 +12,5 @@ export const coreBlocksManifest: PluginManifest = {
     name: 'Core Blocks',
   },
 
-  providers: [() => import('./BlocksLocaleService').then(m => m.BlocksLocaleService)],
+  providers: [() => import('./BlocksLocaleService.js').then(m => m.BlocksLocaleService)],
 };

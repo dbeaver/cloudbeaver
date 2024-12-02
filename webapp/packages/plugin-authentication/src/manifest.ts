@@ -13,10 +13,10 @@ export const manifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./AuthenticationService').then(m => m.AuthenticationService),
-    () => import('./Dialog/AuthDialogService').then(m => m.AuthDialogService),
-    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
-    () => import('./AuthenticationLocaleService').then(m => m.AuthenticationLocaleService),
-    () => import('./UserLoadingErrorDialogBootstrap').then(m => m.UserLoadingErrorDialogBootstrap),
+    () => import('./AuthenticationService.js').then(m => m.AuthenticationService),
+    () => import('./Dialog/AuthDialogService.js').then(m => m.AuthDialogService),
+    () => import('./PluginBootstrap.js').then(m => m.PluginBootstrap),
+    () => import('./AuthenticationLocaleService.js').then(m => m.AuthenticationLocaleService),
+    () => import('./UserLoadingErrorDialogBootstrap.js').then(m => m.UserLoadingErrorDialogBootstrap),
   ],
 };

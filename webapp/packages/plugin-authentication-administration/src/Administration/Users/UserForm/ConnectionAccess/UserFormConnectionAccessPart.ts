@@ -8,11 +8,11 @@
 import type { UsersResource } from '@cloudbeaver/core-authentication';
 import { isGlobalProject, type ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { type AdminConnectionGrantInfo, AdminSubjectType } from '@cloudbeaver/core-sdk';
-import { FormMode, FormPart, IFormState } from '@cloudbeaver/core-ui';
+import { FormMode, FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-import type { IUserFormState } from '../AdministrationUserFormService';
-import type { UserFormInfoPart } from '../Info/UserFormInfoPart';
+import type { IUserFormState } from '../AdministrationUserFormService.js';
+import type { UserFormInfoPart } from '../Info/UserFormInfoPart.js';
 
 export class UserFormConnectionAccessPart extends FormPart<AdminConnectionGrantInfo[], IUserFormState> {
   constructor(
@@ -24,7 +24,7 @@ export class UserFormConnectionAccessPart extends FormPart<AdminConnectionGrantI
     super(formState, []);
   }
 
-  get isChanged(): boolean {
+  override get isChanged(): boolean {
     if (!this.loaded) {
       return false;
     }

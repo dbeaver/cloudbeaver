@@ -7,7 +7,7 @@
  */
 import { uuid } from '@cloudbeaver/core-utils';
 
-import type { ISynchronizationMessage, ISynchronizationMessageResolveCallback } from './ISynchronizationMessage';
+import type { ISynchronizationMessage, ISynchronizationMessageResolveCallback } from './ISynchronizationMessage.js';
 
 export class SynchronizationMessage implements ISynchronizationMessage {
   readonly id: string;

@@ -1,0 +1,16 @@
+fragment OriginDetails on ObjectOrigin {
+  details {
+    id
+    required
+    displayName
+    description
+    category
+    dataType
+    defaultValue
+    validValues
+    value
+    length
+    features
+    order
+  }
+}

@@ -43,4 +43,10 @@ export default [
   ['plugin_sql_editor_action_overlay_title', '需要操作'],
   ['plugin_sql_editor_action_overlay_description', '请重新打开编辑器继续工作。'],
   ['plugin_sql_editor_action_close_group', '关闭所有相同查询'],
+  ['plugin_sql_editor_settings_disable', 'Disable'],
+  ['plugin_sql_editor_settings_disable_description', 'Disable SQL editor for all users'],
+  ['plugin_sql_editor_settings_import_max_size', 'Import limit (KB)'],
+  ['plugin_sql_editor_settings_import_max_size_description', 'Maximum file size that can be imported in KB'],
+  ['plugin_sql_editor_settings_auto_save', 'Auto save'],
+  ['plugin_sql_editor_settings_auto_save_description', 'Automatically save the editor content'],
 ];

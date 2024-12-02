@@ -8,15 +8,15 @@
 import type { DialogComponent, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
-import { Button } from '../Button';
-import { Fill } from '../Fill';
-import { Translate } from '../localization/Translate';
-import { s } from '../s';
-import { useS } from '../useS';
-import { CommonDialogBody } from './CommonDialog/CommonDialogBody';
-import { CommonDialogFooter } from './CommonDialog/CommonDialogFooter';
-import { CommonDialogHeader } from './CommonDialog/CommonDialogHeader';
-import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper';
+import { Button } from '../Button.js';
+import { Fill } from '../Fill.js';
+import { Translate } from '../localization/Translate.js';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
+import { CommonDialogBody } from './CommonDialog/CommonDialogBody.js';
+import { CommonDialogFooter } from './CommonDialog/CommonDialogFooter.js';
+import { CommonDialogHeader } from './CommonDialog/CommonDialogHeader.js';
+import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper.js';
 import style from './ConfirmationDialog.module.css';
 
 export interface ConfirmationDialogPayload {

@@ -13,7 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { AdminSubjectType } from '@cloudbeaver/core-sdk';
 import { useTabState } from '@cloudbeaver/core-ui';
 
-import type { UserFormConnectionAccessPart } from './UserFormConnectionAccessPart';
+import type { UserFormConnectionAccessPart } from './UserFormConnectionAccessPart.js';
 
 interface Props {
   connection: Connection;

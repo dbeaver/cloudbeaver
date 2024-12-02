@@ -9,7 +9,7 @@ import { ComplexLoader, createComplexLoader } from '@cloudbeaver/core-blocks';
 import type { IDataPresentationProps } from '@cloudbeaver/plugin-data-viewer';
 
 const loader = createComplexLoader(async function loader() {
-  const { DataGridTable } = await import('./DataGridTable');
+  const { DataGridTable } = await import('./DataGridTable.js');
   return { DataGridTable };
 });
 

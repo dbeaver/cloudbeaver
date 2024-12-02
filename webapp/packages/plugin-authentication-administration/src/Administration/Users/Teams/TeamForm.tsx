@@ -26,11 +26,11 @@ import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType } from '@cloudbeaver/core-events';
 import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
-import { teamContext } from './Contexts/teamContext';
-import type { ITeamFormState } from './ITeamFormProps';
+import { teamContext } from './Contexts/teamContext.js';
+import type { ITeamFormState } from './ITeamFormProps.js';
 import style from './TeamForm.module.css';
-import { ITeamFormActionsContext, TeamFormActionsContext } from './TeamFormActionsContext';
-import { TeamFormService } from './TeamFormService';
+import { type ITeamFormActionsContext, TeamFormActionsContext } from './TeamFormActionsContext.js';
+import { TeamFormService } from './TeamFormService.js';
 
 interface Props {
   state: ITeamFormState;

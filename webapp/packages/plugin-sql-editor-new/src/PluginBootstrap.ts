@@ -7,7 +7,7 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { SQLCodeEditorPanelService } from './SQLEditor/SQLCodeEditorPanel/SQLCodeEditorPanelService';
+import { SQLCodeEditorPanelService } from './SQLEditor/SQLCodeEditorPanel/SQLCodeEditorPanelService.js';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -15,9 +15,7 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.sqlCodeEditorPanelService.registerPanel();
   }
-
-  load(): void | Promise<void> {}
 }

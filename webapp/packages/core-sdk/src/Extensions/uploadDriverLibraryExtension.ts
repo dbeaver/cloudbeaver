@@ -7,7 +7,7 @@
  */
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
-import type { CustomGraphQLClient, UploadProgressEvent } from '../CustomGraphQLClient';
+import type { CustomGraphQLClient, UploadProgressEvent } from '../CustomGraphQLClient.js';
 
 export interface IUploadDriverLibraryExtension {
   uploadDriverLibrary: (driverId: string, files: File[], onUploadProgress?: (event: UploadProgressEvent) => void) => Promise<void>;

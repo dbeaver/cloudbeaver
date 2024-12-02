@@ -97,6 +97,7 @@ export default [
   ['administration_identity_providers_wizard_description', 'Добавьте провайдеры идентификации'],
   ['administration_identity_providers_configuration_add', 'Создание конфигурации'],
   ['administration_identity_providers_choose_provider_placeholder', 'Выберите провайдер...'],
+  ['administration_identity_providers_choose_provider_placeholder_empty', 'Нет доступных провайдеров'],
   ['administration_identity_providers_add_tooltip', 'Добавить новую конфигурацию'],
   ['administration_identity_providers_refresh_tooltip', 'Обновить список конфигураций'],
   ['administration_identity_providers_delete_tooltip', 'Удалить выбранные конфигурации'],
@@ -149,4 +150,7 @@ export default [
     'plugin_authentication_administration_team_user_team_role_supervisor_description',
     'Супервайзеры могут просматривать выполненные запросы своей команды',
   ],
+
+  ['plugin_authentication_administration_team_form_edit_label', 'Форма редактирования команды'],
+  ['plugin_authentication_administration_user_form_edit_label', 'Форма редактирования пользователя'],
 ];

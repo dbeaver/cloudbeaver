@@ -12,8 +12,8 @@ import { useMemo } from 'react';
 import { Table, TableBody, TableColumnHeader, TableHeader, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyInfo, SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
 
-import { isVisibleProperty } from '../useExecutionPlanTreeState';
-import { PropertiesPanelItemsGroup } from './PropertiesPanelItemsGroup';
+import { isVisibleProperty } from '../useExecutionPlanTreeState.js';
+import { PropertiesPanelItemsGroup } from './PropertiesPanelItemsGroup.js';
 
 interface Props {
   selectedNode: string;

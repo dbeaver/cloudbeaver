@@ -7,7 +7,7 @@
  */
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 
-import { openCenteredPopup } from './openCenteredPopup';
+import { openCenteredPopup } from './openCenteredPopup.js';
 
 type WindowSpyType = jest.SpiedGetter<Window>;
 

@@ -13,8 +13,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { isDefined, isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { TabsContext } from './TabsContext';
-import { TabsValidationContext } from './TabsValidationContext';
+import { TabsContext } from './TabsContext.js';
+import { TabsValidationContext } from './TabsValidationContext.js';
 
 export const TabsValidationProvider = observer(function TabsValidation({ children }: React.PropsWithChildren) {
   const tabsContext = useContext(TabsContext);

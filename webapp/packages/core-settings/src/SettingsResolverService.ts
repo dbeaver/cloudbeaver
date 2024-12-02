@@ -7,7 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 
-import { SettingsResolverSource } from './SettingsResolverSource';
+import { SettingsResolverSource } from './SettingsResolverSource.js';
 
 @injectable()
 export class SettingsResolverService extends SettingsResolverSource {

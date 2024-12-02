@@ -1,12 +1,19 @@
-export * from './RESOURCE_MANAGER_SETTINGS_GROUP';
-export * from './SharedProjectsResource';
-export * from './ProjectPermissionsResource';
-export * from './ResourceManagerEventHandler';
-export * from './ResourceManagerResource';
-export * from './EProjectPermission';
-export * from './isRMNavNode';
-export * from './NAV_NODE_TYPE_RM_FOLDER';
-export * from './NAV_NODE_TYPE_RM_PROJECT';
-export * from './NAV_NODE_TYPE_RM_RESOURCE';
-export * from './RESOURCES_NODE_PATH';
-export { resourceManagerManifest } from './manifest';
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+export * from './RESOURCE_MANAGER_SETTINGS_GROUP.js';
+export * from './SharedProjectsResource.js';
+export * from './ProjectPermissionsResource.js';
+export * from './ResourceManagerEventHandler.js';
+export * from './ResourceManagerResource.js';
+export * from './EProjectPermission.js';
+export * from './isRMNavNode.js';
+export * from './NAV_NODE_TYPE_RM_FOLDER.js';
+export * from './NAV_NODE_TYPE_RM_PROJECT.js';
+export * from './NAV_NODE_TYPE_RM_RESOURCE.js';
+export * from './RESOURCES_NODE_PATH.js';
+export { resourceManagerManifest } from './manifest.js';

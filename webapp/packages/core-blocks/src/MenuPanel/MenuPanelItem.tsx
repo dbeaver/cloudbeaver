@@ -9,14 +9,14 @@ import { observer } from 'mobx-react-lite';
 
 import type { IMenuItem } from '@cloudbeaver/core-dialogs';
 
-import { Checkbox } from '../FormControls/Checkboxes/Checkbox';
-import { Radio } from '../FormControls/Radio';
-import { Icon } from '../Icon';
-import { IconOrImage } from '../IconOrImage';
-import { Loader } from '../Loader/Loader';
-import { useTranslate } from '../localization/useTranslate';
-import { s } from '../s';
-import { useS } from '../useS';
+import { Checkbox } from '../FormControls/Checkboxes/Checkbox.js';
+import { Radio } from '../FormControls/Radio.js';
+import { Icon } from '../Icon.js';
+import { IconOrImage } from '../IconOrImage.js';
+import { Loader } from '../Loader/Loader.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
 import MenuPanelItemAndTriggerStyles from './shared/MenuPanelItemAndTrigger.module.css';
 
 interface MenuPanelItemProps {

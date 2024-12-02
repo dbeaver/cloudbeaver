@@ -24,7 +24,7 @@ export const ProcessorItem = observer<Props>(function ProcessorItem({ processor,
   return (
     <ListItem onClick={select}>
       <ListItemIcon>
-        <StaticImage className={style.staticImage} icon={processor.icon} />
+        <StaticImage className={style['staticImage']} icon={processor.icon} />
       </ListItemIcon>
       <ListItemName>{processor.name}</ListItemName>
       <ListItemDescription title={processor.description}>{processor.description}</ListItemDescription>

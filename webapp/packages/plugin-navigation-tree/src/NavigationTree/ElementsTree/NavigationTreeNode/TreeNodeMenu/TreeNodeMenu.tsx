@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { getComputed, Icon, IMouseContextMenu, s, useS } from '@cloudbeaver/core-blocks';
+import { getComputed, Icon, type IMouseContextMenu, s, useS } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
@@ -15,8 +15,8 @@ import { DATA_CONTEXT_NAV_NODE, type INodeActions, type NavNode } from '@cloudbe
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
-import { MENU_NAV_TREE } from '../../MENU_NAV_TREE';
-import { DATA_CONTEXT_NAV_NODE_ACTIONS } from './DATA_CONTEXT_NAV_NODE_ACTIONS';
+import { MENU_NAV_TREE } from '../../MENU_NAV_TREE.js';
+import { DATA_CONTEXT_NAV_NODE_ACTIONS } from './DATA_CONTEXT_NAV_NODE_ACTIONS.js';
 import style from './TreeNodeMenu.module.css';
 
 export interface TreeNodeMenuProps {

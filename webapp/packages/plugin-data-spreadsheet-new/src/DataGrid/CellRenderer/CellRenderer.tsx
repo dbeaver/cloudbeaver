@@ -13,13 +13,18 @@ import { getComputed, useCombinedHandler, useMouse, useObjectRef, useObservableR
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@cloudbeaver/core-utils';
 import { type CalculatedColumn, Cell, type CellRendererProps } from '@cloudbeaver/plugin-data-grid';
-import { DatabaseEditChangeType, IResultSetElementKey, IResultSetRowKey, isBooleanValuePresentationAvailable } from '@cloudbeaver/plugin-data-viewer';
+import {
+  DatabaseEditChangeType,
+  type IResultSetElementKey,
+  type IResultSetRowKey,
+  isBooleanValuePresentationAvailable,
+} from '@cloudbeaver/plugin-data-viewer';
 
-import { CellPosition, EditingContext } from '../../Editing/EditingContext';
-import { DataGridContext } from '../DataGridContext';
-import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
-import { TableDataContext } from '../TableDataContext';
-import { CellContext } from './CellContext';
+import { type CellPosition, EditingContext } from '../../Editing/EditingContext.js';
+import { DataGridContext } from '../DataGridContext.js';
+import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
+import { TableDataContext } from '../TableDataContext.js';
+import { CellContext } from './CellContext.js';
 
 export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown>>(function CellRenderer(props) {
   const { rowIdx, row, column, isCellSelected, onDoubleClick, selectCell } = props;
@@ -47,6 +52,13 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
       get isSelected(): boolean {
         return selectionContext.isSelected(this.position.rowIdx, this.position.idx) || false;
       },
+      get hasFocusedElementInRow(): boolean {
+        const focusedElement = this.focusedElementPosition;
+        return focusedElement?.rowIdx === this.position.rowIdx;
+      },
+      get focusedElementPosition() {
+        return selectionContext.getFocusedElementPosition();
+      },
       get isFocused(): boolean {
         return this.isEditing ? false : this.isCellSelected;
       },
@@ -65,6 +77,8 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
       isCellSelected: observable.ref,
       position: computed,
       cell: computed,
+      hasFocusedElementInRow: computed,
+      focusedElementPosition: computed,
       isEditing: computed,
       isSelected: computed,
       isFocused: computed,
@@ -73,8 +87,13 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
     { row, column, rowIdx, isCellSelected },
   );
 
+  const isDatabaseActionApplied = getComputed(() =>
+    [DatabaseEditChangeType.add, DatabaseEditChangeType.delete, DatabaseEditChangeType.update].includes(cellContext.editionState!),
+  );
+
   const classes = getComputed(() =>
     clsx({
+      'rdg-cell-custom-highlighted-row': cellContext.hasFocusedElementInRow && !isDatabaseActionApplied,
       'rdg-cell-custom-selected': cellContext.isSelected,
       'rdg-cell-custom-editing': cellContext.isEditing,
       'rdg-cell-custom-added': cellContext.editionState === DatabaseEditChangeType.add,

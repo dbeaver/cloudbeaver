@@ -7,7 +7,7 @@
  */
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
+import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
 
 export interface IDataTableActions {
   presentationId: string | undefined;

@@ -21,6 +21,7 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.SMSignOutLinkProvider;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
+import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionAuthProcessor;
@@ -189,7 +190,12 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     @Override
     public WebUserInfo activeUser(@NotNull WebSession webSession) throws DBWebException {
         if (webSession.getUser() == null) {
-            return null;
+            WebAppConfiguration appConfiguration = webSession.getApplication().getAppConfiguration();
+            if (!appConfiguration.isAnonymousAccessEnabled()) {
+                return null;
+            }
+            SMUser anonymous = new SMUser("anonymous", true, null);
+            return new WebUserInfo(webSession, new WebUser(anonymous));
         }
         try {
             // Read user from security controller. It will also read meta parameters
@@ -303,5 +309,4 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             throw new DBWebException("Error setting user parameters", e);
         }
     }
-
 }

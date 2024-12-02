@@ -1,7 +1,5 @@
 query getTemplateConnections(
   $projectId: ID
-  $includeOrigin: Boolean!
-  $customIncludeOriginDetails: Boolean!
   $includeAuthProperties: Boolean!
   $includeNetworkHandlersConfig: Boolean!
   $includeCredentialsSaved: Boolean!

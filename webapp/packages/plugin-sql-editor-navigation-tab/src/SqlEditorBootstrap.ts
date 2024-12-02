@@ -7,11 +7,11 @@
  */
 import { RenameDialog } from '@cloudbeaver/core-blocks';
 import {
-  Connection,
+  type Connection,
   ConnectionInfoResource,
   createConnectionParam,
   DATA_CONTEXT_CONNECTION,
-  IConnectionInfoParams,
+  type IConnectionInfoParams,
   isConnectionProvider,
   isObjectCatalogProvider,
   isObjectSchemaProvider,
@@ -22,7 +22,7 @@ import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
-import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
+import { type ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
 import { ACTION_RENAME, ActionService, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
@@ -37,13 +37,13 @@ import {
 } from '@cloudbeaver/plugin-sql-editor';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
-import { ACTION_SQL_EDITOR_NEW } from './ACTION_SQL_EDITOR_NEW';
-import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
-import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
-import { isSessionActionOpenSQLEditor } from './sessionActionOpenSQLEditor';
-import { SQL_EDITOR_SOURCE_ACTION } from './SQL_EDITOR_SOURCE_ACTION';
-import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
-import { SqlEditorTabService } from './SqlEditorTabService';
+import { ACTION_SQL_EDITOR_NEW } from './ACTION_SQL_EDITOR_NEW.js';
+import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN.js';
+import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB.js';
+import { isSessionActionOpenSQLEditor } from './sessionActionOpenSQLEditor.js';
+import { SQL_EDITOR_SOURCE_ACTION } from './SQL_EDITOR_SOURCE_ACTION.js';
+import { SqlEditorNavigatorService } from './SqlEditorNavigatorService.js';
+import { SqlEditorTabService } from './SqlEditorTabService.js';
 
 interface IActiveConnectionContext {
   connectionKey?: IConnectionInfoParams;
@@ -71,7 +71,7 @@ export class SqlEditorBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.registerTopAppBarItem();
 
     this.menuService.addCreator({
@@ -179,8 +179,6 @@ export class SqlEditorBootstrap extends Bootstrap {
       }
     });
   }
-
-  load(): void {}
 
   private registerTopAppBarItem() {
     this.menuService.addCreator({

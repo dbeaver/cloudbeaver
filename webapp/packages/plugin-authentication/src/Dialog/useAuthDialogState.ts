@@ -9,7 +9,13 @@ import { action, computed, observable, untracked } from 'mobx';
 import { useEffect } from 'react';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { AuthInfoService, AuthProvider, AuthProviderConfiguration, AuthProvidersResource, IAuthCredentials } from '@cloudbeaver/core-authentication';
+import {
+  AuthInfoService,
+  type AuthProvider,
+  type AuthProviderConfiguration,
+  AuthProvidersResource,
+  type IAuthCredentials,
+} from '@cloudbeaver/core-authentication';
 import { ConfirmationDialog, useObservableRef, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -19,7 +25,7 @@ import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { EServerErrorCode, GQLError, type UserInfo } from '@cloudbeaver/core-sdk';
 import { errorOf, isArraysEqual } from '@cloudbeaver/core-utils';
 
-import { FEDERATED_AUTH } from './FEDERATED_AUTH';
+import { FEDERATED_AUTH } from './FEDERATED_AUTH.js';
 
 interface IData {
   state: IState;
@@ -61,7 +67,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
   const providers = authProvidersResource.data.filter(notEmptyProvider).sort(compareProviders);
 
   const activeProviders = providers.filter(provider => {
-    if (provider.federated || provider.trusted || provider.private) {
+    if (provider.federated || provider.trusted || provider.private || provider.authHidden) {
       return false;
     }
 
@@ -223,8 +229,8 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
               ...state.credentials,
               credentials: {
                 ...state.credentials.credentials,
-                user: state.credentials.credentials.user?.trim(),
-                password: state.credentials.credentials.password?.trim(),
+                user: state.credentials.credentials['user']?.trim(),
+                password: state.credentials.credentials['password']?.trim(),
               },
             },
             forceSessionsLogout: state.forceSessionsLogout,

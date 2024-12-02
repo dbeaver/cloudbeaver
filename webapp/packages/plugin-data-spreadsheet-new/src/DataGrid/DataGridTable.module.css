@@ -13,6 +13,8 @@
   --data-grid-readonly-status-color: #e28835;
   --data-grid-cell-selection-background-color: rgba(150, 150, 150, 0.2);
   --data-grid-cell-selection-background-color-focus: rgba(0, 145, 234, 0.2);
+  --data-grid-index-cell-border-color: var(--theme-primary);
+  --data-grid-selected-row-color: var(--theme-secondary) !important;
 
   composes: theme-typography--caption from global;
   outline: 0;
@@ -53,6 +55,20 @@
   :global(.rdg-row:hover .rdg-cell-frozen) {
     border-bottom: 1px solid !important;
     border-bottom-color: var(--theme-positive) !important;
+  }
+
+  :global(.rdg-cell-custom-highlighted-row) {
+    background: var(--data-grid-selected-row-color) !important;
+
+    &:global(.rdg-cell:first-child::before) {
+      position: absolute;
+      content: '';
+      top: 0;
+      left: 0;
+      width: 2px;
+      height: 100%;
+      background-color: var(--data-grid-index-cell-border-color);
+    }
   }
 
   :global(.rdg-cell-custom-selected) {

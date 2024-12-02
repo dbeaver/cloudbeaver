@@ -10,9 +10,9 @@ import { computed, makeObservable, observable } from 'mobx';
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import type { ISettingsResolverSource } from './ISettingsResolverSource';
-import type { ISettingChangeData, ISettingsSource } from './ISettingsSource';
-import type { ISettingsLayer } from './SettingsLayer';
+import type { ISettingsResolverSource } from './ISettingsResolverSource.js';
+import type { ISettingChangeData, ISettingsSource } from './ISettingsSource.js';
+import type { ISettingsLayer } from './SettingsLayer.js';
 
 interface ISettingsSourcesLayer {
   layer: ISettingsLayer;

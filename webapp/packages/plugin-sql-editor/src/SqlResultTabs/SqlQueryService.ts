@@ -18,14 +18,14 @@ import {
   DataViewerDataChangeConfirmationService,
   DataViewerService,
   DataViewerSettingsService,
-  IDatabaseDataModel,
+  type IDatabaseDataModel,
   TableViewerStorageService,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IResultGroup, ISqlEditorTabState } from '../ISqlEditorTabState';
-import { QueryDataSource } from '../QueryDataSource';
-import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService';
-import { SqlQueryResultService } from './SqlQueryResultService';
+import type { IResultGroup, ISqlEditorTabState } from '../ISqlEditorTabState.js';
+import { QueryDataSource } from '../QueryDataSource.js';
+import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
+import { SqlQueryResultService } from './SqlQueryResultService.js';
 
 interface IQueryExecutionOptions {
   onQueryExecutionStart?: (query: string, index: number) => void;
@@ -211,7 +211,7 @@ export class SqlQueryService {
     let resultCount = 0;
 
     for (let i = 0; i < queries.length; i++) {
-      const query = queries[i];
+      const query = queries[i]!;
 
       options?.onQueryExecutionStart?.(query, i);
 
@@ -231,7 +231,7 @@ export class SqlQueryService {
         .setSupportedDataFormats(connectionInfo.supportedDataFormats)
         .setKeepExecutionContextOnDispose(true)
         .setOptions({
-          query: query,
+          query,
           connectionKey,
           constraints: [],
           whereFilter: '',

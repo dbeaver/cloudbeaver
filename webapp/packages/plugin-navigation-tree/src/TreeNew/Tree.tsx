@@ -9,22 +9,24 @@ import { observer } from 'mobx-react-lite';
 
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 
-import { NodeSizeCacheContext } from './contexts/NodeSizeCacheContext';
-import { TreeContext } from './contexts/TreeContext';
-import { TreeDataContext } from './contexts/TreeDataContext';
-import { TreeDnDContext } from './contexts/TreeDnDContext';
-import { TreeVirtualizationContext } from './contexts/TreeVirtualizationContext';
-import type { INodeRenderer } from './INodeRenderer';
-import { NodeChildren } from './NodeChildren';
-import { useNodeSizeCache } from './useNodeSizeCache';
-import { useTree } from './useTree';
-import type { ITreeData } from './useTreeData';
-import { useTreeDnD } from './useTreeDnD';
-import { useTreeVirtualization } from './useTreeVirtualization';
+import { NodeSizeCacheContext } from './contexts/NodeSizeCacheContext.js';
+import { TreeContext } from './contexts/TreeContext.js';
+import { TreeDataContext } from './contexts/TreeDataContext.js';
+import { TreeDnDContext } from './contexts/TreeDnDContext.js';
+import { TreeVirtualizationContext } from './contexts/TreeVirtualizationContext.js';
+import type { INodeRenderer } from './INodeRenderer.js';
+import type { ITreeData } from './ITreeData.js';
+import { NodeChildren } from './NodeChildren.js';
+import type { NodeEmptyPlaceholderComponent } from './NodeEmptyPlaceholderComponent.js';
+import { useNodeSizeCache } from './useNodeSizeCache.js';
+import { useTree } from './useTree.js';
+import { useTreeDnD } from './useTreeDnD.js';
+import { useTreeVirtualization } from './useTreeVirtualization.js';
 
 export interface NavigationTreeNewProps {
   data: ITreeData;
   nodeRenderers?: INodeRenderer[];
+  emptyPlaceholder?: NodeEmptyPlaceholderComponent;
   onNodeClick?(id: string): void | Promise<void>;
   onNodeDoubleClick?(id: string): void | Promise<void>;
   getNodeDnDContext?(id: string, context: IDataContext): void;
@@ -34,6 +36,7 @@ export interface NavigationTreeNewProps {
 export const Tree = observer<NavigationTreeNewProps>(function Tree({
   data,
   nodeRenderers,
+  emptyPlaceholder,
   onNodeClick,
   onNodeDoubleClick,
   getNodeDnDContext,
@@ -59,7 +62,7 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
           <TreeVirtualizationContext.Provider value={mountOptimization}>
             <TreeContext.Provider value={tree}>
               <TreeDnDContext.Provider value={treeDnD}>
-                <NodeChildren nodeId={data.rootId} offsetHeight={0} root />
+                <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
               </TreeDnDContext.Provider>
             </TreeContext.Provider>
           </TreeVirtualizationContext.Provider>

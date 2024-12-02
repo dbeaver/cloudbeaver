@@ -24,7 +24,7 @@ import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 import style from './ConnectionAuthenticationDialog.module.css';
-import { ConnectionAuthenticationFormLoader } from './ConnectionAuthenticationFormLoader';
+import { ConnectionAuthenticationFormLoader } from './ConnectionAuthenticationFormLoader.js';
 
 export interface ConnectionAuthenticationDialogPayload {
   config: ConnectionConfig;

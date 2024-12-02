@@ -8,11 +8,11 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
-import { SContext, StyleRegistry, TextPlaceholder, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { SContext, type StyleRegistry, TextPlaceholder, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import {
-  ITabData,
+  type ITabData,
   TabList,
   TabListStyles,
   TabPanel,
@@ -26,9 +26,9 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
-import type { IObjectViewerTabState } from '../IObjectViewerTabState';
-import { FolderPanelRenderer } from './FolderPanelRenderer';
-import { FolderTabRenderer } from './FolderTabRenderer';
+import type { IObjectViewerTabState } from '../IObjectViewerTabState.js';
+import { FolderPanelRenderer } from './FolderPanelRenderer.js';
+import { FolderTabRenderer } from './FolderTabRenderer.js';
 import NavNodeTabStyle from './NavNodeTab.module.css';
 import ObjectFoldersNavNodeTab from './shared/ObjectFoldersNavNodeTab.module.css';
 import ObjectFoldersTab from './shared/ObjectFoldersTab.module.css';
@@ -95,7 +95,7 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   const wrongFolder = !folders.includes(folderId) && folders.length > 0 && children.isLoaded() && !children.isLoading() && !children.isOutdated();
 
   if (wrongFolder) {
-    folderId = folders[0];
+    folderId = folders[0]!;
   }
 
   function openFolder(tabData: ITabData) {

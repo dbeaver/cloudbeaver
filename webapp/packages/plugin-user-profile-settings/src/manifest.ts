@@ -13,7 +13,7 @@ export const userProfileSettingsPlugin: PluginManifest = {
   },
 
   providers: [
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./UserProfileSettingsPluginBootstrap').then(m => m.UserProfileSettingsPluginBootstrap),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./UserProfileSettingsPluginBootstrap.js').then(m => m.UserProfileSettingsPluginBootstrap),
   ],
 };

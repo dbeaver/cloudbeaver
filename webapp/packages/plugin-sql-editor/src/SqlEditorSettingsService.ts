@@ -10,7 +10,7 @@ import { ServerSettingsManagerService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
-  ISettingDescription,
+  type ISettingDescription,
   ROOT_SETTINGS_LAYER,
   SettingsManagerService,
   SettingsProvider,
@@ -19,7 +19,7 @@ import {
 } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
-import { SQL_EDITOR_SETTINGS_GROUP } from './SQL_EDITOR_SETTINGS_GROUP';
+import { SQL_EDITOR_SETTINGS_GROUP } from './SQL_EDITOR_SETTINGS_GROUP.js';
 
 const TABLE_ALIAS_OPTIONS = ['NONE', 'PLAIN', 'EXTENDED'] as const;
 
@@ -123,23 +123,33 @@ export class SqlEditorSettingsService extends Dependency {
       const settings: ISettingDescription<SqlEditorSettings>[] = [
         // {
         //   group: SQL_EDITOR_SETTINGS_GROUP,
-        //   key: 'disabled',
+        //   key: 'plugin.sql-editor.disabled',
+        //   access: {
+        //     scope: ['server'],
+        //   },
         //   type: ESettingsValueType.Checkbox,
-        //   name: 'Disable SQL editor',
+        //   name: 'plugin_sql_editor_settings_disable',
+        //   description: 'plugin_sql_editor_settings_disable_description',
         // },
+        {
+          group: SQL_EDITOR_SETTINGS_GROUP,
+          key: 'plugin.sql-editor.maxFileSize',
+          access: {
+            scope: ['client', 'server'],
+          },
+          type: ESettingsValueType.Input,
+          name: 'plugin_sql_editor_settings_import_max_size',
+          description: 'plugin_sql_editor_settings_import_max_size_description',
+        },
         // {
         //   group: SQL_EDITOR_SETTINGS_GROUP,
-        //   key: 'maxFileSize',
-        //   type: ESettingsValueType.Input,
-        //   name: 'Max file size (KB)',
-        //   description: 'Max file size for SQL editor in kilobytes',
-        // },
-        // {
-        //   group: SQL_EDITOR_SETTINGS_GROUP,
-        //   key: 'autoSave',
+        //   key: 'plugin.sql-editor.autoSave',
+        //   access: {
+        //     scope: ['client'],
+        //   },
         //   type: ESettingsValueType.Checkbox,
-        //   name: 'Auto save',
-        //   description: 'Auto save SQL editor content',
+        //   name: 'plugin_sql_editor_settings_auto_save',
+        //   description: 'plugin_sql_editor_settings_auto_save_description',
         // },
       ];
 

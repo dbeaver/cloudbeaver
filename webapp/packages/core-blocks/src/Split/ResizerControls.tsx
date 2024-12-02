@@ -8,11 +8,11 @@
 import { Resizer } from 'go-split';
 import { observer } from 'mobx-react-lite';
 
-import { s } from '../s';
-import { useS } from '../useS';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
 import style from './ResizeControls.module.css';
-import { SplitControls } from './SplitControls';
-import { useSplit } from './useSplit';
+import { SplitControls } from './SplitControls.js';
+import { useSplit } from './useSplit.js';
 
 interface ResizerControlsProps {
   className?: string;

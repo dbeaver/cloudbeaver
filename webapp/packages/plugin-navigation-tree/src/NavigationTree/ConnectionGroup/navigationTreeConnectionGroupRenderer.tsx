@@ -7,8 +7,8 @@
  */
 import { s, Translate, useS } from '@cloudbeaver/core-blocks';
 
-import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent';
-import { NAVIGATION_TREE_CONNECTION_GROUPS } from './navigationTreeConnectionGroupFilter';
+import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent.js';
+import { NAVIGATION_TREE_CONNECTION_GROUPS } from './navigationTreeConnectionGroupFilter.js';
 import style from './NavigationTreeConnectionGroupRenderer.module.css';
 
 export function navigationTreeConnectionGroupRenderer(nodeId: string): NavigationNodeRendererComponent | undefined {

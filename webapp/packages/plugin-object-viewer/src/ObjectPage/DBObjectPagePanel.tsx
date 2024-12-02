@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import type { ObjectPagePanelComponent } from './ObjectPage';
+import type { ObjectPagePanelComponent } from './ObjectPage.js';
 
 export const DBObjectPagePanel: ObjectPagePanelComponent = observer(function DBObjectPagePanel({ tab, page }) {
   const Panel = page.getPanelComponent();

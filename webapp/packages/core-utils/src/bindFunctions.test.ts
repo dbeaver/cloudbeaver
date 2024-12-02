@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from '@jest/globals';
 
-import { bindFunctions } from './bindFunctions';
+import { bindFunctions } from './bindFunctions.js';
 
 describe('bindFunctions', () => {
   test('binds specified functions to the object', () => {

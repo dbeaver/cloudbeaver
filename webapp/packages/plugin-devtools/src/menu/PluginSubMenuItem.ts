@@ -8,7 +8,7 @@
 import type { PluginManifest } from '@cloudbeaver/core-di';
 import { MenuSubMenuItem } from '@cloudbeaver/core-view';
 
-import { MENU_PLUGIN } from './MENU_PLUGIN';
+import { MENU_PLUGIN } from './MENU_PLUGIN.js';
 
 export class PluginSubMenuItem extends MenuSubMenuItem {
   readonly plugin: PluginManifest;

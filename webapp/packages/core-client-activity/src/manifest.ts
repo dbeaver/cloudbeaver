@@ -12,5 +12,5 @@ export const coreClientActivityManifest: PluginManifest = {
     name: 'Core Client Activity',
   },
 
-  providers: [() => import('./ClientActivityService').then(m => m.ClientActivityService)],
+  providers: [() => import('./ClientActivityService.js').then(m => m.ClientActivityService)],
 };

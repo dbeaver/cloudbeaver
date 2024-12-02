@@ -18,9 +18,9 @@ import { useMenu } from '@cloudbeaver/core-view';
 import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
 import { MENU_NAV_TREE, useNode } from '@cloudbeaver/plugin-navigation-tree';
 
-import { getValue } from '../../helpers';
+import { getValue } from '../../helpers.js';
 import classes from './CellFormatter.module.css';
-import { TableContext } from './TableContext';
+import { TableContext } from './TableContext.js';
 
 interface Props {
   value: string;
@@ -72,11 +72,11 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
   return (
     <ContextMenu mouseContextMenu={mouseContextMenu} menu={menu} placement="auto-end" modal disclosure onVisibleSwitch={switchState}>
       <div className={s(styles, { container: true, empty: menuEmpty })} onDoubleClick={openNode}>
-        <div ref={mouse.reference} className={classes.box} onContextMenu={contextMenuOpenHandler}>
+        <div ref={mouse.reference} className={classes['box']} onContextMenu={contextMenuOpenHandler}>
           <div className={s(styles, { value: true, cellValue: true })} title={value} onClick={valueFieldClickHandler}>
             {value}
           </div>
-          {!menuEmpty && <Icon className={classes.icon} name="snack" viewBox="0 0 16 10" />}
+          {!menuEmpty && <Icon className={classes['icon']} name="snack" viewBox="0 0 16 10" />}
         </div>
       </div>
     </ContextMenu>
@@ -97,8 +97,8 @@ export const CellFormatter = observer<RenderCellProps<DBObject>>(function CellFo
   const value = property ? getValue(property.value) : '';
 
   return (
-    <div className={classes.cell} title={value}>
-      {columnIdx === 0 && !!node ? <Menu node={node} value={value} /> : <span className={classes.cellValue}>{value}</span>}
+    <div className={classes['cell']} title={value}>
+      {columnIdx === 0 && !!node ? <Menu node={node} value={value} /> : <span className={classes['cellValue']}>{value}</span>}
     </div>
   );
 });

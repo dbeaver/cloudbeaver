@@ -7,9 +7,9 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
-import { GraphQLService, ServerLicenseStatusFragment } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type ServerLicenseStatusFragment } from '@cloudbeaver/core-sdk';
 
-import { ServerConfigResource } from './ServerConfigResource';
+import { ServerConfigResource } from './ServerConfigResource.js';
 
 export type ServerLicenseStatus = ServerLicenseStatusFragment;
 

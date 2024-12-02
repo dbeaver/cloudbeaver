@@ -10,10 +10,10 @@ import { Fragment } from 'react';
 import { Menu, MenuButton, MenuItem, useMenuState } from 'reakit';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { BaseDropdownStyles, PlaceholderComponent, s, StaticImage, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { BaseDropdownStyles, type PlaceholderComponent, s, StaticImage, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 
-import type { IUserDetailsInfoProps } from '../UsersAdministrationService';
+import type { IUserDetailsInfoProps } from '../UsersAdministrationService.js';
 import style from './UserCredentialsList.module.css';
 
 const MAX_VISIBLE_CREDENTIALS = 3;

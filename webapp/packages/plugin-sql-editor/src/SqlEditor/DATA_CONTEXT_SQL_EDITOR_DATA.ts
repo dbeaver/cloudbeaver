@@ -7,6 +7,6 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
-import type { ISQLEditorData } from './ISQLEditorData';
+import type { ISQLEditorData } from './ISQLEditorData.js';
 
 export const DATA_CONTEXT_SQL_EDITOR_DATA = createDataContext<ISQLEditorData>('sql-editor-data');

@@ -8,10 +8,10 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { Icon } from '../Icon';
-import { s } from '../s';
-import { useS } from '../useS';
-import { TableItemGroupContext } from './TableItemGroupContext';
+import { Icon } from '../Icon.js';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
+import { TableItemGroupContext } from './TableItemGroupContext.js';
 import classes from './TableItemGroupExpand.module.css';
 
 export interface TableItemGroupExpandProps {

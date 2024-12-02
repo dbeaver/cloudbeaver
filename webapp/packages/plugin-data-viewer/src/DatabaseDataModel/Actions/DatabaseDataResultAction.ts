@@ -7,11 +7,11 @@
  */
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataAction } from '../DatabaseDataAction';
-import type { IDatabaseDataResult } from '../IDatabaseDataResult';
-import type { IDatabaseDataSource } from '../IDatabaseDataSource';
-import { databaseDataAction } from './DatabaseDataActionDecorator';
-import type { IDatabaseDataResultAction } from './IDatabaseDataResultAction';
+import { DatabaseDataAction } from '../DatabaseDataAction.js';
+import type { IDatabaseDataResult } from '../IDatabaseDataResult.js';
+import type { IDatabaseDataSource } from '../IDatabaseDataSource.js';
+import { databaseDataAction } from './DatabaseDataActionDecorator.js';
+import type { IDatabaseDataResultAction } from './IDatabaseDataResultAction.js';
 
 @databaseDataAction()
 export abstract class DatabaseDataResultAction<TKey, TResult extends IDatabaseDataResult>

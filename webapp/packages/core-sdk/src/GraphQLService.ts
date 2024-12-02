@@ -7,15 +7,20 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 
-import { CustomGraphQLClient } from './CustomGraphQLClient';
-import { EnvironmentService } from './EnvironmentService';
-import { uploadBlobResultSetExtension } from './Extensions/uploadBlobResultSetExtension';
-import { uploadDriverLibraryExtension } from './Extensions/uploadDriverLibraryExtension';
-import { uploadResultDataExtension } from './Extensions/uploadResultDataExtension';
-import type { IResponseInterceptor } from './IResponseInterceptor';
-import { getSdk } from './sdk';
+import { CustomGraphQLClient } from './CustomGraphQLClient.js';
+import { EnvironmentService } from './EnvironmentService.js';
+import { uploadBlobResultSetExtension } from './Extensions/uploadBlobResultSetExtension.js';
+import { uploadDriverLibraryExtension } from './Extensions/uploadDriverLibraryExtension.js';
+import { uploadResultDataExtension } from './Extensions/uploadResultDataExtension.js';
+import type { IResponseInterceptor } from './IResponseInterceptor.js';
+import { getSdk, type Sdk } from './sdk.js';
 
-function extendedSDK(client: CustomGraphQLClient) {
+function extendedSDK(
+  client: CustomGraphQLClient,
+): Sdk &
+  ReturnType<typeof uploadDriverLibraryExtension> &
+  ReturnType<typeof uploadBlobResultSetExtension> &
+  ReturnType<typeof uploadResultDataExtension> {
   const sdk = getSdk(client);
 
   return {

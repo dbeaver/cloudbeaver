@@ -29,11 +29,11 @@ import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
-import { getFilteredUsers } from './getFilteredUsers';
-import { GrantedUsersTableHeader, IFilterState } from './GrantedUsersTableHeader/GrantedUsersTableHeader';
+import { getFilteredUsers } from './getFilteredUsers.js';
+import { GrantedUsersTableHeader, type IFilterState } from './GrantedUsersTableHeader/GrantedUsersTableHeader.js';
 import style from './UserList.module.css';
-import { UsersTableInnerHeader } from './UsersTableInnerHeader';
-import { UsersTableItem } from './UsersTableItem';
+import { UsersTableInnerHeader } from './UsersTableInnerHeader.js';
+import { UsersTableItem } from './UsersTableItem.js';
 
 interface Props {
   userList: AdminUserInfoFragment[];
@@ -56,7 +56,7 @@ export const UserList = observer<Props>(function UserList({ userList, grantedUse
   const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 
   const users = getFilteredUsers(userList, filterState.filterValue);
-  const keys = users.map(user => user.userId);
+  const keys = userList.map(user => user.userId);
 
   const grant = useCallback(() => {
     props.onGrant(getSelectedItems(selectedSubjects));

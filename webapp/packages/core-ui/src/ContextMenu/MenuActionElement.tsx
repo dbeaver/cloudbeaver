@@ -8,9 +8,9 @@
 import { observer } from 'mobx-react-lite';
 
 import { Checkbox, MenuItem, MenuItemCheckbox, MenuItemElement, MenuItemRadio, Radio, useTranslate } from '@cloudbeaver/core-blocks';
-import { getBindingLabel, IMenuActionItem } from '@cloudbeaver/core-view';
+import { getBindingLabel, type IMenuActionItem } from '@cloudbeaver/core-view';
 
-import type { IContextMenuItemProps } from './IContextMenuItemProps';
+import type { IContextMenuItemProps } from './IContextMenuItemProps.js';
 
 interface IMenuActionElementProps extends IContextMenuItemProps {
   item: IMenuActionItem;

@@ -20,8 +20,8 @@ import {
 import { FormMode } from '@cloudbeaver/core-ui';
 import { isValuesEqual } from '@cloudbeaver/core-utils';
 
-import type { UserFormProps } from '../AdministrationUserFormService';
-import type { UserFormInfoPart } from './UserFormInfoPart';
+import type { UserFormProps } from '../AdministrationUserFormService.js';
+import type { UserFormInfoPart } from './UserFormInfoPart.js';
 
 const PASSWORD_PLACEHOLDER = '••••••';
 
@@ -34,12 +34,7 @@ interface Props extends UserFormProps {
 export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCredentials({ formState, tabState, tabSelected, disabled }) {
   const translate = useTranslate();
   const editing = formState.mode === FormMode.Edit;
-  const userInfo = useResource(
-    UserFormInfoCredentials,
-    UsersResource,
-    { key: tabState.initialState.userId, includes: ['includeMetaParameters'] },
-    { active: tabSelected && editing },
-  );
+  const userInfo = useResource(UserFormInfoCredentials, UsersResource, tabState.initialState.userId, { active: tabSelected && editing });
   const authProvidersResource = useResource(UserFormInfoCredentials, AuthProvidersResource, null);
   const passwordValidationRef = usePasswordValidation();
 
@@ -59,7 +54,16 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
   return (
     <Container gap vertical>
       <GroupTitle keepSize>{translate('authentication_user_credentials')}</GroupTitle>
-      <InputField type="text" name="userId" state={tabState.state} readOnly={editing} disabled={disabled} keepSize tiny required>
+      <InputField
+        description={!editing ? translate('authentication_user_name_description') : undefined}
+        type="text"
+        name="userId"
+        state={tabState.state}
+        readOnly={editing || disabled}
+        keepSize
+        tiny
+        required
+      >
         {translate('authentication_user_name')}
       </InputField>
       {local && (
@@ -72,7 +76,7 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
             autoComplete="new-password"
             placeholder={editing ? PASSWORD_PLACEHOLDER : ''}
             canShowPassword={tabState.state['password'] !== ''}
-            disabled={disabled}
+            readOnly={disabled}
             required={!editing}
             keepSize
             tiny
@@ -84,7 +88,7 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
             type="password"
             name="passwordRepeat"
             placeholder={editing ? PASSWORD_PLACEHOLDER : ''}
-            disabled={disabled}
+            readOnly={disabled}
             required={!editing}
             canShowPassword
             keepSize

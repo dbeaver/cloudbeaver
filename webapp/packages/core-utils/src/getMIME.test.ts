@@ -7,7 +7,7 @@
  */
 import { describe, expect, it } from '@jest/globals';
 
-import { getMIME } from './getMIME';
+import { getMIME } from './getMIME.js';
 
 describe('getMIME', () => {
   it("should return 'application/octet-stream' if binary is empty", () => {

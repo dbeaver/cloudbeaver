@@ -13,8 +13,8 @@ export const coreRoutingManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./Screen/ScreenService').then(m => m.ScreenService),
-    () => import('./RouterService').then(m => m.RouterService),
-    () => import('./WindowsService').then(m => m.WindowsService),
+    () => import('./Screen/ScreenService.js').then(m => m.ScreenService),
+    () => import('./RouterService.js').then(m => m.RouterService),
+    () => import('./WindowsService.js').then(m => m.WindowsService),
   ],
 };

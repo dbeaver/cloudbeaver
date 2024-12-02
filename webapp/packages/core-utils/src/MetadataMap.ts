@@ -7,8 +7,8 @@
  */
 import { action, makeAutoObservable, observable } from 'mobx';
 
-import type { schema } from './schema';
-import { TempMap } from './TempMap';
+import type { schema } from './schema.js';
+import { TempMap } from './TempMap.js';
 
 export type MetadataValueGetter<TKey, TValue> = (key: TKey, metadata: MetadataMap<TKey, any>) => TValue;
 export type DefaultValueGetter<TKey, TValue> = (key: TKey, metadata: MetadataMap<TKey, TValue>) => TValue;

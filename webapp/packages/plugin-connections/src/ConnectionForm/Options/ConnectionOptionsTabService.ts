@@ -13,28 +13,28 @@ import {
   ConnectionInfoProjectKey,
   createConnectionParam,
   DatabaseAuthModelsResource,
-  DatabaseConnection,
+  type DatabaseConnection,
   DBDriverResource,
   isJDBCConnection,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { isSharedProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { DriverConfigurationType, isObjectPropertyInfoStateEqual, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { formStateContext } from '@cloudbeaver/core-ui';
 import { getUniqueName, isNotNullDefined, isValuesEqual } from '@cloudbeaver/core-utils';
 
-import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
-import { ConnectionFormService } from '../ConnectionFormService';
-import { connectionConfigContext } from '../Contexts/connectionConfigContext';
-import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
-import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
-import { getConnectionName } from './getConnectionName';
-import { getDefaultConfigurationType } from './getDefaultConfigurationType';
+import { connectionFormConfigureContext } from '../connectionFormConfigureContext.js';
+import { ConnectionFormService } from '../ConnectionFormService.js';
+import { connectionConfigContext } from '../Contexts/connectionConfigContext.js';
+import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
+import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps.js';
+import { getConnectionName } from './getConnectionName.js';
+import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 
 export const Options = React.lazy(async () => {
-  const { Options } = await import('./Options');
+  const { Options } = await import('./Options.js');
   return { default: Options };
 });
 
@@ -61,10 +61,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
     });
   }
 
-  register(): void {
+  override register(): void {
     this.connectionFormService.tabsContainer.add({
       key: 'options',
-      name: 'customConnection_main',
+      name: 'plugin_connections_connection_form_part_main',
       order: 1,
       panel: () => Options,
     });
@@ -81,8 +81,6 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     this.connectionFormService.fillConfigTask.addHandler(this.fillConfig.bind(this));
   }
-
-  load(): void {}
 
   private async save({ state, submitType }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
     const status = contexts.getContext(this.connectionFormService.connectionStatusContext);
@@ -244,7 +242,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
   private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const configuration = contexts.getContext(connectionFormConfigureContext);
 
-    configuration.include('includeOrigin', 'includeAuthProperties', 'includeCredentialsSaved', 'customIncludeOptions');
+    configuration.include('includeAuthProperties', 'includeCredentialsSaved', 'customIncludeOptions');
   }
 
   private async prepareConfig({ state }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
@@ -384,7 +382,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     if (!this.userInfoResource.hasToken(providerId)) {
       const provider = await this.authProvidersResource.load(providerId);
-      const message = this.localizationService.translate('connections_public_connection_cloud_auth_required', undefined, {
+      const message = this.localizationService.translate('plugin_connections_connection_cloud_auth_required', undefined, {
         providerLabel: provider.label,
       });
       stateContext.setInfo(message);

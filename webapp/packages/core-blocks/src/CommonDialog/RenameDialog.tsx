@@ -12,20 +12,20 @@ import { useEffect } from 'react';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { throttleAsync } from '@cloudbeaver/core-utils';
 
-import { Button } from '../Button';
-import { Container } from '../Containers/Container';
-import { Fill } from '../Fill';
-import { Form } from '../FormControls/Form';
-import { InputField } from '../FormControls/InputField/InputField';
-import { useTranslate } from '../localization/useTranslate';
-import { s } from '../s';
-import { useFocus } from '../useFocus';
-import { useObservableRef } from '../useObservableRef';
-import { useS } from '../useS';
-import { CommonDialogBody } from './CommonDialog/CommonDialogBody';
-import { CommonDialogFooter } from './CommonDialog/CommonDialogFooter';
-import { CommonDialogHeader } from './CommonDialog/CommonDialogHeader';
-import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper';
+import { Button } from '../Button.js';
+import { Container } from '../Containers/Container.js';
+import { Fill } from '../Fill.js';
+import { Form } from '../FormControls/Form.js';
+import { InputField } from '../FormControls/InputField/InputField.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { s } from '../s.js';
+import { useFocus } from '../useFocus.js';
+import { useObservableRef } from '../useObservableRef.js';
+import { useS } from '../useS.js';
+import { CommonDialogBody } from './CommonDialog/CommonDialogBody.js';
+import { CommonDialogFooter } from './CommonDialog/CommonDialogFooter.js';
+import { CommonDialogHeader } from './CommonDialog/CommonDialogHeader.js';
+import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper.js';
 import style from './RenameDialog.module.css';
 
 interface IRenameDialogState {

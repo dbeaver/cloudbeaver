@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import { Switch, useTranslate } from '@cloudbeaver/core-blocks';
 import { CONNECTION_NAVIGATOR_VIEW_SETTINGS, isNavigatorViewSettingsEqual } from '@cloudbeaver/core-root';
 
-import type { IServerConfigurationPageState } from '../IServerConfigurationPageState';
+import type { IServerConfigurationPageState } from '../IServerConfigurationPageState.js';
 
 interface Props {
   configs: IServerConfigurationPageState;

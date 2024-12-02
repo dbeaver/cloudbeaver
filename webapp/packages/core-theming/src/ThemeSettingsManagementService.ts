@@ -8,8 +8,8 @@
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ESettingsValueType, INTERFACE_SETTINGS_GROUP, SettingsManagerService } from '@cloudbeaver/core-settings';
 
-import { ThemeService } from './ThemeService';
-import { ThemeSettingsService } from './ThemeSettingsService';
+import { ThemeService } from './ThemeService.js';
+import { ThemeSettingsService } from './ThemeSettingsService.js';
 
 @injectable()
 export class ThemeSettingsManagementService extends Dependency {

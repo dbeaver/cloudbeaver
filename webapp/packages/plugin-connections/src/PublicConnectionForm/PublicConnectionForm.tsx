@@ -11,9 +11,9 @@ import { useCallback } from 'react';
 import { Loader, s, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { ConnectionFormLoader } from '../ConnectionForm/ConnectionFormLoader';
+import { ConnectionFormLoader } from '../ConnectionForm/ConnectionFormLoader.js';
 import styles from './PublicConnectionForm.module.css';
-import { PublicConnectionFormService } from './PublicConnectionFormService';
+import { PublicConnectionFormService } from './PublicConnectionFormService.js';
 
 export const PublicConnectionForm: React.FC = observer(function PublicConnectionForm() {
   const service = useService(PublicConnectionFormService);

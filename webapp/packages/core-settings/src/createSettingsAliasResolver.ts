@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { invertObject, type schema } from '@cloudbeaver/core-utils';
 
-import type { ISettingChangeData, ISettingsSource } from './ISettingsSource';
-import type { SettingsProvider } from './SettingsProvider';
+import type { ISettingChangeData, ISettingsSource } from './ISettingsSource.js';
+import type { SettingsProvider } from './SettingsProvider.js';
 
 const DEPRECATED_SETTINGS = new Set();
 

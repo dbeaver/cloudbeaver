@@ -13,11 +13,11 @@ export const coreBrowserManifest: PluginManifest = {
   },
 
   preload: [
-    () => import('./ServiceWorkerBootstrap').then(module => module.ServiceWorkerBootstrap),
-    () => import('./ServiceWorkerService').then(module => module.ServiceWorkerService),
+    () => import('./ServiceWorkerBootstrap.js').then(module => module.ServiceWorkerBootstrap),
+    () => import('./ServiceWorkerService.js').then(module => module.ServiceWorkerService),
   ],
   providers: [
-    () => import('./IndexedDB/IndexedDBService').then(module => module.IndexedDBService),
-    () => import('./LocalStorageSaveService').then(module => module.LocalStorageSaveService),
+    () => import('./IndexedDB/IndexedDBService.js').then(module => module.IndexedDBService),
+    () => import('./LocalStorageSaveService.js').then(module => module.LocalStorageSaveService),
   ],
 };

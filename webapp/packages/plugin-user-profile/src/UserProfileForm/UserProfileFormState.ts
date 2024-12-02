@@ -8,7 +8,7 @@
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import { FormState } from '@cloudbeaver/core-ui';
 
-import type { IUserProfileFormState, UserProfileFormService } from './UserProfileFormService';
+import type { IUserProfileFormState, UserProfileFormService } from './UserProfileFormService.js';
 
 export class UserProfileFormState extends FormState<IUserProfileFormState> {
   constructor(serviceProvider: IServiceProvider, service: UserProfileFormService, config: IUserProfileFormState) {

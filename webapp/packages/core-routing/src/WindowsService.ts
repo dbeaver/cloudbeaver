@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { IWindowOptions, openCenteredPopup } from '@cloudbeaver/core-utils';
+import { type IWindowOptions, openCenteredPopup } from '@cloudbeaver/core-utils';
 
 interface IWindowInfo {
   id: string;

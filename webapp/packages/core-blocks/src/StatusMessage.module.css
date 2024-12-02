@@ -8,10 +8,13 @@
 .statusMessage {
   overflow: hidden;
   composes: theme-typography--caption from global;
-  height: 24px;
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.statusMessageExtended {
+  height: 24px;
 }
 .iconOrImage {
   height: 24px;

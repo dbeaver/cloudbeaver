@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useTranslate } from '@cloudbeaver/core-blocks';
 import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 
-import type { ObjectPageTabComponent } from '../ObjectPage/ObjectPage';
+import type { ObjectPageTabComponent } from '../ObjectPage/ObjectPage.js';
 
 export const ObjectPropertiesPageTab: ObjectPageTabComponent = observer(function ObjectPropertiesPageTab({ page, onSelect }) {
   const translate = useTranslate();

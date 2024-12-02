@@ -7,17 +7,17 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { ServiceWorkerService } from './ServiceWorkerService';
+import { ServiceWorkerService } from './ServiceWorkerService.js';
 
 @injectable()
 export class ServiceWorkerBootstrap extends Bootstrap {
   constructor(private readonly serviceWorkerService: ServiceWorkerService) {
     super();
   }
-  async register(): Promise<void> {
+  override async register(): Promise<void> {
     await this.serviceWorkerService.register();
   }
-  async load(): Promise<void> {
+  override async load(): Promise<void> {
     await this.serviceWorkerService.load();
   }
 }

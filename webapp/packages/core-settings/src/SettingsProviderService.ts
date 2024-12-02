@@ -10,8 +10,8 @@ import { makeObservable, observable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { schema } from '@cloudbeaver/core-utils';
 
-import { SettingsProvider } from './SettingsProvider';
-import { SettingsResolverService } from './SettingsResolverService';
+import { SettingsProvider } from './SettingsProvider.js';
+import { SettingsResolverService } from './SettingsResolverService.js';
 
 @injectable()
 export class SettingsProviderService {

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React, { ButtonHTMLAttributes, forwardRef } from 'react';
+import React, { type ButtonHTMLAttributes, forwardRef } from 'react';
 
 import { Icon, IconOrImage, Loader, registry, s, useS, useStateDelay, useTranslate } from '@cloudbeaver/core-blocks';
 
@@ -36,13 +36,17 @@ export const MenuBarItem = registry(
 
       const title = translate(rest.title);
       const Submenu = submenu;
+      const selected = rest['aria-selected'] === 'true';
+      const disabled = rest.disabled;
+      const tabIndex = selected ? 0 : -1;
+
       return (
         <div
-          className={s(styles, { menuBarItemGroup: true, hidden, disabled: rest.disabled }, className)}
+          className={s(styles, { menuBarItemGroup: true, hidden, disabled }, className)}
           aria-selected={rest['aria-selected']}
           aria-disabled={rest['aria-disabled']}
         >
-          <button ref={ref} className={s(styles, { menuBarItem: true })} {...rest} title={title} aria-label={title}>
+          <button ref={ref} className={s(styles, { menuBarItem: true })} tabIndex={tabIndex} {...rest} title={title} aria-label={title}>
             <div className={s(styles, { menuBarItemBox: true })}>
               {loading ? (
                 <div className={s(styles, { menuBarItemIcon: true })}>

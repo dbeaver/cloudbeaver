@@ -8,10 +8,16 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { AuthProvider, AuthProviderConfiguration, AuthProvidersResource, comparePublicAuthConfigurations } from '@cloudbeaver/core-authentication';
+import {
+  type AuthProvider,
+  type AuthProviderConfiguration,
+  AuthProvidersResource,
+  comparePublicAuthConfigurations,
+} from '@cloudbeaver/core-authentication';
 import {
   Button,
   Cell,
+  Clickable,
   Container,
   Filter,
   getComputed,
@@ -30,7 +36,7 @@ import type { ITask } from '@cloudbeaver/core-executor';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { ServerConfigurationAdministrationNavService } from '@cloudbeaver/plugin-administration';
 
-import { AuthenticationService } from '../../AuthenticationService';
+import { AuthenticationService } from '../../AuthenticationService.js';
 import styles from './ConfigurationsList.module.css';
 
 interface IProviderConfiguration {
@@ -145,13 +151,15 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
           const title = `${configuration.displayName}\n${configuration.description || ''}`;
           return (
             <Link key={configuration.id} title={title} wrapper onClick={() => login(false, provider, configuration)}>
-              <Cell
-                className={s(style, { cell: true })}
-                before={icon ? <IconOrImage className={s(style, { iconOrImage: true })} icon={icon} /> : undefined}
-                description={configuration.description}
-              >
-                {configuration.displayName}
-              </Cell>
+              <Clickable as="div">
+                <Cell
+                  className={s(style, { cell: true })}
+                  before={icon ? <IconOrImage className={s(style, { iconOrImage: true })} icon={icon} /> : undefined}
+                  description={configuration.description}
+                >
+                  {configuration.displayName}
+                </Cell>
+              </Clickable>
             </Link>
           );
         })}

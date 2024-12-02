@@ -3,5 +3,4 @@ fragment AdminTeamInfo on AdminTeamInfo {
   teamName
   description
   teamPermissions
-  metaParameters @include(if: $includeMetaParameters)
 }

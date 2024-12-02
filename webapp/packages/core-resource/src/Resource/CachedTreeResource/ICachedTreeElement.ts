@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ICachedResourceMetadata } from '../ICachedResourceMetadata';
+import type { ICachedResourceMetadata } from '../ICachedResourceMetadata.js';
 
 export interface ICachedTreeElement<TValue, TMetadata extends ICachedResourceMetadata> {
   value?: TValue;

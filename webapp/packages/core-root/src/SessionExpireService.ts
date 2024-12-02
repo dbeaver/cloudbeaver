@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { EServerErrorCode, GQLError, GraphQLService, SessionError } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
@@ -29,11 +29,9 @@ export class SessionExpireService extends Bootstrap {
     return this.isExpired;
   }
 
-  register(): void {
+  override register(): void {
     this.graphQLService.registerInterceptor(this.sessionExpiredInterceptor.bind(this));
   }
-
-  load(): void {}
 
   sessionExpired(): void {
     if (this.expired) {

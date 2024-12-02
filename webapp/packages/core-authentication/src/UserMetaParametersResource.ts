@@ -9,9 +9,9 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { SessionResource } from '@cloudbeaver/core-root';
-import { GraphQLService, UserConnectionAuthPropertiesFragment } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type UserConnectionAuthPropertiesFragment } from '@cloudbeaver/core-sdk';
 
-import { UserInfoResource } from './UserInfoResource';
+import { UserInfoResource } from './UserInfoResource.js';
 
 export type UserMetaParameter = UserConnectionAuthPropertiesFragment;
 export interface IUserMetaParameterOptions {

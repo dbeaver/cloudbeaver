@@ -10,15 +10,15 @@ import { observer } from 'mobx-react-lite';
 import { getObjectPropertyType, getObjectPropertyValueType, type ObjectPropertyInfo, type ObjectPropertyType } from '@cloudbeaver/core-sdk';
 import { removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 
-import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox';
-import { Combobox } from '../../FormControls/Combobox';
-import { FormFieldDescription } from '../../FormControls/FormFieldDescription';
-import { InputField } from '../../FormControls/InputField/InputField';
-import { InputFileTextContent } from '../../FormControls/InputFileTextContent';
-import { isControlPresented } from '../../FormControls/isControlPresented';
-import { Textarea } from '../../FormControls/Textarea';
-import { Link } from '../../Link';
-import { useTranslate } from '../../localization/useTranslate';
+import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox.js';
+import { Combobox } from '../../FormControls/Combobox.js';
+import { FormFieldDescription } from '../../FormControls/FormFieldDescription.js';
+import { InputField } from '../../FormControls/InputField/InputField.js';
+import { InputFileTextContent } from '../../FormControls/InputFileTextContent.js';
+import { isControlPresented } from '../../FormControls/isControlPresented.js';
+import { Textarea } from '../../FormControls/Textarea.js';
+import { Link } from '../../Link.js';
+import { useTranslate } from '../../localization/useTranslate.js';
 
 const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 
@@ -221,8 +221,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         placeholder={passwordSavedMessage}
         name={property.id!}
         value={value}
-        disabled={disabled}
-        readOnly={readOnly}
+        readOnly={readOnly || disabled}
         className={className}
       >
         {property.displayName ?? ''}
@@ -243,8 +242,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         autoHide={autoHide}
         description={property.hint}
         placeholder={passwordSavedMessage}
-        disabled={disabled}
-        readOnly={readOnly}
+        readOnly={readOnly || disabled}
         autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
         className={className}
         canShowPassword={canShowPassword}
@@ -266,8 +264,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       defaultValue={defaultValue}
       description={property.hint}
       placeholder={passwordSavedMessage}
-      disabled={disabled}
-      readOnly={readOnly}
+      readOnly={readOnly || disabled}
       autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
       className={className}
       canShowPassword={canShowPassword}

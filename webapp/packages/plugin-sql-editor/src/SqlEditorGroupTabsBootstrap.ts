@@ -10,10 +10,10 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_TABS_CONTEXT, MENU_TAB } from '@cloudbeaver/core-ui';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 
-import { ACTION_TAB_CLOSE_SQL_RESULT_GROUP } from './ACTION_TAB_CLOSE_SQL_RESULT_GROUP';
-import { DATA_CONTEXT_SQL_EDITOR_STATE } from './DATA_CONTEXT_SQL_EDITOR_STATE';
-import { DATA_CONTEXT_SQL_EDITOR_RESULT_ID } from './SqlResultTabs/DATA_CONTEXT_SQL_EDITOR_RESULT_ID';
-import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
+import { ACTION_TAB_CLOSE_SQL_RESULT_GROUP } from './ACTION_TAB_CLOSE_SQL_RESULT_GROUP.js';
+import { DATA_CONTEXT_SQL_EDITOR_STATE } from './DATA_CONTEXT_SQL_EDITOR_STATE.js';
+import { DATA_CONTEXT_SQL_EDITOR_RESULT_ID } from './SqlResultTabs/DATA_CONTEXT_SQL_EDITOR_RESULT_ID.js';
+import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService.js';
 
 @injectable()
 export class SqlEditorGroupTabsBootstrap extends Bootstrap {
@@ -25,7 +25,7 @@ export class SqlEditorGroupTabsBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.menuService.addCreator({
       menus: [MENU_TAB],
       contexts: [DATA_CONTEXT_SQL_EDITOR_RESULT_ID, DATA_CONTEXT_SQL_EDITOR_STATE],

@@ -8,10 +8,10 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { FormContext, GroupTitle, PlaceholderComponent, Switch, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { FeaturesResource } from '@cloudbeaver/core-root';
+import { FormContext, GroupTitle, type PlaceholderComponent, Switch, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { FeaturesResource, sortFeature } from '@cloudbeaver/core-root';
 
-import type { IConfigurationPlaceholderProps } from '../ServerConfigurationService';
+import type { IConfigurationPlaceholderProps } from '../ServerConfigurationService.js';
 
 export const ServerConfigurationFeaturesForm: PlaceholderComponent<IConfigurationPlaceholderProps> = observer(
   function ServerConfigurationFeaturesForm({ state: { serverConfig }, configurationWizard }) {
@@ -21,24 +21,25 @@ export const ServerConfigurationFeaturesForm: PlaceholderComponent<IConfiguratio
       throw new Error('Form state should be provided');
     }
 
-    const features = useResource(ServerConfigurationFeaturesForm, FeaturesResource, configurationWizard ? null : undefined);
+    const featuresResource = useResource(ServerConfigurationFeaturesForm, FeaturesResource, configurationWizard ? null : undefined);
     const translate = useTranslate();
+    const features = featuresResource.data.slice().sort(sortFeature);
 
-    if (features.data.length === 0 || configurationWizard) {
+    if (configurationWizard || features.length === 0) {
       return null;
     }
 
     return (
       <>
         <GroupTitle>{translate('administration_configuration_wizard_configuration_services_group')}</GroupTitle>
-        {features.data.map(feature => (
+        {features.map(feature => (
           <Switch
             key={feature.id}
             value={feature.id}
             name="enabledFeatures"
             state={serverConfig}
             description={feature.description}
-            disabled={features.resource.isBase(feature.id)}
+            disabled={featuresResource.resource.isBase(feature.id)}
             mod={['primary']}
             small
           >

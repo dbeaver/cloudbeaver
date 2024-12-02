@@ -9,8 +9,8 @@ import { computed, makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 
-import { BaseSqlDataSource } from './BaseSqlDataSource';
-import { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
+import { BaseSqlDataSource } from './BaseSqlDataSource.js';
+import { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures.js';
 
 export class MemorySqlDataSource extends BaseSqlDataSource {
   get baseScript(): string {
@@ -19,7 +19,7 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
   get baseExecutionContext(): IConnectionExecutionContextInfo | undefined {
     return this._executionContext;
   }
-  static key = 'memory';
+  static override key = 'memory';
 
   get name(): string | null {
     return this._name;
@@ -33,15 +33,15 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
     return this._executionContext;
   }
 
-  get features(): ESqlDataSourceFeatures[] {
+  override get features(): ESqlDataSourceFeatures[] {
     return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable, ESqlDataSourceFeatures.setName];
   }
 
-  get isSaved(): boolean {
+  override get isSaved(): boolean {
     return true;
   }
 
-  get projectId(): string | null {
+  override get projectId(): string | null {
     // we will be able to attach any connection from any project
     return null;
   }
@@ -65,21 +65,21 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
     });
   }
 
-  isReadonly(): boolean {
+  override isReadonly(): boolean {
     return false;
   }
 
-  setScript(script: string): void {
+  override setScript(script: string): void {
     this._script = script;
     super.setScript(script);
   }
 
-  setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
+  override setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
     this._executionContext = executionContext;
     super.setExecutionContext(executionContext);
   }
 
-  setName(name: string | null): void {
+  override setName(name: string | null): void {
     this._name = name;
     super.setName(name);
   }

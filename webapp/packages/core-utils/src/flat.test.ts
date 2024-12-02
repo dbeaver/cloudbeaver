@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from '@jest/globals';
 
-import { flat } from './flat';
+import { flat } from './flat.js';
 
 describe('Flat array', () => {
   test('should return flatted array', () => {

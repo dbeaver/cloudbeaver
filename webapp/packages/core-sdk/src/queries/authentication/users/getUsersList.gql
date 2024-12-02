@@ -1,4 +1,4 @@
-query getUsersList($page: PageInput!, $filter: AdminUserFilterInput!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+query getUsersList($page: PageInput!, $filter: AdminUserFilterInput!) {
   users: listUsers(page: $page, filter: $filter) {
     ...AdminUserInfo
   }

@@ -9,13 +9,13 @@ import { observer } from 'mobx-react-lite';
 import { useContext, useRef } from 'react';
 
 import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
-import { IResultSetRowKey, isBooleanValuePresentationAvailable } from '@cloudbeaver/plugin-data-viewer';
+import { type IResultSetRowKey, isBooleanValuePresentationAvailable } from '@cloudbeaver/plugin-data-viewer';
 
-import { CellContext } from '../CellRenderer/CellContext';
-import { TableDataContext } from '../TableDataContext';
-import { BlobFormatter } from './CellFormatters/BlobFormatter';
-import { BooleanFormatter } from './CellFormatters/BooleanFormatter';
-import { TextFormatter } from './CellFormatters/TextFormatter';
+import { CellContext } from '../CellRenderer/CellContext.js';
+import { TableDataContext } from '../TableDataContext.js';
+import { BlobFormatter } from './CellFormatters/BlobFormatter.js';
+import { BooleanFormatter } from './CellFormatters/BooleanFormatter.js';
+import { TextFormatter } from './CellFormatters/TextFormatter.js';
 
 interface IProps extends RenderCellProps<IResultSetRowKey> {
   isEditing: boolean;

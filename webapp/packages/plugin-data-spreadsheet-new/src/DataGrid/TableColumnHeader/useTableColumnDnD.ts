@@ -7,13 +7,13 @@
  */
 import { useCombinedRef } from '@cloudbeaver/core-blocks';
 import { useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
-import { IDNDBox, IDNDData, useDNDBox, useDNDData } from '@cloudbeaver/core-ui';
+import { type IDNDBox, type IDNDData, useDNDBox, useDNDData } from '@cloudbeaver/core-ui';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY,
-  IDatabaseDataModel,
-  IResultSetColumnKey,
+  type IDatabaseDataModel,
+  type IResultSetColumnKey,
   isResultSetDataModel,
   ResultSetDataSource,
   ResultSetViewAction,

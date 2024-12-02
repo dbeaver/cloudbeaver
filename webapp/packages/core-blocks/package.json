@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/core-blocks",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -33,6 +34,7 @@
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^18",
+    "react-hotkeys-hook": "^4",
     "reakit": "^1",
     "reakit-utils": "^0"
   },
@@ -48,8 +50,8 @@
     "@cloudbeaver/core-utils": "^0",
     "@cloudbeaver/tests-runner": "^0",
     "@jest/globals": "^29",
-    "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
+    "@types/jest": "^29",
     "@types/react": "^18",
     "mobx": "^6",
     "react": "^18",

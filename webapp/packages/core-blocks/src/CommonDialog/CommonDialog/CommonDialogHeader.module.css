@@ -27,6 +27,7 @@
 }
 
 .headerTitle {
+  composes: theme-typography--headline6 from global;
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;

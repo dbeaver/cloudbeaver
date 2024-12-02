@@ -25,6 +25,9 @@
       "path": "../core-events/tsconfig.json"
     },
     {
+      "path": "../core-links/tsconfig.json"
+    },
+    {
       "path": "../core-localization/tsconfig.json"
     },
     {
@@ -35,9 +38,6 @@
     },
     {
       "path": "../core-view/tsconfig.json"
-    },
-    {
-      "path": "../core-website/tsconfig.json"
     },
     {
       "path": "../plugin-navigation-tree/tsconfig.json"

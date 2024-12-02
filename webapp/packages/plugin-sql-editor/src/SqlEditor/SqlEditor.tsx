@@ -8,20 +8,20 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState } from 'react';
 
-import { getComputed, s, SContext, StyleRegistry, useS, useSplit } from '@cloudbeaver/core-blocks';
+import { getComputed, s, SContext, type StyleRegistry, useS, useSplit } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ITabData, TabList, TabListStyles, TabPanelList, TabsState, TabStyles } from '@cloudbeaver/core-ui';
+import { type ITabData, TabList, TabListStyles, TabPanelList, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
-import { ISqlEditorModeProps, SqlEditorModeService } from '../SqlEditorModeService';
-import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA';
-import type { ISqlEditorProps } from './ISqlEditorProps';
+import { type ISqlEditorModeProps, SqlEditorModeService } from '../SqlEditorModeService.js';
+import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA.js';
+import type { ISqlEditorProps } from './ISqlEditorProps.js';
 import styles from './shared/SqlEditor.module.css';
 import SqlEditorTab from './shared/SqlEditorTab.module.css';
 import SqlEditorTabList from './shared/SqlEditorTabList.module.css';
-import { SQLEditorActions } from './SQLEditorActions';
-import { useSqlEditor } from './useSqlEditor';
+import { SQLEditorActions } from './SQLEditorActions.js';
+import { useSqlEditor } from './useSqlEditor.js';
 
 const sqlEditorRegistry: StyleRegistry = [
   [TabListStyles, { mode: 'append', styles: [SqlEditorTabList] }],

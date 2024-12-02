@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { ACTION_REDO, ACTION_SAVE, ACTION_UNDO, IActiveView, View } from '@cloudbeaver/core-view';
-import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
+import { ACTION_REDO, ACTION_SAVE, ACTION_UNDO, type IActiveView, View } from '@cloudbeaver/core-view';
+import { type ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 @injectable()
 export class DataViewerViewService extends View<ITab> {

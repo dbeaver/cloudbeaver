@@ -10,14 +10,14 @@ import { ActionSnackbar, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { LocalStorageSaveService } from '@cloudbeaver/core-browser';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { ENotificationType, INotification, NotificationService } from '@cloudbeaver/core-events';
+import { ENotificationType, type INotification, NotificationService } from '@cloudbeaver/core-events';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_STATE } from '@cloudbeaver/plugin-top-app-bar';
 
-import { ACTION_APP_HELP } from './actions/ACTION_APP_HELP';
+import { ACTION_APP_HELP } from './actions/ACTION_APP_HELP.js';
 
-const ShortcutsDialog = importLazyComponent(() => import('./Shortcuts/ShortcutsDialog').then(m => m.ShortcutsDialog));
+const ShortcutsDialog = importLazyComponent(() => import('./Shortcuts/ShortcutsDialog.js').then(m => m.ShortcutsDialog));
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -34,9 +34,9 @@ export class PluginBootstrap extends Bootstrap {
     this.errorNotification = null;
   }
 
-  async load(): Promise<void> {}
+  override async load(): Promise<void> {}
 
-  register(): void {
+  override register(): void {
     this.addTopAppMenuItems();
     this.addMultiTabSupportNotification();
   }

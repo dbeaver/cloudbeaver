@@ -19,6 +19,7 @@ package io.cloudbeaver;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
+import com.google.gson.Strictness;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.WebPropertyInfo;
@@ -30,7 +31,6 @@ import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.navigator.WebPropertyFilter;
-import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
@@ -96,10 +96,6 @@ public class WebServiceUtils extends WebCommonUtils {
     @NotNull
     public static DBPDataSourceRegistry getGlobalDataSourceRegistry() throws DBWebException {
         return WebDataSourceUtils.getGlobalDataSourceRegistry();
-    }
-
-    public static DBPDataSourceRegistry getGlobalRegistry(WebSession session) {
-        return session.getProjectById(WebAppUtils.getGlobalProjectId()).getDataSourceRegistry();
     }
 
     public static InputStream openStaticResource(String path) {
@@ -299,7 +295,7 @@ public class WebServiceUtils extends WebCommonUtils {
                 // Make new Gson parser with type adapters to deserialize into existing credentials
                 InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
                 Gson credGson = new GsonBuilder()
-                    .setLenient()
+                    .setStrictness(Strictness.LENIENT)
                     .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
                     .create();
 
@@ -339,8 +335,8 @@ public class WebServiceUtils extends WebCommonUtils {
         return container.getName() + " [" + container.getId() + "]";
     }
 
-    public static void updateConfigAndRefreshDatabases(WebSession session, String projectId) {
-        DBNProject projectNode = session.getNavigatorModel().getRoot().getProjectNode(session.getProjectById(projectId));
+    public static void updateConfigAndRefreshDatabases(WebSession session, String projectId) throws DBWebException {
+        DBNProject projectNode = session.getNavigatorModelOrThrow().getRoot().getProjectNode(session.getProjectById(projectId));
         DBNModel.updateConfigAndRefreshDatabases(projectNode.getDatabases());
     }
 

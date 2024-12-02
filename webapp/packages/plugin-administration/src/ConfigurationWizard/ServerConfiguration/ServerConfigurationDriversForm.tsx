@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
-import { Combobox, Group, GroupTitle, ITag, s, Tag, Tags, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Combobox, Group, GroupTitle, type ITag, s, Tag, Tags, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
@@ -36,23 +36,29 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
       icon: driver!.icon,
     }));
 
-  const handleSelect = useCallback((value: string) => {
-    if (serverConfig.disabledDrivers && !serverConfig.disabledDrivers.includes(value)) {
-      serverConfig.disabledDrivers.push(value);
-    }
-  }, []);
+  const handleSelect = useCallback(
+    (value: string) => {
+      if (serverConfig.disabledDrivers && !serverConfig.disabledDrivers.includes(value)) {
+        serverConfig.disabledDrivers.push(value);
+      }
+    },
+    [serverConfig.disabledDrivers],
+  );
 
-  const handleRemove = useCallback((id: string) => {
-    if (!serverConfig.disabledDrivers) {
-      return;
-    }
+  const handleRemove = useCallback(
+    (id: string) => {
+      if (!serverConfig.disabledDrivers) {
+        return;
+      }
 
-    const index = serverConfig.disabledDrivers.indexOf(id);
+      const index = serverConfig.disabledDrivers.indexOf(id);
 
-    if (index !== -1) {
-      serverConfig.disabledDrivers.splice(index, 1);
-    }
-  }, []);
+      if (index !== -1) {
+        serverConfig.disabledDrivers.splice(index, 1);
+      }
+    },
+    [serverConfig.disabledDrivers],
+  );
 
   return (
     <Group maximum gap>

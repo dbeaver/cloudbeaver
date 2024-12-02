@@ -7,18 +7,18 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
-import { TabList as BaseTabList, TabListOptions, TabStateReturn } from 'reakit/Tab';
+import { TabList as BaseTabList, type TabListOptions, type TabStateReturn } from 'reakit';
 
-import { s, SContext, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { s, SContext, type StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import { generateTabElement } from './generateTabElement';
-import { TabDefault } from './Tab/TabDefault';
-import { TabBigUnderlineStyleRegistry, TabUnderlineStyleRegistry } from './Tab/TabStyleRegistries';
+import { generateTabElement } from './generateTabElement.js';
+import { TabDefault } from './Tab/TabDefault.js';
+import { TabBigUnderlineStyleRegistry, TabUnderlineStyleRegistry } from './Tab/TabStyleRegistries.js';
 import styles from './TabList.module.css';
-import { TabListVerticalRegistry, TabListVerticalRotatedRegistry } from './TabListStyleRegistries';
+import { TabListVerticalRegistry, TabListVerticalRotatedRegistry } from './TabListStyleRegistries.js';
 import verticalStyles from './TabListVertical.module.css';
 import verticalRotatedStyles from './TabListVerticalRotated.module.css';
-import { TabsContext } from './TabsContext';
+import { TabsContext } from './TabsContext.js';
 
 export interface TabListProps extends Omit<TabListOptions, keyof TabStateReturn> {
   'aria-label'?: string;

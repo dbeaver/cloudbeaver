@@ -7,7 +7,7 @@
  */
 import { createContext } from 'react';
 
-import { IServiceProvider } from './IServiceProvider';
+import { IServiceProvider } from './IServiceProvider.js';
 
 export const serviceProviderContext = createContext<IServiceProvider>(undefined as any);
 

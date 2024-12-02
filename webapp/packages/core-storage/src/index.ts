@@ -5,5 +5,5 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-export * from './manifest';
-export * from './StorageService';
+export * from './manifest.js';
+export * from './StorageService.js';

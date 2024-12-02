@@ -11,7 +11,7 @@ import { s, TableColumnValue, TableItem, TableItemExpand, useS } from '@cloudbea
 import type { IVersion } from '@cloudbeaver/core-version';
 
 import styles from './Version.module.css';
-import { VersionInfo } from './VersionInfo';
+import { VersionInfo } from './VersionInfo.js';
 
 interface Props {
   version: IVersion;

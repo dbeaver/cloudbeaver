@@ -7,10 +7,10 @@
  */
 import { useEffect, useState } from 'react';
 
-import { ActionIconButton } from '../../ActionIconButton';
-import { useTranslate } from '../../localization/useTranslate';
-import { s } from '../../s';
-import { useS } from '../../useS';
+import { ActionIconButton } from '../../ActionIconButton.js';
+import { useTranslate } from '../../localization/useTranslate.js';
+import { s } from '../../s.js';
+import { useS } from '../../useS.js';
 import style from './SnackbarWrapper.module.css';
 
 interface Props {

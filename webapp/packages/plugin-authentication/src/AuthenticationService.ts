@@ -15,23 +15,23 @@ import {
   AuthProviderContext,
   AuthProviderService,
   AuthProvidersResource,
-  RequestedProvider,
+  type RequestedProvider,
   UserInfoResource,
-  UserLogoutInfo,
+  type UserLogoutInfo,
 } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { Executor, ExecutorInterrupter, IExecutionContextProvider, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { ISessionAction, ServerConfigResource, sessionActionContext, SessionActionService, SessionDataResource } from '@cloudbeaver/core-root';
+import { type ISessionAction, ServerConfigResource, sessionActionContext, SessionActionService, SessionDataResource } from '@cloudbeaver/core-root';
 import { ScreenService, WindowsService } from '@cloudbeaver/core-routing';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import { AuthDialogService } from './Dialog/AuthDialogService';
-import type { IAuthOptions } from './IAuthOptions';
-import { isAutoLoginSessionAction } from './isAutoLoginSessionAction';
+import { AuthDialogService } from './Dialog/AuthDialogService.js';
+import type { IAuthOptions } from './IAuthOptions.js';
+import { isAutoLoginSessionAction } from './isAutoLoginSessionAction.js';
 
 export type AuthEventType = 'before' | 'after';
 
@@ -67,7 +67,7 @@ export class AuthenticationService extends Bootstrap {
     this.onLogin = new Executor();
 
     this.onLogout.before(this.navigationService.navigationTask);
-    this.onLogin.before(this.navigationService.navigationTask, undefined, () => authInfoService.isAnonymous);
+    this.onLogin.before(this.navigationService.navigationTask, undefined, () => userInfoResource.isAnonymous());
 
     this.authPromise = null;
     this.configureAuthProvider = null;
@@ -153,7 +153,7 @@ export class AuthenticationService extends Bootstrap {
         const configurableProvider = providers.find(provider => provider.configurable);
 
         if (configurableProvider?.configurations?.length === 1) {
-          const configuration = configurableProvider.configurations[0];
+          const configuration = configurableProvider.configurations[0]!;
 
           options.providerId = configurableProvider.id;
           options.configurationId = configuration.id;
@@ -193,7 +193,7 @@ export class AuthenticationService extends Bootstrap {
     await this.auth(true, { accessRequest: true, providerId: null, linkUser: false });
   }
 
-  register(): void {
+  override register(): void {
     // this.sessionDataResource.beforeLoad.addHandler(
     //   ExecutorInterrupter.interrupter(() => this.appAuthService.isAuthNeeded())
     // );

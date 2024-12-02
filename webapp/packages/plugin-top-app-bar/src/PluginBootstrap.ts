@@ -8,7 +8,7 @@
 import { AppScreenService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { PublicTopNavBar } from './TopNavBar/PublicTopNavBar';
+import { PublicTopNavBar } from './TopNavBar/PublicTopNavBar.js';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -16,9 +16,7 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.appScreenService.placeholder.add(PublicTopNavBar);
   }
-
-  load(): void | Promise<void> {}
 }

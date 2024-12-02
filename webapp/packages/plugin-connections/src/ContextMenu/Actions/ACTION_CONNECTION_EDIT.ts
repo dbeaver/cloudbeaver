@@ -8,5 +8,5 @@
 import { createAction } from '@cloudbeaver/core-view';
 
 export const ACTION_CONNECTION_EDIT = createAction('connection-edit', {
-  label: 'connections_public_connection_edit_menu_item_title',
+  label: 'plugin_connections_connection_edit_menu_item_title',
 });

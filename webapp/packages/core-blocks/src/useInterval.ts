@@ -7,7 +7,7 @@
  */
 import { useEffect } from 'react';
 
-import { useObjectRef } from './useObjectRef';
+import { useObjectRef } from './useObjectRef.js';
 
 export function useInterval(callback: () => void, delay: number | null) {
   const state = useObjectRef({ callback });

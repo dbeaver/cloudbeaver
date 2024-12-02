@@ -7,7 +7,7 @@
  */
 import { beforeEach, describe, expect, it } from '@jest/globals';
 
-import { getCookies } from './getCookies';
+import { getCookies } from './getCookies.js';
 
 describe('getCookies', () => {
   beforeEach(() => {

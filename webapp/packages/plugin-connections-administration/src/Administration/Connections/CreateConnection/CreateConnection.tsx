@@ -17,7 +17,7 @@ import {
   s,
   SContext,
   StaticImage,
-  StyleRegistry,
+  type StyleRegistry,
   useResource,
   useS,
   useTranslate,
@@ -27,7 +27,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { TabListStyles, TabPanelList, TabPanelStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { ConnectionFormLoader } from '@cloudbeaver/plugin-connections';
 
-import { CreateConnectionService } from '../CreateConnectionService';
+import { CreateConnectionService } from '../CreateConnectionService.js';
 import styles from './shared/CreateConnection.module.css';
 import CreateConnectionTab from './shared/CreateConnectionTab.module.css';
 import CreateConnectionTabList from './shared/CreateConnectionTabList.module.css';

@@ -7,9 +7,9 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { ITabInfo, ITabInfoOptions, TabsContainer } from '@cloudbeaver/core-ui';
+import { type ITabInfo, type ITabInfoOptions, TabsContainer } from '@cloudbeaver/core-ui';
 
-import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 
 export interface IDataValuePanelOptions {
   dataFormat: ResultDataFormat[];

@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 
-import type { INavNodeFolderTransform, NavNodeFolderTransformFn, NavNodeTransformView } from './IFolderTransform';
+import type { INavNodeFolderTransform, NavNodeFolderTransformFn, NavNodeTransformView } from './IFolderTransform.js';
 
 export interface INodeDuplicateList {
   nodes: string[];

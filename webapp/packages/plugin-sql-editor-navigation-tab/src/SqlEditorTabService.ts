@@ -19,39 +19,40 @@ import {
   ContainerResource,
   createConnectionParam,
   executionContextProvider,
-  ICatalogData,
-  IConnectionExecutorData,
-  IConnectionInfoParams,
+  type ICatalogData,
+  type IConnectionExecutorData,
+  type IConnectionInfoParams,
   objectCatalogProvider,
   objectCatalogSetter,
+  objectLoaderProvider,
   objectSchemaProvider,
   objectSchemaSetter,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeInfoResource, NodeManagerUtils, objectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider, projectSetter, projectSetterState } from '@cloudbeaver/core-projects';
-import { resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { getCachedMapResourceLoaderState, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import type { NavNodeInfoFragment } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
-import { ITab, ITabOptions, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
+import { type ITab, type ITabOptions, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
 import {
   ESqlDataSourceFeatures,
-  ISQLDatasourceUpdateData,
-  ISqlEditorTabState,
+  type ISQLDatasourceUpdateData,
+  type ISqlEditorTabState,
   SQL_EDITOR_TAB_STATE_SCHEMA,
   SqlDataSourceService,
   SqlEditorService,
   SqlResultTabsService,
 } from '@cloudbeaver/plugin-sql-editor';
 
-import { isSQLEditorTab } from './isSQLEditorTab';
-import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey';
+import { isSQLEditorTab } from './isSQLEditorTab.js';
+import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey.js';
 
-const SqlEditorPanel = importLazyComponent(() => import('./SqlEditorPanel').then(m => m.SqlEditorPanel));
-const SqlEditorTab = importLazyComponent(() => import('./SqlEditorTab').then(m => m.SqlEditorTab));
+const SqlEditorPanel = importLazyComponent(() => import('./SqlEditorPanel.js').then(m => m.SqlEditorPanel));
+const SqlEditorTab = importLazyComponent(() => import('./SqlEditorTab.js').then(m => m.SqlEditorTab));
 
 @injectable()
 export class SqlEditorTabService extends Bootstrap {
@@ -95,6 +96,7 @@ export class SqlEditorTabService extends Bootstrap {
         projectProvider(this.getProjectId.bind(this)),
         connectionProvider(this.getConnectionId.bind(this)),
         objectCatalogProvider(this.getObjectCatalogId.bind(this)),
+        objectLoaderProvider(this.getObjectLoader.bind(this)),
         objectSchemaProvider(this.getObjectSchemaId.bind(this)),
         executionContextProvider(this.getExecutionContext.bind(this)),
         projectSetter(this.setProjectId.bind(this)),
@@ -111,15 +113,13 @@ export class SqlEditorTabService extends Bootstrap {
     });
   }
 
-  register(): void {
+  override register(): void {
     this.sqlDataSourceService.onUpdate.addHandler(this.syncDatasourceUpdate.bind(this));
     this.connectionsManagerService.onDisconnect.addHandler(this.disconnectHandler.bind(this));
     this.connectionInfoResource.onItemDelete.addHandler(this.handleConnectionDelete.bind(this));
     this.connectionExecutionContextResource.onItemUpdate.addHandler(this.handleExecutionContextUpdate.bind(this));
     this.connectionExecutionContextResource.onItemDelete.addHandler(this.handleExecutionContextDelete.bind(this));
   }
-
-  load(): void {}
 
   createNewEditor(editorId: string, dataSourceKey: string, name?: string, source?: string, script?: string): ITabOptions<ISqlEditorTabState> | null {
     const order = this.getFreeEditorId();
@@ -184,9 +184,7 @@ export class SqlEditorTabService extends Bootstrap {
     const { projectId, connectionId, defaultCatalog, defaultSchema } = executionContext;
     const connectionKey = createConnectionParam(projectId, connectionId);
 
-    const connection = this.connectionInfoResource.get(connectionKey);
-
-    if (!connection?.connected) {
+    if (!this.connectionInfoResource.isConnected(connectionKey)) {
       return;
     }
 
@@ -210,8 +208,6 @@ export class SqlEditorTabService extends Bootstrap {
     }
 
     const parents = this.navNodeInfoResource.getParents(nodeId);
-
-    untracked(() => this.navNodeInfoResource.load(nodeId!));
 
     return {
       nodeId,
@@ -327,6 +323,34 @@ export class SqlEditorTabService extends Bootstrap {
     }
 
     return createConnectionParam(context.projectId, context.connectionId);
+  }
+
+  private getObjectLoader(tab: ITab<ISqlEditorTabState>) {
+    const executionContextComputed = computed(() => this.sqlDataSourceService.get(tab.handlerState.editorId)?.executionContext);
+
+    const connectionKeyComputed = computed(() => {
+      const executionContext = executionContextComputed.get();
+
+      if (!executionContext) {
+        return null;
+      }
+
+      return createConnectionParam(executionContext.projectId, executionContext.connectionId);
+    });
+
+    return [
+      getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKeyComputed.get()),
+      getCachedMapResourceLoaderState(this.connectionExecutionContextResource, () => executionContextComputed.get()?.id || null),
+      getCachedMapResourceLoaderState(this.containerResource, () => connectionKeyComputed.get()),
+      // TODO: maybe we need it for this.getNavNode to work properly, but it's seems working without it
+      // getCachedMapResourceLoaderState(this.navNodeInfoResource, () => {
+      //   if (this.containerResource.isLoadable(connectionKey)) {
+      //     return null;
+      //   }
+      //   console.log('node:', this.getNavNode(tab)?.nodeId || null);
+      //   return this.getNavNode(tab)?.nodeId || null;
+      // }),
+    ];
   }
 
   private getObjectCatalogId(tab: ITab<ISqlEditorTabState>) {
@@ -462,7 +486,7 @@ export class SqlEditorTabService extends Bootstrap {
 
     const dataSource = this.sqlDataSourceService.get(editorTab.handlerState.editorId);
 
-    if (dataSource?.isSaved === false) {
+    if (dataSource?.isSaved === false && !dataSource?.isReadonly()) {
       const result = await this.commonDialogService.open(ConfirmationDialog, {
         title: 'plugin_sql_editor_navigation_tab_data_source_save_confirmation_title',
         subTitle: dataSource.name ?? undefined,

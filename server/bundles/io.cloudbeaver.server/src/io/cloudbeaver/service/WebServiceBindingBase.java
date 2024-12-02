@@ -27,7 +27,7 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.service.security.SMUtils;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.WebDataSourceUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
@@ -137,7 +137,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
 
     @NotNull
     public static WebConnectionInfo getWebConnection(WebSession session, String projectId, String connectionId) throws DBWebException {
-        return session.getWebConnectionInfo(projectId, connectionId);
+        return WebDataSourceUtils.getWebConnectionInfo(session, projectId, connectionId);
     }
 
     private class ServiceInvocationHandler implements InvocationHandler {
@@ -230,7 +230,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 if (project == null) {
                     throw new DBException("Project not found:" + projectId);
                 }
-                RMProject rmProject = project.getRmProject();
+                RMProject rmProject = project.getRMProject();
 
                 for (String reqProjectPermission : requireProjectPermissions) {
                     if (!rmProject.hasProjectPermission(reqProjectPermission)) {

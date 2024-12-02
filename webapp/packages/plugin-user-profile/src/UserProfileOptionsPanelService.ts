@@ -10,14 +10,14 @@ import { action, makeObservable } from 'mobx';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import { ExecutionContext, Executor, IExecutor, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { ExecutionContext, Executor, type IExecutor, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { userProfileContext } from './userProfileContext';
-import { UserProfileTabsService } from './UserProfileTabsService';
+import { userProfileContext } from './userProfileContext.js';
+import { UserProfileTabsService } from './UserProfileTabsService.js';
 
-const UserProfileOptionsPanel = importLazyComponent(() => import('./UserProfileOptionsPanel').then(m => m.UserProfileOptionsPanel));
+const UserProfileOptionsPanel = importLazyComponent(() => import('./UserProfileOptionsPanel.js').then(m => m.UserProfileOptionsPanel));
 const panelGetter = () => UserProfileOptionsPanel;
 
 @injectable()
@@ -82,7 +82,7 @@ export class UserProfileOptionsPanelService {
       return;
     }
 
-    if (this.userInfoResource.data === null) {
+    if (!this.userInfoResource.hasAccess()) {
       this.close(true);
     }
   }

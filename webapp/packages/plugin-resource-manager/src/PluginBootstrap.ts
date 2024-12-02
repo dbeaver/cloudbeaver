@@ -13,7 +13,5 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {}
-
-  async load(): Promise<void> {}
+  override async load(): Promise<void> {}
 }

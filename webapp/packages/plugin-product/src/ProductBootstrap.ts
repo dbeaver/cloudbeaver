@@ -12,7 +12,7 @@ import { ProductInfoResource } from '@cloudbeaver/core-root';
 import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 
-const ProductInfoDialog = importLazyComponent(() => import('./ProductInfoDialog').then(m => m.ProductInfoDialog));
+const ProductInfoDialog = importLazyComponent(() => import('./ProductInfoDialog.js').then(m => m.ProductInfoDialog));
 
 @injectable()
 export class ProductBootstrap extends Bootstrap {
@@ -24,7 +24,7 @@ export class ProductBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.menuService.addCreator({
       menus: [TOP_NAV_BAR_SETTINGS_MENU],
       isApplicable: () => !!this.productInfoResource.data,

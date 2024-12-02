@@ -7,8 +7,8 @@
  */
 import type { SplitProps, SplitterMode } from 'go-split';
 
-import { useObjectRef } from '../useObjectRef';
-import { useUserData } from '../useUserData';
+import { useObjectRef } from '../useObjectRef.js';
+import { useUserData } from '../useUserData.js';
 
 type SplitState = Pick<SplitProps, 'mode' | 'size' | 'ratio' | 'disable' | 'onModeChange' | 'onResize' | 'onDisable'>;
 

@@ -7,15 +7,15 @@
  */
 import { observable } from 'mobx';
 
-import { DefaultValueGetter, isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
+import { type DefaultValueGetter, isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
 
-import { CachedResourceOffsetPageKey, CachedResourceOffsetPageListKey } from './CachedResourceOffsetPageKeys';
-import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
-import { isResourceAlias, ResourceAlias } from './ResourceAlias';
-import type { ResourceAliases } from './ResourceAliases';
-import type { ResourceKey, ResourceKeyFlat } from './ResourceKey';
-import { isResourceKeyList, ResourceKeyList } from './ResourceKeyList';
-import { ResourceKeyUtils } from './ResourceKeyUtils';
+import { CachedResourceOffsetPageKey, CachedResourceOffsetPageListKey } from './CachedResourceOffsetPageKeys.js';
+import type { ICachedResourceMetadata } from './ICachedResourceMetadata.js';
+import { isResourceAlias, ResourceAlias } from './ResourceAlias.js';
+import type { ResourceAliases } from './ResourceAliases.js';
+import type { ResourceKey, ResourceKeyFlat } from './ResourceKey.js';
+import { isResourceKeyList, ResourceKeyList } from './ResourceKeyList.js';
+import { ResourceKeyUtils } from './ResourceKeyUtils.js';
 
 type MetadataCallback<TMetadata, TValue = void> = (metadata: TMetadata) => TValue;
 

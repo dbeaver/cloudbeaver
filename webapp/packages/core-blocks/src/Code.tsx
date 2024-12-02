@@ -8,8 +8,8 @@
 import { observer } from 'mobx-react-lite';
 
 import style from './Code.module.css';
-import { s } from './s';
-import { useS } from './useS';
+import { s } from './s.js';
+import { useS } from './useS.js';
 
 interface Props {
   className?: string;

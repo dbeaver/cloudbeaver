@@ -8,11 +8,11 @@
 import React from 'react';
 
 export const NavigationNodeControlLoader = React.lazy(async () => {
-  const { NavigationNodeControl } = await import('./NavigationNodeControl');
+  const { NavigationNodeControl } = await import('./NavigationNodeControl.js');
   return { default: NavigationNodeControl };
 });
 
 export const NavigationNodeEditorLoader = React.lazy(async () => {
-  const { NavigationNodeEditor } = await import('./NavigationNodeEditor');
+  const { NavigationNodeEditor } = await import('./NavigationNodeEditor.js');
   return { default: NavigationNodeEditor };
 });

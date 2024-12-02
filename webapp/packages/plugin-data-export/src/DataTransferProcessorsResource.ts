@@ -8,7 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { DataTransferProcessorInfo, GraphQLService } from '@cloudbeaver/core-sdk';
+import { type DataTransferProcessorInfo, GraphQLService } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class DataTransferProcessorsResource extends CachedMapResource<string, DataTransferProcessorInfo> {

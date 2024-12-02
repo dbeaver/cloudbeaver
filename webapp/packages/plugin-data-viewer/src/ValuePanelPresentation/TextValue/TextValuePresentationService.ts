@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { ITabInfo, ITabInfoOptions, TabsContainer } from '@cloudbeaver/core-ui';
+import { type ITabInfo, type ITabInfoOptions, TabsContainer } from '@cloudbeaver/core-ui';
 
-import { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource';
-import type { IDataValuePanelOptions, IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
+import { type IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
+import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
+import type { IDataValuePanelOptions, IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService.js';
 
 export interface ITextValuePanelProps extends Omit<IDataValuePanelProps, 'model'> {
   model: IDatabaseDataModel<ResultSetDataSource>;

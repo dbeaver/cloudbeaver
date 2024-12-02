@@ -12,5 +12,5 @@ export const defaultProductManifest: PluginManifest = {
     name: 'Default Product',
   },
 
-  providers: [() => import('./ProductBootstrap').then(m => m.ProductBootstrap), () => import('./LocaleService').then(m => m.LocaleService)],
+  providers: [() => import('./ProductBootstrap.js').then(m => m.ProductBootstrap), () => import('./LocaleService.js').then(m => m.LocaleService)],
 };

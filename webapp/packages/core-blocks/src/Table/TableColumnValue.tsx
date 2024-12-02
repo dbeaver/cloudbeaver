@@ -10,14 +10,14 @@ import { forwardRef, useCallback, useContext } from 'react';
 
 import { EventContext } from '@cloudbeaver/core-events';
 
-import { s } from '../s';
-import { useObjectRef } from '../useObjectRef';
-import { useS } from '../useS';
-import { EventTableItemExpandFlag } from './EventTableItemExpandFlag';
-import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
+import { s } from '../s.js';
+import { useObjectRef } from '../useObjectRef.js';
+import { useS } from '../useS.js';
+import { EventTableItemExpandFlag } from './EventTableItemExpandFlag.js';
+import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag.js';
 import style from './TableColumnValue.module.css';
-import { TableContext } from './TableContext';
-import { TableItemContext } from './TableItemContext';
+import { TableContext } from './TableContext.js';
+import { TableItemContext } from './TableItemContext.js';
 
 type Props = {
   align?: 'left' | 'center' | 'right' | 'justify' | 'char';

@@ -11,11 +11,11 @@ import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { ServerEventId, SessionDataResource } from '@cloudbeaver/core-root';
-import { GraphQLService, LogEntry } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type LogEntry } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import { LogViewerSettingsService } from './LogViewer/LogViewerSettingsService';
-import { SessionLogsEventHandler } from './SessionLogsEventHandler';
+import { LogViewerSettingsService } from './LogViewer/LogViewerSettingsService.js';
+import { SessionLogsEventHandler } from './SessionLogsEventHandler.js';
 
 export interface ILogEntry extends LogEntry {
   id: string;
@@ -53,10 +53,11 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
   }
 
   protected async loader(): Promise<ILogEntry[]> {
-    const maxLogEntries = this.logViewerSettingsService.logBatchSize;
+    const maxLogRecords = this.logViewerSettingsService.maxLogRecords;
+    const batchSize = this.logViewerSettingsService.logBatchSize;
 
     const { log } = await this.graphQLService.sdk.readSessionLog({
-      maxEntries: maxLogEntries,
+      maxEntries: batchSize,
       clearEntries: true,
     });
 
@@ -68,8 +69,8 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
     runInAction(() => {
       this.data.unshift(...logs.reverse());
 
-      if (this.data.length > maxLogEntries) {
-        this.data.splice(maxLogEntries, this.data.length - maxLogEntries);
+      if (this.data.length > maxLogRecords) {
+        this.data.splice(maxLogRecords, this.data.length - maxLogRecords);
       }
     });
 

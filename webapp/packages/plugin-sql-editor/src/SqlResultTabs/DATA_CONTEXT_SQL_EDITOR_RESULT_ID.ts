@@ -7,6 +7,6 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
-import type { ISqlEditorResultTab } from '../ISqlEditorTabState';
+import type { ISqlEditorResultTab } from '../ISqlEditorTabState.js';
 
 export const DATA_CONTEXT_SQL_EDITOR_RESULT_ID = createDataContext<ISqlEditorResultTab>('sql-editor-result-id');

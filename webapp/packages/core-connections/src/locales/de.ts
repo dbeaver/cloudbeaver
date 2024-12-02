@@ -55,4 +55,8 @@ export default [
   ['connections_network_handler_ssh_tunnel_advanced_settings', 'Erweiterte Einstellungen'],
   ['connections_not_found', 'Es wurden keine Datenbankverbindungen gefunden'],
   ['connections_connection_autocommit', 'Auto commit'],
+
+  ['core_connections_settings_disable', 'Disable'],
+  ['core_connections_settings_disable_description', 'Disable the ability to create new connections'],
+  ['connections_templates_deprecated_message', 'Template connections are deprecated and will be removed in future releases'],
 ];

@@ -13,8 +13,8 @@ export const dataViewerResultTraceDetailsPlugin: PluginManifest = {
   },
 
   providers: [
-    () => import('./DVResultTraceDetailsBootstrap').then(m => m.DVResultTraceDetailsBootstrap),
-    () => import('./DVResultTraceDetailsService').then(m => m.DVResultTraceDetailsService),
-    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./DVResultTraceDetailsBootstrap.js').then(m => m.DVResultTraceDetailsBootstrap),
+    () => import('./DVResultTraceDetailsService.js').then(m => m.DVResultTraceDetailsService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
   ],
 };

@@ -10,16 +10,16 @@ import { computed, observable } from 'mobx';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { DynamicTraceProperty, GetSqlDynamicTraceMutation } from '@cloudbeaver/core-sdk';
-import { ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
+import { type ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
 import {
   DatabaseMetadataAction,
-  IDatabaseDataModel,
-  IResultSetElementKey,
+  type IDatabaseDataModel,
+  type IResultSetElementKey,
   ResultSetCacheAction,
   ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { DVResultTraceDetailsService } from './DVResultTraceDetailsService';
+import { DVResultTraceDetailsService } from './DVResultTraceDetailsService.js';
 
 type ResultTraceDetailsPromise = Promise<GetSqlDynamicTraceMutation>;
 

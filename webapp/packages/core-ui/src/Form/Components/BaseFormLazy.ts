@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const BaseForm = importLazyComponent(() => import('./BaseForm').then(m => m.BaseForm));
+export const BaseForm = importLazyComponent(() => import('./BaseForm.js').then(m => m.BaseForm));

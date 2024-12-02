@@ -14,7 +14,7 @@ import {
   map,
   merge,
   Observable,
-  Observer,
+  type Observer,
   of,
   repeat,
   retry,
@@ -25,7 +25,7 @@ import {
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import {
   CbClientEventId as ClientEventId,
   EnvironmentService,
@@ -34,9 +34,9 @@ import {
   CbEventTopic as SessionEventTopic,
 } from '@cloudbeaver/core-sdk';
 
-import { NetworkStateService } from './NetworkStateService';
-import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Subscription } from './ServerEventEmitter/IServerEventEmitter';
-import { SessionExpireService } from './SessionExpireService';
+import { NetworkStateService } from './NetworkStateService.js';
+import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Subscription } from './ServerEventEmitter/IServerEventEmitter.js';
+import { SessionExpireService } from './SessionExpireService.js';
 
 export { ServerEventId, SessionEventTopic, ClientEventId };
 

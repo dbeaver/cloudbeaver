@@ -9,8 +9,8 @@ import { observer } from 'mobx-react-lite';
 
 import { isDefined } from '@cloudbeaver/core-utils';
 
-import { useAutoLoad } from '../Loader/useAutoLoad';
-import type { PlaceholderContainer, PlaceholderElement } from './PlaceholderContainer';
+import { useAutoLoad } from '../Loader/useAutoLoad.js';
+import type { PlaceholderContainer, PlaceholderElement } from './PlaceholderContainer.js';
 
 type Props<T extends Record<string, any>> = T & {
   container: PlaceholderContainer<T>;

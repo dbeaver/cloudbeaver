@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-datasource-context-switch",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -28,6 +29,7 @@
     "@cloudbeaver/core-projects": "^0",
     "@cloudbeaver/core-resource": "^0",
     "@cloudbeaver/core-ui": "^0",
+    "@cloudbeaver/core-utils": "^0",
     "@cloudbeaver/core-view": "^0",
     "@cloudbeaver/plugin-navigation-tabs": "^0",
     "@cloudbeaver/plugin-top-app-bar": "^0",

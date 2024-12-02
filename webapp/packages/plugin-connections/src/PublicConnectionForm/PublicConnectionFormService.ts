@@ -9,22 +9,28 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import {
+  ConnectionInfoOriginResource,
+  ConnectionInfoResource,
+  ConnectionsManagerService,
+  createConnectionParam,
+  type IConnectionInfoParams,
+} from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { executorHandlerFilter, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { executorHandlerFilter, ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { ResourceKey, ResourceKeySimple } from '@cloudbeaver/core-resource';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
-import { ConnectionFormService } from '../ConnectionForm/ConnectionFormService';
-import { ConnectionFormState } from '../ConnectionForm/ConnectionFormState';
-import type { IConnectionFormState } from '../ConnectionForm/IConnectionFormProps';
+import { ConnectionFormService } from '../ConnectionForm/ConnectionFormService.js';
+import { ConnectionFormState } from '../ConnectionForm/ConnectionFormState.js';
+import type { IConnectionFormState } from '../ConnectionForm/IConnectionFormProps.js';
 
-const PublicConnectionForm = importLazyComponent(() => import('./PublicConnectionForm').then(m => m.PublicConnectionForm));
+const PublicConnectionForm = importLazyComponent(() => import('./PublicConnectionForm.js').then(m => m.PublicConnectionForm));
 
 const formGetter = () => PublicConnectionForm;
 
@@ -43,6 +49,7 @@ export class PublicConnectionFormService {
     private readonly authenticationService: AuthenticationService,
     private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
+    private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
   ) {
     this.formState = null;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
@@ -53,8 +60,9 @@ export class PublicConnectionFormService {
       executorHandlerFilter(
         () => !!this.formState && this.optionsPanelService.isOpen(formGetter),
         async (event, context) => {
-          if (event === 'before' && this.userInfoResource.data === null) {
+          if (event === 'before' && this.userInfoResource.isAnonymous()) {
             const confirmed = await this.showUnsavedChangesDialog();
+
             if (!confirmed) {
               ExecutorInterrupter.interrupt(context);
             }
@@ -82,6 +90,7 @@ export class PublicConnectionFormService {
         this.projectInfoResource,
         this.connectionFormService,
         this.connectionInfoResource,
+        this.connectionInfoOriginResource,
       );
 
       this.formState.closeTask.addHandler(this.close.bind(this, true));
@@ -182,8 +191,8 @@ export class PublicConnectionFormService {
     }
 
     const result = await this.commonDialogService.open(ConfirmationDialog, {
-      title: 'connections_public_connection_edit_cancel_title',
-      message: 'connections_public_connection_edit_cancel_message',
+      title: 'plugin_connections_connection_edit_cancel_title',
+      message: 'plugin_connections_connection_edit_cancel_message',
       confirmActionText: 'ui_processing_ok',
     });
 
@@ -192,8 +201,8 @@ export class PublicConnectionFormService {
 
   private async tryReconnect(connectionKey: IConnectionInfoParams) {
     const result = await this.commonDialogService.open(ConfirmationDialog, {
-      title: 'connections_public_connection_edit_reconnect_title',
-      message: 'connections_public_connection_edit_reconnect_message',
+      title: 'plugin_connections_connection_edit_reconnect_title',
+      message: 'plugin_connections_connection_edit_reconnect_message',
       confirmActionText: 'ui_reconnect',
     });
 
@@ -202,10 +211,10 @@ export class PublicConnectionFormService {
     }
 
     try {
-      await this.connectionInfoResource.close(connectionKey);
+      await this.connectionsManagerService.closeConnectionAsync(connectionKey);
       await this.connectionsManagerService.requireConnection(connectionKey);
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'connections_public_connection_edit_reconnect_failed');
+      this.notificationService.logException(exception, 'plugin_connections_connection_edit_reconnect_failed');
     }
   }
 

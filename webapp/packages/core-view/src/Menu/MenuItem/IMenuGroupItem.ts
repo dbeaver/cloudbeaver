@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IMenuItem } from './IMenuItem';
+import type { IMenuItem } from './IMenuItem.js';
 
 export interface IMenuGroupItem extends IMenuItem {
   items: IMenuItem[];

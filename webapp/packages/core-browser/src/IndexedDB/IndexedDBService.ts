@@ -7,7 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 
-import type { IndexedDB } from './IndexedDB';
+import type { IndexedDB } from './IndexedDB.js';
 
 @injectable()
 export class IndexedDBService {

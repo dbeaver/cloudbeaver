@@ -7,44 +7,41 @@
  */
 import { toJS } from 'mobx';
 
-import type { UserInfoResource, UserResourceIncludes } from '@cloudbeaver/core-authentication';
+import type { UserInfoMetaParametersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { CachedResourceIncludeArgs } from '@cloudbeaver/core-resource';
-import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
-import { FormPart, IFormState } from '@cloudbeaver/core-ui';
+import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import { isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 
-import type { IUserProfileFormState } from '../UserProfileFormService';
-import { type IUserProfileFormInfoState, USER_PROFILE_FORM_INFO_PART_STATE_SCHEMA } from './IUserProfileFormInfoState';
+import type { IUserProfileFormState } from '../UserProfileFormService.js';
+import { type IUserProfileFormInfoState, USER_PROFILE_FORM_INFO_PART_STATE_SCHEMA } from './IUserProfileFormInfoState.js';
 
 export class UserProfileFormInfoPart extends FormPart<IUserProfileFormInfoState, IUserProfileFormState> {
-  private baseIncludes: CachedResourceIncludeArgs<AdminUserInfoFragment, UserResourceIncludes>;
   constructor(
     formState: IFormState<IUserProfileFormState>,
     private readonly userInfoResource: UserInfoResource,
+    private readonly userInfoMetaParametersResource: UserInfoMetaParametersResource,
   ) {
     super(formState, {
       userId: userInfoResource.data?.userId || '',
       displayName: userInfoResource.data?.displayName || '',
       authRole: userInfoResource.data?.authRole || '',
-      metaParameters: toJS(userInfoResource.data?.metaParameters || {}),
+      metaParameters: toJS(userInfoMetaParametersResource.data || {}),
     });
-    this.baseIncludes = ['includeMetaParameters'];
   }
 
-  protected format(data: IFormState<IUserProfileFormState>, contexts: IExecutionContextProvider<IFormState<IUserProfileFormState>>): void {
+  protected override format(data: IFormState<IUserProfileFormState>, contexts: IExecutionContextProvider<IFormState<IUserProfileFormState>>): void {
     this.state = USER_PROFILE_FORM_INFO_PART_STATE_SCHEMA.parse(this.state);
   }
 
-  isOutdated(): boolean {
-    return this.userInfoResource.isOutdated(undefined, this.baseIncludes);
+  override isOutdated(): boolean {
+    return this.userInfoResource.isOutdated(undefined) || this.userInfoMetaParametersResource.isOutdated(undefined);
   }
 
-  isLoaded(): boolean {
-    return this.loaded && this.userInfoResource.isLoaded(undefined, this.baseIncludes);
+  override isLoaded(): boolean {
+    return this.loaded && this.userInfoResource.isLoaded(undefined) && this.userInfoMetaParametersResource.isLoaded(undefined);
   }
 
-  get isChanged(): boolean {
+  override get isChanged(): boolean {
     if (!this.loaded) {
       return false;
     }
@@ -62,13 +59,13 @@ export class UserProfileFormInfoPart extends FormPart<IUserProfileFormInfoState,
   }
 
   protected override async loader() {
-    const user = await this.userInfoResource.load(undefined, this.baseIncludes);
+    const [user, metaParameters] = await Promise.all([this.userInfoResource.load(undefined), this.userInfoMetaParametersResource.load(undefined)]);
 
     this.setInitialState({
       userId: user?.userId || '',
       displayName: user?.displayName || '',
       authRole: user?.authRole ?? '',
-      metaParameters: toJS(user?.metaParameters || {}),
+      metaParameters: toJS(metaParameters || {}),
     });
   }
 }

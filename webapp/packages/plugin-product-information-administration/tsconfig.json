@@ -22,6 +22,9 @@
       "path": "../core-resource/tsconfig.json"
     },
     {
+      "path": "../core-root/tsconfig.json"
+    },
+    {
       "path": "../core-ui/tsconfig.json"
     },
     {

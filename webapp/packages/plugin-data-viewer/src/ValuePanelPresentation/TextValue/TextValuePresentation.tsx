@@ -8,27 +8,27 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { ActionIconButton, Container, Group, Loader, s, SContext, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, Container, Group, Loader, s, SContext, type StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { TabContainerPanelComponent, TabList, TabsState, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, TabList, TabsState, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 
-import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
-import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
-import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
-import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { DataViewerService } from '../../DataViewerService';
-import { isResultSetDataModel } from '../../ResultSet/isResultSetDataModel';
-import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
-import { getDefaultLineWrapping } from './getDefaultLineWrapping';
-import { isTextValueReadonly } from './isTextValueReadonly';
+import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.js';
+import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction.js';
+import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
+import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction.js';
+import { DataViewerService } from '../../DataViewerService.js';
+import { isResultSetDataModel } from '../../ResultSet/isResultSetDataModel.js';
+import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService.js';
+import { getDefaultLineWrapping } from './getDefaultLineWrapping.js';
+import { isTextValueReadonly } from './isTextValueReadonly.js';
 import styles from './shared/TextValuePresentation.module.css';
 import TextValuePresentationTab from './shared/TextValuePresentationTab.module.css';
-import { TextValueEditor } from './TextValueEditor';
-import { TextValuePresentationService } from './TextValuePresentationService';
-import { TextValueTruncatedMessage } from './TextValueTruncatedMessage';
-import { useAutoContentType } from './useAutoContentType';
-import { useTextValueGetter } from './useTextValueGetter';
+import { TextValueEditor } from './TextValueEditor.js';
+import { TextValuePresentationService } from './TextValuePresentationService.js';
+import { TextValueTruncatedMessage } from './TextValueTruncatedMessage.js';
+import { useAutoContentType } from './useAutoContentType.js';
+import { useTextValueGetter } from './useTextValueGetter.js';
 
 const tabRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TextValuePresentationTab] }]];
 

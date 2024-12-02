@@ -6,20 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import type { HTMLAttributes } from 'react';
 
-import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
+import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { TabList, TabListStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 
-import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
-import { PresentationTab } from './PresentationTab';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
+import { DataPresentationService, DataPresentationType } from '../../DataPresentationService.js';
+import { PresentationTab } from './PresentationTab.js';
 import styles from './shared/TablePresentationBar.module.css';
 import TablePresentationBarTab from './shared/TablePresentationBarTab.module.css';
 import TablePresentationBarTabList from './shared/TablePresentationBarTabList.module.css';
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
   type: DataPresentationType;
   presentationId: string | null | undefined;
   dataFormat: ResultDataFormat;
@@ -46,6 +47,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
   className,
   onPresentationChange,
   onClose,
+  ...rest
 }) {
   const style = useS(styles);
   const dataPresentationService = useService(DataPresentationService);
@@ -66,7 +68,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
   }
 
   return (
-    <div className={s(style, { tableLeftBar: true }, className)}>
+    <div {...rest} className={s(style, { tableLeftBar: true }, className)}>
       <TabsState currentTabId={presentationId} autoSelect={main}>
         <SContext registry={tablePresentationBarRegistry}>
           <TabList className={s(style, { tabListFlexible: main })} aria-label="Data Presentations" vertical rotated>

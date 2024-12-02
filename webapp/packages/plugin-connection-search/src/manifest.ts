@@ -12,9 +12,9 @@ export const connectionSearchPlugin: PluginManifest = {
     name: 'Search connection plugin',
   },
   providers: [
-    () => import('./SearchConnectionPluginBootstrap').then(m => m.SearchConnectionPluginBootstrap),
-    () => import('./Search/ConnectionSearchService').then(m => m.ConnectionSearchService),
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./ConnectionSearchSettingsService').then(m => m.ConnectionSearchSettingsService),
+    () => import('./SearchConnectionPluginBootstrap.js').then(m => m.SearchConnectionPluginBootstrap),
+    () => import('./Search/ConnectionSearchService.js').then(m => m.ConnectionSearchService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./ConnectionSearchSettingsService.js').then(m => m.ConnectionSearchSettingsService),
   ],
 };

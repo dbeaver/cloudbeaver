@@ -9,5 +9,5 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 export const resourceManagerAdministrationPlugin: PluginManifest = {
   info: { name: 'Resource manager administration plugin' },
-  providers: [() => import('./PluginBootstrap').then(m => m.PluginBootstrap), () => import('./LocaleService').then(m => m.LocaleService)],
+  providers: [() => import('./PluginBootstrap.js').then(m => m.PluginBootstrap), () => import('./LocaleService.js').then(m => m.LocaleService)],
 };

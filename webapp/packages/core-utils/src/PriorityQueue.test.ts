@@ -7,7 +7,7 @@
  */
 import { beforeEach, describe, expect, it } from '@jest/globals';
 
-import { PriorityQueue } from './PriorityQueue';
+import { PriorityQueue } from './PriorityQueue.js';
 
 describe('PriorityQueue', () => {
   let queue: PriorityQueue;

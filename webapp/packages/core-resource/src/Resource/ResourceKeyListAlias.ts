@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ResourceAlias, ResourceAliasFactory, ResourceAliasOptions } from './ResourceAlias';
+import { ResourceAlias, type ResourceAliasFactory, type ResourceAliasOptions } from './ResourceAlias.js';
 
 export class ResourceKeyListAlias<TKey, TOptions extends ResourceAliasOptions> extends ResourceAlias<TKey, TOptions> {
   readonly name = 'ResourceKeyListAlias';

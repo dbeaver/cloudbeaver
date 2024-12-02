@@ -7,9 +7,9 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
-import { GraphQLService, ResourceQuotasFragment } from '@cloudbeaver/core-sdk';
+import { GraphQLService, type ResourceQuotasFragment } from '@cloudbeaver/core-sdk';
 
-import { ServerConfigResource } from './ServerConfigResource';
+import { ServerConfigResource } from './ServerConfigResource.js';
 
 export type ServerResourceQuotas = ResourceQuotasFragment['resourceQuotas'];
 

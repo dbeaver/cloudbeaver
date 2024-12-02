@@ -7,8 +7,8 @@
  */
 import type { DataContextGetter, IDataContextProvider } from '@cloudbeaver/core-data-context';
 
-import type { IAction } from '../../Action/IAction';
-import type { IKeyBinding } from './IKeyBinding';
+import type { IAction } from '../../Action/IAction.js';
+import type { IKeyBinding } from './IKeyBinding.js';
 
 export interface IKeyBindingHandler {
   id: string;

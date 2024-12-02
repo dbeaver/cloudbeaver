@@ -8,9 +8,9 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { TreeContext } from './contexts/TreeContext';
-import type { NodeComponent } from './INodeRenderer';
-import { Node } from './Node';
+import { TreeContext } from './contexts/TreeContext.js';
+import type { NodeComponent } from './INodeRenderer.js';
+import { Node } from './Node.js';
 
 export const NodeRenderer: NodeComponent = observer(function NodeRenderer(props) {
   const tree = useContext(TreeContext)!;

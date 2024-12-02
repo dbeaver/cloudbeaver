@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/core-bootstrap",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -30,6 +31,7 @@
     "@cloudbeaver/core-dialogs": "^0",
     "@cloudbeaver/core-events": "^0",
     "@cloudbeaver/core-executor": "^0",
+    "@cloudbeaver/core-links": "^0",
     "@cloudbeaver/core-localization": "^0",
     "@cloudbeaver/core-navigation-tree": "^0",
     "@cloudbeaver/core-product": "^0",
@@ -51,7 +53,6 @@
     "@cloudbeaver/core-version": "^0",
     "@cloudbeaver/core-version-update": "^0",
     "@cloudbeaver/core-view": "^0",
-    "@cloudbeaver/core-website": "^0",
     "mobx": "^6",
     "react": "^18",
     "react-dom": "^18"

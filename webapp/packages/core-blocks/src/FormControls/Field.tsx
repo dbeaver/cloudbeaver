@@ -8,11 +8,11 @@
 import { observer } from 'mobx-react-lite';
 import type { HTMLAttributes, PropsWithChildren } from 'react';
 
-import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
-import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
+import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
 import elementsSizeStyles from '../Containers/shared/ElementsSize.module.css';
-import { s } from '../s';
-import { useS } from '../useS';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
 import fieldStyles from './Field.module.css';
 
 type Props = ILayoutSizeProps &

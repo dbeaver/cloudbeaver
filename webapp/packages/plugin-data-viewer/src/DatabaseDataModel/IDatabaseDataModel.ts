@@ -8,7 +8,7 @@
 import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { DatabaseDataAccessMode, IDatabaseDataSource, IDatabaseDataSourceOperationEvent, IRequestInfo } from './IDatabaseDataSource';
+import type { DatabaseDataAccessMode, IDatabaseDataSource, IDatabaseDataSourceOperationEvent, IRequestInfo } from './IDatabaseDataSource.js';
 
 export interface IRequestEventData<TSource extends IDatabaseDataSource<any, any> = IDatabaseDataSource> extends IDatabaseDataSourceOperationEvent {
   model: IDatabaseDataModel<TSource>;

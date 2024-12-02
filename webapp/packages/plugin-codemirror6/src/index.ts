@@ -1,16 +1,23 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 import { createComplexLoader } from '@cloudbeaver/core-blocks';
 
-export * from './ReactCodemirrorPanel';
-export * from './EditorLoader';
-export * from './IEditorProps';
-export * from './IEditorRef';
-export * from './useEditorDefaultExtensions';
-export * from './useEditorAutocompletion';
-export * from './useCodemirrorExtensions';
+export * from './ReactCodemirrorPanel.js';
+export * from './EditorLoader.js';
+export * from './IEditorProps.js';
+export * from './IEditorRef.js';
+export * from './useEditorDefaultExtensions.js';
+export * from './useEditorAutocompletion.js';
+export * from './useCodemirrorExtensions.js';
 
-export * from './Hyperlink/HyperlinkLoader';
-export * from './Hyperlink/IHyperlinkInfo';
-export * from './Hyperlink/useHyperlink';
+export * from './Hyperlink/HyperlinkLoader.js';
+export * from './Hyperlink/IHyperlinkInfo.js';
+export * from './Hyperlink/useHyperlink.js';
 
 export * from '@codemirror/view';
 export * from '@codemirror/state';

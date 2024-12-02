@@ -7,6 +7,6 @@
  */
 import { createContext } from 'react';
 
-import type { ITreeVirtualization } from '../useTreeVirtualization';
+import type { ITreeVirtualization } from '../useTreeVirtualization.js';
 
 export const TreeVirtualizationContext = createContext<ITreeVirtualization | undefined>(undefined);

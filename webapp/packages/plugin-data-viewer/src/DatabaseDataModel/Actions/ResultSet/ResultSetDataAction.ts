@@ -7,21 +7,21 @@
  */
 import { computed, makeObservable } from 'mobx';
 
-import { DataTypeLogicalOperation, ResultDataFormat, SqlResultColumn } from '@cloudbeaver/core-sdk';
+import { type DataTypeLogicalOperation, ResultDataFormat, type SqlResultColumn } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
-import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
-import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import { DatabaseDataResultAction } from '../DatabaseDataResultAction';
-import type { IResultSetContentValue } from './IResultSetContentValue';
-import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
-import { isResultSetContentValue } from './isResultSetContentValue';
-import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
-import type { IResultSetValue } from './ResultSetFormatAction';
+import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
+import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
+import { DatabaseDataResultAction } from '../DatabaseDataResultAction.js';
+import type { IResultSetContentValue } from './IResultSetContentValue.js';
+import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey.js';
+import { isResultSetContentValue } from './isResultSetContentValue.js';
+import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils.js';
+import type { IResultSetValue } from './ResultSetFormatAction.js';
 
 @databaseDataAction()
 export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElementKey, IDatabaseResultSet> {
-  static dataFormat = [ResultDataFormat.Resultset];
+  static override dataFormat = [ResultDataFormat.Resultset];
 
   get rows() {
     return this.result.data?.rowsWithMetaData || [];
@@ -95,7 +95,7 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
       return undefined;
     }
 
-    return this.rows[row.index].data;
+    return this.rows[row.index]?.data;
   }
 
   getRowMetadata(row: IResultSetRowKey) {
@@ -103,7 +103,7 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
       return undefined;
     }
 
-    return this.rows[row.index].metaData;
+    return this.rows[row.index]?.metaData;
   }
 
   getCellValue(cell: IResultSetElementKey): IResultSetValue | undefined {
@@ -111,7 +111,7 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
       return undefined;
     }
 
-    return this.rows[cell.row.index].data?.[cell.column.index];
+    return this.rows[cell.row.index]?.data?.[cell.column.index];
   }
 
   getContent(cell: IResultSetElementKey): IResultSetContentValue | null {

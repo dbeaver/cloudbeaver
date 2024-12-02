@@ -9,11 +9,11 @@ import { action, computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 
-import { DatabaseDataConstraintAction } from '../../DatabaseDataModel/Actions/DatabaseDataConstraintAction';
-import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseDataOptions } from '../../DatabaseDataModel/IDatabaseDataOptions';
-import { isResultSetDataModel } from '../../ResultSet/isResultSetDataModel';
-import { isResultSetDataSource } from '../../ResultSet/ResultSetDataSource';
+import { DatabaseDataConstraintAction } from '../../DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
+import type { IDatabaseDataOptions } from '../../DatabaseDataModel/IDatabaseDataOptions.js';
+import { isResultSetDataModel } from '../../ResultSet/isResultSetDataModel.js';
+import { isResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
 
 interface IState {
   model: IDatabaseDataModel;

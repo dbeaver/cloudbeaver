@@ -42,6 +42,8 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.runtime.DBRRunnableParametrized;
+import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
+import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -356,8 +358,16 @@ public class WebConnectionInfo {
 
     @Property
     public List<WebNetworkHandlerConfig> getNetworkHandlersConfig() {
-        return dataSourceContainer.getConnectionConfiguration().getHandlers().stream()
-            .map(WebNetworkHandlerConfig::new).collect(Collectors.toList());
+        var registry = NetworkHandlerRegistry.getInstance();
+        return dataSourceContainer.getConnectionConfiguration()
+            .getHandlers()
+            .stream()
+            .filter(handlerConf -> {
+                NetworkHandlerDescriptor descriptor = registry.getDescriptor(handlerConf.getId());
+                return descriptor != null && !descriptor.isDesktopHandler();
+            })
+            .map(WebNetworkHandlerConfig::new)
+            .collect(Collectors.toList());
     }
 
     @Property
@@ -445,10 +455,10 @@ public class WebConnectionInfo {
 
     private boolean hasProjectPermission(RMProjectPermission projectPermission) {
         DBPProject project = dataSourceContainer.getProject();
-        if (!(project instanceof WebProjectImpl)) {
+        if (!(project instanceof WebProjectImpl webProject)) {
             return false;
         }
-        return SMUtils.hasProjectPermission(session, ((WebProjectImpl) project).getRmProject(), projectPermission);
+        return SMUtils.hasProjectPermission(session, webProject.getRMProject(), projectPermission);
     }
 
     private boolean canViewReadOnlyConnections() {

@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { AdministrationItemService, IAdministrationItemRoute } from '@cloudbeaver/core-administration';
+import { AdministrationItemService, type IAdministrationItemRoute } from '@cloudbeaver/core-administration';
 import { Loader, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { TabPanel } from '@cloudbeaver/core-ui';

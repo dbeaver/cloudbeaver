@@ -25,6 +25,39 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 24.2.5. 2024-11-18
+- Updated user storage mechanism: New user logins are now stored in lowercase to prevent duplicate entries (e.g., "ADMIN" and "admin"). Note: This update does not affect previously created user logins;
+- A new setting in Global Preferences was added to restrict data import for non-admin users.
+
+### 24.2.4. 2024-11-04
+- General:
+  -    Data export: Added the ability to export JSON values as embedded JSON;
+  -    Brazilian Portuguese localization was enhanced (thanks to [brlarini](https://github.com/brlarini));
+  -    Fixed a proxy issue that excluded the Content-Type header in responses.
+- Administration:
+  -    Refreshed design for the User and Teams tab in the Administration panel;
+  -    Added an ability to change a user password even if the user is disabled in a system.
+### 24.2.3. 2024-10-21
+- Important update:
+  -    Connections Templates feature is declared as obsolete and will be removed in future releases.
+- General:
+  -    Data editor enhancements: Rows with focused cells are specially marked to make it easier to locate a position in large tables;
+  -    DB2i driver has been updated to version 20.0.7;
+  -    The URL mode for PostgreSQL now supports connecting to multiple databases;
+  -    The issue with displaying BLOB data types in DuckDB has been resolved.
+
+### 24.2.2. 2024-10-07
+- Schemas were added to the SQL autocompletion for PostgreSQL, H2, and SQL Server;
+- CloudBeaver can now correctly display negative dates for MySQL database;
+- A search option was added for preferences in the Administration part;
+- Keyboard navigation has been enhanced. You can now use the arrow keys to move through navigator tree elements and the tab key to switch between editors tabs;
+- Sample SQLite database was removed.
+
+### 24.2.1. 2024-09-23
+- Chinese localization has been improved (thanks to [cashlifei](https://github.com/cashlifei));
+- Environment variables configuration has been improved - now you can configure more variables on the initial stage of the Docker setup;
+- SQL Server driver has been updated to version 12.8.0.
+
 ### 24.2.0. 2024-09-02
 ### Changes since 24.1.0:
 - General:

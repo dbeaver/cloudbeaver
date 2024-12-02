@@ -13,8 +13,8 @@ export const datasourceTransactionManagerPlugin: PluginManifest = {
   },
 
   providers: [
-    () => import('./TransactionManagerBootstrap').then(m => m.TransactionManagerBootstrap),
-    () => import('./TransactionManagerSettingsService').then(m => m.TransactionManagerSettingsService),
-    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./TransactionManagerBootstrap.js').then(m => m.TransactionManagerBootstrap),
+    () => import('./TransactionManagerSettingsService.js').then(m => m.TransactionManagerSettingsService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
   ],
 };

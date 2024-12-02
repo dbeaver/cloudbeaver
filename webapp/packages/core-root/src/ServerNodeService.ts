@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { GraphQLService, WsSocketConnectedEvent } from '@cloudbeaver/core-sdk';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
+import { GraphQLService, type WsSocketConnectedEvent } from '@cloudbeaver/core-sdk';
 
-import { ServerNodeError } from './ServerNodeError';
-import { ServerEventId, SessionEventSource } from './SessionEventSource';
+import { ServerNodeError } from './ServerNodeError.js';
+import { ServerEventId, SessionEventSource } from './SessionEventSource.js';
 
 @injectable()
 export class ServerNodeService extends Dependency {

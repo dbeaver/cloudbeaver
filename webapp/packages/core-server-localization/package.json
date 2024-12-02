@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/core-server-localization",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

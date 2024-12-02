@@ -10,7 +10,7 @@ import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { CachedResourceIncludeArgs } from '@cloudbeaver/core-resource';
 import type { GetUserConnectionsQueryVariables } from '@cloudbeaver/core-sdk';
 
-import type { IConnectionFormState } from './IConnectionFormProps';
+import type { IConnectionFormState } from './IConnectionFormProps.js';
 
 export type ConnectionFormInfoIncludes = CachedResourceIncludeArgs<DatabaseConnection, GetUserConnectionsQueryVariables>;
 

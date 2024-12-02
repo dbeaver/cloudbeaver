@@ -13,12 +13,12 @@ export const connectionPlugin: PluginManifest = {
   },
 
   providers: [
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./Administration/Connections/ConnectionsAdministrationService').then(m => m.ConnectionsAdministrationService),
-    () => import('./Administration/Connections/ConnectionsAdministrationNavService').then(m => m.ConnectionsAdministrationNavService),
-    () => import('./Administration/Connections/CreateConnectionService').then(m => m.CreateConnectionService),
-    () => import('./Administration/Connections/CreateConnection/Manual/ConnectionManualService').then(m => m.ConnectionManualService),
-    () => import('./Administration/Connections/CreateConnection/CreateConnectionBaseBootstrap').then(m => m.CreateConnectionBaseBootstrap),
-    () => import('./ConnectionForm/ConnectionAccess/ConnectionAccessTabService').then(m => m.ConnectionAccessTabService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./Administration/Connections/ConnectionsAdministrationService.js').then(m => m.ConnectionsAdministrationService),
+    () => import('./Administration/Connections/ConnectionsAdministrationNavService.js').then(m => m.ConnectionsAdministrationNavService),
+    () => import('./Administration/Connections/CreateConnectionService.js').then(m => m.CreateConnectionService),
+    () => import('./Administration/Connections/CreateConnection/Manual/ConnectionManualService.js').then(m => m.ConnectionManualService),
+    () => import('./Administration/Connections/CreateConnection/CreateConnectionBaseBootstrap.js').then(m => m.CreateConnectionBaseBootstrap),
+    () => import('./ConnectionForm/ConnectionAccess/ConnectionAccessTabService.js').then(m => m.ConnectionAccessTabService),
   ],
 };

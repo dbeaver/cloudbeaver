@@ -25,7 +25,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionPublicSecretsResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 
-import style from './DatabaseSecretAuthDialog.m.css';
+import style from './DatabaseSecretAuthDialog.module.css';
 
 interface Props {
   connectionKey: IConnectionInfoParams;

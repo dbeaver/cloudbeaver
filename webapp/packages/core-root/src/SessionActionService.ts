@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutor, ISyncContextLoader } from '@cloudbeaver/core-executor';
+import { Executor, type IExecutor, type ISyncContextLoader } from '@cloudbeaver/core-executor';
 
-import { ISessionAction, SessionResource } from './SessionResource';
+import { type ISessionAction, SessionResource } from './SessionResource.js';
 
 interface ISessionActionContext {
   processed: boolean;

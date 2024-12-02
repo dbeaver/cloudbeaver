@@ -10,8 +10,8 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 export const productInformationPlugin: PluginManifest = {
   info: { name: 'Product administration plugin' },
   providers: [
-    () => import('./ProductInfoService').then(m => m.ProductInfoService),
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./ProductInfoNavigationService').then(m => m.ProductInfoNavigationService),
+    () => import('./ProductInfoService.js').then(m => m.ProductInfoService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./ProductInfoNavigationService.js').then(m => m.ProductInfoNavigationService),
   ],
 };

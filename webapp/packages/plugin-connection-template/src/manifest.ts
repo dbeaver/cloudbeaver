@@ -13,9 +13,9 @@ export const connectionTemplate: PluginManifest = {
   },
 
   providers: [
-    () => import('./TemplateConnectionsResource').then(m => m.TemplateConnectionsResource),
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./TemplateConnectionPluginBootstrap').then(m => m.TemplateConnectionPluginBootstrap),
-    () => import('./TemplateConnectionsService').then(m => m.TemplateConnectionsService),
+    () => import('./TemplateConnectionsResource.js').then(m => m.TemplateConnectionsResource),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./TemplateConnectionPluginBootstrap.js').then(m => m.TemplateConnectionPluginBootstrap),
+    () => import('./TemplateConnectionsService.js').then(m => m.TemplateConnectionsService),
   ],
 };

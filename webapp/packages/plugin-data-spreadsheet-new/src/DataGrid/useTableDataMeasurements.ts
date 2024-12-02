@@ -69,7 +69,7 @@ export function useTableDataMeasurements(model: IDatabaseDataModel<ResultSetData
           text: rowStrings,
         }).map(width => width + COLUMN_PADDING);
 
-        const width = Math.min(COLUMN_HEADER_MAX_WIDTH, Math.max(columnsWidth[0], cellsWidth[0] ?? 0));
+        const width = Math.min(COLUMN_HEADER_MAX_WIDTH, Math.max(columnsWidth[0]!, cellsWidth[0] ?? 0));
 
         this.cache.set(serializedKey, width);
       },

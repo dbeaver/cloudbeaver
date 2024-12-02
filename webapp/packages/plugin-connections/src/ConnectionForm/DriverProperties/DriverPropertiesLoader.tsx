@@ -8,6 +8,6 @@
 import React from 'react';
 
 export const DriverPropertiesLoader = React.lazy(async () => {
-  const { DriverProperties } = await import('./DriverProperties');
+  const { DriverProperties } = await import('./DriverProperties.js');
   return { default: DriverProperties };
 });

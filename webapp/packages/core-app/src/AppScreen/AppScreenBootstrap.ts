@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { Executor, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { ScreenService } from '@cloudbeaver/core-routing';
 
-import { AppScreen } from './AppScreen';
-import { AppScreenService } from './AppScreenService';
+import { AppScreen } from './AppScreen.js';
+import { AppScreenService } from './AppScreenService.js';
 
 @injectable()
 export class AppScreenBootstrap extends Bootstrap {
@@ -21,7 +21,7 @@ export class AppScreenBootstrap extends Bootstrap {
     this.activation = new Executor();
   }
 
-  register(): void {
+  override register(): void {
     this.screenService.create({
       name: AppScreenService.screenName,
       routes: [{ name: AppScreenService.screenName, path: '/' }],
@@ -32,6 +32,4 @@ export class AppScreenBootstrap extends Bootstrap {
       },
     });
   }
-
-  load(): void | Promise<void> {}
 }

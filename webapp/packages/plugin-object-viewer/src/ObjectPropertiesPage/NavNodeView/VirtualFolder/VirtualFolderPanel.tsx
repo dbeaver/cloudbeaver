@@ -14,9 +14,9 @@ import { type DBObject, DBObjectParentKey, DBObjectResource, NavNodeInfoResource
 import { isDefined } from '@cloudbeaver/core-utils';
 import { type NavNodeTransformViewComponent, NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
-import { TableLoader } from '../../ObjectPropertyTable/Table/TableLoader';
+import { TableLoader } from '../../ObjectPropertyTable/Table/TableLoader.js';
 import classes from './VirtualFolderPanel.module.css';
-import { VirtualFolderUtils } from './VirtualFolderUtils';
+import { VirtualFolderUtils } from './VirtualFolderUtils.js';
 
 export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(function VirtualFolderPanel({ folderId, nodeId }) {
   const translate = useTranslate();
@@ -32,9 +32,10 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
 
   const dbObjectLoader = useResource(VirtualFolderPanel, DBObjectResource, pagination.currentPage);
 
-  const { nodes, duplicates } = navNodeViewService.filterDuplicates(dbObjectLoader.data.filter(isDefined).map(node => node?.id) || []);
+  const allData = dbObjectLoader.resource.get(pagination.allPages).filter(isDefined);
+  const { nodes, duplicates } = navNodeViewService.filterDuplicates(allData.map(node => node?.id) || []);
 
-  const objects = dbObjectLoader.data.filter(
+  const objects = allData.filter(
     object => object && nodes.includes(object.id) && navNodeInfoResource.get(object.id)?.nodeType === nodeType,
   ) as DBObject[];
 
@@ -47,7 +48,7 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
       {objects.length === 0 ? (
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       ) : (
-        <div className={classes.tabWrapper}>
+        <div className={classes['tabWrapper']}>
           <TableLoader objects={objects} hasNextPage={pagination?.hasNextPage ?? false} loadMore={pagination.loadMore} />
         </div>
       )}

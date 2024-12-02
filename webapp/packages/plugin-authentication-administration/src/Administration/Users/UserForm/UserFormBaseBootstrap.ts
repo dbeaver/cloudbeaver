@@ -12,8 +12,4 @@ export class UserFormBaseBootstrap extends Bootstrap {
   constructor() {
     super();
   }
-
-  register(): void | Promise<void> {}
-
-  load(): void | Promise<void> {}
 }

@@ -8,11 +8,11 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
-import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import { IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
-import type { IDataViewerTableStorage } from '../IDataViewerTableStorage';
+import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
+import { type IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource.js';
+import type { IDataViewerTableStorage } from '../IDataViewerTableStorage.js';
 
 export interface ITableViewerStorageChangeEventData {
   type: 'add' | 'remove';

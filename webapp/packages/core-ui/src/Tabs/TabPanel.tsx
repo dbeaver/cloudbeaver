@@ -7,15 +7,15 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
-import { TabPanel as BaseTabPanel } from 'reakit/Tab';
+import { TabPanel as BaseTabPanel } from 'reakit';
 
 import { getComputed, Loader, s, useS } from '@cloudbeaver/core-blocks';
 
-import { TabContext } from './TabContext';
+import { TabContext } from './TabContext.js';
 import tabPanelStyles from './TabPanel.module.css';
-import type { TabPanelProps } from './TabPanelProps';
-import { TabsContext } from './TabsContext';
-import { useTabsValidation } from './useTabsValidation';
+import type { TabPanelProps } from './TabPanelProps.js';
+import { TabsContext } from './TabsContext.js';
+import { useTabsValidation } from './useTabsValidation.js';
 
 export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ tabId, children, contents, className, lazy }) {
   const tabContextState = useContext(TabsContext);

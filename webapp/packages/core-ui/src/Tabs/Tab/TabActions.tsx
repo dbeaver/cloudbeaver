@@ -10,10 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { Icon, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 
-import type { ITabsContext } from '../TabsContext';
+import type { ITabsContext } from '../TabsContext.js';
 import TabStyle from './Tab.module.css';
 import style from './TabActions.module.css';
-import { TabMenu } from './TabMenu';
+import { TabMenu } from './TabMenu.js';
 
 interface TabActionsProps {
   tabId: string;

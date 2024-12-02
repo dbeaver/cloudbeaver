@@ -9,9 +9,9 @@ import { observer } from 'mobx-react-lite';
 
 import { Container, Group, InputFiles, s, Table, TableBody, TableColumnHeader, TableHeader, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import { DataImportFileItem } from './DataImportFileItem';
+import { DataImportFileItem } from './DataImportFileItem.js';
 import classes from './DataImportFileSelector.module.css';
-import type { IDataImportDialogState } from './IDataImportDialogState';
+import type { IDataImportDialogState } from './IDataImportDialogState.js';
 
 interface Props {
   state: IDataImportDialogState;
@@ -24,7 +24,7 @@ export const DataImportFileSelector = observer<Props>(function DataImportFileSel
 
   function handleFileSelect(value: FileList | null) {
     if (value) {
-      state.file = value[0];
+      state.file = value[0]!;
     }
   }
 

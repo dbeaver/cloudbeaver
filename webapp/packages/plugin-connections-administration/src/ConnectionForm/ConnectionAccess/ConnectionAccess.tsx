@@ -26,13 +26,13 @@ import {
 import { isCloudConnection } from '@cloudbeaver/core-connections';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
-import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import type { IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 
 import styles from './ConnectionAccess.module.css';
-import { ConnectionAccessGrantedList } from './ConnectionAccessGrantedList';
-import { ConnectionAccessList } from './ConnectionAccessList';
-import { useConnectionAccessState } from './useConnectionAccessState';
+import { ConnectionAccessGrantedList } from './ConnectionAccessGrantedList.js';
+import { ConnectionAccessList } from './ConnectionAccessList.js';
+import { useConnectionAccessState } from './useConnectionAccessState.js';
 
 export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAccess({ tabId, state: formState }) {
   const state = useConnectionAccessState(formState.info);
@@ -63,7 +63,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
   }
 
   const loading = users.isLoading() || teams.isLoading() || state.state.loading;
-  const cloud = formState.info ? isCloudConnection(formState.info) : false;
+  const cloud = formState.info && formState.originInfo?.origin ? isCloudConnection(formState.originInfo.origin) : false;
   const disabled = loading || !state.state.loaded || formState.disabled || cloud;
   let info: TLocalizationToken | null = null;
 

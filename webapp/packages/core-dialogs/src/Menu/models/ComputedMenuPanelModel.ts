@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable } from 'mobx';
 
-import type { IMenuItem, IMenuPanel } from '../IMenuPanel';
+import type { IMenuItem, IMenuPanel } from '../IMenuPanel.js';
 
 export interface IComputedMenuPanelOptions {
   id: string;

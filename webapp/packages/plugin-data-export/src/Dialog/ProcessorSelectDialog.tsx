@@ -11,9 +11,9 @@ import { CommonDialogBody, CommonDialogHeader, CommonDialogWrapper, s, useResour
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
-import { DataTransferProcessorsResource } from '../DataTransferProcessorsResource';
-import type { IExportContext } from '../IExportContext';
-import { ExportProcessorList } from './ExportProcessorList/ExportProcessorList';
+import { DataTransferProcessorsResource } from '../DataTransferProcessorsResource.js';
+import type { IExportContext } from '../IExportContext.js';
+import { ExportProcessorList } from './ExportProcessorList/ExportProcessorList.js';
 import style from './ProcessorSelectDialog.module.css';
 
 interface Props {

@@ -11,12 +11,12 @@ import type { AdministrationItemContentProps } from '@cloudbeaver/core-administr
 import { ColoredContainer, s, useResource, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
-import { VersionChecker } from './VersionChecker';
-import { VersionSelector } from './VersionSelector';
+import { VersionChecker } from './VersionChecker.js';
+import { VersionSelector } from './VersionSelector.js';
 import styles from './VersionUpdate.module.css';
 
 export const VersionUpdate: TabContainerPanelComponent<AdministrationItemContentProps> = observer(function VersionUpdate() {

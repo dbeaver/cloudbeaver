@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 
 import { type ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
 
-import { getComputed } from '../getComputed';
+import { getComputed } from '../getComputed.js';
 
 export function useAutoLoad(
   component: { name: string },
@@ -68,6 +68,6 @@ export function useAutoLoad(
   }
 
   useEffect(() => {
-    obj[loadFunctionName]();
+    obj[loadFunctionName]!();
   });
 }

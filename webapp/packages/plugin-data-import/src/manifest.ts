@@ -13,10 +13,10 @@ export const dataImportPluginManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./DataImportSettingsService').then(m => m.DataImportSettingsService),
-    () => import('./DataImportBootstrap').then(m => m.DataImportBootstrap),
-    () => import('./DataImportService').then(m => m.DataImportService),
-    () => import('./DataImportProcessorsResource').then(m => m.DataImportProcessorsResource),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./DataImportSettingsService.js').then(m => m.DataImportSettingsService),
+    () => import('./DataImportBootstrap.js').then(m => m.DataImportBootstrap),
+    () => import('./DataImportService.js').then(m => m.DataImportService),
+    () => import('./DataImportProcessorsResource.js').then(m => m.DataImportProcessorsResource),
   ],
 };

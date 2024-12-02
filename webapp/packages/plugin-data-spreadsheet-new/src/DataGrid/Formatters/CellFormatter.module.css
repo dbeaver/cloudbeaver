@@ -7,7 +7,6 @@
  */
 
 .wrapper {
-  height: 100%;
   display: flex;
   overflow: hidden;
   box-sizing: border-box;

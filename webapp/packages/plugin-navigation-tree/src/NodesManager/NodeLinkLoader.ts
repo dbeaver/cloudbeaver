@@ -8,6 +8,6 @@
 import React from 'react';
 
 export const NodeLinkLoader = React.lazy(async () => {
-  const { NodeLink } = await import('./NodeLink');
+  const { NodeLink } = await import('./NodeLink.js');
   return { default: NodeLink };
 });

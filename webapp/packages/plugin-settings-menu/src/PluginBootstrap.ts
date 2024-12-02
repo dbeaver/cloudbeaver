@@ -9,7 +9,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_STATE } from '@cloudbeaver/plugin-top-app-bar';
 
-import { TOP_NAV_BAR_SETTINGS_MENU } from './SettingsMenu/TOP_NAV_BAR_SETTINGS_MENU';
+import { TOP_NAV_BAR_SETTINGS_MENU } from './SettingsMenu/TOP_NAV_BAR_SETTINGS_MENU.js';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -17,7 +17,7 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.addTopAppMenuItems();
   }
 

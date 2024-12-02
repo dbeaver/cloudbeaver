@@ -11,7 +11,7 @@ import { useCallback, useState } from 'react';
 import { Form, ItemList, ItemListSearch, s, TextPlaceholder, useFocus, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 
-import { Database } from './Database';
+import { Database } from './Database.js';
 import style from './DatabaseList.module.css';
 
 interface Props {

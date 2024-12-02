@@ -8,7 +8,7 @@
 import type { ProcessSnackbarProps } from '@cloudbeaver/core-blocks';
 import { ServiceWorkerService } from '@cloudbeaver/core-browser';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { IProcessNotificationContainer, NotificationService } from '@cloudbeaver/core-events';
+import { type IProcessNotificationContainer, NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 
 @injectable()
@@ -23,7 +23,7 @@ export class PluginBrowserBootstrap extends Bootstrap {
     super();
     this.notification = null;
   }
-  register(): void {
+  override register(): void {
     // TODO: notification appears in unexpected moment
     // this.serviceWorkerService.onUpdate.addHandler(({ type, progress }) => {
     //   progress = progress || 0;

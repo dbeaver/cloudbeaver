@@ -8,7 +8,7 @@
 import { Placeholder, TopAppBar } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { WizardTopAppBarService } from './WizardTopAppBarService';
+import { WizardTopAppBarService } from './WizardTopAppBarService.js';
 
 export function WizardTopAppBar() {
   const wizardTopAppBarService = useService(WizardTopAppBarService);

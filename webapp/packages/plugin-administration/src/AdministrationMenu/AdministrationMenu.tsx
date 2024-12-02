@@ -14,7 +14,7 @@ import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { TopMenuWrapperStyles } from '@cloudbeaver/plugin-top-app-bar';
 
-import { MENU_APP_ADMINISTRATION_ACTIONS } from './MENU_APP_ADMINISTRATION_ACTIONS';
+import { MENU_APP_ADMINISTRATION_ACTIONS } from './MENU_APP_ADMINISTRATION_ACTIONS.js';
 
 export const AdministrationMenu = observer(function AdministrationMenu() {
   const styles = useS(TopMenuWrapperStyles);

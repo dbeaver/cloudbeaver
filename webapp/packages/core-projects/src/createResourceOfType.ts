@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { isResourceOfType } from './isResourceOfType';
-import type { ProjectInfoResourceType } from './ProjectInfoResource';
+import { isResourceOfType } from './isResourceOfType.js';
+import type { ProjectInfoResourceType } from './ProjectInfoResource.js';
 
 export function createResourceOfType(resourceType: ProjectInfoResourceType, name: string): string {
   if (isResourceOfType(resourceType, name)) {

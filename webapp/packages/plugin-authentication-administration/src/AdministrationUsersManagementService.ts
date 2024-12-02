@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { type ILoadableState, isArraysEqual } from '@cloudbeaver/core-utils';
 
-import { externalUserProviderStatusContext } from './externalUserProviderStatusContext';
+import { externalUserProviderStatusContext } from './externalUserProviderStatusContext.js';
 
 @injectable()
 export class AdministrationUsersManagementService {

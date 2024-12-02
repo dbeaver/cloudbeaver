@@ -16,15 +16,17 @@
  */
 package io.cloudbeaver.service.navigator;
 
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.security.SMUtils;
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.navigator.DBNDataSource;
-import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
+import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
@@ -91,7 +93,20 @@ public class WebDatabaseObjectInfo {
 
     @Property
     public WebPropertyInfo[] filterProperties(@Nullable WebPropertyFilter filter) {
+        if (object instanceof DBPDataSourceContainer container && !isDataSourceEditable(container)) {
+            // If user cannot edit a connection, then return only name
+            filter = new WebPropertyFilter();
+            filter.setFeatures(List.of(DBConstants.PROP_FEATURE_NAME));
+        }
         return WebServiceUtils.getObjectFilteredProperties(session, object, filter);
+    }
+
+    private boolean isDataSourceEditable(@NotNull DBPDataSourceContainer container) {
+        WebProjectImpl project = session.getProjectById(container.getProject().getId());
+        if (project == null) {
+            return false;
+        }
+        return SMUtils.hasProjectPermission(session, project.getRMProject(), RMProjectPermission.DATA_SOURCES_EDIT);
     }
 
     ///////////////////////////////////
@@ -183,8 +198,7 @@ public class WebDatabaseObjectInfo {
             features.add(OBJECT_FEATURE_OBJECT_CONTAINER);
             try {
                 Class<? extends DBSObject> childType = objectContainer.getPrimaryChildType(null);
-                Collection<? extends DBSObject> childrenCollection = objectContainer.getChildren(session.getProgressMonitor());
-                if (DBSTable.class.isAssignableFrom(childType) && childrenCollection != null) {
+                if (DBSTable.class.isAssignableFrom(childType)) {
                     features.add(OBJECT_FEATURE_ENTITY_CONTAINER);
                 }
             } catch (Exception e) {

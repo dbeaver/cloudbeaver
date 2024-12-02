@@ -13,9 +13,9 @@ export const coreSettingsManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./SettingsManager/SettingsManagerService').then(m => m.SettingsManagerService),
-    () => import('./SettingsResolverService').then(m => m.SettingsResolverService),
-    () => import('./LocaleService').then(m => m.LocaleService),
-    () => import('./SettingsProviderService').then(m => m.SettingsProviderService),
+    () => import('./SettingsManager/SettingsManagerService.js').then(m => m.SettingsManagerService),
+    () => import('./SettingsResolverService.js').then(m => m.SettingsResolverService),
+    () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./SettingsProviderService.js').then(m => m.SettingsProviderService),
   ],
 };

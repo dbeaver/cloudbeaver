@@ -10,14 +10,14 @@ import { useCallback } from 'react';
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
-import { getLayoutProps } from '../../Containers/filterLayoutFakeProps';
-import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps';
+import { getLayoutProps } from '../../Containers/filterLayoutFakeProps.js';
+import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps.js';
 import elementsSizeStyles from '../../Containers/shared/ElementsSize.module.css';
-import { useTranslate } from '../../localization/useTranslate';
-import { s } from '../../s';
-import { TextPlaceholder } from '../../TextPlaceholder';
-import { useS } from '../../useS';
-import { RenderField } from './RenderField';
+import { useTranslate } from '../../localization/useTranslate.js';
+import { s } from '../../s.js';
+import { TextPlaceholder } from '../../TextPlaceholder.js';
+import { useS } from '../../useS.js';
+import { RenderField } from './RenderField.js';
 
 export interface ObjectPropertyFormProps extends ILayoutSizeProps {
   properties: ReadonlyArray<ObjectPropertyInfo>;

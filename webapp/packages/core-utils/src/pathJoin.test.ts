@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from '@jest/globals';
 
-import { pathJoin } from './pathJoin';
+import { pathJoin } from './pathJoin.js';
 
 describe('pathJoin', () => {
   test('joins path segments', () => {

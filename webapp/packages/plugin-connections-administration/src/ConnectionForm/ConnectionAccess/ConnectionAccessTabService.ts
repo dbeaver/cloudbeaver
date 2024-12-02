@@ -8,9 +8,9 @@
 import React from 'react';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { ConnectionInfoResource, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, createConnectionParam, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { executorHandlerFilter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { EAdminPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { formStateContext } from '@cloudbeaver/core-ui';
@@ -18,15 +18,15 @@ import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 import {
   connectionConfigContext,
   ConnectionFormService,
-  IConnectionFormProps,
-  IConnectionFormState,
-  IConnectionFormSubmitData,
+  type IConnectionFormProps,
+  type IConnectionFormState,
+  type IConnectionFormSubmitData,
 } from '@cloudbeaver/plugin-connections';
 
-import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
+import type { IConnectionAccessTabState } from './IConnectionAccessTabState.js';
 
 const ConnectionAccess = React.lazy(async () => {
-  const { ConnectionAccess } = await import('./ConnectionAccess');
+  const { ConnectionAccess } = await import('./ConnectionAccess.js');
   return { default: ConnectionAccess };
 });
 
@@ -45,7 +45,7 @@ export class ConnectionAccessTabService extends Bootstrap {
     this.key = 'access';
   }
 
-  register(): void {
+  override register(): void {
     this.connectionFormService.tabsContainer.add({
       key: this.key,
       name: 'connections_connection_edit_access',
@@ -61,8 +61,6 @@ export class ConnectionAccessTabService extends Bootstrap {
 
     this.connectionFormService.formStateTask.addHandler(executorHandlerFilter(this.isAccessTabActive.bind(this), this.formState.bind(this)));
   }
-
-  load(): void {}
 
   private isAccessTabActive(state: IConnectionFormState): boolean {
     return (

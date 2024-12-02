@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.app;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 
 import java.util.Map;
 
@@ -28,6 +29,7 @@ public interface WebAppConfiguration {
 
     boolean isAnonymousAccessEnabled();
 
+    @Nullable
     <T> T getResourceQuota(String quotaId);
 
     String getDefaultUserTeam();
@@ -41,6 +43,11 @@ public interface WebAppConfiguration {
     boolean isFeaturesEnabled(String[] requiredFeatures);
 
     boolean isFeatureEnabled(String id);
+
+    @NotNull
+    default String[] getEnabledFeatures() {
+        return new String[0];
+    }
 
     default boolean isSupportsCustomConnections() {
         return true;

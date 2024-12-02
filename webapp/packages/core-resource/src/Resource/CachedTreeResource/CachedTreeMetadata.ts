@@ -7,16 +7,16 @@
  */
 import { combineITerableIterators, type DefaultValueGetter } from '@cloudbeaver/core-utils';
 
-import type { ICachedResourceMetadata } from '../ICachedResourceMetadata';
-import { isResourceAlias } from '../ResourceAlias';
-import type { ResourceAliases } from '../ResourceAliases';
-import type { ResourceKey, ResourceKeyFlat } from '../ResourceKey';
-import { isResourceKeyList, ResourceKeyList } from '../ResourceKeyList';
-import { ResourceKeyUtils } from '../ResourceKeyUtils';
-import { ResourceMetadata } from '../ResourceMetadata';
-import { createTreeNode } from './createTreeNode';
-import { getTreeValue } from './getTreeValue';
-import type { ICachedTreeElement } from './ICachedTreeElement';
+import type { ICachedResourceMetadata } from '../ICachedResourceMetadata.js';
+import { isResourceAlias } from '../ResourceAlias.js';
+import type { ResourceAliases } from '../ResourceAliases.js';
+import type { ResourceKey, ResourceKeyFlat } from '../ResourceKey.js';
+import { isResourceKeyList, ResourceKeyList } from '../ResourceKeyList.js';
+import { ResourceKeyUtils } from '../ResourceKeyUtils.js';
+import { ResourceMetadata } from '../ResourceMetadata.js';
+import { createTreeNode } from './createTreeNode.js';
+import { getTreeValue } from './getTreeValue.js';
+import type { ICachedTreeElement } from './ICachedTreeElement.js';
 
 export class CachedTreeMetadata<TValue, TMetadata extends ICachedResourceMetadata> extends ResourceMetadata<string, TMetadata> {
   protected getTree: () => ICachedTreeElement<TValue, TMetadata>;
@@ -31,11 +31,11 @@ export class CachedTreeMetadata<TValue, TMetadata extends ICachedResourceMetadat
     this.getTree = getTree;
   }
 
-  values(): IterableIterator<TMetadata> {
+  override values(): IterableIterator<TMetadata> {
     return combineITerableIterators(this.metadata.values(), getAllMetadata(this.getTree()));
   }
 
-  has(key: ResourceKey<string>): boolean {
+  override has(key: ResourceKey<string>): boolean {
     if (isResourceAlias(key)) {
       return super.has(key);
     }
@@ -50,10 +50,10 @@ export class CachedTreeMetadata<TValue, TMetadata extends ICachedResourceMetadat
    * Use it instead of this.metadata.get
    * This method can be override
    */
-  get(key: ResourceKeyFlat<string>): TMetadata;
-  get(key: ResourceKeyList<string>): TMetadata[];
-  get(key: ResourceKey<string>): TMetadata | TMetadata[];
-  get(key: ResourceKey<string>): TMetadata | TMetadata[] {
+  override get(key: ResourceKeyFlat<string>): TMetadata;
+  override get(key: ResourceKeyList<string>): TMetadata[];
+  override get(key: ResourceKey<string>): TMetadata | TMetadata[];
+  override get(key: ResourceKey<string>): TMetadata | TMetadata[] {
     if (isResourceAlias(key)) {
       return super.get(key);
     }
@@ -68,7 +68,7 @@ export class CachedTreeMetadata<TValue, TMetadata extends ICachedResourceMetadat
    * Use it instead of this.metadata.delete
    * This method can be override
    */
-  delete(key: ResourceKey<string>): void {
+  override delete(key: ResourceKey<string>): void {
     if (isResourceAlias(key)) {
       return super.delete(key);
     }

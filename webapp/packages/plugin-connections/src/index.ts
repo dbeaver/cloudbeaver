@@ -1,27 +1,34 @@
-import { connectionPlugin } from './manifest';
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+import { connectionPlugin } from './manifest.js';
 
-export * from './ConnectionAuthentication/IConnectionAuthenticationConfig';
-export * from './ConnectionAuthentication/ConnectionAuthenticationFormLoader';
-export * from './ConnectionForm/Options/ConnectionOptionsTabService';
-export * from './ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService';
-export * from './ConnectionForm/SSH/ConnectionSSHTabService';
-export * from './ConnectionForm/OriginInfo/ConnectionOriginInfoTabService';
-export * from './ConnectionForm/Contexts/connectionConfigContext';
-export * from './ConnectionForm/Contexts/connectionCredentialsStateContext';
-export * from './ConnectionForm/ConnectionFormBaseActionsLoader';
-export * from './ConnectionForm/connectionFormConfigureContext';
-export * from './ConnectionForm/ConnectionFormLoader';
-export * from './ConnectionForm/ConnectionFormService';
-export * from './ConnectionForm/ConnectionFormState';
-export * from './ConnectionForm/IConnectionFormProps';
-export * from './ConnectionForm/useConnectionFormState';
-export * from './ConnectionForm/SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID';
-export * from './ConnectionForm/ConnectionAuthModelCredentials/ConnectionAuthModelCredentialsForm';
-export * from './ContextMenu/MENU_CONNECTION_VIEW';
-export * from './ContextMenu/MENU_CONNECTIONS';
-export * from './PublicConnectionForm/PublicConnectionFormService';
-export * from './ConnectionAuthService';
-export * from './PluginConnectionsSettingsService';
-export * from './ConnectionShieldLazy';
+export * from './ConnectionAuthentication/IConnectionAuthenticationConfig.js';
+export * from './ConnectionAuthentication/ConnectionAuthenticationFormLoader.js';
+export * from './ConnectionForm/Options/ConnectionOptionsTabService.js';
+export * from './ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService.js';
+export * from './ConnectionForm/SSH/ConnectionSSHTabService.js';
+export * from './ConnectionForm/OriginInfo/ConnectionOriginInfoTabService.js';
+export * from './ConnectionForm/Contexts/connectionConfigContext.js';
+export * from './ConnectionForm/Contexts/connectionCredentialsStateContext.js';
+export * from './ConnectionForm/ConnectionFormBaseActionsLoader.js';
+export * from './ConnectionForm/connectionFormConfigureContext.js';
+export * from './ConnectionForm/ConnectionFormLoader.js';
+export * from './ConnectionForm/ConnectionFormService.js';
+export * from './ConnectionForm/ConnectionFormState.js';
+export * from './ConnectionForm/IConnectionFormProps.js';
+export * from './ConnectionForm/useConnectionFormState.js';
+export * from './ConnectionForm/SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID.js';
+export * from './ConnectionForm/ConnectionAuthModelCredentials/ConnectionAuthModelCredentialsForm.js';
+export * from './ContextMenu/MENU_CONNECTION_VIEW.js';
+export * from './ContextMenu/MENU_CONNECTIONS.js';
+export * from './PublicConnectionForm/PublicConnectionFormService.js';
+export * from './ConnectionAuthService.js';
+export * from './PluginConnectionsSettingsService.js';
+export * from './ConnectionShieldLazy.js';
 
 export default connectionPlugin;

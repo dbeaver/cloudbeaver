@@ -8,12 +8,12 @@
 import { observer } from 'mobx-react-lite';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
-import { Loader, Placeholder, s, TableColumnValue, TableItem, TableItemExpand, TableItemSelect, useS } from '@cloudbeaver/core-blocks';
+import { Link, Loader, Placeholder, s, TableColumnValue, TableItem, TableItemSelect, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { TeamsAdministrationService } from '../TeamsAdministrationService';
+import { TeamsAdministrationService } from '../TeamsAdministrationService.js';
 import style from './Team.module.css';
-import { TeamEdit } from './TeamEdit';
+import { TeamsTableOptionsPanelService } from './TeamsTableOptionsPanelService.js';
 
 interface Props {
   team: TeamInfo;
@@ -22,17 +22,15 @@ interface Props {
 export const Team = observer<Props>(function Team({ team }) {
   const styles = useS(style);
   const service = useService(TeamsAdministrationService);
+  const teamsTableOptionsPanelService = useService(TeamsTableOptionsPanelService);
 
   return (
-    <TableItem item={team.teamId} expandElement={TeamEdit}>
+    <TableItem item={team.teamId}>
       <TableColumnValue centerContent flex>
         <TableItemSelect />
       </TableColumnValue>
-      <TableColumnValue className={s(styles, { expand: true })} centerContent flex expand>
-        <TableItemExpand />
-      </TableColumnValue>
-      <TableColumnValue className={s(styles, { expand: true })} title={team.teamId} ellipsis expand>
-        {team.teamId}
+      <TableColumnValue title={team.teamId} ellipsis onClick={() => teamsTableOptionsPanelService.open(team.teamId)}>
+        <Link truncate>{team.teamId}</Link>
       </TableColumnValue>
       <TableColumnValue title={team.teamName} ellipsis>
         {team.teamName || ''}

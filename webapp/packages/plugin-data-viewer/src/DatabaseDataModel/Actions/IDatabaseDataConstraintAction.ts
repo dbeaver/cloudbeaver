@@ -7,9 +7,9 @@
  */
 import type { SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataAction } from '../IDatabaseDataAction';
-import type { IDatabaseDataResult } from '../IDatabaseDataResult';
-import type { Order } from '../Order';
+import type { IDatabaseDataAction } from '../IDatabaseDataAction.js';
+import type { IDatabaseDataResult } from '../IDatabaseDataResult.js';
+import type { Order } from '../Order.js';
 
 export interface IDatabaseDataConstraintAction<TResult extends IDatabaseDataResult> extends IDatabaseDataAction<any, TResult> {
   readonly filterConstraints: SqlDataFilterConstraint[];

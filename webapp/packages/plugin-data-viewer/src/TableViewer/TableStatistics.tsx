@@ -6,20 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import type { HTMLAttributes } from 'react';
 
 import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet';
-import { isResultSetDataSource, ResultSetDataSource } from '../ResultSet/ResultSetDataSource';
+import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
+import { type IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet.js';
+import { isResultSetDataSource, ResultSetDataSource } from '../ResultSet/ResultSetDataSource.js';
 import classes from './TableStatistics.module.css';
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
   model: IDatabaseDataModel;
   resultIndex: number;
 }
 
-export const TableStatistics = observer<Props>(function TableStatistics({ model, resultIndex }) {
+export const TableStatistics = observer<Props>(function TableStatistics({ model, resultIndex, ...rest }) {
   const styles = useS(classes);
   const translate = useTranslate();
   const source = model.source;
@@ -31,7 +32,7 @@ export const TableStatistics = observer<Props>(function TableStatistics({ model,
   }
 
   return (
-    <div className={s(styles, { statistics: true })}>
+    <div {...rest} className={s(styles, { statistics: true })}>
       {translate('data_viewer_statistics_status')} {translate(source.requestInfo.requestMessage)}
       <br />
       {translate('data_viewer_statistics_duration')} {source.requestInfo.requestDuration} {translate('ui_ms')}

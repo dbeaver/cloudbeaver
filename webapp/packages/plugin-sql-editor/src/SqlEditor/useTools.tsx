@@ -8,17 +8,17 @@
 import { action } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
-import { Connection, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
+import { type Connection, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { download, getTextFileReadingProcess, withTimestamp } from '@cloudbeaver/core-utils';
 
-import { getSqlEditorName } from '../getSqlEditorName';
-import type { ISqlEditorTabState } from '../ISqlEditorTabState';
-import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService';
-import { SqlEditorSettingsService } from '../SqlEditorSettingsService';
-import { ScriptImportDialog } from './ScriptImportDialog';
+import { getSqlEditorName } from '../getSqlEditorName.js';
+import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
+import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
+import { SqlEditorSettingsService } from '../SqlEditorSettingsService.js';
+import { ScriptImportDialog } from './ScriptImportDialog.js';
 
 interface State {
   tryReadScript: (file: File, prevScript: string) => Promise<string | null>;

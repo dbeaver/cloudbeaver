@@ -83,14 +83,16 @@
         box-shadow: 0 0 0 50px $input-background-readonly inset;
       }
     }
+
     &[disabled] {
-      @include mdc-theme-prop(color, input-color-disabled, false);
-      @include mdc-theme-prop(border-color, input-border-disabled, false);
-      @include mdc-theme-prop(background-color, input-background-disabled, false);
+      @include mdc-theme-prop(color, input-color-readonly, false);
+      @include mdc-theme-prop(border-color, input-border-readonly, false);
+      @include mdc-theme-prop(background-color, input-background-readonly, false);
+      pointer-events: all;
       opacity: 1;
       &:-internal-autofill-selected,
       &:-internal-autofill-previewed {
-        box-shadow: 0 0 0 50px $input-background-disabled inset;
+        box-shadow: 0 0 0 50px $input-background-readonly inset;
       }
     }
     &[data-embedded='true'] {

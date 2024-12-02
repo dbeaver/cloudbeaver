@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-sql-editor-new",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

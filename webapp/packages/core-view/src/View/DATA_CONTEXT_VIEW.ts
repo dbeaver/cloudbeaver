@@ -7,6 +7,6 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
-import type { IView } from './IView';
+import type { IView } from './IView.js';
 
 export const DATA_CONTEXT_VIEW = createDataContext<IView<any>>('app-view');

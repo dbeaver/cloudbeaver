@@ -7,12 +7,12 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Icon, MenuPanelItemAndTriggerStyles, MenuTrigger, s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
+import { Icon, MenuPanelItemAndTriggerStyles, MenuTrigger, s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import type { IDatabaseDataModel, IDataPresentationActions, IDataTableActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridContextMenuService } from '../../DataGridContextMenu/DataGridContextMenuService';
+import { DataGridContextMenuService } from '../../DataGridContextMenu/DataGridContextMenuService.js';
 import styles from './CellMenu.module.css';
 
 interface Props {
@@ -21,6 +21,7 @@ interface Props {
   spreadsheetActions: IDataPresentationActions<IResultSetElementKey>;
   resultIndex: number;
   cellKey: IResultSetElementKey;
+  className?: string;
   simple: boolean;
   onClick?: () => void;
   onStateSwitch?: (state: boolean) => void;
@@ -41,6 +42,7 @@ export const CellMenu = observer<Props>(function CellMenu({
   actions,
   spreadsheetActions,
   resultIndex,
+  className,
   cellKey,
   simple,
   onClick,
@@ -70,7 +72,7 @@ export const CellMenu = observer<Props>(function CellMenu({
 
   return (
     <SContext registry={registry}>
-      <div className={s(style, { cellMenu: true })} onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
+      <div className={s(style, { cellMenu: true }, className)} onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
         <MenuTrigger panel={panel} className={s(style, { menuTrigger: true })} modal onClick={handleClick} onVisibleSwitch={onStateSwitch}>
           <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
         </MenuTrigger>

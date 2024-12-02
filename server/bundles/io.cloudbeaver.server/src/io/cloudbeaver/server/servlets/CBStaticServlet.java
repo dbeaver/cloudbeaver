@@ -35,14 +35,24 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.ee10.servlet.DefaultServlet;
+import org.eclipse.jetty.http.HttpHeader;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
+import org.jkiss.dbeaver.utils.MimeTypes;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.IOUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 @WebServlet(urlPatterns = "/")
@@ -53,6 +63,13 @@ public class CBStaticServlet extends DefaultServlet {
     public static final int STATIC_CACHE_SECONDS = 60 * 60 * 24 * 3;
 
     private static final Log log = Log.getLog(CBStaticServlet.class);
+
+    @NotNull
+    private final Path contentRoot;
+
+    public CBStaticServlet(@NotNull Path contentRoot) {
+        this.contentRoot = contentRoot;
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -83,7 +100,7 @@ public class CBStaticServlet extends DefaultServlet {
         } catch (DBWebException e) {
             log.error("Error reading websession", e);
         }
-        super.doGet(request, response);
+        patchStaticContentIfNeeded(request, response);
     }
 
     private void performAutoLoginIfNeeded(HttpServletRequest request, WebSession webSession) {
@@ -175,6 +192,43 @@ public class CBStaticServlet extends DefaultServlet {
         }
 
         return false;
+    }
+
+    private void patchStaticContentIfNeeded(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String pathInContext = request.getServletPath();
+
+        if ("/".equals(pathInContext)) {
+            pathInContext = "index.html";
+        }
+
+        if (pathInContext == null || !pathInContext.endsWith("index.html")
+            && !pathInContext.endsWith("sso.html")
+            && !pathInContext.endsWith("ssoError.html")
+        ) {
+            super.doGet(request, response);
+            return;
+        }
+
+        if (pathInContext.startsWith("/")) {
+            pathInContext = pathInContext.substring(1);
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        var filePath = contentRoot.resolve(pathInContext);
+        try (InputStream fis = Files.newInputStream(filePath)) {
+            IOUtils.copyStream(fis, baos);
+        }
+        String indexContents = baos.toString(StandardCharsets.UTF_8);
+        CBServerConfig serverConfig = CBApplication.getInstance().getServerConfiguration();
+        indexContents = indexContents
+            .replace("{ROOT_URI}", serverConfig.getRootURI())
+            .replace("{STATIC_CONTENT}", serverConfig.getStaticContent());
+        byte[] indexBytes = indexContents.getBytes(StandardCharsets.UTF_8);
+
+        // Disable cache for index.html
+        response.setHeader(HttpHeader.CACHE_CONTROL.toString(), "no-cache, no-store, must-revalidate");
+        response.setHeader(HttpHeader.CONTENT_TYPE.toString(), MimeTypes.TEXT_HTML);
+        response.setHeader(HttpHeader.EXPIRES.toString(), "0");
+        response.getOutputStream().write(ByteBuffer.wrap(indexBytes));
     }
 
 }

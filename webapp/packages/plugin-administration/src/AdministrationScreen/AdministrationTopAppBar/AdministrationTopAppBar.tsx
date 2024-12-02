@@ -8,7 +8,7 @@
 import { Placeholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { AdministrationTopAppBarService } from './AdministrationTopAppBarService';
+import { AdministrationTopAppBarService } from './AdministrationTopAppBarService.js';
 
 export function AdministrationTopAppBar() {
   const administrationTopAppBarService = useService(AdministrationTopAppBarService);

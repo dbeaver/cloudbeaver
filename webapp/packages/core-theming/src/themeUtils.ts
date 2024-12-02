@@ -55,7 +55,7 @@ export function applyComposes(mixed: Array<Composes | ClassCollection>) {
           const classname = classes.shift()!;
 
           for (let i = styles.length - 1; i >= 0; i--) {
-            const test = styles[i][classname];
+            const test = styles[i]![classname]!;
             if (test) {
               classnames.push(test);
               break;

@@ -13,9 +13,9 @@ import { EAdminPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
-import { ACTION_CONNECTION_SEARCH } from './Actions/ACTION_CONNECTION_SEARCH';
-import { ConnectionSearchSettingsService } from './ConnectionSearchSettingsService';
-import { ConnectionSearchService } from './Search/ConnectionSearchService';
+import { ACTION_CONNECTION_SEARCH } from './Actions/ACTION_CONNECTION_SEARCH.js';
+import { ConnectionSearchSettingsService } from './ConnectionSearchSettingsService.js';
+import { ConnectionSearchService } from './Search/ConnectionSearchService.js';
 
 @injectable()
 export class SearchConnectionPluginBootstrap extends Bootstrap {
@@ -31,7 +31,7 @@ export class SearchConnectionPluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.menuService.addCreator({
       menus: [MENU_CONNECTIONS],
       getItems: (context, items) => [...items, ACTION_CONNECTION_SEARCH],

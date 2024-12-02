@@ -9,13 +9,13 @@ import { useContext, useMemo } from 'react';
 
 import { Translate } from '@cloudbeaver/core-blocks';
 
-import { TabContext } from '../TabContext';
-import type { ITabData } from '../TabsContainer/ITabsContainer';
-import { TabsContext } from '../TabsContext';
-import { Tab } from './Tab';
-import { TabIcon } from './TabIcon';
-import type { TabProps } from './TabProps';
-import { TabTitle } from './TabTitle';
+import { TabContext } from '../TabContext.js';
+import type { ITabData } from '../TabsContainer/ITabsContainer.js';
+import { TabsContext } from '../TabsContext.js';
+import { Tab } from './Tab.js';
+import { TabIcon } from './TabIcon.js';
+import type { TabProps } from './TabProps.js';
+import { TabTitle } from './TabTitle.js';
 
 interface Props<T = Record<string, any>> {
   tabId: string;

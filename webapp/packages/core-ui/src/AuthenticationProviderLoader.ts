@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const AuthenticationProvider = importLazyComponent(() => import('./AuthenticationProvider').then(m => m.AuthenticationProvider));
+export const AuthenticationProvider = importLazyComponent(() => import('./AuthenticationProvider.js').then(m => m.AuthenticationProvider));

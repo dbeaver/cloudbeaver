@@ -7,13 +7,13 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { TeamsResource } from '@cloudbeaver/core-authentication';
+import { TeamInfoMetaParametersResource, TeamsResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 
-import type { ITeamFormState } from './ITeamFormProps';
-import { TeamFormService } from './TeamFormService';
-import { TeamFormState } from './TeamFormState';
-import { TeamsAdministrationNavService } from './TeamsAdministrationNavService';
+import type { ITeamFormState } from './ITeamFormProps.js';
+import { TeamFormService } from './TeamFormService.js';
+import { TeamFormState } from './TeamFormState.js';
+import { TeamsAdministrationNavService } from './TeamsAdministrationNavService.js';
 
 @injectable()
 export class CreateTeamService {
@@ -24,6 +24,7 @@ export class CreateTeamService {
     private readonly teamsAdministrationNavService: TeamsAdministrationNavService,
     private readonly teamFormService: TeamFormService,
     private readonly teamsResource: TeamsResource,
+    private readonly teamInfoMetaParametersResource: TeamInfoMetaParametersResource,
   ) {
     this.data = null;
 
@@ -41,7 +42,7 @@ export class CreateTeamService {
   }
 
   fillData(): void {
-    this.data = new TeamFormState(this.teamFormService, this.teamsResource);
+    this.data = new TeamFormState(this.teamFormService, this.teamsResource, this.teamInfoMetaParametersResource);
   }
 
   create(): void {

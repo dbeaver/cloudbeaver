@@ -15,6 +15,7 @@ export interface IResourceOffsetPage {
   get(from: number, to: number): any[];
 
   isOutdated(): boolean;
+  isHasCommonSegment(range: IResourceOffsetPage): boolean;
   isHasCommonSegment(from: number, to: number): boolean;
   isInRange(from: number, to: number): boolean;
 

@@ -9,7 +9,7 @@ import { computed, observable } from 'mobx';
 
 import { useAutoLoad, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ISettingDescription, ROOT_SETTINGS_GROUP, SettingsGroup, SettingsManagerService } from '@cloudbeaver/core-settings';
+import { type ISettingDescription, ROOT_SETTINGS_GROUP, SettingsGroup, SettingsManagerService } from '@cloudbeaver/core-settings';
 
 interface ISettings {
   settings: Map<SettingsGroup, ISettingDescription<any>[]>;

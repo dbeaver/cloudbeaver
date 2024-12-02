@@ -24,9 +24,9 @@ import {
 } from '@cloudbeaver/core-resource';
 import { DetailsError, GraphQLService } from '@cloudbeaver/core-sdk';
 
-import type { DBObject } from './EntityTypes';
-import { NavNodeInfoResource } from './NavNodeInfoResource';
-import { NavTreeResource } from './NavTreeResource';
+import type { DBObject } from './EntityTypes.js';
+import { NavNodeInfoResource } from './NavNodeInfoResource.js';
+import { NavTreeResource } from './NavTreeResource.js';
 
 export const DBObjectParentKey = resourceKeyListAliasFactory('@db-object/parent', (parentId: string) => ({ parentId }));
 
@@ -110,8 +110,8 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
 
         this.offsetPagination.setPage(
           isPageListKey
-            ? CachedResourceOffsetPageListKey(offset, limit).setParent(parentKey || CachedResourceOffsetPageTargetKey(nodeId))
-            : CachedResourceOffsetPageKey(offset, limit).setParent(parentKey || CachedResourceOffsetPageTargetKey(nodeId)),
+            ? CachedResourceOffsetPageListKey(offset, keys.length).setParent(parentKey || CachedResourceOffsetPageTargetKey(nodeId))
+            : CachedResourceOffsetPageKey(offset, keys.length).setParent(parentKey || CachedResourceOffsetPageTargetKey(nodeId)),
           keys,
           keys.length === limit,
         );

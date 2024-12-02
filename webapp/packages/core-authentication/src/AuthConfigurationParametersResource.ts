@@ -9,8 +9,8 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapResource, isResourceAlias, type ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { EAdminPermission, SessionDataResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
-  AuthProviderConfigurationParametersFragment,
-  GetAuthProviderConfigurationParametersQueryVariables,
+  type AuthProviderConfigurationParametersFragment,
+  type GetAuthProviderConfigurationParametersQueryVariables,
   GraphQLService,
 } from '@cloudbeaver/core-sdk';
 

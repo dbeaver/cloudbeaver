@@ -10,9 +10,9 @@ import { observable } from 'mobx';
 import { useObjectRef, useObservableRef, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { SessionLogsResource } from '../SessionLogsResource';
-import type { ILogEntry } from './ILogEntry';
-import { LogViewerService } from './LogViewerService';
+import { SessionLogsResource } from '../SessionLogsResource.js';
+import type { ILogEntry } from './ILogEntry.js';
+import { LogViewerService } from './LogViewerService.js';
 
 interface Props {
   selectedItem: ILogEntry | null;

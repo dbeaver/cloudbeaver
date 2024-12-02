@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ActionIconButton } from '../ActionIconButton';
-import { s } from '../s';
-import { useS } from '../useS';
+import { ActionIconButton } from '../ActionIconButton.js';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
 import styles from './GroupClose.module.css';
 
 interface IProps {

@@ -13,10 +13,10 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, ENodeFeature, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
-import { MENU_NAVIGATION_TREE_FILTERS } from './MENU_NAVIGATION_TREE_FILTERS';
+import { MENU_NAVIGATION_TREE_FILTERS } from './MENU_NAVIGATION_TREE_FILTERS.js';
 
 const NavigationTreeFiltersDialog = importLazyComponent(() =>
-  import('./NavigationTreeFiltersDialog/NavigationTreeFiltersDialog').then(m => m.NavigationTreeFiltersDialog),
+  import('./NavigationTreeFiltersDialog/NavigationTreeFiltersDialog.js').then(m => m.NavigationTreeFiltersDialog),
 );
 
 @injectable()
@@ -31,7 +31,7 @@ export class NavigationTreeFiltersBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.menuService.addCreator({
       root: true,
       contexts: [DATA_CONTEXT_NAV_NODE],

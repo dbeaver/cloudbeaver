@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React, { ChangeEvent, forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import React, { type ChangeEvent, forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 
-import { Icon, IconOrImage, Loader, s, useObjectRef, useS } from '@cloudbeaver/core-blocks';
+import { Icon, IconOrImage, Loader, s, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
-import { EditorDialog } from './EditorDialog';
+import { EditorDialog } from './EditorDialog.js';
 import styles from './InlineEditor.module.css';
 
 export type InlineEditorControls = 'right' | 'top' | 'bottom' | 'inside';
@@ -70,6 +70,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
       disableSave,
     });
     const style = useS(styles);
+    const translate = useTranslate();
 
     const commonDialogService = useService(CommonDialogService);
 
@@ -133,7 +134,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
           onMouseDown={e => e.preventDefault()}
         >
           {!hideSave && (
-            <EditorAction disabled={disabled || disableSave} onClick={onSave}>
+            <EditorAction title={translate('ui_apply')} disabled={disabled || disableSave} onClick={onSave}>
               {loading ? (
                 <Loader className={s(style, { loader: true })} small fullSize />
               ) : (
@@ -142,17 +143,17 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
             </EditorAction>
           )}
           {!hideCancel && onReject && (
-            <EditorAction disabled={disabled} onClick={onReject}>
+            <EditorAction title={translate('ui_cancel')} disabled={disabled} onClick={onReject}>
               <Icon className={s(style, { icon: true })} name="reject" viewBox="0 0 11 11" />
             </EditorAction>
           )}
           {onUndo && (
-            <EditorAction disabled={!edited || disabled} onClick={edited ? onUndo : undefined}>
+            <EditorAction title={translate('ui_undo')} disabled={!edited || disabled} onClick={edited ? onUndo : undefined}>
               <IconOrImage className={s(style, { iconOrImage: true })} icon="/icons/data_revert.svg" />
             </EditorAction>
           )}
           {!simple && (
-            <EditorAction disabled={disabled} onClick={handlePopup}>
+            <EditorAction title={translate('ui_edit')} disabled={disabled} onClick={handlePopup}>
               <Icon className={s(style, { icon: true })} name="edit" viewBox="0 0 13 13" />
             </EditorAction>
           )}

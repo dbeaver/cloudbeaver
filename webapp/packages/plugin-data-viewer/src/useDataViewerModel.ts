@@ -8,11 +8,11 @@
 import { action, computed, observable } from 'mobx';
 
 import { useObservableRef, useResource } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
+import { type ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
 
-import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
+import { TableViewerStorageService } from './TableViewer/TableViewerStorageService.js';
 
 export interface IDataViewerDatabaseDataModel extends ILoadableState {
   connectionKey: IConnectionInfoParams | undefined;

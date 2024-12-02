@@ -7,17 +7,17 @@
  */
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useLayoutEffect, useRef, useState } from 'react';
-import { MenuButton, MenuInitialState, useMenuState } from 'reakit/Menu';
+import { MenuButton, type MenuInitialState, useMenuState } from 'reakit';
 
-import { ErrorBoundary } from '../ErrorBoundary';
-import { s } from '../s';
-import { useCombinedRef } from '../useCombinedRef';
-import { useObjectRef } from '../useObjectRef';
-import { useS } from '../useS';
+import { ErrorBoundary } from '../ErrorBoundary.js';
+import { s } from '../s.js';
+import { useCombinedRef } from '../useCombinedRef.js';
+import { useObjectRef } from '../useObjectRef.js';
+import { useS } from '../useS.js';
 import style from './Menu.module.css';
-import { MenuPanel } from './MenuPanel';
-import { IMenuState, MenuStateContext } from './MenuStateContext';
-import type { IMouseContextMenu } from './useMouseContextMenu';
+import { MenuPanel } from './MenuPanel.js';
+import { type IMenuState, MenuStateContext } from './MenuStateContext.js';
+import type { IMouseContextMenu } from './useMouseContextMenu.js';
 
 interface IMenuProps extends React.ButtonHTMLAttributes<any> {
   mouseContextMenu?: IMouseContextMenu;
@@ -134,6 +134,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
             <MenuButton
               key={relativePosition ? 'link' : 'main'}
               ref={combinedRef}
+              tabIndex={0}
               className={s(styles, { menuButton: true }, className)}
               {...menu}
               visible={menuVisible}
@@ -168,6 +169,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
           <MenuButton
             key={relativePosition ? 'link' : 'main'}
             ref={combinedRef}
+            tabIndex={0}
             className={s(styles, { menuButton: true }, className)}
             {...menu}
             visible={menuVisible}

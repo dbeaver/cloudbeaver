@@ -1,0 +1,3 @@
+fragment AdminTeamInfoMetaParameters on AdminTeamInfo {
+  metaParameters
+}

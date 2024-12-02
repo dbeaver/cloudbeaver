@@ -10,8 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { useTranslate } from '@cloudbeaver/core-blocks';
 import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 
-import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import type { IDataPresentationOptions } from '../../DataPresentationService';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
+import type { IDataPresentationOptions } from '../../DataPresentationService.js';
 
 interface Props {
   model: IDatabaseDataModel;

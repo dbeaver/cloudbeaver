@@ -1,5 +1,12 @@
-export * from './manifest';
-export * from './Screen/IScreen';
-export * from './Screen/ScreenService';
-export * from './RouterService';
-export * from './WindowsService';
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+export * from './manifest.js';
+export * from './Screen/IScreen.js';
+export * from './Screen/ScreenService.js';
+export * from './RouterService.js';
+export * from './WindowsService.js';

@@ -11,11 +11,11 @@ import { useState } from 'react';
 import { Loader, Pane, ResizerControls, s, Split, useS, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import type { IExecutionPlanTab } from '../../ISqlEditorTabState';
-import { ExecutionPlanTreeBlock } from './ExecutionPlanTreeBlock';
-import { PropertiesPanel } from './PropertiesPanel/PropertiesPanel';
+import type { IExecutionPlanTab } from '../../ISqlEditorTabState.js';
+import { ExecutionPlanTreeBlock } from './ExecutionPlanTreeBlock.js';
+import { PropertiesPanel } from './PropertiesPanel/PropertiesPanel.js';
 import style from './SqlExecutionPlanPanel.module.css';
-import { SqlExecutionPlanService } from './SqlExecutionPlanService';
+import { SqlExecutionPlanService } from './SqlExecutionPlanService.js';
 
 interface Props {
   executionPlanTab: IExecutionPlanTab;

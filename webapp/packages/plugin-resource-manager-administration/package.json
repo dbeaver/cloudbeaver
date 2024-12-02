@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-resource-manager-administration",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

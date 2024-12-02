@@ -11,7 +11,7 @@ import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { DatabaseDriverFragment, DriverConfigurationType, DriverListQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
+import { type DatabaseDriverFragment, DriverConfigurationType, type DriverListQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 export type DBDriver = DatabaseDriverFragment;
@@ -87,10 +87,10 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, DBDriv
 
   async addDriverLibraries(driverId: string, files: File[]) {
     await this.graphQLService.sdk.uploadDriverLibrary(driverId, files);
-    await this.refresh(driverId);
+    await this.markOutdated(driverId);
   }
 
-  protected dataSet(key: string, value: DBDriver): void {
+  protected override dataSet(key: string, value: DBDriver): void {
     const oldDriver = this.dataGet(key);
     this.data.set(key, { ...oldDriver, ...value });
   }

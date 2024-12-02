@@ -7,6 +7,6 @@
  */
 import { createContext } from 'react';
 
-import type { ITree } from '../useTree';
+import type { ITree } from '../useTree.js';
 
 export const TreeContext = createContext<ITree | undefined>(undefined);

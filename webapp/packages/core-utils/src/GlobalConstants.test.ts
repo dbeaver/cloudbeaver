@@ -7,7 +7,7 @@
  */
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 
-import { GlobalConstants } from './GlobalConstants';
+import { GlobalConstants } from './GlobalConstants.js';
 
 type WindowSpyType = jest.SpiedGetter<Window>;
 

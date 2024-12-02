@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from '@jest/globals';
 
-import { createPath } from './createPath';
+import { createPath } from './createPath.js';
 
 describe('Create path', () => {
   test('should return valid path when all arguments are valid', () => {

@@ -12,9 +12,9 @@ import { Translate, TreeNodeNestedMessage } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 
-import { ElementsTreeContext } from '../ElementsTreeContext';
-import type { NavTreeNodeComponent } from '../NavigationNodeComponent';
-import { NavigationNodeRendererLoader } from './NavigationNodeRendererLoader';
+import { ElementsTreeContext } from '../ElementsTreeContext.js';
+import type { NavTreeNodeComponent } from '../NavigationNodeComponent.js';
+import { NavigationNodeRendererLoader } from './NavigationNodeRendererLoader.js';
 
 export const NavigationNodeElement: NavTreeNodeComponent = observer(function NavigationNodeElement({ nodeId, path, expanded, dragging, className }) {
   const context = useContext(ElementsTreeContext);

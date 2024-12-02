@@ -7,14 +7,14 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import { MenuItemOptions, MenuItemRadio as ReakitMenuItemRadio } from 'reakit/Menu';
-import type { RadioOptions } from 'reakit/ts';
+import { type MenuItemOptions, MenuItemRadio as ReakitMenuItemRadio } from 'reakit';
+import type { RadioOptions } from 'reakit';
 
-import { s } from '../s';
-import { useS } from '../useS';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
 import style from './MenuItem.module.css';
-import { MenuStateContext } from './MenuStateContext';
-import type { ReakitProxyComponent, ReakitProxyComponentOptions } from './ReakitProxyComponent';
+import { MenuStateContext } from './MenuStateContext.js';
+import type { ReakitProxyComponent, ReakitProxyComponentOptions } from './ReakitProxyComponent.js';
 
 type Options = RadioOptions & MenuItemOptions;
 

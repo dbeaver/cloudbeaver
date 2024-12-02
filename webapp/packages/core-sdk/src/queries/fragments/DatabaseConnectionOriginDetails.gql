@@ -1,0 +1,7 @@
+fragment DatabaseConnectionOriginDetails on ConnectionInfo {
+  id
+  projectId
+  origin {
+    ...OriginDetails
+  }
+}

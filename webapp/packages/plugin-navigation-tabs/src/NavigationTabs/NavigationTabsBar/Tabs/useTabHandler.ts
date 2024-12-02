@@ -7,7 +7,7 @@
  */
 import { useService } from '@cloudbeaver/core-di';
 
-import { NavigationTabsService } from '../../NavigationTabsService';
+import { NavigationTabsService } from '../../NavigationTabsService.js';
 
 export function useTabHandler(handlerId: string) {
   const navigationTabs = useService(NavigationTabsService);

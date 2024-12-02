@@ -8,6 +8,6 @@
 import React from 'react';
 
 export const NavigationNodeRendererLoader = React.lazy(async () => {
-  const { NavigationNodeRenderer } = await import('./NavigationNodeRenderer');
+  const { NavigationNodeRenderer } = await import('./NavigationNodeRenderer.js');
   return { default: NavigationNodeRenderer };
 });

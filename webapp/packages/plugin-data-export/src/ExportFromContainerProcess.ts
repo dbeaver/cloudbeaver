@@ -7,7 +7,7 @@
  */
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { NotificationService } from '@cloudbeaver/core-events';
-import { AsyncTaskInfo, DataTransferParameters, GraphQLService, ServerInternalError } from '@cloudbeaver/core-sdk';
+import { type AsyncTaskInfo, type DataTransferParameters, GraphQLService, ServerInternalError } from '@cloudbeaver/core-sdk';
 import { CancellablePromise, cancellableTimeout, Deferred, EDeferredState } from '@cloudbeaver/core-utils';
 
 const DELAY_BETWEEN_TRIES = 1000;
@@ -53,7 +53,7 @@ export class ExportFromContainerProcess extends Deferred<string> {
    * this method just mark process as cancelling
    * to avoid racing conditions the server request will be executed in synchronous manner in start method
    */
-  cancel() {
+  override cancel() {
     if (this.getState() !== EDeferredState.PENDING) {
       return;
     }

@@ -5,13 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Connectable, connectable, filter, map, merge, Observable, Subject } from 'rxjs';
+import { type Connectable, connectable, filter, map, merge, Observable, Subject } from 'rxjs';
 
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import type { IResource } from '@cloudbeaver/core-resource';
 import { compose } from '@cloudbeaver/core-utils';
 
-import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Subscription } from './IServerEventEmitter';
+import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Subscription } from './IServerEventEmitter.js';
 
 interface ISubscribedResourceInfo {
   listeners: number;
@@ -33,7 +33,10 @@ export abstract class TopicEventHandler<
   private readonly subscribedResources: Map<IResource<any, any, any, any, any>, ISubscribedResourceInfo>;
   private readonly serverSubject?: Observable<TEvent>;
   private readonly subject: Subject<TEvent>;
-  constructor(private readonly topic: string, private readonly emitter: IServerEventEmitter<SourceEvent>) {
+  constructor(
+    private readonly topic: string,
+    private readonly emitter: IServerEventEmitter<SourceEvent>,
+  ) {
     this.onInit = new SyncExecutor();
     this.subject = new Subject();
     this.activeResources = [];

@@ -10,14 +10,14 @@ import { useCallback, useContext } from 'react';
 
 import { EventContext } from '@cloudbeaver/core-events';
 
-import { Icon } from '../Icon';
-import { useTranslate } from '../localization/useTranslate';
-import { s } from '../s';
-import { useS } from '../useS';
-import { EventTableItemExpandFlag } from './EventTableItemExpandFlag';
-import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
-import { TableContext } from './TableContext';
-import { TableItemContext } from './TableItemContext';
+import { Icon } from '../Icon.js';
+import { useTranslate } from '../localization/useTranslate.js';
+import { s } from '../s.js';
+import { useS } from '../useS.js';
+import { EventTableItemExpandFlag } from './EventTableItemExpandFlag.js';
+import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag.js';
+import { TableContext } from './TableContext.js';
+import { TableItemContext } from './TableItemContext.js';
 import style from './TableItemExpand.module.css';
 
 interface Props {

@@ -8,12 +8,12 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, type IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { ICachedTreeMoveData, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { type ICachedTreeMoveData, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { NetworkStateService } from '@cloudbeaver/core-root';
 import { StorageService } from '@cloudbeaver/core-storage';
@@ -25,9 +25,9 @@ import { ResourceManagerScriptsService, SCRIPTS_TYPE_ID } from '@cloudbeaver/plu
 import { createSqlDataSourceHistoryInitialState, getSqlEditorName, SqlDataSourceService, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 import { SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
-import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
-import { ResourceSqlDataSource } from './ResourceSqlDataSource';
-import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
+import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState.js';
+import { ResourceSqlDataSource } from './ResourceSqlDataSource.js';
+import { SqlEditorTabResourceService } from './SqlEditorTabResourceService.js';
 
 const RESOURCE_TAB_STATE = 'sql_editor_resource_tab_state';
 
@@ -84,7 +84,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     );
   }
 
-  register(): void | Promise<void> {
+  override register(): void | Promise<void> {
     this.resourceManagerResource.onItemDelete.addHandler(this.resourceDeleteHandler.bind(this));
     this.resourceManagerResource.onMove.addHandler(this.resourceMoveHandler.bind(this));
 
@@ -149,8 +149,6 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       },
     });
   }
-
-  load(): void | Promise<void> {}
 
   private createState(editorId: string, script?: string, resourceKey?: string): IResourceSqlDataSourceState {
     let state = this.dataSourceStateState.get(editorId);

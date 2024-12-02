@@ -20,7 +20,7 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { ConnectionDialectResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ConnectionDialectResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';

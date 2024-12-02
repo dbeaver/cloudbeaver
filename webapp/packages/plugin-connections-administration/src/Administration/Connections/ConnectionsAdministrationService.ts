@@ -9,31 +9,32 @@ import React from 'react';
 
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { ConfirmationDialog, PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, DatabaseConnection } from '@cloudbeaver/core-connections';
+import { type ConnectionInfoOrigin, ConnectionInfoResource, type DatabaseConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
-import { CreateConnectionService } from './CreateConnectionService';
+import { CreateConnectionService } from './CreateConnectionService.js';
 
 export interface IConnectionDetailsPlaceholderProps {
   connection: DatabaseConnection;
+  connectionOrigin?: ConnectionInfoOrigin;
 }
 
 const ConnectionsAdministration = React.lazy(async () => {
-  const { ConnectionsAdministration } = await import('./ConnectionsAdministration');
+  const { ConnectionsAdministration } = await import('./ConnectionsAdministration.js');
   return { default: ConnectionsAdministration };
 });
 const ConnectionsDrawerItem = React.lazy(async () => {
-  const { ConnectionsDrawerItem } = await import('./ConnectionsDrawerItem');
+  const { ConnectionsDrawerItem } = await import('./ConnectionsDrawerItem.js');
   return { default: ConnectionsDrawerItem };
 });
 const Origin = React.lazy(async () => {
-  const { Origin } = await import('./ConnectionsTable/ConnectionDetailsInfo/Origin');
+  const { Origin } = await import('./ConnectionsTable/ConnectionDetailsInfo/Origin.js');
   return { default: Origin };
 });
 const SSH = React.lazy(async () => {
-  const { SSH } = await import('./ConnectionsTable/ConnectionDetailsInfo/SSH');
+  const { SSH } = await import('./ConnectionsTable/ConnectionDetailsInfo/SSH.js');
   return { default: SSH };
 });
 
@@ -51,7 +52,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.administrationItemService.create({
       name: 'connections',
       type: AdministrationItemType.Administration,
@@ -68,7 +69,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
           canDeActivate: this.canDeActivateCreate.bind(this),
         },
       ],
-      isHidden: () => this.serverConfigResource.distributed,
+      isHidden: () => this.serverConfigResource.distributed || !this.connectionInfoResource.values.some(connection => connection.template),
       getContentComponent: () => ConnectionsAdministration,
       getDrawerComponent: () => ConnectionsDrawerItem,
       onDeActivate: this.refreshUserConnections.bind(this),
@@ -77,7 +78,9 @@ export class ConnectionsAdministrationService extends Bootstrap {
     this.connectionDetailsPlaceholder.add(SSH, 2);
   }
 
-  load(): void | Promise<void> {}
+  override async load(): Promise<void> {
+    await this.connectionInfoResource.load();
+  }
 
   private async refreshUserConnections(configuration: boolean, outside: boolean, outsideAdminPage: boolean): Promise<void> {
     // TODO: we have to track users' leaving the page

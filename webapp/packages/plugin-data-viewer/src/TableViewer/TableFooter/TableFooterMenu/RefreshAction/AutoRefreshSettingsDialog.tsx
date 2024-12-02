@@ -26,7 +26,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
-import { IDatabaseRefreshState } from '../../../../DatabaseDataModel/Actions/DatabaseRefreshAction';
+import type { IDatabaseRefreshState } from '../../../../DatabaseDataModel/Actions/DatabaseRefreshAction.js';
 import style from './AutoRefreshSettingsDialog.module.css';
 
 interface Payload {

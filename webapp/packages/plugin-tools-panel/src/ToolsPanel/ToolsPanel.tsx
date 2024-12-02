@@ -11,11 +11,11 @@ import { useRef } from 'react';
 
 import { s, useS, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ITabData, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
+import { type ITabData, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import styles from './ToolsPanel.module.css';
-import { ToolsPanelService } from './ToolsPanelService';
+import { ToolsPanelService } from './ToolsPanelService.js';
 
 interface IToolsState {
   selectedTabId: string | undefined;

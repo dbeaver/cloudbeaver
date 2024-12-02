@@ -11,14 +11,14 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, ENodeFeature } from '@cloudbeaver/core-navigation-tree';
-import { isResourceOfType, ProjectInfoResource, ProjectInfoResourceType } from '@cloudbeaver/core-projects';
+import { isResourceOfType, ProjectInfoResource, type ProjectInfoResourceType } from '@cloudbeaver/core-projects';
 import { getRmResourceKey, NAV_NODE_TYPE_RM_FOLDER, NAV_NODE_TYPE_RM_RESOURCE } from '@cloudbeaver/core-resource-manager';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
 import { ACTION_DELETE, ACTION_RENAME, ActionService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '@cloudbeaver/plugin-navigation-tree';
 
-import { getResourceKeyFromNodeId } from './NavNodes/getResourceKeyFromNodeId';
-import { NavResourceNodeService } from './NavResourceNodeService';
+import { getResourceKeyFromNodeId } from './NavNodes/getResourceKeyFromNodeId.js';
+import { NavResourceNodeService } from './NavResourceNodeService.js';
 
 @injectable()
 export class NavTreeRMContextMenuService extends Bootstrap {
@@ -33,7 +33,7 @@ export class NavTreeRMContextMenuService extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.actionService.addHandler({
       id: 'nav-node-rm-handler',
       contexts: [DATA_CONTEXT_NAV_NODE],
@@ -128,6 +128,4 @@ export class NavTreeRMContextMenuService extends Bootstrap {
       },
     });
   }
-
-  load(): void {}
 }

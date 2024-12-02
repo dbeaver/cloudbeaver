@@ -8,10 +8,10 @@
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { UserProfileFormService } from '../UserProfileFormService';
-import { getUserProfileFormAuthenticationPart } from './getUserProfileFormAuthenticationPart';
+import { UserProfileFormService } from '../UserProfileFormService.js';
+import { getUserProfileFormAuthenticationPart } from './getUserProfileFormAuthenticationPart.js';
 
-const AuthenticationPanel = importLazyComponent(() => import('./AuthenticationPanel').then(m => m.AuthenticationPanel));
+const AuthenticationPanel = importLazyComponent(() => import('./AuthenticationPanel.js').then(m => m.AuthenticationPanel));
 
 @injectable()
 export class UserProfileFormAuthenticationPartBootstrap extends Bootstrap {
@@ -19,7 +19,7 @@ export class UserProfileFormAuthenticationPartBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void {
+  override register(): void {
     this.userProfileFormService.parts.add({
       key: 'authentication',
       name: 'ui_authentication',

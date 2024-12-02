@@ -8,9 +8,9 @@
 import { observer } from 'mobx-react-lite';
 
 import style from './ActionIconButton.module.css';
-import { IconButton, type IconButtonProps } from './IconButton';
-import { s } from './s';
-import { useS } from './useS';
+import { IconButton, type IconButtonProps } from './IconButton.js';
+import { s } from './s.js';
+import { useS } from './useS.js';
 
 export interface ActionIconButtonProps extends IconButtonProps {
   primary?: boolean;

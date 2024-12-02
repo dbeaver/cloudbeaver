@@ -9,13 +9,13 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataAction } from '../../DatabaseDataAction';
-import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
-import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
-import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import type { IDatabaseDataCacheAction } from '../IDatabaseDataCacheAction';
-import type { IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
-import { ResultSetDataAction } from './ResultSetDataAction';
+import { DatabaseDataAction } from '../../DatabaseDataAction.js';
+import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
+import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
+import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
+import type { IDatabaseDataCacheAction } from '../IDatabaseDataCacheAction.js';
+import type { IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey.js';
+import { ResultSetDataAction } from './ResultSetDataAction.js';
 
 @databaseDataAction()
 export class ResultSetCacheAction
@@ -26,7 +26,10 @@ export class ResultSetCacheAction
 
   private readonly cache: Map<string, Map<symbol, any>>;
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, private readonly data: ResultSetDataAction) {
+  constructor(
+    source: IDatabaseDataSource<any, IDatabaseResultSet>,
+    private readonly data: ResultSetDataAction,
+  ) {
     super(source);
 
     this.cache = new Map();
@@ -113,11 +116,11 @@ export class ResultSetCacheAction
     }
   }
 
-  afterResultUpdate() {
+  override afterResultUpdate() {
     this.cache.clear();
   }
 
-  dispose(): void {
+  override dispose(): void {
     this.cache.clear();
   }
 

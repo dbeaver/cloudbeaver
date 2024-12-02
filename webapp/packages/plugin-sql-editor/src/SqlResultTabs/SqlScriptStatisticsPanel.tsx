@@ -9,11 +9,11 @@ import { observer } from 'mobx-react-lite';
 
 import { Loader, s, TextPlaceholder, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { IDatabaseDataModel, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
+import { type IDatabaseDataModel, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IStatisticsTab } from '../ISqlEditorTabState';
-import type { QueryDataSource } from '../QueryDataSource';
-import { SqlQueryService } from './SqlQueryService';
+import type { IStatisticsTab } from '../ISqlEditorTabState.js';
+import type { QueryDataSource } from '../QueryDataSource.js';
+import { SqlQueryService } from './SqlQueryService.js';
 import classes from './SqlScriptStatisticsPanel.module.css';
 
 interface IProps {

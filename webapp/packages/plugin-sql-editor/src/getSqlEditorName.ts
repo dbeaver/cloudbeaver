@@ -7,8 +7,8 @@
  */
 import type { Connection } from '@cloudbeaver/core-connections';
 
-import type { ISqlEditorTabState } from './ISqlEditorTabState';
-import type { ISqlDataSource } from './SqlDataSource/ISqlDataSource';
+import type { ISqlEditorTabState } from './ISqlEditorTabState.js';
+import type { ISqlDataSource } from './SqlDataSource/ISqlDataSource.js';
 
 export function getSqlEditorName(state: ISqlEditorTabState, dataSource?: ISqlDataSource, connection?: Connection): string {
   if (dataSource?.name) {

@@ -98,6 +98,7 @@ export default [
   ['administration_identity_providers_wizard_description', "Ajouter des fournisseurs d'identité"],
   ['administration_identity_providers_configuration_add', 'Création de configuration'],
   ['administration_identity_providers_choose_provider_placeholder', 'Sélectionner un fournisseur...'],
+  ['administration_identity_providers_choose_provider_placeholder_empty', 'No available providers'],
   ['administration_identity_providers_add_tooltip', 'Ajouter une nouvelle configuration'],
   ['administration_identity_providers_refresh_tooltip', 'Rafraîchir la liste des configurations'],
   ['administration_identity_providers_delete_tooltip', 'Supprimer les configurations sélectionnées'],
@@ -131,4 +132,6 @@ export default [
     'administration_teams_delete_confirmation_users_note',
     "Notez que les utilisateurs perdront leur affiliation à l'équipe et toutes les permissions associées",
   ],
+  ['plugin_authentication_administration_team_form_edit_label', 'Team editing form'],
+  ['plugin_authentication_administration_user_form_edit_label', 'User editing form'],
 ];

@@ -10,7 +10,7 @@ import { type PropsWithChildren, useContext } from 'react';
 
 import { useDataContext } from '@cloudbeaver/core-data-context';
 
-import { CaptureViewContext } from './CaptureViewContext';
+import { CaptureViewContext } from './CaptureViewContext.js';
 
 export const CaptureViewScope = observer<PropsWithChildren>(function CaptureViewScope({ children }) {
   const context = useContext(CaptureViewContext);

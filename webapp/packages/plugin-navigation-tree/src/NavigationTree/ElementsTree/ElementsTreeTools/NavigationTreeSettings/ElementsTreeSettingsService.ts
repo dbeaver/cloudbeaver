@@ -8,8 +8,8 @@
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
-import type { IElementsTree } from '../../useElementsTree';
-import { ElementsTreeBaseSettingsForm } from './ElementsTreeBaseSettingsForm';
+import type { IElementsTree } from '../../useElementsTree.js';
+import { ElementsTreeBaseSettingsForm } from './ElementsTreeBaseSettingsForm.js';
 
 export interface IElementsTreeSettingsProps {
   tree: IElementsTree;

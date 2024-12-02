@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-top-app-bar",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

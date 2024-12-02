@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { AuthProvider, AuthProviderConfiguration, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { type AuthProvider, type AuthProviderConfiguration, UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
   Checkbox,
   CommonDialogBody,
@@ -26,17 +26,17 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogComponent } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, type DialogComponent } from '@cloudbeaver/core-dialogs';
 import { Tab, TabList, TabsState, TabTitle } from '@cloudbeaver/core-ui';
 
-import { AuthenticationService } from '../AuthenticationService';
-import type { IAuthOptions } from '../IAuthOptions';
+import { AuthenticationService } from '../AuthenticationService.js';
+import type { IAuthOptions } from '../IAuthOptions.js';
 import style from './AuthDialog.module.css';
-import { AuthDialogFooter } from './AuthDialogFooter';
-import { AuthProviderForm } from './AuthProviderForm/AuthProviderForm';
-import { ConfigurationsList } from './AuthProviderForm/ConfigurationsList';
-import { FEDERATED_AUTH } from './FEDERATED_AUTH';
-import { getAuthProviderTabId, useAuthDialogState } from './useAuthDialogState';
+import { AuthDialogFooter } from './AuthDialogFooter.js';
+import { AuthProviderForm } from './AuthProviderForm/AuthProviderForm.js';
+import { ConfigurationsList } from './AuthProviderForm/ConfigurationsList.js';
+import { FEDERATED_AUTH } from './FEDERATED_AUTH.js';
+import { getAuthProviderTabId, useAuthDialogState } from './useAuthDialogState.js';
 
 export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function AuthDialog({
   payload: { providerId, configurationId, linkUser = false, accessRequest = false },

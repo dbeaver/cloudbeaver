@@ -8,13 +8,13 @@
 import { observer } from 'mobx-react-lite';
 
 import { s, TextPlaceholder, useAutoLoad, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { DynamicTraceProperty } from '@cloudbeaver/core-sdk';
+import { type DynamicTraceProperty } from '@cloudbeaver/core-sdk';
 import { type Column, DataGrid } from '@cloudbeaver/plugin-data-grid';
-import { type DataPresentationComponent, IDatabaseDataOptions, isResultSetDataModel, isResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
+import { type DataPresentationComponent, type IDatabaseDataOptions, isResultSetDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 import classes from './DVResultTraceDetailsPresentation.module.css';
-import { HeaderCell } from './ResultTraceDetailsTable/HeaderCell';
-import { useResultTraceDetails } from './useResultTraceDetails';
+import { HeaderCell } from './ResultTraceDetailsTable/HeaderCell.js';
+import { useResultTraceDetails } from './useResultTraceDetails.js';
 
 const COLUMNS: Column<DynamicTraceProperty>[] = [
   {

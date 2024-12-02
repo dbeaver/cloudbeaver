@@ -11,6 +11,7 @@
   box-sizing: border-box;
   padding-top: 4px;
   min-height: 24px;
+  word-break: break-word;
 
   &.invalid {
     color: var(--theme-negative);

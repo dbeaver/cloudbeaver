@@ -7,7 +7,7 @@
  */
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
-import type { MenuItemType } from './models/MenuOptionsStore';
+import type { MenuItemType } from './models/MenuOptionsStore.js';
 
 export type MenuMod = 'primary' | 'surface' | 'secondary';
 

@@ -7,8 +7,8 @@
  */
 import { IServiceProvider } from '@cloudbeaver/core-di';
 
-import { DATA_CONTEXT_DI_PROVIDER } from './DATA_CONTEXT_DI_PROVIDER';
-import type { IDataContext } from './IDataContext';
+import { DATA_CONTEXT_DI_PROVIDER } from './DATA_CONTEXT_DI_PROVIDER.js';
+import type { IDataContext } from './IDataContext.js';
 
 export function dataContextAddDIProvider(context: IDataContext, serviceProvider: IServiceProvider, id: string): IDataContext {
   context.set(DATA_CONTEXT_DI_PROVIDER, serviceProvider, id);

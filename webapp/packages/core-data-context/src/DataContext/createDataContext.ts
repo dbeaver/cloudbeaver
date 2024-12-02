@@ -7,7 +7,7 @@
  */
 import { uuid } from '@cloudbeaver/core-utils';
 
-import type { DataContextGetter } from './DataContextGetter';
+import type { DataContextGetter } from './DataContextGetter.js';
 
 export function createDataContext<T>(name: string): DataContextGetter<T> {
   return {

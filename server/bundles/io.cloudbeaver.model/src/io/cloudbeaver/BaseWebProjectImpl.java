@@ -23,7 +23,6 @@ import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMControllerProvider;
 import org.jkiss.dbeaver.model.rm.RMProject;
-import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.Pair;
 
@@ -38,7 +37,6 @@ public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMCo
     @NotNull
     private final Path path;
     @NotNull
-    protected final DataSourceFilter dataSourceFilter;
     private final RMController resourceController;
 
     public BaseWebProjectImpl(
@@ -46,13 +44,12 @@ public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMCo
         @NotNull RMController resourceController,
         @NotNull SMSessionContext sessionContext,
         @NotNull RMProject project,
-        @NotNull DataSourceFilter dataSourceFilter
+        @NotNull Path path
     ) {
         super(workspace, sessionContext);
         this.resourceController = resourceController;
-        this.path = RMUtils.getProjectPath(project);
+        this.path = path;
         this.project = project;
-        this.dataSourceFilter = dataSourceFilter;
     }
 
     @NotNull
@@ -102,11 +99,6 @@ public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMCo
     @Override
     public boolean isUseSecretStorage() {
         return false;
-    }
-
-    @NotNull
-    public RMProject getRmProject() {
-        return this.project;
     }
 
     /**

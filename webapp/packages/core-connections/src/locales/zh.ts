@@ -37,10 +37,7 @@ export default [
   ['connections_connection_authentication_save_credentials_for_session', '当前会话不再询问'],
   ['connections_connection_authentication_save_credentials_for_session_tooltip', '注销后将移除凭证'],
   ['connections_connection_edit_save_credentials_shared', '为所有访问用户保存凭证'],
-  [
-    'connections_connection_edit_save_credentials_shared_tooltip',
-    '凭证将用于为所有访问用户自动连接数据库',
-  ],
+  ['connections_connection_edit_save_credentials_shared_tooltip', '凭证将用于为所有访问用户自动连接数据库'],
   ['connections_connection_share_credentials', '分享凭证至团队'],
   ['connections_connection_share_credentials_tooltip', '凭证将用于为所有团队用户自动连接数据库'],
   ['connections_connection_credentials_provisioning', '认证凭据'],
@@ -52,7 +49,7 @@ export default [
   ['connections_connection_edit_search_hosts', '主机名称'],
   ['connections_connection_address', '地址'],
   ['connections_connection_folder', '文件夹'],
-  ['connections_connection_folder_validation', "文件夹名称不得包含以下符号 / : \" \\ ' <> | ? * 且不能以点开头"],
+  ['connections_connection_folder_validation', '文件夹名称不得包含以下符号 / : " \\ \' <> | ? * 且不能以点开头'],
   ['connections_connection_name', '连接名称'],
   ['connections_connection_access_admin_info', '管理员可以查看除其他用户的私有连接之外的所有连接。'],
   ['connections_connection_description', '描述'],
@@ -92,4 +89,8 @@ export default [
   ['connections_not_found', '未找到数据库连接'],
 
   ['cloud_connections_access_placeholder', '云连接对所有用户可见。可以在“AWS管理控制台”中配置访问管理。'],
+
+  ['core_connections_settings_disable', 'Disable'],
+  ['core_connections_settings_disable_description', 'Disable the ability to create new connections'],
+  ['connections_templates_deprecated_message', 'Template connections are deprecated and will be removed in future releases'],
 ];

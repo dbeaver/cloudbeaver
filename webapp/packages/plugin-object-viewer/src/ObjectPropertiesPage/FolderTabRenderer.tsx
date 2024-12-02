@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
-import { NavNodeTab } from './NavNodeTab';
+import { NavNodeTab } from './NavNodeTab.js';
 
 interface IFolderTabRendererProps {
   nodeId: string;

@@ -27,10 +27,10 @@ import {
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
 import styles from './ConnectionAccessList.module.css';
-import { ConnectionAccessTableHeader, IFilterState } from './ConnectionAccessTableHeader/ConnectionAccessTableHeader';
-import { ConnectionAccessTableInnerHeader } from './ConnectionAccessTableHeader/ConnectionAccessTableInnerHeader';
-import { ConnectionAccessTableItem } from './ConnectionAccessTableItem';
-import { getFilteredTeams, getFilteredUsers } from './getFilteredSubjects';
+import { ConnectionAccessTableHeader, type IFilterState } from './ConnectionAccessTableHeader/ConnectionAccessTableHeader.js';
+import { ConnectionAccessTableInnerHeader } from './ConnectionAccessTableHeader/ConnectionAccessTableInnerHeader.js';
+import { ConnectionAccessTableItem } from './ConnectionAccessTableItem.js';
+import { getFilteredTeams, getFilteredUsers } from './getFilteredSubjects.js';
 
 interface Props {
   userList: AdminUserInfoFragment[];
@@ -49,7 +49,7 @@ export const ConnectionAccessList = observer<Props>(function ConnectionAccessLis
 
   const teams = getFilteredTeams(teamList, filterState.filterValue);
   const users = getFilteredUsers(userList, filterState.filterValue);
-  const keys = teams.map(team => team.teamId).concat(users.map(user => user.userId));
+  const keys = teamList.map(team => team.teamId).concat(userList.map(user => user.userId));
 
   const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 

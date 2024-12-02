@@ -8,6 +8,6 @@
 import React from 'react';
 
 export const NavigationTreeLoader = React.lazy(async () => {
-  const { NavigationTree } = await import('./NavigationTree');
+  const { NavigationTree } = await import('./NavigationTree.js');
   return { default: NavigationTree };
 });

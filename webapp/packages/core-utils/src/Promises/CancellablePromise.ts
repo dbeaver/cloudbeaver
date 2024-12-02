@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { PromiseCancelledError } from './PromiseCancelledError';
+import { PromiseCancelledError } from './PromiseCancelledError.js';
 
 export type CancellableExecutor<T> = (resolve: (value: T) => void, reject: (reason?: any) => void) => undefined | (() => void); // returns nothing or cancel function
 

@@ -8,7 +8,7 @@
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 
-import type { UserProfileFormProps } from '../UserProfileFormService';
+import type { UserProfileFormProps } from '../UserProfileFormService.js';
 
 @injectable()
 export class UserProfileFormInfoPartService {

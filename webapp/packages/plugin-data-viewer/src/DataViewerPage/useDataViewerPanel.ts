@@ -11,14 +11,14 @@ import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 import type { IObjectViewerTabState } from '@cloudbeaver/plugin-object-viewer';
 
-import { ContainerDataSource } from '../ContainerDataSource';
-import { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import { DataPresentationService } from '../DataPresentationService';
-import { DataViewerDataChangeConfirmationService } from '../DataViewerDataChangeConfirmationService';
-import { DataViewerTableService } from '../DataViewerTableService';
-import { DataViewerTabService } from '../DataViewerTabService';
-import { TableViewerStorageService } from '../TableViewer/TableViewerStorageService';
-import { useDataViewerModel } from '../useDataViewerModel';
+import { ContainerDataSource } from '../ContainerDataSource.js';
+import { type IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
+import { DataPresentationService } from '../DataPresentationService.js';
+import { DataViewerDataChangeConfirmationService } from '../DataViewerDataChangeConfirmationService.js';
+import { DataViewerTableService } from '../DataViewerTableService.js';
+import { DataViewerTabService } from '../DataViewerTabService.js';
+import { TableViewerStorageService } from '../TableViewer/TableViewerStorageService.js';
+import { useDataViewerModel } from '../useDataViewerModel.js';
 
 export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
   const dataViewerTableService = useService(DataViewerTableService);

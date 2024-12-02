@@ -16,15 +16,15 @@ import {
   CachedResourceOffsetPageListKey,
   CachedResourceOffsetPageTargetKey,
   getNextPageOffset,
-  ICachedResourceOffsetPageOptions,
+  type ICachedResourceOffsetPageOptions,
   isResourceAlias,
-  ResourceKey,
+  type ResourceKey,
   ResourceKeyAlias,
   ResourceKeyList,
   ResourceKeyListAlias,
 } from '@cloudbeaver/core-resource';
 
-import { useObservableRef } from '../useObservableRef';
+import { useObservableRef } from '../useObservableRef.js';
 
 interface IOptions<TKey extends ResourceKey<any>> {
   key: TKey;
@@ -59,7 +59,7 @@ export function useOffsetPagination<TResource extends CachedMapResource<any, any
   const resource = useService(ctor);
   const pageInfo = resource.offsetPagination.getPageInfo(createPageKey(0, 0, targetKey));
   const offset = Math.max(
-    (pageInfo ? getNextPageOffset(pageInfo) : CACHED_RESOURCE_DEFAULT_PAGE_OFFSET) - pageSize,
+    (pageInfo ? getNextPageOffset(pageInfo) : CACHED_RESOURCE_DEFAULT_PAGE_OFFSET) - (pageInfo?.end ?? pageSize),
     CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   );
 
@@ -86,7 +86,7 @@ export function useOffsetPagination<TResource extends CachedMapResource<any, any
       },
       loadMore() {
         if (this.hasNextPage) {
-          this._key = createPageKey(this._key.options.offset + this._key.options.limit, this._key.options.limit, this._target);
+          this._key = createPageKey(this.offset + this._key.options.limit, this._key.options.limit, this._target);
         }
       },
       refresh() {
@@ -102,7 +102,7 @@ export function useOffsetPagination<TResource extends CachedMapResource<any, any
       loadMore: action.bound,
       refresh: action.bound,
     },
-    { resource },
+    { resource, offset },
   );
 
   if (!resource.isIntersect(targetKey, pagination._target)) {

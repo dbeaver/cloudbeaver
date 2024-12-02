@@ -9,18 +9,22 @@ import { observer } from 'mobx-react-lite';
 
 import {
   Button,
+  Flex,
   Loader,
+  s,
   Table,
   TableBody,
   TableColumnHeader,
   TableColumnValue,
   TableHeader,
   TableItem,
+  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
-import { User } from './User';
+import { User } from './User.js';
+import classes from './UsersTable.module.css';
 
 interface Props {
   users: AdminUserInfoFragment[];
@@ -44,14 +48,17 @@ export const UsersTable = observer<Props>(function UsersTable({
   const translate = useTranslate();
   const keys = users.map(user => user.userId);
   const colSpan = displayAuthRole ? 6 : 5;
+  const styles = useS(classes);
 
   return (
     <Table keys={keys} selectedItems={selectedItems} expandedItems={expandedItems} size="big">
       <TableHeader fixed>
-        <TableColumnHeader min>
-          <Loader loading={loading} small />
+        <TableColumnHeader>
+          <Flex align="center" gap="xs">
+            {translate('authentication_user_name')}
+            <Loader className={s(styles, { loader: true, hidden: !loading })} small inline />
+          </Flex>
         </TableColumnHeader>
-        <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
         {displayAuthRole && <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>}
         <TableColumnHeader>{translate('authentication_user_team')}</TableColumnHeader>
         <TableColumnHeader min>{translate('authentication_user_enabled')}</TableColumnHeader>

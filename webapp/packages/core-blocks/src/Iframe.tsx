@@ -9,8 +9,8 @@ import { observer } from 'mobx-react-lite';
 import type { DetailedHTMLProps, IframeHTMLAttributes } from 'react';
 
 import style from './Iframe.module.css';
-import { s } from './s';
-import { useS } from './useS';
+import { s } from './s.js';
+import { useS } from './useS.js';
 
 export const Iframe = observer<DetailedHTMLProps<IframeHTMLAttributes<HTMLIFrameElement>, HTMLIFrameElement>>(function Iframe(props) {
   const styles = useS(style);

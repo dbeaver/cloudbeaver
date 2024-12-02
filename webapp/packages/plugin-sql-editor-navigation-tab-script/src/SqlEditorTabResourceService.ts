@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 import { SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
-import { ResourceSqlDataSource } from './ResourceSqlDataSource';
+import { ResourceSqlDataSource } from './ResourceSqlDataSource.js';
 
 @injectable()
 export class SqlEditorTabResourceService {

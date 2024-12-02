@@ -9,12 +9,12 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { useDataContext } from '@cloudbeaver/core-data-context';
-import { ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
+import { type ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs';
 import { useNode } from '@cloudbeaver/plugin-navigation-tree';
 
-import type { IObjectViewerTabState } from './IObjectViewerTabState';
+import type { IObjectViewerTabState } from './IObjectViewerTabState.js';
 
 export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = observer(function ObjectViewerTab({ tab, onSelect, onClose }) {
   const viewContext = useContext(CaptureViewContext);

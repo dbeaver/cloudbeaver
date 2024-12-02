@@ -13,11 +13,11 @@ import { EObjectFeature, type NavNode, NavNodeInfoResource } from '@cloudbeaver/
 import { resourceKeyList } from '@cloudbeaver/core-resource';
 import type { IDNDData } from '@cloudbeaver/core-ui';
 
-import { useChildren } from '../../../NodesManager/useChildren';
-import { useNode } from '../../../NodesManager/useNode';
-import { ElementsTreeContext } from '../ElementsTreeContext';
-import type { NavTreeControlComponent } from '../NavigationNodeComponent';
-import type { IElementsTree } from '../useElementsTree';
+import { useChildren } from '../../../NodesManager/useChildren.js';
+import { useNode } from '../../../NodesManager/useNode.js';
+import { ElementsTreeContext } from '../ElementsTreeContext.js';
+import type { NavTreeControlComponent } from '../NavigationNodeComponent.js';
+import type { IElementsTree } from '../useElementsTree.js';
 
 export interface INavigationNode {
   ref: React.RefObject<HTMLDivElement>;

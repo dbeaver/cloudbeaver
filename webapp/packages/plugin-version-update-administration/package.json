@@ -1,5 +1,6 @@
 {
   "name": "@cloudbeaver/plugin-version-update-administration",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -20,6 +21,7 @@
     "@cloudbeaver/core-administration": "^0",
     "@cloudbeaver/core-blocks": "^0",
     "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-links": "^0",
     "@cloudbeaver/core-localization": "^0",
     "@cloudbeaver/core-resource": "^0",
     "@cloudbeaver/core-root": "^0",

@@ -10,7 +10,7 @@ import { computed, observable } from 'mobx';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyInfo, SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
 
-import type { IExecutionPlanNode, IExecutionPlanTreeContext } from './ExecutionPlanTreeContext';
+import type { IExecutionPlanNode, IExecutionPlanTreeContext } from './ExecutionPlanTreeContext.js';
 
 export function isVisibleProperty(property: ObjectPropertyInfo): boolean {
   return property.features.includes('viewable');
@@ -46,7 +46,7 @@ export function useExecutionPlanTreeState(nodeList: SqlExecutionPlanNode[], onNo
         for (const node of tree) {
           if (node.parentId) {
             const parent = map.get(node.parentId)!;
-            tree[parent].children.push(node);
+            tree[parent]?.children.push(node);
           } else {
             nodes.push(node);
           }

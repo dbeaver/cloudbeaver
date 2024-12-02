@@ -11,8 +11,8 @@ import React, { Suspense } from 'react';
 
 import { addKnownError, consoleSpy } from '@cloudbeaver/tests-runner';
 
-import ErrorBoundary from './__custom__mocks__/ErrorBoundaryMock';
-import { importLazyComponent } from './importLazyComponent';
+import ErrorBoundary from './__custom__mocks__/ErrorBoundaryMock.js';
+import { importLazyComponent } from './importLazyComponent.js';
 
 addKnownError(/The above error occurred in one of your React components.*/);
 

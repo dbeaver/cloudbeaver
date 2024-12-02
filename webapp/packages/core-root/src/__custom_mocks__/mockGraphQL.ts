@@ -9,7 +9,7 @@ import { afterAll, afterEach, beforeAll } from '@jest/globals';
 import type { GraphQLHandler } from 'msw';
 import { setupServer } from 'msw/node';
 
-import { createWebsocketEndpoint } from './createWebsocketEndpoint';
+import { createWebsocketEndpoint } from './createWebsocketEndpoint.js';
 
 export function mockGraphQL(...requestHandlers: GraphQLHandler[]) {
   const server = setupServer(...requestHandlers, createWebsocketEndpoint());

@@ -9,12 +9,12 @@ import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState } from 'react';
 
-import { s } from '../s';
-import { useObjectRef } from '../useObjectRef';
-import { useObservableRef } from '../useObservableRef';
-import { useS } from '../useS';
+import { s } from '../s.js';
+import { useObjectRef } from '../useObjectRef.js';
+import { useObservableRef } from '../useObservableRef.js';
+import { useS } from '../useS.js';
 import style from './Table.module.css';
-import { ITableContext, ITableState, TableContext } from './TableContext';
+import { type ITableContext, type ITableState, TableContext } from './TableContext.js';
 
 interface Props {
   keys?: any[];

@@ -7,16 +7,16 @@
  */
 import { expect, test } from '@jest/globals';
 
-import { App } from '../../App';
-import { manifest } from './manifest';
-import { TestBootstrap } from './TestBootstrap';
-import { TestService } from './TestService';
+import { App } from '../../App.js';
+import { manifest } from './manifest.js';
+import { TestBootstrap } from './TestBootstrap.js';
+import { TestService } from './TestService.js';
 
 test('App Initialization', async () => {
   const app = new App([manifest]);
-  const serviceProvider = app.getServiceProvider();
 
   await (app as any).registerServices();
+  const serviceProvider = app.getServiceProvider();
 
   const service = serviceProvider.getService(TestService);
   const bootstrap = serviceProvider.getService(TestBootstrap);

@@ -14,24 +14,22 @@ import {
   ExceptionMessageStyles,
   Group,
   GroupItem,
-  GroupSubTitle,
   GroupTitle,
+  InfoItem,
   Loader,
   s,
   SContext,
-  StyleRegistry,
+  type StyleRegistry,
   ToolsAction,
   ToolsPanel,
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
 
 import ConnectionsAdministrationStyle from './ConnectionsAdministration.module.css';
-import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable';
-import { useConnectionsTable } from './ConnectionsTable/useConnectionsTable';
-import { CreateConnection } from './CreateConnection/CreateConnection';
-import { CreateConnectionService } from './CreateConnectionService';
+import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable.js';
+import { useConnectionsTable } from './ConnectionsTable/useConnectionsTable.js';
+import { CreateConnection } from './CreateConnection/CreateConnection.js';
 
 const registry: StyleRegistry = [
   [
@@ -50,26 +48,16 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
 }) {
   const style = useS(ConnectionsAdministrationStyle);
   const translate = useTranslate();
-  const service = useService(CreateConnectionService);
 
   const state = useConnectionsTable();
 
   return (
     <ColoredContainer vertical wrap parent gap>
       <Group keepSize dense>
-        <GroupSubTitle>{translate('templates_administration_info_message')}</GroupSubTitle>
+        <InfoItem info={translate('connections_templates_deprecated_message')} />
       </Group>
       <Group box keepSize>
         <ToolsPanel rounded>
-          <ToolsAction
-            title={translate('connections_administration_tools_add_tooltip')}
-            icon="add"
-            viewBox="0 0 24 24"
-            disabled={!!sub || state.loading}
-            onClick={service.create}
-          >
-            {translate('ui_add')}
-          </ToolsAction>
           <ToolsAction
             title={translate('connections_administration_tools_refresh_tooltip')}
             icon="refresh"

@@ -11,7 +11,7 @@ import { ItemList, ListItem, ListItemDescription, ListItemIcon, ListItemName, St
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
-import { DataImportProcessorsResource } from '../DataImportProcessorsResource';
+import { DataImportProcessorsResource } from '../DataImportProcessorsResource.js';
 import classes from './ImportProcessorList.module.css';
 
 interface Props {
@@ -27,7 +27,7 @@ export const ImportProcessorList = observer<Props>(function ImportProcessorList(
       {dataImportProcessorsResource.resource.values.map(processor => (
         <ListItem key={processor.id} onClick={() => onSelect(processor)}>
           <ListItemIcon>
-            <StaticImage className={classes.staticImage} icon={processor.icon} />
+            <StaticImage className={classes['staticImage']} icon={processor.icon} />
           </ListItemIcon>
           <ListItemName>{processor.name}</ListItemName>
           <ListItemDescription title={processor.description}>{processor.description}</ListItemDescription>

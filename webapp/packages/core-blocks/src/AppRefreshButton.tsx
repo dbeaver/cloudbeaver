@@ -24,7 +24,7 @@ export const AppRefreshButton: React.FC<IProps> = function AppRefreshButton({ cl
   }
 
   return (
-    <button className={clsx(style.button, className)} onClick={refresh}>
+    <button className={clsx(style['button'], className)} onClick={refresh}>
       Refresh
     </button>
   );

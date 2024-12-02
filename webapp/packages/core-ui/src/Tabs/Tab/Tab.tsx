@@ -7,15 +7,15 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useMemo, useRef } from 'react';
-import { Tab as BaseTab } from 'reakit/Tab';
+import { Tab as BaseTab } from 'reakit';
 
 import { getComputed, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import { TabContext } from '../TabContext';
+import { TabContext } from '../TabContext.js';
 import style from './Tab.module.css';
-import { TabActions } from './TabActions';
-import type { TabProps } from './TabProps';
-import { useTab } from './useTab';
+import { TabActions } from './TabActions.js';
+import type { TabProps } from './TabProps.js';
+import { useTab } from './useTab.js';
 
 export const Tab = observer<TabProps>(function Tab(props) {
   const translate = useTranslate();
