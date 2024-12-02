@@ -211,14 +211,18 @@ type DatabaseAuthModel {
 }
 
 type DriverInfo {
+    # Driver unique full ID. It is `providerId + "." + driverId`.
+    # It is recommended to use providerId and driverId separately.
     id: ID!
     name: String
     description: String
     icon: String
     iconBig: String
 
-    # Driver provider ID
-    providerId: ID
+    # Driver ID. It is unique within provider
+    driverId: ID!
+    # Driver provider ID. It is globally unique
+    providerId: ID!
     # Driver Java class name
     driverClassName: String
     defaultHost: String
@@ -272,6 +276,7 @@ type DriverInfo {
 
     configurationTypes: [DriverConfigurationType]!
 
+    driverInstalled: Boolean!
     driverLibraries: [DriverLibraryInfo!]!
 }
 

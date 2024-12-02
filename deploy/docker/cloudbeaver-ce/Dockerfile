@@ -22,4 +22,4 @@ WORKDIR /opt/cloudbeaver/
 
 RUN chmod +x "run-server.sh" "/opt/cloudbeaver/launch-product.sh"
 
-ENTRYPOINT ["./launch-product.sh"]
+ENTRYPOINT ["./run-server.sh"]
