@@ -336,8 +336,16 @@ export abstract class CachedResource<
    * Return promise that will be resolved when resource will finish loading pending request.
    * Will be resolved immediately if resource is not loading.
    */
-  waitLoad(id: ResourceKey<TKey>): Promise<void> {
-    return this.scheduler.waitRelease(id);
+  waitLoad(key?: ResourceKey<TKey>): Promise<void> {
+    if (key === undefined) {
+      key = CachedResourceParamKey;
+    }
+
+    if (isResourceAlias(key)) {
+      key = this.aliases.transformToKey(key);
+    }
+
+    return this.scheduler.waitRelease(key);
   }
 
   isOutdated(param?: ResourceKey<TKey>, includes?: TInclude): boolean {

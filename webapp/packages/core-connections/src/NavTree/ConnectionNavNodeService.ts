@@ -17,7 +17,14 @@ import {
   NodeManagerUtils,
 } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
-import { isResourceAlias, type ResourceKey, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import {
+  CachedMapAllKey,
+  isResourceAlias,
+  type ResourceKey,
+  resourceKeyList,
+  type ResourceKeySimple,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-resource';
 import { ServerEventId } from '@cloudbeaver/core-root';
 
 import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA.js';
@@ -198,7 +205,7 @@ export class ConnectionNavNodeService extends Dependency {
 
     const parentId = getConnectionParentId(connection.projectId, connection.folder);
 
-    await this.navTreeResource.waitLoad(parentId);
+    await this.navTreeResource.waitLoad(CachedMapAllKey);
     if (!this.navTreeResource.has(parentId)) {
       return;
     }
@@ -210,7 +217,7 @@ export class ConnectionNavNodeService extends Dependency {
     }
 
     const connectionNode = await this.navNodeInfoResource.load(connection.nodePath);
-    await this.navTreeResource.waitLoad(parentId);
+    await this.navTreeResource.waitLoad(CachedMapAllKey);
 
     this.navNodeInfoResource.setParent(connection.nodePath, parentId);
 
