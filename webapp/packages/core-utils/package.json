@@ -26,7 +26,7 @@
     "md5": "^2",
     "mobx": "^6",
     "underscore": "^1",
-    "uuid": "^10",
+    "uuid": "^11",
     "whatwg-mimetype": "^4",
     "zod": "^3",
     "zod-i18n-map": "^2",
