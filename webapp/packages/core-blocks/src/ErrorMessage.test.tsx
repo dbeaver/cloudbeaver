@@ -8,15 +8,12 @@
 import { expect, test } from '@jest/globals';
 import { screen, waitFor } from '@testing-library/react';
 
-import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { coreSettingsManifest } from '@cloudbeaver/core-settings';
-import { coreThemingManifest } from '@cloudbeaver/core-theming';
 import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
 import { ErrorMessage } from './ErrorMessage.js';
 
-const app = createApp(coreEventsManifest, coreSettingsManifest, coreThemingManifest, coreLocalizationManifest);
+const app = createApp(coreLocalizationManifest);
 
 test('icons.svg#name', async () => {
   renderInApp(<ErrorMessage text="error" />, app);
