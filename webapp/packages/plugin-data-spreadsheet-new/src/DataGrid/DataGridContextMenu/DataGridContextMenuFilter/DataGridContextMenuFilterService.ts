@@ -89,22 +89,6 @@ export class DataGridContextMenuFilterService {
 
     this.menuService.addCreator({
       menus: [MENU_DATA_GRID_FILTERS],
-      isApplicable(context) {
-        const model = context.get(DATA_CONTEXT_DV_DDM)!;
-        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
-
-        const source = model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(resultIndex, ResultSetDataAction);
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
-        const supportedOperations = data.getColumnOperations(key.column);
-
-        if (model.isDisabled(resultIndex)) {
-          return false;
-        }
-
-        return constraints.supported && supportedOperations.length > 0;
-      },
       getItems: (context, items) => [
         ...items,
         MENU_DATA_GRID_FILTERS_CELL_VALUE,
@@ -121,7 +105,7 @@ export class DataGridContextMenuFilterService {
       id: 'data-grid-filters-base-handler',
       menus: [MENU_DATA_GRID_FILTERS],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
-      isActionApplicable: (context, action) => {
+      isHidden: (context, action) => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
@@ -136,22 +120,22 @@ export class DataGridContextMenuFilterService {
           const resultColumn = data.getColumn(key.column);
           const currentConstraint = resultColumn ? constraints.get(resultColumn.position) : undefined;
 
-          return !!currentConstraint && isFilterConstraint(currentConstraint);
+          return !currentConstraint || !isFilterConstraint(currentConstraint);
         }
 
         if (action === ACTION_DELETE_ALL) {
-          return constraints.filterConstraints.length > 0 || !!model.requestInfo.requestFilter;
+          return constraints.filterConstraints.length === 0 && !model.requestInfo.requestFilter;
         }
 
         if (action === ACTION_DATA_GRID_FILTERS_IS_NULL) {
-          return supportedOperations.some(operation => operation.id === IS_NULL_ID);
+          return !supportedOperations.some(operation => operation.id === IS_NULL_ID);
         }
 
         if (action === ACTION_DATA_GRID_FILTERS_IS_NOT_NULL) {
-          return supportedOperations.some(operation => operation.id === IS_NOT_NULL_ID);
+          return !supportedOperations.some(operation => operation.id === IS_NOT_NULL_ID);
         }
 
-        return false;
+        return true;
       },
 
       getActionInfo(context, action) {
@@ -229,6 +213,21 @@ export class DataGridContextMenuFilterService {
 
     this.menuService.addCreator({
       menus: [MENU_DATA_GRID_FILTERS_CELL_VALUE],
+      isApplicable: context => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
+        const source = model.source as unknown as ResultSetDataSource;
+        const data = source.getAction(resultIndex, ResultSetDataAction);
+
+        if (model.isDisabled(resultIndex)) {
+          return false;
+        }
+
+        const supportedOperations = data.getColumnOperations(key.column);
+        return supportedOperations.length > 0;
+      },
       getItems: (context, items) => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
@@ -281,9 +280,11 @@ export class DataGridContextMenuFilterService {
 
         const source = model.source as unknown as ResultSetDataSource;
         const data = source.getAction(resultIndex, ResultSetDataAction);
+
+        const supportedOperations = data.getColumnOperations(key.column);
         const cellValue = data.getCellValue(key);
 
-        return cellValue !== undefined;
+        return cellValue !== undefined && supportedOperations.length > 0;
       },
       getItems: (context, items) => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
@@ -348,7 +349,17 @@ export class DataGridContextMenuFilterService {
 
     this.menuService.addCreator({
       menus: [MENU_DATA_GRID_FILTERS_CLIPBOARD],
-      isApplicable: () => this.clipboardService.clipboardAvailable || this.clipboardService.state !== 'denied',
+      isApplicable: context => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
+        const source = model.source as unknown as ResultSetDataSource;
+        const data = source.getAction(resultIndex, ResultSetDataAction);
+        const supportedOperations = data.getColumnOperations(key.column);
+
+        return this.clipboardService.clipboardAvailable && this.clipboardService.state !== 'denied' && supportedOperations.length > 0;
+      },
       getItems: (context, items) => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
