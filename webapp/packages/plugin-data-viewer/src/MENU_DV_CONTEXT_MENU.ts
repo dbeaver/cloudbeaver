@@ -7,4 +7,4 @@
  */
 import { createMenu } from '@cloudbeaver/core-view';
 
-export const MENU_DV_KEY = createMenu('dv-key', 'Key Menu');
+export const MENU_DV_CONTEXT_MENU = createMenu('dv-context-menu', 'Data Viewer Context Menu');

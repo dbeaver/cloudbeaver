@@ -18,7 +18,7 @@ import {
   DatabaseDataConstraintAction,
   DataPresentationService,
   isResultSetDataSource,
-  MENU_DV_KEY,
+  MENU_DV_CONTEXT_MENU,
   ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -66,7 +66,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       root: true,
-      menus: [MENU_DV_KEY],
+      menus: [MENU_DV_CONTEXT_MENU],
       contexts: [DATA_CONTEXT_DV_SIMPLE, DATA_CONTEXT_DV_ACTIONS, DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
@@ -77,7 +77,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'data-grid-key-base-handler',
-      menus: [MENU_DV_KEY],
+      menus: [MENU_DV_CONTEXT_MENU],
       contexts: [DATA_CONTEXT_DV_SIMPLE, DATA_CONTEXT_DV_ACTIONS, DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       getActionInfo: (context, action) => {
         if (action === ACTION_OPEN) {

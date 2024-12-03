@@ -23,7 +23,7 @@ import {
   type IDataPresentationActions,
   type IDataTableActions,
   type IResultSetElementKey,
-  MENU_DV_KEY,
+  MENU_DV_CONTEXT_MENU,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import classes from './CellMenu.module.css';
@@ -50,7 +50,7 @@ const registry: StyleRegistry = [
 
 export const CellMenu = observer<Props>(function CellMenu({ model, actions, spreadsheetActions, resultIndex, cellKey, simple, onStateSwitch }) {
   const style = useS(classes);
-  const menu = useMenu({ menu: MENU_DV_KEY });
+  const menu = useMenu({ menu: MENU_DV_CONTEXT_MENU });
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_DV_DDM, model, id);

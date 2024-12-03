@@ -93,4 +93,4 @@ export * from './ValuePanelPresentation/BooleanValue/isBooleanValuePresentationA
 export * from './useDataViewerCopyHandler.js';
 export * from './DataViewerSettingsService.js';
 export * from './DATA_EDITOR_SETTINGS_GROUP.js';
-export * from './MENU_DV_KEY.js';
+export * from './MENU_DV_CONTEXT_MENU.js';
