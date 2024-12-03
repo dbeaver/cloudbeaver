@@ -17,6 +17,7 @@ import {
   DATA_CONTEXT_DV_SIMPLE,
   DatabaseDataConstraintAction,
   DataPresentationService,
+  isResultSetDataSource,
   MENU_DV_KEY,
   ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -57,6 +58,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
       title: 'Table',
       icon: 'table-icon-sm',
     });
+
     this.dataGridContextMenuSortingService.register();
     this.dataGridContextMenuFilterService.register();
     this.dataGridContextMenuCellEditingService.register();
@@ -66,6 +68,10 @@ export class SpreadsheetBootstrap extends Bootstrap {
       root: true,
       menus: [MENU_DV_KEY],
       contexts: [DATA_CONTEXT_DV_SIMPLE, DATA_CONTEXT_DV_ACTIONS, DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isApplicable: context => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        return isResultSetDataSource(model.source);
+      },
       getItems: (context, items) => [ACTION_OPEN, ...items, ACTION_DELETE_ALL],
     });
 

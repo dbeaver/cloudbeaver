@@ -82,7 +82,7 @@ export class DataGridContextMenuOrderService {
     });
 
     this.actionService.addHandler({
-      id: 'data-grid-sorting-handler',
+      id: 'data-grid-ordering-handler',
       actions: [
         ACTION_DATA_GRID_ORDERING_ASC,
         ACTION_DATA_GRID_ORDERING_DESC,
@@ -138,6 +138,7 @@ export class DataGridContextMenuOrderService {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+        const source = model.source as unknown as ResultSetDataSource;
 
         if (action === ACTION_DATA_GRID_ORDERING_ASC) {
           await this.changeOrder(model, resultIndex, key.column, EOrder.asc);
@@ -155,7 +156,6 @@ export class DataGridContextMenuOrderService {
         }
 
         if (action === ACTION_DATA_GRID_ORDERING_DISABLE_ALL) {
-          const source = model.source as unknown as ResultSetDataSource;
           const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
 
           await model.request(() => {

@@ -14,6 +14,7 @@ import {
   DATA_CONTEXT_DV_RESULT_KEY,
   DatabaseEditChangeType,
   isBooleanValuePresentationAvailable,
+  isResultSetDataSource,
   ResultSetDataContentAction,
   ResultSetDataSource,
   ResultSetEditAction,
@@ -45,7 +46,7 @@ export class DataGridContextMenuCellEditingService {
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-        return !model.isDisabled(resultIndex) && !model.isReadonly(resultIndex);
+        return isResultSetDataSource(model.source) && !model.isDisabled(resultIndex) && !model.isReadonly(resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_EDITING],
     });
@@ -152,36 +153,39 @@ export class DataGridContextMenuCellEditingService {
 
         const selectedElements = select?.getSelectedElements() || [];
 
-        if (action === ACTION_EDIT) {
-          actions.edit(key);
-        }
-
-        if (action === ACTION_DATA_GRID_EDITING_SET_TO_NULL) {
-          editor.set(key, null);
-        }
-
-        if (action === ACTION_DATA_GRID_EDITING_ADD_ROW) {
-          editor.addRow(key.row);
-        }
-
-        if (action === ACTION_DATA_GRID_EDITING_COPY_ROW) {
-          editor.duplicateRow(key);
-        }
-
-        if (action === ACTION_DATA_GRID_EDITING_DELETE_ROW) {
-          editor.deleteRow(key.row);
-        }
-
-        if (action === ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW) {
-          editor.delete(...selectedElements);
-        }
-
-        if (action === ACTION_DATA_GRID_EDITING_REVERT_ROW) {
-          editor.revert(key);
-        }
-
-        if (action === ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW) {
-          editor.revert(...selectedElements);
+        switch (action) {
+          case ACTION_EDIT: {
+            actions.edit(key);
+            break;
+          }
+          case ACTION_DATA_GRID_EDITING_SET_TO_NULL: {
+            editor.set(key, null);
+            break;
+          }
+          case ACTION_DATA_GRID_EDITING_ADD_ROW: {
+            editor.addRow(key.row);
+            break;
+          }
+          case ACTION_DATA_GRID_EDITING_COPY_ROW: {
+            editor.duplicateRow(key);
+            break;
+          }
+          case ACTION_DATA_GRID_EDITING_DELETE_ROW: {
+            editor.deleteRow(key.row);
+            break;
+          }
+          case ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW: {
+            editor.delete(...selectedElements);
+            break;
+          }
+          case ACTION_DATA_GRID_EDITING_REVERT_ROW: {
+            editor.revert(key);
+            break;
+          }
+          case ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW: {
+            editor.revert(...selectedElements);
+            break;
+          }
         }
       },
     });
