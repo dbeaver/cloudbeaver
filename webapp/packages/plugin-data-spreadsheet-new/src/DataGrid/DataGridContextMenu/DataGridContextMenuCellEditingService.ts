@@ -154,38 +154,30 @@ export class DataGridContextMenuCellEditingService {
         const selectedElements = select?.getSelectedElements() || [];
 
         switch (action) {
-          case ACTION_EDIT: {
+          case ACTION_EDIT:
             actions.edit(key);
             break;
-          }
-          case ACTION_DATA_GRID_EDITING_SET_TO_NULL: {
+          case ACTION_DATA_GRID_EDITING_SET_TO_NULL:
             editor.set(key, null);
             break;
-          }
-          case ACTION_DATA_GRID_EDITING_ADD_ROW: {
+          case ACTION_DATA_GRID_EDITING_ADD_ROW:
             editor.addRow(key.row);
             break;
-          }
-          case ACTION_DATA_GRID_EDITING_COPY_ROW: {
+          case ACTION_DATA_GRID_EDITING_COPY_ROW:
             editor.duplicateRow(key);
             break;
-          }
-          case ACTION_DATA_GRID_EDITING_DELETE_ROW: {
+          case ACTION_DATA_GRID_EDITING_DELETE_ROW:
             editor.deleteRow(key.row);
             break;
-          }
-          case ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW: {
+          case ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW:
             editor.delete(...selectedElements);
             break;
-          }
-          case ACTION_DATA_GRID_EDITING_REVERT_ROW: {
+          case ACTION_DATA_GRID_EDITING_REVERT_ROW:
             editor.revert(key);
             break;
-          }
-          case ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW: {
+          case ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW:
             editor.revert(...selectedElements);
             break;
-          }
         }
       },
     });

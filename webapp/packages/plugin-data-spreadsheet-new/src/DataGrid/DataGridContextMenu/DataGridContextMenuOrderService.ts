@@ -140,27 +140,24 @@ export class DataGridContextMenuOrderService {
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
         const source = model.source as unknown as ResultSetDataSource;
 
-        if (action === ACTION_DATA_GRID_ORDERING_ASC) {
-          await this.changeOrder(model, resultIndex, key.column, EOrder.asc);
-          return;
-        }
+        switch (action) {
+          case ACTION_DATA_GRID_ORDERING_ASC:
+            await this.changeOrder(model, resultIndex, key.column, EOrder.asc);
+            break;
+          case ACTION_DATA_GRID_ORDERING_DESC:
+            await this.changeOrder(model, resultIndex, key.column, EOrder.desc);
+            break;
+          case ACTION_DATA_GRID_ORDERING_DISABLE:
+            await this.changeOrder(model, resultIndex, key.column, null);
+            break;
+          case ACTION_DATA_GRID_ORDERING_DISABLE_ALL: {
+            const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
 
-        if (action === ACTION_DATA_GRID_ORDERING_DESC) {
-          await this.changeOrder(model, resultIndex, key.column, EOrder.desc);
-          return;
-        }
-
-        if (action === ACTION_DATA_GRID_ORDERING_DISABLE) {
-          await this.changeOrder(model, resultIndex, key.column, null);
-          return;
-        }
-
-        if (action === ACTION_DATA_GRID_ORDERING_DISABLE_ALL) {
-          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
-
-          await model.request(() => {
-            constraints.deleteOrders();
-          });
+            await model.request(() => {
+              constraints.deleteOrders();
+            });
+            break;
+          }
         }
       },
     });
