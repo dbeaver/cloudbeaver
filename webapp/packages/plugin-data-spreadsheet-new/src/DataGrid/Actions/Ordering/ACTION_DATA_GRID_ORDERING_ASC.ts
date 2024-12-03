@@ -5,24 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { createAction } from '@cloudbeaver/core-view';
 
-.contextMenu {
-  padding: 0;
-  height: 16px;
-  width: 16px;
-
-  &:before {
-    display: none;
-  }
-}
-
-.trigger {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-.icon {
-  width: 16px;
-  height: 10px;
-}
+export const ACTION_DATA_GRID_ORDERING_ASC = createAction('data-grid-ordering-asc', {
+  label: 'ASC',
+  type: 'select',
+});

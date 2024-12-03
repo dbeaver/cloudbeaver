@@ -6,7 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
+import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import {
+  DATA_CONTEXT_DV_DDM,
+  DATA_CONTEXT_DV_DDM_RESULT_INDEX,
+  DATA_CONTEXT_DV_RESULT_KEY,
   DatabaseDataConstraintAction,
   EOrder,
   type IDatabaseDataModel,
@@ -19,17 +23,18 @@ import {
   ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridContextMenuService } from './DataGridContextMenuService.js';
+import { ACTION_DATA_GRID_ORDERING_ASC } from '../Actions/Ordering/ACTION_DATA_GRID_ORDERING_ASC.js';
+import { ACTION_DATA_GRID_ORDERING_DESC } from '../Actions/Ordering/ACTION_DATA_GRID_ORDERING_DESC.js';
+import { ACTION_DATA_GRID_ORDERING_DISABLE } from '../Actions/Ordering/ACTION_DATA_GRID_ORDERING_DISABLE.js';
+import { ACTION_DATA_GRID_ORDERING_DISABLE_ALL } from '../Actions/Ordering/ACTION_DATA_GRID_ORDERING_DISABLE_ALL.js';
+import { MENU_DATA_GRID_ORDERING } from './MENU_DATA_GRID_ORDERING.js';
 
 @injectable()
 export class DataGridContextMenuOrderService {
-  private static readonly menuOrderToken = 'menuOrder';
-
-  constructor(private readonly dataGridContextMenuService: DataGridContextMenuService) {}
-
-  getMenuOrderToken(): string {
-    return DataGridContextMenuOrderService.menuOrderToken;
-  }
+  constructor(
+    private readonly actionService: ActionService,
+    private readonly menuService: MenuService,
+  ) {}
 
   private async changeOrder(unknownModel: IDatabaseDataModel, resultIndex: number, column: IResultSetColumnKey, order: Order) {
     const model = unknownModel as any;
@@ -50,102 +55,113 @@ export class DataGridContextMenuOrderService {
   }
 
   register(): void {
-    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
-      id: this.getMenuOrderToken(),
-      order: 1,
-      title: 'data_grid_table_order',
-      icon: 'order-arrow-unknown',
-      isPanel: true,
-      isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+    this.menuService.addCreator({
+      root: true,
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
+      isApplicable: context => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+
+        const source = model.source as unknown as ResultSetDataSource;
+        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+
+        return isResultSetDataSource(model.source) && constraints.supported && !model.isDisabled(resultIndex);
       },
-      isHidden(context) {
-        const source = context.data.model.source as unknown as ResultSetDataSource;
-        const constraints = source.getAction(context.data.resultIndex, DatabaseDataConstraintAction);
-        return !constraints.supported || context.data.model.isDisabled(context.data.resultIndex);
-      },
+      getItems: (context, items) => [...items, MENU_DATA_GRID_ORDERING],
     });
-    this.dataGridContextMenuService.add(this.getMenuOrderToken(), {
-      id: 'asc',
-      type: 'radio',
-      title: 'ASC',
-      isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+
+    this.menuService.addCreator({
+      menus: [MENU_DATA_GRID_ORDERING],
+      getItems: (context, items) => [
+        ...items,
+        ACTION_DATA_GRID_ORDERING_ASC,
+        ACTION_DATA_GRID_ORDERING_DESC,
+        ACTION_DATA_GRID_ORDERING_DISABLE,
+        ACTION_DATA_GRID_ORDERING_DISABLE_ALL,
+      ],
+    });
+
+    this.actionService.addHandler({
+      id: 'data-grid-sorting-handler',
+      actions: [
+        ACTION_DATA_GRID_ORDERING_ASC,
+        ACTION_DATA_GRID_ORDERING_DESC,
+        ACTION_DATA_GRID_ORDERING_DISABLE,
+        ACTION_DATA_GRID_ORDERING_DISABLE_ALL,
+      ],
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
+      isHidden(context, action) {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+
+        if (action === ACTION_DATA_GRID_ORDERING_DISABLE_ALL) {
+          const source = model.source as unknown as ResultSetDataSource;
+          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+          return !constraints.orderConstraints.length;
+        }
+
+        return false;
       },
-      isDisabled: context => context.data.model.isLoading(),
-      onClick: async context => {
-        await this.changeOrder(context.data.model, context.data.resultIndex, context.data.key.column, EOrder.asc);
+      isDisabled: context => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        return model.isLoading();
       },
-      isChecked: context => {
-        const { model, resultIndex, key } = context.data;
+      isChecked: (context, action) => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
         const source = model.source as unknown as ResultSetDataSource;
         const data = source.getAction(resultIndex, ResultSetDataAction);
         const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
         const resultColumn = data.getColumn(key.column);
 
-        return !!resultColumn && constraints.getOrder(resultColumn.position) === EOrder.asc;
-      },
-    });
-    this.dataGridContextMenuService.add(this.getMenuOrderToken(), {
-      id: 'desc',
-      type: 'radio',
-      title: 'DESC',
-      isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
-      },
-      isDisabled: context => context.data.model.isLoading(),
-      onClick: async context => {
-        await this.changeOrder(context.data.model, context.data.resultIndex, context.data.key.column, EOrder.desc);
-      },
-      isChecked: context => {
-        const { model, resultIndex, key } = context.data;
-        const source = model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(resultIndex, ResultSetDataAction);
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
-        const resultColumn = data.getColumn(key.column);
+        if (!resultColumn) {
+          return false;
+        }
 
-        return !!resultColumn && constraints.getOrder(resultColumn.position) === EOrder.desc;
-      },
-    });
-    this.dataGridContextMenuService.add(this.getMenuOrderToken(), {
-      id: 'disableOrder',
-      type: 'radio',
-      title: 'data_grid_table_disable_order',
-      isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
-      },
-      isDisabled: context => context.data.model.isLoading(),
-      onClick: async context => {
-        await this.changeOrder(context.data.model, context.data.resultIndex, context.data.key.column, null);
-      },
-      isChecked: context => {
-        const { model, resultIndex, key } = context.data;
-        const source = model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(resultIndex, ResultSetDataAction);
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
-        const resultColumn = data.getColumn(key.column);
+        if (action === ACTION_DATA_GRID_ORDERING_ASC) {
+          return constraints.getOrder(resultColumn.position) === EOrder.asc;
+        }
 
-        return !!resultColumn && constraints.getOrder(resultColumn.position) === null;
+        if (action === ACTION_DATA_GRID_ORDERING_DESC) {
+          return constraints.getOrder(resultColumn.position) === EOrder.desc;
+        }
+
+        if (action === ACTION_DATA_GRID_ORDERING_DISABLE) {
+          return constraints.getOrder(resultColumn.position) === null;
+        }
+
+        return false;
       },
-    });
-    this.dataGridContextMenuService.add(this.getMenuOrderToken(), {
-      id: 'disableOrders',
-      title: 'data_grid_table_disable_all_orders',
-      isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
-      },
-      isHidden: context => {
-        const source = context.data.model.source as unknown as ResultSetDataSource;
-        const constraints = source.getAction(context.data.resultIndex, DatabaseDataConstraintAction);
-        return !constraints.orderConstraints.length;
-      },
-      isDisabled: context => context.data.model.isLoading(),
-      onClick: async context => {
-        const source = context.data.model.source as unknown as ResultSetDataSource;
-        const constraints = source.getAction(context.data.resultIndex, DatabaseDataConstraintAction);
-        await context.data.model.request(() => {
-          constraints.deleteOrders();
-        });
+      handler: async (context, action) => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
+        if (action === ACTION_DATA_GRID_ORDERING_ASC) {
+          await this.changeOrder(model, resultIndex, key.column, EOrder.asc);
+          return;
+        }
+
+        if (action === ACTION_DATA_GRID_ORDERING_DESC) {
+          await this.changeOrder(model, resultIndex, key.column, EOrder.desc);
+          return;
+        }
+
+        if (action === ACTION_DATA_GRID_ORDERING_DISABLE) {
+          await this.changeOrder(model, resultIndex, key.column, null);
+          return;
+        }
+
+        if (action === ACTION_DATA_GRID_ORDERING_DISABLE_ALL) {
+          const source = model.source as unknown as ResultSetDataSource;
+          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+
+          await model.request(() => {
+            constraints.deleteOrders();
+          });
+        }
       },
     });
   }

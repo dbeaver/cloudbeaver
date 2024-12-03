@@ -5,24 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { createDataContext } from '@cloudbeaver/core-data-context';
 
-.contextMenu {
-  padding: 0;
-  height: 16px;
-  width: 16px;
-
-  &:before {
-    display: none;
-  }
-}
-
-.trigger {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-.icon {
-  width: 16px;
-  height: 10px;
-}
+export const DATA_CONTEXT_DV_SIMPLE = createDataContext<boolean>('data-viewer-database-simple');

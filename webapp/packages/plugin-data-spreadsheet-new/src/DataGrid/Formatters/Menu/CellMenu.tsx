@@ -7,13 +7,26 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Icon, MenuPanelItemAndTriggerStyles, MenuTrigger, s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
+import { Icon, s, useS } from '@cloudbeaver/core-blocks';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import type { IDatabaseDataModel, IDataPresentationActions, IDataTableActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
+import { ContextMenu } from '@cloudbeaver/core-ui';
+import { useMenu } from '@cloudbeaver/core-view';
+import {
+  DATA_CONTEXT_DV_ACTIONS,
+  DATA_CONTEXT_DV_DDM,
+  DATA_CONTEXT_DV_DDM_RESULT_INDEX,
+  DATA_CONTEXT_DV_PRESENTATION_ACTIONS,
+  DATA_CONTEXT_DV_RESULT_KEY,
+  DATA_CONTEXT_DV_SIMPLE,
+  type IDatabaseDataModel,
+  type IDataPresentationActions,
+  type IDataTableActions,
+  type IResultSetElementKey,
+  MENU_DV_KEY,
+} from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridContextMenuService } from '../../DataGridContextMenu/DataGridContextMenuService.js';
-import styles from './CellMenu.module.css';
+import classes from './CellMenu.module.css';
 
 interface Props {
   model: IDatabaseDataModel;
@@ -21,46 +34,22 @@ interface Props {
   spreadsheetActions: IDataPresentationActions<IResultSetElementKey>;
   resultIndex: number;
   cellKey: IResultSetElementKey;
-  className?: string;
   simple: boolean;
-  onClick?: () => void;
   onStateSwitch?: (state: boolean) => void;
 }
 
-const registry: StyleRegistry = [
-  [
-    MenuPanelItemAndTriggerStyles,
-    {
-      mode: 'append',
-      styles: [styles],
-    },
-  ],
-];
+export const CellMenu = observer<Props>(function CellMenu({ model, actions, spreadsheetActions, resultIndex, cellKey, simple, onStateSwitch }) {
+  const style = useS(classes);
+  const menu = useMenu({ menu: MENU_DV_KEY });
 
-export const CellMenu = observer<Props>(function CellMenu({
-  model,
-  actions,
-  spreadsheetActions,
-  resultIndex,
-  className,
-  cellKey,
-  simple,
-  onClick,
-  onStateSwitch,
-}) {
-  const style = useS(styles);
-  const dataGridContextMenuService = useService(DataGridContextMenuService);
-
-  const panel = dataGridContextMenuService.constructMenuWithContext(model, actions, spreadsheetActions, resultIndex, cellKey, simple);
-
-  if (!panel.menuItems.length || panel.menuItems.every(item => item.isHidden)) {
-    return null;
-  }
-
-  function handleClick() {
-    dataGridContextMenuService.openMenu(model, actions, spreadsheetActions, resultIndex, cellKey, simple);
-    onClick?.();
-  }
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_DV_DDM, model, id);
+    context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex, id);
+    context.set(DATA_CONTEXT_DV_SIMPLE, simple, id);
+    context.set(DATA_CONTEXT_DV_ACTIONS, actions, id);
+    context.set(DATA_CONTEXT_DV_PRESENTATION_ACTIONS, spreadsheetActions, id);
+    context.set(DATA_CONTEXT_DV_RESULT_KEY, cellKey, id);
+  });
 
   function stopPropagation(event: React.MouseEvent<HTMLDivElement>) {
     event.stopPropagation();
@@ -71,12 +60,10 @@ export const CellMenu = observer<Props>(function CellMenu({
   }
 
   return (
-    <SContext registry={registry}>
-      <div className={s(style, { cellMenu: true }, className)} onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
-        <MenuTrigger panel={panel} className={s(style, { menuTrigger: true })} modal onClick={handleClick} onVisibleSwitch={onStateSwitch}>
-          <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
-        </MenuTrigger>
+    <ContextMenu className={s(style, { contextMenu: true })} menu={menu} placement="auto-end" modal disclosure onVisibleSwitch={onStateSwitch}>
+      <div className={s(style, { trigger: true })} onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
+        <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
       </div>
-    </SContext>
+    </ContextMenu>
   );
 });
