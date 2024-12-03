@@ -26,3 +26,7 @@
   width: 16px;
   height: 10px;
 }
+
+.iconOrImage {
+  composes: theme-text-primary from global;
+}

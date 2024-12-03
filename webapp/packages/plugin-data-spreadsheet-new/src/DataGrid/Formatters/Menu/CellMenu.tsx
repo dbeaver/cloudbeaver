@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Icon, s, useS } from '@cloudbeaver/core-blocks';
+import { Icon, MenuItemElementStyles, s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { ContextMenu } from '@cloudbeaver/core-ui';
@@ -38,6 +38,16 @@ interface Props {
   onStateSwitch?: (state: boolean) => void;
 }
 
+const registry: StyleRegistry = [
+  [
+    MenuItemElementStyles,
+    {
+      mode: 'append',
+      styles: [classes],
+    },
+  ],
+];
+
 export const CellMenu = observer<Props>(function CellMenu({ model, actions, spreadsheetActions, resultIndex, cellKey, simple, onStateSwitch }) {
   const style = useS(classes);
   const menu = useMenu({ menu: MENU_DV_KEY });
@@ -60,10 +70,12 @@ export const CellMenu = observer<Props>(function CellMenu({ model, actions, spre
   }
 
   return (
-    <ContextMenu className={s(style, { contextMenu: true })} menu={menu} placement="auto-end" modal disclosure onVisibleSwitch={onStateSwitch}>
-      <div className={s(style, { trigger: true })} onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
-        <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
-      </div>
-    </ContextMenu>
+    <SContext registry={registry}>
+      <ContextMenu className={s(style, { contextMenu: true })} menu={menu} placement="auto-end" modal disclosure onVisibleSwitch={onStateSwitch}>
+        <div className={s(style, { trigger: true })} onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
+          <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
+        </div>
+      </ContextMenu>
+    </SContext>
   );
 });
