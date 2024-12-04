@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { ActionService, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, MenuRadioItem, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
@@ -23,9 +23,6 @@ import {
   ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { ACTION_DATA_GRID_ORDERING_ASC } from '../Actions/Ordering/ACTION_DATA_GRID_ORDERING_ASC.js';
-import { ACTION_DATA_GRID_ORDERING_DESC } from '../Actions/Ordering/ACTION_DATA_GRID_ORDERING_DESC.js';
-import { ACTION_DATA_GRID_ORDERING_DISABLE } from '../Actions/Ordering/ACTION_DATA_GRID_ORDERING_DISABLE.js';
 import { ACTION_DATA_GRID_ORDERING_DISABLE_ALL } from '../Actions/Ordering/ACTION_DATA_GRID_ORDERING_DISABLE_ALL.js';
 import { MENU_DATA_GRID_ORDERING } from './MENU_DATA_GRID_ORDERING.js';
 
@@ -72,23 +69,44 @@ export class DataGridContextMenuOrderService {
 
     this.menuService.addCreator({
       menus: [MENU_DATA_GRID_ORDERING],
-      getItems: (context, items) => [
-        ...items,
-        ACTION_DATA_GRID_ORDERING_ASC,
-        ACTION_DATA_GRID_ORDERING_DESC,
-        ACTION_DATA_GRID_ORDERING_DISABLE,
-        ACTION_DATA_GRID_ORDERING_DISABLE_ALL,
-      ],
+      getItems: (context, items) => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
+        const source = model.source as unknown as ResultSetDataSource;
+        const data = source.getAction(resultIndex, ResultSetDataAction);
+        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+        const resultColumn = data.getColumn(key.column);
+
+        const result = [...items];
+
+        if (resultColumn) {
+          for (const order of [EOrder.asc, EOrder.desc, null]) {
+            result.push(
+              new MenuRadioItem(
+                {
+                  id: `data-grid-ordering-${order ? order : 'disable'}`,
+                  label: order ? order.toUpperCase() : 'data_grid_table_disable_order',
+                },
+                {
+                  onSelect: async () => {
+                    await this.changeOrder(model, resultIndex, key.column, order);
+                  },
+                },
+                { isChecked: () => constraints.getOrder(resultColumn.position) === order, isDisabled: () => model.isLoading() },
+              ),
+            );
+          }
+        }
+
+        return [...result, ACTION_DATA_GRID_ORDERING_DISABLE_ALL];
+      },
     });
 
     this.actionService.addHandler({
       id: 'data-grid-ordering-handler',
-      actions: [
-        ACTION_DATA_GRID_ORDERING_ASC,
-        ACTION_DATA_GRID_ORDERING_DESC,
-        ACTION_DATA_GRID_ORDERING_DISABLE,
-        ACTION_DATA_GRID_ORDERING_DISABLE_ALL,
-      ],
+      actions: [ACTION_DATA_GRID_ORDERING_DISABLE_ALL],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
       isHidden(context, action) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
@@ -106,50 +124,12 @@ export class DataGridContextMenuOrderService {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         return model.isLoading();
       },
-      isChecked: (context, action) => {
-        const model = context.get(DATA_CONTEXT_DV_DDM)!;
-        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
-
-        const source = model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(resultIndex, ResultSetDataAction);
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
-        const resultColumn = data.getColumn(key.column);
-
-        if (!resultColumn) {
-          return false;
-        }
-
-        if (action === ACTION_DATA_GRID_ORDERING_ASC) {
-          return constraints.getOrder(resultColumn.position) === EOrder.asc;
-        }
-
-        if (action === ACTION_DATA_GRID_ORDERING_DESC) {
-          return constraints.getOrder(resultColumn.position) === EOrder.desc;
-        }
-
-        if (action === ACTION_DATA_GRID_ORDERING_DISABLE) {
-          return constraints.getOrder(resultColumn.position) === null;
-        }
-
-        return false;
-      },
       handler: async (context, action) => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
         const source = model.source as unknown as ResultSetDataSource;
 
         switch (action) {
-          case ACTION_DATA_GRID_ORDERING_ASC:
-            await this.changeOrder(model, resultIndex, key.column, EOrder.asc);
-            break;
-          case ACTION_DATA_GRID_ORDERING_DESC:
-            await this.changeOrder(model, resultIndex, key.column, EOrder.desc);
-            break;
-          case ACTION_DATA_GRID_ORDERING_DISABLE:
-            await this.changeOrder(model, resultIndex, key.column, null);
-            break;
           case ACTION_DATA_GRID_ORDERING_DISABLE_ALL: {
             const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
 

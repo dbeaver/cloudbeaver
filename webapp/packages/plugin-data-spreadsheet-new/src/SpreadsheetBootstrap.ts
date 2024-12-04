@@ -9,7 +9,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ExceptionsCatcherService } from '@cloudbeaver/core-events';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { ACTION_DELETE_ALL, ACTION_OPEN, ActionService, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_DELETE, ACTION_OPEN, ActionService, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_ACTIONS,
   DATA_CONTEXT_DV_DDM,
@@ -72,7 +72,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         return isResultSetDataSource(model.source);
       },
-      getItems: (context, items) => [ACTION_OPEN, ...items, ACTION_DELETE_ALL],
+      getItems: (context, items) => [ACTION_OPEN, ...items, ACTION_DELETE],
     });
 
     this.actionService.addHandler({
@@ -84,7 +84,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
           return { ...action.info, label: 'data_grid_table_open_value_panel', icon: 'value-panel' };
         }
 
-        if (action === ACTION_DELETE_ALL) {
+        if (action === ACTION_DELETE) {
           return { ...action.info, label: 'data_grid_table_delete_filters_and_orders', icon: 'erase' };
         }
 
@@ -101,13 +101,13 @@ export class SpreadsheetBootstrap extends Bootstrap {
           return actions?.valuePresentationId !== VALUE_TEXT_PRESENTATION_ID && !simple;
         }
 
-        if (action === ACTION_DELETE_ALL) {
+        if (action === ACTION_DELETE) {
           const source = model.source as unknown as ResultSetDataSource;
           const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
           return constraints.orderConstraints.length > 0 || constraints.filterConstraints.length > 0;
         }
 
-        return [ACTION_OPEN, ACTION_DELETE_ALL].includes(action);
+        return [ACTION_OPEN, ACTION_DELETE].includes(action);
       },
       handler: async (context, action) => {
         if (action === ACTION_OPEN) {
@@ -118,7 +118,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
           }
         }
 
-        if (action === ACTION_DELETE_ALL) {
+        if (action === ACTION_DELETE) {
           const model = context.get(DATA_CONTEXT_DV_DDM)!;
           const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 

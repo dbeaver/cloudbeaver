@@ -7,7 +7,7 @@
  */
 import { createAction } from '@cloudbeaver/core-view';
 
-export const ACTION_DATA_GRID_FILTERS_IS_NULL = createAction('data-grid-filters-is-null', {
-  label: 'IS NULL',
-  icon: 'filter',
+export const ACTION_DATA_GRID_EDITING_DUPLICATE_ROW = createAction('data-grid-editing-duplicate-row', {
+  label: 'data_grid_table_editing_row_add_copy',
+  icon: '/icons/data_add_copy_sm.svg',
 });

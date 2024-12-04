@@ -7,6 +7,6 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
-import type { IDataTableActions } from '../../TableViewer/IDataTableActions.js';
+import type { IResultSetElementKey } from './IResultSetDataKey.js';
 
-export const DATA_CONTEXT_DV_ACTIONS = createDataContext<IDataTableActions>('data-viewer-database-actions');
+export const DATA_CONTEXT_DV_RESULT_KEY = createDataContext<IResultSetElementKey>('data-viewer-database-result-key');

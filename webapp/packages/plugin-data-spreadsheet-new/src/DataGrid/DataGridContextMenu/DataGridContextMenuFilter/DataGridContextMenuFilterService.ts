@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 import { replaceMiddle } from '@cloudbeaver/core-utils';
-import { ACTION_DELETE, ACTION_DELETE_ALL, ActionService, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_DELETE, ActionService, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
@@ -29,8 +29,7 @@ import {
   wrapOperationArgument,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { ACTION_DATA_GRID_FILTERS_IS_NOT_NULL } from '../../Actions/Filters/ACTION_DATA_GRID_FILTERS_IS_NOT_NULL.js';
-import { ACTION_DATA_GRID_FILTERS_IS_NULL } from '../../Actions/Filters/ACTION_DATA_GRID_FILTERS_IS_NULL.js';
+import { ACTION_DATA_GRID_FILTERS_RESET_ALL } from '../../Actions/Filters/ACTION_DATA_GRID_FILTERS_RESET_ALL.js';
 import { MENU_DATA_GRID_FILTERS } from './MENU_DATA_GRID_FILTERS.js';
 import { MENU_DATA_GRID_FILTERS_CELL_VALUE } from './MENU_DATA_GRID_FILTERS_CELL_VALUE.js';
 import { MENU_DATA_GRID_FILTERS_CLIPBOARD } from './MENU_DATA_GRID_FILTERS_CLIPBOARD.js';
@@ -89,16 +88,48 @@ export class DataGridContextMenuFilterService {
 
     this.menuService.addCreator({
       menus: [MENU_DATA_GRID_FILTERS],
-      getItems: (context, items) => [
-        ...items,
-        MENU_DATA_GRID_FILTERS_CELL_VALUE,
-        MENU_DATA_GRID_FILTERS_CUSTOM,
-        MENU_DATA_GRID_FILTERS_CLIPBOARD,
-        ACTION_DATA_GRID_FILTERS_IS_NULL,
-        ACTION_DATA_GRID_FILTERS_IS_NOT_NULL,
-        ACTION_DELETE,
-        ACTION_DELETE_ALL,
-      ],
+      getItems: (context, items) => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
+        const source = model.source as unknown as ResultSetDataSource;
+        const data = source.getAction(resultIndex, ResultSetDataAction);
+        const resultColumn = data.getColumn(key.column);
+
+        const supportedOperations = data.getColumnOperations(key.column);
+        const result = [];
+
+        for (const filter of [IS_NULL_ID, IS_NOT_NULL_ID]) {
+          const label = `${resultColumn ? `"${resultColumn.label}" ` : ''}${filter.split('_').join(' ')}`;
+
+          result.push(
+            new MenuBaseItem(
+              {
+                id: filter,
+                label,
+                icon: 'filter',
+                hidden: !supportedOperations.some(operation => operation.id === filter),
+              },
+              {
+                onSelect: async () => {
+                  await this.applyFilter(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, key.column, filter);
+                },
+              },
+            ),
+          );
+        }
+
+        return [
+          ...items,
+          MENU_DATA_GRID_FILTERS_CELL_VALUE,
+          MENU_DATA_GRID_FILTERS_CUSTOM,
+          MENU_DATA_GRID_FILTERS_CLIPBOARD,
+          ...result,
+          ACTION_DELETE,
+          ACTION_DATA_GRID_FILTERS_RESET_ALL,
+        ];
+      },
     });
 
     this.actionService.addHandler({
@@ -114,8 +145,6 @@ export class DataGridContextMenuFilterService {
         const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
         const data = source.getAction(resultIndex, ResultSetDataAction);
 
-        const supportedOperations = data.getColumnOperations(key.column);
-
         if (action === ACTION_DELETE) {
           const resultColumn = data.getColumn(key.column);
           const currentConstraint = resultColumn ? constraints.get(resultColumn.position) : undefined;
@@ -123,16 +152,8 @@ export class DataGridContextMenuFilterService {
           return !currentConstraint || !isFilterConstraint(currentConstraint);
         }
 
-        if (action === ACTION_DELETE_ALL) {
+        if (action === ACTION_DATA_GRID_FILTERS_RESET_ALL) {
           return constraints.filterConstraints.length === 0 && !model.requestInfo.requestFilter;
-        }
-
-        if (action === ACTION_DATA_GRID_FILTERS_IS_NULL) {
-          return !supportedOperations.some(operation => operation.id === IS_NULL_ID);
-        }
-
-        if (action === ACTION_DATA_GRID_FILTERS_IS_NOT_NULL) {
-          return !supportedOperations.some(operation => operation.id === IS_NOT_NULL_ID);
         }
 
         return true;
@@ -152,21 +173,6 @@ export class DataGridContextMenuFilterService {
             ...action.info,
             icon: 'filter-reset',
             label: `Delete filter for "${resultColumn?.name ?? '?'}"`,
-          };
-        }
-
-        if (action === ACTION_DELETE_ALL) {
-          return {
-            ...action.info,
-            icon: 'filter-reset-all',
-            label: 'data_grid_table_filter_reset_all_filters',
-          };
-        }
-
-        if (action === ACTION_DATA_GRID_FILTERS_IS_NULL || action === ACTION_DATA_GRID_FILTERS_IS_NOT_NULL) {
-          return {
-            ...action.info,
-            label: `${resultColumn ? `"${resultColumn.label}" ` : ''}${action.info.label}`,
           };
         }
 
@@ -193,20 +199,10 @@ export class DataGridContextMenuFilterService {
           });
         }
 
-        if (action === ACTION_DELETE_ALL) {
+        if (action === ACTION_DATA_GRID_FILTERS_RESET_ALL) {
           await model.request(() => {
             constraints.deleteDataFilters();
           });
-        }
-
-        if (action === ACTION_DATA_GRID_FILTERS_IS_NULL || action === ACTION_DATA_GRID_FILTERS_IS_NOT_NULL) {
-          let operator = IS_NULL_ID;
-
-          if (action === ACTION_DATA_GRID_FILTERS_IS_NOT_NULL) {
-            operator = IS_NOT_NULL_ID;
-          }
-
-          await this.applyFilter(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, key.column, operator);
         }
       },
     });

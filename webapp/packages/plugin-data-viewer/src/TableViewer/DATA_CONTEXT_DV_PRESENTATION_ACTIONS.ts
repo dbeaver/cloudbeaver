@@ -7,8 +7,8 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
-import type { IDataPresentationActions } from '../../TableViewer/IDataPresentationActions.js';
-import type { IResultSetElementKey } from '../Actions/ResultSet/IResultSetDataKey.js';
+import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
+import type { IDataPresentationActions } from './IDataPresentationActions.js';
 
 export const DATA_CONTEXT_DV_PRESENTATION_ACTIONS = createDataContext<IDataPresentationActions<IResultSetElementKey>>(
   'data-viewer-database-presentation-actions',

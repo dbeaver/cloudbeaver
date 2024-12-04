@@ -15,8 +15,8 @@ import { useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_DV_DDM } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX.js';
-import { DATA_CONTEXT_DV_SIMPLE } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_SIMPLE.js';
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel.js';
+import { DATA_CONTEXT_DV_SIMPLE } from '../../DATA_CONTEXT_DV_SIMPLE.js';
 import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from './DATA_VIEWER_DATA_MODEL_ACTIONS_MENU.js';
 import { REFRESH_MENU_ITEM_REGISTRY } from './RefreshAction/RefreshMenuAction.js';
 

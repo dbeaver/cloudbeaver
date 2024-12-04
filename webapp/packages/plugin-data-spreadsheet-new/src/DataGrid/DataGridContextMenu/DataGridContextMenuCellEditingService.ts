@@ -24,9 +24,9 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { ACTION_DATA_GRID_EDITING_ADD_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_ADD_ROW.js';
-import { ACTION_DATA_GRID_EDITING_COPY_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_COPY_ROW.js';
 import { ACTION_DATA_GRID_EDITING_DELETE_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_DELETE_ROW.js';
 import { ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW.js';
+import { ACTION_DATA_GRID_EDITING_DUPLICATE_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_DUPLICATE_ROW.js';
 import { ACTION_DATA_GRID_EDITING_REVERT_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_REVERT_ROW.js';
 import { ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW.js';
 import { ACTION_DATA_GRID_EDITING_SET_TO_NULL } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_SET_TO_NULL.js';
@@ -58,7 +58,7 @@ export class DataGridContextMenuCellEditingService {
         ACTION_EDIT,
         ACTION_DATA_GRID_EDITING_SET_TO_NULL,
         ACTION_DATA_GRID_EDITING_ADD_ROW,
-        ACTION_DATA_GRID_EDITING_COPY_ROW,
+        ACTION_DATA_GRID_EDITING_DUPLICATE_ROW,
         ACTION_DATA_GRID_EDITING_DELETE_ROW,
         ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW,
         ACTION_DATA_GRID_EDITING_REVERT_ROW,
@@ -99,7 +99,7 @@ export class DataGridContextMenuCellEditingService {
           return cellValue !== undefined && !format.isReadOnly(key) && !view.getColumn(key.column)?.required && !format.isNull(key);
         }
 
-        if (action === ACTION_DATA_GRID_EDITING_ADD_ROW || action === ACTION_DATA_GRID_EDITING_COPY_ROW) {
+        if (action === ACTION_DATA_GRID_EDITING_ADD_ROW || action === ACTION_DATA_GRID_EDITING_DUPLICATE_ROW) {
           return editor.hasFeature('add');
         }
 
@@ -127,7 +127,7 @@ export class DataGridContextMenuCellEditingService {
           ACTION_EDIT,
           ACTION_DATA_GRID_EDITING_SET_TO_NULL,
           ACTION_DATA_GRID_EDITING_ADD_ROW,
-          ACTION_DATA_GRID_EDITING_COPY_ROW,
+          ACTION_DATA_GRID_EDITING_DUPLICATE_ROW,
           ACTION_DATA_GRID_EDITING_DELETE_ROW,
           ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW,
           ACTION_DATA_GRID_EDITING_REVERT_ROW,
@@ -163,7 +163,7 @@ export class DataGridContextMenuCellEditingService {
           case ACTION_DATA_GRID_EDITING_ADD_ROW:
             editor.addRow(key.row);
             break;
-          case ACTION_DATA_GRID_EDITING_COPY_ROW:
+          case ACTION_DATA_GRID_EDITING_DUPLICATE_ROW:
             editor.duplicateRow(key);
             break;
           case ACTION_DATA_GRID_EDITING_DELETE_ROW:

@@ -15,10 +15,10 @@ export * from './DatabaseDataModel/Actions/ResultSet/DataContext/DATA_CONTEXT_DV
 export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_PRESENTATION.js';
 export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX.js';
-export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_SIMPLE.js';
-export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_RESULT_KEY.js';
-export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_ACTIONS.js';
-export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_PRESENTATION_ACTIONS.js';
+export * from './TableViewer/DATA_CONTEXT_DV_SIMPLE.js';
+export * from './DatabaseDataModel/Actions/ResultSet/DATA_CONTEXT_DV_RESULT_KEY.js';
+export * from './TableViewer/DATA_CONTEXT_DV_ACTIONS.js';
+export * from './TableViewer/DATA_CONTEXT_DV_PRESENTATION_ACTIONS.js';
 export * from './DatabaseDataModel/Actions/ResultSet/compareResultSetRowKeys.js';
 export * from './DatabaseDataModel/Actions/ResultSet/createResultSetBlobValue.js';
 export * from './DatabaseDataModel/Actions/ResultSet/createResultSetContentValue.js';
