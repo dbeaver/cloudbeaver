@@ -23,18 +23,20 @@ import com.google.gson.Strictness;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.config.CBAppConfig;
+import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
-import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.WebAppUtils;
+import io.cloudbeaver.server.WebApplication;
 import io.cloudbeaver.service.navigator.WebPropertyFilter;
+import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
@@ -135,11 +137,11 @@ public class WebServiceUtils extends WebCommonUtils {
         }
         ((DataSourceDescriptor)newDataSource).setTemplate(config.isTemplate());
 
-        // Set default navigator settings
-        DataSourceNavigatorSettings navSettings = new DataSourceNavigatorSettings(
-            CBApplication.getInstance().getAppConfiguration().getDefaultNavigatorSettings());
-        //navSettings.setShowSystemObjects(false);
-        ((DataSourceDescriptor)newDataSource).setNavigatorSettings(navSettings);
+        ServletApplication app = ServletAppUtils.getServletApplication();
+        if (app instanceof WebApplication webApplication) {
+            ((DataSourceDescriptor) newDataSource).setNavigatorSettings(
+                webApplication.getAppConfiguration().getDefaultNavigatorSettings());
+        }
 
         saveAuthProperties(
             newDataSource,
@@ -311,12 +313,6 @@ public class WebServiceUtils extends WebCommonUtils {
             gson.toJsonTree(settingsMap), DataSourceNavigatorSettings.class);
     }
 
-    public static void checkServerConfigured() throws DBWebException {
-        if (CBApplication.getInstance().isConfigurationMode()) {
-            throw new DBWebException("Server is in configuration mode");
-        }
-    }
-
     public static void fireActionParametersOpenEditor(WebSession webSession, DBPDataSourceContainer dataSource, boolean addEditorName) {
         Map<String, Object> actionParameters = new HashMap<>();
         actionParameters.put("action", "open-sql-editor");
@@ -341,13 +337,20 @@ public class WebServiceUtils extends WebCommonUtils {
     }
 
     public static boolean isGlobalProject(DBPProject project) {
-        return project.getId().equals(RMProjectType.GLOBAL.getPrefix() + "_" + CBApplication.getInstance().getDefaultProjectName());
+        return project.getId()
+            .equals(RMProjectType.GLOBAL.getPrefix() + "_" + ServletAppUtils.getServletApplication()
+                .getDefaultProjectName());
     }
 
     public static List<WebAuthProviderDescriptor> getEnabledAuthProviders() {
         List<WebAuthProviderDescriptor> result = new ArrayList<>();
-        CBAppConfig appConfig = CBApplication.getInstance().getAppConfiguration();
-        String[] authProviders = appConfig.getEnabledAuthProviders();
+        String[] authProviders = null;
+        try {
+            authProviders = ServletAppUtils.getAuthApplication().getAuthConfiguration().getEnabledAuthProviders();
+        } catch (DBException e) {
+            log.error(e.getMessage(), e);
+            return List.of();
+        }
         for (String apId : authProviders) {
             WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(apId);
             if (authProvider != null) {
@@ -362,7 +365,7 @@ public class WebServiceUtils extends WebCommonUtils {
      */
     @NotNull
     public static Set<String> getApplicableDriversIds() {
-        return CBPlatform.getInstance().getApplicableDrivers().stream()
+        return WebAppUtils.getWebPlatform().getApplicableDrivers().stream()
             .map(DBPDriver::getId)
             .collect(Collectors.toSet());
     }

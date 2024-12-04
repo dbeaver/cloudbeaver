@@ -80,7 +80,7 @@ public class WebEventUtils {
         if (event == null) {
             return;
         }
-        WebAppUtils.getWebApplication().getEventController().addEvent(event);
+        ServletAppUtils.getServletApplication().getEventController().addEvent(event);
     }
 
     public static void addNavigatorNodeUpdatedEvent(
@@ -122,7 +122,7 @@ public class WebEventUtils {
         if (event == null) {
             return;
         }
-        WebAppUtils.getWebApplication().getEventController().addEvent(event);
+        ServletAppUtils.getServletApplication().getEventController().addEvent(event);
     }
 
     public static void addRmResourceUpdatedEvent(
@@ -179,7 +179,7 @@ public class WebEventUtils {
         if (event == null) {
             return;
         }
-        WebAppUtils.getWebApplication().getEventController().addEvent(event);
+        ServletAppUtils.getServletApplication().getEventController().addEvent(event);
     }
 
 }

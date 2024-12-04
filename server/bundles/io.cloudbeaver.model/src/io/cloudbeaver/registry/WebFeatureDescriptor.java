@@ -18,7 +18,7 @@
 package io.cloudbeaver.registry;
 
 import io.cloudbeaver.DBWFeatureSet;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPImage;
@@ -66,7 +66,7 @@ public class WebFeatureDescriptor extends AbstractContextDescriptor implements D
 
     @Override
     public boolean isEnabled() {
-        return WebAppUtils.getWebApplication().getAppConfiguration().isFeatureEnabled(this.id);
+        return ServletAppUtils.getServletApplication().getAppConfiguration().isFeatureEnabled(this.id);
     }
 
 }

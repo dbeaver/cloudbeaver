@@ -16,17 +16,17 @@
  */
 package io.cloudbeaver.model.rm.lock;
 
-import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.ServletApplication;
 import org.jkiss.dbeaver.DBException;
 
 import java.nio.file.Path;
 
 public class TestLockController extends RMFileLockController {
-    public TestLockController(WebApplication application) throws DBException {
+    public TestLockController(ServletApplication application) throws DBException {
         super(application);
     }
 
-    public TestLockController(WebApplication application, int maxTimeout) throws DBException {
+    public TestLockController(ServletApplication application, int maxTimeout) throws DBException {
         super(application, maxTimeout);
     }
 

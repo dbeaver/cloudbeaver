@@ -16,10 +16,9 @@
  */
 package io.cloudbeaver.server.graphql;
 
-import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.WebAppUtils;
+import io.cloudbeaver.server.WebApplication;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.Nullable;
 import org.jkiss.utils.CommonUtils;
@@ -58,20 +57,17 @@ public class GraphQLLoggerUtil {
         if (request.getSession() == null) {
             return null;
         }
+        WebApplication webApplication = WebAppUtils.getWebApplication();
 
-        if (BaseWebApplication.getInstance() instanceof CBApplication<?> cbApp) {
-            return (WebSession)cbApp.getSessionManager()
-                .getSession(request.getSession().getId());
-        } else {
-            return null;
-        }
+        return webApplication.getSessionManager()
+            .findWebSession(request);
     }
 
     public static String buildLoggerMessage(String sessionId, String userId, Map<String, Object> variables) {
         StringBuilder loggerMessage = new StringBuilder(" [user: ").append(userId)
             .append(", sessionId: ").append(sessionId).append("]");
 
-        if (CBPlatform.getInstance().getPreferenceStore().getBoolean(LOG_API_GRAPHQL_DEBUG_PARAMETER)
+        if (WebAppUtils.getWebPlatform().getPreferenceStore().getBoolean(LOG_API_GRAPHQL_DEBUG_PARAMETER)
                 && variables != null
         ) {
             loggerMessage.append(" [variables] ");

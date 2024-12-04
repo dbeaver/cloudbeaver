@@ -20,11 +20,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.Strictness;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
-import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.config.WebDatabaseConfig;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import org.apache.commons.dbcp2.*;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -83,7 +83,7 @@ public class CBDatabase {
     private static final String V1_DB_NAME = "cb.h2.dat";
     private static final String V2_DB_NAME = "cb.h2v2.dat";
 
-    private final WebApplication application;
+    private final ServletApplication application;
     private final WebDatabaseConfig databaseConfiguration;
     private PoolingDataSource<PoolableConnection> cbDataSource;
     private transient volatile Connection exclusiveConnection;
@@ -92,7 +92,7 @@ public class CBDatabase {
     private SMAdminController adminSecurityController;
     private SQLDialect dialect;
 
-    public CBDatabase(WebApplication application, WebDatabaseConfig databaseConfiguration) {
+    public CBDatabase(ServletApplication application, WebDatabaseConfig databaseConfiguration) {
         this.application = application;
         this.databaseConfiguration = databaseConfiguration;
     }
@@ -299,7 +299,7 @@ public class CBDatabase {
             return null;
         }
 
-        initialDataPath = WebAppUtils.getRelativePath(
+        initialDataPath = ServletAppUtils.getRelativePath(
             databaseConfiguration.getInitialDataConfiguration(), application.getHomeDirectory());
         try (Reader reader = new InputStreamReader(new FileInputStream(initialDataPath), StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder()
@@ -591,7 +591,7 @@ public class CBDatabase {
     }
 
     public static boolean isDefaultH2Configuration(WebDatabaseConfig databaseConfiguration) {
-        var workspace = WebAppUtils.getWebApplication().getWorkspaceDirectory();
+        var workspace = ServletAppUtils.getServletApplication().getWorkspaceDirectory();
         var v1Path = workspace.resolve(".data").resolve(V1_DB_NAME);
         var v2Path = workspace.resolve(".data").resolve(V2_DB_NAME);
         var v1DefaultUrl = "jdbc:h2:" + v1Path;
@@ -604,7 +604,7 @@ public class CBDatabase {
         return databaseConfiguration;
     }
 
-    protected WebApplication getApplication() {
+    protected ServletApplication getApplication() {
         return application;
     }
 
