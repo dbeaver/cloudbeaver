@@ -22,7 +22,7 @@
     "@timohausmann/quadtree-ts": "^2",
     "clsx": "^2",
     "fast-deep-equal": "^3",
-    "i18next": "^23",
+    "i18next": "^24",
     "md5": "^2",
     "mobx": "^6",
     "underscore": "^1",
