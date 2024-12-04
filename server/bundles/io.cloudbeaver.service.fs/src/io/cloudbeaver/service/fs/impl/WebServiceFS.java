@@ -30,8 +30,10 @@ import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystem;
 import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystems;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.dbeaver.registry.fs.FileSystemProviderRegistry;
+import org.jkiss.utils.IOUtils;
 
-import java.nio.charset.StandardCharsets;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -128,8 +130,10 @@ public class WebServiceFS implements DBWServiceFS {
         throws DBWebException {
         try {
             Path filePath = FSUtils.getPathFromNode(webSession, nodePath);
-            var data = Files.readAllBytes(filePath);
-            return new String(data, StandardCharsets.UTF_8);
+            // Some external file systems require more than read-only access permissions
+            try (Reader reader = new InputStreamReader(Files.newInputStream(filePath))) {
+                return IOUtils.readToString(reader);
+            }
         } catch (Exception e) {
             throw new DBWebException("Failed to read file content: " + e.getMessage(), e);
         }
