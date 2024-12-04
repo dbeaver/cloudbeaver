@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+
+<plugin>
+    <extension point="org.jkiss.dbeaver.dataSourceHandler">
+        <handler id="db.access.check" class="io.cloudbeaver.model.WebDatasourceAccessCheckHandler"/>
+    </extension>
+
+    <extension point="io.cloudbeaver.service">
+        <service id="core_ce" label="Core service" description="Core services" class="io.cloudbeaver.service.core.CECoreModelExtender"/>
+    </extension>
+
+    <extension point="org.jkiss.dbeaver.ws.event.handler">
+        <eventHandler class="io.cloudbeaver.server.events.WSUserEventHandler">
+            <topic id="cb_user"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSSubjectPermissionUpdatedEventHandler">
+            <topic id="cb_subject_permissions"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSUserSecretEventHandlerImpl">
+            <topic id="cb_user_secret"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSObjectPermissionUpdatedEventHandler">
+            <topic id="cb_object_permissions"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSRmResourceUpdatedEventHandlerImpl">
+            <topic id="cb_scripts"/>
+        </eventHandler>
+    </extension>
+</plugin>

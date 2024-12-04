@@ -21,12 +21,13 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
-import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.service.security.SMUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -103,12 +104,12 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     }
 
     protected static WebSession getWebSession(DataFetchingEnvironment env) throws DBWebException {
-        return CBPlatform.getInstance().getSessionManager().getWebSession(
+        return WebAppUtils.getWebApplication().getSessionManager().getWebSession(
             getServletRequest(env), getServletResponse(env));
     }
 
     protected static WebSession getWebSession(DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
-        return CBPlatform.getInstance().getSessionManager().getWebSession(
+        return WebAppUtils.getWebApplication().getSessionManager().getWebSession(
             getServletRequest(env), getServletResponse(env), errorOnNotFound);
     }
 
@@ -126,12 +127,12 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
      */
     @Nullable
     public static WebSession findWebSession(DataFetchingEnvironment env) {
-        return CBPlatform.getInstance().getSessionManager().findWebSession(
+        return WebAppUtils.getWebApplication().getSessionManager().findWebSession(
             getServletRequest(env));
     }
 
     public static WebSession findWebSession(DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
-        return CBPlatform.getInstance().getSessionManager().findWebSession(
+        return WebAppUtils.getWebApplication().getSessionManager().findWebSession(
             getServletRequest(env), errorOnNotFound);
     }
 
@@ -242,16 +243,17 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
 
         private void checkServicePermissions(Method method, WebActionSet actionSet) throws DBWebException {
             String[] features = actionSet.requireFeatures();
+            ServletApplication servletApplication = ServletAppUtils.getServletApplication();
             for (String feature : features) {
-                if (!CBApplication.getInstance().isConfigurationMode() &&
-                    !CBApplication.getInstance().getAppConfiguration().isFeatureEnabled(feature)) {
+                if (!servletApplication.isConfigurationMode() &&
+                    !servletApplication.getAppConfiguration().isFeatureEnabled(feature)) {
                     throw new DBWebException("Feature " + feature + " is disabled");
                 }
             }
         }
 
         private void checkActionPermissions(@NotNull Method method, @NotNull WebAction webAction) throws DBWebException {
-            var application = CBPlatform.getInstance().getApplication();
+            var application = WebAppUtils.getWebPlatform().getApplication();
             if (application.isInitializationMode() && webAction.initializationRequired()) {
                 String message = "Server initialization in progress: "
                     + String.join(",", application.getInitActions().values()) + ".\nDo not restart the server.";

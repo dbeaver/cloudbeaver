@@ -21,11 +21,10 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.SMSignOutLinkProvider;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
-import io.cloudbeaver.model.app.WebAppConfiguration;
+import io.cloudbeaver.model.app.ServletAppConfiguration;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionAuthProcessor;
-import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
@@ -35,6 +34,7 @@ import io.cloudbeaver.service.auth.DBWServiceAuth;
 import io.cloudbeaver.service.auth.WebAuthStatus;
 import io.cloudbeaver.service.auth.WebLogoutInfo;
 import io.cloudbeaver.service.auth.WebUserInfo;
+import io.cloudbeaver.service.auth.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -190,7 +190,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     @Override
     public WebUserInfo activeUser(@NotNull WebSession webSession) throws DBWebException {
         if (webSession.getUser() == null) {
-            WebAppConfiguration appConfiguration = webSession.getApplication().getAppConfiguration();
+            ServletAppConfiguration appConfiguration = webSession.getApplication().getAppConfiguration();
             if (!appConfiguration.isAnonymousAccessEnabled()) {
                 return null;
             }

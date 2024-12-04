@@ -17,7 +17,7 @@
 package io.cloudbeaver.model.rm.lock;
 
 import com.google.gson.Gson;
-import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.ServletApplication;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -50,12 +50,12 @@ public class RMFileLockController {
     private final int maxLockTime;
 
 
-    public RMFileLockController(WebApplication application) throws DBException {
+    public RMFileLockController(ServletApplication application) throws DBException {
         this(application, DEFAULT_MAX_LOCK_TIME);
     }
 
     // for tests
-    public RMFileLockController(WebApplication application, int maxLockTime) throws DBException {
+    public RMFileLockController(ServletApplication application, int maxLockTime) throws DBException {
         this.lockFolderPath = application.getWorkspaceDirectory()
             .resolve(DBPWorkspace.METADATA_FOLDER)
             .resolve(LOCK_META_FOLDER);

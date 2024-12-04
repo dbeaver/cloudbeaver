@@ -21,8 +21,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.*;
-import io.cloudbeaver.model.app.WebAuthApplication;
-import io.cloudbeaver.model.app.WebAuthConfiguration;
+import io.cloudbeaver.model.app.ServletAuthApplication;
+import io.cloudbeaver.model.app.ServletAuthConfiguration;
 import io.cloudbeaver.model.config.SMControllerConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
@@ -68,7 +68,7 @@ import java.util.stream.Collectors;
 /**
  * Server controller
  */
-public class CBEmbeddedSecurityController<T extends WebAuthApplication>
+public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     implements SMAdminController, SMAuthenticationManager {
 
     private static final Log log = Log.getLog(CBEmbeddedSecurityController.class);
@@ -1082,7 +1082,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             WebMetaParametersRegistry.getInstance().getMetaParameters(subjectType));
 
         // Add metas from enabled auth providers
-        WebAuthConfiguration authConfiguration = application.getAuthConfiguration();
+        ServletAuthConfiguration authConfiguration = application.getAuthConfiguration();
         for (String apId : authConfiguration.getEnabledAuthProviders()) {
             WebAuthProviderDescriptor ap = WebAuthProviderRegistry.getInstance().getAuthProvider(apId);
             if (ap != null) {
@@ -2650,7 +2650,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
     @Override
     public SMAuthProviderDescriptor[] getAvailableAuthProviders() throws DBException {
-        WebAuthConfiguration appConfiguration = application.getAuthConfiguration();
+        ServletAuthConfiguration appConfiguration = application.getAuthConfiguration();
         Set<SMAuthProviderCustomConfiguration> customConfigurations = appConfiguration.getAuthCustomConfigurations();
         List<SMAuthProviderDescriptor> providers = WebAuthProviderRegistry.getInstance().getAuthProviders().stream()
             .filter(ap ->
@@ -3217,7 +3217,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     }
 
     private boolean isProviderDisabled(@NotNull String providerId, @Nullable String authConfigurationId) {
-        WebAuthConfiguration appConfiguration = application.getAuthConfiguration();
+        ServletAuthConfiguration appConfiguration = application.getAuthConfiguration();
         if (!appConfiguration.isAuthProviderEnabled(providerId)) {
             return true;
         }
