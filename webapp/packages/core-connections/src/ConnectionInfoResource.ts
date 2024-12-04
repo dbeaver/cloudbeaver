@@ -28,6 +28,8 @@ import { DataSynchronizationService, type NavigatorViewSettings, ServerEventId, 
 import {
   type AdminConnectionGrantInfo,
   type AdminConnectionSearchInfo,
+  type CbDatasourceConnectEvent,
+  type CbDatasourceDisconnectEvent,
   type ConnectionConfig,
   type GetUserConnectionsQueryVariables,
   GraphQLService,
@@ -160,6 +162,55 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
             connectionId,
           })),
         ),
+      this,
+    );
+
+    connectionInfoEventHandler.onEvent<CbDatasourceDisconnectEvent>(
+      ServerEventId.CbDatasourceDisconnected,
+      async data => {
+        const key: IConnectionInfoParams = {
+          projectId: data.projectId,
+          connectionId: data.connectionId,
+        };
+        const metadata = this.metadata.get(key);
+
+        metadata.connecting = false;
+
+        if (this.isConnected(key)) {
+          const connection = this.get(key);
+
+          if (!connection) {
+            return;
+          }
+
+          this.dataSynchronizationService.requestSynchronization('connection', connection.name).then(state => {
+            if (state) {
+              this.delete(key);
+            }
+          });
+        }
+      },
+      undefined,
+      this,
+    );
+
+    connectionInfoEventHandler.onEvent<CbDatasourceConnectEvent>(
+      ServerEventId.CbDatasourceConnected,
+      async data => {
+        const key: IConnectionInfoParams = {
+          projectId: data.projectId,
+          connectionId: data.connectionId,
+        };
+        const metadata = this.metadata.get(key);
+
+        metadata.connecting = false;
+
+        if (!this.isConnected(key)) {
+          const connection = await this.load(key);
+          this.set(createConnectionParam(connection), connection);
+        }
+      },
+      undefined,
       this,
     );
 
