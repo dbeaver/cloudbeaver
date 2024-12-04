@@ -22,6 +22,8 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPImage;
+import org.jkiss.dbeaver.model.DBPNamedObjectLocalized;
+import org.jkiss.dbeaver.model.DBPObjectWithDescriptionLocalized;
 import org.jkiss.dbeaver.model.auth.AuthPropertyDescriptor;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.impl.AbstractDescriptor;

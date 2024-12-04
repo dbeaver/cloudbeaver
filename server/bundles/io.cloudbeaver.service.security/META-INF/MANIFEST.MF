@@ -19,4 +19,5 @@ Export-Package: io.cloudbeaver.auth.provider.local,
  io.cloudbeaver.auth.provider.rp,
  io.cloudbeaver.service.security,
  io.cloudbeaver.service.security.db
+Bundle-Localization: OSGI-INF/l10n/bundle
 Automatic-Module-Name: io.cloudbeaver.service.security

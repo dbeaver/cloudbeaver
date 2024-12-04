@@ -11,4 +11,5 @@ Bundle-ClassPath: .
 Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.dbeaver.registry;visibility:=reexport,
  io.cloudbeaver.model
+Bundle-Localization: OSGI-INF/l10n/bundle
 Automatic-Module-Name: io.cloudbeaver.service.ldap.auth

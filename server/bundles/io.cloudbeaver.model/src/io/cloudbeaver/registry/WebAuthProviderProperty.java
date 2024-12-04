@@ -17,17 +17,27 @@
 package io.cloudbeaver.registry;
 
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.spi.RegistryContributor;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.DBPNamedObjectLocalized;
+import org.jkiss.dbeaver.model.DBPObjectWithDescriptionLocalized;
 import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
+import org.jkiss.dbeaver.utils.RuntimeUtils;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
-public class WebAuthProviderProperty extends PropertyDescriptor {
+public class WebAuthProviderProperty extends PropertyDescriptor implements DBPNamedObjectLocalized, DBPObjectWithDescriptionLocalized {
     private final String[] requiredFeatures;
     @Nullable
     private final String type;
 
+    private final Bundle bundle;
+
     public WebAuthProviderProperty(String category, IConfigurationElement config) {
         super(category, config);
+        bundle = FrameworkUtil.getBundle(getClass()).getBundleContext()
+            .getBundle(Long.parseLong(((RegistryContributor)config.getContributor()).getActualId()));
         String featuresAttr = config.getAttribute("requiredFeatures");
         this.requiredFeatures = featuresAttr == null ? new String[0] : featuresAttr.split(",");
         this.type = config.getAttribute("type");
@@ -41,5 +51,24 @@ public class WebAuthProviderProperty extends PropertyDescriptor {
     @Nullable
     public String getType() {
         return type;
+    }
+
+    @Override
+    public String getLocalizedName(String locale) {
+        try {
+            return RuntimeUtils.getBundleLocalization(bundle, locale).getString(this.getId());
+        } catch (Exception e) {
+            return this.getName();
+        }
+    }
+
+    @Nullable
+    @Override
+    public String getLocalizedDescription(String locale) {
+        try {
+            return RuntimeUtils.getBundleLocalization(bundle, locale).getString(this.getId() + ".description");
+        } catch (Exception e) {
+            return this.getDescription();
+        }
     }
 }
