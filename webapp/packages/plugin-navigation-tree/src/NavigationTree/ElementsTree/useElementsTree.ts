@@ -217,7 +217,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     },
 
     async loadNode(nodeId: string) {
-      await projectInfoResource.waitLoad(CachedMapAllKey);
+      await projectInfoResource.waitLoad();
       await connectionInfoResource.waitLoad(ConnectionInfoActiveProjectKey);
       await navTreeResource.waitLoad(nodeId);
       await navNodeInfoResource.waitLoad(nodeId);

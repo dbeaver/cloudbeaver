@@ -17,14 +17,7 @@ import {
   NodeManagerUtils,
 } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
-import {
-  CachedMapAllKey,
-  isResourceAlias,
-  type ResourceKey,
-  resourceKeyList,
-  type ResourceKeySimple,
-  ResourceKeyUtils,
-} from '@cloudbeaver/core-resource';
+import { isResourceAlias, type ResourceKey, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { ServerEventId } from '@cloudbeaver/core-root';
 
 import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA.js';
