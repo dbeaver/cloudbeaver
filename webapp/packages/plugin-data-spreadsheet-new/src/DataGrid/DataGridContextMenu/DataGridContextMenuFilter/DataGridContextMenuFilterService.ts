@@ -103,21 +103,22 @@ export class DataGridContextMenuFilterService {
         for (const filter of [IS_NULL_ID, IS_NOT_NULL_ID]) {
           const label = `${resultColumn ? `"${resultColumn.label}" ` : ''}${filter.split('_').join(' ')}`;
 
-          result.push(
-            new MenuBaseItem(
-              {
-                id: filter,
-                label,
-                icon: 'filter',
-                hidden: !supportedOperations.some(operation => operation.id === filter),
-              },
-              {
-                onSelect: async () => {
-                  await this.applyFilter(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, key.column, filter);
+          if (supportedOperations.some(operation => operation.id === filter)) {
+            result.push(
+              new MenuBaseItem(
+                {
+                  id: filter,
+                  label,
+                  icon: 'filter',
                 },
-              },
-            ),
-          );
+                {
+                  onSelect: async () => {
+                    await this.applyFilter(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, key.column, filter);
+                  },
+                },
+              ),
+            );
+          }
         }
 
         return [
