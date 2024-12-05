@@ -146,6 +146,7 @@ public interface DBWServiceCore extends DBWService {
         @NotNull String connectionId) throws DBWebException;
 
     @WebAction
+    @Deprecated
     WebConnectionInfo createConnectionFromTemplate(
         @NotNull WebSession webSession,
         @NotNull String projectId,

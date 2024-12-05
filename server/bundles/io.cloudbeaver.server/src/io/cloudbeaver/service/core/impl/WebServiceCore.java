@@ -600,6 +600,7 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
+    @Deprecated
     public WebConnectionInfo createConnectionFromTemplate(
         @NotNull WebSession webSession,
         @NotNull String projectId,
