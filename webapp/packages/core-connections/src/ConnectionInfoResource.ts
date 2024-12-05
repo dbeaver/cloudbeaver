@@ -176,15 +176,11 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
         };
         const metadata = this.metadata.get(key);
 
-        metadata.connecting = false;
+        if (metadata?.connecting) {
+          return;
+        }
 
         if (this.isConnected(key)) {
-          const connection = this.get(key);
-
-          if (!connection) {
-            return;
-          }
-
           this.markOutdated(key);
         }
       },
@@ -195,18 +191,19 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     connectionStateEventHandler.onEvent<WsDataSourceConnectEvent>(
       ServerEventId.CbDatasourceConnected,
       async data => {
-        console.log('Connected', { data });
         const key: IConnectionInfoParams = {
           projectId: data.projectId,
           connectionId: data.connectionId,
         };
+
         const metadata = this.metadata.get(key);
 
-        metadata.connecting = false;
+        if (metadata?.connecting) {
+          return;
+        }
 
         if (!this.isConnected(key)) {
-          const connection = await this.load(key);
-          this.add(connection, true);
+          this.markOutdated(key);
         }
       },
       undefined,
