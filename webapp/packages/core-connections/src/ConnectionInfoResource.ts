@@ -28,8 +28,6 @@ import { DataSynchronizationService, type NavigatorViewSettings, ServerEventId, 
 import {
   type AdminConnectionGrantInfo,
   type AdminConnectionSearchInfo,
-  type CbDatasourceConnectEvent,
-  type CbDatasourceDisconnectEvent,
   type ConnectionConfig,
   type GetUserConnectionsQueryVariables,
   GraphQLService,
@@ -37,10 +35,12 @@ import {
   type NavigatorSettingsInput,
   type TestConnectionMutation,
   type UserConnectionAuthPropertiesFragment,
+  type WsDataSourceDisconnectEvent,
 } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 
 import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA.js';
+import { ConnectionDisconnectEventHandler } from './ConnectionDisconnectEventHandler.js';
 import { ConnectionInfoEventHandler, type IConnectionInfoEvent } from './ConnectionInfoEventHandler.js';
 import type { DatabaseConnection } from './DatabaseConnection.js';
 import { DBDriverResource } from './DBDriverResource.js';
@@ -99,6 +99,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     sessionDataResource: SessionDataResource,
     appAuthService: AppAuthService,
     connectionInfoEventHandler: ConnectionInfoEventHandler,
+    connectionDisconnectEventHandler: ConnectionDisconnectEventHandler,
     userInfoResource: UserInfoResource,
   ) {
     super();
@@ -165,7 +166,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       this,
     );
 
-    connectionInfoEventHandler.onEvent<CbDatasourceDisconnectEvent>(
+    connectionDisconnectEventHandler.onEvent<WsDataSourceDisconnectEvent>(
       ServerEventId.CbDatasourceDisconnected,
       async data => {
         const key: IConnectionInfoParams = {
@@ -194,25 +195,25 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       this,
     );
 
-    connectionInfoEventHandler.onEvent<CbDatasourceConnectEvent>(
-      ServerEventId.CbDatasourceConnected,
-      async data => {
-        const key: IConnectionInfoParams = {
-          projectId: data.projectId,
-          connectionId: data.connectionId,
-        };
-        const metadata = this.metadata.get(key);
+    // connectionStateEventHandler.onEvent<CbDatasourceConnectEvent>(
+    //   ServerEventId.CbDatasourceConnected,
+    //   async data => {
+    //     const key: IConnectionInfoParams = {
+    //       projectId: data.projectId,
+    //       connectionId: data.connectionId,
+    //     };
+    //     const metadata = this.metadata.get(key);
 
-        metadata.connecting = false;
+    //     metadata.connecting = false;
 
-        if (!this.isConnected(key)) {
-          const connection = await this.load(key);
-          this.set(createConnectionParam(connection), connection);
-        }
-      },
-      undefined,
-      this,
-    );
+    //     if (!this.isConnected(key)) {
+    //       const connection = await this.load(key);
+    //       this.set(createConnectionParam(connection), connection);
+    //     }
+    //   },
+    //   undefined,
+    //   this,
+    // );
 
     connectionInfoEventHandler.onEvent<ResourceKeyList<IConnectionInfoParams>>(
       ServerEventId.CbDatasourceUpdated,
