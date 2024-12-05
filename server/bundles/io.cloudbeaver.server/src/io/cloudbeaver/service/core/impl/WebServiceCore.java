@@ -55,6 +55,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceConnectEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
@@ -366,7 +367,17 @@ public class WebServiceCore implements DBWServiceCore {
 
         boolean oldSavePassword = dataSourceContainer.isSavePassword();
         try {
-            dataSourceContainer.connect(webSession.getProgressMonitor(), true, false);
+            boolean connect = dataSourceContainer.connect(webSession.getProgressMonitor(), true, false);
+            if (connect) {
+                webSession.addSessionEvent(
+                    new WSDataSourceConnectEvent(
+                        projectId,
+                        connectionId,
+                        webSession.getSessionId(),
+                        webSession.getUserId()
+                    )
+                );
+            }
         } catch (Exception e) {
             throw new DBWebException("Error connecting to database", e);
         } finally {

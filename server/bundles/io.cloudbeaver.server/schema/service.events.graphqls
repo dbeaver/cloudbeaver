@@ -190,14 +190,14 @@ type WSDataSourceDisconnectEvent implements CBServerEvent {
     projectId: String!
     timestamp: Int!
 }
-## Datasource connect event
-#type CBDatasourceConnectEvent implements CBClientEvent {
-#    id: CBClientEventId!
-#    topicId: CBEventTopic
-#    connectionId: String!
-#    projectId: String!
-#    timestamp: Int!
-#}
+# Datasource connect event
+type WSDataSourceConnectEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    connectionId: String!
+    projectId: String!
+    timestamp: Int!
+}
 
 extend type Query {
     emptyEvent: Boolean
