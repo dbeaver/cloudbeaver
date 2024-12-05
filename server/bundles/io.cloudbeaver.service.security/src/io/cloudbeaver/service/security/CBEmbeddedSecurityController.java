@@ -187,15 +187,18 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
     protected void importUsers(@NotNull Connection connection, @NotNull SMUserImportList userImportList)
         throws DBException, SQLException {
+        outer:
         for (SMUserProvisioning user : userImportList.getUsers()) {
             String authRole = user.getAuthRole() == null ? userImportList.getAuthRole() : user.getAuthRole();
-            if (isSubjectExists(user.getUserId())) {
-                log.info("User already exist : " + user.getUserId());
-                setUserAuthRole(connection, user.getUserId(), authRole);
-                enableUser(connection, user.getUserId(), true);
-                continue;
+            for (String possibleUserId : List.of(user.getUserId(), user.getUserId().toLowerCase())) {
+                if (isSubjectExists(possibleUserId)) {
+                    log.info("User already exist : " + possibleUserId);
+                    setUserAuthRole(connection, possibleUserId, authRole);
+                    enableUser(connection, possibleUserId, true);
+                    continue outer;
+                }
             }
-            createUser(connection, user.getUserId(), user.getMetaParameters(), true, authRole);
+            createUser(connection, user.getUserId().toLowerCase(), user.getMetaParameters(), true, authRole);
         }
     }
 
