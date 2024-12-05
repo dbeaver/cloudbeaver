@@ -20,9 +20,6 @@ enum CBServerEventId {
     cb_datasource_folder_updated,
     cb_datasource_folder_deleted,
 
-    cb_datasource_disconnected
-    cb_datasource_connected
-
     cb_rm_resource_created,
     cb_rm_resource_updated,
     cb_rm_resource_deleted,
@@ -41,7 +38,9 @@ enum CBClientEventId {
     cb_client_topic_subscribe,
     cb_client_topic_unsubscribe,
     cb_client_projects_active,
-    cb_client_session_ping
+    cb_client_session_ping,
+    cb_datasource_disconnected,
+    cb_datasource_connected
 }
 
 # Client subscribes on topic to receive only related events
@@ -56,6 +55,7 @@ enum CBEventTopic {
     cb_object_permissions,
     cb_subject_permissions,
     cb_database_output_log,
+    cb_datasource_connection,
     cb_delete_temp_folder
 }
 
@@ -182,21 +182,21 @@ type WSOutputLogInfo {
 }
 
 # Datasource disconnect event
-type CBDatasourceDisconnectEvent implements CBServerEvent {
+type WSDataSourceDisconnectEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
     connectionId: String!
     projectId: String!
     timestamp: Int!
 }
-# Datasource connect event
-type CBDatasourceConnectEvent implements CBServerEvent {
-    id: CBServerEventId!
-    topicId: CBEventTopic
-    connectionId: String!
-    projectId: String!
-    timestamp: Int!
-}
+## Datasource connect event
+#type CBDatasourceConnectEvent implements CBClientEvent {
+#    id: CBClientEventId!
+#    topicId: CBEventTopic
+#    connectionId: String!
+#    projectId: String!
+#    timestamp: Int!
+#}
 
 extend type Query {
     emptyEvent: Boolean
