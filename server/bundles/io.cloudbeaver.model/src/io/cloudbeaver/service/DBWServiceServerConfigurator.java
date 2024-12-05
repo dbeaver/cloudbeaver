@@ -16,9 +16,9 @@
  */
 package io.cloudbeaver.service;
 
-import io.cloudbeaver.model.app.WebAppConfiguration;
-import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.app.WebServerConfiguration;
+import io.cloudbeaver.model.app.ServletAppConfiguration;
+import io.cloudbeaver.model.app.ServletApplication;
+import io.cloudbeaver.model.app.ServletServerConfiguration;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -30,16 +30,16 @@ import org.jkiss.dbeaver.DBException;
 public interface DBWServiceServerConfigurator extends DBWServiceBinding {
 
     void configureServer(
-        @NotNull WebApplication application,
+        @NotNull ServletApplication application,
         @Nullable WebSession session,
-        @NotNull WebServerConfiguration serverConfiguration,
-        @NotNull WebAppConfiguration appConfig
+        @NotNull ServletServerConfiguration serverConfiguration,
+        @NotNull ServletAppConfiguration appConfig
     ) throws DBException;
 
-    default void migrateConfigurationIfNeeded(@NotNull WebApplication application) throws DBException {
+    default void migrateConfigurationIfNeeded(@NotNull ServletApplication application) throws DBException {
 
     }
 
-    void reloadConfiguration(@NotNull WebAppConfiguration appConfig) throws DBException;
+    void reloadConfiguration(@NotNull ServletAppConfiguration appConfig) throws DBException;
 
 }

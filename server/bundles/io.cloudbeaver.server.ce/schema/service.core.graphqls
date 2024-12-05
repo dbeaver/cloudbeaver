@@ -1,0 +1,16 @@
+extend type ServerConfig {
+    serverURL: String!
+    rootURI: String!
+    hostName: String! @deprecated # use container id instead
+    containerId: String!
+    defaultAuthRole: String
+    defaultUserTeam: String # [23.2.2]
+
+    sessionExpireTime: Int!
+    localHostAddress: String
+
+    redirectOnFederatedAuth: Boolean!
+    enabledAuthProviders: [ID!]!
+    passwordPolicyConfiguration: PasswordPolicyConfig! @since(version: "23.3.3")
+}
+

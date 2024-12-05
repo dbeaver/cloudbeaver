@@ -34,7 +34,7 @@ import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
 import io.cloudbeaver.service.security.SMUtils;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -269,7 +269,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (grantor == null) {
             throw new DBWebException("Cannot grant team in anonymous mode");
         }
-        if (!WebAppUtils.getWebApplication().isDistributed()
+        if (!ServletAppUtils.getServletApplication().isDistributed()
             && CommonUtils.equalObjects(user, webSession.getUser().getUserId())
         ) {
             throw new DBWebException("You cannot edit your own permissions");
@@ -289,7 +289,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (grantor == null) {
             throw new DBWebException("Cannot revoke team in anonymous mode");
         }
-        if (!WebAppUtils.getWebApplication().isDistributed() &&
+        if (!ServletAppUtils.getServletApplication().isDistributed() &&
             CommonUtils.equalObjects(user, webSession.getUser().getUserId())
         ) {
             throw new DBWebException("You cannot edit your own permissions");

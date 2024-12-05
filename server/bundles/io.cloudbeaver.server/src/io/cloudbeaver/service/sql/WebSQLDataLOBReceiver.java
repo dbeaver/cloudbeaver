@@ -16,9 +16,9 @@
  */
 package io.cloudbeaver.service.sql;
 
-import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.WebAppUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -36,7 +36,8 @@ import java.text.SimpleDateFormat;
 
 public class WebSQLDataLOBReceiver extends WebSQLCellValueReceiver {
     private static final Log log = Log.getLog(WebSQLDataLOBReceiver.class);
-    public static final Path DATA_EXPORT_FOLDER = CBPlatform.getInstance().getTempFolder(new VoidProgressMonitor(), "sql-lob-files");
+    public static final Path DATA_EXPORT_FOLDER = WebAppUtils.getWebPlatform().getTempFolder(new VoidProgressMonitor(), "sql-lob" +
+        "-files");
     private final String tableName;
 
     WebSQLDataLOBReceiver(String tableName, DBSDataContainer dataContainer, int rowIndex) {
@@ -63,8 +64,10 @@ public class WebSQLDataLOBReceiver extends WebSQLCellValueReceiver {
         fileName.append(s);
         exportFileName = CommonUtils.escapeFileName(fileName.toString());
         byte[] binaryValue = getBinaryValue(monitor);
-        Number fileSizeLimit = CBApplication.getInstance().getAppConfiguration().getResourceQuota(CBConstants.QUOTA_PROP_FILE_LIMIT);
-        if (binaryValue.length > fileSizeLimit.longValue()) {
+        Number fileSizeLimit = ServletAppUtils.getServletApplication()
+            .getAppConfiguration()
+            .getResourceQuota(CBConstants.QUOTA_PROP_FILE_LIMIT);
+        if (fileSizeLimit != null && binaryValue.length > fileSizeLimit.longValue()) {
             throw new DBQuotaException(
                 "Data export quota exceeded \n Please increase the resourceQuotas parameter in configuration",
                 CBConstants.QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), binaryValue.length

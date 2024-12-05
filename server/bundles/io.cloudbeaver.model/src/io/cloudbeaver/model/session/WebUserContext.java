@@ -17,7 +17,7 @@
 
 package io.cloudbeaver.model.session;
 
-import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 public class WebUserContext implements SMCredentialsProvider {
     private static final Log log = Log.getLog(WebUserContext.class);
 
-    private final WebApplication application;
+    private final ServletApplication application;
     private final DBPWorkspace workspace;
 
     private WebUser user;
@@ -67,7 +67,7 @@ public class WebUserContext implements SMCredentialsProvider {
     private Set<String> accessibleProjectIds = new HashSet<>();
     private final WebSessionPreferenceStore preferenceStore;
 
-    public WebUserContext(WebApplication application, DBPWorkspace workspace) throws DBException {
+    public WebUserContext(ServletApplication application, DBPWorkspace workspace) throws DBException {
         this.application = application;
         this.workspace = workspace;
         this.securityController = application.createSecurityController(this);

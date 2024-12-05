@@ -16,12 +16,12 @@
  */
 package io.cloudbeaver.service;
 
-import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.ServletApplication;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 
-public interface DBWServiceBindingWebSocket<APPLICATION extends WebApplication> extends DBWServiceBinding {
-    default boolean isApplicable(@NotNull WebApplication application) {
+public interface DBWServiceBindingWebSocket<APPLICATION extends ServletApplication> extends DBWServiceBinding {
+    default boolean isApplicable(@NotNull ServletApplication application) {
         return true;
     }
 

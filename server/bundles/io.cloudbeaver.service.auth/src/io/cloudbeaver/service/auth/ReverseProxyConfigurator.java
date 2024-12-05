@@ -17,10 +17,10 @@
 package io.cloudbeaver.service.auth;
 
 import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
-import io.cloudbeaver.model.app.WebAppConfiguration;
-import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.app.WebAuthApplication;
-import io.cloudbeaver.model.app.WebServerConfiguration;
+import io.cloudbeaver.model.app.ServletAppConfiguration;
+import io.cloudbeaver.model.app.ServletApplication;
+import io.cloudbeaver.model.app.ServletAuthApplication;
+import io.cloudbeaver.model.app.ServletServerConfiguration;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import org.jkiss.code.NotNull;
@@ -37,15 +37,15 @@ public class ReverseProxyConfigurator implements DBWServiceServerConfigurator {
 
     @Override
     public void configureServer(
-        @NotNull WebApplication application,
+        @NotNull ServletApplication application,
         @Nullable WebSession session,
-        @NotNull WebServerConfiguration serverConfiguration,
-        @NotNull WebAppConfiguration appConfig
+        @NotNull ServletServerConfiguration serverConfiguration,
+        @NotNull ServletAppConfiguration appConfig
     ) throws DBException {
     }
 
     @Override
-    public void migrateConfigurationIfNeeded(@NotNull WebApplication application) throws DBException {
+    public void migrateConfigurationIfNeeded(@NotNull ServletApplication application) throws DBException {
         if (migrationNotNeeded(application)) {
             return;
         }
@@ -53,14 +53,14 @@ public class ReverseProxyConfigurator implements DBWServiceServerConfigurator {
     }
 
     @Override
-    public void reloadConfiguration(@NotNull WebAppConfiguration appConfig) throws DBException {
+    public void reloadConfiguration(@NotNull ServletAppConfiguration appConfig) throws DBException {
 
     }
 
     private void migrateConfiguration(
-        @NotNull WebApplication application
+        @NotNull ServletApplication application
     ) {
-        if (!(application instanceof WebAuthApplication authApplication)) {
+        if (!(application instanceof ServletAuthApplication authApplication)) {
             return;
         }
 
@@ -90,8 +90,8 @@ public class ReverseProxyConfigurator implements DBWServiceServerConfigurator {
         }
     }
 
-    private boolean migrationNotNeeded(@NotNull WebApplication application) {
-        if (!(application instanceof WebAuthApplication authApplication)) {
+    private boolean migrationNotNeeded(@NotNull ServletApplication application) {
+        if (!(application instanceof ServletAuthApplication authApplication)) {
             return true;
         }
 
