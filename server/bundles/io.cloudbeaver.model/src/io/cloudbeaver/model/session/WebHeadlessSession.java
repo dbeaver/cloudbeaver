@@ -17,7 +17,7 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.model.WebServerMessage;
-import io.cloudbeaver.model.app.WebAuthApplication;
+import io.cloudbeaver.model.app.ServletAuthApplication;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -29,7 +29,7 @@ import org.jkiss.dbeaver.model.auth.SMSessionPrincipal;
 public class WebHeadlessSession extends BaseWebSession {
     public WebHeadlessSession(
         @NotNull String id,
-        @NotNull WebAuthApplication application
+        @NotNull ServletAuthApplication application
     ) throws DBException {
         super(id, application);
     }

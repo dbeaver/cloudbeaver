@@ -17,7 +17,7 @@
 package io.cloudbeaver.service.security;
 
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
-import io.cloudbeaver.model.app.WebAuthApplication;
+import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.model.config.SMControllerConfiguration;
 import io.cloudbeaver.model.config.WebDatabaseConfig;
 import io.cloudbeaver.service.security.db.CBDatabase;
@@ -29,7 +29,7 @@ import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 /**
  * Embedded Security Controller Factory
  */
-public class EmbeddedSecurityControllerFactory<T extends WebAuthApplication> {
+public class EmbeddedSecurityControllerFactory<T extends ServletAuthApplication> {
     private static volatile CBDatabase DB_INSTANCE;
 
     public static CBDatabase getDbInstance() {

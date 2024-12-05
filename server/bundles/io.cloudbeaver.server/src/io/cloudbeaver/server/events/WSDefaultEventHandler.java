@@ -17,7 +17,7 @@
 package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.model.session.BaseWebSession;
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
@@ -32,7 +32,9 @@ public class WSDefaultEventHandler<EVENT extends WSEvent> implements WSEventHand
     @Override
     public void handleEvent(@NotNull EVENT event) {
         log.debug(event.getTopicId() + " event handled");
-        Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
+        Collection<BaseWebSession> allSessions = WebAppUtils.getWebApplication()
+            .getSessionManager()
+            .getAllActiveSessions();
         for (var activeUserSession : allSessions) {
             if (!isAcceptableInSession(activeUserSession, event)) {
                 log.debug("Cannot handle " + event.getTopicId() + " event '" + event.getId() +

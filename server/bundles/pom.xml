@@ -15,6 +15,7 @@
     <modules>
         <module>io.cloudbeaver.model</module>
         <module>io.cloudbeaver.server</module>
+        <module>io.cloudbeaver.server.ce</module>
         <module>io.cloudbeaver.slf4j</module>
 
         <module>io.cloudbeaver.service.admin</module>

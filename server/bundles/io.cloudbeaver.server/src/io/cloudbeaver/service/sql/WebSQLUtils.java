@@ -16,11 +16,11 @@
  */
 package io.cloudbeaver.service.sql;
 
-import io.cloudbeaver.model.app.WebAppConfiguration;
+import io.cloudbeaver.model.app.ServletAppConfiguration;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.utils.CBModelConstants;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.*;
@@ -151,7 +151,7 @@ public class WebSQLUtils {
         if (ContentUtils.isTextContent(value)) {
             String stringValue = ContentUtils.getContentStringValue(session.getProgressMonitor(), value);
             int textPreviewMaxLength = CommonUtils.toInt(
-                WebAppUtils.getWebApplication()
+                ServletAppUtils.getServletApplication()
                     .getAppConfiguration()
                     .getResourceQuota(WebSQLConstants.QUOTA_PROP_TEXT_PREVIEW_MAX_LENGTH),
                 WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH
@@ -166,7 +166,7 @@ public class WebSQLUtils {
             if (binaryValue != null) {
                 byte[] previewValue = binaryValue;
                 // gets parameters from the configuration file
-                WebAppConfiguration config = WebAppUtils.getWebApplication().getAppConfiguration();
+                ServletAppConfiguration config = ServletAppUtils.getServletApplication().getAppConfiguration();
                 // the max length of the text preview
                 int textPreviewMaxLength = CommonUtils.toInt(
                     config.getResourceQuota(
@@ -215,7 +215,7 @@ public class WebSQLUtils {
      */
     public static Object serializeStringValue(Object value) {
         int textPreviewMaxLength = CommonUtils.toInt(
-            WebAppUtils.getWebApplication()
+            ServletAppUtils.getServletApplication()
                 .getAppConfiguration()
                 .getResourceQuota(WebSQLConstants.QUOTA_PROP_TEXT_PREVIEW_MAX_LENGTH),
             WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH
