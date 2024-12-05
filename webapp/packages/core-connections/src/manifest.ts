@@ -33,6 +33,6 @@ export const manifest: PluginManifest = {
     () => import('./ConnectionFolderEventHandler.js').then(m => m.ConnectionFolderEventHandler),
     () => import('./ConnectionsSettingsService.js').then(m => m.ConnectionsSettingsService),
     () => import('./ConnectionPublicSecretsResource.js').then(m => m.ConnectionPublicSecretsResource),
-    () => import('./ConnectionDisconnectEventHandler.js').then(m => m.ConnectionDisconnectEventHandler),
+    () => import('./ConnectionStateEventHandler.js').then(m => m.ConnectionStateEventHandler),
   ],
 };

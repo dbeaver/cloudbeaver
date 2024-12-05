@@ -10,12 +10,7 @@ import { type ISessionEvent, type SessionEventId, SessionEventSource, SessionEve
 import type { WsDataSourceDisconnectEvent } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class ConnectionDisconnectEventHandler extends TopicEventHandler<
-  WsDataSourceDisconnectEvent,
-  ISessionEvent,
-  SessionEventId,
-  SessionEventTopic
-> {
+export class ConnectionStateEventHandler extends TopicEventHandler<WsDataSourceDisconnectEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbDatasourceConnection, sessionEventSource);
   }
