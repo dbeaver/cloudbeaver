@@ -19,7 +19,7 @@ package io.cloudbeaver.registry;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.auth.SMSignOutLinkProvider;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
@@ -80,7 +80,7 @@ public class WebAuthProviderConfiguration {
     }
 
     private String buildRedirectUrl(String baseUrl) {
-        return baseUrl + "?" + CBAuthConstants.CB_REDIRECT_URL_REQUEST_PARAM + "=" + WebAppUtils.getFullServerUrl();
+        return baseUrl + "?" + CBAuthConstants.CB_REDIRECT_URL_REQUEST_PARAM + "=" + ServletAppUtils.getFullServerUrl();
     }
 
     @Property

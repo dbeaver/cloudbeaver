@@ -8,6 +8,6 @@ Bundle-Release-Date: 20241223
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
-Require-Bundle: io.cloudbeaver.server
+Require-Bundle: io.cloudbeaver.server.ce
 Automatic-Module-Name: io.cloudbeaver.service.auth
 Export-Package: io.cloudbeaver.service.auth

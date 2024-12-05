@@ -55,7 +55,7 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
     @Override
     public void onWebSocketText(String message) {
         super.onWebSocketText(message);
-        var clientEvent = gson.fromJson(message, WSClientEvent.class);
+        var clientEvent = CBAbstractWebSocket.gson.fromJson(message, WSClientEvent.class);
         var clientEventType = WSClientEventType.valueById(clientEvent.getId());
         if (clientEventType == null) {
             webSession.addSessionError(

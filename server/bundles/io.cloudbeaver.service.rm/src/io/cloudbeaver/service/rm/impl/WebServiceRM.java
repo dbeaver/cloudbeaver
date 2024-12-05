@@ -23,7 +23,7 @@ import io.cloudbeaver.service.rm.DBWServiceRM;
 import io.cloudbeaver.service.rm.model.RMProjectPermissions;
 import io.cloudbeaver.service.rm.model.RMSubjectProjectPermissions;
 import io.cloudbeaver.service.security.SMUtils;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -254,7 +254,7 @@ public class WebServiceRM implements DBWServiceRM {
         try {
             RMProject rmProject = getResourceController(session).createProject(name, description);
             session.addSessionProject(rmProject.getId());
-            WebAppUtils.getWebApplication().getEventController().addEvent(
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
                 WSProjectUpdateEvent.create(session.getSessionId(), session.getUserId(), rmProject.getId())
             );
             return rmProject;
@@ -276,7 +276,7 @@ public class WebServiceRM implements DBWServiceRM {
             }
             getResourceController(session).deleteProject(projectId);
             session.removeSessionProject(projectId);
-            WebAppUtils.getWebApplication().getEventController().addEvent(
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
                 WSProjectUpdateEvent.delete(session.getSessionId(), session.getUserId(), projectId)
             );
             return true;

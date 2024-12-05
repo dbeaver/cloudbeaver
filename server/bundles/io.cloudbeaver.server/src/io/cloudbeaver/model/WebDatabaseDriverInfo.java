@@ -18,10 +18,10 @@ package io.cloudbeaver.model;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.model.config.CBAppConfig;
+import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.utils.ConfigurationUtils;
-import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.WebAppUtils;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
@@ -84,6 +84,11 @@ public class WebDatabaseDriverInfo {
     @Property
     public String getIconBig() {
         return WebServiceUtils.makeIconId(driver.getIconBig());
+    }
+
+    @Property
+    public String getDriverId() {
+        return driver.getId();
     }
 
     @Property
@@ -260,7 +265,7 @@ public class WebDatabaseDriverInfo {
 
     @Property
     public boolean isEnabled() {
-        CBAppConfig config = CBApplication.getInstance().getAppConfiguration();
+        WebAppConfiguration config = WebAppUtils.getWebApplication().getAppConfiguration();
         return ConfigurationUtils.isDriverEnabled(
             driver,
             config.getEnabledDrivers(),
@@ -293,6 +298,11 @@ public class WebDatabaseDriverInfo {
         return driver.getDriverLibraries().stream()
             .map(dbpDriverLibrary -> new WebDriverLibraryInfo(webSession, dbpDriverLibrary))
             .toArray(WebDriverLibraryInfo[]::new);
+    }
+
+    @Property
+    public boolean isDriverInstalled() {
+        return !driver.needsExternalDependencies(webSession.getProgressMonitor());
     }
 
     @Property

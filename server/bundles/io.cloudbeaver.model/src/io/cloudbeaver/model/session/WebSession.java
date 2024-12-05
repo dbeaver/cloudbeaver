@@ -24,8 +24,8 @@ import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
-import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.app.WebAuthApplication;
+import io.cloudbeaver.model.app.ServletApplication;
+import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -114,7 +114,7 @@ public class WebSession extends BaseWebSession
 
     public WebSession(
         @NotNull WebHttpRequestInfo requestInfo,
-        @NotNull WebAuthApplication application,
+        @NotNull ServletAuthApplication application,
         @NotNull Map<String, DBWSessionHandler> sessionHandlers
     ) throws DBException {
         this(requestInfo.getId(),
@@ -128,7 +128,7 @@ public class WebSession extends BaseWebSession
     protected WebSession(
         @NotNull String id,
         @Nullable String locale,
-        @NotNull WebApplication application,
+        @NotNull ServletApplication application,
         @NotNull Map<String, DBWSessionHandler> sessionHandlers
     ) throws DBException {
         super(id, application);

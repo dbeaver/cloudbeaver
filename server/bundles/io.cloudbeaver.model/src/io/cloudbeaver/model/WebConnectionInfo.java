@@ -22,7 +22,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebDataFormat;
 import io.cloudbeaver.utils.CBModelConstants;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
@@ -465,7 +465,8 @@ public class WebConnectionInfo {
         if (isCanEdit()) {
             return true;
         }
-        BaseWebAppConfiguration appConfig = (BaseWebAppConfiguration) WebAppUtils.getWebApplication().getAppConfiguration();
+        BaseWebAppConfiguration appConfig = (BaseWebAppConfiguration) ServletAppUtils.getServletApplication()
+            .getAppConfiguration();
         return appConfig.isShowReadOnlyConnectionInfo();
 
     }

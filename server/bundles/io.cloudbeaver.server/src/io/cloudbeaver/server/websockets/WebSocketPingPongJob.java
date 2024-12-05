@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.server.websockets;
 
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.BaseWebPlatform;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
@@ -27,10 +27,10 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
  */
 class WebSocketPingPongJob extends AbstractJob {
     private static final int INTERVAL = 1000 * 60 * 1; // once per 1 min
-    private final CBPlatform platform;
+    private final BaseWebPlatform platform;
     private final CBJettyWebSocketManager webSocketManager;
 
-    public WebSocketPingPongJob(CBPlatform platform, CBJettyWebSocketManager webSocketManager) {
+    public WebSocketPingPongJob(BaseWebPlatform platform, CBJettyWebSocketManager webSocketManager) {
         super("WebSocket monitor");
         this.platform = platform;
         setUser(false);

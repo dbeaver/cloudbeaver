@@ -16,7 +16,8 @@
  */
 package io.cloudbeaver.server.events;
 
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.BaseWebPlatform;
+import io.cloudbeaver.server.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
@@ -33,9 +34,9 @@ public class WSDeleteTempFileHandler implements WSEventHandler<WSEventDeleteTemp
     private static final Log log = Log.getLog(WSDeleteTempFileHandler.class);
 
     public void resetTempFolder(String sessionId) {
-        Path path = CBPlatform.getInstance()
-                .getTempFolder(new VoidProgressMonitor(), CBPlatform.TEMP_FILE_FOLDER)
-                .resolve(sessionId);
+        Path path = WebAppUtils.getWebPlatform()
+            .getTempFolder(new VoidProgressMonitor(), BaseWebPlatform.TEMP_FILE_FOLDER)
+            .resolve(sessionId);
         if (Files.exists(path)) {
             try {
                 IOUtils.deleteDirectory(path);
@@ -43,9 +44,9 @@ public class WSDeleteTempFileHandler implements WSEventHandler<WSEventDeleteTemp
                 log.error("Error deleting temp path", e);
             }
         }
-        path = CBPlatform.getInstance()
-                .getTempFolder(new VoidProgressMonitor(), CBPlatform.TEMP_FILE_IMPORT_FOLDER)
-                .resolve(sessionId);
+        path = WebAppUtils.getWebPlatform()
+            .getTempFolder(new VoidProgressMonitor(), BaseWebPlatform.TEMP_FILE_IMPORT_FOLDER)
+            .resolve(sessionId);
         if (Files.exists(path)) {
             try {
                 IOUtils.deleteDirectory(path);
