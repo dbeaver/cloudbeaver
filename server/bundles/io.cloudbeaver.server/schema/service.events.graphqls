@@ -20,6 +20,9 @@ enum CBServerEventId {
     cb_datasource_folder_updated,
     cb_datasource_folder_deleted,
 
+    cb_datasource_disconnected,
+    cb_datasource_connected,
+
     cb_rm_resource_created,
     cb_rm_resource_updated,
     cb_rm_resource_deleted,
@@ -39,8 +42,6 @@ enum CBClientEventId {
     cb_client_topic_unsubscribe,
     cb_client_projects_active,
     cb_client_session_ping,
-    cb_datasource_disconnected,
-    cb_datasource_connected
 }
 
 # Client subscribes on topic to receive only related events
