@@ -15,7 +15,7 @@ import { useCombinedRef } from '../useCombinedRef.js';
 import { useObjectRef } from '../useObjectRef.js';
 import { useS } from '../useS.js';
 import style from './Menu.module.css';
-import { MenuPanel } from './MenuPanel.js';
+import { type IMenuPanelProps, MenuPanel } from './MenuPanel.js';
 import { type IMenuState, MenuStateContext } from './MenuStateContext.js';
 import type { IMouseContextMenu } from './useMouseContextMenu.js';
 
@@ -32,6 +32,7 @@ interface IMenuProps extends React.ButtonHTMLAttributes<any> {
   rtl?: boolean;
   hasBindings?: boolean;
   panelAvailable?: boolean;
+  panelProps?: Partial<IMenuPanelProps>;
   getHasBindings?: () => boolean;
   onVisibleSwitch?: (visible: boolean) => void;
 }
@@ -54,6 +55,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
       modal,
       submenu,
       rtl,
+      panelProps,
       className,
       ...props
     },
@@ -152,6 +154,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
               panelAvailable={panelAvailable}
               hasBindings={hasBindings}
               getHasBindings={getHasBindings}
+              {...panelProps}
             >
               {items}
             </MenuPanel>
@@ -186,6 +189,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
             panelAvailable={panelAvailable}
             hasBindings={hasBindings}
             getHasBindings={getHasBindings}
+            {...panelProps}
           >
             {items}
           </MenuPanel>
