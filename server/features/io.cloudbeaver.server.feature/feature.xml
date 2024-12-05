@@ -31,6 +31,7 @@
 
     <plugin id="org.jkiss.dbeaver.launcher" version="0.0.0"/>
     <plugin id="io.cloudbeaver.server" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="io.cloudbeaver.server.ce" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.service.admin" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.service.auth" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.service.data.transfer" download-size="0" install-size="0" version="0.0.0" unpack="false"/>

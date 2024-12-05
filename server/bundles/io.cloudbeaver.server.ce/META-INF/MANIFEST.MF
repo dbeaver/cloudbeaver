@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Vendor: DBeaver Corp
+Bundle-Name: Cloudbeaver CE Server
+Bundle-SymbolicName: io.cloudbeaver.server.ce;singleton:=true
+Bundle-Version: 24.3.1.qualifier
+Bundle-Release-Date: 20241104
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: io.cloudbeaver.server.CBPlatformActivator
+Bundle-ClassPath: .
+Require-Bundle: io.cloudbeaver.server;visibility:=reexport
+Export-Package: io.cloudbeaver,
+ io.cloudbeaver.model,
+ io.cloudbeaver.model.config,
+ io.cloudbeaver.server,
+ io.cloudbeaver.service,
+ io.cloudbeaver.service.session
+Import-Package: org.slf4j
+Automatic-Module-Name: io.cloudbeaver.server.ce

@@ -18,7 +18,6 @@
 package io.cloudbeaver.registry;
 
 import io.cloudbeaver.DBWFeatureSet;
-import io.cloudbeaver.utils.WebAppUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPImage;

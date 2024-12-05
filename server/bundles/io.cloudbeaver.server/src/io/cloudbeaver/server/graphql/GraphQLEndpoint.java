@@ -35,7 +35,7 @@ import io.cloudbeaver.server.HttpConstants;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.service.WebServiceBindingBase;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -122,7 +122,7 @@ public class GraphQLEndpoint extends HttpServlet {
     }
 
     private void setDevelHeaders(HttpServletRequest request, HttpServletResponse response) {
-        if (WebAppUtils.getWebApplication().getServerConfiguration().isDevelMode()) {
+        if (ServletAppUtils.getServletApplication().getServerConfiguration().isDevelMode()) {
             // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
             // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_HEADERS, "*");
             // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "*");
@@ -209,7 +209,7 @@ public class GraphQLEndpoint extends HttpServlet {
         if (path == null) {
             path = request.getServletPath();
         }
-        boolean develMode = WebAppUtils.getWebApplication().getServerConfiguration().isDevelMode();
+        boolean develMode = ServletAppUtils.getServletApplication().getServerConfiguration().isDevelMode();
 
         if (path.contentEquals("/schema.json") && develMode) {
             executeQuery(request, response, GraphQLConstants.SCHEMA_READ_QUERY, null, null);

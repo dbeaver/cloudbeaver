@@ -16,14 +16,14 @@
  */
 package io.cloudbeaver.server.jetty;
 
-import io.cloudbeaver.server.GQLApplicationAdapter;
+import io.cloudbeaver.server.WebApplication;
 import org.eclipse.jetty.ee10.servlet.SessionHandler;
 
 public class CBSessionHandler extends SessionHandler {
     static final int ONE_MINUTE = 60;
-    private final GQLApplicationAdapter application;
+    private final WebApplication application;
 
-    public CBSessionHandler(GQLApplicationAdapter application) {
+    public CBSessionHandler(WebApplication application) {
         this.application = application;
     }
 }

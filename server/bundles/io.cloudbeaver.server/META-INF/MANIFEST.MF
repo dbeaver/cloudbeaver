@@ -7,7 +7,6 @@ Bundle-Version: 24.3.1.qualifier
 Bundle-Release-Date: 20241223
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
-Bundle-Activator: io.cloudbeaver.server.CBPlatformActivator
 Bundle-ClassPath: .
 Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  org.apache.commons.jexl,
@@ -23,6 +22,7 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  io.cloudbeaver.service.security;visibility:=reexport
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.model,
+ io.cloudbeaver.model.app,
  io.cloudbeaver.model.user,
  io.cloudbeaver.registry,
  io.cloudbeaver.server.events,
@@ -32,10 +32,9 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.server.graphql,
  io.cloudbeaver.server.jobs,
  io.cloudbeaver.server.servlets,
-  io.cloudbeaver.server.websockets,
+ io.cloudbeaver.server.websockets,
  io.cloudbeaver.service,
  io.cloudbeaver.service.navigator,
- io.cloudbeaver.service.session,
  io.cloudbeaver.service.sql
 Import-Package: org.slf4j
 Automatic-Module-Name: io.cloudbeaver.server

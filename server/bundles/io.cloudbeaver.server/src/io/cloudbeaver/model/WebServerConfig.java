@@ -16,18 +16,14 @@
  */
 package io.cloudbeaver.model;
 
-import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.config.PasswordPolicyConfiguration;
 import io.cloudbeaver.registry.WebServerFeatureRegistry;
 import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
-import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.WebApplication;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
-import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageDescriptor;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -51,10 +47,7 @@ public class WebServerConfig {
 
     @Property
     public String getName() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return CommonUtils.notEmpty(cbApp.getServerConfiguration().getServerName());
-        }
-        return "";
+        return CommonUtils.notEmpty(application.getServerConfiguration().getServerName());
     }
 
     @Property
@@ -68,33 +61,6 @@ public class WebServerConfig {
     }
 
     @Property
-    public String getServerURL() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return CommonUtils.notEmpty(cbApp.getServerConfiguration().getServerURL());
-        }
-        return "";
-    }
-
-    @Property
-    public String getRootURI() {
-        return CommonUtils.notEmpty(application.getServerConfiguration().getRootURI());
-    }
-
-    @Deprecated
-    @Property
-    public String getHostName() {
-        return getContainerId();
-    }
-
-    @Property
-    public String getContainerId() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return CommonUtils.notEmpty(cbApp.getContainerId());
-        }
-       return "";
-    }
-
-    @Property
     public boolean isAnonymousAccessEnabled() {
         return application.getAppConfiguration().isAnonymousAccessEnabled();
     }
@@ -105,35 +71,13 @@ public class WebServerConfig {
     }
 
     @Property
-    public boolean isSupportsConnectionBrowser() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.getAppConfiguration().isSupportsConnectionBrowser();
-        }
-        return false;
-    }
-
-    @Property
-    public boolean isSupportsWorkspaces() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.getAppConfiguration().isSupportsUserWorkspaces();
-        }
-        return false;
-    }
-
-    @Property
     public boolean isPublicCredentialsSaveEnabled() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.getAppConfiguration().isPublicCredentialsSaveEnabled();
-        }
-        return false;
+        return application.getAppConfiguration().isPublicCredentialsSaveEnabled();
     }
 
     @Property
     public boolean isAdminCredentialsSaveEnabled() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.getAppConfiguration().isAdminCredentialsSaveEnabled();
-        }
-        return false;
+        return application.getAppConfiguration().isAdminCredentialsSaveEnabled();
     }
 
     @Property
@@ -143,18 +87,12 @@ public class WebServerConfig {
 
     @Property
     public boolean isLicenseValid() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.isLicenseValid();
-        }
-        return false;
+        return application.isLicenseValid();
     }
 
     @Property
     public String getLicenseStatus() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.getLicenseStatus();
-        }
-        return "";
+        return application.getLicenseStatus();
     }
 
     @Property
@@ -168,32 +106,8 @@ public class WebServerConfig {
     }
 
     @Property
-    public boolean isRedirectOnFederatedAuth() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.getAppConfiguration().isRedirectOnFederatedAuth();
-        }
-        return false;
-    }
-
-    @Property
     public boolean isResourceManagerEnabled() {
         return application.getAppConfiguration().isResourceManagerEnabled();
-    }
-
-    @Property
-    public long getSessionExpireTime() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.getServerConfiguration().getMaxSessionIdleTime();
-        }
-        return 0;
-    }
-
-    @Property
-    public String getLocalHostAddress() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.getLocalHostAddress();
-        }
-        return "";
     }
 
     @Property
@@ -204,24 +118,13 @@ public class WebServerConfig {
     @Property
     @Nullable
     public String[] getDisabledBetaFeatures() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.getAppConfiguration().getDisabledBetaFeatures();
-        }
-        return new String[0];
+        return application.getAppConfiguration().getDisabledBetaFeatures();
     }
 
     @Property
     @NotNull
     public String[] getServerFeatures() {
         return WebServerFeatureRegistry.getInstance().getServerFeatures();
-    }
-
-    @Property
-    public String[] getEnabledAuthProviders() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.getAppConfiguration().getEnabledAuthProviders();
-        }
-        return new String[0];
     }
 
     @Property
@@ -245,23 +148,17 @@ public class WebServerConfig {
 
     @Property
     public Map<String, Object> getProductConfiguration() {
-        return CBPlatform.getInstance().getApplication().getProductConfiguration();
+        return application.getProductConfiguration();
     }
 
     @Property
     public DBNBrowseSettings getDefaultNavigatorSettings() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.getAppConfiguration().getDefaultNavigatorSettings();
-        }
-        return new DataSourceNavigatorSettings();
+        return application.getAppConfiguration().getDefaultNavigatorSettings();
     }
 
     @Property
     public Map<String, Object> getResourceQuotas() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.getAppConfiguration().getResourceQuotas();
-        }
-        return Map.of();
+        return application.getAppConfiguration().getResourceQuotas();
     }
 
     @Property
@@ -271,35 +168,11 @@ public class WebServerConfig {
 
     @Property
     public String[] getDisabledDrivers() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.getAppConfiguration().getDisabledDrivers();
-        }
-        return new String[0];
+        return application.getAppConfiguration().getDisabledDrivers();
     }
 
     @Property
     public Boolean isDistributed() {
         return application.isDistributed();
-    }
-
-    @Property
-    public String getDefaultAuthRole() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.getDefaultAuthRole();
-        }
-        return "";
-    }
-
-    @Property
-    public String getDefaultUserTeam() {
-        return application.getAppConfiguration().getDefaultUserTeam();
-    }
-
-    @Property
-    public PasswordPolicyConfiguration getPasswordPolicyConfiguration() {
-        if (application instanceof CBApplication<?> cbApp) {
-            return cbApp.getSecurityManagerConfiguration().getPasswordPolicyConfiguration();
-        }
-        return new PasswordPolicyConfiguration();
     }
 }

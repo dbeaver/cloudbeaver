@@ -18,7 +18,7 @@
 package io.cloudbeaver.service.rm;
 
 import io.cloudbeaver.model.rm.DBNResourceManagerRoot;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.navigator.DBNModelExtender;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
@@ -28,7 +28,9 @@ public class RMNavigatorModelExtender implements DBNModelExtender {
 
     @Override
     public DBNNode[] getExtraNodes(@NotNull DBNNode parentNode) {
-        if (parentNode instanceof DBNRoot && WebAppUtils.getWebApplication().getAppConfiguration().isResourceManagerEnabled()) {
+        if (parentNode instanceof DBNRoot && ServletAppUtils.getServletApplication()
+            .getAppConfiguration()
+            .isResourceManagerEnabled()) {
             return createRMNodes((DBNRoot) parentNode);
         } else {
             return null;

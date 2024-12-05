@@ -18,11 +18,11 @@ package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.DBWConstants;
-import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.rm.lock.RMFileLockController;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.file.UniversalFileVisitor;
 import org.eclipse.core.runtime.IPath;
 import org.jkiss.code.NotNull;
@@ -84,7 +84,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         Path sharedProjectsPath,
         Supplier<SMController> smControllerSupplier
     ) throws DBException {
-        super(workspace, new RMFileLockController(WebAppUtils.getWebApplication()));
+        super(workspace, new RMFileLockController(ServletAppUtils.getServletApplication()));
         this.credentialsProvider = credentialsProvider;
         this.rootPath = rootPath;
         this.userProjectsPath = userProjectsPath;
@@ -145,7 +145,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         }
 
         // Checking if private projects are enabled in the configuration and if the user has permission to them
-        var webApp = WebAppUtils.getWebApplication();
+        var webApp = ServletAppUtils.getServletApplication();
         var userHasPrivateProjectPermission = userHasAccessToPrivateProject(webApp, activeUserCreds);
         if (webApp.getAppConfiguration().isSupportsCustomConnections() && userHasPrivateProjectPermission) {
             var userProjectPermission = getProjectPermissions(null, RMProjectType.USER);
@@ -154,7 +154,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                 projects.add(0, userProject);
             }
         }
-        if (WebAppUtils.getWebApplication().isMultiNode()) {
+        if (ServletAppUtils.getServletApplication().isMultiNode()) {
             for (RMProject rmProject : projects) {
                 handleProjectOpened(rmProject.getId());
             }
@@ -200,7 +200,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                 }
                 return getRmProjectPermissions(projectId, activeUserCreds);
             case USER:
-                var webApp = WebAppUtils.getWebApplication();
+                var webApp = ServletAppUtils.getServletApplication();
                 if (userHasAccessToPrivateProject(webApp, activeUserCreds)) {
                     return Set.of(RMProjectPermission.RESOURCE_EDIT, RMProjectPermission.DATA_SOURCES_EDIT);
                 }
@@ -209,7 +209,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         }
     }
 
-    private boolean userHasAccessToPrivateProject(WebApplication webApp, @Nullable SMCredentials activeUserCreds) {
+    private boolean userHasAccessToPrivateProject(ServletApplication webApp, @Nullable SMCredentials activeUserCreds) {
         return !webApp.isMultiNode() ||
             (activeUserCreds != null && activeUserCreds.hasPermission(DBWConstants.PERMISSION_PRIVATE_PROJECT_ACCESS));
     }
@@ -277,7 +277,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         try {
             log.debug("Creating project '" + project.getId() + "'");
             Files.createDirectories(projectPath);
-            if (WebAppUtils.getWebApplication().isMultiNode()) {
+            if (ServletAppUtils.getServletApplication().isMultiNode()) {
                 createResourceTypeFolders(projectPath);
             }
             fireRmProjectAddEvent(project);
@@ -581,7 +581,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     ) throws DBException {
         try (var ignoredLock = lockController.lockProject(projectId, "setResourceContents")) {
             validateResourcePath(resourcePath);
-            Number fileSizeLimit = WebAppUtils.getWebApplication()
+            Number fileSizeLimit = ServletAppUtils.getServletApplication()
                 .getAppConfiguration()
                 .getResourceQuota(WebSQLConstants.QUOTA_PROP_RM_FILE_SIZE_LIMIT);
             if (fileSizeLimit != null && data.length > fileSizeLimit.longValue()) {
@@ -775,7 +775,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                 fileHandler.projectOpened(projectId);
             } catch (Exception e) {
                 if (credentialsProvider.getActiveUserCredentials() != null) {
-                    WebAppUtils.getWebApplication().getEventController().addEvent(
+                    ServletAppUtils.getServletApplication().getEventController().addEvent(
                         new WSSessionLogUpdatedEvent(
                             WSEventType.SESSION_LOG_UPDATED,
                             credentialsProvider.getActiveUserCredentials().getSmSessionId(),
@@ -794,7 +794,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                 fileHandler.beforeFileRead(projectId, file);
             } catch (Exception e) {
                 if (credentialsProvider.getActiveUserCredentials() != null) {
-                    WebAppUtils.getWebApplication().getEventController().addEvent(
+                    ServletAppUtils.getServletApplication().getEventController().addEvent(
                         new WSSessionLogUpdatedEvent(
                             WSEventType.SESSION_LOG_UPDATED,
                             credentialsProvider.getActiveUserCredentials().getSmSessionId(),
