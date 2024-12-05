@@ -206,7 +206,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
         if (!this.isConnected(key)) {
           const connection = await this.load(key);
-          this.set(createConnectionParam(connection), connection);
+          this.add(connection, true);
         }
       },
       undefined,
