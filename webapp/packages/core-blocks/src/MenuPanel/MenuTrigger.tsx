@@ -9,6 +9,7 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { type ButtonHTMLAttributes, forwardRef, useCallback, useEffect, useMemo } from 'react';
 import { Menu, MenuButton, type MenuInitialState, MenuItem, MenuItemCheckbox, MenuItemRadio, type MenuStateReturn, useMenuState } from 'reakit';
+import type { ExtractHTMLAttributes } from 'reakit-utils';
 
 import type { IMenuItem, IMenuPanel } from '@cloudbeaver/core-dialogs';
 
@@ -74,7 +75,7 @@ export const MenuTrigger = React.forwardRef<ButtonHTMLAttributes<any>, IMenuTrig
     return (
       <div className={s(style, { menuTrigger: true }, className)}>
         <MenuButton ref={ref} className={s(style, { menuButton: true })} {...menu} {...props} {...children.props}>
-          {disclosureProps => React.cloneElement(children, disclosureProps)}
+          {(disclosureProps: ExtractHTMLAttributes<any>) => React.cloneElement(children, disclosureProps)}
         </MenuButton>
         {panel && <MenuPanel panel={panel} menu={menu} rtl={rtl} onItemClose={handleItemClose} />}
       </div>
