@@ -621,7 +621,7 @@ extend type Mutation {
     deleteConnection( id: ID!, projectId: ID ): Boolean!
 
     # Create new custom connection from template
-    createConnectionFromTemplate( templateId: ID! @deprecated, projectId: ID!, connectionName: String ): ConnectionInfo! @deprecated
+    createConnectionFromTemplate( templateId: ID!, projectId: ID!, connectionName: String ): ConnectionInfo! @deprecated
 
     # Create new folder for connections
     createConnectionFolder(parentFolderPath: ID, folderName: String!, projectId: ID ): ConnectionFolderInfo!
