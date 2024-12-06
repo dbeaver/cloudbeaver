@@ -35,14 +35,12 @@ import {
   type NavigatorSettingsInput,
   type TestConnectionMutation,
   type UserConnectionAuthPropertiesFragment,
-  type WsDataSourceConnectEvent,
-  type WsDataSourceDisconnectEvent,
 } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 
 import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA.js';
 import { ConnectionInfoEventHandler, type IConnectionInfoEvent } from './ConnectionInfoEventHandler.js';
-import { ConnectionStateEventHandler } from './ConnectionStateEventHandler.js';
+import { ConnectionStateEventHandler, type IWsDataSourceConnectEvent, type IWsDataSourceDisconnectEvent } from './ConnectionStateEventHandler.js';
 import type { DatabaseConnection } from './DatabaseConnection.js';
 import { DBDriverResource } from './DBDriverResource.js';
 import { parseConnectionKey } from './parseConnectionKey.js';
@@ -167,7 +165,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       this,
     );
 
-    connectionStateEventHandler.onEvent<WsDataSourceDisconnectEvent>(
+    connectionStateEventHandler.onEvent<IWsDataSourceDisconnectEvent>(
       ServerEventId.CbDatasourceDisconnected,
       async data => {
         const key: IConnectionInfoParams = {
@@ -188,7 +186,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       this,
     );
 
-    connectionStateEventHandler.onEvent<WsDataSourceConnectEvent>(
+    connectionStateEventHandler.onEvent<IWsDataSourceConnectEvent>(
       ServerEventId.CbDatasourceConnected,
       async data => {
         const key: IConnectionInfoParams = {

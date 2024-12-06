@@ -7,15 +7,20 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { type ISessionEvent, type SessionEventId, SessionEventSource, SessionEventTopic, TopicEventHandler } from '@cloudbeaver/core-root';
-import type { WsDataSourceDisconnectEvent } from '@cloudbeaver/core-sdk';
+import type { WsDataSourceConnectEvent, WsDataSourceDisconnectEvent } from '@cloudbeaver/core-sdk';
+
+export type IWsDataSourceDisconnectEvent = WsDataSourceDisconnectEvent;
+export type IWsDataSourceConnectEvent = WsDataSourceConnectEvent;
+
+type ConnectionStateEvent = IWsDataSourceConnectEvent | IWsDataSourceDisconnectEvent;
 
 @injectable()
-export class ConnectionStateEventHandler extends TopicEventHandler<WsDataSourceDisconnectEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
+export class ConnectionStateEventHandler extends TopicEventHandler<ConnectionStateEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbDatasourceConnection, sessionEventSource);
   }
 
-  map(event: any): WsDataSourceDisconnectEvent {
+  map(event: any): ConnectionStateEvent {
     return event;
   }
 }
