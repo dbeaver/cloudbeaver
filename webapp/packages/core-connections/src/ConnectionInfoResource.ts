@@ -173,11 +173,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
           connectionId: data.connectionId,
         };
 
-        if (this.isConnecting(key)) {
-          return;
-        }
-
-        if (this.isConnected(key)) {
+        if (this.isConnected(key) && !this.isConnecting(key)) {
           this.markOutdated(key);
         }
       },
@@ -193,11 +189,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
           connectionId: data.connectionId,
         };
 
-        if (this.isConnecting(key)) {
-          return;
-        }
-
-        if (!this.isConnected(key)) {
+        if (!this.isConnected(key) && !this.isConnecting(key)) {
           this.markOutdated(key);
         }
       },
