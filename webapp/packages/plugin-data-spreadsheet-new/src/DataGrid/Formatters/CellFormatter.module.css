@@ -10,6 +10,7 @@
   display: flex;
   overflow: hidden;
   box-sizing: border-box;
+  gap: 6px;
 }
 
 .container {

@@ -80,7 +80,7 @@ export const CellMenu = observer<Props>(function CellMenu({ model, actions, spre
         disclosure
         onVisibleSwitch={onStateSwitch}
       >
-        <div className={s(style, { trigger: true })} onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
+        <div role="button" className={s(style, { trigger: true })} onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
           <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
         </div>
       </ContextMenu>

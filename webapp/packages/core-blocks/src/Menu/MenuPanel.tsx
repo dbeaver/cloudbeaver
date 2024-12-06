@@ -11,6 +11,7 @@ import { Menu, type MenuStateReturn } from 'reakit';
 
 import { ErrorBoundary } from '../ErrorBoundary.js';
 import { getComputed } from '../getComputed.js';
+import { useTranslate } from '../localization/useTranslate.js';
 import { s } from '../s.js';
 import { useS } from '../useS.js';
 import { MenuEmptyItem } from './MenuEmptyItem.js';
@@ -32,6 +33,7 @@ export const MenuPanel = observer<IMenuPanelProps, HTMLDivElement>(
     { label, menu, submenu, panelAvailable = true, rtl, getHasBindings, hasBindings, children, className, ...rest },
     ref,
   ) {
+    const translate = useTranslate();
     const styles = useS(style);
     const visible = menu.visible;
 
@@ -53,7 +55,7 @@ export const MenuPanel = observer<IMenuPanelProps, HTMLDivElement>(
           ref={ref}
           className={s(styles, { menu: true, modal: menu.modal, submenu }, className)}
           {...menu}
-          aria-label={label}
+          aria-label={translate(label)}
           visible={panelAvailable}
           {...rest}
         >
