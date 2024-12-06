@@ -172,9 +172,8 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
           projectId: data.projectId,
           connectionId: data.connectionId,
         };
-        const metadata = this.metadata.get(key);
 
-        if (metadata?.connecting) {
+        if (this.isConnecting(key)) {
           return;
         }
 
@@ -194,9 +193,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
           connectionId: data.connectionId,
         };
 
-        const metadata = this.metadata.get(key);
-
-        if (metadata?.connecting) {
+        if (this.isConnecting(key)) {
           return;
         }
 
