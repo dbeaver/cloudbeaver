@@ -60,19 +60,11 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     });
 
     this.beforeLoad.addHandler(async (originalKey, context) => {
-      const key = ResourceKeyUtils.toList(this.aliases.transformToKey(originalKey));
-      const parents = [
-        ...new Set(
-          key.map(nodeId => this.navNodeInfoResource.get(nodeId)?.parentId).filter<string>((nodeId): nodeId is string => nodeId !== undefined),
-        ),
-      ];
       const parentKey = this.aliases.isAlias(originalKey, DBObjectParentKey);
       const pageKey =
         this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
       let limit = this.navTreeResource.childrenLimit;
       let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
-
-      await this.navTreeResource.waitLoad(resourceKeyList(parents));
 
       if (pageKey) {
         limit = pageKey.options.limit;
@@ -85,6 +77,13 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
         );
         return;
       }
+
+      const key = ResourceKeyUtils.toList(this.aliases.transformToKey(originalKey));
+      const parents = [
+        ...new Set(
+          key.map(nodeId => this.navNodeInfoResource.get(nodeId)?.parentId).filter<string>((nodeId): nodeId is string => nodeId !== undefined),
+        ),
+      ];
 
       await this.navTreeResource.load(resourceKeyList(parents));
 
