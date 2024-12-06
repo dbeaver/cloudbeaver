@@ -9,12 +9,9 @@ import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
 import { getCommonAndOSSpecificKeys, type IKeyBinding, KEY_BINDING_OPEN_IN_TAB, KEY_BINDING_REDO, KEY_BINDING_UNDO } from '@cloudbeaver/core-view';
 import {
   KEY_BINDING_ADD_NEW_ROW,
-  KEY_BINDING_COPY_VALUE,
   KEY_BINDING_DELETE_ROW,
   KEY_BINDING_DUPLICATE_ROW,
-  KEY_BINDING_PASTE_VALUE,
   KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES,
-  KEY_BINDING_START_INLINE_EDITING,
 } from '@cloudbeaver/plugin-data-viewer';
 import { KEY_BINDING_COLLAPSE_ALL, KEY_BINDING_ENABLE_FILTER, KEY_BINDING_LINK_OBJECT } from '@cloudbeaver/plugin-navigation-tree';
 import {
@@ -28,10 +25,6 @@ import {
 import type { IShortcut } from './IShortcut.js';
 
 export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
-  {
-    label: 'data_viewer_shortcut_start_inline_editing',
-    code: transformKeys(KEY_BINDING_START_INLINE_EDITING),
-  },
   {
     label: 'data_viewer_shortcut_revert_inline_editor_changes',
     code: transformKeys(KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES),
@@ -47,14 +40,6 @@ export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
   {
     label: 'data_viewer_shortcut_delete_row',
     code: transformKeys(KEY_BINDING_DELETE_ROW),
-  },
-  {
-    label: 'data_viewer_shortcut_past_value',
-    code: transformKeys(KEY_BINDING_PASTE_VALUE),
-  },
-  {
-    label: 'data_viewer_shortcut_copy_value',
-    code: transformKeys(KEY_BINDING_COPY_VALUE),
   },
 ];
 
