@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useLayoutEffect, useRef, useState } from 'react';
 import { MenuButton, type MenuInitialState, useMenuState } from 'reakit';
+import type { ExtractHTMLAttributes } from 'reakit-utils';
 
 import { ErrorBoundary } from '../ErrorBoundary.js';
 import { s } from '../s.js';
@@ -141,7 +142,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
               {...props}
               {...children.props}
             >
-              {disclosureProps => React.cloneElement(children, { ...disclosureProps, ...children.props })}
+              {(disclosureProps: ExtractHTMLAttributes<any>) => React.cloneElement(children, { ...disclosureProps, ...children.props })}
             </MenuButton>
             <MenuPanel
               ref={menuPanelRef}
