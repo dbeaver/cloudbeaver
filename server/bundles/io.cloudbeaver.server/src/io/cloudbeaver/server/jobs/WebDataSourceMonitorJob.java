@@ -58,13 +58,6 @@ public class WebDataSourceMonitorJob extends DataSourceMonitorJob {
     protected void showNotification(@NotNull DBPDataSource dataSource) {
         final DBPProject project = dataSource.getContainer().getProject();
         if (project.getWorkspaceSession() instanceof WebSession webSession) {
-            webSession.addSessionEvent(WSDataSourceEvent.update(
-                webSession.getSessionId(),
-                webSession.getUserId(),
-                project.getId(),
-                List.of(dataSource.getContainer().getId()),
-                WSDataSourceProperty.CONFIGURATION
-            ));
             webSession.addSessionEvent(
                 new WSDataSourceDisconnectEvent(
                     project.getId(),
