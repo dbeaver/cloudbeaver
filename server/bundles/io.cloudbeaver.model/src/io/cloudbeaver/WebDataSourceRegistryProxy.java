@@ -45,9 +45,9 @@ import java.util.stream.Collectors;
 
 public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSourcePersistentRegistry, DBPDataSourceRegistryCache {
     private final DataSourceFilter dataSourceFilter;
-    private final DataSourceRegistry dataSourceRegistry;
+    private final DataSourceRegistry<?> dataSourceRegistry;
 
-    public WebDataSourceRegistryProxy(DataSourceRegistry dataSourceRegistry, DataSourceFilter filter) {
+    public WebDataSourceRegistryProxy(DataSourceRegistry<?> dataSourceRegistry, DataSourceFilter filter) {
         this.dataSourceRegistry = dataSourceRegistry;
         this.dataSourceFilter = filter;
     }
