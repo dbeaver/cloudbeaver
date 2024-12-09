@@ -27,7 +27,6 @@ import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.model.session.monitor.TaskProgressMonitor;
-import io.cloudbeaver.model.session.monitor.TaskWithEventsProgressMonitor;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -66,6 +65,7 @@ import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
+import org.jkiss.dbeaver.model.websocket.event.session.WSSessionTaskInfoEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -508,7 +508,7 @@ public class WebSession extends BaseWebSession
     ///////////////////////////////////////////////////////
     // Async model
 
-    public WebAsyncTaskInfo getAsyncTask(String taskId, String taskName, boolean create) {
+    public WebAsyncTaskInfo getAsyncTask(@NotNull String taskId, @NotNull String taskName, boolean create) {
         synchronized (asyncTasks) {
             WebAsyncTaskInfo taskInfo = asyncTasks.get(taskId);
             if (taskInfo == null && create) {
@@ -525,7 +525,6 @@ public class WebSession extends BaseWebSession
             if (taskInfo == null) {
                 throw new DBWebException("Task '" + taskId + "' not found");
             }
-            taskInfo.setRunning(taskInfo.getJob() != null && !taskInfo.getJob().isFinished());
             if (removeOnFinish && !taskInfo.isRunning()) {
                 asyncTasks.remove(taskId);
             }
@@ -548,11 +547,7 @@ public class WebSession extends BaseWebSession
         return true;
     }
 
-    public WebAsyncTaskInfo createAndRunAsyncTask(String taskName, WebAsyncTaskProcessor<?> runnable) {
-        return createAndRunAsyncTask(taskName, runnable, false);
-    }
-
-    public WebAsyncTaskInfo createAndRunAsyncTask(String taskName, WebAsyncTaskProcessor<?> runnable, boolean sendEvent) {
+    public WebAsyncTaskInfo createAndRunAsyncTask(@NotNull String taskName, @NotNull WebAsyncTaskProcessor<?> runnable) {
         int taskId = TASK_ID.incrementAndGet();
         WebAsyncTaskInfo asyncTask = getAsyncTask(String.valueOf(taskId), taskName, true);
 
@@ -561,9 +556,7 @@ public class WebSession extends BaseWebSession
             protected IStatus run(DBRProgressMonitor monitor) {
                 int curTaskCount = taskCount.incrementAndGet();
 
-                DBRProgressMonitor taskMonitor = sendEvent ?
-                    new TaskWithEventsProgressMonitor(monitor, WebSession.this, asyncTask) :
-                    new TaskProgressMonitor(monitor, asyncTask);
+                DBRProgressMonitor taskMonitor = new TaskProgressMonitor(monitor, WebSession.this, asyncTask);
 
                 try {
                     Number queryLimit = application.getAppConfiguration().getResourceQuota(WebSQLConstants.QUOTA_PROP_QUERY_LIMIT);
@@ -576,7 +569,6 @@ public class WebSession extends BaseWebSession
                     asyncTask.setResult(runnable.getResult());
                     asyncTask.setExtendedResult(runnable.getExtendedResults());
                     asyncTask.setStatus("Finished");
-                    asyncTask.setRunning(false);
                 } catch (InvocationTargetException e) {
                     addSessionError(e.getTargetException());
                     asyncTask.setJobError(e.getTargetException());
@@ -584,6 +576,8 @@ public class WebSession extends BaseWebSession
                     asyncTask.setJobError(e);
                 } finally {
                     taskCount.decrementAndGet();
+                    asyncTask.setRunning(false);
+                    addSessionEvent(WSSessionTaskInfoEvent.finish(asyncTask.getId()));
                 }
                 return Status.OK_STATUS;
             }
