@@ -89,4 +89,3 @@ export * from './ValuePanelPresentation/BooleanValue/isBooleanValuePresentationA
 export * from './useDataViewerCopyHandler.js';
 export * from './DataViewerSettingsService.js';
 export * from './DATA_EDITOR_SETTINGS_GROUP.js';
-export * from './DATA_VIEWER_BINDINGS.js';

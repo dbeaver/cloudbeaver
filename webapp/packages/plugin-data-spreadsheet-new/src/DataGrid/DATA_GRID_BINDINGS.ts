@@ -7,28 +7,23 @@
  */
 import type { IKeyBinding } from '@cloudbeaver/core-view';
 
+/* these consts are only used for the user interface in Shortcuts popup, actual bindings in DataGridTable.tsx */
 export const KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES: IKeyBinding = {
   id: 'data-viewer-revert-inline-editor-changes',
   keys: ['Escape'],
-  preventDefault: true,
 };
 
 export const KEY_BINDING_ADD_NEW_ROW: IKeyBinding = {
   id: 'data-viewer-add-new-row',
-  keysWin: ['Alt+Insert'],
-  keysMac: ['Ctrl+I'],
-  preventDefault: true,
+  keys: ['Alt+R'],
 };
 
 export const KEY_BINDING_DUPLICATE_ROW: IKeyBinding = {
   id: 'data-viewer-duplicate-row',
-  keysWin: ['Ctrl+Alt+Insert'],
-  keysMac: ['Ctrl+D'],
-  preventDefault: true,
+  keys: ['Alt+Shift+R'],
 };
 
 export const KEY_BINDING_DELETE_ROW: IKeyBinding = {
   id: 'data-viewer-delete-row',
   keys: ['Delete'],
-  preventDefault: true,
 };

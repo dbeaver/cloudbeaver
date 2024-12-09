@@ -12,7 +12,7 @@ import {
   KEY_BINDING_DELETE_ROW,
   KEY_BINDING_DUPLICATE_ROW,
   KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES,
-} from '@cloudbeaver/plugin-data-viewer';
+} from '@cloudbeaver/plugin-data-spreadsheet-new';
 import { KEY_BINDING_COLLAPSE_ALL, KEY_BINDING_ENABLE_FILTER, KEY_BINDING_LINK_OBJECT } from '@cloudbeaver/plugin-navigation-tree';
 import {
   KEY_BINDING_SQL_EDITOR_EXECUTE,
