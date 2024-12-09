@@ -94,6 +94,10 @@ export class SpreadsheetBootstrap extends Bootstrap {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
+        if (!isResultSetDataSource(model.source)) {
+          return false;
+        }
+
         if (action === ACTION_OPEN) {
           const actions = context.get(DATA_CONTEXT_DV_ACTIONS);
           const simple = context.get(DATA_CONTEXT_DV_SIMPLE);
