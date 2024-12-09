@@ -156,6 +156,19 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       });
 
       if (!silent) {
+        this.markTreeOutdated(navNodeId);
+      }
+      await this.onNodeRefresh.execute(navNodeId);
+    });
+  }
+
+  async refreshNode(navNodeId: string, silent = false): Promise<void> {
+    this.performUpdate(navNodeId, [], async () => {
+      await this.graphQLService.sdk.navRefreshNode({
+        nodePath: navNodeId,
+      });
+
+      if (!silent) {
         this.markOutdated(navNodeId);
       }
       await this.onNodeRefresh.execute(navNodeId);
@@ -257,7 +270,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       include,
     });
 
-    this.refreshTree(nodePath);
+    this.refreshNode(nodePath);
   }
 
   async changeName(node: NavNode, name: string): Promise<string> {
