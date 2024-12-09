@@ -20,7 +20,7 @@ export const KEY_BINDING_ADD_NEW_ROW: IKeyBinding = {
 
 export const KEY_BINDING_DUPLICATE_ROW: IKeyBinding = {
   id: 'data-viewer-duplicate-row',
-  keys: ['Alt+Shift+R'],
+  keys: ['Shift+Alt+R'],
 };
 
 export const KEY_BINDING_DELETE_ROW: IKeyBinding = {
