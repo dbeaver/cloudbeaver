@@ -10,7 +10,7 @@ import { makeObservable, observable } from 'mobx';
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
-import type { AsyncTaskInfoService } from '@cloudbeaver/core-root';
+import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import {
   GraphQLService,
   ResultDataFormat,

@@ -8,7 +8,7 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import type { ITask, TaskScheduler } from '@cloudbeaver/core-executor';
-import type { AsyncTaskInfoService } from '@cloudbeaver/core-root';
+import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 import type { AsyncTaskInfo, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { ConnectionExecutionContextResource, IConnectionExecutionContextInfo } from './ConnectionExecutionContextResource.js';
