@@ -41,6 +41,9 @@
     },
     {
       "path": "../plugin-connections/tsconfig.json"
+    },
+    {
+      "path": "../plugin-navigation-tree/tsconfig.json"
     }
   ],
   "include": [

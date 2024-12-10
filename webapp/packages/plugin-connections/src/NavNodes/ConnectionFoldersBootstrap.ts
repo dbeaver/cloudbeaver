@@ -46,9 +46,15 @@ import { getProjectNodeId, NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@c
 import { CachedMapAllKey, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_ELEMENTS_TREE, type IElementsTree, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
+import {
+  DATA_CONTEXT_ELEMENTS_TREE,
+  type IElementsTree,
+  MENU_ELEMENTS_TREE_TOOLS,
+  MENU_NAVIGATION_TREE_CREATE,
+} from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 
+import { ACTION_CREATE_FOLDER } from '../Actions/ACTION_CREATE_FOLDER.js';
 import { NAV_NODE_TYPE_CONNECTION } from './NAV_NODE_TYPE_CONNECTION.js';
 
 interface ITargetNode {
@@ -134,21 +140,6 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
         return targetNode !== undefined;
       },
-      // isDisabled: (context, action) => {
-      //   const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
-
-      //   if (!tree) {
-      //     return true;
-      //   }
-
-      //   if (action === ACTION_NEW_FOLDER) {
-      //     const targetNode = this.getTargetNode(tree);
-
-      //     return targetNode === undefined;
-      //   }
-
-      //   return false;
-      // },
       handler: this.elementsTreeActionHandler.bind(this),
     });
 
@@ -161,6 +152,19 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
         return items;
       },
+    });
+
+    this.menuService.addCreator({
+      menus: [MENU_NAVIGATION_TREE_CREATE],
+      getItems: (context, items) => [...items, ACTION_CREATE_FOLDER],
+    });
+
+    this.actionService.addHandler({
+      id: 'nav-tree-create-create-folder-handler',
+      menus: [MENU_NAVIGATION_TREE_CREATE],
+      actions: [ACTION_CREATE_FOLDER],
+      contexts: [DATA_CONTEXT_ELEMENTS_TREE],
+      handler: this.elementsTreeActionHandler.bind(this),
     });
   }
 
@@ -246,6 +250,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     }
 
     switch (action) {
+      case ACTION_CREATE_FOLDER:
       case ACTION_NEW_FOLDER: {
         const targetNode = this.getTargetNode(tree);
 

@@ -38,6 +38,7 @@ import {
 } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS.js';
+import { MENU_NAVIGATION_TREE_CREATE } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_CREATE.js';
 
 export interface INodeMenuData {
   node: NavNode;
@@ -184,7 +185,7 @@ export class NavNodeContextMenuService extends Bootstrap {
       root: true,
       contexts: [DATA_CONTEXT_NAV_NODE],
       getItems: (context, items) => {
-        items = [ACTION_OPEN, ACTION_REFRESH, ...items];
+        items = [MENU_NAVIGATION_TREE_CREATE, ACTION_OPEN, ACTION_REFRESH, ...items];
 
         if (this.navTreeSettingsService.editing) {
           items.push(ACTION_RENAME);

@@ -30,6 +30,7 @@
     "@cloudbeaver/core-utils": "^0",
     "@cloudbeaver/core-view": "^0",
     "@cloudbeaver/plugin-connections": "^0",
+    "@cloudbeaver/plugin-navigation-tree": "^0",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^18"

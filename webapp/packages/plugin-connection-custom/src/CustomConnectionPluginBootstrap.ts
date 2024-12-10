@@ -12,7 +12,8 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
-import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
+import { ACTION_CREATE_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
+import { MENU_NAVIGATION_TREE_CREATE } from '@cloudbeaver/plugin-navigation-tree';
 
 import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM.js';
 import { CustomConnectionSettingsService } from './CustomConnectionSettingsService.js';
@@ -36,6 +37,22 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [MENU_CONNECTIONS],
       getItems: (context, items) => [...items, ACTION_CONNECTION_CUSTOM],
+    });
+
+    this.menuService.addCreator({
+      menus: [MENU_NAVIGATION_TREE_CREATE],
+      getItems: (context, items) => [...items, ACTION_CREATE_CONNECTION],
+    });
+
+    this.actionService.addHandler({
+      id: 'nav-tree-create-create-connection-handler',
+      menus: [MENU_NAVIGATION_TREE_CREATE],
+      actions: [ACTION_CREATE_CONNECTION],
+      handler: async (context, action) => {
+        if (action === ACTION_CREATE_CONNECTION) {
+          await this.openConnectionsDialog();
+        }
+      },
     });
 
     this.actionService.addHandler({
