@@ -315,7 +315,7 @@ public class CBDatabase extends InternalDB {
         public int getCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName) {
             // Check and update schema
             try {
-                return getVersionFromSchema(connection, "CB_SCHEMA_INFO", null);
+                return getVersionFromSchema(connection, "CB_SCHEMA_INFO", schemaName);
             } catch (SQLException e) {
                 try {
                     Object legacyVersion = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
