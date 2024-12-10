@@ -6,10 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
+import { type AsyncTaskInfo, GraphQLService } from '@cloudbeaver/core-sdk';
 import { cancellableTimeout } from '@cloudbeaver/core-utils';
 
-import { GraphQLService } from '../GraphQLService.js';
-import type { AsyncTaskInfo } from '../sdk.js';
 import { AsyncTask } from './AsyncTask.js';
 
 const DELAY_BETWEEN_TRIES = 250;

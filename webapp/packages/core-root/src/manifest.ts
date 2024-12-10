@@ -13,6 +13,7 @@ export const coreRootManifest: PluginManifest = {
   },
 
   providers: [
+    () => import('./AsyncTask/AsyncTaskInfoService.js').then(m => m.AsyncTaskInfoService),
     () => import('./FeaturesResource.js').then(m => m.FeaturesResource),
     () => import('./NetworkStateService.js').then(m => m.NetworkStateService),
     () => import('./SessionPermissionsResource.js').then(m => m.SessionPermissionsResource),
