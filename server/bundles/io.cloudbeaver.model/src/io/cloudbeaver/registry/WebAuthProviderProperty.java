@@ -22,36 +22,23 @@ import org.eclipse.core.runtime.spi.RegistryContributor;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPNamedObjectLocalized;
+import org.jkiss.dbeaver.model.DBPNamedObjectLocalizedBase;
 import org.jkiss.dbeaver.model.DBPObjectWithDescriptionLocalized;
 import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
-public class WebAuthProviderProperty extends PropertyDescriptor implements DBPNamedObjectLocalized, DBPObjectWithDescriptionLocalized {
+public class WebAuthProviderProperty extends DBPNamedObjectLocalizedBase {
     private final String[] requiredFeatures;
     @Nullable
     private final String type;
 
-    private final Bundle bundle;
-
     public WebAuthProviderProperty(String category, IConfigurationElement config) {
         super(category, config);
-        bundle = getBundle(config);
         String featuresAttr = config.getAttribute("requiredFeatures");
         this.requiredFeatures = featuresAttr == null ? new String[0] : featuresAttr.split(",");
         this.type = config.getAttribute("type");
-    }
-
-    @NotNull
-    private Bundle getBundle(@NotNull IConfigurationElement config) {
-        final Bundle bundle;
-        String bundleName = config.getContributor().getName();
-        bundle = Platform.getBundle(bundleName);
-        if (bundle == null) {
-            throw new IllegalStateException("Bundle '" + bundleName + "' not found");
-        }
-        return bundle;
     }
 
     @NotNull
@@ -62,24 +49,5 @@ public class WebAuthProviderProperty extends PropertyDescriptor implements DBPNa
     @Nullable
     public String getType() {
         return type;
-    }
-
-    @Override
-    public String getLocalizedName(String locale) {
-        try {
-            return RuntimeUtils.getBundleLocalization(bundle, locale).getString(this.getId());
-        } catch (Exception e) {
-            return this.getName();
-        }
-    }
-
-    @Nullable
-    @Override
-    public String getLocalizedDescription(String locale) {
-        try {
-            return RuntimeUtils.getBundleLocalization(bundle, locale).getString(this.getId() + ".description");
-        } catch (Exception e) {
-            return this.getDescription();
-        }
     }
 }
