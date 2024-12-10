@@ -181,6 +181,16 @@ export class NavNodeContextMenuService extends Bootstrap {
       },
     });
 
+    this.menuService.setHandler({
+      id: 'menu-navigation-tree-create',
+      menus: [MENU_NAVIGATION_TREE_CREATE],
+      isHidden: context => {
+        const items = this.menuService.getMenuItemCreators(context);
+
+        return items.length === 0;
+      },
+    });
+
     this.menuService.addCreator({
       root: true,
       contexts: [DATA_CONTEXT_NAV_NODE],
