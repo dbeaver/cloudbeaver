@@ -41,6 +41,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_NAVIGATION_TREE_CREATE],
+      isApplicable: context => !this.isHidden(true),
       getItems: (context, items) => [...items, ACTION_CREATE_CONNECTION],
     });
 
@@ -58,17 +59,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'connection-custom',
       actions: [ACTION_CONNECTION_CUSTOM],
-      isHidden: (context, action) => {
-        if (this.connectionsManagerService.createConnectionProjects.length === 0) {
-          return true;
-        }
-
-        if (action === ACTION_CONNECTION_CUSTOM) {
-          return this.customConnectionSettingsService.disabled;
-        }
-
-        return false;
-      },
+      isHidden: (context, action) => this.isHidden(action === ACTION_CONNECTION_CUSTOM),
       getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       handler: async (context, action) => {
         switch (action) {
@@ -79,6 +70,18 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
         }
       },
     });
+  }
+
+  private isHidden(hasSettings: boolean) {
+    if (this.connectionsManagerService.createConnectionProjects.length === 0) {
+      return true;
+    }
+
+    if (hasSettings) {
+      return this.customConnectionSettingsService.disabled;
+    }
+
+    return false;
   }
 
   private async openConnectionsDialog() {
