@@ -55,7 +55,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
         if (
           ACTION_CREATE_CONNECTION !== action ||
           ![NAV_NODE_TYPE_CONNECTION, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_PROJECT].includes(node?.nodeType ?? '') ||
-          this.hasAddConnectionFeature(true)
+          this.isConnectionFeatureDisabled(true)
         ) {
           return false;
         }
@@ -72,7 +72,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'connection-custom',
       actions: [ACTION_CONNECTION_CUSTOM],
-      isHidden: (context, action) => this.hasAddConnectionFeature(action === ACTION_CONNECTION_CUSTOM),
+      isHidden: (context, action) => this.isConnectionFeatureDisabled(action === ACTION_CONNECTION_CUSTOM),
       getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       handler: async (context, action) => {
         switch (action) {
@@ -85,7 +85,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     });
   }
 
-  private hasAddConnectionFeature(hasSettings: boolean) {
+  private isConnectionFeatureDisabled(hasSettings: boolean) {
     if (this.connectionsManagerService.createConnectionProjects.length === 0) {
       return true;
     }
