@@ -113,6 +113,26 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
         return dataSourceRegistry.createDataSource(driver, connConfig);
     }
 
+    @Override
+    public DBPDataSourceContainer createDataSource(
+        @NotNull String id,
+        @NotNull DBPDriver driver,
+        @NotNull DBPConnectionConfiguration connConfig
+    ) {
+        return dataSourceRegistry.createDataSource(id, driver, connConfig);
+    }
+
+    @Override
+    public DBPDataSourceContainer createDataSource(
+        @NotNull DBPDataSourceConfigurationStorage dataSourceStorage,
+        @NotNull DBPDataSourceOrigin origin,
+        @NotNull String id,
+        @NotNull DBPDriver driver,
+        @NotNull DBPConnectionConfiguration configuration
+    ) {
+        return dataSourceRegistry.createDataSource(dataSourceStorage, origin, id, driver, configuration);
+    }
+
     @NotNull
     @Override
     public DBPDataSourceContainer createDataSource(@NotNull DBPDataSourceContainer source) {
