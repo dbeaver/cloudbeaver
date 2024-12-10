@@ -19,9 +19,9 @@ package io.cloudbeaver.registry;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.impl.BasePropertyDescriptor;
+import org.jkiss.dbeaver.model.impl.LocalizedPropertyDescriptor;
 
-public class WebAuthProviderProperty extends BasePropertyDescriptor {
+public class WebAuthProviderProperty extends LocalizedPropertyDescriptor {
     private final String[] requiredFeatures;
     @Nullable
     private final String type;
