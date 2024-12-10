@@ -79,9 +79,13 @@ export class DataGridContextMenuFilterService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
         const source = model.source as unknown as ResultSetDataSource;
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
 
-        return isResultSetDataSource(model.source) && constraints.supported && !model.isDisabled(resultIndex);
+        if (!isResultSetDataSource(source)) {
+          return false;
+        }
+
+        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+        return constraints.supported && !model.isDisabled(resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_FILTERS],
     });
@@ -137,16 +141,25 @@ export class DataGridContextMenuFilterService {
       id: 'data-grid-filters-base-handler',
       menus: [MENU_DATA_GRID_FILTERS],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
+      isActionApplicable: (context, action) => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+
+        if (!isResultSetDataSource(model.source)) {
+          return false;
+        }
+
+        return [ACTION_DELETE, ACTION_DATA_GRID_FILTERS_RESET_ALL].includes(action);
+      },
       isHidden: (context, action) => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
         const source = model.source as unknown as ResultSetDataSource;
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
         const data = source.getAction(resultIndex, ResultSetDataAction);
 
         if (action === ACTION_DELETE) {
+          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
           const resultColumn = data.getColumn(key.column);
           const currentConstraint = resultColumn ? constraints.get(resultColumn.position) : undefined;
 
@@ -154,6 +167,7 @@ export class DataGridContextMenuFilterService {
         }
 
         if (action === ACTION_DATA_GRID_FILTERS_RESET_ALL) {
+          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
           return constraints.filterConstraints.length === 0 && !model.requestInfo.requestFilter;
         }
 
@@ -185,10 +199,10 @@ export class DataGridContextMenuFilterService {
         const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
 
         const source = model.source as unknown as ResultSetDataSource;
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
         const data = source.getAction(resultIndex, ResultSetDataAction);
 
         if (action === ACTION_DELETE) {
+          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
           const resultColumn = data.getColumn(key.column);
 
           if (!resultColumn) {
@@ -201,6 +215,8 @@ export class DataGridContextMenuFilterService {
         }
 
         if (action === ACTION_DATA_GRID_FILTERS_RESET_ALL) {
+          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+
           await model.request(() => {
             constraints.deleteDataFilters();
           });

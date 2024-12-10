@@ -60,9 +60,13 @@ export class DataGridContextMenuOrderService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
         const source = model.source as unknown as ResultSetDataSource;
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
 
-        return isResultSetDataSource(model.source) && constraints.supported && !model.isDisabled(resultIndex);
+        if (!isResultSetDataSource(source)) {
+          return false;
+        }
+
+        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+        return constraints.supported && !model.isDisabled(resultIndex);
       },
       getItems: (context, items) => [...items, MENU_DATA_GRID_ORDERING],
     });

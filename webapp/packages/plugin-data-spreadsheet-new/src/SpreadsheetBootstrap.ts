@@ -68,10 +68,6 @@ export class SpreadsheetBootstrap extends Bootstrap {
       root: true,
       menus: [MENU_DV_CONTEXT_MENU],
       contexts: [DATA_CONTEXT_DV_SIMPLE, DATA_CONTEXT_DV_ACTIONS, DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
-      isApplicable: context => {
-        const model = context.get(DATA_CONTEXT_DV_DDM)!;
-        return isResultSetDataSource(model.source);
-      },
       getItems: (context, items) => [ACTION_OPEN, ...items, ACTION_DELETE],
     });
 
@@ -94,10 +90,6 @@ export class SpreadsheetBootstrap extends Bootstrap {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
-        if (!isResultSetDataSource(model.source)) {
-          return false;
-        }
-
         if (action === ACTION_OPEN) {
           const actions = context.get(DATA_CONTEXT_DV_ACTIONS);
           const simple = context.get(DATA_CONTEXT_DV_SIMPLE);
@@ -107,6 +99,11 @@ export class SpreadsheetBootstrap extends Bootstrap {
 
         if (action === ACTION_DELETE) {
           const source = model.source as unknown as ResultSetDataSource;
+
+          if (!isResultSetDataSource(model.source)) {
+            return false;
+          }
+
           const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
           return constraints.orderConstraints.length > 0 || constraints.filterConstraints.length > 0;
         }
