@@ -29,6 +29,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import {
+  DATA_CONTEXT_NAV_NODE,
   ENodeMoveType,
   getNodesFromContext,
   type INodeMoveData,
@@ -129,7 +130,17 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'tree-tools-menu-folders-handler',
       contexts: [DATA_CONTEXT_ELEMENTS_TREE],
-      isActionApplicable: this.isActionApplicable.bind(this),
+      isActionApplicable: (context, action) => {
+        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
+
+        if (action !== ACTION_NEW_FOLDER || !this.userInfoResource.isAuthenticated() || tree.baseRoot !== ROOT_NODE_PATH) {
+          return false;
+        }
+
+        const targetNode = this.getTargetNode(tree);
+
+        return targetNode !== undefined;
+      },
       handler: this.elementsTreeActionHandler.bind(this),
     });
 
@@ -150,25 +161,32 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     });
 
     this.actionService.addHandler({
-      id: 'nav-tree-create-create-folder-handler',
+      id: 'nav-tree-create-create-folders-handler',
       menus: [MENU_NAVIGATION_TREE_CREATE],
       actions: [ACTION_CREATE_FOLDER],
-      contexts: [DATA_CONTEXT_ELEMENTS_TREE],
-      isActionApplicable: this.isActionApplicable.bind(this),
-      handler: this.elementsTreeActionHandler.bind(this),
+      isActionApplicable: (context, action) => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
+        const targetNode = this.getTargetNode(tree);
+
+        if (
+          ACTION_CREATE_FOLDER !== action ||
+          ![NAV_NODE_TYPE_CONNECTION, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_PROJECT].includes(node?.nodeType ?? '') ||
+          !this.userInfoResource.isAuthenticated() ||
+          tree.baseRoot !== ROOT_NODE_PATH ||
+          targetNode === undefined
+        ) {
+          return false;
+        }
+
+        return true;
+      },
+      handler: async (context, action) => {
+        if (action === ACTION_CREATE_FOLDER) {
+          await this.elementsTreeActionHandler(context, action);
+        }
+      },
     });
-  }
-
-  private isActionApplicable(context: IDataContextProvider, action: IAction): boolean {
-    const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
-
-    if (![ACTION_NEW_FOLDER, ACTION_CREATE_FOLDER].includes(action) || !this.userInfoResource.isAuthenticated() || tree.baseRoot !== ROOT_NODE_PATH) {
-      return false;
-    }
-
-    const targetNode = this.getTargetNode(tree);
-
-    return targetNode !== undefined;
   }
 
   private async moveConnectionToFolder({ type, targetNode, moveContexts }: INodeMoveData, contexts: IExecutionContextProvider<INodeMoveData>) {

@@ -24,6 +24,7 @@
     "@cloudbeaver/core-dialogs": "^0",
     "@cloudbeaver/core-events": "^0",
     "@cloudbeaver/core-localization": "^0",
+    "@cloudbeaver/core-navigation-tree": "^0",
     "@cloudbeaver/core-projects": "^0",
     "@cloudbeaver/core-resource": "^0",
     "@cloudbeaver/core-settings": "^0",

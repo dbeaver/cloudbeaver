@@ -6,10 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
+import { ConnectionsManagerService, NAV_NODE_TYPE_CONNECTION } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { DATA_CONTEXT_NAV_NODE, NAV_NODE_TYPE_FOLDER } from '@cloudbeaver/core-navigation-tree';
+import { NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import { ACTION_CREATE_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
@@ -41,7 +42,6 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_NAVIGATION_TREE_CREATE],
-      isApplicable: context => !this.isHidden(true),
       getItems: (context, items) => [...items, ACTION_CREATE_CONNECTION],
     });
 
@@ -49,6 +49,19 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
       id: 'nav-tree-create-create-connection-handler',
       menus: [MENU_NAVIGATION_TREE_CREATE],
       actions: [ACTION_CREATE_CONNECTION],
+      isActionApplicable: (context, action) => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE);
+
+        if (
+          ACTION_CREATE_CONNECTION !== action ||
+          ![NAV_NODE_TYPE_CONNECTION, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_PROJECT].includes(node?.nodeType ?? '') ||
+          this.hasAddConnectionFeature(true)
+        ) {
+          return false;
+        }
+
+        return true;
+      },
       handler: async (context, action) => {
         if (action === ACTION_CREATE_CONNECTION) {
           await this.openConnectionsDialog();
@@ -59,7 +72,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'connection-custom',
       actions: [ACTION_CONNECTION_CUSTOM],
-      isHidden: (context, action) => this.isHidden(action === ACTION_CONNECTION_CUSTOM),
+      isHidden: (context, action) => this.hasAddConnectionFeature(action === ACTION_CONNECTION_CUSTOM),
       getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       handler: async (context, action) => {
         switch (action) {
@@ -72,7 +85,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     });
   }
 
-  private isHidden(hasSettings: boolean) {
+  private hasAddConnectionFeature(hasSettings: boolean) {
     if (this.connectionsManagerService.createConnectionProjects.length === 0) {
       return true;
     }
