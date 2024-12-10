@@ -7,4 +7,4 @@
  */
 import { createMenu } from '@cloudbeaver/core-view';
 
-export const MENU_NAVIGATION_TREE_CREATE = createMenu('navigation-tree-create-menu', 'Create');
+export const MENU_NAVIGATION_TREE_CREATE = createMenu('navigation-tree-create-menu', 'ui_create');
