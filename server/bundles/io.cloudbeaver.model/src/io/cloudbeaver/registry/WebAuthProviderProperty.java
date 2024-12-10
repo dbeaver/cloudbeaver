@@ -17,19 +17,11 @@
 package io.cloudbeaver.registry;
 
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.spi.RegistryContributor;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.DBPNamedObjectLocalized;
-import org.jkiss.dbeaver.model.DBPNamedObjectLocalizedBase;
-import org.jkiss.dbeaver.model.DBPObjectWithDescriptionLocalized;
-import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
-import org.jkiss.dbeaver.utils.RuntimeUtils;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import org.jkiss.dbeaver.model.impl.BasePropertyDescriptor;
 
-public class WebAuthProviderProperty extends DBPNamedObjectLocalizedBase {
+public class WebAuthProviderProperty extends BasePropertyDescriptor {
     private final String[] requiredFeatures;
     @Nullable
     private final String type;
