@@ -129,17 +129,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'tree-tools-menu-folders-handler',
       contexts: [DATA_CONTEXT_ELEMENTS_TREE],
-      isActionApplicable: (context, action) => {
-        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
-
-        if (action !== ACTION_NEW_FOLDER || !this.userInfoResource.isAuthenticated() || tree.baseRoot !== ROOT_NODE_PATH) {
-          return false;
-        }
-
-        const targetNode = this.getTargetNode(tree);
-
-        return targetNode !== undefined;
-      },
+      isActionApplicable: this.isActionApplicable.bind(this),
       handler: this.elementsTreeActionHandler.bind(this),
     });
 
@@ -164,8 +154,21 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       menus: [MENU_NAVIGATION_TREE_CREATE],
       actions: [ACTION_CREATE_FOLDER],
       contexts: [DATA_CONTEXT_ELEMENTS_TREE],
+      isActionApplicable: this.isActionApplicable.bind(this),
       handler: this.elementsTreeActionHandler.bind(this),
     });
+  }
+
+  private isActionApplicable(context: IDataContextProvider, action: IAction): boolean {
+    const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
+
+    if (![ACTION_NEW_FOLDER, ACTION_CREATE_FOLDER].includes(action) || !this.userInfoResource.isAuthenticated() || tree.baseRoot !== ROOT_NODE_PATH) {
+      return false;
+    }
+
+    const targetNode = this.getTargetNode(tree);
+
+    return targetNode !== undefined;
   }
 
   private async moveConnectionToFolder({ type, targetNode, moveContexts }: INodeMoveData, contexts: IExecutionContextProvider<INodeMoveData>) {
