@@ -76,6 +76,7 @@ export const CellMenu = observer<Props>(function CellMenu({ model, actions, spre
         menu={menu}
         placement="auto-end"
         panelProps={{ onMouseUp: markStopPropagation, onDoubleClick: stopPropagation }}
+        tabIndex={-1}
         modal
         disclosure
         onVisibleSwitch={onStateSwitch}
