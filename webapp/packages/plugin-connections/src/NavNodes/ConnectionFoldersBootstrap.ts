@@ -181,11 +181,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
         return true;
       },
-      handler: async (context, action) => {
-        if (action === ACTION_CREATE_FOLDER) {
-          await this.elementsTreeActionHandler(context, action);
-        }
-      },
+      handler: this.elementsTreeActionHandler.bind(this),
     });
   }
 
