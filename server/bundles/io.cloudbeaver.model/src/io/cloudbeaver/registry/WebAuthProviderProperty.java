@@ -17,6 +17,7 @@
 package io.cloudbeaver.registry;
 
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.spi.RegistryContributor;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -36,11 +37,21 @@ public class WebAuthProviderProperty extends PropertyDescriptor implements DBPNa
 
     public WebAuthProviderProperty(String category, IConfigurationElement config) {
         super(category, config);
-        bundle = FrameworkUtil.getBundle(getClass()).getBundleContext()
-            .getBundle(Long.parseLong(((RegistryContributor)config.getContributor()).getActualId()));
+        bundle = getBundle(config);
         String featuresAttr = config.getAttribute("requiredFeatures");
         this.requiredFeatures = featuresAttr == null ? new String[0] : featuresAttr.split(",");
         this.type = config.getAttribute("type");
+    }
+
+    @NotNull
+    private Bundle getBundle(@NotNull IConfigurationElement config) {
+        final Bundle bundle;
+        String bundleName = config.getContributor().getName();
+        bundle = Platform.getBundle(bundleName);
+        if (bundle == null) {
+            throw new IllegalStateException("Bundle '" + bundleName + "' not found");
+        }
+        return bundle;
     }
 
     @NotNull
