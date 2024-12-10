@@ -495,7 +495,7 @@ public class WebServiceCore implements DBWServiceCore {
         DBPDataSourceContainer dataSource = connectionInfo.getDataSourceContainer();
         webSession.addInfoMessage("Update connection - " + WebServiceUtils.getConnectionContainerInfo(dataSource));
         DataSourceDescriptor oldDataSource;
-        oldDataSource = (DataSourceDescriptor) dataSource.getRegistry().createDataSource(dataSource);
+        oldDataSource = dataSource.getRegistry().createDataSource(dataSource);
         oldDataSource.setId(dataSource.getId());
         if (!CommonUtils.isEmpty(config.getName())) {
             dataSource.setName(config.getName());
