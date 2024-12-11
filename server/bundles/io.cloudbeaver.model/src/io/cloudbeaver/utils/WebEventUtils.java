@@ -16,7 +16,9 @@
  */
 package io.cloudbeaver.utils;
 
+import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebSession;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
@@ -25,6 +27,7 @@ import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEvent;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
+import org.jkiss.dbeaver.model.websocket.event.session.WSSessionTaskInfoEvent;
 
 import java.util.List;
 
@@ -180,6 +183,17 @@ public class WebEventUtils {
             return;
         }
         ServletAppUtils.getServletApplication().getEventController().addEvent(event);
+    }
+
+    @NotNull
+    public static WSSessionTaskInfoEvent createAsyncTaskEvent(@NotNull WebAsyncTaskInfo taskInfo) {
+        return new WSSessionTaskInfoEvent(
+            taskInfo.getId(),
+            taskInfo.getStatus(),
+            taskInfo.getTaskResult(),
+            taskInfo.getExtendedResult(),
+            taskInfo.isRunning()
+        );
     }
 
 }

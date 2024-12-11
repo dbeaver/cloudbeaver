@@ -32,6 +32,7 @@ import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebDataSourceUtils;
+import io.cloudbeaver.utils.WebEventUtils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -65,7 +66,6 @@ import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
-import org.jkiss.dbeaver.model.websocket.event.session.WSSessionTaskInfoEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -577,7 +577,7 @@ public class WebSession extends BaseWebSession
                 } finally {
                     taskCount.decrementAndGet();
                     asyncTask.setRunning(false);
-                    addSessionEvent(WSSessionTaskInfoEvent.finish(asyncTask.getId()));
+                    addSessionEvent(WebEventUtils.createAsyncTaskEvent(asyncTask));
                 }
                 return Status.OK_STATUS;
             }

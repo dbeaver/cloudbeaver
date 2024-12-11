@@ -18,10 +18,10 @@ package io.cloudbeaver.model.session.monitor;
 
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
-import org.jkiss.dbeaver.model.websocket.event.session.WSSessionTaskInfoEvent;
 
 /**
  * Task progress monitor.
@@ -43,13 +43,13 @@ public class TaskProgressMonitor extends ProxyProgressMonitor {
     public void beginTask(String name, int totalWork) {
         super.beginTask(name, totalWork);
         asyncTask.setStatus(name);
-        webSession.addSessionEvent(WSSessionTaskInfoEvent.update(asyncTask.getId(), name));
+        webSession.addSessionEvent(WebEventUtils.createAsyncTaskEvent(asyncTask));
     }
 
     @Override
     public void subTask(String name) {
         super.subTask(name);
         asyncTask.setStatus(name);
-        webSession.addSessionEvent(WSSessionTaskInfoEvent.update(asyncTask.getId(), name));
+        webSession.addSessionEvent(WebEventUtils.createAsyncTaskEvent(asyncTask));
     }
 }
