@@ -31,9 +31,19 @@ export class AsyncTaskInfoService extends Disposable {
 
     this.onEventUnsubscribe = asyncTaskInfoEventHandler.onEvent<WsAsyncTaskInfo>(ServerEventId.CbSessionTaskInfoUpdated, async data => {
       const task = this.tasks.get(data.taskId);
-      console.log(task);
 
-      await task?.updateInfoAsync(async () => data);
+      if (data.running === false) {
+        await task?.updateInfoAsync(async () => {
+          const { taskInfo } = await this.graphQLService.sdk.getAsyncTaskInfo({
+            taskId: data.taskId,
+            removeOnFinish: false,
+          });
+
+          return taskInfo;
+        });
+      } else {
+        task?.updateStatus(data);
+      }
     });
   }
 
@@ -47,7 +57,6 @@ export class AsyncTaskInfoService extends Disposable {
       const info = await getter();
       if (info.id && !this.tasks.has(info.id)) {
         this.tasks.set(info.id, task);
-        console.log(this.tasks);
         task.id = info.id;
         if (this.tasks.size === 1) {
           this.connection = this.asyncTaskInfoEventHandler.eventsSubject.connect();
@@ -88,7 +97,7 @@ export class AsyncTaskInfoService extends Disposable {
 
     if (task.info !== null) {
       await this.graphQLService.sdk.getAsyncTaskInfo({
-        taskId: task.info.id,
+        taskId: task.id,
         removeOnFinish: true,
       });
     }
@@ -100,9 +109,9 @@ export class AsyncTaskInfoService extends Disposable {
     await task?.cancelAsync();
   }
 
-  private async cancelTask(info: AsyncTaskInfo): Promise<void> {
+  private async cancelTask(id: string): Promise<void> {
     await this.graphQLService.sdk.asyncTaskCancel({
-      taskId: info.id,
+      taskId: id,
     });
   }
 }

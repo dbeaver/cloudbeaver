@@ -47,10 +47,10 @@ export class AsyncTask {
   private readonly innerPromise: Promise<AsyncTaskInfo>;
   private updatingAsync: boolean;
   private readonly init: () => Promise<AsyncTaskInfo>;
-  private readonly cancel: (info: AsyncTaskInfo) => Promise<void>;
+  private readonly cancel: (id: string) => Promise<void>;
   private initPromise: Promise<void> | null;
 
-  constructor(init: () => Promise<AsyncTaskInfo>, cancel: (info: AsyncTaskInfo) => Promise<void>) {
+  constructor(init: () => Promise<AsyncTaskInfo>, cancel: (id: string) => Promise<void>) {
     this._id = '';
     this.init = init;
     this.cancel = cancel;
@@ -125,6 +125,11 @@ export class AsyncTask {
     }
   }
 
+  public updateStatus(info: AsyncTaskInfo): void {
+    this.taskInfo = info;
+    this.onStatusChange.execute(this.taskInfo);
+  }
+
   private updateInfo(info: AsyncTaskInfo): void {
     this.taskInfo = info;
 
@@ -139,8 +144,6 @@ export class AsyncTask {
   }
 
   private async cancelTask(): Promise<void> {
-    if (this.info) {
-      await this.cancel(this.info);
-    }
+    await this.cancel(this.id);
   }
 }
