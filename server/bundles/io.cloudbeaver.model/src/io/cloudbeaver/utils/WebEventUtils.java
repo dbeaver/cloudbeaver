@@ -190,8 +190,6 @@ public class WebEventUtils {
         return new WSSessionTaskInfoEvent(
             taskInfo.getId(),
             taskInfo.getStatus(),
-            taskInfo.getTaskResult(),
-            taskInfo.getExtendedResult(),
             taskInfo.isRunning()
         );
     }

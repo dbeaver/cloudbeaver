@@ -25,11 +25,9 @@ import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.data.DBDDocument;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Web SQL query results.
@@ -38,7 +36,7 @@ public class WebSQLQueryResults {
 
     private static final Log log = Log.getLog(WebSQLQueryResults.class);
 
-    private final WebSession webSession;
+    private final transient WebSession webSession;
     private final WebDataFormat dataFormat;
     private Long updateRowCount;
     private WebSQLQueryResultSet resultSet;

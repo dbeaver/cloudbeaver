@@ -188,8 +188,6 @@ type WSAsyncTaskInfo @since(version: "24.3.1") {
     taskId: ID!
     statusName: String
     running: Boolean!
-    result: Object
-    extendedResult: Object
 }
 
 extend type Query {
