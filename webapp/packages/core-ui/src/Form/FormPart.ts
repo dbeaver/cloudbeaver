@@ -88,6 +88,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     if (this.loading) {
       return;
     }
+
     this.loading = true;
 
     try {
