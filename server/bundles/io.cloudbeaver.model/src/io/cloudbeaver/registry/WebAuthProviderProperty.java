@@ -26,8 +26,11 @@ public class WebAuthProviderProperty extends LocalizedPropertyDescriptor {
     @Nullable
     private final String type;
 
-    public WebAuthProviderProperty(String category, IConfigurationElement config) {
+    private final String authProviderId;
+
+    public WebAuthProviderProperty(String category, IConfigurationElement config, String authProviderId) {
         super(category, config);
+        this.authProviderId = authProviderId;
         String featuresAttr = config.getAttribute("requiredFeatures");
         this.requiredFeatures = featuresAttr == null ? new String[0] : featuresAttr.split(",");
         this.type = config.getAttribute("type");
@@ -41,5 +44,10 @@ public class WebAuthProviderProperty extends LocalizedPropertyDescriptor {
     @Nullable
     public String getType() {
         return type;
+    }
+
+    @Override
+    public String getPropertyId() {
+        return "prop.auth.model." + authProviderId + "." + this.getId();
     }
 }
