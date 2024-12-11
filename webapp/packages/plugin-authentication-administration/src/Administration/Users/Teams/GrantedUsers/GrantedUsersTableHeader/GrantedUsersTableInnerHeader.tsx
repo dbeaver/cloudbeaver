@@ -26,7 +26,7 @@ export const GrantedUsersTableInnerHeader = observer<Props>(function GrantedUser
       <TableColumnHeader min />
       <TableColumnHeader>{translate('administration_teams_team_granted_users_user_id')}</TableColumnHeader>
       {showUserTeamRole && (
-        <TableColumnHeader title={translate('plugin_authentication_administration_team_user_team_role_supervisor_description')}>
+        <TableColumnHeader title={translate('plugin_authentication_administration_team_user_team_role_supervisor_description')} flex centerContent>
           {translate('plugin_authentication_administration_team_user_team_role_supervisor')}
         </TableColumnHeader>
       )}
