@@ -48,6 +48,10 @@ public class WebAuthProviderProperty extends LocalizedPropertyDescriptor {
 
     @Override
     public String getPropertyId() {
-        return "prop.auth.model." + authProviderId + "." + this.getId();
+        if (authProviderId != null) {
+            return "prop.auth.model." + authProviderId + "." + this.getId();
+        } else {
+            return this.getId();
+        }
     }
 }
