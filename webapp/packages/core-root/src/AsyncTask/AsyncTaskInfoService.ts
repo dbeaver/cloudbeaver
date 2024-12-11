@@ -10,6 +10,7 @@ import type { Subscription } from 'rxjs';
 import { Disposable, injectable } from '@cloudbeaver/core-di';
 import { type AsyncTaskInfo, GraphQLService, type WsAsyncTaskInfo } from '@cloudbeaver/core-sdk';
 
+import type { Unsubscribe } from '../ServerEventEmitter/IServerEventEmitter.js';
 import { ServerEventId } from '../SessionEventSource.js';
 import { AsyncTask } from './AsyncTask.js';
 import { AsyncTaskInfoEventHandler } from './AsyncTaskInfoEventHandler.js';
@@ -18,7 +19,7 @@ import { AsyncTaskInfoEventHandler } from './AsyncTaskInfoEventHandler.js';
 export class AsyncTaskInfoService extends Disposable {
   private readonly tasks: Map<string, AsyncTask>;
   private connection: Subscription | null;
-  private onEvent: any;
+  private onEventUnsubscribe: Unsubscribe | null;
 
   constructor(
     private readonly graphQLService: GraphQLService,
@@ -28,35 +29,33 @@ export class AsyncTaskInfoService extends Disposable {
     this.tasks = new Map();
     this.connection = null;
 
-    this.onEvent = asyncTaskInfoEventHandler.onEvent<WsAsyncTaskInfo>(ServerEventId.CbSessionTaskInfoUpdated, async data => {
-      console.log('onEvent', data);
-      // const task = this.tasks.get(data.taskId);
+    this.onEventUnsubscribe = asyncTaskInfoEventHandler.onEvent<WsAsyncTaskInfo>(ServerEventId.CbSessionTaskInfoUpdated, async data => {
+      const task = this.tasks.get(data.taskId);
+      console.log(task);
 
-      // if (task?.pending && task.info) {
-      //   await task.updateInfoAsync(async task => {
-      //     const { taskInfo } = await this.graphQLService.sdk.getAsyncTaskInfo({
-      //       taskId: task.info!.id,
-      //       removeOnFinish: false,
-      //     });
-
-      //     return taskInfo;
-      //   });
-      // }
+      await task?.updateInfoAsync(async () => data);
     });
   }
 
   override dispose(): void {
     this.connection?.unsubscribe();
-    this.onEvent.dispose();
+    this.onEventUnsubscribe?.();
   }
 
   create(getter: () => Promise<AsyncTaskInfo>): AsyncTask {
-    const task = new AsyncTask(getter, this.cancelTask.bind(this));
-    this.tasks.set(task.id, task);
+    const task = new AsyncTask(async () => {
+      const info = await getter();
+      if (info.id && !this.tasks.has(info.id)) {
+        this.tasks.set(info.id, task);
+        console.log(this.tasks);
+        task.id = info.id;
+        if (this.tasks.size === 1) {
+          this.connection = this.asyncTaskInfoEventHandler.eventsSubject.connect();
+        }
+      }
 
-    if (this.tasks.size === 1) {
-      this.connection = this.asyncTaskInfoEventHandler.eventsSubject.connect();
-    }
+      return info;
+    }, this.cancelTask.bind(this));
 
     return task;
   }

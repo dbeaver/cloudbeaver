@@ -9,10 +9,17 @@ import { computed, makeObservable, observable } from 'mobx';
 
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { type AsyncTaskInfo, ServerInternalError } from '@cloudbeaver/core-sdk';
-import { uuid } from '@cloudbeaver/core-utils';
 
 export class AsyncTask {
-  readonly id: string;
+  get id(): string {
+    return this._id;
+  }
+
+  set id(id: string) {
+    if (!this._id) {
+      this._id = id;
+    }
+  }
 
   get cancelled(): boolean {
     return this._cancelled;
@@ -32,6 +39,7 @@ export class AsyncTask {
 
   readonly onStatusChange: ISyncExecutor<AsyncTaskInfo>;
 
+  private _id: string;
   private _cancelled: boolean;
   private taskInfo: AsyncTaskInfo | null;
   private resolve!: (value: AsyncTaskInfo) => void;
@@ -43,7 +51,7 @@ export class AsyncTask {
   private initPromise: Promise<void> | null;
 
   constructor(init: () => Promise<AsyncTaskInfo>, cancel: (info: AsyncTaskInfo) => Promise<void>) {
-    this.id = uuid();
+    this._id = '';
     this.init = init;
     this.cancel = cancel;
     this._cancelled = false;
