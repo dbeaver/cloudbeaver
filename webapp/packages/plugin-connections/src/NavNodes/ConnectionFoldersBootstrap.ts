@@ -157,20 +157,12 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_NAVIGATION_TREE_CREATE],
-      getItems: (context, items) => [...items, ACTION_CREATE_FOLDER],
-    });
-
-    this.actionService.addHandler({
-      id: 'nav-tree-create-create-folders-handler',
-      menus: [MENU_NAVIGATION_TREE_CREATE],
-      actions: [ACTION_CREATE_FOLDER],
-      isActionApplicable: (context, action) => {
+      isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
         const targetNode = this.getTargetNode(tree);
 
         if (
-          ACTION_CREATE_FOLDER !== action ||
           ![NAV_NODE_TYPE_CONNECTION, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_PROJECT].includes(node?.nodeType ?? '') ||
           !this.userInfoResource.isAuthenticated() ||
           tree.baseRoot !== ROOT_NODE_PATH ||
@@ -181,6 +173,13 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
         return true;
       },
+      getItems: (context, items) => [...items, ACTION_CREATE_FOLDER],
+    });
+
+    this.actionService.addHandler({
+      id: 'nav-tree-create-create-folders-handler',
+      menus: [MENU_NAVIGATION_TREE_CREATE],
+      actions: [ACTION_CREATE_FOLDER],
       handler: this.elementsTreeActionHandler.bind(this),
     });
   }

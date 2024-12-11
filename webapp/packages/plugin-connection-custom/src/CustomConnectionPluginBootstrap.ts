@@ -42,18 +42,10 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_NAVIGATION_TREE_CREATE],
-      getItems: (context, items) => [...items, ACTION_CREATE_CONNECTION],
-    });
-
-    this.actionService.addHandler({
-      id: 'nav-tree-create-create-connection-handler',
-      menus: [MENU_NAVIGATION_TREE_CREATE],
-      actions: [ACTION_CREATE_CONNECTION],
-      isActionApplicable: (context, action) => {
+      isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
 
         if (
-          ACTION_CREATE_CONNECTION !== action ||
           ![NAV_NODE_TYPE_CONNECTION, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_PROJECT].includes(node?.nodeType ?? '') ||
           this.isConnectionFeatureDisabled(true)
         ) {
@@ -62,6 +54,13 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
 
         return true;
       },
+      getItems: (context, items) => [...items, ACTION_CREATE_CONNECTION],
+    });
+
+    this.actionService.addHandler({
+      id: 'nav-tree-create-create-connection-handler',
+      menus: [MENU_NAVIGATION_TREE_CREATE],
+      actions: [ACTION_CREATE_CONNECTION],
       handler: async (context, action) => {
         if (action === ACTION_CREATE_CONNECTION) {
           await this.openConnectionsDialog();
