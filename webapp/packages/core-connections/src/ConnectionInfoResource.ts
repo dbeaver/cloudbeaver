@@ -421,19 +421,17 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   }
 
   async changeConnectionView(key: IConnectionInfoParams, settings: NavigatorViewSettings): Promise<Connection> {
-    await this.performUpdate(key, [], async () => {
-      const connectionNavigatorViewSettings = this.get(key)?.navigatorSettings || DEFAULT_NAVIGATOR_VIEW_SETTINGS;
-      const { connection } = await this.graphQLService.sdk.setConnectionNavigatorSettings({
-        connectionId: key.connectionId,
-        projectId: key.projectId,
-        settings: { ...connectionNavigatorViewSettings, ...settings },
-        ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(key),
-      });
-
-      this.set(createConnectionParam(connection), connection);
-      this.onDataOutdated.execute(key);
+    const connectionNavigatorViewSettings = this.get(key)?.navigatorSettings || DEFAULT_NAVIGATOR_VIEW_SETTINGS;
+    const { connection } = await this.graphQLService.sdk.setConnectionNavigatorSettings({
+      connectionId: key.connectionId,
+      projectId: key.projectId,
+      settings: { ...connectionNavigatorViewSettings, ...settings },
+      ...this.getDefaultIncludes(),
+      ...this.getIncludesMap(key),
     });
+
+    this.set(createConnectionParam(connection), connection);
+    this.onDataOutdated.execute(key);
 
     return this.get(key)!;
   }
