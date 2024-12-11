@@ -577,7 +577,7 @@ public class WebSession extends BaseWebSession
                 } finally {
                     taskCount.decrementAndGet();
                     asyncTask.setRunning(false);
-                    addSessionEvent(WSSessionTaskInfoEvent.finish(asyncTask.getId()));
+                    addSessionEvent(new WSSessionTaskInfoEvent(asyncTask.getId(), asyncTask.getStatus(), asyncTask.isRunning()));
                 }
                 return Status.OK_STATUS;
             }

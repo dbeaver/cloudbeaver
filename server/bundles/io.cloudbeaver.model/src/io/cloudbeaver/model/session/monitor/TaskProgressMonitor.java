@@ -43,13 +43,13 @@ public class TaskProgressMonitor extends ProxyProgressMonitor {
     public void beginTask(String name, int totalWork) {
         super.beginTask(name, totalWork);
         asyncTask.setStatus(name);
-        webSession.addSessionEvent(WSSessionTaskInfoEvent.update(asyncTask.getId(), name));
+        webSession.addSessionEvent(new WSSessionTaskInfoEvent(asyncTask.getId(), name, asyncTask.isRunning()));
     }
 
     @Override
     public void subTask(String name) {
         super.subTask(name);
         asyncTask.setStatus(name);
-        webSession.addSessionEvent(WSSessionTaskInfoEvent.update(asyncTask.getId(), name));
+        webSession.addSessionEvent(new WSSessionTaskInfoEvent(asyncTask.getId(), name, asyncTask.isRunning()));
     }
 }
