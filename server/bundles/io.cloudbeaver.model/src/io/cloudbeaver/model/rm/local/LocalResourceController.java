@@ -511,7 +511,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                     log.warn("Failed to remove resources properties", e);
                 }
                 try {
-                    if (targetPath.toFile().isDirectory()) {
+                    if (Files.isDirectory(targetPath)) {
                         IOUtils.deleteDirectory(targetPath);
                     } else {
                         Files.delete(targetPath);
