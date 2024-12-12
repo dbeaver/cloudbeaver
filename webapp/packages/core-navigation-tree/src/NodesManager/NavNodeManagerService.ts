@@ -194,6 +194,10 @@ export class NavNodeManagerService extends Bootstrap {
     await this.navTree.refreshTree(navNodeId);
   }
 
+  async refreshNode(navNodeId: string): Promise<void> {
+    await this.navTree.refreshNode(navNodeId);
+  }
+
   getTree(navNodeId: string): string[] | undefined;
   getTree(navNodeKey: NavNodeKey): string[] | undefined;
   getTree(navNodeKey: NavNodeKey[]): Array<string[] | undefined>;

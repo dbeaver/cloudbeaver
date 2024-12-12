@@ -564,7 +564,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       },
       async refresh(nodeId: string): Promise<void> {
         try {
-          await navTreeResource.refreshTree(nodeId);
+          await navTreeResource.refreshNode(nodeId);
         } catch (exception: any) {
           notificationService.logException(exception, 'app_navigationTree_refresh_error');
         }
