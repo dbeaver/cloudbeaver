@@ -19,6 +19,7 @@ import { AsyncTaskInfoEventHandler } from './AsyncTaskInfoEventHandler.js';
 export class AsyncTaskInfoService extends Disposable {
   private readonly tasks: Map<string, AsyncTask>;
   private readonly taskIdAliases: Map<string, string>;
+  private readonly pendingEvents: Map<string, WsAsyncTaskInfo>;
   private connection: Subscription | null;
   private onEventUnsubscribe: Unsubscribe | null;
 
@@ -29,24 +30,37 @@ export class AsyncTaskInfoService extends Disposable {
     super();
     this.tasks = new Map();
     this.taskIdAliases = new Map();
+    this.pendingEvents = new Map();
     this.connection = null;
+    this.handleEvent = this.handleEvent.bind(this);
 
-    this.onEventUnsubscribe = asyncTaskInfoEventHandler.onEvent<WsAsyncTaskInfo>(ServerEventId.CbSessionTaskInfoUpdated, async data => {
-      const task = this.getTask(data.taskId);
+    this.onEventUnsubscribe = asyncTaskInfoEventHandler.onEvent<WsAsyncTaskInfo>(ServerEventId.CbSessionTaskInfoUpdated, this.handleEvent);
+  }
 
-      if (data.running === false) {
-        await task?.updateInfoAsync(async () => {
-          const { taskInfo } = await this.graphQLService.sdk.getAsyncTaskInfo({
-            taskId: data.taskId,
-            removeOnFinish: false,
-          });
-
-          return taskInfo;
+  private async updateTask(task: AsyncTask, data: WsAsyncTaskInfo) {
+    if (data.running === false) {
+      await task.updateInfoAsync(async () => {
+        const { taskInfo } = await this.graphQLService.sdk.getAsyncTaskInfo({
+          taskId: data.taskId,
+          removeOnFinish: false,
         });
-      } else {
-        task?.updateStatus(data);
-      }
-    });
+
+        return taskInfo;
+      });
+    } else {
+      task.updateStatus(data);
+    }
+  }
+
+  private async handleEvent(data: WsAsyncTaskInfo) {
+    const task = this.getTask(data.taskId);
+
+    if (!task) {
+      this.pendingEvents.set(data.taskId, data);
+      return;
+    }
+
+    await this.updateTask(task, data);
   }
 
   override dispose(): void {
@@ -56,9 +70,18 @@ export class AsyncTaskInfoService extends Disposable {
 
   create(getter: () => Promise<AsyncTaskInfo>): AsyncTask {
     const task = new AsyncTask(getter, this.cancelTask.bind(this));
+
     this.tasks.set(task.id, task);
     task.onStatusChange.addHandler(info => {
-      this.taskIdAliases.set(info.id, task.id);
+      const pendingEvent = this.pendingEvents.get(info.id);
+      if (pendingEvent) {
+        const changes = { ...pendingEvent };
+        this.pendingEvents.delete(info.id);
+        this.updateTask(task, changes);
+      }
+      if (!this.taskIdAliases.get(info.id)) {
+        this.taskIdAliases.set(info.id, task.id);
+      }
     });
 
     if (this.tasks.size === 1) {
@@ -103,6 +126,7 @@ export class AsyncTaskInfoService extends Disposable {
     this.tasks.delete(task.id);
     if (task.info) {
       this.taskIdAliases.delete(task.info.id);
+      this.pendingEvents.delete(task.info.id);
     }
     if (this.tasks.size === 0) {
       this.connection?.unsubscribe();
