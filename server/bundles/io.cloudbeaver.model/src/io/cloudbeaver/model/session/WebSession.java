@@ -577,7 +577,7 @@ public class WebSession extends BaseWebSession
                 } finally {
                     taskCount.decrementAndGet();
                     asyncTask.setRunning(false);
-                    addSessionEvent(WebEventUtils.createAsyncTaskEvent(asyncTask));
+                    WebEventUtils.sendAsyncTaskEvent(WebSession.this, asyncTask);
                 }
                 return Status.OK_STATUS;
             }

@@ -185,12 +185,13 @@ public class WebEventUtils {
         ServletAppUtils.getServletApplication().getEventController().addEvent(event);
     }
 
-    @NotNull
-    public static WSSessionTaskInfoEvent createAsyncTaskEvent(@NotNull WebAsyncTaskInfo taskInfo) {
-        return new WSSessionTaskInfoEvent(
-            taskInfo.getId(),
-            taskInfo.getStatus(),
-            taskInfo.isRunning()
+    public static void sendAsyncTaskEvent(@NotNull WebSession webSession, @NotNull WebAsyncTaskInfo taskInfo) {
+        webSession.addSessionEvent(
+            new WSSessionTaskInfoEvent(
+                taskInfo.getId(),
+                taskInfo.getStatus(),
+                taskInfo.isRunning()
+            )
         );
     }
 

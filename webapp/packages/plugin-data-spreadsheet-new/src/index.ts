@@ -6,3 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 export * from './manifest.js';
+export * from './DataGrid/DATA_GRID_BINDINGS.js';

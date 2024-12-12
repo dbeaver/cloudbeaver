@@ -36,7 +36,7 @@ public class WebSQLQueryResults {
 
     private static final Log log = Log.getLog(WebSQLQueryResults.class);
 
-    private final transient WebSession webSession;
+    private final WebSession webSession;
     private final WebDataFormat dataFormat;
     private Long updateRowCount;
     private WebSQLQueryResultSet resultSet;
