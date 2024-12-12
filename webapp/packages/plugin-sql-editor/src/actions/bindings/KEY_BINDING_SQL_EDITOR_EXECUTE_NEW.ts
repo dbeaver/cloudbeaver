@@ -9,6 +9,6 @@ import { createKeyBinding } from '@cloudbeaver/core-view';
 
 export const KEY_BINDING_SQL_EDITOR_EXECUTE_NEW = createKeyBinding({
   id: 'sql-editor-execute-new',
-  keys: ['ctrl+\\', 'shift+ctrl+enter'],
+  keys: ['mod+\\', 'shift+mod+enter'],
   preventDefault: true,
 });

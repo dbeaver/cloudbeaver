@@ -9,6 +9,6 @@ import { createKeyBinding } from '@cloudbeaver/core-view';
 
 export const KEY_BINDING_SQL_EDITOR_FORMAT = createKeyBinding({
   id: 'sql-editor-format',
-  keys: 'shift+ctrl+f',
+  keys: 'shift+mod+f',
   preventDefault: true,
 });

@@ -9,6 +9,6 @@ import { createKeyBinding } from '../createKeyBinding.js';
 
 export const KEY_BINDING_REDO = createKeyBinding({
   id: 'redo',
-  keys: ['mod+y', 'mod+shift+z'],
+  keys: ['mod+y', 'shift+mod+z'],
   preventDefault: true,
 });
