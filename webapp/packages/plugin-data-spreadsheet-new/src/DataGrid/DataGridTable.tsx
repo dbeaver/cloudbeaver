@@ -248,9 +248,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         tableData.editor.revert(...activeElements);
         return;
       }
-      case 'Insert': {
+      case 'KeyR': {
         if (event.altKey) {
-          if (event.ctrlKey || event.metaKey) {
+          if (event.shiftKey) {
             tableData.editor.duplicate(...activeRows);
           } else {
             tableData.editor.add(cell);

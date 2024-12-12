@@ -20,6 +20,9 @@ enum CBServerEventId {
     cb_datasource_folder_updated,
     cb_datasource_folder_deleted,
 
+    cb_datasource_disconnected,
+    cb_datasource_connected,
+
     cb_rm_resource_created,
     cb_rm_resource_updated,
     cb_rm_resource_deleted,
@@ -55,8 +58,11 @@ enum CBEventTopic {
     cb_object_permissions,
     cb_subject_permissions,
     cb_database_output_log,
-    cb_delete_temp_folder,
-    cb_session_task @since(version: "24.3.1")
+
+    cb_session_task, @since(version: "24.3.1")
+
+    cb_datasource_connection,
+    cb_delete_temp_folder
 }
 
 # Base server event interface
@@ -187,6 +193,22 @@ type WSAsyncTaskInfo @since(version: "24.3.1") {
     taskId: ID!
     statusName: String
     running: Boolean!
+
+# Datasource disconnect event
+type WSDataSourceDisconnectEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    connectionId: String!
+    projectId: String!
+    timestamp: Int!
+}
+# Datasource connect event
+type WSDataSourceConnectEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    connectionId: String!
+    projectId: String!
+    timestamp: Int!
 }
 
 extend type Query {

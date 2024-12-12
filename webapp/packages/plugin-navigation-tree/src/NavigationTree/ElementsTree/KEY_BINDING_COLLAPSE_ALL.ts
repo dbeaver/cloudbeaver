@@ -9,6 +9,6 @@ import { createKeyBinding } from '@cloudbeaver/core-view';
 
 export const KEY_BINDING_COLLAPSE_ALL = createKeyBinding({
   id: 'collapse-all',
-  keys: 'ctrl+shift+/',
+  keys: 'shift+ctrl+/',
   preventDefault: true,
 });
