@@ -28,6 +28,7 @@
         <module>mariadb</module>
         <module>oracle</module>
         <module>postgresql</module>
+        <module>salesforce</module>
         <module>sqlite</module>
         <module>sqlserver</module>
         <module>trino</module>
