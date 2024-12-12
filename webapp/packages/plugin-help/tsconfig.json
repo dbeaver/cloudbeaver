@@ -40,6 +40,9 @@
       "path": "../core-view/tsconfig.json"
     },
     {
+      "path": "../plugin-data-spreadsheet-new/tsconfig.json"
+    },
+    {
       "path": "../plugin-navigation-tree/tsconfig.json"
     },
     {

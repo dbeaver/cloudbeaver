@@ -223,7 +223,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
             const key = getRmResourcePath(result.projectId, result.folder ?? root);
             await this.resourceManagerResource.create(createPath(key, result.name), true);
 
-            this.navTreeResource.refreshTree(getRmProjectNodeId(result.projectId));
+            this.navTreeResource.refreshNode(getRmProjectNodeId(result.projectId));
           } catch (exception: any) {
             this.notificationService.logException(exception, 'Error occurred while renaming');
           }

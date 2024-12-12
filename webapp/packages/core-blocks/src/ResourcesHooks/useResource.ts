@@ -47,6 +47,8 @@ type ResourceData<TResource extends IResource<any, any, any, any>, TKey, TInclud
 
 interface IActions<TResource extends IResource<any, any, any, any>, TKey, TIncludes> {
   active?: boolean;
+  /** Indicates whether the resource should be loadable without modifying data, unlike the "active" field */
+  freeze?: boolean;
   forceSuspense?: boolean;
   silent?: boolean;
   onData?: (data: ResourceData<TResource, TKey, TIncludes>, resource: TResource) => any;
@@ -184,6 +186,7 @@ export function useResource<
       }
       return propertiesRef.resource.get(propertiesRef.key);
     }
+
     return propertiesRef.resource.data;
   }
 
@@ -290,6 +293,10 @@ export function useResource<
     () => ({
       preloaded,
       get canLoad(): boolean {
+        if (actions?.freeze) {
+          return false;
+        }
+
         return propertiesRef.key !== null && this.preloaded && this.outdated && !this.loading;
       },
       get resource() {
