@@ -10,6 +10,7 @@
   display: flex;
   overflow: hidden;
   box-sizing: border-box;
+  gap: 6px;
 }
 
 .container {
@@ -18,10 +19,10 @@
 }
 
 .menuContainer {
-  width: 25px;
-  height: 100%;
+  display: flex;
   box-sizing: border-box;
   overflow: hidden;
+  z-index: 1;
 
   &:empty {
     display: none;
