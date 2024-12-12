@@ -17,7 +17,11 @@ import { DriverSelector } from './DriverSelector.js';
 import styles from './DriverSelectorDialog.module.css';
 import { useDriverSelectorDialog } from './useDriverSelectorDialog.js';
 
-export const DriverSelectorDialog: DialogComponent<null> = observer(function DriverSelectorDialog({ rejectDialog }) {
+type Payload = {
+  projectId?: string;
+};
+
+export const DriverSelectorDialog: DialogComponent<Payload> = observer(function DriverSelectorDialog({ rejectDialog, payload }) {
   const translate = useTranslate();
   const style = useS(styles);
   useResource(DriverSelectorDialog, ProjectInfoResource, CachedMapAllKey, { forceSuspense: true });
@@ -33,7 +37,11 @@ export const DriverSelectorDialog: DialogComponent<null> = observer(function Dri
     <CommonDialogWrapper size="large" autofocus={false} fixedSize>
       <CommonDialogHeader title={translate('plugin_connections_new_connection_dialog_title')} />
       <CommonDialogBody noBodyPadding noOverflow>
-        <DriverSelector className={s(style, { driverSelector: true })} drivers={enabledDrivers} onSelect={dialog.select} />
+        <DriverSelector
+          className={s(style, { driverSelector: true })}
+          drivers={enabledDrivers}
+          onSelect={driverId => dialog.select(driverId, payload.projectId)}
+        />
       </CommonDialogBody>
     </CommonDialogWrapper>
   );

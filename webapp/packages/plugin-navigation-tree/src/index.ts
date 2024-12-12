@@ -35,6 +35,7 @@ export * from './NavigationTree/ElementsTree/ElementsTreeTools/MENU_ELEMENTS_TRE
 export * from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeToolsMenuService.js';
 export * from './NavigationTree/ElementsTree/elementsTreeNameFilter.js';
 export * from './NavigationTree/ElementsTree/ElementsTreeService.js';
+export * from './NavigationTree/ElementsTree/TreeSelectionService.js';
 export * from './NavigationTree/NavigationTreeBootstrap.js';
 export * from './NavigationTree/NavigationTreeService.js';
 export { default as ElementsTreeToolsStyles } from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeTools.module.css';

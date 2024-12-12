@@ -5,8 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { untracked } from 'mobx';
-
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialogDelete } from '@cloudbeaver/core-blocks';
 import {
@@ -14,7 +12,6 @@ import {
   ConnectionFolderProjectKey,
   ConnectionFolderResource,
   ConnectionInfoResource,
-  ConnectionsManagerService,
   createConnectionFolderParam,
   createConnectionParam,
   getConnectionFolderId,
@@ -49,22 +46,14 @@ import { createPath } from '@cloudbeaver/core-utils';
 import { ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_ELEMENTS_TREE,
-  type IElementsTree,
   MENU_ELEMENTS_TREE_TOOLS,
   MENU_NAVIGATION_TREE_CREATE,
+  TreeSelectionService,
 } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 
 import { ACTION_CREATE_FOLDER } from '../Actions/ACTION_CREATE_FOLDER.js';
 import { NAV_NODE_TYPE_CONNECTION } from './NAV_NODE_TYPE_CONNECTION.js';
-
-interface ITargetNode {
-  projectId: string;
-  folderId?: string;
-
-  projectNodeId: string;
-  selectProject: boolean;
-}
 
 @injectable()
 export class ConnectionFoldersBootstrap extends Bootstrap {
@@ -77,12 +66,12 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly connectionFolderResource: ConnectionFolderResource,
-    private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly projectsNavNodeService: ProjectsNavNodeService,
+    private readonly treeProjectsService: TreeSelectionService,
   ) {
     super();
   }
@@ -137,7 +126,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           return false;
         }
 
-        const targetNode = this.getTargetNode(tree);
+        const targetNode = this.treeProjectsService.getSelectedNode(tree, getProjectNodeId);
 
         return targetNode !== undefined;
       },
@@ -160,7 +149,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
-        const targetNode = this.getTargetNode(tree);
+        const targetNode = this.treeProjectsService.getSelectedNode(tree, getProjectNodeId);
 
         if (
           ![NAV_NODE_TYPE_CONNECTION, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_PROJECT].includes(node?.nodeType ?? '') ||
@@ -268,7 +257,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     switch (action) {
       case ACTION_CREATE_FOLDER:
       case ACTION_NEW_FOLDER: {
-        const targetNode = this.getTargetNode(tree);
+        const targetNode = this.treeProjectsService.getSelectedNode(tree, getProjectNodeId);
 
         if (!targetNode) {
           this.notificationService.logError({ title: "Can't create folder", message: 'core_projects_no_default_project' });
@@ -332,52 +321,5 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     if (isFolder) {
       this.connectionFolderResource.markOutdated();
     }
-  }
-
-  private getTargetNode(tree: IElementsTree): ITargetNode | undefined {
-    untracked(() => this.projectInfoResource.load(CachedMapAllKey));
-    const selected = tree.getSelected();
-
-    if (selected.length === 0) {
-      const editableProjects = this.connectionsManagerService.createConnectionProjects;
-
-      if (editableProjects.length > 0) {
-        const project = editableProjects[0]!;
-
-        return {
-          projectId: project.id,
-          projectNodeId: getProjectNodeId(project.id),
-          selectProject: editableProjects.length > 1,
-        };
-      }
-      return;
-    }
-
-    const targetFolder = selected[0]!;
-    const parentIds = [...this.navNodeInfoResource.getParents(targetFolder), targetFolder];
-    const parents = this.navNodeInfoResource.get(resourceKeyList(parentIds));
-    const projectNode = parents.find(parent => parent?.nodeType === NAV_NODE_TYPE_PROJECT);
-
-    if (!projectNode) {
-      return;
-    }
-
-    const project = this.projectsNavNodeService.getByNodeId(projectNode.id);
-
-    if (!project?.canEditDataSources) {
-      return;
-    }
-
-    const targetFolderNode = parents
-      .slice()
-      .reverse()
-      .find(parent => parent?.nodeType === NAV_NODE_TYPE_FOLDER);
-
-    return {
-      projectId: project.id,
-      folderId: targetFolderNode?.id,
-      projectNodeId: projectNode.id,
-      selectProject: false,
-    };
   }
 }

@@ -7,14 +7,15 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionsManagerService, NAV_NODE_TYPE_CONNECTION } from '@cloudbeaver/core-connections';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { DATA_CONTEXT_NAV_NODE, NAV_NODE_TYPE_FOLDER } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
-import { ActionService, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
 import { ACTION_CREATE_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
-import { MENU_NAVIGATION_TREE_CREATE } from '@cloudbeaver/plugin-navigation-tree';
+import { DATA_CONTEXT_ELEMENTS_TREE, MENU_NAVIGATION_TREE_CREATE, TreeSelectionService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM.js';
 import { CustomConnectionSettingsService } from './CustomConnectionSettingsService.js';
@@ -30,6 +31,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     private readonly actionService: ActionService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly customConnectionSettingsService: CustomConnectionSettingsService,
+    private readonly treeProjectsService: TreeSelectionService,
   ) {
     super();
   }
@@ -61,11 +63,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
       id: 'nav-tree-create-create-connection-handler',
       menus: [MENU_NAVIGATION_TREE_CREATE],
       actions: [ACTION_CREATE_CONNECTION],
-      handler: async (context, action) => {
-        if (action === ACTION_CREATE_CONNECTION) {
-          await this.openConnectionsDialog();
-        }
-      },
+      handler: this.createConnectionHandler.bind(this),
     });
 
     this.actionService.addHandler({
@@ -73,16 +71,24 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
       actions: [ACTION_CONNECTION_CUSTOM],
       isHidden: (context, action) => this.isConnectionFeatureDisabled(action === ACTION_CONNECTION_CUSTOM),
       getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
-      handler: async (context, action) => {
-        switch (action) {
-          case ACTION_CONNECTION_CUSTOM: {
-            await this.openConnectionsDialog();
-            break;
-          }
-        }
-      },
+      handler: this.createConnectionHandler.bind(this),
     });
   }
+
+  private createConnectionHandler = async (context: IDataContextProvider, action: IAction) => {
+    const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
+
+    switch (action) {
+      case ACTION_CREATE_CONNECTION:
+        if (tree) {
+          await this.openConnectionsDialog(this.treeProjectsService.getSelectedProject(tree)?.id);
+        }
+        break;
+      case ACTION_CONNECTION_CUSTOM:
+        await this.openConnectionsDialog();
+        break;
+    }
+  };
 
   private isConnectionFeatureDisabled(hasSettings: boolean) {
     if (this.connectionsManagerService.createConnectionProjects.length === 0) {
@@ -96,7 +102,9 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     return false;
   }
 
-  private async openConnectionsDialog() {
-    await this.commonDialogService.open(DriverSelectorDialog, null);
+  private async openConnectionsDialog(projectId?: string) {
+    await this.commonDialogService.open(DriverSelectorDialog, {
+      projectId,
+    });
   }
 }

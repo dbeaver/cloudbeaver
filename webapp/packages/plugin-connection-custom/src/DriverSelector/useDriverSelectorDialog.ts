@@ -14,7 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { PublicConnectionFormService } from '@cloudbeaver/plugin-connections';
 
 interface State {
-  select(driverId: string): Promise<void>;
+  select(driverId: string, projectId?: string): Promise<void>;
 }
 
 export function useDriverSelectorDialog(drivers: string[], onSelect?: () => void) {
@@ -24,7 +24,7 @@ export function useDriverSelectorDialog(drivers: string[], onSelect?: () => void
 
   const state: State = useObservableRef(
     () => ({
-      async select(driverId: string) {
+      async select(driverId: string, projectId?: string) {
         const projects = this.connectionsManagerService.createConnectionProjects;
 
         if (projects.length === 0) {
@@ -32,7 +32,8 @@ export function useDriverSelectorDialog(drivers: string[], onSelect?: () => void
           return;
         }
 
-        const state = await this.publicConnectionFormService.open(projects[0]!.id, { driverId }, this.drivers);
+        const selectedProjectId = projects.find(project => project.id === projectId)?.id || projects[0]!.id;
+        const state = await this.publicConnectionFormService.open(selectedProjectId, { driverId }, this.drivers);
 
         if (state) {
           onSelect?.();
