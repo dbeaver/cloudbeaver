@@ -8,7 +8,7 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { type AsyncTaskInfo, ServerInternalError } from '@cloudbeaver/core-sdk';
+import { type AsyncTaskInfo, ServerInternalError, type WsAsyncTaskInfo } from '@cloudbeaver/core-sdk';
 
 export class AsyncTask {
   get id(): string {
@@ -125,9 +125,11 @@ export class AsyncTask {
     }
   }
 
-  public updateStatus(info: AsyncTaskInfo): void {
-    this.taskInfo = info;
-    this.onStatusChange.execute(this.taskInfo);
+  public updateStatus(info: WsAsyncTaskInfo): void {
+    if (this.taskInfo) {
+      this.taskInfo.status = info.statusName;
+      this.onStatusChange.execute(this.taskInfo);
+    }
   }
 
   private updateInfo(info: AsyncTaskInfo): void {
