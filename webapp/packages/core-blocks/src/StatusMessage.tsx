@@ -39,13 +39,18 @@ export const StatusMessage = observer<Props>(function StatusMessage({
   const errorDetails = useErrorDetails(exception);
   const isError = type === ENotificationType.Error || exception !== null;
 
-  if (Array.isArray(message)) {
-    message = message.map(m => translate(m)).join(', ');
-  } else if (message !== null) {
-    message = translate(message);
+  function translateMessage(message: string | string[] | null | undefined) {
+    if (Array.isArray(message)) {
+      message = message.map(m => translate(m)).join(', ');
+    } else if (message !== null) {
+      message = translate(message);
+    }
+
+    return message;
   }
 
-  message = message ?? errorDetails.message;
+  message = translateMessage(message) || translateMessage(errorDetails.message);
+
   let icon = '/icons/info_icon.svg';
 
   if (isError) {
