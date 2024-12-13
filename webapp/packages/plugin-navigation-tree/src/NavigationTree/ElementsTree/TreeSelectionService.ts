@@ -7,7 +7,7 @@
  */
 import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { isConnectionFolderNode, isProjectNode, type NavNode, NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
+import { isFolderNode, isProjectNode, type NavNode, NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { type ProjectInfo } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
@@ -65,7 +65,7 @@ export class TreeSelectionService {
       return;
     }
 
-    const selectedFolderNode = this.getParents(tree).slice().reverse().find(isConnectionFolderNode);
+    const selectedFolderNode = this.getParents(tree).slice().reverse().find(isFolderNode);
 
     return {
       projectId: project.id,

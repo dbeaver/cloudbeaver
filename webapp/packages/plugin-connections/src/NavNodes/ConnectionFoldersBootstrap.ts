@@ -18,6 +18,7 @@ import {
   getConnectionFolderIdFromNodeId,
   type IConnectionFolderParam,
   type IConnectionInfoParams,
+  isConnectionNode,
 } from '@cloudbeaver/core-connections';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -30,8 +31,8 @@ import {
   ENodeMoveType,
   getNodesFromContext,
   type INodeMoveData,
-  isConnectionFolderNode,
-  NAV_NODE_TYPE_FOLDER,
+  isFolderNode,
+  isProjectNode,
   type NavNode,
   NavNodeInfoResource,
   NavNodeManagerService,
@@ -41,7 +42,7 @@ import {
   ProjectsNavNodeService,
   ROOT_NODE_PATH,
 } from '@cloudbeaver/core-navigation-tree';
-import { getProjectNodeId, NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { getProjectNodeId, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
@@ -54,7 +55,6 @@ import {
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 
 import { ACTION_TREE_CREATE_FOLDER } from '../Actions/ACTION_TREE_CREATE_FOLDER.js';
-import { NAV_NODE_TYPE_CONNECTION } from './NAV_NODE_TYPE_CONNECTION.js';
 
 @injectable()
 export class ConnectionFoldersBootstrap extends Bootstrap {
@@ -153,7 +153,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         const targetNode = this.treeSelectionService.getFirstSelectedNode(tree, getProjectNodeId);
 
         if (
-          ![NAV_NODE_TYPE_CONNECTION, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_PROJECT].includes(node?.nodeType ?? '') ||
+          ![isConnectionNode, isFolderNode, isProjectNode].some(check => check(node)) ||
           !this.userInfoResource.isAuthenticated() ||
           tree.baseRoot !== ROOT_NODE_PATH ||
           targetNode === undefined
@@ -175,7 +175,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
   }
 
   private async moveConnectionToFolder({ type, targetNode, moveContexts }: INodeMoveData, contexts: IExecutionContextProvider<INodeMoveData>) {
-    if (![NAV_NODE_TYPE_PROJECT, NAV_NODE_TYPE_FOLDER].includes(targetNode.nodeType!)) {
+    if (![isProjectNode, isFolderNode].some(check => check(targetNode))) {
       return;
     }
 
@@ -189,7 +189,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
     const supported = nodes.every(node => {
       if (
-        ![NAV_NODE_TYPE_CONNECTION, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_PROJECT].includes(node.nodeType!) ||
+        ![isConnectionNode, isFolderNode, isProjectNode].some(check => check(node)) ||
         targetProject !== this.projectsNavNodeService.getProject(node.id) ||
         children.includes(node.id) ||
         targetNode.id === node.id
@@ -212,9 +212,9 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       const childrenNode = this.navNodeInfoResource.get(resourceKeyList(children));
       const folderDuplicates = nodes.filter(
         node =>
-          isConnectionFolderNode(node) &&
-          (childrenNode.some(child => child && isConnectionFolderNode(child) && child.name === node.name) ||
-            nodes.some(child => isConnectionFolderNode(child) && child.name === node.name && child.id !== node.id)),
+          isFolderNode(node) &&
+          (childrenNode.some(child => child && isFolderNode(child) && child.name === node.name) ||
+            nodes.some(child => isFolderNode(child) && child.name === node.name && child.id !== node.id)),
       );
 
       if (folderDuplicates.length > 0) {

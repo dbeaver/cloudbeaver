@@ -8,6 +8,6 @@
 import type { NavNode } from './EntityTypes.js';
 import { NAV_NODE_TYPE_FOLDER } from './NAV_NODE_TYPE_FOLDER.js';
 
-export function isConnectionFolderNode(node: NavNode | undefined): boolean {
+export function isFolderNode(node: NavNode | undefined): boolean {
   return node?.nodeType === NAV_NODE_TYPE_FOLDER;
 }
