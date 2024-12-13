@@ -317,7 +317,7 @@ public class WebSession extends BaseWebSession
         if (project.isGlobal()) {
             sessionProject = createGlobalProject(project);
         } else {
-            sessionProject = new WebSessionProjectImpl(this, project, getProjectPath(project));
+            sessionProject = createSessionProject(project);
         }
         // do not load data sources for anonymous project
         if (project.getType() == RMProjectType.USER && userContext.getUser() == null) {
@@ -328,6 +328,10 @@ public class WebSession extends BaseWebSession
             getWorkspace().setActiveProject(sessionProject);
         }
         return sessionProject;
+    }
+
+    protected WebSessionProjectImpl createSessionProject(@NotNull RMProject project) throws DBException {
+        return new WebSessionProjectImpl(this, project, getProjectPath(project));
     }
 
     @NotNull

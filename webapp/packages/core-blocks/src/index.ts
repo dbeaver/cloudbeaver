@@ -58,7 +58,6 @@ export * from './Menu/MenuBarSmallItem.js';
 export * from './Menu/MenuEmptyItem.js';
 export * from './Menu/MenuItem.js';
 export { default as MenuItemStyles } from './Menu/MenuItem.module.css';
-export { default as MenuPanelItemAndTriggerStyles } from './MenuPanel/shared/MenuPanelItemAndTrigger.module.css';
 export * from './Menu/MenuItemCheckbox.js';
 export * from './Menu/MenuItemElement.js';
 export { default as MenuItemElementStyles } from './Menu/MenuItemElement.module.css';
@@ -69,7 +68,6 @@ export * from './Menu/MenuSeparator.js';
 export { default as MenuSeparatorStyles } from './Menu/MenuSeparator.module.css';
 export * from './Menu/MenuStateContext.js';
 export * from './Menu/useMouseContextMenu.js';
-export { MenuTrigger, type MenuState } from './MenuPanel/MenuTrigger.js';
 
 export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoFormLoader.js';
 export * from './ObjectPropertyInfo/useObjectPropertyCategories.js';

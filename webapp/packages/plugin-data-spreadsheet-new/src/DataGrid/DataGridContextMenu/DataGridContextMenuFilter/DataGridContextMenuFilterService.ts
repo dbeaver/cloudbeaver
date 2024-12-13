@@ -7,16 +7,14 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  CommonDialogService,
-  ComputedContextMenuModel,
-  DialogueStateResult,
-  type IContextMenuItem,
-  type IMenuContext,
-} from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 import { replaceMiddle } from '@cloudbeaver/core-utils';
+import { ACTION_DELETE, ActionService, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import {
+  DATA_CONTEXT_DV_DDM,
+  DATA_CONTEXT_DV_DDM_RESULT_INDEX,
+  DATA_CONTEXT_DV_RESULT_KEY,
   DatabaseDataConstraintAction,
   type IDatabaseDataModel,
   type IResultSetColumnKey,
@@ -31,25 +29,22 @@ import {
   wrapOperationArgument,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridContextMenuService, type IDataGridCellMenuContext } from '../DataGridContextMenuService.js';
+import { ACTION_DATA_GRID_FILTERS_RESET_ALL } from '../../Actions/Filters/ACTION_DATA_GRID_FILTERS_RESET_ALL.js';
+import { MENU_DATA_GRID_FILTERS } from './MENU_DATA_GRID_FILTERS.js';
+import { MENU_DATA_GRID_FILTERS_CELL_VALUE } from './MENU_DATA_GRID_FILTERS_CELL_VALUE.js';
+import { MENU_DATA_GRID_FILTERS_CLIPBOARD } from './MENU_DATA_GRID_FILTERS_CLIPBOARD.js';
+import { MENU_DATA_GRID_FILTERS_CUSTOM } from './MENU_DATA_GRID_FILTERS_CUSTOM.js';
 
 const FilterCustomValueDialog = importLazyComponent(() => import('./FilterCustomValueDialog.js').then(m => m.FilterCustomValueDialog));
 
 @injectable()
 export class DataGridContextMenuFilterService {
-  private static readonly menuFilterToken = 'menuFilter';
-
   constructor(
-    private readonly dataGridContextMenuService: DataGridContextMenuService,
     private readonly commonDialogService: CommonDialogService,
     private readonly clipboardService: ClipboardService,
-  ) {
-    this.dataGridContextMenuService.onRootMenuOpen.addHandler(this.getClipboardValue.bind(this));
-  }
-
-  getMenuFilterToken(): string {
-    return DataGridContextMenuFilterService.menuFilterToken;
-  }
+    private readonly actionService: ActionService,
+    private readonly menuService: MenuService,
+  ) {}
 
   private async applyFilter(
     model: IDatabaseDataModel<ResultSetDataSource>,
@@ -75,218 +70,261 @@ export class DataGridContextMenuFilterService {
     });
   }
 
-  private async getClipboardValue() {
-    if (this.clipboardService.state === 'granted') {
-      await this.clipboardService.read();
-    }
-  }
-
-  private getGeneralizedMenuItems(
-    context: IMenuContext<IDataGridCellMenuContext>,
-    value: any | (() => any),
-    icon: string,
-    isHidden?: (context: IMenuContext<IDataGridCellMenuContext>) => boolean,
-  ): Array<IContextMenuItem<IDataGridCellMenuContext>> {
-    const { model, resultIndex, key } = context.data;
-    const source = model.source as unknown as ResultSetDataSource;
-    const data = source.getAction(resultIndex, ResultSetDataAction);
-    const supportedOperations = data.getColumnOperations(key.column);
-    const columnLabel = data.getColumn(key.column)?.label || '';
-
-    return supportedOperations
-      .filter(operation => !nullOperationsFilter(operation))
-      .map(operation => ({
-        id: operation.id,
-        icon,
-        isPresent: context => isResultSetDataSource(context.data.model.source),
-        isDisabled(context) {
-          return context.data.model.isLoading();
-        },
-        isHidden(context) {
-          return isHidden?.(context) ?? false;
-        },
-        titleGetter() {
-          const val = typeof value === 'function' ? value() : value;
-          const wrappedValue = wrapOperationArgument(operation.id, val);
-          const clippedValue = replaceMiddle(wrappedValue, ' ... ', 8, 30);
-          return `${columnLabel} ${operation.expression} ${clippedValue}`;
-        },
-        onClick: async () => {
-          const val = typeof value === 'function' ? value() : value;
-          const wrappedValue = wrapOperationArgument(operation.id, val);
-          await this.applyFilter(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, key.column, operation.id, wrappedValue);
-        },
-      }));
-  }
-
   register(): void {
-    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
-      id: this.getMenuFilterToken(),
-      order: 2,
-      title: 'data_grid_table_filter',
-      icon: 'filter',
-      isPanel: true,
-      isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
-      },
-      isHidden(context) {
-        if (context.data.model.isDisabled(context.data.resultIndex)) {
-          return true;
-        }
+    this.menuService.addCreator({
+      root: true,
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
+      isApplicable: context => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
-        const source = context.data.model.source as unknown as ResultSetDataSource;
-        const constraints = source.getAction(context.data.resultIndex, DatabaseDataConstraintAction);
-        return !constraints.supported;
-      },
-    });
-    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
-      id: 'deleteFiltersAndOrders',
-      order: 3,
-      title: 'data_grid_table_delete_filters_and_orders',
-      icon: 'erase',
-      isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
-      },
-      isHidden(context) {
-        if (context.data.model.isDisabled(context.data.resultIndex)) {
-          return true;
-        }
-
-        const source = context.data.model.source as unknown as ResultSetDataSource;
-        const constraints = source.getAction(context.data.resultIndex, DatabaseDataConstraintAction);
-        return constraints.orderConstraints.length === 0 && constraints.filterConstraints.length === 0;
-      },
-      onClick: async context => {
-        const { model, resultIndex } = context.data;
         const source = model.source as unknown as ResultSetDataSource;
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
 
-        await model.request(() => {
-          constraints.deleteData();
-        });
-      },
-    });
-    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
-      id: 'clipboardValue',
-      order: 0,
-      title: 'ui_clipboard',
-      icon: 'filter-clipboard',
-      isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
-      },
-      isHidden: context => {
-        if (!this.clipboardService.clipboardAvailable || this.clipboardService.state === 'denied') {
-          return true;
+        if (!isResultSetDataSource(source)) {
+          return false;
         }
 
-        const source = context.data.model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(context.data.resultIndex, ResultSetDataAction);
-        const supportedOperations = data.getColumnOperations(context.data.key.column);
-
-        return supportedOperations.length === 0;
+        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+        return constraints.supported && !model.isDisabled(resultIndex);
       },
-      panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
-        id: 'clipboardValuePanel',
-        menuItemsGetter: context => {
-          if (context.contextType !== DataGridContextMenuService.cellContext) {
-            return [];
+      getItems: (context, items) => [...items, MENU_DATA_GRID_FILTERS],
+    });
+
+    this.menuService.addCreator({
+      menus: [MENU_DATA_GRID_FILTERS],
+      getItems: (context, items) => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
+        const source = model.source as unknown as ResultSetDataSource;
+        const data = source.getAction(resultIndex, ResultSetDataAction);
+        const resultColumn = data.getColumn(key.column);
+
+        const supportedOperations = data.getColumnOperations(key.column);
+        const result = [];
+
+        for (const filter of [IS_NULL_ID, IS_NOT_NULL_ID]) {
+          const label = `${resultColumn ? `"${resultColumn.label}" ` : ''}${filter.split('_').join(' ')}`;
+
+          if (supportedOperations.some(operation => operation.id === filter)) {
+            result.push(
+              new MenuBaseItem(
+                {
+                  id: filter,
+                  label,
+                  icon: 'filter',
+                },
+                {
+                  onSelect: async () => {
+                    await this.applyFilter(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, key.column, filter);
+                  },
+                },
+              ),
+            );
+          }
+        }
+
+        return [
+          ...items,
+          MENU_DATA_GRID_FILTERS_CELL_VALUE,
+          MENU_DATA_GRID_FILTERS_CUSTOM,
+          MENU_DATA_GRID_FILTERS_CLIPBOARD,
+          ...result,
+          ACTION_DELETE,
+          ACTION_DATA_GRID_FILTERS_RESET_ALL,
+        ];
+      },
+    });
+
+    this.actionService.addHandler({
+      id: 'data-grid-filters-base-handler',
+      menus: [MENU_DATA_GRID_FILTERS],
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
+      isActionApplicable: (context, action) => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+
+        if (!isResultSetDataSource(model.source)) {
+          return false;
+        }
+
+        return [ACTION_DELETE, ACTION_DATA_GRID_FILTERS_RESET_ALL].includes(action);
+      },
+      isHidden: (context, action) => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
+        const source = model.source as unknown as ResultSetDataSource;
+        const data = source.getAction(resultIndex, ResultSetDataAction);
+
+        if (action === ACTION_DELETE) {
+          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+          const resultColumn = data.getColumn(key.column);
+          const currentConstraint = resultColumn ? constraints.get(resultColumn.position) : undefined;
+
+          return !currentConstraint || !isFilterConstraint(currentConstraint);
+        }
+
+        if (action === ACTION_DATA_GRID_FILTERS_RESET_ALL) {
+          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+          return constraints.filterConstraints.length === 0 && !model.requestInfo.requestFilter;
+        }
+
+        return true;
+      },
+
+      getActionInfo(context, action) {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
+        const source = model.source as unknown as ResultSetDataSource;
+        const data = source.getAction(resultIndex, ResultSetDataAction);
+        const resultColumn = data.getColumn(key.column);
+
+        if (action === ACTION_DELETE) {
+          return {
+            ...action.info,
+            icon: 'filter-reset',
+            label: `Delete filter for "${resultColumn?.name ?? '?'}"`,
+          };
+        }
+
+        return action.info;
+      },
+      handler: async (context, action) => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
+        const source = model.source as unknown as ResultSetDataSource;
+        const data = source.getAction(resultIndex, ResultSetDataAction);
+
+        if (action === ACTION_DELETE) {
+          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+          const resultColumn = data.getColumn(key.column);
+
+          if (!resultColumn) {
+            throw new Error(`Failed to get result column info for the following column index: "${key.column.index}"`);
           }
 
-          const valueGetter = () => this.clipboardService.clipboardValue || '';
-          const items = this.getGeneralizedMenuItems(context, valueGetter, 'filter-clipboard', () => this.clipboardService.state === 'prompt');
+          await model.request(() => {
+            constraints.deleteFilter(resultColumn.position);
+          });
+        }
 
-          return [
-            {
-              id: 'permission',
-              isPresent: () => true,
-              isHidden: () => this.clipboardService.state !== 'prompt',
-              isDisabled(context) {
-                return context.data.model.isLoading();
-              },
-              title: 'data_grid_table_context_menu_filter_clipboard_permission',
-              icon: 'permission',
-              onClick: async () => {
-                await this.clipboardService.read();
-              },
-            },
-            ...items,
-          ];
-        },
-      }),
-    });
-    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
-      id: 'cellValue',
-      order: 1,
-      title: 'data_grid_table_filter_cell_value',
-      icon: 'filter',
-      isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
+        if (action === ACTION_DATA_GRID_FILTERS_RESET_ALL) {
+          const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+
+          await model.request(() => {
+            constraints.deleteDataFilters();
+          });
+        }
       },
-      isHidden: context => {
-        const { model, resultIndex, key } = context.data;
+    });
+
+    this.menuService.addCreator({
+      menus: [MENU_DATA_GRID_FILTERS_CELL_VALUE],
+      isApplicable: context => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
+        const source = model.source as unknown as ResultSetDataSource;
+        const data = source.getAction(resultIndex, ResultSetDataAction);
+
+        if (model.isDisabled(resultIndex)) {
+          return false;
+        }
+
+        const supportedOperations = data.getColumnOperations(key.column);
+        return supportedOperations.length > 0;
+      },
+      getItems: (context, items) => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
+        const source = model.source as unknown as ResultSetDataSource;
+        const format = source.getAction(resultIndex, ResultSetFormatAction);
+        const data = source.getAction(resultIndex, ResultSetDataAction);
+
+        const cellValue = format.getText(key);
+        const supportedOperations = data.getColumnOperations(key.column);
+        const columnLabel = data.getColumn(key.column)?.label || '';
+
+        const filters = supportedOperations
+          .filter(operation => !nullOperationsFilter(operation))
+          .map(operation => {
+            const wrappedValue = wrapOperationArgument(operation.id, cellValue);
+            const clippedValue = replaceMiddle(wrappedValue, ' ... ', 8, 30);
+
+            return new MenuBaseItem(
+              {
+                id: operation.id,
+                label: `${columnLabel} ${operation.expression} ${clippedValue}`,
+                icon: 'filter',
+              },
+              {
+                onSelect: async () => {
+                  await this.applyFilter(
+                    model as unknown as IDatabaseDataModel<ResultSetDataSource>,
+                    resultIndex,
+                    key.column,
+                    operation.id,
+                    wrappedValue,
+                  );
+                },
+              },
+            );
+          });
+
+        return [...items, ...filters];
+      },
+    });
+
+    this.menuService.addCreator({
+      menus: [MENU_DATA_GRID_FILTERS_CUSTOM],
+      isApplicable(context) {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
+        const source = model.source as unknown as ResultSetDataSource;
+        const data = source.getAction(resultIndex, ResultSetDataAction);
+
+        const supportedOperations = data.getColumnOperations(key.column);
+        const cellValue = data.getCellValue(key);
+
+        return cellValue !== undefined && supportedOperations.length > 0;
+      },
+      getItems: (context, items) => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
         const source = model.source as unknown as ResultSetDataSource;
         const data = source.getAction(resultIndex, ResultSetDataAction);
         const format = source.getAction(resultIndex, ResultSetFormatAction);
+
         const supportedOperations = data.getColumnOperations(key.column);
-        const value = data.getCellValue(key);
+        const columnLabel = data.getColumn(key.column)?.label || '';
+        const displayString = format.getText(key);
 
-        return value === undefined || supportedOperations.length === 0 || format.isNull(key);
-      },
-      panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
-        id: 'cellValuePanel',
-        menuItemsGetter: context => {
-          const { model, resultIndex, key } = context.data;
-          const source = model.source as unknown as ResultSetDataSource;
-          const format = source.getAction(resultIndex, ResultSetFormatAction);
-          const cellValue = format.getText(key);
-          const items = this.getGeneralizedMenuItems(context, cellValue, 'filter');
-          return items;
-        },
-      }),
-    });
-    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
-      id: 'customValue',
-      order: 2,
-      title: 'data_grid_table_filter_custom_value',
-      icon: 'filter-custom',
-      isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
-      },
-      isHidden: context => {
-        const { model, resultIndex, key } = context.data;
-        const source = model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(resultIndex, ResultSetDataAction);
-        const cellValue = data.getCellValue(key);
-        const supportedOperations = data.getColumnOperations(key.column);
+        const filters = supportedOperations
+          .filter(operation => !nullOperationsFilter(operation))
+          .map(operation => {
+            const title = `${columnLabel} ${operation.expression}`;
 
-        return cellValue === undefined || supportedOperations.length === 0;
-      },
-      panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
-        id: 'customValuePanel',
-        menuItemsGetter: context => {
-          const { model, resultIndex, key } = context.data;
-          const source = model.source as unknown as ResultSetDataSource;
-          const data = source.getAction(resultIndex, ResultSetDataAction);
-          const supportedOperations = data.getColumnOperations(key.column);
-          const columnLabel = data.getColumn(key.column)?.label || '';
-
-          return supportedOperations
-            .filter(operation => !nullOperationsFilter(operation))
-            .map(operation => {
-              const title = `${columnLabel} ${operation.expression}`;
-
-              return {
+            return new MenuBaseItem(
+              {
                 id: operation.id,
-                isPresent: () => true,
-                isDisabled(context) {
-                  return context.data.model.isLoading();
-                },
-                title: title + ' ..',
+                label: title + ' ..',
                 icon: 'filter-custom',
-                onClick: async () => {
-                  const source = model.source as unknown as ResultSetDataSource;
-                  const format = source.getAction(resultIndex, ResultSetFormatAction);
-                  const displayString = format.getText(key);
+              },
+              {
+                onSelect: async () => {
                   const customValue = await this.commonDialogService.open(FilterCustomValueDialog, {
                     defaultValue: displayString,
                     inputTitle: title + ':',
@@ -304,131 +342,100 @@ export class DataGridContextMenuFilterService {
                     customValue,
                   );
                 },
-              };
-            });
-        },
-      }),
-    });
-    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
-      id: 'isNullValue',
-      order: 3,
-      icon: 'filter',
-      isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
-      },
-      isHidden: context => {
-        const source = context.data.model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(context.data.resultIndex, ResultSetDataAction);
-        const supportedOperations = data.getColumnOperations(context.data.key.column);
+              },
+            );
+          });
 
-        return !supportedOperations.some(operation => operation.id === IS_NULL_ID);
-      },
-      titleGetter: context => {
-        const source = context.data.model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(context.data.resultIndex, ResultSetDataAction);
-        const columnLabel = data.getColumn(context.data.key.column)?.label || '';
-        return `${columnLabel} IS NULL`;
-      },
-      onClick: async context => {
-        await this.applyFilter(
-          context.data.model as unknown as IDatabaseDataModel<ResultSetDataSource>,
-          context.data.resultIndex,
-          context.data.key.column,
-          IS_NULL_ID,
-        );
+        return [...items, ...filters];
       },
     });
-    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
-      id: 'isNotNullValue',
-      order: 4,
-      icon: 'filter',
-      isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
-      },
-      isHidden: context => {
-        const source = context.data.model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(context.data.resultIndex, ResultSetDataAction);
-        const supportedOperations = data.getColumnOperations(context.data.key.column);
 
-        return !supportedOperations.some(operation => operation.id === IS_NOT_NULL_ID);
-      },
-      titleGetter: context => {
-        const source = context.data.model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(context.data.resultIndex, ResultSetDataAction);
-        const columnLabel = data.getColumn(context.data.key.column)?.label || '';
-        return `${columnLabel} IS NOT NULL`;
-      },
-      onClick: async context => {
-        await this.applyFilter(
-          context.data.model as unknown as IDatabaseDataModel<ResultSetDataSource>,
-          context.data.resultIndex,
-          context.data.key.column,
-          IS_NOT_NULL_ID,
-        );
+    this.menuService.setHandler({
+      id: 'data-grid-filters-clipboard-handler',
+      menus: [MENU_DATA_GRID_FILTERS_CLIPBOARD],
+      handler: () => {
+        if (this.clipboardService.state === 'granted') {
+          this.clipboardService.read();
+        }
       },
     });
-    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
-      id: 'deleteFilter',
-      order: 5,
-      icon: 'filter-reset',
-      isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
-      },
-      isHidden: context => {
-        const { model, resultIndex, key } = context.data;
+
+    this.menuService.addCreator({
+      menus: [MENU_DATA_GRID_FILTERS_CLIPBOARD],
+      isApplicable: context => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
         const source = model.source as unknown as ResultSetDataSource;
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
         const data = source.getAction(resultIndex, ResultSetDataAction);
-        const resultColumn = data.getColumn(key.column);
-        const currentConstraint = resultColumn ? constraints.get(resultColumn.position) : undefined;
+        const supportedOperations = data.getColumnOperations(key.column);
 
-        return !currentConstraint || !isFilterConstraint(currentConstraint);
+        return this.clipboardService.clipboardAvailable && this.clipboardService.state !== 'denied' && supportedOperations.length > 0;
       },
-      titleGetter: context => {
-        const source = context.data.model.source as unknown as ResultSetDataSource;
-        const data = source.getAction(context.data.resultIndex, ResultSetDataAction);
-        const columnLabel = data.getColumn(context.data.key.column)?.name || '';
-        return `Delete filter for ${columnLabel}`;
-      },
-      onClick: async context => {
-        const { model, resultIndex, key } = context.data;
+      getItems: (context, items) => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const key = context.get(DATA_CONTEXT_DV_RESULT_KEY)!;
+
         const source = model.source as unknown as ResultSetDataSource;
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
         const data = source.getAction(resultIndex, ResultSetDataAction);
-        const resultColumn = data.getColumn(key.column);
+        const supportedOperations = data.getColumnOperations(key.column);
+        const columnLabel = data.getColumn(key.column)?.label || '';
 
-        if (!resultColumn) {
-          throw new Error(`Failed to get result column info for the following column index: "${key.column.index}"`);
+        const result = [...items];
+
+        if (this.clipboardService.state === 'prompt') {
+          const permission = new MenuBaseItem(
+            {
+              id: 'permission',
+              hidden: this.clipboardService.state !== 'prompt',
+              label: 'data_grid_table_context_menu_filter_clipboard_permission',
+              icon: 'permission',
+            },
+            {
+              onSelect: async () => {
+                await this.clipboardService.read();
+              },
+            },
+            { isDisabled: () => model.isLoading() },
+          );
+
+          result.push(permission);
         }
 
-        await model.request(() => {
-          constraints.deleteFilter(resultColumn.position);
-        });
-      },
-    });
-    this.dataGridContextMenuService.add(this.getMenuFilterToken(), {
-      id: 'deleteAllFilters',
-      order: 6,
-      icon: 'filter-reset-all',
-      title: 'data_grid_table_filter_reset_all_filters',
-      isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
-      },
-      isHidden: context => {
-        const { model, resultIndex } = context.data;
-        const source = model.source as unknown as ResultSetDataSource;
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+        if (this.clipboardService.state === 'granted') {
+          const filters = supportedOperations
+            .filter(operation => !nullOperationsFilter(operation))
+            .map(operation => {
+              const val = this.clipboardService.clipboardValue || '';
+              const wrappedValue = wrapOperationArgument(operation.id, val);
+              const clippedValue = replaceMiddle(wrappedValue, ' ... ', 8, 30);
+              const label = `${columnLabel} ${operation.expression} ${clippedValue}`;
 
-        return constraints.filterConstraints.length === 0 && !model.requestInfo.requestFilter;
-      },
-      onClick: async context => {
-        const { model, resultIndex } = context.data;
-        const source = model.source as unknown as ResultSetDataSource;
-        const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
+              return new MenuBaseItem(
+                { id: operation.id, icon: 'filter-clipboard', label },
+                {
+                  onSelect: async () => {
+                    const wrappedValue = wrapOperationArgument(operation.id, val);
 
-        await model.request(() => {
-          constraints.deleteDataFilters();
-        });
+                    await this.applyFilter(
+                      model as unknown as IDatabaseDataModel<ResultSetDataSource>,
+                      resultIndex,
+                      key.column,
+                      operation.id,
+                      wrappedValue,
+                    );
+                  },
+                },
+                { isDisabled: () => model.isLoading() },
+              );
+            });
+
+          result.push(...filters);
+        }
+
+        return result;
       },
     });
   }
