@@ -29,25 +29,18 @@ export const DriverSelectorDialog: DialogComponent<Payload> = observer(function 
   const dbDriverResource = useResource(DriverSelectorDialog, DBDriverResource, CachedMapAllKey);
 
   const enabledDrivers = dbDriverResource.resource.enabledDrivers;
-  const dialog = useDriverSelectorDialog(
-    enabledDrivers.map(driver => driver.id),
-    rejectDialog,
-  );
+  const dialog = useDriverSelectorDialog({
+    drivers: enabledDrivers.map(driver => driver.id),
+    projectId: payload.projectId,
+    folderPath: payload.folderPath,
+    onSelect: rejectDialog,
+  });
 
   return (
     <CommonDialogWrapper size="large" autofocus={false} fixedSize>
       <CommonDialogHeader title={translate('plugin_connections_new_connection_dialog_title')} />
       <CommonDialogBody noBodyPadding noOverflow>
-        <DriverSelector
-          className={s(style, { driverSelector: true })}
-          drivers={enabledDrivers}
-          onSelect={driverId =>
-            dialog.select({
-              driverId,
-              ...payload,
-            })
-          }
-        />
+        <DriverSelector className={s(style, { driverSelector: true })} drivers={enabledDrivers} onSelect={driverId => dialog.select(driverId)} />
       </CommonDialogBody>
     </CommonDialogWrapper>
   );

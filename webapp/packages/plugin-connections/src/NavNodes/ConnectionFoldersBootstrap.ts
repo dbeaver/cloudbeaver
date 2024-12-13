@@ -30,6 +30,7 @@ import {
   ENodeMoveType,
   getNodesFromContext,
   type INodeMoveData,
+  isConnectionFolderNode,
   NAV_NODE_TYPE_FOLDER,
   type NavNode,
   NavNodeInfoResource,
@@ -126,7 +127,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           return false;
         }
 
-        const targetNode = this.treeSelectionService.getSelectedNode(tree, getProjectNodeId);
+        const targetNode = this.treeSelectionService.getFirstSelectedNode(tree, getProjectNodeId);
 
         return targetNode !== undefined;
       },
@@ -149,7 +150,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
-        const targetNode = this.treeSelectionService.getSelectedNode(tree, getProjectNodeId);
+        const targetNode = this.treeSelectionService.getFirstSelectedNode(tree, getProjectNodeId);
 
         if (
           ![NAV_NODE_TYPE_CONNECTION, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_PROJECT].includes(node?.nodeType ?? '') ||
@@ -211,9 +212,9 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       const childrenNode = this.navNodeInfoResource.get(resourceKeyList(children));
       const folderDuplicates = nodes.filter(
         node =>
-          node.nodeType === NAV_NODE_TYPE_FOLDER &&
-          (childrenNode.some(child => child?.nodeType === NAV_NODE_TYPE_FOLDER && child.name === node.name) ||
-            nodes.some(child => child.nodeType === NAV_NODE_TYPE_FOLDER && child.name === node.name && child.id !== node.id)),
+          isConnectionFolderNode(node) &&
+          (childrenNode.some(child => child && isConnectionFolderNode(child) && child.name === node.name) ||
+            nodes.some(child => isConnectionFolderNode(child) && child.name === node.name && child.id !== node.id)),
       );
 
       if (folderDuplicates.length > 0) {
@@ -257,7 +258,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     switch (action) {
       case ACTION_TREE_CREATE_FOLDER:
       case ACTION_NEW_FOLDER: {
-        const targetNode = this.treeSelectionService.getSelectedNode(tree, getProjectNodeId);
+        const targetNode = this.treeSelectionService.getFirstSelectedNode(tree, getProjectNodeId);
 
         if (!targetNode) {
           this.notificationService.logError({ title: "Can't create folder", message: 'core_projects_no_default_project' });

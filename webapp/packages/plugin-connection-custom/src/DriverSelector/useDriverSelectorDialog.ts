@@ -13,24 +13,25 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { PublicConnectionFormService } from '@cloudbeaver/plugin-connections';
 
-type SelectParameters = {
-  driverId: string;
-  projectId?: string;
-  folderPath?: string;
-};
-
 interface State {
-  select(params: SelectParameters): Promise<void>;
+  select(driverId: string): Promise<void>;
 }
 
-export function useDriverSelectorDialog(drivers: string[], onSelect?: () => void) {
+type Args = {
+  drivers: string[];
+  onSelect?: () => void;
+  projectId: string | undefined;
+  folderPath: string | undefined;
+};
+
+export function useDriverSelectorDialog({ drivers, onSelect, projectId, folderPath }: Args) {
   const notificationService = useService(NotificationService);
   const connectionsManagerService = useService(ConnectionsManagerService);
   const publicConnectionFormService = useService(PublicConnectionFormService);
 
   const state: State = useObservableRef(
     () => ({
-      async select({ driverId, projectId, folderPath }: SelectParameters) {
+      async select(driverId: string) {
         const projects = this.connectionsManagerService.createConnectionProjects;
 
         if (projects.length === 0) {

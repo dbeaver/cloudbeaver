@@ -77,10 +77,11 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'tree-tools-menu-resource-folders-handler',
       actions: [ACTION_NEW_FOLDER],
+      contexts: [DATA_CONTEXT_ELEMENTS_TREE],
       isActionApplicable: context => {
-        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
+        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
 
-        if (!tree?.baseRoot.startsWith(RESOURCES_NODE_PATH) || !this.userInfoResource.isAuthenticated()) {
+        if (!tree.baseRoot.startsWith(RESOURCES_NODE_PATH) || !this.userInfoResource.isAuthenticated()) {
           return false;
         }
 
@@ -94,7 +95,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
           return true;
         }
 
-        return this.treeSelectionService.getSelectedNode(tree, getRmProjectNodeId) === undefined;
+        return this.treeSelectionService.getFirstSelectedNode(tree, getRmProjectNodeId) === undefined;
       },
       handler: this.elementsTreeActionHandler.bind(this),
     });
@@ -172,7 +173,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
 
     switch (action) {
       case ACTION_NEW_FOLDER: {
-        const targetNode = this.treeSelectionService.getSelectedNode(tree, getRmProjectNodeId);
+        const targetNode = this.treeSelectionService.getFirstSelectedNode(tree, getRmProjectNodeId);
 
         if (!targetNode) {
           return;

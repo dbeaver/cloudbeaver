@@ -16,7 +16,7 @@ import {
   ENodeFeature,
   getNodePlainName,
   type INodeActions,
-  NAV_NODE_TYPE_FOLDER,
+  isConnectionFolderNode,
   type NavNode,
   NavNodeInfoResource,
   NavNodeManagerService,
@@ -101,7 +101,7 @@ export class NavNodeContextMenuService extends Bootstrap {
       isActionApplicable: (context, action): boolean => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
-        if (NodeManagerUtils.isDatabaseObject(node.id) || node.nodeType === NAV_NODE_TYPE_FOLDER) {
+        if (NodeManagerUtils.isDatabaseObject(node.id) || isConnectionFolderNode(node)) {
           if (action === ACTION_RENAME) {
             return node.features?.includes(ENodeFeature.canRename) ?? false;
           }

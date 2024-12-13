@@ -63,35 +63,36 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
       id: 'nav-tree-create-create-connection-handler',
       menus: [MENU_NAVIGATION_TREE_CREATE],
       actions: [ACTION_TREE_CREATE_CONNECTION],
+      contexts: [DATA_CONTEXT_ELEMENTS_TREE],
       handler: this.createConnectionHandler.bind(this),
     });
 
     this.actionService.addHandler({
       id: 'connection-custom',
       actions: [ACTION_CONNECTION_CUSTOM],
+      contexts: [DATA_CONTEXT_ELEMENTS_TREE],
       isHidden: (context, action) => this.isConnectionFeatureDisabled(action === ACTION_CONNECTION_CUSTOM),
       getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       handler: this.createConnectionHandler.bind(this),
     });
   }
 
-  private createConnectionHandler = async (context: IDataContextProvider, action: IAction) => {
-    const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
+  private async createConnectionHandler(context: IDataContextProvider, action: IAction) {
+    const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
 
     switch (action) {
-      case ACTION_TREE_CREATE_CONNECTION:
-        if (tree) {
-          const projectId = this.treeSelectionService.getSelectedProject(tree)?.id;
-          const selectedNode = this.treeSelectionService.getSelectedNode(tree, getProjectNodeId);
-          const folderPath = selectedNode?.folderId ? getFolderPath(selectedNode.folderId) : undefined;
-          await this.openConnectionsDialog(projectId, folderPath);
-        }
+      case ACTION_TREE_CREATE_CONNECTION: {
+        const projectId = this.treeSelectionService.getSelectedProject(tree)?.id;
+        const selectedNode = this.treeSelectionService.getFirstSelectedNode(tree, getProjectNodeId);
+        const folderPath = selectedNode?.folderId ? getFolderPath(selectedNode.folderId) : undefined;
+        await this.openConnectionsDialog(projectId, folderPath);
         break;
+      }
       case ACTION_CONNECTION_CUSTOM:
         await this.openConnectionsDialog();
         break;
     }
-  };
+  }
 
   private isConnectionFeatureDisabled(hasSettings: boolean) {
     if (this.connectionsManagerService.createConnectionProjects.length === 0) {

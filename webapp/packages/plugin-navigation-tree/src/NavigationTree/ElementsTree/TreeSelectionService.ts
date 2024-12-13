@@ -5,13 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { untracked } from 'mobx';
-
 import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { NAV_NODE_TYPE_FOLDER, type NavNode, NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
-import { NAV_NODE_TYPE_PROJECT, type ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
+import { isConnectionFolderNode, isProjectNode, type NavNode, NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
+import { type ProjectInfo } from '@cloudbeaver/core-projects';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import type { IElementsTree } from './useElementsTree.js';
@@ -31,14 +29,12 @@ export class TreeSelectionService {
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly projectsNavNodeService: ProjectsNavNodeService,
-    private readonly projectInfoResource: ProjectInfoResource,
   ) {
     this.getSelectedProject = this.getSelectedProject.bind(this);
-    this.getSelectedNode = this.getSelectedNode.bind(this);
+    this.getFirstSelectedNode = this.getFirstSelectedNode.bind(this);
   }
 
-  getSelectedNode(tree: IElementsTree, nodeIdGetter: NodeIdGetter): ISelectedNode | undefined {
-    untracked(() => this.projectInfoResource.load(CachedMapAllKey));
+  getFirstSelectedNode(tree: IElementsTree, nodeIdGetter: NodeIdGetter): ISelectedNode | undefined {
     const selected = tree.getSelected();
 
     if (selected.length === 0) {
@@ -57,7 +53,7 @@ export class TreeSelectionService {
       return;
     }
 
-    const projectNode = this.getProjectNode(tree);
+    const projectNode = this.getParents(tree).find(isProjectNode);
 
     if (!projectNode) {
       return;
@@ -69,7 +65,7 @@ export class TreeSelectionService {
       return;
     }
 
-    const selectedFolderNode = this.getSelectedFolderNode(tree);
+    const selectedFolderNode = this.getParents(tree).slice().reverse().find(isConnectionFolderNode);
 
     return {
       projectId: project.id,
@@ -80,7 +76,7 @@ export class TreeSelectionService {
   }
 
   getSelectedProject(tree: IElementsTree): ProjectInfo | undefined {
-    const projectNode = this.getProjectNode(tree);
+    const projectNode = this.getParents(tree).find(isProjectNode);
 
     if (!projectNode) {
       return;
@@ -91,23 +87,13 @@ export class TreeSelectionService {
 
   private getParents(tree: IElementsTree): NavNode[] {
     const selected = tree.getSelected();
-    const selectedFolder = selected[0]!;
+    const selectedFolder = selected[0];
+
+    if (!selectedFolder) {
+      return [];
+    }
+
     const parentIds = [...this.navNodeInfoResource.getParents(selectedFolder), selectedFolder];
     return this.navNodeInfoResource.get(resourceKeyList(parentIds)).filter(isNotNullDefined);
-  }
-
-  private getProjectNode(tree: IElementsTree): NavNode | undefined {
-    const parents = this.getParents(tree);
-
-    return parents.find(parent => parent?.nodeType === NAV_NODE_TYPE_PROJECT);
-  }
-
-  private getSelectedFolderNode(tree: IElementsTree): NavNode | undefined {
-    const parents = this.getParents(tree);
-
-    return parents
-      .slice()
-      .reverse()
-      .find(parent => parent?.nodeType === NAV_NODE_TYPE_FOLDER);
   }
 }
