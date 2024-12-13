@@ -35,7 +35,7 @@ import {
 } from '@cloudbeaver/core-sdk';
 
 import { NetworkStateService } from './NetworkStateService.js';
-import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Subscription } from './ServerEventEmitter/IServerEventEmitter.js';
+import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Unsubscribe } from './ServerEventEmitter/IServerEventEmitter.js';
 import { SessionExpireService } from './SessionExpireService.js';
 
 export { ServerEventId, SessionEventTopic, ClientEventId };
@@ -111,7 +111,7 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
     this.errorHandler = this.errorHandler.bind(this);
   }
 
-  onEvent<T = ISessionEvent>(id: SessionEventId, callback: IServerEventCallback<T>, mapTo: (event: ISessionEvent) => T = e => e as T): Subscription {
+  onEvent<T = ISessionEvent>(id: SessionEventId, callback: IServerEventCallback<T>, mapTo: (event: ISessionEvent) => T = e => e as T): Unsubscribe {
     const sub = this.eventsSubject
       .pipe(
         filter(event => event.id === id),
@@ -128,7 +128,7 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
     callback: IServerEventCallback<T>,
     mapTo: (event: ISessionEvent) => T = e => e as T,
     filterFn: (event: ISessionEvent) => boolean = () => true,
-  ): Subscription {
+  ): Unsubscribe {
     const sub = this.eventsSubject.pipe(filter(filterFn), map(mapTo)).subscribe(callback);
 
     return () => {
