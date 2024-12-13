@@ -73,14 +73,16 @@ export class AsyncTaskInfoService extends Disposable {
 
     this.tasks.set(task.id, task);
     task.onStatusChange.addHandler(info => {
+      if (this.taskIdAliases.get(info.id)) {
+        return;
+      }
+
+      this.taskIdAliases.set(info.id, task.id);
+
       const pendingEvent = this.pendingEvents.get(info.id);
       if (pendingEvent) {
-        const changes = { ...pendingEvent };
         this.pendingEvents.delete(info.id);
-        this.updateTask(task, changes);
-      }
-      if (!this.taskIdAliases.get(info.id)) {
-        this.taskIdAliases.set(info.id, task.id);
+        this.updateTask(task, pendingEvent);
       }
     });
 
