@@ -25,6 +25,9 @@
       "path": "../core-localization/tsconfig.json"
     },
     {
+      "path": "../core-navigation-tree/tsconfig.json"
+    },
+    {
       "path": "../core-projects/tsconfig.json"
     },
     {
