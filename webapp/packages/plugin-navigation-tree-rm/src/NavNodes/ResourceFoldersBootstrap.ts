@@ -65,7 +65,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     private readonly navResourceNodeService: NavResourceNodeService,
-    private readonly treeProjectsService: TreeSelectionService,
+    private readonly treeSelectionService: TreeSelectionService,
     private readonly projectsNavNodeService: ProjectsNavNodeService,
   ) {
     super();
@@ -94,7 +94,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
           return true;
         }
 
-        return this.treeProjectsService.getSelectedNode(tree, getRmProjectNodeId) === undefined;
+        return this.treeSelectionService.getSelectedNode(tree, getRmProjectNodeId) === undefined;
       },
       handler: this.elementsTreeActionHandler.bind(this),
     });
@@ -172,7 +172,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
 
     switch (action) {
       case ACTION_NEW_FOLDER: {
-        const targetNode = this.treeProjectsService.getSelectedNode(tree, getRmProjectNodeId);
+        const targetNode = this.treeSelectionService.getSelectedNode(tree, getRmProjectNodeId);
 
         if (!targetNode) {
           return;

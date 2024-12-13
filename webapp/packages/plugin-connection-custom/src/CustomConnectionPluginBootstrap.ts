@@ -14,7 +14,7 @@ import { DATA_CONTEXT_NAV_NODE, NAV_NODE_TYPE_FOLDER } from '@cloudbeaver/core-n
 import { NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
-import { ACTION_CREATE_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
+import { ACTION_TREE_CREATE_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_NAVIGATION_TREE_CREATE, TreeSelectionService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM.js';
@@ -31,7 +31,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     private readonly actionService: ActionService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly customConnectionSettingsService: CustomConnectionSettingsService,
-    private readonly treeProjectsService: TreeSelectionService,
+    private readonly treeSelectionService: TreeSelectionService,
   ) {
     super();
   }
@@ -56,13 +56,13 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
 
         return true;
       },
-      getItems: (context, items) => [...items, ACTION_CREATE_CONNECTION],
+      getItems: (context, items) => [...items, ACTION_TREE_CREATE_CONNECTION],
     });
 
     this.actionService.addHandler({
       id: 'nav-tree-create-create-connection-handler',
       menus: [MENU_NAVIGATION_TREE_CREATE],
-      actions: [ACTION_CREATE_CONNECTION],
+      actions: [ACTION_TREE_CREATE_CONNECTION],
       handler: this.createConnectionHandler.bind(this),
     });
 
@@ -79,9 +79,9 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
 
     switch (action) {
-      case ACTION_CREATE_CONNECTION:
+      case ACTION_TREE_CREATE_CONNECTION:
         if (tree) {
-          await this.openConnectionsDialog(this.treeProjectsService.getSelectedProject(tree)?.id);
+          await this.openConnectionsDialog(this.treeSelectionService.getSelectedProject(tree)?.id);
         }
         break;
       case ACTION_CONNECTION_CUSTOM:

@@ -7,6 +7,6 @@
  */
 import { createAction } from '@cloudbeaver/core-view';
 
-export const ACTION_CREATE_FOLDER = createAction('create-folder', {
+export const ACTION_TREE_CREATE_FOLDER = createAction('create-folder', {
   label: 'ui_folder_new',
 });

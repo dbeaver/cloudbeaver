@@ -7,6 +7,6 @@
  */
 import { createAction } from '@cloudbeaver/core-view';
 
-export const ACTION_CREATE_CONNECTION = createAction('create-connection', {
+export const ACTION_TREE_CREATE_CONNECTION = createAction('create-connection', {
   label: 'plugin_connections_connection_create_menu_title',
 });

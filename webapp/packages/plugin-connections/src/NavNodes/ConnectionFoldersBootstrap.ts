@@ -52,7 +52,7 @@ import {
 } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 
-import { ACTION_CREATE_FOLDER } from '../Actions/ACTION_CREATE_FOLDER.js';
+import { ACTION_TREE_CREATE_FOLDER } from '../Actions/ACTION_TREE_CREATE_FOLDER.js';
 import { NAV_NODE_TYPE_CONNECTION } from './NAV_NODE_TYPE_CONNECTION.js';
 
 @injectable()
@@ -71,7 +71,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly projectsNavNodeService: ProjectsNavNodeService,
-    private readonly treeProjectsService: TreeSelectionService,
+    private readonly treeSelectionService: TreeSelectionService,
   ) {
     super();
   }
@@ -126,7 +126,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           return false;
         }
 
-        const targetNode = this.treeProjectsService.getSelectedNode(tree, getProjectNodeId);
+        const targetNode = this.treeSelectionService.getSelectedNode(tree, getProjectNodeId);
 
         return targetNode !== undefined;
       },
@@ -149,7 +149,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
-        const targetNode = this.treeProjectsService.getSelectedNode(tree, getProjectNodeId);
+        const targetNode = this.treeSelectionService.getSelectedNode(tree, getProjectNodeId);
 
         if (
           ![NAV_NODE_TYPE_CONNECTION, NAV_NODE_TYPE_FOLDER, NAV_NODE_TYPE_PROJECT].includes(node?.nodeType ?? '') ||
@@ -162,13 +162,13 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
         return true;
       },
-      getItems: (context, items) => [...items, ACTION_CREATE_FOLDER],
+      getItems: (context, items) => [...items, ACTION_TREE_CREATE_FOLDER],
     });
 
     this.actionService.addHandler({
       id: 'nav-tree-create-create-folders-handler',
       menus: [MENU_NAVIGATION_TREE_CREATE],
-      actions: [ACTION_CREATE_FOLDER],
+      actions: [ACTION_TREE_CREATE_FOLDER],
       handler: this.elementsTreeActionHandler.bind(this),
     });
   }
@@ -255,9 +255,9 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     }
 
     switch (action) {
-      case ACTION_CREATE_FOLDER:
+      case ACTION_TREE_CREATE_FOLDER:
       case ACTION_NEW_FOLDER: {
-        const targetNode = this.treeProjectsService.getSelectedNode(tree, getProjectNodeId);
+        const targetNode = this.treeSelectionService.getSelectedNode(tree, getProjectNodeId);
 
         if (!targetNode) {
           this.notificationService.logError({ title: "Can't create folder", message: 'core_projects_no_default_project' });
