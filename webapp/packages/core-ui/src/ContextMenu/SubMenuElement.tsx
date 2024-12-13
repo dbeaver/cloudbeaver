@@ -42,7 +42,7 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
     });
 
     const handler = subMenuData.handler;
-    const hidden = getComputed(() => !subMenuData.items.length || handler?.isHidden?.(subMenuData.context));
+    const hidden = getComputed(() => handler?.isHidden?.(subMenuData.context));
     useAutoLoad(SubMenuElement, subMenuData.loaders, !hidden, visible, true);
 
     const handlers = useObjectRef(
@@ -66,7 +66,7 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
       ['handleItemClose', 'hasBindings', 'handleVisibleSwitch'],
     );
 
-    if (hidden) {
+    if (hidden || !subMenuData.items.length) {
       return null;
     }
 
