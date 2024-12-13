@@ -12,6 +12,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NAV_NODE_TYPE_FOLDER, type NavNode, NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT, type ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import type { IElementsTree } from './useElementsTree.js';
 
@@ -88,11 +89,11 @@ export class TreeSelectionService {
     return this.projectsNavNodeService.getByNodeId(projectNode.id);
   }
 
-  private getParents(tree: IElementsTree): (NavNode | undefined)[] {
+  private getParents(tree: IElementsTree): NavNode[] {
     const selected = tree.getSelected();
     const selectedFolder = selected[0]!;
     const parentIds = [...this.navNodeInfoResource.getParents(selectedFolder), selectedFolder];
-    return this.navNodeInfoResource.get(resourceKeyList(parentIds));
+    return this.navNodeInfoResource.get(resourceKeyList(parentIds)).filter(isNotNullDefined);
   }
 
   private getProjectNode(tree: IElementsTree): NavNode | undefined {
