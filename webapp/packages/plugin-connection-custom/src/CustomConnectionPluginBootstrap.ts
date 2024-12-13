@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { ConnectionsManagerService, NAV_NODE_TYPE_CONNECTION } from '@cloudbeaver/core-connections';
+import { ConnectionsManagerService, getFolderPath, NAV_NODE_TYPE_CONNECTION } from '@cloudbeaver/core-connections';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { DATA_CONTEXT_NAV_NODE, NAV_NODE_TYPE_FOLDER } from '@cloudbeaver/core-navigation-tree';
-import { NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { getProjectNodeId, NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
 import { ACTION_TREE_CREATE_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
@@ -81,7 +81,10 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     switch (action) {
       case ACTION_TREE_CREATE_CONNECTION:
         if (tree) {
-          await this.openConnectionsDialog(this.treeSelectionService.getSelectedProject(tree)?.id);
+          const projectId = this.treeSelectionService.getSelectedProject(tree)?.id;
+          const selectedNode = this.treeSelectionService.getSelectedNode(tree, getProjectNodeId);
+          const folderPath = selectedNode?.folderId ? getFolderPath(selectedNode.folderId) : undefined;
+          await this.openConnectionsDialog(projectId, folderPath);
         }
         break;
       case ACTION_CONNECTION_CUSTOM:
@@ -102,9 +105,10 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     return false;
   }
 
-  private async openConnectionsDialog(projectId?: string) {
+  private async openConnectionsDialog(projectId?: string, folderPath?: string) {
     await this.commonDialogService.open(DriverSelectorDialog, {
       projectId,
+      folderPath,
     });
   }
 }

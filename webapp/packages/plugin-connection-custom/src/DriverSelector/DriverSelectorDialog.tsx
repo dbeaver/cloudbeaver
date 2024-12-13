@@ -19,6 +19,7 @@ import { useDriverSelectorDialog } from './useDriverSelectorDialog.js';
 
 type Payload = {
   projectId?: string;
+  folderPath?: string;
 };
 
 export const DriverSelectorDialog: DialogComponent<Payload> = observer(function DriverSelectorDialog({ rejectDialog, payload }) {
@@ -40,7 +41,12 @@ export const DriverSelectorDialog: DialogComponent<Payload> = observer(function 
         <DriverSelector
           className={s(style, { driverSelector: true })}
           drivers={enabledDrivers}
-          onSelect={driverId => dialog.select(driverId, payload.projectId)}
+          onSelect={driverId =>
+            dialog.select({
+              driverId,
+              ...payload,
+            })
+          }
         />
       </CommonDialogBody>
     </CommonDialogWrapper>
