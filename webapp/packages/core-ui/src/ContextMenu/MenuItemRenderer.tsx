@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import React, { useCallback } from 'react';
 
-import { Checkbox, MenuItem, MenuItemCheckbox, MenuItemElement, MenuSeparator, useTranslate } from '@cloudbeaver/core-blocks';
+import { Checkbox, MenuItem, MenuItemCheckbox, MenuItemElement, MenuItemRadio, MenuSeparator, Radio, useTranslate } from '@cloudbeaver/core-blocks';
 import {
   type IMenuData,
   type IMenuItem,
@@ -16,6 +16,7 @@ import {
   MenuActionItem,
   MenuBaseItem,
   MenuCheckboxItem,
+  MenuRadioItem,
   MenuSeparatorItem,
   MenuSubMenuItem,
 } from '@cloudbeaver/core-view';
@@ -94,6 +95,23 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
           tooltip={item.tooltip}
         />
       </MenuItemCheckbox>
+    );
+  }
+
+  if (item instanceof MenuRadioItem) {
+    return (
+      <MenuItemRadio
+        hidden={item.hidden}
+        id={item.id}
+        aria-label={translate(item.label)}
+        disabled={item.disabled}
+        name={item.id}
+        value={item.label}
+        checked={item.checked}
+        onClick={() => onClick()}
+      >
+        <MenuItemElement label={item.label} icon={<Radio checked={item.checked} mod={['primary', 'menu']} ripple={false} />} tooltip={item.tooltip} />
+      </MenuItemRadio>
     );
   }
 

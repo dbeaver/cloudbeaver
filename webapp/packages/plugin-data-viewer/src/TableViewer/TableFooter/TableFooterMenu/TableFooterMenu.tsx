@@ -16,7 +16,7 @@ import { useMenu } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_DV_DDM } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX.js';
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel.js';
-import { DATA_CONTEXT_DATA_VIEWER_SIMPLE } from '../../TableHeader/DATA_CONTEXT_DATA_VIEWER_SIMPLE.js';
+import { DATA_CONTEXT_DV_SIMPLE } from '../../DATA_CONTEXT_DV_SIMPLE.js';
 import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from './DATA_VIEWER_DATA_MODEL_ACTIONS_MENU.js';
 import { REFRESH_MENU_ITEM_REGISTRY } from './RefreshAction/RefreshMenuAction.js';
 
@@ -35,7 +35,7 @@ export const TableFooterMenu = observer<Props>(function TableFooterMenu({ result
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_DV_DDM, model, id);
     context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex, id);
-    context.set(DATA_CONTEXT_DATA_VIEWER_SIMPLE, simple, id);
+    context.set(DATA_CONTEXT_DV_SIMPLE, simple, id);
   });
 
   return (
