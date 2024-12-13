@@ -6,12 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { ConnectionsManagerService, getFolderPath, isConnectionNode, NAV_NODE_TYPE_CONNECTION } from '@cloudbeaver/core-connections';
+import { ConnectionsManagerService, getFolderPath, isConnectionNode } from '@cloudbeaver/core-connections';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { DATA_CONTEXT_NAV_NODE, isFolderNode, isProjectNode, NAV_NODE_TYPE_FOLDER } from '@cloudbeaver/core-navigation-tree';
-import { getProjectNodeId, NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { DATA_CONTEXT_NAV_NODE, isFolderNode, isProjectNode } from '@cloudbeaver/core-navigation-tree';
+import { getProjectNodeId, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
 import { ACTION_TREE_CREATE_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';

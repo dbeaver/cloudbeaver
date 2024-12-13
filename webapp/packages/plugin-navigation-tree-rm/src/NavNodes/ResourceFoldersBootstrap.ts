@@ -77,7 +77,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'tree-tools-menu-resource-folders-handler',
       actions: [ACTION_NEW_FOLDER],
-      contexts: [DATA_CONTEXT_ELEMENTS_TREE],
+      contexts: [DATA_CONTEXT_ELEMENTS_TREE, DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID],
       isActionApplicable: context => {
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
 
@@ -89,11 +89,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       },
       getLoader: () => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       isDisabled: context => {
-        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
-
-        if (!tree) {
-          return true;
-        }
+        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
 
         return this.treeSelectionService.getFirstSelectedNode(tree, getRmProjectNodeId) === undefined;
       },
@@ -164,12 +160,8 @@ export class ResourceFoldersBootstrap extends Bootstrap {
   }
 
   private async elementsTreeActionHandler(contexts: IDataContextProvider, action: IAction) {
-    const resourceTypeId = contexts.get(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
-    const tree = contexts.get(DATA_CONTEXT_ELEMENTS_TREE);
-
-    if (!tree) {
-      return;
-    }
+    const resourceTypeId = contexts.get(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID)!;
+    const tree = contexts.get(DATA_CONTEXT_ELEMENTS_TREE)!;
 
     switch (action) {
       case ACTION_NEW_FOLDER: {
