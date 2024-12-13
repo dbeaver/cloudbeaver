@@ -78,10 +78,9 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
   }
 
   private async createConnectionHandler(context: IDataContextProvider, action: IAction) {
-    const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
-
     switch (action) {
       case ACTION_TREE_CREATE_CONNECTION: {
+        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
         const projectId = this.treeSelectionService.getSelectedProject(tree)?.id;
         const selectedNode = this.treeSelectionService.getFirstSelectedNode(tree, getProjectNodeId);
         const folderPath = selectedNode?.folderId ? getFolderPath(selectedNode.folderId) : undefined;
