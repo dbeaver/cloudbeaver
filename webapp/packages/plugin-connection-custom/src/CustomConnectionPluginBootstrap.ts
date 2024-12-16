@@ -67,7 +67,6 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'connection-custom',
       actions: [ACTION_CONNECTION_CUSTOM],
-      contexts: [DATA_CONTEXT_ELEMENTS_TREE],
       isHidden: (context, action) => this.isConnectionFeatureDisabled(action === ACTION_CONNECTION_CUSTOM),
       getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       handler: this.createConnectionHandler.bind(this),
