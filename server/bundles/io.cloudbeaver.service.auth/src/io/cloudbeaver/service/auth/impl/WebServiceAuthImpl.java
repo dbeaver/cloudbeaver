@@ -222,9 +222,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     @Override
-    public WebAuthProviderInfo[] getAuthProviders() {
+    public WebAuthProviderInfo[] getAuthProviders(WebSession webSession) {
         return WebAuthProviderRegistry.getInstance().getAuthProviders()
-            .stream().map(WebAuthProviderInfo::new)
+            .stream().map(p -> new WebAuthProviderInfo(webSession, p))
             .toArray(WebAuthProviderInfo[]::new);
     }
 
