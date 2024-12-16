@@ -71,20 +71,21 @@ export const CellMenu = observer<Props>(function CellMenu({ model, actions, spre
 
   return (
     <SContext registry={registry}>
-      <ContextMenu
-        className={s(style, { contextMenu: true })}
-        menu={menu}
-        placement="auto-end"
-        panelProps={{ onMouseUp: markStopPropagation, onDoubleClick: stopPropagation }}
-        tabIndex={-1}
-        modal
-        disclosure
-        onVisibleSwitch={onStateSwitch}
-      >
-        <div role="button" className={s(style, { trigger: true })} onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
-          <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
-        </div>
-      </ContextMenu>
+      <div className={s(style, { container: true })} onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
+        <ContextMenu
+          className={s(style, { contextMenu: true })}
+          menu={menu}
+          placement="auto-end"
+          tabIndex={-1}
+          modal
+          disclosure
+          onVisibleSwitch={onStateSwitch}
+        >
+          <div role="button" className={s(style, { trigger: true })}>
+            <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
+          </div>
+        </ContextMenu>
+      </div>
     </SContext>
   );
 });

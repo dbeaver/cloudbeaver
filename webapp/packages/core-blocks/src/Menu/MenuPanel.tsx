@@ -17,7 +17,7 @@ import { useS } from '../useS.js';
 import { MenuEmptyItem } from './MenuEmptyItem.js';
 import style from './MenuPanel.module.css';
 
-export interface IMenuPanelProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface IMenuPanelProps {
   label: string;
   menu: MenuStateReturn; // from reakit useMenuState
   panelAvailable?: boolean;
@@ -26,13 +26,11 @@ export interface IMenuPanelProps extends Omit<React.HTMLAttributes<HTMLDivElemen
   children: React.ReactNode | (() => React.ReactNode);
   rtl?: boolean;
   submenu?: boolean;
+  className?: string;
 }
 
 export const MenuPanel = observer<IMenuPanelProps, HTMLDivElement>(
-  forwardRef(function MenuPanel(
-    { label, menu, submenu, panelAvailable = true, rtl, getHasBindings, hasBindings, children, className, ...rest },
-    ref,
-  ) {
+  forwardRef(function MenuPanel({ label, menu, submenu, panelAvailable = true, rtl, getHasBindings, hasBindings, children, className }, ref) {
     const translate = useTranslate();
     const styles = useS(style);
     const visible = menu.visible;
@@ -57,7 +55,6 @@ export const MenuPanel = observer<IMenuPanelProps, HTMLDivElement>(
           {...menu}
           aria-label={translate(label)}
           visible={panelAvailable}
-          {...rest}
         >
           <div dir={rtl ? 'rtl' : undefined} data-s-has-bindings={hasBindings} className={s(styles, { menuBox: true })}>
             {Children.count(renderedChildren) === 0 && <MenuEmptyItem />}
