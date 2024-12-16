@@ -31,7 +31,7 @@ import {
   ENodeMoveType,
   getNodesFromContext,
   type INodeMoveData,
-  isFolderNode,
+  isConnectionFolder,
   isProjectNode,
   type NavNode,
   NavNodeInfoResource,
@@ -43,7 +43,13 @@ import {
   ROOT_NODE_PATH,
 } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import {
+  CachedMapAllKey,
+  getCachedMapResourceLoaderState,
+  resourceKeyList,
+  type ResourceKeySimple,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-resource';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
 import {
@@ -131,6 +137,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
         return targetNode !== undefined;
       },
+      getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       handler: this.elementsTreeActionHandler.bind(this),
     });
 
@@ -147,13 +154,23 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_NAVIGATION_TREE_CREATE],
-      isApplicable: context => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
+      contexts: [DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_ELEMENTS_TREE],
+      getItems: (context, items) => [...items, ACTION_TREE_CREATE_FOLDER],
+    });
+
+    this.actionService.addHandler({
+      id: 'nav-tree-create-create-folders-handler',
+      menus: [MENU_NAVIGATION_TREE_CREATE],
+      contexts: [DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_ELEMENTS_TREE],
+      actions: [ACTION_TREE_CREATE_FOLDER],
+      isActionApplicable: (context, action) => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
         const targetNode = this.treeSelectionService.getFirstSelectedNode(tree, getProjectNodeId);
 
         if (
-          ![isConnectionNode, isFolderNode, isProjectNode].some(check => check(node)) ||
+          action !== ACTION_TREE_CREATE_FOLDER ||
+          ![isConnectionNode, isConnectionFolder, isProjectNode].some(check => check(node)) ||
           !this.userInfoResource.isAuthenticated() ||
           tree.baseRoot !== ROOT_NODE_PATH ||
           targetNode === undefined
@@ -163,19 +180,13 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
         return true;
       },
-      getItems: (context, items) => [...items, ACTION_TREE_CREATE_FOLDER],
-    });
-
-    this.actionService.addHandler({
-      id: 'nav-tree-create-create-folders-handler',
-      menus: [MENU_NAVIGATION_TREE_CREATE],
-      actions: [ACTION_TREE_CREATE_FOLDER],
+      getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       handler: this.elementsTreeActionHandler.bind(this),
     });
   }
 
   private async moveConnectionToFolder({ type, targetNode, moveContexts }: INodeMoveData, contexts: IExecutionContextProvider<INodeMoveData>) {
-    if (![isProjectNode, isFolderNode].some(check => check(targetNode))) {
+    if (![isProjectNode, isConnectionFolder].some(check => check(targetNode))) {
       return;
     }
 
@@ -189,7 +200,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
     const supported = nodes.every(node => {
       if (
-        ![isConnectionNode, isFolderNode, isProjectNode].some(check => check(node)) ||
+        ![isConnectionNode, isConnectionFolder, isProjectNode].some(check => check(node)) ||
         targetProject !== this.projectsNavNodeService.getProject(node.id) ||
         children.includes(node.id) ||
         targetNode.id === node.id
@@ -212,9 +223,9 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       const childrenNode = this.navNodeInfoResource.get(resourceKeyList(children));
       const folderDuplicates = nodes.filter(
         node =>
-          isFolderNode(node) &&
-          (childrenNode.some(child => child && isFolderNode(child) && child.name === node.name) ||
-            nodes.some(child => isFolderNode(child) && child.name === node.name && child.id !== node.id)),
+          isConnectionFolder(node) &&
+          (childrenNode.some(child => child && isConnectionFolder(child) && child.name === node.name) ||
+            nodes.some(child => isConnectionFolder(child) && child.name === node.name && child.id !== node.id)),
       );
 
       if (folderDuplicates.length > 0) {

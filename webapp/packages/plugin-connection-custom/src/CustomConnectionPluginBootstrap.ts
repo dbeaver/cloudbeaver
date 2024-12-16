@@ -10,7 +10,7 @@ import { ConnectionsManagerService, getFolderPath, isConnectionNode } from '@clo
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { DATA_CONTEXT_NAV_NODE, isFolderNode, isProjectNode } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, isConnectionFolder, isProjectNode } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
@@ -47,7 +47,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
 
-        if (![isConnectionNode, isFolderNode, isProjectNode].some(check => check(node)) || this.isConnectionFeatureDisabled(true)) {
+        if (![isConnectionNode, isConnectionFolder, isProjectNode].some(check => check(node)) || this.isConnectionFeatureDisabled(true)) {
           return false;
         }
 
@@ -61,6 +61,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
       menus: [MENU_NAVIGATION_TREE_CREATE],
       actions: [ACTION_TREE_CREATE_CONNECTION],
       contexts: [DATA_CONTEXT_ELEMENTS_TREE],
+      getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       handler: this.createConnectionHandler.bind(this),
     });
 

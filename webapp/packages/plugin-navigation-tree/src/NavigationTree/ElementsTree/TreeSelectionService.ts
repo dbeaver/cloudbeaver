@@ -7,7 +7,7 @@
  */
 import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { isFolderNode, isProjectNode, type NavNode, NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
+import { isConnectionFolder, isProjectNode, type NavNode, NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { type ProjectInfo } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
@@ -34,6 +34,7 @@ export class TreeSelectionService {
     this.getFirstSelectedNode = this.getFirstSelectedNode.bind(this);
   }
 
+  // Should preload ProjectInfoResource. Cause the resource used indirectly (TODO make it directly used)
   getFirstSelectedNode(tree: IElementsTree, nodeIdGetter: NodeIdGetter): ISelectedNode | undefined {
     const selected = tree.getSelected();
 
@@ -53,28 +54,23 @@ export class TreeSelectionService {
       return;
     }
 
-    const projectNode = this.getParents(tree).find(isProjectNode);
-
-    if (!projectNode) {
-      return;
-    }
-
     const project = this.getSelectedProject(tree);
 
     if (!project?.canEditDataSources) {
       return;
     }
 
-    const selectedFolderNode = this.getParents(tree).slice().reverse().find(isFolderNode);
+    const selectedFolderNode = this.getParents(tree).slice().reverse().find(isConnectionFolder);
 
     return {
       projectId: project.id,
       folderId: selectedFolderNode?.id,
-      projectNodeId: projectNode.id,
+      projectNodeId: nodeIdGetter(project.id),
       selectProject: false,
     };
   }
 
+  // Should preload ProjectInfoResource. Cause the resource used indirectly (TODO make it directly used)
   getSelectedProject(tree: IElementsTree): ProjectInfo | undefined {
     const projectNode = this.getParents(tree).find(isProjectNode);
 
