@@ -6,6 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+.container {
+  display: flex;
+}
+
 .contextMenu {
   padding: 0;
   height: 16px;
