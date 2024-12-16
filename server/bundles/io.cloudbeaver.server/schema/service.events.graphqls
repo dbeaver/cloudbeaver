@@ -193,6 +193,7 @@ type WSAsyncTaskInfo @since(version: "24.3.1") {
     taskId: ID!
     statusName: String
     running: Boolean!
+}
 
 # Datasource disconnect event
 type WSDataSourceDisconnectEvent implements CBServerEvent {
