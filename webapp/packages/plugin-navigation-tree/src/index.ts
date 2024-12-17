@@ -15,6 +15,7 @@ export * from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSet
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeLoaders.js';
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS.js';
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/TreeNodeMenuLoader.js';
+export * from './NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_CREATE.js';
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNodeRendererLoader.js';
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/isDraggingInsideProject.js';
 
@@ -34,6 +35,7 @@ export * from './NavigationTree/ElementsTree/ElementsTreeTools/MENU_ELEMENTS_TRE
 export * from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeToolsMenuService.js';
 export * from './NavigationTree/ElementsTree/elementsTreeNameFilter.js';
 export * from './NavigationTree/ElementsTree/ElementsTreeService.js';
+export * from './NavigationTree/ElementsTree/TreeSelectionService.js';
 export * from './NavigationTree/NavigationTreeBootstrap.js';
 export * from './NavigationTree/NavigationTreeService.js';
 export { default as ElementsTreeToolsStyles } from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeTools.module.css';
