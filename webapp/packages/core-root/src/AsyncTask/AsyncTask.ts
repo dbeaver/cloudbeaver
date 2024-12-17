@@ -83,6 +83,9 @@ export class AsyncTask {
 
     if (this.updatingAsync) {
       if (!init) {
+        /* With websockets we encounter a situation when we receive status update before the task is initialized.
+        We save the update in pendingEvents, but we can't update the task because updatingAsync is still true,
+        so we need to wait a bit before retrying */
         setTimeout(() => this.updateInfoAsync.call(this, getter), 100);
       }
       return;
