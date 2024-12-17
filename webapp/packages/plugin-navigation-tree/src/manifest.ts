@@ -22,5 +22,6 @@ export const navigationTreePlugin: PluginManifest = {
       ),
     () => import('./NavigationTreeSettingsService.js').then(m => m.NavigationTreeSettingsService),
     () => import('./NavigationTree/ElementsTree/ElementsTreeService.js').then(m => m.ElementsTreeService),
+    () => import('./NavigationTree/ElementsTree/TreeSelectionService.js').then(m => m.TreeSelectionService),
   ],
 };
