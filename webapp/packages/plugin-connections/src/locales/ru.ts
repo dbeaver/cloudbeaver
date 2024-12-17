@@ -44,4 +44,5 @@ export default [
     'plugin_connections_connection_auth_secret_description',
     'У вас есть несколько учетных записей для авторизации.\nВыберите учетную запись из списка.',
   ],
+  ['plugin_connections_connection_create_menu_title', 'Подключение'],
 ];
