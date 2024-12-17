@@ -51,7 +51,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private final Map<SMSubjectType, List<DBPPropertyDescriptor>> metaParameters = new HashMap<>();
     private SMAuthProvider<?> instance;
     private final DBPImage icon;
-    private final Map<String, WebAuthProviderProperty> configurationParameters = new LinkedHashMap<>(); //
+    private final Map<String, WebAuthProviderProperty> configurationParameters = new LinkedHashMap<>();
     private final List<SMAuthCredentialsProfile> credentialProfiles = new ArrayList<>();
     private final boolean configurable;
     private final boolean trusted;
