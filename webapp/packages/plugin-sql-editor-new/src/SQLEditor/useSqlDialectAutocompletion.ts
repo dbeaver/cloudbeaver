@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { createComplexLoader, useComplexLoader, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { GlobalConstants } from '@cloudbeaver/core-utils';
+import { GlobalConstants, isNotNullDefined } from '@cloudbeaver/core-utils';
 import type { Compartment, Completion, CompletionConfig, CompletionContext, CompletionResult, Extension } from '@cloudbeaver/plugin-codemirror6';
 import { type ISQLEditorData, type SQLProposal } from '@cloudbeaver/plugin-sql-editor';
 
@@ -78,12 +78,10 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
         const startPos = context.pos;
         const proposals = await optionsRef.data.getHintProposals(startPos, !context.explicit);
         const limitIsMet = optionsRef.data.hintsLimitIsMet;
-        const options = getOptionsFromProposals(context.explicit, word.text, proposals);
-        const from = proposals[0]?.replacementOffset ?? word.from;
 
         const result: CompletionResult = {
-          from,
-          options,
+          from: getFrom(proposals, word.from),
+          options: getOptionsFromProposals(context.explicit, word.text, proposals),
           update(current, from, to, context) {
             if (startPos > context.pos) {
               return null;
@@ -148,4 +146,24 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
   });
 
   return useEditorAutocompletion(config);
+}
+
+function getFrom(proposals: SQLProposal[], defaultFrom: number): number {
+  if (!proposals.length) {
+    return defaultFrom;
+  }
+
+  const candidate = proposals.find(proposal => proposal.replacementOffset !== undefined)?.replacementOffset;
+
+  if (!isNotNullDefined(candidate)) {
+    return defaultFrom;
+  }
+
+  if (proposals.every(proposal => proposal.replacementOffset === candidate)) {
+    return candidate;
+  }
+
+  console.error('Inconsistent proposals replacementOffset. It is supposed to be the same for all proposals');
+
+  return defaultFrom;
 }
