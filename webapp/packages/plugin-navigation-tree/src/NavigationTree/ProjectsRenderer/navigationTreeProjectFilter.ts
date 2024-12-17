@@ -5,8 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { type NavNode, NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
-import { NAV_NODE_TYPE_PROJECT, ProjectsService } from '@cloudbeaver/core-projects';
+import {
+  isProjectNode,
+  type NavNode,
+  NavNodeInfoResource,
+  NavTreeResource,
+  ProjectsNavNodeService,
+  ROOT_NODE_PATH,
+} from '@cloudbeaver/core-navigation-tree';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
 
 import type { IElementsTreeFilter } from '../ElementsTree/useElementsTree.js';
@@ -26,7 +33,7 @@ export function navigationTreeProjectFilter(
       .get(resourceKeyList(children))
       .filter<NavNode>((node => node !== undefined) as (node: NavNode | undefined) => node is NavNode)
       .filter(node => {
-        if (node.nodeType === NAV_NODE_TYPE_PROJECT) {
+        if (isProjectNode(node)) {
           const project = projectsNavNodeService.getProject(node.id);
 
           if (!project || !projectsService.activeProjects.includes(project)) {
