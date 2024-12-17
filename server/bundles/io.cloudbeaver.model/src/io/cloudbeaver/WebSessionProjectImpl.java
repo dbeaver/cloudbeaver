@@ -34,6 +34,7 @@ import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class WebSessionProjectImpl extends WebProjectImpl {
@@ -199,8 +200,8 @@ public class WebSessionProjectImpl extends WebProjectImpl {
             .filter(Objects::nonNull)
             .collect(Collectors.toMap(
                 DBPDataSourceContainer::getId,
-                ds -> new DataSourceDescriptor((DataSourceDescriptor) ds, ds.getRegistry())
-            ));
+                Function.identity())
+            );
         if (type == WSEventType.DATASOURCE_CREATED || type == WSEventType.DATASOURCE_UPDATED) {
             registry.refreshConfig(dataSourceIds);
         }

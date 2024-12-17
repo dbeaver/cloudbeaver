@@ -9,9 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { getComputed, s, SContext, type StyleRegistry, Translate, TreeNodeNestedMessage, useS } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
-import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { NAV_NODE_TYPE_PROJECT, ProjectsService } from '@cloudbeaver/core-projects';
+import { isProjectNode, type NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 
 import { NavigationNodeControlRendererStyles, NavigationNodeNestedStyles } from '../../index.js';
 import { useNode } from '../../NodesManager/useNode.js';
@@ -44,7 +42,7 @@ export function navigationTreeProjectsRendererRenderer(navNodeInfoResource: NavN
   return nodeId => {
     const node = navNodeInfoResource.get(nodeId);
 
-    if (node?.nodeType === NAV_NODE_TYPE_PROJECT) {
+    if (isProjectNode(node)) {
       return ProjectRenderer;
     }
 
@@ -61,7 +59,6 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
   expanded,
 }) {
   const styles = useS(style);
-  const projectsService = useService(ProjectsService);
   const elementsTreeContext = useContext(ElementsTreeContext);
 
   const { node } = useNode(nodeId);
