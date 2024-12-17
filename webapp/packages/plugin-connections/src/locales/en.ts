@@ -44,4 +44,5 @@ export default [
     'plugin_connections_connection_auth_secret_description',
     'There are multiple credentials available for authentication.\nPlease choose credentials you want to use.',
   ],
+  ['plugin_connections_connection_create_menu_title', 'Connection'],
 ];

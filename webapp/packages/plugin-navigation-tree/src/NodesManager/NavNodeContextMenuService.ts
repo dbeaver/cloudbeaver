@@ -16,7 +16,7 @@ import {
   ENodeFeature,
   getNodePlainName,
   type INodeActions,
-  NAV_NODE_TYPE_FOLDER,
+  isConnectionFolder,
   type NavNode,
   NavNodeInfoResource,
   NavNodeManagerService,
@@ -38,6 +38,7 @@ import {
 } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS.js';
+import { MENU_NAVIGATION_TREE_CREATE } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MENU_NAVIGATION_TREE_CREATE.js';
 
 export interface INodeMenuData {
   node: NavNode;
@@ -100,7 +101,7 @@ export class NavNodeContextMenuService extends Bootstrap {
       isActionApplicable: (context, action): boolean => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
-        if (NodeManagerUtils.isDatabaseObject(node.id) || node.nodeType === NAV_NODE_TYPE_FOLDER) {
+        if (NodeManagerUtils.isDatabaseObject(node.id) || isConnectionFolder(node)) {
           if (action === ACTION_RENAME) {
             return node.features?.includes(ENodeFeature.canRename) ?? false;
           }
@@ -180,11 +181,16 @@ export class NavNodeContextMenuService extends Bootstrap {
       },
     });
 
+    this.menuService.setHandler({
+      id: 'menu-navigation-tree-create',
+      menus: [MENU_NAVIGATION_TREE_CREATE],
+    });
+
     this.menuService.addCreator({
       root: true,
       contexts: [DATA_CONTEXT_NAV_NODE],
       getItems: (context, items) => {
-        items = [ACTION_OPEN, ACTION_REFRESH, ...items];
+        items = [MENU_NAVIGATION_TREE_CREATE, ACTION_OPEN, ACTION_REFRESH, ...items];
 
         if (this.navTreeSettingsService.editing) {
           items.push(ACTION_RENAME);
