@@ -560,7 +560,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                 resultsInfo.getDataContainer(),
                 getSqlDialectFromConnection(dataSource.getContainer()),
                 contextInfo.getProcessor().getSyntaxManager(),
-                columnsList,
+                columnsList.stream().map(s -> SQLGroupingAttribute.makeCustom(dataSource, s)).toList(),
                 functions == null ? List.of(SQLGroupingQueryGenerator.DEFAULT_FUNCTION) : functions, // backward compatibility
                 CommonUtils.getBoolean(showDuplicatesOnly, false));
             return groupingQueryGenerator.generateGroupingQuery(resultsInfo.getQueryText());
