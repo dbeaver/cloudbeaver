@@ -24,6 +24,8 @@ export * from './NodesManager/navNodeMoveContext.js';
 export * from './NodesManager/getNodesFromContext.js';
 export * from './NodesManager/NAV_NODE_TYPE_FOLDER.js';
 export * from './NodesManager/NAV_NODE_TYPE_ROOT.js';
+export * from './NodesManager/isConnectionFolder.js';
+export * from './NodesManager/isProjectNode.js';
 
 export * from './NodesManager/ENodeFeature.js';
 export * from './NodesManager/EObjectFeature.js';
