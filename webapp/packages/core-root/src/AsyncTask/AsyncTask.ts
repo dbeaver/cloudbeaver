@@ -79,14 +79,17 @@ export class AsyncTask {
   }
 
   async updateInfoAsync(getter: (task: AsyncTask) => Promise<AsyncTaskInfo>): Promise<void> {
+    const init = this.info === null;
+
     if (this.updatingAsync) {
+      if (!init) {
+        setTimeout(() => this.updateInfoAsync.call(this, getter), 100);
+      }
       return;
     }
 
     this.updatingAsync = true;
     try {
-      const init = this.info === null;
-
       if (this._cancelled && init) {
         throw new Error('Task was cancelled');
       }
