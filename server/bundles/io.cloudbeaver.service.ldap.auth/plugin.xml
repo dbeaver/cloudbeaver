@@ -31,8 +31,8 @@
             </configuration>
             <credentials>
                 <propertyGroup label="Auth credentials">
-                    <property id="user-dn" label="%user-dn" type="string" description="%user-dn.description" user="true"/>
-                    <property id="password" label="%password" type="string" description="%password.description"
+                    <property id="user-dn" label="User DN" type="string" description="LDAP user name" user="true"/>
+                    <property id="password" label="User password" type="string" description="LDAP user password"
                               user="true" encryption="plain"/>
                 </propertyGroup>
             </credentials>

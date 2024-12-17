@@ -40,11 +40,9 @@ public class WebAuthProviderInfo {
     private static final Log log = Log.getLog(WebAuthProviderInfo.class);
 
     private final WebAuthProviderDescriptor descriptor;
-    private final WebSession webSession;
 
-    public WebAuthProviderInfo(WebSession webSession, WebAuthProviderDescriptor descriptor) {
+    public WebAuthProviderInfo(WebAuthProviderDescriptor descriptor) {
         this.descriptor = descriptor;
-        this.webSession = webSession;
     }
 
     WebAuthProviderDescriptor getDescriptor() {
