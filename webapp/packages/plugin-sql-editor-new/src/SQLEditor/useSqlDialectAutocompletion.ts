@@ -79,9 +79,10 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
         const proposals = await optionsRef.data.getHintProposals(startPos, !context.explicit);
         const limitIsMet = optionsRef.data.hintsLimitIsMet;
         const options = getOptionsFromProposals(context.explicit, word.text, proposals);
+        const from = proposals[0]?.replacementOffset ?? word.from;
 
         const result: CompletionResult = {
-          from: proposals[0]?.replacementOffset ?? word.from,
+          from,
           options,
           update(current, from, to, context) {
             if (startPos > context.pos) {
