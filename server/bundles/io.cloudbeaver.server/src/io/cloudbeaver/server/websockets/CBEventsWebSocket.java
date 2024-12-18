@@ -31,6 +31,8 @@ import org.jkiss.dbeaver.model.websocket.event.session.WSAccessTokenExpiredEvent
 import org.jkiss.dbeaver.model.websocket.event.session.WSSocketConnectedEvent;
 import org.jkiss.utils.CommonUtils;
 
+import java.time.Duration;
+
 public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessionEventHandler {
     private static final Log log = Log.getLog(CBEventsWebSocket.class);
 
@@ -49,6 +51,8 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
             this.webSession.addEventHandler(this);
             handleEvent(new WSSocketConnectedEvent(webSession.getApplication().getApplicationRunId()));
             log.debug("EventWebSocket connected to the " + webSession.getSessionId() + " session");
+
+            session.setMaxIdleTimeout(Duration.ofMinutes(5).toMillis());
             session.addMessageHandler(String.class, new FromUserEventHandler());
             session.addMessageHandler(PongMessage.class, new WebSocketPingPongCallback(webSession));
 
