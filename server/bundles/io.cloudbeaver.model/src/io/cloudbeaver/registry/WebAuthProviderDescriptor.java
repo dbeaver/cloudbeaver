@@ -22,6 +22,8 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPImage;
+import org.jkiss.dbeaver.model.DBPNamedObjectLocalized;
+import org.jkiss.dbeaver.model.DBPObjectWithDescriptionLocalized;
 import org.jkiss.dbeaver.model.auth.AuthPropertyDescriptor;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.impl.AbstractDescriptor;
@@ -73,7 +75,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         this.isCaseInsensitive = CommonUtils.toBoolean(cfg.getAttribute("caseInsensitive"));
 
         for (IConfigurationElement cfgElement : cfg.getChildren("configuration")) {
-            List<WebAuthProviderProperty> properties = WebAuthProviderRegistry.readProperties(cfgElement);
+            List<WebAuthProviderProperty> properties = WebAuthProviderRegistry.readProperties(cfgElement, getId());
             for (WebAuthProviderProperty property : properties) {
                 configurationParameters.put(CommonUtils.toString(property.getId()), property);
             }

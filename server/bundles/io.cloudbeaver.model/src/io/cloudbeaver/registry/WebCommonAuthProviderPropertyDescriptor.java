@@ -34,7 +34,7 @@ public class WebCommonAuthProviderPropertyDescriptor extends AbstractDescriptor 
 
     public WebCommonAuthProviderPropertyDescriptor(IConfigurationElement cfg) {
         super(cfg);
-        configurationParameters = WebAuthProviderRegistry.readProperties(cfg);
+        configurationParameters = WebAuthProviderRegistry.readProperties(cfg, null);
         String supportedCategoriesAttr = cfg.getAttribute("supportedProviderCategories");
         if (CommonUtils.isNotEmpty(supportedCategoriesAttr)) {
             supportedProviderCategories.addAll(Arrays.stream(supportedCategoriesAttr.split(",")).toList());
