@@ -108,6 +108,19 @@ export class ResultSetFormatAction
     return false;
   }
 
+  isNumeric(key: IResultSetPartialKey): boolean {
+    if (!key?.column) {
+      return false;
+    }
+
+    const column = this.view.getColumn(key.column);
+
+    if (column?.dataKind?.toLocaleLowerCase() === 'numeric') {
+      return true;
+    }
+    return false;
+  }
+
   isText(key: IResultSetPartialKey): boolean {
     if (!key?.column) {
       return false;
@@ -160,6 +173,7 @@ export class ResultSetFormatAction
 
   getText(key: IResultSetElementKey): string {
     const value = this.get(key);
+    const numConversionNeeded = this.isNumeric(key);
 
     if (value === null) {
       return '';
@@ -199,15 +213,22 @@ export class ResultSetFormatAction
       return JSON.stringify(value);
     }
 
-    if (typeof value === 'number' || typeof value === 'boolean') {
-      return String(value);
+    if (numConversionNeeded && (typeof value === "string")) {
+        const numberValue = parseFloat(value);
+        if (!isNaN(numberValue)) {
+            return this.formatNumber(value);
+        }
     }
 
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return this.formatNumber(String(value));
+    }
     return value;
   }
 
   getDisplayString(key: IResultSetElementKey): string {
     const value = this.get(key);
+    const numConversionNeeded = this.isNumeric(key);
 
     if (value === null) {
       return '[null]';
@@ -248,8 +269,14 @@ export class ResultSetFormatAction
 
       return '[null]';
     }
-
-    return this.truncateText(String(value), DISPLAY_STRING_LENGTH);
+    let to_trunc = String(value);
+    if (numConversionNeeded && (typeof value === "string")) {
+        const numberValue = parseFloat(value);
+        if (!isNaN(numberValue)) {
+            to_trunc = this.formatNumber(value);
+        }
+    }
+    return this.truncateText(to_trunc, DISPLAY_STRING_LENGTH);
   }
 
   truncateText(text: string, length: number): string {
@@ -258,5 +285,14 @@ export class ResultSetFormatAction
       .split('')
       .map(v => (v.charCodeAt(0) < 32 ? ' ' : v))
       .join('');
+  }
+
+  formatNumber(value: string): string {
+      const [integerPart, decimalPart] = value.split(".");
+      if (typeof integerPart !== "undefined") {
+          const intWithCommas = parseFloat(integerPart).toLocaleString("en-US");
+          return decimalPart ? `${intWithCommas}.${decimalPart}` : intWithCommas
+      }
+      return value
   }
 }
