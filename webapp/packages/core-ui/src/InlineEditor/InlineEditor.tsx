@@ -8,7 +8,18 @@
 import { observer } from 'mobx-react-lite';
 import React, { type ChangeEvent, forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 
-import { Icon, IconOrImage, Loader, s, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Icon,
+  IconOrImage,
+  type InputAutocompleteProposal,
+  InputAutocompletion,
+  Loader,
+  s,
+  useInputAutocomplete,
+  useObjectRef,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
@@ -28,6 +39,7 @@ export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLIn
   autofocus?: boolean;
   active?: boolean;
   loading?: boolean;
+  autoCompleteProposals?: InputAutocompleteProposal[];
   onChange: (value: string) => void;
   onSave?: () => void;
   onReject?: () => void;
@@ -51,6 +63,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
       active,
       loading,
       disabled,
+      autoCompleteProposals,
       onChange,
       onSave,
       onUndo,
@@ -102,6 +115,10 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
     }, []);
 
     const inputRef = useRef<HTMLInputElement>(null);
+    const isAutoCompleteEnabled = !!autoCompleteProposals;
+    const autocompleteState = useInputAutocomplete(inputRef, {
+      sourceHints: autoCompleteProposals ?? [],
+    });
 
     useEffect(() => {
       if (autofocus && !disabled) {
@@ -125,6 +142,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
             onKeyDown={handleKeyDown}
             {...rest}
           />
+          {isAutoCompleteEnabled && <InputAutocompletion items={autocompleteState.filteredSuggestions} inputRef={inputRef} />}
         </div>
         <div
           className={s(style, {

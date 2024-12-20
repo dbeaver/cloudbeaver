@@ -15,8 +15,6 @@ import { useObservableRef } from '../../useObservableRef.js';
 interface InputAutocompleteOptions {
   sourceHints: InputAutocompleteProposal[];
   matchStrategy?: 'startsWith' | 'contains' | 'fuzzy';
-  onSelect: (suggestion: InputAutocompleteProposal) => void;
-  onClose: () => void;
   filter?: (suggestion: InputAutocompleteProposal, lastWord?: string) => boolean;
 }
 
@@ -27,29 +25,17 @@ export interface InputAutocompleteProposal {
   score?: number;
 }
 
-const SELECTED_INDEX_DEFAULT = -1;
 const INPUT_DELAY = 300;
 
 export const useInputAutocomplete = (
-  inputRef: RefObject<HTMLInputElement>,
-  { sourceHints, matchStrategy = 'startsWith', onSelect, filter, onClose }: InputAutocompleteOptions,
+  inputRef: RefObject<HTMLInputElement | HTMLTextAreaElement>,
+  { sourceHints, matchStrategy = 'startsWith', filter }: InputAutocompleteOptions,
 ) => {
   const state = useObservableRef(
     () => ({
       input: inputRef.current?.value as string | undefined,
       selectionStart: inputRef.current?.selectionStart ?? null,
       selectionEnd: inputRef.current?.value?.length ?? null,
-      selectedIndex: SELECTED_INDEX_DEFAULT,
-      setSelectedIndex(index: number) {
-        if (index < SELECTED_INDEX_DEFAULT) {
-          throw new Error(`Index cannot be less than ${SELECTED_INDEX_DEFAULT}`);
-        }
-
-        this.selectedIndex = index;
-      },
-      get selected() {
-        return this.filteredSuggestions[this.selectedIndex];
-      },
       replaceCurrentWord(replacement: string) {
         const input = this.inputRef.current;
 
@@ -69,7 +55,6 @@ export const useInputAutocomplete = (
 
         this.input = this.input?.slice(0, start) + replacement + this.input?.slice(end);
         input.value = this.input;
-        input.setSelectionRange(start, start + replacement.length);
         input.focus();
       },
       get currentWord() {
@@ -123,14 +108,11 @@ export const useInputAutocomplete = (
       input: observable.ref,
       selectionStart: observable.ref,
       selectionEnd: observable.ref,
-      selectedIndex: observable.ref,
       sourceHints: observable.ref,
       matchStrategy: observable.ref,
       inputRef: observable.ref,
-      selected: computed,
       currentWord: computed,
       filteredSuggestions: computed,
-      setSelectedIndex: action.bound,
       replaceCurrentWord: action.bound,
     },
     { sourceHints, matchStrategy, inputRef },
@@ -144,39 +126,6 @@ export const useInputAutocomplete = (
     state.input = target?.value;
   }, INPUT_DELAY);
 
-  // TODO move it to the ui?
-  function handleKeyDown(event: KeyboardEvent) {
-    if (!state.filteredSuggestions.length) {
-      return;
-    }
-
-    switch (event.key) {
-      case 'ArrowDown':
-        event.preventDefault();
-        state.setSelectedIndex(Math.min(state.selectedIndex + 1, state.filteredSuggestions.length - 1));
-        break;
-      case 'ArrowUp':
-        event.preventDefault();
-        state.setSelectedIndex(Math.max(state.selectedIndex - 1, 0));
-        break;
-      case 'Enter':
-        if (state.selected) {
-          event.preventDefault();
-          event.stopPropagation();
-          state.replaceCurrentWord(state.selected.replacementString);
-          state.setSelectedIndex(SELECTED_INDEX_DEFAULT);
-          onSelect(state.selected);
-        }
-        break;
-      case 'Escape':
-        state.setSelectedIndex(SELECTED_INDEX_DEFAULT);
-        onClose();
-        break;
-      default:
-        break;
-    }
-  }
-
   useEffect(() => {
     const input = state.inputRef.current;
 
@@ -185,17 +134,10 @@ export const useInputAutocomplete = (
     }
 
     input.addEventListener('input', handleInput);
-    input.addEventListener('keydown', handleKeyDown);
     return () => {
       input.removeEventListener('input', handleInput);
-      input.removeEventListener('keydown', handleKeyDown);
     };
   }, [state.inputRef.current]);
-
-  // TODO move it to the ui?
-  useEffect(() => {
-    state.setSelectedIndex(SELECTED_INDEX_DEFAULT);
-  }, [sourceHints, matchStrategy]);
 
   return state;
 };
