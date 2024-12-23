@@ -36,7 +36,6 @@ export const InputAutocompletionMenu = observer(
       sourceHints,
       matchStrategy,
     });
-    const hidden = getComputed(() => !autocompleteState.filteredSuggestions.length || false);
 
     function handleSelect(proposal: InputAutocompleteProposal) {
       hideMenu();
@@ -90,7 +89,6 @@ export const InputAutocompletionMenu = observer(
     return (
       <Menu
         className={s(styles, { menu: true }, className)}
-        hidden={hidden}
         menuRef={menuRef}
         label="Autocompletion"
         items={autocompleteState.filteredSuggestions.map(item => (
@@ -110,7 +108,7 @@ export const InputAutocompletionMenu = observer(
             <Text truncate>{item.displayString}</Text>
           </MenuItem>
         ))}
-        disclosure
+        modal
       />
     );
   }),

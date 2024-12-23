@@ -9,6 +9,7 @@ import { observer } from 'mobx-react-lite';
 import React, { type ChangeEvent, forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 
 import {
+  Container,
   Icon,
   IconOrImage,
   type InputAutocompleteProposal,
@@ -114,7 +115,6 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
     }, []);
 
     const inputRef = useRef<HTMLInputElement>(null);
-    const isAutoCompleteEnabled = !!autoCompleteProposals;
 
     useEffect(() => {
       if (autofocus && !disabled) {
@@ -125,56 +125,56 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
     useImperativeHandle(ref, () => inputRef.current!);
 
     return (
-      <div className={s(style, { editor: true, editorActive: active }, className)} onClick={onClick} onDoubleClick={onDoubleClick}>
-        <div className={s(style, { editorContainer: true })}>
-          <input
-            ref={inputRef}
-            className={s(style, { input: true })}
-            lang="en"
-            value={value}
-            autoComplete="off"
-            disabled={disabled}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            {...rest}
-          />
-          {isAutoCompleteEnabled && (
-            <InputAutocompletionMenu className={s(style, { autocompleteMenu: true })} sourceHints={autoCompleteProposals} inputRef={inputRef} />
-          )}
+      <Container vertical>
+        <div className={s(style, { editor: true, editorActive: active }, className)} onClick={onClick} onDoubleClick={onDoubleClick}>
+          <div className={s(style, { editorContainer: true })}>
+            <input
+              ref={inputRef}
+              className={s(style, { input: true })}
+              lang="en"
+              value={value}
+              autoComplete="off"
+              disabled={disabled}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              {...rest}
+            />
+          </div>
+          <div
+            className={s(style, {
+              editorActions: true,
+            })}
+            data-s-position={controlsPosition}
+            onMouseDown={e => e.preventDefault()}
+          >
+            {!hideSave && (
+              <EditorAction title={translate('ui_apply')} disabled={disabled || disableSave} onClick={onSave}>
+                {loading ? (
+                  <Loader className={s(style, { loader: true })} small fullSize />
+                ) : (
+                  <Icon className={s(style, { icon: true })} name="apply" viewBox="0 0 12 10" />
+                )}
+              </EditorAction>
+            )}
+            {!hideCancel && onReject && (
+              <EditorAction title={translate('ui_cancel')} disabled={disabled} onClick={onReject}>
+                <Icon className={s(style, { icon: true })} name="reject" viewBox="0 0 11 11" />
+              </EditorAction>
+            )}
+            {onUndo && (
+              <EditorAction title={translate('ui_undo')} disabled={!edited || disabled} onClick={edited ? onUndo : undefined}>
+                <IconOrImage className={s(style, { iconOrImage: true })} icon="/icons/data_revert.svg" />
+              </EditorAction>
+            )}
+            {!simple && (
+              <EditorAction title={translate('ui_edit')} disabled={disabled} onClick={handlePopup}>
+                <Icon className={s(style, { icon: true })} name="edit" viewBox="0 0 13 13" />
+              </EditorAction>
+            )}
+          </div>
         </div>
-        <div
-          className={s(style, {
-            editorActions: true,
-          })}
-          data-s-position={controlsPosition}
-          onMouseDown={e => e.preventDefault()}
-        >
-          {!hideSave && (
-            <EditorAction title={translate('ui_apply')} disabled={disabled || disableSave} onClick={onSave}>
-              {loading ? (
-                <Loader className={s(style, { loader: true })} small fullSize />
-              ) : (
-                <Icon className={s(style, { icon: true })} name="apply" viewBox="0 0 12 10" />
-              )}
-            </EditorAction>
-          )}
-          {!hideCancel && onReject && (
-            <EditorAction title={translate('ui_cancel')} disabled={disabled} onClick={onReject}>
-              <Icon className={s(style, { icon: true })} name="reject" viewBox="0 0 11 11" />
-            </EditorAction>
-          )}
-          {onUndo && (
-            <EditorAction title={translate('ui_undo')} disabled={!edited || disabled} onClick={edited ? onUndo : undefined}>
-              <IconOrImage className={s(style, { iconOrImage: true })} icon="/icons/data_revert.svg" />
-            </EditorAction>
-          )}
-          {!simple && (
-            <EditorAction title={translate('ui_edit')} disabled={disabled} onClick={handlePopup}>
-              <Icon className={s(style, { icon: true })} name="edit" viewBox="0 0 13 13" />
-            </EditorAction>
-          )}
-        </div>
-      </div>
+        <InputAutocompletionMenu sourceHints={autoCompleteProposals ?? []} inputRef={inputRef} />
+      </Container>
     );
   }),
 );
