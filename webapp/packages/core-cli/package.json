@@ -56,6 +56,7 @@
     "@swc/core": "^1",
     "@swc/jest": "^0",
     "@types/madge": "^5",
+    "enquirer": "^2.4.1",
     "esbuild-loader": "^4.2.2",
     "execa": "^9.5.2",
     "fake-indexeddb": "^6",

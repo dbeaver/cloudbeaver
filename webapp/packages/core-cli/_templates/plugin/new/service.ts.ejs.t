@@ -1,10 +1,10 @@
 ---
-to: <%= name %>/src/<%= h.changeCase.pascal(name) %>Service.ts
+to: <%= name %>/src/<%= h.changeCase.pascal(name) %>ServiceBootstrap.ts
 ---
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 @injectable()
-export class <%= h.changeCase.pascal(name) %>Service extends Bootstrap {
+export class <%= h.changeCase.pascal(name) %>ServiceBootstrap extends Bootstrap {
   constructor() {
     super();
   }

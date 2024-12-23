@@ -22,8 +22,10 @@ to: <%= name %>/package.json
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-di": "^0"
   },
   "peerDependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "typescript": "^5"
+  }
 }
