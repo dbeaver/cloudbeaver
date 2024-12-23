@@ -24,9 +24,11 @@ public interface LdapConstants {
     String PARAM_BIND_USER_PASSWORD = "ldap-bind-user-pwd";
     String PARAM_FILTER = "ldap-filter";
     String PARAM_USER_IDENTIFIER_ATTR = "ldap-identifier-attr";
+    String PARAM_LOGIN = "ldap-login";
 
 
     String CRED_USERNAME = "user";
+    String CRED_DISPLAY_NAME = "displayName";
     String CRED_USER_DN = "user-dn";
     String CRED_PASSWORD = "password";
     String CRED_SESSION_ID = "session-id";
