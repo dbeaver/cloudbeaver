@@ -24,6 +24,13 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
+
+### 24.3.1. 2024-12-23
+- Added an ability to reconnect for all editors if a connection has been lost;
+- Added an option to replace line break characters on any custom value when exporting to CSV;
+- Added an ability to create connections in the Navigation tree not only on the initial level but in folders and sub-folders directly;
+- Updated list of available shortcuts for MacOS.
+
 ### 24.3.0. 2024-12-02
 ### Changes since 24.2.0:
 - General:
