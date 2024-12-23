@@ -13,11 +13,12 @@ import { Icon } from '../../Icon.js';
 import { useCombinedRef } from '../../useCombinedRef.js';
 import { useS } from '../../useS.js';
 import style from './InputAutocompletion.module.css';
-import { type InputAutocompleteProposal, useInputAutocomplete } from './useInputAutocomplete.js';
+import { type InputAutocompleteProposal, type InputAutocompleteStrategy, useInputAutocomplete } from './useInputAutocomplete.js';
 
 interface AutocompletionProps {
-  items: InputAutocompleteProposal[] | null;
+  sourceHints: InputAutocompleteProposal[];
   inputRef: React.RefObject<HTMLInputElement | HTMLTextAreaElement>;
+  matchStrategy?: InputAutocompleteStrategy;
   placement?: MenuInitialState['placement'];
   gutter?: number;
   ref?: React.Ref<HTMLDivElement>;
@@ -27,7 +28,7 @@ interface AutocompletionProps {
 
 export const InputAutocompletion = observer(
   forwardRef(function Autocompletion(
-    { items, placement = 'bottom-end', gutter = 1, propertyName, inputRef, onSelect }: AutocompletionProps,
+    { sourceHints, placement = 'bottom-end', gutter = 1, matchStrategy, propertyName, inputRef, onSelect }: AutocompletionProps,
     ref: React.Ref<HTMLDivElement>,
   ) {
     const styles = useS(style);
@@ -37,8 +38,8 @@ export const InputAutocompletion = observer(
       gutter: gutter,
     });
     const autocompleteState = useInputAutocomplete(inputRef, {
-      sourceHints: items || [],
-      matchStrategy: 'startsWith',
+      sourceHints,
+      matchStrategy,
     });
 
     function handleSelect(proposal: InputAutocompleteProposal) {
@@ -85,7 +86,7 @@ export const InputAutocompletion = observer(
       if (!menu.visible && autocompleteState.filteredSuggestions !== null && autocompleteState.filteredSuggestions.length !== 0) {
         menu.show();
       }
-    }, [items, menu, autocompleteState.filteredSuggestions]);
+    }, [sourceHints, menu, autocompleteState.filteredSuggestions]);
 
     return (
       <>

@@ -12,9 +12,11 @@ import { debounce, isFuzzySearchable, isNotNullDefined } from '@cloudbeaver/core
 
 import { useObservableRef } from '../../useObservableRef.js';
 
+export type InputAutocompleteStrategy = 'startsWith' | 'contains' | 'fuzzy';
+
 interface InputAutocompleteOptions {
   sourceHints: InputAutocompleteProposal[];
-  matchStrategy?: 'startsWith' | 'contains' | 'fuzzy';
+  matchStrategy?: InputAutocompleteStrategy;
   filter?: (suggestion: InputAutocompleteProposal, lastWord?: string) => boolean;
 }
 
@@ -54,6 +56,9 @@ export const useInputAutocomplete = (
         const end = cursorPosition;
 
         this.input = this.input?.slice(0, start) + replacement + this.input?.slice(end);
+        this.selectionStart = start + replacement.length;
+        this.selectionEnd = start + replacement.length;
+
         input.value = this.input;
         input.focus();
       },
@@ -70,7 +75,7 @@ export const useInputAutocomplete = (
           return '';
         }
 
-        return substring.split(' ').filter(Boolean).at(-1);
+        return substring.split(' ').at(-1);
       },
       get filteredSuggestions() {
         if (!this.currentWord) {
@@ -91,7 +96,7 @@ export const useInputAutocomplete = (
                 values.some(value => isNotNullDefined(this.currentWord) && value.startsWith(this.currentWord))) ||
               (this.matchStrategy === 'contains' && values.some(value => isNotNullDefined(this.currentWord) && value.includes(this.currentWord))) ||
               (this.matchStrategy === 'fuzzy' &&
-                values.some(value => isNotNullDefined(this.currentWord) && isFuzzySearchable(value, this.currentWord)))
+                values.some(value => isNotNullDefined(this.currentWord) && isFuzzySearchable(this.currentWord, value)))
             );
           })
           .filter(suggestion => (filter ? filter(suggestion, this.currentWord) : true))

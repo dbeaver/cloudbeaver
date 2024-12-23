@@ -15,7 +15,6 @@ import {
   InputAutocompletion,
   Loader,
   s,
-  useInputAutocomplete,
   useObjectRef,
   useS,
   useTranslate,
@@ -116,9 +115,6 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
 
     const inputRef = useRef<HTMLInputElement>(null);
     const isAutoCompleteEnabled = !!autoCompleteProposals;
-    const autocompleteState = useInputAutocomplete(inputRef, {
-      sourceHints: autoCompleteProposals ?? [],
-    });
 
     useEffect(() => {
       if (autofocus && !disabled) {
@@ -142,7 +138,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
             onKeyDown={handleKeyDown}
             {...rest}
           />
-          {isAutoCompleteEnabled && <InputAutocompletion items={autocompleteState.filteredSuggestions} inputRef={inputRef} />}
+          {isAutoCompleteEnabled && <InputAutocompletion sourceHints={autoCompleteProposals} inputRef={inputRef} />}
         </div>
         <div
           className={s(style, {
