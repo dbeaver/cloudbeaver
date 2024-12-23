@@ -76,7 +76,11 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
         Map<String, Object> userData = null;
         if (isFullDN(userName) && CommonUtils.isNotEmpty(ldapSettings.getLoginAttribute())) {
+            if (CommonUtils.isEmpty(ldapSettings.getBaseDN())) {
+                throw new DBException("Base DN doesnt configure");
+            }
             userData = validateAndLoginUserAccessByUsername(userName, password, ldapSettings);
+
         }
         if (userData == null) {
             String fullUserDN = userName;
