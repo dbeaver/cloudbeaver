@@ -41,7 +41,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   const providerList = providers.data
     .filter(isDefined)
     .filter(provider => {
-      if (provider.private) {
+      if (provider.private || provider.authHidden) {
         return false;
       }
 
