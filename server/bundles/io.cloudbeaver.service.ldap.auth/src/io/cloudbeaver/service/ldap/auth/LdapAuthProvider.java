@@ -75,7 +75,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         Hashtable<String, String> environment = creteAuthEnvironment(ldapSettings);
 
         Map<String, Object> userData = null;
-        if (CommonUtils.isNotEmpty(ldapSettings.getLoginAttribute())) {
+        if (isFullDN(userName) && CommonUtils.isNotEmpty(ldapSettings.getLoginAttribute())) {
             userData = validateAndLoginUserAccessByUsername(userName, password, ldapSettings);
         }
         if (userData == null) {
@@ -124,11 +124,10 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
      */
     private Map<String, Object> validateAndLoginUserAccessByUsername(@NotNull String login, @NotNull String password, @NotNull LdapSettings ldapSettings) throws DBException {
         if (
-            CommonUtils.isEmpty(ldapSettings.getFilter())
-                || CommonUtils.isEmpty(ldapSettings.getBindUserDN())
-                || CommonUtils.isEmpty(ldapSettings.getBindUserPassword())
+            CommonUtils.isEmpty(ldapSettings.getBindUserDN())
+            || CommonUtils.isEmpty(ldapSettings.getBindUserPassword())
         ) {
-            throw new DBException("Incorrect settings in identity provider. Tell your administrator");
+            return new HashMap<>();
         }
         Hashtable<String, String> adminEnvironment = creteAuthEnvironment(ldapSettings);
         adminEnvironment.put(Context.SECURITY_PRINCIPAL, ldapSettings.getBindUserDN());
@@ -343,5 +342,9 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     @Override
     public Object getInputUsername(@NotNull Map<String, Object> cred) {
         return cred.get(LdapConstants.CRED_USERNAME);
+    }
+
+    private boolean isFullDN(String userName) {
+        return userName.contains(",") && userName.contains("=");
     }
 }
