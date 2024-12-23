@@ -37,10 +37,7 @@ import org.jkiss.utils.CommonUtils;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
+import javax.naming.directory.*;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -75,10 +72,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         Hashtable<String, String> environment = creteAuthEnvironment(ldapSettings);
 
         Map<String, Object> userData = null;
-        if (isFullDN(userName) && CommonUtils.isNotEmpty(ldapSettings.getLoginAttribute())) {
-            if (CommonUtils.isEmpty(ldapSettings.getBaseDN())) {
-                throw new DBException("Base DN doesnt configure");
-            }
+        if (!isFullDN(userName) && CommonUtils.isNotEmpty(ldapSettings.getLoginAttribute())) {
             userData = validateAndLoginUserAccessByUsername(userName, password, ldapSettings);
 
         }
@@ -217,8 +211,12 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             SearchControls searchControls = new SearchControls();
             searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
             searchControls.setReturningAttributes(new String[]{"distinguishedName"});
+            String baseDN = ldapSettings.getBaseDN();
+            if (CommonUtils.isEmpty(baseDN)) {
+                baseDN = getRootDN(adminContext);
+            }
 
-            NamingEnumeration<SearchResult> results = adminContext.search(ldapSettings.getBaseDN(), searchFilter, searchControls);
+            NamingEnumeration<SearchResult> results = adminContext.search(baseDN, searchFilter, searchControls);
 
             if (results.hasMore()) {
                 SearchResult result = results.next();
@@ -228,6 +226,19 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             return null;
         } catch (Exception e) {
             throw new DBException("Error finding user DN: " + e.getMessage(), e);
+        }
+    }
+
+    private String getRootDN(DirContext adminContext) throws DBException {
+        try {
+            Attributes attributes = adminContext.getAttributes("", new String[]{"namingContexts"});
+            Attribute namingContexts = attributes.get("namingContexts");
+            if (namingContexts != null && namingContexts.size() > 0) {
+                return (String) namingContexts.get(0);
+            }
+            throw new DBException("Root DN not found in namingContexts");
+        } catch (Exception e) {
+            throw new DBException("Error retrieving root DN: " + e.getMessage(), e);
         }
     }
 
