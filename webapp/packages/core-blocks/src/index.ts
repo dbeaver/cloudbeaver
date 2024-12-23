@@ -254,4 +254,4 @@ export * from './ClickableLoader.js';
 export * from './FormControls/TagsComboboxLoader.js';
 export * from './Flex/Flex.js';
 export * from './FormControls/InputField/useInputAutocomplete.js';
-export * from './FormControls/InputField/InputAutocompletion.js';
+export * from './FormControls/InputField/InputAutocompletionMenu.js';
