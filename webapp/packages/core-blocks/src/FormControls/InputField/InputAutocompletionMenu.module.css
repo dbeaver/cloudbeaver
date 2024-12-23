@@ -5,8 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.menuItem {
-  composes: theme-ripple from global;
+
+.menu {
+  &::before {
+    opacity: 0 !important;
+  }
 }
 
 .menuItem {
@@ -21,12 +24,12 @@
   cursor: pointer;
   gap: 8px;
 
-  & .itemIcon,
   & .itemTitle {
     position: relative;
   }
 
   & .itemIcon {
+    position: relative;
     width: 16px;
     height: 16px;
     overflow: hidden;

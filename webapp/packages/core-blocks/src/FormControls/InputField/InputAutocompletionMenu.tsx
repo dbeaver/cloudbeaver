@@ -14,6 +14,7 @@ import { getComputed } from '../../getComputed.js';
 import { IconOrImage } from '../../IconOrImage.js';
 import { Menu } from '../../Menu/Menu.js';
 import type { IMenuState } from '../../Menu/MenuStateContext.js';
+import { s } from '../../s.js';
 import { Text } from '../../Text.js';
 import { useS } from '../../useS.js';
 import style from './InputAutocompletionMenu.module.css';
@@ -23,13 +24,13 @@ interface AutocompletionProps {
   sourceHints: InputAutocompleteProposal[];
   inputRef: React.RefObject<HTMLInputElement | HTMLTextAreaElement>;
   matchStrategy?: InputAutocompleteStrategy;
+  className?: string;
   onSelect?: (proposal: InputAutocompleteProposal) => void;
 }
 
 export const InputAutocompletionMenu = observer(
-  forwardRef(function InputAutocompletionMenu({ sourceHints, matchStrategy, inputRef, onSelect }: AutocompletionProps) {
+  forwardRef(function InputAutocompletionMenu({ sourceHints, className, matchStrategy, inputRef, onSelect }: AutocompletionProps) {
     const styles = useS(style);
-    const localRef = useRef<HTMLButtonElement>(null);
     const menuRef = useRef<IMenuState>();
     const autocompleteState = useInputAutocomplete(inputRef, {
       sourceHints,
@@ -38,7 +39,7 @@ export const InputAutocompletionMenu = observer(
     const hidden = getComputed(() => !autocompleteState.filteredSuggestions.length || false);
 
     function handleSelect(proposal: InputAutocompleteProposal) {
-      menuRef.current?.hide();
+      hideMenu();
       autocompleteState.replaceCurrentWord(proposal.replacementString);
       onSelect?.(proposal);
     }
@@ -46,16 +47,6 @@ export const InputAutocompletionMenu = observer(
     function hideMenu() {
       menuRef.current?.hide();
       autocompleteState.prevented = true;
-    }
-
-    function handleMenuKeyDown(event: any) {
-      switch (event.key) {
-        case 'Escape':
-          hideMenu();
-          break;
-        default:
-          break;
-      }
     }
 
     function handleKeyDown(event: any) {
@@ -82,10 +73,8 @@ export const InputAutocompletionMenu = observer(
 
     useEffect(() => {
       inputRef.current?.addEventListener('keydown', handleKeyDown);
-      localRef.current?.addEventListener('keydown', handleMenuKeyDown);
       return () => {
         inputRef.current?.removeEventListener('keydown', handleKeyDown);
-        localRef.current?.removeEventListener('keydown', handleMenuKeyDown);
       };
     }, [inputRef.current, menuRef.current]);
 
@@ -100,7 +89,7 @@ export const InputAutocompletionMenu = observer(
 
     return (
       <Menu
-        ref={localRef}
+        className={s(styles, { menu: true }, className)}
         hidden={hidden}
         menuRef={menuRef}
         label="Autocompletion"
@@ -121,7 +110,7 @@ export const InputAutocompletionMenu = observer(
             <Text truncate>{item.displayString}</Text>
           </MenuItem>
         ))}
-        modal
+        disclosure
       />
     );
   }),
