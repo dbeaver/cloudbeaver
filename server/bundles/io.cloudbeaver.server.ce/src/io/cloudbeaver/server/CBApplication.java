@@ -735,6 +735,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
     public abstract CBServerConfigurationController<T> getServerConfigurationController();
 
     private void refreshDisabledDriversConfig() {
+        CBPlatform.getInstance().refreshApplicableDrivers();
         CBAppConfig config = getAppConfiguration();
         Set<String> disabledDrivers = new LinkedHashSet<>(Arrays.asList(config.getDisabledDrivers()));
         for (DBPDriver driver : CBPlatform.getInstance().getApplicableDrivers()) {

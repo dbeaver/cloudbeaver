@@ -78,8 +78,6 @@ public class CBPlatform extends BaseWebPlatform {
         log.info("Initialize web platform...: ");
         this.preferenceStore = new WebServerPreferenceStore(WebPlatformActivator.getInstance().getPreferences());
         super.initialize();
-        refreshApplicableDrivers();
-
         scheduleServerJobs();
         log.info("Web platform initialized (" + (System.currentTimeMillis() - startTime) + "ms)");
     }
