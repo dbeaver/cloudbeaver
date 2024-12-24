@@ -29,7 +29,6 @@ import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebServletHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,7 +48,6 @@ import org.jkiss.utils.IOUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -227,7 +225,7 @@ public class CBStaticServlet extends DefaultServlet {
         response.setHeader(HttpHeader.CACHE_CONTROL.toString(), "no-cache, no-store, must-revalidate");
         response.setHeader(HttpHeader.CONTENT_TYPE.toString(), MimeTypes.TEXT_HTML);
         response.setHeader(HttpHeader.EXPIRES.toString(), "0");
-        response.getOutputStream().write(ByteBuffer.wrap(indexBytes));
+        response.getOutputStream().write(indexBytes);
     }
 
 }

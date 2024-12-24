@@ -10,7 +10,7 @@ import type { Observable } from 'rxjs';
 import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 
 export type IServerEventCallback<T> = (data: T) => any;
-export type Subscription = () => void;
+export type Unsubscribe = () => void;
 
 export interface IBaseServerEvent<TID extends string = string, TTopic extends string = string> {
   id: TID;
@@ -25,9 +25,9 @@ export interface IServerEventEmitter<
 > {
   readonly onInit: ISyncExecutor;
 
-  onEvent<T = TEvent>(id: TEventID, callback: IServerEventCallback<T>, mapTo?: (event: TEvent) => T): Subscription;
+  onEvent<T = TEvent>(id: TEventID, callback: IServerEventCallback<T>, mapTo?: (event: TEvent) => T): Unsubscribe;
 
-  on<T = TEvent>(callback: IServerEventCallback<T>, mapTo?: (event: TEvent) => T, filter?: (event: TEvent) => boolean): Subscription;
+  on<T = TEvent>(callback: IServerEventCallback<T>, mapTo?: (event: TEvent) => T, filter?: (event: TEvent) => boolean): Unsubscribe;
 
   multiplex<T = TEvent>(topicId: TTopic, mapTo?: (event: TEvent) => T): Observable<T>;
 

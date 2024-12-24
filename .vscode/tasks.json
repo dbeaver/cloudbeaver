@@ -107,6 +107,14 @@
       "options": {
         "cwd": "${workspaceFolder}/webapp"
       }
+    },
+    {
+      "label": "Add Custom Plugin",
+      "type": "shell",
+      "command": "yarn run add-plugin",
+      "options": {
+        "cwd": "${workspaceFolder}/webapp/packages"
+      }
     }
   ],
   "inputs": [

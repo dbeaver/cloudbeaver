@@ -11,7 +11,8 @@ import { ConnectionExecutionContextService } from '@cloudbeaver/core-connections
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
-import { AsyncTaskInfoService, GraphQLService, type SqlExecutionPlan } from '@cloudbeaver/core-sdk';
+import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
+import { GraphQLService, type SqlExecutionPlan } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState.js';

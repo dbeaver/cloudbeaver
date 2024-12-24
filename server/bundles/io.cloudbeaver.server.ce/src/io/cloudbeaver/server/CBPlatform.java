@@ -21,7 +21,6 @@ import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.server.jobs.SessionStateJob;
 import io.cloudbeaver.server.jobs.WebDataSourceMonitorJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
-import io.cloudbeaver.service.session.CBSessionManager;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
@@ -84,6 +83,7 @@ public class CBPlatform extends BaseWebPlatform {
     }
 
     protected void scheduleServerJobs() {
+        super.scheduleServerJobs();
         new WebSessionMonitorJob(this, application.getSessionManager())
             .scheduleMonitor();
 
