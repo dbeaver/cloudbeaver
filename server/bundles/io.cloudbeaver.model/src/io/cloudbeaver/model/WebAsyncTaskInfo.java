@@ -16,16 +16,19 @@
  */
 package io.cloudbeaver.model;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 
 /**
- * Web connection info
+ * Web async task info
  */
 public class WebAsyncTaskInfo {
 
-    private String id;
-    private String name;
-    private boolean running;
+    @NotNull
+    private final String id;
+    @NotNull
+    private final String name;
+    private boolean running = false;
     private Object result;
     private Object extendedResult;
     private String status;
@@ -33,25 +36,19 @@ public class WebAsyncTaskInfo {
 
     private AbstractJob job;
 
-    public WebAsyncTaskInfo(String id, String name) {
+    public WebAsyncTaskInfo(@NotNull String id, @NotNull String name) {
         this.id = id;
         this.name = name;
     }
 
+    @NotNull
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
+    @NotNull
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public boolean isRunning() {
