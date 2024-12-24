@@ -17,28 +17,41 @@
 package io.cloudbeaver.server.websockets;
 
 import com.google.gson.Gson;
-import org.eclipse.jetty.websocket.api.Callback;
-import org.eclipse.jetty.websocket.api.Session;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.Session;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 
-public class CBAbstractWebSocket extends Session.Listener.AbstractAutoDemanding {
+public abstract class CBAbstractWebSocket extends Endpoint {
     private static final Log log = Log.getLog(CBAbstractWebSocket.class);
     protected static final Gson gson = WSUtils.clientGson;
+
+    @Nullable
+    private Session webSocketSession;
+
+    @Override
+    public void onOpen(Session session, EndpointConfig config) {
+        this.webSocketSession = session;
+    }
 
     public void handleEvent(WSEvent event) {
         if (!isOpen()) {
             return;
         }
-        Session session = getSession();
-        session.sendText(gson.toJson(event), new Callback() {
-            @Override
-            public void fail(Throwable e) {
-                handleEventException(e);
-            }
-        });
+        try {
+            webSocketSession.getBasicRemote().sendText(
+                gson.toJson(event)
+            );
+        } catch (Exception e) {
+            handleEventException(e);
+        }
+    }
 
+    protected boolean isOpen() {
+        return webSocketSession != null && webSocketSession.isOpen();
     }
 
     protected void handleEventException(Throwable e) {
@@ -46,10 +59,18 @@ public class CBAbstractWebSocket extends Session.Listener.AbstractAutoDemanding 
     }
 
     public void close() {
-        var session = getSession();
-        // the socket may not be connected to the client
-        if (session != null) {
-            getSession().close();
+        if (isOpen()) {
+            try {
+                getSession().close();
+            } catch (Exception e) {
+                log.error("Failed to close websocket", e);
+            }
         }
     }
+
+    @Nullable
+    public Session getSession() {
+        return webSocketSession;
+    }
+
 }

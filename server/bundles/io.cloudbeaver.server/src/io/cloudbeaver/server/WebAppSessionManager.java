@@ -19,11 +19,10 @@ package io.cloudbeaver.server;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebHeadlessSession;
+import io.cloudbeaver.model.session.WebHttpRequestInfo;
 import io.cloudbeaver.model.session.WebSession;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Session;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -56,9 +55,13 @@ public interface WebAppSessionManager {
 
     Collection<BaseWebSession> getAllActiveSessions();
 
-    WebSession getOrRestoreSession(Request httpRequest);
+    WebSession getOrRestoreWebSession(WebHttpRequestInfo httpRequest);
 
-    WebHeadlessSession getHeadlessSession(Request request, Session session, boolean create) throws DBException;
+    WebHeadlessSession getHeadlessSession(
+        @Nullable String smAccessToken,
+        @NotNull WebHttpRequestInfo requestInfo,
+        boolean create
+    ) throws DBException;
 
     boolean touchSession(HttpServletRequest request, HttpServletResponse response) throws DBWebException;
 

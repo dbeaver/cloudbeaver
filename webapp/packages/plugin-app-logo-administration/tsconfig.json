@@ -19,6 +19,16 @@
       "path": "../plugin-app-logo/tsconfig.json"
     }
   ],
-  "include": ["__custom_mocks__/**/*", "src/**/*", "src/**/*.json", "src/**/*.css", "src/**/*.scss"],
-  "exclude": ["**/node_modules", "lib/**/*", "dist/**/*"]
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "lib/**/*",
+    "dist/**/*"
+  ]
 }

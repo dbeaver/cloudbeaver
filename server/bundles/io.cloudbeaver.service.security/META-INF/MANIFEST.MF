@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Cloudbeaver Web Service - Security
 Bundle-Vendor: DBeaver Corp
 Bundle-SymbolicName: io.cloudbeaver.service.security;singleton:=true
-Bundle-Version: 1.0.67.qualifier
-Bundle-Release-Date: 20241223
+Bundle-Version: 1.0.68.qualifier
+Bundle-Release-Date: 20250106
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
@@ -19,4 +19,5 @@ Export-Package: io.cloudbeaver.auth.provider.local,
  io.cloudbeaver.auth.provider.rp,
  io.cloudbeaver.service.security,
  io.cloudbeaver.service.security.db
+Bundle-Localization: OSGI-INF/l10n/bundle
 Automatic-Module-Name: io.cloudbeaver.service.security

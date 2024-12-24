@@ -22,22 +22,18 @@ import io.cloudbeaver.model.session.*;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.events.WSWebUtils;
 import io.cloudbeaver.service.DBWSessionHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Session;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
-import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSessionStateEvent;
 import org.jkiss.utils.CommonUtils;
@@ -163,15 +159,12 @@ public class CBSessionManager implements WebAppSessionManager {
      * @return WebSession object or null, if session expired or invalid
      */
     @Nullable
-    public WebSession getOrRestoreSession(@NotNull Request request) {
-        var sessionIdCookie = Request.getCookies(request).stream().filter(
-            c -> c.getName().equals(CBConstants.CB_SESSION_COOKIE_NAME)
-        ).findAny().orElse(null);
-        if (sessionIdCookie == null) {
+    public WebSession getOrRestoreWebSession(@NotNull WebHttpRequestInfo requestInfo) {
+        final var sessionId = requestInfo.getId();
+        if (sessionId == null) {
             log.debug("Http session is null. No Web Session returned");
             return null;
         }
-        var sessionId = sessionIdCookie.getValue();
         WebSession webSession;
         synchronized (sessionMap) {
             if (sessionMap.containsKey(sessionId)) {
@@ -189,12 +182,7 @@ public class CBSessionManager implements WebAppSessionManager {
                         return null;
                     }
 
-                    webSession = createWebSessionImpl(new WebHttpRequestInfo(
-                        request.getId(),
-                        request.getAttribute("locale"),
-                        Request.getRemoteAddr(request),
-                        request.getHeaders().get("User-Agent")
-                    ));
+                    webSession = createWebSessionImpl(requestInfo);
                     restorePreviousUserSession(webSession, oldAuthInfo);
 
                     sessionMap.put(sessionId, webSession);
@@ -301,15 +289,18 @@ public class CBSessionManager implements WebAppSessionManager {
     }
 
     @Nullable
-    public WebHeadlessSession getHeadlessSession(Request request, Session session, boolean create) throws DBException {
-        String smAccessToken = request.getHeaders().get(WSConstants.WS_AUTH_HEADER);
+    public WebHeadlessSession getHeadlessSession(
+        @Nullable String smAccessToken,
+        @NotNull WebHttpRequestInfo requestInfo,
+        boolean create
+    ) throws DBException {
         if (CommonUtils.isEmpty(smAccessToken)) {
             return null;
         }
         synchronized (sessionMap) {
             var tempCredProvider = new SMTokenCredentialProvider(smAccessToken);
             SMAuthPermissions authPermissions = application.createSecurityController(tempCredProvider).getTokenPermissions();
-            var sessionId = session != null ? session.getId()
+            var sessionId = requestInfo.getId() != null ? requestInfo.getId()
                 : authPermissions.getSessionId();
 
             var existSession = sessionMap.get(sessionId);

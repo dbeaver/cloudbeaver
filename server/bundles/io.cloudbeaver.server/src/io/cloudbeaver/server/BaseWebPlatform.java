@@ -17,6 +17,7 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.server.websockets.WebSocketPingPongJob;
 import org.eclipse.core.runtime.Plugin;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
@@ -132,7 +133,9 @@ public abstract class BaseWebPlatform extends BasePlatformImpl {
     @NotNull
     public abstract WebApplication getApplication();
 
-    protected abstract void scheduleServerJobs();
+    protected void scheduleServerJobs() {
+        new WebSocketPingPongJob(WebAppUtils.getWebPlatform()).scheduleMonitor();
+    }
 
     @Override
     public synchronized void dispose() {

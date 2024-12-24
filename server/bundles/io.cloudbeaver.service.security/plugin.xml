@@ -29,14 +29,14 @@
             </credentials>
             <configuration>
                 <propertyGroup label="Configuration">
-                    <property id="logout-url" label="Logout URL" type="string" description="Logout URL"/>
-                    <property id="user-header" label="Username header" type="string" description="Username header"/>
-                    <property id="team-header" label="Team header" type="string" description="Team header"/>
-                    <property id="team-delimiter" label="Team delimiter symbol" type="string" description="Team delimiter symbol, default: |"/>
-                    <property id="first-name-header" label="First name header" type="string" description="First name header name"/>
-                    <property id="last-name-header" label="Last name header" type="string" description="Last name header name"/>
-                    <property id="full-name-header" label="Full name header" type="string" description="Full name header name"/>
-                    <property id="role-header" label="Role header" type="string" description="Role header name" requiredFeatures="distributed"/>
+                    <property id="logout-url" label="%logout-url" type="string" description="%logout-url.description"/>
+                    <property id="user-header" label="%user-header" type="string" description="%user-header.description"/>
+                    <property id="team-header" label="%team-header" type="string" description="%team-header.description"/>
+                    <property id="team-delimiter" label="%team-delimiter" type="string" description="%team-delimiter.description"/>
+                    <property id="first-name-header" label="%first-name-header" type="string" description="%first-name-header.description"/>
+                    <property id="last-name-header" label="%last-name-header" type="string" description="%last-name-header.description"/>
+                    <property id="full-name-header" label="%full-name-header" type="string" description="%full-name-header.description"/>
+                    <property id="role-header" label="%role-header" type="string" description="%role-header.description" requiredFeatures="distributed"/>
                 </propertyGroup>
             </configuration>
         </authProvider>

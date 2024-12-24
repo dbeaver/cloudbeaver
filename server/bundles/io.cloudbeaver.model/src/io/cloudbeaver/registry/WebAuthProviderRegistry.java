@@ -81,13 +81,13 @@ public class WebAuthProviderRegistry {
         }
     }
 
-    static List<WebAuthProviderProperty> readProperties(IConfigurationElement root) {
+    static List<WebAuthProviderProperty> readProperties(IConfigurationElement root, String authProviderId) {
         List<WebAuthProviderProperty> properties = new ArrayList<>();
         for (IConfigurationElement propGroup : ArrayUtils.safeArray(root.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
             String category = propGroup.getAttribute(PropertyDescriptor.ATTR_LABEL);
             IConfigurationElement[] propElements = propGroup.getChildren(PropertyDescriptor.TAG_PROPERTY);
             for (IConfigurationElement prop : propElements) {
-                WebAuthProviderProperty propertyDescriptor = new WebAuthProviderProperty(category, prop);
+                WebAuthProviderProperty propertyDescriptor = new WebAuthProviderProperty(category, prop, authProviderId);
                 properties.add(propertyDescriptor);
             }
         }
