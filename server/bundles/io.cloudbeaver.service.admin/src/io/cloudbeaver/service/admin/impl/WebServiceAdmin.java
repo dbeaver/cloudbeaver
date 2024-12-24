@@ -219,13 +219,17 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (teamId.isEmpty()) {
             throw new DBWebException("Empty team ID");
         }
+        WebUser user = webSession.getUser();
+        if (user == null) {
+            throw new DBWebException("Admin user is not found");
+        }
         webSession.addInfoMessage("Create new team - " + teamId);
         try {
             SMTeam newTeam = webSession.getAdminSecurityController().createTeam(
                 teamId,
                 teamName,
                 description,
-                webSession.getUser().getUserId()
+                user.getUserId()
             );
             return new AdminTeamInfo(webSession, newTeam);
         } catch (Exception e) {
