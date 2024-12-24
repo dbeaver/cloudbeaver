@@ -269,6 +269,13 @@ type DriverLibraryInfo {
     id: ID!
     name: String!
     icon: String
+    libraryFiles: [DriverFileInfo!]
+}
+
+type DriverFileInfo @since(version: "24.3.2") {
+    id: ID!
+    fileName: String!
+    icon: String
 }
 
 enum ResultDataFormat {
