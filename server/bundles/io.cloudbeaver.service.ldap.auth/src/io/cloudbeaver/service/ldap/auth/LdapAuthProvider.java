@@ -87,7 +87,11 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
      * Find user and validate in ldap by uniq parameter from identityProviders
      *
      */
-    private Map<String, Object> validateAndLoginUserAccessByUsername(@NotNull String login, @NotNull String password, @NotNull LdapSettings ldapSettings) throws DBException {
+    private Map<String, Object> validateAndLoginUserAccessByUsername(
+        @NotNull String login,
+        @NotNull String password,
+        @NotNull LdapSettings ldapSettings
+    ) throws DBException {
         if (
             CommonUtils.isEmpty(ldapSettings.getBindUserDN())
             || CommonUtils.isEmpty(ldapSettings.getBindUserPassword())
@@ -115,7 +119,11 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
      * Find user and validate in ldap by fullUserDN
      */
     private void validateUserAccess(@NotNull String fullUserDN, @NotNull LdapSettings ldapSettings) throws DBException {
-        if (CommonUtils.isEmpty(ldapSettings.getFilter()) || CommonUtils.isEmpty(ldapSettings.getBindUserDN()) || CommonUtils.isEmpty(ldapSettings.getBindUserPassword())) {
+        if (
+            CommonUtils.isEmpty(ldapSettings.getFilter())
+            || CommonUtils.isEmpty(ldapSettings.getBindUserDN())
+            || CommonUtils.isEmpty(ldapSettings.getBindUserPassword())
+        ) {
             return;
         }
 
@@ -309,7 +317,13 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return searchControls;
     }
 
-    private Map<String, Object> authenticateLdap(String userDN, String password, LdapSettings ldapSettings, @Nullable String login, Hashtable<String, String> environment) throws DBException {
+    private Map<String, Object> authenticateLdap(
+        String userDN,
+        String password,
+        LdapSettings ldapSettings,
+        @Nullable String login,
+        Hashtable<String, String> environment
+    ) throws DBException {
         environment.put(Context.SECURITY_PRINCIPAL, userDN);
         environment.put(Context.SECURITY_CREDENTIALS, password);
         DirContext userContext = null;
