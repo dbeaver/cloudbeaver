@@ -8,7 +8,8 @@
 import { type Connection, ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { EObjectFeature, type NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
+import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { ContainerDataSource } from './ContainerDataSource.js';
 import { DatabaseDataModel } from './DatabaseDataModel/DatabaseDataModel.js';

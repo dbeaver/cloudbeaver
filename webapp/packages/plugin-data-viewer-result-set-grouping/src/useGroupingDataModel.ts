@@ -11,7 +11,8 @@ import { useEffect } from 'react';
 import { useObjectRef, useResource } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { IServiceProvider, useService } from '@cloudbeaver/core-di';
-import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
+import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 import {
   DatabaseDataAccessMode,

@@ -8,14 +8,10 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type AsyncTaskInfo, ServerInternalError, type WsAsyncTaskInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import type { AsyncTaskInfo } from '../sdk.js';
-import { ServerInternalError } from '../ServerInternalError.js';
-
 export class AsyncTask {
-  readonly id: string;
-
   get cancelled(): boolean {
     return this._cancelled;
   }
@@ -32,8 +28,13 @@ export class AsyncTask {
     return this.innerPromise;
   }
 
+  get id(): string {
+    return this._id;
+  }
+
   readonly onStatusChange: ISyncExecutor<AsyncTaskInfo>;
 
+  private _id: string;
   private _cancelled: boolean;
   private taskInfo: AsyncTaskInfo | null;
   private resolve!: (value: AsyncTaskInfo) => void;
@@ -41,11 +42,11 @@ export class AsyncTask {
   private readonly innerPromise: Promise<AsyncTaskInfo>;
   private updatingAsync: boolean;
   private readonly init: () => Promise<AsyncTaskInfo>;
-  private readonly cancel: (info: AsyncTaskInfo) => Promise<void>;
+  private readonly cancel: (id: string) => Promise<void>;
   private initPromise: Promise<void> | null;
 
-  constructor(init: () => Promise<AsyncTaskInfo>, cancel: (info: AsyncTaskInfo) => Promise<void>) {
-    this.id = uuid();
+  constructor(init: () => Promise<AsyncTaskInfo>, cancel: (id: string) => Promise<void>) {
+    this._id = uuid();
     this.init = init;
     this.cancel = cancel;
     this._cancelled = false;
@@ -78,14 +79,20 @@ export class AsyncTask {
   }
 
   async updateInfoAsync(getter: (task: AsyncTask) => Promise<AsyncTaskInfo>): Promise<void> {
+    const init = this.info === null;
+
     if (this.updatingAsync) {
+      if (!init) {
+        /* With websockets we encounter a situation when we receive status update before the task is initialized.
+        We save the update in pendingEvents, but we can't update the task because updatingAsync is still true,
+        so we need to wait a bit before retrying */
+        setTimeout(() => this.updateInfoAsync.call(this, getter), 100);
+      }
       return;
     }
 
     this.updatingAsync = true;
     try {
-      const init = this.info === null;
-
       if (this._cancelled && init) {
         throw new Error('Task was cancelled');
       }
@@ -119,6 +126,13 @@ export class AsyncTask {
     }
   }
 
+  public updateStatus(info: WsAsyncTaskInfo): void {
+    if (this.taskInfo) {
+      this.taskInfo.status = info.statusName;
+      this.onStatusChange.execute(this.taskInfo);
+    }
+  }
+
   private updateInfo(info: AsyncTaskInfo): void {
     this.taskInfo = info;
 
@@ -134,7 +148,7 @@ export class AsyncTask {
 
   private async cancelTask(): Promise<void> {
     if (this.info) {
-      await this.cancel(this.info);
+      await this.cancel(this.info.id);
     }
   }
 }
