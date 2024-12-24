@@ -17,36 +17,34 @@
 package io.cloudbeaver.server.jetty;
 
 import io.cloudbeaver.service.DBWWebSocketContext;
+import jakarta.websocket.server.ServerEndpointConfig;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.websocket.api.Configurable;
-import org.eclipse.jetty.websocket.server.WebSocketCreator;
-import org.eclipse.jetty.websocket.server.WebSocketUpgradeHandler;
 import org.jkiss.code.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 public class CBJettyWebSocketContext implements DBWWebSocketContext {
     private final List<String> mappings = new ArrayList<>();
 
     private final Server server;
-    private final ContextHandler handler;
+    private final ServletContextHandler servletContextHandler;
 
-    public CBJettyWebSocketContext(@NotNull Server server, @NotNull ContextHandler handler) {
+    public CBJettyWebSocketContext(@NotNull Server server, @NotNull ServletContextHandler servletContextHandler) {
         this.server = server;
-        this.handler = handler;
+        this.servletContextHandler = servletContextHandler;
     }
 
+
     @Override
-    public void addWebSocket(@NotNull String mapping, @NotNull Function<Configurable, WebSocketCreator> configurator) {
-        handler.insertHandler(WebSocketUpgradeHandler.from(
-            server,
-            handler,
-            container -> container.addMapping(mapping, configurator.apply(container))
-        ));
-        mappings.add(mapping);
+    public void addWebSocket(@NotNull ServerEndpointConfig endpointConfig) {
+        // Add jakarta.websocket support
+        JakartaWebSocketServletContainerInitializer.configure(servletContextHandler, (context, container) -> {
+            container.addEndpoint(endpointConfig);
+            this.mappings.add(endpointConfig.getPath());
+        });
     }
 
     @NotNull
