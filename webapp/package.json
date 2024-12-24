@@ -25,6 +25,7 @@
     "lint": "eslint --ext .ts,.tsx",
     "validate-dependencies": "core-cli-validate-dependencies './packages/*/'",
     "update-ts-references": "yarn run clean && typescript-resolve-references './packages/*/'",
+    "add-plugin": "core-cli-add-plugin",
     "prebuild": "lerna run gql:gen --stream --parallel",
     "prepare": "cd .. && husky ./webapp/.husky",
     "postinstall": "husky"
