@@ -77,15 +77,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
         }
         if (userData == null) {
-            String fullUserDN = userName;
-
-            if (!fullUserDN.startsWith(ldapSettings.getUserIdentifierAttr())) {
-                fullUserDN = String.join("=", ldapSettings.getUserIdentifierAttr(), userName);
-            }
-            if (CommonUtils.isNotEmpty(ldapSettings.getBaseDN()) && !fullUserDN.endsWith(ldapSettings.getBaseDN())) {
-                fullUserDN = String.join(",", fullUserDN, ldapSettings.getBaseDN());
-            }
-
+            String fullUserDN = buildFullUserDN(userName, ldapSettings);
             validateUserAccess(fullUserDN, ldapSettings);
             userData = authenticateWithUserDN(environment, fullUserDN, password, ldapSettings);
         }
@@ -94,28 +86,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
     @NotNull
     private Map<String, Object> authenticateWithUserDN(Hashtable<String, String> environment, String fullUserDN, String password, LdapSettings ldapSettings) throws DBException {
-        environment.put(Context.SECURITY_PRINCIPAL, fullUserDN);
-        environment.put(Context.SECURITY_CREDENTIALS, password);
-        DirContext context = null;
-        try {
-            context = new InitialDirContext(environment);
-            Map<String, Object> userData = new HashMap<>();
-            userData.put(LdapConstants.CRED_USERNAME, findUserNameFromDN(fullUserDN, ldapSettings));
-            userData.put(LdapConstants.CRED_SESSION_ID, UUID.randomUUID());
-            return userData;
-        } catch (Exception e) {
-            throw new DBException("LDAP authentication failed: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (context != null) {
-                    context.close();
-                }
-            } catch (NamingException e) {
-                log.warn("Error closing LDAP user context", e);
-            }
-        }
+        return performLdapAuthentication(environment, fullUserDN, password, ldapSettings, null);
     }
-
     /**
      * Find user and validate in ldap by uniq parameter from identityProviders
      *
@@ -127,55 +99,38 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         ) {
             return new HashMap<>();
         }
-        Hashtable<String, String> adminEnvironment = creteAuthEnvironment(ldapSettings);
-        adminEnvironment.put(Context.SECURITY_PRINCIPAL, ldapSettings.getBindUserDN());
-        adminEnvironment.put(Context.SECURITY_CREDENTIALS, ldapSettings.getBindUserPassword());
-        DirContext adminContext = null;
+        Hashtable<String, String> serviceUserContext = creteAuthEnvironment(ldapSettings);
+        serviceUserContext.put(Context.SECURITY_PRINCIPAL, ldapSettings.getBindUserDN());
+        serviceUserContext.put(Context.SECURITY_CREDENTIALS, ldapSettings.getBindUserPassword());
+        DirContext serviceContext;
 
         try {
-            adminContext = new InitialDirContext(adminEnvironment);
-
-            String userDN = findUserDN(adminContext, ldapSettings, login);
+            serviceContext = new InitialDirContext(serviceUserContext);
+            String userDN = findUserDN(serviceContext, ldapSettings, login);
             if (userDN == null) {
                 return null;
             }
             return authenticateWithUserLogin(userDN, password, ldapSettings, login);
         } catch (Exception e) {
             throw new DBException("LDAP authentication failed: " + e.getMessage(), e);
-        } finally {
-            if (adminContext != null) {
-                try {
-                    adminContext.close();
-                } catch (NamingException e) {
-                    log.warn("Error closing LDAP admin context", e);
-                }
-            }
         }
-
     }
 
     /**
      * Find user and validate in ldap by fullUserDN
      */
     private void validateUserAccess(@NotNull String fullUserDN, @NotNull LdapSettings ldapSettings) throws DBException {
-        if (
-            CommonUtils.isEmpty(ldapSettings.getFilter())
-                || CommonUtils.isEmpty(ldapSettings.getBindUserDN())
-                || CommonUtils.isEmpty(ldapSettings.getBindUserPassword())
-        ) {
+        if (CommonUtils.isEmpty(ldapSettings.getFilter()) || CommonUtils.isEmpty(ldapSettings.getBindUserDN()) || CommonUtils.isEmpty(ldapSettings.getBindUserPassword())) {
             return;
         }
 
         var environment = creteAuthEnvironment(ldapSettings);
         environment.put(Context.SECURITY_PRINCIPAL, ldapSettings.getBindUserDN());
         environment.put(Context.SECURITY_CREDENTIALS, ldapSettings.getBindUserPassword());
-        DirContext bindUserContext = null;
+        DirContext bindUserContext;
         try {
             bindUserContext = new InitialDirContext(environment);
-
-            SearchControls searchControls = new SearchControls();
-            searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            searchControls.setTimeLimit(30_000);
+            SearchControls searchControls = createSearchControls();
             var searchResult = bindUserContext.search(fullUserDN, ldapSettings.getFilter(), searchControls);
             if (!searchResult.hasMore()) {
                 throw new DBException("Access denied");
@@ -184,14 +139,6 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             throw e;
         } catch (Exception e) {
             throw new DBException("LDAP user access validation by filter failed: " + e.getMessage(), e);
-        } finally {
-            if (bindUserContext != null) {
-                try {
-                    bindUserContext.close();
-                } catch (NamingException e) {
-                    log.warn("Error closing LDAP bind user context", e);
-                }
-            }
         }
     }
 
@@ -205,28 +152,38 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return environment;
     }
 
-    private String findUserDN(DirContext adminContext, LdapSettings ldapSettings, String userIdentifier) throws DBException {
+    private String findUserDN(DirContext serviceContext, LdapSettings ldapSettings, String userIdentifier) throws DBException {
         try {
-            String searchFilter = String.format("(%s=%s)", ldapSettings.getLoginAttribute(), userIdentifier);
+            String searchFilter = buildSearchFilter(ldapSettings, userIdentifier);
             SearchControls searchControls = new SearchControls();
             searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
             searchControls.setReturningAttributes(new String[]{"distinguishedName"});
-            String baseDN = ldapSettings.getBaseDN();
-            if (CommonUtils.isEmpty(baseDN)) {
-                baseDN = getRootDN(adminContext);
-            }
+            String baseDN = getBaseDN(serviceContext, ldapSettings);
 
-            NamingEnumeration<SearchResult> results = adminContext.search(baseDN, searchFilter, searchControls);
+            NamingEnumeration<SearchResult> results = serviceContext.search(baseDN, searchFilter, searchControls);
 
             if (results.hasMore()) {
-                SearchResult result = results.next();
-                return result.getNameInNamespace();
+                return results.next().getNameInNamespace();
             }
-
             return null;
         } catch (Exception e) {
             throw new DBException("Error finding user DN: " + e.getMessage(), e);
         }
+    }
+
+    private String getBaseDN(DirContext serviceContext, LdapSettings ldapSettings) throws DBException {
+        if (CommonUtils.isEmpty(ldapSettings.getBaseDN())) {
+            return getRootDN(serviceContext);
+        }
+        return ldapSettings.getBaseDN();
+    }
+
+    private String buildSearchFilter(LdapSettings ldapSettings, String userIdentifier) {
+        String userFilter = String.format("(%s=%s)", ldapSettings.getLoginAttribute(), userIdentifier);
+        if (CommonUtils.isNotEmpty(ldapSettings.getFilter())) {
+            return String.format("(&%s%s)", userFilter, ldapSettings.getFilter());
+        }
+        return userFilter;
     }
 
     private String getRootDN(DirContext adminContext) throws DBException {
@@ -361,5 +318,41 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
     private boolean isFullDN(String userName) {
         return userName.contains(",") && userName.contains("=");
+    }
+
+    private String buildFullUserDN(String userName, LdapSettings ldapSettings) {
+        String fullUserDN = userName;
+
+        if (!fullUserDN.startsWith(ldapSettings.getUserIdentifierAttr())) {
+            fullUserDN = String.join("=", ldapSettings.getUserIdentifierAttr(), userName);
+        }
+        if (CommonUtils.isNotEmpty(ldapSettings.getBaseDN()) && !fullUserDN.endsWith(ldapSettings.getBaseDN())) {
+            fullUserDN = String.join(",", fullUserDN, ldapSettings.getBaseDN());
+        }
+
+        return fullUserDN;
+    }
+
+    private SearchControls createSearchControls() {
+        SearchControls searchControls = new SearchControls();
+        searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        searchControls.setTimeLimit(30_000);
+        return searchControls;
+    }
+
+    private Map<String, Object> performLdapAuthentication(Hashtable<String, String> environment, String userDN, String password, LdapSettings ldapSettings, @Nullable String login) throws DBException {
+        environment.put(Context.SECURITY_PRINCIPAL, userDN);
+        environment.put(Context.SECURITY_CREDENTIALS, password);
+        try {
+            Map<String, Object> userData = new HashMap<>();
+            userData.put(LdapConstants.CRED_USERNAME, findUserNameFromDN(userDN, ldapSettings));
+            userData.put(LdapConstants.CRED_SESSION_ID, UUID.randomUUID());
+            if (login != null) {
+                userData.put(LdapConstants.CRED_DISPLAY_NAME, login);
+            }
+            return userData;
+        } catch (Exception e) {
+            throw new DBException("LDAP authentication failed: " + e.getMessage(), e);
+        }
     }
 }
