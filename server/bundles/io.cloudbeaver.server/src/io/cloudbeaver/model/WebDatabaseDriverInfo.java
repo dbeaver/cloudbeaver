@@ -53,7 +53,7 @@ public class WebDatabaseDriverInfo {
     public static final String URL_DATABASE_FIELD = ".*(?:\\{(?:database|file|folder)}).*";
     private final WebSession webSession;
     private final DBPDriver driver;
-    private String id;
+    private final String id;
 
     public WebDatabaseDriverInfo(WebSession webSession, DBPDriver driver) {
         this.webSession = webSession;
@@ -296,13 +296,13 @@ public class WebDatabaseDriverInfo {
     @Property
     public WebDriverLibraryInfo[] getDriverLibraries() {
         return driver.getDriverLibraries().stream()
-            .map(dbpDriverLibrary -> new WebDriverLibraryInfo(webSession, dbpDriverLibrary))
+            .map(dbpDriverLibrary -> new WebDriverLibraryInfo(driver, dbpDriverLibrary))
             .toArray(WebDriverLibraryInfo[]::new);
     }
 
     @Property
     public boolean isDriverInstalled() {
-        return !driver.needsExternalDependencies(webSession.getProgressMonitor());
+        return !driver.needsExternalDependencies();
     }
 
     @Property

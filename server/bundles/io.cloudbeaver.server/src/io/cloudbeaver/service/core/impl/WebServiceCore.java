@@ -366,8 +366,10 @@ public class WebServiceCore implements DBWServiceCore {
         }
 
         boolean oldSavePassword = dataSourceContainer.isSavePassword();
+        DBRProgressMonitor monitor = webSession.getProgressMonitor();
+        WebServiceUtils.validateDriverLibrariesPresence(dataSourceContainer);
         try {
-            boolean connect = dataSourceContainer.connect(webSession.getProgressMonitor(), true, false);
+            boolean connect = dataSourceContainer.connect(monitor, true, false);
             if (connect) {
                 webSession.addSessionEvent(
                     new WSDataSourceConnectEvent(
@@ -755,6 +757,7 @@ public class WebServiceCore implements DBWServiceCore {
             testDataSource = (DataSourceDescriptor) WebServiceUtils.createConnectionFromConfig(connectionConfig,
                 sessionRegistry);
         }
+        WebServiceUtils.validateDriverLibrariesPresence(testDataSource);
         webSession.provideAuthParameters(webSession.getProgressMonitor(),
             testDataSource,
             testDataSource.getConnectionConfiguration());

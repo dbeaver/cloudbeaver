@@ -400,4 +400,11 @@ public class WebServiceUtils extends WebCommonUtils {
         }
         return webProps.toArray(new WebPropertyInfo[0]);
     }
+
+    public static void validateDriverLibrariesPresence(@NotNull DBPDataSourceContainer container) throws DBWebException {
+        if (container.getDriver().needsExternalDependencies()) {
+            throw new DBWebException("Driver files for %s are not found. Please, ask administrator to download it."
+                .formatted(container.getDriver().getName()));
+        }
+    }
 }

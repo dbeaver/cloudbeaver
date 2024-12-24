@@ -17,18 +17,23 @@
 package io.cloudbeaver.model;
 
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.connection.DBPDriverLibrary;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
+
+import java.util.List;
 
 public class WebDriverLibraryInfo {
 
-    private final WebSession webSession;
+    @NotNull
+    private final DBPDriver driver;
+    @NotNull
     private final DBPDriverLibrary driverLibrary;
 
-    public WebDriverLibraryInfo(@NotNull WebSession webSession, @NotNull DBPDriverLibrary driverLibrary) {
-        this.webSession = webSession;
+    public WebDriverLibraryInfo(@NotNull DBPDriver driver, @NotNull DBPDriverLibrary driverLibrary) {
+        this.driver = driver;
         this.driverLibrary = driverLibrary;
     }
 
@@ -41,6 +46,13 @@ public class WebDriverLibraryInfo {
     @Property
     public String getName() {
         return driverLibrary.getDisplayName();
+    }
+
+    @Property
+    public List<String> getLibraryFiles() {
+        return ((DriverDescriptor) driver).getLibraryFiles(driverLibrary).stream()
+            .map(f -> f.getFile().getFileName().toString())
+            .toList();
     }
 
     @Property

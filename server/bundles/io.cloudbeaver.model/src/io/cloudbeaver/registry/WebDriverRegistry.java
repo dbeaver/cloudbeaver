@@ -63,4 +63,9 @@ public class WebDriverRegistry {
         return webDrivers.contains(driver.getFullId());
     }
 
+
+    public boolean validateDriverFilesAvailability() {
+        return true;
+    }
+
 }

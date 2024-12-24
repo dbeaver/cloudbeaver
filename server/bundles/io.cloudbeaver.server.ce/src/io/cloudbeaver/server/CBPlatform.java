@@ -18,6 +18,7 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
+import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.server.jobs.SessionStateJob;
 import io.cloudbeaver.server.jobs.WebDataSourceMonitorJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
@@ -39,6 +40,7 @@ import org.jkiss.utils.IOUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -142,18 +144,19 @@ public class CBPlatform extends BaseWebPlatform {
 
     public void refreshApplicableDrivers() {
         this.applicableDrivers.clear();
+        assert application != null;
+        WebDriverRegistry driverRegistry = application.getDriverRegistry();
 
         for (DBPDataSourceProviderDescriptor dspd : DataSourceProviderRegistry.getInstance().getEnabledDataSourceProviders()) {
             for (DBPDriver driver : dspd.getEnabledDrivers()) {
                 List<? extends DBPDriverLibrary> libraries = driver.getDriverLibraries();
                 {
-                    if (!application.getDriverRegistry().isDriverEnabled(driver)) {
+                    if (!driverRegistry.isDriverEnabled(driver)) {
                         continue;
                     }
                     boolean hasAllFiles = true, hasJars = false;
                     for (DBPDriverLibrary lib : libraries) {
-                        if (!DBWorkbench.isDistributed() && !lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
-                            (lib.getLocalFile() == null || !Files.exists(lib.getLocalFile())))
+                        if (driverRegistry.validateDriverFilesAvailability() && !isDriverLibraryFilePresent(lib))
                         {
                             hasAllFiles = false;
                             log.error("\tDriver '" + driver.getId() + "' is missing library '" + lib.getDisplayName() + "'");
@@ -170,6 +173,14 @@ public class CBPlatform extends BaseWebPlatform {
             }
         }
         log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
+    }
+
+    private boolean isDriverLibraryFilePresent(@NotNull DBPDriverLibrary lib) {
+        if (lib.getType() == DBPDriverLibrary.FileType.license) {
+            return true;
+        }
+        Path localFile = lib.getLocalFile();
+        return localFile != null && Files.exists(localFile);
     }
 
     @NotNull
