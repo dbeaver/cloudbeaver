@@ -21,5 +21,6 @@ package io.cloudbeaver.auth.provider.local;
 public class LocalAuthProviderConstants {
     public static final String PROVIDER_ID = "local";
     public static final String CRED_USER = "user";
+    public static final String CRED_DISPLAY_NAME = "displayName";
     public static final String CRED_PASSWORD = "password";
 }
