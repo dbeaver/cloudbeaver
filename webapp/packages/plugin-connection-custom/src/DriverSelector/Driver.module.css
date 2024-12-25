@@ -19,8 +19,8 @@
   position: absolute;
   bottom: 2px;
   right: 0;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   display: flex;
   border-radius: 50%;
   background-color: var(--theme-surface);
