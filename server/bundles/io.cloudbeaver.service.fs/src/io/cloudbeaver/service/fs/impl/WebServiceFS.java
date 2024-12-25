@@ -36,11 +36,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Web file system implementation
  */
 public class WebServiceFS implements DBWServiceFS {
+
+    public static final String FORBIDDEN_FILENAME_REGEX = "[%#:;№_$]";
 
     @NotNull
     @Override
@@ -208,6 +212,7 @@ public class WebServiceFS implements DBWServiceFS {
         @NotNull String nodePath,
         @NotNull String newName
     ) throws DBWebException {
+        validateFilename(newName);
         try {
             DBNPathBase node = FSUtils.getNodeByPath(webSession, nodePath);
             node.rename(webSession.getProgressMonitor(), newName);
@@ -274,6 +279,15 @@ public class WebServiceFS implements DBWServiceFS {
             return true;
         } catch (Exception e) {
             throw new DBWebException("Failed to create folder: " + e.getMessage(), e);
+        }
+    }
+
+    private static void validateFilename(String filename) throws DBWebException {
+        Pattern pattern = Pattern.compile(FORBIDDEN_FILENAME_REGEX);
+        Matcher matcher = pattern.matcher(filename);
+
+        if (matcher.find()) {
+            throw new DBWebException("File include forbidden symbols: " + filename);
         }
     }
 }
