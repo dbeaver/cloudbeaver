@@ -210,14 +210,27 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @NotNull
     @Override
-    public AdminTeamInfo createTeam(@NotNull WebSession webSession, String teamId, String teamName, String description) throws DBWebException {
+    public AdminTeamInfo createTeam(
+        @NotNull WebSession webSession,
+        @NotNull String teamId,
+        @Nullable String teamName,
+        @Nullable String description
+    ) throws DBWebException {
         if (teamId.isEmpty()) {
             throw new DBWebException("Empty team ID");
         }
+        WebUser user = webSession.getUser();
+        if (user == null) {
+            throw new DBWebException("Admin user is not found");
+        }
         webSession.addInfoMessage("Create new team - " + teamId);
         try {
-            webSession.getAdminSecurityController().createTeam(teamId, teamName, description, webSession.getUser().getUserId());
-            SMTeam newTeam = webSession.getAdminSecurityController().findTeam(teamId);
+            SMTeam newTeam = webSession.getAdminSecurityController().createTeam(
+                teamId,
+                teamName,
+                description,
+                user.getUserId()
+            );
             return new AdminTeamInfo(webSession, newTeam);
         } catch (Exception e) {
             throw new DBWebException("Error creating new team", e);
