@@ -41,14 +41,14 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   const providerList = providers.data
     .filter(isDefined)
     .filter(provider => {
-      if (provider.private || provider.authHidden) {
+      if (provider.private) {
         return false;
       }
 
       if (configurationWizard) {
         const disabledByFeature = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
 
-        if (provider.configurable || disabledByFeature) {
+        if (provider.configurable || disabledByFeature || provider.authHidden) {
           return false;
         }
       }
