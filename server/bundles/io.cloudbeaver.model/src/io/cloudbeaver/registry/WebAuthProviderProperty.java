@@ -19,15 +19,18 @@ package io.cloudbeaver.registry;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
+import org.jkiss.dbeaver.model.impl.LocalizedPropertyDescriptor;
 
-public class WebAuthProviderProperty extends PropertyDescriptor {
+public class WebAuthProviderProperty extends LocalizedPropertyDescriptor {
     private final String[] requiredFeatures;
     @Nullable
     private final String type;
 
-    public WebAuthProviderProperty(String category, IConfigurationElement config) {
+    private final String authProviderId;
+
+    public WebAuthProviderProperty(String category, IConfigurationElement config, String authProviderId) {
         super(category, config);
+        this.authProviderId = authProviderId;
         String featuresAttr = config.getAttribute("requiredFeatures");
         this.requiredFeatures = featuresAttr == null ? new String[0] : featuresAttr.split(",");
         this.type = config.getAttribute("type");
@@ -41,5 +44,14 @@ public class WebAuthProviderProperty extends PropertyDescriptor {
     @Nullable
     public String getType() {
         return type;
+    }
+
+    @Override
+    public String getPropertyId() {
+        if (authProviderId != null) {
+            return "prop.auth.model." + authProviderId + "." + this.getId();
+        } else {
+            return "prop.auth.model." + this.getId();
+        }
     }
 }

@@ -20,24 +20,22 @@ import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
-import io.cloudbeaver.server.WebApplication;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.server.servlets.WebStatusServlet;
-import io.cloudbeaver.server.websockets.CBJettyWebSocketManager;
+import io.cloudbeaver.server.websockets.CBEventsWebSocket;
+import io.cloudbeaver.server.websockets.CBWebSocketServerConfigurator;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServiceBindingWebSocket;
+import jakarta.websocket.server.ServerEndpointConfig;
 import org.eclipse.jetty.ee10.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.ee10.servlet.ServletMapping;
+import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.session.DefaultSessionCache;
-import org.eclipse.jetty.session.DefaultSessionIdManager;
-import org.eclipse.jetty.session.NullSessionDataStore;
 import org.eclipse.jetty.util.resource.ResourceFactory;
-import org.eclipse.jetty.websocket.server.WebSocketUpgradeHandler;
 import org.eclipse.jetty.xml.XmlConfiguration;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -48,7 +46,6 @@ import org.jkiss.utils.CommonUtils;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.util.Arrays;
 
 public class CBJettyServer {
@@ -137,7 +134,7 @@ public class CBJettyServer {
                 }
 
                 CBJettyWebSocketContext webSocketContext = new CBJettyWebSocketContext(server, servletContextHandler);
-                for (DBWServiceBindingWebSocket<CBApplication> wsb : WebServiceRegistry.getInstance()
+                for (DBWServiceBindingWebSocket wsb : WebServiceRegistry.getInstance()
                     .getWebServices(DBWServiceBindingWebSocket.class)
                 ) {
                     if (wsb.isApplicable(this.application)) {
@@ -149,16 +146,16 @@ public class CBJettyServer {
                     }
                 }
 
-                WebSocketUpgradeHandler webSocketHandler = WebSocketUpgradeHandler.from(server, servletContextHandler, (wsContainer) -> {
-                        wsContainer.setIdleTimeout(Duration.ofMinutes(5));
-                        // Add websockets
-                        wsContainer.addMapping(
-                            serverConfiguration.getServicesURI() + "ws",
-                            new CBJettyWebSocketManager(this.application.getSessionManager())
-                        );
-                    }
-                );
-                servletContextHandler.insertHandler(webSocketHandler);
+                JakartaWebSocketServletContainerInitializer.configure(servletContextHandler, (context, container) -> {
+                    // Add echo endpoint to server container
+                    ServerEndpointConfig eventWsEnpoint = ServerEndpointConfig.Builder
+                        .create(
+                            CBEventsWebSocket.class,
+                            serverConfiguration.getServicesURI() + "ws"
+                        ).configurator(new CBWebSocketServerConfigurator(application.getSessionManager()))
+                        .build();
+                    container.addEndpoint(eventWsEnpoint);
+                });
 
                 JettyUtils.initSessionManager(
                     this.application.getMaxSessionIdleTime(),
