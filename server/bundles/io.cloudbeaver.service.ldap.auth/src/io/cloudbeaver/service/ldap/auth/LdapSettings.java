@@ -33,6 +33,7 @@ public class LdapSettings {
     private final String bindUser;
     private final String bindUserPassword;
     private final String filter;
+    private final String loginAttribute;
 
 
     protected LdapSettings(
@@ -48,6 +49,7 @@ public class LdapSettings {
         this.bindUser = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_BIND_USER, "");
         this.bindUserPassword = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_BIND_USER_PASSWORD, "");
         this.filter = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_FILTER, "");
+        this.loginAttribute = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_LOGIN, "");;
     }
 
 
@@ -84,5 +86,9 @@ public class LdapSettings {
 
     public String getFilter() {
         return filter;
+    }
+
+    public String getLoginAttribute() {
+        return loginAttribute;
     }
 }

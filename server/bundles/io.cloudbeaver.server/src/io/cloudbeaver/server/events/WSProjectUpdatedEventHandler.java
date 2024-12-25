@@ -21,7 +21,6 @@ import io.cloudbeaver.model.session.BaseWebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
 
 public class WSProjectUpdatedEventHandler extends WSAbstractProjectEventHandler<WSProjectUpdateEvent> {
@@ -33,10 +32,10 @@ public class WSProjectUpdatedEventHandler extends WSAbstractProjectEventHandler<
         var eventId = event.getId();
         var projectId = event.getProjectId();
         try {
-            if (eventId.equals(WSEventType.RM_PROJECT_ADDED.getEventId())) {
+            if (WSProjectUpdateEvent.ADDED.equals(eventId)) {
                 activeUserSession.addSessionProject(projectId);
                 log.info("Project '" + projectId + "' added to '" + activeUserSession.getSessionId() + "' session");
-            } else if (eventId.equals(WSEventType.RM_PROJECT_REMOVED.getEventId())) {
+            } else if (WSProjectUpdateEvent.REMOVED.equals(eventId)) {
                 activeUserSession.removeSessionProject(projectId);
                 log.info("Project '" + projectId + "' removed from '" + activeUserSession.getSessionId() + "' session");
             }
@@ -49,7 +48,7 @@ public class WSProjectUpdatedEventHandler extends WSAbstractProjectEventHandler<
     @Override
     protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull WSProjectUpdateEvent event) {
         return !WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId()) &&
-            (event.getId().equals(WSEventType.RM_PROJECT_REMOVED.getEventId()) ||
+            (event.getId().equals(WSProjectUpdateEvent.REMOVED) ||
             activeUserSession.getUserContext().hasPermission(DBWConstants.PERMISSION_ADMIN));
     }
 }
