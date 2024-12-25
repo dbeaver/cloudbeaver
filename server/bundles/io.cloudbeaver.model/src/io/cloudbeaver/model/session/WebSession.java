@@ -26,11 +26,13 @@ import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.app.ServletAuthApplication;
+import io.cloudbeaver.model.session.monitor.TaskProgressMonitor;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebDataSourceUtils;
+import io.cloudbeaver.utils.WebEventUtils;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -57,7 +59,6 @@ import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
@@ -511,7 +512,7 @@ public class WebSession extends BaseWebSession
     ///////////////////////////////////////////////////////
     // Async model
 
-    public WebAsyncTaskInfo getAsyncTask(String taskId, String taskName, boolean create) {
+    public WebAsyncTaskInfo getAsyncTask(@NotNull String taskId, @NotNull String taskName, boolean create) {
         synchronized (asyncTasks) {
             WebAsyncTaskInfo taskInfo = asyncTasks.get(taskId);
             if (taskInfo == null && create) {
@@ -528,7 +529,6 @@ public class WebSession extends BaseWebSession
             if (taskInfo == null) {
                 throw new DBWebException("Task '" + taskId + "' not found");
             }
-            taskInfo.setRunning(taskInfo.getJob() != null && !taskInfo.getJob().isFinished());
             if (removeOnFinish && !taskInfo.isRunning()) {
                 asyncTasks.remove(taskId);
             }
@@ -551,7 +551,7 @@ public class WebSession extends BaseWebSession
         return true;
     }
 
-    public WebAsyncTaskInfo createAndRunAsyncTask(String taskName, WebAsyncTaskProcessor<?> runnable) {
+    public WebAsyncTaskInfo createAndRunAsyncTask(@NotNull String taskName, @NotNull WebAsyncTaskProcessor<?> runnable) {
         int taskId = TASK_ID.incrementAndGet();
         WebAsyncTaskInfo asyncTask = getAsyncTask(String.valueOf(taskId), taskName, true);
 
@@ -560,7 +560,8 @@ public class WebSession extends BaseWebSession
             protected IStatus run(DBRProgressMonitor monitor) {
                 int curTaskCount = taskCount.incrementAndGet();
 
-                TaskProgressMonitor taskMonitor = new TaskProgressMonitor(monitor, asyncTask);
+                DBRProgressMonitor taskMonitor = new TaskProgressMonitor(monitor, WebSession.this, asyncTask);
+
                 try {
                     Number queryLimit = application.getAppConfiguration().getResourceQuota(WebSQLConstants.QUOTA_PROP_QUERY_LIMIT);
                     if (queryLimit != null && curTaskCount > queryLimit.intValue()) {
@@ -572,7 +573,6 @@ public class WebSession extends BaseWebSession
                     asyncTask.setResult(runnable.getResult());
                     asyncTask.setExtendedResult(runnable.getExtendedResults());
                     asyncTask.setStatus("Finished");
-                    asyncTask.setRunning(false);
                 } catch (InvocationTargetException e) {
                     addSessionError(e.getTargetException());
                     asyncTask.setJobError(e.getTargetException());
@@ -580,6 +580,8 @@ public class WebSession extends BaseWebSession
                     asyncTask.setJobError(e);
                 } finally {
                     taskCount.decrementAndGet();
+                    asyncTask.setRunning(false);
+                    WebEventUtils.sendAsyncTaskEvent(WebSession.this, asyncTask);
                 }
                 return Status.OK_STATUS;
             }
@@ -989,27 +991,6 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    private static class TaskProgressMonitor extends ProxyProgressMonitor {
-
-        private final WebAsyncTaskInfo asyncTask;
-
-        public TaskProgressMonitor(DBRProgressMonitor original, WebAsyncTaskInfo asyncTask) {
-            super(original);
-            this.asyncTask = asyncTask;
-        }
-
-        @Override
-        public void beginTask(String name, int totalWork) {
-            super.beginTask(name, totalWork);
-            asyncTask.setStatus(name);
-        }
-
-        @Override
-        public void subTask(String name) {
-            super.subTask(name);
-            asyncTask.setStatus(name);
-        }
-    }
 
     private record PersistentAttribute(Object value) {
     }
