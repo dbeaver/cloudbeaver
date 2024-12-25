@@ -56,7 +56,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
 
     await this.setSubjectPermissions(newTeam.teamId, teamPermissions);
 
-    return this.get(teamId)!;
+    return this.get(newTeam.teamId)!;
   }
 
   async updateTeam({ teamId, teamPermissions, teamName, description }: TeamInfo): Promise<TeamInfo> {
@@ -73,7 +73,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
 
     this.markOutdated(team.teamId);
 
-    return this.get(teamId)!;
+    return this.get(team.teamId)!;
   }
 
   async deleteTeam(key: ResourceKeySimple<string>, options?: { force: boolean }): Promise<Map<string, TeamInfo>> {
