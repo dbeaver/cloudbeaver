@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { createComplexLoader, useComplexLoader, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { GlobalConstants, isNotNullDefined } from '@cloudbeaver/core-utils';
+import { GlobalConstants } from '@cloudbeaver/core-utils';
 import type { Compartment, Completion, CompletionConfig, CompletionContext, CompletionResult, Extension } from '@cloudbeaver/plugin-codemirror6';
 import { type ISQLEditorData, type SQLProposal } from '@cloudbeaver/plugin-sql-editor';
 
@@ -24,7 +24,7 @@ const CLOSE_CHARACTERS = /[\s()[\]{};:>,=\\*]/;
 const COMPLETION_WORD = /[\w*]*/;
 
 export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment, Extension] {
-  const { closeCompletion, useEditorAutocompletion } = useComplexLoader(codemirrorComplexLoader);
+  const { closeCompletion, useEditorAutocompletion, insertCompletionText } = useComplexLoader(codemirrorComplexLoader);
   const localizationService = useService(LocalizationService);
   const optionsRef = useObjectRef({ data });
 
@@ -56,7 +56,9 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
       return [
         ...filteredProposals.map<SqlCompletion>(proposal => ({
           label: proposal.displayString,
-          apply: proposal.replacementString,
+          apply: (view, completion, from, to) => {
+            view.dispatch(insertCompletionText(view.state, proposal.replacementString, proposal.replacementOffset, to));
+          },
           boost: proposal.score,
           icon: proposal.icon,
         })),
@@ -80,7 +82,7 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
         const limitIsMet = optionsRef.data.hintsLimitIsMet;
 
         const result: CompletionResult = {
-          from: getFrom(proposals, word.from),
+          from: word.from,
           options: getOptionsFromProposals(context.explicit, word.text, proposals),
           update(current, from, to, context) {
             if (startPos > context.pos) {
@@ -146,24 +148,4 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
   });
 
   return useEditorAutocompletion(config);
-}
-
-function getFrom(proposals: SQLProposal[], defaultFrom: number): number {
-  if (!proposals.length) {
-    return defaultFrom;
-  }
-
-  const candidate = proposals.find(proposal => proposal.replacementOffset !== undefined)?.replacementOffset;
-
-  if (!isNotNullDefined(candidate)) {
-    return defaultFrom;
-  }
-
-  if (proposals.every(proposal => proposal.replacementOffset === candidate)) {
-    return candidate;
-  }
-
-  console.error('Inconsistent proposals replacementOffset. It is supposed to be the same for all proposals');
-
-  return defaultFrom;
 }
