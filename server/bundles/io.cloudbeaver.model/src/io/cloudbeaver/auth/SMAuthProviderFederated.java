@@ -30,7 +30,7 @@ import java.util.Map;
 public interface SMAuthProviderFederated extends SMSignOutLinkProvider {
 
     @NotNull
-    String getSignInLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
+    String getSignInLink(String id) throws DBException;
 
     @Override
     default String getUserSignOutLink(
