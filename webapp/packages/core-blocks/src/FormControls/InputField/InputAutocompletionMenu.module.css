@@ -18,6 +18,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  max-width: 200px;
   padding: 4px 8px;
   text-align: left;
   outline: none;
@@ -33,12 +34,4 @@
     width: 16px;
     height: 16px;
   }
-}
-
-.menuButton {
-  position: absolute;
-  right: 0;
-  padding: 0;
-  height: 100%;
-  width: 0px;
 }

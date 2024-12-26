@@ -39,7 +39,6 @@ export const useInputAutocomplete = (
       input: inputRef.current?.value as string | undefined,
       selectionStart: inputRef.current?.selectionStart ?? null,
       selectionEnd: inputRef.current?.value?.length ?? null,
-      prevented: false,
       replaceCurrentWord(replacement: string) {
         const input = this.inputRef.current;
 
@@ -80,7 +79,7 @@ export const useInputAutocomplete = (
         return substring.split(' ').at(-1);
       },
       get filteredSuggestions() {
-        if (!this.currentWord || this.prevented) {
+        if (!this.currentWord) {
           return [];
         }
 
@@ -117,7 +116,6 @@ export const useInputAutocomplete = (
       selectionEnd: observable.ref,
       sourceHints: observable.ref,
       matchStrategy: observable.ref,
-      prevented: observable.ref,
       inputRef: observable.ref,
       currentWord: computed,
       filteredSuggestions: computed,
@@ -132,7 +130,6 @@ export const useInputAutocomplete = (
     state.selectionStart = target.selectionStart;
     state.selectionEnd = target.selectionEnd;
     state.input = target?.value;
-    state.prevented = false;
   }, INPUT_DELAY);
 
   useEffect(() => {
