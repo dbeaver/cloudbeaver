@@ -10,4 +10,5 @@ import type { IGroupingQueryState } from './IGroupingQueryState.js';
 export interface IDVResultSetGroupingPresentationState extends IGroupingQueryState {
   presentationId: string;
   valuePresentationId: string | null;
+  modelId: string;
 }
