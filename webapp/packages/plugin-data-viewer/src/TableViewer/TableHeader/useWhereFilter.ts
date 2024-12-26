@@ -31,6 +31,39 @@ interface IState {
   apply: () => Promise<void>;
 }
 
+const BASE_HINTS: InputAutocompleteProposal[] = [
+  {
+    displayString: 'AND',
+    replacementString: 'AND',
+    score: 0,
+  },
+  {
+    displayString: 'OR',
+    replacementString: 'OR',
+    score: 0,
+  },
+  {
+    displayString: 'ILIKE',
+    replacementString: 'ILIKE',
+    score: 0,
+  },
+  {
+    displayString: 'LIKE',
+    replacementString: 'LIKE',
+    score: 0,
+  },
+  {
+    displayString: 'IN',
+    replacementString: 'IN',
+    score: 0,
+  },
+  {
+    displayString: 'BETWEEN',
+    replacementString: 'BETWEEN',
+    score: 0,
+  },
+];
+
 export function useWhereFilter(model: IDatabaseDataModel, resultIndex: number): Readonly<IState> {
   return useObservableRef(
     () => ({
@@ -65,12 +98,15 @@ export function useWhereFilter(model: IDatabaseDataModel, resultIndex: number): 
         return view?.columns ?? [];
       },
       get hintProposals() {
-        return this.columns.map(column => ({
-          title: column.label || '',
-          displayString: column.label || '',
-          replacementString: column.label || '',
-          icon: column.icon || '',
-        }));
+        return [...BASE_HINTS].concat(
+          this.columns.map(column => ({
+            title: column.label || '',
+            displayString: column.label || '',
+            replacementString: column.label || '',
+            icon: column.icon || '',
+            score: 1,
+          })),
+        );
       },
       get constraints() {
         const model = this.model as any;

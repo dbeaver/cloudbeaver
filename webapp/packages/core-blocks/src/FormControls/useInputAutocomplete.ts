@@ -76,7 +76,12 @@ export const useInputAutocomplete = (
           return '';
         }
 
-        return substring.split(' ').at(-1);
+        return (
+          substring
+            .split(' ')
+            .at(-1)
+            ?.replace(/[^\w\s]|_/g, '') ?? ''
+        );
       },
       get filteredSuggestions() {
         if (!this.currentWord) {
