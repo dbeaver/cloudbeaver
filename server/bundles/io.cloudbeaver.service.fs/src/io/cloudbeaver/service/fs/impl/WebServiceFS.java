@@ -282,11 +282,11 @@ public class WebServiceFS implements DBWServiceFS {
         }
     }
 
-    public void validateFilename(@NotNull String filename) throws DBWebException {
+    private void validateFilename(@NotNull String filename) throws DBWebException {
         Matcher matcher = FORBIDDEN_FILENAME_PATTERN.matcher(filename);
 
         if (matcher.find()) {
-            throw new DBWebException("File includes forbidden symbols: " + filename);
+            throw new DBWebException(String.format("File %s contains forbidden symbols", filename));
         }
     }
 }
