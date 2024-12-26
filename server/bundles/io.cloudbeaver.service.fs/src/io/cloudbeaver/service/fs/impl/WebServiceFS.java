@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
  */
 public class WebServiceFS implements DBWServiceFS {
 
-    public static final String FORBIDDEN_FILENAME_REGEX = "[%#:;№_$]";
+    private static final Pattern FORBIDDEN_FILENAME_PATTERN = Pattern.compile("[%#:;№_$]");
 
     @NotNull
     @Override
@@ -282,12 +282,11 @@ public class WebServiceFS implements DBWServiceFS {
         }
     }
 
-    private static void validateFilename(String filename) throws DBWebException {
-        Pattern pattern = Pattern.compile(FORBIDDEN_FILENAME_REGEX);
-        Matcher matcher = pattern.matcher(filename);
+    public void validateFilename(String filename) throws DBWebException {
+        Matcher matcher = FORBIDDEN_FILENAME_PATTERN.matcher(filename);
 
         if (matcher.find()) {
-            throw new DBWebException("File include forbidden symbols: " + filename);
+            throw new DBWebException("File includes forbidden symbols: " + filename);
         }
     }
 }
