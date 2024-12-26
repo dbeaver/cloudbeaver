@@ -282,7 +282,7 @@ public class WebServiceFS implements DBWServiceFS {
         }
     }
 
-    public void validateFilename(String filename) throws DBWebException {
+    public void validateFilename(@NotNull String filename) throws DBWebException {
         Matcher matcher = FORBIDDEN_FILENAME_PATTERN.matcher(filename);
 
         if (matcher.find()) {
