@@ -21,6 +21,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.utils.ConfigurationUtils;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.service.admin.AdminConnectionSearchInfo;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -44,12 +45,10 @@ public class ConnectionSearcher implements DBRRunnableWithProgress {
     private final WebSession webSession;
     private final String[] hostNames;
     private final List<AdminConnectionSearchInfo> foundConnections = new ArrayList<>();
-    private List<DBPDriver> availableDrivers = new ArrayList<>();
 
     public ConnectionSearcher(WebSession webSession, String[] hostNames) {
         this.webSession = webSession;
         this.hostNames = hostNames;
-        this.availableDrivers.addAll(CBPlatform.getInstance().getApplicableDrivers());
     }
 
     public List<AdminConnectionSearchInfo> getFoundConnections() {
@@ -107,7 +106,7 @@ public class ConnectionSearcher implements DBRRunnableWithProgress {
         int checkTimeout = 150;
         Map<Integer, AdminConnectionSearchInfo> portCache = new HashMap<>();
 
-        for (DBPDriver driver : availableDrivers) {
+        for (DBPDriver driver : WebAppUtils.getWebApplication().getDriverRegistry().getApplicableDrivers()) {
             monitor.subTask("Check '" + driver.getName() + "' on '" + hostName + "'");
             if (!CommonUtils.isEmpty(driver.getDefaultPort()) && !isPortInBlockList(CommonUtils.toInt(driver.getDefaultPort()))) {
                 updatePortInfo(portCache, hostName, displayName, driver, checkTimeout);
