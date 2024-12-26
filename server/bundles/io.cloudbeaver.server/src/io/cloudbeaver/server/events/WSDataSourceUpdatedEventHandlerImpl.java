@@ -21,7 +21,6 @@ import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 
 /**
@@ -42,7 +41,7 @@ public class WSDataSourceUpdatedEventHandlerImpl extends WSAbstractProjectEventH
             }
             sendEvent = project.updateProjectDataSources(
                 event.getDataSourceIds(),
-                WSEventType.valueById(event.getId())
+                event.getId()
             );
         }
         if (sendEvent) {

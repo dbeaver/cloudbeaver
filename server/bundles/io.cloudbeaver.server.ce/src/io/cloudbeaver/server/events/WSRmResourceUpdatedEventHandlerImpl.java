@@ -25,7 +25,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMEvent;
 import org.jkiss.dbeaver.model.rm.RMEventManager;
-import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
 
 /**
@@ -41,7 +40,7 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSAbstractProjectEventH
         if (activeUserSession instanceof WebSession) {
             var webSession = (WebSession) activeUserSession;
             acceptChangesInNavigatorTree(
-                WSEventType.valueById(event.getId()),
+                event.getId(),
                 event.getResourcePath(),
                 webSession.getProjectById(event.getProjectId())
             );
@@ -49,14 +48,14 @@ public class WSRmResourceUpdatedEventHandlerImpl extends WSAbstractProjectEventH
         activeUserSession.addSessionEvent(event);
     }
 
-    private void acceptChangesInNavigatorTree(WSEventType eventType, String resourcePath, WebProjectImpl project) {
-        if (eventType == WSEventType.RM_RESOURCE_CREATED) {
+    private void acceptChangesInNavigatorTree(@NotNull String eventId, String resourcePath, WebProjectImpl project) {
+        if (WSResourceUpdatedEvent.CREATED.equals(eventId)) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_ADD,
                     project.getRMProject(),
                     resourcePath)
             );
-        } else if (eventType == WSEventType.RM_RESOURCE_DELETED) {
+        } else if (WSResourceUpdatedEvent.DELETED.equals(eventId)) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_DELETE,
                     project.getRMProject(),
