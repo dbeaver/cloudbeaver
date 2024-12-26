@@ -9,12 +9,12 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useRef } from 'react';
 import { MenuItem } from 'reakit';
 
-import { IconOrImage } from '../../IconOrImage.js';
-import { Menu } from '../../Menu/Menu.js';
-import type { IMenuState } from '../../Menu/MenuStateContext.js';
-import { s } from '../../s.js';
-import { Text } from '../../Text.js';
-import { useS } from '../../useS.js';
+import { IconOrImage } from '../IconOrImage.js';
+import { Menu } from '../Menu/Menu.js';
+import type { IMenuState } from '../Menu/MenuStateContext.js';
+import { s } from '../s.js';
+import { Text } from '../Text.js';
+import { useS } from '../useS.js';
 import style from './InputAutocompletionMenu.module.css';
 import { type InputAutocompleteProposal, type InputAutocompleteStrategy, useInputAutocomplete } from './useInputAutocomplete.js';
 

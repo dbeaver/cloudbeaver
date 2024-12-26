@@ -15,7 +15,7 @@ import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/R
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import type { IDatabaseDataOptions } from '../../DatabaseDataModel/IDatabaseDataOptions.js';
 import { isResultSetDataModel } from '../../ResultSet/isResultSetDataModel.js';
-import { isResultSetDataSource, ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
+import { isResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
 
 interface IState {
   model: IDatabaseDataModel;

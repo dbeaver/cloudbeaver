@@ -10,7 +10,7 @@ import { type RefObject, useEffect } from 'react';
 
 import { debounce, isFuzzySearchable, isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { useObservableRef } from '../../useObservableRef.js';
+import { useObservableRef } from '../useObservableRef.js';
 
 export type InputAutocompleteStrategy = 'startsWith' | 'contains' | 'fuzzy';
 
