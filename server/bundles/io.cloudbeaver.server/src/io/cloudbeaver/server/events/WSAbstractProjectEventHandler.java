@@ -18,7 +18,6 @@ package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.model.session.BaseWebSession;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSProjectEvent;
 
 /**
@@ -29,7 +28,6 @@ public abstract class WSAbstractProjectEventHandler<EVENT extends WSProjectEvent
     @Override
     protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull EVENT event) {
         return super.isAcceptableInSession(activeUserSession, event) &&
-            activeUserSession.isProjectAccessible(event.getProjectId()) &&
-            WSEventType.valueById(event.getId()) != null;
+            activeUserSession.isProjectAccessible(event.getProjectId());
     }
 }

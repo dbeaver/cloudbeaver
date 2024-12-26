@@ -64,7 +64,6 @@ import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.MessageType;
-import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
@@ -602,7 +601,6 @@ public class WebSession extends BaseWebSession
             sessionMessages.add(message);
         }
         addSessionEvent(new WSSessionLogUpdatedEvent(
-            WSEventType.SESSION_LOG_UPDATED,
             this.userContext.getSmSessionId(),
             this.userContext.getUserId(),
             MessageType.ERROR,
