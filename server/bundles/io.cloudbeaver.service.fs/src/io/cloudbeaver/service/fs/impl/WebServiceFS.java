@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
  */
 public class WebServiceFS implements DBWServiceFS {
 
-    private static final Pattern FORBIDDEN_FILENAME_PATTERN = Pattern.compile("[%#:;№_$]");
+    private static final Pattern FORBIDDEN_FILENAME_PATTERN = Pattern.compile("[%#:;№$]");
 
     @NotNull
     @Override
