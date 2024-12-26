@@ -33,7 +33,9 @@ enum CBServerEventId {
     cb_object_permissions_updated,
     cb_subject_permissions_updated,
 
-    cb_database_output_log_updated
+    cb_database_output_log_updated,
+
+    cb_session_task_info_updated @since(version: "24.3.1")
 }
 
 # Events sent by client
@@ -56,6 +58,9 @@ enum CBEventTopic {
     cb_object_permissions,
     cb_subject_permissions,
     cb_database_output_log,
+
+    cb_session_task, @since(version: "24.3.1")
+
     cb_datasource_connection,
     cb_delete_temp_folder
 }
@@ -180,6 +185,14 @@ type WSOutputLogInfo {
     severity: String
     message: String
     # Add more fields as needed
+}
+
+# Async task info status event
+type WSAsyncTaskInfo @since(version: "24.3.1") {
+    id: CBServerEventId!
+    taskId: ID!
+    statusName: String
+    running: Boolean!
 }
 
 # Datasource disconnect event

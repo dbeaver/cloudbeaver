@@ -10,7 +10,8 @@ import { makeObservable, observable } from 'mobx';
 import type { IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
-import type { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
+import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
+import type { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataSource } from '../DatabaseDataModel/DatabaseDataSource.js';
 import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';

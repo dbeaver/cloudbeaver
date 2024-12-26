@@ -8,7 +8,8 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
+import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA.js';

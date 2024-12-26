@@ -39,7 +39,6 @@ import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.MessageType;
-import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.registry.ResourceTypeDescriptor;
 import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
@@ -777,7 +776,6 @@ public class LocalResourceController extends BaseLocalResourceController {
                 if (credentialsProvider.getActiveUserCredentials() != null) {
                     ServletAppUtils.getServletApplication().getEventController().addEvent(
                         new WSSessionLogUpdatedEvent(
-                            WSEventType.SESSION_LOG_UPDATED,
                             credentialsProvider.getActiveUserCredentials().getSmSessionId(),
                             credentialsProvider.getActiveUserCredentials().getUserId(),
                             MessageType.ERROR,
@@ -796,7 +794,6 @@ public class LocalResourceController extends BaseLocalResourceController {
                 if (credentialsProvider.getActiveUserCredentials() != null) {
                     ServletAppUtils.getServletApplication().getEventController().addEvent(
                         new WSSessionLogUpdatedEvent(
-                            WSEventType.SESSION_LOG_UPDATED,
                             credentialsProvider.getActiveUserCredentials().getSmSessionId(),
                             credentialsProvider.getActiveUserCredentials().getUserId(),
                             MessageType.ERROR,

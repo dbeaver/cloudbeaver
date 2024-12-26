@@ -18,10 +18,11 @@ package io.cloudbeaver.server.websockets;
 
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebHeadlessSession;
-import org.eclipse.jetty.websocket.api.Callback;
+import jakarta.websocket.MessageHandler;
+import jakarta.websocket.PongMessage;
 import org.jkiss.code.NotNull;
 
-public class WebSocketPingPongCallback implements Callback {
+public class WebSocketPingPongCallback implements MessageHandler.Whole<PongMessage> {
     @NotNull
     private final BaseWebSession webSession;
 
@@ -30,7 +31,7 @@ public class WebSocketPingPongCallback implements Callback {
     }
 
     @Override
-    public void succeed() {
+    public void onMessage(PongMessage message) {
         if (webSession instanceof WebHeadlessSession) {
             webSession.touchSession();
         }

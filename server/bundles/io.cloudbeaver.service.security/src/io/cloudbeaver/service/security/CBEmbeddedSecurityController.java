@@ -1148,7 +1148,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     @Override
-    public SMTeam findTeam(String teamId) throws DBCException {
+    public SMTeam findTeam(@NotNull String teamId) throws DBCException {
         return Arrays.stream(readAllTeams())
             .filter(r -> r.getTeamId().equals(teamId))
             .findFirst().orElse(null);
@@ -1219,7 +1219,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     @Override
-    public void createTeam(String teamId, String name, String description, String grantor) throws DBCException {
+    public SMTeam createTeam(
+        @NotNull String teamId,
+        @Nullable String name,
+        @Nullable String description,
+        @NotNull String grantor
+    ) throws DBCException {
         if (CommonUtils.isEmpty(teamId)) {
             throw new DBCException("Empty team name is not allowed");
         }
@@ -1251,6 +1256,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error saving team in database", e);
         }
+        SMTeam smTeam = new SMTeam(teamId, name, description, true);
+        for (String permission : getDefaultTeamPermissions()) {
+            smTeam.addPermission(permission);
+        }
+        return smTeam;
     }
 
     protected String[] getDefaultTeamPermissions() {

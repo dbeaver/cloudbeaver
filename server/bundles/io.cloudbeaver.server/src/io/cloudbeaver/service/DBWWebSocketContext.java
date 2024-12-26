@@ -16,13 +16,10 @@
  */
 package io.cloudbeaver.service;
 
-import org.eclipse.jetty.websocket.api.Configurable;
-import org.eclipse.jetty.websocket.server.WebSocketCreator;
+import jakarta.websocket.server.ServerEndpointConfig;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 
-import java.util.function.Function;
-
 public interface DBWWebSocketContext {
-    void addWebSocket(@NotNull String mapping, @NotNull Function<Configurable, WebSocketCreator> configurator) throws DBException;
+    void addWebSocket(@NotNull ServerEndpointConfig endpointConfig) throws DBException;
 }
