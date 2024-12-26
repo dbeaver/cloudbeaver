@@ -100,11 +100,7 @@ export const InputAutocompletionMenu = observer(
             className={styles['menuItem']}
             onClick={event => handleSelect(item)}
           >
-            {item.icon && (
-              <Container className={styles['itemIcon']}>
-                <IconOrImage icon={item.icon} className={styles['iconOrImage']} />
-              </Container>
-            )}
+            {item.icon && <IconOrImage icon={item.icon} className={styles['iconOrImage']} />}
             <Text truncate>{item.displayString}</Text>
           </MenuItem>
         ))}

@@ -28,6 +28,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
         className={styles['inlineEditor']}
         name="data_where"
         value={state.filter}
+        autoCompleteProposals={state.hintProposals}
         placeholder={translate(state.constraints?.supported ? 'table_header_sql_expression' : 'table_header_sql_expression_not_supported')}
         controlsPosition="inside"
         edited={!!state.filter}

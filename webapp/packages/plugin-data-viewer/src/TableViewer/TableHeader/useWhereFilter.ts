@@ -7,19 +7,23 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import { useObservableRef } from '@cloudbeaver/core-blocks';
+import { type InputAutocompleteProposal, useObservableRef } from '@cloudbeaver/core-blocks';
+import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataConstraintAction } from '../../DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';
+import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction.js';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import type { IDatabaseDataOptions } from '../../DatabaseDataModel/IDatabaseDataOptions.js';
 import { isResultSetDataModel } from '../../ResultSet/isResultSetDataModel.js';
-import { isResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
+import { isResultSetDataSource, ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
 
 interface IState {
   model: IDatabaseDataModel;
   resultIndex: number;
   readonly supported: boolean;
   readonly filter: string;
+  readonly columns: SqlResultColumn[];
+  readonly hintProposals: InputAutocompleteProposal[];
   readonly constraints: DatabaseDataConstraintAction | null;
   readonly disabled: boolean;
   readonly applicableFilter: boolean;
@@ -44,6 +48,29 @@ export function useWhereFilter(model: IDatabaseDataModel, resultIndex: number): 
         }
 
         return source.options?.whereFilter ?? '';
+      },
+      get columns() {
+        const model = this.model as any;
+
+        if (!model.source.hasResult(this.resultIndex) || !isResultSetDataModel(model)) {
+          return [];
+        }
+
+        const view = model.source.tryGetAction(resultIndex, ResultSetViewAction);
+
+        if (!view) {
+          return [];
+        }
+
+        return view?.columns ?? [];
+      },
+      get hintProposals() {
+        return this.columns.map(column => ({
+          title: column.label || '',
+          displayString: column.label || '',
+          replacementString: column.label || '',
+          icon: column.icon || '',
+        }));
       },
       get constraints() {
         const model = this.model as any;
@@ -84,6 +111,8 @@ export function useWhereFilter(model: IDatabaseDataModel, resultIndex: number): 
       model: observable.ref,
       resultIndex: observable.ref,
       filter: computed,
+      columns: computed,
+      hintProposals: computed,
       constraints: computed,
       disabled: computed,
       applicableFilter: computed,

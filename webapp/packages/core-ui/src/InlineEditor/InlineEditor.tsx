@@ -173,7 +173,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
             )}
           </div>
         </div>
-        <InputAutocompletionMenu sourceHints={autoCompleteProposals ?? []} inputRef={inputRef} />
+        <InputAutocompletionMenu matchStrategy="fuzzy" sourceHints={autoCompleteProposals ?? []} inputRef={inputRef} />
       </Container>
     );
   }),
