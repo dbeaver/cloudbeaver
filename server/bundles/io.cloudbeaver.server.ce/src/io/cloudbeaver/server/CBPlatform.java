@@ -17,7 +17,6 @@
 
 package io.cloudbeaver.server;
 
-import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.server.jobs.SessionStateJob;
 import io.cloudbeaver.server.jobs.WebDataSourceMonitorJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
@@ -26,7 +25,6 @@ import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -125,9 +123,4 @@ public class CBPlatform extends BaseWebPlatform {
         return false;
     }
 
-    @NotNull
-    @Override
-    public DBFileController createFileController() {
-        return getApplication().createFileController(new NoAuthCredentialsProvider());
-    }
 }
