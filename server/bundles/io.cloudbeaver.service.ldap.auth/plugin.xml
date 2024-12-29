@@ -27,11 +27,13 @@
                               features="password" required="false"/>
                     <property id="ldap-filter" label="%ldap-filter" type="string" required="false"
                               description="%ldap-filter.description"/>
+                    <property id="ldap-login" label="%ldap-login" type="string" required="false"
+                              description="%ldap-login.description"/>
                 </propertyGroup>
             </configuration>
             <credentials>
                 <propertyGroup label="Auth credentials">
-                    <property id="user-dn" label="User DN" type="string" description="LDAP user name" user="true"/>
+                    <property id="user-dn" label="User login" type="string" description="LDAP user name" user="true"/>
                     <property id="password" label="User password" type="string" description="LDAP user password"
                               user="true" encryption="plain"/>
                 </propertyGroup>

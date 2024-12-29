@@ -84,7 +84,7 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, String driverId) {
         List<WebDatabaseDriverInfo> result = new ArrayList<>();
-        for (DBPDriver driver : WebAppUtils.getWebPlatform().getApplicableDrivers()) {
+        for (DBPDriver driver : WebAppUtils.getWebApplication().getDriverRegistry().getApplicableDrivers()) {
             if (driverId == null || driverId.equals(driver.getFullId())) {
                 result.add(new WebDatabaseDriverInfo(webSession, driver));
             }
@@ -141,7 +141,7 @@ public class WebServiceCore implements DBWServiceCore {
 
         for (DBPDataSourceContainer ds : dsRegistry.getDataSources()) {
             if (ds.isTemplate()) {
-                if (WebAppUtils.getWebPlatform().getApplicableDrivers().contains(ds.getDriver())) {
+                if (WebAppUtils.getWebApplication().getDriverRegistry().getApplicableDrivers().contains(ds.getDriver())) {
                     result.add(new WebDataSourceConfig(ds));
                 } else {
                     log.debug("Template datasource '" + ds.getName() + "' ignored - driver is not applicable");
@@ -180,7 +180,7 @@ public class WebServiceCore implements DBWServiceCore {
         for (DBPDataSourceContainer ds : registry.getDataSources()) {
             if (ds.isTemplate() &&
                 project.getDataSourceFilter().filter(ds) &&
-                WebAppUtils.getWebPlatform().getApplicableDrivers().contains(ds.getDriver())) {
+                WebAppUtils.getWebApplication().getDriverRegistry().getApplicableDrivers().contains(ds.getDriver())) {
                 result.add(new WebConnectionInfo(webSession, ds));
             }
         }

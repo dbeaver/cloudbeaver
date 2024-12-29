@@ -17,24 +17,18 @@
 package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
 import org.jkiss.dbeaver.model.websocket.event.WSAbstractEvent;
-import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
 
 public class WSUserEventHandler<EVENT extends WSAbstractEvent> implements WSEventHandler<EVENT> {
     @Override
     public void handleEvent(@NotNull EVENT event) {
-        var eventType = WSEventType.valueById(event.getId());
-        if (eventType == null) {
-            return;
-        }
         var sessionManager = CBApplication.getInstance().getSessionManager();
-        switch (eventType) {
-            case CLOSE_USER_SESSIONS:
+        switch (event.getId()) {
+            case WSUserCloseSessionsEvent.ID:
                 if (event instanceof WSUserCloseSessionsEvent closeSessionsEvent) {
                     if (closeSessionsEvent.getSessionIds().isEmpty()) {
                         sessionManager.closeAllSessions(closeSessionsEvent.getSessionId());
@@ -43,7 +37,7 @@ public class WSUserEventHandler<EVENT extends WSAbstractEvent> implements WSEven
                     }
                 }
                 break;
-            case USER_DELETED:
+            case WSUserDeletedEvent.ID:
                 if (event instanceof WSUserDeletedEvent userDeletedEvent) {
                     sessionManager.closeUserSession(userDeletedEvent);
                 }
