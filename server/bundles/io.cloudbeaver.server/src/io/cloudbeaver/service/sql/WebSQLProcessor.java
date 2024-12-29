@@ -200,7 +200,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             SQLScriptElement element = SQLScriptParser.extractActiveQuery(parserContext, 0, sql.length());
 
             if (element instanceof SQLControlCommand command) {
-                dataContainer.getScriptContext().executeControlCommand(command);
+                dataContainer.getScriptContext().executeControlCommand(webSession.getProgressMonitor(), command);
                 WebSQLQueryResults stats = new WebSQLQueryResults(webSession, dataFormat);
                 executeInfo.setResults(new WebSQLQueryResults[]{stats});
             } else if (element instanceof SQLQuery sqlQuery) {
