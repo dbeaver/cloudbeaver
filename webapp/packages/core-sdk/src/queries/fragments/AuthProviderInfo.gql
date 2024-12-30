@@ -9,6 +9,14 @@ fragment AuthProviderInfo on AuthProviderInfo {
   supportProvisioning
   required
   authHidden
+  templateConfiguration {
+    id
+    signInLink
+    signOutLink
+    metadataLink
+    acsLink
+    entityIdLink
+  }
 
   #configurationParameters {
   #  id

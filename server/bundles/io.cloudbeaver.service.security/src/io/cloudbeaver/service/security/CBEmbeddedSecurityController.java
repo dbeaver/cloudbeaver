@@ -1607,7 +1607,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
                     //async auth
                     var authProviderFederated = (SMAuthProviderFederated) authProviderInstance;
-                    String signInLink = buildRedirectLink(authProviderFederated.getSignInLink(authProviderConfigurationId, Map.of()),
+                    String signInLink = buildRedirectLink(authProviderFederated.getSignInLink(authProviderConfigurationId),
                         authAttemptId);
                     String signOutLink = authProviderFederated.getCommonSignOutLink(authProviderConfigurationId,
                         providerConfig.getParameters());
