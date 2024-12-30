@@ -62,6 +62,7 @@ export class PluginBootstrap extends Bootstrap {
     private readonly sqlEditorView: SqlEditorView,
   ) {
     super();
+    this.saveAsScriptHandler = this.saveAsScriptHandler.bind(this);
   }
 
   override register(): void {
@@ -85,7 +86,7 @@ export class PluginBootstrap extends Bootstrap {
       },
       handler: (context, action) => {
         if (action === ACTION_SAVE_AS_SCRIPT) {
-          this.saveAsScriptHandler.apply(this, [context]);
+          this.saveAsScriptHandler(context);
         }
       },
       getActionInfo: (context, action) => {
