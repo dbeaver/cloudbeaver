@@ -72,10 +72,10 @@ export class PluginBootstrap extends Bootstrap {
       id: 'scripts-base-handler',
       actions: [ACTION_SAVE_AS_SCRIPT],
       contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
-      isActionApplicable: (context, action): boolean => {
+      isActionApplicable: (context): boolean => {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
-        if (!this.projectsService.activeProjects.some(project => project.canEditResources) || action !== ACTION_SAVE_AS_SCRIPT) {
+        if (!this.projectsService.activeProjects.some(project => project.canEditResources)) {
           return false;
         }
 
@@ -83,7 +83,11 @@ export class PluginBootstrap extends Bootstrap {
 
         return dataSource instanceof MemorySqlDataSource || dataSource instanceof LocalStorageSqlDataSource;
       },
-      handler: this.saveAsScriptHandler.bind(this),
+      handler: (context, action) => {
+        if (action === ACTION_SAVE_AS_SCRIPT) {
+          this.saveAsScriptHandler.apply(this, [context]);
+        }
+      },
       getActionInfo: (context, action) => {
         if (action === ACTION_SAVE_AS_SCRIPT) {
           return {
