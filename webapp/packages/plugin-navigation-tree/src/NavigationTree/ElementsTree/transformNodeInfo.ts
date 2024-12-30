@@ -13,6 +13,7 @@ import type { IElementsTreeCustomNodeInfo } from './useElementsTree.js';
 export function transformNodeInfo(node: NavNode, transformers: IElementsTreeCustomNodeInfo[]): INavTreeNodeInfo {
   return transformers.reduce((info, transformer) => transformer(node.id, info), {
     name: node.name,
+    description: node.description,
     tooltip: node.name,
     icon: node.icon,
   } as INavTreeNodeInfo);
