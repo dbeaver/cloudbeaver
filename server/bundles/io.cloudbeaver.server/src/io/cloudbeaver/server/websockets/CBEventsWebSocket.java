@@ -24,8 +24,10 @@ import jakarta.websocket.*;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
-import org.jkiss.dbeaver.model.websocket.event.WSClientEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.client.WSSessionPingClientEvent;
+import org.jkiss.dbeaver.model.websocket.event.client.WSSubscribeOnTopicClientEvent;
+import org.jkiss.dbeaver.model.websocket.event.client.WSUnsubscribeFromTopicClientEvent;
 import org.jkiss.dbeaver.model.websocket.event.client.WSUpdateActiveProjectsClientEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSAccessTokenExpiredEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSocketConnectedEvent;
@@ -66,33 +68,43 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
             if (CommonUtils.isEmpty(message)) {
                 return;
             }
-            var clientEvent = CBAbstractWebSocket.gson.fromJson(message, WSClientEvent.class);
-            var clientEventType = WSClientEventType.valueById(clientEvent.getId());
             if (webSession == null) {
                 log.warn("No web session for browser event");
                 return;
             }
-            if (clientEventType == null) {
+            WSClientEvent clientEvent;
+            try {
+                clientEvent = CBAbstractWebSocket.gson.fromJson(message, WSClientEvent.class);
+            } catch (Exception e) {
+                if (webSession != null) {
+                    webSession.addSessionError(
+                        new DBWebException("Invalid websocket event: " + e.getMessage())
+                    );
+                }
+                log.error("Error parsing websocket event: " + e.getMessage(), e);
+                return;
+            }
+            if (clientEvent.getId() == null) {
                 webSession.addSessionError(
                     new DBWebException("Invalid websocket event: " + message)
                 );
                 return;
             }
-            switch (clientEventType) {
-                case TOPIC_SUBSCRIBE: {
+            switch (clientEvent.getId()) {
+                case WSSubscribeOnTopicClientEvent.ID: {
                     webSession.getEventsFilter().subscribeOnEventTopic(clientEvent.getTopicId());
                     break;
                 }
-                case TOPIC_UNSUBSCRIBE: {
+                case WSUnsubscribeFromTopicClientEvent.ID: {
                     webSession.getEventsFilter().unsubscribeFromEventTopic(clientEvent.getTopicId());
                     break;
                 }
-                case ACTIVE_PROJECTS: {
+                case WSUpdateActiveProjectsClientEvent.ID: {
                     var projectEvent = (WSUpdateActiveProjectsClientEvent) clientEvent;
                     webSession.getEventsFilter().setSubscribedProjects(projectEvent.getProjectIds());
                     break;
                 }
-                case SESSION_PING: {
+                case WSSessionPingClientEvent.ID: {
                     if (webSession instanceof WebSession session) {
                         session.updateInfo(true);
                     }

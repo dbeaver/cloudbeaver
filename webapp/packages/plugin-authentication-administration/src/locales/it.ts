@@ -82,6 +82,9 @@ export default [
     "Permetti agli utenti di autenticarsi. In alternativa solo l'accesso anonimo sarà attivo",
   ],
 
+  ['administration_identity_providers_provider_id', 'ID'],
+  ['administration_identity_providers_provider_configuration_description', 'Descrizione'],
+
   ['plugin_authentication_administration_user_team_default_readonly_tooltip', "Default team. Can't be revoked"],
   ['plugin_authentication_administration_team_default_users_tooltip', 'Default team. Contains all users'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'Supervisor'],

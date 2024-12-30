@@ -200,10 +200,15 @@ public class WebSQLProcessor implements WebSessionProvider {
             SQLScriptElement element = SQLScriptParser.extractActiveQuery(parserContext, 0, sql.length());
 
             if (element instanceof SQLControlCommand command) {
-                dataContainer.getScriptContext().executeControlCommand(command);
-                WebSQLQueryResults stats = new WebSQLQueryResults(webSession, dataFormat);
-                executeInfo.setResults(new WebSQLQueryResults[]{stats});
-            } else if (element instanceof SQLQuery sqlQuery) {
+                SQLControlResult controlResult = dataContainer.getScriptContext().executeControlCommand(monitor, command);
+                if (controlResult.getTransformed() != null) {
+                    element = controlResult.getTransformed();
+                } else {
+                    WebSQLQueryResults stats = new WebSQLQueryResults(webSession, dataFormat);
+                    executeInfo.setResults(new WebSQLQueryResults[]{stats});
+                }
+            }
+            if (element instanceof SQLQuery sqlQuery) {
                 DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
                     try (DBCSession session = context.openSession(monitor, resolveQueryPurpose(dataFilter), "Execute SQL")) {
                         AbstractExecutionSource source = new AbstractExecutionSource(

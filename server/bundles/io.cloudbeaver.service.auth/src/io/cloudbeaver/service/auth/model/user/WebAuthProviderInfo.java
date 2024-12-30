@@ -20,11 +20,11 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.auth.provisioning.SMProvisioner;
 import io.cloudbeaver.model.app.ServletAuthConfiguration;
-import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.WebAppUtils;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.SMAuthCredentialsProfile;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
@@ -38,15 +38,13 @@ import java.util.List;
 public class WebAuthProviderInfo {
 
     private static final Log log = Log.getLog(WebAuthProviderInfo.class);
+    private static final SMAuthProviderCustomConfiguration TEMPLATE_CONFIG = new SMAuthProviderCustomConfiguration("{configuration_id}");
 
+    @NotNull
     private final WebAuthProviderDescriptor descriptor;
 
-    public WebAuthProviderInfo(WebAuthProviderDescriptor descriptor) {
+    public WebAuthProviderInfo(@NotNull WebAuthProviderDescriptor descriptor) {
         this.descriptor = descriptor;
-    }
-
-    WebAuthProviderDescriptor getDescriptor() {
-        return descriptor;
     }
 
     public String getId() {
@@ -124,6 +122,10 @@ public class WebAuthProviderInfo {
     public String[] getRequiredFeatures() {
         String[] rf = descriptor.getRequiredFeatures();
         return rf == null ? new String[0] : rf;
+    }
+
+    public WebAuthProviderConfiguration getTemplateConfiguration() {
+        return new WebAuthProviderConfiguration(descriptor, TEMPLATE_CONFIG);
     }
 
     @Override

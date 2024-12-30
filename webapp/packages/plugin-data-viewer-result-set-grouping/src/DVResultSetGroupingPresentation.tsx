@@ -5,12 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { CaptureViewScope } from '@cloudbeaver/core-view';
-import { type DataPresentationComponent, isResultSetDataModel, TableViewerLoader } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseMetadataAction, type DataPresentationComponent, isResultSetDataModel, TableViewerLoader } from '@cloudbeaver/plugin-data-viewer';
 
 import { DEFAULT_GROUPING_QUERY_OPERATION } from './DEFAULT_GROUPING_QUERY_OPERATION.js';
 import styles from './DVResultSetGroupingPresentation.module.css';
@@ -27,13 +27,19 @@ export const DVResultSetGroupingPresentation: DataPresentationComponent = observ
   if (!isResultSetDataModel(originalModel)) {
     throw new Error('DVResultSetGroupingPresentation can only be used with ResultSetDataSource');
   }
-  const state = useTabLocalState<IDVResultSetGroupingPresentationState>(() => ({
-    presentationId: '',
-    valuePresentationId: null,
-    columns: [],
-    functions: [DEFAULT_GROUPING_QUERY_OPERATION],
-    showDuplicatesOnly: false,
-  }));
+  const metadataAction = originalModel.source.getAction(resultIndex, DatabaseMetadataAction);
+
+  const state = metadataAction.get<IDVResultSetGroupingPresentationState>(`grouping-panel-${originalModel.id}`, () =>
+    observable({
+      presentationId: '',
+      valuePresentationId: null,
+      columns: [],
+      functions: [DEFAULT_GROUPING_QUERY_OPERATION],
+      showDuplicatesOnly: false,
+      modelId: '',
+    }),
+  );
+
   const style = useS(styles);
 
   const translate = useTranslate();
