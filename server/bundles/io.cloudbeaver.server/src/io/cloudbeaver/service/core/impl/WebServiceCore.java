@@ -44,6 +44,7 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.exec.DBCConnectException;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWHandlerType;
@@ -62,6 +63,7 @@ import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.registry.settings.ProductSettingsRegistry;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
@@ -367,7 +369,7 @@ public class WebServiceCore implements DBWServiceCore {
 
         boolean oldSavePassword = dataSourceContainer.isSavePassword();
         DBRProgressMonitor monitor = webSession.getProgressMonitor();
-        WebServiceUtils.validateDriverLibrariesPresence(dataSourceContainer);
+        validateDriverLibrariesPresence(dataSourceContainer);
         try {
             boolean connect = dataSourceContainer.connect(monitor, true, false);
             if (connect) {
@@ -757,7 +759,7 @@ public class WebServiceCore implements DBWServiceCore {
             testDataSource = (DataSourceDescriptor) WebServiceUtils.createConnectionFromConfig(connectionConfig,
                 sessionRegistry);
         }
-        WebServiceUtils.validateDriverLibrariesPresence(testDataSource);
+        validateDriverLibrariesPresence(testDataSource);
         webSession.provideAuthParameters(webSession.getProgressMonitor(),
             testDataSource,
             testDataSource.getConnectionConfiguration());
@@ -770,6 +772,12 @@ public class WebServiceCore implements DBWServiceCore {
             });
             ct.run(webSession.getProgressMonitor());
             if (ct.getConnectError() != null) {
+                if (ct.getConnectError() instanceof DBCConnectException error) {
+                    Throwable rootCause = CommonUtils.getRootCause(error);
+                    if (rootCause instanceof ClassNotFoundException) {
+                        throwDriverNotFoundException(testDataSource);
+                    }
+                }
                 throw new DBWebException("Connection failed", ct.getConnectError());
             }
             WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, testDataSource);
@@ -1018,5 +1026,17 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Project '" + projectId + "' not found");
         }
         return project;
+    }
+
+    private void validateDriverLibrariesPresence(@NotNull DBPDataSourceContainer container) throws DBWebException {
+        if (!DBWorkbench.isDistributed() && container.getDriver().needsExternalDependencies()) {
+            throwDriverNotFoundException(container);
+        }
+    }
+
+    @NotNull
+    private static String throwDriverNotFoundException(@NotNull DBPDataSourceContainer container) throws DBWebException {
+        throw new DBWebException("Driver files for %s are not found. Please, ask administrator to download it."
+            .formatted(container.getDriver().getName()));
     }
 }
