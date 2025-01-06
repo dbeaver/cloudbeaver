@@ -73,6 +73,9 @@ public class WebDriverRegistry {
         return applicableDrivers;
     }
 
+    /**
+     * Updates info about applicable drivers (f.e. some changes were made in driver config file).
+     */
     public void refreshApplicableDrivers() {
         this.applicableDrivers.clear();
         this.applicableDrivers.addAll(

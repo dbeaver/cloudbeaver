@@ -51,6 +51,9 @@ public class ConnectionSearcher implements DBRRunnableWithProgress {
         this.hostNames = hostNames;
     }
 
+    /**
+     * Returns all found connections in a current machine.
+     */
     public List<AdminConnectionSearchInfo> getFoundConnections() {
         synchronized (foundConnections) {
             return new ArrayList<>(foundConnections);
