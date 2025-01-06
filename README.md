@@ -25,6 +25,10 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 24.3.2. 2025-01-06
+- Added an ability to specify a user login as an attribute parameter for LDAP providers;
+- The collapse of the grouping panel doesn't lead to the full panel cleaning anymore.
+  
 ### 24.3.1. 2024-12-23
 - Added an ability to reconnect for all editors if a connection has been lost;
 - Added an option to replace line break characters on any custom value when exporting to CSV;
