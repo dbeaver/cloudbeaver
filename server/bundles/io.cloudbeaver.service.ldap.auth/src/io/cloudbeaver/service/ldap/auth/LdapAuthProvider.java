@@ -213,7 +213,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             }
         }
         if (userId == null) {
-            throw new DBException("Failed to determinate userId from user DN: " + fullUserDN);
+            throw new DBException("Failed to determine userId from user DN: " + fullUserDN);
         }
         return userId;
     }
