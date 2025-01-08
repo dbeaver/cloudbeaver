@@ -32,6 +32,7 @@
     "@cloudbeaver/plugin-data-spreadsheet-new": "^0",
     "@cloudbeaver/plugin-navigation-tree": "^0",
     "@cloudbeaver/plugin-sql-editor": "^0",
+    "@cloudbeaver/plugin-sql-editor-navigation-tab-script": "^0",
     "@cloudbeaver/plugin-top-app-bar": "^0",
     "react": "^18"
   },
