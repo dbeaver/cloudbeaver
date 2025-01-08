@@ -39,6 +39,7 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.UUID;
 
 @MultipartConfig
 public class WebSQLFileLoaderServlet extends WebServiceServletBase {
@@ -52,8 +53,6 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
     private static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
 
     private static final String FILE_ID = "fileId";
-
-    private static final String FORBIDDEN_CHARACTERS_FILE_REGEX = "(?U)[$()@ /]+";
 
     private static final Gson gson = new GsonBuilder()
             .serializeNulls()
@@ -89,19 +88,21 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
         Map<String, Object> variables = gson.fromJson(request.getParameter(REQUEST_PARAM_VARIABLES), MAP_STRING_OBJECT_TYPE);
 
         String fileId = JSONUtils.getString(variables, FILE_ID);
-
-        if (fileId != null && !fileId.matches(FORBIDDEN_CHARACTERS_FILE_REGEX) && !fileId.startsWith(".")) {
-            Path file = tempFolder.resolve(fileId);
-            try {
-                Files.write(file, request.getPart("fileData").getInputStream().readAllBytes());
-            } catch (ServletException e) {
-                log.error(e.getMessage());
-                throw new DBWebException(e.getMessage());
-            }
-        } else {
-            String illegalCharacters = fileId != null ?
-                fileId.replaceAll(FORBIDDEN_CHARACTERS_FILE_REGEX, " ").strip() : null;
-            throw new DBException("Resource path '" + fileId + "' contains illegal characters: " + illegalCharacters);
+        if (fileId == null) {
+            throw new DBWebException("File ID not found");
+        }
+        try {
+            // file id must be UUID
+            UUID.fromString(fileId);
+        } catch (IllegalArgumentException e) {
+            throw new DBWebException("File ID is invalid");
+        }
+        Path file = tempFolder.resolve(fileId);
+        try {
+            Files.write(file, request.getPart("fileData").getInputStream().readAllBytes());
+        } catch (ServletException e) {
+            log.error(e.getMessage());
+            throw new DBWebException(e.getMessage());
         }
     }
 }

@@ -46,6 +46,9 @@
       "path": "../plugin-navigation-tree/tsconfig.json"
     },
     {
+      "path": "../plugin-sql-editor-navigation-tab-script/tsconfig.json"
+    },
+    {
       "path": "../plugin-sql-editor/tsconfig.json"
     },
     {
