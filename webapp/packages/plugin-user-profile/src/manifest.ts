@@ -17,10 +17,7 @@ export const userProfilePlugin: PluginManifest = {
     () => import('./LocaleService.js').then(m => m.LocaleService),
     () => import('./UserProfileTabsService.js').then(m => m.UserProfileTabsService),
     () => import('./UserProfileOptionsPanelService.js').then(m => m.UserProfileOptionsPanelService),
-    () => import('./UserProfileForm/UserProfileFormBootstrap.js').then(m => m.UserProfileFormBootstrap),
-    () => import('./UserProfileForm/UserProfileFormService.js').then(m => m.UserProfileFormService),
     () => import('./UserProfileForm/UserInfoPart/UserProfileFormInfoPartBootstrap.js').then(m => m.UserProfileFormInfoPartBootstrap),
-    () => import('./UserProfileForm/UserInfoPart/UserProfileFormInfoPartService.js').then(m => m.UserProfileFormInfoPartService),
     () =>
       import('./UserProfileForm/UserAuthenticationPart/UserProfileFormAuthenticationPartBootstrap.js').then(
         m => m.UserProfileFormAuthenticationPartBootstrap,
