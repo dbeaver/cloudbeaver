@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Vendor: Cloudbeaver LDAP
+Bundle-Name: Cloudbeaver Web Service - LDAP
 Bundle-Vendor: DBeaver Corp
 Bundle-SymbolicName: io.cloudbeaver.service.ldap.auth;singleton:=true
 Bundle-Version: 1.0.0.qualifier
@@ -11,4 +11,5 @@ Bundle-ClassPath: .
 Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.dbeaver.registry;visibility:=reexport,
  io.cloudbeaver.model
+Bundle-Localization: OSGI-INF/l10n/bundle
 Automatic-Module-Name: io.cloudbeaver.service.ldap.auth

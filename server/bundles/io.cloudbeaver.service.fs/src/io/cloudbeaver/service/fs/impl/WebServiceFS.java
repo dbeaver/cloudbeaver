@@ -36,11 +36,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Web file system implementation
  */
 public class WebServiceFS implements DBWServiceFS {
+
+    private static final Pattern FORBIDDEN_FILENAME_PATTERN = Pattern.compile("[%#:;№$]");
 
     @NotNull
     @Override
@@ -51,7 +55,7 @@ public class WebServiceFS implements DBWServiceFS {
             if (project == null) {
                 throw new DBException(MessageFormat.format("Project ''{0}'' is not found in session", projectId));
             }
-            DBNProject projectNode = webSession.getNavigatorModel().getRoot().getProjectNode(project);
+            DBNProject projectNode = webSession.getNavigatorModelOrThrow().getRoot().getProjectNode(project);
             if (projectNode == null) {
                 throw new DBException(MessageFormat.format("Project ''{0}'' is not found in navigator model", projectId));
             }
@@ -78,7 +82,7 @@ public class WebServiceFS implements DBWServiceFS {
         @NotNull String nodePath
     ) throws DBWebException {
         try {
-            var node = webSession.getNavigatorModel().getNodeByPath(webSession.getProgressMonitor(), nodePath);
+            var node = webSession.getNavigatorModelOrThrow().getNodeByPath(webSession.getProgressMonitor(), nodePath);
             if (!(node instanceof DBNFileSystem fs)) {
                 throw new DBException(MessageFormat.format("Node ''{0}'' is not File System", nodePath));
             }
@@ -208,6 +212,7 @@ public class WebServiceFS implements DBWServiceFS {
         @NotNull String nodePath,
         @NotNull String newName
     ) throws DBWebException {
+        validateFilename(newName);
         try {
             DBNPathBase node = FSUtils.getNodeByPath(webSession, nodePath);
             node.rename(webSession.getProgressMonitor(), newName);
@@ -274,6 +279,14 @@ public class WebServiceFS implements DBWServiceFS {
             return true;
         } catch (Exception e) {
             throw new DBWebException("Failed to create folder: " + e.getMessage(), e);
+        }
+    }
+
+    private void validateFilename(@NotNull String filename) throws DBWebException {
+        Matcher matcher = FORBIDDEN_FILENAME_PATTERN.matcher(filename);
+
+        if (matcher.find()) {
+            throw new DBWebException(String.format("File %s contains forbidden symbols", filename));
         }
     }
 }

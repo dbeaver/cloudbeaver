@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.server;
 
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.impl.preferences.AbstractPreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
@@ -185,7 +185,7 @@ public class WebServerPreferenceStore extends AbstractPreferenceStore {
     }
 
     private Map<String, Object> productConf() {
-        var app = WebAppUtils.getWebApplication();
+        var app = ServletAppUtils.getServletApplication();
         return app.getServerConfiguration().getProductSettings();
     }
 }

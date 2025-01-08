@@ -64,8 +64,6 @@ export default [
   ['settings_data_editor_disable_data_copy_description', 'Отключить копирование данных для пользователей без прав администратора'],
   ['settings_data_editor_disable_data_export_name', 'Отключить скачивание данных'],
   ['settings_data_editor_disable_data_export_description', 'Отключить скачивание данных для пользователей без прав администратора'],
-  ['settings_data_editor_fetch_min_name', 'Минимальный размер выборки'],
-  ['settings_data_editor_fetch_min_description', 'Минимальное количество строк для выборки'],
   ['settings_data_editor_fetch_max_name', 'Максимальный размер выборки'],
   ['settings_data_editor_fetch_max_description', 'Максимальное количество строк для выборки'],
   ['settings_data_editor_fetch_default_name', 'Размер выборки по умолчанию'],

@@ -7,6 +7,19 @@
  */
 import { observer } from 'mobx-react-lite';
 
-export const Text: React.FC<React.HTMLAttributes<HTMLDivElement>> = observer(function Text({ children, ...rest }) {
-  return <div {...rest}>{children}</div>;
+import { s } from './s.js';
+import classes from './Text.module.css';
+import { useS } from './useS.js';
+
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
+  truncate?: boolean;
+}
+
+export const Text = observer<Props>(function Text({ truncate, children, className, ...rest }) {
+  const styles = useS(classes);
+  return (
+    <div className={s(styles, { truncate }, className)} {...rest}>
+      {children}
+    </div>
+  );
 });

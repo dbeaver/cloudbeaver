@@ -10,6 +10,8 @@ import 'reflect-metadata';
 import { bootstrap } from '@cloudbeaver/core-bootstrap';
 import type { PluginManifest } from '@cloudbeaver/core-di';
 import administration from '@cloudbeaver/plugin-administration';
+import appLogoPlugin from '@cloudbeaver/plugin-app-logo';
+import appLogoPluginAdministration from '@cloudbeaver/plugin-app-logo-administration';
 import authentication from '@cloudbeaver/plugin-authentication';
 import authenticationAdministration from '@cloudbeaver/plugin-authentication-administration';
 import { browserPlugin } from '@cloudbeaver/plugin-browser';
@@ -31,6 +33,8 @@ import ddlViewer from '@cloudbeaver/plugin-ddl-viewer';
 import devTools from '@cloudbeaver/plugin-devtools';
 import gisViewer from '@cloudbeaver/plugin-gis-viewer';
 import help from '@cloudbeaver/plugin-help';
+import holidaysPlugin from '@cloudbeaver/plugin-holidays';
+import holidaysPluginAdministration from '@cloudbeaver/plugin-holidays-administration';
 import localization from '@cloudbeaver/plugin-localization';
 import logViewer from '@cloudbeaver/plugin-log-viewer';
 import { navigationTabsPlugin } from '@cloudbeaver/plugin-navigation-tabs';
@@ -129,6 +133,10 @@ const PLUGINS: PluginManifest[] = [
   taskManagerPluginManifest,
   settingsAdministrationPlugin,
   userProfileSettingsPlugin,
+  holidaysPlugin,
+  holidaysPluginAdministration,
+  appLogoPlugin,
+  appLogoPluginAdministration,
   // must be las one to override all
   defaultProductManifest,
 ];

@@ -25,6 +25,9 @@
       "path": "../core-events/tsconfig.json"
     },
     {
+      "path": "../core-links/tsconfig.json"
+    },
+    {
       "path": "../core-localization/tsconfig.json"
     },
     {
@@ -37,10 +40,13 @@
       "path": "../core-view/tsconfig.json"
     },
     {
-      "path": "../core-website/tsconfig.json"
+      "path": "../plugin-data-spreadsheet-new/tsconfig.json"
     },
     {
       "path": "../plugin-navigation-tree/tsconfig.json"
+    },
+    {
+      "path": "../plugin-sql-editor-navigation-tab-script/tsconfig.json"
     },
     {
       "path": "../plugin-sql-editor/tsconfig.json"

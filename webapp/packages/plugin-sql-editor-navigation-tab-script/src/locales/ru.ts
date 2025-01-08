@@ -1,5 +1,12 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
-  ['plugin_sql_editor_navigation_tab_resource_save_script_title', 'Сохранить как скрипт'],
+  ['plugin_sql_editor_navigation_tab_resource_save_script_title', 'Сохранить как скрипт (Shift + Ctrl + S)'],
   ['plugin_sql_editor_navigation_tab_script_state_renaming', 'Переименовывание скрипта...'],
   ['plugin_sql_editor_navigation_tab_script_state_reading', 'Чтение скрипта...'],
   ['plugin_sql_editor_navigation_tab_script_state_saving', 'Сохранение скрипта...'],
@@ -8,6 +15,7 @@ export default [
     'plugin_sql_editor_navigation_tab_script_state_different_project',
     'Проект подключения отличается от проекта скрипта. Изменение подключения не сохранено.',
   ],
+  ['plugin_sql_editor_navigation_tab_script_state_readonly', 'Этот скрипт только для чтения. Изменения не будут сохранены.'],
   ['plugin_sql_editor_navigation_tab_resource_save_script_success', 'Скрипт успешно сохранен'],
   ['plugin_sql_editor_navigation_tab_resource_open_script_error', 'Не удалось открыть скрипт'],
   ['plugin_sql_editor_navigation_tab_resource_save_script_error', 'Возникла ошибка при попытки сохранить скрипт'],

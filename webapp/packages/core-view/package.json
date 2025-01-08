@@ -26,7 +26,8 @@
     "@cloudbeaver/core-utils": "^0",
     "mobx": "^6",
     "mobx-react-lite": "^4",
-    "react": "^18"
+    "react": "^18",
+    "react-hotkeys-hook": "^4"
   },
   "peerDependencies": {},
   "devDependencies": {

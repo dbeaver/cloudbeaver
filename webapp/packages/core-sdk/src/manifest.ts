@@ -13,7 +13,6 @@ export const coreSDKManifest: PluginManifest = {
   },
 
   providers: [
-    () => import('./AsyncTask/AsyncTaskInfoService.js').then(m => m.AsyncTaskInfoService),
     () => import('./EnvironmentService.js').then(m => m.EnvironmentService),
     () => import('./GraphQLService.js').then(m => m.GraphQLService),
   ],

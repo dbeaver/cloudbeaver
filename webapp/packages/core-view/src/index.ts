@@ -53,6 +53,7 @@ export * from './Menu/MenuItem/IMenuCustomItem.js';
 export * from './Menu/MenuItem/IMenuItem.js';
 export * from './Menu/MenuItem/IMenuSubMenuItem.js';
 export * from './Menu/MenuItem/MenuCheckboxItem.js';
+export * from './Menu/MenuItem/MenuRadioItem.js';
 export * from './Menu/MenuItem/MenuActionItem.js';
 export * from './Menu/MenuItem/MenuBaseItem.js';
 export * from './Menu/MenuItem/MenuCustomItem.js';

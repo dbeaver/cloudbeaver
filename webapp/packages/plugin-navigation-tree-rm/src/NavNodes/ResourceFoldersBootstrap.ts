@@ -17,13 +17,12 @@ import {
   ENodeMoveType,
   getNodesFromContext,
   type INodeMoveData,
-  NavNodeInfoResource,
   NavNodeManagerService,
   navNodeMoveContext,
   NavTreeResource,
   ProjectsNavNodeService,
 } from '@cloudbeaver/core-navigation-tree';
-import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import {
   CachedMapAllKey,
   CachedTreeChildrenKey,
@@ -41,7 +40,7 @@ import {
 } from '@cloudbeaver/core-resource-manager';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
 import { ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
+import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, TreeSelectionService } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
@@ -50,13 +49,6 @@ import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../Tree/DAT
 import { getResourceKeyFromNodeId } from './getResourceKeyFromNodeId.js';
 import { getResourceNodeId } from './getResourceNodeId.js';
 import { getRmProjectNodeId } from './getRmProjectNodeId.js';
-
-interface ITargetNode {
-  projectId: string;
-  folderId?: string;
-  projectNodeId: string;
-  selectProject: boolean;
-}
 
 @injectable()
 export class ResourceFoldersBootstrap extends Bootstrap {
@@ -68,13 +60,12 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly resourceManagerResource: ResourceManagerResource,
     private readonly resourceManagerService: ResourceManagerService,
-    private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     private readonly navResourceNodeService: NavResourceNodeService,
-    private readonly navNodeInfoResource: NavNodeInfoResource,
+    private readonly treeSelectionService: TreeSelectionService,
     private readonly projectsNavNodeService: ProjectsNavNodeService,
   ) {
     super();
@@ -86,17 +77,22 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'tree-tools-menu-resource-folders-handler',
       actions: [ACTION_NEW_FOLDER],
+      contexts: [DATA_CONTEXT_ELEMENTS_TREE, DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID],
       isActionApplicable: context => {
-        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
+        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
 
-        if (!tree?.baseRoot.startsWith(RESOURCES_NODE_PATH) || !this.userInfoResource.isAuthenticated()) {
+        if (!tree.baseRoot.startsWith(RESOURCES_NODE_PATH) || !this.userInfoResource.isAuthenticated()) {
           return false;
         }
 
         return true;
       },
       getLoader: () => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
-      isDisabled: context => this.getTargetNode(context) === undefined,
+      isDisabled: context => {
+        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
+
+        return this.treeSelectionService.getFirstSelectedNode(tree, getRmProjectNodeId) === undefined;
+      },
       handler: this.elementsTreeActionHandler.bind(this),
     });
 
@@ -164,10 +160,12 @@ export class ResourceFoldersBootstrap extends Bootstrap {
   }
 
   private async elementsTreeActionHandler(contexts: IDataContextProvider, action: IAction) {
-    const resourceTypeId = contexts.get(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
+    const resourceTypeId = contexts.get(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID)!;
+    const tree = contexts.get(DATA_CONTEXT_ELEMENTS_TREE)!;
+
     switch (action) {
       case ACTION_NEW_FOLDER: {
-        const targetNode = this.getTargetNode(contexts);
+        const targetNode = this.treeSelectionService.getFirstSelectedNode(tree, getRmProjectNodeId);
 
         if (!targetNode) {
           return;
@@ -223,7 +221,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
             const key = getRmResourcePath(result.projectId, result.folder ?? root);
             await this.resourceManagerResource.create(createPath(key, result.name), true);
 
-            this.navTreeResource.refreshTree(getRmProjectNodeId(result.projectId));
+            this.navTreeResource.refreshNode(getRmProjectNodeId(result.projectId));
           } catch (exception: any) {
             this.notificationService.logException(exception, 'Error occurred while renaming');
           }
@@ -232,58 +230,6 @@ export class ResourceFoldersBootstrap extends Bootstrap {
         break;
       }
     }
-  }
-
-  private getTargetNode(contexts: IDataContextProvider): ITargetNode | undefined {
-    const tree = contexts.get(DATA_CONTEXT_ELEMENTS_TREE);
-
-    if (!tree) {
-      return undefined;
-    }
-
-    const selected = tree.getSelected();
-
-    if (selected.length === 0) {
-      const editableProjects = this.projectsService.activeProjects.filter(project => project.canEditResources);
-
-      if (editableProjects.length > 0) {
-        const project = editableProjects[0]!;
-
-        return {
-          projectId: project.id,
-          projectNodeId: getRmProjectNodeId(project.id),
-          selectProject: editableProjects.length > 1,
-        };
-      }
-      return;
-    }
-
-    const targetFolder = selected[0]!;
-    const parentIds = [...this.navNodeInfoResource.getParents(targetFolder), targetFolder];
-    const parents = this.navNodeInfoResource.get(resourceKeyList(parentIds));
-    const projectNode = parents.find(parent => parent?.nodeType === NAV_NODE_TYPE_RM_PROJECT);
-
-    if (!projectNode) {
-      return;
-    }
-
-    const project = this.projectsNavNodeService.getByNodeId(projectNode.id);
-
-    if (!project?.canEditResources) {
-      return;
-    }
-
-    const targetFolderNode = parents
-      .slice()
-      .reverse()
-      .find(parent => parent?.nodeType === NAV_NODE_TYPE_RM_RESOURCE && parent.folder);
-
-    return {
-      projectId: project.id,
-      folderId: targetFolderNode?.id,
-      projectNodeId: projectNode.id,
-      selectProject: false,
-    };
   }
 
   private getResourceTypeFolder(projectId: string, resourceTypeId: string | undefined): string | undefined {

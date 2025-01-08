@@ -41,6 +41,7 @@ class GraphQLBindingContext implements DBWBindingContext {
         runtimeWiring = RuntimeWiring.newRuntimeWiring();
         runtimeWiring
             .scalar(ExtendedScalars.DateTime)
+            .scalar(ExtendedScalars.Date)
             .scalar(ExtendedScalars.Object);
         queryType = TypeRuntimeWiring.newTypeWiring("Query");
         mutationType = TypeRuntimeWiring.newTypeWiring("Mutation");

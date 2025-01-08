@@ -22,7 +22,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebDataFormat;
 import io.cloudbeaver.utils.CBModelConstants;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
@@ -42,6 +42,8 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.runtime.DBRRunnableParametrized;
+import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
+import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -356,8 +358,16 @@ public class WebConnectionInfo {
 
     @Property
     public List<WebNetworkHandlerConfig> getNetworkHandlersConfig() {
-        return dataSourceContainer.getConnectionConfiguration().getHandlers().stream()
-            .map(WebNetworkHandlerConfig::new).collect(Collectors.toList());
+        var registry = NetworkHandlerRegistry.getInstance();
+        return dataSourceContainer.getConnectionConfiguration()
+            .getHandlers()
+            .stream()
+            .filter(handlerConf -> {
+                NetworkHandlerDescriptor descriptor = registry.getDescriptor(handlerConf.getId());
+                return descriptor != null && !descriptor.isDesktopHandler();
+            })
+            .map(WebNetworkHandlerConfig::new)
+            .collect(Collectors.toList());
     }
 
     @Property
@@ -455,7 +465,8 @@ public class WebConnectionInfo {
         if (isCanEdit()) {
             return true;
         }
-        BaseWebAppConfiguration appConfig = (BaseWebAppConfiguration) WebAppUtils.getWebApplication().getAppConfiguration();
+        BaseWebAppConfiguration appConfig = (BaseWebAppConfiguration) ServletAppUtils.getServletApplication()
+            .getAppConfiguration();
         return appConfig.isShowReadOnlyConnectionInfo();
 
     }

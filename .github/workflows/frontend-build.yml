@@ -62,15 +62,15 @@ jobs:
         run: yarn clear
 
       - run: yarn install --immutable
-      
+
       - run: yarn bundle
         working-directory: ./webapp/packages/product-default
 
       - run: yarn test
 
-      - name: Archive build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build-artifacts
-          path: webapp/packages/product-default/lib
-          if-no-files-found: error
+      # - name: Archive build artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: frontend-build-artifacts
+      #     path: webapp/packages/product-default/lib
+      #     if-no-files-found: error

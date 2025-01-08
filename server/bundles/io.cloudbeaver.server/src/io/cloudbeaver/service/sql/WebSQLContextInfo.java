@@ -282,7 +282,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
     public Boolean isAutoCommit() throws DBWebException {
         DBCExecutionContext context = processor.getExecutionContext();
         DBCTransactionManager txnManager = DBUtils.getTransactionManager(context);
-        if (txnManager == null) {
+        if (txnManager == null || !txnManager.isSupportsTransactions()) {
             return null;
         }
         try {

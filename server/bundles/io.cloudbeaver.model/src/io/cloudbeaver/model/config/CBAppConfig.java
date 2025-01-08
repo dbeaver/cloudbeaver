@@ -19,7 +19,8 @@ package io.cloudbeaver.model.config;
 import com.google.gson.annotations.Expose;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
 import io.cloudbeaver.model.app.BaseWebAppConfiguration;
-import io.cloudbeaver.model.app.WebAuthConfiguration;
+import io.cloudbeaver.model.app.WebAppConfiguration;
+import io.cloudbeaver.model.app.ServletAuthConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import org.jkiss.code.NotNull;
@@ -36,9 +37,8 @@ import java.util.*;
 /**
  * Application configuration
  */
-public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfiguration {
+public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthConfiguration, WebAppConfiguration {
     private static final Log log = Log.getLog(CBAppConfig.class);
-    public static final DataSourceNavigatorSettings.Preset PRESET_WEB = new DataSourceNavigatorSettings.Preset("web", "Web", "Default view");
 
     public static final DataSourceNavigatorSettings DEFAULT_VIEW_SETTINGS = PRESET_WEB.getSettings();
     private final Set<SMAuthProviderCustomConfiguration> authConfigurations;
@@ -47,8 +47,6 @@ public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfi
     private final Map<String, SMAuthProviderCustomConfiguration> authConfiguration;
 
     private boolean supportsCustomConnections;
-    private boolean supportsConnectionBrowser;
-    private boolean supportsUserWorkspaces;
     private boolean enableReverseProxyAuth;
     private boolean forwardProxy;
     private boolean publicCredentialsSaveEnabled;
@@ -80,8 +78,6 @@ public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfi
         this.anonymousUserRole = DEFAULT_APP_ANONYMOUS_TEAM_NAME;
         this.anonymousUserTeam = DEFAULT_APP_ANONYMOUS_TEAM_NAME;
         this.supportsCustomConnections = true;
-        this.supportsConnectionBrowser = false;
-        this.supportsUserWorkspaces = false;
         this.publicCredentialsSaveEnabled = true;
         this.adminCredentialsSaveEnabled = true;
         this.redirectOnFederatedAuth = false;
@@ -106,8 +102,6 @@ public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfi
         this.anonymousUserRole = src.anonymousUserRole;
         this.anonymousUserTeam = src.anonymousUserTeam;
         this.supportsCustomConnections = src.supportsCustomConnections;
-        this.supportsConnectionBrowser = src.supportsConnectionBrowser;
-        this.supportsUserWorkspaces = src.supportsUserWorkspaces;
         this.publicCredentialsSaveEnabled = src.publicCredentialsSaveEnabled;
         this.adminCredentialsSaveEnabled = src.adminCredentialsSaveEnabled;
         this.redirectOnFederatedAuth = src.redirectOnFederatedAuth;
@@ -148,14 +142,6 @@ public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfi
         this.supportsCustomConnections = supportsCustomConnections;
     }
 
-    public boolean isSupportsConnectionBrowser() {
-        return supportsConnectionBrowser;
-    }
-
-    public boolean isSupportsUserWorkspaces() {
-        return supportsUserWorkspaces;
-    }
-
     public boolean isPublicCredentialsSaveEnabled() {
         return publicCredentialsSaveEnabled;
     }
@@ -176,6 +162,7 @@ public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfi
         return redirectOnFederatedAuth;
     }
 
+    @NotNull
     public String[] getEnabledDrivers() {
         return enabledDrivers;
     }
@@ -184,6 +171,7 @@ public class CBAppConfig extends BaseWebAppConfiguration implements WebAuthConfi
         this.enabledDrivers = enabledDrivers;
     }
 
+    @NotNull
     public String[] getDisabledDrivers() {
         return disabledDrivers;
     }

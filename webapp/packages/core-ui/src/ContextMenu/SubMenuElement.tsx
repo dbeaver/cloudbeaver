@@ -66,7 +66,7 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
       ['handleItemClose', 'hasBindings', 'handleVisibleSwitch'],
     );
 
-    if (hidden) {
+    if (hidden || !subMenuData.items.length) {
       return null;
     }
 

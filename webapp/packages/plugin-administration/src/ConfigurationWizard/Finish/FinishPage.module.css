@@ -27,5 +27,5 @@
 
 .message {
   line-height: 2;
-  white-space: pre;
+  white-space: pre-wrap;
 }

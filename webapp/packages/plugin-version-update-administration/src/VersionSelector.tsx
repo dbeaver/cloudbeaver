@@ -38,6 +38,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
 
   const version = versions.find(v => v.number === selected);
   const Instruction = versionUpdateService.versionInstructionGetter?.();
+  const instructionLink = versionUpdateService.instructionLink;
 
   return (
     <Container gap>
@@ -54,7 +55,12 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
         </Combobox>
         {version && Instruction && (
           <GroupItem>
-            <Instruction className={s(style, { instruction: true })} version={version} containerId={serverConfigResource.data?.containerId} />
+            <Instruction
+              link={instructionLink}
+              className={s(style, { instruction: true })}
+              version={version}
+              containerId={serverConfigResource.data?.containerId}
+            />
           </GroupItem>
         )}
         <GroupTitle>{translate('plugin_version_update_administration_recommendations_label')}</GroupTitle>

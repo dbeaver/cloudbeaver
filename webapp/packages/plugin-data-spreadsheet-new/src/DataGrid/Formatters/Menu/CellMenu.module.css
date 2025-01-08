@@ -6,39 +6,31 @@
  * you may not use this file except in compliance with the License.
  */
 
-.iconOrImage {
-  composes: theme-text-primary from global;
-}
-:global(.rdg-cell):not(:global([aria-selected='true'])):not(:hover) .cellMenu {
-  display: none;
-}
-.cellMenu {
-  flex: 0 0 auto;
-  height: var(--rdg-row-height);
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  height: 100%;
-}
-
-.menuTrigger {
-  padding: 1px 2px;
+.container {
   display: flex;
-  align-items: center;
-  height: 100%;
-  justify-content: center;
+}
 
-  &:hover {
-    background: none;
-  }
+.contextMenu {
+  padding: 0;
+  height: 16px;
+  width: 16px;
 
   &:before {
     display: none;
   }
+}
 
-  & .icon {
-    cursor: pointer;
-    width: 16px;
-    height: 10px;
-  }
+.trigger {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  width: 16px;
+  height: 10px;
+}
+
+.iconOrImage {
+  composes: theme-text-primary from global;
 }

@@ -14,7 +14,7 @@ import { useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_DV_DDM } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM.js';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX.js';
-import { DATA_CONTEXT_DATA_VIEWER_SIMPLE } from './DATA_CONTEXT_DATA_VIEWER_SIMPLE.js';
+import { DATA_CONTEXT_DV_SIMPLE } from '../DATA_CONTEXT_DV_SIMPLE.js';
 import { DATA_VIEWER_DATA_MODEL_TOOLS_MENU } from './DATA_VIEWER_DATA_MODEL_TOOLS_MENU.js';
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService.js';
 
@@ -25,7 +25,7 @@ export const TableHeaderMenu: PlaceholderComponent<ITableHeaderPlaceholderProps>
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_DV_DDM, model, id);
     context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex, id);
-    context.set(DATA_CONTEXT_DATA_VIEWER_SIMPLE, simple, id);
+    context.set(DATA_CONTEXT_DV_SIMPLE, simple, id);
   });
 
   return <MenuBar className={menuBarStyles['floating']} menu={menu} />;

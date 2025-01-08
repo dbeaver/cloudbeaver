@@ -17,8 +17,8 @@
 package io.cloudbeaver.model.session;
 
 import io.cloudbeaver.model.WebServerMessage;
-import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.app.WebAuthApplication;
+import io.cloudbeaver.model.app.ServletApplication;
+import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -51,14 +51,14 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @NotNull
     protected final WebUserContext userContext;
     @NotNull
-    protected final WebApplication application;
+    protected final ServletApplication application;
     protected volatile long lastAccessTime;
 
     private final List<CBWebSessionEventHandler> sessionEventHandlers = new CopyOnWriteArrayList<>();
     private WebSessionEventsFilter eventsFilter = new WebSessionEventsFilter();
     private final WebSessionWorkspace workspace;
 
-    public BaseWebSession(@NotNull String id, @NotNull WebApplication application) throws DBException {
+    public BaseWebSession(@NotNull String id, @NotNull ServletApplication application) throws DBException {
         this.id = id;
         this.application = application;
         this.createTime = System.currentTimeMillis();
@@ -153,7 +153,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     }
 
     @NotNull
-    public WebApplication getApplication() {
+    public ServletApplication getApplication() {
         return application;
     }
 
@@ -238,7 +238,7 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
 
     @Property
     public long getRemainingTime() {
-        if (application instanceof WebAuthApplication authApplication) {
+        if (application instanceof ServletAuthApplication authApplication) {
             return authApplication.getMaxSessionIdleTime() + lastAccessTime - System.currentTimeMillis();
         }
         return Integer.MAX_VALUE;

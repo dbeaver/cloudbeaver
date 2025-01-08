@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 export default [
-  ['plugin_sql_editor_navigation_tab_resource_save_title', 'Enregistrer comme script'],
+  ['plugin_sql_editor_navigation_tab_resource_save_title', 'Enregistrer comme script (Shift + Ctrl + S)'],
   ['plugin_sql_editor_navigation_tab_script_state_renaming', 'Renommer le script...'],
   ['plugin_sql_editor_navigation_tab_script_state_reading', 'Lecture du script...'],
   ['plugin_sql_editor_navigation_tab_script_state_saving', 'Enregistrement du script...'],
@@ -15,6 +15,7 @@ export default [
     'plugin_sql_editor_navigation_tab_script_state_different_project',
     "Le projet de connexion diffère du projet du script, le changement de connexion n'est pas enregistré.",
   ],
+  ['plugin_sql_editor_navigation_tab_script_state_readonly', 'This is readonly script. Any changes will not be saved.'],
   ['plugin_sql_editor_navigation_tab_resource_save_script_success', 'Script enregistré avec succès'],
   ['plugin_sql_editor_navigation_tab_resource_open_script_error', "Échec de l'ouverture du script"],
   ['plugin_sql_editor_navigation_tab_resource_save_script_error', "Erreur lors de la tentative d'enregistrement du script"],

@@ -229,7 +229,7 @@ public class WebNavigatorNodeInfo {
         if (node instanceof DBNDatabaseNode) {
             boolean canEditDatasources = hasNodePermission(RMProjectPermission.DATA_SOURCES_EDIT);
             DBSObject object = ((DBNDatabaseNode) node).getObject();
-            if (object != null && canEditDatasources) {
+            if (object != null && canEditDatasources && !DBUtils.isReadOnly(object)) {
                 DBEObjectMaker objectManager = DBWorkbench.getPlatform().getEditorsRegistry().getObjectManager(
                     object.getClass(), DBEObjectMaker.class);
                 if (objectManager != null && objectManager.canDeleteObject(object)) {
@@ -324,8 +324,14 @@ public class WebNavigatorNodeInfo {
         if (!(node instanceof DBNDatabaseNode dbNode)) {
             throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
         }
-        DBSObjectFilter filter = dbNode.getNodeFilter(dbNode.getItemsMeta(), true);
-        return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
+        try {
+            DBSObjectFilter filter = dbNode.getNodeFilter(
+                DBNUtils.getValidItemsMeta(session.getProgressMonitor(), dbNode),
+                true);
+            return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
+        } catch (DBException e) {
+            throw new DBWebException(e);
+        }
     }
 
     @Override

@@ -28,12 +28,13 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMUtils;
-import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class WebSessionProjectImpl extends WebProjectImpl {
@@ -188,9 +189,9 @@ public class WebSessionProjectImpl extends WebProjectImpl {
      * updates data sources based on event in web session
      *
      * @param dataSourceIds list of updated connections
-     * @param type          type of event
+     * @param eventId  id of event
      */
-    public synchronized boolean updateProjectDataSources(@NotNull List<String> dataSourceIds, @NotNull WSEventType type) {
+    public synchronized boolean updateProjectDataSources(@NotNull List<String> dataSourceIds, @NotNull String eventId) {
         var sendDataSourceUpdatedEvent = false;
         DBPDataSourceRegistry registry = getDataSourceRegistry();
         // save old connections
@@ -199,9 +200,9 @@ public class WebSessionProjectImpl extends WebProjectImpl {
             .filter(Objects::nonNull)
             .collect(Collectors.toMap(
                 DBPDataSourceContainer::getId,
-                ds -> new DataSourceDescriptor((DataSourceDescriptor) ds, ds.getRegistry())
-            ));
-        if (type == WSEventType.DATASOURCE_CREATED || type == WSEventType.DATASOURCE_UPDATED) {
+                Function.identity())
+            );
+        if (WSDataSourceEvent.CREATED.equals(eventId) || WSDataSourceEvent.UPDATED.equals(eventId)) {
             registry.refreshConfig(dataSourceIds);
         }
         for (String dsId : dataSourceIds) {
@@ -209,14 +210,14 @@ public class WebSessionProjectImpl extends WebProjectImpl {
             if (ds == null) {
                 continue;
             }
-            switch (type) {
-                case DATASOURCE_CREATED -> {
+            switch (eventId) {
+                case WSDataSourceEvent.CREATED -> {
                     addConnection(ds);
                     sendDataSourceUpdatedEvent = true;
                 }
-                case DATASOURCE_UPDATED -> // if settings were changed we need to send event
+                case WSDataSourceEvent.UPDATED -> // if settings were changed we need to send event
                     sendDataSourceUpdatedEvent |= !ds.equalSettings(oldDataSources.get(dsId));
-                case DATASOURCE_DELETED -> {
+                case WSDataSourceEvent.DELETED -> {
                     WebDataSourceUtils.disconnectDataSource(webSession, ds);
                     if (registry instanceof DBPDataSourceRegistryCache dsrc) {
                         dsrc.removeDataSourceFromList(ds);

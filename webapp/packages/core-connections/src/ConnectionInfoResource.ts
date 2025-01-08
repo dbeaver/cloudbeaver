@@ -40,6 +40,7 @@ import { schemaValidationError } from '@cloudbeaver/core-utils';
 
 import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA.js';
 import { ConnectionInfoEventHandler, type IConnectionInfoEvent } from './ConnectionInfoEventHandler.js';
+import { ConnectionStateEventHandler, type IWsDataSourceConnectEvent, type IWsDataSourceDisconnectEvent } from './ConnectionStateEventHandler.js';
 import type { DatabaseConnection } from './DatabaseConnection.js';
 import { DBDriverResource } from './DBDriverResource.js';
 import { parseConnectionKey } from './parseConnectionKey.js';
@@ -97,6 +98,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     sessionDataResource: SessionDataResource,
     appAuthService: AppAuthService,
     connectionInfoEventHandler: ConnectionInfoEventHandler,
+    connectionStateEventHandler: ConnectionStateEventHandler,
     userInfoResource: UserInfoResource,
   ) {
     super();
@@ -160,6 +162,38 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
             connectionId,
           })),
         ),
+      this,
+    );
+
+    connectionStateEventHandler.onEvent<IWsDataSourceDisconnectEvent>(
+      ServerEventId.CbDatasourceDisconnected,
+      async data => {
+        const key: IConnectionInfoParams = {
+          projectId: data.projectId,
+          connectionId: data.connectionId,
+        };
+
+        if (this.isConnected(key) && !this.isConnecting(key)) {
+          this.markOutdated(key);
+        }
+      },
+      undefined,
+      this,
+    );
+
+    connectionStateEventHandler.onEvent<IWsDataSourceConnectEvent>(
+      ServerEventId.CbDatasourceConnected,
+      async data => {
+        const key: IConnectionInfoParams = {
+          projectId: data.projectId,
+          connectionId: data.connectionId,
+        };
+
+        if (!this.isConnected(key) && !this.isConnecting(key)) {
+          this.markOutdated(key);
+        }
+      },
+      undefined,
       this,
     );
 
@@ -421,19 +455,17 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   }
 
   async changeConnectionView(key: IConnectionInfoParams, settings: NavigatorViewSettings): Promise<Connection> {
-    await this.performUpdate(key, [], async () => {
-      const connectionNavigatorViewSettings = this.get(key)?.navigatorSettings || DEFAULT_NAVIGATOR_VIEW_SETTINGS;
-      const { connection } = await this.graphQLService.sdk.setConnectionNavigatorSettings({
-        connectionId: key.connectionId,
-        projectId: key.projectId,
-        settings: { ...connectionNavigatorViewSettings, ...settings },
-        ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(key),
-      });
-
-      this.set(createConnectionParam(connection), connection);
-      this.onDataOutdated.execute(key);
+    const connectionNavigatorViewSettings = this.get(key)?.navigatorSettings || DEFAULT_NAVIGATOR_VIEW_SETTINGS;
+    const { connection } = await this.graphQLService.sdk.setConnectionNavigatorSettings({
+      connectionId: key.connectionId,
+      projectId: key.projectId,
+      settings: { ...connectionNavigatorViewSettings, ...settings },
+      ...this.getDefaultIncludes(),
+      ...this.getIncludesMap(key),
     });
+
+    this.set(createConnectionParam(connection), connection);
+    this.onDataOutdated.execute(key);
 
     return this.get(key)!;
   }

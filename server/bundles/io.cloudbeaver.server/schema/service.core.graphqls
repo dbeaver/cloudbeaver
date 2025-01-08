@@ -132,6 +132,7 @@ type ProductInfo {
     licenseInfo: String
 
     latestVersionInfo: String
+    productPurchaseURL: String
 }
 
 type ServerConfig {
@@ -139,17 +140,8 @@ type ServerConfig {
     version: String!
     workspaceId: ID!
 
-    serverURL: String!
-    rootURI: String!
-    hostName: String! @deprecated # use container id instead
-    containerId: String!
-    defaultAuthRole: String
-    defaultUserTeam: String # [23.2.2]
-
     anonymousAccessEnabled: Boolean!
     supportsCustomConnections: Boolean!
-    supportsConnectionBrowser: Boolean!
-    supportsWorkspaces: Boolean!
     resourceManagerEnabled: Boolean!
 
     publicCredentialsSaveEnabled: Boolean!
@@ -159,18 +151,14 @@ type ServerConfig {
     licenseValid: Boolean!
     licenseStatus: String @since(version: "24.1.5")
 
-    sessionExpireTime: Int!
-    localHostAddress: String
-
     configurationMode: Boolean!
     #    initializationMode: Boolean! @since(version: "24.1.5")
     developmentMode: Boolean!
-    redirectOnFederatedAuth: Boolean!
     distributed: Boolean!
 
     enabledFeatures: [ID!]!
     disabledBetaFeatures: [ID!] @since(version: "24.0.5")
-    enabledAuthProviders: [ID!]!
+    serverFeatures: [ID!] @since(version: "24.3.0")
     supportedLanguages: [ ServerLanguage! ]!
     services: [ WebServiceConfig ]
     productConfiguration: Object!
@@ -178,7 +166,6 @@ type ServerConfig {
     defaultNavigatorSettings: NavigatorSettings!
     disabledDrivers: [ID!]!
     resourceQuotas: Object!
-    passwordPolicyConfiguration: PasswordPolicyConfig! @since(version: "23.3.3")
 }
 
 type ProductSettingsGroup @since(version: "24.0.1") {
@@ -223,14 +210,18 @@ type DatabaseAuthModel {
 }
 
 type DriverInfo {
+    # Driver unique full ID. It is `providerId + "." + driverId`.
+    # It is recommended to use providerId and driverId separately.
     id: ID!
     name: String
     description: String
     icon: String
     iconBig: String
 
-    # Driver provider ID
-    providerId: ID
+    # Driver ID. It is unique within provider
+    driverId: ID!
+    # Driver provider ID. It is globally unique
+    providerId: ID!
     # Driver Java class name
     driverClassName: String
     defaultHost: String
@@ -284,6 +275,7 @@ type DriverInfo {
 
     configurationTypes: [DriverConfigurationType]!
 
+    driverInstalled: Boolean!
     driverLibraries: [DriverLibraryInfo!]!
 }
 
@@ -368,7 +360,7 @@ type ConnectionInfo {
 
     properties: Object
 
-    template: Boolean!
+    template: Boolean! @deprecated
     connected: Boolean!
     provided: Boolean!
     readOnly: Boolean!
@@ -514,7 +506,7 @@ input ConnectionConfig {
     description: String
 
     # ID of template connection
-    templateId: ID
+    templateId: ID @deprecated
     # ID of database driver
     driverId: ID
 
@@ -528,18 +520,21 @@ input ConnectionConfig {
     # Host, port, serverName, databaseName are also stored in mainPropertyValues for custom pages
     mainPropertyValues: Object @since(version: "24.1.2")
 
-    # Connection url jdbc:{driver}://{host}[:{port}]/[{database}]
+    # Return connection URL jdbc:{driver}://{host}[:{port}]/[{database}]
     url: String
-    # Properties
+
+    # Return properties list
     properties: Object
 
-    # Keep-Alive interval
+    # Return keep-alive interval
     keepAliveInterval: Int
+
+    # Return auto-commit connection state
     autocommit: Boolean
 
-    # Template connection
-    template: Boolean
-    # Read-onyl connection
+    # Return template connection state
+    template: Boolean @deprecated
+    # Return read-only connection state
     readOnly: Boolean
 
     # User credentials
@@ -550,12 +545,10 @@ input ConnectionConfig {
     selectedSecretId: ID @since(version: "23.3.5")
     credentials: Object
 
-    # Map of provider properties (name/value)
-
+    # Return map of provider properties (name/value)
     providerProperties: Object
 
-    # Network handlers. Map of id->property map (name/value).
-
+    # Return network handlers configuration. Map of id->property map (name/value).
     networkHandlersConfig: [NetworkHandlerConfigInput!]
 
     #### deprecated fields
@@ -579,15 +572,16 @@ input ConnectionConfig {
 ####################################################
 
 extend type Query {
-    # Returns server config
+    # Return server config
     serverConfig: ServerConfig!
 
+    # Return product settings
     productSettings: ProductSettings! @since(version: "24.0.1")
 
-    # Returns session state ( initialize if not )
+    # Return session state ( initialize if not )
     sessionState: SessionInfo!
 
-    # Session permissions
+    # Return session permissions
     sessionPermissions: [ID]!
 
     # Get driver info
@@ -595,10 +589,11 @@ extend type Query {
     authModels: [DatabaseAuthModel!]!
     networkHandlers: [NetworkHandlerDescriptor!]!
 
-    # List of user connections.
+    # Return list of user connections
     userConnections( projectId: ID, id: ID, projectIds: [ID!] ): [ ConnectionInfo! ]!
-    # List of template connections.
-    templateConnections( projectId: ID ): [ ConnectionInfo! ]!
+
+    # Return list of template connections by project ID
+    templateConnections( projectId: ID ): [ ConnectionInfo! ]! @deprecated
 
     # List of connection folders
     connectionFolders( projectId: ID, path: ID ): [ ConnectionFolderInfo! ]!
@@ -627,21 +622,25 @@ extend type Mutation {
     # Refresh session connection list
     refreshSessionConnections: Boolean
 
-    # Refreshes session on server and returns its state
+    # Change session language to specified
     changeSessionLanguage(locale: String): Boolean
 
-    # Create new custom connection. Custom connections exist only within the current session.
+    # Create new custom connection
     createConnection( config: ConnectionConfig!, projectId: ID ): ConnectionInfo!
 
+    # Update specified connection
     updateConnection( config: ConnectionConfig!, projectId: ID ): ConnectionInfo!
 
+    # Delete specified connection
     deleteConnection( id: ID!, projectId: ID ): Boolean!
 
-    createConnectionFromTemplate( templateId: ID!, projectId: ID!, connectionName: String ): ConnectionInfo!
+    # Create new custom connection from template
+    createConnectionFromTemplate( templateId: ID!, projectId: ID!, connectionName: String ): ConnectionInfo! @deprecated
 
-    # Create new folder
+    # Create new folder for connections
     createConnectionFolder(parentFolderPath: ID, folderName: String!, projectId: ID ): ConnectionFolderInfo!
 
+    # Delete specified connection folder
     deleteConnectionFolder( folderPath: ID!, projectId: ID ): Boolean!
 
     # Copies connection configuration from node
@@ -650,7 +649,7 @@ extend type Mutation {
     # Test connection configuration. Returns remote server version
     testConnection( config: ConnectionConfig!, projectId: ID): ConnectionInfo!
 
-    # Test connection configuration. Returns remote server version
+    # Test network handler
     testNetworkHandler( config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!
 
     # Initiate existing connection
@@ -660,7 +659,7 @@ extend type Mutation {
     # Disconnect from database
     closeConnection( id: ID!, projectId: ID ): ConnectionInfo!
 
-    # Changes navigator settings for connection
+    # Change navigator settings for connection
     setConnectionNavigatorSettings( id: ID!, projectId: ID, settings: NavigatorSettingsInput!): ConnectionInfo!
 
     #### Generic async functions

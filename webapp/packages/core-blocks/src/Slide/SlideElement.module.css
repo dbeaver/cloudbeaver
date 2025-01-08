@@ -13,10 +13,12 @@
   white-space: normal;
   transition: transform ease-in-out 0.3s;
   transform: translateX(-100%);
+  will-change: transform;
 
   &:first-child {
     transition: width ease-in-out 0.3s;
     width: 100%;
+    will-change: width;
   }
 }
 

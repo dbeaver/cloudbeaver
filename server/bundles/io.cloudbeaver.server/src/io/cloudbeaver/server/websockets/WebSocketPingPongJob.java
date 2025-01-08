@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.server.websockets;
 
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.BaseWebPlatform;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
@@ -25,17 +25,15 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 /**
  * WebSessionMonitorJob
  */
-class WebSocketPingPongJob extends AbstractJob {
+public class WebSocketPingPongJob extends AbstractJob {
     private static final int INTERVAL = 1000 * 60 * 1; // once per 1 min
-    private final CBPlatform platform;
-    private final CBJettyWebSocketManager webSocketManager;
+    private final BaseWebPlatform platform;
 
-    public WebSocketPingPongJob(CBPlatform platform, CBJettyWebSocketManager webSocketManager) {
+    public WebSocketPingPongJob(BaseWebPlatform platform) {
         super("WebSocket monitor");
         this.platform = platform;
         setUser(false);
         setSystem(true);
-        this.webSocketManager = webSocketManager;
     }
 
     @Override
@@ -44,7 +42,7 @@ class WebSocketPingPongJob extends AbstractJob {
             return Status.OK_STATUS;
         }
 
-        webSocketManager.sendPing();
+        CBJettyWebSocketManager.sendPing();
 
         if (!platform.isShuttingDown()) {
             scheduleMonitor();
@@ -52,7 +50,7 @@ class WebSocketPingPongJob extends AbstractJob {
         return Status.OK_STATUS;
     }
 
-    void scheduleMonitor() {
+    public void scheduleMonitor() {
         schedule(INTERVAL);
     }
 

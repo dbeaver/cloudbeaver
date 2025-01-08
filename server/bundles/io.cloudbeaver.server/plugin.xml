@@ -29,9 +29,6 @@
         </service>
     </extension>
 
-    <extension point="org.jkiss.dbeaver.dataSourceHandler">
-        <handler id="db.access.check" class="io.cloudbeaver.model.WebDatasourceAccessCheckHandler"/>
-    </extension>
     <extension point="io.cloudbeaver.valueSerializer">
         <serializer type="geometry" class="io.cloudbeaver.server.data.WebGeometryValueSerializer"/>
     </extension>
@@ -46,20 +43,8 @@
         <eventHandler class="io.cloudbeaver.server.events.WSFolderUpdatedEventHandlerImpl">
             <topic id="cb_datasource_folder"/>
         </eventHandler>
-        <eventHandler class="io.cloudbeaver.server.events.WSRmResourceUpdatedEventHandlerImpl">
-            <topic id="cb_scripts"/>
-        </eventHandler>
-        <eventHandler class="io.cloudbeaver.server.events.WSObjectPermissionUpdatedEventHandler">
-            <topic id="cb_object_permissions"/>
-        </eventHandler>
-        <eventHandler class="io.cloudbeaver.server.events.WSSubjectPermissionUpdatedEventHandler">
-            <topic id="cb_subject_permissions"/>
-        </eventHandler>
         <eventHandler class="io.cloudbeaver.server.events.WSProjectUpdatedEventHandler">
             <topic id="cb_projects"/>
-        </eventHandler>
-        <eventHandler class="io.cloudbeaver.server.events.WSUserSecretEventHandlerImpl">
-            <topic id="cb_user_secret"/>
         </eventHandler>
         <eventHandler class="io.cloudbeaver.server.events.WSLogEventHandler">
             <topic id="cb_session_log"/>
@@ -70,9 +55,14 @@
         <eventHandler class="io.cloudbeaver.server.events.WSDeleteTempFileHandler">
             <topic id="cb_delete_temp_folder"/>
         </eventHandler>
-        <eventHandler class="io.cloudbeaver.server.events.WSUserEventHandler">
-            <topic id="cb_user"/>
-        </eventHandler>
+    </extension>
+
+    <extension point="org.jkiss.dbeaver.settings">
+        <propertyGroup id="log" label="Logger">
+            <property id="log.api.graphql.debug" label="Enable detailed logging"
+                      type="boolean" scopes="global"
+                      description="Enable detailed logging of GraphQL queries in the server log, including all provided variables"/>
+        </propertyGroup>
     </extension>
 
 </plugin>

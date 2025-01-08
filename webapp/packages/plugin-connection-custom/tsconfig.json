@@ -13,6 +13,9 @@
       "path": "../core-connections/tsconfig.json"
     },
     {
+      "path": "../core-data-context/tsconfig.json"
+    },
+    {
       "path": "../core-di/tsconfig.json"
     },
     {
@@ -23,6 +26,9 @@
     },
     {
       "path": "../core-localization/tsconfig.json"
+    },
+    {
+      "path": "../core-navigation-tree/tsconfig.json"
     },
     {
       "path": "../core-projects/tsconfig.json"
@@ -41,6 +47,9 @@
     },
     {
       "path": "../plugin-connections/tsconfig.json"
+    },
+    {
+      "path": "../plugin-navigation-tree/tsconfig.json"
     }
   ],
   "include": [

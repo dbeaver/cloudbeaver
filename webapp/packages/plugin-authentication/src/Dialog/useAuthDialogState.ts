@@ -67,7 +67,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
   const providers = authProvidersResource.data.filter(notEmptyProvider).sort(compareProviders);
 
   const activeProviders = providers.filter(provider => {
-    if (provider.federated || provider.trusted || provider.private) {
+    if (provider.federated || provider.trusted || provider.private || provider.authHidden) {
       return false;
     }
 

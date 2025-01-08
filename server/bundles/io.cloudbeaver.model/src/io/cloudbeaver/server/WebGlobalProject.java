@@ -80,6 +80,6 @@ public class WebGlobalProject extends BaseProjectImpl {
     @NotNull
     @Override
     protected DBPDataSourceRegistry createDataSourceRegistry() {
-        return new DataSourceRegistry(this);
+        return new DataSourceRegistry<>(this);
     }
 }

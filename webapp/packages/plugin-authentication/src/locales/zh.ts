@@ -9,7 +9,7 @@ export default [
   ['authentication_login_dialog_title', '认证'],
   ['authentication_login', '登录'],
   ['authentication_logout', '注销'],
-  ['authentication_logout_error', "无法注销"],
+  ['authentication_logout_error', '无法注销'],
   ['authentication_authenticate', '认证'],
   ['authentication_authorizing', '认证中...'],
   ['authentication_auth_federated', '联合认证'],
@@ -26,6 +26,7 @@ export default [
   ['authentication_identity_provider_dialog_subtitle', '选择您要用于登录的配置'],
 
   ['authentication_user_name', '用户名称'],
+  ['authentication_user_name_description', "User's identifier is stored in lowercase"],
   ['authentication_user_role', 'Role'],
   ['authentication_user_credentials', '凭据'],
   ['authentication_user_meta_parameters', '参数'],
@@ -42,7 +43,7 @@ export default [
   ['authentication_user_login_cant_be_used', '抱歉，不能使用该名称'],
   ['authentication_user_icon_tooltip', '用户'],
 
-  ['plugin_authentication_user_loading_error', "无法加载用户数据"],
+  ['plugin_authentication_user_loading_error', '无法加载用户数据'],
   ['plugin_authentication_loading_error_dialog_title', '认证错误'],
   ['plugin_authentication_loading_error_dialog_message', '加载用户数据出错，是否注销?'],
 

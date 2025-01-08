@@ -40,6 +40,7 @@ import org.jkiss.dbeaver.model.exec.trace.DBCTrace;
 import org.jkiss.dbeaver.model.exec.trace.DBCTraceDynamic;
 import org.jkiss.dbeaver.model.exec.trace.DBCTraceProperty;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.qm.QMTransactionLogInfo;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -242,8 +243,9 @@ public class WebServiceSQL implements DBWServiceSQL {
     private List<DBSObject> getObjectListFromNodeIds(@NotNull WebSession session, @NotNull List<String> nodePathList) throws DBWebException {
         try {
             List<DBSObject> objectList = new ArrayList<>(nodePathList.size());
+            DBNModel navigatorModel = session.getNavigatorModelOrThrow();
             for (String nodePath : nodePathList) {
-                DBNNode node = session.getNavigatorModel().getNodeByPath(session.getProgressMonitor(), nodePath);
+                DBNNode node = navigatorModel.getNodeByPath(session.getProgressMonitor(), nodePath);
                 if (node == null) {
                     throw new DBException("Node '" + nodePath + "' not found");
                 }
@@ -559,7 +561,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                 resultsInfo.getDataContainer(),
                 getSqlDialectFromConnection(dataSource.getContainer()),
                 contextInfo.getProcessor().getSyntaxManager(),
-                columnsList,
+                columnsList.stream().map(s -> SQLGroupingAttribute.makeCustom(dataSource, s)).toList(),
                 functions == null ? List.of(SQLGroupingQueryGenerator.DEFAULT_FUNCTION) : functions, // backward compatibility
                 CommonUtils.getBoolean(showDuplicatesOnly, false));
             return groupingQueryGenerator.generateGroupingQuery(resultsInfo.getQueryText());

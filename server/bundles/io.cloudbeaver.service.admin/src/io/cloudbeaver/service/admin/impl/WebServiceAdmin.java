@@ -34,7 +34,7 @@ import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
 import io.cloudbeaver.service.security.SMUtils;
-import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -161,12 +161,13 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (userName.isEmpty()) {
             throw new DBWebException("Empty user name");
         }
-        webSession.addInfoMessage("Create new user - " + userName);
+        String userId = userName.toLowerCase();
+        webSession.addInfoMessage("Create new user - " + userId);
 
         try {
             var securityController = webSession.getAdminSecurityController();
-            securityController.createUser(userName, Map.of(), enabled, authRole);
-            var smUser = securityController.getUserById(userName);
+            securityController.createUser(userId, Map.of(), enabled, authRole);
+            var smUser = securityController.getUserById(userId);
             return new AdminUserInfo(webSession, new WebUser(smUser));
         } catch (Exception e) {
             throw new DBWebException("Error creating new user", e);
@@ -209,14 +210,27 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @NotNull
     @Override
-    public AdminTeamInfo createTeam(@NotNull WebSession webSession, String teamId, String teamName, String description) throws DBWebException {
+    public AdminTeamInfo createTeam(
+        @NotNull WebSession webSession,
+        @NotNull String teamId,
+        @Nullable String teamName,
+        @Nullable String description
+    ) throws DBWebException {
         if (teamId.isEmpty()) {
             throw new DBWebException("Empty team ID");
         }
+        WebUser user = webSession.getUser();
+        if (user == null) {
+            throw new DBWebException("Admin user is not found");
+        }
         webSession.addInfoMessage("Create new team - " + teamId);
         try {
-            webSession.getAdminSecurityController().createTeam(teamId, teamName, description, webSession.getUser().getUserId());
-            SMTeam newTeam = webSession.getAdminSecurityController().findTeam(teamId);
+            SMTeam newTeam = webSession.getAdminSecurityController().createTeam(
+                teamId,
+                teamName,
+                description,
+                user.getUserId()
+            );
             return new AdminTeamInfo(webSession, newTeam);
         } catch (Exception e) {
             throw new DBWebException("Error creating new team", e);
@@ -268,7 +282,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (grantor == null) {
             throw new DBWebException("Cannot grant team in anonymous mode");
         }
-        if (!WebAppUtils.getWebApplication().isDistributed()
+        if (!ServletAppUtils.getServletApplication().isDistributed()
             && CommonUtils.equalObjects(user, webSession.getUser().getUserId())
         ) {
             throw new DBWebException("You cannot edit your own permissions");
@@ -288,7 +302,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (grantor == null) {
             throw new DBWebException("Cannot revoke team in anonymous mode");
         }
-        if (!WebAppUtils.getWebApplication().isDistributed() &&
+        if (!ServletAppUtils.getServletApplication().isDistributed() &&
             CommonUtils.equalObjects(user, webSession.getUser().getUserId())
         ) {
             throw new DBWebException("You cannot edit your own permissions");

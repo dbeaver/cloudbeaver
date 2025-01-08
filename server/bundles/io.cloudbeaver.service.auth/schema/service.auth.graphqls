@@ -61,6 +61,7 @@ type AuthProviderInfo {
     defaultProvider: Boolean!
     trusted: Boolean!
     private: Boolean!
+    authHidden: Boolean! @since(version: "24.2.4")
     supportProvisioning: Boolean!
 
     # Configurable providers must be configured first. See configurations field.
@@ -70,6 +71,8 @@ type AuthProviderInfo {
 
     # Provider configurations (applicable only if configurable=true)
     configurations: [AuthProviderConfiguration!]
+
+    templateConfiguration: AuthProviderConfiguration! @since(version: "24.1.2")
 
     credentialProfiles: [AuthProviderCredentialsProfile!]!
 

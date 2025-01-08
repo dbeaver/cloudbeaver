@@ -31,8 +31,10 @@ interface State {
 export function useUsersTable(filters: IUserFilters) {
   const translate = useTranslate();
   const usersResource = useService(UsersResource);
+  const searchFilter = filters.search.trim().toLowerCase();
+  const enabledStateFilter = filters.status === 'true' ? true : filters.status === 'false' ? false : undefined;
   const pagination = useOffsetPagination(UsersResource, {
-    key: UsersResourceFilterKey(filters.search.toLowerCase(), filters.status === 'true' ? true : filters.status === 'false' ? false : undefined),
+    key: UsersResourceFilterKey(searchFilter, enabledStateFilter),
   });
   const usersLoader = useResource(useUsersTable, usersResource, pagination.currentPage);
   const notificationService = useService(NotificationService);
@@ -48,7 +50,7 @@ export function useUsersTable(filters: IUserFilters) {
       get users() {
         const users = Array.from(
           new Set([
-            ...this.usersLoader.resource.get(UsersResourceNewUsers),
+            ...this.usersLoader.resource.get(UsersResourceFilterKey(searchFilter, enabledStateFilter)),
             ...usersResource.get(pagination.allPages).filter(isDefined).sort(compareUsers),
           ]),
         );

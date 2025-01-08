@@ -20,8 +20,8 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.service.DBWService;
+import io.cloudbeaver.service.auth.model.user.WebAuthProviderInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 

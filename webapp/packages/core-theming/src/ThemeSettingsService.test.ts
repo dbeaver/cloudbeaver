@@ -8,7 +8,6 @@
 import { expect, test } from '@jest/globals';
 
 import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
-import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint.js';
@@ -31,7 +30,6 @@ const endpoint = createGQLEndpoint();
 const server = mockGraphQL(...mockAppInit(endpoint));
 const app = createApp(
   coreThemingManifest,
-  coreEventsManifest,
   coreRootManifest,
   coreSDKManifest,
   coreSettingsManifest,

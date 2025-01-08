@@ -52,6 +52,9 @@ public class WebServiceBindingMetadata extends WebServiceBindingBase<DBWServiceM
     private DBNNode getNodeFromPath(DataFetchingEnvironment env) throws DBException {
         WebSession webSession = getWebSession(env);
         String nodePath = env.getArgument("nodeId");
-        return webSession.getNavigatorModel().getNodeByPath(webSession.getProgressMonitor(), nodePath);
+        if (nodePath == null) {
+            throw new DBException("Node path is null");
+        }
+        return webSession.getNavigatorModelOrThrow().getNodeByPath(webSession.getProgressMonitor(), nodePath);
     }
 }

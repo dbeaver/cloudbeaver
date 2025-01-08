@@ -16,13 +16,14 @@
  */
 package io.cloudbeaver.server.jobs;
 
-import io.cloudbeaver.server.AppWebSessionManager;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.WebAppSessionManager;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceDisconnectEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.runtime.jobs.DataSourceMonitorJob;
@@ -34,11 +35,11 @@ import java.util.List;
  * Web data source monitor job.
  */
 public class WebDataSourceMonitorJob extends DataSourceMonitorJob {
-    private final AppWebSessionManager sessionManager;
+    private final WebAppSessionManager sessionManager;
 
     public WebDataSourceMonitorJob(
         @NotNull DBPPlatform platform,
-        @NotNull AppWebSessionManager sessionManager
+        @NotNull WebAppSessionManager sessionManager
     ) {
         super(platform);
         this.sessionManager = sessionManager;
@@ -57,14 +58,14 @@ public class WebDataSourceMonitorJob extends DataSourceMonitorJob {
     protected void showNotification(@NotNull DBPDataSource dataSource) {
         final DBPProject project = dataSource.getContainer().getProject();
         if (project.getWorkspaceSession() instanceof WebSession webSession) {
-            // TODO: Add new event for disconnect datasource
-            webSession.addSessionEvent(WSDataSourceEvent.update(
-                webSession.getSessionId(),
-                webSession.getUserId(),
-                project.getId(),
-                List.of(dataSource.getContainer().getId()),
-                WSDataSourceProperty.CONFIGURATION
-            ));
+            webSession.addSessionEvent(
+                new WSDataSourceDisconnectEvent(
+                    project.getId(),
+                    dataSource.getContainer().getId(),
+                    webSession.getSessionId(),
+                    webSession.getUserId()
+                )
+            );
         }
     }
 }

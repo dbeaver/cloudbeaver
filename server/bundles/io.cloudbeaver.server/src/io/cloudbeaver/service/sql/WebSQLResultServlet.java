@@ -17,10 +17,9 @@
 package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.app.WebApplication;
+import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.servlets.CBStaticServlet;
+import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.service.WebServiceServletBase;
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletException;
@@ -52,7 +51,7 @@ public class WebSQLResultServlet extends WebServiceServletBase {
 
     private final DBWServiceSQL sqlService;
 
-    public WebSQLResultServlet(WebApplication application, DBWServiceSQL sqlService) {
+    public WebSQLResultServlet(ServletApplication application, DBWServiceSQL sqlService) {
         super(application);
         this.sqlService = sqlService;
     }
@@ -89,8 +88,8 @@ public class WebSQLResultServlet extends WebServiceServletBase {
             response.setHeader("Content-Type", "application/octet-stream");
             response.setHeader("Content-Disposition", "attachment; filename=\"" + dataFile.getFileName().toString() + "\"");
             response.setHeader("Content-Length", String.valueOf(Files.size(dataFile)));
-            response.setDateHeader("Expires", System.currentTimeMillis() + CBStaticServlet.STATIC_CACHE_SECONDS * 1000);
-            response.setHeader("Cache-Control", "public, max-age=" + CBStaticServlet.STATIC_CACHE_SECONDS);
+            response.setDateHeader("Expires", System.currentTimeMillis() + CBConstants.STATIC_CACHE_SECONDS * 1000);
+            response.setHeader("Cache-Control", "public, max-age=" + CBConstants.STATIC_CACHE_SECONDS);
 
             try (InputStream is = Files.newInputStream(dataFile)) {
                 IOUtils.copyStream(is, response.getOutputStream());

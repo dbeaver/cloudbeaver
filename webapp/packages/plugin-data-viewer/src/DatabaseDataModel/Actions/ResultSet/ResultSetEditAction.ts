@@ -206,32 +206,32 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
   }
 
   duplicate(...keys: IResultSetElementKey[]): void {
-    const rows: IResultSetRowKey[] = [];
+    const result: IResultSetElementKey[] = [];
     const rowKeys = new Set<string>();
 
     for (const key of keys) {
       const serialized = ResultSetDataKeysUtils.serialize(key.row);
 
       if (!rowKeys.has(serialized)) {
-        rows.push(key.row);
+        result.push(key);
         rowKeys.add(serialized);
       }
     }
 
-    this.duplicateRow(...rows);
+    this.duplicateRow(...result);
   }
 
-  duplicateRow(...rows: IResultSetRowKey[]): void {
-    for (const row of rows) {
-      let value = this.data.getRowValue(row);
+  duplicateRow(...keys: IResultSetElementKey[]): void {
+    for (const key of keys) {
+      let value = this.data.getRowValue(key.row);
 
-      const editedValue = this.editorData.get(ResultSetDataKeysUtils.serialize(row));
+      const editedValue = this.editorData.get(ResultSetDataKeysUtils.serialize(key.row));
 
       if (editedValue) {
         value = editedValue.update;
       }
 
-      this.addRow(row, JSON.parse(JSON.stringify(value)));
+      this.addRow(key.row, JSON.parse(JSON.stringify(value)), key.column);
     }
   }
 

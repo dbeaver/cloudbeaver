@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import type { ILoadableState } from '@cloudbeaver/core-utils';
+
 import type { IRouteParams } from './IRouteParams.js';
 
 export enum AdministrationItemType {
@@ -84,6 +86,7 @@ export interface IAdministrationItemOptions {
   replace?: IAdministrationItemReplaceOptions;
   defaultSub?: string;
   defaultParam?: string;
+  getLoader?: () => ILoadableState[] | ILoadableState;
   getDrawerComponent: () => AdministrationItemDrawerComponent;
   getContentComponent: () => AdministrationItemContentComponent;
   onLoad?: AdministrationItemEvent;

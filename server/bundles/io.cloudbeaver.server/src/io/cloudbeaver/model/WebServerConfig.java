@@ -16,11 +16,11 @@
  */
 package io.cloudbeaver.model;
 
-import io.cloudbeaver.model.config.PasswordPolicyConfiguration;
+import io.cloudbeaver.registry.WebServerFeatureRegistry;
 import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
-import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.WebApplication;
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
@@ -39,9 +39,9 @@ import java.util.Map;
  */
 public class WebServerConfig {
 
-    private final CBApplication application;
+    private final WebApplication application;
 
-    public WebServerConfig(CBApplication application) {
+    public WebServerConfig(@NotNull WebApplication application) {
         this.application = application;
     }
 
@@ -61,27 +61,6 @@ public class WebServerConfig {
     }
 
     @Property
-    public String getServerURL() {
-        return CommonUtils.notEmpty(application.getServerConfiguration().getServerURL());
-    }
-
-    @Property
-    public String getRootURI() {
-        return CommonUtils.notEmpty(application.getServerConfiguration().getRootURI());
-    }
-
-    @Deprecated
-    @Property
-    public String getHostName() {
-        return getContainerId();
-    }
-
-    @Property
-    public String getContainerId() {
-        return CommonUtils.notEmpty(application.getContainerId());
-    }
-
-    @Property
     public boolean isAnonymousAccessEnabled() {
         return application.getAppConfiguration().isAnonymousAccessEnabled();
     }
@@ -89,16 +68,6 @@ public class WebServerConfig {
     @Property
     public boolean isSupportsCustomConnections() {
         return application.getAppConfiguration().isSupportsCustomConnections();
-    }
-
-    @Property
-    public boolean isSupportsConnectionBrowser() {
-        return application.getAppConfiguration().isSupportsConnectionBrowser();
-    }
-
-    @Property
-    public boolean isSupportsWorkspaces() {
-        return application.getAppConfiguration().isSupportsUserWorkspaces();
     }
 
     @Property
@@ -137,23 +106,8 @@ public class WebServerConfig {
     }
 
     @Property
-    public boolean isRedirectOnFederatedAuth() {
-        return application.getAppConfiguration().isRedirectOnFederatedAuth();
-    }
-
-    @Property
     public boolean isResourceManagerEnabled() {
         return application.getAppConfiguration().isResourceManagerEnabled();
-    }
-
-    @Property
-    public long getSessionExpireTime() {
-        return application.getServerConfiguration().getMaxSessionIdleTime();
-    }
-
-    @Property
-    public String getLocalHostAddress() {
-        return application.getLocalHostAddress();
     }
 
     @Property
@@ -168,8 +122,9 @@ public class WebServerConfig {
     }
 
     @Property
-    public String[] getEnabledAuthProviders() {
-        return application.getAppConfiguration().getEnabledAuthProviders();
+    @NotNull
+    public String[] getServerFeatures() {
+        return WebServerFeatureRegistry.getInstance().getServerFeatures();
     }
 
     @Property
@@ -193,7 +148,7 @@ public class WebServerConfig {
 
     @Property
     public Map<String, Object> getProductConfiguration() {
-        return CBPlatform.getInstance().getApplication().getProductConfiguration();
+        return application.getProductConfiguration();
     }
 
     @Property
@@ -219,20 +174,5 @@ public class WebServerConfig {
     @Property
     public Boolean isDistributed() {
         return application.isDistributed();
-    }
-
-    @Property
-    public String getDefaultAuthRole() {
-        return application.getDefaultAuthRole();
-    }
-
-    @Property
-    public String getDefaultUserTeam() {
-        return application.getAppConfiguration().getDefaultUserTeam();
-    }
-
-    @Property
-    public PasswordPolicyConfiguration getPasswordPolicyConfiguration() {
-        return application.getSecurityManagerConfiguration().getPasswordPolicyConfiguration();
     }
 }
