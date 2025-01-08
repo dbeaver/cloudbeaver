@@ -20,6 +20,7 @@
   "dependencies": {
     "@cloudbeaver/core-blocks": "^0",
     "@cloudbeaver/core-connections": "^0",
+    "@cloudbeaver/core-data-context": "^0",
     "@cloudbeaver/core-di": "^0",
     "@cloudbeaver/core-dialogs": "^0",
     "@cloudbeaver/core-events": "^0",
