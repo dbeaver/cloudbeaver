@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.trace.DBCTraceProperty;
+import org.jkiss.dbeaver.model.qm.QMTransactionLogInfo;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 
 import java.util.List;
@@ -202,4 +203,10 @@ public interface DBWServiceSQL extends DBWService {
     WebAsyncTaskInfo asyncSqlCommitTransaction(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo sqlContext);
+
+    @WebAction
+    QMTransactionLogInfo getTransactionLogInfo(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo sqlContext
+    );
 }

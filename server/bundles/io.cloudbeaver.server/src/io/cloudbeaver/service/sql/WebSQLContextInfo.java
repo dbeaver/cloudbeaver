@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.exec.trace.DBCTrace;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.qm.QMTransactionLogInfo;
 import org.jkiss.dbeaver.model.qm.QMTransactionState;
 import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -214,6 +215,11 @@ public class WebSQLContextInfo implements WebSessionProvider {
         };
         return getWebSession().createAndRunAsyncTask("Set auto-commit", runnable);
 
+    }
+
+    public QMTransactionLogInfo getTransactionLogInfo() {
+        DBCExecutionContext context = processor.getExecutionContext();
+        return QMUtils.getTransactionLogInfo(context);
     }
 
     public WebAsyncTaskInfo commitTransaction() {
