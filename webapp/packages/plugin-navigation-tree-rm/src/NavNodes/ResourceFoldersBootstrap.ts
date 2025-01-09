@@ -33,6 +33,8 @@ import {
 import {
   getRmResourceKey,
   getRmResourcePath,
+  isRMProjectNode,
+  isRMResourceNode,
   NAV_NODE_TYPE_RM_PROJECT,
   NAV_NODE_TYPE_RM_RESOURCE,
   ResourceManagerResource,
@@ -91,7 +93,15 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       isDisabled: context => {
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
 
-        return this.treeSelectionService.getFirstSelectedNode(tree, getRmProjectNodeId) === undefined;
+        return (
+          this.treeSelectionService.getFirstSelectedNode(
+            tree,
+            getRmProjectNodeId,
+            project => project.canEditResources,
+            isRMProjectNode,
+            node => isRMResourceNode(node) && Boolean(node?.folder),
+          ) === undefined
+        );
       },
       handler: this.elementsTreeActionHandler.bind(this),
     });
@@ -165,7 +175,13 @@ export class ResourceFoldersBootstrap extends Bootstrap {
 
     switch (action) {
       case ACTION_NEW_FOLDER: {
-        const targetNode = this.treeSelectionService.getFirstSelectedNode(tree, getRmProjectNodeId);
+        const targetNode = this.treeSelectionService.getFirstSelectedNode(
+          tree,
+          getRmProjectNodeId,
+          project => project.canEditResources,
+          isRMProjectNode,
+          node => isRMResourceNode(node) && Boolean(node?.folder),
+        );
 
         if (!targetNode) {
           return;

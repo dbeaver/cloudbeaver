@@ -16,4 +16,6 @@ export * from './NAV_NODE_TYPE_RM_FOLDER.js';
 export * from './NAV_NODE_TYPE_RM_PROJECT.js';
 export * from './NAV_NODE_TYPE_RM_RESOURCE.js';
 export * from './RESOURCES_NODE_PATH.js';
+export * from './isRMProjectNode.js';
+export * from './isRMResourceNode.js';
 export { resourceManagerManifest } from './manifest.js';
