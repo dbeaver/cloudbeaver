@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
@@ -23,6 +23,7 @@ import {
   useCustomInputValidation,
   useExecutor,
   useForm,
+  useObservableRef,
   usePasswordValidation,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
@@ -36,14 +37,19 @@ import { userProfileContext } from '../../userProfileContext.js';
 import { UserProfileOptionsPanelService } from '../../UserProfileOptionsPanelService.js';
 import type { IUserProfileFormAuthenticationState } from './IUserProfileFormAuthenticationState.js';
 
+const INITIAL_STATE: IUserProfileFormAuthenticationState = {
+  oldPassword: '',
+  password: '',
+  repeatedPassword: '',
+};
+
 export const ChangePassword = observer(function ChangePassword() {
-  const INITIAL_STATE: IUserProfileFormAuthenticationState = {
-    oldPassword: '',
-    password: '',
-    repeatedPassword: '',
-  };
   const translate = useTranslate();
-  const [state, setState] = useState<IUserProfileFormAuthenticationState>(INITIAL_STATE);
+  const state = useObservableRef(INITIAL_STATE, {
+    oldPassword: observable.ref,
+    password: observable.ref,
+    repeatedPassword: observable.ref,
+  });
   const notificationService = useService(NotificationService);
   const userProfileOptionsPanelService = useService(UserProfileOptionsPanelService);
   const userInfoResource = useService(UserInfoResource);
@@ -72,12 +78,14 @@ export const ChangePassword = observer(function ChangePassword() {
   });
 
   function resetForm() {
-    setState(() => INITIAL_STATE);
+    state.oldPassword = '';
+    state.password = '';
+    state.repeatedPassword = '';
     form.ref?.reset();
   }
 
   function onChange(value: FormChangeValues, name: string | undefined) {
-    setState(prevState => ({ ...prevState, [name as string]: value }));
+    state[name as keyof IUserProfileFormAuthenticationState] = value as string;
   }
 
   useExecutor({
