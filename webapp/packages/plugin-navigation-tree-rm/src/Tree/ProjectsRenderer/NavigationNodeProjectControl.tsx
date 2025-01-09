@@ -13,7 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { NAV_NODE_TYPE_RM_PROJECT } from '@cloudbeaver/core-resource-manager';
+import { isRMProjectNode } from '@cloudbeaver/core-resource-manager';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import {
   ElementsTreeContext,
@@ -69,7 +69,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     }
 
     if (node.projectId && resourceType !== undefined) {
-      if (node.nodeType === NAV_NODE_TYPE_RM_PROJECT) {
+      if (isRMProjectNode(node)) {
         const project = projectInfoResource.get(node.projectId);
         if (project) {
           const resourceFolder = resourceManagerService.getRootFolder(project, resourceType);

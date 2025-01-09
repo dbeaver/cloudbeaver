@@ -78,8 +78,14 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     switch (action) {
       case ACTION_TREE_CREATE_CONNECTION: {
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
-        const projectId = this.treeSelectionService.getSelectedProject(tree)?.id;
-        const selectedNode = this.treeSelectionService.getFirstSelectedNode(tree, getProjectNodeId);
+        const projectId = this.treeSelectionService.getSelectedProject(tree, isProjectNode)?.id;
+        const selectedNode = this.treeSelectionService.getFirstSelectedNode(
+          tree,
+          getProjectNodeId,
+          project => project.canEditDataSources,
+          isProjectNode,
+          isConnectionFolder,
+        );
         const folderPath = selectedNode?.folderId ? getFolderPath(selectedNode.folderId) : undefined;
         await this.openConnectionsDialog(projectId, folderPath);
         break;

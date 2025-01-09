@@ -8,7 +8,7 @@
 import type { NavNode, NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { isResourceOfType, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
-import { NAV_NODE_TYPE_RM_RESOURCE } from '@cloudbeaver/core-resource-manager';
+import { isRMResourceNode } from '@cloudbeaver/core-resource-manager';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 import type { IElementsTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
@@ -27,7 +27,7 @@ export function navigationTreeResourceTypeFilter(
       .get(resourceKeyList(children))
       .filter<NavNode>(isNotNullDefined)
       .filter(node => {
-        if (node.nodeType === NAV_NODE_TYPE_RM_RESOURCE) {
+        if (isRMResourceNode(node)) {
           if (node.folder) {
             return true;
           }
