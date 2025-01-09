@@ -14,6 +14,7 @@ import {
   ConfirmationDialog,
   Container,
   Form,
+  type FormChangeValues,
   Group,
   GroupTitle,
   InputField,
@@ -29,7 +30,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { isValuesEqual } from '@cloudbeaver/core-utils';
+import { isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 
 import { userProfileContext } from '../../userProfileContext.js';
 import { UserProfileOptionsPanelService } from '../../UserProfileOptionsPanelService.js';
@@ -75,13 +76,17 @@ export const ChangePassword = observer(function ChangePassword() {
     form.ref?.reset();
   }
 
+  function onChange(value: FormChangeValues, name: string | undefined) {
+    setState(prevState => ({ ...prevState, [name as string]: value }));
+  }
+
   useExecutor({
     executor: userProfileOptionsPanelService.onClose,
     handlers: [
       async function closeHandler(_, contexts) {
         const context = contexts.getContext(userProfileContext);
 
-        if (state !== INITIAL_STATE && !context.force) {
+        if (!isObjectsEqual(state, INITIAL_STATE) && !context.force) {
           const result = await commonDialogService.open(ConfirmationDialog, {
             title: 'plugin_user_profile_authentication_change_password_cancel_title',
             message: 'plugin_user_profile_authentication_change_password_cancel_message',
@@ -99,7 +104,7 @@ export const ChangePassword = observer(function ChangePassword() {
   return (
     <ColoredContainer wrap overflow gap>
       <Container medium gap>
-        <Form context={form} onChange={value => setState(prev => ({ ...prev, value }))}>
+        <Form context={form} onChange={onChange}>
           <ColoredContainer parent overflow compact vertical noWrap gap>
             <Group overflow box keepSize>
               <ToolsPanel rounded minHeight>
