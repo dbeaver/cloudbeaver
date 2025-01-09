@@ -21,6 +21,7 @@ export const UserProfileFormInfo: TabContainerPanelComponent = observer(function
   const translate = useTranslate();
   const userInfoResource = useService(UserInfoResource);
   const userInfoMetaParametersResource = useService(UserInfoMetaParametersResource);
+  const disabled = userInfoResource.isLoading() || userInfoMetaParametersResource.isLoading();
   const tab = useTab(tabId);
 
   const state: IUserProfileFormInfoState = {
@@ -46,7 +47,7 @@ export const UserProfileFormInfo: TabContainerPanelComponent = observer(function
             </InputField>
           </Container>
           <Loader suspense inline>
-            <UserProfileFormInfoMetaParameters state={state} tabSelected={tab.selected} disabled={false} />
+            <UserProfileFormInfoMetaParameters state={state} tabSelected={tab.selected} disabled={disabled} />
           </Loader>
         </Group>
         <Group box medium overflow>
