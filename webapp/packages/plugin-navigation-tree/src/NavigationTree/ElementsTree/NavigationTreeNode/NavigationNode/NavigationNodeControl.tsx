@@ -113,6 +113,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(
 
     let icon = nodeInfo.icon;
     const name = nodeInfo.name;
+    const description = nodeInfo.description;
     const title = nodeInfo.tooltip;
 
     if (error) {
@@ -150,8 +151,8 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(
             ) : (
               <div className={s(styles, { nameBox: true })}>
                 {name}
-                {elementsTreeContext?.tree.settings?.objectsDescription && nodeInfo.description && !node.folder && (
-                  <TreeNodeDescription>{` - ${nodeInfo.description}`}</TreeNodeDescription>
+                {elementsTreeContext?.tree.settings?.objectsDescription && description && (
+                  <TreeNodeDescription>{` - ${description}`}</TreeNodeDescription>
                 )}
               </div>
             )}
