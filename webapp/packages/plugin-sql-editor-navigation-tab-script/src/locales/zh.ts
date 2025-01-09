@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 export default [
-  ['plugin_sql_editor_navigation_tab_resource_save_script_title', '保存为脚本'],
+  ['plugin_sql_editor_navigation_tab_resource_save_script_title', '保存为脚本 (Shift + Ctrl + S)'],
   ['plugin_sql_editor_navigation_tab_script_state_renaming', '重命名脚本中...'],
   ['plugin_sql_editor_navigation_tab_script_state_reading', '读取脚本中...'],
   ['plugin_sql_editor_navigation_tab_script_state_saving', '保存脚本中...'],

@@ -20,7 +20,6 @@ import io.cloudbeaver.WebSessionGlobalProjectImpl;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
@@ -28,7 +27,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMObjectPermissionsGrant;
-import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
@@ -108,7 +106,7 @@ public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler
                 return;
             }
             boolean isAccessibleNow = project.findWebConnectionInfo(dataSourceId) != null;
-            if (WSEventType.OBJECT_PERMISSIONS_UPDATED.getEventId().equals(event.getId())) {
+            if (WSObjectPermissionEvent.UPDATED.equals(event.getId())) {
                 if (isAccessibleNow || !shouldBeAccessible) {
                     return;
                 }
@@ -122,7 +120,7 @@ public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler
                         WSDataSourceProperty.CONFIGURATION
                     )
                 );
-            } else if (WSEventType.OBJECT_PERMISSIONS_DELETED.getEventId().equals(event.getId())) {
+            } else if (WSObjectPermissionEvent.DELETED.equals(event.getId())) {
                 if (!isAccessibleNow || shouldBeAccessible) {
                     return;
                 }
@@ -147,7 +145,7 @@ public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler
     ) {
         return (activeUserSession) -> {
             try {
-                if (WSEventType.OBJECT_PERMISSIONS_UPDATED.getEventId().equals(event.getId())) {
+                if (WSObjectPermissionEvent.UPDATED.equals(event.getId())) {
                     var accessibleProjectIds = activeUserSession.getUserContext().getAccessibleProjectIds();
                     if (accessibleProjectIds.contains(event.getObjectId())) {
                         return;
@@ -160,7 +158,7 @@ public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler
                             projectId
                         )
                     );
-                } else if (WSEventType.OBJECT_PERMISSIONS_DELETED.getEventId().equals(event.getId())) {
+                } else if (WSObjectPermissionEvent.DELETED.equals(event.getId())) {
                     activeUserSession.removeSessionProject(projectId);
                     activeUserSession.addSessionEvent(
                         WSProjectUpdateEvent.delete(

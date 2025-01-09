@@ -48,7 +48,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
       if (configurationWizard) {
         const disabledByFeature = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
 
-        if (provider.configurable || disabledByFeature) {
+        if (provider.configurable || disabledByFeature || provider.authHidden) {
           return false;
         }
       }

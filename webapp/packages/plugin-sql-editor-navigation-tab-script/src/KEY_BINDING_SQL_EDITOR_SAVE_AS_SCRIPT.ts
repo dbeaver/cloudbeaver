@@ -5,8 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { manifest } from './manifest.js';
+import { createKeyBinding } from '@cloudbeaver/core-view';
 
-export * from './KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT.js';
-
-export default manifest;
+export const KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT = createKeyBinding({
+  id: 'save-as-script',
+  keys: 'shift+mod+s',
+  preventDefault: true,
+});

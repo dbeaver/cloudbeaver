@@ -21,6 +21,7 @@ export default [
   ['sql_editor_shortcut_execute_script', '执行脚本'],
   ['sql_editor_shortcut_show_execution_plan', '显示执行计划'],
   ['sql_editor_shortcut_format', '格式化脚本'],
+  ['sql_editor_shortcut_save_as_script', 'Save as script'],
   ['sql_editor_shortcut_open_editor_in_new_tab', '在单独的浏览器标签下打开SQL编辑器'],
   ['sql_editor_shortcut_undo', '撤销'],
   ['sql_editor_shortcut_redo', '重做'],

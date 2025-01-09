@@ -24,7 +24,7 @@ const CLOSE_CHARACTERS = /[\s()[\]{};:>,=\\*]/;
 const COMPLETION_WORD = /[\w*]*/;
 
 export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment, Extension] {
-  const { closeCompletion, useEditorAutocompletion } = useComplexLoader(codemirrorComplexLoader);
+  const { closeCompletion, useEditorAutocompletion, insertCompletionText } = useComplexLoader(codemirrorComplexLoader);
   const localizationService = useService(LocalizationService);
   const optionsRef = useObjectRef({ data });
 
@@ -56,7 +56,9 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
       return [
         ...filteredProposals.map<SqlCompletion>(proposal => ({
           label: proposal.displayString,
-          apply: proposal.replacementString,
+          apply: (view, completion, from, to) => {
+            view.dispatch(insertCompletionText(view.state, proposal.replacementString, proposal.replacementOffset, to));
+          },
           boost: proposal.score,
           icon: proposal.icon,
         })),
