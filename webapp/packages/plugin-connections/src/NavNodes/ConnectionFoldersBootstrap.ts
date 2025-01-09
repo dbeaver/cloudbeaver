@@ -133,7 +133,13 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           return false;
         }
 
-        const targetNode = this.treeSelectionService.getFirstSelectedNode(tree, getProjectNodeId);
+        const targetNode = this.treeSelectionService.getFirstSelectedNode(
+          tree,
+          getProjectNodeId,
+          project => project.canEditDataSources,
+          isProjectNode,
+          isConnectionFolder,
+        );
 
         return targetNode !== undefined;
       },
@@ -166,7 +172,13 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       isActionApplicable: (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
-        const targetNode = this.treeSelectionService.getFirstSelectedNode(tree, getProjectNodeId);
+        const targetNode = this.treeSelectionService.getFirstSelectedNode(
+          tree,
+          getProjectNodeId,
+          project => project.canEditDataSources,
+          isProjectNode,
+          isConnectionFolder,
+        );
 
         if (
           action !== ACTION_TREE_CREATE_FOLDER ||
@@ -269,7 +281,13 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     switch (action) {
       case ACTION_TREE_CREATE_FOLDER:
       case ACTION_NEW_FOLDER: {
-        const targetNode = this.treeSelectionService.getFirstSelectedNode(tree, getProjectNodeId);
+        const targetNode = this.treeSelectionService.getFirstSelectedNode(
+          tree,
+          getProjectNodeId,
+          project => project.canEditDataSources,
+          isProjectNode,
+          isConnectionFolder,
+        );
 
         if (!targetNode) {
           this.notificationService.logError({ title: "Can't create folder", message: 'core_projects_no_default_project' });
