@@ -24,4 +24,9 @@ export default [
   ['plugin_user_profile_authentication_change_password_submit_label', 'Сменить'],
   ['plugin_user_profile_authentication_change_password_passwords_not_match', 'Пароли не совпадают'],
   ['plugin_user_profile_authentication_change_password_password_validation_error', 'Валидация пароля не удалась'],
+  ['plugin_user_profile_authentication_change_password_cancel_title', 'Отменить смену пароля'],
+  [
+    'plugin_user_profile_authentication_change_password_cancel_message',
+    'Вы собираетесь отменить смену пароля. Несохраненные данные будут утеряны. Вы уверены?',
+  ],
 ];

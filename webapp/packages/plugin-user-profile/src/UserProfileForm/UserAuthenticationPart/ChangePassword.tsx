@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
   ColoredContainer,
+  ConfirmationDialog,
   Container,
   Form,
   Group,
@@ -19,14 +20,19 @@ import {
   ToolsAction,
   ToolsPanel,
   useCustomInputValidation,
+  useExecutor,
   useForm,
   usePasswordValidation,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { isValuesEqual } from '@cloudbeaver/core-utils';
 
+import { userProfileContext } from '../../userProfileContext.js';
+import { UserProfileOptionsPanelService } from '../../UserProfileOptionsPanelService.js';
 import type { IUserProfileFormAuthenticationState } from './IUserProfileFormAuthenticationState.js';
 
 export const ChangePassword = observer(function ChangePassword() {
@@ -38,7 +44,9 @@ export const ChangePassword = observer(function ChangePassword() {
   const translate = useTranslate();
   const [state, setState] = useState<IUserProfileFormAuthenticationState>(INITIAL_STATE);
   const notificationService = useService(NotificationService);
+  const userProfileOptionsPanelService = useService(UserProfileOptionsPanelService);
   const userInfoResource = useService(UserInfoResource);
+  const commonDialogService = useService(CommonDialogService);
   const disabled = userInfoResource.isLoading();
   const passwordValidationRef = usePasswordValidation();
   const passwordRepeatRef = useCustomInputValidation<string>(value => {
@@ -67,6 +75,27 @@ export const ChangePassword = observer(function ChangePassword() {
     form.ref?.reset();
   }
 
+  useExecutor({
+    executor: userProfileOptionsPanelService.onClose,
+    handlers: [
+      async function closeHandler(_, contexts) {
+        const context = contexts.getContext(userProfileContext);
+
+        if (state !== INITIAL_STATE && !context.force) {
+          const result = await commonDialogService.open(ConfirmationDialog, {
+            title: 'plugin_user_profile_authentication_change_password_cancel_title',
+            message: 'plugin_user_profile_authentication_change_password_cancel_message',
+            confirmActionText: 'ui_processing_ok',
+          });
+
+          if (result === DialogueStateResult.Rejected) {
+            ExecutorInterrupter.interrupt(contexts);
+          }
+        }
+      },
+    ],
+  });
+
   return (
     <ColoredContainer wrap overflow gap>
       <Container medium gap>
@@ -78,7 +107,7 @@ export const ChangePassword = observer(function ChangePassword() {
                   {translate('plugin_user_profile_authentication_change_password_submit_label')}
                 </ToolsAction>
                 <ToolsAction icon="admin-cancel" viewBox="0 0 24 24" onClick={resetForm}>
-                  {translate('ui_processing_cancel')}
+                  {translate('ui_clear')}
                 </ToolsAction>
               </ToolsPanel>
             </Group>
