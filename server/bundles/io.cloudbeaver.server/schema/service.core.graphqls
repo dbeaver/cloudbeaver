@@ -261,6 +261,7 @@ type DriverInfo {
 
     configurationTypes: [DriverConfigurationType]!
 
+    downloadable: Boolean! @since(version: "24.3.3")
     driverInstalled: Boolean!
     driverLibraries: [DriverLibraryInfo!]!
 }
