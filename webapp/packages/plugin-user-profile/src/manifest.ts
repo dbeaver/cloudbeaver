@@ -22,9 +22,5 @@ export const userProfilePlugin: PluginManifest = {
       import('./UserProfileForm/UserAuthenticationPart/UserProfileFormAuthenticationPartBootstrap.js').then(
         m => m.UserProfileFormAuthenticationPartBootstrap,
       ),
-    () =>
-      import('./UserProfileForm/UserAuthenticationPart/UserProfileFormAuthenticationPartService.js').then(
-        m => m.UserProfileFormAuthenticationPartService,
-      ),
   ],
 };
