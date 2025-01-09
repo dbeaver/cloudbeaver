@@ -27,7 +27,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.trace.DBCTraceProperty;
-import org.jkiss.dbeaver.model.qm.QMTransactionLogInfo;
+import io.cloudbeaver.model.WebTransactionLogInfo;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 
 import java.util.List;
@@ -205,7 +205,7 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull WebSQLContextInfo sqlContext);
 
     @WebAction
-    QMTransactionLogInfo getTransactionLogInfo(
+    WebTransactionLogInfo getTransactionLogInfo(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo sqlContext
     );

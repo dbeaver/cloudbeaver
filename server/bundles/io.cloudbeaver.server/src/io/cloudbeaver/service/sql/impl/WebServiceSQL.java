@@ -42,7 +42,7 @@ import org.jkiss.dbeaver.model.exec.trace.DBCTraceProperty;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
-import org.jkiss.dbeaver.model.qm.QMTransactionLogInfo;
+import io.cloudbeaver.model.WebTransactionLogInfo;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.*;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
@@ -319,6 +319,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                     }
                 }
             );
+            // do event
             return result[0];
         } catch (DBException e) {
             throw new DBWebException("Error updating resultset data", e);
@@ -617,7 +618,7 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public QMTransactionLogInfo getTransactionLogInfo(@NotNull WebSession webSession, @NotNull WebSQLContextInfo sqlContext) {
+    public WebTransactionLogInfo getTransactionLogInfo(@NotNull WebSession webSession, @NotNull WebSQLContextInfo sqlContext) {
         return sqlContext.getTransactionLogInfo();
     }
 }

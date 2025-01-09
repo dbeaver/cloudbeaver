@@ -461,16 +461,16 @@ type LogEntry {
 
 type TransactionLogInfos {
     count: Int
-    transactionLogInfos: [ TransactionLogInfoItem ]
+    transactionLogInfos: [TransactionLogInfoItem!]!
 }
 
 type TransactionLogInfoItem {
-    time: DateTime
-    type: String
-    queryString: String
-    durationMs: Int
-    rows: Int
-    result: String
+    time: DateTime!
+    type: String!
+    queryString: String!
+    durationMs: Int!
+    rows: Int!
+    result: String!
 }
 
 ####################################################
