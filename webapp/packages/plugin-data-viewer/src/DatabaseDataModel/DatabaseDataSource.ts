@@ -206,8 +206,8 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return !this.isLoading() && !this.disabled;
   }
 
-  isImportAllowed(resultIndex: number): boolean {
-    return !this.isReadonly(resultIndex);
+  hasRowIdentifier(resultIndex: number): boolean {
+    return !!this.getResult(resultIndex)?.data?.hasRowIdentifier;
   }
 
   isReadonly(resultIndex: number): boolean {

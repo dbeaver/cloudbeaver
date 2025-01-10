@@ -103,7 +103,10 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
   );
 
   function isEditable(column: CalculatedColumn<IResultSetRowKey>): boolean {
-    if (!cellContext.cell) {
+    if (
+      !cellContext.cell ||
+      (!dataGridContext.model.hasRowIdentifier(tableDataContext.view.resultIndex) && cellContext.editionState !== DatabaseEditChangeType.add)
+    ) {
       return false;
     }
 
