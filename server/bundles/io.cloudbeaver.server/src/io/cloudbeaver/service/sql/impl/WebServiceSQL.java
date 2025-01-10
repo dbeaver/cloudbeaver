@@ -319,7 +319,6 @@ public class WebServiceSQL implements DBWServiceSQL {
                     }
                 }
             );
-            // do event
             return result[0];
         } catch (DBException e) {
             throw new DBWebException("Error updating resultset data", e);
