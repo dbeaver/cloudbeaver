@@ -17,7 +17,7 @@ export type InputAutocompleteStrategy = 'startsWith' | 'contains' | 'fuzzy';
 interface InputAutocompleteOptions {
   sourceHints: InputAutocompleteProposal[];
   matchStrategy?: InputAutocompleteStrategy;
-  filter?: (suggestion: InputAutocompleteProposal, lastWord?: string) => boolean;
+  predicate?: (suggestion: InputAutocompleteProposal, lastWord?: string) => boolean;
 }
 
 export interface InputAutocompleteProposal {
@@ -32,7 +32,7 @@ const INPUT_DELAY = 300;
 
 export const useInputAutocomplete = (
   inputRef: RefObject<HTMLInputElement | HTMLTextAreaElement>,
-  { sourceHints, matchStrategy = 'startsWith', filter }: InputAutocompleteOptions,
+  { sourceHints, matchStrategy = 'startsWith', predicate }: InputAutocompleteOptions,
 ) => {
   const state = useObservableRef(
     () => ({
@@ -49,7 +49,7 @@ export const useInputAutocomplete = (
         const cursorPosition = this.selectionStart;
         const words = this.input?.split(' ');
 
-        if (!isNotNullDefined(words) || !isNotNullDefined(cursorPosition) || !isNotNullDefined(this.currentWord)) {
+        if (!this.currentWord || !isNotNullDefined(words) || !isNotNullDefined(cursorPosition)) {
           return;
         }
 
@@ -88,6 +88,12 @@ export const useInputAutocomplete = (
           return [];
         }
 
+        const matchFunctions: Record<InputAutocompleteStrategy, (value: string) => boolean> = {
+          startsWith: value => value.startsWith(this.currentWord),
+          contains: value => value.includes(this.currentWord),
+          fuzzy: value => isFuzzySearchable(this.currentWord, value),
+        };
+
         return this.sourceHints
           .filter(suggestion => {
             const values = [suggestion.displayString.toLocaleLowerCase(), suggestion.replacementString.toLocaleLowerCase()];
@@ -97,15 +103,9 @@ export const useInputAutocomplete = (
               return false;
             }
 
-            return (
-              (this.matchStrategy === 'startsWith' &&
-                values.some(value => isNotNullDefined(this.currentWord) && value.startsWith(this.currentWord))) ||
-              (this.matchStrategy === 'contains' && values.some(value => isNotNullDefined(this.currentWord) && value.includes(this.currentWord))) ||
-              (this.matchStrategy === 'fuzzy' &&
-                values.some(value => isNotNullDefined(this.currentWord) && isFuzzySearchable(this.currentWord, value)))
-            );
+            return values.some(matchFunctions[this.matchStrategy]);
           })
-          .filter(suggestion => (filter ? filter(suggestion, this.currentWord) : true))
+          .filter(suggestion => (predicate ? predicate(suggestion, this.currentWord) : true))
           .sort((a, b) => {
             if (isNotNullDefined(a.score) && isNotNullDefined(b.score)) {
               return b.score - a.score;
