@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { IconOrImage } from '../IconOrImage.js';
 import { Menu } from '../Menu/Menu.js';
@@ -41,13 +41,10 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
   });
 
   function handleSelect(proposal: InputAutocompleteProposal) {
-    hideMenu();
+    menuRef.current?.hide();
+
     autocompleteState.replaceCurrentWord(proposal.replacementString);
     onSelect?.(proposal);
-  }
-
-  function hideMenu() {
-    menuRef.current?.hide();
   }
 
   function handleKeyDown(event: any) {
@@ -57,7 +54,7 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
 
     switch (event.key) {
       case 'Escape':
-        hideMenu();
+        menuRef.current?.hide();
         break;
       case 'ArrowDown':
       case 'ArrowUp':
@@ -73,16 +70,16 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
     return () => {
       inputRef.current?.removeEventListener('keydown', handleKeyDown);
     };
-  }, [inputRef.current, menuRef.current]);
+  }, [inputRef.current]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (menuRef.current?.visible && autocompleteState.filteredSuggestions.length === 0) {
       menuRef.current?.hide();
     }
     if (!menuRef.current?.visible && autocompleteState.filteredSuggestions.length) {
       menuRef.current?.show();
     }
-  }, [sourceHints, menuRef, autocompleteState.filteredSuggestions]);
+  }, [menuRef.current, autocompleteState.filteredSuggestions]);
 
   return (
     <Menu
