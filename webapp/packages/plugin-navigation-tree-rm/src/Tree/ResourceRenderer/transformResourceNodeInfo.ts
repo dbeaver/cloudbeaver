@@ -7,7 +7,7 @@
  */
 import type { NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { NAV_NODE_TYPE_RM_RESOURCE } from '@cloudbeaver/core-resource-manager';
+import { isRMResourceNode } from '@cloudbeaver/core-resource-manager';
 import type { IElementsTreeCustomNodeInfo } from '@cloudbeaver/plugin-navigation-tree';
 
 export function transformResourceNodeInfo(
@@ -18,7 +18,7 @@ export function transformResourceNodeInfo(
 ): IElementsTreeCustomNodeInfo {
   return function transformResourceNodeInfo(nodeId, info) {
     const node = navNodeInfoResource.get(nodeId);
-    if (node?.nodeType === NAV_NODE_TYPE_RM_RESOURCE && resourceTypeId) {
+    if (node && isRMResourceNode(node) && resourceTypeId) {
       const project = projectsNavNodeService.getProject(node.id);
 
       if (project) {

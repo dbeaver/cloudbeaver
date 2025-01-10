@@ -12,7 +12,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, ENodeFeature } from '@cloudbeaver/core-navigation-tree';
 import { isResourceOfType, ProjectInfoResource, type ProjectInfoResourceType } from '@cloudbeaver/core-projects';
-import { getRmResourceKey, NAV_NODE_TYPE_RM_FOLDER, NAV_NODE_TYPE_RM_RESOURCE } from '@cloudbeaver/core-resource-manager';
+import { getRmResourceKey, isRMResourceNode, NAV_NODE_TYPE_RM_FOLDER, NAV_NODE_TYPE_RM_RESOURCE } from '@cloudbeaver/core-resource-manager';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
 import { ACTION_DELETE, ACTION_RENAME, ActionService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '@cloudbeaver/plugin-navigation-tree';
@@ -81,7 +81,7 @@ export class NavTreeRMContextMenuService extends Bootstrap {
 
             const save = async (newName: string) => {
               if (key.name !== newName && newName.trim().length) {
-                if (resourceType && node.nodeType === NAV_NODE_TYPE_RM_RESOURCE && !node.folder) {
+                if (resourceType && isRMResourceNode(node) && !node.folder) {
                   newName = this.projectInfoResource.getNameWithExtension(key.projectId, resourceType.id, newName);
                 }
 
