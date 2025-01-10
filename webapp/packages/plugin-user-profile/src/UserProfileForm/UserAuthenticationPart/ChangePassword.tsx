@@ -14,7 +14,6 @@ import {
   ConfirmationDialog,
   Container,
   Form,
-  type FormChangeValues,
   Group,
   GroupTitle,
   InputField,
@@ -31,25 +30,25 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
+import { isValuesEqual } from '@cloudbeaver/core-utils';
 
 import { userProfileContext } from '../../userProfileContext.js';
 import { UserProfileOptionsPanelService } from '../../UserProfileOptionsPanelService.js';
-import type { IUserProfileFormAuthenticationState } from './IUserProfileFormAuthenticationState.js';
-
-const INITIAL_STATE: IUserProfileFormAuthenticationState = {
-  oldPassword: '',
-  password: '',
-  repeatedPassword: '',
-};
 
 export const ChangePassword = observer(function ChangePassword() {
   const translate = useTranslate();
-  const state = useObservableRef(INITIAL_STATE, {
-    oldPassword: observable.ref,
-    password: observable.ref,
-    repeatedPassword: observable.ref,
-  });
+  const state = useObservableRef(
+    {
+      oldPassword: '',
+      password: '',
+      repeatedPassword: '',
+    },
+    {
+      oldPassword: observable.ref,
+      password: observable.ref,
+      repeatedPassword: observable.ref,
+    },
+  );
   const notificationService = useService(NotificationService);
   const userProfileOptionsPanelService = useService(UserProfileOptionsPanelService);
   const userInfoResource = useService(UserInfoResource);
@@ -84,17 +83,13 @@ export const ChangePassword = observer(function ChangePassword() {
     form.ref?.reset();
   }
 
-  function onChange(value: FormChangeValues, name: string | undefined) {
-    state[name as keyof IUserProfileFormAuthenticationState] = value as string;
-  }
-
   useExecutor({
     executor: userProfileOptionsPanelService.onClose,
     handlers: [
       async function closeHandler(_, contexts) {
         const context = contexts.getContext(userProfileContext);
 
-        if (!isObjectsEqual(state, INITIAL_STATE) && !context.force) {
+        if ((state.oldPassword || state.password || state.repeatedPassword) && !context.force) {
           const result = await commonDialogService.open(ConfirmationDialog, {
             title: 'plugin_user_profile_authentication_change_password_cancel_title',
             message: 'plugin_user_profile_authentication_change_password_cancel_message',
@@ -112,7 +107,7 @@ export const ChangePassword = observer(function ChangePassword() {
   return (
     <ColoredContainer wrap overflow gap>
       <Container medium gap>
-        <Form context={form} onChange={onChange}>
+        <Form context={form}>
           <ColoredContainer parent overflow compact vertical noWrap gap>
             <Group overflow box keepSize>
               <ToolsPanel rounded minHeight>
