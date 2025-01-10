@@ -72,9 +72,17 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
     };
   }, [inputRef.current]);
 
+  useEffect(() => {
+    if (menuRef.current?.visible && autocompleteState.filteredSuggestions.length === 0) {
+      menuRef.current?.hide();
+    }
+    if (!menuRef.current?.visible && autocompleteState.filteredSuggestions.length) {
+      menuRef.current?.show();
+    }
+  }, [menuRef.current, autocompleteState.filteredSuggestions]);
+
   return (
     <Menu
-      visible={autocompleteState.filteredSuggestions.length > 0}
       panelAvailable={autocompleteState.filteredSuggestions.length > 0}
       className={s(styles, { menu: true }, className)}
       menuRef={menuRef}
