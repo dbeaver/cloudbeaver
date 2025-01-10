@@ -22,11 +22,10 @@ export interface IDriver {
 
 interface Props {
   driver: IDriver;
-  isAdmin?: boolean;
   onSelect: (driverId: string) => void;
 }
 
-export const Driver = observer<Props>(function Driver({ driver, isAdmin, onSelect }) {
+export const Driver = observer<Props>(function Driver({ driver, onSelect }) {
   const translate = useTranslate();
   const select = useCallback(() => onSelect(driver.id), [driver]);
   const styles = useS(style);
@@ -35,7 +34,7 @@ export const Driver = observer<Props>(function Driver({ driver, isAdmin, onSelec
     <ListItem onClick={select}>
       <ListItemIcon className={s(styles, { icon: true })}>
         <StaticImage icon={driver.icon} className={s(styles, { staticImage: true })} />
-        {!driver.driverInstalled && isAdmin && (
+        {!driver.driverInstalled && (
           <div className={s(styles, { indicator: true })} title={translate('plugin_connection_custom_drivers_driver_not_installed')}>
             <IconOrImage icon="/icons/info_icon_sm.svg" />
           </div>
