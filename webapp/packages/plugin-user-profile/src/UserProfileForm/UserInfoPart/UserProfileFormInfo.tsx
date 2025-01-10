@@ -9,8 +9,7 @@ import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import { UserInfoMetaParametersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { ColoredContainer, Container, Group, GroupTitle, InputField, Loader, useTranslate } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
+import { ColoredContainer, Container, Group, GroupTitle, InputField, Loader, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { IUserProfileFormInfoState } from './IUserProfileFormInfoState.js';
@@ -19,8 +18,8 @@ import { UserProfileFormInfoMetaParameters } from './UserProfileFormInfoMetaPara
 
 export const UserProfileFormInfo: TabContainerPanelComponent = observer(function UserProfileFormInfo({ tabId }) {
   const translate = useTranslate();
-  const userInfoResource = useService(UserInfoResource);
-  const userInfoMetaParametersResource = useService(UserInfoMetaParametersResource);
+  const userInfoResource = useResource(UserProfileFormInfo, UserInfoResource, undefined);
+  const userInfoMetaParametersResource = useResource(UserProfileFormInfo, UserInfoMetaParametersResource, undefined);
   const disabled = userInfoResource.isLoading() || userInfoMetaParametersResource.isLoading();
   const tab = useTab(tabId);
 
