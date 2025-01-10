@@ -30,7 +30,9 @@ import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ACTION_DATASOURCE_TRANSACTION_COMMIT } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT.js';
 import { ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE.js';
+import { ACTION_DATASOURCE_TRANSACTION_GET_LOGS } from './actions/ACTION_DATASOURCE_TRANSACTION_GET_LOGS.js';
 import { ACTION_DATASOURCE_TRANSACTION_ROLLBACK } from './actions/ACTION_DATASOURCE_TRANSACTION_ROLLBACK.js';
+import { TransactionLogsDialog } from './TransactionLogs/TransactionLogsDialog.js';
 import { TransactionManagerSettingsService } from './TransactionManagerSettingsService.js';
 
 @injectable()
@@ -73,12 +75,18 @@ export class TransactionManagerBootstrap extends Bootstrap {
         ACTION_DATASOURCE_TRANSACTION_COMMIT,
         ACTION_DATASOURCE_TRANSACTION_ROLLBACK,
         ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE,
+        ACTION_DATASOURCE_TRANSACTION_GET_LOGS,
       ],
     });
 
     this.actionService.addHandler({
       id: 'commit-mode-base',
-      actions: [ACTION_DATASOURCE_TRANSACTION_COMMIT, ACTION_DATASOURCE_TRANSACTION_ROLLBACK, ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE],
+      actions: [
+        ACTION_DATASOURCE_TRANSACTION_COMMIT,
+        ACTION_DATASOURCE_TRANSACTION_ROLLBACK,
+        ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE,
+        ACTION_DATASOURCE_TRANSACTION_GET_LOGS,
+      ],
       isLabelVisible: (_, action) => action === ACTION_DATASOURCE_TRANSACTION_COMMIT || action === ACTION_DATASOURCE_TRANSACTION_ROLLBACK,
       getActionInfo: (_, action) => {
         const transaction = this.getContextTransaction();
@@ -108,7 +116,11 @@ export class TransactionManagerBootstrap extends Bootstrap {
           return true;
         }
 
-        if (action === ACTION_DATASOURCE_TRANSACTION_COMMIT || action === ACTION_DATASOURCE_TRANSACTION_ROLLBACK) {
+        if (
+          action === ACTION_DATASOURCE_TRANSACTION_COMMIT ||
+          action === ACTION_DATASOURCE_TRANSACTION_ROLLBACK ||
+          action === ACTION_DATASOURCE_TRANSACTION_GET_LOGS
+        ) {
           return transaction.autoCommit === true;
         }
 
@@ -127,13 +139,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
             break;
           }
           case ACTION_DATASOURCE_TRANSACTION_ROLLBACK: {
-            try {
-              const result = await transaction.rollback();
-              this.showTransactionResult(transaction, result);
-            } catch (exception: any) {
-              this.notificationService.logException(exception, 'plugin_datasource_transaction_manager_rollback_fail');
-            }
-
+            await this.rollback(transaction);
             break;
           }
           case ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE:
@@ -145,6 +151,14 @@ export class TransactionManagerBootstrap extends Bootstrap {
             }
 
             break;
+          case ACTION_DATASOURCE_TRANSACTION_GET_LOGS: {
+            await this.commonDialogService.open(TransactionLogsDialog, {
+              transaction,
+              onCommit: () => this.commit(transaction),
+              onRollback: () => this.rollback(transaction),
+            });
+            break;
+          }
         }
       },
     });
@@ -197,6 +211,15 @@ export class TransactionManagerBootstrap extends Bootstrap {
           }
         }
       }
+    }
+  }
+
+  private async rollback(transaction: ConnectionExecutionContext) {
+    try {
+      const result = await transaction.rollback();
+      this.showTransactionResult(transaction, result);
+    } catch (exception: any) {
+      this.notificationService.logException(exception, 'plugin_datasource_transaction_manager_rollback_fail');
     }
   }
 
