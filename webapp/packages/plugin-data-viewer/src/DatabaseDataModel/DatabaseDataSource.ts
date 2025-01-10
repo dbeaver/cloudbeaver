@@ -207,7 +207,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   }
 
   hasRowIdentifier(resultIndex: number): boolean {
-    return !!this.getResult(resultIndex)?.data?.hasRowIdentifier;
+    return this.getResult(resultIndex)?.data?.hasRowIdentifier === false;
   }
 
   isReadonly(resultIndex: number): boolean {
