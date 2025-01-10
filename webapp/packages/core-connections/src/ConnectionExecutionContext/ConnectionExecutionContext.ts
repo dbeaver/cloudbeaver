@@ -164,7 +164,7 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
 
   async getLogs() {
     const result = await this.withContext(async context => {
-      const { logs } = await this.graphQLService.sdk.getTransactionsLogs({
+      const { logs } = await this.graphQLService.sdk.getTransactionLogs({
         projectId: context.projectId,
         connectionId: context.connectionId,
         contextId: context.id,
