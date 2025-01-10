@@ -206,6 +206,10 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return !this.isLoading() && !this.disabled;
   }
 
+  isImportAllowed(resultIndex: number): boolean {
+    return !this.isReadonly(resultIndex);
+  }
+
   isReadonly(resultIndex: number): boolean {
     return this.access === DatabaseDataAccessMode.Readonly || this.results.length > 1 || this.disabled;
   }

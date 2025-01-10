@@ -103,7 +103,7 @@ export class DataImportBootstrap extends Bootstrap {
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
         const isContainer = model.source instanceof ContainerDataSource;
         return (
-          !model.isReadonly(resultIndex) &&
+          model.isImportAllowed(resultIndex) &&
           isContainer &&
           !this.dataImportService.disabled &&
           !presentation?.readonly &&
