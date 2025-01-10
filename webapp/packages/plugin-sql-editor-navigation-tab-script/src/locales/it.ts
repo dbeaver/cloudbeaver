@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 export default [
-  ['plugin_sql_editor_navigation_tab_resource_save_script_title', 'Save as script'],
+  ['plugin_sql_editor_navigation_tab_resource_save_script_title', 'Save as script (Shift + Ctrl + S)'],
   ['plugin_sql_editor_navigation_tab_script_state_renaming', 'Renaming script...'],
   ['plugin_sql_editor_navigation_tab_script_state_reading', 'Reading script...'],
   ['plugin_sql_editor_navigation_tab_script_state_saving', 'Saving script...'],

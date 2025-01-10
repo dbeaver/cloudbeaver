@@ -5,10 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { isConnectionFolder, isProjectNode, type NavNode, NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
-import { type ProjectInfo } from '@cloudbeaver/core-projects';
+import { type NavNode, NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
+import { type ProjectInfo, ProjectsService } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
@@ -26,8 +25,8 @@ type NodeIdGetter = (projectId: string) => string;
 @injectable()
 export class TreeSelectionService {
   constructor(
-    private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
+    private readonly projectsService: ProjectsService,
     private readonly projectsNavNodeService: ProjectsNavNodeService,
   ) {
     this.getSelectedProject = this.getSelectedProject.bind(this);
@@ -35,11 +34,17 @@ export class TreeSelectionService {
   }
 
   // Should preload ProjectInfoResource. Cause the resource used indirectly (TODO make it directly used)
-  getFirstSelectedNode(tree: IElementsTree, nodeIdGetter: NodeIdGetter): ISelectedNode | undefined {
+  getFirstSelectedNode(
+    tree: IElementsTree,
+    nodeIdGetter: NodeIdGetter,
+    projectPredicate: (project: ProjectInfo) => boolean,
+    nodePredicate: (node: NavNode | undefined) => boolean,
+    folderPredicate: (node: NavNode | undefined) => boolean,
+  ): ISelectedNode | undefined {
     const selected = tree.getSelected();
 
     if (selected.length === 0) {
-      const editableProjects = this.connectionsManagerService.createConnectionProjects;
+      const editableProjects = this.projectsService.activeProjects.filter(projectPredicate);
 
       if (editableProjects.length > 0) {
         const project = editableProjects[0]!;
@@ -54,13 +59,13 @@ export class TreeSelectionService {
       return;
     }
 
-    const project = this.getSelectedProject(tree);
+    const project = this.getSelectedProject(tree, nodePredicate);
 
-    if (!project?.canEditDataSources) {
+    if (!project || !projectPredicate(project)) {
       return;
     }
 
-    const selectedFolderNode = this.getParents(tree).slice().reverse().find(isConnectionFolder);
+    const selectedFolderNode = this.getParents(tree).slice().reverse().find(folderPredicate);
 
     return {
       projectId: project.id,
@@ -71,8 +76,8 @@ export class TreeSelectionService {
   }
 
   // Should preload ProjectInfoResource. Cause the resource used indirectly (TODO make it directly used)
-  getSelectedProject(tree: IElementsTree): ProjectInfo | undefined {
-    const projectNode = this.getParents(tree).find(isProjectNode);
+  getSelectedProject(tree: IElementsTree, nodePredicate: (node: NavNode | undefined) => boolean): ProjectInfo | undefined {
+    const projectNode = this.getParents(tree).find(nodePredicate);
 
     if (!projectNode) {
       return;
