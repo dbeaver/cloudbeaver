@@ -253,7 +253,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
                         if (!exec.hasError() && purpose != DBCExecutionPurpose.META && purpose != DBCExecutionPurpose.UTIL) {
                             updateCount++;
                         }
-                        generateLogInfo(logItemInfos, exec, purpose);
+                        generateLogInfo(logItemInfos, exec, purpose, updateCount);
                     }
                 }
             }
@@ -261,15 +261,21 @@ public class WebSQLContextInfo implements WebSessionProvider {
             QMMStatementExecuteInfo execInfo = sessionInfo.getExecutionStack();
             for (QMMStatementExecuteInfo exec = execInfo; exec != null; exec = exec.getPrevious()) {
                 if (exec.getUpdateRowCount() > 0) {
+                    updateCount++;
                     DBCExecutionPurpose purpose = exec.getStatement().getPurpose();
-                    generateLogInfo(logItemInfos, exec, purpose);
+                    generateLogInfo(logItemInfos, exec, purpose, updateCount);
                 }
             }
         }
         return new WebTransactionLogInfo(logItemInfos, updateCount == 0 ? null : updateCount);
     }
 
-    private void generateLogInfo(List<WebTransactionLogItemInfo> logItemInfos, QMMStatementExecuteInfo exec, DBCExecutionPurpose purpose) {
+    private void generateLogInfo(
+        @NotNull List<WebTransactionLogItemInfo> logItemInfos,
+        @NotNull QMMStatementExecuteInfo exec,
+        @NotNull DBCExecutionPurpose purpose,
+        int id
+    ) {
         String type = "SQL / " + purpose.getTitle();
         String dateTime = ISO_DATE_FORMAT.format(Instant.ofEpochMilli(exec.getCloseTime()));
         String result = ModelMessages.controls_querylog_success;
@@ -284,7 +290,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
         }
 
         logItemInfos.add(
-            new WebTransactionLogItemInfo(dateTime, type, exec.getQueryString(),
+            new WebTransactionLogItemInfo(id, dateTime, type, exec.getQueryString(),
                 exec.getDuration(), exec.getUpdateRowCount(), result)
         );
     }

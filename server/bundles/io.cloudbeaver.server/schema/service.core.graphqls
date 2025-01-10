@@ -465,6 +465,7 @@ type TransactionLogInfos {
 }
 
 type TransactionLogInfoItem {
+    id: Int
     time: DateTime!
     type: String!
     queryString: String!

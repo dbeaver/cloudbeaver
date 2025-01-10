@@ -17,8 +17,10 @@
 package io.cloudbeaver.model;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 
 public record WebTransactionLogItemInfo(
+    @Nullable Integer id,
     @NotNull String time,
     @NotNull String type,
     @NotNull String queryString,
