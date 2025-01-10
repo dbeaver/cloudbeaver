@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useEffect, useRef } from 'react';
-import { MenuItem } from 'reakit';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
 import { IconOrImage } from '../IconOrImage.js';
 import { Menu } from '../Menu/Menu.js';
+import { MenuItem } from '../Menu/MenuItem.js';
 import type { IMenuState } from '../Menu/MenuStateContext.js';
 import { s } from '../s.js';
 import { Text } from '../Text.js';
@@ -59,6 +59,10 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
       case 'Escape':
         hideMenu();
         break;
+      case 'ArrowDown':
+      case 'ArrowUp':
+        menuRef.current?.first();
+        break;
       default:
         break;
     }
@@ -71,17 +75,18 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
     };
   }, [inputRef.current, menuRef.current]);
 
-  useEffect(() => {
-    if (menuRef.current?.visible && (autocompleteState.filteredSuggestions === null || autocompleteState.filteredSuggestions.length === 0)) {
+  useLayoutEffect(() => {
+    if (menuRef.current?.visible && autocompleteState.filteredSuggestions.length === 0) {
       menuRef.current?.hide();
     }
-    if (!menuRef.current?.visible && autocompleteState.filteredSuggestions !== null && autocompleteState.filteredSuggestions.length !== 0) {
+    if (!menuRef.current?.visible && autocompleteState.filteredSuggestions.length) {
       menuRef.current?.show();
     }
   }, [sourceHints, menuRef, autocompleteState.filteredSuggestions]);
 
   return (
     <Menu
+      panelAvailable={autocompleteState.filteredSuggestions.length > 0}
       className={s(styles, { menu: true }, className)}
       menuRef={menuRef}
       label="Autocompletion"
