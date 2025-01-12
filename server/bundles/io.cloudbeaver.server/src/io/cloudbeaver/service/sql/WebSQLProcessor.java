@@ -450,8 +450,10 @@ public class WebSQLProcessor implements WebSessionProvider {
         int count = QMUtils.getTransactionState(getExecutionContext()).getUpdateCount();
         webSession.addSessionEvent(
             new WSTransactionalCountEvent(
+                contextInfo.getWebSession().getSessionId(),
+                contextInfo.getWebSession().getUserId(),
                 contextInfo.getProjectId(),
-                contextInfo.getConnectionId(),
+                contextInfo.getId(),
                 count
             )
         );
