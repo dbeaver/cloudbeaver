@@ -224,6 +224,24 @@ type DynamicTraceProperty {
 }
 
 ####################################################
+# Transactional info
+####################################################
+type TransactionLogInfoItem {
+    id: Int!
+    time: DateTime!
+    type: String!
+    queryString: String!
+    durationMs: Int!
+    rows: Int!
+    result: String!
+}
+type TransactionLogInfos {
+    count: Int!
+    transactionLogInfos: [TransactionLogInfoItem!]!
+}
+
+
+####################################################
 # Query and Mutation
 ####################################################
 

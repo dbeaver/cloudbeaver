@@ -21,5 +21,4 @@ import org.jkiss.code.NotNull;
 import java.util.List;
 
 public record WebTransactionLogInfo(@NotNull List<WebTransactionLogItemInfo> transactionLogInfos, int count) {
-
 }

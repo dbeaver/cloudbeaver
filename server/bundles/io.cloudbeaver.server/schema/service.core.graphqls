@@ -458,22 +458,6 @@ type LogEntry {
     stackTrace: String
 }
 
-
-type TransactionLogInfos {
-    count: Int!
-    transactionLogInfos: [TransactionLogInfoItem!]!
-}
-
-type TransactionLogInfoItem {
-    id: Int!
-    time: DateTime!
-    type: String!
-    queryString: String!
-    durationMs: Int!
-    rows: Int!
-    result: String!
-}
-
 ####################################################
 # Input types
 ####################################################

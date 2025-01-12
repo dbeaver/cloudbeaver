@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.WebTransactionLogInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
@@ -27,7 +28,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.trace.DBCTraceProperty;
-import io.cloudbeaver.model.WebTransactionLogInfo;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 
 import java.util.List;

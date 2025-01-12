@@ -272,9 +272,11 @@ public class WebSQLProcessor implements WebSessionProvider {
         } catch (DBException e) {
             throw new DBWebException("Error executing query", e);
         }
-        if (!DBUtils.getTransactionManager(context).isAutoCommit()) {
+        DBCTransactionManager txnManager = DBUtils.getTransactionManager(context);
+        if (txnManager != null && !txnManager.isAutoCommit()) {
             sendTransactionalEvent(contextInfo);
         }
+
         executeInfo.setDuration(System.currentTimeMillis() - startTime);
         if (executeInfo.getResults().length == 0) {
             executeInfo.setStatusMessage("No Data");
