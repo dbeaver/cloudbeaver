@@ -60,7 +60,7 @@ export const TransactionLogsDialog: DialogComponent<IPayload> = observer(functio
     <CommonDialogWrapper size="large" fixedWidth>
       <CommonDialogHeader title={title} onReject={props.rejectDialog} />
       <CommonDialogBody>
-        <TransactionLogsTable logs={state.logs} />
+        <TransactionLogsTable logs={state.logs ?? []} />
       </CommonDialogBody>
       <CommonDialogFooter>
         <Flex justify="space-between">

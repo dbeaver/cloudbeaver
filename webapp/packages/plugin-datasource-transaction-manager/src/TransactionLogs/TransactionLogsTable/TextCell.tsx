@@ -17,7 +17,7 @@ import { TextDetailsDialog } from './TextDetailsDialog.js';
 
 export const TextCell = observer<RenderCellProps<TransactionLogInfoItem>>(function TextCell(props) {
   const commonDialogService = useService(CommonDialogService);
-  const value = props.row.queryString ?? '';
+  const value = props.row.queryString;
 
   async function openDetails() {
     await commonDialogService.open(TextDetailsDialog, {

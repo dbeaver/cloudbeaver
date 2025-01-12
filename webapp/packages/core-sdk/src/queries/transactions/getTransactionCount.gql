@@ -1,0 +1,5 @@
+mutation getTransactionCount($projectId: ID!, $connectionId: ID!, $contextId: ID!) {
+  info: getTransactionLogInfo(projectId: $projectId, connectionId: $connectionId, contextId: $contextId) {
+    count
+  }
+}
