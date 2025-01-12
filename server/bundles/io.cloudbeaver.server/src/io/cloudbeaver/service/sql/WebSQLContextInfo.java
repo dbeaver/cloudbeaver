@@ -325,6 +325,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
                         processor.getWebSession().getUserId(),
                         getProjectId(),
                         getId(),
+                        getConnectionId(),
                         0
                     )
                 );
@@ -362,6 +363,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
                             processor.getWebSession().getUserId(),
                             getProjectId(),
                             getId(),
+                            getConnectionId(),
                             0
                         )
                     );

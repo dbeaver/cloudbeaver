@@ -222,6 +222,7 @@ type WSTransactionalCountEvent implements CBServerEvent {
     topicId: CBEventTopic
     contextId: String!
     projectId: String!
+    connectionId: String!
     transactionalCount: Int!
 }
 

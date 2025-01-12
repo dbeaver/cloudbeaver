@@ -456,6 +456,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                 contextInfo.getWebSession().getUserId(),
                 contextInfo.getProjectId(),
                 contextInfo.getId(),
+                contextInfo.getConnectionId(),
                 count
             )
         );
