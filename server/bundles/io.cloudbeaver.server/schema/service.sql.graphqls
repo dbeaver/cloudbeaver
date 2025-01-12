@@ -335,7 +335,7 @@ extend type Mutation {
         projectId: ID!,
         connectionId: ID!,
         contextId: ID!
-    ): TransactionLogInfos
+    ): TransactionLogInfos!
 
     # Close results (free resources)
     sqlResultClose(projectId: ID, connectionId: ID!, contextId: ID!, resultId: ID!): Boolean!

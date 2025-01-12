@@ -45,6 +45,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
+import org.jkiss.dbeaver.model.websocket.event.WSTransactionalCountEvent;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -267,7 +268,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
                 }
             }
         }
-        return new WebTransactionLogInfo(logItemInfos, updateCount == 0 ? null : updateCount);
+        return new WebTransactionLogInfo(logItemInfos, updateCount);
     }
 
     private void generateLogInfo(
@@ -318,6 +319,16 @@ public class WebSQLContextInfo implements WebSessionProvider {
                         RuntimeUtils.formatExecutionTime(System.currentTimeMillis() - txnInfo.getTransactionStartTime())
                     );
                 }
+                processor.getWebSession().addSessionEvent(
+                    new WSTransactionalCountEvent(
+                        processor.getWebSession().getSessionId(),
+                        processor.getWebSession().getUserId(),
+                        getProjectId(),
+                        getId(),
+                        0
+                    )
+                );
+
             }
         };
         return getWebSession().createAndRunAsyncTask("Commit transaction", runnable);
@@ -344,6 +355,15 @@ public class WebSQLContextInfo implements WebSessionProvider {
                     """.formatted(
                         txnInfo.getUpdateCount(),
                         RuntimeUtils.formatExecutionTime(System.currentTimeMillis() - txnInfo.getTransactionStartTime())
+                    );
+                    processor.getWebSession().addSessionEvent(
+                        new WSTransactionalCountEvent(
+                            processor.getWebSession().getSessionId(),
+                            processor.getWebSession().getUserId(),
+                            getProjectId(),
+                            getId(),
+                            0
+                        )
                     );
                 }
             }

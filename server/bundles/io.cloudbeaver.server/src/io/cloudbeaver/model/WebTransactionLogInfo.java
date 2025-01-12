@@ -17,12 +17,9 @@
 package io.cloudbeaver.model;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 
 import java.util.List;
 
-public record WebTransactionLogInfo(@NotNull List<WebTransactionLogItemInfo> transactionLogInfos, @Nullable
-
-Integer count) {
+public record WebTransactionLogInfo(@NotNull List<WebTransactionLogItemInfo> transactionLogInfos, int count) {
 
 }
