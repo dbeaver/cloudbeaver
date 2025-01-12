@@ -66,7 +66,7 @@ enum CBEventTopic {
     cb_datasource_connection,
     cb_delete_temp_folder,
 
-    cb_transaction_count @since(version: "24.3.3")
+    cb_transaction @since(version: "24.3.3")
 }
 
 # Base server event interface
