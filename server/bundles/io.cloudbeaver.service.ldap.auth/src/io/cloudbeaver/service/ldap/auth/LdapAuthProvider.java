@@ -40,7 +40,10 @@ import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.UUID;
 
 public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected, SMAuthProviderAssigner {
     private static final Log log = Log.getLog(LdapAuthProvider.class);
@@ -397,7 +400,9 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
             NamingEnumeration<SearchResult> results = context.search(ldapSettings.getBaseDN(), searchFilter, searchControls);
-            if (results.hasMore()) return results.next().getName();
+            if (results.hasMore()) {
+                return results.next().getName();
+            }
         } catch (Exception e) {
             log.error("Group not found", e);
         }
