@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@
 package io.cloudbeaver.service.ldap.auth;
 
 import io.cloudbeaver.DBWUserIdentity;
+import io.cloudbeaver.auth.SMAuthProviderAssigner;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
+import io.cloudbeaver.auth.SMAutoAssign;
 import io.cloudbeaver.auth.SMBruteForceProtected;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
 import io.cloudbeaver.model.session.WebSession;
@@ -38,12 +40,9 @@ import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected {
+public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected, SMAuthProviderAssigner {
     private static final Log log = Log.getLog(LdapAuthProvider.class);
 
     public LdapAuthProvider() {
@@ -349,4 +348,64 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         }
     }
 
+    @NotNull
+    @Override
+    public SMAutoAssign detectAutoAssignments(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull SMAuthProviderCustomConfiguration providerConfig,
+        @NotNull Map<String, Object> authParameters
+    ) throws DBException {
+        String userName = JSONUtils.getString(authParameters, LdapConstants.CRED_USERNAME);
+        if (CommonUtils.isEmpty(userName)) {
+            throw new DBException("LDAP user name is empty");
+        }
+
+        LdapSettings ldapSettings = new LdapSettings(providerConfig);
+        String userDN = getUserDN(ldapSettings, JSONUtils.getString(authParameters, LdapConstants.CRED_DISPLAY_NAME));
+        if (userDN == null) {
+            return new SMAutoAssign();
+        }
+
+        SMAutoAssign smAutoAssign = new SMAutoAssign();
+        smAutoAssign.addExternalTeamId(userDN);
+
+        String groupDN = getGroupForMember(userDN, ldapSettings);
+        if (groupDN != null) {
+            smAutoAssign.addExternalTeamId(groupDN);
+        }
+
+        return smAutoAssign;
+    }
+
+    private String getUserDN(LdapSettings ldapSettings, String displayName) {
+        DirContext context;
+        try {
+            context = new InitialDirContext(creteAuthEnvironment(ldapSettings));
+            return findUserDN(context, ldapSettings, displayName);
+        } catch (Exception e) {
+            log.error("User not found", e);
+            return null;
+        }
+    }
+
+    private String getGroupForMember(String fullDN, LdapSettings ldapSettings) {
+        DirContext context;
+        try {
+            context = new InitialDirContext(creteAuthEnvironment(ldapSettings));
+            String searchFilter = "(member=" + fullDN + ")";
+            SearchControls searchControls = new SearchControls();
+            searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+
+            NamingEnumeration<SearchResult> results = context.search(ldapSettings.getBaseDN(), searchFilter, searchControls);
+            if (results.hasMore()) return results.next().getName();
+        } catch (Exception e) {
+            log.error("Group not found", e);
+        }
+        return null;
+    }
+
+    @Override
+    public String getExternalTeamIdMetadataFieldName() {
+        return LdapConstants.LDAP_META_GROUP_NAME;
+    }
 }
