@@ -10,15 +10,29 @@
   composes: theme-ripple from global;
   cursor: pointer;
   padding: 0 12px;
+  position: relative;
+
+  &:after {
+    position: absolute;
+    background: #236ea0 !important;
+    height: 32px;
+    width: 1px;
+    top: 8px;
+    right: -1px;
+    opacity: 1 !important;
+    content: '';
+  }
+
+  &:hover {
+    background: #338ecc;
+  }
 }
 
 .count {
-  border: 2px solid var(--theme-on-primary);
+  border: 1px solid var(--theme-on-primary);
   border-radius: var(--theme-form-element-radius);
   height: 26px;
   width: 50px;
-  box-sizing: border-box;
-  padding: 4px 7px;
   display: flex;
   align-items: center;
   justify-content: center;

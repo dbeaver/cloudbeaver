@@ -68,7 +68,7 @@ export const TransactionLogsDialog: DialogComponent<IPayload> = observer(functio
             {translate('ui_cancel')}
           </Button>
           <Container gap dense noWrap keepSize>
-            <Button mod={['unelevated']} onClick={handleRollback}>
+            <Button mod={['outlined']} onClick={handleRollback}>
               {translate('plugin_datasource_transaction_manager_rollback')}
             </Button>
             <Button mod={['unelevated']} onClick={handleCommit}>
