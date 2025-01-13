@@ -7,7 +7,6 @@
  */
 
 .container {
-  composes: theme-ripple from global;
   cursor: pointer;
   padding: 0 12px;
   position: relative;

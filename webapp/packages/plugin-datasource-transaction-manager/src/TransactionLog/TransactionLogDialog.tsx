@@ -22,8 +22,8 @@ import {
 import { type ConnectionExecutionContext, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
-import { TransactionLogsTable } from './TransactionLogsTable/TransactionLogsTable.js';
-import { useTransactionLogs } from './useTransactionLogs.js';
+import { TransactionLogTable } from './TransactionLogTable/TransactionLogTable.js';
+import { useTransactionLog } from './useTransactionLog.js';
 
 interface IPayload {
   transaction: ConnectionExecutionContext;
@@ -31,20 +31,20 @@ interface IPayload {
   onRollback: () => void;
 }
 
-export const TransactionLogsDialog: DialogComponent<IPayload> = observer(function TransactionLogsDialog(props) {
+export const TransactionLogDialog: DialogComponent<IPayload> = observer(function TransactionLogDialog(props) {
   const translate = useTranslate();
   const context = props.payload.transaction.context;
   const connectionParam = context ? createConnectionParam(context.projectId, context.connectionId) : null;
 
-  const state = useTransactionLogs(props.payload);
-  const connectionInfoResource = useResource(useTransactionLogs, ConnectionInfoResource, connectionParam);
+  const state = useTransactionLog(props.payload);
+  const connectionInfoResource = useResource(useTransactionLog, ConnectionInfoResource, connectionParam);
   let title: string = translate('plugin_datasource_transaction_manager_logs');
 
   if (connectionInfoResource.data?.name) {
     title = `${title} (${connectionInfoResource.data.name})`;
   }
 
-  useAutoLoad(TransactionLogsDialog, state);
+  useAutoLoad(TransactionLogDialog, state);
 
   function handleRollback() {
     props.payload.onRollback();
@@ -60,7 +60,7 @@ export const TransactionLogsDialog: DialogComponent<IPayload> = observer(functio
     <CommonDialogWrapper size="large" fixedWidth>
       <CommonDialogHeader title={title} onReject={props.rejectDialog} />
       <CommonDialogBody>
-        <TransactionLogsTable logs={state.logs ?? []} />
+        <TransactionLogTable log={state.log ?? []} />
       </CommonDialogBody>
       <CommonDialogFooter>
         <Flex justify="space-between">

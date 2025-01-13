@@ -14,18 +14,18 @@ import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { isObjectsEqual, schemaValidationError } from '@cloudbeaver/core-utils';
 
 import { createTransactionInfoParam, type ITransactionInfoParam, TRANSACTION_INFO_PARAM_SCHEMA } from './TRANSACTION_INFO_PARAM_SCHEMA.js';
-import { type IWsTransactionCountEvent, TransactionLogsCountEventHandler } from './TransactionLogsCountEventHandler.js';
+import { type IWsTransactionCountEvent, TransactionLogCountEventHandler } from './TransactionLogCountEventHandler.js';
 
 @injectable()
-export class TransactionLogsCountResource extends CachedMapResource<ITransactionInfoParam, number> {
+export class TransactionLogCountResource extends CachedMapResource<ITransactionInfoParam, number> {
   constructor(
     private readonly graphQLService: GraphQLService,
-    transactionLogsCountEventHandler: TransactionLogsCountEventHandler,
+    transactionLogCountEventHandler: TransactionLogCountEventHandler,
   ) {
     super();
 
-    transactionLogsCountEventHandler.onEvent<IWsTransactionCountEvent>(
-      ServerEventId.CbTransactionalCount,
+    transactionLogCountEventHandler.onEvent<IWsTransactionCountEvent>(
+      ServerEventId.CbTransactionCount,
       async data => {
         const key = createTransactionInfoParam(data.connectionId, data.projectId, data.contextId);
         this.set(key, data.transactionalCount);

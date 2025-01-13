@@ -12,11 +12,12 @@ import type { TransactionLogInfoItem } from '@cloudbeaver/core-sdk';
 import { type Column, DataGrid } from '@cloudbeaver/plugin-data-grid';
 
 import { HeaderCell } from './HeaderCell.js';
-import { TextCell } from './TextCell.js';
-import classes from './TransactionLogsTable.module.css';
+import { QueryCell } from './QueryCell.js';
+import { TimeCell } from './TimeCell.js';
+import classes from './TransactionLogTable.module.css';
 
 interface Props {
-  logs: TransactionLogInfoItem[];
+  log: TransactionLogInfoItem[];
 }
 
 const COLUMNS: Column<TransactionLogInfoItem>[] = [
@@ -24,7 +25,7 @@ const COLUMNS: Column<TransactionLogInfoItem>[] = [
     key: 'time',
     name: 'plugin_datasource_transaction_manager_logs_table_column_time',
     resizable: true,
-    renderCell: props => <div>{props.row.time}</div>,
+    renderCell: props => <TimeCell {...props} />,
     renderHeaderCell: props => <HeaderCell {...props} />,
   },
   {
@@ -38,7 +39,7 @@ const COLUMNS: Column<TransactionLogInfoItem>[] = [
     key: 'text',
     name: 'plugin_datasource_transaction_manager_logs_table_column_text',
     resizable: true,
-    renderCell: props => <TextCell {...props} />,
+    renderCell: props => <QueryCell {...props} />,
     renderHeaderCell: props => <HeaderCell {...props} />,
   },
   {
@@ -64,12 +65,12 @@ const COLUMNS: Column<TransactionLogInfoItem>[] = [
   },
 ];
 
-export const TransactionLogsTable = observer<Props>(function TransactionLogsTable(props) {
+export const TransactionLogTable = observer<Props>(function TransactionLogTable(props) {
   const styles = useS(classes);
 
   return (
     <div className={s(styles, { container: true })}>
-      <DataGrid rows={props.logs} rowKeyGetter={row => row.id} columns={COLUMNS} rowHeight={30} />
+      <DataGrid rows={props.log} rowKeyGetter={row => row.id} columns={COLUMNS} rowHeight={30} />
     </div>
   );
 });

@@ -17,20 +17,20 @@ interface Payload {
 }
 
 interface State extends ILoadableState {
-  logs: TransactionLogInfoItem[] | null;
+  log: TransactionLogInfoItem[] | null;
   exception: Error | null;
   promise: Promise<TransactionLogInfoItem[]> | null;
   payload: Payload;
 }
 
-export function useTransactionLogs(payload: Payload) {
+export function useTransactionLog(payload: Payload) {
   const state = useObservableRef<State>(
     () => ({
-      logs: null,
+      log: null,
       exception: null,
       promise: null,
       isLoaded() {
-        return this.logs !== null;
+        return this.log !== null;
       },
       isError() {
         return this.exception !== null;
@@ -42,12 +42,9 @@ export function useTransactionLogs(payload: Payload) {
         try {
           this.exception = null;
 
-          this.promise = payload.transaction.getLogs();
-          const logs = await this.promise;
-
-          if (logs) {
-            this.logs = logs;
-          }
+          this.promise = payload.transaction.getLog();
+          const log = await this.promise;
+          this.log = log;
         } catch (exception: any) {
           this.exception = exception;
         } finally {
@@ -55,7 +52,7 @@ export function useTransactionLogs(payload: Payload) {
         }
       },
     }),
-    { logs: observable.ref, promise: observable.ref, exception: observable.ref },
+    { log: observable.ref, promise: observable.ref, exception: observable.ref },
     { payload },
   );
 

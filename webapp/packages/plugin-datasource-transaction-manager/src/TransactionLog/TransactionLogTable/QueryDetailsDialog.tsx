@@ -16,7 +16,7 @@ interface IPayload {
   text: string;
 }
 
-export const TextDetailsDialog: DialogComponent<IPayload> = observer(function TextDetailsDialog(props) {
+export const QueryDetailsDialog: DialogComponent<IPayload> = observer(function QueryDetailsDialog(props) {
   const translate = useTranslate();
   const sqlDialect = useSqlDialectExtension(undefined);
   const extensions = useCodemirrorExtensions();

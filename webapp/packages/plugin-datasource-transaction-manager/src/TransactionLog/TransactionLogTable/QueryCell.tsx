@@ -12,15 +12,15 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import type { TransactionLogInfoItem } from '@cloudbeaver/core-sdk';
 import { type RenderCellProps } from '@cloudbeaver/plugin-data-grid';
 
-import classes from './TextCell.module.css';
-import { TextDetailsDialog } from './TextDetailsDialog.js';
+import classes from './QueryCell.module.css';
+import { QueryDetailsDialog } from './QueryDetailsDialog.js';
 
-export const TextCell = observer<RenderCellProps<TransactionLogInfoItem>>(function TextCell(props) {
+export const QueryCell = observer<RenderCellProps<TransactionLogInfoItem>>(function QueryCell(props) {
   const commonDialogService = useService(CommonDialogService);
   const value = props.row.queryString;
 
   async function openDetails() {
-    await commonDialogService.open(TextDetailsDialog, {
+    await commonDialogService.open(QueryDetailsDialog, {
       text: value,
     });
   }

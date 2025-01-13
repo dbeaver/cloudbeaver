@@ -31,10 +31,10 @@ import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 import { ACTION_DATASOURCE_TRANSACTION_COMMIT } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT.js';
 import { ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE.js';
 import { ACTION_DATASOURCE_TRANSACTION_ROLLBACK } from './actions/ACTION_DATASOURCE_TRANSACTION_ROLLBACK.js';
-import { createTransactionInfoParam } from './TransactionLogs/TRANSACTION_INFO_PARAM_SCHEMA.js';
-import { TransactionInfoAction } from './TransactionLogs/TransactionInfoAction.js';
-import { TransactionLogsCountResource } from './TransactionLogs/TransactionLogsCountResource.js';
-import { TransactionLogsDialog } from './TransactionLogs/TransactionLogsDialog.js';
+import { createTransactionInfoParam } from './TransactionLog/TRANSACTION_INFO_PARAM_SCHEMA.js';
+import { TransactionInfoAction } from './TransactionLog/TransactionInfoAction.js';
+import { TransactionLogCountResource } from './TransactionLog/TransactionLogCountResource.js';
+import { TransactionLogDialog } from './TransactionLog/TransactionLogDialog.js';
 import { TransactionManagerSettingsService } from './TransactionManagerSettingsService.js';
 
 @injectable()
@@ -52,7 +52,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly localizationService: LocalizationService,
     private readonly transactionManagerSettingsService: TransactionManagerSettingsService,
-    private readonly transactionLogsCountResource: TransactionLogsCountResource,
+    private readonly transactionLogCountResource: TransactionLogCountResource,
   ) {
     super();
   }
@@ -92,7 +92,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
               },
               {
                 onSelect: async () => {
-                  await this.commonDialogService.open(TransactionLogsDialog, {
+                  await this.commonDialogService.open(TransactionLogDialog, {
                     transaction,
                     onCommit: () => this.commit(transaction),
                     onRollback: () => this.rollback(transaction),
@@ -169,7 +169,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
               const context = transaction.context;
 
               if (transaction.autoCommit === true && context) {
-                this.transactionLogsCountResource.markOutdated(createTransactionInfoParam(context.connectionId, context.projectId, context.id));
+                this.transactionLogCountResource.markOutdated(createTransactionInfoParam(context.connectionId, context.projectId, context.id));
               }
             } catch (exception: any) {
               this.notificationService.logException(exception, 'plugin_datasource_transaction_manager_commit_mode_fail');

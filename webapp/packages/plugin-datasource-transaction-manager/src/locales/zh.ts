@@ -15,10 +15,11 @@ export default [
   ['plugin_datasource_transaction_manager_commit_mode_fail', '切换提交方式失败'],
   ['plugin_datasource_transaction_manager_commit_confirmation_message', '是否提交更改?'],
 
-  ['plugin_datasource_transaction_manager_logs', 'Transaction logs'],
+  ['plugin_datasource_transaction_manager_logs', 'Transaction log'],
+  ['plugin_datasource_transaction_manager_logs_tooltip', 'Open transaction log'],
   ['plugin_datasource_transaction_manager_logs_table_column_time', 'Time'],
   ['plugin_datasource_transaction_manager_logs_table_column_type', 'Type'],
-  ['plugin_datasource_transaction_manager_logs_table_column_text', 'Text'],
+  ['plugin_datasource_transaction_manager_logs_table_column_text', 'Query'],
   ['plugin_datasource_transaction_manager_logs_table_column_duration', 'Duration (ms)'],
   ['plugin_datasource_transaction_manager_logs_table_column_duration', 'Rows'],
   ['plugin_datasource_transaction_manager_logs_table_column_duration', 'Result'],
