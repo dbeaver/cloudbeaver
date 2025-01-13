@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.test.WebGQLClient;
@@ -30,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class AuthenticationTest {
+public class AuthenticationTest extends CloudbeaverMockTest {
     private static final String GQL_OPEN_SESSION = """
         mutation openSession($defaultLocale: String) {
           result: openSession(defaultLocale: $defaultLocale) {

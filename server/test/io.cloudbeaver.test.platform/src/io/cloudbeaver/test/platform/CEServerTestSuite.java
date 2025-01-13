@@ -17,6 +17,7 @@
 
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.rm.RMNIOTest;
 import io.cloudbeaver.model.rm.lock.RMLockTest;
@@ -46,7 +47,7 @@ import java.util.Map;
         RMNIOTest.class
     }
 )
-public class CEServerTestSuite {
+public class CEServerTestSuite extends CloudbeaverMockTest {
 
     private static final String GQL_API_URL = "http://localhost:18978/api/gql";
     private static final String SERVER_STATUS_URL = "http://localhost:18978/status";

@@ -17,6 +17,7 @@
 
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.test.WebGQLClient;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -30,7 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ConnectionsTest {
+public class ConnectionsTest extends CloudbeaverMockTest {
     private static final String GQL_CONNECTIONS_GET = """
         query userConnections {
           result: userConnections {

@@ -17,6 +17,7 @@
 
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.test.WebGQLClient;
@@ -32,7 +33,7 @@ import org.junit.Test;
 import java.nio.file.Path;
 import java.util.Map;
 
-public class ResourceManagerTest {
+public class ResourceManagerTest extends CloudbeaverMockTest {
 
     private static WebGQLClient client;
     private static final String GQL_RESOURCES_CREATE = """
