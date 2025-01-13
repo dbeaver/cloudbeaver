@@ -105,8 +105,7 @@ export class TableFooterMenuService {
 
             // we can't edit table cells if table doesn't have row identifier, but we can edit new created rows before insert (CB-6063)
             const canEdit =
-              model.hasRowIdentifier(resultIndex) ||
-              (!model.hasRowIdentifier(resultIndex) && selectedElements.every(key => editor?.getElementState(key) === DatabaseEditChangeType.add));
+              model.hasElementIdentifier(resultIndex) || selectedElements.every(key => editor?.getElementState(key) === DatabaseEditChangeType.add);
 
             if (!editor || !canEdit) {
               return true;

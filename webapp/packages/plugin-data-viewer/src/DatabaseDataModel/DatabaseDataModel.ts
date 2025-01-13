@@ -59,8 +59,8 @@ export class DatabaseDataModel<TSource extends IDatabaseDataSource<any, any> = I
     return this.source.isReadonly(resultIndex);
   }
 
-  hasRowIdentifier(resultIndex: number): boolean {
-    return this.source.hasRowIdentifier(resultIndex);
+  hasElementIdentifier(resultIndex: number): boolean {
+    return this.source.hasElementIdentifier(resultIndex);
   }
 
   isDataAvailable(offset: number, count: number): boolean {

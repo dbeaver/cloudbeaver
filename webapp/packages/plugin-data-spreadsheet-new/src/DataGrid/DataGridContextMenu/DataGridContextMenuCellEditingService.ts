@@ -86,9 +86,8 @@ export class DataGridContextMenuCellEditingService {
         const isComplex = format.isBinary(key) || format.isGeometry(key);
         const isTruncated = content.isTextTruncated(key);
         const selectedElements = select?.getSelectedElements() || [];
-        const hasRowIdentifier = model.hasRowIdentifier(resultIndex);
         // we can't edit table cells if table doesn't have row identifier, but we can edit new created rows before insert (CB-6063)
-        const canEdit = hasRowIdentifier || (!hasRowIdentifier && editor.getElementState(key) === DatabaseEditChangeType.add);
+        const canEdit = model.hasElementIdentifier(resultIndex) || editor.getElementState(key) === DatabaseEditChangeType.add;
 
         if (action === ACTION_EDIT) {
           if (!column || cellValue === undefined || format.isReadOnly(key) || isComplex || isTruncated || !canEdit) {

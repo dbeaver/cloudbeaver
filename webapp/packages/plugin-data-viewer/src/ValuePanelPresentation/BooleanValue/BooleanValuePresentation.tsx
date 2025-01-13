@@ -53,7 +53,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
   const nullable = column?.required === false;
   const readonly =
     model.isReadonly(resultIndex) ||
-    !model.hasRowIdentifier(resultIndex) ||
+    !model.hasElementIdentifier(resultIndex) ||
     model.isDisabled(resultIndex) ||
     formatAction.isReadOnly(firstSelectedCell);
 

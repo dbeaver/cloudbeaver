@@ -31,6 +31,6 @@ export function isTextValueReadonly({ contentAction, formatAction, model, result
     contentAction.isTextTruncated(cell) ||
     model.isReadonly(resultIndex) ||
     model.isDisabled(resultIndex) ||
-    !model.hasRowIdentifier(resultIndex)
+    !model.hasElementIdentifier(resultIndex)
   );
 }
