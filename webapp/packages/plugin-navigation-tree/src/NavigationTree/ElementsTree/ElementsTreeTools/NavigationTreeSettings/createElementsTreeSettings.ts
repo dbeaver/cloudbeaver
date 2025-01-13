@@ -17,6 +17,7 @@ export function createElementsTreeSettings(defaults?: Partial<IElementsTreeSetti
     showFolderExplorerPath: true,
     configurable: true,
     projects: true,
+    objectsDescription: true,
     ...defaults,
   };
 }
@@ -31,6 +32,7 @@ export function validateElementsTreeSettings(data: any): boolean {
     typeof data.foldersTree === 'boolean' &&
     typeof data.showFolderExplorerPath === 'boolean' &&
     typeof data.configurable === 'boolean' &&
-    typeof data.projects === 'boolean'
+    typeof data.projects === 'boolean' &&
+    typeof data.objectsDescription === 'boolean'
   );
 }

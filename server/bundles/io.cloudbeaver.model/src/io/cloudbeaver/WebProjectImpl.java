@@ -90,6 +90,7 @@ public abstract class WebProjectImpl extends BaseWebProjectImpl {
         );
     }
 
+    @NotNull
     protected DataSourceRegistry<?> createRMRegistry() {
         return new DataSourceRegistryRM<>(this, getResourceController(), preferenceStore);
     }

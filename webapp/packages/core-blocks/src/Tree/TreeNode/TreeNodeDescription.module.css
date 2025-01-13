@@ -5,10 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-export interface INavTreeNodeInfo {
-  name: string;
-  description?: string;
-  tooltip?: string;
-  icon?: string;
+.description {
+  composes: theme-typography--caption from global;
+  color: var(--theme-text-hint-on-light);
 }
