@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapResource } from '@cloudbeaver/core-resource';
 import { ServerEventId } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
-import { isObjectsEqual, schemaValidationError } from '@cloudbeaver/core-utils';
+import { schemaValidationError } from '@cloudbeaver/core-utils';
 
 import { createTransactionInfoParam, type ITransactionInfoParam, TRANSACTION_INFO_PARAM_SCHEMA } from './TRANSACTION_INFO_PARAM_SCHEMA.js';
 import { type IWsTransactionCountEvent, TransactionLogCountEventHandler } from './TransactionLogCountEventHandler.js';
