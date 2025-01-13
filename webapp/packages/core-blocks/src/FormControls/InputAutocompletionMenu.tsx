@@ -83,6 +83,8 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
 
   return (
     <Menu
+      contextInputRef={inputRef}
+      visible={autocompleteState.filteredSuggestions.length > 0}
       panelAvailable={autocompleteState.filteredSuggestions.length > 0}
       className={s(styles, { menu: true }, className)}
       menuRef={menuRef}

@@ -22,6 +22,7 @@ import type { IMouseContextMenu } from './useMouseContextMenu.js';
 
 interface IMenuProps extends React.ButtonHTMLAttributes<any> {
   mouseContextMenu?: IMouseContextMenu;
+  contextInputRef?: React.RefObject<HTMLInputElement | HTMLTextAreaElement>;
   label: string;
   items: React.ReactNode | (() => React.ReactNode);
   menuRef?: React.RefObject<IMenuState | undefined>;
@@ -36,6 +37,9 @@ interface IMenuProps extends React.ButtonHTMLAttributes<any> {
   getHasBindings?: () => boolean;
   onVisibleSwitch?: (visible: boolean) => void;
 }
+
+const CONTEXT_INPUT_OFFSET_X = 5;
+const CONTEXT_INPUT_OFFSET_Y = 3;
 
 export const Menu = observer<IMenuProps, HTMLButtonElement>(
   forwardRef(function Menu(
@@ -56,6 +60,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
       submenu,
       rtl,
       className,
+      contextInputRef,
       ...props
     },
     ref,
@@ -95,34 +100,61 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
     }, [menuVisible]);
 
     useLayoutEffect(() => {
-      if (!mouseContextMenu?.position) {
-        return;
-      }
+      if (contextInputRef?.current && menuVisible) {
+        const inputRect = contextInputRef.current.getBoundingClientRect();
+        const caretPosition = contextInputRef.current.selectionStart || 0;
 
-      if (menuVisible) {
-        menu.hide();
-        return;
-      }
+        const span = document.createElement('span');
+        span.style.position = 'absolute';
+        span.style.visibility = 'hidden';
+        span.style.whiteSpace = 'pre';
+        span.textContent = contextInputRef.current.value.substring(0, caretPosition);
 
-      if (innerMenuButtonRef.current) {
+        document.body.appendChild(span);
+        const spanRect = span.getBoundingClientRect();
+        document.body.removeChild(span);
+
         menu.show();
 
-        const boxSize = innerMenuButtonRef.current.getBoundingClientRect();
         setRelativePosition({
-          x: mouseContextMenu.position.x - boxSize.x,
-          y: mouseContextMenu.position.y - boxSize.y,
+          x: spanRect.width + inputRect.x + CONTEXT_INPUT_OFFSET_X,
+          y: spanRect.height + inputRect.y + CONTEXT_INPUT_OFFSET_Y,
         });
+      }
+    }, [contextInputRef, menuVisible]);
 
-        mouseContextMenu.position = null;
+    useLayoutEffect(() => {
+      if (mouseContextMenu?.position) {
+        if (menuVisible) {
+          menu.hide();
+          return;
+        }
+
+        if (innerMenuButtonRef.current) {
+          menu.show();
+
+          const boxSize = innerMenuButtonRef.current.getBoundingClientRect();
+          setRelativePosition({
+            x: mouseContextMenu.position.x - boxSize.x,
+            y: mouseContextMenu.position.y - boxSize.y,
+          });
+
+          mouseContextMenu.position = null;
+        }
       }
     }, [mouseContextMenu?.position, menuVisible]);
 
     useLayoutEffect(() => {
-      if (relativePosition) {
-        if (menuButtonLinkRef.current) {
-          menuButtonLinkRef.current.style.left = `${relativePosition.x}px`;
-          menuButtonLinkRef.current.style.top = `${relativePosition.y}px`;
-        }
+      if (relativePosition && menuButtonLinkRef.current && mouseContextMenu) {
+        menuButtonLinkRef.current.style.left = `${relativePosition.x}px`;
+        menuButtonLinkRef.current.style.top = `${relativePosition.y}px`;
+      }
+    });
+
+    useLayoutEffect(() => {
+      if (relativePosition && menuPanelRef.current && contextInputRef?.current) {
+        menuPanelRef.current.style.left = `${relativePosition.x}px`;
+        menuPanelRef.current.style.top = `${relativePosition.y}px`;
       }
     });
 
