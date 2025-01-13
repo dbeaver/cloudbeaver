@@ -42,6 +42,7 @@ export const useInputAutocomplete = (
   });
   const state = useObservableRef(
     () => ({
+      isFound: false,
       input: inputRef.current?.value as string | undefined,
       selectionStart: inputRef.current?.selectionStart ?? null,
       selectionEnd: inputRef.current?.value?.length ?? null,
@@ -66,9 +67,10 @@ export const useInputAutocomplete = (
         this.selectionStart = start + replacement.length;
         this.selectionEnd = start + replacement.length;
 
-        setFuzzySearchValue('');
         input.value = this.input;
         input.focus();
+        this.setFuzzySearchValue('');
+        this.isFound = true;
       },
       get currentWord() {
         const cursorPosition = this.selectionStart;
@@ -91,7 +93,7 @@ export const useInputAutocomplete = (
         );
       },
       get filteredSuggestions() {
-        if (!this.currentWord) {
+        if (!this.currentWord || this.isFound) {
           return [];
         }
 
@@ -102,8 +104,8 @@ export const useInputAutocomplete = (
         }
 
         const matchFunctions: Record<Exclude<InputAutocompleteStrategy, 'fuzzy'>, (value: string) => boolean> = {
-          startsWith: value => value.startsWith(this.currentWord),
-          contains: value => value.includes(this.currentWord),
+          startsWith: value => value.toLocaleLowerCase().startsWith(this.currentWord.toLocaleLowerCase()),
+          contains: value => value.toLocaleLowerCase().includes(this.currentWord.toLocaleLowerCase()),
         };
 
         return this.sourceHints
@@ -123,6 +125,7 @@ export const useInputAutocomplete = (
       input: observable.ref,
       selectionStart: observable.ref,
       selectionEnd: observable.ref,
+      isFound: observable.ref,
       sourceHints: observable.ref,
       matchStrategy: observable.ref,
       inputRef: observable.ref,
@@ -130,7 +133,7 @@ export const useInputAutocomplete = (
       filteredSuggestions: computed,
       replaceCurrentWord: action.bound,
     },
-    { sourceHints, matchStrategy, inputRef, fuzzySetResults },
+    { sourceHints, matchStrategy, inputRef, fuzzySetResults, setFuzzySearchValue },
   );
 
   const handleInput = debounce((event: Event) => {
@@ -140,6 +143,7 @@ export const useInputAutocomplete = (
     state.selectionEnd = target.selectionEnd;
     state.input = target?.value;
     setFuzzySearchValue(state.currentWord);
+    state.isFound = false;
   }, INPUT_DELAY);
 
   useEffect(() => {
@@ -168,7 +172,7 @@ function sortByScore(a: InputAutocompleteProposal, b: InputAutocompleteProposal)
 
 function filterWithoutSameWord(suggestion: InputAutocompleteProposal, currentWord: string) {
   const values = SEARCH_FIELDS.map(field => suggestion[field]).filter(value => isNotNullDefined(value) && typeof value === 'string');
-  const isEqual = values.some(value => value === currentWord?.toLocaleLowerCase());
+  const isEqual = values.some(value => value.toLocaleLowerCase() === currentWord?.toLocaleLowerCase());
 
   if (!currentWord || isEqual) {
     return false;
