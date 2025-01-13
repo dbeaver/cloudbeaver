@@ -1036,7 +1036,7 @@ public class WebServiceCore implements DBWServiceCore {
 
     @NotNull
     private static String throwDriverNotFoundException(@NotNull DBPDataSourceContainer container) throws DBWebException {
-        throw new DBWebException("Driver files for %s are not found. Please, ask administrator to download it."
+        throw new DBWebException("Driver files for %s are not found. Please ask the administrator to download it."
             .formatted(container.getDriver().getName()));
     }
 }
