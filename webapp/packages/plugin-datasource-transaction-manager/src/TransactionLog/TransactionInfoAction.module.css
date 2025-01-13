@@ -13,12 +13,12 @@
 
   &:after {
     position: absolute;
-    background: #236ea0 !important;
+    background: #236ea0;
     height: 32px;
     width: 1px;
     top: 8px;
     right: -1px;
-    opacity: 1 !important;
+    opacity: 1;
     content: '';
   }
 
