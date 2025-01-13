@@ -8,7 +8,7 @@
 import { action, computed, observable } from 'mobx';
 import { type RefObject, useEffect } from 'react';
 
-import { debounce, isFuzzySearchable, isNotNullDefined } from '@cloudbeaver/core-utils';
+import { debounce, isNotNullDefined, useFuzzySearch } from '@cloudbeaver/core-utils';
 
 import { useObservableRef } from '../useObservableRef.js';
 
@@ -29,11 +29,16 @@ export interface InputAutocompleteProposal {
 }
 
 const INPUT_DELAY = 300;
+const SEARCH_FIELDS: Array<keyof InputAutocompleteProposal> = ['displayString', 'replacementString'];
 
 export const useInputAutocomplete = (
   inputRef: RefObject<HTMLInputElement | HTMLTextAreaElement>,
   { sourceHints, matchStrategy = 'startsWith', predicate }: InputAutocompleteOptions,
 ) => {
+  const { setFuzzySearchValue, fuzzySetsResults } = useFuzzySearch({
+    dataSet: sourceHints,
+    keys: SEARCH_FIELDS,
+  });
   const state = useObservableRef(
     () => ({
       input: inputRef.current?.value as string | undefined,
@@ -88,31 +93,28 @@ export const useInputAutocomplete = (
           return [];
         }
 
-        const matchFunctions: Record<InputAutocompleteStrategy, (value: string) => boolean> = {
+        if (this.matchStrategy === 'fuzzy') {
+          return this.fuzzySetsResults.filter(suggestion => (predicate ? predicate(suggestion, this.currentWord) : true)).sort(sortByScore);
+        }
+
+        const matchFunctions: Record<Exclude<InputAutocompleteStrategy, 'fuzzy'>, (value: string) => boolean> = {
           startsWith: value => value.startsWith(this.currentWord),
           contains: value => value.includes(this.currentWord),
-          fuzzy: value => isFuzzySearchable(this.currentWord, value),
         };
 
         return this.sourceHints
           .filter(suggestion => {
-            const values = [suggestion.displayString.toLocaleLowerCase(), suggestion.replacementString.toLocaleLowerCase()];
+            const values = SEARCH_FIELDS.map(field => suggestion[field]).filter(value => isNotNullDefined(value) && typeof value === 'string');
             const isEqual = values.some(value => value === this.currentWord?.toLocaleLowerCase());
 
             if (!this.currentWord || isEqual) {
               return false;
             }
 
-            return values.some(matchFunctions[this.matchStrategy]);
+            return values.some(matchFunctions[this.matchStrategy as Exclude<InputAutocompleteStrategy, 'fuzzy'>]);
           })
           .filter(suggestion => (predicate ? predicate(suggestion, this.currentWord) : true))
-          .sort((a, b) => {
-            if (isNotNullDefined(a.score) && isNotNullDefined(b.score)) {
-              return b.score - a.score;
-            }
-
-            return 0;
-          });
+          .sort(sortByScore);
       },
     }),
     {
@@ -126,7 +128,7 @@ export const useInputAutocomplete = (
       filteredSuggestions: computed,
       replaceCurrentWord: action.bound,
     },
-    { sourceHints, matchStrategy, inputRef },
+    { sourceHints, matchStrategy, inputRef, fuzzySetsResults },
   );
 
   const handleInput = debounce((event: Event) => {
@@ -135,6 +137,7 @@ export const useInputAutocomplete = (
     state.selectionStart = target.selectionStart;
     state.selectionEnd = target.selectionEnd;
     state.input = target?.value;
+    setFuzzySearchValue(target.value);
   }, INPUT_DELAY);
 
   useEffect(() => {
@@ -152,3 +155,11 @@ export const useInputAutocomplete = (
 
   return state;
 };
+
+function sortByScore(a: InputAutocompleteProposal, b: InputAutocompleteProposal) {
+  if (isNotNullDefined(a.score) && isNotNullDefined(b.score)) {
+    return b.score - a.score;
+  }
+
+  return 0;
+}
