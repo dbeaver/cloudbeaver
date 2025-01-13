@@ -255,3 +255,4 @@ export * from './FormControls/TagsComboboxLoader.js';
 export * from './Flex/Flex.js';
 export * from './FormControls/useInputAutocomplete.js';
 export * from './FormControls/InputAutocompletionMenu.js';
+export * from './useFuzzySearch.js';
