@@ -24,4 +24,9 @@ export default [
   ['plugin_user_profile_authentication_change_password_submit_label', 'Change'],
   ['plugin_user_profile_authentication_change_password_passwords_not_match', "Passwords don't match"],
   ['plugin_user_profile_authentication_change_password_password_validation_error', 'Password validation failed'],
+  ['plugin_user_profile_authentication_change_password_cancel_title', 'Cancel password change'],
+  [
+    'plugin_user_profile_authentication_change_password_cancel_message',
+    "You're going to cancel password changes. Unsaved changes will be lost. Are you sure?",
+  ],
 ];
