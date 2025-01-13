@@ -31,7 +31,7 @@ const COLUMNS: Column<TransactionLogInfoItem>[] = [
     key: 'type',
     name: 'plugin_datasource_transaction_manager_logs_table_column_type',
     resizable: true,
-    renderCell: props => <div>{props.row.type ?? ''}</div>,
+    renderCell: props => <div>{props.row.type}</div>,
     renderHeaderCell: props => <HeaderCell {...props} />,
   },
   {
@@ -45,21 +45,21 @@ const COLUMNS: Column<TransactionLogInfoItem>[] = [
     key: 'duration',
     name: 'plugin_datasource_transaction_manager_logs_table_column_duration',
     resizable: true,
-    renderCell: props => <div>{props.row.durationMs ?? ''}</div>,
+    renderCell: props => <div>{props.row.durationMs}</div>,
     renderHeaderCell: props => <HeaderCell {...props} />,
   },
   {
     key: 'rows',
     name: 'plugin_datasource_transaction_manager_logs_table_column_rows',
     resizable: true,
-    renderCell: props => <div>{props.row.rows ?? ''}</div>,
+    renderCell: props => <div>{props.row.rows}</div>,
     renderHeaderCell: props => <HeaderCell {...props} />,
   },
   {
     key: 'result',
     name: 'plugin_datasource_transaction_manager_logs_table_column_result',
     resizable: true,
-    renderCell: props => <div>{props.row.result ?? ''}</div>,
+    renderCell: props => <div>{props.row.result}</div>,
     renderHeaderCell: props => <HeaderCell {...props} />,
   },
 ];
@@ -69,7 +69,7 @@ export const TransactionLogsTable = observer<Props>(function TransactionLogsTabl
 
   return (
     <div className={s(styles, { container: true })}>
-      <DataGrid rows={props.logs} rowKeyGetter={row => row.time} columns={COLUMNS} rowHeight={30} />
+      <DataGrid rows={props.logs} rowKeyGetter={row => row.id} columns={COLUMNS} rowHeight={30} />
     </div>
   );
 });

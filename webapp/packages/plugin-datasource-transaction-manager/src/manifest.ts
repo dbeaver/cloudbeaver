@@ -16,5 +16,8 @@ export const datasourceTransactionManagerPlugin: PluginManifest = {
     () => import('./TransactionManagerBootstrap.js').then(m => m.TransactionManagerBootstrap),
     () => import('./TransactionManagerSettingsService.js').then(m => m.TransactionManagerSettingsService),
     () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./TransactionManagerService.js').then(m => m.TransactionManagerService),
+    () => import('./TransactionLogs/TransactionLogsCountResource.js').then(m => m.TransactionLogsCountResource),
+    () => import('./TransactionLogs/TransactionLogsCountEventHandler.js').then(m => m.TransactionLogsCountEventHandler),
   ],
 };

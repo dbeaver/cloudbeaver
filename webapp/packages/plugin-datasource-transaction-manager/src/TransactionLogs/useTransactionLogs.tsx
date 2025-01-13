@@ -17,20 +17,20 @@ interface Payload {
 }
 
 interface State extends ILoadableState {
-  logs: TransactionLogInfoItem[];
+  logs: TransactionLogInfoItem[] | null;
   exception: Error | null;
-  promise: Promise<TransactionLogInfoItem[] | undefined> | null;
+  promise: Promise<TransactionLogInfoItem[]> | null;
   payload: Payload;
 }
 
 export function useTransactionLogs(payload: Payload) {
   const state = useObservableRef<State>(
     () => ({
-      logs: [],
+      logs: null,
       exception: null,
       promise: null,
       isLoaded() {
-        return this.logs.length > 0;
+        return this.logs !== null;
       },
       isError() {
         return this.exception !== null;

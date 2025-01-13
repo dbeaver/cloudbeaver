@@ -1,6 +1,7 @@
 mutation getTransactionLogs($projectId: ID!, $connectionId: ID!, $contextId: ID!) {
   logs: getTransactionLogInfo(projectId: $projectId, connectionId: $connectionId, contextId: $contextId) {
     transactionLogInfos {
+      id
       time
       type
       queryString
