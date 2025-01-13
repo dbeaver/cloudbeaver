@@ -15,6 +15,7 @@ import {
   s,
   TreeNodeContext,
   TreeNodeControl,
+  TreeNodeDescription,
   TreeNodeIcon,
   TreeNodeName,
   useMouseContextMenu,
@@ -26,6 +27,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { getNodePlainName, type INodeActions, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 
+import { ElementsTreeContext } from '../../ElementsTreeContext.js';
 import type { NavTreeControlComponent } from '../../NavigationNodeComponent.js';
 import { TreeNodeMenuLoader } from '../TreeNodeMenu/TreeNodeMenuLoader.js';
 import { DATA_ATTRIBUTE_NODE_EDITING } from './DATA_ATTRIBUTE_NODE_EDITING.js';
@@ -52,6 +54,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(
     const styles = useS(style);
     const mouseContextMenu = useMouseContextMenu();
     const treeNodeContext = useContext(TreeNodeContext);
+    const elementsTreeContext = useContext(ElementsTreeContext);
     const navNodeInfoResource = useService(NavNodeInfoResource);
     const navTreeResource = useService(NavTreeResource);
     const error = getComputed(() => !!navNodeInfoResource.getException(node.id) || !!navTreeResource.getException(node.id));
@@ -110,6 +113,7 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(
 
     let icon = nodeInfo.icon;
     const name = nodeInfo.name;
+    const description = nodeInfo.description;
     const title = nodeInfo.tooltip;
 
     if (error) {
@@ -145,7 +149,12 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(
             {editing ? (
               <NavigationNodeEditorLoader name={getNodePlainName(node)} disabled={saving} onSave={editingState.save} onClose={editingState.cancel} />
             ) : (
-              <div className={s(styles, { nameBox: true })}>{name}</div>
+              <div className={s(styles, { nameBox: true })}>
+                {name}
+                {elementsTreeContext?.tree.settings?.objectsDescription && description && (
+                  <TreeNodeDescription>{` - ${description}`}</TreeNodeDescription>
+                )}
+              </div>
             )}
           </Loader>
         </TreeNodeName>

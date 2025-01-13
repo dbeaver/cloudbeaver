@@ -77,6 +77,7 @@ export interface IElementsTreeSettings {
   showFolderExplorerPath: boolean;
   configurable: boolean;
   projects: boolean;
+  objectsDescription: boolean;
 }
 
 export interface IElementsTreeOptions {
