@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   ConnectionExecutionContext,
   ConnectionExecutionContextResource,
@@ -32,10 +32,16 @@ import { ACTION_DATASOURCE_TRANSACTION_COMMIT } from './actions/ACTION_DATASOURC
 import { ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE.js';
 import { ACTION_DATASOURCE_TRANSACTION_ROLLBACK } from './actions/ACTION_DATASOURCE_TRANSACTION_ROLLBACK.js';
 import { createTransactionInfoParam } from './TransactionLog/TRANSACTION_INFO_PARAM_SCHEMA.js';
-import { TransactionInfoAction } from './TransactionLog/TransactionInfoAction.js';
 import { TransactionLogCountResource } from './TransactionLog/TransactionLogCountResource.js';
-import { TransactionLogDialog } from './TransactionLog/TransactionLogDialog.js';
 import { TransactionManagerSettingsService } from './TransactionManagerSettingsService.js';
+
+const TransactionInfoAction = importLazyComponent(() =>
+  import('./TransactionLog/TransactionInfoAction.js').then(module => module.TransactionInfoAction),
+);
+
+const TransactionLogDialog = importLazyComponent(() =>
+  import('./TransactionLog/TransactionLogDialog.js').then(module => module.TransactionLogDialog),
+);
 
 @injectable()
 export class TransactionManagerBootstrap extends Bootstrap {

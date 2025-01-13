@@ -52,7 +52,7 @@ export function useTransactionLog(payload: Payload) {
         }
       },
     }),
-    { log: observable.ref, promise: observable.ref, exception: observable.ref },
+    { log: observable.ref, promise: observable.ref, exception: observable.ref, payload: observable.ref },
     { payload },
   );
 

@@ -48,7 +48,7 @@ export class TransactionLogCountResource extends CachedMapResource<ITransactionI
   }
 
   override isKeyEqual(key: ITransactionInfoParam, secondKey: ITransactionInfoParam): boolean {
-    return isObjectsEqual(key, secondKey);
+    return key.connectionId === secondKey.connectionId && key.projectId === secondKey.projectId;
   }
 
   protected override validateKey(key: ITransactionInfoParam): boolean {
