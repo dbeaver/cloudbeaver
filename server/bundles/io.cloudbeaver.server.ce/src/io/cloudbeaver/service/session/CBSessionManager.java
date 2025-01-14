@@ -61,18 +61,26 @@ public class CBSessionManager implements WebAppSessionManager {
     @Override
     public BaseWebSession closeSession(@NotNull HttpServletRequest request) {
         HttpSession session = request.getSession();
-        if (session != null) {
-            BaseWebSession webSession;
-            synchronized (sessionMap) {
-                webSession = sessionMap.remove(session.getId());
-            }
-            if (webSession != null) {
-                log.debug("> Close session '" + session.getId() + "'");
-                webSession.close();
-                return webSession;
-            }
+        if (session == null) {
+            return null;
         }
-        return null;
+
+        return closeSession(session.getId());
+    }
+
+    @Override
+    public BaseWebSession closeSession(@NotNull String sessionId) {
+        BaseWebSession webSession;
+        synchronized (sessionMap) {
+            webSession = sessionMap.remove(sessionId);
+        }
+        if (webSession == null) {
+            return null;
+        }
+
+        log.debug("> Close session '" + sessionId + "'");
+        webSession.close();
+        return webSession;
     }
 
     protected CBApplication getApplication() {
