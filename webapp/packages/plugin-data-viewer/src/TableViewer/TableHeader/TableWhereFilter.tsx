@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useRef } from 'react';
 
-import { Container, type PlaceholderComponent, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, InputAutocompletionMenu, type PlaceholderComponent, useTranslate } from '@cloudbeaver/core-blocks';
 import { InlineEditor } from '@cloudbeaver/core-ui';
 
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService.js';
@@ -19,6 +20,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
   const translate = useTranslate();
   const state = useWhereFilter(model, resultIndex);
   const data = useTableViewerHeaderData({ model, resultIndex });
+  const ref = useRef<HTMLInputElement>(null);
 
   if (!state.supported) {
     return null;
@@ -27,10 +29,10 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
   return (
     <Container className={styles['imbeddedEditor']}>
       <InlineEditor
+        ref={ref}
         className={styles['inlineEditor']}
         name="data_where"
         value={state.filter}
-        autoCompleteProposals={data.hintProposals}
         placeholder={translate(state.constraints?.supported ? 'table_header_sql_expression' : 'table_header_sql_expression_not_supported')}
         controlsPosition="inside"
         edited={!!state.filter}
@@ -40,6 +42,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
         onSave={state.apply}
         onChange={state.set}
       />
+      <InputAutocompletionMenu matchStrategy="fuzzy" sourceHints={data.hintProposals ?? []} inputRef={ref} />
     </Container>
   );
 });
