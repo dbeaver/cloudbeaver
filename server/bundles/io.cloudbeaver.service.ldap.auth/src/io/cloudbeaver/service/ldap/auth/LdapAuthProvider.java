@@ -79,9 +79,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
         }
         if (userData == null) {
-            String fullUserDN = buildFullUserDN(userName, ldapSettings);
-            validateUserAccess(fullUserDN, ldapSettings);
-            userData = authenticateLdap(fullUserDN, password, ldapSettings, null, environment);
+            validateUserAccess(userName, ldapSettings);
+            userData = authenticateLdap(userName, password, ldapSettings, null, environment);
         }
         return userData;
     }
@@ -333,6 +332,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             userContext = new InitialDirContext(environment);
             Map<String, Object> userData = new HashMap<>();
             userData.put(LdapConstants.CRED_USERNAME, findUserNameFromDN(userDN, ldapSettings));
+            userData.put(LdapConstants.CRED_FULL_DN, userDN);
             userData.put(LdapConstants.CRED_SESSION_ID, UUID.randomUUID());
             if (login != null) {
                 userData.put(LdapConstants.CRED_DISPLAY_NAME, login);
@@ -364,7 +364,13 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         }
 
         LdapSettings ldapSettings = new LdapSettings(providerConfig);
-        String userDN = getUserDN(ldapSettings, JSONUtils.getString(authParameters, LdapConstants.CRED_DISPLAY_NAME));
+        String fullDN = JSONUtils.getString(authParameters, LdapConstants.CRED_FULL_DN);
+        String userDN;
+        if (!CommonUtils.isEmpty(fullDN)) {
+            userDN = fullDN;
+        } else {
+            userDN = getUserDN(ldapSettings, JSONUtils.getString(authParameters, LdapConstants.CRED_DISPLAY_NAME));
+        }
         if (userDN == null) {
             return new SMAutoAssign();
         }
