@@ -32,6 +32,8 @@ import java.util.Collection;
 public interface WebAppSessionManager {
     BaseWebSession closeSession(@NotNull HttpServletRequest request);
 
+    BaseWebSession closeSession(@NotNull String sessionId);
+
     @NotNull
     WebSession getWebSession(
         @NotNull HttpServletRequest request,
