@@ -10,15 +10,15 @@ import { observer } from 'mobx-react-lite';
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
 import { Container, ObjectPropertyInfoForm, useResource } from '@cloudbeaver/core-blocks';
 
-import type { UserProfileFormInfoPart } from './UserProfileFormInfoPart.js';
+import type { IUserProfileFormInfoState } from './IUserProfileFormInfoState.js';
 
 interface Props {
-  tabState: UserProfileFormInfoPart;
+  state: IUserProfileFormInfoState;
   tabSelected: boolean;
   disabled: boolean;
 }
 
-export const UserProfileFormInfoMetaParameters = observer<Props>(function UserProfileFormInfoMetaParameters({ tabState, tabSelected, disabled }) {
+export const UserProfileFormInfoMetaParameters = observer<Props>(function UserProfileFormInfoMetaParameters({ state, tabSelected, disabled }) {
   const userMetaParameters = useResource(UserProfileFormInfoMetaParameters, UserMetaParametersResource, undefined, { active: tabSelected });
 
   if (userMetaParameters.data.length === 0) {
@@ -27,7 +27,7 @@ export const UserProfileFormInfoMetaParameters = observer<Props>(function UserPr
 
   return (
     <Container wrap gap>
-      <ObjectPropertyInfoForm state={tabState.state.metaParameters} properties={userMetaParameters.data} disabled={disabled} readOnly fill tiny />
+      <ObjectPropertyInfoForm state={state.metaParameters} properties={userMetaParameters.data} disabled={disabled} readOnly fill tiny />
     </Container>
   );
 });
