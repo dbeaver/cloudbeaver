@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
-import { ListItem, ListItemDescription, ListItemIcon, ListItemName, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
+import { IconOrImage, ListItem, ListItemDescription, ListItemIcon, ListItemName, s, StaticImage, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import style from './Driver.module.css';
 
@@ -17,6 +17,7 @@ export interface IDriver {
   icon?: string;
   name?: string;
   description?: string;
+  driverInstalled?: boolean;
 }
 
 interface Props {
@@ -25,13 +26,19 @@ interface Props {
 }
 
 export const Driver = observer<Props>(function Driver({ driver, onSelect }) {
+  const translate = useTranslate();
   const select = useCallback(() => onSelect(driver.id), [driver]);
   const styles = useS(style);
 
   return (
     <ListItem onClick={select}>
-      <ListItemIcon>
+      <ListItemIcon className={s(styles, { icon: true })}>
         <StaticImage icon={driver.icon} className={s(styles, { staticImage: true })} />
+        {!driver.driverInstalled && (
+          <div className={s(styles, { indicator: true })} title={translate('plugin_connection_custom_drivers_driver_not_installed')}>
+            <IconOrImage icon="/icons/info_icon_sm.svg" />
+          </div>
+        )}
       </ListItemIcon>
       <ListItemName>{driver.name}</ListItemName>
       <ListItemDescription title={driver.description}>{driver.description}</ListItemDescription>

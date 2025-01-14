@@ -162,6 +162,20 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
     return mapAsyncTaskInfo(result);
   }
 
+  async getLog() {
+    const result = await this.withContext(async context => {
+      const { log } = await this.graphQLService.sdk.getTransactionLog({
+        projectId: context.projectId,
+        connectionId: context.connectionId,
+        contextId: context.id,
+      });
+
+      return log;
+    });
+
+    return result?.transactionLogInfos;
+  }
+
   private withContext<R>(callback: (context: IConnectionExecutionContextInfo) => Promise<R>): Promise<R> {
     if (!this.context) {
       throw new Error('Execution Context not found');
