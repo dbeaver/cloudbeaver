@@ -22,6 +22,7 @@ interface InputAutocompleteOptions {
 }
 
 export interface InputAutocompleteProposal {
+  id: string;
   displayString: string;
   replacementString: string;
   icon?: string;
@@ -36,9 +37,9 @@ export const useInputAutocomplete = (
   inputRef: RefObject<HTMLInputElement | HTMLTextAreaElement>,
   { sourceHints, matchStrategy = 'startsWith', predicate }: InputAutocompleteOptions,
 ) => {
-  const { setSearchValue: setFuzzySearchValue, searchResults: fuzzySetResults } = useFuzzySearch({
-    dataSet: sourceHints,
-    keys: SEARCH_FIELDS,
+  const fuzzySearch = useFuzzySearch({
+    sourceProposals: sourceHints,
+    fields: SEARCH_FIELDS,
   });
   const state = useObservableRef(
     () => ({
@@ -69,7 +70,7 @@ export const useInputAutocomplete = (
 
         input.value = this.input;
         input.focus();
-        this.setFuzzySearchValue('');
+        this.fuzzySearch.setSearch('');
         this.isFound = true;
       },
       get currentWord() {
@@ -98,7 +99,7 @@ export const useInputAutocomplete = (
         }
 
         if (this.matchStrategy === 'fuzzy') {
-          return this.fuzzySetResults
+          return this.fuzzySearch.proposals
             .filter(suggestion => filterWithoutSameWord(suggestion, this.currentWord) && (predicate ? predicate(suggestion, this.currentWord) : true))
             .sort(sortByScore);
         }
@@ -133,7 +134,7 @@ export const useInputAutocomplete = (
       filteredSuggestions: computed,
       replaceCurrentWord: action.bound,
     },
-    { sourceHints, matchStrategy, inputRef, fuzzySetResults, setFuzzySearchValue },
+    { sourceHints, matchStrategy, inputRef, fuzzySearch },
   );
 
   const handleInput = useMemo(
@@ -144,7 +145,7 @@ export const useInputAutocomplete = (
         state.selectionStart = target.selectionStart;
         state.selectionEnd = target.selectionEnd;
         state.input = target?.value;
-        setFuzzySearchValue(state.currentWord);
+        fuzzySearch.setSearch(state.currentWord);
         state.isFound = false;
       }, INPUT_DELAY),
     [],

@@ -5,58 +5,68 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import Fuse, { type IFuseOptions } from 'fuse.js';
+import MiniSearch, { type Options } from 'minisearch';
 import { action, computed, observable } from 'mobx';
-import { useMemo } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useObservableRef } from './useObservableRef.js';
 
-interface UseSearchProps<T> {
-  dataSet: T[];
-  keys: string[];
-  threshold?: number;
+interface UseSearchProps<T> extends Options {
+  sourceProposals: T[];
 }
 
 const DEFAULT_THRESHOLD = 0.4;
 
-export function useFuzzySearch<T>({ dataSet, keys, threshold = DEFAULT_THRESHOLD }: UseSearchProps<T>) {
-  const fuse = useMemo(() => {
-    const options: IFuseOptions<T> = {
-      includeScore: true,
-      keys,
-      threshold,
+function createSearchInstance<T>(options: Options) {
+  return new MiniSearch<T>(options);
+}
+
+export function useFuzzySearch<T extends object>({ sourceProposals, ...options }: UseSearchProps<T>) {
+  const minisearchOptions = { ...options };
+  const dataSetKeys = sourceProposals.reduce((acc, item) => {
+    Object.keys(item).forEach(key => acc.add(key));
+
+    return acc;
+  }, new Set<string>());
+  const searchInstance = useRef(createSearchInstance<T>(minisearchOptions));
+
+  if (!minisearchOptions.searchOptions) {
+    minisearchOptions.searchOptions = {
+      prefix: true,
+      fuzzy: DEFAULT_THRESHOLD,
     };
-    return new Fuse(dataSet, options);
-  }, [dataSet, keys, threshold]);
+  }
+
+  if (!minisearchOptions.storeFields) {
+    minisearchOptions.storeFields = Array.from(dataSetKeys);
+  }
+
+  useEffect(() => {
+    state.searchInstance.current = createSearchInstance<T>(minisearchOptions);
+    state.searchInstance.current.addAll(sourceProposals);
+  }, [dataSetKeys, sourceProposals]);
 
   const state = useObservableRef(
     () => ({
-      fuzzySetSearchValue: '',
-      setFuzzySearchValue(value: string) {
-        this.fuzzySetSearchValue = value;
+      search: '',
+      setSearch(value: string) {
+        this.search = value;
       },
-      get fuzzySetsResults() {
-        if (!this.fuzzySetSearchValue) {
+      get proposals() {
+        if (!this.search) {
           return [];
         }
 
-        return this.fuse
-          .search(this.fuzzySetSearchValue)
-          .filter(result => (result.score ?? 1) < threshold)
-          .map(result => result.item);
+        return this.searchInstance.current.search(this.search) as T[];
       },
     }),
     {
-      fuzzySetSearchValue: observable,
-      setFuzzySearchValue: action.bound,
-      fuzzySetsResults: computed,
+      search: observable,
+      setSearch: action.bound,
+      proposals: computed,
     },
-    { fuse },
+    { searchInstance },
   );
 
-  return {
-    searchValue: state.fuzzySetSearchValue,
-    setSearchValue: state.setFuzzySearchValue,
-    searchResults: state.fuzzySetsResults,
-  };
+  return state;
 }
