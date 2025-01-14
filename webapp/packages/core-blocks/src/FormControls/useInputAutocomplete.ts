@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { action, computed, observable } from 'mobx';
-import { type RefObject, useEffect } from 'react';
+import { type RefObject, useEffect, useMemo } from 'react';
 
 import { debounce, isNotNullDefined } from '@cloudbeaver/core-utils';
 
@@ -136,15 +136,19 @@ export const useInputAutocomplete = (
     { sourceHints, matchStrategy, inputRef, fuzzySetResults, setFuzzySearchValue },
   );
 
-  const handleInput = debounce((event: Event) => {
-    const target = event.target as HTMLInputElement;
+  const handleInput = useMemo(
+    () =>
+      debounce((event: Event) => {
+        const target = event.target as HTMLInputElement;
 
-    state.selectionStart = target.selectionStart;
-    state.selectionEnd = target.selectionEnd;
-    state.input = target?.value;
-    setFuzzySearchValue(state.currentWord);
-    state.isFound = false;
-  }, INPUT_DELAY);
+        state.selectionStart = target.selectionStart;
+        state.selectionEnd = target.selectionEnd;
+        state.input = target?.value;
+        setFuzzySearchValue(state.currentWord);
+        state.isFound = false;
+      }, INPUT_DELAY),
+    [],
+  );
 
   useEffect(() => {
     const input = state.inputRef.current;

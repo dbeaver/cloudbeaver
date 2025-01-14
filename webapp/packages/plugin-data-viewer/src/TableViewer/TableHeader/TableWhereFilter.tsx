@@ -12,11 +12,13 @@ import { InlineEditor } from '@cloudbeaver/core-ui';
 
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService.js';
 import styles from './TableWhereFilter.module.css';
+import { useTableViewerHeaderData } from './useTableViewerHeaderData.js';
 import { useWhereFilter } from './useWhereFilter.js';
 
 export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps> = observer(function TableWhereFilter({ model, resultIndex }) {
   const translate = useTranslate();
   const state = useWhereFilter(model, resultIndex);
+  const data = useTableViewerHeaderData({ model, resultIndex });
 
   if (!state.supported) {
     return null;
@@ -28,7 +30,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
         className={styles['inlineEditor']}
         name="data_where"
         value={state.filter}
-        autoCompleteProposals={state.hintProposals}
+        autoCompleteProposals={data.hintProposals}
         placeholder={translate(state.constraints?.supported ? 'table_header_sql_expression' : 'table_header_sql_expression_not_supported')}
         controlsPosition="inside"
         edited={!!state.filter}

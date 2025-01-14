@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef } from 'react';
 
+import BaseDropdownStyles from '../FormControls/BaseDropdown.module.css';
 import { IconOrImage } from '../IconOrImage.js';
 import { Menu } from '../Menu/Menu.js';
 import { MenuItem } from '../Menu/MenuItem.js';
@@ -33,7 +34,7 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
   inputRef,
   onSelect,
 }: AutocompletionProps) {
-  const styles = useS(style);
+  const styles = useS(style, BaseDropdownStyles);
   const menuRef = useRef<IMenuState>();
   const autocompleteState = useInputAutocomplete(inputRef, {
     sourceHints,
@@ -95,10 +96,14 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
           id={item.displayString}
           type="button"
           title={item.title}
-          className={styles['menuItem']}
+          className={s(styles, { menuItem: true })}
           onClick={event => handleSelect(item)}
         >
-          {item.icon && <IconOrImage icon={item.icon} className={styles['iconOrImage']} />}
+          {item.icon && (
+            <div className={s(styles, { itemIcon: true })}>
+              <IconOrImage icon={item.icon} className={s(styles, { iconOrImage: true })} />
+            </div>
+          )}
           <Text truncate>{item.displayString}</Text>
         </MenuItem>
       ))}
