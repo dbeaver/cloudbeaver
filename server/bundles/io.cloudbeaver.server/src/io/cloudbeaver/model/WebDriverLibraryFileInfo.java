@@ -18,51 +18,36 @@ package io.cloudbeaver.model;
 
 import io.cloudbeaver.WebServiceUtils;
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.DBIcon;
 import org.jkiss.dbeaver.model.connection.DBPDriverLibrary;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
 
-import java.util.List;
-
-public class WebDriverLibraryInfo {
+public class WebDriverLibraryFileInfo {
 
     @NotNull
-    private final DBPDriver driver;
-    @NotNull
-    private final DBPDriverLibrary driverLibrary;
+    private final DriverDescriptor.DriverFileInfo fileInfo;
 
-    public WebDriverLibraryInfo(@NotNull DBPDriver driver, @NotNull DBPDriverLibrary driverLibrary) {
-        this.driver = driver;
-        this.driverLibrary = driverLibrary;
+    public WebDriverLibraryFileInfo(@NotNull DriverDescriptor.DriverFileInfo fileInfo) {
+        this.fileInfo = fileInfo;
     }
 
 
     @Property
     public String getId() {
-        return driverLibrary.getId();
+        return fileInfo.getId();
     }
 
     @Property
-    public String getName() {
-        return driverLibrary.getDisplayName();
-    }
-
-    @Property
-    @Nullable
-    public List<WebDriverLibraryFileInfo> getLibraryFiles() {
-        var libraryFiles = ((DriverDescriptor) driver).getLibraryFiles(driverLibrary);
-        if (libraryFiles == null) {
-            return null;
-        }
-        return libraryFiles.stream()
-            .map(WebDriverLibraryFileInfo::new)
-            .toList();
+    public String getFileName() {
+        return fileInfo.toString();
     }
 
     @Property
     public String getIcon() {
-        return WebServiceUtils.makeIconId(driverLibrary.getIcon());
+        if (fileInfo.getType() == DBPDriverLibrary.FileType.license) {
+            return WebServiceUtils.makeIconId(DBIcon.TYPE_TEXT);
+        }
+        return WebServiceUtils.makeIconId(DBIcon.JAR);
     }
 }
