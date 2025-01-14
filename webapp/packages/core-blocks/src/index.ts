@@ -131,6 +131,7 @@ export * from './Tree/TreeNode/TreeNodeControl.js';
 export * from './Tree/TreeNode/TreeNodeExpand.js';
 export * from './Tree/TreeNode/TreeNodeIcon.js';
 export * from './Tree/TreeNode/TreeNodeName.js';
+export * from './Tree/TreeNode/TreeNodeDescription.js';
 export * from './Tree/TreeNode/TreeNodeNested.js';
 export * from './Tree/TreeNode/TreeNodeNestedMessage.js';
 export * from './Tree/TreeNode/TreeNodeSelect.js';
