@@ -5,8 +5,24 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+.icon {
+  position: relative;
+}
+
 .staticImage {
   box-sizing: border-box;
   width: 24px;
   max-height: 24px;
-};
+}
+
+.indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  border-radius: 50%;
+  background-color: var(--theme-surface);
+  border: 1px solid var(--theme-surface);
+}

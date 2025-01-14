@@ -17,7 +17,6 @@
 
 package io.cloudbeaver.server;
 
-import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.server.jobs.SessionStateJob;
 import io.cloudbeaver.server.jobs.WebDataSourceMonitorJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
@@ -26,22 +25,13 @@ import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBFileController;
-import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
-import org.jkiss.dbeaver.model.connection.DBPDriverLibrary;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.IOUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * CBPlatform
@@ -57,7 +47,6 @@ public class CBPlatform extends BaseWebPlatform {
     private static CBApplication<?> application = null;
 
     private WebServerPreferenceStore preferenceStore;
-    protected final List<DBPDriver> applicableDrivers = new ArrayList<>();
 
     public static CBPlatform getInstance() {
         return (CBPlatform) DBWorkbench.getPlatform();
@@ -76,8 +65,6 @@ public class CBPlatform extends BaseWebPlatform {
         log.info("Initialize web platform...: ");
         this.preferenceStore = new WebServerPreferenceStore(WebPlatformActivator.getInstance().getPreferences());
         super.initialize();
-        refreshApplicableDrivers();
-
         scheduleServerJobs();
         log.info("Web platform initialized (" + (System.currentTimeMillis() - startTime) + "ms)");
     }
@@ -124,10 +111,6 @@ public class CBPlatform extends BaseWebPlatform {
         return application;
     }
 
-    public List<DBPDriver> getApplicableDrivers() {
-        return applicableDrivers;
-    }
-
 
     @NotNull
     @Override
@@ -140,41 +123,4 @@ public class CBPlatform extends BaseWebPlatform {
         return false;
     }
 
-    public void refreshApplicableDrivers() {
-        this.applicableDrivers.clear();
-
-        for (DBPDataSourceProviderDescriptor dspd : DataSourceProviderRegistry.getInstance().getEnabledDataSourceProviders()) {
-            for (DBPDriver driver : dspd.getEnabledDrivers()) {
-                List<? extends DBPDriverLibrary> libraries = driver.getDriverLibraries();
-                {
-                    if (!application.getDriverRegistry().isDriverEnabled(driver)) {
-                        continue;
-                    }
-                    boolean hasAllFiles = true, hasJars = false;
-                    for (DBPDriverLibrary lib : libraries) {
-                        if (!DBWorkbench.isDistributed() && !lib.isOptional() && lib.getType() != DBPDriverLibrary.FileType.license &&
-                            (lib.getLocalFile() == null || !Files.exists(lib.getLocalFile())))
-                        {
-                            hasAllFiles = false;
-                            log.error("\tDriver '" + driver.getId() + "' is missing library '" + lib.getDisplayName() + "'");
-                        } else {
-                            if (lib.getType() == DBPDriverLibrary.FileType.jar) {
-                                hasJars = true;
-                            }
-                        }
-                    }
-                    if (hasAllFiles || hasJars) {
-                        applicableDrivers.add(driver);
-                    }
-                }
-            }
-        }
-        log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
-    }
-
-    @NotNull
-    @Override
-    public DBFileController createFileController() {
-        return getApplication().createFileController(new NoAuthCredentialsProvider());
-    }
 }

@@ -61,18 +61,26 @@ public class CBSessionManager implements WebAppSessionManager {
     @Override
     public BaseWebSession closeSession(@NotNull HttpServletRequest request) {
         HttpSession session = request.getSession();
-        if (session != null) {
-            BaseWebSession webSession;
-            synchronized (sessionMap) {
-                webSession = sessionMap.remove(session.getId());
-            }
-            if (webSession != null) {
-                log.debug("> Close session '" + session.getId() + "'");
-                webSession.close();
-                return webSession;
-            }
+        if (session == null) {
+            return null;
         }
-        return null;
+
+        return closeSession(session.getId());
+    }
+
+    @Override
+    public BaseWebSession closeSession(@NotNull String sessionId) {
+        BaseWebSession webSession;
+        synchronized (sessionMap) {
+            webSession = sessionMap.remove(sessionId);
+        }
+        if (webSession == null) {
+            return null;
+        }
+
+        log.debug("> Close session '" + sessionId + "'");
+        webSession.close();
+        return webSession;
     }
 
     protected CBApplication getApplication() {
@@ -114,14 +122,14 @@ public class CBSessionManager implements WebAppSessionManager {
             var baseWebSession = sessionMap.get(sessionId);
             if (baseWebSession == null && CBApplication.getInstance().isConfigurationMode()) {
                 try {
-                    webSession = createWebSessionImpl(new WebHttpRequestInfo(request));
+                    webSession = createWebSession(new WebHttpRequestInfo(request));
                 } catch (DBException e) {
                     throw new DBWebException("Failed to create web session", e);
                 }
                 sessionMap.put(sessionId, webSession);
             } else if (baseWebSession == null) {
                 try {
-                    webSession = createWebSessionImpl(new WebHttpRequestInfo(request));
+                    webSession = createWebSession(new WebHttpRequestInfo(request));
                 } catch (DBException e) {
                     throw new DBWebException("Failed to create web session", e);
                 }
@@ -182,7 +190,7 @@ public class CBSessionManager implements WebAppSessionManager {
                         return null;
                     }
 
-                    webSession = createWebSessionImpl(requestInfo);
+                    webSession = createWebSession(requestInfo);
                     restorePreviousUserSession(webSession, oldAuthInfo);
 
                     sessionMap.put(sessionId, webSession);
@@ -216,7 +224,7 @@ public class CBSessionManager implements WebAppSessionManager {
     }
 
     @NotNull
-    protected WebSession createWebSessionImpl(@NotNull WebHttpRequestInfo request) throws DBException {
+    public WebSession createWebSession(@NotNull WebHttpRequestInfo request) throws DBException {
         return new WebSession(request, application, getSessionHandlers());
     }
 
