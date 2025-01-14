@@ -19,11 +19,20 @@ package io.cloudbeaver.registry;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.connection.DBPDriverLibrary;
+import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class WebDriverRegistry {
 
@@ -42,6 +51,7 @@ public class WebDriverRegistry {
         return instance;
     }
 
+    private final List<DBPDriver> applicableDrivers = new ArrayList<>();
     private final Set<String> webDrivers = new HashSet<>();
 
     protected WebDriverRegistry() {
@@ -59,8 +69,48 @@ public class WebDriverRegistry {
         }
     }
 
-    public boolean isDriverEnabled(DBPDriver driver) {
-        return webDrivers.contains(driver.getFullId());
+    public List<DBPDriver> getApplicableDrivers() {
+        return applicableDrivers;
     }
 
+    /**
+     * Updates info about applicable drivers (f.e. some changes were made in driver config file).
+     */
+    public void refreshApplicableDrivers() {
+        this.applicableDrivers.clear();
+        this.applicableDrivers.addAll(
+            DataSourceProviderRegistry.getInstance().getEnabledDataSourceProviders().stream()
+                .map(DBPDataSourceProviderDescriptor::getEnabledDrivers)
+                .flatMap(List::stream)
+                .filter(this::isDriverApplicable)
+                .toList());
+        log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
+    }
+
+    protected boolean isDriverApplicable(@NotNull DBPDriver driver) {
+        List<? extends DBPDriverLibrary> libraries = driver.getDriverLibraries();
+        if (!webDrivers.contains(driver.getFullId())) {
+            return false;
+        }
+        boolean hasAllFiles = true;
+        for (DBPDriverLibrary lib : libraries) {
+            if (!isDriverLibraryFilePresent(lib)) {
+                hasAllFiles = false;
+                log.error("\tDriver '" + driver.getId() + "' is missing library '" + lib.getDisplayName() + "'");
+            } else {
+                if (lib.getType() == DBPDriverLibrary.FileType.jar) {
+                    return true;
+                }
+            }
+        }
+        return hasAllFiles;
+    }
+
+    private boolean isDriverLibraryFilePresent(@NotNull DBPDriverLibrary lib) {
+        if (lib.getType() == DBPDriverLibrary.FileType.license) {
+            return true;
+        }
+        Path localFile = lib.getLocalFile();
+        return localFile != null && Files.exists(localFile);
+    }
 }

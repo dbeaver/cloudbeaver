@@ -35,6 +35,8 @@ enum CBServerEventId {
 
     cb_database_output_log_updated,
 
+    cb_transaction_count @since(version: "24.3.3")
+
     cb_session_task_info_updated @since(version: "24.3.1")
 }
 
@@ -62,7 +64,9 @@ enum CBEventTopic {
     cb_session_task, @since(version: "24.3.1")
 
     cb_datasource_connection,
-    cb_delete_temp_folder
+    cb_delete_temp_folder,
+
+    cb_transaction @since(version: "24.3.3")
 }
 
 # Base server event interface
@@ -210,6 +214,16 @@ type WSDataSourceConnectEvent implements CBServerEvent {
     connectionId: String!
     projectId: String!
     timestamp: Int!
+}
+
+# Datasource count event in transactional mode
+type WSTransactionalCountEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    contextId: String!
+    projectId: String!
+    connectionId: String!
+    transactionalCount: Int!
 }
 
 extend type Query {

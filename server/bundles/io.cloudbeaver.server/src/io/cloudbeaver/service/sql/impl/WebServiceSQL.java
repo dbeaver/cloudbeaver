@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import org.jkiss.dbeaver.model.exec.trace.DBCTraceProperty;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
+import io.cloudbeaver.model.WebTransactionLogInfo;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.*;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
@@ -615,4 +616,8 @@ public class WebServiceSQL implements DBWServiceSQL {
         return contextInfo.commitTransaction();
     }
 
+    @Override
+    public WebTransactionLogInfo getTransactionLogInfo(@NotNull WebSession webSession, @NotNull WebSQLContextInfo sqlContext) {
+        return sqlContext.getTransactionLogInfo();
+    }
 }

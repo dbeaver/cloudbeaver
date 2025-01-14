@@ -1,0 +1,13 @@
+mutation getTransactionLog($projectId: ID!, $connectionId: ID!, $contextId: ID!) {
+  log: getTransactionLogInfo(projectId: $projectId, connectionId: $connectionId, contextId: $contextId) {
+    transactionLogInfos {
+      id
+      time
+      type
+      queryString
+      durationMs
+      rows
+      result
+    }
+  }
+}

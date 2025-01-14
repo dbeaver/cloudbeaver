@@ -261,6 +261,7 @@ type DriverInfo {
 
     configurationTypes: [DriverConfigurationType]!
 
+    downloadable: Boolean! @since(version: "24.3.3")
     driverInstalled: Boolean!
     driverLibraries: [DriverLibraryInfo!]!
 }
@@ -268,6 +269,13 @@ type DriverInfo {
 type DriverLibraryInfo {
     id: ID!
     name: String!
+    icon: String
+    libraryFiles: [DriverFileInfo!]
+}
+
+type DriverFileInfo @since(version: "24.3.2") {
+    id: ID!
+    fileName: String!
     icon: String
 }
 

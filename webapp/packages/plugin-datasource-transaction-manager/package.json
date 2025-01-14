@@ -25,15 +25,26 @@
     "@cloudbeaver/core-events": "^0",
     "@cloudbeaver/core-executor": "^0",
     "@cloudbeaver/core-localization": "^0",
+    "@cloudbeaver/core-resource": "^0",
+    "@cloudbeaver/core-root": "^0",
+    "@cloudbeaver/core-sdk": "^0",
     "@cloudbeaver/core-settings": "^0",
     "@cloudbeaver/core-ui": "^0",
     "@cloudbeaver/core-utils": "^0",
     "@cloudbeaver/core-view": "^0",
+    "@cloudbeaver/plugin-codemirror6": "^0",
+    "@cloudbeaver/plugin-data-grid": "^0",
     "@cloudbeaver/plugin-datasource-context-switch": "^0",
-    "@cloudbeaver/plugin-top-app-bar": "^0"
+    "@cloudbeaver/plugin-sql-editor-new": "^0",
+    "@cloudbeaver/plugin-top-app-bar": "^0",
+    "mobx": "^6",
+    "mobx-react-lite": "^4",
+    "react": "^18"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "typescript": "^5"
+    "@types/react": "^18",
+    "typescript": "^5",
+    "typescript-plugin-css-modules": "^5"
   }
 }

@@ -71,6 +71,7 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   isOutdated: () => boolean;
   isLoadable: () => boolean;
   isReadonly: (resultIndex: number) => boolean;
+  hasElementIdentifier: (resultIndex: number) => boolean;
   isDataAvailable: (offset: number, count: number) => boolean;
   isLoading: () => boolean;
   isDisabled: (resultIndex?: number) => boolean;

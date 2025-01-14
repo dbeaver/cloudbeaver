@@ -28,6 +28,9 @@
       "path": "../core-localization/tsconfig.json"
     },
     {
+      "path": "../core-sdk/tsconfig.json"
+    },
+    {
       "path": "../core-settings/tsconfig.json"
     },
     {
@@ -40,7 +43,16 @@
       "path": "../core-view/tsconfig.json"
     },
     {
+      "path": "../plugin-codemirror6/tsconfig.json"
+    },
+    {
+      "path": "../plugin-data-grid/tsconfig.json"
+    },
+    {
       "path": "../plugin-datasource-context-switch/tsconfig.json"
+    },
+    {
+      "path": "../plugin-sql-editor-new/tsconfig.json"
     },
     {
       "path": "../plugin-top-app-bar/tsconfig.json"
