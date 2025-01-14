@@ -20,6 +20,7 @@ import io.cloudbeaver.WebSessionGlobalProjectImpl;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
@@ -95,8 +96,18 @@ public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler
                 return;
             }
             var user = activeUserSession.getUserContext().getUser();
-            var userSubjects = new HashSet<>(Set.of(user.getTeams()));
-            userSubjects.add(user.getUserId());
+            Set<String> userSubjects = new HashSet<>();
+            if (user == null) {
+                String anonymousUserTeam = WebAppUtils.getWebApplication().getAppConfiguration().getAnonymousUserTeam();
+                if (anonymousUserTeam == null) {
+                    // cannot apply event for anonymous user is there are no user subjects
+                    return;
+                }
+                userSubjects.add(anonymousUserTeam);
+            } else {
+                userSubjects.addAll(Set.of(user.getTeams()));
+                userSubjects.add(user.getUserId());
+            }
             boolean shouldBeAccessible = dataSourcePermissions.stream().anyMatch(userSubjects::contains);
             List<String> dataSources = List.of(dataSourceId);
             WebSessionGlobalProjectImpl project = webSession.getGlobalProject();
@@ -173,10 +184,5 @@ public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler
                     event.getObjectId() + " in session " + activeUserSession.getSessionId(), e);
             }
         };
-    }
-
-    @Override
-    protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull WSObjectPermissionEvent event) {
-        return activeUserSession.getUserContext().getUser() != null && super.isAcceptableInSession(activeUserSession, event);
     }
 }
