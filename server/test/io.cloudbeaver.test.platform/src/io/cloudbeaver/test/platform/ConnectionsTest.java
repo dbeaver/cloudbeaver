@@ -18,6 +18,7 @@
 package io.cloudbeaver.test.platform;
 
 import io.cloudbeaver.CloudbeaverMockTest;
+import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.test.WebGQLClient;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -65,8 +66,8 @@ public class ConnectionsTest extends CloudbeaverMockTest {
 
     @Test
     public void testBCreateConnection() throws Exception {
-        WebGQLClient client = CEServerTestSuite.createClient();
-        CEServerTestSuite.authenticateTestUser(client);
+        WebGQLClient client = CEAppStarter.createClient();
+        CEAppStarter.authenticateTestUser(client);
 
         Map<String, Object> configuration = new LinkedHashMap<>();
         Map<String, Object> variables = new LinkedHashMap<>();

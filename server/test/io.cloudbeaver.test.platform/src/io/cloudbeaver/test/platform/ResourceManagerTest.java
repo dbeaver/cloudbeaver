@@ -18,6 +18,7 @@
 package io.cloudbeaver.test.platform;
 
 import io.cloudbeaver.CloudbeaverMockTest;
+import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.test.WebGQLClient;
@@ -70,8 +71,8 @@ public class ResourceManagerTest extends CloudbeaverMockTest {
     @BeforeClass
     public static void init() throws Exception {
         Assert.assertTrue(CBApplication.getInstance().getAppConfiguration().isResourceManagerEnabled());
-        client = CEServerTestSuite.createClient();
-        Map<String, Object> authInfo = CEServerTestSuite.authenticateTestUser(client);
+        client = CEAppStarter.createClient();
+        Map<String, Object> authInfo = CEAppStarter.authenticateTestUser(client);
         Assert.assertEquals(SMAuthStatus.SUCCESS.name(), JSONUtils.getString(authInfo, "authStatus"));
     }
 
