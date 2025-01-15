@@ -10,6 +10,8 @@ import React, { forwardRef, useLayoutEffect, useRef, useState } from 'react';
 import { MenuButton, type MenuInitialState, useMenuState } from 'reakit';
 import type { ExtractHTMLAttributes } from 'reakit-utils';
 
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
+
 import { ErrorBoundary } from '../ErrorBoundary.js';
 import { s } from '../s.js';
 import { useCombinedRef } from '../useCombinedRef.js';
@@ -38,7 +40,6 @@ interface IMenuProps extends React.ButtonHTMLAttributes<any> {
   onVisibleSwitch?: (visible: boolean) => void;
 }
 
-const CONTEXT_INPUT_OFFSET_X = 5;
 const CONTEXT_INPUT_OFFSET_Y = 3;
 
 export const Menu = observer<IMenuProps, HTMLButtonElement>(
@@ -79,6 +80,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
       unstable_fixed: true,
     });
     const styles = useS(style);
+    const hasAnchorButton = isNotNullDefined(relativePosition) || isNotNullDefined(contextInputRef?.current);
 
     if (menuRef) {
       //@ts-expect-error Ref mutation
@@ -100,63 +102,54 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
     }, [menuVisible]);
 
     useLayoutEffect(() => {
-      if (contextInputRef?.current && menuVisible) {
-        const inputRect = contextInputRef.current.getBoundingClientRect();
-        const caretPosition = contextInputRef.current.selectionStart || 0;
+      if (!mouseContextMenu?.position) {
+        return;
+      }
 
-        const span = document.createElement('span');
-        span.style.position = 'absolute';
-        span.style.visibility = 'hidden';
-        span.style.whiteSpace = 'pre';
-        span.textContent = contextInputRef.current.value.substring(0, caretPosition);
+      if (menuVisible) {
+        menu.hide();
+        return;
+      }
 
-        document.body.appendChild(span);
-        const spanRect = span.getBoundingClientRect();
-        document.body.removeChild(span);
-
+      if (innerMenuButtonRef.current) {
         menu.show();
 
+        const boxSize = innerMenuButtonRef.current.getBoundingClientRect();
         setRelativePosition({
-          x: spanRect.width + inputRect.x + CONTEXT_INPUT_OFFSET_X,
-          y: spanRect.height + inputRect.y + CONTEXT_INPUT_OFFSET_Y,
+          x: mouseContextMenu.position.x - boxSize.x,
+          y: mouseContextMenu.position.y - boxSize.y,
         });
-      }
-    }, [contextInputRef, menuVisible]);
 
-    useLayoutEffect(() => {
-      if (mouseContextMenu?.position) {
-        if (menuVisible) {
-          menu.hide();
-          return;
-        }
-
-        if (innerMenuButtonRef.current) {
-          menu.show();
-
-          const boxSize = innerMenuButtonRef.current.getBoundingClientRect();
-          setRelativePosition({
-            x: mouseContextMenu.position.x - boxSize.x,
-            y: mouseContextMenu.position.y - boxSize.y,
-          });
-
-          mouseContextMenu.position = null;
-        }
+        mouseContextMenu.position = null;
       }
     }, [mouseContextMenu?.position, menuVisible]);
 
     useLayoutEffect(() => {
-      if (relativePosition && menuButtonLinkRef.current && mouseContextMenu) {
+      if (mouseContextMenu?.position && relativePosition && menuButtonLinkRef.current) {
         menuButtonLinkRef.current.style.left = `${relativePosition.x}px`;
         menuButtonLinkRef.current.style.top = `${relativePosition.y}px`;
       }
     });
 
     useLayoutEffect(() => {
-      if (relativePosition && menuPanelRef.current && contextInputRef?.current) {
-        menuPanelRef.current.style.left = `${relativePosition.x}px`;
-        menuPanelRef.current.style.top = `${relativePosition.y}px`;
+      if (contextInputRef?.current && menuButtonLinkRef.current) {
+        const span = document.createElement('span');
+        span.style.position = 'absolute';
+        span.style.visibility = 'hidden';
+        span.style.whiteSpace = 'pre';
+        span.style.fontFamily = window.getComputedStyle(contextInputRef.current).fontFamily;
+        span.style.fontSize = window.getComputedStyle(contextInputRef.current).fontSize;
+        span.textContent = contextInputRef.current.value;
+
+        document.body.appendChild(span);
+        const spanRect = span.getBoundingClientRect();
+        const letterWidth = spanRect.width / contextInputRef.current.value.length;
+        document.body.removeChild(span);
+
+        menuButtonLinkRef.current.style.left = `${spanRect.width + letterWidth}px`;
+        menuButtonLinkRef.current.style.top = `${spanRect.height + CONTEXT_INPUT_OFFSET_Y}px`;
       }
-    });
+    }, [contextInputRef?.current?.value]);
 
     const MenuButtonLink = MenuButton;
 
@@ -188,7 +181,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
             >
               {items}
             </MenuPanel>
-            {relativePosition && (
+            {hasAnchorButton && (
               <MenuButtonLink ref={menuButtonLinkRef} className={s(styles, { menuButtonLink: true })} {...menu} visible={menuVisible} />
             )}
           </MenuStateContext.Provider>
@@ -222,7 +215,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
           >
             {items}
           </MenuPanel>
-          {relativePosition && (
+          {hasAnchorButton && (
             <MenuButtonLink ref={menuButtonLinkRef} className={s(styles, { menuButtonLink: true })} {...menu} visible={menuVisible} />
           )}
         </MenuStateContext.Provider>
