@@ -43,7 +43,6 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
 
   function handleSelect(proposal: InputAutocompleteProposal) {
     menuRef.current?.hide();
-
     autocompleteState.replaceCurrentWord(proposal.replacementString);
     onSelect?.(proposal);
   }
@@ -80,7 +79,7 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
     if (!menuRef.current?.visible && autocompleteState.filteredSuggestions.length) {
       menuRef.current?.show();
     }
-  }, [menuRef.current, autocompleteState.filteredSuggestions]);
+  }, [menuRef.current?.visible, autocompleteState.filteredSuggestions]);
 
   return (
     <Menu

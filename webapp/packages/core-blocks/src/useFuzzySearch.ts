@@ -44,7 +44,7 @@ export function useFuzzySearch<T extends object>({ sourceProposals, ...options }
   useEffect(() => {
     state.searchInstance.current = createSearchInstance<T>(minisearchOptions);
     state.searchInstance.current.addAll(sourceProposals);
-  }, [dataSetKeys, sourceProposals]);
+  }, [sourceProposals]);
 
   const state = useObservableRef(
     () => ({
