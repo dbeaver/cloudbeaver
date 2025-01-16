@@ -81,6 +81,10 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
     }
   }, [menuRef.current?.visible, autocompleteState.filteredSuggestions]);
 
+  if (!autocompleteState.filteredSuggestions.length) {
+    return;
+  }
+
   return (
     <Menu
       contextInputRef={inputRef}
