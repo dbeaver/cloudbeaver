@@ -7,7 +7,7 @@
  */
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { useFuzzySearch } from '../useFuzzySearch.js';
+import { useFuzzySearch } from './useFuzzySearch.js';
 
 export type SearchStrategy = 'startsWith' | 'contains' | 'fuzzy';
 

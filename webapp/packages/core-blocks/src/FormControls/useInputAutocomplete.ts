@@ -11,7 +11,7 @@ import { type RefObject, useEffect, useMemo } from 'react';
 import { debounce, isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { useObservableRef } from '../useObservableRef.js';
-import { type SearchStrategy, useSearch } from './useSearch.js';
+import { type SearchStrategy, useSearch } from '../useSearch.js';
 
 export type InputAutocompleteStrategy = 'startsWith' | 'contains' | 'fuzzy';
 
@@ -49,7 +49,6 @@ export const useInputAutocomplete = (
       isFound: false,
       input: inputRef.current?.value as string | undefined,
       selectionStart: inputRef.current?.selectionStart ?? null,
-      selectionEnd: inputRef.current?.value?.length ?? null,
       replaceCurrentWord(replacement: string) {
         const cursorPosition = this.selectionStart;
         const words = this.input?.split(' ');
@@ -63,7 +62,6 @@ export const useInputAutocomplete = (
 
         this.input = this.input?.slice(0, start) + replacement + this.input?.slice(end);
         this.selectionStart = start + replacement.length;
-        this.selectionEnd = start + replacement.length;
 
         if (this.inputRef.current) {
           this.inputRef.current.value = this.input;
@@ -98,7 +96,6 @@ export const useInputAutocomplete = (
     {
       input: observable.ref,
       selectionStart: observable.ref,
-      selectionEnd: observable.ref,
       isFound: observable.ref,
       filteredSuggestions: computed,
       currentWord: computed,
@@ -113,7 +110,6 @@ export const useInputAutocomplete = (
         const target = event.target as HTMLInputElement;
 
         state.selectionStart = target.selectionStart;
-        state.selectionEnd = target.selectionEnd;
         state.input = target.value;
         state.isFound = false;
       }, INPUT_DELAY),

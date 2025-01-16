@@ -6,10 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import MiniSearch, { type Options } from 'minisearch';
-import { action, computed, observable } from 'mobx';
 import { useEffect, useRef } from 'react';
-
-import { useObservableRef } from './useObservableRef.js';
 
 interface UseSearchProps<T> extends Options {
   sourceProposals: T[];
