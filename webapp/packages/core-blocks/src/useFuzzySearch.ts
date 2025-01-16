@@ -42,31 +42,13 @@ export function useFuzzySearch<T extends object>({ sourceProposals, ...options }
   }
 
   useEffect(() => {
-    state.searchInstance.current = createSearchInstance<T>(minisearchOptions);
-    state.searchInstance.current.addAll(sourceProposals);
+    searchInstance.current = createSearchInstance<T>(minisearchOptions);
+    searchInstance.current.addAll(sourceProposals);
   }, [sourceProposals]);
 
-  const state = useObservableRef(
-    () => ({
-      search: '',
-      setSearch(value: string) {
-        this.search = value;
-      },
-      get proposals() {
-        if (!this.search) {
-          return [];
-        }
+  function search(searchWord: string) {
+    return searchInstance.current.search(searchWord) as T[];
+  }
 
-        return this.searchInstance.current.search(this.search) as T[];
-      },
-    }),
-    {
-      search: observable,
-      setSearch: action.bound,
-      proposals: computed,
-    },
-    { searchInstance },
-  );
-
-  return state;
+  return search;
 }

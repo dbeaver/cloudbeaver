@@ -10,14 +10,14 @@ import { type RefObject, useEffect, useMemo } from 'react';
 
 import { debounce, isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { useFuzzySearch } from '../useFuzzySearch.js';
 import { useObservableRef } from '../useObservableRef.js';
+import { type SearchStrategy, useSearch } from './useSearch.js';
 
 export type InputAutocompleteStrategy = 'startsWith' | 'contains' | 'fuzzy';
 
 interface InputAutocompleteOptions {
   sourceHints: InputAutocompleteProposal[];
-  matchStrategy?: InputAutocompleteStrategy;
+  matchStrategy?: SearchStrategy;
   predicate?: (suggestion: InputAutocompleteProposal, lastWord?: string) => boolean;
 }
 
@@ -37,10 +37,13 @@ export const useInputAutocomplete = (
   inputRef: RefObject<HTMLInputElement | HTMLTextAreaElement>,
   { sourceHints, matchStrategy = 'contains', predicate }: InputAutocompleteOptions,
 ) => {
-  const fuzzySearch = useFuzzySearch({
-    sourceProposals: sourceHints,
-    fields: SEARCH_FIELDS,
+  const getSearchResults = useSearch({
+    sourceHints,
+    searchFields: SEARCH_FIELDS,
+    matchStrategy,
+    predicate,
   });
+
   const state = useObservableRef(
     () => ({
       isFound: false,
@@ -67,7 +70,6 @@ export const useInputAutocomplete = (
           this.inputRef.current.focus();
         }
 
-        this.fuzzySearch.setSearch('');
         this.isFound = true;
       },
       get currentWord(): string {
@@ -90,25 +92,7 @@ export const useInputAutocomplete = (
           return [];
         }
 
-        if (this.matchStrategy === 'fuzzy') {
-          return this.fuzzySearch.proposals.filter(suggestion => filterBase(suggestion, this.currentWord, predicate)).sort(sortByScore);
-        }
-
-        const matchFunctions: Record<Exclude<InputAutocompleteStrategy, 'fuzzy'>, (value: string) => boolean> = {
-          startsWith: value => value.toLocaleLowerCase().startsWith(this.currentWord.toLocaleLowerCase()),
-          contains: value => value.toLocaleLowerCase().includes(this.currentWord.toLocaleLowerCase()),
-        };
-
-        return this.sourceHints
-          .filter(suggestion => {
-            const values = SEARCH_FIELDS.map(field => suggestion[field]).filter(value => isNotNullDefined(value) && typeof value === 'string');
-
-            return (
-              values.some(matchFunctions[this.matchStrategy as Exclude<InputAutocompleteStrategy, 'fuzzy'>]) &&
-              filterBase(suggestion, this.currentWord, predicate)
-            );
-          })
-          .sort(sortByScore);
+        return this.getSearchResults(this.currentWord).sort(this.sortByScore);
       },
     }),
     {
@@ -116,14 +100,11 @@ export const useInputAutocomplete = (
       selectionStart: observable.ref,
       selectionEnd: observable.ref,
       isFound: observable.ref,
-      sourceHints: observable.ref,
-      matchStrategy: observable.ref,
-      inputRef: observable.ref,
-      currentWord: computed,
       filteredSuggestions: computed,
+      currentWord: computed,
       replaceCurrentWord: action.bound,
     },
-    { sourceHints, matchStrategy, inputRef, fuzzySearch },
+    { sourceHints, matchStrategy, inputRef, getSearchResults, sortByScore },
   );
 
   const handleInput = useMemo(
@@ -133,8 +114,7 @@ export const useInputAutocomplete = (
 
         state.selectionStart = target.selectionStart;
         state.selectionEnd = target.selectionEnd;
-        state.input = target?.value;
-        fuzzySearch.setSearch(state.currentWord);
+        state.input = target.value;
         state.isFound = false;
       }, INPUT_DELAY),
     [],
@@ -162,19 +142,4 @@ function sortByScore(a: InputAutocompleteProposal, b: InputAutocompleteProposal)
   }
 
   return 0;
-}
-
-function filterBase(
-  suggestion: InputAutocompleteProposal,
-  currentWord: string,
-  predicate?: (suggestion: InputAutocompleteProposal, currentWord: string) => boolean,
-) {
-  const values = SEARCH_FIELDS.map(field => suggestion[field]).filter(value => isNotNullDefined(value) && typeof value === 'string');
-  const hasEqual = values.some(value => value.toLocaleLowerCase() === currentWord?.toLocaleLowerCase());
-
-  if (!currentWord || hasEqual) {
-    return false;
-  }
-
-  return predicate ? predicate(suggestion, currentWord) : true;
 }
