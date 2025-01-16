@@ -11,7 +11,7 @@ import { TeamInfoMetaParametersResource, TeamsResource } from '@cloudbeaver/core
 import { ColoredContainer, GroupBack, GroupTitle, Text, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { TeamForm } from '../TeamForm.js';
+import { TeamForm } from '../TeamsForm/TeamForm.js';
 import { useTeamFormState } from '../useTeamFormState.js';
 import { TeamsTableOptionsPanelService } from './TeamsTableOptionsPanelService.js';
 

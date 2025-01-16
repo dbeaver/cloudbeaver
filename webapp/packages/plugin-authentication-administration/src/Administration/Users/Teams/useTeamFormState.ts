@@ -10,9 +10,9 @@ import { useState } from 'react';
 import type { TeamInfoMetaParametersResource, TeamsResource } from '@cloudbeaver/core-authentication';
 import { useService } from '@cloudbeaver/core-di';
 
-import type { ITeamFormState } from './ITeamFormProps.js';
-import { TeamFormService } from './TeamFormService.js';
-import { TeamFormState } from './TeamFormState.js';
+import type { ITeamFormState } from './TeamsForm/ITeamFormProps.js';
+import { TeamFormService } from './TeamsForm/TeamFormService.js';
+import { TeamFormState } from './TeamsForm/TeamFormState.js';
 
 export function useTeamFormState(
   resource: TeamsResource,

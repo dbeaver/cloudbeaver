@@ -10,10 +10,10 @@ import { makeObservable, observable } from 'mobx';
 import { TeamInfoMetaParametersResource, TeamsResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 
-import type { ITeamFormState } from './ITeamFormProps.js';
-import { TeamFormService } from './TeamFormService.js';
-import { TeamFormState } from './TeamFormState.js';
-import { TeamsAdministrationNavService } from './TeamsAdministrationNavService.js';
+import { TeamsAdministrationNavService } from '../TeamsAdministrationNavService.js';
+import type { ITeamFormState } from '../TeamsForm/ITeamFormProps.js';
+import { TeamFormService } from '../TeamsForm/TeamFormService.js';
+import { TeamFormState } from '../TeamsForm/TeamFormState.js';
 
 @injectable()
 export class CreateTeamService {

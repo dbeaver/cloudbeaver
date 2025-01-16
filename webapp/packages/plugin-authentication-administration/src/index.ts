@@ -10,9 +10,9 @@ import { manifest } from './manifest.js';
 export default manifest;
 
 export * from './Administration/Users/UsersAdministrationNavigationService.js';
-export * from './Administration/Users/Teams/TeamFormService.js';
-export * from './Administration/Users/Teams/ITeamFormProps.js';
-export * from './Administration/Users/Teams/Contexts/teamContext.js';
+export * from './Administration/Users/Teams/TeamsForm/TeamFormService.js';
+export * from './Administration/Users/Teams/TeamsForm/ITeamFormProps.js';
+export * from './Administration/Users/Teams/TeamsForm/Contexts/teamContext.js';
 export * from './Administration/Users/UsersTable/CreateUserService.js';
 export * from './Administration/Users/UsersAdministrationService.js';
 export * from './Administration/Users/UserForm/AdministrationUserFormService.js';
