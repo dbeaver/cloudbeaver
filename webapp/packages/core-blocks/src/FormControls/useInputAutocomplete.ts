@@ -48,12 +48,6 @@ export const useInputAutocomplete = (
       selectionStart: inputRef.current?.selectionStart ?? null,
       selectionEnd: inputRef.current?.value?.length ?? null,
       replaceCurrentWord(replacement: string) {
-        const input = this.inputRef.current;
-
-        if (!input) {
-          return;
-        }
-
         const cursorPosition = this.selectionStart;
         const words = this.input?.split(' ');
 
@@ -68,12 +62,15 @@ export const useInputAutocomplete = (
         this.selectionStart = start + replacement.length;
         this.selectionEnd = start + replacement.length;
 
-        input.value = this.input;
-        input.focus();
+        if (this.inputRef.current) {
+          this.inputRef.current.value = this.input;
+          this.inputRef.current.focus();
+        }
+
         this.fuzzySearch.setSearch('');
         this.isFound = true;
       },
-      get currentWord() {
+      get currentWord(): string {
         const cursorPosition = this.selectionStart;
 
         if (!cursorPosition) {
@@ -86,12 +83,7 @@ export const useInputAutocomplete = (
           return '';
         }
 
-        return (
-          substring
-            .split(' ')
-            .at(-1)
-            ?.replace(/[^\w\s]|_/g, '') ?? ''
-        );
+        return substring.split(' ').at(-1) ?? '';
       },
       get filteredSuggestions() {
         if (!this.currentWord || this.isFound) {
