@@ -18,6 +18,7 @@
 package io.cloudbeaver.test.platform;
 
 import io.cloudbeaver.CloudbeaverMockTest;
+import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.rm.RMNIOTest;
 import io.cloudbeaver.model.rm.lock.RMLockTest;
@@ -47,7 +48,15 @@ import java.util.Map;
         RMNIOTest.class
     }
 )
-public class CEServerTestSuite extends CloudbeaverMockTest {
+public class CEServerTestSuite {
 
+    @BeforeClass
+    public static void startServer() throws Exception {
+        CEAppStarter.startServerIfNotStarted();
+    }
 
+    @AfterClass
+    public static void shutdownServer() {
+        CEAppStarter.shutdownServer();
+    }
 }

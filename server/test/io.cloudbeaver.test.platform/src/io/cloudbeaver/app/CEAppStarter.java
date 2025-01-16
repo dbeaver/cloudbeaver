@@ -9,7 +9,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.SecurityUtils;
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 
 import java.net.CookieManager;
 import java.net.http.HttpClient;
@@ -25,11 +24,11 @@ public class CEAppStarter {
 
     private static CBApplication<?> testApp;
 
-    @BeforeClass
     public static void startServerIfNotStarted() throws Exception {
         System.out.println("Start CBApplication");
-        if (DBWorkbench.isPlatformStarted()) {
+        if (DBWorkbench.isPlatformStarted() && DBWorkbench.getPlatform().getApplication() instanceof CBApplication<?>) {
             testApp = (CBApplication<?>) DBWorkbench.getPlatform().getApplication();
+            return;
         }
         testApp = new CBApplicationCE();
         Thread thread = new Thread(() -> testApp.start(null));
