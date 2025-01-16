@@ -91,9 +91,7 @@ export const useInputAutocomplete = (
         }
 
         if (this.matchStrategy === 'fuzzy') {
-          return this.fuzzySearch.proposals
-            .filter(suggestion => filterWithoutSameWord(suggestion, this.currentWord) && (predicate ? predicate(suggestion, this.currentWord) : true))
-            .sort(sortByScore);
+          return this.fuzzySearch.proposals.filter(suggestion => filterBase(suggestion, this.currentWord, predicate)).sort(sortByScore);
         }
 
         const matchFunctions: Record<Exclude<InputAutocompleteStrategy, 'fuzzy'>, (value: string) => boolean> = {
@@ -106,11 +104,10 @@ export const useInputAutocomplete = (
             const values = SEARCH_FIELDS.map(field => suggestion[field]).filter(value => isNotNullDefined(value) && typeof value === 'string');
 
             return (
-              filterWithoutSameWord(suggestion, this.currentWord) &&
-              values.some(matchFunctions[this.matchStrategy as Exclude<InputAutocompleteStrategy, 'fuzzy'>])
+              values.some(matchFunctions[this.matchStrategy as Exclude<InputAutocompleteStrategy, 'fuzzy'>]) &&
+              filterBase(suggestion, this.currentWord, predicate)
             );
           })
-          .filter(suggestion => (predicate ? predicate(suggestion, this.currentWord) : true))
           .sort(sortByScore);
       },
     }),
@@ -167,13 +164,17 @@ function sortByScore(a: InputAutocompleteProposal, b: InputAutocompleteProposal)
   return 0;
 }
 
-function filterWithoutSameWord(suggestion: InputAutocompleteProposal, currentWord: string) {
+function filterBase(
+  suggestion: InputAutocompleteProposal,
+  currentWord: string,
+  predicate?: (suggestion: InputAutocompleteProposal, currentWord: string) => boolean,
+) {
   const values = SEARCH_FIELDS.map(field => suggestion[field]).filter(value => isNotNullDefined(value) && typeof value === 'string');
-  const isEqual = values.some(value => value.toLocaleLowerCase() === currentWord?.toLocaleLowerCase());
+  const hasEqual = values.some(value => value.toLocaleLowerCase() === currentWord?.toLocaleLowerCase());
 
-  if (!currentWord || isEqual) {
+  if (!currentWord || hasEqual) {
     return false;
   }
 
-  return true;
+  return predicate ? predicate(suggestion, currentWord) : true;
 }
