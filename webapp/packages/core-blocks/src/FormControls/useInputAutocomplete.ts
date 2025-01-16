@@ -35,7 +35,7 @@ const SEARCH_FIELDS: Array<keyof InputAutocompleteProposal> = ['displayString', 
 
 export const useInputAutocomplete = (
   inputRef: RefObject<HTMLInputElement | HTMLTextAreaElement>,
-  { sourceHints, matchStrategy = 'startsWith', predicate }: InputAutocompleteOptions,
+  { sourceHints, matchStrategy = 'contains', predicate }: InputAutocompleteOptions,
 ) => {
   const fuzzySearch = useFuzzySearch({
     sourceProposals: sourceHints,

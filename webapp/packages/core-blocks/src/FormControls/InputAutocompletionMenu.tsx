@@ -72,15 +72,6 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
     };
   }, [inputRef.current]);
 
-  useEffect(() => {
-    if (menuRef.current?.visible && autocompleteState.filteredSuggestions.length === 0) {
-      menuRef.current?.hide();
-    }
-    if (!menuRef.current?.visible && autocompleteState.filteredSuggestions.length) {
-      menuRef.current?.show();
-    }
-  }, [menuRef.current?.visible, autocompleteState.filteredSuggestions]);
-
   if (!autocompleteState.filteredSuggestions.length) {
     return;
   }

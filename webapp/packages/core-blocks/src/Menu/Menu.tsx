@@ -102,25 +102,23 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
     }, [menuVisible]);
 
     useLayoutEffect(() => {
-      if (!mouseContextMenu?.position) {
-        return;
-      }
+      if (mouseContextMenu?.position) {
+        if (menuVisible) {
+          menu.hide();
+          return;
+        }
 
-      if (menuVisible) {
-        menu.hide();
-        return;
-      }
+        if (innerMenuButtonRef.current) {
+          menu.show();
 
-      if (innerMenuButtonRef.current) {
-        menu.show();
+          const boxSize = innerMenuButtonRef.current.getBoundingClientRect();
+          setRelativePosition({
+            x: mouseContextMenu.position.x - boxSize.x,
+            y: mouseContextMenu.position.y - boxSize.y,
+          });
 
-        const boxSize = innerMenuButtonRef.current.getBoundingClientRect();
-        setRelativePosition({
-          x: mouseContextMenu.position.x - boxSize.x,
-          y: mouseContextMenu.position.y - boxSize.y,
-        });
-
-        mouseContextMenu.position = null;
+          mouseContextMenu.position = null;
+        }
       }
     }, [mouseContextMenu?.position, menuVisible]);
 
@@ -148,6 +146,8 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
 
         menuButtonLinkRef.current.style.left = `${spanRect.width + letterWidth}px`;
         menuButtonLinkRef.current.style.top = `${spanRect.height + CONTEXT_INPUT_OFFSET_Y}px`;
+
+        menu.show();
       }
     }, [contextInputRef?.current?.value]);
 
@@ -158,7 +158,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
         <ErrorBoundary>
           <MenuStateContext.Provider value={menu}>
             <MenuButton
-              key={relativePosition ? 'link' : 'main'}
+              key={hasAnchorButton ? 'link' : 'main'}
               ref={combinedRef}
               tabIndex={0}
               className={s(styles, { menuButton: true }, className)}
@@ -193,7 +193,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
       <ErrorBoundary>
         <MenuStateContext.Provider value={menu}>
           <MenuButton
-            key={relativePosition ? 'link' : 'main'}
+            key={hasAnchorButton ? 'link' : 'main'}
             ref={combinedRef}
             tabIndex={0}
             className={s(styles, { menuButton: true }, className)}
