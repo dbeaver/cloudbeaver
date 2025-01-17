@@ -43,6 +43,7 @@ export class GeneratorMenuBootstrap extends Bootstrap {
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
         return (
           !model.isReadonly(resultIndex) &&
+          model.hasElementIdentifier(resultIndex) &&
           model.source.getResult(resultIndex)?.dataFormat === ResultDataFormat.Resultset &&
           !presentation?.readonly &&
           (!presentation || presentation.type === DataViewerPresentationType.Data)

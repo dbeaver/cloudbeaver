@@ -224,6 +224,24 @@ type DynamicTraceProperty {
 }
 
 ####################################################
+# Transactional info
+####################################################
+type TransactionLogInfoItem {
+    id: Int!
+    time: DateTime!
+    type: String!
+    queryString: String!
+    durationMs: Int!
+    rows: Int!
+    result: String!
+}
+type TransactionLogInfos {
+    count: Int!
+    transactionLogInfos: [TransactionLogInfoItem!]!
+}
+
+
+####################################################
 # Query and Mutation
 ####################################################
 
@@ -330,6 +348,12 @@ extend type Mutation {
         filter: SQLDataFilter,
         dataFormat: ResultDataFormat
     ): AsyncTaskInfo!
+
+    getTransactionLogInfo(
+        projectId: ID!,
+        connectionId: ID!,
+        contextId: ID!
+    ): TransactionLogInfos!
 
     # Close results (free resources)
     sqlResultClose(projectId: ID, connectionId: ID!, contextId: ID!, resultId: ID!): Boolean!

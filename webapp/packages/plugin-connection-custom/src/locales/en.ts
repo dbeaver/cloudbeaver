@@ -5,4 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-export default [['plugin_connection_custom_action_custom_label', 'New Connection']];
+export default [
+  ['plugin_connection_custom_action_custom_label', 'New Connection'],
+  ['plugin_connection_custom_drivers_driver_not_installed', 'Driver is not installed'],
+];

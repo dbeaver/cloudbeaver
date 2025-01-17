@@ -30,6 +30,7 @@ export function isTextValueReadonly({ contentAction, formatAction, model, result
     formatAction.isGeometry(cell) ||
     contentAction.isTextTruncated(cell) ||
     model.isReadonly(resultIndex) ||
-    model.isDisabled(resultIndex)
+    model.isDisabled(resultIndex) ||
+    !model.hasElementIdentifier(resultIndex)
   );
 }

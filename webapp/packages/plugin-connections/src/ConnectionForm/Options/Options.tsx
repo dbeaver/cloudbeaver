@@ -14,11 +14,13 @@ import {
   Combobox,
   Container,
   FieldCheckbox,
+  Flex,
   Form,
   FormFieldDescription,
   getComputed,
   Group,
   GroupTitle,
+  IconOrImage,
   InputField,
   Link,
   ObjectPropertyInfoForm,
@@ -28,6 +30,7 @@ import {
   Textarea,
   useAdministrationSettings,
   useFormValidator,
+  usePermission,
   useResource,
   useS,
   useTranslate,
@@ -35,7 +38,7 @@ import {
 import { DatabaseAuthModelsResource, type DBDriver, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { EAdminPermission, ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 import { type TabContainerPanelComponent, TabsContext, useAuthenticationAction } from '@cloudbeaver/core-ui';
 import { EMPTY_ARRAY } from '@cloudbeaver/core-utils';
@@ -76,6 +79,7 @@ const driverConfiguration: IDriverConfiguration[] = [
 ];
 
 export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({ state }) {
+  const isAdmin = usePermission(EAdminPermission.admin);
   const serverConfigResource = useResource(Options, ServerConfigResource, undefined);
   const projectInfoResource = useService(ProjectInfoResource);
   const service = useService(ConnectionFormService);
@@ -151,7 +155,13 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const edit = state.mode === 'edit';
   const originLocal = !info || (originInfo?.origin && isLocalConnection(originInfo.origin));
 
-  const drivers = driverMap.resource.enabledDrivers.filter(({ id }) => availableDrivers.includes(id));
+  const drivers = driverMap.resource.enabledDrivers.filter(({ id, driverInstalled }) => {
+    if (!edit && !isAdmin && !driverInstalled) {
+      return false;
+    }
+
+    return availableDrivers.includes(id);
+  });
 
   let properties = authModel?.properties;
 
@@ -187,7 +197,12 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 tiny
                 fill
               >
-                {translate('connections_connection_driver')}
+                <Flex gap="xs">
+                  {isAdmin && !driver?.driverInstalled && (
+                    <IconOrImage icon="/icons/info_icon_sm.svg" title={translate('plugin_connections_connection_driver_not_installed')} />
+                  )}
+                  {translate('connections_connection_driver')}
+                </Flex>
               </Combobox>
               {configurationTypes.length > 1 && (
                 <FormFieldDescription label={translate('connections_connection_configuration')} tiny>

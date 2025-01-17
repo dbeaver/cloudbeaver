@@ -101,12 +101,15 @@ export class TableFooterMenuService {
           }
           case ACTION_DELETE: {
             const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
+            const selectedElements = getActiveElements(model, resultIndex);
 
-            if (!editor) {
+            // we can't edit table cells if table doesn't have row identifier, but we can edit new created rows before insert (CB-6063)
+            const canEdit =
+              model.hasElementIdentifier(resultIndex) || selectedElements.every(key => editor?.getElementState(key) === DatabaseEditChangeType.add);
+
+            if (!editor || !canEdit) {
               return true;
             }
-
-            const selectedElements = getActiveElements(model, resultIndex);
 
             return selectedElements.length === 0 || !selectedElements.some(key => editor.getElementState(key) !== DatabaseEditChangeType.delete);
           }

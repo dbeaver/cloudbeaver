@@ -86,9 +86,11 @@ export class DataGridContextMenuCellEditingService {
         const isComplex = format.isBinary(key) || format.isGeometry(key);
         const isTruncated = content.isTextTruncated(key);
         const selectedElements = select?.getSelectedElements() || [];
+        // we can't edit table cells if table doesn't have row identifier, but we can edit new created rows before insert (CB-6063)
+        const canEdit = model.hasElementIdentifier(resultIndex) || editor.getElementState(key) === DatabaseEditChangeType.add;
 
         if (action === ACTION_EDIT) {
-          if (!column || cellValue === undefined || format.isReadOnly(key) || isComplex || isTruncated) {
+          if (!column || cellValue === undefined || format.isReadOnly(key) || isComplex || isTruncated || !canEdit) {
             return false;
           }
 
@@ -96,7 +98,7 @@ export class DataGridContextMenuCellEditingService {
         }
 
         if (action === ACTION_DATA_GRID_EDITING_SET_TO_NULL) {
-          return cellValue !== undefined && !format.isReadOnly(key) && !view.getColumn(key.column)?.required && !format.isNull(key);
+          return cellValue !== undefined && !format.isReadOnly(key) && !view.getColumn(key.column)?.required && !format.isNull(key) && canEdit;
         }
 
         if (action === ACTION_DATA_GRID_EDITING_ADD_ROW || action === ACTION_DATA_GRID_EDITING_DUPLICATE_ROW) {
@@ -104,11 +106,11 @@ export class DataGridContextMenuCellEditingService {
         }
 
         if (action === ACTION_DATA_GRID_EDITING_DELETE_ROW) {
-          return !format.isReadOnly(key) && editor.getElementState(key) !== DatabaseEditChangeType.delete;
+          return !format.isReadOnly(key) && canEdit && editor.getElementState(key) !== DatabaseEditChangeType.delete;
         }
 
         if (action === ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW) {
-          if (model.isReadonly(resultIndex) || !editor.hasFeature('delete')) {
+          if (model.isReadonly(resultIndex) || !canEdit || !editor.hasFeature('delete')) {
             return false;
           }
 
