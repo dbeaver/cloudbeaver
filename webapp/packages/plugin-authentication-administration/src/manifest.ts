@@ -22,7 +22,8 @@ export const manifest: PluginManifest = {
     () => import('./Administration/Users/Teams/TeamsAdministrationService.js').then(m => m.TeamsAdministrationService),
     () => import('./Administration/Users/Teams/TeamsTable/CreateTeamService.js').then(m => m.CreateTeamService),
     () => import('./Administration/Users/Teams/TeamsAdministrationNavService.js').then(m => m.TeamsAdministrationNavService),
-    () => import('./Administration/Users/Teams/TeamsForm/TeamFormService.js').then(m => m.TeamFormService),
+    () => import('./Administration/Users/Teams/TeamsForm/TeamsAdministrationFormService.js').then(m => m.TeamsAdministrationFormService),
+    () => import('./Administration/Users/Teams/TeamsForm/TeamsAdministrationFormState.js').then(m => m.TeamsAdministrationFormState),
     () => import('./Administration/Users/Teams/TeamsForm/Options/TeamOptionsTabService.js').then(m => m.TeamOptionsTabService),
     () => import('./Administration/Users/Teams/TeamsForm/GrantedUsers/GrantedUsersTabService.js').then(m => m.GrantedUsersTabService),
     () =>

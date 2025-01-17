@@ -34,19 +34,19 @@ import { isGlobalProject, type ProjectInfo, ProjectInfoResource } from '@cloudbe
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
-import type { ITeamFormProps } from '../ITeamFormProps.js';
+import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
 import { ConnectionList } from './ConnectionList.js';
+import { getGrantedConnectionsFormPart } from './getGrantedConnectionsFormPart.js';
 import style from './GrantedConnections.module.css';
 import { GrantedConnectionList } from './GrantedConnectionsList.js';
-import { useGrantedConnections } from './useGrantedConnections.js';
 
-export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = observer(function GrantedConnections({ tabId, state: formState }) {
+export const GrantedConnections: TabContainerPanelComponent<TeamFormProps> = observer(function GrantedConnections({ tabId, formState }) {
   const styles = useS(style);
   const translate = useTranslate();
 
-  const state = useGrantedConnections(formState.config, formState.mode);
+  const part = getGrantedConnectionsFormPart(formState);
   const { selected } = useTab(tabId);
-  const loaded = state.state.loaded;
+  const loaded = part.isLoaded();
 
   const projects = useResource(GrantedConnections, ProjectInfoResource, CachedMapAllKey);
 
@@ -61,10 +61,10 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
 
   const connections = connectionsLoader.data as Connection[];
 
-  const grantedConnections = getComputed(() => connections.filter(connection => state.state.grantedSubjects.includes(connection.id)));
+  const grantedConnections = getComputed(() => connections.filter(connection => part.state.grantedSubjects.includes(connection.id)));
   const connectionsOrigins = (connectionsOriginLoader.data ?? []) as ConnectionInfoOrigin[];
 
-  useAutoLoad(GrantedConnections, state, selected && !loaded);
+  useAutoLoad(GrantedConnections, part, selected && !loaded);
 
   if (!selected) {
     return null;
@@ -78,12 +78,12 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
     info = 'cloud_connections_access_placeholder';
   }
 
-  if (formState.mode === 'edit' && state.changed) {
+  if (formState.mode === 'edit' && part.isChanged) {
     info = 'ui_save_reminder';
   }
 
   return (
-    <Loader className={s(styles, { loader: true })} state={[state.state]}>
+    <Loader className={s(styles, { loader: true })} state={part}>
       {() => (
         <Container className={s(styles, { box: true })} parent gap vertical>
           {!connections.length ? (
@@ -97,17 +97,17 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
                 <GrantedConnectionList
                   grantedConnections={grantedConnections}
                   connectionsOrigins={connectionsOrigins}
-                  disabled={formState.disabled}
-                  onEdit={state.edit}
-                  onRevoke={state.revoke}
+                  disabled={formState.isDisabled}
+                  onEdit={part.edit}
+                  onRevoke={part.revoke}
                 />
-                {state.state.editing && (
+                {part.state.editing && (
                   <ConnectionList
                     connectionList={connections}
                     connectionsOrigins={connectionsOrigins}
-                    grantedSubjects={state.state.grantedSubjects}
-                    disabled={formState.disabled}
-                    onGrant={state.grant}
+                    grantedSubjects={part.state.grantedSubjects}
+                    disabled={formState.isDisabled}
+                    onGrant={part.grant}
                   />
                 )}
               </Container>

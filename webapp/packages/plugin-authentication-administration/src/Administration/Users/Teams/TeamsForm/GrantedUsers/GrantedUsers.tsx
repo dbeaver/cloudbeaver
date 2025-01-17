@@ -13,22 +13,22 @@ import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
-import type { ITeamFormProps } from '../ITeamFormProps.js';
+import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
+import { getGrantedUsersFormPart } from './getGrantedUsersFormPart.js';
 import { GrantedUserList } from './GrantedUserList.js';
 import style from './GrantedUsers.module.css';
 import type { IGrantedUser } from './IGrantedUser.js';
-import { useGrantedUsers } from './useGrantedUsers.js';
 import { UserList } from './UserList.js';
 
-export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer(function GrantedUsers({ tabId, state: formState }) {
+export const GrantedUsers: TabContainerPanelComponent<TeamFormProps> = observer(function GrantedUsers({ tabId, formState }) {
   const styles = useS(style);
   const translate = useTranslate();
 
-  const state = useGrantedUsers(formState.config, formState.mode);
+  const part = getGrantedUsersFormPart(formState);
   const { selected } = useTab(tabId);
 
   const serverConfigResource = useResource(UserList, ServerConfigResource, undefined, { active: selected });
-  const isDefaultTeam = formState.config.teamId === serverConfigResource.data?.defaultUserTeam;
+  const isDefaultTeam = formState.state.teamId === serverConfigResource.data?.defaultUserTeam;
 
   const users = useResource(GrantedUsers, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()), {
     active: selected && !isDefaultTeam,
@@ -37,7 +37,7 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
   const grantedUsers: IGrantedUser[] = [];
 
   for (const user of users.data) {
-    const granted = state.state.grantedUsers.find(grantedUser => grantedUser.userId === user?.userId);
+    const granted = part.state.grantedUsers.find(grantedUser => grantedUser.userId === user?.userId);
 
     if (granted && user) {
       grantedUsers.push({
@@ -47,7 +47,7 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
     }
   }
 
-  useAutoLoad(GrantedUsers, state, selected && !state.state.loaded && !isDefaultTeam);
+  useAutoLoad(GrantedUsers, part, selected && !part.isLoaded() && !isDefaultTeam);
 
   if (!selected) {
     return null;
@@ -66,7 +66,7 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
   }
 
   return (
-    <Loader className={s(styles, { loader: true })} state={[state.state]}>
+    <Loader className={s(styles, { loader: true })} state={part}>
       {() => (
         <Container className={s(styles, { box: true })} parent={!!users.resource.values.length} gap vertical>
           {!users.resource.values.length ? (
@@ -77,21 +77,21 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
             </Group>
           ) : (
             <>
-              {formState.mode === 'edit' && state.changed && <InfoItem info="ui_save_reminder" />}
+              {formState.mode === 'edit' && part.isChanged && <InfoItem info="ui_save_reminder" />}
               <Container gap overflow>
                 <GrantedUserList
                   grantedUsers={grantedUsers}
-                  disabled={formState.disabled}
-                  onEdit={state.edit}
-                  onRevoke={state.revoke}
-                  onTeamRoleAssign={state.assignTeamRole}
+                  disabled={formState.isDisabled}
+                  onEdit={part.edit}
+                  onRevoke={part.revoke}
+                  onTeamRoleAssign={part.assignTeamRole}
                 />
-                {state.state.editing && (
+                {part.state.editing && (
                   <UserList
                     userList={users.resource.values}
                     grantedUsers={grantedUsers.map(user => user.userId)}
-                    disabled={formState.disabled}
-                    onGrant={state.grant}
+                    disabled={formState.isDisabled}
+                    onGrant={part.grant}
                   />
                 )}
               </Container>

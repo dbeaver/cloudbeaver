@@ -6,83 +6,65 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
 
-import type { TeamInfo } from '@cloudbeaver/core-authentication';
-import {
-  Container,
-  Form,
-  Loader,
-  Placeholder,
-  s,
-  StatusMessage,
-  useExecutor,
-  useForm,
-  useObjectRef,
-  useS,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { Container, Form, Loader, Placeholder, s, StatusMessage, useForm, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ENotificationType } from '@cloudbeaver/core-events';
+import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
+import { getFirstException } from '@cloudbeaver/core-utils';
 
-import { teamContext } from './Contexts/teamContext.js';
-import type { ITeamFormState } from './ITeamFormProps.js';
 import style from './TeamForm.module.css';
 import { type ITeamFormActionsContext, TeamFormActionsContext } from './TeamFormActionsContext.js';
-import { TeamFormService } from './TeamFormService.js';
+import { TeamsAdministrationFormService } from './TeamsAdministrationFormService.js';
+import type { TeamsAdministrationFormState } from './TeamsAdministrationFormState.js';
 
 interface Props {
-  state: ITeamFormState;
+  state: TeamsAdministrationFormState;
   onCancel?: () => void;
-  onSave?: (team: TeamInfo) => void;
+  onSave?: VoidFunction;
   className?: string;
 }
 
 export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onSave = () => {}, className }) {
-  const translate = useTranslate();
-  const props = useObjectRef({ onSave });
   const styles = useS(style);
-  const service = useService(TeamFormService);
+  const service = useService(TeamsAdministrationFormService);
+  const notificationService = useService(NotificationService);
   const form = useForm({
-    onSubmit: state.save,
+    onSubmit: async function onSubmit() {
+      const saved = await state.save();
+
+      if (saved) {
+        const message = state.state.teamId ?? '';
+        const title = state.mode === 'create' ? 'administration_teams_team_info_created' : 'administration_teams_team_info_updated';
+
+        notificationService.logSuccess({ title, message });
+
+        onSave?.();
+        onCancel?.();
+      } else {
+        const errorKey = state.mode === 'create' ? 'administration_teams_team_create_error' : 'administration_teams_team_save_error';
+        notificationService.logException(getFirstException(state.exception), errorKey);
+      }
+    },
   });
   const actions = useObjectRef<ITeamFormActionsContext>({
     save: async () => form.submit(),
+    onCancel: () => onCancel?.(),
   });
-
-  useExecutor({
-    executor: state.submittingTask,
-    postHandlers: [
-      function save(data, contexts) {
-        const validation = contexts.getContext(service.configurationValidationContext);
-        const state = contexts.getContext(service.configurationStatusContext);
-        const config = contexts.getContext(teamContext);
-
-        if (validation.valid && state.saved) {
-          props.onSave(config);
-        }
-      },
-    ],
-  });
-
-  useEffect(() => {
-    state.loadTeamInfo();
-  }, []);
 
   return (
     <Form context={form} contents>
-      <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
+      <TabsState container={service.parts} formState={state}>
         <Container noWrap vertical>
           <Container className={s(styles, { topBar: true })} gap keepSize noWrap>
             <Container fill>
-              <StatusMessage message={translate(state.statusMessage || undefined)} type={ENotificationType.Info} />
+              <StatusMessage exception={getFirstException(state.exception)} message={state.statusMessage} type={ENotificationType.Info} />
               <TabList disabled={false} underline big />
             </Container>
             <Container keepSize noWrap center gap compact>
               <Loader suspense inline hideMessage hideException>
                 <TeamFormActionsContext.Provider value={actions}>
-                  <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+                  <Placeholder container={service.actionsContainer} formState={state} />
                 </TeamFormActionsContext.Provider>
               </Loader>
             </Container>

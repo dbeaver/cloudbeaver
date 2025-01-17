@@ -10,10 +10,10 @@ import { useContext } from 'react';
 
 import { Button, type PlaceholderComponent, useTranslate } from '@cloudbeaver/core-blocks';
 
-import type { ITeamFormProps } from './ITeamFormProps.js';
 import { TeamFormActionsContext } from './TeamFormActionsContext.js';
+import type { TeamFormProps } from './TeamsAdministrationFormService.js';
 
-export const TeamFormBaseActions: PlaceholderComponent<ITeamFormProps> = observer(function TeamFormBaseActions({ state, onCancel }) {
+export const TeamFormBaseActions: PlaceholderComponent<TeamFormProps> = observer(function TeamFormBaseActions({ formState }) {
   const translate = useTranslate();
   const actions = useContext(TeamFormActionsContext);
 
@@ -23,13 +23,13 @@ export const TeamFormBaseActions: PlaceholderComponent<ITeamFormProps> = observe
 
   return (
     <>
-      {onCancel && (
-        <Button type="button" disabled={state.disabled} mod={['outlined']} onClick={onCancel}>
+      {actions.onCancel && (
+        <Button type="button" disabled={formState.isDisabled} mod={['outlined']} onClick={actions.onCancel}>
           {translate('ui_processing_cancel')}
         </Button>
       )}
-      <Button type="button" disabled={state.disabled || state.readonly} mod={['unelevated']} loader onClick={actions.save}>
-        {translate(state.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_create')}
+      <Button type="button" disabled={formState.isDisabled} mod={['unelevated']} loader onClick={actions.save}>
+        {translate(formState.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_create')}
       </Button>
     </>
   );

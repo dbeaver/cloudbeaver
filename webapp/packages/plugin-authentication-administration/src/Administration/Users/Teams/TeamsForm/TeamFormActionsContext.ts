@@ -7,10 +7,9 @@
  */
 import { createContext } from 'react';
 
-import type { ITeamFormState } from './ITeamFormProps.js';
-
 export interface ITeamFormActionsContext {
-  save: ITeamFormState['save'];
+  save: VoidFunction;
+  onCancel: VoidFunction;
 }
 
 export const TeamFormActionsContext = createContext<ITeamFormActionsContext | null>(null);
