@@ -21,6 +21,7 @@ import {
   KEY_BINDING_SQL_EDITOR_FORMAT,
   KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN,
 } from '@cloudbeaver/plugin-sql-editor';
+import { KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT } from '@cloudbeaver/plugin-sql-editor-navigation-tab-script';
 
 import type { IShortcut } from './IShortcut.js';
 
@@ -63,6 +64,10 @@ export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [
   {
     label: 'sql_editor_shortcut_format',
     code: transformKeys(KEY_BINDING_SQL_EDITOR_FORMAT),
+  },
+  {
+    label: 'sql_editor_shortcut_save_as_script',
+    code: transformKeys(KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT),
   },
   {
     label: 'sql_editor_shortcut_undo',

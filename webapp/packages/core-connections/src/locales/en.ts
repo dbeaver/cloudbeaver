@@ -88,7 +88,7 @@ export default [
   ['connections_network_handler_ssh_tunnel_user', 'User'],
   ['connections_network_handler_ssh_tunnel_password', 'Password'],
   ['connections_network_handler_ssh_tunnel_auth_type', 'Authentication method'],
-  ['connections_network_handler_ssh_tunnel_private_key', 'Private key'],
+  ['connections_network_handler_ssh_tunnel_private_key', 'Private Key'],
   ['connections_network_handler_ssh_tunnel_advanced_settings', 'Advanced Settings'],
   ['connections_network_handler_ssh_tunnel_advanced_settings_alive_interval', 'Alive interval (ms)'],
   ['connections_network_handler_ssh_tunnel_advanced_settings_connect_timeout', 'Connect timeout (ms)'],

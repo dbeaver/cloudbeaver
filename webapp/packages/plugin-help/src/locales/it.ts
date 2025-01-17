@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['shortcuts_title', 'Shortcuts'],
 
@@ -14,6 +21,7 @@ export default [
   ['sql_editor_shortcut_execute_script', 'Execute script'],
   ['sql_editor_shortcut_show_execution_plan', 'Show Execution plan'],
   ['sql_editor_shortcut_format', 'Format script'],
+  ['sql_editor_shortcut_save_as_script', 'Save as script'],
   ['sql_editor_shortcut_open_editor_in_new_tab', 'Open SQL Editor in the separate browser Tab'],
   ['sql_editor_shortcut_undo', 'Undo'],
   ['sql_editor_shortcut_redo', 'Redo'],

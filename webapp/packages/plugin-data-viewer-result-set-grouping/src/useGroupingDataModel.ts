@@ -86,6 +86,7 @@ export function useGroupingDataModel(
   const prevStateRef = useRef({
     columns: state.columns,
     functions: state.functions,
+    showDuplicatesOnly: state.showDuplicatesOnly,
     sourceResultId: sourceModel.source.getResult(sourceResultIndex)?.id,
   });
 
@@ -108,14 +109,19 @@ export function useGroupingDataModel(
           sourceResultId: result?.id,
         };
       },
-      async ({ columns, functions, sourceResultId }) => {
+      async ({ columns, functions, sourceResultId, showDuplicatesOnly }) => {
         const prevState = prevStateRef.current;
 
-        if (columns == prevState.columns && functions == prevState.functions && sourceResultId == prevState.sourceResultId) {
+        if (
+          columns == prevState.columns &&
+          functions == prevState.functions &&
+          sourceResultId == prevState.sourceResultId &&
+          showDuplicatesOnly == prevState.showDuplicatesOnly
+        ) {
           return;
         }
 
-        prevStateRef.current = { columns, functions, sourceResultId };
+        prevStateRef.current = { columns, functions, sourceResultId, showDuplicatesOnly };
 
         if (columns.length !== 0 && functions.length !== 0 && sourceResultId) {
           const executionContext = sourceModel.source.executionContext;

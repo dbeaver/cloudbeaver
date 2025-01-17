@@ -24,6 +24,8 @@ import {
   createElementsTreeSettings,
   validateElementsTreeSettings,
 } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/createElementsTreeSettings.js';
+import { ObjectsDescriptionSettingsPlaceholderElement } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/ObjectsDescriptionSettingsForm.js';
+import { transformDescriptionNodeInfo } from './ElementsTree/transformDescriptionNodeInfo.js';
 import { transformFilteredNodeInfo } from './ElementsTree/transformFilteredNodeInfo.js';
 import type { IElementsTreeSettings } from './ElementsTree/useElementsTree.js';
 import elementsTreeToolsStyles from './ElementsTreeTools.module.css';
@@ -77,12 +79,13 @@ export const NavigationTree = observer(function NavigationTree() {
     [navNodeInfoResource, projectsService, projectsNavNodeService],
   );
   const transformFilteredNode = useMemo(() => transformFilteredNodeInfo(navNodeInfoResource), [navNodeInfoResource]);
+  const transformDescriptionNode = useMemo(() => transformDescriptionNodeInfo(navNodeInfoResource), [navNodeInfoResource]);
   const projectFilter = useMemo(
     () => navigationTreeProjectFilter(projectsNavNodeService, projectsService, navNodeInfoResource, navTreeResource),
     [projectsNavNodeService, projectsService, navNodeInfoResource, navTreeResource],
   );
 
-  const settingsElements = useMemo(() => [ProjectsSettingsPlaceholderElement], []);
+  const settingsElements = useMemo(() => [ProjectsSettingsPlaceholderElement, ObjectsDescriptionSettingsPlaceholderElement], []);
 
   return (
     <SContext registry={registry}>
@@ -93,7 +96,7 @@ export const NavigationTree = observer(function NavigationTree() {
           filters={[duplicateFilter, connectionGroupFilter, projectFilter]}
           renderers={[projectsRendererRenderer, navigationTreeConnectionGroupRenderer, connectionRenderer]}
           navNodeFilterCompare={navigationTreeProjectSearchCompare}
-          nodeInfoTransformers={[transformFilteredNode]}
+          nodeInfoTransformers={[transformFilteredNode, transformDescriptionNode]}
           expandStateGetters={[projectsExpandStateGetter]}
           settingsElements={settingsElements}
           className={s(styles, { elementsTree: true })}

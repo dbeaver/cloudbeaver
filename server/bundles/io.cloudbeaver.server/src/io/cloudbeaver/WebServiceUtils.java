@@ -365,7 +365,7 @@ public class WebServiceUtils extends WebCommonUtils {
      */
     @NotNull
     public static Set<String> getApplicableDriversIds() {
-        return WebAppUtils.getWebPlatform().getApplicableDrivers().stream()
+        return WebAppUtils.getWebApplication().getDriverRegistry().getApplicableDrivers().stream()
             .map(DBPDriver::getId)
             .collect(Collectors.toSet());
     }

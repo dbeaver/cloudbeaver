@@ -44,10 +44,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSourcePersistentRegistry, DBPDataSourceRegistryCache {
+    @NotNull
     private final DataSourceFilter dataSourceFilter;
+    @NotNull
     private final DataSourceRegistry<?> dataSourceRegistry;
 
-    public WebDataSourceRegistryProxy(DataSourceRegistry<?> dataSourceRegistry, DataSourceFilter filter) {
+    public WebDataSourceRegistryProxy(@NotNull DataSourceRegistry<?> dataSourceRegistry, @NotNull DataSourceFilter filter) {
         this.dataSourceRegistry = dataSourceRegistry;
         this.dataSourceFilter = filter;
     }
@@ -62,7 +64,7 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     @Override
     public DBPDataSourceContainer getDataSource(@NotNull String id) {
         DBPDataSourceContainer dataSource = dataSourceRegistry.getDataSource(id);
-        if (dataSource == null || dataSourceFilter != null && !dataSourceFilter.filter(dataSource)) {
+        if (dataSource == null || !dataSourceFilter.filter(dataSource)) {
             return null;
         }
         return dataSource;
@@ -71,7 +73,7 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     @Nullable
     @Override
     public DBPDataSourceContainer getDataSource(@NotNull DBPDataSource dataSource) {
-        if (dataSourceFilter != null && !dataSourceFilter.filter(dataSource.getContainer())) {
+        if (!dataSourceFilter.filter(dataSource.getContainer())) {
             return null;
         }
         return dataSourceRegistry.getDataSource(dataSource);
@@ -81,10 +83,8 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     @Override
     public DBPDataSourceContainer findDataSourceByName(String name) {
         var dataSource = dataSourceRegistry.findDataSourceByName(name);
-        if (dataSource != null) {
-            if (dataSourceFilter == null || dataSourceFilter.filter(dataSource)) {
-                return dataSource;
-            }
+        if (dataSource != null && dataSourceFilter.filter(dataSource)) {
+            return dataSource;
         }
         return null;
     }

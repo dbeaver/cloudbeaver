@@ -30,7 +30,7 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.*;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
 import io.cloudbeaver.service.security.SMUtils;
@@ -633,7 +633,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 // Just reload session state
                 webSession.refreshUserData();
             }
-            CBPlatform.getInstance().refreshApplicableDrivers();
+            WebAppUtils.getWebApplication().getDriverRegistry().refreshApplicableDrivers();
         } catch (Throwable e) {
             throw new DBWebException("Error configuring server", e);
         }

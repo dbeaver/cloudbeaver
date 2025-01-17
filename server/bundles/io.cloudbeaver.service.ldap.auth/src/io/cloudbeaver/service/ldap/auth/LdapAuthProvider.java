@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@
 package io.cloudbeaver.service.ldap.auth;
 
 import io.cloudbeaver.DBWUserIdentity;
+import io.cloudbeaver.auth.SMAuthProviderAssigner;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
+import io.cloudbeaver.auth.SMAutoAssign;
 import io.cloudbeaver.auth.SMBruteForceProtected;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
 import io.cloudbeaver.model.session.WebSession;
@@ -43,7 +45,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
 
-public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected {
+public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected, SMAuthProviderAssigner {
     private static final Log log = Log.getLog(LdapAuthProvider.class);
 
     public LdapAuthProvider() {
@@ -77,9 +79,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
         }
         if (userData == null) {
-            String fullUserDN = buildFullUserDN(userName, ldapSettings);
-            validateUserAccess(fullUserDN, ldapSettings);
-            userData = authenticateLdap(fullUserDN, password, ldapSettings, null, environment);
+            validateUserAccess(userName, ldapSettings);
+            userData = authenticateLdap(userName, password, ldapSettings, null, environment);
         }
         return userData;
     }
@@ -213,7 +214,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             }
         }
         if (userId == null) {
-            throw new DBException("Failed to determinate userId from user DN: " + fullUserDN);
+            throw new DBException("Failed to determine userId from user DN: " + fullUserDN);
         }
         return userId;
     }
@@ -331,6 +332,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             userContext = new InitialDirContext(environment);
             Map<String, Object> userData = new HashMap<>();
             userData.put(LdapConstants.CRED_USERNAME, findUserNameFromDN(userDN, ldapSettings));
+            userData.put(LdapConstants.CRED_FULL_DN, userDN);
             userData.put(LdapConstants.CRED_SESSION_ID, UUID.randomUUID());
             if (login != null) {
                 userData.put(LdapConstants.CRED_DISPLAY_NAME, login);
@@ -349,4 +351,72 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         }
     }
 
+    @NotNull
+    @Override
+    public SMAutoAssign detectAutoAssignments(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull SMAuthProviderCustomConfiguration providerConfig,
+        @NotNull Map<String, Object> authParameters
+    ) throws DBException {
+        String userName = JSONUtils.getString(authParameters, LdapConstants.CRED_USERNAME);
+        if (CommonUtils.isEmpty(userName)) {
+            throw new DBException("LDAP user name is empty");
+        }
+
+        LdapSettings ldapSettings = new LdapSettings(providerConfig);
+        String fullDN = JSONUtils.getString(authParameters, LdapConstants.CRED_FULL_DN);
+        String userDN;
+        if (!CommonUtils.isEmpty(fullDN)) {
+            userDN = fullDN;
+        } else {
+            userDN = getUserDN(ldapSettings, JSONUtils.getString(authParameters, LdapConstants.CRED_DISPLAY_NAME));
+        }
+        if (userDN == null) {
+            return new SMAutoAssign();
+        }
+
+        SMAutoAssign smAutoAssign = new SMAutoAssign();
+        smAutoAssign.addExternalTeamId(userDN);
+
+        String groupDN = getGroupForMember(userDN, ldapSettings);
+        if (groupDN != null) {
+            smAutoAssign.addExternalTeamId(groupDN);
+        }
+
+        return smAutoAssign;
+    }
+
+    private String getUserDN(LdapSettings ldapSettings, String displayName) {
+        DirContext context;
+        try {
+            context = new InitialDirContext(creteAuthEnvironment(ldapSettings));
+            return findUserDN(context, ldapSettings, displayName);
+        } catch (Exception e) {
+            log.error("User not found", e);
+            return null;
+        }
+    }
+
+    private String getGroupForMember(String fullDN, LdapSettings ldapSettings) {
+        DirContext context;
+        try {
+            context = new InitialDirContext(creteAuthEnvironment(ldapSettings));
+            String searchFilter = "(member=" + fullDN + ")";
+            SearchControls searchControls = new SearchControls();
+            searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+
+            NamingEnumeration<SearchResult> results = context.search(ldapSettings.getBaseDN(), searchFilter, searchControls);
+            if (results.hasMore()) {
+                return results.next().getName();
+            }
+        } catch (Exception e) {
+            log.error("Group not found", e);
+        }
+        return null;
+    }
+
+    @Override
+    public String getExternalTeamIdMetadataFieldName() {
+        return LdapConstants.LDAP_META_GROUP_NAME;
+    }
 }

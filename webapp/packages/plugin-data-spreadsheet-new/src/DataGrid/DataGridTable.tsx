@@ -222,12 +222,14 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
     gridSelectedCellCopy.onKeydownHandler(event);
+    const cell = selectionAction.getFocusedElement();
+    // we can't edit table cells if table doesn't have row identifier, but we can edit new created rows before insert (CB-6063)
+    const canEdit = model.hasElementIdentifier(resultIndex) || !!(cell && tableData.editor.getElementState(cell) === DatabaseEditChangeType.add);
 
-    if (EventContext.has(event, EventStopPropagationFlag) || tableData.isReadOnly() || model.isReadonly(resultIndex)) {
+    if (EventContext.has(event, EventStopPropagationFlag) || !canEdit || tableData.isReadOnly() || model.isReadonly(resultIndex)) {
       return;
     }
 
-    const cell = selectionAction.getFocusedElement();
     const activeElements = selectionAction.getActiveElements();
     const activeRows = selectionAction.getActiveRows();
 

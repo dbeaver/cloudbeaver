@@ -47,5 +47,6 @@ export * from './SQLEditorLoader.js';
 export * from './SqlEditorModeService.js';
 export * from './SqlEditorService.js';
 export * from './SqlEditorSettingsService.js';
+export * from './SqlEditorView.js';
 
 export default sqlEditorPluginManifest;

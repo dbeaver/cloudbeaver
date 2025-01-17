@@ -38,6 +38,13 @@
                               user="true" encryption="plain"/>
                 </propertyGroup>
             </credentials>
+
+            <metaParameters type="team">
+                <propertyGroup label="LDAP group name">
+                    <property id="ldap.group-name" label="LDAP Group name" type="string"
+                              description="LDAP group name."/>
+                </propertyGroup>
+            </metaParameters>
         </authProvider>
     </extension>
 </plugin>

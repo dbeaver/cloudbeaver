@@ -25,10 +25,7 @@ import io.cloudbeaver.server.WebAppUtils;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
-import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
-import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
-import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
+import org.jkiss.dbeaver.model.connection.*;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
@@ -53,7 +50,7 @@ public class WebDatabaseDriverInfo {
     public static final String URL_DATABASE_FIELD = ".*(?:\\{(?:database|file|folder)}).*";
     private final WebSession webSession;
     private final DBPDriver driver;
-    private String id;
+    private final String id;
 
     public WebDatabaseDriverInfo(WebSession webSession, DBPDriver driver) {
         this.webSession = webSession;
@@ -296,13 +293,18 @@ public class WebDatabaseDriverInfo {
     @Property
     public WebDriverLibraryInfo[] getDriverLibraries() {
         return driver.getDriverLibraries().stream()
-            .map(dbpDriverLibrary -> new WebDriverLibraryInfo(webSession, dbpDriverLibrary))
+            .map(dbpDriverLibrary -> new WebDriverLibraryInfo(driver, dbpDriverLibrary))
             .toArray(WebDriverLibraryInfo[]::new);
     }
 
     @Property
     public boolean isDriverInstalled() {
-        return !driver.needsExternalDependencies(webSession.getProgressMonitor());
+        return driver.isDriverInstalled();
+    }
+
+    @Property
+    public boolean isDownloadable() {
+        return driver.getDriverLibraries().stream().anyMatch(DBPDriverLibrary::isDownloadable);
     }
 
     @Property
