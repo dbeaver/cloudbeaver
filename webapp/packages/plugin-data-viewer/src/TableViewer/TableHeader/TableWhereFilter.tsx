@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 
-import { Container, InputAutocompletionMenu, type PlaceholderComponent, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, InputAutocompletionMenu, type PlaceholderComponent, useInputAutocomplete, useTranslate } from '@cloudbeaver/core-blocks';
 import { InlineEditor } from '@cloudbeaver/core-ui';
 
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService.js';
@@ -20,7 +20,11 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
   const translate = useTranslate();
   const state = useWhereFilter(model, resultIndex);
   const data = useTableViewerHeaderData({ model, resultIndex });
-  const ref = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const autocompleteState = useInputAutocomplete(inputRef, {
+    sourceHints: data.hintProposals ?? [],
+    matchStrategy: 'fuzzy',
+  });
 
   if (!state.supported) {
     return null;
@@ -29,7 +33,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
   return (
     <Container className={styles['imbeddedEditor']}>
       <InlineEditor
-        ref={ref}
+        ref={inputRef}
         className={styles['inlineEditor']}
         name="data_where"
         value={state.filter}
@@ -42,7 +46,11 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
         onSave={state.apply}
         onChange={state.set}
       />
-      <InputAutocompletionMenu matchStrategy="fuzzy" sourceHints={data.hintProposals ?? []} inputRef={ref} />
+      <InputAutocompletionMenu
+        proposals={autocompleteState.filteredSuggestions ?? []}
+        inputRef={inputRef}
+        onSelect={proposal => autocompleteState.replaceCurrentWord(proposal.replacementString)}
+      />
     </Container>
   );
 });

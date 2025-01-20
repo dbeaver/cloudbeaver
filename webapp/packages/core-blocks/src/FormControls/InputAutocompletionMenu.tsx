@@ -5,8 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
 import BaseDropdownStyles from '../FormControls/BaseDropdown.module.css';
 import { IconOrImage } from '../IconOrImage.js';
@@ -15,43 +16,43 @@ import { MenuItem } from '../Menu/MenuItem.js';
 import type { IMenuState } from '../Menu/MenuStateContext.js';
 import { s } from '../s.js';
 import { Text } from '../Text.js';
+import { useObservableRef } from '../useObservableRef.js';
 import { useS } from '../useS.js';
 import style from './InputAutocompletionMenu.module.css';
-import { type InputAutocompleteProposal, type InputAutocompleteStrategy, useInputAutocomplete } from './useInputAutocomplete.js';
+import { type InputAutocompleteProposal } from './useInputAutocomplete.js';
 
 interface AutocompletionProps {
-  sourceHints: InputAutocompleteProposal[];
+  proposals: InputAutocompleteProposal[];
   inputRef: React.RefObject<HTMLInputElement | HTMLTextAreaElement>;
-  matchStrategy?: InputAutocompleteStrategy;
   className?: string;
   onSelect?: (proposal: InputAutocompleteProposal) => void;
 }
 
-export const InputAutocompletionMenu = observer(function InputAutocompletionMenu({
-  sourceHints,
-  className,
-  matchStrategy,
-  inputRef,
-  onSelect,
-}: AutocompletionProps) {
+const CONTEXT_INPUT_OFFSET_Y = 3;
+
+export const InputAutocompletionMenu = observer(function InputAutocompletionMenu({ className, proposals, inputRef, onSelect }: AutocompletionProps) {
   const styles = useS(style, BaseDropdownStyles);
   const menuRef = useRef<IMenuState>();
-  const autocompleteState = useInputAutocomplete(inputRef, {
-    sourceHints,
-    matchStrategy,
-  });
+  const state = useObservableRef(
+    () => ({
+      x: 0,
+      y: 0,
+      inputValue: '',
+    }),
+    {
+      x: observable.ref,
+      y: observable.ref,
+      inputValue: observable.ref,
+    },
+    false,
+  );
 
   function handleSelect(proposal: InputAutocompleteProposal) {
     menuRef.current?.hide();
-    autocompleteState.replaceCurrentWord(proposal.replacementString);
     onSelect?.(proposal);
   }
 
   function handleKeyDown(event: any) {
-    if (!autocompleteState.filteredSuggestions.length) {
-      return;
-    }
-
     switch (event.key) {
       case 'Escape':
         menuRef.current?.hide();
@@ -65,40 +66,74 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
     }
   }
 
+  function handleInput(event: any) {
+    state.inputValue = event.target.value;
+  }
+
+  useLayoutEffect(() => {
+    if (!inputRef.current) {
+      return;
+    }
+
+    const span = document.createElement('span');
+    span.style.position = 'absolute';
+    span.style.visibility = 'hidden';
+    span.style.whiteSpace = 'pre';
+    span.style.fontFamily = window.getComputedStyle(inputRef.current).fontFamily;
+    span.style.fontSize = window.getComputedStyle(inputRef.current).fontSize;
+    span.textContent = state.inputValue;
+
+    document.body.appendChild(span);
+    const spanRect = span.getBoundingClientRect();
+    const letterWidth = spanRect.width / state.inputValue.length;
+    document.body.removeChild(span);
+
+    state.x = spanRect.width + letterWidth;
+    state.y = spanRect.height + CONTEXT_INPUT_OFFSET_Y;
+
+    menuRef.current?.show();
+  }, [state.inputValue, inputRef.current]);
+
   useEffect(() => {
     inputRef.current?.addEventListener('keydown', handleKeyDown);
+    inputRef.current?.addEventListener('input', handleInput);
+
     return () => {
       inputRef.current?.removeEventListener('keydown', handleKeyDown);
+      inputRef.current?.removeEventListener('input', handleInput);
     };
   }, [inputRef.current]);
 
-  if (!autocompleteState.filteredSuggestions.length) {
+  if (!proposals.length) {
     return;
   }
 
   return (
     <Menu
-      contextInputRef={inputRef}
-      visible={autocompleteState.filteredSuggestions.length > 0}
-      panelAvailable={autocompleteState.filteredSuggestions.length > 0}
+      menuButtonPosition={{
+        x: state.x,
+        y: state.y,
+      }}
+      visible={proposals.length > 0}
+      panelAvailable={proposals.length > 0}
       className={s(styles, { menu: true }, className)}
       menuRef={menuRef}
       label="Autocompletion"
-      items={autocompleteState.filteredSuggestions.map(item => (
+      items={proposals.map(proposal => (
         <MenuItem
-          key={item.displayString}
-          id={item.displayString}
+          key={proposal.displayString}
+          id={proposal.displayString}
           type="button"
-          title={item.title}
+          title={proposal.title}
           className={s(styles, { menuItem: true })}
-          onClick={event => handleSelect(item)}
+          onClick={event => handleSelect(proposal)}
         >
-          {item.icon && (
+          {proposal.icon && (
             <div className={s(styles, { itemIcon: true })}>
-              <IconOrImage icon={item.icon} className={s(styles, { iconOrImage: true })} />
+              <IconOrImage icon={proposal.icon} className={s(styles, { iconOrImage: true })} />
             </div>
           )}
-          <Text truncate>{item.displayString}</Text>
+          <Text truncate>{proposal.displayString}</Text>
         </MenuItem>
       ))}
       modal
