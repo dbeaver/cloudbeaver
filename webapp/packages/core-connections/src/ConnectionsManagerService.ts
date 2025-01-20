@@ -80,10 +80,6 @@ export class ConnectionsManagerService {
     return connection.connection;
   }
 
-  addOpenedConnection(connection: Connection): void {
-    this.connectionInfo.add(connection);
-  }
-
   getObjectContainerById(connectionKey: IConnectionInfoParams, objectCatalogId?: string, objectSchemaId?: string): ObjectContainer | undefined {
     if (objectCatalogId) {
       const objectContainers = this.containerContainers.getCatalogData(connectionKey, objectCatalogId);

@@ -292,6 +292,18 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   }
 
   // TODO: we need here node path ie ['', 'project://', 'database://...', '...']
+  getConnectionIdForNodeId(projectId: string, nodeId: string): IConnectionInfoParams | undefined {
+    if (!nodeId.startsWith('database://')) {
+      return;
+    }
+
+    const indexOfConnectionPart = nodeId.indexOf('/', 11);
+    const connectionId = nodeId.slice(11, indexOfConnectionPart > -1 ? indexOfConnectionPart : nodeId.length);
+
+    return createConnectionParam(projectId, connectionId);
+  }
+
+  // TODO: we need here node path ie ['', 'project://', 'database://...', '...']
   getConnectionForNode(nodeId: string): Connection | undefined {
     if (!nodeId.startsWith('database://')) {
       return;
