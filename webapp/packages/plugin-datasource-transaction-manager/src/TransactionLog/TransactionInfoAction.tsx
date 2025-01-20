@@ -28,7 +28,7 @@ export const TransactionInfoAction: ICustomMenuItemComponent = observer(function
   const count =
     transactionLogCountResource.data === 0 ? translate('plugin_datasource_transaction_manager_logs_counter_none') : transactionLogCountResource.data;
 
-  let title = `${translate('plugin_datasource_transaction_manager_logs_tooltip')}`;
+  let title: string = translate('plugin_datasource_transaction_manager_logs_tooltip');
 
   if (transactionLogCountResource.data) {
     title = `${title}\n${translate('plugin_datasource_transaction_manager_logs_tooltip_count', undefined, { count })}`;
