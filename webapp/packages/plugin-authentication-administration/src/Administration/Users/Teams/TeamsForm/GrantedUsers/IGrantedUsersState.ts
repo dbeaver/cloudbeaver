@@ -14,7 +14,6 @@ const GRANTED_USER_STATE = schema.object({
 
 const GRANTED_USERS_STATE = schema.object({
   grantedUsers: schema.array(GRANTED_USER_STATE),
-  editing: schema.boolean(),
 });
 
 export type IGrantedUsersState = schema.infer<typeof GRANTED_USERS_STATE>;

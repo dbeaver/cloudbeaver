@@ -16,7 +16,6 @@ import type { IGrantedUsersState } from './IGrantedUsersState.js';
 function getInitialState(): IGrantedUsersState {
   return {
     grantedUsers: [],
-    editing: false,
   };
 }
 
@@ -30,7 +29,6 @@ export class GrantedUsersFormPart extends FormPart<IGrantedUsersState, ITeamForm
   ) {
     super(formState, getInitialState());
 
-    this.edit = this.edit.bind(this);
     this.grant = this.grant.bind(this);
     this.revoke = this.revoke.bind(this);
     this.assignTeamRole = this.assignTeamRole.bind(this);
@@ -57,20 +55,16 @@ export class GrantedUsersFormPart extends FormPart<IGrantedUsersState, ITeamForm
   ): Promise<void> {
     const status = contexts.getContext(formStatusContext);
 
-    if (!status.saved) {
-      return;
-    }
-
     if (!this.formState.state.teamId) {
       return;
     }
 
-    const initial = await this.teamsResource.loadGrantedUsers(this.formState.state.teamId);
-
     const granted: string[] = [];
     const revoked: string[] = [];
 
-    const revokedUsers = initial.filter(user => !this.state.grantedUsers.some(grantedUser => grantedUser.userId === user.userId));
+    const revokedUsers = this.initialState.grantedUsers.filter(
+      user => !this.state.grantedUsers.some(grantedUser => grantedUser.userId === user.userId),
+    );
 
     try {
       for (const user of revokedUsers) {
@@ -79,7 +73,7 @@ export class GrantedUsersFormPart extends FormPart<IGrantedUsersState, ITeamForm
       }
 
       for (const user of this.state.grantedUsers) {
-        const initialUser = initial.find(grantedUser => grantedUser.userId === user.userId);
+        const initialUser = this.initialState.grantedUsers.find(grantedUser => grantedUser.userId === user.userId);
 
         if (!initialUser) {
           await this.usersResource.grantTeam(user.userId, this.formState.state.teamId);
@@ -103,10 +97,6 @@ export class GrantedUsersFormPart extends FormPart<IGrantedUsersState, ITeamForm
     if (revoked.length) {
       status.info(`Deleted users: "${revoked.join(', ')}"`);
     }
-  }
-
-  edit() {
-    this.state.editing = !this.state.editing;
   }
 
   revoke(subjectIds: string[]) {

@@ -36,8 +36,10 @@ export class TeamOptionsFormPart extends FormPart<ITeamOptionsState, ITeamFormSt
 
   protected override async loader(): Promise<void> {
     if (this.formState.mode === 'edit' && this.formState.state.teamId) {
-      const team = await this.teamResource.load(this.formState.state.teamId);
-      const metaParameters = await this.teamsMetaParametersResource.load(this.formState.state.teamId);
+      const [team, metaParameters] = await Promise.all([
+        this.teamResource.load(this.formState.state.teamId),
+        this.teamsMetaParametersResource.load(this.formState.state.teamId),
+      ]);
 
       this.setInitialState({
         teamId: team.teamId,
@@ -109,20 +111,21 @@ export class TeamOptionsFormPart extends FormPart<ITeamOptionsState, ITeamFormSt
       description: this.state.description,
       teamPermissions: this.state.teamPermissions,
     };
-    const create = this.formState.mode === 'create';
 
-    if (create) {
+    if (this.formState.mode === 'create') {
       const team = await this.teamResource.createTeam(teamInfo);
       await this.teamsMetaParametersResource.setMetaParameters(this.state.teamId, this.state.metaParameters);
 
       this.formState.setState({
         teamId: team.teamId,
       });
-    } else {
-      await Promise.all([
-        this.teamResource.updateTeam(teamInfo),
-        this.teamsMetaParametersResource.setMetaParameters(this.state.teamId, this.state.metaParameters),
-      ]);
+
+      return;
     }
+
+    await Promise.all([
+      this.teamResource.updateTeam(teamInfo),
+      this.teamsMetaParametersResource.setMetaParameters(this.state.teamId, this.state.metaParameters),
+    ]);
   }
 }

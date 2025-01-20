@@ -12,7 +12,6 @@ import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
 import { TeamsAdministrationFormService } from '../TeamsAdministrationFormService.js';
-import { getGrantedConnectionsFormPart } from './getGrantedConnectionsFormPart.js';
 
 const GrantedConnections = React.lazy(async () => {
   const { GrantedConnections } = await import('./GrantedConnections.js');
@@ -39,7 +38,6 @@ export class GrantedConnectionsTabService extends Bootstrap {
       order: 3,
       panel: () => GrantedConnections,
       isHidden: () => !this.isEnabled(),
-      stateGetter: props => () => getGrantedConnectionsFormPart(props.formState),
       getLoader: () => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
     });
   }

@@ -5,10 +5,23 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import { UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
-import { Container, Group, InfoItem, Loader, s, TextPlaceholder, useAutoLoad, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Container,
+  Group,
+  InfoItem,
+  Loader,
+  s,
+  TextPlaceholder,
+  useAutoLoad,
+  useObservableRef,
+  useResource,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
@@ -23,6 +36,19 @@ import { UserList } from './UserList.js';
 export const GrantedUsers: TabContainerPanelComponent<TeamFormProps> = observer(function GrantedUsers({ tabId, formState }) {
   const styles = useS(style);
   const translate = useTranslate();
+  const state = useObservableRef(
+    () => ({
+      editing: false,
+      edit: function () {
+        this.editing = !this.editing;
+      },
+    }),
+    {
+      editing: observable.ref,
+      edit: action.bound,
+    },
+    false,
+  );
 
   const part = getGrantedUsersFormPart(formState);
   const { selected } = useTab(tabId);
@@ -82,11 +108,11 @@ export const GrantedUsers: TabContainerPanelComponent<TeamFormProps> = observer(
                 <GrantedUserList
                   grantedUsers={grantedUsers}
                   disabled={formState.isDisabled}
-                  onEdit={part.edit}
+                  onEdit={state.edit}
                   onRevoke={part.revoke}
                   onTeamRoleAssign={part.assignTeamRole}
                 />
-                {part.state.editing && (
+                {state.editing && (
                   <UserList
                     userList={users.resource.values}
                     grantedUsers={grantedUsers.map(user => user.userId)}

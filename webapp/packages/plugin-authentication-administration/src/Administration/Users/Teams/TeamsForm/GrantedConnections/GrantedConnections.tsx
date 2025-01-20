@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import {
@@ -16,6 +17,7 @@ import {
   s,
   TextPlaceholder,
   useAutoLoad,
+  useObservableRef,
   useResource,
   useS,
   useTranslate,
@@ -47,6 +49,19 @@ export const GrantedConnections: TabContainerPanelComponent<TeamFormProps> = obs
   const part = getGrantedConnectionsFormPart(formState);
   const { selected } = useTab(tabId);
   const loaded = part.isLoaded();
+  const state = useObservableRef(
+    () => ({
+      editing: false,
+      edit: function () {
+        this.editing = !this.editing;
+      },
+    }),
+    {
+      editing: observable.ref,
+      edit: action.bound,
+    },
+    false,
+  );
 
   const projects = useResource(GrantedConnections, ProjectInfoResource, CachedMapAllKey);
 
@@ -98,10 +113,10 @@ export const GrantedConnections: TabContainerPanelComponent<TeamFormProps> = obs
                   grantedConnections={grantedConnections}
                   connectionsOrigins={connectionsOrigins}
                   disabled={formState.isDisabled}
-                  onEdit={part.edit}
+                  onEdit={state.edit}
                   onRevoke={part.revoke}
                 />
-                {part.state.editing && (
+                {state.editing && (
                   <ConnectionList
                     connectionList={connections}
                     connectionsOrigins={connectionsOrigins}

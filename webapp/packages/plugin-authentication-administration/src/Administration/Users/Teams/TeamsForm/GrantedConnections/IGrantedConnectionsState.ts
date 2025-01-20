@@ -15,7 +15,6 @@ const GRANTED_CONNECTION = schema.object({
 });
 
 export const TEAM_GRANTED_CONNECTIONS_SCHEMA = schema.object({
-  editing: schema.boolean(),
   grantedSubjects: schema.array(schema.string()),
   grantedConnections: schema.array(GRANTED_CONNECTION),
 });

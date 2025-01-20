@@ -9,7 +9,7 @@ import type { TeamsResource } from '@cloudbeaver/core-authentication';
 import type { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isGlobalProject, type ProjectInfoResource } from '@cloudbeaver/core-projects';
-import type { AdminConnectionGrantInfo, GraphQLService } from '@cloudbeaver/core-sdk';
+import type { GraphQLService } from '@cloudbeaver/core-sdk';
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormState } from '../TeamsAdministrationFormService.js';
@@ -17,7 +17,6 @@ import type { IGrantedConnectionsState } from './IGrantedConnectionsState.js';
 
 function getInitialState(): IGrantedConnectionsState {
   return {
-    editing: false,
     grantedSubjects: [],
     grantedConnections: [],
   };
@@ -33,7 +32,6 @@ export class GrantedConnectionsFormPart extends FormPart<IGrantedConnectionsStat
   ) {
     super(formState, getInitialState());
 
-    this.edit = this.edit.bind(this);
     this.grant = this.grant.bind(this);
     this.revoke = this.revoke.bind(this);
   }
@@ -67,9 +65,7 @@ export class GrantedConnectionsFormPart extends FormPart<IGrantedConnectionsStat
       throw new Error('The global project does not exist');
     }
 
-    const grantInfo = await this.teamsResource.getSubjectConnectionAccess(this.formState.state.teamId);
-
-    const { connectionsToRevoke, connectionsToGrant } = this.getConnectionsDifferences(grantInfo);
+    const { connectionsToRevoke, connectionsToGrant } = this.getConnectionsDifferences(this.initialState.grantedSubjects, this.state.grantedSubjects);
 
     try {
       if (connectionsToRevoke.length > 0) {
@@ -92,10 +88,6 @@ export class GrantedConnectionsFormPart extends FormPart<IGrantedConnectionsStat
     }
   }
 
-  edit() {
-    this.state.editing = !this.state.editing;
-  }
-
   grant(subjectIds: string[]) {
     this.state.grantedSubjects.push(...subjectIds);
   }
@@ -104,10 +96,7 @@ export class GrantedConnectionsFormPart extends FormPart<IGrantedConnectionsStat
     this.state.grantedSubjects = this.state.grantedSubjects.filter(subject => !subjectIds.includes(subject));
   }
 
-  private getConnectionsDifferences(grantInfo: AdminConnectionGrantInfo[]): { connectionsToRevoke: string[]; connectionsToGrant: string[] } {
-    const current = grantInfo.map(info => info.connectionId);
-    const next = this.state.grantedSubjects;
-
+  private getConnectionsDifferences(current: string[], next: string[]): { connectionsToRevoke: string[]; connectionsToGrant: string[] } {
     const connectionsToRevoke = current.filter(connectionId => !next.includes(connectionId));
     const connectionsToGrant = next.filter(connectionId => !current.includes(connectionId));
 

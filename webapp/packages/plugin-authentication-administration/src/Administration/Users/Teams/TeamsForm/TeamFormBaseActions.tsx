@@ -28,7 +28,7 @@ export const TeamFormBaseActions: PlaceholderComponent<TeamFormProps> = observer
           {translate('ui_processing_cancel')}
         </Button>
       )}
-      <Button type="button" disabled={formState.isDisabled} mod={['unelevated']} loader onClick={actions.save}>
+      <Button type="button" disabled={formState.isDisabled || !formState.isChanged} mod={['unelevated']} loader onClick={actions.save}>
         {translate(formState.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_create')}
       </Button>
     </>
