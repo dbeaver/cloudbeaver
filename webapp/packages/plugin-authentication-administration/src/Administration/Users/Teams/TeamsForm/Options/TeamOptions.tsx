@@ -30,7 +30,7 @@ export const TeamOptions: TabContainerPanelComponent<TeamFormProps> = observer(f
         <InputField name="teamId" state={part.state} readOnly={edit || formState.isDisabled} required tiny fill>
           {translate('administration_teams_team_id')}
         </InputField>
-        <InputField name="teamName" state={part.state} readOnly={formState.isDisabled} tiny fill>
+        <InputField name="teamName" state={part.state} readOnly={formState.isDisabled} required tiny fill>
           {translate('administration_teams_team_name')}
         </InputField>
         <Textarea name="description" state={part.state} readOnly={formState.isDisabled} tiny fill>

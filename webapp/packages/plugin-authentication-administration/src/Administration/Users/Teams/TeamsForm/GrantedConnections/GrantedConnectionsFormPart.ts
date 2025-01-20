@@ -18,7 +18,6 @@ import type { IGrantedConnectionsState } from './IGrantedConnectionsState.js';
 function getInitialState(): IGrantedConnectionsState {
   return {
     grantedSubjects: [],
-    grantedConnections: [],
   };
 }
 
@@ -42,7 +41,6 @@ export class GrantedConnectionsFormPart extends FormPart<IGrantedConnectionsStat
 
       this.setInitialState({
         ...getInitialState(),
-        grantedConnections: grantInfo,
         grantedSubjects: grantInfo.map(info => info.connectionId),
       });
       return;
