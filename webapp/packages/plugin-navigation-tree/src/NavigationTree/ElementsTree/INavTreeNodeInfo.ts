@@ -8,6 +8,7 @@
 
 export interface INavTreeNodeInfo {
   name: string;
+  description?: string;
   tooltip?: string;
   icon?: string;
 }

@@ -25,6 +25,17 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 24.3.3. 2025-01-20
+- Administration:
+  -    Added an ability to match users from LDAP configuration with CloudBeaver users;
+  -    New environment variables were introduced for theme styling, SQL editor, and log viewer settings. You can use them for quick setup during the initial Docker configuration stage.
+- General:
+  -    An ability to show metadata object comments was added in the Navigator tree. You can enable it in the database navigator settings panel;
+  -    Added transaction log viewing for connections with manual commit mode. This allows users to see all modifying statements before committing;
+  -    Added an ability to import data in tables without unique keys;
+  -    Added an ability to insert data in tables without unique keys;
+  -    Added Ctrl + Shift + S (Cmd + Shift + S on Mac) shortcut for "Save As Script" action.
+
 ### 24.3.2. 2025-01-06
 - Added an ability to specify a user login as an attribute parameter for LDAP providers;
 - The collapse of the grouping panel doesn't lead to the full panel cleaning anymore.

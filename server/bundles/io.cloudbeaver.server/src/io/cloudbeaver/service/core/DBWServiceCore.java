@@ -121,8 +121,8 @@ public interface DBWServiceCore extends DBWService {
         @NotNull String connectionId,
         @NotNull Map<String, Object> authProperties,
         @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
-        @Nullable Boolean saveCredentials,
-        @Nullable Boolean sharedCredentials,
+        boolean saveCredentials,
+        boolean sharedCredentials,
         @Nullable String selectedCredentials
     ) throws DBWebException;
 

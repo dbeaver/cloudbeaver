@@ -27,7 +27,12 @@ export const TableIndexColumnHeader = observer<RenderHeaderCellProps<any>>(funct
     throw new Error('Contexts required');
   }
 
-  const readonly = getComputed(() => tableDataContext.isReadOnly() || dataGridContext.model.isReadonly(dataGridContext.resultIndex));
+  const readonly = getComputed(
+    () =>
+      tableDataContext.isReadOnly() ||
+      dataGridContext.model.isReadonly(dataGridContext.resultIndex) ||
+      !dataGridContext.model.hasElementIdentifier(dataGridContext.resultIndex),
+  );
 
   function handleClick(event: React.MouseEvent<HTMLDivElement>) {
     selectionContext.selectTable();
