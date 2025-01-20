@@ -17,6 +17,8 @@ export default [
 
   ['plugin_datasource_transaction_manager_logs', 'Журнал транзакции'],
   ['plugin_datasource_transaction_manager_logs_tooltip', 'Открыть журнал транзакции'],
+  ['plugin_datasource_transaction_manager_logs_tooltip_count', 'Всего запросов: {arg:count}'],
+  ['plugin_datasource_transaction_manager_logs_counter_none', 'Нет'],
   ['plugin_datasource_transaction_manager_logs_table_column_time', 'Время'],
   ['plugin_datasource_transaction_manager_logs_table_column_type', 'Тип'],
   ['plugin_datasource_transaction_manager_logs_table_column_text', 'Запрос'],
