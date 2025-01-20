@@ -17,6 +17,8 @@ export * from './Administration/Users/UserForm/AdministrationUserFormState.js';
 export * from './Administration/Users/UserForm/Info/getUserFormInfoPart.js';
 export * from './Administration/Users/UserForm/Info/UserFormInfoPart.js';
 export * from './Administration/Users/UserForm/Info/UserFormInfoPartService.js';
+export * from './Administration/Users/Teams/TeamsForm/TeamsAdministrationFormService.js';
 export * from './Menus/MENU_USERS_ADMINISTRATION.js';
 export * from './AdministrationUsersManagementService.js';
 export * from './externalUserProviderStatusContext.js';
+export * from './Administration/Users/Teams/TeamsForm/Options/getTeamOptionsFormPart.js';
