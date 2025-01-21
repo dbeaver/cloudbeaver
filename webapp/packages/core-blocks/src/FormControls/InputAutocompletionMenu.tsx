@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useLayoutEffect, useRef } from 'react';
 
 import BaseDropdownStyles from '../FormControls/BaseDropdown.module.css';
+import { getComputed } from '../getComputed.js';
 import { IconOrImage } from '../IconOrImage.js';
 import { Menu } from '../Menu/Menu.js';
 import { MenuItem } from '../Menu/MenuItem.js';
@@ -46,6 +47,10 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
     },
     false,
   );
+  const contextMenuPosition = getComputed(() => ({
+    position: { x: state.x, y: state.y },
+    handleContextMenuOpen: () => {},
+  }));
 
   function handleSelect(proposal: InputAutocompleteProposal) {
     menuRef.current?.hide();
@@ -90,8 +95,6 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
 
     state.x = spanRect.width + letterWidth;
     state.y = spanRect.height + CONTEXT_INPUT_OFFSET_Y;
-
-    menuRef.current?.show();
   }, [state.inputValue, inputRef.current]);
 
   useEffect(() => {
@@ -110,10 +113,7 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
 
   return (
     <Menu
-      menuButtonPosition={{
-        x: state.x,
-        y: state.y,
-      }}
+      contextMenuPosition={contextMenuPosition}
       visible={proposals.length > 0}
       panelAvailable={proposals.length > 0}
       className={s(styles, { menu: true }, className)}

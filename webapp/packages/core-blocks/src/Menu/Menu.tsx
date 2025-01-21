@@ -10,8 +10,6 @@ import React, { forwardRef, useLayoutEffect, useRef, useState } from 'react';
 import { MenuButton, type MenuInitialState, useMenuState } from 'reakit';
 import type { ExtractHTMLAttributes } from 'reakit-utils';
 
-import { isNotNullDefined } from '@cloudbeaver/core-utils';
-
 import { ErrorBoundary } from '../ErrorBoundary.js';
 import { s } from '../s.js';
 import { useCombinedRef } from '../useCombinedRef.js';
@@ -20,14 +18,10 @@ import { useS } from '../useS.js';
 import style from './Menu.module.css';
 import { MenuPanel } from './MenuPanel.js';
 import { type IMenuState, MenuStateContext } from './MenuStateContext.js';
-import type { IMouseContextMenu } from './useMouseContextMenu.js';
+import type { IContextMenuPosition } from './useContextMenuPosition.js';
 
 interface IMenuProps extends React.ButtonHTMLAttributes<any> {
-  mouseContextMenu?: IMouseContextMenu;
-  menuButtonPosition?: {
-    x: number;
-    y: number;
-  };
+  contextMenuPosition?: IContextMenuPosition;
   label: string;
   items: React.ReactNode | (() => React.ReactNode);
   menuRef?: React.RefObject<IMenuState | undefined>;
@@ -46,7 +40,7 @@ interface IMenuProps extends React.ButtonHTMLAttributes<any> {
 export const Menu = observer<IMenuProps, HTMLButtonElement>(
   forwardRef(function Menu(
     {
-      mouseContextMenu,
+      contextMenuPosition,
       label,
       items,
       menuRef,
@@ -55,7 +49,6 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
       placement,
       visible,
       hasBindings,
-      menuButtonPosition,
       panelAvailable,
       getHasBindings,
       onVisibleSwitch,
@@ -81,7 +74,6 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
       unstable_fixed: true,
     });
     const styles = useS(style);
-    const hasAnchorButton = isNotNullDefined(relativePosition) || isNotNullDefined(menuButtonPosition);
 
     if (menuRef) {
       //@ts-expect-error Ref mutation
@@ -103,7 +95,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
     }, [menuVisible]);
 
     useLayoutEffect(() => {
-      if (!mouseContextMenu?.position) {
+      if (!contextMenuPosition?.position) {
         return;
       }
 
@@ -117,13 +109,13 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
 
         const boxSize = innerMenuButtonRef.current.getBoundingClientRect();
         setRelativePosition({
-          x: mouseContextMenu.position.x - boxSize.x,
-          y: mouseContextMenu.position.y - boxSize.y,
+          x: contextMenuPosition.position.x - boxSize.x,
+          y: contextMenuPosition.position.y - boxSize.y,
         });
 
-        mouseContextMenu.position = null;
+        contextMenuPosition.position = null;
       }
-    }, [mouseContextMenu?.position, menuVisible]);
+    }, [contextMenuPosition?.position, menuVisible]);
 
     useLayoutEffect(() => {
       if (relativePosition) {
@@ -131,11 +123,6 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
           menuButtonLinkRef.current.style.left = `${relativePosition.x}px`;
           menuButtonLinkRef.current.style.top = `${relativePosition.y}px`;
         }
-      }
-
-      if (menuButtonLinkRef.current && menuButtonPosition) {
-        menuButtonLinkRef.current.style.left = `${menuButtonPosition.x}px`;
-        menuButtonLinkRef.current.style.top = `${menuButtonPosition.y}px`;
       }
     });
 
@@ -169,7 +156,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
             >
               {items}
             </MenuPanel>
-            {hasAnchorButton && (
+            {relativePosition && (
               <MenuButtonLink ref={menuButtonLinkRef} className={s(styles, { menuButtonLink: true })} {...menu} visible={menuVisible} />
             )}
           </MenuStateContext.Provider>
@@ -203,7 +190,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
           >
             {items}
           </MenuPanel>
-          {hasAnchorButton && (
+          {relativePosition && (
             <MenuButtonLink ref={menuButtonLinkRef} className={s(styles, { menuButtonLink: true })} {...menu} visible={menuVisible} />
           )}
         </MenuStateContext.Provider>
