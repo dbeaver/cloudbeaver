@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import {
+  AriaKitPopover,
   BasePopover,
   Button,
   CommonDialogBody,
@@ -36,6 +37,9 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
       <BasePopover>
         <CommonDialogHeader title={translate('shortcuts_title')} onReject={rejectDialog} />
       </BasePopover>
+      <AriaKitPopover>
+        <CommonDialogHeader title={translate('shortcuts_title')} onReject={rejectDialog} />
+      </AriaKitPopover>
       <CommonDialogBody>
         <Container className={s(styles, { container: true })} gap wrap overflow>
           <Group box gap dense overflow>

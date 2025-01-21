@@ -19,6 +19,7 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
+    "@ariakit/react": "^0.4.15",
     "@base-ui-components/react": "^1.0.0-alpha.5",
     "@cloudbeaver/core-authentication": "^0",
     "@cloudbeaver/core-di": "^0",

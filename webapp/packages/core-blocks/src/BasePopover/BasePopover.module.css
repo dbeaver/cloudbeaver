@@ -8,7 +8,7 @@
 .iconButton {
   background-color: transparent;
   &:active {
-    background-color: aqua;
+    background-color: gainsboro;
   }
 }
 
