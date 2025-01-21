@@ -6,14 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 
-import { GroupTitle, type PlaceholderComponent, Switch, useTranslate } from '@cloudbeaver/core-blocks';
+import { BaseSwitch, GroupTitle, type PlaceholderComponent, Switch, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { IElementsTreeSettingsProps } from './ElementsTreeSettingsService.js';
 
 export const ElementsTreeBaseSettingsForm: PlaceholderComponent<IElementsTreeSettingsProps> = observer(function ElementsTreeBaseSettingsForm({
   tree: { root, settings },
 }) {
+  const [filterState, setFilterState] = useState(true);
   const translate = useTranslate();
 
   if (!settings) {
@@ -23,17 +25,16 @@ export const ElementsTreeBaseSettingsForm: PlaceholderComponent<IElementsTreeSet
   return (
     <>
       <GroupTitle>{translate('ui_settings')}</GroupTitle>
-      <Switch
+      <BaseSwitch
         id={`${root}.filter`}
         name="filter"
-        state={settings}
+        checked={filterState}
         disabled={!settings.configurable}
         title={translate('app_navigationTree_settings_filter_description')}
-        mod={['primary', 'dense']}
-        small
+        onCheckedChange={setFilterState}
       >
         {translate('app_navigationTree_settings_filter_title')}
-      </Switch>
+      </BaseSwitch>
       <Switch
         id={`${root}.filterAll`}
         name="filterAll"

@@ -148,6 +148,7 @@ export * from './FormControls/Checkboxes/Checkbox.js';
 export * from './FormControls/Checkboxes/FieldCheckbox.js';
 export * from './FormControls/Checkboxes/CheckboxMarkup.js';
 export * from './FormControls/Checkboxes/Switch.js';
+export * from './FormControls/Checkboxes/BaseSwitch.js';
 export * from './FormControls/Checkboxes/useCheckboxState.js';
 export * from './FormControls/Filter.js';
 export { default as BaseDropdownStyles } from './FormControls/BaseDropdown.module.css';
