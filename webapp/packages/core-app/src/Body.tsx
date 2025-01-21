@@ -59,6 +59,7 @@ export const Body = observer(function Body() {
             'theme-typography--body2',
             'theme-background-surface',
             'theme-text-on-surface',
+            'root',
           )}
         >
           <Loader className={s(styles, { loader: true })} suspense>

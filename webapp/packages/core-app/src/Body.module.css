@@ -12,6 +12,7 @@
   padding: 0 !important;
   flex-direction: column;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .loader {

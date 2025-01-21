@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import {
+  BasePopover,
   Button,
   CommonDialogBody,
   CommonDialogFooter,
@@ -32,7 +33,9 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
 
   return (
     <CommonDialogWrapper size="large">
-      <CommonDialogHeader title={translate('shortcuts_title')} onReject={rejectDialog} />
+      <BasePopover>
+        <CommonDialogHeader title={translate('shortcuts_title')} onReject={rejectDialog} />
+      </BasePopover>
       <CommonDialogBody>
         <Container className={s(styles, { container: true })} gap wrap overflow>
           <Group box gap dense overflow>
