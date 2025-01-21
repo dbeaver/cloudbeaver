@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 
 import {
   Container,
@@ -17,7 +17,6 @@ import {
   s,
   TextPlaceholder,
   useAutoLoad,
-  useObservableRef,
   useResource,
   useS,
   useTranslate,
@@ -49,20 +48,7 @@ export const GrantedConnections: TabContainerPanelComponent<TeamFormProps> = obs
   const part = getGrantedConnectionsFormPart(formState);
   const { selected } = useTab(tabId);
   const loaded = part.isLoaded();
-  const state = useObservableRef(
-    () => ({
-      editing: false,
-      edit: function () {
-        this.editing = !this.editing;
-      },
-    }),
-    {
-      editing: observable.ref,
-      edit: action.bound,
-    },
-    false,
-  );
-
+  const [edit, setEdit] = useState(false);
   const projects = useResource(GrantedConnections, ProjectInfoResource, CachedMapAllKey);
 
   const globalConnectionsKey = ConnectionInfoProjectKey(
@@ -78,6 +64,10 @@ export const GrantedConnections: TabContainerPanelComponent<TeamFormProps> = obs
 
   const grantedConnections = getComputed(() => connections.filter(connection => part.state.grantedSubjects.includes(connection.id)));
   const connectionsOrigins = (connectionsOriginLoader.data ?? []) as ConnectionInfoOrigin[];
+
+  function toggleEdit() {
+    setEdit(value => !value);
+  }
 
   useAutoLoad(GrantedConnections, part, selected && !loaded);
 
@@ -113,10 +103,10 @@ export const GrantedConnections: TabContainerPanelComponent<TeamFormProps> = obs
                   grantedConnections={grantedConnections}
                   connectionsOrigins={connectionsOrigins}
                   disabled={formState.isDisabled}
-                  onEdit={state.edit}
+                  onEdit={toggleEdit}
                   onRevoke={part.revoke}
                 />
-                {state.editing && (
+                {edit && (
                   <ConnectionList
                     connectionList={connections}
                     connectionsOrigins={connectionsOrigins}

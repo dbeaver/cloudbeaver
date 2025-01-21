@@ -8,7 +8,7 @@
 import type { TeamInfo, TeamInfoMetaParametersResource, TeamsResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { LocalizationService } from '@cloudbeaver/core-localization';
-import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
+import { FormMode, FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 
 import type { ITeamFormState } from '../TeamsAdministrationFormService.js';
@@ -116,6 +116,7 @@ export class TeamOptionsFormPart extends FormPart<ITeamOptionsState, ITeamFormSt
       const team = await this.teamResource.createTeam(teamInfo);
       await this.teamsMetaParametersResource.setMetaParameters(this.state.teamId, this.state.metaParameters);
 
+      this.formState.setMode(FormMode.Edit);
       this.formState.setState({
         teamId: team.teamId,
       });

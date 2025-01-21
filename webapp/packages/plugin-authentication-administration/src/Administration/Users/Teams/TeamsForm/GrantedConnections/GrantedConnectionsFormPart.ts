@@ -65,24 +65,20 @@ export class GrantedConnectionsFormPart extends FormPart<IGrantedConnectionsStat
 
     const { connectionsToRevoke, connectionsToGrant } = this.getConnectionsDifferences(this.initialState.grantedSubjects, this.state.grantedSubjects);
 
-    try {
-      if (connectionsToRevoke.length > 0) {
-        await this.graphQLService.sdk.deleteConnectionsAccess({
-          projectId: globalProject.id,
-          subjects: [this.formState.state.teamId],
-          connectionIds: connectionsToRevoke,
-        });
-      }
+    if (connectionsToRevoke.length > 0) {
+      await this.graphQLService.sdk.deleteConnectionsAccess({
+        projectId: globalProject.id,
+        subjects: [this.formState.state.teamId],
+        connectionIds: connectionsToRevoke,
+      });
+    }
 
-      if (connectionsToGrant.length > 0) {
-        await this.graphQLService.sdk.addConnectionsAccess({
-          projectId: globalProject.id,
-          subjects: [this.formState.state.teamId],
-          connectionIds: connectionsToGrant,
-        });
-      }
-    } catch (exception: any) {
-      this.notificationService.logException(exception);
+    if (connectionsToGrant.length > 0) {
+      await this.graphQLService.sdk.addConnectionsAccess({
+        projectId: globalProject.id,
+        subjects: [this.formState.state.teamId],
+        connectionIds: connectionsToGrant,
+      });
     }
   }
 

@@ -66,28 +66,24 @@ export class GrantedUsersFormPart extends FormPart<IGrantedUsersState, ITeamForm
       user => !this.state.grantedUsers.some(grantedUser => grantedUser.userId === user.userId),
     );
 
-    try {
-      for (const user of revokedUsers) {
-        await this.usersResource.revokeTeam(user.userId, this.formState.state.teamId);
-        revoked.push(user.userId);
+    for (const user of revokedUsers) {
+      await this.usersResource.revokeTeam(user.userId, this.formState.state.teamId);
+      revoked.push(user.userId);
+    }
+
+    for (const user of this.state.grantedUsers) {
+      const initialUser = this.initialState.grantedUsers.find(grantedUser => grantedUser.userId === user.userId);
+
+      if (!initialUser) {
+        await this.usersResource.grantTeam(user.userId, this.formState.state.teamId);
+        granted.push(user.userId);
       }
 
-      for (const user of this.state.grantedUsers) {
-        const initialUser = this.initialState.grantedUsers.find(grantedUser => grantedUser.userId === user.userId);
+      const initialRole = initialUser?.teamRole ?? null;
 
-        if (!initialUser) {
-          await this.usersResource.grantTeam(user.userId, this.formState.state.teamId);
-          granted.push(user.userId);
-        }
-
-        const initialRole = initialUser?.teamRole ?? null;
-
-        if (user.teamRole !== initialRole) {
-          await this.teamRolesResource.assignTeamRoleToUser(user.userId, this.formState.state.teamId, user.teamRole);
-        }
+      if (user.teamRole !== initialRole) {
+        await this.teamRolesResource.assignTeamRoleToUser(user.userId, this.formState.state.teamId, user.teamRole);
       }
-    } catch (exception: any) {
-      this.notificationService.logException(exception);
     }
 
     if (granted.length) {

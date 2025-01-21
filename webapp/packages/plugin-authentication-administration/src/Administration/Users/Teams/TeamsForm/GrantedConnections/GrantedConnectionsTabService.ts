@@ -5,18 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import React from 'react';
-
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
 import { TeamsAdministrationFormService } from '../TeamsAdministrationFormService.js';
 
-const GrantedConnections = React.lazy(async () => {
-  const { GrantedConnections } = await import('./GrantedConnections.js');
-  return { default: GrantedConnections };
-});
+const GrantedConnections = importLazyComponent(() => import('./GrantedConnections.js').then(module => module.GrantedConnections));
 
 @injectable()
 export class GrantedConnectionsTabService extends Bootstrap {
