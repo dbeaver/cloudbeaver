@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { TeamRolesResource, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
-import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { FormPart, formStatusContext, type IFormState } from '@cloudbeaver/core-ui';
 
@@ -25,7 +24,6 @@ export class GrantedUsersFormPart extends FormPart<IGrantedUsersState, ITeamForm
     private readonly teamsResource: TeamsResource,
     private readonly usersResource: UsersResource,
     private readonly teamRolesResource: TeamRolesResource,
-    private readonly notificationService: NotificationService,
   ) {
     super(formState, getInitialState());
 

@@ -7,7 +7,6 @@
  */
 import { TeamRolesResource, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
-import { NotificationService } from '@cloudbeaver/core-events';
 import type { IFormState } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormState } from '../TeamsAdministrationFormService.js';
@@ -21,8 +20,7 @@ export function getGrantedUsersFormPart(formState: IFormState<ITeamFormState>): 
     const teamsResource = di.getService(TeamsResource);
     const usersResource = di.getService(UsersResource);
     const teamRolesResource = di.getService(TeamRolesResource);
-    const notificationService = di.getService(NotificationService);
 
-    return new GrantedUsersFormPart(formState, teamsResource, usersResource, teamRolesResource, notificationService);
+    return new GrantedUsersFormPart(formState, teamsResource, usersResource, teamRolesResource);
   });
 }

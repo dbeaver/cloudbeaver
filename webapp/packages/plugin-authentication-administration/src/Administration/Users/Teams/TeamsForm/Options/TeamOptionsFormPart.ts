@@ -114,9 +114,9 @@ export class TeamOptionsFormPart extends FormPart<ITeamOptionsState, ITeamFormSt
 
     if (this.formState.mode === 'create') {
       const team = await this.teamResource.createTeam(teamInfo);
+      this.formState.setMode(FormMode.Edit);
       await this.teamsMetaParametersResource.setMetaParameters(this.state.teamId, this.state.metaParameters);
 
-      this.formState.setMode(FormMode.Edit);
       this.formState.setState({
         teamId: team.teamId,
       });
