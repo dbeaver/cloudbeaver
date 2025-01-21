@@ -24,7 +24,6 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.BaseWebPlatform;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
@@ -33,6 +32,7 @@ import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.core.impl.WebServiceCore;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jkiss.utils.CommonUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -134,8 +134,8 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                         env.getArgument("id"),
                         env.getArgument("credentials"),
                         nhc,
-                        env.getArgument("saveCredentials"),
-                        env.getArgument("sharedCredentials"),
+                        CommonUtils.toBoolean(env.getArgument("saveCredentials")),
+                        CommonUtils.toBoolean(env.getArgument("sharedCredentials")),
                         env.getArgument("selectedSecretId")
                     );
                 }

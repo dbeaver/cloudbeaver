@@ -337,8 +337,8 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull String connectionId,
         @NotNull Map<String, Object> authProperties,
         @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
-        @Nullable Boolean saveCredentials,
-        @Nullable Boolean sharedCredentials,
+        boolean saveCredentials,
+        boolean sharedCredentials,
         @Nullable String selectedSecretId
     ) throws DBWebException {
         WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, connectionId);
@@ -406,14 +406,14 @@ public class WebServiceCore implements DBWServiceCore {
                 }
             });
         }
-        if (saveCredentials != null && saveCredentials) {
+        if (saveCredentials) {
             // Save all passed credentials in the datasource container
             WebServiceUtils.saveAuthProperties(
                 dataSourceContainer,
                 dataSourceContainer.getConnectionConfiguration(),
                 authProperties,
                 true,
-                sharedCredentials == null ? false : sharedCredentials
+                sharedCredentials
             );
 
             var project = dataSourceContainer.getProject();
@@ -434,6 +434,9 @@ public class WebServiceCore implements DBWServiceCore {
         }
         if (WebServiceUtils.isGlobalProject(dataSourceContainer.getProject())) {
             // Do not flush config for global project (only admin can do it - CB-2415)
+            if (saveCredentials) {
+                connectionInfo.setCredentialsSavedInSession(true);
+            }
             saveConfig[0] = false;
         }
         if (saveConfig[0]) {
@@ -554,6 +557,7 @@ public class WebServiceCore implements DBWServiceCore {
                 config.isSharedCredentials()
             );
         }
+        connectionInfo.setCredentialsSavedInSession(null);
 
         WSDataSourceProperty property = getDatasourceEventProperty(oldDataSource, dataSource);
 
