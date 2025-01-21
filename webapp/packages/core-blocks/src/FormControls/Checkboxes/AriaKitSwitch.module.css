@@ -1,0 +1,76 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.switchWrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 1px;
+  width: 2.5rem !important;
+  height: 1.5rem !important;
+  border-radius: 1.5rem;
+  outline: 1px solid;
+  outline-offset: -1px;
+  background-color: transparent;
+  background-image: linear-gradient(to right, gray 35%, lightgray 65%);
+  background-size: 6.5rem 100%;
+  background-position-x: 100%;
+  background-repeat: no-repeat;
+  transition-property: background-position, box-shadow;
+  transition-timing-function: cubic-bezier(0.26, 0.75, 0.38, 0.45);
+  transition-duration: 125ms;
+
+  &:active {
+    background-color: lightblue;
+  }
+
+  &[data-checked='true'] {
+    background-position-x: 0%;
+  }
+
+  &[data-checked='true']:active {
+    background-color: lightslategray;
+  }
+
+  &:focus-visible {
+    &::before {
+      content: '';
+      inset: 0;
+      position: absolute;
+      border-radius: inherit;
+      outline: 2px solid var(--color-blue);
+      outline-offset: 2px;
+    }
+  }
+}
+
+.thumb {
+  padding: 0.25rem;
+  width: 1rem !important;
+  height: 1rem !important;
+  aspect-ratio: 1 / 1;
+  height: 100%;
+  border-radius: 100%;
+  background-color: white;
+  transition: translate 150ms ease;
+
+  &[data-checked='true'] {
+    translate: 1rem 0;
+  }
+}
+
+.title {
+  margin-inline-start: 1rem;
+}

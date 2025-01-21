@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { BaseSwitch, GroupTitle, MantineSwitch, type PlaceholderComponent, Switch, useTranslate } from '@cloudbeaver/core-blocks';
+import { AriaKitSwitch, BaseSwitch, GroupTitle, MantineSwitch, type PlaceholderComponent, Switch, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { IElementsTreeSettingsProps } from './ElementsTreeSettingsService.js';
 
@@ -39,6 +39,7 @@ export const ElementsTreeBaseSettingsForm: PlaceholderComponent<IElementsTreeSet
       >
         {translate('app_navigationTree_settings_filter_title')}
       </BaseSwitch>
+      <AriaKitSwitch> Filter </AriaKitSwitch>
       <MantineSwitch checked={filterState} label={translate('app_navigationTree_settings_filter_title')} onChange={onFilterChange} />
       <Switch
         id={`${root}.filterAll`}
