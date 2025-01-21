@@ -6,11 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 .switchWrapper {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  input {
+    display: none;
+  }
+
+  &[data-checked] .thumb {
+    translate: 1rem 0;
+  }
+
+  &[data-checked] .track {
+    background-image: linear-gradient(to right, gray 35%, black 65%);
+  }
 }
-.switch {
+
+.track {
   position: relative;
   display: flex;
   align-items: center;
@@ -18,7 +33,7 @@
   border: 0;
   margin: 0;
   padding: 1px;
-  width: 3.6rem !important;
+  width: 2.5rem !important;
   height: 1.5rem !important;
   border-radius: 1.5rem;
   outline: 1px solid;
@@ -31,29 +46,6 @@
   transition-property: background-position, box-shadow;
   transition-timing-function: cubic-bezier(0.26, 0.75, 0.38, 0.45);
   transition-duration: 125ms;
-
-  &:active {
-    background-color: lightblue;
-  }
-
-  &[data-checked] {
-    background-position-x: 0%;
-  }
-
-  &[data-checked]:active {
-    background-color: lightslategray;
-  }
-
-  &:focus-visible {
-    &::before {
-      content: '';
-      inset: 0;
-      position: absolute;
-      border-radius: inherit;
-      outline: 2px solid var(--color-blue);
-      outline-offset: 2px;
-    }
-  }
 }
 
 .thumb {
@@ -62,10 +54,12 @@
   border-radius: 100%;
   background-color: white;
   transition: translate 150ms ease;
+}
 
-  &[data-checked] {
-    translate: 1rem 0;
-  }
+.labelWrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .title {

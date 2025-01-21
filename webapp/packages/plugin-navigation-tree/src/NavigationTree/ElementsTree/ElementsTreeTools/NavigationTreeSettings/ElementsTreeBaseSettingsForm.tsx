@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { BaseSwitch, GroupTitle, type PlaceholderComponent, Switch, useTranslate } from '@cloudbeaver/core-blocks';
+import { BaseSwitch, GroupTitle, MantineSwitch, type PlaceholderComponent, Switch, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { IElementsTreeSettingsProps } from './ElementsTreeSettingsService.js';
 
@@ -22,6 +22,10 @@ export const ElementsTreeBaseSettingsForm: PlaceholderComponent<IElementsTreeSet
     return null;
   }
 
+  function onFilterChange() {
+    setFilterState(prev => !prev);
+  }
+
   return (
     <>
       <GroupTitle>{translate('ui_settings')}</GroupTitle>
@@ -31,10 +35,11 @@ export const ElementsTreeBaseSettingsForm: PlaceholderComponent<IElementsTreeSet
         checked={filterState}
         disabled={!settings.configurable}
         title={translate('app_navigationTree_settings_filter_description')}
-        onCheckedChange={setFilterState}
+        onCheckedChange={onFilterChange}
       >
         {translate('app_navigationTree_settings_filter_title')}
       </BaseSwitch>
+      <MantineSwitch checked={filterState} label={translate('app_navigationTree_settings_filter_title')} onChange={onFilterChange} />
       <Switch
         id={`${root}.filterAll`}
         name="filterAll"

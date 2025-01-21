@@ -31,6 +31,8 @@
     "@cloudbeaver/core-sdk": "^0",
     "@cloudbeaver/core-theming": "^0",
     "@cloudbeaver/core-utils": "^0",
+    "@mantine/core": "^7.16.1",
+    "@mantine/hooks": "^7.16.1",
     "go-split": "^3",
     "mobx": "^6",
     "mobx-react-lite": "^4",

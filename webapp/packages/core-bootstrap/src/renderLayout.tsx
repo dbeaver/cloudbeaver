@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { HeadlessMantineProvider } from '@mantine/core';
 import { Suspense } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 
@@ -51,8 +52,10 @@ export function renderLayout(serviceProvider: IServiceProvider): IRender {
           <ServiceProviderContext serviceProvider={serviceProvider}>
             <ErrorBoundary fallback={<HideAppLoadingScreen />} root>
               <Suspense fallback={<Loader className={s(styles, { loader: true })} />}>
-                <BodyLazy />
-                <HideAppLoadingScreen />
+                <HeadlessMantineProvider>
+                  <BodyLazy />
+                  <HideAppLoadingScreen />
+                </HeadlessMantineProvider>
               </Suspense>
             </ErrorBoundary>
           </ServiceProviderContext>

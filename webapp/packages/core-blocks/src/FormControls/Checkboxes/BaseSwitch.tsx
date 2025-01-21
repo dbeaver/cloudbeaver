@@ -16,7 +16,9 @@ export const BaseSwitch = observer(function BaseSwitch(props: Switch.Root.Props)
       <Switch.Root className={styles.switch} {...props}>
         <Switch.Thumb className={styles.thumb} />
       </Switch.Root>
-      <span className={styles.title}> {props.children}</span>
+      <label htmlFor={props.id} className={styles.title}>
+        {props.children}
+      </label>
     </div>
   );
 });
