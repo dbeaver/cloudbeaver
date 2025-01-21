@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -111,6 +112,20 @@ public class AdminUserInfo {
         return getUserLinkedProviders();
     }
 
+    @Property
+    public String getDisableDate() {
+        return Instant.now().toString();
+    }
+
+    @Property
+    public String getDisableByUserId() {
+        return "cbadmin";
+    }
+
+    @Property
+    public String getDisableReason() {
+        return "Disabled by Admin";
+    }
     private String[] getUserLinkedProviders() throws DBWebException {
         if (userLinkedProviders != null) {
             return userLinkedProviders;

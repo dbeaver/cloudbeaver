@@ -48,6 +48,9 @@ type AdminUserInfo {
     linkedAuthProviders: [String!]!
     enabled: Boolean!
     authRole: String
+    disableDate: DateTime
+    disableByUserId: String
+    disableReason: String
 }
 
 type AdminTeamInfo {
