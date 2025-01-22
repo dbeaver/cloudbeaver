@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.CloudbeaverMockTest;
+import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.test.WebGQLClient;
@@ -30,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class AuthenticationTest {
+public class AuthenticationTest extends CloudbeaverMockTest {
     private static final String GQL_OPEN_SESSION = """
         mutation openSession($defaultLocale: String) {
           result: openSession(defaultLocale: $defaultLocale) {
@@ -52,19 +54,19 @@ public class AuthenticationTest {
 
     @Test
     public void testLoginUser() throws Exception {
-        WebGQLClient client = CEServerTestSuite.createClient();
-        Map<String, Object> authInfo = CEServerTestSuite.authenticateTestUser(client);
+        WebGQLClient client = CEAppStarter.createClient();
+        Map<String, Object> authInfo = CEAppStarter.authenticateTestUser(client);
         Assert.assertEquals(SMAuthStatus.SUCCESS.name(), JSONUtils.getString(authInfo, "authStatus"));
     }
 
 
     @Test
     public void testLoginUserWithCamelCase() throws Exception {
-        WebGQLClient client = CEServerTestSuite.createClient();
+        WebGQLClient client = CEAppStarter.createClient();
         for (String userId : Set.of("Test", "tESt", "tesT", "TEST")) {
             Map<String, Object> credsWithCamelCase = getUserCredentials(userId);
             // authenticating with user
-            Map<String, Object> authInfo = CEServerTestSuite.authenticateTestUser(client, credsWithCamelCase);
+            Map<String, Object> authInfo = CEAppStarter.authenticateTestUser(client, credsWithCamelCase);
             Assert.assertEquals(SMAuthStatus.SUCCESS.name(), JSONUtils.getString(authInfo, "authStatus"));
             Map<String, Object> activeUser = client.sendQuery(GQL_ACTIVE_USER, null);
             Assert.assertEquals(userId.toLowerCase(), JSONUtils.getString(activeUser, "userId"));
@@ -87,7 +89,7 @@ public class AuthenticationTest {
 
     @Test
     public void testReverseProxyAnonymousModeLogin() throws Exception {
-        WebGQLClient client = CEServerTestSuite.createClient();
+        WebGQLClient client = CEAppStarter.createClient();
         String testUserId = "reverseProxyTestUser";
         List<String> headers = List.of(RPAuthProvider.X_USER, testUserId, RPAuthProvider.X_TEAM, "user");
         Map<String, Object> sessionInfo = client.sendQueryWithHeaders(GQL_OPEN_SESSION, null, headers);

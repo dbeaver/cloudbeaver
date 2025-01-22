@@ -29,6 +29,7 @@ function DEFAULT_STATE_GETTER(): IServerConfigurationFormPartState {
       enabledFeatures: [],
       publicCredentialsSaveEnabled: false,
       resourceManagerEnabled: false,
+      secretManagerEnabled: false,
       serverName: '',
       serverURL: '',
       sessionExpireTime: MIN_SESSION_EXPIRE_TIME * 1000 * 60,
@@ -147,6 +148,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
         anonymousAccessEnabled: config?.anonymousAccessEnabled ?? false,
         enabledFeatures: config?.enabledFeatures ? [...config.enabledFeatures] : [],
         resourceManagerEnabled: config?.resourceManagerEnabled ?? false,
+        secretManagerEnabled: config?.secretManagerEnabled ?? false,
       },
       navigatorConfig: { ...this.state.navigatorConfig, ...defaultNavigatorSettings },
     });

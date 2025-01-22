@@ -17,6 +17,8 @@
 
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.CloudbeaverMockTest;
+import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.test.WebGQLClient;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -30,7 +32,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ConnectionsTest {
+public class ConnectionsTest extends CloudbeaverMockTest {
     private static final String GQL_CONNECTIONS_GET = """
         query userConnections {
           result: userConnections {
@@ -64,8 +66,8 @@ public class ConnectionsTest {
 
     @Test
     public void testBCreateConnection() throws Exception {
-        WebGQLClient client = CEServerTestSuite.createClient();
-        CEServerTestSuite.authenticateTestUser(client);
+        WebGQLClient client = CEAppStarter.createClient();
+        CEAppStarter.authenticateTestUser(client);
 
         Map<String, Object> configuration = new LinkedHashMap<>();
         Map<String, Object> variables = new LinkedHashMap<>();

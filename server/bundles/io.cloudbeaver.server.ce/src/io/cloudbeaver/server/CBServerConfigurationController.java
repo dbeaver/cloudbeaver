@@ -439,6 +439,11 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             copyConfigValue(
                 oldAppConfig,
                 appConfigProperties,
+                CBConstants.PARAM_SECRET_MANAGER_ENABLED,
+                appConfig.isSecretManagerEnabled());
+            copyConfigValue(
+                oldAppConfig,
+                appConfigProperties,
                 CBConstants.PARAM_SHOW_READ_ONLY_CONN_INFO,
                 appConfig.isShowReadOnlyConnectionInfo());
             copyConfigValue(
