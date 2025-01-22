@@ -114,17 +114,17 @@ public class AdminUserInfo {
 
     @Property
     public String getDisableDate() {
-        return Instant.now().toString();
+        return user.getDisableDate() != null ? user.getDisableDate().toString() : null;
     }
 
     @Property
     public String getDisableByUserId() {
-        return "cbadmin";
+        return user.getDisableByUserId();
     }
 
     @Property
     public String getDisableReason() {
-        return "Disabled by Admin";
+        return user.getDisableReason();
     }
     private String[] getUserLinkedProviders() throws DBWebException {
         if (userLinkedProviders != null) {

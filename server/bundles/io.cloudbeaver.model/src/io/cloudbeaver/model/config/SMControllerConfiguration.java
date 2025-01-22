@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,11 @@ public class SMControllerConfiguration {
     private int expiredAuthAttemptInfoTtl = DEFAULT_EXPIRED_AUTH_ATTEMPT_INFO_TTL;
 
     private boolean enableBruteForceProtection = true;
+    private boolean enableConnectionBruteForceProtection = false;
+    private long blockPeriodTimeBruteForceProtection = 1440;
 
-    //in seconds
-    public static final int DEFAULT_MAX_FAILED_LOGIN = 10;
+    public static final int DEFAULT_MAX_FAILED_LOGIN = 5;
+
     public static final int DEFAULT_MINIMUM_LOGIN_TIMEOUT = 1; //1sec
     public static final int DEFAULT_BLOCK_LOGIN_PERIOD = 300; //5min
     private int maxFailedLogin = DEFAULT_MAX_FAILED_LOGIN;
@@ -66,8 +68,24 @@ public class SMControllerConfiguration {
         this.enableBruteForceProtection = checkBruteforce;
     }
 
+    public void setBlockPeriodTimeBruteForceProtection(long blockPeriodTimeBruteForceProtection) {
+        this.blockPeriodTimeBruteForceProtection = blockPeriodTimeBruteForceProtection;
+    }
+
+    public void setEnableConnectionBruteForceProtection(boolean enableConnectionBruteForceProtection) {
+        this.enableConnectionBruteForceProtection = enableConnectionBruteForceProtection;
+    }
+
     public boolean isCheckBruteforce() {
         return enableBruteForceProtection;
+    }
+
+    public long getBlockPeriodTimeBruteForceProtection() {
+        return blockPeriodTimeBruteForceProtection;
+    }
+
+    public boolean isEnableConnectionBruteForceProtection() {
+        return enableConnectionBruteForceProtection;
     }
 
     public int getMaxFailedLogin() {

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,13 @@
 package io.cloudbeaver.service.security.bruteforce;
 
 import io.cloudbeaver.model.config.SMControllerConfiguration;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 
+import java.sql.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -58,6 +60,24 @@ public class BruteForceUtils {
                     lockDuration.minus(Duration.between(oldestLoginAttempt.time(), now)).getSeconds() + " seconds");
             }
         }
+    }
+
+    public static boolean checkBruteforceBlockUser(
+        @NotNull SMControllerConfiguration smConfig,
+        @NotNull List<UserLoginRecord> latestLoginAttempts
+    )
+        throws DBException, SQLException {
+        if (latestLoginAttempts.isEmpty()) {
+            return false;
+        }
+
+        var oldestLoginAttempt = latestLoginAttempts.get(latestLoginAttempts.size() - 1);
+        checkLoginInterval(oldestLoginAttempt.time(), smConfig.getMinimumLoginTimeout());
+
+        long errorsCount = latestLoginAttempts.stream()
+            .filter(authAttemptSessionInfo -> authAttemptSessionInfo.smAuthStatus() == SMAuthStatus.ERROR).count();
+
+        return errorsCount >= smConfig.getMaxFailedLogin();
     }
 
     private static void checkLoginInterval(LocalDateTime createTime, int timeout) throws DBException {

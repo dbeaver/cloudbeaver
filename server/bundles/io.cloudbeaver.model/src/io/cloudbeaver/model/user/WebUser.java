@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@
 package io.cloudbeaver.model.user;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 
@@ -92,5 +94,21 @@ public class WebUser {
 
     public String getAuthRole() {
         return user.getAuthRole();
+    }
+
+
+    @Nullable
+    public Instant getDisableDate() {
+        return user.getDisableDate();
+    }
+
+    @Nullable
+    public String getDisableByUserId() {
+        return user.getDisableByUserId();
+    }
+
+    @Nullable
+    public String getDisableReason() {
+        return user.getDisableReason();
     }
 }
