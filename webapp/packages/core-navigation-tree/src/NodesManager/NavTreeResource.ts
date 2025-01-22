@@ -455,17 +455,22 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     this.navNodeInfoResource.delete(items.exclude(key));
   }
 
+  async preloadParents(nodeId: string): Promise<boolean> {
+    if (!this.navNodeInfoResource.has(nodeId) && nodeId !== ROOT_NODE_PATH) {
+      await this.navNodeInfoResource.loadNodeParents(nodeId);
+    }
+    const parents = this.navNodeInfoResource.getParents(nodeId);
+    return await this.preloadNodeParents(parents, nodeId);
+  }
+
   protected override async preLoadData(key: ResourceKey<string>, contexts: IExecutionContext<ResourceKey<string>>): Promise<void> {
     await ResourceKeyUtils.forEachAsync(key, async nodeId => {
       if (isResourceAlias(nodeId)) {
         return;
       }
 
-      if (!this.navNodeInfoResource.has(nodeId) && nodeId !== ROOT_NODE_PATH) {
-        await this.navNodeInfoResource.loadNodeParents(nodeId);
-      }
+      const preloaded = await this.preloadParents(nodeId);
       const parents = this.navNodeInfoResource.getParents(nodeId);
-      const preloaded = await this.preloadNodeParents(parents, nodeId);
 
       if (!preloaded) {
         const cause = new DetailsError(`Entity not found:\n"${nodeId}"\nPath:\n${parents.map(parent => `"${parent}"`).join('\n')}`);

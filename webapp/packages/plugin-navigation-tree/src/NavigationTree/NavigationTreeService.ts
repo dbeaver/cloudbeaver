@@ -104,15 +104,13 @@ export class NavigationTreeService extends View<string> {
       }
     }
 
-    await this.navTreeResource.waitLoad();
-
     if (tryConnect && this.navTreeResource.getException(id)) {
       this.navTreeResource.markOutdated(id);
     }
 
-    const parents = this.navNodeInfoResource.getParents(id);
+    const preloaded = await this.navTreeResource.preloadParents(id);
 
-    if (parents.length > 0 && !this.navNodeInfoResource.has(id)) {
+    if (!preloaded) {
       return false;
     }
 
