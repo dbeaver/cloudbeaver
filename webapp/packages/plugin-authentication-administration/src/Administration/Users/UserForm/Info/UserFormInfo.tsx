@@ -33,7 +33,7 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
 
   const disabled = tabState.isLoading();
   const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
-  const userInfo = useResource(UserFormDisabledStatus, UsersResource, formState.state.userId, {
+  const user = useResource(UserFormDisabledStatus, UsersResource, formState.state.userId, {
     active: formState.mode === 'edit',
   });
 
@@ -46,7 +46,7 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
         <Placeholder container={userFormInfoPartService.placeholderContainer} formState={formState} />
         <GroupTitle>{translate('authentication_user_status')}</GroupTitle>
         <FieldCheckbox
-          caption={constructUserEnabledCaption(userInfo.data)}
+          caption={constructUserEnabledCaption(user.data)}
           label={translate('authentication_user_enabled')}
           id={`${formState.id}_user_enabled`}
           name="enabled"
