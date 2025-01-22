@@ -32,7 +32,7 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
 
   const disabled = tabState.isLoading();
   const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
-  const user = useResource(UserFormDisabledStatus, UsersResource, formState.state.userId, {
+  const user = useResource(UserFormInfo, UsersResource, formState.state.userId, {
     active: formState.mode === 'edit',
   });
 
