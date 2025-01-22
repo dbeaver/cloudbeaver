@@ -15,7 +15,6 @@ import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeav
 import { AdministrationUsersManagementService } from '../../../../AdministrationUsersManagementService.js';
 import type { UserFormProps } from '../AdministrationUserFormService.js';
 import { constructUserEnabledCaption } from './constructUserEnabledCaption.js';
-import { UserFormDisabledStatus } from './UserFormDisabledStatus.js';
 import { UserFormInfoCredentials } from './UserFormInfoCredentials.js';
 import { UserFormInfoMetaParameters } from './UserFormInfoMetaParameters.js';
 import type { UserFormInfoPart } from './UserFormInfoPart.js';
