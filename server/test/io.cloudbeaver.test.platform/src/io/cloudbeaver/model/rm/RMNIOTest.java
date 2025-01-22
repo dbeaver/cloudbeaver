@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.rm;
 
+import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.service.rm.nio.RMNIOFileSystem;
@@ -54,12 +55,13 @@ public class RMNIOTest {
     @BeforeClass
     public static void init() throws Exception {
         var cookieManager = new CookieManager();
+        CEAppStarter.startServerIfNotStarted();
         var httpClient = HttpClient.newBuilder()
             .cookieHandler(cookieManager)
             .version(HttpClient.Version.HTTP_2)
             .build();
-        WebGQLClient client = CEServerTestSuite.createClient(httpClient);
-        Map<String, Object> authInfo = CEServerTestSuite.authenticateTestUser(client);
+        WebGQLClient client = CEAppStarter.createClient(httpClient);
+        Map<String, Object> authInfo = CEAppStarter.authenticateTestUser(client);
         Assert.assertEquals(SMAuthStatus.SUCCESS.name(), JSONUtils.getString(authInfo, "authStatus"));
 
         String sessionId = cookieManager.getCookieStore().getCookies()
@@ -68,7 +70,7 @@ public class RMNIOTest {
             .findFirst()
             .get()
             .getValue();
-        webSession = (WebSession) CEServerTestSuite.getTestApp().getSessionManager().getSession(sessionId);
+        webSession = (WebSession) CEAppStarter.getTestApp().getSessionManager().getSession(sessionId);
         Assert.assertNotNull(webSession);
         var projectName = "NIO_Test" + SecurityUtils.generateUniqueId();
         testProject = webSession.getRmController().createProject(projectName, null);
