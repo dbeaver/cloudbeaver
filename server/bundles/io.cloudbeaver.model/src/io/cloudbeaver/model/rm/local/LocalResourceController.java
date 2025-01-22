@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,11 +114,20 @@ public class LocalResourceController extends BaseLocalResourceController {
             if (project == null || refresh) {
                 SessionContextImpl sessionContext = new SessionContextImpl(null);
                 RMProject rmProject = makeProjectFromId(projectId, false);
-                project = new InternalWebProjectImpl(sessionContext, rmProject, getProjectPath(projectId));
+                project = createWebProjectImpl(projectId, sessionContext, rmProject);
                 projectRegistries.put(projectId, project);
             }
             return project;
         }
+    }
+
+    @NotNull
+    protected InternalWebProjectImpl createWebProjectImpl(
+        String projectId,
+        SessionContextImpl sessionContext,
+        RMProject rmProject
+    ) throws DBException {
+        return new InternalWebProjectImpl(sessionContext, rmProject, getProjectPath(projectId));
     }
 
     @NotNull
@@ -946,16 +955,19 @@ public class LocalResourceController extends BaseLocalResourceController {
         return "pong (RM)";
     }
 
-    public static final class Builder {
-        private final SMCredentialsProvider credentialsProvider;
-        private final Supplier<SMController> smController;
-        private final DBPWorkspace workspace;
+    public static class Builder {
+        protected final SMCredentialsProvider credentialsProvider;
+        protected final Supplier<SMController> smController;
+        protected final DBPWorkspace workspace;
 
-        private Path rootPath;
-        private Path userProjectsPath;
-        private Path sharedProjectsPath;
+        protected Path rootPath;
+        protected Path userProjectsPath;
+        protected Path sharedProjectsPath;
 
-        private Builder(DBPWorkspace workspace, SMCredentialsProvider credentialsProvider, Supplier<SMController> smControllerSupplier) {
+        protected Builder(
+            DBPWorkspace workspace, SMCredentialsProvider credentialsProvider,
+            Supplier<SMController> smControllerSupplier
+        ) {
             this.workspace = workspace;
             this.credentialsProvider = credentialsProvider;
             this.smController = smControllerSupplier;

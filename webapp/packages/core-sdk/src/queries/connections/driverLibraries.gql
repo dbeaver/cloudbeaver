@@ -4,6 +4,11 @@ query getDriverLibraries($id: ID!) {
       id
       name
       icon
+      libraryFiles {
+        id
+        fileName
+        icon
+      }
     }
   }
 }

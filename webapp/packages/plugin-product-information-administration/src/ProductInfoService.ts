@@ -40,7 +40,7 @@ export class ProductInfoService extends Dependency {
       onActivate: async () => {
         await this.serverLicenseStatusResource.load();
       },
-      order: 12,
+      order: 13,
     });
   }
 
