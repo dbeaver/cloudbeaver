@@ -7,12 +7,15 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, FieldCheckbox, Group, GroupTitle, Placeholder, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
+import { UsersResource } from '@cloudbeaver/core-authentication';
+import { Container, FieldCheckbox, Group, GroupTitle, Placeholder, useAutoLoad, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import { AdministrationUsersManagementService } from '../../../../AdministrationUsersManagementService.js';
 import type { UserFormProps } from '../AdministrationUserFormService.js';
+import { constructUserEnabledCaption } from './constructUserEnabledCaption.js';
+import { UserFormDisabledStatus } from './UserFormDisabledStatus.js';
 import { UserFormInfoCredentials } from './UserFormInfoCredentials.js';
 import { UserFormInfoMetaParameters } from './UserFormInfoMetaParameters.js';
 import type { UserFormInfoPart } from './UserFormInfoPart.js';
@@ -30,6 +33,9 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
 
   const disabled = tabState.isLoading();
   const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
+  const userInfo = useResource(UserFormDisabledStatus, UsersResource, formState.state.userId, {
+    active: formState.mode === 'edit',
+  });
 
   return (
     <Container overflow>
@@ -39,9 +45,14 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
       <Group small gap overflow>
         <Placeholder container={userFormInfoPartService.placeholderContainer} formState={formState} />
         <GroupTitle>{translate('authentication_user_status')}</GroupTitle>
-        <FieldCheckbox id={`${formState.id}_user_enabled`} name="enabled" state={tabState.state} disabled={disabled || userManagementDisabled}>
-          {translate('authentication_user_enabled')}
-        </FieldCheckbox>
+        <FieldCheckbox
+          caption={constructUserEnabledCaption(userInfo.data)}
+          label={translate('authentication_user_enabled')}
+          id={`${formState.id}_user_enabled`}
+          name="enabled"
+          state={tabState.state}
+          disabled={disabled || userManagementDisabled}
+        />
         <UserFormInfoTeams formState={formState} tabState={tabState} tabSelected={tab.selected} disabled={disabled} />
       </Group>
       <UserFormInfoMetaParameters formState={formState} tabState={tabState} tabSelected={tab.selected} disabled={disabled} />
