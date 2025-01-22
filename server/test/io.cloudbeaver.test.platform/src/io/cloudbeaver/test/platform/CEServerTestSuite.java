@@ -17,25 +17,13 @@
 
 package io.cloudbeaver.test.platform;
 
-import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.app.CEAppStarter;
-import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.rm.RMNIOTest;
 import io.cloudbeaver.model.rm.lock.RMLockTest;
-import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBApplicationCE;
-import io.cloudbeaver.test.WebGQLClient;
-import io.cloudbeaver.utils.WebTestUtils;
-import org.jkiss.code.NotNull;
-import org.jkiss.utils.SecurityUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-
-import java.net.CookieManager;
-import java.net.http.HttpClient;
-import java.util.Map;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses(
