@@ -12,7 +12,13 @@ import styles from './MantineSwitch.module.css';
 export function MantineSwitch(props: SwitchProps) {
   return (
     <Switch
-      classNames={{ root: styles.switchWrapper, track: styles.track, thumb: styles.thumb, labelWrapper: styles.labelWrapper, label: styles.title }}
+      classNames={{
+        root: styles['switchWrapper'],
+        track: styles['track'],
+        thumb: styles['thumb'],
+        labelWrapper: styles['labelWrapper'],
+        label: styles['title'],
+      }}
       {...props}
     />
   );

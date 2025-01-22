@@ -18,7 +18,7 @@ export const AriaKitSwitch = forwardRef<HTMLInputElement, CheckboxProps>(functio
   const [checked, setChecked] = useState(props.defaultChecked ?? false);
   const [focusVisible, setFocusVisible] = useState(false);
   return (
-    <label className={styles.switchWrapper} data-checked={checked} data-focus-visible={focusVisible || undefined}>
+    <label className={styles['switchWrapper']} data-checked={checked} data-focus-visible={focusVisible || undefined}>
       <Ariakit.VisuallyHidden>
         <Ariakit.Checkbox
           {...props}
@@ -32,10 +32,10 @@ export const AriaKitSwitch = forwardRef<HTMLInputElement, CheckboxProps>(functio
           }}
         />
       </Ariakit.VisuallyHidden>
-      <div className={styles.switch} data-checked={checked}>
-        <div className={styles.thumb} data-checked={checked} />
+      <div className={styles['switch']} data-checked={checked}>
+        <div className={styles['thumb']} data-checked={checked} />
       </div>
-      <span className={styles.title}> {children}</span>
+      <span className={styles['title']}> {children}</span>
     </label>
   );
 });

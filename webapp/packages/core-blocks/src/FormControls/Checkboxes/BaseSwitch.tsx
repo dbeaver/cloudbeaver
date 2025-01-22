@@ -12,11 +12,11 @@ import styles from './BaseSwitch.module.css';
 
 export const BaseSwitch = observer(function BaseSwitch(props: Switch.Root.Props) {
   return (
-    <div className={styles.switchWrapper}>
-      <Switch.Root className={styles.switch} {...props}>
-        <Switch.Thumb className={styles.thumb} />
+    <div className={styles['switchWrapper']}>
+      <Switch.Root className={styles['switch']} {...props}>
+        <Switch.Thumb className={styles['thumb']} />
       </Switch.Root>
-      <label htmlFor={props.id} className={styles.title}>
+      <label htmlFor={props.id} className={styles['title']}>
         {props.children}
       </label>
     </div>

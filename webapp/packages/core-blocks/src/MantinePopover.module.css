@@ -1,0 +1,25 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.popover {
+  z-index: 50;
+  display: flex;
+  max-width: min(calc(100vw - 16px), 320px);
+  flex-direction: column;
+  gap: 1rem;
+  border-radius: 0.5rem;
+  border-width: 1px;
+  border-style: solid;
+  border-color: hsl(204 20% 88%);
+  background-color: white;
+  padding: 1rem;
+  color: black;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+}

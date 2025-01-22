@@ -17,6 +17,7 @@ import {
   Group,
   GroupTitle,
   Link,
+  MantinePopover,
   s,
   useS,
   useTranslate,
@@ -40,6 +41,10 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
       <AriaKitPopover>
         <CommonDialogHeader title={translate('shortcuts_title')} onReject={rejectDialog} />
       </AriaKitPopover>
+      <MantinePopover>
+        <button>123</button>
+      </MantinePopover>
+
       <CommonDialogBody>
         <Container className={s(styles, { container: true })} gap wrap overflow>
           <Group box gap dense overflow>
