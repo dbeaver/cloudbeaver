@@ -69,6 +69,7 @@ export const useInputAutocomplete = (
         if (this.inputRef.current) {
           this.inputRef.current.value = this.input;
           this.inputRef.current.focus();
+          this.inputRef.current.setSelectionRange(this.selectionStart, this.selectionStart);
         }
 
         this.isFound = true;

@@ -19,30 +19,13 @@ interface UseSearchProps<T> {
 const DEFAULT_THRESHOLD = 0.4;
 
 export function useFuzzySearch<T extends object>({ sourceProposals, fields, threshold = DEFAULT_THRESHOLD, prefix = true }: UseSearchProps<T>) {
-  const storeFields = useMemo(
-    () =>
-      sourceProposals.reduce((acc, proposal) => {
-        for (const field of fields) {
-          if (typeof proposal[field as keyof typeof proposal] === 'string') {
-            acc.push(field);
-          }
-        }
-        return acc;
-      }, [] as string[]),
-    [],
-  );
-  const options = useMemo(
-    () => ({
-      fields,
-      storeFields,
-      searchOptions: {
-        fuzzy: threshold,
-        prefix,
-      },
-    }),
-    [fields, storeFields],
-  );
-  const miniSearch = useMiniSearch(sourceProposals, options);
+  const miniSearch = useMiniSearch(sourceProposals, {
+    fields,
+    searchOptions: {
+      fuzzy: threshold,
+      prefix,
+    },
+  });
 
   useMemo(
     () =>
