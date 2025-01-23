@@ -31,6 +31,7 @@ public abstract class BaseWebAppConfiguration implements ServletAppConfiguration
     protected final Map<String, Object> plugins;
     protected String defaultUserTeam = DEFAULT_APP_ANONYMOUS_TEAM_NAME;
     protected boolean resourceManagerEnabled;
+    protected boolean secretManagerEnabled;
     protected boolean showReadOnlyConnectionInfo;
     protected String[] enabledFeatures;
     protected String[] disabledBetaFeatures;
@@ -42,6 +43,7 @@ public abstract class BaseWebAppConfiguration implements ServletAppConfiguration
         this.enabledFeatures = null;
         this.disabledBetaFeatures = new String[0];
         this.showReadOnlyConnectionInfo = false;
+        this.secretManagerEnabled = false;
     }
 
     public BaseWebAppConfiguration(BaseWebAppConfiguration src) {
@@ -51,6 +53,7 @@ public abstract class BaseWebAppConfiguration implements ServletAppConfiguration
         this.enabledFeatures = src.enabledFeatures;
         this.disabledBetaFeatures = src.disabledBetaFeatures;
         this.showReadOnlyConnectionInfo = src.showReadOnlyConnectionInfo;
+        this.secretManagerEnabled = src.secretManagerEnabled;
     }
 
     @Override
@@ -82,6 +85,11 @@ public abstract class BaseWebAppConfiguration implements ServletAppConfiguration
     @Override
     public boolean isResourceManagerEnabled() {
         return resourceManagerEnabled;
+    }
+
+    @Override
+    public boolean isSecretManagerEnabled() {
+        return secretManagerEnabled;
     }
 
     @Override

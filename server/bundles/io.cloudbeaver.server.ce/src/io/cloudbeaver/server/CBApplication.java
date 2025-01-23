@@ -29,6 +29,8 @@ import io.cloudbeaver.model.config.SMControllerConfiguration;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
+import io.cloudbeaver.service.ConnectionController;
+import io.cloudbeaver.service.ConnectionControllerCE;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.session.CBSessionManager;
@@ -772,5 +774,10 @@ public abstract class CBApplication<T extends CBServerConfig> extends
     @Override
     public WebServerConfig getWebServerConfig() {
         return new CBWebServerConfig(this);
+    }
+
+    @Override
+    public ConnectionController getConnectionController() {
+        return new ConnectionControllerCE();
     }
 }

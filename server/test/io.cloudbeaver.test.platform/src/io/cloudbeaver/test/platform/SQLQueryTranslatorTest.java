@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.CloudbeaverMockTest;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.ext.h2.model.H2SQLDialect;
@@ -34,7 +35,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SQLQueryTranslatorTest {
+public class SQLQueryTranslatorTest extends CloudbeaverMockTest {
     @Test
     public void createSimpleTable() throws DBException {
         var basicSql = "CREATE TABLE CB_AUTH_SUBJECT (SUBJECT_ID VARCHAR(128) NOT NULL," +

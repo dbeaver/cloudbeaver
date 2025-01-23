@@ -19,6 +19,7 @@ const ServerConfigurationFormPartStateConfigSchema = schema.object({
   enabledFeatures: schema.array(schema.string()).optional(),
   publicCredentialsSaveEnabled: schema.boolean().optional(),
   resourceManagerEnabled: schema.boolean().optional(),
+  secretManagerEnabled: schema.boolean().optional(),
   serverName: schema.string().optional(),
   serverURL: schema.string().optional(),
   sessionExpireTime: schema.number().optional(),

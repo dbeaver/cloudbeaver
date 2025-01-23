@@ -7,4 +7,6 @@
  */
 .cell {
   cursor: pointer;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }

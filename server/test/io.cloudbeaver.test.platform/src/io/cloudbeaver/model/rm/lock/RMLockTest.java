@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.rm.lock;
 
+import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.test.platform.CEServerTestSuite;
 import org.jkiss.dbeaver.Log;
 import org.junit.Assert;
@@ -39,7 +40,7 @@ public class RMLockTest {
 
     @Test
     public void testProjectAccessUsingSeveralControllers() throws Throwable {
-        var lockController1 = new TestLockController(CEServerTestSuite.getTestApp(), 1);
+        var lockController1 = new TestLockController(CEAppStarter.getTestApp(), 1);
 
         CountDownLatch thread1CDL = new CountDownLatch(1);
         CountDownLatch thread2CDL = new CountDownLatch(1);
@@ -63,7 +64,7 @@ public class RMLockTest {
         };
 
         int atLeastWaitCalls = 1;
-        var lockController2 = Mockito.spy(new TestLockController(CEServerTestSuite.getTestApp(), 1000));
+        var lockController2 = Mockito.spy(new TestLockController(CEAppStarter.getTestApp(), 1000));
         Mockito.doAnswer(new Answer() {
             private int count = 0;
 
@@ -105,7 +106,7 @@ public class RMLockTest {
 
     @Test
     public void testAccessToDifferentProjects() throws Throwable {
-        var lockController1 = new TestLockController(CEServerTestSuite.getTestApp(), 1);
+        var lockController1 = new TestLockController(CEAppStarter.getTestApp(), 1);
 
         CountDownLatch thread1CDL = new CountDownLatch(1);
         CountDownLatch thread2CDL = new CountDownLatch(1);
@@ -131,7 +132,7 @@ public class RMLockTest {
             }
         };
 
-        var lockController2 = new TestLockController(CEServerTestSuite.getTestApp(), 1);
+        var lockController2 = new TestLockController(CEAppStarter.getTestApp(), 1);
         Runnable runnable2 = () -> {
             try {
                 try (var lock = lockController2.lockProject(project2, "testAccessToDifferentProjects2")) {
@@ -163,7 +164,7 @@ public class RMLockTest {
 
     @Test
     public void testForceUnlock() throws Throwable {
-        var lockController1 = new TestLockController(CEServerTestSuite.getTestApp(), 1);
+        var lockController1 = new TestLockController(CEAppStarter.getTestApp(), 1);
 
         CountDownLatch thread1CDL = new CountDownLatch(1);
         CountDownLatch globalCountDown = new CountDownLatch(2);
@@ -183,7 +184,7 @@ public class RMLockTest {
             }
         };
 
-        var lockController2 = Mockito.spy(new TestLockController(CEServerTestSuite.getTestApp(), 100));
+        var lockController2 = Mockito.spy(new TestLockController(CEAppStarter.getTestApp(), 100));
         Runnable runnable2 = () -> {
             try {
                 try (var lock = lockController2.lockProject(project1, "testForceUnlock2")) {
