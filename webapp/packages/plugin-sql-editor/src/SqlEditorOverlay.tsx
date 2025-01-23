@@ -19,6 +19,7 @@ import {
   OverlayHeaderTitle,
   OverlayMessage,
   s,
+  useFocus,
   useResource,
   useS,
   useTranslate,
@@ -59,6 +60,7 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
     executionContext ? createConnectionParam(executionContext.projectId, executionContext.connectionId) : null,
   );
   const driver = useResource(SqlEditorOverlay, DBDriverResource, connection.tryGetData?.driverId ?? null);
+  const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
 
   const connected = getComputed(() => connection.tryGetData?.connected ?? false);
 
@@ -102,12 +104,14 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
       </OverlayHeader>
       <OverlayMessage>{translate('sql_editor_restore_message')}</OverlayMessage>
       <OverlayActions className={s(styles, { overlayActions: true })}>
-        <Button type="button" mod={['outlined']} loader onClick={cancelConnection}>
-          {translate('ui_processing_cancel')}
-        </Button>
-        <Button type="button" mod={['unelevated']} loading={initializingContext} loader onClick={init}>
-          {translate('sql_editor_restore')}
-        </Button>
+        <div ref={focusedRef} tabIndex={0}>
+          <Button type="button" mod={['outlined']} loader onClick={cancelConnection}>
+            {translate('ui_processing_cancel')}
+          </Button>
+          <Button type="button" mod={['unelevated']} loading={initializingContext} loader onClick={init}>
+            {translate('sql_editor_restore')}
+          </Button>
+        </div>
       </OverlayActions>
     </Overlay>
   );
