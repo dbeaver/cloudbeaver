@@ -40,6 +40,8 @@ public interface ServletAppConfiguration {
 
     boolean isResourceManagerEnabled();
 
+    boolean isSecretManagerEnabled();
+
     boolean isFeaturesEnabled(String[] requiredFeatures);
 
     boolean isFeatureEnabled(String id);

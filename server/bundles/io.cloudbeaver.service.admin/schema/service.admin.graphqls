@@ -114,6 +114,7 @@ input ServerConfigInput {
     publicCredentialsSaveEnabled: Boolean
     adminCredentialsSaveEnabled: Boolean
     resourceManagerEnabled: Boolean
+    secretManagerEnabled: Boolean @since(version: "24.3.2")
 
     enabledFeatures: [ID!]
     enabledAuthProviders: [ID!]
