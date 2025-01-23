@@ -16,15 +16,15 @@ export function constructUserEnabledCaption(user: AdminUserInfoFragment | undefi
   let caption = '';
 
   if (user.disableReason) {
-    caption = caption.concat(user.disableReason);
+    caption += user.disableReason;
   }
 
   if (user.disableByUserId) {
-    caption = caption.concat(` (${user.disableByUserId})`);
+    caption += ` (${user.disableByUserId})`;
   }
 
   if (user.disableDate) {
-    caption = caption.concat(`, ${new Date(user.disableDate).toLocaleDateString()}`);
+    caption += `, ${new Date(user.disableDate).toLocaleDateString()}`;
   }
 
   return caption;
