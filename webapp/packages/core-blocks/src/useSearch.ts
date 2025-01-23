@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { useState } from 'react';
+
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { useFuzzySearch } from './useFuzzySearch.js';
@@ -18,20 +20,32 @@ interface Props<T extends object> {
   predicate?: (suggestion: T, lastWord?: string) => boolean;
 }
 
-export function useSearch<T extends object>({
-  sourceHints,
-  searchFields,
-  predicate,
-  matchStrategy = 'contains',
-}: Props<T>): (searchWord: string) => T[] {
+interface UseSearchAPI<T> {
+  searchResult: T[];
+  setSearch: (searchWord: string) => void;
+}
+
+export function useSearch<T extends object>({ sourceHints, searchFields, predicate, matchStrategy = 'contains' }: Props<T>): UseSearchAPI<T> {
   const fuzzySearch = useFuzzySearch({
     sourceProposals: sourceHints,
     fields: searchFields as string[],
   });
+  const [searchResult, setSearchResult] = useState<T[]>([]);
 
-  function search(searchWord: string): T[] {
+  function setSearch(searchWord: string): void {
     if (matchStrategy === 'fuzzy') {
-      return fuzzySearch(searchWord).filter(suggestion => filterBase(suggestion, searchFields, searchWord, predicate));
+      fuzzySearch.search(searchWord, {
+        filter: result => {
+          const suggestion = sourceHints.find(suggestion => searchFields.some(field => result.terms.includes(suggestion[field] as string)));
+
+          if (!suggestion) {
+            return false;
+          }
+
+          return filterBase(suggestion, searchFields, searchWord, predicate);
+        },
+      });
+      return;
     }
 
     const matchFunctions: Record<Exclude<SearchStrategy, 'fuzzy'>, (value: string) => boolean> = {
@@ -39,13 +53,25 @@ export function useSearch<T extends object>({
       contains: value => value.toLocaleLowerCase().includes(searchWord.toLocaleLowerCase()),
     };
 
-    return sourceHints.filter(suggestion => {
-      const values = searchFields.map(field => suggestion[field]).filter(value => isNotNullDefined(value) && typeof value === 'string');
-      return values.some(matchFunctions[matchStrategy]) && filterBase(suggestion, searchFields, searchWord, predicate);
-    });
+    setSearchResult(
+      sourceHints.filter(suggestion => {
+        const values = searchFields.map(field => suggestion[field]).filter(value => isNotNullDefined(value) && typeof value === 'string');
+        return values.some(matchFunctions[matchStrategy]) && filterBase(suggestion, searchFields, searchWord, predicate);
+      }),
+    );
   }
 
-  return search;
+  if (matchStrategy === 'fuzzy') {
+    return {
+      searchResult: fuzzySearch.searchResults ?? [],
+      setSearch,
+    };
+  }
+
+  return {
+    searchResult,
+    setSearch,
+  };
 }
 
 function filterBase<T extends object>(

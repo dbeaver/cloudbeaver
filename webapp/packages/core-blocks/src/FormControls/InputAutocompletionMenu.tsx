@@ -7,7 +7,9 @@
  */
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+
+import { debounce } from '@cloudbeaver/core-utils';
 
 import BaseDropdownStyles from '../FormControls/BaseDropdown.module.css';
 import { getComputed } from '../getComputed.js';
@@ -30,6 +32,7 @@ interface AutocompletionProps {
 }
 
 const CONTEXT_INPUT_OFFSET_Y = 3;
+const DEBOUNCE_DELAY = 300;
 
 export const InputAutocompletionMenu = observer(function InputAutocompletionMenu({ className, proposals, inputRef, onSelect }: AutocompletionProps) {
   const styles = useS(style, BaseDropdownStyles);
@@ -71,26 +74,37 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
     }
   }
 
-  function handleInput(event: any) {
-    state.inputValue = event.target.value;
-  }
+  const handleInput = useMemo(
+    () =>
+      debounce((event: any) => {
+        state.inputValue = event.target.value;
+      }, DEBOUNCE_DELAY),
+    [state],
+  );
 
   useLayoutEffect(() => {
     if (!inputRef.current) {
       return;
     }
 
+    const inputElement = inputRef.current;
+    const caretPosition = inputElement.selectionStart || 0;
+    const inputStyle = window.getComputedStyle(inputElement);
+
     const span = document.createElement('span');
     span.style.position = 'absolute';
     span.style.visibility = 'hidden';
     span.style.whiteSpace = 'pre';
-    span.style.fontFamily = window.getComputedStyle(inputRef.current).fontFamily;
-    span.style.fontSize = window.getComputedStyle(inputRef.current).fontSize;
-    span.textContent = state.inputValue;
+    span.style.fontFamily = inputStyle.fontFamily;
+    span.style.fontSize = inputStyle.fontSize;
+    span.style.fontWeight = inputStyle.fontWeight;
+    span.style.letterSpacing = inputStyle.letterSpacing;
+    span.style.lineHeight = inputStyle.lineHeight;
+    span.textContent = inputElement.value.slice(0, caretPosition);
 
     document.body.appendChild(span);
     const spanRect = span.getBoundingClientRect();
-    const letterWidth = spanRect.width / state.inputValue.length;
+    const letterWidth = spanRect.width / span.textContent.length;
     document.body.removeChild(span);
 
     state.x = spanRect.width + letterWidth;

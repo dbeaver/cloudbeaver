@@ -21,7 +21,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
   const state = useWhereFilter(model, resultIndex);
   const data = useTableViewerHeaderData({ model, resultIndex });
   const inputRef = useRef<HTMLInputElement>(null);
-  const autocompleteState = useInputAutocomplete(inputRef, {
+  const [autocompleteState, proposals] = useInputAutocomplete(inputRef, {
     sourceHints: data.hintProposals ?? [],
     matchStrategy: 'fuzzy',
   });
@@ -47,7 +47,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
         onChange={state.set}
       />
       <InputAutocompletionMenu
-        proposals={autocompleteState.filteredSuggestions ?? []}
+        proposals={proposals}
         inputRef={inputRef}
         onSelect={proposal => autocompleteState.replaceCurrentWord(proposal.replacementString)}
       />

@@ -27,37 +27,31 @@ interface IState {
 
 const BASE_HINTS: InputAutocompleteProposal[] = [
   {
-    id: uuid(),
     displayString: 'AND',
     replacementString: 'AND',
     score: 0,
   },
   {
-    id: uuid(),
     displayString: 'OR',
     replacementString: 'OR',
     score: 0,
   },
   {
-    id: uuid(),
     displayString: 'ILIKE',
     replacementString: 'ILIKE',
     score: 0,
   },
   {
-    id: uuid(),
     displayString: 'LIKE',
     replacementString: 'LIKE',
     score: 0,
   },
   {
-    id: uuid(),
     displayString: 'IN',
     replacementString: 'IN',
     score: 0,
   },
   {
-    id: uuid(),
     displayString: 'BETWEEN',
     replacementString: 'BETWEEN',
     score: 0,

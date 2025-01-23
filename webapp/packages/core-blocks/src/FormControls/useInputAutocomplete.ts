@@ -22,12 +22,16 @@ interface InputAutocompleteOptions {
 }
 
 export interface InputAutocompleteProposal {
-  id: string;
   displayString: string;
   replacementString: string;
   icon?: string;
   title?: string;
   score?: number;
+}
+
+interface State {
+  replaceCurrentWord: (replacement: string) => void;
+  currentWord: string;
 }
 
 const INPUT_DELAY = 300;
@@ -36,8 +40,8 @@ const SEARCH_FIELDS: Array<keyof InputAutocompleteProposal> = ['displayString', 
 export const useInputAutocomplete = (
   inputRef: RefObject<HTMLInputElement | HTMLTextAreaElement>,
   { sourceHints, matchStrategy = 'contains', predicate }: InputAutocompleteOptions,
-) => {
-  const getSearchResults = useSearch({
+): [State, InputAutocompleteProposal[]] => {
+  const { searchResult, setSearch } = useSearch({
     sourceHints,
     searchFields: SEARCH_FIELDS,
     matchStrategy,
@@ -85,23 +89,15 @@ export const useInputAutocomplete = (
 
         return substring.split(' ').at(-1) ?? '';
       },
-      get filteredSuggestions() {
-        if (!this.currentWord || this.isFound) {
-          return [];
-        }
-
-        return this.getSearchResults(this.currentWord).sort(this.sortByScore);
-      },
     }),
     {
       input: observable.ref,
       selectionStart: observable.ref,
       isFound: observable.ref,
-      filteredSuggestions: computed,
       currentWord: computed,
       replaceCurrentWord: action.bound,
     },
-    { sourceHints, matchStrategy, inputRef, getSearchResults, sortByScore },
+    { sourceHints, matchStrategy, inputRef, setSearch },
   );
 
   const handleInput = useMemo(
@@ -112,8 +108,9 @@ export const useInputAutocomplete = (
         state.selectionStart = target.selectionStart;
         state.input = target.value;
         state.isFound = false;
+        state.setSearch(state.currentWord);
       }, INPUT_DELAY),
-    [],
+    [state],
   );
 
   useEffect(() => {
@@ -129,13 +126,5 @@ export const useInputAutocomplete = (
     };
   }, [state.inputRef.current]);
 
-  return state;
+  return [state as State, state.isFound ? [] : searchResult];
 };
-
-function sortByScore(a: InputAutocompleteProposal, b: InputAutocompleteProposal) {
-  if (isNotNullDefined(a.score) && isNotNullDefined(b.score)) {
-    return b.score - a.score;
-  }
-
-  return 0;
-}

@@ -5,47 +5,53 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import MiniSearch, { type Options } from 'minisearch';
-import { useEffect, useRef } from 'react';
+import { autorun } from 'mobx';
+import { useMemo } from 'react';
+import { useMiniSearch } from 'react-minisearch';
 
-interface UseSearchProps<T> extends Options {
+interface UseSearchProps<T> {
   sourceProposals: T[];
+  fields: string[];
+  threshold?: number;
+  prefix?: boolean;
 }
 
 const DEFAULT_THRESHOLD = 0.4;
 
-function createSearchInstance<T>(options: Options) {
-  return new MiniSearch<T>(options);
-}
+export function useFuzzySearch<T extends object>({ sourceProposals, fields, threshold = DEFAULT_THRESHOLD, prefix = true }: UseSearchProps<T>) {
+  const storeFields = useMemo(
+    () =>
+      sourceProposals.reduce((acc, proposal) => {
+        for (const field of fields) {
+          if (typeof proposal[field as keyof typeof proposal] === 'string') {
+            acc.push(field);
+          }
+        }
+        return acc;
+      }, [] as string[]),
+    [],
+  );
+  const options = useMemo(
+    () => ({
+      fields,
+      storeFields,
+      searchOptions: {
+        fuzzy: threshold,
+        prefix,
+      },
+    }),
+    [fields, storeFields],
+  );
+  const miniSearch = useMiniSearch(sourceProposals, options);
 
-export function useFuzzySearch<T extends object>({ sourceProposals, ...options }: UseSearchProps<T>) {
-  const minisearchOptions = { ...options };
-  const dataSetKeys = sourceProposals.reduce((acc, item) => {
-    Object.keys(item).forEach(key => acc.add(key));
+  useMemo(
+    () =>
+      autorun(() => {
+        miniSearch.removeAll();
+        miniSearch.addAll(sourceProposals.map((proposal, index) => ({ id: index, ...proposal })));
+      }),
+    [sourceProposals],
+  );
 
-    return acc;
-  }, new Set<string>());
-  const searchInstance = useRef(createSearchInstance<T>(minisearchOptions));
-
-  if (!minisearchOptions.searchOptions) {
-    minisearchOptions.searchOptions = {
-      prefix: true,
-      fuzzy: DEFAULT_THRESHOLD,
-    };
-  }
-
-  if (!minisearchOptions.storeFields) {
-    minisearchOptions.storeFields = Array.from(dataSetKeys);
-  }
-
-  useEffect(() => {
-    searchInstance.current = createSearchInstance<T>(minisearchOptions);
-    searchInstance.current.addAll(sourceProposals);
-  }, [sourceProposals]);
-
-  function search(searchWord: string) {
-    return searchInstance.current.search(searchWord) as T[];
-  }
-
-  return search;
+  return miniSearch;
 }
