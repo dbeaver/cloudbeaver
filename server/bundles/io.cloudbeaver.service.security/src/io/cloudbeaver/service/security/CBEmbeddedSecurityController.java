@@ -1720,7 +1720,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                             disableUserByBruteForceProtection(database, dbCon, "system", inputUsername.toString(), "Disabled by system");
                         } else {
                             BruteForceUtils.checkBruteforce(smConfig,
-                                getLatestUserLogins(dbCon, authProviderId, inputUsername.toString(), null));
+                                getLatestUserLogins(dbCon, authProviderId, inputUsername.toString(), (long) smConfig.getBlockLoginPeriod()));
                         }
                     }
                 }
@@ -1785,8 +1785,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         String inputLogin,
         Long periodTime
     ) throws SQLException {
-        long effectivePeriodTime = periodTime != null ? periodTime : smConfig.getBlockLoginPeriod();
-
         List<UserLoginRecord> userLoginRecords = new ArrayList<>();
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             database.normalizeTableNames(
@@ -1805,7 +1803,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             dbStat.setString(1, authProviderId);
             dbStat.setString(2, inputLogin);
             dbStat.setTimestamp(3,
-                Timestamp.valueOf(LocalDateTime.now().minusSeconds(effectivePeriodTime)));
+                Timestamp.valueOf(LocalDateTime.now().minusSeconds(periodTime)));
             try (ResultSet dbResult = dbStat.executeQuery()) {
                 while (dbResult.next()) {
                     UserLoginRecord loginDto = new UserLoginRecord(

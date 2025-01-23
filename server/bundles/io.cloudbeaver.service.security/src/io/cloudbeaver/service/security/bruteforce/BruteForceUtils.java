@@ -62,6 +62,9 @@ public class BruteForceUtils {
         }
     }
 
+    /**
+     * Check user by brute force protection, block user if count more then maximum attempt from configuration
+     */
     public static boolean checkBruteforceBlockUser(
         @NotNull SMControllerConfiguration smConfig,
         @NotNull List<UserLoginRecord> latestLoginAttempts

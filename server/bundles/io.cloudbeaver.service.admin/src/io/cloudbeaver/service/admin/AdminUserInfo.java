@@ -126,6 +126,7 @@ public class AdminUserInfo {
     public String getDisableReason() {
         return user.getDisableReason();
     }
+
     private String[] getUserLinkedProviders() throws DBWebException {
         if (userLinkedProviders != null) {
             return userLinkedProviders;
