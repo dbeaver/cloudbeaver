@@ -538,7 +538,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                         Instant disableDate = timestamp != null ? timestamp.toInstant() : null;
                         String disableByUserId = dbResult.getString(5);
                         String disableReason = dbResult.getString(6);
-                        result.put(userId, new SMUser(userId, CHAR_BOOL_TRUE.equals(active), authRole, disableDate, disableByUserId, disableReason));
+                        result.put(userId, new SMUser(
+                            userId,
+                            CHAR_BOOL_TRUE.equals(active),
+                            authRole,
+                            disableDate,
+                            disableByUserId,
+                            disableReason)
+                        );
                     }
                 }
             }
@@ -775,7 +782,30 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     public void enableUser(Connection dbCon, String userId, boolean enabled) throws SQLException {
-        changeUserStatusWithReason(database, dbCon, getUserId(), userId, "Disabled by Administrator", enabled);
+        if (enabled) {
+            enableUser(dbCon, userId);
+        } else {
+            disableUserWithReason(database, dbCon, getUserId(), userId, "Disabled by Administrator");
+        }
+    }
+
+    private void enableUser(Connection dbCon, String userId) throws SQLException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
+            "UPDATE CB_USER " +
+                "SET DISABLE_DATE = ?, " +
+                "    DISABLE_BY_USER_ID = ?, " +
+                "    DISABLE_REASON = ?, " +
+                "    IS_ACTIVE = ? " +
+                "WHERE USER_ID = ?"
+        ))) {
+            dbStat.setTimestamp(1, null);
+            dbStat.setString(2, null);
+            dbStat.setString(3, null);
+            dbStat.setString(4, CHAR_BOOL_TRUE);
+            dbStat.setString(5, userId);
+
+            dbStat.executeUpdate();
+        }
     }
 
     @Override
@@ -1684,7 +1714,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                             disableUserByBruteForceProtection(database, dbCon, "system", inputUsername.toString(), "Disabled by system");
                         } else {
                             BruteForceUtils.checkBruteforce(smConfig,
-                                getLatestUserLogins(dbCon, authProviderId, inputUsername.toString()));
+                                getLatestUserLogins(dbCon, authProviderId, inputUsername.toString(), null));
                         }
                     }
                 }
@@ -1743,40 +1773,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
-    private List<UserLoginRecord> getLatestUserLogins(Connection dbCon, String authProviderId, String inputLogin) throws SQLException {
-        List<UserLoginRecord> userLoginRecords = new ArrayList<>();
-        try (PreparedStatement dbStat = dbCon.prepareStatement(
-            database.normalizeTableNames(
-                "SELECT" +
-                    "    attempt.AUTH_STATUS," +
-                    "    attempt.CREATE_TIME" +
-                    " FROM" +
-                    "    {table_prefix}CB_AUTH_ATTEMPT attempt" +
-                    "        JOIN" +
-                    "    {table_prefix}CB_AUTH_ATTEMPT_INFO info ON attempt.AUTH_ID = info.AUTH_ID" +
-                    " WHERE AUTH_PROVIDER_ID = ? AND AUTH_USERNAME = ? AND attempt.CREATE_TIME > ?" +
-                    " ORDER BY attempt.CREATE_TIME DESC " +
-                    database.getDialect().getOffsetLimitQueryPart(0, smConfig.getMaxFailedLogin())
-            )
-        )) {
-            dbStat.setString(1, authProviderId);
-            dbStat.setString(2, inputLogin);
-            dbStat.setTimestamp(3,
-                Timestamp.valueOf(LocalDateTime.now().minusSeconds(smConfig.getBlockLoginPeriod())));
-            try (ResultSet dbResult = dbStat.executeQuery()) {
-                while (dbResult.next()) {
-                    UserLoginRecord loginDto = new UserLoginRecord(
-                        SMAuthStatus.valueOf(dbResult.getString(1)),
-                        dbResult.getTimestamp(2).toLocalDateTime()
-                    );
-                    userLoginRecords.add(loginDto);
-                }
-            }
-        }
-        return userLoginRecords;
-    }
+    private List<UserLoginRecord> getLatestUserLogins(
+        Connection dbCon,
+        String authProviderId,
+        String inputLogin,
+        Long periodTime
+    ) throws SQLException {
+        long effectivePeriodTime = periodTime != null ? periodTime : smConfig.getBlockLoginPeriod();
 
-    private List<UserLoginRecord> getLatestUserLogins(Connection dbCon, String authProviderId, String inputLogin, long periodTime) throws SQLException {
         List<UserLoginRecord> userLoginRecords = new ArrayList<>();
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             database.normalizeTableNames(
@@ -1795,7 +1799,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             dbStat.setString(1, authProviderId);
             dbStat.setString(2, inputLogin);
             dbStat.setTimestamp(3,
-                Timestamp.valueOf(LocalDateTime.now().minusMinutes(periodTime)));
+                Timestamp.valueOf(LocalDateTime.now().minusSeconds(effectivePeriodTime)));
             try (ResultSet dbResult = dbStat.executeQuery()) {
                 while (dbResult.next()) {
                     UserLoginRecord loginDto = new UserLoginRecord(
@@ -1831,13 +1835,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         return false;
     }
 
-    private static void changeUserStatusWithReason(
+    private static void disableUserWithReason(
         @NotNull CBDatabase database,
         @NotNull Connection dbCon,
         @Nullable String disabledBy,
         @Nullable String username,
-        @Nullable String reason,
-        boolean enabled
+        @Nullable String reason
     ) throws SQLException {
         String query = database.normalizeTableNames(
             "UPDATE CB_USER " +
@@ -1849,19 +1852,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         );
 
         try (PreparedStatement dbStat = dbCon.prepareStatement(query)) {
-            if (enabled) {
-                dbStat.setTimestamp(1, null);
-                dbStat.setString(2, null);
-                dbStat.setString(3, null);
-                dbStat.setString(4, CHAR_BOOL_TRUE);
-                dbStat.setString(5, username);
-            } else {
-                dbStat.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
-                dbStat.setString(2, disabledBy);
-                dbStat.setString(3, reason);
-                dbStat.setString(4, CHAR_BOOL_FALSE);
-                dbStat.setString(5, username);
-            }
+            dbStat.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
+            dbStat.setString(2, disabledBy);
+            dbStat.setString(3, reason);
+            dbStat.setString(4, CHAR_BOOL_FALSE);
+            dbStat.setString(5, username);
 
             dbStat.executeUpdate();
         }
@@ -1874,7 +1869,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull String username,
         @NotNull String reason
     ) throws SQLException, DBException {
-        changeUserStatusWithReason(database, dbCon, disabledBy, username, reason, false);
+        disableUserWithReason(database, dbCon, disabledBy, username, reason);
         killAllExistsUserSessions(username);
         throw new SMException("User has been disabled. Tell your administrator");
     }

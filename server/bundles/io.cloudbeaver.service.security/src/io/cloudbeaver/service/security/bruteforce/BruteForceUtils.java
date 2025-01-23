@@ -65,8 +65,7 @@ public class BruteForceUtils {
     public static boolean checkBruteforceBlockUser(
         @NotNull SMControllerConfiguration smConfig,
         @NotNull List<UserLoginRecord> latestLoginAttempts
-    )
-        throws DBException, SQLException {
+    ) throws DBException, SQLException {
         if (latestLoginAttempts.isEmpty()) {
             return false;
         }
