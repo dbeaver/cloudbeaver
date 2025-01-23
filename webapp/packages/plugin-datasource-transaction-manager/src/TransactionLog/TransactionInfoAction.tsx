@@ -25,17 +25,18 @@ export const TransactionInfoAction: ICustomMenuItemComponent = observer(function
   const key = context ? createTransactionInfoParam(context.connectionId, context.projectId, context.id) : null;
 
   const transactionLogCountResource = useResource(TransactionInfoAction, TransactionLogCountResource, key);
+  const count =
+    transactionLogCountResource.data === 0 ? translate('plugin_datasource_transaction_manager_logs_counter_none') : transactionLogCountResource.data;
+
+  let title: string = translate('plugin_datasource_transaction_manager_logs_tooltip');
+
+  if (transactionLogCountResource.data) {
+    title = `${title}\n${translate('plugin_datasource_transaction_manager_logs_tooltip_count', undefined, { count })}`;
+  }
 
   return (
-    <Container
-      className={s(styles, { container: true })}
-      title={translate('plugin_datasource_transaction_manager_logs_tooltip')}
-      keepSize
-      noGrow
-      center
-      onClick={() => props.item.events?.onSelect?.()}
-    >
-      <span className={s(styles, { count: true })}>{transactionLogCountResource.data}</span>
+    <Container className={s(styles, { container: true })} title={title} keepSize noGrow center onClick={() => props.item.events?.onSelect?.()}>
+      <span className={s(styles, { count: true })}>{count}</span>
     </Container>
   );
 });

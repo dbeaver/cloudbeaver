@@ -134,6 +134,10 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
         this.resourceManagerEnabled = resourceManagerEnabled;
     }
 
+    public void setSecretManagerEnabled(boolean secretManagerEnabled) {
+        this.secretManagerEnabled = secretManagerEnabled;
+    }
+
     public boolean isSupportsCustomConnections() {
         return supportsCustomConnections;
     }

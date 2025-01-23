@@ -28,6 +28,7 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
     anonymousAccessEnabled: true,
     adminCredentialsSaveEnabled: true,
     publicCredentialsSaveEnabled: true,
+    secretManagerEnabled: true,
     resourceManagerEnabled: true,
     licenseRequired: false,
     licenseValid: false,
