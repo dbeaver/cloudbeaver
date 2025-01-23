@@ -449,7 +449,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             SMUser user;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames(
-                    "SELECT U.USER_ID,U.IS_ACTIVE,U.DEFAULT_AUTH_ROLE,S.IS_SECRET_STORAGE FROM " +
+                    "SELECT U.USER_ID,U.IS_ACTIVE,U.DEFAULT_AUTH_ROLE," +
+                        "U.DISABLE_DATE,U.DISABLE_BY_USER_ID,U.DISABLE_REASON,S.IS_SECRET_STORAGE FROM " +
                         "{table_prefix}CB_USER U, {table_prefix}CB_AUTH_SUBJECT S " +
                         "WHERE U.USER_ID=? AND U.USER_ID=S.SUBJECT_ID")
             )) {
@@ -1241,11 +1242,16 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @NotNull
     private SMUser fetchUser(ResultSet dbResult) throws SQLException {
+        Timestamp timestamp = dbResult.getTimestamp("DISABLE_DATE");
+        Instant disableDate = timestamp != null ? timestamp.toInstant() : null;
         return new SMUser(
             dbResult.getString("USER_ID"),
             stringToBoolean(dbResult.getString("IS_ACTIVE")),
             dbResult.getString("DEFAULT_AUTH_ROLE"),
-            stringToBoolean(dbResult.getString("IS_SECRET_STORAGE"))
+            stringToBoolean(dbResult.getString("IS_SECRET_STORAGE")),
+            disableDate,
+            dbResult.getString("DISABLE_BY_USER_ID"),
+            dbResult.getString("DISABLE_REASON")
         );
     }
 
