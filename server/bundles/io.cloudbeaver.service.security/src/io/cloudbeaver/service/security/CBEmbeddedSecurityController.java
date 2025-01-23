@@ -775,7 +775,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     public void enableUser(Connection dbCon, String userId, boolean enabled) throws SQLException {
-        disableUserWithReason(database, dbCon, getUserId(), userId, "Disabled by Administrator", enabled);
+        changeUserStatusWithReason(database, dbCon, getUserId(), userId, "Disabled by Administrator", enabled);
     }
 
     @Override
@@ -1679,7 +1679,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                                 inputUsername.toString(),
                                 smConfig.getBlockPeriodTimeBruteForceProtection())
                                )
-                            && isUserExistsAndEnabled(dbCon, inputUsername.toString().toLowerCase(), database)
+                            && isUserExistsAndEnabled(dbCon, inputUsername.toString(), database)
                         ) {
                             disableUserByBruteForceProtection(database, dbCon, "system", inputUsername.toString(), "Disabled by system");
                         } else {
@@ -1814,9 +1814,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             "SELECT EXISTS (" +
                 "    SELECT 1 " +
                 "    FROM CB_USER attempt " +
-                "    WHERE LOWER(USER_ID) = ?" +
+                "    WHERE USER_ID = ?" +
                 "    AND IS_ACTIVE = ?" +
-                ") AS user_exists"
+                ") AS user_exists_and_enabled"
         );
         try (PreparedStatement dbStat = dbCon.prepareStatement(query)) {
             dbStat.setString(1, inputLogin);
@@ -1824,14 +1824,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
             try (ResultSet dbResult = dbStat.executeQuery()) {
                 if (dbResult.next()) {
-                    return dbResult.getBoolean("user_exists");
+                    return dbResult.getBoolean("user_exists_and_enabled");
                 }
             }
         }
         return false;
     }
 
-    private static void disableUserWithReason(
+    private static void changeUserStatusWithReason(
         @NotNull CBDatabase database,
         @NotNull Connection dbCon,
         @Nullable String disabledBy,
@@ -1845,7 +1845,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 "    DISABLE_BY_USER_ID = ?, " +
                 "    DISABLE_REASON = ?, " +
                 "    IS_ACTIVE = ? " +
-                "WHERE LOWER(USER_ID) = ?"
+                "WHERE USER_ID = ?"
         );
 
         try (PreparedStatement dbStat = dbCon.prepareStatement(query)) {
@@ -1867,14 +1867,15 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
-    private static void disableUserByBruteForceProtection(
+    private void disableUserByBruteForceProtection(
         @NotNull CBDatabase database,
         @NotNull Connection dbCon,
         @NotNull String disabledBy,
         @NotNull String username,
         @NotNull String reason
-    ) throws SQLException, SMException {
-        disableUserWithReason(database, dbCon, disabledBy, username, reason, false);
+    ) throws SQLException, DBException {
+        changeUserStatusWithReason(database, dbCon, disabledBy, username, reason, false);
+        killAllExistsUserSessions(username);
         throw new SMException("User has been disabled. Tell your administrator");
     }
 
