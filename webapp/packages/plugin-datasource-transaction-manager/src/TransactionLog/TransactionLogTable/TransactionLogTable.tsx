@@ -20,6 +20,8 @@ interface Props {
   log: TransactionLogInfoItem[];
 }
 
+const QUERY_COLUMN_WIDTH = 300;
+
 const COLUMNS: Column<TransactionLogInfoItem>[] = [
   {
     key: 'time',
@@ -39,6 +41,7 @@ const COLUMNS: Column<TransactionLogInfoItem>[] = [
     key: 'text',
     name: 'plugin_datasource_transaction_manager_logs_table_column_text',
     resizable: true,
+    width: QUERY_COLUMN_WIDTH,
     renderCell: props => <QueryCell {...props} />,
     renderHeaderCell: props => <HeaderCell {...props} />,
   },

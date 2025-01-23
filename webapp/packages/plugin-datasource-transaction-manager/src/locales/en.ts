@@ -17,6 +17,8 @@ export default [
 
   ['plugin_datasource_transaction_manager_logs', 'Transaction log'],
   ['plugin_datasource_transaction_manager_logs_tooltip', 'Open transaction log'],
+  ['plugin_datasource_transaction_manager_logs_tooltip_count', 'Total statements: {arg:count}'],
+  ['plugin_datasource_transaction_manager_logs_counter_none', 'None'],
   ['plugin_datasource_transaction_manager_logs_table_column_time', 'Time'],
   ['plugin_datasource_transaction_manager_logs_table_column_type', 'Type'],
   ['plugin_datasource_transaction_manager_logs_table_column_text', 'Query'],
