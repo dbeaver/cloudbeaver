@@ -24,6 +24,7 @@ export abstract class BaseOptionsPanelService<T> {
 
     this.optionsPanelService.closeTask.next(this.onClose, undefined, () => this.optionsPanelService.isOpen(panelGetter));
     this.close = this.close.bind(this);
+    this.open = this.open.bind(this);
 
     makeObservable(this, {
       itemId: observable.ref,
