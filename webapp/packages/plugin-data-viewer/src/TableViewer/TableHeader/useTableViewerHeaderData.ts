@@ -29,32 +29,26 @@ const BASE_HINTS: InputAutocompleteProposal[] = [
   {
     displayString: 'AND',
     replacementString: 'AND',
-    score: 0,
   },
   {
     displayString: 'OR',
     replacementString: 'OR',
-    score: 0,
   },
   {
     displayString: 'ILIKE',
     replacementString: 'ILIKE',
-    score: 0,
   },
   {
     displayString: 'LIKE',
     replacementString: 'LIKE',
-    score: 0,
   },
   {
     displayString: 'IN',
     replacementString: 'IN',
-    score: 0,
   },
   {
     displayString: 'BETWEEN',
     replacementString: 'BETWEEN',
-    score: 0,
   },
 ];
 

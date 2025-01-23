@@ -26,7 +26,6 @@ export interface InputAutocompleteProposal {
   replacementString: string;
   icon?: string;
   title?: string;
-  score?: number;
 }
 
 interface State {
