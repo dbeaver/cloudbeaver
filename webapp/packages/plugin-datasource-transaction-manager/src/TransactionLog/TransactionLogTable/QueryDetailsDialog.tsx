@@ -32,7 +32,7 @@ export const QueryDetailsDialog: DialogComponent<IPayload> = observer(function Q
       </CommonDialogBody>
       <CommonDialogFooter>
         <Button mod={['outlined']} onClick={props.rejectDialog}>
-          {translate('ui_cancel')}
+          {translate('ui_stepper_back')}
         </Button>
       </CommonDialogFooter>
     </CommonDialogWrapper>
