@@ -799,9 +799,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 "    IS_ACTIVE = ? " +
                 "WHERE USER_ID = ?"
         ))) {
-            dbStat.setTimestamp(1, null);
-            dbStat.setString(2, null);
-            dbStat.setString(3, null);
+            dbStat.setNull(1, Types.TIMESTAMP);;
+            dbStat.setNull(2, Types.VARCHAR);;
+            dbStat.setNull(3, Types.VARCHAR);
             dbStat.setString(4, CHAR_BOOL_TRUE);
             dbStat.setString(5, userId);
 
@@ -1720,7 +1720,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                             disableUserByBruteForceProtection(database, dbCon, "system", inputUsername.toString(), "Disabled by system");
                         } else {
                             BruteForceUtils.checkBruteforce(smConfig,
-                                getLatestUserLogins(dbCon, authProviderId, inputUsername.toString(), (long) smConfig.getBlockLoginPeriod()));
+                                getLatestUserLogins(dbCon, authProviderId, inputUsername.toString(), smConfig.getBlockLoginPeriod()));
                         }
                     }
                 }
@@ -1783,7 +1783,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         Connection dbCon,
         String authProviderId,
         String inputLogin,
-        Long periodTime
+        int periodTime
     ) throws SQLException {
         List<UserLoginRecord> userLoginRecords = new ArrayList<>();
         try (PreparedStatement dbStat = dbCon.prepareStatement(

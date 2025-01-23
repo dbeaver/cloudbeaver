@@ -29,7 +29,7 @@ public class SMControllerConfiguration {
 
     private boolean enableBruteForceProtection = true;
     private boolean enableConnectionBruteForceProtection = false;
-    private long blockPeriodTimeBruteForceProtection = 1440;
+    private int blockPeriodTimeBruteForceProtection = 1440;
 
     public static final int DEFAULT_MAX_FAILED_LOGIN = 5;
 
@@ -68,7 +68,7 @@ public class SMControllerConfiguration {
         this.enableBruteForceProtection = checkBruteforce;
     }
 
-    public void setBlockPeriodTimeBruteForceProtection(long blockPeriodTimeBruteForceProtection) {
+    public void setBlockPeriodTimeBruteForceProtection(int blockPeriodTimeBruteForceProtection) {
         this.blockPeriodTimeBruteForceProtection = blockPeriodTimeBruteForceProtection;
     }
 
@@ -80,7 +80,7 @@ public class SMControllerConfiguration {
         return enableBruteForceProtection;
     }
 
-    public long getBlockPeriodTimeBruteForceProtection() {
+    public int getBlockPeriodTimeBruteForceProtection() {
         return blockPeriodTimeBruteForceProtection;
     }
 
