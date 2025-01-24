@@ -179,9 +179,7 @@ public class WebServiceCore implements DBWServiceCore {
     ) {
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         for (DBPDataSourceContainer ds : registry.getDataSources()) {
-            if (ds.isTemplate() &&
-                project.getDataSourceFilter().filter(ds) &&
-                WebAppUtils.getWebApplication().getDriverRegistry().getApplicableDrivers().contains(ds.getDriver())) {
+            if (ds.isTemplate() && WebAppUtils.getWebApplication().getDriverRegistry().getApplicableDrivers().contains(ds.getDriver())) {
                 result.add(new WebConnectionInfo(webSession, ds));
             }
         }
