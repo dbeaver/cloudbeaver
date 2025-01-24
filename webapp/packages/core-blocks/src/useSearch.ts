@@ -22,7 +22,7 @@ interface Props<T extends object> {
 }
 
 export interface UseSearchAPI<T> {
-  searchResult: T[] | null;
+  searchResult: T[];
   setSearch: (searchWord: string) => void;
 }
 
@@ -42,15 +42,13 @@ export function useSearch<T extends object>({
       setSearch(searchWord: string) {
         if (this.matchStrategy === 'fuzzy') {
           this.fuzzySearch.search(searchWord);
-          return;
         }
 
         this.search = searchWord;
       },
-      get searchResult() {
+      get searchResult(): T[] {
         if (this.matchStrategy === 'fuzzy') {
-          return this.fuzzySearch.searchResult;
-          // .filter(suggestion => filterBase(suggestion, this.searchFields, this.search, this.predicate))
+          return (this.fuzzySearch.searchResult ?? []).filter(suggestion => filterBase(suggestion, this.searchFields, this.search, this.predicate));
         }
 
         const matchFunctions: Record<Exclude<SearchStrategy, 'fuzzy'>, (value: string) => boolean> = {

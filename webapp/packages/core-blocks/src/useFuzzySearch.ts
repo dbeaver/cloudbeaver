@@ -19,7 +19,7 @@ interface UseSearchProps<T> {
 }
 
 interface UseSearchAPI<T> {
-  searchResult: T[];
+  searchResult: T[] | null;
   isIndexing: boolean;
   removeAll: () => void;
   addAll: (proposals: T[]) => void;
