@@ -78,7 +78,6 @@ export function useTableViewerHeaderData({ model, resultIndex }: Props): Readonl
             displayString: column.label || '',
             replacementString: column.label || '',
             icon: column.icon || '',
-            score: 1,
           })),
         );
       },

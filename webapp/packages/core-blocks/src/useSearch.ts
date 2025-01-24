@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, autorun, computed, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
@@ -22,7 +22,7 @@ interface Props<T extends object> {
 }
 
 export interface UseSearchAPI<T> {
-  searchResult: T[];
+  searchResult: T[] | null;
   setSearch: (searchWord: string) => void;
 }
 
@@ -34,26 +34,14 @@ export function useSearch<T extends object>({
 }: Props<T>): Readonly<UseSearchAPI<T>> {
   const fuzzySearch = useFuzzySearch({
     sourceProposals: sourceHints,
-    fields: searchFields as string[],
+    fields: searchFields,
   });
   const state = useObservableRef(
     () => ({
       search: '',
       setSearch(searchWord: string) {
         if (this.matchStrategy === 'fuzzy') {
-          this.fuzzySearch.engine.search(searchWord, {
-            filter: result => {
-              const suggestion = this.sourceHints.find(suggestion =>
-                this.searchFields.every(field => result.terms.includes(suggestion[field] as string)),
-              );
-
-              if (!suggestion) {
-                return false;
-              }
-
-              return filterBase(suggestion, this.searchFields, searchWord, this.predicate);
-            },
-          });
+          this.fuzzySearch.search(searchWord);
           return;
         }
 
@@ -61,7 +49,8 @@ export function useSearch<T extends object>({
       },
       get searchResult() {
         if (this.matchStrategy === 'fuzzy') {
-          return this.fuzzySearch.engine.searchResults;
+          return this.fuzzySearch.searchResult;
+          // .filter(suggestion => filterBase(suggestion, this.searchFields, this.search, this.predicate))
         }
 
         const matchFunctions: Record<Exclude<SearchStrategy, 'fuzzy'>, (value: string) => boolean> = {

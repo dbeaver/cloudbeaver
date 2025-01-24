@@ -13,16 +13,30 @@ import { useObservableRef } from './useObservableRef.js';
 
 interface UseSearchProps<T> {
   sourceProposals: T[];
-  fields: string[];
+  fields: Array<keyof T>;
   threshold?: number;
   prefix?: boolean;
 }
 
+interface UseSearchAPI<T> {
+  searchResult: T[];
+  isIndexing: boolean;
+  removeAll: () => void;
+  addAll: (proposals: T[]) => void;
+  search: (query: string) => void;
+  clearSearch: VoidFunction;
+}
+
 const DEFAULT_THRESHOLD = 0.4;
 
-export function useFuzzySearch<T extends object>({ sourceProposals, fields, threshold = DEFAULT_THRESHOLD, prefix = true }: UseSearchProps<T>) {
-  const miniSearch = useMiniSearch(sourceProposals, {
-    fields,
+export function useFuzzySearch<T extends object>({
+  sourceProposals,
+  fields,
+  threshold = DEFAULT_THRESHOLD,
+  prefix = true,
+}: UseSearchProps<T>): UseSearchAPI<T> {
+  const miniSearch = useMiniSearch([] as T[], {
+    fields: fields as string[],
     searchOptions: {
       fuzzy: threshold,
       prefix,
@@ -31,21 +45,28 @@ export function useFuzzySearch<T extends object>({ sourceProposals, fields, thre
   const state = useObservableRef(
     () => ({}),
     {
-      engine: observable.ref,
+      searchResult: observable.ref,
+      isIndexing: observable.ref,
     },
     {
-      engine: miniSearch,
+      searchResult: miniSearch.searchResults,
+      isIndexing: miniSearch.isIndexing,
+      removeAll: miniSearch.removeAll,
+      addAll: miniSearch.addAll,
+      search: miniSearch.search,
+      clearSearch: miniSearch.clearSearch,
     },
+    ['removeAll', 'addAll', 'search', 'clearSearch'],
   );
 
   useMemo(
     () =>
       autorun(() => {
-        state.engine.removeAll();
-        state.engine.addAll(sourceProposals.map((proposal, index) => ({ id: index, ...proposal })));
+        state.removeAll();
+        state.addAll(sourceProposals.map((proposal, index) => ({ id: index, ...proposal })));
       }),
     [sourceProposals],
   );
 
-  return state;
+  return state as UseSearchAPI<T>;
 }
