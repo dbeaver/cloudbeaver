@@ -100,6 +100,10 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     return this.data?.resourceManagerEnabled ?? false;
   }
 
+  get secretManagerEnabled() {
+    return this.data?.secretManagerEnabled ?? false;
+  }
+
   isBetaFeatureDisabled(feature: string): boolean {
     return this.data?.disabledBetaFeatures?.includes(feature) || false;
   }

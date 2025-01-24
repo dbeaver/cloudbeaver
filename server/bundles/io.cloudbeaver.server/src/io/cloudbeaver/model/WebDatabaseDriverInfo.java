@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,8 @@ import org.jkiss.utils.CommonUtils;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Web driver configuration
@@ -255,9 +257,19 @@ public class WebDatabaseDriverInfo {
 
     @Property
     public WebPropertyInfo[] getProviderProperties() {
-        return Arrays.stream(driver.getProviderPropertyDescriptors())
+        WebPropertyInfo[] additionalWebProperty = Optional.of(WebAppUtils.getWebApplication())
+            .filter(app -> app.getAppConfiguration().isSecretManagerEnabled())
+            .map(app -> app.getConnectionController().getExternalInfo(webSession))
+            .orElse(new WebPropertyInfo[0]);
+
+        WebPropertyInfo[] providerProperties = Arrays.stream(driver.getProviderPropertyDescriptors())
             .map(p -> new WebPropertyInfo(webSession, p, null))
             .toArray(WebPropertyInfo[]::new);
+
+        return Stream.concat(
+            Arrays.stream(additionalWebProperty),
+            Arrays.stream(providerProperties)
+        ).toArray(WebPropertyInfo[]::new);
     }
 
     @Property

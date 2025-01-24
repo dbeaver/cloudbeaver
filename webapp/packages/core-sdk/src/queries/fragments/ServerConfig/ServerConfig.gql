@@ -17,6 +17,7 @@ fragment ServerConfig on ServerConfig {
   publicCredentialsSaveEnabled
 
   resourceManagerEnabled
+  secretManagerEnabled
 
   configurationMode
   developmentMode

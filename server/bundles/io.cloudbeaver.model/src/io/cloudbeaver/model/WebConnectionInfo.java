@@ -25,6 +25,7 @@ import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.*;
@@ -76,6 +77,8 @@ public class WebConnectionInfo {
     private String connectTime;
     private String serverVersion;
     private String clientVersion;
+    @Nullable
+    private Boolean credentialsSavedInSession;
 
     private transient Map<String, Object> savedAuthProperties;
     private transient List<WebNetworkHandlerConfigInput> savedNetworkCredentials;
@@ -195,7 +198,8 @@ public class WebConnectionInfo {
 
     @Property
     public boolean isCredentialsSaved() throws DBException {
-        return dataSourceContainer.isCredentialsSaved();
+        // isCredentialsSaved can be true if credentials were saved during connection init for global project
+        return dataSourceContainer.isCredentialsSaved() && !(credentialsSavedInSession != null && credentialsSavedInSession);
     }
 
     @Property
@@ -514,4 +518,10 @@ public class WebConnectionInfo {
         return tools;
     }
 
+    /**
+     * Updates param that checks whether credentials were saved only in session.
+     */
+    public void setCredentialsSavedInSession(@Nullable Boolean credentialsSavedInSession) {
+        this.credentialsSavedInSession = credentialsSavedInSession;
+    }
 }

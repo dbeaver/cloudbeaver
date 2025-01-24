@@ -130,6 +130,8 @@ type ServerConfig {
     supportsCustomConnections: Boolean!
     resourceManagerEnabled: Boolean!
 
+    secretManagerEnabled: Boolean!  @since(version: "24.3.2")
+
     publicCredentialsSaveEnabled: Boolean!
     adminCredentialsSaveEnabled: Boolean!
 

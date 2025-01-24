@@ -15,6 +15,7 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.model.config,
  io.cloudbeaver.server,
  io.cloudbeaver.service,
+ io.cloudbeaver.service.core,
  io.cloudbeaver.service.session
 Import-Package: org.slf4j
 Automatic-Module-Name: io.cloudbeaver.server.ce

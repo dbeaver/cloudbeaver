@@ -111,6 +111,11 @@ public class WebServerConfig {
     }
 
     @Property
+    public boolean isSecretManagerEnabled() {
+        return application.getAppConfiguration().isSecretManagerEnabled();
+    }
+
+    @Property
     public String[] getEnabledFeatures() {
         return application.getAppConfiguration().getEnabledFeatures();
     }
