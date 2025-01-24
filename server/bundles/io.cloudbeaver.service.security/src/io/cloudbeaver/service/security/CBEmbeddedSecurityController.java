@@ -450,7 +450,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames(
                     "SELECT U.USER_ID,U.IS_ACTIVE,U.DEFAULT_AUTH_ROLE," +
-                        "U.DISABLE_DATE,U.DISABLE_BY_USER_ID,U.DISABLE_REASON,S.IS_SECRET_STORAGE FROM " +
+                        "U.CHANGE_DATE,U.DISABLE_BY_USER_ID,U.DISABLE_REASON,S.IS_SECRET_STORAGE FROM " +
                         "{table_prefix}CB_USER U, {table_prefix}CB_AUTH_SUBJECT S " +
                         "WHERE U.USER_ID=? AND U.USER_ID=S.SUBJECT_ID")
             )) {
@@ -525,7 +525,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames("SELECT " +
-                    "USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE,DISABLE_DATE,DISABLE_BY_USER_ID,DISABLE_REASON" +
+                    "USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE,CHANGE_DATE,DISABLE_BY_USER_ID,DISABLE_REASON" +
                     " FROM {table_prefix}CB_USER"
                     + buildUsersFilter(filter) + "\nORDER BY USER_ID " + getOffsetLimitPart(filter)))) {
                 setUsersFilterValues(dbStat, filter, 1);
@@ -793,13 +793,13 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private void enableUser(Connection dbCon, String userId) throws SQLException {
         try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
             "UPDATE CB_USER " +
-                "SET DISABLE_DATE = ?, " +
+                "SET CHANGE_DATE = ?, " +
                 "    DISABLE_BY_USER_ID = ?, " +
                 "    DISABLE_REASON = ?, " +
                 "    IS_ACTIVE = ? " +
                 "WHERE USER_ID = ?"
         ))) {
-            dbStat.setNull(1, Types.TIMESTAMP);;
+            dbStat.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
             dbStat.setNull(2, Types.VARCHAR);;
             dbStat.setNull(3, Types.VARCHAR);
             dbStat.setString(4, CHAR_BOOL_TRUE);
@@ -1242,7 +1242,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @NotNull
     private SMUser fetchUser(ResultSet dbResult) throws SQLException {
-        Timestamp timestamp = dbResult.getTimestamp("DISABLE_DATE");
+        Timestamp timestamp = dbResult.getTimestamp("CHANGE_DATE");
         Instant disableDate = timestamp != null ? timestamp.toInstant() : null;
         return new SMUser(
             dbResult.getString("USER_ID"),
@@ -1714,10 +1714,13 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                                 authProviderId,
                                 inputUsername.toString(),
                                 smConfig.getBlockPeriodTimeBruteForceProtection())
-                               )
-                            && isUserExistsAndEnabled(dbCon, inputUsername.toString(), database)
-                        ) {
-                            disableUserByBruteForceProtection(database, dbCon, "system", inputUsername.toString(), "Disabled by system");
+                        ) && isUserExistsAndEnabled(dbCon, getUserId() != null ? getUserId() : (String) inputUsername, database)) {
+                            disableUserByBruteForceProtection(
+                                database,
+                                dbCon,
+                                "system",
+                                getUserId() != null ? getUserId() : (String) inputUsername,
+                                "Disabled by bruteforce protection");
                         } else {
                             BruteForceUtils.checkBruteforce(smConfig,
                                 getLatestUserLogins(dbCon, authProviderId, inputUsername.toString(), smConfig.getBlockLoginPeriod()));
@@ -1793,9 +1796,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     "    attempt.CREATE_TIME" +
                     " FROM" +
                     "    {table_prefix}CB_AUTH_ATTEMPT attempt" +
-                    "        JOIN" +
+                    "    JOIN {table_prefix}CB_USER cu ON attempt.AUTH_USERNAME = cu.USER_ID " +
+                    "    JOIN" +
                     "    {table_prefix}CB_AUTH_ATTEMPT_INFO info ON attempt.AUTH_ID = info.AUTH_ID" +
-                    " WHERE AUTH_PROVIDER_ID = ? AND AUTH_USERNAME = ? AND attempt.CREATE_TIME > ?" +
+                    " WHERE AUTH_PROVIDER_ID = ? AND AUTH_USERNAME = ? AND attempt.CREATE_TIME > ? " +
+                    " AND (CHANGE_DATE IS NULL OR CHANGE_DATE < attempt.CREATE_TIME)" +
                     " ORDER BY attempt.CREATE_TIME DESC " +
                     database.getDialect().getOffsetLimitQueryPart(0, smConfig.getMaxFailedLogin())
             )
@@ -1848,11 +1853,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     ) throws SQLException {
         String query = database.normalizeTableNames(
             "UPDATE CB_USER " +
-                "SET DISABLE_DATE = ?, " +
+                "SET CHANGE_DATE = ?, " +
                 "    DISABLE_BY_USER_ID = ?, " +
                 "    DISABLE_REASON = ?, " +
                 "    IS_ACTIVE = ? " +
-                "WHERE USER_ID = ?"
+                "WHERE USER_ID = ? " +
+                "AND (DEFAULT_AUTH_ROLE IS NULL OR DEFAULT_AUTH_ROLE <> 'ADMINISTRATOR')"
         );
 
         try (PreparedStatement dbStat = dbCon.prepareStatement(query)) {
@@ -1875,7 +1881,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     ) throws SQLException, DBException {
         disableUserWithReason(database, dbCon, disabledBy, username, reason);
         killAllExistsUserSessions(username);
-        throw new SMException("User has been disabled. Tell your administrator");
+        throw new SMException("The user is disabled. Please contact the administrator for more information");
     }
 
     private boolean isSmSessionNotExpired(String prevSessionId) {
@@ -2654,7 +2660,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         List<String> smSessionsId = findActiveUserSessions(userId, currentTime)
                 .stream().map(SMActiveSession::sessionId).collect(Collectors.toList());
         deleteSessionsTokens(smSessionsId);
-        application.getEventController().addEvent(new WSUserCloseSessionsEvent(smSessionsId, getSmSessionId(), getUserId()));
+        if (!smSessionsId.isEmpty()) {
+            application.getEventController().addEvent(new WSUserCloseSessionsEvent(smSessionsId, getSmSessionId(), getUserId()));
+        }
     }
 
     /**

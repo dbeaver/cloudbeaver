@@ -31,11 +31,13 @@ public class SMControllerConfiguration {
     private boolean enableConnectionBruteForceProtection = false;
     private int blockPeriodTimeBruteForceProtection = 1440;
 
-    public static final int DEFAULT_MAX_FAILED_LOGIN = 5;
+    public static final int DEFAULT_MAX_FAILED_LOGIN = 10;
+    public static final int DEFAULT_MAX_FAILED_LOGIN_CONNECTION = 5;
 
     public static final int DEFAULT_MINIMUM_LOGIN_TIMEOUT = 1; //1sec
     public static final int DEFAULT_BLOCK_LOGIN_PERIOD = 300; //5min
     private int maxFailedLogin = DEFAULT_MAX_FAILED_LOGIN;
+    private int maxFailedConnectionLogin = DEFAULT_MAX_FAILED_LOGIN_CONNECTION;
     private int minimumLoginTimeout = DEFAULT_MINIMUM_LOGIN_TIMEOUT;
     private int blockLoginPeriod = DEFAULT_BLOCK_LOGIN_PERIOD;
     private final PasswordPolicyConfiguration passwordPolicy = new PasswordPolicyConfiguration();
@@ -92,6 +94,10 @@ public class SMControllerConfiguration {
         return maxFailedLogin;
     }
 
+    public int getMaxFailedConnectionLogin() {
+        return maxFailedConnectionLogin;
+    }
+
     public int getMinimumLoginTimeout() {
         return minimumLoginTimeout;
     }
@@ -110,6 +116,10 @@ public class SMControllerConfiguration {
 
     public void setBlockLoginPeriod(int blockPeriod) {
         this.blockLoginPeriod = blockPeriod;
+    }
+
+    public void setEnableBruteForceProtection(boolean enableBruteForceProtection) {
+        this.enableBruteForceProtection = enableBruteForceProtection;
     }
 
     public PasswordPolicyConfiguration getPasswordPolicyConfiguration() {

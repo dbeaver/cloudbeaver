@@ -79,7 +79,7 @@ public class BruteForceUtils {
         long errorsCount = latestLoginAttempts.stream()
             .filter(authAttemptSessionInfo -> authAttemptSessionInfo.smAuthStatus() == SMAuthStatus.ERROR).count();
 
-        return errorsCount >= smConfig.getMaxFailedLogin();
+        return errorsCount >= smConfig.getMaxFailedConnectionLogin();
     }
 
     private static void checkLoginInterval(LocalDateTime createTime, int timeout) throws DBException {
