@@ -51,22 +51,19 @@ export class GrantedConnectionsFormPart extends FormPart<IGrantedConnectionsStat
     data: IFormState<ITeamFormState>,
     contexts: IExecutionContextProvider<IFormState<ITeamFormState>>,
   ): Promise<void> {
-    if (!this.formState.state.teamId) {
-      return;
-    }
-
+    const teamId = this.formState.state.teamId!;
     const globalProject = this.projectInfoResource.values.find(isGlobalProject);
 
     if (!globalProject) {
       throw new Error('The global project does not exist');
     }
 
-    const { connectionsToRevoke, connectionsToGrant } = this.getConnectionsDifferences(this.initialState.grantedSubjects, this.state.grantedSubjects);
+    const { connectionsToRevoke, connectionsToGrant } = this.getConnectionsUpdates(this.initialState.grantedSubjects, this.state.grantedSubjects);
 
     if (connectionsToRevoke.length > 0) {
       await this.graphQLService.sdk.deleteConnectionsAccess({
         projectId: globalProject.id,
-        subjects: [this.formState.state.teamId],
+        subjects: [teamId],
         connectionIds: connectionsToRevoke,
       });
     }
@@ -74,7 +71,7 @@ export class GrantedConnectionsFormPart extends FormPart<IGrantedConnectionsStat
     if (connectionsToGrant.length > 0) {
       await this.graphQLService.sdk.addConnectionsAccess({
         projectId: globalProject.id,
-        subjects: [this.formState.state.teamId],
+        subjects: [teamId],
         connectionIds: connectionsToGrant,
       });
     }
@@ -88,7 +85,7 @@ export class GrantedConnectionsFormPart extends FormPart<IGrantedConnectionsStat
     this.state.grantedSubjects = this.state.grantedSubjects.filter(subject => !subjectIds.includes(subject));
   }
 
-  private getConnectionsDifferences(current: string[], next: string[]): { connectionsToRevoke: string[]; connectionsToGrant: string[] } {
+  private getConnectionsUpdates(current: string[], next: string[]): { connectionsToRevoke: string[]; connectionsToGrant: string[] } {
     const connectionsToRevoke = current.filter(connectionId => !next.includes(connectionId));
     const connectionsToGrant = next.filter(connectionId => !current.includes(connectionId));
 
