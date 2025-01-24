@@ -31,10 +31,11 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
   const notificationService = useService(NotificationService);
   const form = useForm({
     onSubmit: async function onSubmit() {
+      const initialMode = state.mode;
       const title = state.mode === 'create' ? 'administration_teams_team_info_created' : 'administration_teams_team_info_updated';
-      const errorKey = state.mode === 'create' ? 'administration_teams_team_create_error' : 'administration_teams_team_save_error';
 
       const saved = await state.save();
+      const exception = getFirstException(state.exception);
 
       if (saved) {
         const message = state.state.teamId ?? '';
@@ -44,7 +45,15 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
         onSave?.();
         onCancel?.();
       } else {
-        notificationService.logException(getFirstException(state.exception), errorKey);
+        if (exception) {
+          const errorKey = state.mode === 'create' ? 'administration_teams_team_create_error' : 'administration_teams_team_save_error';
+          notificationService.logException(exception, errorKey);
+        }
+
+        // team created but other parts failed
+        if (initialMode === 'create' && state.mode === 'edit') {
+          notificationService.logSuccess({ title: 'administration_teams_team_info_created', message: state.state?.teamId ?? '' });
+        }
       }
     },
   });

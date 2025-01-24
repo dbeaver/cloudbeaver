@@ -7,7 +7,6 @@
  */
 import { TeamsResource } from '@cloudbeaver/core-authentication';
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
-import { NotificationService } from '@cloudbeaver/core-events';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 import type { IFormState } from '@cloudbeaver/core-ui';
@@ -23,8 +22,7 @@ export function getGrantedConnectionsFormPart(formState: IFormState<ITeamFormSta
     const projectInfoResource = di.getService(ProjectInfoResource);
     const teamsResource = di.getService(TeamsResource);
     const graphQLService = di.getService(GraphQLService);
-    const notificationService = di.getService(NotificationService);
 
-    return new GrantedConnectionsFormPart(formState, projectInfoResource, teamsResource, graphQLService, notificationService);
+    return new GrantedConnectionsFormPart(formState, projectInfoResource, teamsResource, graphQLService);
   });
 }

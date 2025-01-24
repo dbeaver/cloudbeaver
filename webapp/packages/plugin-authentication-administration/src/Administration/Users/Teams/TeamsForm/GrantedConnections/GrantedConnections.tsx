@@ -83,7 +83,7 @@ export const GrantedConnections: TabContainerPanelComponent<TeamFormProps> = obs
     info = 'cloud_connections_access_placeholder';
   }
 
-  if (formState.mode === 'edit' && part.isChanged) {
+  if (formState.mode === 'edit' && part.isChanged && !formState.isDisabled) {
     info = 'ui_save_reminder';
   }
 

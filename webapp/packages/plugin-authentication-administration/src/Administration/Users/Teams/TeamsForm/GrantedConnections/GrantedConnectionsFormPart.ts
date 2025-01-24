@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { TeamsResource } from '@cloudbeaver/core-authentication';
-import type { NotificationService } from '@cloudbeaver/core-events';
+import { TeamsResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { isGlobalProject, type ProjectInfoResource } from '@cloudbeaver/core-projects';
-import type { GraphQLService } from '@cloudbeaver/core-sdk';
+import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormState } from '../TeamsAdministrationFormService.js';
@@ -27,7 +26,6 @@ export class GrantedConnectionsFormPart extends FormPart<IGrantedConnectionsStat
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly teamsResource: TeamsResource,
     private readonly graphQLService: GraphQLService,
-    private readonly notificationService: NotificationService,
   ) {
     super(formState, getInitialState());
 

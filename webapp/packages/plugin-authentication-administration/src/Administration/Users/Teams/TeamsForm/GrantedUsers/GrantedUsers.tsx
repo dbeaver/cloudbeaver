@@ -83,7 +83,7 @@ export const GrantedUsers: TabContainerPanelComponent<TeamFormProps> = observer(
             </Group>
           ) : (
             <>
-              {formState.mode === 'edit' && part.isChanged && <InfoItem info="ui_save_reminder" />}
+              {formState.mode === 'edit' && part.isChanged && !formState.isDisabled && <InfoItem info="ui_save_reminder" />}
               <Container gap overflow>
                 <GrantedUserList
                   grantedUsers={grantedUsers}

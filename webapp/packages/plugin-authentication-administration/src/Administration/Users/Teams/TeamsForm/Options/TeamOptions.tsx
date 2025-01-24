@@ -9,20 +9,21 @@ import { observer } from 'mobx-react-lite';
 
 import { Container, Group, InputField, Textarea, useAutoLoad, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
 import { getTeamOptionsFormPart } from './getTeamOptionsFormPart.js';
 import { Permissions } from './Permissions.js';
 import { TeamMetaParameters } from './TeamMetaParameters.js';
 
-export const TeamOptions: TabContainerPanelComponent<TeamFormProps> = observer(function TeamOptions({ formState }) {
+export const TeamOptions: TabContainerPanelComponent<TeamFormProps> = observer(function TeamOptions({ formState, tabId }) {
   const serverConfigResource = useResource(TeamOptions, ServerConfigResource, undefined);
   const part = getTeamOptionsFormPart(formState);
   const translate = useTranslate();
+  const tab = useTab(tabId);
   const edit = formState.mode === 'edit';
 
-  useAutoLoad(TeamOptions, part);
+  useAutoLoad(TeamOptions, part, tab.selected);
 
   return (
     <Container overflow>
