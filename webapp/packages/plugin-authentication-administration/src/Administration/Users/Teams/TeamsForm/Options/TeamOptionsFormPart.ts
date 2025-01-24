@@ -46,7 +46,7 @@ export class TeamOptionsFormPart extends FormPart<ITeamOptionsState, ITeamFormSt
         teamName: team.teamName ?? '',
         description: team.description ?? '',
         teamPermissions: team.teamPermissions,
-        metaParameters: metaParameters || {},
+        metaParameters: metaParameters,
       });
 
       return;

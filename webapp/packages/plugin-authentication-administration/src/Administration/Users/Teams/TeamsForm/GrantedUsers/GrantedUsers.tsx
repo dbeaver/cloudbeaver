@@ -12,12 +12,12 @@ import { UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authent
 import { Container, Group, InfoItem, Loader, s, TextPlaceholder, useAutoLoad, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
-import { getGrantedUsersFormPart } from './getGrantedUsersFormPart.js';
 import { GrantedUserList } from './GrantedUserList.js';
 import style from './GrantedUsers.module.css';
+import { GrantedUsersFormPart } from './GrantedUsersFormPart.js';
 import type { IGrantedUser } from './IGrantedUser.js';
 import { UserList } from './UserList.js';
 
@@ -26,7 +26,7 @@ export const GrantedUsers: TabContainerPanelComponent<TeamFormProps> = observer(
   const translate = useTranslate();
   const [edit, setEdit] = useState(false);
 
-  const part = getGrantedUsersFormPart(formState);
+  const tabState = useTabState<GrantedUsersFormPart>();
   const { selected } = useTab(tabId);
 
   const serverConfigResource = useResource(UserList, ServerConfigResource, undefined, { active: selected });
@@ -39,7 +39,7 @@ export const GrantedUsers: TabContainerPanelComponent<TeamFormProps> = observer(
   const grantedUsers: IGrantedUser[] = [];
 
   for (const user of users.data) {
-    const granted = part.state.grantedUsers.find(grantedUser => grantedUser.userId === user?.userId);
+    const granted = tabState.state.grantedUsers.find(grantedUser => grantedUser.userId === user?.userId);
 
     if (granted && user) {
       grantedUsers.push({
@@ -53,7 +53,7 @@ export const GrantedUsers: TabContainerPanelComponent<TeamFormProps> = observer(
     setEdit(value => !value);
   }
 
-  useAutoLoad(GrantedUsers, part, selected && !part.isLoaded() && !isDefaultTeam);
+  useAutoLoad(GrantedUsers, tabState, selected && !tabState.isLoaded() && !isDefaultTeam);
 
   if (!selected) {
     return null;
@@ -72,7 +72,7 @@ export const GrantedUsers: TabContainerPanelComponent<TeamFormProps> = observer(
   }
 
   return (
-    <Loader className={s(styles, { loader: true })} state={part}>
+    <Loader className={s(styles, { loader: true })} state={tabState}>
       {() => (
         <Container className={s(styles, { box: true })} parent={!!users.resource.values.length} gap vertical>
           {!users.resource.values.length ? (
@@ -83,21 +83,21 @@ export const GrantedUsers: TabContainerPanelComponent<TeamFormProps> = observer(
             </Group>
           ) : (
             <>
-              {formState.mode === 'edit' && part.isChanged && !formState.isDisabled && <InfoItem info="ui_save_reminder" />}
+              {formState.mode === 'edit' && tabState.isChanged && !formState.isDisabled && <InfoItem info="ui_save_reminder" />}
               <Container gap overflow>
                 <GrantedUserList
                   grantedUsers={grantedUsers}
                   disabled={formState.isDisabled}
                   onEdit={toggleEdit}
-                  onRevoke={part.revoke}
-                  onTeamRoleAssign={part.assignTeamRole}
+                  onRevoke={tabState.revoke}
+                  onTeamRoleAssign={tabState.assignTeamRole}
                 />
                 {edit && (
                   <UserList
                     userList={users.resource.values}
                     grantedUsers={grantedUsers.map(user => user.userId)}
                     disabled={formState.isDisabled}
-                    onGrant={part.grant}
+                    onGrant={tabState.grant}
                   />
                 )}
               </Container>

@@ -7,14 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, Form, Loader, Placeholder, s, StatusMessage, useForm, useObjectRef, useS } from '@cloudbeaver/core-blocks';
+import { Button, Container, Form, s, StatusMessage, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
 import style from './TeamForm.module.css';
-import { type ITeamFormActionsContext, TeamFormActionsContext } from './TeamFormActionsContext.js';
 import { TeamsAdministrationFormService } from './TeamsAdministrationFormService.js';
 import type { TeamsAdministrationFormState } from './TeamsAdministrationFormState.js';
 
@@ -29,6 +28,8 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
   const styles = useS(style);
   const service = useService(TeamsAdministrationFormService);
   const notificationService = useService(NotificationService);
+  const translate = useTranslate();
+  const editing = state.mode === 'edit';
   const form = useForm({
     onSubmit: async function onSubmit() {
       const initialMode = state.mode;
@@ -57,10 +58,6 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
       }
     },
   });
-  const actions = useObjectRef<ITeamFormActionsContext>({
-    save: async () => form.submit(),
-    onCancel: () => onCancel?.(),
-  });
 
   return (
     <Form context={form} contents>
@@ -72,11 +69,12 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
               <TabList disabled={false} underline big />
             </Container>
             <Container keepSize noWrap center gap compact>
-              <Loader suspense inline hideMessage hideException>
-                <TeamFormActionsContext.Provider value={actions}>
-                  <Placeholder container={service.actionsContainer} formState={state} />
-                </TeamFormActionsContext.Provider>
-              </Loader>
+              <Button type="button" disabled={state.isDisabled} mod={['outlined']} onClick={onCancel}>
+                {translate('ui_processing_cancel')}
+              </Button>
+              <Button type="button" disabled={state.isDisabled || !state.isChanged} mod={['unelevated']} onClick={() => form.submit()}>
+                {translate(!editing ? 'ui_processing_create' : 'ui_processing_save')}
+              </Button>
             </Container>
           </Container>
           <Container vertical>

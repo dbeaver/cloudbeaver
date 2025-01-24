@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
@@ -17,13 +16,9 @@ export interface ITeamFormState {
 
 export type TeamFormProps = IFormProps<ITeamFormState>;
 
-const TeamFormBaseActions = importLazyComponent(async () => import('./TeamFormBaseActions.js').then(module => module.TeamFormBaseActions));
-
 @injectable()
 export class TeamsAdministrationFormService extends FormBaseService<ITeamFormState, TeamFormProps> {
   constructor(localizationService: LocalizationService, notificationService: NotificationService) {
     super(localizationService, notificationService, 'Administration Team form');
-
-    this.actionsContainer.add(TeamFormBaseActions);
   }
 }

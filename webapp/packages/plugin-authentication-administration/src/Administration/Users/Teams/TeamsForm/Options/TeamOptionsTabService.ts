@@ -10,6 +10,7 @@ import React from 'react';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { TeamsAdministrationFormService } from '../TeamsAdministrationFormService.js';
+import { getTeamOptionsFormPart } from './getTeamOptionsFormPart.js';
 
 const TeamOptions = React.lazy(async () => {
   const { TeamOptions } = await import('./TeamOptions.js');
@@ -27,6 +28,7 @@ export class TeamOptionsTabService extends Bootstrap {
       key: 'options',
       name: 'ui_options',
       order: 1,
+      stateGetter: props => () => getTeamOptionsFormPart(props.formState),
       panel: () => TeamOptions,
     });
   }

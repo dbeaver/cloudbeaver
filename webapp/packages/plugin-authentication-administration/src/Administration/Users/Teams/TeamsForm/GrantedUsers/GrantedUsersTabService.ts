@@ -10,6 +10,7 @@ import React from 'react';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { TeamsAdministrationFormService } from '../TeamsAdministrationFormService.js';
+import { getGrantedUsersFormPart } from './getGrantedUsersFormPart.js';
 
 const GrantedUsers = React.lazy(async () => {
   const { GrantedUsers } = await import('./GrantedUsers.js');
@@ -31,6 +32,7 @@ export class GrantedUsersTabService extends Bootstrap {
       name: 'administration_teams_team_granted_users_tab_title',
       title: 'administration_teams_team_granted_users_tab_title',
       order: 2,
+      stateGetter: props => () => getGrantedUsersFormPart(props.formState),
       panel: () => GrantedUsers,
     });
   }

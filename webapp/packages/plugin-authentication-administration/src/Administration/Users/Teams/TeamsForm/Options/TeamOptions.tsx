@@ -9,37 +9,38 @@ import { observer } from 'mobx-react-lite';
 
 import { Container, Group, InputField, Textarea, useAutoLoad, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import type { TeamFormProps } from '../TeamsAdministrationFormService.js';
-import { getTeamOptionsFormPart } from './getTeamOptionsFormPart.js';
 import { Permissions } from './Permissions.js';
 import { TeamMetaParameters } from './TeamMetaParameters.js';
+import type { TeamOptionsFormPart } from './TeamOptionsFormPart.js';
 
 export const TeamOptions: TabContainerPanelComponent<TeamFormProps> = observer(function TeamOptions({ formState, tabId }) {
   const serverConfigResource = useResource(TeamOptions, ServerConfigResource, undefined);
-  const part = getTeamOptionsFormPart(formState);
+  const tabState = useTabState<TeamOptionsFormPart>();
   const translate = useTranslate();
-  const tab = useTab(tabId);
   const edit = formState.mode === 'edit';
+  const tab = useTab(tabId);
+  const loaded = tabState.isLoaded();
 
-  useAutoLoad(TeamOptions, part, tab.selected);
+  useAutoLoad(TeamOptions, tabState, tab.selected && !loaded);
 
   return (
     <Container overflow>
       <Group small gap>
-        <InputField name="teamId" state={part.state} readOnly={edit || formState.isDisabled} required tiny fill>
+        <InputField name="teamId" state={tabState.state} readOnly={edit || formState.isDisabled} required tiny fill>
           {translate('administration_teams_team_id')}
         </InputField>
-        <InputField name="teamName" state={part.state} readOnly={formState.isDisabled} required tiny fill>
+        <InputField name="teamName" state={tabState.state} readOnly={formState.isDisabled} required tiny fill>
           {translate('administration_teams_team_name')}
         </InputField>
-        <Textarea name="description" state={part.state} readOnly={formState.isDisabled} tiny fill>
+        <Textarea name="description" state={tabState.state} readOnly={formState.isDisabled} tiny fill>
           {translate('administration_teams_team_description')}
         </Textarea>
       </Group>
-      {!serverConfigResource.resource.distributed && <Permissions state={part.state} disabled={formState.isDisabled} />}
-      <TeamMetaParameters state={part.state} disabled={formState.isDisabled} />
+      {!serverConfigResource.resource.distributed && <Permissions state={tabState.state} disabled={formState.isDisabled} />}
+      <TeamMetaParameters state={tabState.state} disabled={formState.isDisabled} />
     </Container>
   );
 });
