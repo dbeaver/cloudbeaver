@@ -17,7 +17,7 @@ export function useTeamsAdministrationFormState(id: string | null, configure?: (
   const serviceProvider = useService(IServiceProvider);
   const ref = useRef<null | TeamsAdministrationFormState>(null);
 
-  if (ref.current?.id !== id) {
+  if (ref.current?.state.teamId !== id) {
     ref.current = new TeamsAdministrationFormState(serviceProvider, service, {
       teamId: id,
     });
