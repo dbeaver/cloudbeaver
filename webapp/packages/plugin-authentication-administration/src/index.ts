@@ -23,3 +23,4 @@ export * from './Administration/Users/UserForm/Info/UserFormInfoPartService.js';
 export * from './Menus/MENU_USERS_ADMINISTRATION.js';
 export * from './AdministrationUsersManagementService.js';
 export * from './externalUserProviderStatusContext.js';
+export * from './Administration/Users/UsersTable/UsersTableOptionsPanelService.js';
