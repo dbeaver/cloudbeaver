@@ -30,6 +30,7 @@ import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 
 import java.nio.file.Path;
@@ -83,7 +84,12 @@ public class WebSessionProjectImpl extends WebProjectImpl {
     @NotNull
     @Override
     protected DBPDataSourceRegistry createDataSourceRegistry() {
-        DBPDataSourceRegistry dataSourceRegistry = super.createDataSourceRegistry();
+        return createRegistryWithCredentialsProvider();
+    }
+
+    @NotNull
+    protected DataSourceRegistry<?> createRegistryWithCredentialsProvider() {
+        DataSourceRegistry<?> dataSourceRegistry = createRMRegistry();
         dataSourceRegistry.setAuthCredentialsProvider(webSession);
         return dataSourceRegistry;
     }

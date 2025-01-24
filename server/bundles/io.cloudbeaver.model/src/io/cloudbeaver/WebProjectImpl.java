@@ -84,20 +84,12 @@ public abstract class WebProjectImpl extends BaseWebProjectImpl {
     @NotNull
     @Override
     protected DBPDataSourceRegistry createDataSourceRegistry() {
-        return new WebDataSourceRegistryProxy(
-            createRMRegistry(),
-            getDataSourceFilter()
-        );
+        return createRMRegistry();
     }
 
     @NotNull
     protected DataSourceRegistry<?> createRMRegistry() {
         return new DataSourceRegistryRM<>(this, getResourceController(), preferenceStore);
-    }
-
-    @NotNull
-    public DataSourceFilter getDataSourceFilter() {
-        return (ds) -> true;
     }
 
 }
