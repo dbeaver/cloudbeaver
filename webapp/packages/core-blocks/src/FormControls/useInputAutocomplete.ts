@@ -95,7 +95,7 @@ export const useInputAutocomplete = (
           return [];
         }
 
-        return this.search.searchResult ?? [];
+        return this.search.searchResult;
       },
     }),
     {

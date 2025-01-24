@@ -61,7 +61,7 @@ export function useSearch<T extends object>({
       },
       get searchResult() {
         if (this.matchStrategy === 'fuzzy') {
-          return this.fuzzySearch.engine.searchResults;
+          return this.fuzzySearch.engine.searchResults ?? [];
         }
 
         const matchFunctions: Record<Exclude<SearchStrategy, 'fuzzy'>, (value: string) => boolean> = {
