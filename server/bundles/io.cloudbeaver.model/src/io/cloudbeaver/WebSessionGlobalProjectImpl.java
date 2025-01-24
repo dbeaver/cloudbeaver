@@ -22,13 +22,13 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPEvent;
+import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 
-import java.util.Collections;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Global project.
@@ -36,31 +36,39 @@ import java.util.stream.Collectors;
  */
 public class WebSessionGlobalProjectImpl extends WebSessionProjectImpl {
     private static final Log log = Log.getLog(WebSessionGlobalProjectImpl.class);
-    private Set<String> accessibleConnectionIds = Collections.emptySet();
+
+    private final Set<String> accessibleConnectionIds = new CopyOnWriteArraySet<>();
 
     public WebSessionGlobalProjectImpl(@NotNull WebSession webSession, @NotNull RMProject project) {
         super(webSession, project);
     }
 
     /**
-     * Update info about accessible connections from a database.
+     * Creates data source registry that can filter data sources that are not accessible for user.
      */
-    public synchronized void refreshAccessibleConnectionIds() {
-        this.accessibleConnectionIds = readAccessibleConnectionIds();
+    @NotNull
+    @Override
+    protected DBPDataSourceRegistry createDataSourceRegistry() {
+        return new WebDataSourceRegistryProxy(
+            createRegistryWithCredentialsProvider(),
+            this::isDataSourceAccessible
+        );
     }
 
-    @NotNull
-    private Set<String> readAccessibleConnectionIds() {
+    /**
+     * Update info about accessible connections from a database.
+     */
+    public void refreshAccessibleConnectionIds() {
+        this.accessibleConnectionIds.clear();
         try {
-            return webSession.getSecurityController()
-                .getAllAvailableObjectsPermissions(SMObjectType.datasource)
-                .stream()
-                .map(SMObjectPermissions::getObjectId)
-                .collect(Collectors.toSet());
+            for (SMObjectPermissions smObjectPermissions : webSession.getSecurityController()
+                .getAllAvailableObjectsPermissions(SMObjectType.datasource)) {
+                String objectId = smObjectPermissions.getObjectId();
+                this.accessibleConnectionIds.add(objectId);
+            }
         } catch (DBException e) {
             webSession.addSessionError(e);
             log.error("Error reading connection grants", e);
-            return Collections.emptySet();
         }
     }
 
@@ -109,10 +117,5 @@ public class WebSessionGlobalProjectImpl extends WebSessionProjectImpl {
             registry.notifyDataSourceListeners(new DBPEvent(DBPEvent.Action.OBJECT_REMOVE, dataSource));
             dataSource.dispose();
         }
-    }
-
-    @NotNull
-    public DataSourceFilter getDataSourceFilter() {
-        return this::isDataSourceAccessible;
     }
 }
