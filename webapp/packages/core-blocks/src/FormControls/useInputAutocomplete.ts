@@ -31,6 +31,7 @@ export interface InputAutocompleteProposal {
 interface State {
   replaceCurrentWord: (replacement: string) => void;
   currentWord: string;
+  proposals: InputAutocompleteProposal[];
 }
 
 const INPUT_DELAY = 300;
@@ -39,8 +40,8 @@ const SEARCH_FIELDS: Array<keyof InputAutocompleteProposal> = ['displayString', 
 export const useInputAutocomplete = (
   inputRef: RefObject<HTMLInputElement | HTMLTextAreaElement>,
   { sourceHints, matchStrategy = 'contains', predicate }: InputAutocompleteOptions,
-): [State, InputAutocompleteProposal[]] => {
-  const { searchResult, setSearch } = useSearch({
+): Readonly<State> => {
+  const search = useSearch({
     sourceHints,
     searchFields: SEARCH_FIELDS,
     matchStrategy,
@@ -89,15 +90,23 @@ export const useInputAutocomplete = (
 
         return substring.split(' ').at(-1) ?? '';
       },
+      get proposals() {
+        if (this.isFound || !this.currentWord) {
+          return [];
+        }
+
+        return this.search.searchResult ?? [];
+      },
     }),
     {
+      proposals: computed,
       input: observable.ref,
       selectionStart: observable.ref,
       isFound: observable.ref,
       currentWord: computed,
       replaceCurrentWord: action.bound,
     },
-    { sourceHints, matchStrategy, inputRef, setSearch },
+    { sourceHints, matchStrategy, inputRef, search },
   );
 
   const handleInput = useMemo(
@@ -108,7 +117,7 @@ export const useInputAutocomplete = (
         state.selectionStart = target.selectionStart;
         state.input = target.value;
         state.isFound = false;
-        state.setSearch(state.currentWord);
+        state.search.setSearch(state.currentWord);
       }, INPUT_DELAY),
     [state],
   );
@@ -126,5 +135,5 @@ export const useInputAutocomplete = (
     };
   }, [state.inputRef.current]);
 
-  return [state as State, state.isFound ? [] : searchResult];
+  return state as Readonly<State>;
 };

@@ -5,9 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { autorun } from 'mobx';
+import { autorun, observable } from 'mobx';
 import { useMemo } from 'react';
 import { useMiniSearch } from 'react-minisearch';
+
+import { useObservableRef } from './useObservableRef.js';
 
 interface UseSearchProps<T> {
   sourceProposals: T[];
@@ -26,15 +28,24 @@ export function useFuzzySearch<T extends object>({ sourceProposals, fields, thre
       prefix,
     },
   });
+  const state = useObservableRef(
+    () => ({}),
+    {
+      engine: observable.ref,
+    },
+    {
+      engine: miniSearch,
+    },
+  );
 
   useMemo(
     () =>
       autorun(() => {
-        miniSearch.removeAll();
-        miniSearch.addAll(sourceProposals.map((proposal, index) => ({ id: index, ...proposal })));
+        state.engine.removeAll();
+        state.engine.addAll(sourceProposals.map((proposal, index) => ({ id: index, ...proposal })));
       }),
     [sourceProposals],
   );
 
-  return miniSearch;
+  return state;
 }
