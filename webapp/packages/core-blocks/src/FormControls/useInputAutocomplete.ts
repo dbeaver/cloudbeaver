@@ -6,10 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { action, computed, observable } from 'mobx';
-import { type RefObject, useEffect, useLayoutEffect, useMemo } from 'react';
+import { type RefObject, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
 import { debounce, isNotNullDefined } from '@cloudbeaver/core-utils';
 
+import type { IMenuState } from '../Menu/MenuStateContext.js';
 import type { IContextMenuPositionCoords } from '../Menu/useContextMenuPosition.js';
 import { useObservableRef } from '../useObservableRef.js';
 import { type SearchStrategy, useSearch } from '../useSearch.js';
@@ -35,6 +36,7 @@ interface State {
   proposals: InputAutocompleteProposal[];
   position: IContextMenuPositionCoords;
   inputValue: string;
+  menuRef: RefObject<IMenuState>;
 }
 
 const INPUT_DELAY = 300;
@@ -51,7 +53,7 @@ export const useInputAutocomplete = (
     matchStrategy,
     predicate,
   });
-
+  const menuRef = useRef<IMenuState>();
   const state = useObservableRef(
     () => ({
       position: { x: 0, y: 0 } as IContextMenuPositionCoords,
@@ -112,7 +114,7 @@ export const useInputAutocomplete = (
       position: observable.ref,
       inputValue: observable.ref,
     },
-    { inputRef, search },
+    { inputRef, search, menuRef },
   );
 
   const handleInput = useMemo(
@@ -128,11 +130,28 @@ export const useInputAutocomplete = (
     [state],
   );
 
+  function handleKeyDown(event: any) {
+    switch (event.key) {
+      case 'Escape':
+        state.menuRef.current?.hide();
+        break;
+      case 'ArrowDown':
+      case 'ArrowUp':
+        state.menuRef.current?.first();
+        break;
+      default:
+        break;
+    }
+  }
+
   useEffect(() => {
     const input = state.inputRef.current!;
 
     input.addEventListener('input', handleInput);
+    input.addEventListener('keydown', handleKeyDown);
+
     return () => {
+      input.removeEventListener('keydown', handleKeyDown);
       input.removeEventListener('input', handleInput);
     };
   }, []);

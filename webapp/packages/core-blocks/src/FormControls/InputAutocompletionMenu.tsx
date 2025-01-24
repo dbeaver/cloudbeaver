@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useEffect, useRef } from 'react';
+import type { RefObject } from 'react';
 
 import BaseDropdownStyles from '../FormControls/BaseDropdown.module.css';
 import { getComputed } from '../getComputed.js';
@@ -23,7 +23,7 @@ import { type InputAutocompleteProposal } from './useInputAutocomplete.js';
 interface AutocompletionProps {
   position: { x: number; y: number };
   proposals: InputAutocompleteProposal[];
-  inputRef: React.RefObject<HTMLInputElement | HTMLTextAreaElement>;
+  menuRef: RefObject<IMenuState>;
   className?: string;
   onSelect?: (proposal: InputAutocompleteProposal) => void;
 }
@@ -31,12 +31,11 @@ interface AutocompletionProps {
 export const InputAutocompletionMenu = observer(function InputAutocompletionMenu({
   position,
   className,
+  menuRef,
   proposals,
-  inputRef,
   onSelect,
 }: AutocompletionProps) {
   const styles = useS(style, BaseDropdownStyles);
-  const menuRef = useRef<IMenuState>();
   const contextMenuPosition = getComputed(() => ({
     position,
     handleContextMenuOpen: () => {},
@@ -46,30 +45,6 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
     menuRef.current?.hide();
     onSelect?.(proposal);
   }
-
-  function handleKeyDown(event: any) {
-    switch (event.key) {
-      case 'Escape':
-        menuRef.current?.hide();
-        break;
-      case 'ArrowDown':
-      case 'ArrowUp':
-        menuRef.current?.first();
-        break;
-      default:
-        break;
-    }
-  }
-
-  useEffect(() => {
-    const input = inputRef.current!;
-
-    input.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      input.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
 
   if (!proposals.length) {
     return;

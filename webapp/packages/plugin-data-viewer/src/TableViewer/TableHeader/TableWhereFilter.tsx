@@ -49,7 +49,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
       <InputAutocompletionMenu
         position={autocompleteState.position}
         proposals={autocompleteState.proposals}
-        inputRef={inputRef}
+        menuRef={autocompleteState.menuRef}
         onSelect={proposal => autocompleteState.replaceCurrentWord(proposal.replacementString)}
       />
     </Container>
