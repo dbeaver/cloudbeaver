@@ -17,7 +17,6 @@ import {
   MenuService,
 } from '@cloudbeaver/core-view';
 
-import { ContainerDataSource } from '../../../ContainerDataSource.js';
 import { DatabaseEditAction } from '../../../DatabaseDataModel/Actions/DatabaseEditAction.js';
 import { DatabaseSelectAction } from '../../../DatabaseDataModel/Actions/DatabaseSelectAction.js';
 import { DatabaseEditChangeType } from '../../../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
@@ -62,7 +61,7 @@ export class TableFooterMenuService {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
-        if (model.isReadonly(resultIndex) || !(model.source instanceof ContainerDataSource)) {
+        if (model.isReadonly(resultIndex)) {
           return false;
         }
 
@@ -82,6 +81,10 @@ export class TableFooterMenuService {
           }
           case ACTION_REVERT: {
             return editor.hasFeature('revert');
+          }
+          case ACTION_SAVE:
+          case ACTION_CANCEL: {
+            return editor.hasFeature('add') || editor.hasFeature('delete') || editor.hasFeature('revert');
           }
         }
         return true;
