@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -43,9 +43,6 @@ public class CBPlatform extends BaseWebPlatform {
 
     private static final Log log = Log.getLog(CBPlatform.class);
 
-    @Nullable
-    private static CBApplication<?> application = null;
-
     private WebServerPreferenceStore preferenceStore;
 
     public static CBPlatform getInstance() {
@@ -53,10 +50,6 @@ public class CBPlatform extends BaseWebPlatform {
     }
 
     protected CBPlatform() {
-    }
-
-    public static void setApplication(@NotNull CBApplication<?> application) {
-        CBPlatform.application = application;
     }
 
     @Override
@@ -71,13 +64,13 @@ public class CBPlatform extends BaseWebPlatform {
 
     protected void scheduleServerJobs() {
         super.scheduleServerJobs();
-        new WebSessionMonitorJob(this, application.getSessionManager())
+        new WebSessionMonitorJob(this, getApplication().getSessionManager())
             .scheduleMonitor();
 
-        new SessionStateJob(this, application.getSessionManager())
+        new SessionStateJob(this, getApplication().getSessionManager())
             .scheduleMonitor();
 
-        new WebDataSourceMonitorJob(this, application.getSessionManager())
+        new WebDataSourceMonitorJob(this, getApplication().getSessionManager())
             .scheduleMonitor();
 
         new AbstractJob("Delete temp folder") {
@@ -100,7 +93,6 @@ public class CBPlatform extends BaseWebPlatform {
 
         super.dispose();
 
-        CBPlatform.application = null;
         System.gc();
         log.debug("Shutdown completed in " + (System.currentTimeMillis() - startTime) + "ms");
     }
@@ -108,7 +100,7 @@ public class CBPlatform extends BaseWebPlatform {
     @NotNull
     @Override
     public CBApplication<?> getApplication() {
-        return application;
+        return (CBApplication) BaseApplicationImpl.getInstance();
     }
 
 
