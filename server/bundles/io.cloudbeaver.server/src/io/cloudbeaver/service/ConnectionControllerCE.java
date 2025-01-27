@@ -145,6 +145,7 @@ public class ConnectionControllerCE implements ConnectionController {
         if (config.isDefaultAutoCommit() != null) {
             dataSource.setDefaultAutoCommit(config.isDefaultAutoCommit());
         }
+        dataSource.setConnectionReadOnly(config.isReadOnly());
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(),
             dataSource.getConnectionConfiguration(),
             config);
