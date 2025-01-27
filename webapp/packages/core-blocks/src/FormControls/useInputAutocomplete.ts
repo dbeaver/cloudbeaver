@@ -27,7 +27,6 @@ export interface InputAutocompleteProposal {
   displayString: string;
   replacementString: string;
   icon?: string;
-  title?: string;
 }
 
 interface State {
@@ -154,7 +153,7 @@ export const useInputAutocomplete = (
       input.removeEventListener('keydown', handleKeyDown);
       input.removeEventListener('input', handleInput);
     };
-  }, []);
+  });
 
   useLayoutEffect(() => {
     const inputElement = inputRef.current!;
