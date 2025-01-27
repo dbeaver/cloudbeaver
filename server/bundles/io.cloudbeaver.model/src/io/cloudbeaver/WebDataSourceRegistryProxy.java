@@ -186,7 +186,7 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
         return dataSourceRegistry.getRootFolders();
     }
 
-    @Nullable
+    @NotNull
     @Override
     public DBPDataSourceFolder getFolder(@NotNull String path) {
         return dataSourceRegistry.getFolder(path);
