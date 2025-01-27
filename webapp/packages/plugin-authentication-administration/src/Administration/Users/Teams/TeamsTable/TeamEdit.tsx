@@ -7,12 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { TeamInfoMetaParametersResource, TeamsResource } from '@cloudbeaver/core-authentication';
-import { ColoredContainer, GroupBack, GroupTitle, Text, useTranslate } from '@cloudbeaver/core-blocks';
+import { TeamsResource } from '@cloudbeaver/core-authentication';
+import { ColoredContainer, GroupBack, GroupTitle, Text, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { FormMode } from '@cloudbeaver/core-ui';
 
-import { TeamForm } from '../TeamForm.js';
-import { useTeamFormState } from '../useTeamFormState.js';
+import { TeamForm } from '../TeamsForm/TeamForm.js';
+import { useTeamsAdministrationFormState } from '../TeamsForm/useTeamsAdministrationFormState.js';
 import { TeamsTableOptionsPanelService } from './TeamsTableOptionsPanelService.js';
 
 interface Props {
@@ -22,13 +23,10 @@ interface Props {
 
 export const TeamEdit = observer<Props>(function TeamEdit({ item }) {
   const translate = useTranslate();
-  const resource = useService(TeamsResource);
-  const teamInfoMetaParametersResource = useService(TeamInfoMetaParametersResource);
   const teamsTableOptionsPanelService = useService(TeamsTableOptionsPanelService);
+  const team = useResource(TeamEdit, TeamsResource, item);
 
-  const data = useTeamFormState(resource, teamInfoMetaParametersResource, state => state.setOptions('edit'));
-
-  data.config.teamId = item;
+  const formState = useTeamsAdministrationFormState(item, state => state.setMode(FormMode.Edit))!;
 
   return (
     <ColoredContainer aria-label={translate('plugin_authentication_administration_team_form_edit_label')} parent vertical noWrap surface gap compact>
@@ -36,11 +34,11 @@ export const TeamEdit = observer<Props>(function TeamEdit({ item }) {
         <GroupBack onClick={teamsTableOptionsPanelService.close}>
           <Text truncate>
             {translate('ui_edit')}
-            {data.config.teamName ? ` "${data.config.teamName}"` : ''}
+            {team.data?.teamName ? ` "${team.data.teamName}"` : ''}
           </Text>
         </GroupBack>
       </GroupTitle>
-      <TeamForm state={data} onCancel={teamsTableOptionsPanelService.close} />
+      <TeamForm state={formState} onCancel={teamsTableOptionsPanelService.close} />
     </ColoredContainer>
   );
 });

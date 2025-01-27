@@ -11,9 +11,14 @@ import { PermissionsResource } from '@cloudbeaver/core-administration';
 import { FieldCheckbox, Group, GroupTitle, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
-import type { ITeamFormProps } from '../ITeamFormProps.js';
+import type { ITeamOptionsState } from './ITeamOptionsState.js';
 
-export const Permissions = observer<ITeamFormProps>(function Permissions({ state }) {
+interface Props {
+  state: ITeamOptionsState;
+  disabled: boolean;
+}
+
+export const Permissions = observer<Props>(function Permissions({ state, disabled }) {
   const translate = useTranslate();
   const permissionsResource = useResource(Permissions, PermissionsResource, CachedMapAllKey);
 
@@ -45,9 +50,9 @@ export const Permissions = observer<ITeamFormProps>(function Permissions({ state
             title={tooltip}
             label={label}
             name="teamPermissions"
-            state={state.config}
-            readOnly={state.readonly}
-            disabled={state.disabled}
+            state={state}
+            readOnly={disabled}
+            disabled={disabled}
             caption={caption}
           />
         );
