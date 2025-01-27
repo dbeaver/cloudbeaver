@@ -11,21 +11,18 @@
   display: inline-block;
   vertical-align: top;
   white-space: normal;
-  transition: transform ease-in-out 0.3s;
-  transform: translateX(-100%);
-  will-change: transform;
+  position: relative;
 
-  &:first-child {
-    transition: width ease-in-out 0.3s;
-    width: 100%;
-    will-change: width;
+  &:last-child {
+    width: calc(100% - 120px);
+    transition: transform ease-in-out 0.3s;
+    will-change: transform;
+    z-index: 1;
   }
 }
 
 .open .slideElement {
-  transform: translateX(0%);
-
-  &:first-child {
-    width: calc(100% - 120px);
+  &:last-child {
+    transform: translateX(-100%);
   }
 }
