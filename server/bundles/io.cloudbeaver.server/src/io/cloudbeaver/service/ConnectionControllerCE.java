@@ -452,6 +452,12 @@ public class ConnectionControllerCE implements ConnectionController {
                 );
             }
         } catch (Exception e) {
+            if (e instanceof DBCConnectException) {
+                Throwable rootCause = CommonUtils.getRootCause(e);
+                if (rootCause instanceof ClassNotFoundException) {
+                    throwDriverNotFoundException(dataSourceContainer);
+                }
+            }
             throw new DBWebException("Error connecting to database", e);
         } finally {
             dataSourceContainer.setSavePassword(oldSavePassword);
