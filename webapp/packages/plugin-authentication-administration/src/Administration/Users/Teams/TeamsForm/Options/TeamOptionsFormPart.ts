@@ -69,7 +69,7 @@ export class TeamOptionsFormPart extends FormPart<ITeamOptionsState, ITeamFormSt
       if (this.state.teamId && this.teamResource.has(this.state.teamId)) {
         validation.error(
           this.localizationService.translate('administration_teams_team_info_exists', undefined, {
-            teamId: this.formState.state.teamId,
+            teamId: this.state.teamId,
           }),
         );
       }
