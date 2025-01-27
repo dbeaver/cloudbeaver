@@ -19,6 +19,7 @@ export type InputAutocompleteStrategy = 'startsWith' | 'contains' | 'fuzzy';
 
 interface InputAutocompleteOptions {
   sourceHints: InputAutocompleteProposal[];
+  separator?: string | RegExp;
   matchStrategy?: SearchStrategy;
   predicate?: (suggestion: InputAutocompleteProposal, lastWord?: string) => boolean;
 }
@@ -39,13 +40,14 @@ interface State {
   menuRef: RefObject<IMenuState>;
 }
 
+const DEFAULT_SEPARATOR = ' ';
 const INPUT_DELAY = 300;
 const SEARCH_FIELDS: Array<keyof InputAutocompleteProposal> = ['displayString', 'replacementString'];
 const CONTEXT_INPUT_OFFSET_Y = 3;
 
 export const useInputAutocomplete = (
   inputRef: RefObject<HTMLInputElement | HTMLTextAreaElement>,
-  { sourceHints, matchStrategy = 'contains', predicate }: InputAutocompleteOptions,
+  { sourceHints, separator = DEFAULT_SEPARATOR, matchStrategy = 'contains', predicate }: InputAutocompleteOptions,
 ): Readonly<State> => {
   const search = useSearch({
     sourceHints,
@@ -62,7 +64,7 @@ export const useInputAutocomplete = (
       selectionStart: 0 as number | null,
       replaceCurrentWord(replacement: string) {
         const cursorPosition = this.selectionStart;
-        const words = this.inputValue.split(' ');
+        const words = this.inputValue.split(separator);
 
         if (!this.currentWord || !isNotNullDefined(words) || !isNotNullDefined(cursorPosition)) {
           return;
@@ -95,7 +97,7 @@ export const useInputAutocomplete = (
           return '';
         }
 
-        return substring.split(' ').at(-1) ?? '';
+        return substring.split(separator).at(-1) ?? '';
       },
       get proposals() {
         if (this.isFound || !this.currentWord) {

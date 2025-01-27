@@ -49,6 +49,18 @@ const BASE_HINTS: InputAutocompleteProposal[] = [
     displayString: 'BETWEEN',
     replacementString: 'BETWEEN',
   },
+  {
+    displayString: 'IS',
+    replacementString: 'IS',
+  },
+  {
+    displayString: 'NOT',
+    replacementString: 'NOT',
+  },
+  {
+    displayString: 'NULL',
+    replacementString: 'NULL',
+  },
 ];
 
 export function useTableViewerHeaderData({ model, resultIndex }: Props): Readonly<IState> {

@@ -16,12 +16,15 @@ import styles from './TableWhereFilter.module.css';
 import { useTableViewerHeaderData } from './useTableViewerHeaderData.js';
 import { useWhereFilter } from './useWhereFilter.js';
 
+const AUTOCOMPLETE_WORD_SEPARATOR = /[^\w]/;
+
 export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps> = observer(function TableWhereFilter({ model, resultIndex }) {
   const translate = useTranslate();
   const state = useWhereFilter(model, resultIndex);
   const data = useTableViewerHeaderData({ model, resultIndex });
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteState = useInputAutocomplete(inputRef, {
+    separator: AUTOCOMPLETE_WORD_SEPARATOR,
     sourceHints: data.hintProposals ?? [],
     matchStrategy: 'fuzzy',
   });
