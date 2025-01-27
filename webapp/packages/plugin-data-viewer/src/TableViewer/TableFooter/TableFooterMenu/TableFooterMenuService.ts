@@ -82,6 +82,10 @@ export class TableFooterMenuService {
           case ACTION_REVERT: {
             return editor.hasFeature('revert');
           }
+          case ACTION_SAVE:
+          case ACTION_CANCEL: {
+            return editor.hasFeature('add') || editor.hasFeature('delete') || editor.hasFeature('revert');
+          }
         }
         return true;
       },
