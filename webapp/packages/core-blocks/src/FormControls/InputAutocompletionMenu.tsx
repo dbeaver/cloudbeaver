@@ -36,10 +36,10 @@ export const InputAutocompletionMenu = observer(function InputAutocompletionMenu
   onSelect,
 }: AutocompletionProps) {
   const styles = useS(style, BaseDropdownStyles);
-  const contextMenuPosition = getComputed(() => ({
+  const contextMenuPosition = {
     position,
     handleContextMenuOpen: () => {},
-  }));
+  };
 
   function handleSelect(proposal: InputAutocompleteProposal) {
     menuRef.current?.hide();
