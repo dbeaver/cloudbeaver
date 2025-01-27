@@ -61,6 +61,7 @@ export const AdvancedPropertiesForm = observer<Props>(function AdvancedPropertie
             defaultChecked={DEFAULT_CONFIG.readOnly}
             title={translate('connections_connection_read_only')}
             disabled={disabled}
+            readOnly={readonly}
           >
             {translate('connections_connection_read_only')}
           </FieldCheckbox>
