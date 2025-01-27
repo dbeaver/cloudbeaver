@@ -2232,8 +2232,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 if (activeUserId == null) {
                     activeUserId = userIdFromCreds;
                 }
-                if (autoAssign != null && CommonUtils.isNotEmpty(autoAssign.getAuthRoleChangedReason())) {
-                    log.info(activeUserId + " authenticated with role " + autoAssign.getAuthRole() + ", reason: " + autoAssign.getAuthRoleChangedReason());
+                if (autoAssign != null && CommonUtils.isNotEmpty(autoAssign.getAuthRoleAssignReason())) {
+                    log.info(activeUserId + " authenticated with role " + autoAssign.getAuthRole() + ", reason: " + autoAssign.getAuthRoleAssignReason());
                 }
             }
             dbStoredUserData.put(

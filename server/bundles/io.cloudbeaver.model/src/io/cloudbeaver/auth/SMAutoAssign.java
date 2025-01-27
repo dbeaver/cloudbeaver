@@ -24,7 +24,7 @@ import java.util.List;
 
 public class SMAutoAssign {
     private String authRole;
-    private String authRoleChangedReason;
+    private String authRoleAssignReason;
     private List<String> externalTeamIds = new ArrayList<>();
 
     public SMAutoAssign() {
@@ -52,11 +52,11 @@ public class SMAutoAssign {
     }
 
     @Nullable
-    public String getAuthRoleChangedReason() {
-        return authRoleChangedReason;
+    public String getAuthRoleAssignReason() {
+        return authRoleAssignReason;
     }
 
-    public void setAuthRoleChangedReason(@Nullable String authRoleChangedReason) {
-        this.authRoleChangedReason = authRoleChangedReason;
+    public void setAuthRoleAssignReason(@Nullable String authRoleChangedReason) {
+        this.authRoleAssignReason = authRoleChangedReason;
     }
 }
