@@ -10,13 +10,14 @@ import { observer } from 'mobx-react-lite';
 import { TeamMetaParametersResource } from '@cloudbeaver/core-authentication';
 import { Group, GroupTitle, ObjectPropertyInfoForm, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 
-import type { ITeamFormState } from '../ITeamFormProps.js';
+import type { ITeamOptionsState } from './ITeamOptionsState.js';
 
 interface IProps {
-  state: ITeamFormState;
+  state: ITeamOptionsState;
+  disabled: boolean;
 }
 
-export const TeamMetaParameters = observer<IProps>(function TeamMetaParameters({ state }) {
+export const TeamMetaParameters = observer<IProps>(function TeamMetaParameters({ state, disabled }) {
   const teamMetaParameters = useResource(TeamMetaParameters, TeamMetaParametersResource, undefined);
   const translate = useTranslate();
 
@@ -27,7 +28,7 @@ export const TeamMetaParameters = observer<IProps>(function TeamMetaParameters({
   return (
     <Group small gap vertical overflow>
       <GroupTitle keepSize>{translate('authentication_team_meta_parameters')}</GroupTitle>
-      <ObjectPropertyInfoForm state={state.config.metaParameters} properties={teamMetaParameters.data} disabled={state.disabled} keepSize tiny />
+      <ObjectPropertyInfoForm state={state.metaParameters} properties={teamMetaParameters.data} disabled={disabled} keepSize tiny />
     </Group>
   );
 });
