@@ -8,7 +8,14 @@
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 
-import { Container, InputAutocompletionMenu, type PlaceholderComponent, useInputAutocomplete, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Container,
+  type InputAutocompleteProposal,
+  InputAutocompletionMenu,
+  type PlaceholderComponent,
+  useInputAutocomplete,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { InlineEditor } from '@cloudbeaver/core-ui';
 
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService.js';
@@ -33,6 +40,11 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
     return null;
   }
 
+  function handleSelect(proposal: InputAutocompleteProposal) {
+    autocompleteState.replaceCurrentWord(proposal.replacementString);
+    state.set(autocompleteState.inputValue);
+  }
+
   return (
     <Container className={styles['imbeddedEditor']}>
       <InlineEditor
@@ -53,7 +65,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
         position={autocompleteState.position}
         proposals={autocompleteState.proposals}
         menuRef={autocompleteState.menuRef}
-        onSelect={proposal => autocompleteState.replaceCurrentWord(proposal.replacementString)}
+        onSelect={handleSelect}
       />
     </Container>
   );
