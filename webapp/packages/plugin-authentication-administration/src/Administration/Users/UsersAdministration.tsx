@@ -16,7 +16,7 @@ import style from './shared/UsersAdministration.module.css';
 import tabStyle from './shared/UsersAdministrationTab.module.css';
 import tabPanelStyle from './shared/UsersAdministrationTabPanel.module.css';
 import TabTitleModuleStyles from './shared/UsersAdministrationTabTitle.module.css';
-import { TeamsPage } from './Teams/TeamsPage.js';
+import { TeamsPage } from './Teams/TeamsTable/TeamsPage.js';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService.js';
 import { UsersPage } from './UsersTable/UsersPage.js';
 
