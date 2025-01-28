@@ -12,6 +12,7 @@ import { IconOrImage, s, useTranslate } from '@cloudbeaver/core-blocks';
 import { type Connection, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { type ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs';
@@ -38,12 +39,13 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
 
   const sqlDataSourceService = useService(SqlDataSourceService);
   const connectionInfo = useService(ConnectionInfoResource);
+  const projectInfo = useService(ProjectInfoResource);
 
   const translate = useTranslate();
 
   const dataSource = sqlDataSourceService.get(handlerState.editorId);
-  let connection: Connection | undefined;
   const executionContext = dataSource?.executionContext;
+  let connection: Connection | undefined;
 
   if (executionContext) {
     connection = connectionInfo.get(createConnectionParam(executionContext.projectId, executionContext.connectionId));
@@ -59,8 +61,30 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
 
+  let tooltip = name;
+
+  if (connection) {
+    tooltip += `\n${translate('ui_connection')}: ${connection.name}`;
+  }
+
+  if (executionContext) {
+    const project = projectInfo.get(executionContext.projectId);
+
+    if (executionContext.defaultCatalog) {
+      tooltip += `\n${translate('ui_catalog')}: ${executionContext.defaultCatalog}`;
+    }
+
+    if (executionContext.defaultSchema) {
+      tooltip += `\n${translate('ui_schema')}: ${executionContext.defaultSchema}`;
+    }
+
+    if (project) {
+      tooltip += `\n${translate('ui_project')}: ${project.name}`;
+    }
+  }
+
   return (
-    <Tab tabId={tab.id} title={name} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
+    <Tab tabId={tab.id} title={tooltip} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
       <TabIcon icon={icon} />
       <TabTitle>{name}</TabTitle>
       {isReadonly && isScript && (
