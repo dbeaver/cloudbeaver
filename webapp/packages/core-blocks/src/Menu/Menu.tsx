@@ -74,6 +74,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
       unstable_fixed: true,
     });
     const styles = useS(style);
+    const testeslint = 'test';
 
     if (menuRef) {
       //@ts-expect-error Ref mutation
