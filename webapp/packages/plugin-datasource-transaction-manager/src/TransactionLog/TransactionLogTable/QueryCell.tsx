@@ -26,7 +26,7 @@ export const QueryCell = observer<RenderCellProps<TransactionLogInfoItem>>(funct
   }
 
   return (
-    <div className={classes['cell']} onDoubleClick={openDetails}>
+    <div title={value} className={classes['cell']} onDoubleClick={openDetails}>
       {value}
     </div>
   );

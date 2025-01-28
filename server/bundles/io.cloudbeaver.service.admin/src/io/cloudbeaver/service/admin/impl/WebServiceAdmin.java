@@ -564,6 +564,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 // custom logic for enabling embedded drivers
                 updateDisabledDriversConfig(appConfig, config.getDisabledDrivers());
                 appConfig.setResourceManagerEnabled(config.isResourceManagerEnabled());
+                appConfig.setSecretManagerEnabled(config.isSecretManagerEnabled());
 
                 if (CommonUtils.isEmpty(config.getEnabledAuthProviders())) {
                     // All of them

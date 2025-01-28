@@ -10,7 +10,7 @@ import { useContext } from 'react';
 
 import { getComputed, s, useS } from '@cloudbeaver/core-blocks';
 import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
-import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseEditChangeType, type IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../../Editing/EditingContext.js';
 import { CellContext } from '../../CellRenderer/CellContext.js';
@@ -38,7 +38,11 @@ export const BooleanFormatter = observer<RenderCellProps<IResultSetRowKey>>(func
   const booleanValue = getComputed(() => textValue.toLowerCase() === 'true');
   const stringifiedValue = getComputed(() => formatter.getDisplayString(cell));
   const valueRepresentation = value === null ? stringifiedValue : `[${booleanValue ? 'v' : ' '}]`;
-  const disabled = !column.editable || editingContext.readonly || formatter.isReadOnly(cell);
+  const disabled =
+    !column.editable ||
+    editingContext.readonly ||
+    formatter.isReadOnly(cell) ||
+    (!context.model.hasElementIdentifier(context.resultIndex) && cellContext.editionState !== DatabaseEditChangeType.add);
 
   function toggleValue() {
     if (disabled || !tableDataContext || !cell) {
