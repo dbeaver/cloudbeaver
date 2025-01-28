@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
+import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import {
   ACTION_ADD,
   ACTION_CANCEL,
@@ -84,7 +85,12 @@ export class TableFooterMenuService {
           }
           case ACTION_SAVE:
           case ACTION_CANCEL: {
-            return editor.hasFeature('add') || editor.hasFeature('delete') || editor.hasFeature('revert');
+            return (
+              editor.hasFeature('add') ||
+              editor.hasFeature('delete') ||
+              editor.hasFeature('revert') ||
+              model.source.getResult(resultIndex)?.dataFormat === ResultDataFormat.Document
+            );
           }
         }
         return true;
