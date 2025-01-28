@@ -12,8 +12,8 @@ import { useService } from '@cloudbeaver/core-di';
 
 import { CreateTeam } from './CreateTeam.js';
 import { CreateTeamService } from './CreateTeamService.js';
-import { TeamsTable } from './TeamsTable/TeamsTable.js';
-import { useTeamsTable } from './TeamsTable/useTeamsTable.js';
+import { TeamsTable } from './TeamsTable.js';
+import { useTeamsTable } from './useTeamsTable.js';
 
 interface Props {
   param?: string | null;

@@ -7,24 +7,21 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { TeamInfoMetaParametersResource, TeamsResource } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
+import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 
-import type { ITeamFormState } from './ITeamFormProps.js';
-import { TeamFormService } from './TeamFormService.js';
-import { TeamFormState } from './TeamFormState.js';
-import { TeamsAdministrationNavService } from './TeamsAdministrationNavService.js';
+import { TeamsAdministrationNavService } from '../TeamsAdministrationNavService.js';
+import { TeamsAdministrationFormService } from '../TeamsForm/TeamsAdministrationFormService.js';
+import { TeamsAdministrationFormState } from '../TeamsForm/TeamsAdministrationFormState.js';
 
 @injectable()
 export class CreateTeamService {
   disabled = false;
-  data: ITeamFormState | null;
+  data: TeamsAdministrationFormState | null;
 
   constructor(
     private readonly teamsAdministrationNavService: TeamsAdministrationNavService,
-    private readonly teamFormService: TeamFormService,
-    private readonly teamsResource: TeamsResource,
-    private readonly teamInfoMetaParametersResource: TeamInfoMetaParametersResource,
+    private readonly serviceProvider: IServiceProvider,
+    private readonly service: TeamsAdministrationFormService,
   ) {
     this.data = null;
 
@@ -42,7 +39,9 @@ export class CreateTeamService {
   }
 
   fillData(): void {
-    this.data = new TeamFormState(this.teamFormService, this.teamsResource, this.teamInfoMetaParametersResource);
+    this.data = new TeamsAdministrationFormState(this.serviceProvider, this.service, {
+      teamId: null,
+    });
   }
 
   create(): void {

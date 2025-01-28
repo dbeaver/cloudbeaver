@@ -9,7 +9,7 @@ RUN apt-get update && \
     apt-get upgrade -y
 
 RUN groupadd -g $DBEAVER_GID dbeaver && \
-    useradd -g $DBEAVER_GID -M -u $DBEAVER_UID -s /bin/bash dbeaver
+    useradd -g $DBEAVER_GID -m -u $DBEAVER_UID -s /bin/bash dbeaver
 
 COPY cloudbeaver /opt/cloudbeaver
 COPY scripts/launch-product.sh /opt/cloudbeaver/launch-product.sh
@@ -20,4 +20,4 @@ WORKDIR /opt/cloudbeaver/
 
 RUN chmod +x "run-server.sh" "/opt/cloudbeaver/launch-product.sh"
 
-ENTRYPOINT ["./run-server.sh"]
+ENTRYPOINT ["./launch-product.sh"]
