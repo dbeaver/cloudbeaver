@@ -47,6 +47,9 @@ import java.util.UUID;
 
 public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected, SMAuthProviderAssigner {
     private static final Log log = Log.getLog(LdapAuthProvider.class);
+    public static final String LDAP_AUTH_PROVIDER_ID = "ldap";
+    public static final String LDAP_ATTRIBUTE_OBJECT_GUID = "objectGUID";
+    public static final String LDAP_ATTRIBUTE_ENTRY_UUID = "entryUUID";
 
     public LdapAuthProvider() {
     }
@@ -279,7 +282,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         String oldUsername = JSONUtils.getString(userCredentials, LdapConstants.CRED_FULL_DN);
         if (CommonUtils.isNotEmpty(oldUsername)) {
             oldUsername = findUserNameFromDN(oldUsername, new LdapSettings(providerConfig));
-            Map<String,Object> oldUserLDAP = securityController.getUserCredentials(oldUsername, "ldap");
+            Map<String,Object> oldUserLDAP = securityController.getUserCredentials(oldUsername, LDAP_AUTH_PROVIDER_ID);
             userCredentials.putAll(oldUserLDAP);
             if (userCredentials.containsValue(oldUsername)) {
                 userId = oldUsername;
@@ -341,7 +344,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         SearchControls searchControls = new SearchControls();
         searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         searchControls.setTimeLimit(30_000);
-        searchControls.setReturningAttributes(new String[]{"objectGUID", "entryUUID"});
+        searchControls.setReturningAttributes(new String[]{LDAP_ATTRIBUTE_OBJECT_GUID, LDAP_ATTRIBUTE_ENTRY_UUID});
         return searchControls;
     }
 
@@ -361,14 +364,13 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             if (CommonUtils.isNotEmpty(login)) {
                 userData.put(LdapConstants.CRED_USERNAME, login);
                 userData.put(LdapConstants.CRED_FULL_DN, userDN);
-                userData.put(LdapConstants.CRED_SESSION_ID, UUID.randomUUID());
                 userData.put(LdapConstants.CRED_DISPLAY_NAME, findUserNameFromDN(userDN, ldapSettings));
             } else {
                 userData.putIfAbsent(LdapConstants.CRED_USERNAME, login);
                 userData.put(LdapConstants.CRED_FULL_DN, userDN);
-                userData.put(LdapConstants.CRED_SESSION_ID, UUID.randomUUID());
                 userData.put(LdapConstants.CRED_DISPLAY_NAME, findUserNameFromDN(userDN, ldapSettings));
             }
+            userData.put(LdapConstants.CRED_SESSION_ID, UUID.randomUUID());
             return userData;
         } catch (Exception e) {
             throw new DBException("LDAP authentication failed: " + e.getMessage(), e);
