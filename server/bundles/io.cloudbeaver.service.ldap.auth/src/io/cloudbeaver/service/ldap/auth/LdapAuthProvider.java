@@ -282,7 +282,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         String oldUsername = JSONUtils.getString(userCredentials, LdapConstants.CRED_FULL_DN);
         if (CommonUtils.isNotEmpty(oldUsername)) {
             oldUsername = findUserNameFromDN(oldUsername, new LdapSettings(providerConfig));
-            Map<String,Object> oldUserLDAP = securityController.getUserCredentials(oldUsername, LDAP_AUTH_PROVIDER_ID);
+            Map<String, Object> oldUserLDAP = securityController.getUserCredentials(oldUsername, LDAP_AUTH_PROVIDER_ID);
             userCredentials.putAll(oldUserLDAP);
             if (userCredentials.containsValue(oldUsername)) {
                 userId = oldUsername;
