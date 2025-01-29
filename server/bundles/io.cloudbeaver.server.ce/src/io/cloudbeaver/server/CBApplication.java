@@ -34,6 +34,7 @@ import io.cloudbeaver.service.ConnectionControllerCE;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.session.CBSessionManager;
+import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -66,9 +67,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -402,37 +401,10 @@ public abstract class CBApplication<T extends CBServerConfig> extends
 
     private void determineLocalAddresses() {
         try {
-//            InetAddress localHost = InetAddress.getLocalHost();
-//            InetAddress[] allMyIps = InetAddress.getAllByName(localHost.getCanonicalHostName());
-//            for (InetAddress addr : allMyIps) {
-//                System.out.println("Local addr: " + addr);
-//            }
-            try {
-                InetAddress dockerAddress = InetAddress.getByName(CBConstants.VAR_HOST_DOCKER_INTERNAL);
-                localInetAddresses.add(dockerAddress);
-                log.debug("\tRun in Docker container (" + dockerAddress + ")?");
-            } catch (UnknownHostException e) {
-                // Ignore - not a docker env
-            }
-
-            boolean hasLoopbackAddress = false;
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
-                NetworkInterface intf = en.nextElement();
-                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
-                    InetAddress localInetAddress = enumIpAddr.nextElement();
-                    boolean loopbackAddress = localInetAddress.isLoopbackAddress();
-                    if (loopbackAddress ? !hasLoopbackAddress : !localInetAddress.isLinkLocalAddress()) {
-                        if (loopbackAddress) {
-                            hasLoopbackAddress = true;
-                        }
-                        localInetAddresses.add(localInetAddress);
-                    }
-                }
-            }
+            localInetAddresses.addAll(ServletAppUtils.getLocalAddresses());
         } catch (Exception e) {
-            log.error(e);
+            log.error(e.getMessage(), e);
         }
-
     }
 
     @NotNull

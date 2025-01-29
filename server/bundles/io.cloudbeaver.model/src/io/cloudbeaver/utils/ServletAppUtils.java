@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.server.CBConstants;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,6 +37,9 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -278,6 +282,36 @@ public class ServletAppUtils {
             .map(ServletAppUtils::removeSideSlashes)
             .filter(CommonUtils::isNotEmpty)
             .collect(Collectors.joining("/"));
+    }
+
+    public static List<InetAddress> getLocalAddresses() throws DBException {
+        List<InetAddress> localInetAddresses = new ArrayList<>();
+        try {
+            InetAddress dockerAddress = InetAddress.getByName(CBConstants.VAR_HOST_DOCKER_INTERNAL);
+            localInetAddresses.add(dockerAddress);
+            log.debug("\tRun in Docker container (" + dockerAddress + ")?");
+        } catch (UnknownHostException e) {
+            // Ignore - not a docker env
+        }
+        try {
+            boolean hasLoopbackAddress = false;
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
+                    InetAddress localInetAddress = enumIpAddr.nextElement();
+                    boolean loopbackAddress = localInetAddress.isLoopbackAddress();
+                    if (loopbackAddress ? !hasLoopbackAddress : !localInetAddress.isLinkLocalAddress()) {
+                        if (loopbackAddress) {
+                            hasLoopbackAddress = true;
+                        }
+                        localInetAddresses.add(localInetAddress);
+                    }
+                }
+            }
+            return localInetAddresses;
+        } catch (Exception e) {
+            throw new DBException("Failed to read local inet addresses: " + e.getMessage(), e);
+        }
     }
 
 }
