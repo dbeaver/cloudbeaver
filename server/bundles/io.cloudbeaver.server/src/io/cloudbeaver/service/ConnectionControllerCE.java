@@ -40,6 +40,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
 import org.jkiss.dbeaver.model.security.SMController;
+import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceConnectEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
@@ -466,7 +467,7 @@ public class ConnectionControllerCE implements ConnectionController {
             try {
                 webSession.getSecurityController().updateConnectionAttempt(connectionId, false);
             } catch (DBCException ex) {
-                e.addSuppressed(ex);
+                throw new DBWebException(ex.getMessage());
             }
             throw new DBWebException("Error connecting to database", e);
         } finally {

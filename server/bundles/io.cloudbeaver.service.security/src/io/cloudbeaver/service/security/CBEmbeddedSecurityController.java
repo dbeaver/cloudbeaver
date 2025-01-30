@@ -1853,9 +1853,13 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
             if (smConfig.isEnableConnectionBruteForceProtection()
                 && CommonUtils.isNotEmpty(userId)
-                && failedLoginCount(dbCon, userId, connectionId, database) > smConfig.getMaxFailedConnectionLogin()
+                && failedLoginCount(dbCon, userId, connectionId, database) >= smConfig.getMaxFailedConnectionLogin()
             ) {
-               disableUserWithReason(database, dbCon, "system", getUserId(), "Disabled by bruteforce connection protection");
+                try {
+                    disableUserByBruteForceProtection(database, dbCon, "system", userId, "Disabled by bruteforce connection protection");
+                } catch (DBException e) {
+                    throw new DBCException(e.getMessage());
+                }
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving team in database", e);
@@ -1880,6 +1884,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     "   AND cdc.CONNECTION_TIME > ? " +
                     "   AND cu.USER_ID = ? " +
                     "   AND cdc.CONNECTION_ID = ?" +
+                    "   AND cdc.CONNECTION_STATUS = 'FAILED'" +
                     "   AND (cu.CHANGE_DATE IS NULL OR cu.CHANGE_DATE < cdc.CONNECTION_TIME) "
             )
         )) {
