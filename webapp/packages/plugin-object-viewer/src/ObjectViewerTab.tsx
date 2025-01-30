@@ -13,6 +13,7 @@ import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { type ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs';
@@ -24,6 +25,7 @@ export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = ob
   const translate = useTranslate();
   const connectionInfoResource = useService(ConnectionInfoResource);
   const navNodeManagerService = useService(NavNodeManagerService);
+  const projectInfoResource = useService(ProjectInfoResource);
   const viewContext = useContext(CaptureViewContext);
   const tabMenuContext = useDataContext(viewContext);
   const { node } = useNode(tab.handlerState.objectId);
@@ -39,15 +41,21 @@ export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = ob
 
     if (connection) {
       tooltip += `\n${translate('ui_connection')}: ${connection.name}`;
-    }
 
-    if (nodeInfo) {
-      if (nodeInfo.catalogId) {
-        tooltip += `\n${translate('ui_catalog')}: ${nodeInfo.catalogId}`;
+      if (nodeInfo) {
+        if (nodeInfo.catalogId) {
+          tooltip += `\n${translate('ui_catalog')}: ${nodeInfo.catalogId}`;
+        }
+
+        if (nodeInfo.schemaId) {
+          tooltip += `\n${translate('ui_schema')}: ${nodeInfo.schemaId}`;
+        }
       }
 
-      if (nodeInfo.schemaId) {
-        tooltip += `\n${translate('ui_schema')}: ${nodeInfo.schemaId}`;
+      const project = projectInfoResource.get(connection.projectId);
+
+      if (project) {
+        tooltip += `\n${translate('ui_project')}: ${project.name}`;
       }
     }
   }
