@@ -32,12 +32,14 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.exec.DBCConnectException;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWHandlerType;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
+import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceConnectEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
@@ -410,11 +412,19 @@ public class ConnectionControllerCE implements ConnectionController {
     }
 
     @Override
-    public WebConnectionInfo initConnection(@NotNull WebSession webSession, @Nullable String projectId, @NotNull String connectionId, @NotNull Map<String, Object> authProperties, @Nullable List<WebNetworkHandlerConfigInput> networkCredentials, boolean saveCredentials, boolean sharedCredentials, @Nullable String selectedSecretId) throws DBWebException {
+    public WebConnectionInfo initConnection(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String connectionId,
+        @NotNull Map<String, Object> authProperties,
+        @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
+        boolean saveCredentials,
+        boolean sharedCredentials,
+        @Nullable String selectedSecretId
+    ) throws DBWebException {
         WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, connectionId);
         connectionInfo.setSavedCredentials(authProperties, networkCredentials);
-
-        var dataSourceContainer = connectionInfo.getDataSourceContainer();;
+        var dataSourceContainer = connectionInfo.getDataSourceContainer();
         validateConnection(dataSourceContainer);
         if (dataSourceContainer.isConnected()) {
             throw new DBWebException("Datasource '" + dataSourceContainer.getName() + "' is already connected");
@@ -451,7 +461,13 @@ public class ConnectionControllerCE implements ConnectionController {
                     )
                 );
             }
+            webSession.getSecurityController().updateConnectionAttempt(connectionId, connect);
         } catch (Exception e) {
+            try {
+                webSession.getSecurityController().updateConnectionAttempt(connectionId, false);
+            } catch (DBCException ex) {
+                e.addSuppressed(ex);
+            }
             throw new DBWebException("Error connecting to database", e);
         } finally {
             dataSourceContainer.setSavePassword(oldSavePassword);

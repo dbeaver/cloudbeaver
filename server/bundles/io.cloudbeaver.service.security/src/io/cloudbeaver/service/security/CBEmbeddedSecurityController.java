@@ -1707,14 +1707,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     && this.getAuthProvider(authProviderId).getInstance() instanceof SMBruteForceProtected bruteforceProtected) {
                     Object inputUsername = bruteforceProtected.getInputUsername(authData);
                     if (inputUsername != null) {
-                        if (smConfig.isEnableConnectionBruteForceProtection()
-                            && BruteForceUtils.checkBruteforceBlockUser(smConfig,
-                            getLatestUserLogins(
-                                dbCon,
-                                authProviderId,
-                                inputUsername.toString(),
-                                smConfig.getBlockPeriodTimeBruteForceProtection())
-                        ) && isUserExistsAndEnabled(dbCon, getUserId() != null ? getUserId() : (String) inputUsername, database)) {
+                        if (handleBruteForceProtection(dbCon, authProviderId, inputUsername, database)) {
                             disableUserByBruteForceProtection(
                                 database,
                                 dbCon,
@@ -1797,10 +1790,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     " FROM" +
                     "    {table_prefix}CB_AUTH_ATTEMPT attempt" +
                     "    JOIN {table_prefix}CB_USER cu ON attempt.AUTH_USERNAME = cu.USER_ID " +
-                    "    JOIN" +
-                    "    {table_prefix}CB_AUTH_ATTEMPT_INFO info ON attempt.AUTH_ID = info.AUTH_ID" +
-                    " WHERE AUTH_PROVIDER_ID = ? AND AUTH_USERNAME = ? AND attempt.CREATE_TIME > ? " +
-                    " AND (CHANGE_DATE IS NULL OR CHANGE_DATE < attempt.CREATE_TIME)" +
+                    "    JOIN {table_prefix}CB_AUTH_ATTEMPT_INFO info ON attempt.AUTH_ID = info.AUTH_ID " +
+                    " WHERE info.AUTH_PROVIDER_ID = ? " +
+                    "   AND attempt.AUTH_USERNAME = ? " +
+                    "   AND attempt.CREATE_TIME > ? " +
+                    "   AND cu.USER_ID = ? " +
+                    "   AND (cu.CHANGE_DATE IS NULL OR cu.CHANGE_DATE < attempt.CREATE_TIME) " +
                     " ORDER BY attempt.CREATE_TIME DESC " +
                     database.getDialect().getOffsetLimitQueryPart(0, smConfig.getMaxFailedLogin())
             )
@@ -1809,6 +1804,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             dbStat.setString(2, inputLogin);
             dbStat.setTimestamp(3,
                 Timestamp.valueOf(LocalDateTime.now().minusSeconds(periodTime)));
+            dbStat.setString(4, getUserId() != null ? getUserId() : inputLogin);
             try (ResultSet dbResult = dbStat.executeQuery()) {
                 while (dbResult.next()) {
                     UserLoginRecord loginDto = new UserLoginRecord(
@@ -1820,6 +1816,85 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
         }
         return userLoginRecords;
+    }
+
+    private boolean handleBruteForceProtection(
+        @NotNull Connection dbCon,
+        @NotNull String authProviderId,
+        @NotNull Object inputUsername,
+        @NotNull CBDatabase database
+    ) throws SQLException, DBException {
+        return smConfig.isEnableConnectionBruteForceProtection()
+            && BruteForceUtils.checkBruteforceBlockUser(smConfig,
+            getLatestUserLogins(
+                dbCon,
+                authProviderId,
+                inputUsername.toString(),
+                smConfig.getBlockPeriodTimeBruteForceProtection()))
+            && isUserExistsAndEnabled(dbCon, getUserId() != null ? getUserId() : (String) inputUsername, database);
+    }
+
+    @Override
+    public void updateConnectionAttempt(@NotNull String connectionId, boolean connect) throws DBCException {
+        String connectionStatus = connect ? "SUCCESS" : "FAILED";
+        String userId = getUserId();
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    database.normalizeTableNames("INSERT INTO {table_prefix}CB_DATABASE_CONNECTION" +
+                        "(CONNECTION_ID,CONNECTION_TIME,CONNECTION_STATUS,USER_ID) VALUES(?,?,?,?)"))) {
+                    dbStat.setString(1, connectionId);
+                    dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+                    dbStat.setString(3, connectionStatus);
+                    dbStat.setString(4, userId);
+                    dbStat.execute();
+                }
+                txn.commit();
+            }
+            if (smConfig.isEnableConnectionBruteForceProtection()
+                && CommonUtils.isNotEmpty(userId)
+                && failedLoginCount(dbCon, userId, connectionId, database) > smConfig.getMaxFailedConnectionLogin()
+            ) {
+               disableUserWithReason(database, dbCon, "system", getUserId(), "Disabled by bruteforce connection protection");
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error saving team in database", e);
+        }
+    }
+
+
+    private int failedLoginCount (
+        @NotNull Connection dbCon,
+        @NotNull String userId,
+        @NotNull String connectionId,
+        @NotNull CBDatabase database
+    ) throws SQLException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            database.normalizeTableNames(
+                "SELECT" +
+                    "   COUNT(cdc.CONNECTION_ID) " +
+                    "FROM " +
+                    "   {table_prefix}CB_DATABASE_CONNECTION cdc " +
+                    "   JOIN {table_prefix}CB_USER cu ON cdc.USER_ID = cu.USER_ID " +
+                    "WHERE cdc.USER_ID = ? " +
+                    "   AND cdc.CONNECTION_TIME > ? " +
+                    "   AND cu.USER_ID = ? " +
+                    "   AND cdc.CONNECTION_ID = ?" +
+                    "   AND (cu.CHANGE_DATE IS NULL OR cu.CHANGE_DATE < cdc.CONNECTION_TIME) "
+            )
+        )) {
+            dbStat.setString(1, userId);
+            dbStat.setTimestamp(2,
+                Timestamp.valueOf(LocalDateTime.now().minusMinutes(smConfig.getMaxFailedConnectionLogin())));
+            dbStat.setString(3, userId);
+            dbStat.setString(4, connectionId);
+            try (ResultSet rs = dbStat.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
     }
 
     private static boolean isUserExistsAndEnabled(Connection dbCon, String inputLogin, CBDatabase database) throws SQLException {
