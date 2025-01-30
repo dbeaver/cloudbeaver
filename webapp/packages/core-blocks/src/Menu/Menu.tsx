@@ -18,10 +18,10 @@ import { useS } from '../useS.js';
 import style from './Menu.module.css';
 import { MenuPanel } from './MenuPanel.js';
 import { type IMenuState, MenuStateContext } from './MenuStateContext.js';
-import type { IMouseContextMenu } from './useMouseContextMenu.js';
+import type { IContextMenuPosition } from './useContextMenuPosition.js';
 
 interface IMenuProps extends React.ButtonHTMLAttributes<any> {
-  mouseContextMenu?: IMouseContextMenu;
+  contextMenuPosition?: IContextMenuPosition;
   label: string;
   items: React.ReactNode | (() => React.ReactNode);
   menuRef?: React.RefObject<IMenuState | undefined>;
@@ -40,7 +40,7 @@ interface IMenuProps extends React.ButtonHTMLAttributes<any> {
 export const Menu = observer<IMenuProps, HTMLButtonElement>(
   forwardRef(function Menu(
     {
-      mouseContextMenu,
+      contextMenuPosition,
       label,
       items,
       menuRef,
@@ -95,7 +95,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
     }, [menuVisible]);
 
     useLayoutEffect(() => {
-      if (!mouseContextMenu?.position) {
+      if (!contextMenuPosition?.position) {
         return;
       }
 
@@ -109,13 +109,13 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
 
         const boxSize = innerMenuButtonRef.current.getBoundingClientRect();
         setRelativePosition({
-          x: mouseContextMenu.position.x - boxSize.x,
-          y: mouseContextMenu.position.y - boxSize.y,
+          x: contextMenuPosition.position.x - boxSize.x,
+          y: contextMenuPosition.position.y - boxSize.y,
         });
 
-        mouseContextMenu.position = null;
+        contextMenuPosition.position = null;
       }
-    }, [mouseContextMenu?.position, menuVisible]);
+    }, [contextMenuPosition?.position, menuVisible]);
 
     useLayoutEffect(() => {
       if (relativePosition) {

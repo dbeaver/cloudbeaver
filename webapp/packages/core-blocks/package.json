@@ -31,12 +31,14 @@
     "@cloudbeaver/core-theming": "^0",
     "@cloudbeaver/core-utils": "^0",
     "go-split": "^3",
+    "minisearch": "^7",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^18",
     "react-hotkeys-hook": "^4",
     "reakit": "^1",
-    "reakit-utils": "^0"
+    "reakit-utils": "^0",
+    "react-minisearch": "^7"
   },
   "peerDependencies": {},
   "devDependencies": {
