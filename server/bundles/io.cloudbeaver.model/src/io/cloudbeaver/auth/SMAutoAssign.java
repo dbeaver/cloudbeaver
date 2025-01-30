@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,14 @@
 
 package io.cloudbeaver.auth;
 
+import org.jkiss.code.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class SMAutoAssign {
     private String authRole;
+    private String authRoleAssignReason;
     private List<String> externalTeamIds = new ArrayList<>();
 
     public SMAutoAssign() {
@@ -46,5 +49,14 @@ public class SMAutoAssign {
 
     public void addExternalTeamId(String externalRoleId) {
         this.externalTeamIds.add(externalRoleId);
+    }
+
+    @Nullable
+    public String getAuthRoleAssignReason() {
+        return authRoleAssignReason;
+    }
+
+    public void setAuthRoleAssignReason(@Nullable String authRoleChangedReason) {
+        this.authRoleAssignReason = authRoleChangedReason;
     }
 }

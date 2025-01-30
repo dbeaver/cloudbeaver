@@ -79,6 +79,7 @@ export default [
   ['connections_connection_keep_alive', 'Поддерживать соединение (в секундах)'],
   ['connections_connection_autocommit', 'Авто коммит'],
   ['connections_connection_keep_alive_tooltip', 'Не отключать соединение'],
+  ['connections_connection_read_only', 'Разрешить только чтение'],
   ['connections_network_handler_test', 'Проверить подключение'],
   ['connections_network_handler_test_fail', 'Не удалось установить соединение'],
   ['connections_network_handler_test_success', 'Соединение установлено'],

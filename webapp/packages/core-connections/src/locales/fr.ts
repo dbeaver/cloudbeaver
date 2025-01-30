@@ -74,6 +74,7 @@ export default [
   ['connections_connection_configuration', 'Configuration'],
   ['connections_connection_host', 'Hôte'],
   ['connections_connection_port', 'Port'],
+  ['connections_connection_read_only', 'Read-only connection'],
   ['connections_connection_template', 'Modèle'],
   ['connections_connection_test', 'Tester'],
   ['connections_connection_test_tooltip', 'Tester la connexion'],
