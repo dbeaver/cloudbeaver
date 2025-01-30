@@ -12,7 +12,7 @@ import { type AdminUser, TeamsResource, UsersResource } from '@cloudbeaver/core-
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { CreateTeamService } from './Teams/CreateTeamService.js';
+import { CreateTeamService } from './Teams/TeamsTable/CreateTeamService.js';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService.js';
 import { CreateUserService } from './UsersTable/CreateUserService.js';
 

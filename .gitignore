@@ -47,3 +47,4 @@ workspace-dev-ce/
 deploy/cloudbeaver
 server/**/target
 apps/**/target
+osgi-cache/
