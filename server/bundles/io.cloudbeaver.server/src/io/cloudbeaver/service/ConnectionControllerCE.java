@@ -449,8 +449,9 @@ public class ConnectionControllerCE implements ConnectionController {
         boolean oldSavePassword = dataSourceContainer.isSavePassword();
         DBRProgressMonitor monitor = webSession.getProgressMonitor();
         validateDriverLibrariesPresence(dataSourceContainer);
+        boolean connect = false;
         try {
-            boolean connect = dataSourceContainer.connect(monitor, true, false);
+            connect = dataSourceContainer.connect(monitor, true, false);
             if (connect) {
                 webSession.addSessionEvent(
                     new WSDataSourceConnectEvent(
@@ -474,7 +475,7 @@ public class ConnectionControllerCE implements ConnectionController {
             dataSourceContainer.setSavePassword(oldSavePassword);
             connectionInfo.clearCache();
             try {
-                webSession.getSecurityController().updateConnectionAttempt(connectionId, false);
+                webSession.getSecurityController().updateConnectionAttempt(connectionId, connect);
             } catch (DBCException ex) {
                 throw new DBWebException(ex.getMessage());
             }
