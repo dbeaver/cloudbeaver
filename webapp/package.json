@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "workspaces": [
+    "../common-typescript",
     "packages/*"
   ],
   "resolutions": {
@@ -29,6 +30,7 @@
     "@cloudbeaver/core-cli": "workspace:^",
     "@cloudbeaver/eslint-config": "workspace:^",
     "@cloudbeaver/eslint-plugin": "workspace:^",
+    "@dbeaver/prettier-config": "workspace:^",
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
@@ -55,6 +57,5 @@
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5"
   },
-  "prettier": "@cloudbeaver/prettier-config",
   "packageManager": "yarn@4.6.0"
 }
