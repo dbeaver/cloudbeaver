@@ -41,10 +41,11 @@
     "@cloudbeaver/plugin-resource-manager-scripts": "^0",
     "@cloudbeaver/plugin-sql-editor": "^0",
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "^0",
-    "mobx": "^6"
+    "mobx": "^6",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "typescript": "^5"
   }
 }

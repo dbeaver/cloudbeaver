@@ -22,10 +22,11 @@
     "@cloudbeaver/core-browser": "^0",
     "@cloudbeaver/core-di": "^0",
     "@cloudbeaver/core-events": "^0",
-    "@cloudbeaver/core-localization": "^0"
+    "@cloudbeaver/core-localization": "^0",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "typescript": "^5"
   }
 }

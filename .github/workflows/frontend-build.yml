@@ -11,9 +11,9 @@ on:
         description: "Test status"
         value: ${{ jobs.frontend-build.outputs.test-status }}
     inputs:
-      skip_cache:
+      clean-cache:
         required: false
-        type: string
+        type: boolean
 
 jobs:
   frontend-build:
@@ -29,42 +29,42 @@ jobs:
 
     defaults:
       run:
-        working-directory: ./webapp
+        working-directory: ./cloudbeaver/webapp
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout cloudbeaver
+        uses: actions/checkout@v4
+        with:
+          path: cloudbeaver
+
+      - name: Clone Deps Repositories
+        uses: dbeaver/github-actions/clone-repositories@devel
+        with:
+          project_deps_path: './cloudbeaver/project.deps'
+          token: ${{ secrets.DEVOPS_ISSUE_RO_TOKEN }}
 
       - run: corepack enable
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: yarn
-          cache-dependency-path: webapp/yarn.lock
-
-      - name: restore node_modules
-        uses: actions/cache@v4
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('webapp/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node_modules-
+          node-version: "lts/*"
+          cache: "yarn"
+          cache-dependency-path: './cloudbeaver/webapp/yarn.lock'
 
       - name: restore typescript cache
         uses: actions/cache@v4
         with:
-          path: "**/packages/*/dist"
-          key: ${{ runner.os }}-dist-${{ hashFiles('webapp/yarn.lock') }}
+          path: "cloudbeaver/webapp/**/packages/*/dist"
+          key: ${{ runner.os }}-dist-${{ hashFiles('cloudbeaver/webapp/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-dist-
 
-      - name: yarn clean
-        if: env.skip_cache == 'true'
+      - if: inputs.clean-cache
         run: yarn clear
 
       - run: yarn install --immutable
 
       - run: yarn bundle
-        working-directory: ./webapp/packages/product-default
+        working-directory: ./cloudbeaver/webapp/packages/product-default
 
       - run: yarn test
 

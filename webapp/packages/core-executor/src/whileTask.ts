@@ -22,8 +22,8 @@ export function whileTask<T>(
   let reject: (reason?: any) => void;
   let fulfilled = false;
 
-  let intervalTimeoutId: NodeJS.Timeout | null = null;
-  let timeoutId: NodeJS.Timeout | null = null;
+  let intervalTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
   let activeTask: Promise<T> | null = null;
   let stopped = false;
 

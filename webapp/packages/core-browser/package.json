@@ -2,6 +2,7 @@
   "name": "@cloudbeaver/core-browser",
   "type": "module",
   "sideEffects": [
+    "dist/service-worker.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"
@@ -24,6 +25,7 @@
     "@cloudbeaver/core-utils": "^0",
     "dexie": "^4",
     "mobx": "^6",
+    "tslib": "^2",
     "workbox-cacheable-response": "^7",
     "workbox-core": "^7",
     "workbox-expiration": "^7",
@@ -32,8 +34,9 @@
     "workbox-strategies": "^7",
     "workbox-window": "^7"
   },
-  "peerDependencies": {},
   "devDependencies": {
-    "typescript": "^5"
+    "@cloudbeaver/tsconfig": "workspace:^",
+    "typescript": "^5",
+    "vite": "^6"
   }
 }

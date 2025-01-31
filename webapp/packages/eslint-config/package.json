@@ -12,17 +12,11 @@
   ],
   "type": "commonjs",
   "devDependencies": {
+    "@cloudbeaver/eslint-plugin": "workspace:^",
     "@typescript-eslint/eslint-plugin": "^6",
     "@typescript-eslint/parser": "^6",
     "eslint": "^8",
-    "eslint-config-airbnb-base": "^15",
-    "eslint-config-airbnb-typescript": "^17",
     "eslint-config-prettier": "^9",
-    "eslint-plugin-import": "^2",
-    "eslint-plugin-jest": "^27",
-    "eslint-plugin-jsx-a11y": "^6",
-    "eslint-plugin-node": "^11",
-    "eslint-plugin-promise": "^6",
     "eslint-plugin-react": "^7",
     "eslint-plugin-react-hooks": "^4"
   }

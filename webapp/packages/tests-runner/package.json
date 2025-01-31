@@ -19,15 +19,16 @@
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
     "mobx": "^6",
-    "react": "^18"
+    "react": "^18",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"
   ],
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "@jest/globals": "^29",
     "@types/jest": "^29",
     "@types/react": "^18",

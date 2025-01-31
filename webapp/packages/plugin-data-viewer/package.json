@@ -42,9 +42,10 @@
     "@cloudbeaver/plugin-object-viewer": "^0",
     "mobx": "^6",
     "mobx-react-lite": "^4",
-    "react": "^18"
+    "react": "^18",
+    "reflect-metadata": "^0",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
     "@cloudbeaver/core-administration": "^0",
     "@cloudbeaver/core-app": "^0",
@@ -69,6 +70,7 @@
     "@cloudbeaver/plugin-navigation-tree": "^0",
     "@cloudbeaver/plugin-object-viewer": "^0",
     "@cloudbeaver/tests-runner": "^0",
+    "@cloudbeaver/tsconfig": "workspace:^",
     "@jest/globals": "^29",
     "@types/jest": "^29",
     "@types/react": "^18",

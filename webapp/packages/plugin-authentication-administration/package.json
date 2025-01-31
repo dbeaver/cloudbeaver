@@ -40,10 +40,11 @@
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^18",
-    "reakit": "^1"
+    "reakit": "^1",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "@types/react": "^18",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5"

@@ -6,7 +6,6 @@
   "description": "ESLint custom rules for CloudBeaver",
   "license": "Apache-2.0",
   "type": "commonjs",
-  "dependencies": {},
   "keywords": [
     "eslint",
     "eslintplugin",

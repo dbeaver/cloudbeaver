@@ -36,12 +36,13 @@
     "mobx-react-lite": "^4",
     "react": "^18",
     "react-hotkeys-hook": "^4",
+    "react-minisearch": "^7",
     "reakit": "^1",
     "reakit-utils": "^0",
-    "react-minisearch": "^7"
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/core-cli": "workspace:^",
     "@cloudbeaver/core-di": "^0",
     "@cloudbeaver/core-dialogs": "^0",
     "@cloudbeaver/core-events": "^0",
@@ -51,6 +52,7 @@
     "@cloudbeaver/core-theming": "^0",
     "@cloudbeaver/core-utils": "^0",
     "@cloudbeaver/tests-runner": "^0",
+    "@cloudbeaver/tsconfig": "workspace:^",
     "@jest/globals": "^29",
     "@testing-library/react": "^16",
     "@types/jest": "^29",

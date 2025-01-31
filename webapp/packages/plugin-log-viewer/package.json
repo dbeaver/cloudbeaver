@@ -32,9 +32,9 @@
     "@cloudbeaver/plugin-tools-panel": "^0",
     "mobx": "^6",
     "mobx-react-lite": "^4",
-    "react": "^18"
+    "react": "^18",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
     "@cloudbeaver/core-app": "^0",
     "@cloudbeaver/core-authentication": "^0",
@@ -49,6 +49,7 @@
     "@cloudbeaver/core-view": "^0",
     "@cloudbeaver/plugin-tools-panel": "^0",
     "@cloudbeaver/tests-runner": "^0",
+    "@cloudbeaver/tsconfig": "workspace:^",
     "@jest/globals": "^29",
     "@types/jest": "^29",
     "@types/react": "^18",

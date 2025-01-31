@@ -23,7 +23,7 @@ import type {
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-declare module 'react-data-grid' {
+declare module '@cloudbeaver/plugin-data-grid' {
   interface Column<TRow, TSummaryRow = unknown> {
     columnDataIndex: IResultSetColumnKey | null;
     onRenderHeader?(key: IResultSetColumnKey): void;

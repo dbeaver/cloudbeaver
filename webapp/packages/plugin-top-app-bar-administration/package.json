@@ -21,10 +21,11 @@
     "@cloudbeaver/core-di": "^0",
     "@cloudbeaver/plugin-administration": "^0",
     "@cloudbeaver/plugin-top-app-bar": "^0",
-    "react": "^18"
+    "react": "^18",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "@types/react": "^18",
     "typescript": "^5"
   }

@@ -21,12 +21,13 @@
   "dependencies": {
     "@cloudbeaver/core-di": "^0",
     "d3": "^7",
-    "d3-drag": "^3"
+    "d3-drag": "^3",
+    "tslib": "^2"
   },
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "@types/d3": "^7",
     "@types/d3-drag": "^3",
     "typescript": "^5"
-  },
-  "peerDependencies": {}
+  }
 }

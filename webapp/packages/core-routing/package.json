@@ -23,10 +23,11 @@
     "@cloudbeaver/core-utils": "^0",
     "mobx": "^6",
     "router5": "^8",
-    "router5-plugin-browser": "^8"
+    "router5-plugin-browser": "^8",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "typescript": "^5"
   }
 }

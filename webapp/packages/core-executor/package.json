@@ -19,10 +19,11 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "mobx": "^6"
+    "mobx": "^6",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "typescript": "^5"
   }
 }

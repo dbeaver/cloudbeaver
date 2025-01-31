@@ -20,10 +20,11 @@
   },
   "dependencies": {
     "@cloudbeaver/core-browser-settings": "^0",
-    "@cloudbeaver/core-di": "^0"
+    "@cloudbeaver/core-di": "^0",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "typescript": "^5"
   }
 }

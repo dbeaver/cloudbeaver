@@ -1,0 +1,7 @@
+{
+  "name": "vscode-java-configs",
+  "packageManager": "yarn@4.6.0",
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

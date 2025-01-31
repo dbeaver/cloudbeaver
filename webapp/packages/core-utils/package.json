@@ -25,6 +25,7 @@
     "i18next": "^24",
     "md5": "^2",
     "mobx": "^6",
+    "tslib": "^2",
     "underscore": "^1",
     "uuid": "^11",
     "whatwg-mimetype": "^4",
@@ -32,8 +33,8 @@
     "zod-i18n-map": "^2",
     "zod-validation-error": "^3"
   },
-  "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "@jest/globals": "^29",
     "@types/jest": "^29",
     "@types/md5": "^2",

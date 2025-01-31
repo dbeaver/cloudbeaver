@@ -27,9 +27,11 @@
     "axios": "^1",
     "graphql": "^16",
     "graphql-request": "^6",
-    "mobx": "^6"
+    "mobx": "^6",
+    "tslib": "^2"
   },
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "@graphql-codegen/add": "^5",
     "@graphql-codegen/cli": "^5",
     "@graphql-codegen/near-operation-file-preset": "^3",
@@ -41,6 +43,5 @@
     "graphql": "^16",
     "graphql-tag": "^2",
     "typescript": "^5"
-  },
-  "peerDependencies": {}
+  }
 }

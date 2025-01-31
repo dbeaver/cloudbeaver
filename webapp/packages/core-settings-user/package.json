@@ -26,10 +26,11 @@
     "@cloudbeaver/core-settings": "^0",
     "@cloudbeaver/core-storage": "^0",
     "@cloudbeaver/core-utils": "^0",
-    "mobx": "^6"
+    "mobx": "^6",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "typescript": "^5"
   }
 }

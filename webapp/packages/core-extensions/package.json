@@ -17,9 +17,11 @@
     "validate-dependencies": "core-cli-validate-dependencies",
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
-  "dependencies": {},
-  "peerDependencies": {},
+  "dependencies": {
+    "tslib": "^2"
+  },
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "typescript": "^5"
   }
 }

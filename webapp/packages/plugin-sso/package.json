@@ -2,6 +2,7 @@
   "name": "@cloudbeaver/plugin-sso",
   "type": "module",
   "sideEffects": [
+    "./dist/index.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"
@@ -17,11 +18,12 @@
     "validate-dependencies": "core-cli-validate-dependencies",
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
-  "peerDependencies": {},
   "dependencies": {
-    "@cloudbeaver/core-di": "^0"
+    "@cloudbeaver/core-di": "^0",
+    "tslib": "^2"
   },
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "typescript": "^5"
   }
 }

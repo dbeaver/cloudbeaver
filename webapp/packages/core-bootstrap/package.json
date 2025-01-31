@@ -55,11 +55,13 @@
     "@cloudbeaver/core-view": "^0",
     "mobx": "^6",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "@types/react": "^18",
+    "@types/react-dom": "^18",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5"
   }

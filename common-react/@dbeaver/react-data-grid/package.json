@@ -1,0 +1,39 @@
+{
+  "name": "@dbeaver/react-data-grid",
+  "type": "module",
+  "sideEffects": [],
+  "exports": {
+    ".": "./lib/index.js",
+    "./*": "./lib/*.js"
+  },
+  "scripts": {
+    "clear": "rimraf lib"
+  },
+  "files": [
+    "package.json",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md",
+    "lib",
+    "!lib/**/*.d.ts.map",
+    "!lib/**/*.test.js",
+    "!lib/**/*.test.d.ts",
+    "!lib/**/*.test.d.ts.map",
+    "!lib/**/*.test.js.map",
+    "!lib/tests",
+    "!.tsbuildinfo"
+  ],
+  "packageManager": "yarn@4.6.0",
+  "devDependencies": {
+    "@dbeaver/tsconfig": "workspace:^",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "rimraf": "^6",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "react": "^19",
+    "react-data-grid": "7.0.0-beta.47",
+    "react-dom": "^19"
+  }
+}

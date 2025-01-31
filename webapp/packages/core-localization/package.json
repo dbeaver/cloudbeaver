@@ -21,10 +21,11 @@
   "dependencies": {
     "@cloudbeaver/core-di": "^0",
     "@cloudbeaver/core-executor": "^0",
-    "mobx": "^6"
+    "mobx": "^6",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "@jest/globals": "^29",
     "@types/jest": "^29",
     "typescript": "^5"

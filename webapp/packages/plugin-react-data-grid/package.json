@@ -18,10 +18,11 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "react-data-grid": "file:react-data-grid-dist"
+    "react-data-grid": "file:react-data-grid-dist",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/tsconfig": "workspace:^",
     "typescript": "^5"
   }
 }
