@@ -786,7 +786,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         if (enabled) {
             enableUser(dbCon, userId);
         } else {
-            disableUserWithReason(database, dbCon, getUserId(), userId, "Disabled by Administrator");
+            disableUserWithReason(dbCon, getUserId(), userId, "Disabled by Administrator");
         }
     }
 
@@ -1709,7 +1709,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     if (inputUsername != null) {
                         if (handleBruteForceProtection(dbCon, authProviderId, inputUsername)) {
                             disableUserByBruteForceProtection(
-                                database,
                                 dbCon,
                                 "system",
                                 getUserId() != null ? getUserId() : (String) inputUsername,
@@ -1855,7 +1854,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 && failedLoginCount(dbCon, userId, connectionId) >= smConfig.getMaxFailedConnectionLogin()
             ) {
                 try {
-                    disableUserByBruteForceProtection(database, dbCon, "system", userId, "Disabled by bruteforce connection protection");
+                    disableUserByBruteForceProtection(dbCon, "system", userId, "Disabled by bruteforce connection protection");
                 } catch (DBException e) {
                     throw new DBCException(e.getMessage());
                 }
@@ -1922,8 +1921,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         return false;
     }
 
-    private static void disableUserWithReason(
-        @NotNull CBDatabase database,
+    private void disableUserWithReason(
         @NotNull Connection dbCon,
         @Nullable String disabledBy,
         @Nullable String username,
@@ -1951,13 +1949,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     private void disableUserByBruteForceProtection(
-        @NotNull CBDatabase database,
         @NotNull Connection dbCon,
         @NotNull String disabledBy,
         @NotNull String username,
         @NotNull String reason
     ) throws SQLException, DBException {
-        disableUserWithReason(database, dbCon, disabledBy, username, reason);
+        disableUserWithReason(dbCon, disabledBy, username, reason);
         killAllExistsUserSessions(username);
         throw new SMException("The user is disabled. Please contact the administrator for more information");
     }
