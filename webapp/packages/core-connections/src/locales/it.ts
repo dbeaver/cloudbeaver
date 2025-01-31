@@ -73,6 +73,7 @@ export default [
   ['connections_connection_keep_alive', 'Keep alive (in seconds)'],
   ['connections_connection_autocommit', 'Auto commit'],
   ['connections_connection_keep_alive_tooltip', 'No auto disconnect'],
+  ['connections_connection_read_only', 'Read-only connection'],
   ['connections_network_handler_test', 'Prova il Tunnel'],
   ['connections_network_handler_test_fail', 'Prova del Tunnel fallita'],
   ['connections_network_handler_test_success', 'Prova del Tunnel terminata con successo'],

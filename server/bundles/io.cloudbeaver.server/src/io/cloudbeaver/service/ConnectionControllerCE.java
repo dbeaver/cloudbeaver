@@ -148,6 +148,7 @@ public class ConnectionControllerCE implements ConnectionController {
         if (config.isDefaultAutoCommit() != null) {
             dataSource.setDefaultAutoCommit(config.isDefaultAutoCommit());
         }
+        dataSource.setConnectionReadOnly(config.isReadOnly());
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(),
             dataSource.getConnectionConfiguration(),
             config);
@@ -468,6 +469,12 @@ public class ConnectionControllerCE implements ConnectionController {
                 webSession.getSecurityController().updateConnectionAttempt(connectionId, false);
             } catch (DBCException ex) {
                 throw new DBWebException(ex.getMessage());
+            }
+            if (e instanceof DBCConnectException) {
+                Throwable rootCause = CommonUtils.getRootCause(e);
+                if (rootCause instanceof ClassNotFoundException) {
+                    throwDriverNotFoundException(dataSourceContainer);
+                }
             }
             throw new DBWebException("Error connecting to database", e);
         } finally {
