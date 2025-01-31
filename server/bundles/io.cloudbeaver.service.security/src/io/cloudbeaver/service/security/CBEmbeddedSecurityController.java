@@ -1707,7 +1707,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     && this.getAuthProvider(authProviderId).getInstance() instanceof SMBruteForceProtected bruteforceProtected) {
                     Object inputUsername = bruteforceProtected.getInputUsername(authData);
                     if (inputUsername != null) {
-                        if (handleBruteForceProtection(dbCon, authProviderId, inputUsername, database)) {
+                        if (handleBruteForceProtection(dbCon, authProviderId, inputUsername)) {
                             disableUserByBruteForceProtection(
                                 database,
                                 dbCon,
@@ -1821,8 +1821,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private boolean handleBruteForceProtection(
         @NotNull Connection dbCon,
         @NotNull String authProviderId,
-        @NotNull Object inputUsername,
-        @NotNull CBDatabase database
+        @NotNull Object inputUsername
     ) throws SQLException, DBException {
         return smConfig.isEnableConnectionBruteForceProtection()
             && BruteForceUtils.checkBruteforceBlockUser(smConfig,
@@ -1831,7 +1830,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 authProviderId,
                 inputUsername.toString(),
                 smConfig.getBlockPeriodTimeBruteForceProtection()))
-            && isUserExistsAndEnabled(dbCon, getUserId() != null ? getUserId() : (String) inputUsername, database);
+            && isUserExistsAndEnabled(dbCon, getUserId() != null ? getUserId() : (String) inputUsername);
     }
 
     @Override
@@ -1853,7 +1852,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
             if (smConfig.isEnableConnectionBruteForceProtection()
                 && CommonUtils.isNotEmpty(userId)
-                && failedLoginCount(dbCon, userId, connectionId, database) >= smConfig.getMaxFailedConnectionLogin()
+                && failedLoginCount(dbCon, userId, connectionId) >= smConfig.getMaxFailedConnectionLogin()
             ) {
                 try {
                     disableUserByBruteForceProtection(database, dbCon, "system", userId, "Disabled by bruteforce connection protection");
@@ -1867,11 +1866,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
 
-    private int failedLoginCount (
+    private int failedLoginCount(
         @NotNull Connection dbCon,
         @NotNull String userId,
-        @NotNull String connectionId,
-        @NotNull CBDatabase database
+        @NotNull String connectionId
     ) throws SQLException {
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             database.normalizeTableNames(
@@ -1902,7 +1900,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         return 0;
     }
 
-    private static boolean isUserExistsAndEnabled(Connection dbCon, String inputLogin, CBDatabase database) throws SQLException {
+    private boolean isUserExistsAndEnabled(Connection dbCon, String inputLogin) throws SQLException {
         String query = database.normalizeTableNames(
             "SELECT EXISTS (" +
                 "    SELECT 1 " +
