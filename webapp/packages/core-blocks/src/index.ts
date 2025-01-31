@@ -67,7 +67,7 @@ export { default as MenuPanelStyles } from './Menu/MenuPanel.module.css';
 export * from './Menu/MenuSeparator.js';
 export { default as MenuSeparatorStyles } from './Menu/MenuSeparator.module.css';
 export * from './Menu/MenuStateContext.js';
-export * from './Menu/useMouseContextMenu.js';
+export * from './Menu/useContextMenuPosition.js';
 
 export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoFormLoader.js';
 export * from './ObjectPropertyInfo/useObjectPropertyCategories.js';
@@ -254,3 +254,6 @@ export * from './importLazyComponent.js';
 export * from './ClickableLoader.js';
 export * from './FormControls/TagsComboboxLoader.js';
 export * from './Flex/Flex.js';
+export * from './FormControls/useInputAutocomplete.js';
+export * from './FormControls/InputAutocompletionMenu.js';
+export * from './useSearch.js';
