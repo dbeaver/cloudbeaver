@@ -39,8 +39,6 @@ import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
-import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceConnectEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
@@ -465,11 +463,6 @@ public class ConnectionControllerCE implements ConnectionController {
             }
             webSession.getSecurityController().updateConnectionAttempt(connectionId, connect);
         } catch (Exception e) {
-            try {
-                webSession.getSecurityController().updateConnectionAttempt(connectionId, false);
-            } catch (DBCException ex) {
-                throw new DBWebException(ex.getMessage());
-            }
             if (e instanceof DBCConnectException) {
                 Throwable rootCause = CommonUtils.getRootCause(e);
                 if (rootCause instanceof ClassNotFoundException) {
@@ -480,6 +473,11 @@ public class ConnectionControllerCE implements ConnectionController {
         } finally {
             dataSourceContainer.setSavePassword(oldSavePassword);
             connectionInfo.clearCache();
+            try {
+                webSession.getSecurityController().updateConnectionAttempt(connectionId, false);
+            } catch (DBCException ex) {
+                throw new DBWebException(ex.getMessage());
+            }
         }
         // Mark all specified network configs as saved
         boolean[] saveConfig = new boolean[1];
