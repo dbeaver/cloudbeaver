@@ -148,13 +148,6 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             if (!searchResult.hasMore()) {
                 throw new DBException("Access denied");
             }
-            SearchResult entry = searchResult.next();
-            Attributes attributes = entry.getAttributes();
-            String userId = getAttributeValue(attributes, "objectGUID");
-            if (userId == null) {
-                userId = getAttributeValue(attributes, "entryUUID");
-            }
-            userData.put(LdapConstants.CRED_USERNAME, userId);
         } catch (DBException e) {
             throw e;
         } catch (Exception e) {
@@ -367,7 +360,18 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                 userData.put(LdapConstants.CRED_USER_DN, userDN);
                 userData.put(LdapConstants.CRED_DISPLAY_NAME, findUserNameFromDN(userDN, ldapSettings));
             } else {
-                userData.putIfAbsent(LdapConstants.CRED_USERNAME, login);
+                SearchControls searchControls = createSearchControls();
+                String userId = "";
+                var searchResult = userContext.search(userDN, "objectClass=*", searchControls);
+                if (searchResult.hasMore()) {
+                    SearchResult result = searchResult.next();
+                    Attributes attributes = result.getAttributes();
+                    userId = getAttributeValue(attributes, "objectGUID");
+                    if (userId == null) {
+                        userId = getAttributeValue(attributes, "entryUUID");
+                    }
+                }
+                userData.putIfAbsent(LdapConstants.CRED_USERNAME, CommonUtils.isNotEmpty(userId) ? userId : login);
                 userData.put(LdapConstants.CRED_USER_DN, userDN);
                 userData.put(LdapConstants.CRED_DISPLAY_NAME, findUserNameFromDN(userDN, ldapSettings));
             }
