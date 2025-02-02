@@ -8,7 +8,7 @@
 import type { ButtonHTMLAttributes } from 'react';
 import type { MenuInitialState } from 'reakit';
 
-import type { IMouseContextMenu } from '@cloudbeaver/core-blocks';
+import type { IContextMenuPosition } from '@cloudbeaver/core-blocks';
 import type { IMenuData } from '@cloudbeaver/core-view';
 
 export interface IContextMenuBaseProps extends React.PropsWithChildren {
@@ -19,7 +19,7 @@ export interface IContextMenuBaseProps extends React.PropsWithChildren {
 export type ContextMenuRenderingChildren = (props: IContextMenuBaseProps) => React.ReactNode | React.ReactElement;
 
 export interface IContextMenuProps extends Omit<ButtonHTMLAttributes<any>, 'children'> {
-  mouseContextMenu?: IMouseContextMenu;
+  contextMenuPosition?: IContextMenuPosition;
   menu: IMenuData;
   disclosure?: boolean;
   placement?: MenuInitialState['placement'];

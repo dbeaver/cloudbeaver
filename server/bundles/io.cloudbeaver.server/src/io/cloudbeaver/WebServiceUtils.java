@@ -132,6 +132,7 @@ public class WebServiceUtils extends WebCommonUtils {
         newDataSource.setSavePassword(true);
         newDataSource.setName(config.getName());
         newDataSource.setDescription(config.getDescription());
+        newDataSource.setConnectionReadOnly(config.isReadOnly());
         if (config.getFolder() != null) {
             newDataSource.setFolder(registry.getFolder(config.getFolder()));
         }
