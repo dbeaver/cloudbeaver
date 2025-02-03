@@ -7,7 +7,6 @@ mkdir ./cloudbeaver/web
 
 cd ../../cloudbeaver/webapp
 
-corepack enable
 yarn
 cd ./packages/product-default
 yarn run bundle
