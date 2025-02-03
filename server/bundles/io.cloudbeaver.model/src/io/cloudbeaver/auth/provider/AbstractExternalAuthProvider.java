@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@ import org.jkiss.utils.CommonUtils;
 /**
  * Abstract external auth provider
  */
-public abstract class AbstractExternalAuthProvider<SESSION extends SMSession> implements SMAuthProviderExternal<SESSION> {
+public abstract class AbstractExternalAuthProvider<SESSION extends SMSession>
+    implements SMAuthProviderExternal<SESSION> {
 
     public static final String META_AUTH_PROVIDER = "$provider";
     public static final String META_AUTH_SPACE_ID = "$space";

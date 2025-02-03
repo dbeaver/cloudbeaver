@@ -9,18 +9,18 @@ import { observable } from 'mobx';
 
 import { useObservableRef } from '../useObservableRef.js';
 
-export interface IContextMenuPosition {
+export interface IContextMenuPositionCoords {
   x: number;
   y: number;
 }
 
-export interface IMouseContextMenu {
-  position: IContextMenuPosition | null;
+export interface IContextMenuPosition {
+  position: IContextMenuPositionCoords | null;
   handleContextMenuOpen: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-export function useMouseContextMenu(): IMouseContextMenu {
-  return useObservableRef<IMouseContextMenu>(
+export function useContextMenuPosition(): IContextMenuPosition {
+  return useObservableRef<IContextMenuPosition>(
     () => ({
       position: null,
       handleContextMenuOpen(event: React.MouseEvent<HTMLDivElement>) {

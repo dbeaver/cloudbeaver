@@ -37,6 +37,7 @@ export default [
   ['connections_connection_edit_search', 'Suchen'],
   ['connections_connection_edit_search_hosts', 'Hostnamen'],
   ['connections_connection_expert_settings', 'Expert settings'],
+  ['connections_connection_read_only', 'Read-only connection'],
   ['connections_connection_address', 'Adresse'],
   ['connections_connection_folder', 'Ordner'],
   ['connections_connection_name', 'Verbindungsname'],
