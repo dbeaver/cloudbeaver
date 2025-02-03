@@ -46,7 +46,7 @@ export class TableHeaderService extends Bootstrap {
   }
 
   override register(): void {
-    this.tableHeaderPlaceholder.add(TableWhereFilter, 1);
+    this.tableHeaderPlaceholder.add(TableWhereFilter, 1, props => !isResultSetDataSource(props.model.source));
     this.tableHeaderPlaceholder.add(TableHeaderMenu, 2);
 
     this.actionService.addHandler({
