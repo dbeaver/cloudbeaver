@@ -11,7 +11,6 @@ import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import {
   AppAuthService,
   AUTH_PROVIDER_LOCAL_ID,
-  AuthInfoService,
   AuthProviderContext,
   AuthProviderService,
   AuthProvidersResource,
@@ -50,7 +49,6 @@ export class AuthenticationService extends Bootstrap {
     private readonly appAuthService: AppAuthService,
     private readonly authDialogService: AuthDialogService,
     private readonly userInfoResource: UserInfoResource,
-    private readonly authInfoService: AuthInfoService,
     private readonly notificationService: NotificationService,
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly authProviderService: AuthProviderService,

@@ -18,6 +18,7 @@ import { browserPlugin } from '@cloudbeaver/plugin-browser';
 import connectionCustom from '@cloudbeaver/plugin-connection-custom';
 import connectionSearch from '@cloudbeaver/plugin-connection-search';
 import connectionTemplate from '@cloudbeaver/plugin-connection-template';
+import { objectViewerNavTreeLinkPlugin } from '@cloudbeaver/plugin-object-viewer-nav-tree-link';
 import connectionPlugin from '@cloudbeaver/plugin-connections';
 import connectionAdministration from '@cloudbeaver/plugin-connections-administration';
 import { dataExportManifest } from '@cloudbeaver/plugin-data-export';
@@ -103,6 +104,7 @@ const PLUGINS: PluginManifest[] = [
   sqlGeneratorPlugin,
   userProfile,
   userProfileAdministration,
+  objectViewerNavTreeLinkPlugin,
   connectionPlugin,
   connectionAdministration,
   versionUpdate,

@@ -7,7 +7,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-'use strict';
 process.title = 'core-analyser';
-
-return;

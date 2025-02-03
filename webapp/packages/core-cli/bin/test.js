@@ -8,16 +8,14 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 
-'use strict';
+// import jest from 'jest';
+// import { fileURLToPath } from 'node:url';
 process.title = 'core-test';
 
-return;
-const jest = require('jest');
+// if (process.env.NODE_ENV == null) {
+//   process.env.NODE_ENV = 'test';
+// }
 
-if (process.env.NODE_ENV == null) {
-  process.env.NODE_ENV = 'test';
-}
+// const argv = [...process.argv.slice(2, process.argv.length), '--config', fileURLToPath(import.meta.resolve('../configs/jest.config.js'))];
 
-const argv = [...process.argv.slice(2, process.argv.length), '--config', require.resolve('../configs/jest.config.js')];
-
-jest.run(argv);
+// jest.run(argv);

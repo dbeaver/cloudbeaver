@@ -3,16 +3,36 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
   },
   "references": [
     {
-      "path": "../product-default-impl/tsconfig.json"
+      "path": "../core-browser"
     },
     {
-      "path": "../product-base/tsconfig.json"
+      "path": "../core-cli"
+    },
+    {
+      "path": "../plugin-sso"
+    },
+    {
+      "path": "../product-base"
+    },
+    {
+      "path": "../product-default-impl"
     }
   ],
-  "include": ["__custom_mocks__/**/*", "src/**/*", "src/**/*.json", "src/**/*.css", "src/**/*.scss"],
-  "exclude": ["**/node_modules", "lib/**/*", "dist/**/*"]
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "lib/**/*",
+    "dist/**/*"
+  ]
 }

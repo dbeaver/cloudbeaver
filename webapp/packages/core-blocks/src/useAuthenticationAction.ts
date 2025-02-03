@@ -8,8 +8,8 @@
 import { computed, observable } from 'mobx';
 
 import { AuthProviderService, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { useObservableRef } from './useObservableRef.js';
 
 interface IAuthenticationAction {
   providerId: string;

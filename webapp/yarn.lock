@@ -1605,80 +1605,85 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cloudbeaver/browserslist-config@workspace:^, @cloudbeaver/browserslist-config@workspace:packages/browserslist-config":
+"@cloudbeaver/browserslist-config@workspace:*, @cloudbeaver/browserslist-config@workspace:packages/browserslist-config":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/browserslist-config@workspace:packages/browserslist-config"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-administration@npm:^0, @cloudbeaver/core-administration@workspace:packages/core-administration":
+"@cloudbeaver/core-administration@workspace:*, @cloudbeaver/core-administration@workspace:packages/core-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-administration@workspace:packages/core-administration"
   dependencies:
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-storage": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-app@npm:^0, @cloudbeaver/core-app@workspace:packages/core-app":
+"@cloudbeaver/core-app@workspace:*, @cloudbeaver/core-app@workspace:packages/core-app":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-app@workspace:packages/core-app"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-client-activity": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-notifications": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-theming": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-version": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-notifications": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-theming": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-version": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
+    mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-authentication@npm:^0, @cloudbeaver/core-authentication@workspace:packages/core-authentication":
+"@cloudbeaver/core-authentication@workspace:*, @cloudbeaver/core-authentication@workspace:packages/core-authentication":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-authentication@workspace:packages/core-authentication"
   dependencies:
-    "@cloudbeaver/core-client-activity": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-storage": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tests-runner": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     mobx: "npm:^6"
@@ -1688,26 +1693,26 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-blocks@npm:^0, @cloudbeaver/core-blocks@workspace:packages/core-blocks":
+"@cloudbeaver/core-blocks@workspace:*, @cloudbeaver/core-blocks@workspace:packages/core-blocks":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-blocks@workspace:packages/core-blocks"
   dependencies:
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-cli": "workspace:^"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-theming": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tests-runner": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-theming": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
+    "@testing-library/dom": "npm:^10"
     "@testing-library/react": "npm:^16"
     "@types/jest": "npm:^29"
     "@types/react": "npm:^18"
@@ -1716,6 +1721,7 @@ __metadata:
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     react-hotkeys-hook: "npm:^4"
     react-minisearch: "npm:^7"
     reakit: "npm:^1"
@@ -1726,46 +1732,47 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-bootstrap@npm:^0, @cloudbeaver/core-bootstrap@workspace:packages/core-bootstrap":
+"@cloudbeaver/core-bootstrap@workspace:*, @cloudbeaver/core-bootstrap@workspace:packages/core-bootstrap":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-bootstrap@workspace:packages/core-bootstrap"
   dependencies:
-    "@cloudbeaver/core-administration": "npm:^0"
-    "@cloudbeaver/core-app": "npm:^0"
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-browser": "npm:^0"
-    "@cloudbeaver/core-browser-cookies": "npm:^0"
-    "@cloudbeaver/core-browser-settings": "npm:^0"
-    "@cloudbeaver/core-client-activity": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-links": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-product": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-resource-manager": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-server-localization": "npm:^0"
-    "@cloudbeaver/core-session-localization": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-settings-localization": "npm:^0"
-    "@cloudbeaver/core-settings-user": "npm:^0"
-    "@cloudbeaver/core-storage": "npm:^0"
-    "@cloudbeaver/core-task-manager": "npm:^0"
-    "@cloudbeaver/core-theming": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-version": "npm:^0"
-    "@cloudbeaver/core-version-update": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-app": "workspace:*"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-browser": "workspace:*"
+    "@cloudbeaver/core-browser-cookies": "workspace:*"
+    "@cloudbeaver/core-browser-settings": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-links": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-product": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-resource-manager": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-server-localization": "workspace:*"
+    "@cloudbeaver/core-session-localization": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-settings-localization": "workspace:*"
+    "@cloudbeaver/core-settings-user": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
+    "@cloudbeaver/core-task-manager": "workspace:*"
+    "@cloudbeaver/core-theming": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-version": "workspace:*"
+    "@cloudbeaver/core-version-update": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18"
     mobx: "npm:^6"
@@ -1777,32 +1784,33 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-browser-cookies@npm:^0, @cloudbeaver/core-browser-cookies@workspace:packages/core-browser-cookies":
+"@cloudbeaver/core-browser-cookies@workspace:*, @cloudbeaver/core-browser-cookies@workspace:packages/core-browser-cookies":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-browser-cookies@workspace:packages/core-browser-cookies"
   dependencies:
-    "@cloudbeaver/core-browser-settings": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-browser-settings": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-browser-settings@npm:^0, @cloudbeaver/core-browser-settings@workspace:packages/core-browser-settings":
+"@cloudbeaver/core-browser-settings@workspace:*, @cloudbeaver/core-browser-settings@workspace:packages/core-browser-settings":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-browser-settings@workspace:packages/core-browser-settings"
   dependencies:
-    "@cloudbeaver/core-browser": "npm:^0"
-    "@cloudbeaver/core-client-activity": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tests-runner": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     tslib: "npm:^2"
@@ -1810,14 +1818,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-browser@npm:^0, @cloudbeaver/core-browser@workspace:^, @cloudbeaver/core-browser@workspace:packages/core-browser":
+"@cloudbeaver/core-browser@workspace:*, @cloudbeaver/core-browser@workspace:packages/core-browser":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-browser@workspace:packages/core-browser"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     dexie: "npm:^4"
     mobx: "npm:^6"
     tslib: "npm:^2"
@@ -1833,14 +1842,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-cli@npm:^0, @cloudbeaver/core-cli@workspace:^, @cloudbeaver/core-cli@workspace:packages/core-cli":
+"@cloudbeaver/core-cli@workspace:*, @cloudbeaver/core-cli@workspace:packages/core-cli":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-cli@workspace:packages/core-cli"
   dependencies:
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@swc/core": "npm:^1"
     "@swc/jest": "npm:^0"
     "@testing-library/jest-dom": "npm:^6"
+    "@types/node": "npm:^20"
     enquirer: "npm:^2"
     execa: "npm:^9"
     fake-indexeddb: "npm:^6"
@@ -1849,6 +1859,7 @@ __metadata:
     jest: "npm:^29"
     jest-environment-jsdom: "npm:^29"
     tslib: "npm:^2"
+    typescript: "npm:^5"
     upath: "npm:^2"
   bin:
     core-cli-add-plugin: ./bin/add-plugin.js
@@ -1856,18 +1867,18 @@ __metadata:
     core-cli-dependency-graph: ./bin/dependency-graph.js
     core-cli-set-version: ./bin/set-version.mjs
     core-cli-test: ./bin/test.js
-    core-cli-validate-dependencies: ./bin/validate-dependencies.js
-    typescript-resolve-references: ./bin/typescript-resolve-references.js
+    core-cli-validate-dependencies: ./dist/cli/validate-dependencies.js
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-client-activity@npm:^0, @cloudbeaver/core-client-activity@workspace:packages/core-client-activity":
+"@cloudbeaver/core-client-activity@workspace:*, @cloudbeaver/core-client-activity@workspace:packages/core-client-activity":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-client-activity@workspace:packages/core-client-activity"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     mobx: "npm:^6"
@@ -1876,27 +1887,28 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-connections@npm:^0, @cloudbeaver/core-connections@workspace:packages/core-connections":
+"@cloudbeaver/core-connections@workspace:*, @cloudbeaver/core-connections@workspace:packages/core-connections":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-connections@workspace:packages/core-connections"
   dependencies:
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-extensions": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-extensions": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     react: "npm:^18"
@@ -1905,13 +1917,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-data-context@npm:^0, @cloudbeaver/core-data-context@workspace:packages/core-data-context":
+"@cloudbeaver/core-data-context@workspace:*, @cloudbeaver/core-data-context@workspace:packages/core-data-context":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-data-context@workspace:packages/core-data-context"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     react: "npm:^18"
@@ -1920,50 +1933,54 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-di@npm:^0, @cloudbeaver/core-di@workspace:packages/core-di":
+"@cloudbeaver/core-di@workspace:*, @cloudbeaver/core-di@workspace:packages/core-di":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-di@workspace:packages/core-di"
   dependencies:
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     "@types/react": "npm:^18"
     inversify: "npm:^6"
     mobx: "npm:^6"
     react: "npm:^18"
+    reflect-metadata: "npm:^0"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-dialogs@npm:^0, @cloudbeaver/core-dialogs@workspace:packages/core-dialogs":
+"@cloudbeaver/core-dialogs@workspace:*, @cloudbeaver/core-dialogs@workspace:packages/core-dialogs":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-dialogs@workspace:packages/core-dialogs"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-events@npm:^0, @cloudbeaver/core-events@workspace:packages/core-events":
+"@cloudbeaver/core-events@workspace:*, @cloudbeaver/core-events@workspace:packages/core-events":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-events@workspace:packages/core-events"
   dependencies:
-    "@cloudbeaver/core-client-activity": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tests-runner": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     mobx: "npm:^6"
@@ -1972,45 +1989,49 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-executor@npm:^0, @cloudbeaver/core-executor@workspace:packages/core-executor":
+"@cloudbeaver/core-executor@workspace:*, @cloudbeaver/core-executor@workspace:packages/core-executor":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-executor@workspace:packages/core-executor"
   dependencies:
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-extensions@npm:^0, @cloudbeaver/core-extensions@workspace:packages/core-extensions":
+"@cloudbeaver/core-extensions@workspace:*, @cloudbeaver/core-extensions@workspace:packages/core-extensions":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-extensions@workspace:packages/core-extensions"
   dependencies:
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-links@npm:^0, @cloudbeaver/core-links@workspace:packages/core-links":
+"@cloudbeaver/core-links@workspace:*, @cloudbeaver/core-links@workspace:packages/core-links":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-links@workspace:packages/core-links"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-localization@npm:^0, @cloudbeaver/core-localization@workspace:packages/core-localization":
+"@cloudbeaver/core-localization@workspace:*, @cloudbeaver/core-localization@workspace:packages/core-localization":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-localization@workspace:packages/core-localization"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     mobx: "npm:^6"
@@ -2019,31 +2040,32 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-navigation-tree@npm:^0, @cloudbeaver/core-navigation-tree@workspace:packages/core-navigation-tree":
+"@cloudbeaver/core-navigation-tree@workspace:*, @cloudbeaver/core-navigation-tree@workspace:packages/core-navigation-tree":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-navigation-tree@workspace:packages/core-navigation-tree"
   dependencies:
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-browser": "npm:^0"
-    "@cloudbeaver/core-client-activity": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-extensions": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-storage": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/tests-runner": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-browser": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-extensions": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     mobx: "npm:^6"
@@ -2052,17 +2074,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-notifications@npm:^0, @cloudbeaver/core-notifications@workspace:packages/core-notifications":
+"@cloudbeaver/core-notifications@workspace:*, @cloudbeaver/core-notifications@workspace:packages/core-notifications":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-notifications@workspace:packages/core-notifications"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
+    mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     reakit: "npm:^1"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -2070,70 +2095,73 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-product@npm:^0, @cloudbeaver/core-product@workspace:packages/core-product":
+"@cloudbeaver/core-product@workspace:*, @cloudbeaver/core-product@workspace:packages/core-product":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-product@workspace:packages/core-product"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-projects@npm:^0, @cloudbeaver/core-projects@workspace:packages/core-projects":
+"@cloudbeaver/core-projects@workspace:*, @cloudbeaver/core-projects@workspace:packages/core-projects":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-projects@workspace:packages/core-projects"
   dependencies:
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-extensions": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-extensions": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-resource-manager@npm:^0, @cloudbeaver/core-resource-manager@workspace:packages/core-resource-manager":
+"@cloudbeaver/core-resource-manager@workspace:*, @cloudbeaver/core-resource-manager@workspace:packages/core-resource-manager":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-resource-manager@workspace:packages/core-resource-manager"
   dependencies:
-    "@cloudbeaver/core-administration": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-resource@npm:^0, @cloudbeaver/core-resource@workspace:packages/core-resource":
+"@cloudbeaver/core-resource@workspace:*, @cloudbeaver/core-resource@workspace:packages/core-resource":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-resource@workspace:packages/core-resource"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     mobx: "npm:^6"
@@ -2142,22 +2170,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-root@npm:^0, @cloudbeaver/core-root@workspace:packages/core-root":
+"@cloudbeaver/core-root@workspace:*, @cloudbeaver/core-root@workspace:packages/core-root":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-root@workspace:packages/core-root"
   dependencies:
-    "@cloudbeaver/core-client-activity": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-links": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-product": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tests-runner": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-links": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-product": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     mobx: "npm:^6"
@@ -2168,14 +2197,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-routing@npm:^0, @cloudbeaver/core-routing@workspace:packages/core-routing":
+"@cloudbeaver/core-routing@workspace:*, @cloudbeaver/core-routing@workspace:packages/core-routing":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-routing@workspace:packages/core-routing"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
     router5: "npm:^8"
     router5-plugin-browser: "npm:^8"
@@ -2184,14 +2214,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-sdk@npm:^0, @cloudbeaver/core-sdk@workspace:packages/core-sdk":
+"@cloudbeaver/core-sdk@workspace:*, @cloudbeaver/core-sdk@workspace:packages/core-sdk":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-sdk@workspace:packages/core-sdk"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@graphql-codegen/add": "npm:^5"
     "@graphql-codegen/cli": "npm:^5"
     "@graphql-codegen/near-operation-file-preset": "npm:^3"
@@ -2210,46 +2240,49 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-server-localization@npm:^0, @cloudbeaver/core-server-localization@workspace:packages/core-server-localization":
+"@cloudbeaver/core-server-localization@workspace:*, @cloudbeaver/core-server-localization@workspace:packages/core-server-localization":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-server-localization@workspace:packages/core-server-localization"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-session-localization@npm:^0, @cloudbeaver/core-session-localization@workspace:packages/core-session-localization":
+"@cloudbeaver/core-session-localization@workspace:*, @cloudbeaver/core-session-localization@workspace:packages/core-session-localization":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-session-localization@workspace:packages/core-session-localization"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-settings-localization": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-settings-localization": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-settings-localization@npm:^0, @cloudbeaver/core-settings-localization@workspace:packages/core-settings-localization":
+"@cloudbeaver/core-settings-localization@workspace:*, @cloudbeaver/core-settings-localization@workspace:packages/core-settings-localization":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-settings-localization@workspace:packages/core-settings-localization"
   dependencies:
-    "@cloudbeaver/core-client-activity": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tests-runner": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     mobx: "npm:^6"
@@ -2258,34 +2291,36 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-settings-user@npm:^0, @cloudbeaver/core-settings-user@workspace:packages/core-settings-user":
+"@cloudbeaver/core-settings-user@workspace:*, @cloudbeaver/core-settings-user@workspace:packages/core-settings-user":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-settings-user@workspace:packages/core-settings-user"
   dependencies:
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-storage": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-settings@npm:^0, @cloudbeaver/core-settings@workspace:packages/core-settings":
+"@cloudbeaver/core-settings@workspace:*, @cloudbeaver/core-settings@workspace:packages/core-settings":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-settings@workspace:packages/core-settings"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tests-runner": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     mobx: "npm:^6"
@@ -2294,48 +2329,51 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-storage@npm:^0, @cloudbeaver/core-storage@workspace:packages/core-storage":
+"@cloudbeaver/core-storage@workspace:*, @cloudbeaver/core-storage@workspace:packages/core-storage":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-storage@workspace:packages/core-storage"
   dependencies:
-    "@cloudbeaver/core-browser": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-browser": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-task-manager@npm:^0, @cloudbeaver/core-task-manager@workspace:packages/core-task-manager":
+"@cloudbeaver/core-task-manager@workspace:*, @cloudbeaver/core-task-manager@workspace:packages/core-task-manager":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-task-manager@workspace:packages/core-task-manager"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-theming@npm:^0, @cloudbeaver/core-theming@workspace:packages/core-theming":
+"@cloudbeaver/core-theming@workspace:*, @cloudbeaver/core-theming@workspace:packages/core-theming":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-theming@workspace:packages/core-theming"
   dependencies:
-    "@cloudbeaver/core-client-activity": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tests-runner": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@fontsource/roboto": "npm:^5"
     "@jest/globals": "npm:^29"
     "@material/button": "npm:^4"
@@ -2355,28 +2393,29 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-ui@npm:^0, @cloudbeaver/core-ui@workspace:packages/core-ui":
+"@cloudbeaver/core-ui@workspace:*, @cloudbeaver/core-ui@workspace:packages/core-ui":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-ui@workspace:packages/core-ui"
   dependencies:
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
     react-dnd: "npm:^16"
     react-dnd-html5-backend: "npm:^16"
+    react-dom: "npm:^18"
     reakit: "npm:^1"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -2384,11 +2423,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-utils@npm:^0, @cloudbeaver/core-utils@workspace:packages/core-utils":
+"@cloudbeaver/core-utils@workspace:*, @cloudbeaver/core-utils@workspace:packages/core-utils":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-utils@workspace:packages/core-utils"
   dependencies:
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@timohausmann/quadtree-ts": "npm:^2"
     "@types/jest": "npm:^29"
@@ -2412,16 +2452,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-version-update@npm:^0, @cloudbeaver/core-version-update@workspace:packages/core-version-update":
+"@cloudbeaver/core-version-update@workspace:*, @cloudbeaver/core-version-update@workspace:packages/core-version-update":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-version-update@workspace:packages/core-version-update"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-version": "npm:^0"
-    "@cloudbeaver/core-version-update": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-version": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     react: "npm:^18"
@@ -2430,16 +2470,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-version@npm:^0, @cloudbeaver/core-version@workspace:packages/core-version":
+"@cloudbeaver/core-version@workspace:*, @cloudbeaver/core-version@workspace:packages/core-version":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-version@workspace:packages/core-version"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     "@types/semver": "npm:^7"
     mobx: "npm:^6"
@@ -2450,21 +2491,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/core-view@npm:^0, @cloudbeaver/core-view@workspace:packages/core-view":
+"@cloudbeaver/core-view@workspace:*, @cloudbeaver/core-view@workspace:packages/core-view":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/core-view@workspace:packages/core-view"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-extensions": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-extensions": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     react-hotkeys-hook: "npm:^4"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -2472,11 +2515,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/eslint-config@workspace:^, @cloudbeaver/eslint-config@workspace:packages/eslint-config":
+"@cloudbeaver/eslint-config@workspace:*, @cloudbeaver/eslint-config@workspace:packages/eslint-config":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/eslint-config@workspace:packages/eslint-config"
   dependencies:
-    "@cloudbeaver/eslint-plugin": "workspace:^"
+    "@cloudbeaver/eslint-plugin": "workspace:*"
     "@typescript-eslint/eslint-plugin": "npm:^6"
     "@typescript-eslint/parser": "npm:^6"
     eslint: "npm:^8"
@@ -2486,7 +2529,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/eslint-plugin@workspace:^, @cloudbeaver/eslint-plugin@workspace:packages/eslint-plugin":
+"@cloudbeaver/eslint-plugin@workspace:*, @cloudbeaver/eslint-plugin@workspace:packages/eslint-plugin":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/eslint-plugin@workspace:packages/eslint-plugin"
   dependencies:
@@ -2494,105 +2537,109 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-administration@npm:^0, @cloudbeaver/plugin-administration@workspace:packages/plugin-administration":
+"@cloudbeaver/plugin-administration@workspace:*, @cloudbeaver/plugin-administration@workspace:packages/plugin-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-administration@workspace:packages/plugin-administration"
   dependencies:
-    "@cloudbeaver/core-administration": "npm:^0"
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-settings-menu": "npm:^0"
-    "@cloudbeaver/plugin-top-app-bar": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-settings-menu": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-app-logo-administration@npm:^0, @cloudbeaver/plugin-app-logo-administration@workspace:packages/plugin-app-logo-administration":
+"@cloudbeaver/plugin-app-logo-administration@workspace:*, @cloudbeaver/plugin-app-logo-administration@workspace:packages/plugin-app-logo-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-app-logo-administration@workspace:packages/plugin-app-logo-administration"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/plugin-administration": "npm:^0"
-    "@cloudbeaver/plugin-app-logo": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/plugin-administration": "workspace:*"
+    "@cloudbeaver/plugin-app-logo": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-app-logo@npm:^0, @cloudbeaver/plugin-app-logo@workspace:packages/plugin-app-logo":
+"@cloudbeaver/plugin-app-logo@workspace:*, @cloudbeaver/plugin-app-logo@workspace:packages/plugin-app-logo":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-app-logo@workspace:packages/plugin-app-logo"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-version": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-holidays": "npm:^0"
-    "@cloudbeaver/plugin-top-app-bar": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-version": "workspace:*"
+    "@cloudbeaver/plugin-holidays": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
-    typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-authentication-administration@npm:^0, @cloudbeaver/plugin-authentication-administration@workspace:packages/plugin-authentication-administration":
+"@cloudbeaver/plugin-authentication-administration@workspace:*, @cloudbeaver/plugin-authentication-administration@workspace:packages/plugin-authentication-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-authentication-administration@workspace:packages/plugin-authentication-administration"
   dependencies:
-    "@cloudbeaver/core-administration": "npm:^0"
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-administration": "npm:^0"
-    "@cloudbeaver/plugin-authentication": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-administration": "workspace:*"
+    "@cloudbeaver/plugin-authentication": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     reakit: "npm:^1"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -2600,61 +2647,62 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-authentication@npm:^0, @cloudbeaver/plugin-authentication@workspace:packages/plugin-authentication":
+"@cloudbeaver/plugin-authentication@workspace:*, @cloudbeaver/plugin-authentication@workspace:packages/plugin-authentication":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-authentication@workspace:packages/plugin-authentication"
   dependencies:
-    "@cloudbeaver/core-administration": "npm:^0"
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-administration": "npm:^0"
-    "@cloudbeaver/plugin-settings-menu": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-settings-menu": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-browser@npm:^0, @cloudbeaver/plugin-browser@workspace:packages/plugin-browser":
+"@cloudbeaver/plugin-browser@workspace:*, @cloudbeaver/plugin-browser@workspace:packages/plugin-browser":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-browser@workspace:packages/plugin-browser"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-browser": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-browser": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-codemirror6@npm:^0, @cloudbeaver/plugin-codemirror6@workspace:packages/plugin-codemirror6":
+"@cloudbeaver/plugin-codemirror6@workspace:*, @cloudbeaver/plugin-codemirror6@workspace:packages/plugin-codemirror6":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-codemirror6@workspace:packages/plugin-codemirror6"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-theming": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-theming": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@codemirror/autocomplete": "npm:^6"
     "@codemirror/commands": "npm:^6"
     "@codemirror/lang-html": "npm:^6"
@@ -2671,6 +2719,7 @@ __metadata:
     "@lezer/highlight": "npm:^1"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18"
+    mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
     react-dom: "npm:^18"
@@ -2680,159 +2729,169 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-connection-custom@npm:^0, @cloudbeaver/plugin-connection-custom@workspace:packages/plugin-connection-custom":
+"@cloudbeaver/plugin-connection-custom@workspace:*, @cloudbeaver/plugin-connection-custom@workspace:packages/plugin-connection-custom":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-connection-custom@workspace:packages/plugin-connection-custom"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-connections": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tree": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-connections": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-connection-search@npm:^0, @cloudbeaver/plugin-connection-search@workspace:packages/plugin-connection-search":
+"@cloudbeaver/plugin-connection-search@workspace:*, @cloudbeaver/plugin-connection-search@workspace:packages/plugin-connection-search":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-connection-search@workspace:packages/plugin-connection-search"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-connections": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-connections": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-connection-template@npm:^0, @cloudbeaver/plugin-connection-template@workspace:packages/plugin-connection-template":
+"@cloudbeaver/plugin-connection-template@workspace:*, @cloudbeaver/plugin-connection-template@workspace:packages/plugin-connection-template":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-connection-template@workspace:packages/plugin-connection-template"
   dependencies:
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-connections": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-connections": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-connections-administration@npm:^0, @cloudbeaver/plugin-connections-administration@workspace:packages/plugin-connections-administration":
+"@cloudbeaver/plugin-connections-administration@workspace:*, @cloudbeaver/plugin-connections-administration@workspace:packages/plugin-connections-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-connections-administration@workspace:packages/plugin-connections-administration"
   dependencies:
-    "@cloudbeaver/core-administration": "npm:^0"
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/plugin-connections": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-connections": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-connections@npm:^0, @cloudbeaver/plugin-connections@workspace:packages/plugin-connections":
+"@cloudbeaver/plugin-connections@workspace:*, @cloudbeaver/plugin-connections@workspace:packages/plugin-connections":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-connections@workspace:packages/plugin-connections"
   dependencies:
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-authentication": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tree": "npm:^0"
-    "@cloudbeaver/plugin-projects": "npm:^0"
-    "@cloudbeaver/plugin-top-app-bar": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-authentication": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/plugin-projects": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -2843,8 +2902,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-d3js@workspace:packages/plugin-d3js"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/d3": "npm:^7"
     "@types/d3-drag": "npm:^3"
     d3: "npm:^7"
@@ -2854,116 +2914,124 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-data-export@npm:^0, @cloudbeaver/plugin-data-export@workspace:packages/plugin-data-export":
+"@cloudbeaver/plugin-data-export@workspace:*, @cloudbeaver/plugin-data-export@workspace:packages/plugin-data-export":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-data-export@workspace:packages/plugin-data-export"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-data-viewer": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-data-grid@npm:^0, @cloudbeaver/plugin-data-grid@workspace:packages/plugin-data-grid":
+"@cloudbeaver/plugin-data-grid@workspace:*, @cloudbeaver/plugin-data-grid@workspace:packages/plugin-data-grid":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-data-grid@workspace:packages/plugin-data-grid"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/plugin-react-data-grid": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/plugin-react-data-grid": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     clsx: "npm:^2"
+    mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-data-import@npm:^0, @cloudbeaver/plugin-data-import@workspace:packages/plugin-data-import":
+"@cloudbeaver/plugin-data-import@workspace:*, @cloudbeaver/plugin-data-import@workspace:packages/plugin-data-import":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-data-import@workspace:packages/plugin-data-import"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-data-viewer": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-data-spreadsheet-new@npm:^0, @cloudbeaver/plugin-data-spreadsheet-new@workspace:packages/plugin-data-spreadsheet-new":
+"@cloudbeaver/plugin-data-spreadsheet-new@workspace:*, @cloudbeaver/plugin-data-spreadsheet-new@workspace:packages/plugin-data-spreadsheet-new":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-data-spreadsheet-new@workspace:packages/plugin-data-spreadsheet-new"
   dependencies:
-    "@cloudbeaver/core-administration": "npm:^0"
-    "@cloudbeaver/core-app": "npm:^0"
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-browser": "npm:^0"
-    "@cloudbeaver/core-client-activity": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-storage": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-data-grid": "npm:^0"
-    "@cloudbeaver/plugin-data-viewer": "npm:^0"
-    "@cloudbeaver/plugin-datasource-context-switch": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tabs": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tree": "npm:^0"
-    "@cloudbeaver/plugin-object-viewer": "npm:^0"
-    "@cloudbeaver/tests-runner": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-app": "workspace:*"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-browser": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-data-grid": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer": "workspace:*"
+    "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/plugin-object-viewer": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@popperjs/core": "npm:^2"
     "@types/jest": "npm:^29"
@@ -2980,98 +3048,104 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-data-viewer-result-set-grouping@npm:^0, @cloudbeaver/plugin-data-viewer-result-set-grouping@workspace:packages/plugin-data-viewer-result-set-grouping":
+"@cloudbeaver/plugin-data-viewer-result-set-grouping@workspace:*, @cloudbeaver/plugin-data-viewer-result-set-grouping@workspace:packages/plugin-data-viewer-result-set-grouping":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-data-viewer-result-set-grouping@workspace:packages/plugin-data-viewer-result-set-grouping"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-data-viewer": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-data-viewer-result-trace-details@npm:^0, @cloudbeaver/plugin-data-viewer-result-trace-details@workspace:packages/plugin-data-viewer-result-trace-details":
+"@cloudbeaver/plugin-data-viewer-result-trace-details@workspace:*, @cloudbeaver/plugin-data-viewer-result-trace-details@workspace:packages/plugin-data-viewer-result-trace-details":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-data-viewer-result-trace-details@workspace:packages/plugin-data-viewer-result-trace-details"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/plugin-data-grid": "npm:^0"
-    "@cloudbeaver/plugin-data-viewer": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-data-grid": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-data-viewer@npm:^0, @cloudbeaver/plugin-data-viewer@workspace:packages/plugin-data-viewer":
+"@cloudbeaver/plugin-data-viewer@workspace:*, @cloudbeaver/plugin-data-viewer@workspace:packages/plugin-data-viewer":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-data-viewer@workspace:packages/plugin-data-viewer"
   dependencies:
-    "@cloudbeaver/core-administration": "npm:^0"
-    "@cloudbeaver/core-app": "npm:^0"
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-browser": "npm:^0"
-    "@cloudbeaver/core-client-activity": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-links": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-storage": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-codemirror6": "npm:^0"
-    "@cloudbeaver/plugin-datasource-context-switch": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tabs": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tree": "npm:^0"
-    "@cloudbeaver/plugin-object-viewer": "npm:^0"
-    "@cloudbeaver/tests-runner": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-app": "workspace:*"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-browser": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-links": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-codemirror6": "workspace:*"
+    "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/plugin-object-viewer": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     reflect-metadata: "npm:^0"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -3079,118 +3153,127 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-datasource-context-switch@npm:^0, @cloudbeaver/plugin-datasource-context-switch@workspace:packages/plugin-datasource-context-switch":
+"@cloudbeaver/plugin-datasource-context-switch@workspace:*, @cloudbeaver/plugin-datasource-context-switch@workspace:packages/plugin-datasource-context-switch":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-datasource-context-switch@workspace:packages/plugin-datasource-context-switch"
   dependencies:
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-extensions": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tabs": "npm:^0"
-    "@cloudbeaver/plugin-top-app-bar": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-extensions": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-datasource-transaction-manager@npm:^0, @cloudbeaver/plugin-datasource-transaction-manager@workspace:packages/plugin-datasource-transaction-manager":
+"@cloudbeaver/plugin-datasource-transaction-manager@workspace:*, @cloudbeaver/plugin-datasource-transaction-manager@workspace:packages/plugin-datasource-transaction-manager":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-datasource-transaction-manager@workspace:packages/plugin-datasource-transaction-manager"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-codemirror6": "npm:^0"
-    "@cloudbeaver/plugin-data-grid": "npm:^0"
-    "@cloudbeaver/plugin-datasource-context-switch": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor-new": "npm:^0"
-    "@cloudbeaver/plugin-top-app-bar": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-codemirror6": "workspace:*"
+    "@cloudbeaver/plugin-data-grid": "workspace:*"
+    "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-new": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-ddl-viewer@npm:^0, @cloudbeaver/plugin-ddl-viewer@workspace:packages/plugin-ddl-viewer":
+"@cloudbeaver/plugin-ddl-viewer@workspace:*, @cloudbeaver/plugin-ddl-viewer@workspace:packages/plugin-ddl-viewer":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-ddl-viewer@workspace:packages/plugin-ddl-viewer"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-codemirror6": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tree": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor-navigation-tab": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor-new": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-codemirror6": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-new": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
+    mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-devtools@npm:^0, @cloudbeaver/plugin-devtools@workspace:packages/plugin-devtools":
+"@cloudbeaver/plugin-devtools@workspace:*, @cloudbeaver/plugin-devtools@workspace:packages/plugin-devtools":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-devtools@workspace:packages/plugin-devtools"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-storage": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-settings-menu": "npm:^0"
-    "@cloudbeaver/plugin-user-profile": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-settings-menu": "workspace:*"
+    "@cloudbeaver/plugin-user-profile": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -3198,25 +3281,28 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-gis-viewer@npm:^0, @cloudbeaver/plugin-gis-viewer@workspace:packages/plugin-gis-viewer":
+"@cloudbeaver/plugin-gis-viewer@workspace:*, @cloudbeaver/plugin-gis-viewer@workspace:packages/plugin-gis-viewer":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-gis-viewer@workspace:packages/plugin-gis-viewer"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/plugin-data-viewer": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/leaflet": "npm:^1"
     "@types/proj4": "npm:^2"
     "@types/react": "npm:^18"
     "@types/wellknown": "npm:^0"
     leaflet: "npm:^1"
+    mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     proj4: "npm:^2"
     react: "npm:^18"
+    react-dom: "npm:^18"
     react-leaflet: "npm:^4"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -3225,27 +3311,29 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-help@npm:^0, @cloudbeaver/plugin-help@workspace:packages/plugin-help":
+"@cloudbeaver/plugin-help@workspace:*, @cloudbeaver/plugin-help@workspace:packages/plugin-help":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-help@workspace:packages/plugin-help"
   dependencies:
-    "@cloudbeaver/core-app": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-browser": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-links": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-data-spreadsheet-new": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tree": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor-navigation-tab-script": "npm:^0"
-    "@cloudbeaver/plugin-top-app-bar": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-app": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-browser": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-links": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-data-spreadsheet-new": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/plugin-object-viewer-nav-tree-link": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-navigation-tab-script": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     react: "npm:^18"
     tslib: "npm:^2"
@@ -3254,245 +3342,275 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-holidays-administration@npm:^0, @cloudbeaver/plugin-holidays-administration@workspace:packages/plugin-holidays-administration":
+"@cloudbeaver/plugin-holidays-administration@workspace:*, @cloudbeaver/plugin-holidays-administration@workspace:packages/plugin-holidays-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-holidays-administration@workspace:packages/plugin-holidays-administration"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/plugin-administration": "npm:^0"
-    "@cloudbeaver/plugin-holidays": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/plugin-administration": "workspace:*"
+    "@cloudbeaver/plugin-holidays": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-holidays@npm:^0, @cloudbeaver/plugin-holidays@workspace:packages/plugin-holidays":
+"@cloudbeaver/plugin-holidays@workspace:*, @cloudbeaver/plugin-holidays@workspace:packages/plugin-holidays":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-holidays@workspace:packages/plugin-holidays"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/plugin-top-app-bar": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-localization@npm:^0, @cloudbeaver/plugin-localization@workspace:packages/plugin-localization":
+"@cloudbeaver/plugin-localization@workspace:*, @cloudbeaver/plugin-localization@workspace:packages/plugin-localization":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-localization@workspace:packages/plugin-localization"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-log-viewer@npm:^0, @cloudbeaver/plugin-log-viewer@workspace:packages/plugin-log-viewer":
+"@cloudbeaver/plugin-log-viewer@workspace:*, @cloudbeaver/plugin-log-viewer@workspace:packages/plugin-log-viewer":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-log-viewer@workspace:packages/plugin-log-viewer"
   dependencies:
-    "@cloudbeaver/core-app": "npm:^0"
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-browser": "npm:^0"
-    "@cloudbeaver/core-client-activity": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-storage": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-tools-panel": "npm:^0"
-    "@cloudbeaver/tests-runner": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-app": "workspace:*"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-browser": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-tools-panel": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-navigation-tabs@npm:^0, @cloudbeaver/plugin-navigation-tabs@workspace:packages/plugin-navigation-tabs":
+"@cloudbeaver/plugin-navigation-tabs@workspace:*, @cloudbeaver/plugin-navigation-tabs@workspace:packages/plugin-navigation-tabs":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-navigation-tabs@workspace:packages/plugin-navigation-tabs"
   dependencies:
-    "@cloudbeaver/core-administration": "npm:^0"
-    "@cloudbeaver/core-app": "npm:^0"
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-extensions": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-storage": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-app": "workspace:*"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-extensions": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-navigation-tree-filters@npm:^0, @cloudbeaver/plugin-navigation-tree-filters@workspace:packages/plugin-navigation-tree-filters":
+"@cloudbeaver/plugin-navigation-tree-filters@workspace:*, @cloudbeaver/plugin-navigation-tree-filters@workspace:packages/plugin-navigation-tree-filters":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-navigation-tree-filters@workspace:packages/plugin-navigation-tree-filters"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-navigation-tree-rm@npm:^0, @cloudbeaver/plugin-navigation-tree-rm@workspace:packages/plugin-navigation-tree-rm":
+"@cloudbeaver/plugin-navigation-tree-rm@workspace:*, @cloudbeaver/plugin-navigation-tree-rm@workspace:packages/plugin-navigation-tree-rm":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-navigation-tree-rm@workspace:packages/plugin-navigation-tree-rm"
   dependencies:
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-resource-manager": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tree": "npm:^0"
-    "@cloudbeaver/plugin-projects": "npm:^0"
-    "@cloudbeaver/plugin-resource-manager": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-resource-manager": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/plugin-projects": "workspace:*"
+    "@cloudbeaver/plugin-resource-manager": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
+    mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-navigation-tree@npm:^0, @cloudbeaver/plugin-navigation-tree@workspace:packages/plugin-navigation-tree":
+"@cloudbeaver/plugin-navigation-tree@workspace:*, @cloudbeaver/plugin-navigation-tree@workspace:packages/plugin-navigation-tree":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-navigation-tree@workspace:packages/plugin-navigation-tree"
   dependencies:
-    "@cloudbeaver/core-administration": "npm:^0"
-    "@cloudbeaver/core-app": "npm:^0"
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-browser": "npm:^0"
-    "@cloudbeaver/core-client-activity": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-product": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-storage": "npm:^0"
-    "@cloudbeaver/core-theming": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-datasource-context-switch": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tabs": "npm:^0"
-    "@cloudbeaver/tests-runner": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-app": "workspace:*"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-browser": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-object-viewer@npm:^0, @cloudbeaver/plugin-object-viewer@workspace:packages/plugin-object-viewer":
+"@cloudbeaver/plugin-object-viewer-nav-tree-link@workspace:*, @cloudbeaver/plugin-object-viewer-nav-tree-link@workspace:packages/plugin-object-viewer-nav-tree-link":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-object-viewer-nav-tree-link@workspace:packages/plugin-object-viewer-nav-tree-link"
+  dependencies:
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-object-viewer@workspace:*, @cloudbeaver/plugin-object-viewer@workspace:packages/plugin-object-viewer":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-object-viewer@workspace:packages/plugin-object-viewer"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-connections": "npm:^0"
-    "@cloudbeaver/plugin-data-grid": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tabs": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tree": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-connections": "workspace:*"
+    "@cloudbeaver/plugin-data-grid": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     reakit: "npm:^1"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -3500,155 +3618,167 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-product-information-administration@npm:^0, @cloudbeaver/plugin-product-information-administration@workspace:packages/plugin-product-information-administration":
+"@cloudbeaver/plugin-product-information-administration@workspace:*, @cloudbeaver/plugin-product-information-administration@workspace:packages/plugin-product-information-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-product-information-administration@workspace:packages/plugin-product-information-administration"
   dependencies:
-    "@cloudbeaver/core-administration": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-version": "npm:^0"
-    "@cloudbeaver/core-version-update": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
-    "@types/react": "npm:^18"
-    mobx-react-lite: "npm:^4"
-    react: "npm:^18"
-    tslib: "npm:^2"
-    typescript: "npm:^5"
-    typescript-plugin-css-modules: "npm:^5"
-  languageName: unknown
-  linkType: soft
-
-"@cloudbeaver/plugin-product@npm:^0, @cloudbeaver/plugin-product@workspace:packages/plugin-product":
-  version: 0.0.0-use.local
-  resolution: "@cloudbeaver/plugin-product@workspace:packages/plugin-product"
-  dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-links": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-theming": "npm:^0"
-    "@cloudbeaver/core-version": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-settings-menu": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
-    "@types/react": "npm:^18"
-    mobx-react-lite: "npm:^4"
-    react: "npm:^18"
-    tslib: "npm:^2"
-    typescript: "npm:^5"
-    typescript-plugin-css-modules: "npm:^5"
-  languageName: unknown
-  linkType: soft
-
-"@cloudbeaver/plugin-projects@npm:^0, @cloudbeaver/plugin-projects@workspace:packages/plugin-projects":
-  version: 0.0.0-use.local
-  resolution: "@cloudbeaver/plugin-projects@workspace:packages/plugin-projects"
-  dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-version": "workspace:*"
+    "@cloudbeaver/core-version-update": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-react-data-grid@npm:^0, @cloudbeaver/plugin-react-data-grid@workspace:packages/plugin-react-data-grid":
+"@cloudbeaver/plugin-product@workspace:*, @cloudbeaver/plugin-product@workspace:packages/plugin-product":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-product@workspace:packages/plugin-product"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-links": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-theming": "workspace:*"
+    "@cloudbeaver/core-version": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-settings-menu": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@types/react": "npm:^18"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^18"
+    react-dom: "npm:^18"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-projects@workspace:*, @cloudbeaver/plugin-projects@workspace:packages/plugin-projects":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-projects@workspace:packages/plugin-projects"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@types/react": "npm:^18"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^18"
+    react-dom: "npm:^18"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-react-data-grid@workspace:*, @cloudbeaver/plugin-react-data-grid@workspace:packages/plugin-react-data-grid":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-react-data-grid@workspace:packages/plugin-react-data-grid"
   dependencies:
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     react-data-grid: "file:react-data-grid-dist"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-resource-manager-administration@npm:^0, @cloudbeaver/plugin-resource-manager-administration@workspace:packages/plugin-resource-manager-administration":
+"@cloudbeaver/plugin-resource-manager-administration@workspace:*, @cloudbeaver/plugin-resource-manager-administration@workspace:packages/plugin-resource-manager-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-resource-manager-administration@workspace:packages/plugin-resource-manager-administration"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/plugin-administration": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/plugin-administration": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
+    mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-resource-manager-scripts@npm:^0, @cloudbeaver/plugin-resource-manager-scripts@workspace:packages/plugin-resource-manager-scripts":
+"@cloudbeaver/plugin-resource-manager-scripts@workspace:*, @cloudbeaver/plugin-resource-manager-scripts@workspace:packages/plugin-resource-manager-scripts":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-resource-manager-scripts@workspace:packages/plugin-resource-manager-scripts"
   dependencies:
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-resource-manager": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tree-rm": "npm:^0"
-    "@cloudbeaver/plugin-projects": "npm:^0"
-    "@cloudbeaver/plugin-resource-manager": "npm:^0"
-    "@cloudbeaver/plugin-tools-panel": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-resource-manager": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree-rm": "workspace:*"
+    "@cloudbeaver/plugin-projects": "workspace:*"
+    "@cloudbeaver/plugin-resource-manager": "workspace:*"
+    "@cloudbeaver/plugin-tools-panel": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-resource-manager@npm:^0, @cloudbeaver/plugin-resource-manager@workspace:packages/plugin-resource-manager":
+"@cloudbeaver/plugin-resource-manager@workspace:*, @cloudbeaver/plugin-resource-manager@workspace:packages/plugin-resource-manager":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-resource-manager@workspace:packages/plugin-resource-manager"
   dependencies:
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-client-activity": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-resource-manager": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tests-runner": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-resource-manager": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     mobx: "npm:^6"
@@ -3657,391 +3787,422 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-root@npm:^0, @cloudbeaver/plugin-root@workspace:packages/plugin-root":
+"@cloudbeaver/plugin-root@workspace:*, @cloudbeaver/plugin-root@workspace:packages/plugin-root":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-root@workspace:packages/plugin-root"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
+    mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-session-expiration@npm:^0, @cloudbeaver/plugin-session-expiration@workspace:packages/plugin-session-expiration":
+"@cloudbeaver/plugin-session-expiration@workspace:*, @cloudbeaver/plugin-session-expiration@workspace:packages/plugin-session-expiration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-session-expiration@workspace:packages/plugin-session-expiration"
   dependencies:
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/plugin-root": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/plugin-root": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
+    mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-settings-administration@npm:^0, @cloudbeaver/plugin-settings-administration@workspace:packages/plugin-settings-administration":
+"@cloudbeaver/plugin-settings-administration@workspace:*, @cloudbeaver/plugin-settings-administration@workspace:packages/plugin-settings-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-settings-administration@workspace:packages/plugin-settings-administration"
   dependencies:
-    "@cloudbeaver/core-administration": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/plugin-settings-panel": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/plugin-settings-panel": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
+    mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
-    typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-settings-menu-administration@npm:^0, @cloudbeaver/plugin-settings-menu-administration@workspace:packages/plugin-settings-menu-administration":
+"@cloudbeaver/plugin-settings-menu-administration@workspace:*, @cloudbeaver/plugin-settings-menu-administration@workspace:packages/plugin-settings-menu-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-settings-menu-administration@workspace:packages/plugin-settings-menu-administration"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-settings-menu@npm:^0, @cloudbeaver/plugin-settings-menu@workspace:packages/plugin-settings-menu":
+"@cloudbeaver/plugin-settings-menu@workspace:*, @cloudbeaver/plugin-settings-menu@workspace:packages/plugin-settings-menu":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-settings-menu@workspace:packages/plugin-settings-menu"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-top-app-bar": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
+    mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-settings-panel@npm:^0, @cloudbeaver/plugin-settings-panel@workspace:packages/plugin-settings-panel":
+"@cloudbeaver/plugin-settings-panel@workspace:*, @cloudbeaver/plugin-settings-panel@workspace:packages/plugin-settings-panel":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-settings-panel@workspace:packages/plugin-settings-panel"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tree": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-sql-editor-navigation-tab-script@npm:^0, @cloudbeaver/plugin-sql-editor-navigation-tab-script@workspace:packages/plugin-sql-editor-navigation-tab-script":
+"@cloudbeaver/plugin-sql-editor-navigation-tab-script@workspace:*, @cloudbeaver/plugin-sql-editor-navigation-tab-script@workspace:packages/plugin-sql-editor-navigation-tab-script":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-sql-editor-navigation-tab-script@workspace:packages/plugin-sql-editor-navigation-tab-script"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-resource-manager": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-storage": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tabs": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tree-rm": "npm:^0"
-    "@cloudbeaver/plugin-resource-manager": "npm:^0"
-    "@cloudbeaver/plugin-resource-manager-scripts": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor-navigation-tab": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-resource-manager": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree-rm": "workspace:*"
+    "@cloudbeaver/plugin-resource-manager": "workspace:*"
+    "@cloudbeaver/plugin-resource-manager-scripts": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     mobx: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-sql-editor-navigation-tab@npm:^0, @cloudbeaver/plugin-sql-editor-navigation-tab@workspace:packages/plugin-sql-editor-navigation-tab":
+"@cloudbeaver/plugin-sql-editor-navigation-tab@workspace:*, @cloudbeaver/plugin-sql-editor-navigation-tab@workspace:packages/plugin-sql-editor-navigation-tab":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-sql-editor-navigation-tab@workspace:packages/plugin-sql-editor-navigation-tab"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-extensions": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-connections": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tabs": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor": "npm:^0"
-    "@cloudbeaver/plugin-top-app-bar": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-extensions": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-connections": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-sql-editor-new@npm:^0, @cloudbeaver/plugin-sql-editor-new@workspace:packages/plugin-sql-editor-new":
+"@cloudbeaver/plugin-sql-editor-new@workspace:*, @cloudbeaver/plugin-sql-editor-new@workspace:packages/plugin-sql-editor-new":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-sql-editor-new@workspace:packages/plugin-sql-editor-new"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/plugin-codemirror6": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-codemirror6": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-sql-editor-screen@npm:^0, @cloudbeaver/plugin-sql-editor-screen@workspace:packages/plugin-sql-editor-screen":
+"@cloudbeaver/plugin-sql-editor-screen@workspace:*, @cloudbeaver/plugin-sql-editor-screen@workspace:packages/plugin-sql-editor-screen":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-sql-editor-screen@workspace:packages/plugin-sql-editor-screen"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor-navigation-tab": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-sql-editor@npm:^0, @cloudbeaver/plugin-sql-editor@workspace:packages/plugin-sql-editor":
+"@cloudbeaver/plugin-sql-editor@workspace:*, @cloudbeaver/plugin-sql-editor@workspace:packages/plugin-sql-editor":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-sql-editor@workspace:packages/plugin-sql-editor"
   dependencies:
-    "@cloudbeaver/core-administration": "npm:^0"
-    "@cloudbeaver/core-app": "npm:^0"
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-browser": "npm:^0"
-    "@cloudbeaver/core-client-activity": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-projects": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-storage": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-codemirror6": "npm:^0"
-    "@cloudbeaver/plugin-data-viewer": "npm:^0"
-    "@cloudbeaver/plugin-datasource-context-switch": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tabs": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tree": "npm:^0"
-    "@cloudbeaver/plugin-object-viewer": "npm:^0"
-    "@cloudbeaver/tests-runner": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-app": "workspace:*"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-browser": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-client-activity": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-projects": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-routing": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-storage": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-codemirror6": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer": "workspace:*"
+    "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/plugin-object-viewer": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
     "@types/jest": "npm:^29"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-sql-generator@npm:^0, @cloudbeaver/plugin-sql-generator@workspace:packages/plugin-sql-generator":
+"@cloudbeaver/plugin-sql-generator@workspace:*, @cloudbeaver/plugin-sql-generator@workspace:packages/plugin-sql-generator":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-sql-generator@workspace:packages/plugin-sql-generator"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-connections": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-navigation-tree": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-codemirror6": "npm:^0"
-    "@cloudbeaver/plugin-data-viewer": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor-new": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-navigation-tree": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-codemirror6": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-new": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-sso@npm:^0, @cloudbeaver/plugin-sso@workspace:^, @cloudbeaver/plugin-sso@workspace:packages/plugin-sso":
+"@cloudbeaver/plugin-sso@workspace:*, @cloudbeaver/plugin-sso@workspace:packages/plugin-sso":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-sso@workspace:packages/plugin-sso"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-task-manager@npm:^0, @cloudbeaver/plugin-task-manager@workspace:packages/plugin-task-manager":
+"@cloudbeaver/plugin-task-manager@workspace:*, @cloudbeaver/plugin-task-manager@workspace:packages/plugin-task-manager":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-task-manager@workspace:packages/plugin-task-manager"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-task-manager": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-task-manager": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-theme@npm:^0, @cloudbeaver/plugin-theme@workspace:packages/plugin-theme":
+"@cloudbeaver/plugin-theme@workspace:*, @cloudbeaver/plugin-theme@workspace:packages/plugin-theme":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-theme@workspace:packages/plugin-theme"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-tools-panel@npm:^0, @cloudbeaver/plugin-tools-panel@workspace:packages/plugin-tools-panel":
+"@cloudbeaver/plugin-tools-panel@workspace:*, @cloudbeaver/plugin-tools-panel@workspace:packages/plugin-tools-panel":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-tools-panel@workspace:packages/plugin-tools-panel"
   dependencies:
-    "@cloudbeaver/core-app": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-settings": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-top-app-bar": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-app": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-top-app-bar-administration@npm:^0, @cloudbeaver/plugin-top-app-bar-administration@workspace:packages/plugin-top-app-bar-administration":
+"@cloudbeaver/plugin-top-app-bar-administration@workspace:*, @cloudbeaver/plugin-top-app-bar-administration@workspace:packages/plugin-top-app-bar-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-top-app-bar-administration@workspace:packages/plugin-top-app-bar-administration"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/plugin-administration": "npm:^0"
-    "@cloudbeaver/plugin-top-app-bar": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/plugin-administration": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     react: "npm:^18"
     tslib: "npm:^2"
@@ -4049,115 +4210,123 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-top-app-bar@npm:^0, @cloudbeaver/plugin-top-app-bar@workspace:packages/plugin-top-app-bar":
+"@cloudbeaver/plugin-top-app-bar@workspace:*, @cloudbeaver/plugin-top-app-bar@workspace:packages/plugin-top-app-bar":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-top-app-bar@workspace:packages/plugin-top-app-bar"
   dependencies:
-    "@cloudbeaver/core-app": "npm:^0"
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-routing": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-version": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
-    "@types/react": "npm:^18"
-    mobx-react-lite: "npm:^4"
-    react: "npm:^18"
-    tslib: "npm:^2"
-    typescript: "npm:^5"
-    typescript-plugin-css-modules: "npm:^5"
-  languageName: unknown
-  linkType: soft
-
-"@cloudbeaver/plugin-user-profile-administration@npm:^0, @cloudbeaver/plugin-user-profile-administration@workspace:packages/plugin-user-profile-administration":
-  version: 0.0.0-use.local
-  resolution: "@cloudbeaver/plugin-user-profile-administration@workspace:packages/plugin-user-profile-administration"
-  dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/plugin-administration": "npm:^0"
-    "@cloudbeaver/plugin-user-profile": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
-    tslib: "npm:^2"
-    typescript: "npm:^5"
-  languageName: unknown
-  linkType: soft
-
-"@cloudbeaver/plugin-user-profile-settings@npm:^0, @cloudbeaver/plugin-user-profile-settings@workspace:packages/plugin-user-profile-settings":
-  version: 0.0.0-use.local
-  resolution: "@cloudbeaver/plugin-user-profile-settings@workspace:packages/plugin-user-profile-settings"
-  dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-settings-user": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-settings-menu": "npm:^0"
-    "@cloudbeaver/plugin-settings-panel": "npm:^0"
-    "@cloudbeaver/plugin-user-profile": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
-    "@types/react": "npm:^18"
-    mobx-react-lite: "npm:^4"
-    react: "npm:^18"
-    tslib: "npm:^2"
-    typescript: "npm:^5"
-  languageName: unknown
-  linkType: soft
-
-"@cloudbeaver/plugin-user-profile@npm:^0, @cloudbeaver/plugin-user-profile@workspace:packages/plugin-user-profile":
-  version: 0.0.0-use.local
-  resolution: "@cloudbeaver/plugin-user-profile@workspace:packages/plugin-user-profile"
-  dependencies:
-    "@cloudbeaver/core-authentication": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-data-context": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-dialogs": "npm:^0"
-    "@cloudbeaver/core-events": "npm:^0"
-    "@cloudbeaver/core-executor": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-sdk": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-utils": "npm:^0"
-    "@cloudbeaver/core-view": "npm:^0"
-    "@cloudbeaver/plugin-authentication": "npm:^0"
-    "@cloudbeaver/plugin-top-app-bar": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-app": "workspace:*"
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-version-update-administration@npm:^0, @cloudbeaver/plugin-version-update-administration@workspace:packages/plugin-version-update-administration":
+"@cloudbeaver/plugin-user-profile-administration@workspace:*, @cloudbeaver/plugin-user-profile-administration@workspace:packages/plugin-user-profile-administration":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-user-profile-administration@workspace:packages/plugin-user-profile-administration"
+  dependencies:
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/plugin-administration": "workspace:*"
+    "@cloudbeaver/plugin-user-profile": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-user-profile-settings@workspace:*, @cloudbeaver/plugin-user-profile-settings@workspace:packages/plugin-user-profile-settings":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-user-profile-settings@workspace:packages/plugin-user-profile-settings"
+  dependencies:
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-settings-user": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-settings-menu": "workspace:*"
+    "@cloudbeaver/plugin-settings-panel": "workspace:*"
+    "@cloudbeaver/plugin-user-profile": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@types/react": "npm:^18"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^18"
+    react-dom: "npm:^18"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-user-profile@workspace:*, @cloudbeaver/plugin-user-profile@workspace:packages/plugin-user-profile":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-user-profile@workspace:packages/plugin-user-profile"
+  dependencies:
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-dialogs": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/core-view": "workspace:*"
+    "@cloudbeaver/plugin-authentication": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@types/react": "npm:^18"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^18"
+    react-dom: "npm:^18"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-version-update-administration@workspace:*, @cloudbeaver/plugin-version-update-administration@workspace:packages/plugin-version-update-administration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-version-update-administration@workspace:packages/plugin-version-update-administration"
   dependencies:
-    "@cloudbeaver/core-administration": "npm:^0"
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-links": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-resource": "npm:^0"
-    "@cloudbeaver/core-root": "npm:^0"
-    "@cloudbeaver/core-ui": "npm:^0"
-    "@cloudbeaver/core-version": "npm:^0"
-    "@cloudbeaver/core-version-update": "npm:^0"
-    "@cloudbeaver/plugin-product-information-administration": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/core-version": "workspace:*"
+    "@cloudbeaver/core-version-update": "workspace:*"
+    "@cloudbeaver/plugin-product-information-administration": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
+    mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^18"
+    react-dom: "npm:^18"
     react-markdown: "npm:^9"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -4165,22 +4334,24 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-version@npm:^0, @cloudbeaver/plugin-version@workspace:packages/plugin-version":
+"@cloudbeaver/plugin-version@workspace:*, @cloudbeaver/plugin-version@workspace:packages/plugin-version":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-version@workspace:packages/plugin-version"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/product-base@workspace:^, @cloudbeaver/product-base@workspace:packages/product-base":
+"@cloudbeaver/product-base@workspace:*, @cloudbeaver/product-base@workspace:packages/product-base":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/product-base@workspace:packages/product-base"
   dependencies:
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/fs-extra": "npm:^11"
     "@types/node": "npm:^20"
     "@vitejs/plugin-react": "npm:^4"
@@ -4195,81 +4366,81 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/product-default-impl@workspace:^, @cloudbeaver/product-default-impl@workspace:packages/product-default-impl":
+"@cloudbeaver/product-default-impl@workspace:*, @cloudbeaver/product-default-impl@workspace:packages/product-default-impl":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/product-default-impl@workspace:packages/product-default-impl"
   dependencies:
-    "@cloudbeaver/core-blocks": "npm:^0"
-    "@cloudbeaver/core-bootstrap": "npm:^0"
-    "@cloudbeaver/core-cli": "npm:^0"
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/core-localization": "npm:^0"
-    "@cloudbeaver/core-version-update": "npm:^0"
-    "@cloudbeaver/plugin-administration": "npm:^0"
-    "@cloudbeaver/plugin-app-logo": "npm:^0"
-    "@cloudbeaver/plugin-app-logo-administration": "npm:^0"
-    "@cloudbeaver/plugin-authentication": "npm:^0"
-    "@cloudbeaver/plugin-authentication-administration": "npm:^0"
-    "@cloudbeaver/plugin-browser": "npm:^0"
-    "@cloudbeaver/plugin-connection-custom": "npm:^0"
-    "@cloudbeaver/plugin-connection-search": "npm:^0"
-    "@cloudbeaver/plugin-connection-template": "npm:^0"
-    "@cloudbeaver/plugin-connections": "npm:^0"
-    "@cloudbeaver/plugin-connections-administration": "npm:^0"
-    "@cloudbeaver/plugin-data-export": "npm:^0"
-    "@cloudbeaver/plugin-data-grid": "npm:^0"
-    "@cloudbeaver/plugin-data-import": "npm:^0"
-    "@cloudbeaver/plugin-data-spreadsheet-new": "npm:^0"
-    "@cloudbeaver/plugin-data-viewer": "npm:^0"
-    "@cloudbeaver/plugin-data-viewer-result-set-grouping": "npm:^0"
-    "@cloudbeaver/plugin-data-viewer-result-trace-details": "npm:^0"
-    "@cloudbeaver/plugin-datasource-context-switch": "npm:^0"
-    "@cloudbeaver/plugin-datasource-transaction-manager": "npm:^0"
-    "@cloudbeaver/plugin-ddl-viewer": "npm:^0"
-    "@cloudbeaver/plugin-devtools": "npm:^0"
-    "@cloudbeaver/plugin-gis-viewer": "npm:^0"
-    "@cloudbeaver/plugin-help": "npm:^0"
-    "@cloudbeaver/plugin-holidays": "npm:^0"
-    "@cloudbeaver/plugin-holidays-administration": "npm:^0"
-    "@cloudbeaver/plugin-localization": "npm:^0"
-    "@cloudbeaver/plugin-log-viewer": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tabs": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tree": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tree-filters": "npm:^0"
-    "@cloudbeaver/plugin-navigation-tree-rm": "npm:^0"
-    "@cloudbeaver/plugin-object-viewer": "npm:^0"
-    "@cloudbeaver/plugin-product": "npm:^0"
-    "@cloudbeaver/plugin-product-information-administration": "npm:^0"
-    "@cloudbeaver/plugin-projects": "npm:^0"
-    "@cloudbeaver/plugin-resource-manager": "npm:^0"
-    "@cloudbeaver/plugin-resource-manager-administration": "npm:^0"
-    "@cloudbeaver/plugin-resource-manager-scripts": "npm:^0"
-    "@cloudbeaver/plugin-root": "npm:^0"
-    "@cloudbeaver/plugin-session-expiration": "npm:^0"
-    "@cloudbeaver/plugin-settings-administration": "npm:^0"
-    "@cloudbeaver/plugin-settings-menu": "npm:^0"
-    "@cloudbeaver/plugin-settings-menu-administration": "npm:^0"
-    "@cloudbeaver/plugin-settings-panel": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor-navigation-tab": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor-navigation-tab-script": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor-new": "npm:^0"
-    "@cloudbeaver/plugin-sql-editor-screen": "npm:^0"
-    "@cloudbeaver/plugin-sql-generator": "npm:^0"
-    "@cloudbeaver/plugin-sso": "npm:^0"
-    "@cloudbeaver/plugin-task-manager": "npm:^0"
-    "@cloudbeaver/plugin-theme": "npm:^0"
-    "@cloudbeaver/plugin-tools-panel": "npm:^0"
-    "@cloudbeaver/plugin-top-app-bar": "npm:^0"
-    "@cloudbeaver/plugin-top-app-bar-administration": "npm:^0"
-    "@cloudbeaver/plugin-user-profile": "npm:^0"
-    "@cloudbeaver/plugin-user-profile-administration": "npm:^0"
-    "@cloudbeaver/plugin-user-profile-settings": "npm:^0"
-    "@cloudbeaver/plugin-version": "npm:^0"
-    "@cloudbeaver/plugin-version-update-administration": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-bootstrap": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-version-update": "workspace:*"
+    "@cloudbeaver/plugin-administration": "workspace:*"
+    "@cloudbeaver/plugin-app-logo": "workspace:*"
+    "@cloudbeaver/plugin-app-logo-administration": "workspace:*"
+    "@cloudbeaver/plugin-authentication": "workspace:*"
+    "@cloudbeaver/plugin-authentication-administration": "workspace:*"
+    "@cloudbeaver/plugin-browser": "workspace:*"
+    "@cloudbeaver/plugin-connection-custom": "workspace:*"
+    "@cloudbeaver/plugin-connection-search": "workspace:*"
+    "@cloudbeaver/plugin-connection-template": "workspace:*"
+    "@cloudbeaver/plugin-connections": "workspace:*"
+    "@cloudbeaver/plugin-connections-administration": "workspace:*"
+    "@cloudbeaver/plugin-data-export": "workspace:*"
+    "@cloudbeaver/plugin-data-grid": "workspace:*"
+    "@cloudbeaver/plugin-data-import": "workspace:*"
+    "@cloudbeaver/plugin-data-spreadsheet-new": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer-result-set-grouping": "workspace:*"
+    "@cloudbeaver/plugin-data-viewer-result-trace-details": "workspace:*"
+    "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
+    "@cloudbeaver/plugin-datasource-transaction-manager": "workspace:*"
+    "@cloudbeaver/plugin-ddl-viewer": "workspace:*"
+    "@cloudbeaver/plugin-devtools": "workspace:*"
+    "@cloudbeaver/plugin-gis-viewer": "workspace:*"
+    "@cloudbeaver/plugin-help": "workspace:*"
+    "@cloudbeaver/plugin-holidays": "workspace:*"
+    "@cloudbeaver/plugin-holidays-administration": "workspace:*"
+    "@cloudbeaver/plugin-localization": "workspace:*"
+    "@cloudbeaver/plugin-log-viewer": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree-filters": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tree-rm": "workspace:*"
+    "@cloudbeaver/plugin-object-viewer": "workspace:*"
+    "@cloudbeaver/plugin-object-viewer-nav-tree-link": "workspace:*"
+    "@cloudbeaver/plugin-product": "workspace:*"
+    "@cloudbeaver/plugin-product-information-administration": "workspace:*"
+    "@cloudbeaver/plugin-projects": "workspace:*"
+    "@cloudbeaver/plugin-resource-manager": "workspace:*"
+    "@cloudbeaver/plugin-resource-manager-administration": "workspace:*"
+    "@cloudbeaver/plugin-resource-manager-scripts": "workspace:*"
+    "@cloudbeaver/plugin-root": "workspace:*"
+    "@cloudbeaver/plugin-session-expiration": "workspace:*"
+    "@cloudbeaver/plugin-settings-administration": "workspace:*"
+    "@cloudbeaver/plugin-settings-menu": "workspace:*"
+    "@cloudbeaver/plugin-settings-menu-administration": "workspace:*"
+    "@cloudbeaver/plugin-settings-panel": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-navigation-tab-script": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-new": "workspace:*"
+    "@cloudbeaver/plugin-sql-editor-screen": "workspace:*"
+    "@cloudbeaver/plugin-sql-generator": "workspace:*"
+    "@cloudbeaver/plugin-sso": "workspace:*"
+    "@cloudbeaver/plugin-task-manager": "workspace:*"
+    "@cloudbeaver/plugin-theme": "workspace:*"
+    "@cloudbeaver/plugin-tools-panel": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar": "workspace:*"
+    "@cloudbeaver/plugin-top-app-bar-administration": "workspace:*"
+    "@cloudbeaver/plugin-user-profile": "workspace:*"
+    "@cloudbeaver/plugin-user-profile-administration": "workspace:*"
+    "@cloudbeaver/plugin-user-profile-settings": "workspace:*"
+    "@cloudbeaver/plugin-version": "workspace:*"
+    "@cloudbeaver/plugin-version-update-administration": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
-    concurrently: "npm:^9"
     react: "npm:^18"
     reflect-metadata: "npm:^0"
     rimraf: "npm:^6"
@@ -4282,50 +4453,53 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/product-default@workspace:packages/product-default"
   dependencies:
-    "@cloudbeaver/browserslist-config": "workspace:^"
-    "@cloudbeaver/core-browser": "workspace:^"
-    "@cloudbeaver/core-cli": "npm:^0"
-    "@cloudbeaver/plugin-sso": "workspace:^"
-    "@cloudbeaver/product-base": "workspace:^"
-    "@cloudbeaver/product-default-impl": "workspace:^"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/browserslist-config": "workspace:*"
+    "@cloudbeaver/core-browser": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/plugin-sso": "workspace:*"
+    "@cloudbeaver/product-base": "workspace:*"
+    "@cloudbeaver/product-default-impl": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^18"
-    "@types/react-dom": "npm:^19"
+    "@types/react-dom": "npm:^18"
     concurrently: "npm:^9"
     react: "npm:^18"
-    react-dom: "npm:^19.0.0"
+    react-dom: "npm:^18"
     reflect-metadata: "npm:^0"
     rimraf: "npm:^6"
-    sass-embedded: "npm:^1.83.4"
+    sass-embedded: "npm:^1"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vite: "npm:^6"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/tests-runner@npm:^0, @cloudbeaver/tests-runner@workspace:packages/tests-runner":
+"@cloudbeaver/tests-runner@workspace:*, @cloudbeaver/tests-runner@workspace:packages/tests-runner":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/tests-runner@workspace:packages/tests-runner"
   dependencies:
-    "@cloudbeaver/core-di": "npm:^0"
-    "@cloudbeaver/tsconfig": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
     "@jest/globals": "npm:^29"
+    "@testing-library/dom": "npm:^10"
     "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
     "@types/jest": "npm:^29"
     "@types/react": "npm:^18"
     mobx: "npm:^6"
     react: "npm:^18"
+    react-dom: "npm:^18"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/tsconfig@workspace:^, @cloudbeaver/tsconfig@workspace:packages/tsconfig":
+"@cloudbeaver/tsconfig@workspace:*, @cloudbeaver/tsconfig@workspace:packages/tsconfig":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/tsconfig@workspace:packages/tsconfig"
   dependencies:
-    "@cloudbeaver/core-cli": "workspace:^"
+    "@dbeaver/tsconfig": "workspace:*"
   languageName: unknown
   linkType: soft
 
@@ -4508,7 +4682,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dbeaver/prettier-config@workspace:../common-typescript/@dbeaver/prettier-config, @dbeaver/prettier-config@workspace:^":
+"@dbeaver/prettier-config@workspace:*, @dbeaver/prettier-config@workspace:../common-typescript/@dbeaver/prettier-config, @dbeaver/prettier-config@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/prettier-config@workspace:../common-typescript/@dbeaver/prettier-config"
   dependencies:
@@ -4516,6 +4690,12 @@ __metadata:
     prettier: "npm:^3"
   peerDependencies:
     prettier: ">=3.0.0"
+  languageName: unknown
+  linkType: soft
+
+"@dbeaver/tsconfig@workspace:*, @dbeaver/tsconfig@workspace:../common-typescript/@dbeaver/tsconfig":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/tsconfig@workspace:../common-typescript/@dbeaver/tsconfig"
   languageName: unknown
   linkType: soft
 
@@ -8912,10 +9092,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "cloudbeaver-ce@workspace:."
   dependencies:
-    "@cloudbeaver/core-cli": "workspace:^"
-    "@cloudbeaver/eslint-config": "workspace:^"
-    "@cloudbeaver/eslint-plugin": "workspace:^"
-    "@dbeaver/prettier-config": "workspace:^"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/eslint-config": "workspace:*"
+    "@cloudbeaver/eslint-plugin": "workspace:*"
+    "@dbeaver/prettier-config": "workspace:*"
     "@testing-library/dom": "npm:^10"
     "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
@@ -15869,7 +16049,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass-embedded@npm:^1.83.4":
+"sass-embedded@npm:^1":
   version: 1.83.4
   resolution: "sass-embedded@npm:1.83.4"
   dependencies:

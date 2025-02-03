@@ -3,9 +3,24 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
   },
-  "references": [],
-  "include": ["__custom_mocks__/**/*", "src/**/*", "src/**/*.json", "src/**/*.css", "src/**/*.scss"],
-  "exclude": ["**/node_modules", "lib/**/*", "dist/**/*"]
+  "references": [
+    {
+      "path": "../core-cli"
+    }
+  ],
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "lib/**/*",
+    "dist/**/*"
+  ]
 }

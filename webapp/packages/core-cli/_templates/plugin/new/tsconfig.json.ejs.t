@@ -7,7 +7,8 @@ to: <%= name %>/tsconfig.json
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true,
   },
   "references": [
     {

@@ -7,7 +7,7 @@
  */
 import { useEffect } from 'react';
 
-import type { IExecutor, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
+import type { IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
 import { useObjectRef } from './useObjectRef.js';
 

@@ -116,9 +116,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/tsconfig@workspace:@dbeaver/tsconfig, @dbeaver/tsconfig@workspace:^":
+"@dbeaver/tsconfig@workspace:../common-typescript/@dbeaver/tsconfig, @dbeaver/tsconfig@workspace:^":
   version: 0.0.0-use.local
-  resolution: "@dbeaver/tsconfig@workspace:@dbeaver/tsconfig"
+  resolution: "@dbeaver/tsconfig@workspace:../common-typescript/@dbeaver/tsconfig"
   languageName: unknown
   linkType: soft
 

@@ -124,7 +124,7 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
   applyPartialUpdate(result: IDatabaseResultSet): void {
     let rowIndex = 0;
 
-    for (const [id, document] of this.editedElements) {
+    for (const [id] of this.editedElements) {
       const row = result.data?.rowsWithMetaData?.[rowIndex];
       const value = row?.data;
 
@@ -138,7 +138,7 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
   applyUpdate(result: IDatabaseResultSet): void {
     let rowIndex = 0;
 
-    for (const [id, document] of this.editedElements) {
+    for (const [id] of this.editedElements) {
       const row = result.data?.rowsWithMetaData?.[rowIndex];
       const value = row?.data;
 

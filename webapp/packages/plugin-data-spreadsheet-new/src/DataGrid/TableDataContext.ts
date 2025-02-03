@@ -10,7 +10,6 @@ import { createContext } from 'react';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import type { Column } from '@cloudbeaver/plugin-data-grid';
 import type {
-  DatabaseDataConstraintAction,
   DatabaseEditChangeType,
   IResultSetColumnKey,
   IResultSetElementKey,

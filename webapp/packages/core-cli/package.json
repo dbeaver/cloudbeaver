@@ -1,6 +1,11 @@
 {
   "name": "@cloudbeaver/core-cli",
-  "sideEffects": [],
+  "type": "module",
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
   "version": "0.1.0",
   "description": "CLI for CloudBeaver build system",
   "license": "Apache-2.0",
@@ -22,20 +27,25 @@
     "core-cli-dependency-graph": "./bin/dependency-graph.js",
     "core-cli-set-version": "./bin/set-version.mjs",
     "core-cli-test": "./bin/test.js",
-    "core-cli-validate-dependencies": "./bin/validate-dependencies.js",
-    "typescript-resolve-references": "./bin/typescript-resolve-references.js"
+    "core-cli-validate-dependencies": "./dist/cli/validate-dependencies.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "postinstall": "yarn build"
   },
   "engines": {
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "glob": "^11",
     "tslib": "^2"
   },
   "devDependencies": {
-    "@cloudbeaver/tsconfig": "workspace:^",
+    "@cloudbeaver/tsconfig": "workspace:*",
     "@swc/core": "^1",
     "@swc/jest": "^0",
     "@testing-library/jest-dom": "^6",
+    "@types/node": "^20",
     "enquirer": "^2",
     "execa": "^9",
     "fake-indexeddb": "^6",
@@ -43,6 +53,7 @@
     "hygen": "^6",
     "jest": "^29",
     "jest-environment-jsdom": "^29",
+    "typescript": "^5",
     "upath": "^2"
   }
 }

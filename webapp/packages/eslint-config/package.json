@@ -1,6 +1,10 @@
 {
   "name": "@cloudbeaver/eslint-config",
-  "sideEffects": [],
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
   "version": "0.1.0",
   "main": "index.js",
   "description": "ESLint for CloudBeaver",
@@ -12,7 +16,7 @@
   ],
   "type": "commonjs",
   "devDependencies": {
-    "@cloudbeaver/eslint-plugin": "workspace:^",
+    "@cloudbeaver/eslint-plugin": "workspace:*",
     "@typescript-eslint/eslint-plugin": "^6",
     "@typescript-eslint/parser": "^6",
     "eslint": "^8",

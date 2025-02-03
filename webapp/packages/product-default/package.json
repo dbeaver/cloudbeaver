@@ -4,7 +4,8 @@
   "sideEffects": [
     "src/**/*.ts",
     "src/**/*.scss",
-    "public/**/*"
+    "public/**/*",
+    "src/**/*.css"
   ],
   "version": "24.3.5",
   "description": "CloudBeaver Community",
@@ -22,16 +23,15 @@
     "dev": "yarn build && concurrently -P -k \"yarn workspaces foreach -Ap --include '@cloudbeaver/core-sdk' run gql:gen:dev\" \"vite {@}\"",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "version:set": "yarn core-cli-set-version",
-    "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "yarn run clean && typescript-resolve-references"
+    "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-browser": "workspace:^",
-    "@cloudbeaver/plugin-sso": "workspace:^",
-    "@cloudbeaver/product-base": "workspace:^",
-    "@cloudbeaver/product-default-impl": "workspace:^",
+    "@cloudbeaver/core-browser": "workspace:*",
+    "@cloudbeaver/plugin-sso": "workspace:*",
+    "@cloudbeaver/product-base": "workspace:*",
+    "@cloudbeaver/product-default-impl": "workspace:*",
     "react": "^18",
-    "react-dom": "^19.0.0",
+    "react-dom": "^18",
     "reflect-metadata": "^0",
     "tslib": "^2",
     "vite": "^6"
@@ -40,14 +40,14 @@
     "name": "CloudBeaver Community"
   },
   "devDependencies": {
-    "@cloudbeaver/browserslist-config": "workspace:^",
-    "@cloudbeaver/core-cli": "^0",
-    "@cloudbeaver/tsconfig": "workspace:^",
+    "@cloudbeaver/browserslist-config": "workspace:*",
+    "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/tsconfig": "workspace:*",
     "@types/react": "^18",
-    "@types/react-dom": "^19",
+    "@types/react-dom": "^18",
     "concurrently": "^9",
     "rimraf": "^6",
-    "sass-embedded": "^1.83.4",
+    "sass-embedded": "^1",
     "typescript": "^5"
   }
 }

@@ -23,12 +23,25 @@ export const manualChunks = (): PluginOption => {
               output: {
                 ...config.build?.rollupOptions?.output,
                 manualChunks(id, { getModuleInfo }) {
+                  function isModuleSync(moduleId: string) {
+                    const info = getModuleInfo(moduleId);
+                    if (!info) return true; // fallback if no info available
+                    if (info.isEntry) return true;
+                    // info.importers is the list of modules that import this module.
+                    // info.dynamicImporters is the subset of those that import it dynamically.
+                    // If there’s any importer that did a static import, we consider this module sync.
+                    return (
+                      info.importers &&
+                      info.importers.some(importer => {
+                        return !info.dynamicImporters.includes(importer);
+                      })
+                    );
+                  }
+
                   const nodeModulesMatch = /[\\/]node_modules[\\/](.*?)[\\/]/.exec(id);
 
                   if (nodeModulesMatch) {
-                    const info = getModuleInfo(id)!;
-
-                    if (info.dynamicImporters.length === 0) {
+                    if (isModuleSync(id)) {
                       return 'vendor';
                     }
 
