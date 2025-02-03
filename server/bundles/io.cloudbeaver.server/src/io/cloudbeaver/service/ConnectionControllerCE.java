@@ -32,7 +32,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.exec.DBCConnectException;
-import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWHandlerType;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
@@ -462,7 +461,6 @@ public class ConnectionControllerCE implements ConnectionController {
                     )
                 );
             }
-            webSession.getSecurityController().updateConnectionAttempt(connectionId, connect);
         } catch (Exception e) {
             if (e instanceof DBCConnectException) {
                 Throwable rootCause = CommonUtils.getRootCause(e);
@@ -476,7 +474,7 @@ public class ConnectionControllerCE implements ConnectionController {
             connectionInfo.clearCache();
             try {
                 webSession.getSecurityController().updateConnectionAttempt(connectionId, connect);
-            } catch (DBCException ex) {
+            } catch (DBException ex) {
                 throw new DBWebException(ex.getMessage());
             }
         }

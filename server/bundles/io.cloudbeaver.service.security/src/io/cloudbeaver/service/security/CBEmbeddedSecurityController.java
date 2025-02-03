@@ -792,7 +792,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     private void enableUser(Connection dbCon, String userId) throws SQLException {
         try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
-            "UPDATE CB_USER " +
+            "UPDATE {table_prefix}CB_USER " +
                 "SET CHANGE_DATE = ?, " +
                 "    DISABLE_BY_USER_ID = ?, " +
                 "    DISABLE_REASON = ?, " +
@@ -1610,7 +1610,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                             userCredentials
                         );
                     } catch (DBException e) {
-                       createNewAuthAttempt(
+                        createNewAuthAttempt(
                             SMAuthStatus.ERROR,
                             authProviderId,
                             authProviderConfigurationId,
@@ -1688,14 +1688,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     private String createNewAuthAttempt(
-        SMAuthStatus status,
-        String authProviderId,
-        String authProviderConfigurationId,
-        Map<String, Object> authData,
-        String appSessionId,
-        String prevSessionId,
-        SMSessionType sessionType,
-        Map<String, Object> sessionParameters,
+        @NotNull SMAuthStatus status,
+        @NotNull String authProviderId,
+        @Nullable String authProviderConfigurationId,
+        @NotNull Map<String, Object> authData,
+        @NotNull String appSessionId,
+        @Nullable String prevSessionId,
+        @NotNull SMSessionType sessionType,
+        @NotNull Map<String, Object> sessionParameters,
         boolean isMainSession,
         @Nullable String errorCode,
         boolean forceSessionsLogout
@@ -1710,12 +1710,18 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                         if (handleBruteForceProtection(dbCon, authProviderId, inputUsername)) {
                             disableUserByBruteForceProtection(
                                 dbCon,
-                                "system",
-                                getUserId() != null ? getUserId() : (String) inputUsername,
-                                "Disabled by bruteforce protection");
+                                getUserId() != null ? getUserId() : inputUsername.toString(),
+                                "Disabled by bruteforce protection"
+                            );
                         } else {
-                            BruteForceUtils.checkBruteforce(smConfig,
-                                getLatestUserLogins(dbCon, authProviderId, inputUsername.toString(), smConfig.getBlockLoginPeriod()));
+                            BruteForceUtils.checkBruteforce(
+                                smConfig,
+                                getLatestUserLogins(
+                                    dbCon,
+                                    authProviderId,
+                                    inputUsername.toString(),
+                                    smConfig.getBlockLoginPeriod())
+                            );
                         }
                     }
                 }
@@ -1775,28 +1781,29 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     private List<UserLoginRecord> getLatestUserLogins(
-        Connection dbCon,
-        String authProviderId,
-        String inputLogin,
+        @NotNull Connection dbCon,
+        @NotNull String authProviderId,
+        @NotNull String inputLogin,
         int periodTime
     ) throws SQLException {
         List<UserLoginRecord> userLoginRecords = new ArrayList<>();
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             database.normalizeTableNames(
-                "SELECT" +
-                    "    attempt.AUTH_STATUS," +
-                    "    attempt.CREATE_TIME" +
-                    " FROM" +
-                    "    {table_prefix}CB_AUTH_ATTEMPT attempt" +
-                    "    JOIN {table_prefix}CB_USER cu ON attempt.AUTH_USERNAME = cu.USER_ID " +
-                    "    JOIN {table_prefix}CB_AUTH_ATTEMPT_INFO info ON attempt.AUTH_ID = info.AUTH_ID " +
-                    " WHERE info.AUTH_PROVIDER_ID = ? " +
-                    "   AND attempt.AUTH_USERNAME = ? " +
-                    "   AND attempt.CREATE_TIME > ? " +
-                    "   AND cu.USER_ID = ? " +
-                    "   AND (cu.CHANGE_DATE IS NULL OR cu.CHANGE_DATE < attempt.CREATE_TIME) " +
-                    " ORDER BY attempt.CREATE_TIME DESC " +
-                    database.getDialect().getOffsetLimitQueryPart(0, smConfig.getMaxFailedLogin())
+                """
+                    SELECT
+                        attempt.AUTH_STATUS,
+                        attempt.CREATE_TIME
+                    FROM
+                        {table_prefix}CB_AUTH_ATTEMPT attempt
+                        JOIN {table_prefix}CB_USER cu ON attempt.AUTH_USERNAME = cu.USER_ID
+                        JOIN {table_prefix}CB_AUTH_ATTEMPT_INFO info ON attempt.AUTH_ID = info.AUTH_ID
+                    WHERE info.AUTH_PROVIDER_ID = ?
+                       AND attempt.AUTH_USERNAME = ?
+                       AND attempt.CREATE_TIME > ?
+                       AND cu.USER_ID = ?
+                       AND (cu.CHANGE_DATE IS NULL OR cu.CHANGE_DATE < attempt.CREATE_TIME)
+                    ORDER BY attempt.CREATE_TIME DESC %s"""
+                    .formatted(database.getDialect().getOffsetLimitQueryPart(0, smConfig.getMaxFailedLogin()))
             )
         )) {
             dbStat.setString(1, authProviderId);
@@ -1823,17 +1830,19 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull Object inputUsername
     ) throws SQLException, DBException {
         return smConfig.isEnableConnectionBruteForceProtection()
-            && BruteForceUtils.checkBruteforceBlockUser(smConfig,
+               && BruteForceUtils.checkBruteforceBlockUser(
+            smConfig,
             getLatestUserLogins(
                 dbCon,
                 authProviderId,
                 inputUsername.toString(),
-                smConfig.getBlockPeriodTimeBruteForceProtection()))
+                smConfig.getBlockPeriodTimeBruteForceProtection()
+            ))
             && isUserExistsAndEnabled(dbCon, getUserId() != null ? getUserId() : (String) inputUsername);
     }
 
     @Override
-    public void updateConnectionAttempt(@NotNull String connectionId, boolean connect) throws DBCException {
+    public void updateConnectionAttempt(@NotNull String connectionId, boolean connect) throws DBException {
         String connectionStatus = connect ? "SUCCESS" : "FAILED";
         String userId = getUserId();
         try (Connection dbCon = database.openConnection()) {
@@ -1853,11 +1862,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 && CommonUtils.isNotEmpty(userId)
                 && failedLoginCount(dbCon, userId, connectionId) >= smConfig.getMaxFailedConnectionLogin()
             ) {
-                try {
-                    disableUserByBruteForceProtection(dbCon, "system", userId, "Disabled by bruteforce connection protection");
-                } catch (DBException e) {
-                    throw new DBCException(e.getMessage());
-                }
+                disableUserByBruteForceProtection(dbCon, userId, "Disabled by bruteforce connection protection");
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving team in database", e);
@@ -1872,17 +1877,18 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     ) throws SQLException {
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             database.normalizeTableNames(
-                "SELECT" +
-                    "   COUNT(cdc.CONNECTION_ID) " +
-                    "FROM " +
-                    "   {table_prefix}CB_DATABASE_CONNECTION cdc " +
-                    "   JOIN {table_prefix}CB_USER cu ON cdc.USER_ID = cu.USER_ID " +
-                    "WHERE cdc.USER_ID = ? " +
-                    "   AND cdc.CONNECTION_TIME > ? " +
-                    "   AND cu.USER_ID = ? " +
-                    "   AND cdc.CONNECTION_ID = ?" +
-                    "   AND cdc.CONNECTION_STATUS = 'FAILED'" +
-                    "   AND (cu.CHANGE_DATE IS NULL OR cu.CHANGE_DATE < cdc.CONNECTION_TIME) "
+                """
+                    SELECT
+                       COUNT(cdc.CONNECTION_ID)
+                    FROM
+                       {table_prefix}CB_DATABASE_CONNECTION cdc
+                       JOIN {table_prefix}CB_USER cu ON cdc.USER_ID = cu.USER_ID
+                    WHERE cdc.USER_ID = ?
+                       AND cdc.CONNECTION_TIME > ?
+                       AND cu.USER_ID = ?
+                       AND cdc.CONNECTION_ID = ?
+                       AND cdc.CONNECTION_STATUS = 'FAILED'
+                       AND (cu.CHANGE_DATE IS NULL OR cu.CHANGE_DATE < cdc.CONNECTION_TIME)"""
             )
         )) {
             dbStat.setString(1, userId);
@@ -1900,21 +1906,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     private boolean isUserExistsAndEnabled(Connection dbCon, String inputLogin) throws SQLException {
-        String query = database.normalizeTableNames(
-            "SELECT EXISTS (" +
-                "    SELECT 1 " +
-                "    FROM CB_USER attempt " +
-                "    WHERE USER_ID = ?" +
-                "    AND IS_ACTIVE = ?" +
-                ") AS user_exists_and_enabled"
-        );
+        String query = database.normalizeTableNames("SELECT 1 FROM {table_prefix}CB_USER WHERE USER_ID=? AND IS_ACTIVE=?");
         try (PreparedStatement dbStat = dbCon.prepareStatement(query)) {
             dbStat.setString(1, inputLogin);
             dbStat.setString(2, CHAR_BOOL_TRUE);
 
             try (ResultSet dbResult = dbStat.executeQuery()) {
                 if (dbResult.next()) {
-                    return dbResult.getBoolean("user_exists_and_enabled");
+                    return true;
                 }
             }
         }
@@ -1928,13 +1927,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @Nullable String reason
     ) throws SQLException {
         String query = database.normalizeTableNames(
-            "UPDATE CB_USER " +
-                "SET CHANGE_DATE = ?, " +
-                "    DISABLE_BY_USER_ID = ?, " +
-                "    DISABLE_REASON = ?, " +
-                "    IS_ACTIVE = ? " +
-                "WHERE USER_ID = ? " +
-                "AND (DEFAULT_AUTH_ROLE IS NULL OR DEFAULT_AUTH_ROLE <> 'ADMINISTRATOR')"
+            """
+                UPDATE {table_prefix}CB_USER
+                SET CHANGE_DATE = ?,
+                    DISABLE_BY_USER_ID = ?,
+                    DISABLE_REASON = ?,
+                    IS_ACTIVE = ?
+                WHERE USER_ID = ?
+                AND (DEFAULT_AUTH_ROLE IS NULL OR DEFAULT_AUTH_ROLE <> 'ADMINISTRATOR')"""
         );
 
         try (PreparedStatement dbStat = dbCon.prepareStatement(query)) {
@@ -1950,11 +1950,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     private void disableUserByBruteForceProtection(
         @NotNull Connection dbCon,
-        @NotNull String disabledBy,
         @NotNull String username,
         @NotNull String reason
     ) throws SQLException, DBException {
-        disableUserWithReason(dbCon, disabledBy, username, reason);
+        disableUserWithReason(dbCon, "system", username, reason);
         killAllExistsUserSessions(username);
         throw new SMException("The user is disabled. Please contact the administrator for more information");
     }

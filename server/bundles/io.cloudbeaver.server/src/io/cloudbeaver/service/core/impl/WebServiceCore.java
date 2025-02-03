@@ -43,15 +43,12 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
-import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWNetworkHandler;
 import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHSession;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.security.SMSubjectType;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -59,13 +56,8 @@ import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.registry.settings.ProductSettingsRegistry;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -740,17 +732,5 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Project '" + projectId + "' not found");
         }
         return project;
-    }
-
-    private void validateDriverLibrariesPresence(@NotNull DBPDataSourceContainer container) throws DBWebException {
-        if (!DBWorkbench.isDistributed() && container.getDriver().needsExternalDependencies()) {
-            throwDriverNotFoundException(container);
-        }
-    }
-
-    @NotNull
-    private static String throwDriverNotFoundException(@NotNull DBPDataSourceContainer container) throws DBWebException {
-        throw new DBWebException("Driver files for %s are not found. Please ask the administrator to download it."
-            .formatted(container.getDriver().getName()));
     }
 }
