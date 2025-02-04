@@ -41,6 +41,10 @@ export abstract class DatabaseEditAction<TKey, TValue, TResult extends IDatabase
     return this.features.includes(feature);
   }
 
+  get hasFeatures() {
+    return this.features.length > 0;
+  }
+
   abstract isEdited(): boolean;
   abstract isElementEdited(key: TKey): boolean;
   abstract getElementState(key: TKey): DatabaseEditChangeType | null;
