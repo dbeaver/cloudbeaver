@@ -67,7 +67,7 @@ export class TableFooterMenuService {
 
         const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
 
-        if (!editor || (!editor.hasFeatures && !model.hasElementIdentifier(resultIndex))) {
+        if (!editor) {
           return false;
         }
 
