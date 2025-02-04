@@ -14,6 +14,7 @@ function logger(planAndResolve: interfaces.Next): interfaces.Next {
     try {
       return planAndResolve(args);
     } catch (exception: any) {
+      // @ts-ignore
       let metadata: Array<() => void> = Reflect.getMetadata('design:paramtypes', args.serviceIdentifier) || [];
       const matchIndex = /argument\s(\d+)/.exec((exception as Error).message);
       const matchDependency = /(serviceIdentifier:|class)\s([\w]+)/.exec((exception as Error).message);
@@ -32,6 +33,7 @@ function logger(planAndResolve: interfaces.Next): interfaces.Next {
       let notFoundElement = dep;
 
       if (index !== -1) {
+        // @ts-ignore
         metadata = Reflect.getMetadata('design:paramtypes', dep) || [];
         serviceName = dep.name;
         notFoundElement = metadata[index]!;

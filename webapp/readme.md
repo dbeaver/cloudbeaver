@@ -9,7 +9,8 @@ yarn
 ## Build
 
 ```sh
-yarn lerna run bundle --stream --scope=@cloudbeaver/product-default
+cd packages/product-default
+yarn run bundle
 ```
 
 open `packages/product-default/lib/index.html` or run `npx serve packages/product-default/lib`
@@ -17,11 +18,6 @@ open `packages/product-default/lib/index.html` or run `npx serve packages/produc
 ## Dev
 
 ```sh
-yarn lerna run dev --stream --scope=@cloudbeaver/product-default
-```
-
-## Generate GQL SDK
-
-```sh
-yarn lerna run gql:gen --stream
+cd packages/product-default
+yarn run dev
 ```

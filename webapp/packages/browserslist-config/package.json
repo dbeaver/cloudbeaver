@@ -1,6 +1,10 @@
 {
   "name": "@cloudbeaver/browserslist-config",
-  "sideEffects": false,
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
   "version": "0.1.0",
   "license": "Apache-2.0",
   "main": "index.js"

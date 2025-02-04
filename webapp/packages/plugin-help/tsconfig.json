@@ -1,58 +1,65 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
   },
   "references": [
     {
-      "path": "../core-app/tsconfig.json"
+      "path": "../core-app"
     },
     {
-      "path": "../core-blocks/tsconfig.json"
+      "path": "../core-blocks"
     },
     {
-      "path": "../core-browser/tsconfig.json"
+      "path": "../core-browser"
     },
     {
-      "path": "../core-di/tsconfig.json"
+      "path": "../core-cli"
     },
     {
-      "path": "../core-dialogs/tsconfig.json"
+      "path": "../core-di"
     },
     {
-      "path": "../core-events/tsconfig.json"
+      "path": "../core-dialogs"
     },
     {
-      "path": "../core-links/tsconfig.json"
+      "path": "../core-events"
     },
     {
-      "path": "../core-localization/tsconfig.json"
+      "path": "../core-links"
     },
     {
-      "path": "../core-routing/tsconfig.json"
+      "path": "../core-localization"
     },
     {
-      "path": "../core-utils/tsconfig.json"
+      "path": "../core-routing"
     },
     {
-      "path": "../core-view/tsconfig.json"
+      "path": "../core-utils"
     },
     {
-      "path": "../plugin-data-spreadsheet-new/tsconfig.json"
+      "path": "../core-view"
     },
     {
-      "path": "../plugin-navigation-tree/tsconfig.json"
+      "path": "../plugin-data-spreadsheet-new"
     },
     {
-      "path": "../plugin-sql-editor-navigation-tab-script/tsconfig.json"
+      "path": "../plugin-navigation-tree"
     },
     {
-      "path": "../plugin-sql-editor/tsconfig.json"
+      "path": "../plugin-object-viewer-nav-tree-link"
     },
     {
-      "path": "../plugin-top-app-bar/tsconfig.json"
+      "path": "../plugin-sql-editor"
+    },
+    {
+      "path": "../plugin-sql-editor-navigation-tab-script"
+    },
+    {
+      "path": "../plugin-top-app-bar"
     }
   ],
   "include": [

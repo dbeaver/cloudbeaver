@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { CommonDialogHeader, CommonDialogWrapper, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { CommonDialogHeader, CommonDialogWrapper, useResource } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionPublicSecretsResource, DBDriverResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 

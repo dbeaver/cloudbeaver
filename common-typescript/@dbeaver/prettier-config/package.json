@@ -1,0 +1,19 @@
+{
+  "name": "@dbeaver/prettier-config",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": "./config.js",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^5"
+  },
+  "peerDependencies": {
+    "prettier": ">=3.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3"
+  }
+}

@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import type { AdministrationItemContentProps } from '@cloudbeaver/core-administration';
-import { ColoredContainer, Form, Group, ToolsAction, ToolsPanel, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Form, Group, ToolsAction, ToolsPanel, useForm, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerSettingsService } from '@cloudbeaver/core-root';

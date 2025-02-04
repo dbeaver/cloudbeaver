@@ -5,14 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { type GraphQLResolverExtras, type GraphQLResponseBody, HttpResponse, type ResponseResolver } from 'msw';
+import { HttpResponse, type GraphQLResponseResolver } from 'msw';
 
 import type { GetActiveUserQuery, GetActiveUserQueryVariables } from '@cloudbeaver/core-sdk';
 
-export const mockGetActiveUser: ResponseResolver<
-  GraphQLResolverExtras<GetActiveUserQueryVariables>,
-  null,
-  GraphQLResponseBody<GetActiveUserQuery>
+export const mockGetActiveUser: GraphQLResponseResolver<
+GetActiveUserQuery, GetActiveUserQueryVariables
 > = function mockGetActiveUser() {
   return HttpResponse.json({
     data: {

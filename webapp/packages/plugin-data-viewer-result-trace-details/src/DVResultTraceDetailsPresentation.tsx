@@ -59,7 +59,15 @@ export const DVResultTraceDetailsPresentation: DataPresentationComponent = obser
 
   return (
     <div className={s(styles, { container: true })}>
-      <DataGrid rows={state.trace} rowKeyGetter={row => row.name} columns={COLUMNS} rowHeight={30} />
+      <DataGrid
+        rows={state.trace}
+        rowKeyGetter={
+          // @ts-ignore
+          row => row.name
+        }
+        columns={COLUMNS}
+        rowHeight={30}
+      />
     </div>
   );
 });
