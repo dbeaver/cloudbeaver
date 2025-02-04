@@ -68,6 +68,7 @@ export default [
   ['connections_connection_keep_alive', '保持连接 (秒)'],
   ['connections_connection_autocommit', '自动提交'],
   ['connections_connection_keep_alive_tooltip', '无自动断开连接'],
+  ['connections_connection_read_only', 'Read-only connection'],
   ['connections_network_handler_test', '测试隧道'],
   ['connections_network_handler_test_fail', '隧道测试失败'],
   ['connections_network_handler_test_success', '隧道测试成功'],

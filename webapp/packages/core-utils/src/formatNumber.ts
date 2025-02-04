@@ -8,7 +8,7 @@
 
 export function formatNumber(n: number, d: number) {
   if (n < 1000) {
-    return n.toString();
+    return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
   }
 
   const numStr = n.toString();
