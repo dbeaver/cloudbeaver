@@ -942,7 +942,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         List<DBDAttributeConstraint> constraints = new ArrayList<>();
         for (int i = 0; i < keyAttributes.length; i++) {
             DBDAttributeBinding keyAttribute = keyAttributes[i];
-            boolean isDocumentValue = keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
+            boolean isDocumentValue = keyAttributes.length == 1
+                                      && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT
+                                      && dataContainer instanceof DBSDocumentLocator;
             if (isDocumentValue) {
                 rowValues[i] =
                     makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row, null);
@@ -965,6 +967,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         dataFilter.addConstraints(constraints);
     }
 
+    /**
+     * Reads cell value as string from provided row and column index.
+     */
     @NotNull
     public String readStringValue(
         @NotNull DBRProgressMonitor monitor,
