@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.8"?>
+<target name="org.jkiss.cloudbeaver.tp">
+	<locations>
+		<location path="../../dbeaver-workspace/dependencies/plugins" type="Directory"/>
+	</locations>
+</target>

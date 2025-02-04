@@ -9,23 +9,23 @@ import { expect, test } from '@jest/globals';
 
 import { coreAppManifest } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
-import { mockAuthentication } from '@cloudbeaver/core-authentication/dist/__custom_mocks__/mockAuthentication.js';
+import { mockAuthentication } from '@cloudbeaver/core-authentication/__custom_mocks__/mockAuthentication.js';
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
-import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint.js';
-import '@cloudbeaver/core-root/dist/__custom_mocks__/expectWebsocketClosedMessage.js';
-import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit.js';
-import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL.js';
-import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig.js';
+import { createGQLEndpoint } from '@cloudbeaver/core-root/__custom_mocks__/createGQLEndpoint.js';
+import '@cloudbeaver/core-root/__custom_mocks__/expectWebsocketClosedMessage.js';
+import { mockAppInit } from '@cloudbeaver/core-root/__custom_mocks__/mockAppInit.js';
+import { mockGraphQL } from '@cloudbeaver/core-root/__custom_mocks__/mockGraphQL.js';
+import { mockServerConfig } from '@cloudbeaver/core-root/__custom_mocks__/resolvers/mockServerConfig.js';
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
 import {
   expectDeprecatedSettingMessage,
   expectNoDeprecatedSettingMessage,
-} from '@cloudbeaver/core-settings/dist/__custom_mocks__/expectDeprecatedSettingMessage.js';
+} from '@cloudbeaver/core-settings/__custom_mocks__/expectDeprecatedSettingMessage.js';
 import { coreStorageManifest } from '@cloudbeaver/core-storage';
 import { coreViewManifest } from '@cloudbeaver/core-view';
 import toolsPanelPlugin from '@cloudbeaver/plugin-tools-panel';

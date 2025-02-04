@@ -7,8 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import { type MenuItemOptions, MenuItemCheckbox as ReakitMenuItemCheckbox } from 'reakit';
-import type { CheckboxOptions } from 'reakit';
+import { type MenuItemOptions, MenuItemCheckbox as ReakitMenuItemCheckbox, type CheckboxOptions } from 'reakit';
 
 import { s } from '../s.js';
 import { useS } from '../useS.js';

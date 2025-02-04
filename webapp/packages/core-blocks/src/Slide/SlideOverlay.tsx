@@ -24,7 +24,7 @@ export const SlideOverlay = observer<Props>(function SlideOverlay({ className, o
   return (
     <div className={s(styles, { slideOverlay: true }, className)} onClick={onClick}>
       <div className={s(styles, { iconBtn: true })}>
-        <Icon className={s(styles, { icon: true })} name="angle" viewBox="0 0 15 8" />
+        <Icon className={s(styles, { icon: true })} name="cross" viewBox="0 0 24 24" />
       </div>
     </div>
   );

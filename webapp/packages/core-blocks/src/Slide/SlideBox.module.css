@@ -8,4 +8,5 @@
 .slideBox {
   overflow: hidden;
   white-space: nowrap;
+  position: relative;
 }

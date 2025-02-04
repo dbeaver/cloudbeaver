@@ -9,18 +9,19 @@
   "version": "0.1.0",
   "description": "",
   "license": "Apache-2.0",
-  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "scripts": {
     "build": "tsc -b",
     "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "yarn run clean && typescript-resolve-references"
+    "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-blocks": "^0",
-    "@cloudbeaver/core-theming": "^0",
-    "@cloudbeaver/core-utils": "^0",
+    "@cloudbeaver/core-blocks": "workspace:*",
+    "@cloudbeaver/core-theming": "workspace:*",
+    "@cloudbeaver/core-utils": "workspace:*",
     "@codemirror/autocomplete": "^6",
     "@codemirror/commands": "^6",
     "@codemirror/lang-html": "^6",
@@ -35,14 +36,18 @@
     "@codemirror/view": "^6",
     "@lezer/common": "^1",
     "@lezer/highlight": "^1",
+    "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
-    "@cloudbeaver/core-theming": "^0",
+    "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/core-theming": "workspace:*",
+    "@cloudbeaver/tsconfig": "workspace:*",
     "@types/react": "^18",
+    "@types/react-dom": "^18",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5"
   }

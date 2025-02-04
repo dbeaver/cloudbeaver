@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React from 'react';
 
 import { Container, Filter, useTranslate } from '@cloudbeaver/core-blocks';
 

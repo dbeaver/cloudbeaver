@@ -1,0 +1,1 @@
+/// <reference path="./packages/core-cli/global.d.ts" />

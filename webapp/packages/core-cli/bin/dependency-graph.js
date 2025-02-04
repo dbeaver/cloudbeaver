@@ -1,12 +1,17 @@
 #!/usr/bin/env node
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 
-'use strict';
 process.title = 'dependency-graph';
 
-const madge = require('madge');
-const { resolve } = require('path');
+import madge from 'madge';
 
-madge('packages', {
+const res = await madge('packages', {
   includeNpm: true,
   fileExtensions: ['ts', 'tsx'],
   detectiveOptions: {
@@ -20,8 +25,7 @@ madge('packages', {
       // skipTypeImports: true,
     },
   },
-})
-  .then(res => res.image('image.svg'))
-  .then(writtenImagePath => {
-    console.log('Image written to ' + writtenImagePath);
-  });
+});
+
+const writtenImagePath = await res.image('image.svg');
+console.log('Image written to ' + writtenImagePath);

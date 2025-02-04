@@ -1,64 +1,68 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
   },
   "references": [
     {
-      "path": "../core-authentication/tsconfig.json"
+      "path": "../core-authentication"
     },
     {
-      "path": "../core-blocks/tsconfig.json"
+      "path": "../core-blocks"
     },
     {
-      "path": "../core-connections/tsconfig.json"
+      "path": "../core-cli"
     },
     {
-      "path": "../core-data-context/tsconfig.json"
+      "path": "../core-connections"
     },
     {
-      "path": "../core-di/tsconfig.json"
+      "path": "../core-data-context"
     },
     {
-      "path": "../core-dialogs/tsconfig.json"
+      "path": "../core-di"
     },
     {
-      "path": "../core-events/tsconfig.json"
+      "path": "../core-dialogs"
     },
     {
-      "path": "../core-executor/tsconfig.json"
+      "path": "../core-events"
     },
     {
-      "path": "../core-localization/tsconfig.json"
+      "path": "../core-executor"
     },
     {
-      "path": "../core-navigation-tree/tsconfig.json"
+      "path": "../core-localization"
     },
     {
-      "path": "../core-projects/tsconfig.json"
+      "path": "../core-navigation-tree"
     },
     {
-      "path": "../core-resource-manager/tsconfig.json"
+      "path": "../core-projects"
     },
     {
-      "path": "../core-resource/tsconfig.json"
+      "path": "../core-resource"
     },
     {
-      "path": "../core-utils/tsconfig.json"
+      "path": "../core-resource-manager"
     },
     {
-      "path": "../core-view/tsconfig.json"
+      "path": "../core-utils"
     },
     {
-      "path": "../plugin-navigation-tree/tsconfig.json"
+      "path": "../core-view"
     },
     {
-      "path": "../plugin-projects/tsconfig.json"
+      "path": "../plugin-navigation-tree"
     },
     {
-      "path": "../plugin-resource-manager/tsconfig.json"
+      "path": "../plugin-projects"
+    },
+    {
+      "path": "../plugin-resource-manager"
     }
   ],
   "include": [

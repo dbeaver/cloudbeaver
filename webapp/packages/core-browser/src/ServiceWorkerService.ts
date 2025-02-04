@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+/// <reference types="vite/client" />
 /// <reference lib="WebWorker" />
 import { Workbox, type WorkboxLifecycleEvent, type WorkboxMessageEvent } from 'workbox-window';
 
@@ -45,7 +46,7 @@ export class ServiceWorkerService extends Disposable {
     }
 
     try {
-      if (process.env['NODE_ENV'] === 'development') {
+      if (import.meta.env.DEV) {
         const registration = await navigator.serviceWorker.getRegistration(this.workerURL);
         registration?.unregister();
       } else {

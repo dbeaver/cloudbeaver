@@ -3,14 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "private": true,
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ],
-    "nohoist": [
-      "**/core-cli/**"
-    ]
-  },
+  "workspaces": [
+    "../common-typescript",
+    "packages/*"
+  ],
   "resolutions": {
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -21,25 +17,32 @@
   },
   "scripts": {
     "test": "core-cli-test",
-    "clean": "rimraf --glob packages/*/dist",
+    "clear": "rimraf -g 'packages/*/{dist,lib}'",
     "lint": "eslint --ext .ts,.tsx",
     "validate-dependencies": "core-cli-validate-dependencies './packages/*/'",
-    "update-ts-references": "yarn run clean && typescript-resolve-references './packages/*/'",
     "add-plugin": "core-cli-add-plugin",
-    "prebuild": "lerna run gql:gen --stream --parallel",
     "prepare": "cd .. && husky ./webapp/.husky",
+    "version:set": "yarn workspaces foreach -Ap --include '@cloudbeaver/product-*' run version:set",
     "postinstall": "husky"
   },
   "devDependencies": {
+    "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/eslint-config": "workspace:*",
+    "@cloudbeaver/eslint-plugin": "workspace:*",
+    "@dbeaver/prettier-config": "workspace:*",
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
     "@testing-library/user-event": "^14",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@typescript-eslint/eslint-plugin": "^6",
+    "@typescript-eslint/parser": "^6",
     "concurrently": "^9",
+    "eslint": "^8",
+    "eslint-plugin-react": "^7",
+    "eslint-plugin-react-hooks": "^4",
     "husky": "^9",
-    "lerna": "^5",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "msw": "^2",
@@ -53,7 +56,5 @@
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5"
   },
-  "dependencies": {},
-  "prettier": "@cloudbeaver/prettier-config",
-  "packageManager": "yarn@1.22.21"
+  "packageManager": "yarn@4.6.0"
 }

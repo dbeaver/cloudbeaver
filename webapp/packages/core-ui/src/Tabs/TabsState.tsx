@@ -251,29 +251,29 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     },
   );
 
+  let currentTabInfo: ITabInfo<T, never> | undefined;
   if (container) {
-    let currentTabInfo: ITabInfo<T, never> | undefined;
-
     if (state.selectedId) {
       currentTabInfo = value.getTabInfo(state.selectedId);
     }
-
-    useAutoLoad(
-      TabsState,
-      container
-        .getDisplayed(props)
-        .map(tab => tab.getLoader?.(context, props))
-        .filter(isDefined)
-        .flat(),
-    );
-
-    useAutoLoad(
-      TabsState,
-      [currentTabInfo?.getLoader?.(context, props) || []].flat().filter(loader => loader.lazy),
-      true,
-      true,
-    );
   }
+
+  useAutoLoad(
+    TabsState,
+    container
+      ?.getDisplayed(props)
+      .map(tab => tab.getLoader?.(context, props))
+      .filter(isDefined)
+      .flat() || [],
+    !!container,
+  );
+
+  useAutoLoad(
+    TabsState,
+    [currentTabInfo?.getLoader?.(context, props) || []].flat().filter(loader => loader.lazy),
+    !!container,
+    true,
+  );
 
   return (
     <TabsContext.Provider value={value}>
