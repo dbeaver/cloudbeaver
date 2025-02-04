@@ -57,11 +57,13 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
               '/api': {
                 target: envServer,
                 changeOrigin: true,
+                secure: false,
               },
               '/api/ws': {
                 target: envServer?.replace('http:', 'ws:'),
                 ws: true,
                 rewriteWsOrigin: true,
+                secure: false,
               },
             },
           },
