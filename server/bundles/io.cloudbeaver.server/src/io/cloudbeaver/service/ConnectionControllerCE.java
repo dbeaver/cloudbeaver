@@ -462,21 +462,10 @@ public class ConnectionControllerCE implements ConnectionController {
                 );
             }
         } catch (Exception e) {
-            if (e instanceof DBCConnectException) {
-                Throwable rootCause = CommonUtils.getRootCause(e);
-                if (rootCause instanceof ClassNotFoundException) {
-                    throwDriverNotFoundException(dataSourceContainer);
-                }
-            }
-            throw new DBWebException("Error connecting to database", e);
+            handleConnectException(webSession, dataSourceContainer, e);
         } finally {
             dataSourceContainer.setSavePassword(oldSavePassword);
             connectionInfo.clearCache();
-            try {
-                webSession.getSecurityController().updateConnectionAttempt(connectionId, connect);
-            } catch (DBException ex) {
-                throw new DBWebException(ex.getMessage());
-            }
         }
         // Mark all specified network configs as saved
         boolean[] saveConfig = new boolean[1];
@@ -536,6 +525,20 @@ public class ConnectionControllerCE implements ConnectionController {
         }
 
         return connectionInfo;
+    }
+
+    protected void handleConnectException(
+        @NotNull WebSession webSession,
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull Exception e
+    ) throws DBWebException {
+        if (e instanceof DBCConnectException) {
+            Throwable rootCause = CommonUtils.getRootCause(e);
+            if (rootCause instanceof ClassNotFoundException) {
+                throwDriverNotFoundException(dataSourceContainer);
+            }
+        }
+        throw new DBWebException("Error connecting to database", e);
     }
 
     @Override
