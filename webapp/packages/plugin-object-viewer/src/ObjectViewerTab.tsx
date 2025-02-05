@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { useTranslate } from '@cloudbeaver/core-blocks';
+import { useObjectInfoTooltip } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
@@ -22,7 +22,6 @@ import { useNode } from '@cloudbeaver/plugin-navigation-tree';
 import type { IObjectViewerTabState } from './IObjectViewerTabState.js';
 
 export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = observer(function ObjectViewerTab({ tab, onSelect, onClose }) {
-  const translate = useTranslate();
   const connectionInfoResource = useService(ConnectionInfoResource);
   const navNodeManagerService = useService(NavNodeManagerService);
   const projectInfoResource = useService(ProjectInfoResource);
@@ -32,36 +31,14 @@ export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = ob
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
   const title = node?.name || tab.handlerState.tabTitle;
+  const connection = tab.handlerState.connectionKey ? connectionInfoResource.get(tab.handlerState.connectionKey) : undefined;
+  const project = connection ? projectInfoResource.get(connection.projectId) : undefined;
+  const nodeInfo = node ? navNodeManagerService.getNodeContainerInfo(node.id) : undefined;
 
-  let tooltip = title;
-
-  if (tab.handlerState.connectionKey) {
-    const connection = connectionInfoResource.get(tab.handlerState.connectionKey);
-    const nodeInfo = node ? navNodeManagerService.getNodeContainerInfo(node.id) : undefined;
-
-    if (connection) {
-      tooltip += `\n${translate('ui_connection')}: ${connection.name}`;
-
-      if (nodeInfo) {
-        if (nodeInfo.catalogId) {
-          tooltip += `\n${translate('ui_catalog')}: ${nodeInfo.catalogId}`;
-        }
-
-        if (nodeInfo.schemaId) {
-          tooltip += `\n${translate('ui_schema')}: ${nodeInfo.schemaId}`;
-        }
-      }
-
-      const project = projectInfoResource.get(connection.projectId);
-
-      if (project) {
-        tooltip += `\n${translate('ui_project')}: ${project.name}`;
-      }
-    }
-  }
+  const tooltip = useObjectInfoTooltip(connection?.name, nodeInfo?.catalogId, nodeInfo?.schemaId, project?.name);
 
   return (
-    <Tab tabId={tab.id} title={tooltip} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
+    <Tab tabId={tab.id} title={`${title}${tooltip ? '\n' + tooltip : ''}`} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
       <TabIcon icon={node?.icon || tab.handlerState.tabIcon} />
       <TabTitle>{title}</TabTitle>
     </Tab>
