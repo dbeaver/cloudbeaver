@@ -9,7 +9,6 @@ import { Dependency, injectable } from '@cloudbeaver/core-di';
 import {
   createSettingsAliasResolver,
   ROOT_SETTINGS_LAYER,
-  SettingsManagerService,
   SettingsProvider,
   SettingsProviderService,
   SettingsResolverService,
@@ -39,7 +38,6 @@ export class NavTreeSettingsService extends Dependency {
 
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
-    private readonly settingsManagerService: SettingsManagerService,
     private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();

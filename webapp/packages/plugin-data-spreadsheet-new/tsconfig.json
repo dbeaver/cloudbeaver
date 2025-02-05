@@ -1,127 +1,104 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
   },
   "references": [
     {
-      "path": "../core-administration/tsconfig.json"
+      "path": "../core-administration"
     },
     {
-      "path": "../core-app/tsconfig.json"
+      "path": "../core-app"
     },
     {
-      "path": "../core-authentication/tsconfig.json"
+      "path": "../core-authentication"
     },
     {
-      "path": "../core-blocks/tsconfig.json"
+      "path": "../core-blocks"
     },
     {
-      "path": "../core-browser/tsconfig.json"
+      "path": "../core-browser"
     },
     {
-      "path": "../core-browser/tsconfig.json"
+      "path": "../core-cli"
     },
     {
-      "path": "../core-client-activity/tsconfig.json"
+      "path": "../core-client-activity"
     },
     {
-      "path": "../core-connections/tsconfig.json"
+      "path": "../core-connections"
     },
     {
-      "path": "../core-data-context/tsconfig.json"
+      "path": "../core-data-context"
     },
     {
-      "path": "../core-di/tsconfig.json"
+      "path": "../core-di"
     },
     {
-      "path": "../core-dialogs/tsconfig.json"
+      "path": "../core-dialogs"
     },
     {
-      "path": "../core-dialogs/tsconfig.json"
+      "path": "../core-events"
     },
     {
-      "path": "../core-events/tsconfig.json"
+      "path": "../core-executor"
     },
     {
-      "path": "../core-events/tsconfig.json"
+      "path": "../core-localization"
     },
     {
-      "path": "../core-executor/tsconfig.json"
+      "path": "../core-navigation-tree"
     },
     {
-      "path": "../core-localization/tsconfig.json"
+      "path": "../core-projects"
     },
     {
-      "path": "../core-localization/tsconfig.json"
+      "path": "../core-root"
     },
     {
-      "path": "../core-navigation-tree/tsconfig.json"
+      "path": "../core-routing"
     },
     {
-      "path": "../core-projects/tsconfig.json"
+      "path": "../core-sdk"
     },
     {
-      "path": "../core-root/tsconfig.json"
+      "path": "../core-settings"
     },
     {
-      "path": "../core-routing/tsconfig.json"
+      "path": "../core-storage"
     },
     {
-      "path": "../core-sdk/tsconfig.json"
+      "path": "../core-ui"
     },
     {
-      "path": "../core-sdk/tsconfig.json"
+      "path": "../core-utils"
     },
     {
-      "path": "../core-settings/tsconfig.json"
+      "path": "../core-view"
     },
     {
-      "path": "../core-settings/tsconfig.json"
+      "path": "../plugin-data-grid"
     },
     {
-      "path": "../core-storage/tsconfig.json"
+      "path": "../plugin-data-viewer"
     },
     {
-      "path": "../core-ui/tsconfig.json"
+      "path": "../plugin-datasource-context-switch"
     },
     {
-      "path": "../core-ui/tsconfig.json"
+      "path": "../plugin-navigation-tabs"
     },
     {
-      "path": "../core-utils/tsconfig.json"
+      "path": "../plugin-navigation-tree"
     },
     {
-      "path": "../core-view/tsconfig.json"
+      "path": "../plugin-object-viewer"
     },
     {
-      "path": "../core-view/tsconfig.json"
-    },
-    {
-      "path": "../plugin-data-grid/tsconfig.json"
-    },
-    {
-      "path": "../plugin-data-viewer/tsconfig.json"
-    },
-    {
-      "path": "../plugin-data-viewer/tsconfig.json"
-    },
-    {
-      "path": "../plugin-datasource-context-switch/tsconfig.json"
-    },
-    {
-      "path": "../plugin-navigation-tabs/tsconfig.json"
-    },
-    {
-      "path": "../plugin-navigation-tree/tsconfig.json"
-    },
-    {
-      "path": "../plugin-object-viewer/tsconfig.json"
-    },
-    {
-      "path": "../tests-runner/tsconfig.json"
+      "path": "../tests-runner"
     }
   ],
   "include": [

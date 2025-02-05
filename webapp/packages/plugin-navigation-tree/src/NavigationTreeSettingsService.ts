@@ -8,8 +8,7 @@
 import { computed, makeObservable } from 'mobx';
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { NAVIGATION_TREE_SETTINGS_GROUP } from '@cloudbeaver/core-navigation-tree';
-import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
+import { SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({

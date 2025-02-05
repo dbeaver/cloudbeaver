@@ -11,7 +11,6 @@ export default [
   ['app_navigationTree_search', 'Искать элементы...'],
   ['app_navigationTree_limited', 'Отображено {arg:limit} элементов'],
 
-  ['app_navigationTree_action_link_with_editor', 'Синхронизовать с редактором'],
   ['app_navigationTree_action_collapse_all', 'Свернуть все элементы'],
   ['app_navigationTree_settings_filter_objects_description', 'Показывать описание объектов'],
 

@@ -63,7 +63,6 @@ export function applyComposes(mixed: Array<Composes | ClassCollection>) {
           }
         }
 
-        // eslint-disable-next-line no-param-reassign
         map[key] = classnames.join(' ');
         return map;
       }, {}),

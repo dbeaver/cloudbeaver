@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./lib/vite.conf.tsbuildinfo",
+    "outDir": "lib",
+    "incremental": true,
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "lib": ["esnext"],
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "verbatimModuleSyntax": true,
+    "importHelpers": true,
+    "strict": true
+  },
+  "include": ["vite.config.ts", "vite-plugins/**/*"]
+}

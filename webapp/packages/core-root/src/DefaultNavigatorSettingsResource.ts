@@ -9,7 +9,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { type DefaultNavigatorSettingsFragment, GraphQLService, type NavigatorSettingsInput } from '@cloudbeaver/core-sdk';
 
-import { isNavigatorViewSettingsEqual } from './ConnectionNavigatorViewSettings.js';
 import { ServerConfigResource } from './ServerConfigResource.js';
 
 export type DefaultNavigatorSettings = DefaultNavigatorSettingsFragment['defaultNavigatorSettings'];

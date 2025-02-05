@@ -1,37 +1,41 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
   },
   "references": [
     {
-      "path": "../core-app/tsconfig.json"
+      "path": "../core-app"
     },
     {
-      "path": "../core-blocks/tsconfig.json"
+      "path": "../core-blocks"
     },
     {
-      "path": "../core-di/tsconfig.json"
+      "path": "../core-cli"
     },
     {
-      "path": "../core-localization/tsconfig.json"
+      "path": "../core-di"
     },
     {
-      "path": "../core-settings/tsconfig.json"
+      "path": "../core-localization"
     },
     {
-      "path": "../core-ui/tsconfig.json"
+      "path": "../core-settings"
     },
     {
-      "path": "../core-utils/tsconfig.json"
+      "path": "../core-ui"
     },
     {
-      "path": "../core-view/tsconfig.json"
+      "path": "../core-utils"
     },
     {
-      "path": "../plugin-top-app-bar/tsconfig.json"
+      "path": "../core-view"
+    },
+    {
+      "path": "../plugin-top-app-bar"
     }
   ],
   "include": [

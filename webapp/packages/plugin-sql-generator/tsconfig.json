@@ -1,52 +1,56 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
   },
   "references": [
     {
-      "path": "../core-blocks/tsconfig.json"
+      "path": "../core-blocks"
     },
     {
-      "path": "../core-connections/tsconfig.json"
+      "path": "../core-cli"
     },
     {
-      "path": "../core-di/tsconfig.json"
+      "path": "../core-connections"
     },
     {
-      "path": "../core-dialogs/tsconfig.json"
+      "path": "../core-di"
     },
     {
-      "path": "../core-events/tsconfig.json"
+      "path": "../core-dialogs"
     },
     {
-      "path": "../core-localization/tsconfig.json"
+      "path": "../core-events"
     },
     {
-      "path": "../core-navigation-tree/tsconfig.json"
+      "path": "../core-localization"
     },
     {
-      "path": "../core-resource/tsconfig.json"
+      "path": "../core-navigation-tree"
     },
     {
-      "path": "../core-sdk/tsconfig.json"
+      "path": "../core-resource"
     },
     {
-      "path": "../core-view/tsconfig.json"
+      "path": "../core-sdk"
     },
     {
-      "path": "../plugin-codemirror6/tsconfig.json"
+      "path": "../core-view"
     },
     {
-      "path": "../plugin-data-viewer/tsconfig.json"
+      "path": "../plugin-codemirror6"
     },
     {
-      "path": "../plugin-sql-editor-new/tsconfig.json"
+      "path": "../plugin-data-viewer"
     },
     {
-      "path": "../plugin-sql-editor/tsconfig.json"
+      "path": "../plugin-sql-editor"
+    },
+    {
+      "path": "../plugin-sql-editor-new"
     }
   ],
   "include": [

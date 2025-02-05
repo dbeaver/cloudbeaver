@@ -47,11 +47,6 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
   return (
     <SlideBox open={optionsPanelService.active} className={s(styles, { slideBox: true }, className)} onClose={close}>
       <SlideElement>
-        <Loader className={s(styles, { loader: true })} suspense>
-          <OptionsPanel />
-        </Loader>
-      </SlideElement>
-      <SlideElement>
         <Split {...splitState} sticky={30} split="horizontal" mode={toolsDisabled ? 'minimize' : splitState.mode} disable={toolsDisabled} keepRatio>
           <Pane className={s(styles, { pane: true })}>
             <Loader className={s(styles, { loader: true })} suspense>
@@ -66,6 +61,11 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
           </Pane>
         </Split>
         <SlideOverlay onClick={close} />
+      </SlideElement>
+      <SlideElement>
+        <Loader className={s(styles, { loader: true })} suspense>
+          <OptionsPanel />
+        </Loader>
       </SlideElement>
     </SlideBox>
   );

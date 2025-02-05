@@ -7,8 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 import React, { useContext } from 'react';
-import { MenuItem as ReakitMenuItem } from 'reakit';
-import type { CompositeItemOptions } from 'reakit';
+import { MenuItem as ReakitMenuItem, type CompositeItemOptions } from 'reakit';
 
 import { s } from '../s.js';
 import { useCombinedHandler } from '../useCombinedHandler.js';

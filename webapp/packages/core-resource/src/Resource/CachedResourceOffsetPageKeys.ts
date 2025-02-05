@@ -22,7 +22,6 @@ export interface ICachedResourceOffsetPage {
   pages: IResourceOffsetPage[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ICachedResourceOffsetPageOptions extends IOffsetPageInfo {}
 
 export const CACHED_RESOURCE_DEFAULT_PAGE_OFFSET = 0;

@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "exclude": [
     "**/node_modules",
     "lib/**/*",
@@ -8,44 +8,45 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
   },
   "references": [
     {
-      "path": "../core-client-activity/tsconfig.json"
+      "path": "../core-cli"
     },
     {
-      "path": "../core-di/tsconfig.json"
+      "path": "../core-client-activity"
     },
     {
-      "path": "../core-executor/tsconfig.json"
+      "path": "../core-di"
     },
     {
-      "path": "../core-links/tsconfig.json"
+      "path": "../core-executor"
     },
     {
-      "path": "../core-localization/tsconfig.json"
+      "path": "../core-links"
     },
     {
-      "path": "../core-product/tsconfig.json"
+      "path": "../core-localization"
     },
     {
-      "path": "../core-resource/tsconfig.json"
+      "path": "../core-product"
     },
     {
-      "path": "../core-sdk/tsconfig.json"
+      "path": "../core-resource"
     },
     {
-      "path": "../core-sdk/tsconfig.json"
+      "path": "../core-sdk"
     },
     {
-      "path": "../core-settings/tsconfig.json"
+      "path": "../core-settings"
     },
     {
-      "path": "../core-utils/tsconfig.json"
+      "path": "../core-utils"
     },
     {
-      "path": "../tests-runner/tsconfig.json"
+      "path": "../tests-runner"
     }
   ],
   "include": [

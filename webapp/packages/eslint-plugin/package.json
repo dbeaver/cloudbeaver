@@ -1,18 +1,23 @@
 {
   "name": "@cloudbeaver/eslint-plugin",
-  "sideEffects": false,
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
   "version": "1.0.0",
-  "main": "customRules.cjs",
+  "exports": {
+    ".": "./plugin.js"
+  },
   "description": "ESLint custom rules for CloudBeaver",
   "license": "Apache-2.0",
-  "type": "commonjs",
-  "dependencies": {},
+  "type": "module",
   "keywords": [
     "eslint",
     "eslintplugin",
     "eslint-plugin"
   ],
   "devDependencies": {
-    "eslint": "^8"
+    "eslint": "^9"
   }
 }
