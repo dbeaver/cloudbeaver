@@ -1,0 +1,29 @@
+{
+  "name": "@dbeaver/ui-kit",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rimraf --glob dist",
+    "lint": "eslint ./src/ --ext .ts,.tsx"
+  },
+  "packageManager": "yarn@4.6.0",
+  "devDependencies": {
+    "@dbeaver/tsconfig": "workspace:^",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "rimraf": "^6",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@ariakit/react": "^0.4.15",
+    "react": "^19",
+    "react-data-grid": "7.0.0-beta.47",
+    "react-dom": "^19"
+  }
+}

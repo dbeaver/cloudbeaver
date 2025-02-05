@@ -1,0 +1,12 @@
+{
+  "extends": "@dbeaver/tsconfig/tsconfig.webview.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "incremental": true,
+    "composite": true
+  },
+  "include": [
+    "src"
+  ]
+}
