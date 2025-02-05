@@ -25,17 +25,16 @@ export const manualChunks = (): PluginOption => {
                 manualChunks(id, { getModuleInfo }) {
                   function isModuleSync(moduleId: string) {
                     const info = getModuleInfo(moduleId);
-                    if (!info) return true; // fallback if no info available
-                    if (info.isEntry) return true;
+                    if (!info) {
+                      return true;
+                    } // fallback if no info available
+                    if (info.isEntry) {
+                      return true;
+                    }
                     // info.importers is the list of modules that import this module.
                     // info.dynamicImporters is the subset of those that import it dynamically.
                     // If there’s any importer that did a static import, we consider this module sync.
-                    return (
-                      info.importers &&
-                      info.importers.some(importer => {
-                        return !info.dynamicImporters.includes(importer);
-                      })
-                    );
+                    return info.importers && info.importers.some(importer => !info.dynamicImporters.includes(importer));
                   }
 
                   const nodeModulesMatch = /[\\/]node_modules[\\/](.*?)[\\/]/.exec(id);

@@ -6,20 +6,24 @@
  * you may not use this file except in compliance with the License.
  */
 
-const noSyncComponentImport = require('./noSyncComponentImport.cjs');
+import noSyncComponentImport from './noSyncComponentImport.js';
 
-module.exports = {
+const plugin = {
   meta: {
     name: '@cloudbeaver/eslint-plugin',
     version: '1.0.0',
   },
-  configs: {
-    recommended: {
-      plugins: ['@cloudbeaver'],
-      rules: {
-        '@cloudbeaver/no-sync-component-import': 'error',
-      },
-    },
-  },
+  configs: {},
   rules: { 'no-sync-component-import': noSyncComponentImport },
 };
+
+Object.assign(plugin.configs, {
+  recommended: {
+    plugins: { '@cloudbeaver': plugin },
+    rules: {
+      '@cloudbeaver/no-sync-component-import': 'error',
+    },
+  },
+});
+
+export default plugin;
