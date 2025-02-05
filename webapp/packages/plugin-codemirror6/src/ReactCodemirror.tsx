@@ -42,7 +42,13 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
   ) {
     value = value ?? getValue?.();
     const currentExtensions = useRef<Map<Compartment, Extension>>(new Map());
-    const readOnlyFacet = useMemo(() => EditorView.editable.of(!readonly), [readonly]);
+    const readOnlyFacet = useMemo(() => {
+      if (readonly) {
+        return [EditorState.readOnly.of(true), EditorView.editable.of(false), EditorView.contentAttributes.of({ tabIndex: '0' })];
+      }
+
+      return [];
+    }, [readonly]);
     const eventHandlers = useMemo(
       () =>
         EditorView.domEventHandlers({
