@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
+import { SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const settingsSchema = schema.object({
@@ -22,10 +22,7 @@ export class ConnectionsSettingsService extends Dependency {
   }
   readonly settings: SettingsProvider<typeof settingsSchema>;
 
-  constructor(
-    private readonly settingsProviderService: SettingsProviderService,
-    private readonly settingsManagerService: SettingsManagerService,
-  ) {
+  constructor(private readonly settingsProviderService: SettingsProviderService) {
     super();
     this.settings = this.settingsProviderService.createSettings(settingsSchema);
     this.registerSettings();

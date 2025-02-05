@@ -50,11 +50,9 @@ export class CommonDialogService {
     options?: DialogOptions,
   ): Promise<TResult | DialogueStateResult> {
     let _resolve: (value: TResult | DialogueStateResult) => void;
-    let _reject: (reason?: any) => void;
 
-    const promise = new Promise<TResult | DialogueStateResult>((resolve, reject) => {
+    const promise = new Promise<TResult | DialogueStateResult>(resolve => {
       _resolve = resolve;
-      _reject = reject;
     });
 
     const dialogInternal: DialogInternal<TResult> = {

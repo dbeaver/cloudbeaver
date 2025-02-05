@@ -1,22 +1,32 @@
 #!/usr/bin/env node
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 
-'use strict';
 process.title = 'core-add-plugin';
 
-const { resolve, join } = require('path');
-const { runner, Logger } = require('hygen');
+import { resolve, join } from 'node:path';
+import { runner, Logger } from 'hygen';
+import { command } from 'execa';
+import enquirer from 'enquirer';
 
-const templates = join(__dirname, '../_templates');
+const templates = join(import.meta.dirname, '../_templates');
 const currentDir = resolve();
 
-runner(['plugin', 'new'], {
+const { success } = await runner(['plugin', 'new'], {
   templates,
   cwd: join(currentDir, 'packages'),
   logger: new Logger(console.log.bind(console)),
   debug: !!process.env.DEBUG,
   exec: (action, body) => {
     const opts = body && body.length > 0 ? { input: body } : {};
-    return require('execa').command(action, { ...opts, shell: true });
+    return command(action, { ...opts, shell: true });
   },
-  createPrompter: () => require('enquirer'),
-}).then(({ success }) => process.exit(success ? 0 : 1));
+  createPrompter: () => enquirer,
+});
+
+process.exit(success ? 0 : 1);

@@ -18,11 +18,9 @@ export abstract class ResourceAlias<TKey, TOptions extends ResourceAliasOptions>
   readonly id: string;
   readonly options: TOptions;
   parent?: ResourceAlias<TKey, any>;
-  private readonly typescriptHack: TKey;
   abstract readonly name: string;
 
   constructor(id: string, options: TOptions, parent?: ResourceAlias<TKey, any>) {
-    this.typescriptHack = null as any;
     this.id = id;
     this.options = options;
     this.parent = parent;
@@ -72,7 +70,7 @@ export abstract class ResourceAlias<TKey, TOptions extends ResourceAliasOptions>
     return this.toString();
   }
 
-  private get [Symbol.toStringTag]() {
+  get [Symbol.toStringTag]() {
     return this.toString();
   }
 

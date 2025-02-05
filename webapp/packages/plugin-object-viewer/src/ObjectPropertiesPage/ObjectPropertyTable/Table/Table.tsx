@@ -131,6 +131,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
         <DataGrid
           className={s(styles, { dataGrid: true })}
           rows={objects}
+          // @ts-ignore
           rowKeyGetter={row => row.id}
           columns={tableData.columns}
           rowHeight={40}

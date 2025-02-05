@@ -1,52 +1,56 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
   },
   "references": [
     {
-      "path": "../core-blocks/tsconfig.json"
+      "path": "../core-blocks"
     },
     {
-      "path": "../core-client-activity/tsconfig.json"
+      "path": "../core-cli"
     },
     {
-      "path": "../core-di/tsconfig.json"
+      "path": "../core-client-activity"
     },
     {
-      "path": "../core-executor/tsconfig.json"
+      "path": "../core-di"
     },
     {
-      "path": "../core-localization/tsconfig.json"
+      "path": "../core-executor"
     },
     {
-      "path": "../core-notifications/tsconfig.json"
+      "path": "../core-localization"
     },
     {
-      "path": "../core-projects/tsconfig.json"
+      "path": "../core-notifications"
     },
     {
-      "path": "../core-resource/tsconfig.json"
+      "path": "../core-projects"
     },
     {
-      "path": "../core-root/tsconfig.json"
+      "path": "../core-resource"
     },
     {
-      "path": "../core-routing/tsconfig.json"
+      "path": "../core-root"
     },
     {
-      "path": "../core-theming/tsconfig.json"
+      "path": "../core-routing"
     },
     {
-      "path": "../core-ui/tsconfig.json"
+      "path": "../core-theming"
     },
     {
-      "path": "../core-utils/tsconfig.json"
+      "path": "../core-ui"
     },
     {
-      "path": "../core-version/tsconfig.json"
+      "path": "../core-utils"
+    },
+    {
+      "path": "../core-version"
     }
   ],
   "include": [

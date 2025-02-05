@@ -9,7 +9,6 @@ import { observer } from 'mobx-react-lite';
 import type { RefObject } from 'react';
 
 import BaseDropdownStyles from '../FormControls/BaseDropdown.module.css';
-import { getComputed } from '../getComputed.js';
 import { IconOrImage } from '../IconOrImage.js';
 import { Menu } from '../Menu/Menu.js';
 import { MenuItem } from '../Menu/MenuItem.js';

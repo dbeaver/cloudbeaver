@@ -13,7 +13,9 @@
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.preferences.includePackageJsonAutoImports": "on",
   "typescript.preferences.quoteStyle": "single",
-  "typescript.tsdk": "webapp/node_modules/typescript/lib",
+  "typescript.tsdk": "webapp/.yarn/sdks/typescript/lib",
+  "prettier.prettierPath": "webapp/.yarn/sdks/prettier/index.cjs",
+  "eslint.nodePath": "webapp/.yarn/sdks",
 
   "eslint.enable": true,
   "eslint.validate": [

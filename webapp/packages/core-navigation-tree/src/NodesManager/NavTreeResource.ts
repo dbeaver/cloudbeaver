@@ -469,7 +469,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
       if (!preloaded) {
         const cause = new DetailsError(`Entity not found:\n"${nodeId}"\nPath:\n${parents.map(parent => `"${parent}"`).join('\n')}`);
-        const error = new ResourceError(this, key, undefined, 'Entity not found', { cause });
+        const error = new ResourceError(this, key, 'Entity not found', { cause });
         ExecutorInterrupter.interrupt(contexts);
         throw this.markError(error, key);
       }

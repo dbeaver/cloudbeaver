@@ -1,40 +1,44 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
   },
   "references": [
     {
-      "path": "../core-authentication/tsconfig.json"
+      "path": "../core-authentication"
     },
     {
-      "path": "../core-di/tsconfig.json"
+      "path": "../core-cli"
     },
     {
-      "path": "../core-executor/tsconfig.json"
+      "path": "../core-di"
     },
     {
-      "path": "../core-extensions/tsconfig.json"
+      "path": "../core-executor"
     },
     {
-      "path": "../core-localization/tsconfig.json"
+      "path": "../core-extensions"
     },
     {
-      "path": "../core-resource/tsconfig.json"
+      "path": "../core-localization"
     },
     {
-      "path": "../core-root/tsconfig.json"
+      "path": "../core-resource"
     },
     {
-      "path": "../core-sdk/tsconfig.json"
+      "path": "../core-root"
     },
     {
-      "path": "../core-ui/tsconfig.json"
+      "path": "../core-sdk"
     },
     {
-      "path": "../core-utils/tsconfig.json"
+      "path": "../core-ui"
+    },
+    {
+      "path": "../core-utils"
     }
   ],
   "include": [

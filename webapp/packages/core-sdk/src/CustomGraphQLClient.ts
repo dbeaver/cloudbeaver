@@ -22,11 +22,11 @@ import { ServerInternalError } from './ServerInternalError.js';
 
 export type UploadProgressEvent = AxiosProgressEvent;
 
-type GqlResponse =
-  | { data: object; errors: undefined }[]
-  | { data: object; errors: undefined }
-  | { data: undefined; errors: object }
-  | { data: undefined; errors: object[] };
+// type GqlResponse =
+//   | { data: object; errors: undefined }[]
+//   | { data: object; errors: undefined }
+//   | { data: undefined; errors: object }
+//   | { data: undefined; errors: object[] };
 
 export class CustomGraphQLClient extends GraphQLClient {
   get blockReason(): Error | string | null {
