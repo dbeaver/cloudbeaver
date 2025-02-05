@@ -1,12 +1,16 @@
 {
   "name": "@cloudbeaver/eslint-config",
+  "type": "module",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"
   ],
   "version": "0.1.0",
-  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./*": "./*"
+  },
   "description": "ESLint for CloudBeaver",
   "license": "Apache-2.0",
   "files": [
@@ -14,14 +18,16 @@
     "index.js",
     "package.json"
   ],
-  "type": "commonjs",
-  "devDependencies": {
+  "dependencies": {
     "@cloudbeaver/eslint-plugin": "workspace:*",
-    "@typescript-eslint/eslint-plugin": "^6",
-    "@typescript-eslint/parser": "^6",
-    "eslint": "^8",
-    "eslint-config-prettier": "^9",
+    "@eslint/js": "^9.19.0",
+    "@stylistic/eslint-plugin": "^3.0.1",
+    "@typescript-eslint/eslint-plugin": "^8",
+    "@typescript-eslint/parser": "^8",
+    "eslint": "^9",
+    "eslint-config-prettier": "^10",
     "eslint-plugin-react": "^7",
-    "eslint-plugin-react-hooks": "^4"
+    "eslint-plugin-react-hooks": "^5",
+    "typescript-eslint": "^8"
   }
 }

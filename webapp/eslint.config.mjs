@@ -5,16 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-{
-  "extends": "@cloudbeaver",
-  "env": {
-    "node": true
-  },
-  "parserOptions": {
-    "ecmaVersion": 2019,
-    "sourceType": "module",
-    "ecmaFeatures": {
-      "jsx": true
-    }
-  }
-}
+import cloudbeaverConfig from '@cloudbeaver/eslint-config/flat.js';
+
+export default cloudbeaverConfig;

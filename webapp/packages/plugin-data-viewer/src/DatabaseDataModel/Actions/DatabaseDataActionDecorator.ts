@@ -11,7 +11,6 @@ import type { IDatabaseDataActionInterface } from '../IDatabaseDataAction.js';
 const ACTION_PARAMS = 'custom:data-viewer/action/params';
 
 export function databaseDataAction<T extends IDatabaseDataActionInterface<any, any, any>>() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
   return <U extends T>(target: U): U => {
     if (Reflect.hasOwnMetadata(ACTION_PARAMS, target)) {
       throw new Error('Duplicate databaseDataAction() decorator');
@@ -24,7 +23,6 @@ export function databaseDataAction<T extends IDatabaseDataActionInterface<any, a
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 export function getDependingDataActions(action: IDatabaseDataActionInterface<any, any, any>): Function[] {
   return Reflect.getMetadata(ACTION_PARAMS, action) || [];
 }

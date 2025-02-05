@@ -152,7 +152,7 @@ export function validateDependencies(currentPackageRoot: string) {
   }
 
   if (selfImports.size > 0) {
-    packageLogger.log('error', false, `Self import found in:`, Array.from(selfImports));
+    packageLogger.log('error', false, 'Self import found in:', Array.from(selfImports));
   }
 
   const newDependencies = [...dependencies].sort(sortDependencies);
