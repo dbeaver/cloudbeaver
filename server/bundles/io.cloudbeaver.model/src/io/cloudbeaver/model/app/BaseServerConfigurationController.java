@@ -38,7 +38,8 @@ public abstract class BaseServerConfigurationController<T extends ServletServerC
     @NotNull
     private final Path homeDirectory;
 
-    protected Path workspacePath;
+    @NotNull
+    protected final Path workspacePath;
 
     protected BaseServerConfigurationController(@NotNull Path homeDirectory) {
         this.homeDirectory = homeDirectory;
@@ -101,9 +102,6 @@ public abstract class BaseServerConfigurationController<T extends ServletServerC
     @NotNull
     @Override
     public Path getWorkspacePath() {
-        if (workspacePath == null) {
-            throw new RuntimeException("Workspace path not initialized");
-        }
         return workspacePath;
     }
 }

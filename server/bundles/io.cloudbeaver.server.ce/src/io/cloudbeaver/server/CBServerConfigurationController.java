@@ -106,7 +106,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
     @Nullable
     @Override
-    protected String getWorkspaceLocationFromEnv() {
+    public String getWorkspaceLocationFromEnv() {
         String envValue = System.getenv("CLOUDBEAVER_WORKSPACE_LOCATION");
         return CommonUtils.nullIfEmpty(envValue);
     }
