@@ -32,6 +32,5 @@ public interface LdapConstants {
     String CRED_USER_DN = "user-dn";
     String CRED_PASSWORD = "password";
     String CRED_SESSION_ID = "session-id";
-    String CRED_FULL_DN = "full-dn";
     String LDAP_META_GROUP_NAME = "ldap.group-name";
 }
