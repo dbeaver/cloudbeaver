@@ -134,6 +134,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     result.add(new WebNavigatorNodeInfo(session, node));
                 }
             }
+            result.stream().peek(r -> r.getFeatures());
             // Checks the range of the expected result
             if (offset == null || limit == null || (offset == 0 && limit >= result.size())) {
                 return result;

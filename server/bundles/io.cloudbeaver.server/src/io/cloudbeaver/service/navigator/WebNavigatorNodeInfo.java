@@ -24,13 +24,13 @@ import io.cloudbeaver.model.fs.FSUtils;
 import io.cloudbeaver.model.rm.DBNResourceManagerProject;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.registry.WebDriverRegistry;
+import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.ext.generic.GenericConstants;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.fs.DBFUtils;
@@ -270,19 +270,8 @@ public class WebNavigatorNodeInfo {
         if (CommonUtils.isEmpty(fileExtension)) {
             return false;
         }
-        DBPDriver driver = null;
-        try {
-            driver = WebServiceUtils.getDriverById("jdbc-files-ee:multi");
-        } catch (DBWebException e) {
-            log.warn("Can't find multi flat file driver to get supported extensions");
-            return false;
-        }
-        String supportExtensionValue = (String) driver.getDriverParameter(GenericConstants.PARAM_DATABASE_FILE_EXTENSIONS);
-        if (CommonUtils.isEmpty(supportExtensionValue)) {
-            return false;
-        }
-        Set<String> supportExtensionSet = Set.of(supportExtensionValue.split(","));
-        return supportExtensionSet.contains(fileExtension);
+        WebDriverRegistry driverRegistry = WebAppUtils.getWebApplication().getDriverRegistry();
+        return driverRegistry.getSupportedCloudOpenExtension().containsKey(fileExtension);
     }
 
     private boolean hasNodePermission(RMProjectPermission permission) {
