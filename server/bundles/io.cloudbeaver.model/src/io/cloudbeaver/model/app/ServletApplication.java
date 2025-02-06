@@ -91,6 +91,12 @@ public interface ServletApplication extends DBPApplication {
 
     boolean isLicenseRequired();
 
+    /**
+     * Collector that contains information about system.
+     */
+    @NotNull
+    ServletSystemInformationCollector getSystemInformationCollector();
+
     default void getStatusInfo(Map<String, Object> infoMap) {
 
     }
