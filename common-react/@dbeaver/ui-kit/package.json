@@ -22,8 +22,10 @@
   },
   "dependencies": {
     "@ariakit/react": "^0.4.15",
+    "@ladle/react": "^5.0.1",
+    "@tailwindcss/vite": "^4.0.3",
     "react": "^19",
-    "react-data-grid": "7.0.0-beta.47",
-    "react-dom": "^19"
+    "react-dom": "^19",
+    "tailwindcss": "^4.0.3"
   }
 }

@@ -33,6 +33,7 @@
     "react": "^19",
     "react-dom": "^19",
     "reflect-metadata": "^0",
+    "tailwindcss": "^4.0.3",
     "tslib": "^2",
     "vite": "^6"
   },

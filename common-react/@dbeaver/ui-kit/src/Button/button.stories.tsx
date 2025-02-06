@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import './index.css';
+import {Button} from '../index.js';
 
-export { Button } from './Button/Button.js';
+
+export const Primary = () => <Button>Simple Button</Button>;
+export const Secondary = () => <Button variant="secondary">Secondary Button</Button>;

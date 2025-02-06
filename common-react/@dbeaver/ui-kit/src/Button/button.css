@@ -1,124 +1,50 @@
-@layer theme {
-    @property --background {
-      syntax: "<color>";
-      inherits: true;
-      initial-value: white;
-    }
-    :root {
-      --font-mono: Menlo, Consolas, Courier New, monospace;
-      --color-white: white;
-      --color-black: black;
-      --color-primary: #007acc;
-      --background: oklch(from var(--color-primary) 95% 0.005 h);
-    }
-    :root:where(.dark, .dark *) {
-      --background: oklch(from var(--color-primary) 20% 0.002 h);
-    }
-    .ak-button {
-      --size: 2.5rem;
-      display: flex;
-      max-width: 100%;
-      height: var(--size);
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      padding-inline: 1rem;
-      text-decoration-line: none;
-      background-color: var(--background);
-      color: var(--text, currentColor);
-      border-style: none;
-      scroll-margin: var(--padding, 0px);
-      border-radius: calc(var(--rounded, 0.5rem) - var(--padding, 0px));
-      font-size: 1rem;
-      line-height: 1.5rem;
-      box-shadow:
-        inset 0 0 0 1px var(--border),
-        inset 0 2px 0 var(--light),
-        inset 0 -1px 0 var(--shadow),
-        0 1px 1px var(--shadow);
-      --outline-offset: 0;
-      --outline: var(--color-primary);
-      --depth: 1px;
-      --padding-block: var(--depth);
-      outline-width: 2px;
-      outline-color: var(--outline);
-      outline-offset: var(--outline-offset);
-      user-select: none;
-      white-space: nowrap;
-      padding-block: var(--padding-block-start, var(--padding-block))
-        var(--padding-block-end, var(--padding-block));
-    }
-    .ak-button-default {
-      --outline-offset: -1px;
-      --background: white;
-      --border: rgb(0 0 0 / 13%);
-      --light: rgb(255 255 255 / 20%);
-      --shadow: rgb(0 0 0 / 10%);
-      --text: black;
-    }
-    .ak-button-default:where(.dark, .dark *) {
-      --background: rgb(255 255 255 / 5%);
-      --border: rgb(255 255 255 / 10%);
-      --light: rgb(255 255 255 / 5%);
-      --shadow: rgb(0 0 0 / 25%);
-      --text: white;
-    }
-    .ak-button-default:not(:active):hover {
-      --border: rgb(0 0 0 / 33%);
-    }
-    .ak-button-default:where(.dark, .dark *):not(:active):hover {
-      --border: rgb(255 255 255 / 25%);
-    }
-    @layer theme {
-    }
-    @layer theme {
-      .ak-button[aria-disabled="true"] {
-        opacity: 0.5;
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+@import 'tailwindcss';
+
+@layer components {
+  .btn-primary {
+    border-radius: var(--radius-md);
+    background-color: var(--color-primary-500, var(--color-gray-500));
+    padding-inline: --spacing(5);
+    padding-block: --spacing(2);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-white);
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-primary-700, var(--color-gray-700));
       }
     }
-    .ak-button:where(.dark, .dark *) {
-      box-shadow:
-        inset 0 0 0 1px var(--border),
-        inset 0 -1px 0 1px var(--shadow),
-        inset 0 1px 0 var(--light);
-    }
-    .ak-button:active,
-    .ak-button[data-active] {
-      box-shadow:
-        inset 0 0 0 1px var(--border),
-        inset 0 2px 0 var(--border);
-    }
-    .ak-button:active:where(.dark, .dark *),
-    .ak-button[data-active]:where(.dark, .dark *) {
-      box-shadow:
-        inset 0 0 0 1px var(--border),
-        inset 0 1px 1px 1px var(--shadow);
-    }
-    @media (min-width: 640px) {
-    }
-    @layer theme {
-      .ak-button[data-focus-visible] {
-        outline-style: solid;
-      }
-    }
-    @layer theme {
-    }
-    @layer theme {
-      @layer theme {
-      }
-    }
-    @layer theme {
-      @layer theme {
-        .ak-button:active,
-        .ak-button[data-active] {
-          padding-block: calc(
-              var(--padding-block-start, var(--padding-block)) + var(--depth, 0px)
-            )
-            calc(
-              var(--padding-block-end, var(--padding-block)) - var(--depth, 0px)
-            );
-        }
-      }
+    &:active {
+        background-color: var(--color-primary-900, var(--color-gray-900));
     }
   }
+
+  .btn-secondary {
+    border-radius: var(--radius-md);
+    background-color: transparent;
+    border: 1px solid var(--color-primary-500, var(--color-gray-500));
+    padding-inline: --spacing(5);
+    padding-block: --spacing(2);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-primary-500, var(--color-gray-500));
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-primary-100, var(--color-gray-100));
+        border-color: var(--color-primary-700, var(--color-gray-700));
+        color: var(--color-primary-700, var(--color-gray-700));
+      }
+    }
+    &:active {
+      background-color: var(--color-primary-200, var(--color-gray-200));
+      border-color: var(--color-primary-900, var(--color-gray-900));
+      color: var(--color-primary-900, var(--color-gray-900));
+    }
+  }
+}
   
