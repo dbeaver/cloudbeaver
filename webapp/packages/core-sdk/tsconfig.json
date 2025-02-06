@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "exclude": [
     "**/node_modules",
     "lib/**/*",
@@ -8,17 +8,18 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
   },
   "references": [
     {
-      "path": "../core-di/tsconfig.json"
+      "path": "../core-cli"
     },
     {
-      "path": "../core-executor/tsconfig.json"
+      "path": "../core-di"
     },
     {
-      "path": "../core-utils/tsconfig.json"
+      "path": "../core-utils"
     }
   ],
   "include": [

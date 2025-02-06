@@ -10,6 +10,7 @@
 # misc
 .DS_Store
 .env*
+/src/public
 
 # debug
 npm-debug.log*

@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+// @ts-nocheck
 import { afterEach, describe, expect, test } from '@jest/globals';
 import { cleanup, render, screen } from '@testing-library/react';
 

@@ -392,11 +392,7 @@ export class NavNodeManagerService extends Bootstrap {
     };
   };
 
-  private async navigateHandler(
-    data: INodeNavigationData,
-    contexts: IExecutionContextProvider<INodeNavigationData>,
-    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-  ): Promise<void> {}
+  private async navigateHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>): Promise<void> {}
 }
 
 export function parseNodeParentId(nodeId: string): string {

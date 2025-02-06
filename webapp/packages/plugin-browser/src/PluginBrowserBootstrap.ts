@@ -5,23 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ProcessSnackbarProps } from '@cloudbeaver/core-blocks';
-import { ServiceWorkerService } from '@cloudbeaver/core-browser';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { type IProcessNotificationContainer, NotificationService } from '@cloudbeaver/core-events';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 
 @injectable()
 export class PluginBrowserBootstrap extends Bootstrap {
-  private notification: IProcessNotificationContainer<ProcessSnackbarProps> | null;
-
-  constructor(
-    private readonly serviceWorkerService: ServiceWorkerService,
-    private readonly notificationService: NotificationService,
-    private readonly localizationService: LocalizationService,
-  ) {
+  constructor() {
     super();
-    this.notification = null;
   }
   override register(): void {
     // TODO: notification appears in unexpected moment

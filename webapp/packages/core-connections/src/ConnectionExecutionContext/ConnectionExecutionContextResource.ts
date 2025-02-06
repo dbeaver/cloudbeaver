@@ -51,7 +51,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     this.aliases.add(ConnectionExecutionContextProjectKey, param =>
       resourceKeyList(
         Array.from(this.data.entries())
-          .filter(([key, context]) => context.projectId === param.options.projectId)
+          .filter(([, context]) => context.projectId === param.options.projectId)
           .map(([key]) => key),
       ),
     );

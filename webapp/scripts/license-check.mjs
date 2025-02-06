@@ -35,7 +35,7 @@ for (const scope of scopes) {
   }
 }
 
-const output = exec('git diff --cached --name-only --diff-filter=ACMR');
+const output = exec('git diff --cached --name-only --diff-filter=ACMR -- webapp/**/*');
 const rl = createInterface(output.stdout);
 const invalidFiles = [];
 

@@ -12,7 +12,7 @@ export function getConnectionFolderIdFromNodeId(nodeId: string): IConnectionFold
   const data = /^folder:\/\/(.*?)\/(.*)$/gi.exec(nodeId);
 
   if (data) {
-    const [t, projectId, folderId] = data;
+    const [, projectId, folderId] = data;
     return createConnectionFolderParam(projectId!, folderId!);
   }
 
