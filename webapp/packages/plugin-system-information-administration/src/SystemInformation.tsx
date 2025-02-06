@@ -35,7 +35,7 @@ export const SystemInformation: TabContainerPanelComponent<AdministrationItemCon
   }
 
   return (
-    <ColoredContainer wrap gap overflow parent>
+    <ColoredContainer overflow parent>
       <Group gap medium wrap>
         <ObjectPropertyInfoForm properties={systemInformationResource.data ?? []} small fill readOnly />
         <Flex>
