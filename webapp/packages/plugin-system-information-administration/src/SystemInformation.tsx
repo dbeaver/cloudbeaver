@@ -5,44 +5,45 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { observer } from 'mobx-react-lite';
 
 import type { AdministrationItemContentProps } from '@cloudbeaver/core-administration';
-import { ColoredContainer, Group } from '@cloudbeaver/core-blocks';
+import {
+  Button,
+  ColoredContainer,
+  Flex,
+  Fill,
+  Group,
+  ObjectPropertyInfoForm,
+  useClipboard,
+  useResource,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { type Column, DataGrid } from '@cloudbeaver/plugin-data-grid';
-import { HeaderCell } from './SystemInformationTable/HeaderCell.js';
-
-const COLUMNS: Column<string>[] = [
-  {
-    key: 'name',
-    name: 'Product name',
-    resizable: true,
-    renderCell: props => <div>{props.row}</div>,
-    renderHeaderCell: props => <HeaderCell {...props} />,
-  },
-  {
-    key: 'storage',
-    name: 'Storage',
-    resizable: true,
-    renderCell: props => <div>{props.row}</div>,
-    renderHeaderCell: props => <HeaderCell {...props} />,
-  },
-];
+import { SystemInformationResource } from './SystemInformationResource.js';
 
 export const SystemInformation: TabContainerPanelComponent<AdministrationItemContentProps> = observer(function SystemInformation() {
+  const translate = useTranslate();
+  const copy = useClipboard();
+  const systemInformationResource = useResource(SystemInformation, SystemInformationResource, undefined);
+
+  function copyToClipboard() {
+    if (systemInformationResource.data) {
+      copy(systemInformationResource.data.map(property => `${property.displayName}: ${property.value}`).join('\n'), true);
+    }
+  }
+
   return (
     <ColoredContainer wrap gap overflow parent>
-      <Group overflow>
-        <DataGrid
-          rows={['Product name', 'Storage']}
-          rowKeyGetter={
-            // @ts-ignore
-            row => row.id
-          }
-          columns={COLUMNS}
-          rowHeight={30}
-        />
+      <Group gap medium wrap>
+        <ObjectPropertyInfoForm properties={systemInformationResource.data ?? []} small fill readOnly />
+        <Flex>
+          <Fill />
+          <Button mod={['unelevated']} onClick={copyToClipboard}>
+            {translate('ui_copy_to_clipboard')}
+          </Button>
+        </Flex>
       </Group>
     </ColoredContainer>
   );

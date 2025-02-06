@@ -15,5 +15,6 @@ export const pluginSystemInformationAdministrationManifest: PluginManifest = {
   providers: [
     () => import('./LocaleService.js').then(m => m.LocaleService),
     () => import('./SystemInformationBootstrap.js').then(m => m.SystemInformationBootstrap),
+    () => import('./SystemInformationResource.js').then(m => m.SystemInformationResource),
   ],
 };

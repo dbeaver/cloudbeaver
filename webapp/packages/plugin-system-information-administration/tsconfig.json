@@ -23,10 +23,13 @@
       "path": "../core-localization"
     },
     {
-      "path": "../core-ui"
+      "path": "../core-resource"
     },
     {
-      "path": "../plugin-data-grid"
+      "path": "../core-sdk"
+    },
+    {
+      "path": "../core-ui"
     },
     {
       "path": "../plugin-product-information-administration"
