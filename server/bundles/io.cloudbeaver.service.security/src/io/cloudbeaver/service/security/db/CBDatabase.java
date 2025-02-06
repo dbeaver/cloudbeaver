@@ -86,6 +86,7 @@ public class CBDatabase {
     private final ServletApplication application;
     private final WebDatabaseConfig databaseConfiguration;
     private PoolingDataSource<PoolableConnection> cbDataSource;
+    private DatabaseMetaData metaData;
     private transient volatile Connection exclusiveConnection;
 
     private String instanceId;
@@ -199,7 +200,7 @@ public class CBDatabase {
         dialect = driver.getScriptDialect().createInstance();
 
         try (Connection connection = cbDataSource.getConnection()) {
-            DatabaseMetaData metaData = connection.getMetaData();
+            this.metaData = connection.getMetaData();
             log.debug("\tConnected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
 
             if (dialect instanceof SQLDialectSchemaController && CommonUtils.isNotEmpty(schemaName)) {
@@ -598,6 +599,11 @@ public class CBDatabase {
         var v2DefaultUrl = "jdbc:h2:" + v2Path;
         return v1DefaultUrl.equals(databaseConfiguration.getUrl())
             || v2DefaultUrl.equals(databaseConfiguration.getUrl());
+    }
+
+    @NotNull
+    public DatabaseMetaData getMetaData() {
+        return metaData;
     }
 
     protected WebDatabaseConfig getDatabaseConfiguration() {
