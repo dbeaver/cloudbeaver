@@ -31,6 +31,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.fs.DBFUtils;
@@ -271,7 +272,16 @@ public class WebNavigatorNodeInfo {
             return false;
         }
         WebDriverRegistry driverRegistry = WebAppUtils.getWebApplication().getDriverRegistry();
-        return driverRegistry.getSupportedCloudOpenExtension().containsKey(fileExtension);
+        Set<DBPDriver> dbpDrivers = driverRegistry.getSupportedCloudOpenExtension().get(fileExtension);
+        if (dbpDrivers == null) {
+            return false;
+        }
+        for (DBPDriver dbpDriver : dbpDrivers) {
+            if (WebServiceUtils.isDriverEnabled(dbpDriver)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean hasNodePermission(RMProjectPermission permission) {
