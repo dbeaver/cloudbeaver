@@ -13,11 +13,6 @@
 
   .theme-switch {
     @extend .mdc-switch;
-
-    &:focus-within {
-      outline: 2px solid var(--theme-primary);
-      outline-offset: 12px;
-    }
   }
   .theme-switch_native-control {
     @extend .mdc-switch__native-control;
@@ -40,6 +35,12 @@
   }
   .theme-switch--disabled {
     @extend .mdc-switch--disabled;
+  }
+  .theme-switch--focus {
+    &:focus-within {
+      outline: 2px solid var(--theme-primary);
+      outline-offset: 12px;
+    }
   }
 
   .theme-switch_dense {

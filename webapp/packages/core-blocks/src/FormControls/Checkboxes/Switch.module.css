@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 .switchControl {
-  composes: theme-switch from global;
+  composes: theme-switch theme-switch--focus from global;
 }
 
 .disabled {
