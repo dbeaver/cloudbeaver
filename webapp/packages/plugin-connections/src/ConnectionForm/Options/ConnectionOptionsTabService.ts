@@ -221,6 +221,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     state.config.keepAliveInterval = state.info.keepAliveInterval;
     state.config.autocommit = state.info.autocommit;
+    state.config.readOnly = state.info.readOnly;
 
     if (state.info.authProperties) {
       for (const property of state.info.authProperties) {
@@ -275,6 +276,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     tempConfig.driverId = state.config.driverId;
     tempConfig.keepAliveInterval = Number(state.config.keepAliveInterval);
     tempConfig.autocommit = state.config.autocommit;
+    tempConfig.readOnly = state.config.readOnly;
 
     if (!state.config.template && state.config.folder) {
       tempConfig.folder = state.config.folder;

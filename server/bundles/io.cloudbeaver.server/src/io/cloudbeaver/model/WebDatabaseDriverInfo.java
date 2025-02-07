@@ -305,7 +305,8 @@ public class WebDatabaseDriverInfo {
     @Property
     public WebDriverLibraryInfo[] getDriverLibraries() {
         return driver.getDriverLibraries().stream()
-            .map(dbpDriverLibrary -> new WebDriverLibraryInfo(driver, dbpDriverLibrary))
+            .filter(library -> !library.isDisabled())
+            .map(library -> new WebDriverLibraryInfo(driver, library))
             .toArray(WebDriverLibraryInfo[]::new);
     }
 

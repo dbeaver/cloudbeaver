@@ -17,7 +17,7 @@ import { MenuItemRenderer } from './MenuItemRenderer.js';
 // TODO the click doesn't work for React components as children
 export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
   forwardRef(function ContextMenu(
-    { mouseContextMenu, menu: menuData, disclosure, children, placement, visible, onVisibleSwitch, modal, rtl, ...props },
+    { contextMenuPosition, menu: menuData, disclosure, children, placement, visible, onVisibleSwitch, modal, rtl, ...props },
     ref,
   ) {
     const translate = useTranslate();
@@ -78,7 +78,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
         menuRef={menu}
         modal={modal}
         visible={visible}
-        mouseContextMenu={mouseContextMenu}
+        contextMenuPosition={contextMenuPosition}
         placement={placement}
         disabled={disabled}
         disclosure={disclosure}
