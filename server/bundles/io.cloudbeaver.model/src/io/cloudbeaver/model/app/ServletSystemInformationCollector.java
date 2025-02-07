@@ -16,16 +16,34 @@
  */
 package io.cloudbeaver.model.app;
 
+import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.meta.PropertyLength;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.StandardConstants;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Web system information collector.
  */
-public class ServletSystemInformationCollector implements DBPObject {
+public class ServletSystemInformationCollector<T extends ServletApplication> implements DBPObject {
+
+    private enum DeploymentType {
+        DEFAULT,
+        DOCKER,
+        KUBERNETES
+    }
+
+    @NotNull
+    protected final T application;
 
     @NotNull
     private final String osInfo;
@@ -34,48 +52,129 @@ public class ServletSystemInformationCollector implements DBPObject {
     @NotNull
     private final String javaParameters;
     @NotNull
+    private final String productName;
+    @NotNull
     private final String productVersion;
+    @NotNull
+    private final String memoryAvailable;
+    @NotNull
+    private final String installPath;
+    private String smDatabaseInfo;
     private String workspacePath;
+    private final DeploymentType deploymentType;
 
-    public ServletSystemInformationCollector() {
+    public ServletSystemInformationCollector(@NotNull T application) {
+        this.application = application;
         this.osInfo = System.getProperty(StandardConstants.ENV_OS_NAME) + " " + System.getProperty(
             StandardConstants.ENV_OS_VERSION) + " (" + System.getProperty(StandardConstants.ENV_OS_ARCH) + ")";
         this.javaVersion = System.getProperty(StandardConstants.ENV_JAVA_VERSION) + " by " + System.getProperty(
             StandardConstants.ENV_JAVA_VENDOR) + " (" + System.getProperty(StandardConstants.ENV_JAVA_ARCH) + "bit)";
         this.javaParameters = System.getProperty("sun.java.command");
+        this.productName = GeneralUtils.getProductName();
         this.productVersion = GeneralUtils.getProductVersion().toString();
+        this.installPath = SystemVariablesResolver.getInstallPath();
+        this.memoryAvailable = "%dMb/%dMb".formatted(
+            Runtime.getRuntime().totalMemory() / (1024 * 1024),
+            Runtime.getRuntime().maxMemory() / (1024 * 1024)
+        );
+        deploymentType = checkDeploymentType();
+    }
+
+    private DeploymentType checkDeploymentType() {
+        if (System.getenv("KUBERNETES_SERVICE_HOST") != null) {
+            return DeploymentType.KUBERNETES;
+        }
+        if (isRunningInDocker()) {
+            return DeploymentType.DOCKER;
+        }
+
+        return DeploymentType.DEFAULT;
     }
 
     @NotNull
-    @Property
+    @Property(order = 1)
+    public String getProductName() {
+        return productName;
+    }
+
+    @NotNull
+    @Property(order = 2)
+    public String getProductVersion() {
+        return productVersion;
+    }
+
+    @NotNull
+    @Property(order = 11)
     public String getOsInfo() {
         return osInfo;
     }
 
     @NotNull
-    @Property
+    @Property(order = 12)
+    public String getMemoryAvailable() {
+        return memoryAvailable;
+    }
+
+    @NotNull
+    @Property(order = 21, length = PropertyLength.MULTILINE)
     public String getJavaVersion() {
         return javaVersion;
     }
 
     @NotNull
-    @Property
+    @Property(order = 22, length = PropertyLength.MULTILINE)
     public String getJavaParameters() {
         return javaParameters;
     }
 
     @NotNull
-    @Property
-    public String getProductVersion() {
-        return productVersion;
+    @Property(order = 23)
+    public String getDeploymentType() {
+        return deploymentType.name();
     }
 
-    @Property
+    @NotNull
+    @Property(order = 31)
+    public String getSmDatabaseInfo() {
+        return smDatabaseInfo;
+    }
+
+    @Property(order = Integer.MAX_VALUE - 10, length = PropertyLength.MULTILINE)
     public String getWorkspacePath() {
         return workspacePath;
     }
 
     public void setWorkspacePath(String workspacePath) {
         this.workspacePath = workspacePath;
+    }
+
+    @NotNull
+    @Property(order = Integer.MAX_VALUE - 10, length = PropertyLength.MULTILINE)
+    public String getInstallPath() {
+        return installPath;
+    }
+
+
+    public void collectInternalDatabaseUseInformation() throws DBException {
+        this.smDatabaseInfo = application.getAdminSecurityController(new NoAuthCredentialsProvider())
+            .getInternalDatabaseInformation();
+    }
+
+    private static boolean isRunningInDocker() {
+        Path cgroupPath = Path.of("/proc/1/cgroup");
+        if (!Files.exists(cgroupPath)) {
+            return false;
+        }
+        try (BufferedReader reader = Files.newBufferedReader(cgroupPath)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("/docker") || line.contains("/lxc")) {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            // File not found or unreadable, assume not in Docker
+        }
+        return false;
     }
 }

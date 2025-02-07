@@ -3322,4 +3322,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private String getDefaultUserTeam() {
         return application.getAppConfiguration().getDefaultUserTeam();
     }
+
+    @NotNull
+    @Override
+    public String getInternalDatabaseInformation() {
+        return database.getMetaDataInfo();
+    }
 }

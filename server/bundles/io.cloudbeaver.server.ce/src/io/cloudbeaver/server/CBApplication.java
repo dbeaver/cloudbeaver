@@ -57,8 +57,6 @@ import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
-import org.jkiss.dbeaver.utils.GeneralUtils;
-import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -251,12 +249,12 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         this.systemInformationCollector = createSystemInformationCollector();
         this.systemInformationCollector.setWorkspacePath(instanceLoc.getURL().toString());
         
-        log.debug(GeneralUtils.getProductName() + " " + GeneralUtils.getProductVersion() + " is starting"); //$NON-NLS-1$
+        log.debug(systemInformationCollector.getProductName() + " " + systemInformationCollector.getProductVersion() + " is starting"); //$NON-NLS-1$
         log.debug("\tOS: " + systemInformationCollector.getOsInfo());
         log.debug("\tJava version: " + systemInformationCollector.getJavaVersion());
-        log.debug("\tInstall path: '" + SystemVariablesResolver.getInstallPath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+        log.debug("\tInstall path: '" + systemInformationCollector.getInstallPath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         log.debug("\tGlobal workspace: '" + systemInformationCollector.getWorkspacePath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        log.debug("\tMemory available " + (runtime.totalMemory() / (1024 * 1024)) + "Mb/" + (runtime.maxMemory() / (1024 * 1024)) + "Mb");
+        log.debug("\tMemory available " + systemInformationCollector.getMemoryAvailable());
 
         DBWorkbench.getPlatform().getApplication();
 
@@ -322,6 +320,11 @@ public abstract class CBApplication<T extends CBServerConfig> extends
             }
             grantPermissionsToConnections();
         }
+        try {
+            this.systemInformationCollector.collectInternalDatabaseUseInformation();
+        } catch (DBException e) {
+            log.error("Error collecting system information", e);
+        }
 
         eventController.scheduleCheckJob();
 
@@ -332,8 +335,8 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         return;
     }
 
-    protected ServletSystemInformationCollector createSystemInformationCollector() {
-        return new ServletSystemInformationCollector();
+    protected ServletSystemInformationCollector<?> createSystemInformationCollector() {
+        return new ServletSystemInformationCollector<>(this);
     }
 
     protected void initializeAdditionalConfiguration() {
@@ -790,7 +793,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
 
     @NotNull
     @Override
-    public ServletSystemInformationCollector getSystemInformationCollector() {
+    public ServletSystemInformationCollector<?> getSystemInformationCollector() {
         return systemInformationCollector;
     }
 }
