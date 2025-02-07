@@ -9,7 +9,7 @@ import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { ExecutorInterrupter, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import {
   CachedMapAllKey,
@@ -84,7 +84,7 @@ export interface IConnectionInfoMetadata extends ICachedResourceMetadata {
 
 @injectable()
 export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoParams, Connection, ConnectionInfoIncludes, IConnectionInfoMetadata> {
-  readonly onConnectionCreate: ISyncExecutor<Connection>;
+  readonly onConnectionCreate: Executor<Connection>;
   readonly onConnectionClose: ISyncExecutor<IConnectionInfoParams>;
 
   private sessionUpdate: boolean;
@@ -103,7 +103,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   ) {
     super();
 
-    this.onConnectionCreate = new SyncExecutor();
+    this.onConnectionCreate = new Executor();
     this.onConnectionClose = new SyncExecutor();
     this.sessionUpdate = false;
     this.nodeIdMap = new Map();
@@ -382,7 +382,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   //   return this.get(key) as Connection[];
   // }
 
-  add(connection: Connection, isNew = false): Connection {
+  async add(connection: Connection, isNew = false): Promise<Connection> {
     const key = createConnectionParam(connection);
     const exists = this.has(key);
 
@@ -396,7 +396,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     const observedConnection = this.get(key)!;
 
     if (!exists) {
-      this.onConnectionCreate.execute(observedConnection);
+      await this.onConnectionCreate.execute(observedConnection);
     }
 
     return observedConnection;
@@ -626,7 +626,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     this.nodeIdMap.clear();
   }
 
-  private getDefaultIncludes(): ConnectionInfoIncludes {
+  getDefaultIncludes(): ConnectionInfoIncludes {
     return {
       includeNetworkHandlersConfig: false,
       includeAuthProperties: false,
