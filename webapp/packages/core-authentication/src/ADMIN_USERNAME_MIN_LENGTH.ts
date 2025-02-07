@@ -6,4 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export const ADMIN_USERNAME_MIN_LENGTH = 6;
+export const ADMIN_USERNAME_MIN_LENGTH = 1;
