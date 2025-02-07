@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { MenuSeparator as MenuSeparatorBase } from 'reakit';
-import type { SeparatorOptions } from 'reakit';
+import { MenuSeparator as MenuSeparatorBase, type SeparatorOptions } from 'reakit';
 
 import { s } from '../s.js';
 import { useS } from '../useS.js';

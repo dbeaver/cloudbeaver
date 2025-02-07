@@ -19,14 +19,12 @@ export * from './NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/MEN
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNodeRendererLoader.js';
 export * from './NavigationTree/ElementsTree/NavigationTreeNode/isDraggingInsideProject.js';
 
-export * from './NavigationTree/ElementsTree/ACTION_LINK_OBJECT.js';
 export * from './NavigationTree/ElementsTree/DATA_CONTEXT_ELEMENTS_TREE.js';
 
 export * from './NavigationTree/ElementsTree/ElementsTreeLoader.js';
 
 export * from './NavigationTree/ElementsTree/ElementsTreeContext.js';
 export * from './NavigationTree/ElementsTree/KEY_BINDING_COLLAPSE_ALL.js';
-export * from './NavigationTree/ElementsTree/KEY_BINDING_LINK_OBJECT.js';
 export * from './NavigationTree/ElementsTree/MENU_NAV_TREE.js';
 export * from './NavigationTree/ElementsTree/NavigationNodeComponent.js';
 export * from './NavigationTree/ElementsTree/NavNodeFilterCompareFn.js';

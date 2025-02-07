@@ -1,6 +1,11 @@
 {
   "name": "@cloudbeaver/core-cli",
-  "sideEffects": [],
+  "type": "module",
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
   "version": "0.1.0",
   "description": "CLI for CloudBeaver build system",
   "license": "Apache-2.0",
@@ -13,66 +18,42 @@
     "/bin",
     "/tests"
   ],
+  "exports": {
+    "./*": "./*"
+  },
   "bin": {
-    "core-cli-dependency-graph": "./bin/dependency-graph.js",
-    "core-cli-build": "./bin/build.js",
-    "core-cli-test": "./bin/test.js",
-    "core-cli-analyzer": "./bin/analyzer.js",
-    "core-cli-validate-dependencies": "./bin/validate-dependencies.js",
     "core-cli-add-plugin": "./bin/add-plugin.js",
-    "typescript-resolve-references": "./bin/typescript-resolve-references.js"
+    "core-cli-analyzer": "./bin/analyzer.js",
+    "core-cli-dependency-graph": "./bin/dependency-graph.js",
+    "core-cli-set-version": "./bin/set-version.mjs",
+    "core-cli-test": "./bin/test.js",
+    "core-cli-validate-dependencies": "./dist/cli/validate-dependencies.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "postinstall": "yarn build"
   },
   "engines": {
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "copy-webpack-plugin": "^12",
-    "css-loader": "^7",
-    "declaration-bundler-webpack-plugin": "^1",
-    "html-loader": "^5",
-    "html-replace-webpack-plugin": "^2",
-    "html-webpack-plugin": "^5",
-    "json5-loader": "^4",
-    "mini-css-extract-plugin": "^2",
-    "pnp-webpack-plugin": "^1",
-    "postcss": "^8",
-    "postcss-discard-comments": "^7",
-    "postcss-loader": "^8",
-    "postcss-preset-env": "^10",
-    "sass": "^1",
-    "sass-loader": "^16",
-    "source-map-loader": "^5",
-    "style-loader": "^4",
-    "thread-loader": "^4",
-    "ts-loader": "^9",
-    "webpack": "^5",
-    "webpack-bundle-analyzer": "^4",
-    "webpack-cli": "^5",
-    "webpack-dev-server": "^5",
-    "webpack-merge": "^6"
+    "glob": "^11",
+    "tslib": "^2"
   },
   "devDependencies": {
-    "@pmmmwh/react-refresh-webpack-plugin": "^0",
+    "@cloudbeaver/tsconfig": "workspace:*",
     "@swc/core": "^1",
     "@swc/jest": "^0",
-    "@types/madge": "^5",
-    "enquirer": "^2.4.1",
-    "esbuild-loader": "^4.2.2",
-    "execa": "^9.5.2",
+    "@testing-library/jest-dom": "^6",
+    "@types/node": "^20",
+    "enquirer": "^2",
+    "execa": "^9",
     "fake-indexeddb": "^6",
     "glob": "^11",
-    "http-proxy": "^1",
-    "hygen": "^6.2.11",
+    "hygen": "^6",
     "jest": "^29",
     "jest-environment-jsdom": "^29",
-    "madge": "^8",
-    "react-refresh": "^0",
-    "swc-loader": "^0",
-    "tsconfig-paths-webpack-plugin": "^4",
-    "upath": "^2",
-    "workbox-webpack-plugin": "^7"
-  },
-  "resolutions": {
-    "webpack-dev-middleware": "^7"
+    "typescript": "^5",
+    "upath": "^2"
   }
 }

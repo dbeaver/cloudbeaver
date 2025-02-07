@@ -9,32 +9,36 @@
   "version": "0.1.0",
   "description": "",
   "license": "Apache-2.0",
-  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./*": "./dist/*"
+  },
   "scripts": {
     "build": "tsc -b",
     "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "yarn run clean && typescript-resolve-references"
+    "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-client-activity": "^0",
-    "@cloudbeaver/core-di": "^0",
-    "@cloudbeaver/core-executor": "^0",
-    "@cloudbeaver/core-localization": "^0",
-    "@cloudbeaver/core-product": "^0",
-    "@cloudbeaver/core-resource": "^0",
-    "@cloudbeaver/core-sdk": "^0",
-    "@cloudbeaver/core-settings": "^0",
-    "@cloudbeaver/core-utils": "^0",
+    "@cloudbeaver/core-client-activity": "workspace:*",
+    "@cloudbeaver/core-di": "workspace:*",
+    "@cloudbeaver/core-executor": "workspace:*",
+    "@cloudbeaver/core-localization": "workspace:*",
+    "@cloudbeaver/core-product": "workspace:*",
+    "@cloudbeaver/core-resource": "workspace:*",
+    "@cloudbeaver/core-sdk": "workspace:*",
+    "@cloudbeaver/core-settings": "workspace:*",
+    "@cloudbeaver/core-utils": "workspace:*",
     "mobx": "^6",
-    "rxjs": "^7"
+    "rxjs": "^7",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
-    "@cloudbeaver/core-links": "^0",
-    "@cloudbeaver/core-sdk": "^0",
-    "@cloudbeaver/tests-runner": "^0",
+    "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/core-links": "workspace:*",
+    "@cloudbeaver/core-sdk": "workspace:*",
+    "@cloudbeaver/tests-runner": "workspace:*",
+    "@cloudbeaver/tsconfig": "workspace:*",
     "@jest/globals": "^29",
     "@types/jest": "^29",
     "msw": "^2",

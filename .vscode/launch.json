@@ -18,7 +18,7 @@
     {
       "type": "java",
       "name": "CloudBeaver CE Server",
-      "cwd": "${workspaceFolder}/../opt/cbce",
+      "cwd": "${workspaceFolder}/../dbeaver-workspace/app-workspace/cbce",
       "request": "launch",
       "mainClass": "org.jkiss.dbeaver.launcher.DBeaverLauncher",
       "args": [

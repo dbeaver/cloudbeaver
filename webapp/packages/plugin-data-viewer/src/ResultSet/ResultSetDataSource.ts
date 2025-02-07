@@ -39,7 +39,11 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
   }
 
   override isReadonly(resultIndex: number): boolean {
-    return super.isReadonly(resultIndex) || !this.executionContext?.context;
+    return (
+      super.isReadonly(resultIndex) ||
+      !this.executionContext?.context ||
+      !!this.getResult(resultIndex)?.data?.columns?.every(column => column.readOnly)
+    );
   }
 
   override async cancel(): Promise<void> {

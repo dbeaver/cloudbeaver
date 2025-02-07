@@ -28,7 +28,7 @@ export class ConnectionAuthService extends Dependency {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly authProviderService: AuthProviderService,
-    private readonly userInfoResource: UserInfoResource,
+    userInfoResource: UserInfoResource,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly authenticationService: AuthenticationService,
   ) {

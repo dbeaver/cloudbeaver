@@ -20,6 +20,8 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.model.WebTransactionLogInfo;
+import io.cloudbeaver.model.WebTransactionLogItemInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
@@ -33,8 +35,6 @@ import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.exec.trace.DBCTrace;
 import org.jkiss.dbeaver.model.messages.ModelMessages;
 import org.jkiss.dbeaver.model.meta.Property;
-import io.cloudbeaver.model.WebTransactionLogInfo;
-import io.cloudbeaver.model.WebTransactionLogItemInfo;
 import org.jkiss.dbeaver.model.qm.QMTransactionState;
 import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.model.qm.meta.QMMConnectionInfo;
@@ -168,12 +168,14 @@ public class WebSQLContextInfo implements WebSessionProvider {
     public WebSQLResultsInfo saveResult(
         @NotNull DBSDataContainer dataContainer,
         @NotNull DBCTrace trace,
-        @NotNull DBDAttributeBinding[] attributes) {
+        @NotNull DBDAttributeBinding[] attributes,
+        boolean singleRow) {
         WebSQLResultsInfo resultInfo = new WebSQLResultsInfo(
             dataContainer,
             String.valueOf(resultId.incrementAndGet())
         );
         resultInfo.setAttributes(attributes);
+        resultInfo.setSingleRow(singleRow);
         resultInfo.setTrace(trace);
         resultInfoMap.put(resultInfo.getId(), resultInfo);
         return resultInfo;

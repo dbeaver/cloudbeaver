@@ -9,31 +9,36 @@
   "version": "0.1.0",
   "description": "",
   "license": "Apache-2.0",
-  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "scripts": {
     "build": "tsc -b",
     "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "yarn run clean && typescript-resolve-references"
+    "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-blocks": "^0",
-    "@cloudbeaver/core-di": "^0",
-    "@cloudbeaver/core-dialogs": "^0",
-    "@cloudbeaver/core-events": "^0",
-    "@cloudbeaver/core-executor": "^0",
-    "@cloudbeaver/core-localization": "^0",
-    "@cloudbeaver/core-settings-user": "^0",
-    "@cloudbeaver/core-view": "^0",
-    "@cloudbeaver/plugin-settings-menu": "^0",
-    "@cloudbeaver/plugin-settings-panel": "^0",
-    "@cloudbeaver/plugin-user-profile": "^0",
+    "@cloudbeaver/core-blocks": "workspace:*",
+    "@cloudbeaver/core-di": "workspace:*",
+    "@cloudbeaver/core-dialogs": "workspace:*",
+    "@cloudbeaver/core-events": "workspace:*",
+    "@cloudbeaver/core-executor": "workspace:*",
+    "@cloudbeaver/core-localization": "workspace:*",
+    "@cloudbeaver/core-settings-user": "workspace:*",
+    "@cloudbeaver/core-view": "workspace:*",
+    "@cloudbeaver/plugin-settings-menu": "workspace:*",
+    "@cloudbeaver/plugin-settings-panel": "workspace:*",
+    "@cloudbeaver/plugin-user-profile": "workspace:*",
+    "mobx": "^6",
     "mobx-react-lite": "^4",
-    "react": "^18"
+    "react": "^18",
+    "react-dom": "^18",
+    "tslib": "^2"
   },
-  "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/tsconfig": "workspace:*",
     "@types/react": "^18",
     "typescript": "^5"
   }

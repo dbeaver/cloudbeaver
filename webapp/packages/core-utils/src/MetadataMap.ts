@@ -34,7 +34,7 @@ export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
     });
   }
 
-  [Symbol.iterator](): IterableIterator<[TKey, TValue]> {
+  [Symbol.iterator](): ArrayIterator<[TKey, TValue]> {
     return this.temp[Symbol.iterator]();
   }
 
@@ -63,15 +63,15 @@ export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
     this.temp.forEach(callbackfn, thisArg);
   }
 
-  entries(): IterableIterator<[TKey, TValue]> {
+  entries(): ArrayIterator<[TKey, TValue]> {
     return this.temp.entries();
   }
 
-  keys(): IterableIterator<TKey> {
+  keys(): ArrayIterator<TKey> {
     return this.temp.keys();
   }
 
-  values(): IterableIterator<TValue> {
+  values(): ArrayIterator<TValue> {
     return this.temp.values();
   }
 

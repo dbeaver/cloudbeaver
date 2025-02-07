@@ -15,7 +15,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
     return Array.from(this.keys()).length;
   }
 
-  [Symbol.iterator](): IterableIterator<[TKey, TValue]> {
+  [Symbol.iterator](): ArrayIterator<[TKey, TValue]> {
     return this.entries();
   }
 
@@ -114,17 +114,17 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
     return this;
   }
 
-  entries(): IterableIterator<[TKey, TValue]> {
+  entries(): ArrayIterator<[TKey, TValue]> {
     return this.entriesTemp.value(() => Array.from(this.keys()).map<[TKey, TValue]>(key => [key, this.get(key)!])).values();
   }
 
-  keys(): IterableIterator<TKey> {
+  keys(): ArrayIterator<TKey> {
     return this.keysTemp
       .value(() => Array.from(new Set(combineITerableIterators(this.target.keys(), this.temp.keys()))).filter(key => !this.isDeleted(key)))
       .values();
   }
 
-  values(): IterableIterator<TValue> {
+  values(): ArrayIterator<TValue> {
     return this.valuesTemp.value(() => Array.from(this.keys()).map<TValue>(key => this.get(key)!)).values();
   }
 

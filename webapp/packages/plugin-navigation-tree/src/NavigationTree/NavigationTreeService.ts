@@ -27,7 +27,6 @@ import {
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { ACTION_COLLAPSE_ALL, ACTION_FILTER, type IActiveView, View } from '@cloudbeaver/core-view';
 
-import { ACTION_LINK_OBJECT } from './ElementsTree/ACTION_LINK_OBJECT.js';
 import type { ITreeNodeState } from './ElementsTree/useElementsTree.js';
 
 export interface INavigationNodeSelectionData {
@@ -60,7 +59,7 @@ export class NavigationTreeService extends View<string> {
     this.getView = this.getView.bind(this);
     this.getChildren = this.getChildren.bind(this);
     this.loadNestedNodes = this.loadNestedNodes.bind(this);
-    this.registerAction(ACTION_FILTER, ACTION_COLLAPSE_ALL, ACTION_LINK_OBJECT);
+    this.registerAction(ACTION_FILTER, ACTION_COLLAPSE_ALL);
 
     makeObservable<NavigationTreeService, 'unselectAll'>(this, {
       selectNode: action,

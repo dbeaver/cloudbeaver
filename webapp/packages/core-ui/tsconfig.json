@@ -1,43 +1,44 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
   },
   "references": [
     {
-      "path": "../core-authentication/tsconfig.json"
+      "path": "../core-blocks"
     },
     {
-      "path": "../core-blocks/tsconfig.json"
+      "path": "../core-cli"
     },
     {
-      "path": "../core-data-context/tsconfig.json"
+      "path": "../core-data-context"
     },
     {
-      "path": "../core-di/tsconfig.json"
+      "path": "../core-di"
     },
     {
-      "path": "../core-dialogs/tsconfig.json"
+      "path": "../core-dialogs"
     },
     {
-      "path": "../core-events/tsconfig.json"
+      "path": "../core-events"
     },
     {
-      "path": "../core-executor/tsconfig.json"
+      "path": "../core-executor"
     },
     {
-      "path": "../core-localization/tsconfig.json"
+      "path": "../core-localization"
     },
     {
-      "path": "../core-routing/tsconfig.json"
+      "path": "../core-routing"
     },
     {
-      "path": "../core-utils/tsconfig.json"
+      "path": "../core-utils"
     },
     {
-      "path": "../core-view/tsconfig.json"
+      "path": "../core-view"
     }
   ],
   "include": [
@@ -45,7 +46,10 @@
     "src/**/*",
     "src/**/*.json",
     "src/**/*.css",
-    "src/**/*.scss"
+    "src/**/*.scss",
+    "../core-blocks/src/AuthenticationProvider.tsx",
+    "../core-blocks/src/useAuthenticationAction.ts",
+    "../core-blocks/src/AuthenticationProviderLoader.ts"
   ],
   "exclude": [
     "**/node_modules",

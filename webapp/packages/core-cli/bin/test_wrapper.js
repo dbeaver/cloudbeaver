@@ -1,18 +1,19 @@
 #!/usr/bin/env node
-/* eslint-disable @typescript-eslint/no-var-requires */
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 
-'use strict';
-const { spawn } = require('node:child_process');
+import { spawn } from 'node:child_process';
 
-const ls = spawn(
-  'cmd',
-  ['/c', 'yarn', 'run', 'core-cli-test-wrapped', ...process.argv.slice(2, process.argv.length)],
-  {
-    // cwd: __dirname,
-    env: {
-      ...process.env,
-      // NODE_OPTIONS: "-r esm"
-    },
-    stdio: 'inherit',
-  }
-);
+spawn('cmd', ['/c', 'yarn', 'run', 'core-cli-test-wrapped', ...process.argv.slice(2, process.argv.length)], {
+  // cwd: __dirname,
+  env: {
+    ...process.env,
+    // NODE_OPTIONS: "-r esm"
+  },
+  stdio: 'inherit',
+});
