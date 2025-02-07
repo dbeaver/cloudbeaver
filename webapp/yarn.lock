@@ -8128,11 +8128,11 @@ __metadata:
   linkType: hard
 
 "@wroud/vite-plugin-asset-resolver@npm:^0":
-  version: 0.1.3
-  resolution: "@wroud/vite-plugin-asset-resolver@npm:0.1.3"
+  version: 0.1.5
+  resolution: "@wroud/vite-plugin-asset-resolver@npm:0.1.5"
   peerDependencies:
     vite: "*"
-  checksum: 10c0/6d57109eac5c47f5aa7e25e2d93543fe797f3557a1958fad5c77b30dc1d2f52efa319ea111894afbab6d33880d9c466a9daef0b6f32ac8fb2e07e6b6dbb3ec99
+  checksum: 10c0/20d20242ccf9079fb157546f8b9cf824179a5efc8e6d6ec1e6748663babf75516ceabb4816fc27cc5172ce50d4cb8e02209f12e4c5b2e34bc04124ab09f2040d
   languageName: node
   linkType: hard
 
