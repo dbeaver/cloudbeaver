@@ -1,5 +1,12 @@
 query getSystemInfo {
   info: systemInfo {
-    ...ObjectPropertyInfo
+    id
+    displayName
+    category
+    value
+    length
+    features
+    order
+    required
   }
 }
