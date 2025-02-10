@@ -28,8 +28,6 @@ import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.StandardConstants;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -136,7 +134,7 @@ public class ServletSystemInformationCollector<T extends ServletApplication> imp
     }
 
     @NotNull
-    @PropertyGroup(order = 31, category = "Security manager database")
+    @PropertyGroup(order = 31, category = "Security manager database", id = "sm")
     public DBPConnectionInformation getSmDatabaseInfo() {
         return smDatabaseInfo;
     }
@@ -166,20 +164,7 @@ public class ServletSystemInformationCollector<T extends ServletApplication> imp
     }
 
     private static boolean isRunningInDocker() {
-        Path cgroupPath = Path.of("/proc/1/cgroup");
-        if (!Files.exists(cgroupPath)) {
-            return false;
-        }
-        try (BufferedReader reader = Files.newBufferedReader(cgroupPath)) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.contains("/docker") || line.contains("/lxc")) {
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            // File not found or unreadable, assume not in Docker
-        }
-        return false;
+        Path cgroupPath = Path.of("/.dockerenv");
+        return Files.exists(cgroupPath);
     }
 }
