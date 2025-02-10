@@ -134,6 +134,11 @@ export default [
   ['ui_export', '导出'],
   ['ui_you', '你'],
   ['ui_ms', 'ms'],
+  ['ui_connection', 'Connection'],
+  ['ui_catalog', 'Catalog'],
+  ['ui_schema', 'Schema'],
+  ['ui_project', 'Project'],
+
   ['root_permission_denied', '您没有权限'],
   ['root_permission_no_permission', '您没有权限执行此操作'],
   ['app_root_session_expire_warning_title', '会话即将过期'],
