@@ -249,7 +249,10 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         this.systemInformationCollector = createSystemInformationCollector();
         this.systemInformationCollector.setWorkspacePath(instanceLoc.getURL().toString());
         
-        log.debug(systemInformationCollector.getProductName() + " " + systemInformationCollector.getProductVersion() + " is starting"); //$NON-NLS-1$
+        log.debug("%s %s is starting".formatted(
+            systemInformationCollector.getProductName(),
+            systemInformationCollector.getProductVersion())
+        ); //$NON-NLS-1$
         log.debug("\tOS: " + systemInformationCollector.getOsInfo());
         log.debug("\tJava version: " + systemInformationCollector.getJavaVersion());
         log.debug("\tInstall path: '" + systemInformationCollector.getInstallPath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$

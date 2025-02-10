@@ -157,6 +157,9 @@ public class ServletSystemInformationCollector<T extends ServletApplication> imp
     }
 
 
+    /**
+     * Collects info about internal databases.
+     */
     public void collectInternalDatabaseUseInformation() throws DBException {
         this.smDatabaseInfo = application.getAdminSecurityController(new NoAuthCredentialsProvider())
             .getInternalDatabaseInformation();
