@@ -413,15 +413,20 @@ public class CBSessionManager implements WebAppSessionManager {
         }
     }
 
+    /**
+     * Creates new web session or returns existing one.
+     */
     public WebSession createWebSession(WebHttpRequestInfo requestInfo) throws DBException {
         String id = requestInfo.getId();
-        BaseWebSession baseWebSession = sessionMap.get(id);
-        if (baseWebSession instanceof WebSession) {
-            return (WebSession) baseWebSession;
-        } else {
-            WebSession webSessionImpl = createWebSessionImpl(requestInfo);
-            sessionMap.put(id, webSessionImpl);
-            return webSessionImpl;
+        synchronized (sessionMap) {
+            BaseWebSession baseWebSession = sessionMap.get(id);
+            if (baseWebSession instanceof WebSession) {
+                return (WebSession) baseWebSession;
+            } else {
+                WebSession webSessionImpl = createWebSessionImpl(requestInfo);
+                sessionMap.put(id, webSessionImpl);
+                return webSessionImpl;
+            }
         }
     }
 }
