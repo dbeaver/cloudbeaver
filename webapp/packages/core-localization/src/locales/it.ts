@@ -128,6 +128,10 @@ export default [
   ['ui_you', 'You'],
   ['ui_ms', 'ms'],
   ['ui_not_found', 'Not found'],
+  ['ui_connection', 'Connection'],
+  ['ui_catalog', 'Catalog'],
+  ['ui_schema', 'Schema'],
+  ['ui_project', 'Project'],
 
   ['root_permission_denied', 'Non hai i permessi'],
   ['app_root_session_expire_warning_title', 'La sessione sta per scadere'],

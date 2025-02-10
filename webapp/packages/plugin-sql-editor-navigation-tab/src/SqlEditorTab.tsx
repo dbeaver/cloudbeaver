@@ -8,10 +8,11 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { IconOrImage, s, useTranslate } from '@cloudbeaver/core-blocks';
-import { type Connection, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
+import { IconOrImage, s, useObjectInfoTooltip, useTranslate } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { type ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs';
@@ -38,16 +39,16 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
 
   const sqlDataSourceService = useService(SqlDataSourceService);
   const connectionInfo = useService(ConnectionInfoResource);
+  const projectInfo = useService(ProjectInfoResource);
 
   const translate = useTranslate();
 
   const dataSource = sqlDataSourceService.get(handlerState.editorId);
-  let connection: Connection | undefined;
   const executionContext = dataSource?.executionContext;
-
-  if (executionContext) {
-    connection = connectionInfo.get(createConnectionParam(executionContext.projectId, executionContext.connectionId));
-  }
+  const project = executionContext ? projectInfo.get(executionContext.projectId) : undefined;
+  const connection = executionContext
+    ? connectionInfo.get(createConnectionParam(executionContext.projectId, executionContext.connectionId))
+    : undefined;
 
   const name = getSqlEditorName(handlerState, dataSource, connection);
   const icon = dataSource?.icon ?? '/icons/sql_script_m.svg';
@@ -59,8 +60,10 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
 
+  const tooltip = useObjectInfoTooltip(connection?.name, executionContext?.defaultCatalog, executionContext?.defaultSchema, project?.name);
+
   return (
-    <Tab tabId={tab.id} title={name} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
+    <Tab tabId={tab.id} title={`${name}${tooltip ? '\n' + tooltip : ''}`} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
       <TabIcon icon={icon} />
       <TabTitle>{name}</TabTitle>
       {isReadonly && isScript && (
