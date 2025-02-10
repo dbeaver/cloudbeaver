@@ -1,0 +1,15 @@
+@import '../index.css';
+
+.checkbox {
+    accent-color: var(--checkbox-background);
+    width: 16px;
+    height: 16px;
+}
+
+.checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: --spacing(1);
+    margin-left: 0.5rem;
+    color: var(--checkbox-foreground);
+}
