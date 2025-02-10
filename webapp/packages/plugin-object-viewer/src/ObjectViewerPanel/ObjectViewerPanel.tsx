@@ -55,7 +55,6 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
         tab.handlerState.tabTitle = data.name;
       });
     },
-    freeze: navTreeResource.isOutdated(resourceKeyList(navNodeInfoResource.getParents(objectId))),
     active: getComputed(() => !!connection.tryGetData?.connected && !connection.outdated),
   });
 
