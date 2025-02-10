@@ -251,7 +251,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     },
   );
 
-  let currentTabInfo: ITabInfo<T, never> | undefined;
+  let currentTabInfo: ITabInfo<T, unknown> | undefined;
   if (container) {
     if (state.selectedId) {
       currentTabInfo = value.getTabInfo(state.selectedId);
