@@ -43,7 +43,7 @@ export class PermissionsService {
   }
 
   async hasAsync(id: string): Promise<boolean> {
-    return await this.permissions.hasAsync(id);
+    return this.permissions.hasAsync(id);
   }
 
   async update(): Promise<void> {
