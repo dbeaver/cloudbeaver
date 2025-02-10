@@ -6,6 +6,7 @@ query getSystemInfo {
     value
     length
     features
+    dataType
     order
     required
   }
