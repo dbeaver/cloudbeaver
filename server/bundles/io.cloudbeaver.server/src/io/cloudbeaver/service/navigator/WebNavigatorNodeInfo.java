@@ -71,7 +71,7 @@ public class WebNavigatorNodeInfo {
     public static final String NODE_FEATURE_CAN_DELETE = "canDelete";
     public static final String NODE_FEATURE_CAN_FILTER = "canFilter";
     public static final String NODE_FEATURE_CAN_RENAME = "canRename";
-    public static final String NODE_FEATURE_FLAT_FILE_SUPPORT = "flatFileSupport";
+    public static final String NODE_FEATURE_CAN_CREATE_CONNECTION_FROM_NODE = "canCreateConnectionFromNode";
     private final WebSession session;
     private final DBNNode node;
 
@@ -259,20 +259,20 @@ public class WebNavigatorNodeInfo {
             }
         }
         if (node instanceof DBNPath dbnPath) {
-            if (isFlatFileSupport(dbnPath.getName())) {
-                features.add(NODE_FEATURE_FLAT_FILE_SUPPORT);
+            if (canCreateConnectionFromFileName(dbnPath.getName())) {
+                features.add(NODE_FEATURE_CAN_CREATE_CONNECTION_FROM_NODE);
             }
         }
         return features.toArray(new String[0]);
     }
 
-    private static boolean isFlatFileSupport(String fileName) {
+    private boolean canCreateConnectionFromFileName(String fileName) {
         String fileExtension = IOUtils.getFileExtension(fileName);
         if (CommonUtils.isEmpty(fileExtension)) {
             return false;
         }
         WebDriverRegistry driverRegistry = WebAppUtils.getWebApplication().getDriverRegistry();
-        Set<DBPDriver> dbpDrivers = driverRegistry.getSupportedCloudOpenExtension().get(fileExtension);
+        Set<DBPDriver> dbpDrivers = driverRegistry.getSupportedFileOpenExtension().get(fileExtension);
         if (dbpDrivers == null) {
             return false;
         }

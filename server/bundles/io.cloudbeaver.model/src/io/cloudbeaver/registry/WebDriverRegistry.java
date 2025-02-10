@@ -75,7 +75,7 @@ public class WebDriverRegistry {
      */
     public void refreshApplicableDrivers() {
         this.applicableDrivers.clear();
-        this.getSupportedCloudOpenExtension().clear();
+        this.getSupportedFileOpenExtension().clear();
         this.applicableDrivers.addAll(
             DataSourceProviderRegistry.getInstance().getEnabledDataSourceProviders().stream()
                 .map(DBPDataSourceProviderDescriptor::getEnabledDrivers)
@@ -88,7 +88,7 @@ public class WebDriverRegistry {
     }
 
     @NotNull
-    public Map<String, Set<DBPDriver>> getSupportedCloudOpenExtension() {
+    public Map<String, Set<DBPDriver>> getSupportedFileOpenExtension() {
         return Collections.emptyMap();
     }
 
