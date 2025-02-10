@@ -7,7 +7,7 @@
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { NavigationTreeService, DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
-import { injectable } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ActionService, getBindingLabel, type IAction, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
@@ -16,7 +16,7 @@ import { ACTION_LINK_OBJECT } from './ACTION_LINK_OBJECT.js';
 import { KEY_BINDING_LINK_OBJECT } from './KEY_BINDING_LINK_OBJECT.js';
 
 @injectable()
-export class ObjectViewerNavTreeLinkMenuService {
+export class ObjectViewerNavTreeLinkMenuService extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,
     private readonly keyBindingService: KeyBindingService,
@@ -24,9 +24,11 @@ export class ObjectViewerNavTreeLinkMenuService {
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
     private readonly menuService: MenuService,
     private readonly localizationService: LocalizationService,
-  ) {}
+  ) {
+    super();
+  }
 
-  register() {
+  override register() {
     this.navigationTreeService.registerAction(ACTION_LINK_OBJECT);
 
     this.actionService.addHandler({
