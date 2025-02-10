@@ -10,10 +10,16 @@ import './Button.css';
 
 interface UiKitButtonProps extends ButtonProps {
   variant?: 'primary' | 'secondary';
+  loading?: boolean;
 }
 
-export function Button({ className, variant = 'primary', ...props }: UiKitButtonProps) {
+export function Button({ className, variant = 'primary', loading, children, onClick, ...props }: UiKitButtonProps) {
   const classToApply = `btn btn-${variant}`;
 
-  return <AriaButton className={className ?? '' + ' ' + classToApply} {...props} />;
+  return (
+    <AriaButton onClick={loading ? () => null : onClick} className={(className ? className : '') + ' ' + classToApply} {...props}>
+      {loading && <span className="btn-loader" />}
+      {children}
+    </AriaButton>
+  );
 }

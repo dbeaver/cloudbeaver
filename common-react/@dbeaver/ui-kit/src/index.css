@@ -9,12 +9,21 @@
 
 @layer components {
   :root {
+    /* Colors */
+    --color-text: var(--color-gray-900);
+
+    --color-primary-50: var(--color-blue-50);
+    --color-primary-100: var(--color-blue-100);
+    --color-primary-500: var(--color-blue-500);
+    --color-primary-600: var(--color-blue-600);
+    --color-primary-700: var(--color-blue-700);
+
     /* Button */
     --btn-radius: var(--radius-md);
     --btn-padding-inline: --spacing(5);
     --btn-padding-block: --spacing(2);
 
-    --btn-font-weight: var(--font-weight-semibold)
+    --btn-font-weight: var(--font-weight-semibold);
 
     --btn-foreground: var(--color-white);
     --btn-background: var(--color-primary-500);
@@ -25,13 +34,14 @@
     --btn-secondary-background: transparent;
     --btn-secondary-background-hover: var(--color-primary-50);
     --btn-secondary-background-active: var(--color-primary-100);
-    --btn-secondary-border: var(--color-primary-500);
+    --btn-secondary-border-color: var(--color-primary-500);
 
     /* Checkbox */
-    --checkbox-background: var(--color-white);
+    --checkbox-background: var(--color-primary-500);
     --checkbox-foreground: var(--color-text);
     --checkbox-border: var(--color-orange-500);
     --checkbox-selectBackground: var(--color-orange-500);
     --checkbox-selectBorder: var(--color-primary-500);
+    --checkbox-gap: --spacing(1);
     }
 }
