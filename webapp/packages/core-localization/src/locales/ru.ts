@@ -134,6 +134,10 @@ export default [
   ['ui_you', 'Вы'],
   ['ui_ms', 'мс'],
   ['ui_not_found', 'Не найдено'],
+  ['ui_connection', 'Подключение'],
+  ['ui_catalog', 'Каталог'],
+  ['ui_schema', 'Схема'],
+  ['ui_project', 'Проект'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],
