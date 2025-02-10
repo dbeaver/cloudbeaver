@@ -60,6 +60,9 @@
                     <testRuntime>default</testRuntime>
                     <testClass>io.cloudbeaver.test.platform.CEServerTestSuite</testClass>
                     <appArgLine>-web-config workspace/conf/cloudbeaver.conf</appArgLine>
+                    <environmentVariables>
+                        <CLOUDBEAVER_WORKSPACE_LOCATION>target/workspace</CLOUDBEAVER_WORKSPACE_LOCATION>
+                    </environmentVariables>
                     <argLine>-Dlogback.configurationFile=workspace/conf/logback.xml ${debugArgs}</argLine>
                 </configuration>
             </plugin>
