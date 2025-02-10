@@ -265,6 +265,9 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         //log.debug("\tProduct details: " + application.getInfoDetails());
         log.debug("\tListen port: " + getServerPort() + (CommonUtils.isEmpty(getServerHost()) ? " on all interfaces" : " on " + getServerHost()));
         log.debug("\tBase URI: " + getServicesURI());
+        if (!isConfigurationMode()) {
+            log.debug("\tGlobal access server URL: " + getServerConfiguration().getServerURL());
+        }
         if (isDevelMode()) {
             log.debug("\tDevelopment mode");
         } else {
