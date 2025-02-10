@@ -5,45 +5,58 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-@import 'tailwindcss';
+
+@import '../index.css';
+
 
 @layer components {
+  .btn {
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+
+    border-radius: var(--btn-radius);
+    padding-inline: var(--btn-padding-inline);
+    padding-block: var(--btn-padding-block);
+
+    font-weight: var(--btn-font-weight);
+  
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+   
+  }
+
   .btn-primary {
-    border-radius: var(--radius-md);
-    background-color: var(--color-primary-500, var(--color-gray-500));
-    padding-inline: --spacing(5);
-    padding-block: --spacing(2);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-white);
+    background-color: var(--btn-background);
+    color: var(--btn-foreground);
+
     &:hover {
       @media (hover: hover) {
-        background-color: var(--color-primary-700, var(--color-gray-700));
+        background-color: var(--btn-background-hover);
       }
     }
     &:active {
-        background-color: var(--color-primary-900, var(--color-gray-900));
+      background-color: var(--btn-background-active);
     }
   }
 
   .btn-secondary {
-    border-radius: var(--radius-md);
-    background-color: transparent;
-    border: 1px solid var(--color-primary-500, var(--color-gray-500));
-    padding-inline: --spacing(5);
-    padding-block: --spacing(2);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-primary-500, var(--color-gray-500));
+    background-color: var(--btn-secondary-background);
+    border: 1px solid var(--btn-secondary-border);
+    color: var(--btn-secondary-foreground);
+
     &:hover {
       @media (hover: hover) {
-        background-color: var(--color-primary-100, var(--color-gray-100));
-        border-color: var(--color-primary-700, var(--color-gray-700));
-        color: var(--color-primary-700, var(--color-gray-700));
+        background-color: var(--btn-secondary-background-hover);
       }
     }
     &:active {
-      background-color: var(--color-primary-200, var(--color-gray-200));
-      border-color: var(--color-primary-900, var(--color-gray-900));
-      color: var(--color-primary-900, var(--color-gray-900));
+      background-color: var(--btn-secondary-background-active);
     }
   }
 }

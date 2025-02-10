@@ -4717,7 +4717,6 @@ __metadata:
     rimraf: "npm:^6"
     tailwindcss: "npm:^4.0.3"
     typescript: "npm:^5"
-    vite: "npm:^6.1.0"
   languageName: unknown
   linkType: soft
 
@@ -20064,7 +20063,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^6.0.5, vite@npm:^6.1.0":
+"vite@npm:^6.0.5":
   version: 6.1.0
   resolution: "vite@npm:6.1.0"
   dependencies:
