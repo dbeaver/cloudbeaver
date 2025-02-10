@@ -36,6 +36,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPConnectionInformation;
 import org.jkiss.dbeaver.model.DBPPage;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
@@ -3325,7 +3326,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @NotNull
     @Override
-    public String getInternalDatabaseInformation() {
+    public DBPConnectionInformation getInternalDatabaseInformation() {
         return database.getMetaDataInfo();
     }
 }

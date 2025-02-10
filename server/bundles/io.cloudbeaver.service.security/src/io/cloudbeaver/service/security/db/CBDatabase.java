@@ -33,6 +33,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
+import org.jkiss.dbeaver.model.DBPConnectionInformation;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
@@ -86,8 +87,7 @@ public class CBDatabase {
     private final ServletApplication application;
     private final WebDatabaseConfig databaseConfiguration;
     private PoolingDataSource<PoolableConnection> cbDataSource;
-    private String databaseProductName;
-    private String databaseProductVersion;
+    private DBPConnectionInformation cbConnectionInformation;
 
     private transient volatile Connection exclusiveConnection;
 
@@ -203,9 +203,16 @@ public class CBDatabase {
 
         try (Connection connection = cbDataSource.getConnection()) {
             DatabaseMetaData metaData = connection.getMetaData();
-            this.databaseProductName = metaData.getDatabaseProductName();
-            this.databaseProductVersion = metaData.getDatabaseProductVersion();
-            log.debug("\tConnected to " + getMetaDataInfo());
+            final String dbName = metaData.getDatabaseProductName();
+            final String dbVersion = metaData.getDatabaseProductVersion();
+            log.debug("\tConnected to " + dbName + " " + dbVersion);
+
+            cbConnectionInformation = new DBPConnectionInformation(
+                databaseConfiguration.getUrl(),
+                databaseConfiguration.getDriver(),
+                dbName,
+                dbVersion
+            );
 
             if (dialect instanceof SQLDialectSchemaController && CommonUtils.isNotEmpty(schemaName)) {
                 var dialectSchemaController = (SQLDialectSchemaController) dialect;
@@ -609,8 +616,8 @@ public class CBDatabase {
      * Returns internal database metadata.
      */
     @NotNull
-    public String getMetaDataInfo() {
-        return databaseProductName + " " + databaseProductVersion;
+    public DBPConnectionInformation getMetaDataInfo() {
+        return cbConnectionInformation;
     }
 
     protected WebDatabaseConfig getDatabaseConfiguration() {

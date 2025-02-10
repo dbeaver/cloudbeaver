@@ -19,8 +19,10 @@ package io.cloudbeaver.model.app;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBPConnectionInformation;
 import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.meta.PropertyGroup;
 import org.jkiss.dbeaver.model.meta.PropertyLength;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
@@ -59,7 +61,7 @@ public class ServletSystemInformationCollector<T extends ServletApplication> imp
     private final String memoryAvailable;
     @NotNull
     private final String installPath;
-    private String smDatabaseInfo;
+    private DBPConnectionInformation smDatabaseInfo;
     private String workspacePath;
     private final DeploymentType deploymentType;
 
@@ -134,8 +136,8 @@ public class ServletSystemInformationCollector<T extends ServletApplication> imp
     }
 
     @NotNull
-    @Property(order = 31)
-    public String getSmDatabaseInfo() {
+    @PropertyGroup(order = 31, category = "Security manager database")
+    public DBPConnectionInformation getSmDatabaseInfo() {
         return smDatabaseInfo;
     }
 
