@@ -45,6 +45,14 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
     state.set(autocompleteState.inputValue);
   }
 
+  async function onSave() {
+    try {
+      await state.apply();
+    } finally {
+      inputRef.current?.focus();
+    }
+  }
+
   return (
     <Container className={styles['imbeddedEditor']}>
       <InlineEditor
@@ -58,7 +66,7 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
         disableSave={!state.applicableFilter}
         disabled={state.disabled}
         simple
-        onSave={state.apply}
+        onSave={onSave}
         onChange={state.set}
       />
       <InputAutocompletionMenu
