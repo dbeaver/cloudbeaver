@@ -35,7 +35,12 @@ export const SystemInformation: TabContainerPanelComponent<AdministrationItemCon
 
   function copyToClipboard() {
     if (systemInformationResource.data) {
-      copy(systemInformationResource.data.map(property => `${property.displayName}: ${property.value}`).join('\n'), true);
+      copy(
+        systemInformationResource.data
+          .map(property => `${property.category ? property.category + '/' : ''}${property.displayName}: ${property.value}`)
+          .join('\n'),
+        true,
+      );
     }
   }
 
