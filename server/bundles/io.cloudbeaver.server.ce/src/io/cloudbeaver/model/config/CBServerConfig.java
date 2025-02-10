@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,6 @@ public class CBServerConfig implements WebServerConfiguration {
     private String rootURI = CBConstants.DEFAULT_ROOT_URI;
     private String serviceURI = CBConstants.DEFAULT_SERVICES_URI;
 
-    private String workspaceLocation = CBConstants.DEFAULT_WORKSPACE_LOCATION;
     private String driversLocation = CBConstants.DEFAULT_DRIVERS_LOCATION;
     @SerializedName("expireSessionAfterPeriod")
     private long maxSessionIdleTime = CBAuthConstants.MAX_SESSION_IDLE_TIME;
@@ -85,10 +84,6 @@ public class CBServerConfig implements WebServerConfiguration {
         return serviceURI;
     }
 
-    public String getWorkspaceLocation() {
-        return workspaceLocation;
-    }
-
     public String getDriversLocation() {
         return driversLocation;
     }
@@ -131,10 +126,6 @@ public class CBServerConfig implements WebServerConfiguration {
 
     public void setServicesURI(String servicesURI) {
         this.serviceURI = servicesURI;
-    }
-
-    public void setWorkspaceLocation(String workspaceLocation) {
-        this.workspaceLocation = workspaceLocation;
     }
 
     public void setDriversLocation(String driversLocation) {
