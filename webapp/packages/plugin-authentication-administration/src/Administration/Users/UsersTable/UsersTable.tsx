@@ -33,6 +33,7 @@ interface Props {
   displayAuthRole: boolean;
   loading?: boolean;
   hasMore: boolean;
+  isManageable: boolean;
   onLoadMore?: () => void;
 }
 
@@ -43,6 +44,7 @@ export const UsersTable = observer<Props>(function UsersTable({
   displayAuthRole,
   loading,
   hasMore,
+  isManageable,
   onLoadMore,
 }) {
   const translate = useTranslate();
@@ -66,7 +68,7 @@ export const UsersTable = observer<Props>(function UsersTable({
       </TableHeader>
       <TableBody>
         {users.map(user => (
-          <User key={user.userId} user={user} displayAuthRole={displayAuthRole} />
+          <User key={user.userId} user={user} displayAuthRole={displayAuthRole} isManageable={isManageable} />
         ))}
         {(loading || users.length === 0) && (
           <TableItem item="empty">
