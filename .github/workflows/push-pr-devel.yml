@@ -15,9 +15,19 @@ concurrency:
 
 jobs:
   build-server:
-    name: Server
-    uses: ./.github/workflows/backend-build.yml
+    uses: dbeaver/dbeaver-common/.github/workflows/mvn-package.yml@devel
+    name: Check
     secrets: inherit
+    with:
+      mvn-args: -Dplain-api-server -Dheadless-platform
+      project-directory: ./cloudbeaver/server/product/aggregate
+      project-deps: ./cloudbeaver/project.deps
+      timeout-minutes: 5
+
+  # build-server:
+  #   name: Server
+  #   uses: ./.github/workflows/backend-build.yml
+  #   secrets: inherit
 
   build-frontend:
     name: Frontend

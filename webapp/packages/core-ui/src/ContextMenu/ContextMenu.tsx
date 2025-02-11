@@ -29,7 +29,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
     const disabled = getComputed(() => loading || handler?.isDisabled?.(menuData.context) || false);
     const lazy = getComputed(() => !menuData.available || hidden);
 
-    const menu = useRef<IMenuState>();
+    const menu = useRef<IMenuState>(null);
 
     useAutoLoad({ name: `${ContextMenu.name}(${menuData.menu.id})` }, menuData.loaders, !lazy, menuVisible, true);
 

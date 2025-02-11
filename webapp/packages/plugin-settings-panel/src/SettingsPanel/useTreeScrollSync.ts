@@ -14,7 +14,7 @@ import type { ITreeData } from '@cloudbeaver/plugin-navigation-tree';
 import { getSettingGroupIdFromElementId } from './getSettingGroupIdFromElementId.js';
 import { querySettingsGroups } from './querySettingsGroups.js';
 
-export function useTreeScrollSync(treeData: ITreeData, onSettingsOpen?: (groupId: string) => void): React.RefObject<HTMLDivElement> {
+export function useTreeScrollSync(treeData: ITreeData, onSettingsOpen?: (groupId: string) => void): React.RefObject<HTMLDivElement | null> {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
