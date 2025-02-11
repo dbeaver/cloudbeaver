@@ -89,7 +89,7 @@ public class WebDriverRegistry {
 
     @NotNull
     public Map<String, Set<DBPDriver>> getSupportedFileOpenExtension() {
-        return Collections.emptyMap();
+        return new HashMap<>();
     }
 
     protected void refreshFileExtensions(DBPDriver dbpDriver) {
