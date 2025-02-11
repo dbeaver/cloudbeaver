@@ -160,7 +160,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         webResultSet.setSupportsDataFilter(dataContainer.isFeatureSupported(DBSDataContainer.FEATURE_DATA_FILTER));
         webResultSet.setHasDynamicTrace(trace instanceof DBCTraceDynamic);
 
-        WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, trace, bindings);
+        WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, trace, bindings, rows.size() == 1);
         webResultSet.setResultsInfo(resultsInfo);
 
         boolean isSingleEntity = DBExecUtils.detectSingleSourceTable(bindings) != null;

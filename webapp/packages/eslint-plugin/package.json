@@ -6,16 +6,18 @@
     "public/**/*"
   ],
   "version": "1.0.0",
-  "main": "customRules.cjs",
+  "exports": {
+    ".": "./plugin.js"
+  },
   "description": "ESLint custom rules for CloudBeaver",
   "license": "Apache-2.0",
-  "type": "commonjs",
+  "type": "module",
   "keywords": [
     "eslint",
     "eslintplugin",
     "eslint-plugin"
   ],
   "devDependencies": {
-    "eslint": "^8"
+    "eslint": "^9"
   }
 }

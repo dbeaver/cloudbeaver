@@ -47,6 +47,9 @@ import java.util.UUID;
 
 public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected, SMAuthProviderAssigner {
     private static final Log log = Log.getLog(LdapAuthProvider.class);
+    public static final String LDAP_AUTH_PROVIDER_ID = "ldap";
+    public static final String LDAP_ATTRIBUTE_OBJECT_GUID = "objectGUID";
+    public static final String LDAP_ATTRIBUTE_ENTRY_UUID = "entryUUID";
 
     public LdapAuthProvider() {
     }
@@ -73,14 +76,16 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         LdapSettings ldapSettings = new LdapSettings(providerConfig);
         Hashtable<String, String> environment = creteAuthEnvironment(ldapSettings);
 
-        Map<String, Object> userData = null;
+        Map<String, Object> userData = new HashMap<>();
         if (!isFullDN(userName) && CommonUtils.isNotEmpty(ldapSettings.getLoginAttribute())) {
             userData = validateAndLoginUserAccessByUsername(userName, password, ldapSettings);
 
         }
-        if (userData == null) {
-            validateUserAccess(userName, ldapSettings);
-            userData = authenticateLdap(userName, password, ldapSettings, null, environment);
+        if (CommonUtils.isEmpty(userData)) {
+            userData = new HashMap<>();
+            String fullUserDN = buildFullUserDN(userName, ldapSettings);
+            validateUserAccess(fullUserDN, ldapSettings, userData);
+            authenticateLdap(fullUserDN, password, ldapSettings, null, environment, userData);
         }
         return userData;
     }
@@ -110,7 +115,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             if (userDN == null) {
                 return null;
             }
-            return authenticateLdap(userDN, password, ldapSettings, login, creteAuthEnvironment(ldapSettings));
+            return authenticateLdap(userDN, password, ldapSettings, login, creteAuthEnvironment(ldapSettings), new HashMap<>());
         } catch (Exception e) {
             throw new DBException("LDAP authentication failed: " + e.getMessage(), e);
         }
@@ -119,7 +124,11 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     /**
      * Find user and validate in ldap by fullUserDN
      */
-    private void validateUserAccess(@NotNull String fullUserDN, @NotNull LdapSettings ldapSettings) throws DBException {
+    private void validateUserAccess(
+        @NotNull String fullUserDN,
+        @NotNull LdapSettings ldapSettings,
+        @NotNull Map<String, Object> userData
+    ) throws DBException {
         if (
             CommonUtils.isEmpty(ldapSettings.getFilter())
             || CommonUtils.isEmpty(ldapSettings.getBindUserDN())
@@ -144,6 +153,11 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         } catch (Exception e) {
             throw new DBException("LDAP user access validation by filter failed: " + e.getMessage(), e);
         }
+    }
+
+    private String getAttributeValue(Attributes attributes, String attributeName) throws NamingException {
+        Attribute attribute = attributes.get(attributeName);
+        return attribute != null ? attribute.get().toString() : null;
     }
 
     @NotNull
@@ -259,6 +273,15 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         @Nullable String activeUserId
     ) throws DBException {
         String userId = JSONUtils.getString(userCredentials, LdapConstants.CRED_USERNAME);
+        String oldUsername = JSONUtils.getString(userCredentials, LdapConstants.CRED_USER_DN);
+        if (CommonUtils.isNotEmpty(oldUsername)) {
+            oldUsername = findUserNameFromDN(oldUsername, new LdapSettings(providerConfig));
+            Map<String, Object> oldUserLDAP = securityController.getUserCredentials(oldUsername, LDAP_AUTH_PROVIDER_ID);
+            userCredentials.putAll(oldUserLDAP);
+            if (userCredentials.get("user").equals(oldUsername)) {
+                userId = oldUsername;
+            }
+        }
         if (CommonUtils.isEmpty(userId)) {
             throw new DBException("LDAP user id not found");
         }
@@ -315,6 +338,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         SearchControls searchControls = new SearchControls();
         searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         searchControls.setTimeLimit(30_000);
+        searchControls.setReturningAttributes(new String[]{LDAP_ATTRIBUTE_OBJECT_GUID, LDAP_ATTRIBUTE_ENTRY_UUID});
         return searchControls;
     }
 
@@ -323,20 +347,35 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         String password,
         LdapSettings ldapSettings,
         @Nullable String login,
-        Hashtable<String, String> environment
+        Hashtable<String, String> environment,
+        Map<String, Object> userData
     ) throws DBException {
         environment.put(Context.SECURITY_PRINCIPAL, userDN);
         environment.put(Context.SECURITY_CREDENTIALS, password);
         DirContext userContext = null;
         try {
             userContext = new InitialDirContext(environment);
-            Map<String, Object> userData = new HashMap<>();
-            userData.put(LdapConstants.CRED_USERNAME, findUserNameFromDN(userDN, ldapSettings));
-            userData.put(LdapConstants.CRED_FULL_DN, userDN);
-            userData.put(LdapConstants.CRED_SESSION_ID, UUID.randomUUID());
-            if (login != null) {
-                userData.put(LdapConstants.CRED_DISPLAY_NAME, login);
+            if (CommonUtils.isNotEmpty(login)) {
+                userData.put(LdapConstants.CRED_USERNAME, login);
+                userData.put(LdapConstants.CRED_USER_DN, userDN);
+                userData.put(LdapConstants.CRED_DISPLAY_NAME, findUserNameFromDN(userDN, ldapSettings));
+            } else {
+                SearchControls searchControls = createSearchControls();
+                String userId = "";
+                var searchResult = userContext.search(userDN, "objectClass=*", searchControls);
+                if (searchResult.hasMore()) {
+                    SearchResult result = searchResult.next();
+                    Attributes attributes = result.getAttributes();
+                    userId = getAttributeValue(attributes, "objectGUID");
+                    if (userId == null) {
+                        userId = getAttributeValue(attributes, "entryUUID");
+                    }
+                }
+                userData.putIfAbsent(LdapConstants.CRED_USERNAME, CommonUtils.isNotEmpty(userId) ? userId : login);
+                userData.put(LdapConstants.CRED_USER_DN, userDN);
+                userData.put(LdapConstants.CRED_DISPLAY_NAME, findUserNameFromDN(userDN, ldapSettings));
             }
+            userData.put(LdapConstants.CRED_SESSION_ID, UUID.randomUUID());
             return userData;
         } catch (Exception e) {
             throw new DBException("LDAP authentication failed: " + e.getMessage(), e);
@@ -364,7 +403,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         }
 
         LdapSettings ldapSettings = new LdapSettings(providerConfig);
-        String fullDN = JSONUtils.getString(authParameters, LdapConstants.CRED_FULL_DN);
+        String fullDN = JSONUtils.getString(authParameters, LdapConstants.CRED_USER_DN);
         String userDN;
         if (!CommonUtils.isEmpty(fullDN)) {
             userDN = fullDN;

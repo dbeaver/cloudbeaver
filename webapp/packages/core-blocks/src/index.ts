@@ -22,8 +22,6 @@ export * from './CommonDialog/DialogsPortal.js';
 export * from './ErrorDetailsDialog/ErrorDetailsDialog.js';
 
 export * from './ComponentsRegistry/CRegistryLoader.js';
-// we don't expect to use this component directly only as a wrapper for another component
-// eslint-disable-next-line @cloudbeaver/no-sync-component-import
 export * from './ComponentsRegistry/registry.js';
 export * from './ComponentsRegistry/CRegistryList.js';
 export * from './ComponentsRegistry/IComponentsTreeNodeValidator.js';
@@ -259,3 +257,4 @@ export * from './Flex/Flex.js';
 export * from './FormControls/useInputAutocomplete.js';
 export * from './FormControls/InputAutocompletionMenu.js';
 export * from './useSearch.js';
+export * from './useObjectInfoTooltip.js';
