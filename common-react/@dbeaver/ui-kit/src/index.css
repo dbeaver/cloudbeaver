@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @layer components {
   :root {
@@ -17,9 +17,12 @@
 
     --color-primary-50: var(--color-blue-50);
     --color-primary-100: var(--color-blue-100);
+    --color-primary-200: var(--color-blue-200);
     --color-primary-500: var(--color-blue-500);
     --color-primary-600: var(--color-blue-600);
     --color-primary-700: var(--color-blue-700);
+    --color-primary-800: var(--color-blue-800);
+    --color-primary-900: var(--color-blue-900);
 
     /* Button */
     --btn-radius: var(--radius-md);
@@ -29,22 +32,22 @@
 
     /* Primary Button */
     --btn-foreground: var(--color-white);
-    --btn-background: var(--color-primary-500);
-    --btn-background-hover: var(--color-primary-600);
-    --btn-background-active: var(--color-primary-700);
+    --btn-background: var(--color-primary-600);
+    --btn-background-hover: var(--color-primary-700);
+    --btn-background-active: var(--color-primary-800);
 
     /* Secondary Button */
-    --btn-secondary-foreground: var(--color-primary-500);
+    --btn-secondary-foreground: var(--color-primary-600);
     --btn-secondary-background: transparent;
     --btn-secondary-background-hover: var(--color-primary-50);
     --btn-secondary-background-active: var(--color-primary-100);
-    --btn-secondary-border-color: var(--color-primary-500);
+    --btn-secondary-border-color: var(--color-primary-600);
 
     /* Danger Button */
     --btn-danger-foreground: var(--color-white);
-    --btn-danger-background: var(--color-red-500);
-    --btn-danger-background-hover: var(--color-red-600);
-    --btn-danger-background-active: var(--color-red-700);
+    --btn-danger-background: var(--color-red-600);
+    --btn-danger-background-hover: var(--color-red-700);
+    --btn-danger-background-active: var(--color-red-800);
 
     /* Checkbox */
     --checkbox-background: var(--color-primary-500);
@@ -53,5 +56,5 @@
     --checkbox-selectBackground: var(--color-orange-500);
     --checkbox-selectBorder: var(--color-primary-500);
     --checkbox-gap: --spacing(1);
-    }
+  }
 }
