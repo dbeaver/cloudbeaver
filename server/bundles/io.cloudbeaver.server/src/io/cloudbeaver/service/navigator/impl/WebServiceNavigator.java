@@ -630,7 +630,10 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         WSDataSourceProperty.CONFIGURATION
                     );
                 } else if (node instanceof DBNLocalFolder dbnLocalFolder) {
-                    DBPDataSourceFolder parentFolder = dbnLocalFolder.getFolder();
+                    DBPDataSourceFolder parentFolder = null;
+                    if (folderNode instanceof DBNLocalFolder parentFolderNode) {
+                        parentFolder = parentFolderNode.getFolder();
+                    }
                     if (parentFolder != null) {
                         List<String> siblings = Arrays.stream(parentFolder.getChildren())
                             .map(DBPDataSourceFolder::getName)
