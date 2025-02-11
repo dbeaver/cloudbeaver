@@ -36,7 +36,7 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
   const create = param === 'create';
   const displayAuthRole = authRolesResource.data.length > 0;
   const loading = authRolesResource.isLoading() || table.loadableState.isLoading();
-  const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
+  const isManageable = !administrationUsersManagementService.externalUserProviderEnabled;
 
   return (
     <ColoredContainer vertical wrap gap parent maximum>
@@ -49,7 +49,7 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
       </Group>
 
       <Container overflow gap maximum>
-        {create && createUserService.state && !userManagementDisabled && (
+        {create && createUserService.state && isManageable && (
           <CreateUser state={createUserService.state} onCancel={createUserService.cancelCreate} />
         )}
 
@@ -63,6 +63,7 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
             displayAuthRole={displayAuthRole}
             loading={loading}
             hasMore={table.hasMore}
+            isManageable={isManageable}
             onLoadMore={table.loadMore}
           />
         </Group>
