@@ -34,11 +34,78 @@ export const All = () => (
         Disabled
       </Button>
     </div>
-    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
       <Button size="small">Small</Button>
       <Button size="medium">Medium</Button>
       <Button size="large">Large</Button>
       <Button size="xlarge">XLarge</Button>
+    </div>
+    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
+      <Button>
+        <Button.Icon position="left">🎾</Button.Icon>
+        Tennis
+      </Button>
+      <Button>
+        Love
+        <Button.Icon position="right">❤️</Button.Icon>
+      </Button>
+      <Button>
+        <Button.Icon position="left">🎾</Button.Icon>
+        Tennis is Love
+        <Button.Icon position="right">❤️</Button.Icon>
+      </Button>
+      <Button className="text-lime-300">
+        Have you seen
+        <Button.Icon className="w-2">
+          <svg width="16" height="16" fill="none">
+            <g strokeWidth="0"></g>
+            <g strokeLinecap="round" strokeLinejoin="round"></g>
+            <g>
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M8 16L3.54223 12.3383C1.93278 11.0162 1 9.04287 1 6.96005C1 3.11612 4.15607 0 8 0C11.8439 0 15 3.11612 15 6.96005C15 9.04287 14.0672 11.0162 12.4578 12.3383L8 16ZM3 6H5C6.10457 6 7 6.89543 7 8V9L3 7.5V6ZM11 6C9.89543 6 9 6.89543 9 8V9L13 7.5V6H11Z"
+                fill="currentColor"
+              ></path>
+            </g>
+          </svg>
+        </Button.Icon>
+        UFO?
+      </Button>
+    </div>
+    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
+      <Button loading>
+        <Button.Icon className="w-8 h-4" position="left">
+          <svg width="16" height="16" fill="none">
+            <g strokeWidth="0"></g>
+            <g strokeLinecap="round" strokeLinejoin="round"></g>
+            <g>
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M8 16L3.54223 12.3383C1.93278 11.0162 1 9.04287 1 6.96005C1 3.11612 4.15607 0 8 0C11.8439 0 15 3.11612 15 6.96005C15 9.04287 14.0672 11.0162 12.4578 12.3383L8 16ZM3 6H5C6.10457 6 7 6.89543 7 8V9L3 7.5V6ZM11 6C9.89543 6 9 6.89543 9 8V9L13 7.5V6H11Z"
+                fill="currentColor"
+              ></path>
+            </g>
+          </svg>
+        </Button.Icon>
+        UFO
+      </Button>
+      <Button variant="secondary" loading>
+        <Button.Icon position="left">🎾</Button.Icon>
+        Tennis
+      </Button>
+      <Button disabled>
+        <Button.Icon position="left">🎾</Button.Icon>
+        Tennis
+      </Button>
+      <Button variant="danger">
+        <Button.Icon position="left">🎾</Button.Icon>
+        Tennis
+      </Button>
+      <Button>
+        <Button.Icon>🎾</Button.Icon>
+      </Button>
     </div>
   </div>
 );

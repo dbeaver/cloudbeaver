@@ -8,19 +8,21 @@
 
 @layer components {
   .btn {
-    display: inline-block;
+    display: inline-flex;
     text-align: center;
     text-decoration: none;
     cursor: pointer;
     user-select: none;
     position: relative;
+    gap: calc(var(--btn-padding-inline) / 4);
+    align-items: center;
 
     border-radius: var(--btn-radius);
     padding-inline: var(--btn-padding-inline);
     padding-block: var(--btn-padding-block);
 
     font-weight: var(--btn-font-weight);
-  
+
     &:disabled {
       cursor: not-allowed;
       opacity: 0.5;
@@ -87,7 +89,7 @@
   }
 
   .btn-danger {
-    --btn-loader-color: color-mix(in srgb, var(--btn-danger-background) 65%,var(--color-white));
+    --btn-loader-color: color-mix(in srgb, var(--btn-danger-background) 65%, var(--color-white));
     --btn-loader-background: color-mix(in srgb, var(--btn-danger-foreground) 85%, transparent);
 
     background-color: var(--btn-danger-background);
@@ -136,5 +138,20 @@
       transform: rotate(360deg);
     }
   }
+
+  .btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    fill: currentColor;
+  }
+
+  .btn-icon-left {
+    margin-inline-start: calc(var(--btn-padding-inline) / 4 * -1);
+  }
+
+  .btn-icon-right {
+    margin-inline-end: calc(var(--btn-padding-inline) / 4 * -1);
+  }
 }
-  
