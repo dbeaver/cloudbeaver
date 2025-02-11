@@ -16,38 +16,24 @@
  */
 package io.cloudbeaver.server;
 
-import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.server.websockets.WebSocketPingPongJob;
 import org.eclipse.core.runtime.Plugin;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.impl.app.DefaultCertificateStorage;
 import org.jkiss.dbeaver.model.qm.QMRegistry;
 import org.jkiss.dbeaver.model.qm.QMUtils;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.SecurityProviderUtils;
 import org.jkiss.dbeaver.runtime.qm.QMLogFileWriter;
 import org.jkiss.dbeaver.runtime.qm.QMRegistryImpl;
-import org.jkiss.dbeaver.utils.ContentUtils;
-import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.StandardConstants;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-public abstract class BaseWebPlatform extends BasePlatformImpl {
-    private static final Log log = Log.getLog(BaseWebPlatform.class);
-    public static final String BASE_TEMP_DIR = "dbeaver";
+public abstract class BaseWebPlatform extends BaseServletPlatform {
     public static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
     public static final String TEMP_FILE_IMPORT_FOLDER = "temp-import-files";
 
-    private Path tempFolder;
 
     private QMRegistryImpl queryManager;
     private QMLogFileWriter qmLogWriter;
@@ -97,39 +83,6 @@ public abstract class BaseWebPlatform extends BasePlatformImpl {
     }
 
     @NotNull
-    public Path getTempFolder(@NotNull DBRProgressMonitor monitor, @NotNull String name) {
-
-        if (tempFolder == null) {
-            synchronized (this) {
-                if (tempFolder == null) {
-                    initTempFolder(monitor);
-                }
-            }
-        }
-        Path folder = tempFolder.resolve(name);
-        if (!Files.exists(folder)) {
-            try {
-                Files.createDirectories(folder);
-            } catch (IOException e) {
-                log.error("Error creating temp folder '" + folder.toAbsolutePath() + "'", e);
-            }
-        }
-        return folder;
-    }
-
-    private void initTempFolder(@NotNull DBRProgressMonitor monitor) {
-        // Make temp folder
-        monitor.subTask("Create temp folder");
-        String sysTempFolder = System.getProperty(StandardConstants.ENV_TMP_DIR);
-        if (CommonUtils.isNotEmpty(sysTempFolder)) {
-            tempFolder = Path.of(sysTempFolder).resolve(BASE_TEMP_DIR).resolve(DBWConstants.WORK_DATA_FOLDER_NAME);
-        } else {
-            //we do not use workspace because it can be in external file system
-            tempFolder = getApplication().getHomeDirectory().resolve(DBWConstants.WORK_DATA_FOLDER_NAME);
-        }
-    }
-
-    @NotNull
     public abstract WebApplication getApplication();
 
     protected void scheduleServerJobs() {
@@ -149,15 +102,6 @@ public abstract class BaseWebPlatform extends BasePlatformImpl {
             //queryManager = null;
         }
         DataSourceProviderRegistry.dispose();
-
-        // Remove temp folder
-        if (tempFolder != null) {
-
-            if (!ContentUtils.deleteFileRecursive(tempFolder.toFile())) {
-                log.warn("Can't delete temp folder '" + tempFolder.toAbsolutePath() + "'");
-            }
-            tempFolder = null;
-        }
     }
 
     @NotNull
