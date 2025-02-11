@@ -1,7 +1,7 @@
 import { Checkbox as AriaCheckbox, type CheckboxProps } from '@ariakit/react';
 import './Checkbox.css';
 
-interface UIKitCheckboxProps extends CheckboxProps {}
+export interface UIKitCheckboxProps extends CheckboxProps {}
 
 export function Checkbox({ className, children, disabled, ...props }: UIKitCheckboxProps) {
   return (

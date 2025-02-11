@@ -27,9 +27,31 @@
     }
   }
 
+  .btn-small {
+    padding-inline: calc(var(--btn-padding-inline) * 0.5);
+    padding-block: calc(var(--btn-padding-block) * 0.5);
+    font-size: calc(var(--font-size-base) * 0.875);
+  }
+
+  .btn-medium {
+    font-size: var(--font-size-base);
+  }
+
+  .btn-large {
+    padding-inline: calc(var(--btn-padding-inline) * 1.25);
+    padding-block: calc(var(--btn-padding-block) * 1.25);
+    font-size: calc(var(--font-size-base) * 1.125);
+  }
+
+  .btn-xlarge {
+    padding-inline: calc(var(--btn-padding-inline) * 1.5);
+    padding-block: calc(var(--btn-padding-block) * 1.5);
+    font-size: calc(var(--font-size-base) * 1.25);
+  }
+
   .btn-primary {
-    --btn-loader-color: var(--btn-foreground);
-    --btn-loader-background: color-mix(in srgb, var(--btn-foreground) 75%, transparent);
+    --btn-loader-color: color-mix(in srgb, var(--btn-background) 65%, var(--color-white));
+    --btn-loader-background: color-mix(in srgb, var(--btn-foreground) 85%, transparent);
 
     background-color: var(--btn-background);
     color: var(--btn-foreground);
@@ -45,8 +67,10 @@
   }
 
   .btn-secondary {
-    --btn-loader-color: color-mix(in srgb, var(--btn-secondary-foreground) 55%, transparent);
+    --btn-loader-color: color-mix(in srgb, var(--btn-secondary-foreground) 75%, var(--color-gray-600));
     --btn-loader-background: color-mix(in srgb, var(--color-white) 75%, transparent);
+
+    padding-block: calc(var(--btn-padding-block) - 1px);
 
     background-color: var(--btn-secondary-background);
     border: 1px solid var(--btn-secondary-border-color);
@@ -62,13 +86,30 @@
     }
   }
 
+  .btn-danger {
+    --btn-loader-color: color-mix(in srgb, var(--btn-danger-background) 65%,var(--color-white));
+    --btn-loader-background: color-mix(in srgb, var(--btn-danger-foreground) 85%, transparent);
+
+    background-color: var(--btn-danger-background);
+    color: var(--btn-danger-foreground);
+
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--btn-danger-background-hover);
+      }
+    }
+    &:active {
+      background-color: var(--btn-danger-background-active);
+    }
+  }
+
   .btn-loader {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--btn-loader-background);
+    background: color-mix(in srgb, var(--btn-loader-background) 75%, var(--color-gray-100));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -78,12 +119,12 @@
 
   .btn-loader::after {
     content: '';
-    border: 4px solid var(--btn-loader-color);
-    border-top: 4px solid transparent;
+    border: 3px solid var(--btn-loader-background);
+    border-top: 3px solid var(--btn-loader-color);
     border-radius: 50%;
     opacity: 1;
-    width: 1rem;
-    height: 1rem;
+    width: calc(var(--font-size-base) * 1.2);
+    height: calc(var(--font-size-base) * 1.2);
     animation: spin 2s linear infinite;
   }
 

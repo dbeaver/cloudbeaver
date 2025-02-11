@@ -8,13 +8,14 @@
 import { Button as AriaButton, type ButtonProps } from '@ariakit/react';
 import './Button.css';
 
-interface UiKitButtonProps extends ButtonProps {
-  variant?: 'primary' | 'secondary';
+export interface UiKitButtonProps extends ButtonProps {
+  variant?: 'primary' | 'secondary' | 'danger';
+  size?: 'small' | 'medium' | 'large' | 'xlarge';
   loading?: boolean;
 }
 
-export function Button({ className, variant = 'primary', loading, children, onClick, ...props }: UiKitButtonProps) {
-  const classToApply = `btn btn-${variant}`;
+export function Button({ className, variant = 'primary', size = 'medium', loading, children, onClick, ...props }: UiKitButtonProps) {
+  const classToApply = `btn btn-${variant} btn-${size}`;
 
   return (
     <AriaButton onClick={loading ? () => null : onClick} className={(className ? className : '') + ' ' + classToApply} {...props}>

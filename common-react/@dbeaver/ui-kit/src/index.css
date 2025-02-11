@@ -9,6 +9,9 @@
 
 @layer components {
   :root {
+    /* General */
+    --font-size-base: 1rem;
+
     /* Colors */
     --color-text: var(--color-gray-900);
 
@@ -22,19 +25,26 @@
     --btn-radius: var(--radius-md);
     --btn-padding-inline: --spacing(5);
     --btn-padding-block: --spacing(2);
-
     --btn-font-weight: var(--font-weight-semibold);
 
+    /* Primary Button */
     --btn-foreground: var(--color-white);
     --btn-background: var(--color-primary-500);
     --btn-background-hover: var(--color-primary-600);
     --btn-background-active: var(--color-primary-700);
 
+    /* Secondary Button */
     --btn-secondary-foreground: var(--color-primary-500);
     --btn-secondary-background: transparent;
     --btn-secondary-background-hover: var(--color-primary-50);
     --btn-secondary-background-active: var(--color-primary-100);
     --btn-secondary-border-color: var(--color-primary-500);
+
+    /* Danger Button */
+    --btn-danger-foreground: var(--color-white);
+    --btn-danger-background: var(--color-red-500);
+    --btn-danger-background-hover: var(--color-red-600);
+    --btn-danger-background-active: var(--color-red-700);
 
     /* Checkbox */
     --checkbox-background: var(--color-primary-500);

@@ -7,5 +7,5 @@
  */
 import './index.css';
 
-export { Button } from './Button/Button.js';
-export { Checkbox } from './Checkbox/Checkbox.js';
+export { Button, type UiKitButtonProps } from './Button/Button.js';
+export { Checkbox, type UIKitCheckboxProps } from './Checkbox/Checkbox.js';
