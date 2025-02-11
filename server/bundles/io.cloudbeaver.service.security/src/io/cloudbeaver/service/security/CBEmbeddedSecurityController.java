@@ -194,7 +194,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 if (isSubjectExists(possibleUserId)) {
                     log.info("User already exist : " + possibleUserId);
                     setUserAuthRole(connection, possibleUserId, authRole);
-                    enableUser(connection, possibleUserId, true);
+                    enableUser(connection, possibleUserId, null, null, true);
                     continue outer;
                 }
             }
@@ -449,9 +449,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             SMUser user;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames(
-                    "SELECT U.USER_ID,U.IS_ACTIVE,U.DEFAULT_AUTH_ROLE,S.IS_SECRET_STORAGE FROM " +
-                    "{table_prefix}CB_USER U, {table_prefix}CB_AUTH_SUBJECT S " +
-                    "WHERE U.USER_ID=? AND U.USER_ID=S.SUBJECT_ID")
+                    """
+                        SELECT U.USER_ID,U.IS_ACTIVE,U.DEFAULT_AUTH_ROLE,U.CHANGE_DATE,
+                        U.DISABLE_BY_USER_ID,U.DISABLE_REASON,S.IS_SECRET_STORAGE
+                        FROM {table_prefix}CB_USER U, {table_prefix}CB_AUTH_SUBJECT S
+                        WHERE U.USER_ID=? AND U.USER_ID=S.SUBJECT_ID""")
             )) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -760,15 +762,21 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
-    public void enableUser(String userId, boolean enabled) throws DBException {
+    public void enableUser(@NotNull String userId, boolean enabled) throws DBException {
         try (Connection dbCon = database.openConnection()) {
-            enableUser(dbCon, userId, enabled);
+            enableUser(dbCon, userId, null, null, enabled);
         } catch (SQLException e) {
             throw new DBCException("Error while updating user configuration", e);
         }
     }
 
-    public void enableUser(Connection dbCon, String userId, boolean enabled) throws SQLException {
+    public void enableUser(
+        @NotNull Connection dbCon,
+        @NotNull String userId,
+        @Nullable String disabledBy,
+        @Nullable String disableReason,
+        boolean enabled
+    ) throws SQLException {
         try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
             """
                 UPDATE {table_prefix}CB_USER
@@ -776,8 +784,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 WHERE USER_ID=?"""))) {
             dbStat.setString(1, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
             dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-            dbStat.setString(2, CommonUtils.toString(userId));
-            dbStat.setString(2, userId);
+            dbStat.setString(3, disabledBy);
+            dbStat.setString(4, disableReason);
+            dbStat.setString(5, userId);
             dbStat.executeUpdate();
         }
     }
@@ -1200,6 +1209,26 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 .toList();
         } catch (SQLException e) {
             throw new DBCException("Error while reading team members", e);
+        }
+    }
+
+    @Override
+    public void blockUserByBruteForceProtection(@NotNull String userId) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            var currentPermissions = getUserPermissions(userId);
+            if (currentPermissions.contains(DBWConstants.PERMISSION_ADMIN)) {
+                return;
+            }
+            enableUser(
+                dbCon,
+                userId,
+                "system",
+                "Disabled by bruteforce connection protection",
+                false
+            );
+            killAllExistsUserSessions(userId);
+        } catch (SQLException e) {
+            throw new DBCException("Error while blocking user", e);
         }
     }
 

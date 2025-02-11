@@ -23,7 +23,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 
-import java.sql.*;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
