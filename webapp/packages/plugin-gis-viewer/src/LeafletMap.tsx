@@ -7,7 +7,6 @@
  */
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./react-leaflet.d.ts" />
-import type geojson from 'geojson';
 import leaflet from 'leaflet';
 import { useCallback, useEffect, useState } from 'react';
 import { GeoJSON, LayersControl, MapContainer, TileLayer, type TileLayerProps } from 'react-leaflet';
@@ -30,7 +29,7 @@ interface IFeatureProperties {
 
 export interface IGeoJSONFeature extends GeoJSON.Feature<GeoJSON.GeometryObject, IFeatureProperties> {
   type: 'Feature';
-  bbox?: geojson.BBox;
+  bbox?: any;
 }
 
 interface IBaseTile extends TileLayerProps {

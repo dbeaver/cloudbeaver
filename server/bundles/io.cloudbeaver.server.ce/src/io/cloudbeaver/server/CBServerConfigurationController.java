@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,8 +91,6 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             loadConfiguration(configPath);
         }
 
-        initWorkspacePath();
-
         // Try to load configuration from runtime app config file
         Path runtimeConfigPath = getRuntimeAppConfigPath();
         if (Files.exists(runtimeConfigPath)) {
@@ -106,10 +104,11 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         validateFinalServerConfiguration();
     }
 
-    @NotNull
+    @Nullable
     @Override
-    protected String getWorkspaceLocation() {
-        return getServerConfiguration().getWorkspaceLocation();
+    public String getWorkspaceLocationFromEnv() {
+        String envValue = System.getenv("CLOUDBEAVER_WORKSPACE_LOCATION");
+        return CommonUtils.nullIfEmpty(envValue);
     }
 
     public void loadConfiguration(Path configPath) throws DBException {

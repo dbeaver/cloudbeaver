@@ -305,7 +305,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     const removeKeys: IResultSetElementKey[] = [];
     const selectedElements = this.selectedElements.entries();
 
-    for (const [key, rowSelection] of selectedElements) {
+    for (const [, rowSelection] of selectedElements) {
       for (const element of rowSelection) {
         if (element && !this.view.has(element)) {
           removeKeys.push(element);

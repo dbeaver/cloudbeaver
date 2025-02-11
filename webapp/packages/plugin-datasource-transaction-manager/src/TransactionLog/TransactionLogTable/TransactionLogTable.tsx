@@ -73,7 +73,15 @@ export const TransactionLogTable = observer<Props>(function TransactionLogTable(
 
   return (
     <div className={s(styles, { container: true })}>
-      <DataGrid rows={props.log} rowKeyGetter={row => row.id} columns={COLUMNS} rowHeight={30} />
+      <DataGrid
+        rows={props.log}
+        rowKeyGetter={
+          // @ts-ignore
+          row => row.id
+        }
+        columns={COLUMNS}
+        rowHeight={30}
+      />
     </div>
   );
 });

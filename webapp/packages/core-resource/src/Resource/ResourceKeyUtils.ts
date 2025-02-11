@@ -47,7 +47,6 @@ export interface ResourceKeyUtils {
   toList: <TKey>(key: TKey | ResourceKeyList<TKey>) => ResourceKeyList<TKey>;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ResourceKeyUtils: ResourceKeyUtils = {
   forEach<TKey extends ResourceKey<unknown>>(
     key: TKey,

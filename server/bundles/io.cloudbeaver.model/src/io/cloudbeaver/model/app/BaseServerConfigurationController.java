@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ package io.cloudbeaver.model.app;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.DBException;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.registry.fs.FileSystemProviderRegistry;
-import org.jkiss.utils.IOUtils;
+import org.jkiss.utils.CommonUtils;
 
 import java.net.URI;
 import java.nio.file.FileSystem;
@@ -38,12 +38,13 @@ public abstract class BaseServerConfigurationController<T extends ServletServerC
     @NotNull
     private final Path homeDirectory;
 
-    protected Path workspacePath;
+    @NotNull
+    protected final Path workspacePath;
 
     protected BaseServerConfigurationController(@NotNull Path homeDirectory) {
         this.homeDirectory = homeDirectory;
-        //default workspaceLocation
-        this.workspacePath = homeDirectory.resolve("workspace");
+        this.workspacePath = initWorkspacePath();
+        log.info("Workspace path initialized: " + workspacePath.toAbsolutePath());
     }
 
     @NotNull
@@ -58,35 +59,40 @@ public abstract class BaseServerConfigurationController<T extends ServletServerC
 
 
     @NotNull
-    protected synchronized void initWorkspacePath() throws DBException {
-        if (workspacePath != null && !IOUtils.isFileFromDefaultFS(workspacePath)) {
-            log.warn("Workspace directory already initialized: " + workspacePath);
+    protected synchronized Path initWorkspacePath() {
+        Path defaultWorkspaceLocation = homeDirectory.resolve("workspace");
+        String workspaceLocation = getWorkspaceLocationFromEnv();
+        if (CommonUtils.isEmpty(workspaceLocation)) {
+            return defaultWorkspaceLocation;
         }
-        String workspaceLocation = getWorkspaceLocation();
         URI workspaceUri = URI.create(workspaceLocation);
         if (workspaceUri.getScheme() == null) {
             // default filesystem
-            this.workspacePath = getHomeDirectory().resolve(workspaceLocation);
+            return getHomeDirectory().resolve(workspaceLocation);
         } else {
             var externalFsProvider =
                 FileSystemProviderRegistry.getInstance().getFileSystemProviderBySchema(workspaceUri.getScheme());
             if (externalFsProvider == null) {
-                throw new DBException("File system not found for scheme: " + workspaceUri.getScheme());
+                log.error("File system not found for scheme: " + workspaceUri.getScheme() + " default workspace " +
+                    "location will be used");
+                return defaultWorkspaceLocation;
             }
             ClassLoader fsClassloader = externalFsProvider.getInstance().getClass().getClassLoader();
             try (FileSystem externalFileSystem = FileSystems.newFileSystem(workspaceUri,
                 System.getenv(),
-                fsClassloader);) {
-                this.workspacePath = externalFileSystem.provider().getPath(workspaceUri);
+                fsClassloader)) {
+                log.info("Path from external filesystem used for workspace: " + workspaceUri);
+                return externalFileSystem.provider().getPath(workspaceUri);
             } catch (Exception e) {
-                throw new DBException("Failed to initialize workspace path: " + workspaceUri, e);
+                log.error("Failed to initialize workspace path: " + workspaceUri + " default workspace " +
+                    "location will be used", e);
             }
         }
-        log.info("Workspace path initialized: " + workspacePath);
+        return defaultWorkspaceLocation;
     }
 
-    @NotNull
-    protected abstract String getWorkspaceLocation();
+    @Nullable
+    protected abstract String getWorkspaceLocationFromEnv();
 
     @NotNull
     protected Path getHomeDirectory() {
@@ -96,9 +102,6 @@ public abstract class BaseServerConfigurationController<T extends ServletServerC
     @NotNull
     @Override
     public Path getWorkspacePath() {
-        if (workspacePath == null) {
-            throw new RuntimeException("Workspace path not initialized");
-        }
         return workspacePath;
     }
 }

@@ -8,9 +8,8 @@
 import { observer } from 'mobx-react-lite';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { Button, getComputed, type PlaceholderComponent, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, getComputed, type PlaceholderComponent, useResource, useTranslate, useAuthenticationAction } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
-import { useAuthenticationAction } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps.js';
 

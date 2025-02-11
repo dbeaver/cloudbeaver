@@ -1,0 +1,44 @@
+{
+  "name": "@cloudbeaver/product-base",
+  "type": "module",
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./dist/index.js",
+    "./*.js": "./dist/*.js",
+    "./*": "./*"
+  },
+  "imports": {
+    "#html/*": "./src/*"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rimraf --glob dist",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "validate-dependencies": "core-cli-validate-dependencies"
+  },
+  "devDependencies": {
+    "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/tsconfig": "workspace:*",
+    "@types/fs-extra": "^11",
+    "@types/node": "^20",
+    "tslib": "^2",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^4",
+    "@wroud/vite-plugin-asset-resolver": "^0",
+    "@wroud/vite-plugin-tsc": "^0",
+    "fs-extra": "^11",
+    "tslib": "^2",
+    "vite": "^6",
+    "vite-multiple-assets": "^2",
+    "vite-plugin-pwa": "^0"
+  }
+}

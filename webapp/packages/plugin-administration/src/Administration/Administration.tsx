@@ -131,17 +131,17 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
           <SContext registry={adminPageRegistry}>
             <SlideBox className={s(styles, { slideBox: true })} open={optionsPanelService.active} onClose={close}>
               <SlideElement className={s(styles, { slideElement: true })}>
+                <div className={s(styles, { content: true })}>
+                  <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
+                </div>
+                <SlideOverlay onClick={close} />
+              </SlideElement>
+              <SlideElement className={s(styles, { slideElement: true })}>
                 <Loader className={s(styles, { loader: true })} suspense>
                   <div className={s(styles, { content: true })}>
                     <OptionsPanel />
                   </div>
                 </Loader>
-              </SlideElement>
-              <SlideElement className={s(styles, { slideElement: true })}>
-                <div className={s(styles, { content: true })}>
-                  <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
-                </div>
-                <SlideOverlay onClick={close} />
               </SlideElement>
             </SlideBox>
           </SContext>

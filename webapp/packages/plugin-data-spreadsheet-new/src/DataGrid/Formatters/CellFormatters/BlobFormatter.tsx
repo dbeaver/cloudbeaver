@@ -36,8 +36,6 @@ export const BlobFormatter = observer<RenderCellProps<IResultSetRowKey>>(functio
   const displayString = getComputed(() => formatter.getDisplayString(cell));
 
   const nullValue = isResultSetContentValue(rawValue) ? rawValue.text === 'null' : rawValue === null;
-  const disabled = !column.editable || editingContext.readonly || formatter.isReadOnly(cell);
-  const readonly = tableDataContext.isCellReadonly(cell);
 
   return (
     <span className={s(styles, { blobFormatter: true, nullValue })} title={displayString}>

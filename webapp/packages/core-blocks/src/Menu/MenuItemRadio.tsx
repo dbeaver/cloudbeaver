@@ -7,8 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import { type MenuItemOptions, MenuItemRadio as ReakitMenuItemRadio } from 'reakit';
-import type { RadioOptions } from 'reakit';
+import { type MenuItemOptions, MenuItemRadio as ReakitMenuItemRadio, type RadioOptions } from 'reakit';
 
 import { s } from '../s.js';
 import { useS } from '../useS.js';

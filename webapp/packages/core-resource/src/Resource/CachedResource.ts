@@ -69,9 +69,6 @@ export abstract class CachedResource<
   protected outdateWaitList: ResourceKey<TKey>[];
   protected readonly scheduler: TaskScheduler<ResourceKey<TKey>>;
 
-  /** Need to infer value type */
-  private readonly typescriptHack: TValue;
-
   constructor(defaultKey: ResourceKey<TKey>, defaultValue: () => TData, defaultIncludes: TInclude = [] as any) {
     super(defaultValue, defaultIncludes);
 
@@ -79,7 +76,6 @@ export abstract class CachedResource<
 
     this.loadingTask = this.loadingTask.bind(this);
 
-    this.typescriptHack = null as any;
     this.outdateWaitList = [];
     this.scheduler = new TaskScheduler(this.isIntersect);
     this.beforeLoad = new Executor(null, this.isIntersect);
@@ -389,7 +385,7 @@ export abstract class CachedResource<
   }
 
   markError(exception: Error, key: ResourceKey<TKey>, include?: TInclude): ResourceError {
-    exception = new ResourceError(this, key, include, exception.message, { cause: exception });
+    exception = new ResourceError(this, key, exception.message, { cause: exception });
     const pageKey = this.aliases.isAlias(key, CachedResourceOffsetPageKey) || this.aliases.isAlias(key, CachedResourceOffsetPageListKey);
     this.metadata.update(key, metadata => {
       metadata.exception = exception;

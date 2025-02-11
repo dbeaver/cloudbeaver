@@ -34,13 +34,14 @@ import {
   useResource,
   useS,
   useTranslate,
+  useAuthenticationAction,
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, type DBDriver, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { EAdminPermission, ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
-import { type TabContainerPanelComponent, TabsContext, useAuthenticationAction } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, TabsContext } from '@cloudbeaver/core-ui';
 import { EMPTY_ARRAY } from '@cloudbeaver/core-utils';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 

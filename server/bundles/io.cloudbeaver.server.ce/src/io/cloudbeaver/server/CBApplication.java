@@ -240,11 +240,11 @@ public abstract class CBApplication<T extends CBServerConfig> extends
                 URL wsLocationURL = new URL(
                     "file",  //$NON-NLS-1$
                     null,
-                    getServerConfiguration().getWorkspaceLocation());
+                    getWorkspaceDirectory().toAbsolutePath().toString());
                 instanceLoc.set(wsLocationURL, true);
             }
         } catch (Exception e) {
-            log.error("Error setting workspace location to " + getServerConfiguration().getWorkspaceLocation(), e);
+            log.error("Error setting workspace location to " + getWorkspaceDirectory().toAbsolutePath(), e);
             return;
         }
 
@@ -265,6 +265,9 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         //log.debug("\tProduct details: " + application.getInfoDetails());
         log.debug("\tListen port: " + getServerPort() + (CommonUtils.isEmpty(getServerHost()) ? " on all interfaces" : " on " + getServerHost()));
         log.debug("\tBase URI: " + getServicesURI());
+        if (!isConfigurationMode()) {
+            log.debug("\tGlobal access server URL: " + getServerConfiguration().getServerURL());
+        }
         if (isDevelMode()) {
             log.debug("\tDevelopment mode");
         } else {
@@ -437,13 +440,16 @@ public abstract class CBApplication<T extends CBServerConfig> extends
 
     @NotNull
     public Path getDataDirectory(boolean create) {
-        File dataDir = new File(getServerConfiguration().getWorkspaceLocation(), CBConstants.RUNTIME_DATA_DIR_NAME);
-        if (create && !dataDir.exists()) {
-            if (!dataDir.mkdirs()) {
-                log.error("Can't create data directory '" + dataDir.getAbsolutePath() + "'");
+        Path dataDir = getWorkspaceDirectory().resolve(CBConstants.RUNTIME_DATA_DIR_NAME);
+        if (create && !Files.exists(dataDir)) {
+            try {
+                Files.createDirectories(dataDir);
+            } catch (IOException e) {
+                log.error("Can't create data directory '" + dataDir.toAbsolutePath() + "'");
+
             }
         }
-        return dataDir.toPath();
+        return dataDir;
     }
 
     private void initializeSecurityController() throws DBException {

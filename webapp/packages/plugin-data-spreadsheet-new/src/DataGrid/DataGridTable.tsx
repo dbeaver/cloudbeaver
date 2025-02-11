@@ -471,6 +471,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
                 defaultColumnOptions={{
                   minWidth: 80,
                   resizable: true,
+                  // @ts-ignore
                   renderCell: props => <CellFormatter {...props} />,
                 }}
                 rows={tableData.rows}
@@ -478,9 +479,11 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
                 headerRowHeight={headerHeight}
                 rowHeight={rowHeight}
                 renderers={{
+                  // @ts-ignore
                   renderCell: (key, props) => <CellRenderer key={key} {...props} />,
                 }}
                 onSelectedCellChange={handleFocusChange}
+                // @ts-ignore
                 onColumnResize={(idx, width) => columnResize.execute({ column: idx, width })}
                 onScroll={handleScroll}
               />
