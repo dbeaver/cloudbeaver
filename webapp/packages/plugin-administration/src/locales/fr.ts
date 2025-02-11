@@ -1,10 +1,3 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
 export default [
   ['administration_server_configuration_save_confirmation_title', 'Mise à jour des paramètres du serveur'],
   ['administration_server_configuration_save_confirmation_message', 'Vous êtes sur le point de changer des paramètres critiques. Êtes-vous sûr?'],
