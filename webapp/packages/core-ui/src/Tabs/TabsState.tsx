@@ -260,8 +260,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
 
   useAutoLoad(
     TabsState,
-    container
-      ?.getDisplayed(props)
+    container?.tabInfoList
       .map(tab => tab.getLoader?.(context, props))
       .filter(isDefined)
       .flat() || [],
