@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-version="{VERSION}">
+  <head>
+    {HEAD}
+  </head>
+
+  <body class="theme-typography">
+    <style>
+      body {
+        margin: 0;
+        font-family: Roboto, sans-serif;
+      }
+
+      .wrapper {
+        display: flex;
+        height: 100vh;
+        flex-direction: column;
+      }
+
+      header {
+        flex-grow: 0;
+        flex-shrink: 0;
+        height: 48px;
+        padding: 0 16px;
+        background-color: #2a7cb4;
+        display: flex;
+        align-items: center;
+      }
+
+      .logo {
+        height: 34px;
+        width: 154px;
+      }
+
+      .content {
+        display: flex;
+        flex-grow: 1;
+        flex-shrink: 1;
+        align-items: center;
+        justify-content: space-around;
+      }
+
+      .message {
+        text-align: center;
+      }
+    </style>
+
+    <div class="wrapper">
+      <header>
+        <img src="{ROOT_URI}/icons/logo.svg" class="logo" />
+      </header>
+
+      <div class="content">
+        <div class="message">
+          <p>Authorization was failed.</p>
+          <p>Now you can close this page.</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      window.close();
+    </script>
+
+    <script type="module" src="./ssoError.ts"></script>
+  </body>
+</html>

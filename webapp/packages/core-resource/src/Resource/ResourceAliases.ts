@@ -91,7 +91,6 @@ export class ResourceAliases<TKey> {
     }
 
     let deep = 0;
-    // eslint-disable-next-line no-labels
     transform: if (deep < 10) {
       if (!this.validateResourceKey(key)) {
         let paramString = JSON.stringify(toJS(key));
@@ -112,7 +111,6 @@ export class ResourceAliases<TKey> {
             return key;
           }
           deep++;
-          // eslint-disable-next-line no-labels
           break transform;
         }
       }

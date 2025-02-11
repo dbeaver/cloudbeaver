@@ -39,6 +39,8 @@ public class WebSQLResultsInfo {
     @NotNull
     private final String id;
     private DBDAttributeBinding[] attributes;
+    // TODO: find a way to remove isSingleRow and use virtual keys for reading BLOB and string cell values.
+    private boolean isSingleRow;
     private DBCTrace trace;
     private String queryText;
 
@@ -140,5 +142,13 @@ public class WebSQLResultsInfo {
 
     public void setTrace(@NotNull DBCTrace trace) {
         this.trace = trace;
+    }
+
+    public boolean isSingleRow() {
+        return isSingleRow;
+    }
+
+    public void setSingleRow(boolean singleRow) {
+        isSingleRow = singleRow;
     }
 }

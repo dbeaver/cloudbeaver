@@ -100,7 +100,6 @@ export class RouterService extends Bootstrap {
       const contexts = await this.transitionTask.execute({ fromState: toState, toState: fromState, done });
 
       if (ExecutorInterrupter.isInterrupted(contexts)) {
-        // eslint-disable-next-line prefer-promise-reject-errors
         return Promise.reject();
       }
 

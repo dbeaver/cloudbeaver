@@ -1,0 +1,12 @@
+{
+  "name": "common-typescript",
+  "packageManager": "yarn@4.6.0",
+  "private": true,
+  "workspaces": [
+    "@dbeaver/*"
+  ],
+  "devDependencies": {
+    "@dbeaver/prettier-config": "workspace:^",
+    "prettier": "^3"
+  }
+}

@@ -18,13 +18,10 @@ import {
   KeyBindingService,
   MenuService,
 } from '@cloudbeaver/core-view';
-import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 
 import { getNavigationTreeUserSettingsId } from '../../getNavigationTreeUserSettingsId.js';
-import { ACTION_LINK_OBJECT } from '../ACTION_LINK_OBJECT.js';
 import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE.js';
 import { KEY_BINDING_COLLAPSE_ALL } from '../KEY_BINDING_COLLAPSE_ALL.js';
-import { KEY_BINDING_LINK_OBJECT } from '../KEY_BINDING_LINK_OBJECT.js';
 import { MENU_ELEMENTS_TREE_TOOLS } from './MENU_ELEMENTS_TREE_TOOLS.js';
 import { createElementsTreeSettings, validateElementsTreeSettings } from './NavigationTreeSettings/createElementsTreeSettings.js';
 import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT.js';
@@ -36,7 +33,6 @@ export class ElementsTreeToolsMenuService {
     private readonly actionService: ActionService,
     private readonly keyBindingService: KeyBindingService,
     private readonly userDataService: UserDataService,
-    private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
     private readonly menuService: MenuService,
     private readonly localizationService: LocalizationService,
   ) {}
@@ -55,19 +51,10 @@ export class ElementsTreeToolsMenuService {
           return tree.getExpanded().length > 0;
         }
 
-        return [ACTION_LINK_OBJECT].includes(action);
+        return false;
       },
       getActionInfo: (context, action) => {
         switch (action) {
-          case ACTION_LINK_OBJECT: {
-            const bindingLabel = getBindingLabel(KEY_BINDING_LINK_OBJECT);
-            const tooltip =
-              this.localizationService.translate('app_navigationTree_action_link_with_editor') + (bindingLabel ? ` (${bindingLabel})` : '');
-            return {
-              ...action.info,
-              tooltip,
-            };
-          }
           case ACTION_COLLAPSE_ALL: {
             const bindingLabel = getBindingLabel(KEY_BINDING_COLLAPSE_ALL);
             const tooltip = this.localizationService.translate('app_navigationTree_action_collapse_all') + (bindingLabel ? ` (${bindingLabel})` : '');
@@ -80,23 +67,12 @@ export class ElementsTreeToolsMenuService {
 
         return action.info;
       },
-      isHidden: (context, action) => {
-        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
-
-        if (action === ACTION_LINK_OBJECT && tree) {
-          const navNode = this.connectionSchemaManagerService.activeNavNode;
-          const nodeInTree = navNode?.path.includes(tree.baseRoot);
-          return !nodeInTree;
-        }
-
-        return false;
-      },
       handler: this.elementsTreeActionHandler.bind(this),
     });
 
     this.menuService.addCreator({
       menus: [MENU_ELEMENTS_TREE_TOOLS],
-      getItems: (context, items) => [...items, ACTION_LINK_OBJECT, ACTION_COLLAPSE_ALL],
+      getItems: (context, items) => [...items, ACTION_COLLAPSE_ALL],
     });
 
     this.registerBindings();
@@ -123,7 +99,7 @@ export class ElementsTreeToolsMenuService {
           return tree.getExpanded().length > 0;
         }
 
-        return [ACTION_LINK_OBJECT].includes(action);
+        return false;
       },
       handler: this.elementsTreeActionHandler.bind(this),
     });
@@ -139,13 +115,6 @@ export class ElementsTreeToolsMenuService {
       id: 'elements-tree-collapse',
       binding: KEY_BINDING_COLLAPSE_ALL,
       actions: [ACTION_COLLAPSE_ALL],
-      handler: this.elementsTreeActionHandler.bind(this),
-    });
-
-    this.keyBindingService.addKeyBindingHandler({
-      id: 'elements-tree-link',
-      binding: KEY_BINDING_LINK_OBJECT,
-      actions: [ACTION_LINK_OBJECT],
       handler: this.elementsTreeActionHandler.bind(this),
     });
   }
@@ -177,17 +146,6 @@ export class ElementsTreeToolsMenuService {
       case ACTION_COLLAPSE_ALL:
         tree.collapse();
         break;
-      case ACTION_LINK_OBJECT: {
-        for (const loader of this.connectionSchemaManagerService.currentObjectLoaders) {
-          await loader.load();
-        }
-        const navNode = this.connectionSchemaManagerService.activeNavNode;
-
-        if (navNode?.path.includes(tree.baseRoot)) {
-          tree.show(navNode.nodeId, navNode.path);
-        }
-        break;
-      }
     }
   }
 }

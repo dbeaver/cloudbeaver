@@ -1,115 +1,119 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
   },
   "references": [
     {
-      "path": "../core-administration/tsconfig.json"
+      "path": "../core-administration"
     },
     {
-      "path": "../core-app/tsconfig.json"
+      "path": "../core-app"
     },
     {
-      "path": "../core-authentication/tsconfig.json"
+      "path": "../core-authentication"
     },
     {
-      "path": "../core-blocks/tsconfig.json"
+      "path": "../core-blocks"
     },
     {
-      "path": "../core-browser-cookies/tsconfig.json"
+      "path": "../core-browser"
     },
     {
-      "path": "../core-browser-settings/tsconfig.json"
+      "path": "../core-browser-cookies"
     },
     {
-      "path": "../core-browser/tsconfig.json"
+      "path": "../core-browser-settings"
     },
     {
-      "path": "../core-client-activity/tsconfig.json"
+      "path": "../core-cli"
     },
     {
-      "path": "../core-connections/tsconfig.json"
+      "path": "../core-client-activity"
     },
     {
-      "path": "../core-di/tsconfig.json"
+      "path": "../core-connections"
     },
     {
-      "path": "../core-dialogs/tsconfig.json"
+      "path": "../core-di"
     },
     {
-      "path": "../core-events/tsconfig.json"
+      "path": "../core-dialogs"
     },
     {
-      "path": "../core-executor/tsconfig.json"
+      "path": "../core-events"
     },
     {
-      "path": "../core-links/tsconfig.json"
+      "path": "../core-executor"
     },
     {
-      "path": "../core-localization/tsconfig.json"
+      "path": "../core-links"
     },
     {
-      "path": "../core-navigation-tree/tsconfig.json"
+      "path": "../core-localization"
     },
     {
-      "path": "../core-product/tsconfig.json"
+      "path": "../core-navigation-tree"
     },
     {
-      "path": "../core-projects/tsconfig.json"
+      "path": "../core-product"
     },
     {
-      "path": "../core-resource-manager/tsconfig.json"
+      "path": "../core-projects"
     },
     {
-      "path": "../core-resource/tsconfig.json"
+      "path": "../core-resource"
     },
     {
-      "path": "../core-root/tsconfig.json"
+      "path": "../core-resource-manager"
     },
     {
-      "path": "../core-routing/tsconfig.json"
+      "path": "../core-root"
     },
     {
-      "path": "../core-sdk/tsconfig.json"
+      "path": "../core-routing"
     },
     {
-      "path": "../core-server-localization/tsconfig.json"
+      "path": "../core-sdk"
     },
     {
-      "path": "../core-session-localization/tsconfig.json"
+      "path": "../core-server-localization"
     },
     {
-      "path": "../core-settings-localization/tsconfig.json"
+      "path": "../core-session-localization"
     },
     {
-      "path": "../core-settings-user/tsconfig.json"
+      "path": "../core-settings"
     },
     {
-      "path": "../core-settings/tsconfig.json"
+      "path": "../core-settings-localization"
     },
     {
-      "path": "../core-storage/tsconfig.json"
+      "path": "../core-settings-user"
     },
     {
-      "path": "../core-task-manager/tsconfig.json"
+      "path": "../core-storage"
     },
     {
-      "path": "../core-theming/tsconfig.json"
+      "path": "../core-task-manager"
     },
     {
-      "path": "../core-ui/tsconfig.json"
+      "path": "../core-theming"
     },
     {
-      "path": "../core-version-update/tsconfig.json"
+      "path": "../core-ui"
     },
     {
-      "path": "../core-version/tsconfig.json"
+      "path": "../core-version"
     },
     {
-      "path": "../core-view/tsconfig.json"
+      "path": "../core-version-update"
+    },
+    {
+      "path": "../core-view"
     }
   ],
   "include": [

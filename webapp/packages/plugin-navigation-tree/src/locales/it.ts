@@ -10,7 +10,6 @@ export default [
   ['app_navigationTree_openNodeTab', 'Apri'],
   ['app_navigationTree_search', 'Search elements...'],
   ['app_navigationTree_limited', 'Elements are limited to {arg:limit} items'],
-  ['app_navigationTree_action_link_with_editor', 'Link with editor'],
   ['app_navigationTree_action_collapse_all', 'Collapse all'],
   ['app_navigationTree_settings_filter_objects_description', 'Show objects description'],
   ['app_navigationTree_settings_filter_title', 'Filter'],
