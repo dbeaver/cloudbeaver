@@ -199,10 +199,8 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
     connectionInfoEventHandler.onEvent<ResourceKeyList<IConnectionInfoParams>>(
       ServerEventId.CbDatasourceUpdated,
-      async key => {
-        const isConnected = await this.isConnectedAsync(key);
-
-        if (isConnected) {
+      key => {
+        if (this.isConnected(key)) {
           const connection = this.get(key);
 
           this.dataSynchronizationService
@@ -291,16 +289,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   isConnected(key: ResourceKey<IConnectionInfoParams>): boolean {
     key = ResourceKeyUtils.toList(this.aliases.transformToKey(key));
     return this.get(key).every(connection => connection?.connected ?? false);
-  }
-
-  async isConnectedAsync(key: IConnectionInfoParams): Promise<boolean>;
-  async isConnectedAsync(key: ResourceKeyList<IConnectionInfoParams>): Promise<boolean>;
-  async isConnectedAsync(key: ResourceKey<IConnectionInfoParams>): Promise<boolean>;
-  async isConnectedAsync(key: ResourceKey<IConnectionInfoParams>): Promise<boolean> {
-    key = ResourceKeyUtils.toList(this.aliases.transformToKey(key));
-    const connections = await this.refresh(key);
-
-    return connections.every(connection => connection?.connected ?? false);
   }
 
   // TODO: we need here node path ie ['', 'project://', 'database://...', '...']
