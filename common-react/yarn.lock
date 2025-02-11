@@ -360,6 +360,7 @@ __metadata:
     "@tailwindcss/vite": "npm:^4.0.3"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
+    "@wroud/vite-plugin-asset-resolver": "npm:^0.1.5"
     react: "npm:^19"
     react-dom: "npm:^19"
     rimraf: "npm:^6"
@@ -1557,6 +1558,15 @@ __metadata:
     ts-template: ./lib/cli.js
     tst: ./lib/cli.js
   checksum: 10c0/09a76cd64337f91fb3aba812a1f6eeb083f6df955e6cd4c2d1cd3f676c6a0473d4ce818dad64869fbbe8c356f6832fbec5b2232a596acabeea841359ed692fc1
+  languageName: node
+  linkType: hard
+
+"@wroud/vite-plugin-asset-resolver@npm:^0.1.5":
+  version: 0.1.5
+  resolution: "@wroud/vite-plugin-asset-resolver@npm:0.1.5"
+  peerDependencies:
+    vite: "*"
+  checksum: 10c0/20d20242ccf9079fb157546f8b9cf824179a5efc8e6d6ec1e6748663babf75516ceabb4816fc27cc5172ce50d4cb8e02209f12e4c5b2e34bc04124ab09f2040d
   languageName: node
   linkType: hard
 
