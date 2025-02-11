@@ -1,13 +1,20 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 .checkbox {
-    accent-color: var(--checkbox-background);
-    width: 16px;
-    height: 16px;
+  accent-color: var(--checkbox-background);
+  width: 16px;
+  height: 16px;
 }
 
 .checkbox-label {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--checkbox-gap);
-    margin-left: 0.5rem;
-    color: var(--checkbox-foreground);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--checkbox-gap);
+  margin-left: 0.5rem;
+  color: var(--checkbox-foreground);
 }
