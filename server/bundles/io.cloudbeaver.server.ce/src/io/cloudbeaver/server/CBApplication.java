@@ -42,6 +42,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
@@ -214,9 +215,9 @@ public abstract class CBApplication<T extends CBServerConfig> extends
             return;
         }
 
-        refreshDisabledDriversConfig();
-
         configurationMode = CommonUtils.isEmpty(getServerConfiguration().getServerName());
+
+        refreshDisabledDriversConfig();
 
         eventController.setForceSkipEvents(isConfigurationMode()); // do not send events if configuration mode is on
 
@@ -756,13 +757,22 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         getDriverRegistry().refreshApplicableDrivers();
         CBAppConfig config = getAppConfiguration();
         Set<String> disabledDrivers = new LinkedHashSet<>(Arrays.asList(config.getDisabledDrivers()));
+        Set<String> enabledDrivers = new LinkedHashSet<>(Arrays.asList(config.getEnabledDrivers()));
         for (DBPDriver driver : getDriverRegistry().getApplicableDrivers()) {
+            if (isConfigurationMode()
+                && driver.isEmbedded()
+                && !CommonUtils.toBoolean(driver.getDriverParameter(DBConstants.PARAM_EXCLUDE_AS_EMBEDDED), true)
+            ) {
+                enabledDrivers.add(driver.getFullId());
+                continue;
+            }
             if (!driver.isEmbedded() || config.isDriverForceEnabled(driver.getFullId())) {
                 continue;
             }
             disabledDrivers.add(driver.getFullId());
         }
         config.setDisabledDrivers(disabledDrivers.toArray(new String[0]));
+        config.setEnabledDrivers(enabledDrivers.toArray(new String[0]));
     }
 
     @Override
