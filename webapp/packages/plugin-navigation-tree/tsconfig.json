@@ -8,25 +8,13 @@
   },
   "references": [
     {
-      "path": "../core-administration"
-    },
-    {
-      "path": "../core-app"
-    },
-    {
       "path": "../core-authentication"
     },
     {
       "path": "../core-blocks"
     },
     {
-      "path": "../core-browser"
-    },
-    {
       "path": "../core-cli"
-    },
-    {
-      "path": "../core-client-activity"
     },
     {
       "path": "../core-connections"
@@ -59,19 +47,7 @@
       "path": "../core-resource"
     },
     {
-      "path": "../core-root"
-    },
-    {
-      "path": "../core-routing"
-    },
-    {
-      "path": "../core-sdk"
-    },
-    {
       "path": "../core-settings"
-    },
-    {
-      "path": "../core-storage"
     },
     {
       "path": "../core-ui"
@@ -81,12 +57,6 @@
     },
     {
       "path": "../core-view"
-    },
-    {
-      "path": "../plugin-navigation-tabs"
-    },
-    {
-      "path": "../tests-runner"
     }
   ],
   "include": [

@@ -25,14 +25,14 @@
     "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
     "mobx": "^6",
-    "react": "^18",
+    "react": "^19",
     "semver": "^7",
     "tslib": "^2"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
-    "@types/react": "^18",
+    "@types/react": "^19",
     "@types/semver": "^7",
     "typescript": "^5"
   }

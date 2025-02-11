@@ -31,8 +31,8 @@ type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
 };
 
 interface RadioGroupType {
-  <T>(props: ControlledProps<T>): JSX.Element;
-  <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): JSX.Element;
+  <T>(props: ControlledProps<T>): React.JSX.Element;
+  <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.JSX.Element;
 }
 
 export const RadioGroup: RadioGroupType = observer(function RadioGroup({

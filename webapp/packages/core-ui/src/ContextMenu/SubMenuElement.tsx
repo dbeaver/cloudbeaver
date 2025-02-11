@@ -32,7 +32,7 @@ interface ISubMenuElementProps extends Omit<React.ButtonHTMLAttributes<any>, 'st
 
 export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
   forwardRef(function SubMenuElement({ menuData, subMenu, itemRenderer, menuModal: modal, menuRtl: rtl, onItemClose, ...rest }, ref) {
-    const menu = useRef<IMenuState>();
+    const menu = useRef<IMenuState>(null);
     const subMenuData = useMenu({ menu: subMenu.menu, context: menuData.context });
     const [visible, setVisible] = useState(false);
 
