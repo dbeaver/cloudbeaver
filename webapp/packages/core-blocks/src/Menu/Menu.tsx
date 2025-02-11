@@ -24,7 +24,7 @@ interface IMenuProps extends React.ButtonHTMLAttributes<any> {
   contextMenuPosition?: IContextMenuPosition;
   label: string;
   items: React.ReactNode | (() => React.ReactNode);
-  menuRef?: React.RefObject<IMenuState | undefined>;
+  menuRef?: React.RefObject<IMenuState | null>;
   disclosure?: boolean;
   placement?: MenuInitialState['placement'];
   submenu?: boolean;
@@ -76,7 +76,6 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
     const styles = useS(style);
 
     if (menuRef) {
-      //@ts-expect-error Ref mutation
       menuRef.current = menu;
     }
 
@@ -140,9 +139,9 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
               {...menu}
               visible={menuVisible}
               {...props}
-              {...children.props}
+              {...(children.props as any)}
             >
-              {(disclosureProps: ExtractHTMLAttributes<any>) => React.cloneElement(children, { ...disclosureProps, ...children.props })}
+              {(disclosureProps: ExtractHTMLAttributes<any>) => React.cloneElement(children, { ...disclosureProps, ...(children.props as any) })}
             </MenuButton>
             <MenuPanel
               ref={menuPanelRef}

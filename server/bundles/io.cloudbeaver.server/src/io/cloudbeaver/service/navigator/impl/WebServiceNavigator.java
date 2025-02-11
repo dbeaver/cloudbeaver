@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -600,29 +600,40 @@ public class WebServiceNavigator implements DBWServiceNavigator {
     ) throws DBWebException {
         try {
             DBRProgressMonitor monitor = session.getProgressMonitor();
-            DBNNode folderNode;
             DBNModel navigatorModel = session.getNavigatorModelOrThrow();
-            folderNode = navigatorModel.getNodeByPath(monitor, folderNodePath);
+            DBNNode folderNode = navigatorModel.getNodeByPath(monitor, folderNodePath);
+            if (folderNode == null) {
+                throw new DBException("Folder node '" + folderNodePath + "' not found");
+            }
             for (String path : nodePaths) {
                 DBNNode node = navigatorModel.getNodeByPath(monitor, path);
                 if (node == null) {
                     throw new DBWebException("Navigator node '"  + path + "' not found");
                 }
                 checkProjectEditAccess(node, session);
-                if (node instanceof DBNDataSource) {
-                    DBPDataSourceFolder folder = WebConnectionFolderUtils.getParentFolder(folderNode);
-                    ((DBNDataSource) node).moveToFolder(folderNode.getOwnerProject(), folder);
+                if (node.getNodeUri().equals(folderNode.getNodeUri())) {
+                    throw new DBWebException("Cannot move node inside itself");
+                }
+                if (node instanceof DBNDataSource dataSourceNode) {
+                    DBPDataSourceFolder folder = null;
+                    if (folderNode instanceof DBNLocalFolder localFolderNode) {
+                        folder = localFolderNode.getFolder();
+                    }
+                    dataSourceNode.moveToFolder(folderNode.getOwnerProject(), folder);
                     node.getOwnerProject().getDataSourceRegistry().updateDataSource(
-                        ((DBNDataSource) node).getDataSourceContainer());
+                        dataSourceNode.getDataSourceContainer());
                     WebEventUtils.addDataSourceUpdatedEvent(
                         node.getOwnerProject(),
                         session,
-                        ((DBNDataSource) node).getDataSourceContainer().getId(),
+                        dataSourceNode.getDataSourceContainer().getId(),
                         WSConstants.EventAction.UPDATE,
                         WSDataSourceProperty.CONFIGURATION
                     );
-                } else if (node instanceof DBNLocalFolder) {
-                    DBPDataSourceFolder parentFolder = WebConnectionFolderUtils.getParentFolder(folderNode);
+                } else if (node instanceof DBNLocalFolder dbnLocalFolder) {
+                    DBPDataSourceFolder parentFolder = null;
+                    if (folderNode instanceof DBNLocalFolder parentFolderNode) {
+                        parentFolder = parentFolderNode.getFolder();
+                    }
                     if (parentFolder != null) {
                         List<String> siblings = Arrays.stream(parentFolder.getChildren())
                             .map(DBPDataSourceFolder::getName)
@@ -631,12 +642,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                             throw new DBWebException("Node " + folderNodePath + " contains folder with name '" + node.getName() + "'");
                         }
                     }
-                    DBNLocalFolder dbnLocalFolder = ((DBNLocalFolder) node);
                     var oldNodePath = node.getNodeItemPath();
                     node.getOwnerProject().getDataSourceRegistry().moveFolder(
                         dbnLocalFolder.getFolder().getFolderPath(),
                         dbnLocalFolder.generateNewFolderPath(parentFolder, dbnLocalFolder.getNodeDisplayName())
                     );
+                    node.getOwnerProject().getDataSourceRegistry().checkForErrors();
                     var newNodePath = node.getNodeItemPath();
                     WebServiceUtils.updateConfigAndRefreshDatabases(session, node.getOwnerProject().getId());
                     addNavigatorNodeMoveEvent(session, node, oldNodePath, newNodePath);

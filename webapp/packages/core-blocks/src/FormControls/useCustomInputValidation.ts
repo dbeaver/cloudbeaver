@@ -13,7 +13,7 @@ import { useTranslate } from '../localization/useTranslate.js';
 import { useExecutor } from '../useExecutor.js';
 import { FormContext } from './FormContext.js';
 
-export function useCustomInputValidation<T = void>(validation: (value: T) => string | null): React.RefObject<HTMLInputElement> {
+export function useCustomInputValidation<T = void>(validation: (value: T) => string | null): React.RefObject<HTMLInputElement | null> {
   const context = useContext(FormContext);
   const inputRef = useRef<HTMLInputElement>(null);
   const translate = useTranslate();

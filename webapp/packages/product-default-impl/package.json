@@ -88,7 +88,7 @@
     "@cloudbeaver/plugin-user-profile-settings": "workspace:*",
     "@cloudbeaver/plugin-version": "workspace:*",
     "@cloudbeaver/plugin-version-update-administration": "workspace:*",
-    "react": "^18",
+    "react": "^19",
     "reflect-metadata": "^0",
     "tslib": "^2"
   },
@@ -98,7 +98,7 @@
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
-    "@types/react": "^18",
+    "@types/react": "^19",
     "rimraf": "^6",
     "typescript": "^5"
   }

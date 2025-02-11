@@ -36,13 +36,13 @@
     "@cloudbeaver/plugin-sql-editor": "workspace:*",
     "@cloudbeaver/plugin-sql-editor-navigation-tab-script": "workspace:*",
     "@cloudbeaver/plugin-top-app-bar": "workspace:*",
-    "react": "^18",
+    "react": "^19",
     "tslib": "^2"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
-    "@types/react": "^18",
+    "@types/react": "^19",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5"
   }

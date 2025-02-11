@@ -37,15 +37,8 @@
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
-    "@cloudbeaver/core-client-activity": "workspace:*",
-    "@cloudbeaver/core-localization": "workspace:*",
-    "@cloudbeaver/core-root": "workspace:*",
-    "@cloudbeaver/core-routing": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
-    "@cloudbeaver/core-settings": "workspace:*",
-    "@cloudbeaver/tests-runner": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
-    "@jest/globals": "^29",
     "@types/jest": "^29",
     "msw": "^2",
     "typescript": "^5"

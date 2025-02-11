@@ -18,7 +18,7 @@ export interface ITabData<T = void> {
 export type TabContainerTabComponent<TProps = void> = React.FC<TabProps & TProps>;
 export type TabContainerPanelComponent<TProps = void> = React.FC<{ tabId: string; className?: string } & TProps>;
 
-export interface ITabInfoOptions<TProps = void, TOptions extends Record<string, any> = never> {
+export interface ITabInfoOptions<TProps = void, TOptions extends Record<string, any> | unknown = unknown> {
   key: string;
   name?: string;
   title?: string;
@@ -41,11 +41,11 @@ export interface ITabInfoOptions<TProps = void, TOptions extends Record<string, 
   onOpen?: (tab: ITabData<TProps>) => void;
 }
 
-export interface ITabInfo<TProps = void, TOptions extends Record<string, any> = never> extends ITabInfoOptions<TProps, TOptions> {
+export interface ITabInfo<TProps = void, TOptions extends Record<string, any> | unknown = unknown> extends ITabInfoOptions<TProps, TOptions> {
   order: number;
 }
 
-export interface ITabsContainer<TProps = void, TOptions extends Record<string, any> = never> {
+export interface ITabsContainer<TProps = void, TOptions extends Record<string, any> | unknown = unknown> {
   readonly areaLabel: string;
   readonly tabInfoList: Array<ITabInfo<TProps, TOptions>>;
   readonly selectedId: string | null;

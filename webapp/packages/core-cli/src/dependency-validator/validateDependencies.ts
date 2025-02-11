@@ -28,8 +28,8 @@ export function validateDependencies(currentPackageRoot: string) {
   let isSuccess = true;
 
   const sourceFilesIterator = glob.globIterateSync('**/*.{ts,tsx,scss,css}', { cwd: currentPackageSrcPath });
-  const referenceRegex = /\/\/\/\s+<reference\s+types="(.*?)"/g;
-  const importRegex = /(import|export) ((type |)([\w,\s*]*?)(\{[\w\s\n,]*?\}|) from |)['"]((@[\w-]*\/[\w-]*)|([^\\.].*?))(\/.*)*['"]/g;
+  const referenceRegex = /^\/\/\/\s+<reference\s+types="(.*?)"/gm;
+  const importRegex = /^(import|export) ((type |)([\w,\s*]*?)(\{[\w\s\n,]*?\}|) from |)['"]((@[\w-]*\/[\w-]*)|([^\\.].*?))(\/.*)*['"]/gm;
   const testFileRegex = /((__custom_mocks__|__tests__).*|\.test)\.tsx?$/i;
   const tsFileRegex = /\.ts$/i;
   const tsxFileRegex = /\.tsx$/i;

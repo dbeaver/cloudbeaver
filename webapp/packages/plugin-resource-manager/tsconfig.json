@@ -14,9 +14,6 @@
       "path": "../core-cli"
     },
     {
-      "path": "../core-client-activity"
-    },
-    {
       "path": "../core-di"
     },
     {
@@ -42,9 +39,6 @@
     },
     {
       "path": "../core-utils"
-    },
-    {
-      "path": "../tests-runner"
     }
   ],
   "include": [
