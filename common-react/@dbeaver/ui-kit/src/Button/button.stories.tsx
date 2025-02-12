@@ -10,7 +10,27 @@ import type { Story } from '@ladle/react';
 
 export const All = () => (
   <div>
-    <h3>Variants</h3>
+    <h2 className="text-2xl">Button</h2>
+    <p>
+      Underlying components docs: <br />
+      <a target="_blank" href="https://ariakit.org/reference/button">
+        https://ariakit.org/reference/button
+      </a>
+      <br />
+      <br />
+      Visual parameters:
+      <dl>
+        <dt className="font-bold">variant</dt>
+        <dd>primary | secondary | danger</dd>
+        <dt className="font-bold">size</dt>
+        <dd>small | medium | large | xlarge</dd>
+        <dt className="font-bold">loading</dt>
+        <dd>boolean</dd>
+      </dl>
+    </p>
+    <hr />
+    <br />
+    <h3 className="text-lg my-2">Variants</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
       <Button>Primary</Button>
       <Button loading>Loading</Button>
@@ -35,14 +55,14 @@ export const All = () => (
         Disabled
       </Button>
     </div>
-    <h3>Sizes</h3>
+    <h3 className="text-lg my-2">Sizes</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
       <Button size="small">Small</Button>
       <Button size="medium">Medium</Button>
       <Button size="large">Large</Button>
       <Button size="xlarge">XLarge</Button>
     </div>
-    <h3>Icons</h3>
+    <h3 className="text-lg my-2">Icons</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
       <Button>
         <Button.Icon position="left">🎾</Button.Icon>
@@ -110,7 +130,7 @@ export const All = () => (
         <Button.Icon>🎾</Button.Icon>
       </Button>
     </div>
-    <h3>Custom renders</h3>
+    <h3 className="text-lg my-2">Custom renders</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
       <Button render={<a target="_blank" href="http://localhost:61000/?story=button--all" />} size="small">
         Link button
