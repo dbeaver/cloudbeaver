@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -139,7 +139,7 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
         {children}
       </FieldLabel>
       <UploadArea title={tooltip} disabled={disabled} accept={accept} reset onChange={handleChange}>
-        <Button icon="/icons/import.svg" tag="div" mod={['outlined']} disabled={disabled}>
+        <Button icon="/icons/import.svg" render={<div />} mod={['outlined']} disabled={disabled}>
           {translate('ui_upload_file')}
         </Button>
       </UploadArea>

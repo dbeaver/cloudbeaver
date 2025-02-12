@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ export const ExportNotification = observer<Props>(function ExportNotification({ 
               <Button type="button" mod={['outlined']} onClick={state.delete}>
                 {translate('ui_processing_cancel')}
               </Button>
-              <Button tag="a" href={state.downloadUrl} mod={['unelevated']} download onClick={state.download}>
+              <Button render={<a />} href={state.downloadUrl} mod={['unelevated']} download onClick={state.download}>
                 {translate('data_transfer_notification_download')}
               </Button>
             </>

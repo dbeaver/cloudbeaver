@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -182,7 +182,7 @@ export const InputFiles: InputFilesType = observer(
         </FieldLabel>
         <div className={s(styles, { inputContainer: true })}>
           <UploadArea ref={ref} {...rest} name={name} value={value} required={required} onChange={handleChange}>
-            <Button icon="/icons/import.svg" tag="div" loading={loading} mod={['outlined']}>
+            <Button icon="/icons/import.svg" render={<div />} loading={loading} mod={['outlined']}>
               {text}
             </Button>
           </UploadArea>
