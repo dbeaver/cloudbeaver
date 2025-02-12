@@ -24,10 +24,14 @@ import io.cloudbeaver.model.fs.FSUtils;
 import io.cloudbeaver.model.rm.DBNResourceManagerProject;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.registry.WebDriverRegistry;
+import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.fs.DBFUtils;
@@ -35,6 +39,7 @@ import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystem;
+import org.jkiss.dbeaver.model.navigator.fs.DBNPath;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.dbeaver.model.navigator.meta.DBXTreeNode;
 import org.jkiss.dbeaver.model.rm.RMProject;
@@ -58,6 +63,7 @@ import java.util.Set;
  * Web connection info
  */
 public class WebNavigatorNodeInfo {
+    private static final Log log = Log.getLog(WebNavigatorNodeInfo.class);
     public static final String NODE_FEATURE_ITEM = "item";
     public static final String NODE_FEATURE_LEAF = "leaf";
     public static final String NODE_FEATURE_CONTAINER = "container";
@@ -65,6 +71,7 @@ public class WebNavigatorNodeInfo {
     public static final String NODE_FEATURE_CAN_DELETE = "canDelete";
     public static final String NODE_FEATURE_CAN_FILTER = "canFilter";
     public static final String NODE_FEATURE_CAN_RENAME = "canRename";
+    public static final String NODE_FEATURE_CAN_CREATE_CONNECTION_FROM_NODE = "canCreateConnectionFromNode";
     private final WebSession session;
     private final DBNNode node;
 
@@ -251,7 +258,30 @@ public class WebNavigatorNodeInfo {
                 features.add(NODE_FEATURE_CAN_DELETE);
             }
         }
+        if (node instanceof DBNPath dbnPath) {
+            if (canCreateConnectionFromFileName(dbnPath.getName())) {
+                features.add(NODE_FEATURE_CAN_CREATE_CONNECTION_FROM_NODE);
+            }
+        }
         return features.toArray(new String[0]);
+    }
+
+    private boolean canCreateConnectionFromFileName(String fileName) {
+        String fileExtension = IOUtils.getFileExtension(fileName);
+        if (CommonUtils.isEmpty(fileExtension)) {
+            return false;
+        }
+        WebDriverRegistry driverRegistry = WebAppUtils.getWebApplication().getDriverRegistry();
+        Set<DBPDriver> dbpDrivers = driverRegistry.getSupportedFileOpenExtension().get(fileExtension);
+        if (dbpDrivers == null) {
+            return false;
+        }
+        for (DBPDriver dbpDriver : dbpDrivers) {
+            if (WebServiceUtils.isDriverEnabled(dbpDriver)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean hasNodePermission(RMProjectPermission permission) {
