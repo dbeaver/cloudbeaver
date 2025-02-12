@@ -4712,6 +4712,7 @@ __metadata:
     "@tailwindcss/vite": "npm:^4.0.3"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
+    "@wroud/vite-plugin-asset-resolver": "npm:^0.1.5"
     react: "npm:^19"
     react-dom: "npm:^19"
     rimraf: "npm:^6"
@@ -8725,7 +8726,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wroud/vite-plugin-asset-resolver@npm:^0":
+"@wroud/vite-plugin-asset-resolver@npm:^0, @wroud/vite-plugin-asset-resolver@npm:^0.1.5":
   version: 0.1.5
   resolution: "@wroud/vite-plugin-asset-resolver@npm:0.1.5"
   peerDependencies:
