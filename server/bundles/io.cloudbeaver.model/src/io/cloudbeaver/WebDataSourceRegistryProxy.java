@@ -141,7 +141,7 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
 
     @Override
     public void addDataSourceListener(@NotNull DBPEventListener listener) {
-        dataSourceRegistry.addDataSourceListener(listener);
+        dataSourceRegistry.addDataSourceListener(new WebDBPEventListenerProxy(listener));
     }
 
     @Override
@@ -386,5 +386,30 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     @Override
     public void resolveSecrets(DBSSecretController secretController) throws DBException {
         dataSourceRegistry.resolveSecrets(secretController);
+    }
+
+    /**
+     * Event listener proxy.
+     * For some cases (like creating data source) we should not send event because of accessibility of connection.
+     */
+    private class WebDBPEventListenerProxy implements DBPEventListener {
+        @NotNull
+        private final DBPEventListener eventListener;
+
+        public WebDBPEventListenerProxy(@NotNull DBPEventListener eventListener) {
+            this.eventListener = eventListener;
+        }
+
+        @Override
+        public void handleDataSourceEvent(@NotNull DBPEvent event) {
+            if (event.getAction() == DBPEvent.Action.OBJECT_ADD &&
+                event.getObject() instanceof DBPDataSourceContainer container &&
+                !dataSourceFilter.filter(container)
+            ) {
+                // we cannot send event of creating data source connection because it is not accessible for user
+                return;
+            }
+            eventListener.handleDataSourceEvent(event);
+        }
     }
 }
