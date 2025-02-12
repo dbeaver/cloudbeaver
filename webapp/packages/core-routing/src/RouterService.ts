@@ -38,7 +38,6 @@ export class RouterService extends Bootstrap {
 
   readonly transitionTask: IExecutor<RouterTransitionData>;
   readonly router: Router;
-  readonly onLoad: Executor<void>;
 
   private currentState: RouterState;
   private currentRoute = '';
@@ -47,7 +46,6 @@ export class RouterService extends Bootstrap {
   constructor(private readonly app: App) {
     super();
 
-    this.onLoad = new Executor();
     this.transitionTask = new Executor();
     this.router = createRouter();
     this.currentState = this.router.getState();
@@ -70,7 +68,6 @@ export class RouterService extends Bootstrap {
   }
 
   override async load(): Promise<void> {
-    await this.onLoad.execute();
     this.start();
   }
 

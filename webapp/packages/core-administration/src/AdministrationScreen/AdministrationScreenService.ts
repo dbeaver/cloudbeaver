@@ -112,14 +112,27 @@ export class AdministrationScreenService {
       this.checkPermissions(this.screenService.routerService.state);
     });
 
-    this.screenService.routerService.onLoad.addHandler(this.loadersHandler.bind(this));
     this.screenService.routeChange.addHandler(this.onRouteChange.bind(this));
   }
 
-  private async loadersHandler() {
+  private async onRouteChange() {
+    // this is need for this.isConfigurationMode
+    await this.serverConfigResource.load();
+
     const uniqueItems = this.administrationItemService.getUniqueItems(this.isConfigurationMode);
-    const loaders = uniqueItems
-      .map(item => item.getLoader?.())
+    const item = uniqueItems.find(i => i.name === this.activeScreen?.item);
+
+    if (!this.isAdministrationPageActive) {
+      return;
+    }
+
+    if (!this.activeScreen || !item) {
+      this.navigateToRoot();
+      return;
+    }
+
+    const loaders = [item]
+      .map(loader => loader?.getLoader?.())
       .filter(isNotNullDefined)
       .flat();
 
@@ -134,17 +147,10 @@ export class AdministrationScreenService {
         } catch {}
       }
     }
-  }
 
-  private async onRouteChange() {
-    // this is need for this.isConfigurationMode
-    await this.serverConfigResource.load();
+    const loadedItem = this.administrationItemService.getItem(this.activeScreen.item, this.isConfigurationMode);
 
-    if (!this.isAdministrationPageActive) {
-      return;
-    }
-
-    if (!this.activeScreen || !this.administrationItemService.getItem(this.activeScreen.item, this.isConfigurationMode)) {
+    if (!loadedItem) {
       this.navigateToRoot();
     }
   }
