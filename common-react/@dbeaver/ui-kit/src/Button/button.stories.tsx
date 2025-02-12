@@ -10,6 +10,7 @@ import type { Story } from '@ladle/react';
 
 export const All = () => (
   <div>
+    <h3>Variants</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
       <Button>Primary</Button>
       <Button loading>Loading</Button>
@@ -34,12 +35,14 @@ export const All = () => (
         Disabled
       </Button>
     </div>
+    <h3>Sizes</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
       <Button size="small">Small</Button>
       <Button size="medium">Medium</Button>
       <Button size="large">Large</Button>
       <Button size="xlarge">XLarge</Button>
     </div>
+    <h3>Icons</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
       <Button>
         <Button.Icon position="left">🎾</Button.Icon>
@@ -105,6 +108,18 @@ export const All = () => (
       </Button>
       <Button>
         <Button.Icon>🎾</Button.Icon>
+      </Button>
+    </div>
+    <h3>Custom renders</h3>
+    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
+      <Button render={<a target="_blank" href="http://localhost:61000/?story=button--all" />} size="small">
+        Link button
+      </Button>
+      <Button variant="secondary" render={<a />}>
+        Link secondary
+      </Button>
+      <Button render={({ children, className }) => <p className={className}>{children} render</p>} size="medium">
+        Paragraph
       </Button>
     </div>
   </div>
