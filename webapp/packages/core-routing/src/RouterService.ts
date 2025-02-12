@@ -67,7 +67,7 @@ export class RouterService extends Bootstrap {
     return this.router.subscribe(subscriber);
   }
 
-  override async load(): Promise<void> {
+  override load(): void {
     this.start();
   }
 
