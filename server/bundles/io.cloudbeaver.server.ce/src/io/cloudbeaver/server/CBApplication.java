@@ -766,7 +766,6 @@ public abstract class CBApplication<T extends CBServerConfig> extends
                 && driver.isEmbedded()
                 && CommonUtils.toBoolean(driver.getDriverParameter(DBConstants.PARAM_SAFE_EMBEDDED_DRIVER), false)
             ) {
-                enabledDrivers.add(driver.getFullId());
                 continue;
             }
             if (!driver.isEmbedded() || config.isDriverForceEnabled(driver.getFullId())) {
