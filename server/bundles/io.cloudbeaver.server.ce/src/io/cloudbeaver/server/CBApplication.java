@@ -753,28 +753,19 @@ public abstract class CBApplication<T extends CBServerConfig> extends
     @Override
     public abstract CBServerConfigurationController<T> getServerConfigurationController();
 
-    /**
-     * see comment at #{@link WebServiceAdmin#updateDisabledDriversConfig(CBAppConfig, String[])}
-     */
     private void refreshDisabledDriversConfig() {
         getDriverRegistry().refreshApplicableDrivers();
         CBAppConfig config = getAppConfiguration();
         Set<String> disabledDrivers = new LinkedHashSet<>(Arrays.asList(config.getDisabledDrivers()));
-        Set<String> enabledDrivers = new LinkedHashSet<>(Arrays.asList(config.getEnabledDrivers()));
         for (DBPDriver driver : getDriverRegistry().getApplicableDrivers()) {
-            if (isConfigurationMode()
-                && driver.isEmbedded()
-                && CommonUtils.toBoolean(driver.getDriverParameter(DBConstants.PARAM_SAFE_EMBEDDED_DRIVER), false)
-            ) {
-                continue;
-            }
-            if (!driver.isEmbedded() || config.isDriverForceEnabled(driver.getFullId())) {
+            boolean isSafeEmbedded = CommonUtils.toBoolean(driver.getDriverParameter(DBConstants.PARAM_SAFE_EMBEDDED_DRIVER), false);
+            boolean isNotEmbeddedOrForced = !driver.isEmbedded() || config.isDriverForceEnabled(driver.getFullId());
+            if (isSafeEmbedded || isNotEmbeddedOrForced) {
                 continue;
             }
             disabledDrivers.add(driver.getFullId());
         }
         config.setDisabledDrivers(disabledDrivers.toArray(new String[0]));
-        config.setEnabledDrivers(enabledDrivers.toArray(new String[0]));
     }
 
     @Override
