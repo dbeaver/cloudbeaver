@@ -15,7 +15,7 @@ export interface UiKitButtonProps extends ButtonProps {
 }
 
 export function Button({ className, variant = 'primary', size = 'medium', loading, children, onClick, ...props }: UiKitButtonProps) {
-  const classToApply = `btn btn-${variant} btn-${size}` + (className ? ` ${className}` : '');
+  const classToApply = `btn btn--${variant} btn--${size}` + (className ? ` ${className}` : '');
 
   return (
     <AriaButton onClick={loading ? () => null : onClick} className={classToApply} {...props}>
@@ -30,6 +30,6 @@ export interface ButtonIconProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 Button.Icon = function ButtonIcon({ className, children, position }: ButtonIconProps) {
-  const classToApply = `btn-icon` + (position ? ` btn-icon-${position}` : '') + (className ? ` ${className}` : '');
+  const classToApply = `btn-icon` + (position ? ` btn-icon--${position}` : '') + (className ? ` ${className}` : '');
   return <span className={classToApply}>{children}</span>;
 };

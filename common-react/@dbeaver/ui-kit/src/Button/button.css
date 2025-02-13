@@ -29,29 +29,29 @@
     }
   }
 
-  .btn-small {
+  .btn--small {
     padding-inline: calc(var(--btn-padding-inline) * 0.5);
     padding-block: calc(var(--btn-padding-block) * 0.5);
     font-size: calc(var(--font-size-base) * 0.875);
   }
 
-  .btn-medium {
+  .btn--medium {
     font-size: var(--font-size-base);
   }
 
-  .btn-large {
+  .btn--large {
     padding-inline: calc(var(--btn-padding-inline) * 1.25);
     padding-block: calc(var(--btn-padding-block) * 1.25);
     font-size: calc(var(--font-size-base) * 1.125);
   }
 
-  .btn-xlarge {
+  .btn--xlarge {
     padding-inline: calc(var(--btn-padding-inline) * 1.5);
     padding-block: calc(var(--btn-padding-block) * 1.5);
     font-size: calc(var(--font-size-base) * 1.25);
   }
 
-  .btn-primary {
+  .btn--primary {
     --btn-loader-color: color-mix(in srgb, var(--btn-background) 65%, var(--color-white));
     --btn-loader-background: color-mix(in srgb, var(--btn-foreground) 85%, transparent);
 
@@ -68,7 +68,7 @@
     }
   }
 
-  .btn-secondary {
+  .btn--secondary {
     --btn-loader-color: color-mix(in srgb, var(--btn-secondary-foreground) 75%, var(--color-gray-600));
     --btn-loader-background: color-mix(in srgb, var(--color-white) 75%, transparent);
 
@@ -88,7 +88,7 @@
     }
   }
 
-  .btn-danger {
+  .btn--danger {
     --btn-loader-color: color-mix(in srgb, var(--btn-danger-background) 65%, var(--color-white));
     --btn-loader-background: color-mix(in srgb, var(--btn-danger-foreground) 85%, transparent);
 
@@ -147,11 +147,11 @@
     fill: currentColor;
   }
 
-  .btn-icon-left {
+  .btn-icon--left {
     margin-inline-start: calc(var(--btn-padding-inline) / 4 * -1);
   }
 
-  .btn-icon-right {
+  .btn-icon--right {
     margin-inline-end: calc(var(--btn-padding-inline) / 4 * -1);
   }
 }
