@@ -753,6 +753,9 @@ public abstract class CBApplication<T extends CBServerConfig> extends
     @Override
     public abstract CBServerConfigurationController<T> getServerConfigurationController();
 
+    /**
+     * see comment at #{@link WebServiceAdmin#updateDisabledDriversConfig(CBAppConfig, String[])}
+     */
     private void refreshDisabledDriversConfig() {
         getDriverRegistry().refreshApplicableDrivers();
         CBAppConfig config = getAppConfiguration();
@@ -761,7 +764,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         for (DBPDriver driver : getDriverRegistry().getApplicableDrivers()) {
             if (isConfigurationMode()
                 && driver.isEmbedded()
-                && !CommonUtils.toBoolean(driver.getDriverParameter(DBConstants.PARAM_EXCLUDE_AS_EMBEDDED), true)
+                && !CommonUtils.toBoolean(driver.getDriverParameter(DBConstants.PARAM_SAFE_EMBEDDED_DRIVER), true)
             ) {
                 enabledDrivers.add(driver.getFullId());
                 continue;
