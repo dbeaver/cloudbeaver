@@ -2123,13 +2123,13 @@ __metadata:
 
 "react-data-grid@file:./artifacts::locator=%40dbeaver%2Freact-data-grid%40workspace%3A%40dbeaver%2Freact-data-grid":
   version: 7.0.0-beta.47
-  resolution: "react-data-grid@file:./artifacts#./artifacts::hash=1878c9&locator=%40dbeaver%2Freact-data-grid%40workspace%3A%40dbeaver%2Freact-data-grid"
+  resolution: "react-data-grid@file:./artifacts#./artifacts::hash=ebde6a&locator=%40dbeaver%2Freact-data-grid%40workspace%3A%40dbeaver%2Freact-data-grid"
   dependencies:
     clsx: "npm:^2.0.0"
   peerDependencies:
     react: ^18.0 || ^19.0
     react-dom: ^18.0 || ^19.0
-  checksum: 10c0/2e0e9dc5126a0e48fbc7a75339f2ebcb981f7664c83cac7a19f29eddea3babf39b4a805bea4273b876238266ffbd1515ae9ff2d7eaf9f3a5528e4a3a3f959f22
+  checksum: 10c0/6a1ee314f8cdd603ffa72c778e4aee72f3cd5922a56df1d3f7b095d541a8056946598dde34bddff4de442bef9c732174fb1e8853d6ab3a901001973ba109de7d
   languageName: node
   linkType: hard
 
