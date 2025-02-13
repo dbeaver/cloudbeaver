@@ -68,6 +68,8 @@ export class DataGridContextMenuFilterService {
     await model.request(() => {
       constraints.setFilter(resultColumn.position, operator, filterValue);
     });
+
+    constraints.setWhereFilter(model.requestInfo.requestFilter || model.source.options?.whereFilter || '');
   }
 
   register(): void {
