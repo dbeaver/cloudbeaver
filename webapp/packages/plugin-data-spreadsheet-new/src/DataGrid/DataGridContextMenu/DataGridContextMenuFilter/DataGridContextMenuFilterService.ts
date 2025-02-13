@@ -9,7 +9,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ClipboardService } from '@cloudbeaver/core-ui';
-import { replaceMiddle } from '@cloudbeaver/core-utils';
+import { isNotNullDefined, replaceMiddle } from '@cloudbeaver/core-utils';
 import { ACTION_DELETE, ActionService, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
@@ -69,7 +69,11 @@ export class DataGridContextMenuFilterService {
       constraints.setFilter(resultColumn.position, operator, filterValue);
     });
 
-    constraints.setWhereFilter(model.requestInfo.requestFilter || model.source.options?.whereFilter || '');
+    const whereFilter = model.requestInfo.requestFilter || model.source.options?.whereFilter;
+
+    if (isNotNullDefined(whereFilter)) {
+      constraints.setWhereFilter(whereFilter);
+    }
   }
 
   register(): void {
