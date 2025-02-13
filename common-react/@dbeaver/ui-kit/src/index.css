@@ -9,12 +9,15 @@
 
 @import 'tailwindcss';
 
-@layer components {
+@layer base {
   :root {
     /* General */
     --font-size-base: 1rem;
 
     /* Colors */
+    --color-foreground: var(--color-gray-900);
+    --color-background: var(--color-gray-50);
+
     --color-text: var(--color-gray-900);
 
     --color-primary-50: var(--color-blue-50);
@@ -25,6 +28,43 @@
     --color-primary-700: var(--color-blue-700);
     --color-primary-800: var(--color-blue-800);
     --color-primary-900: var(--color-blue-900);
+
+    --color-error-text: var(--color-red-900);
+    --color-error-background: var(--color-red-50);
+    --color-error-border: var(--color-red-200);
+
+    --color-info-text: var(--color-blue-900);
+    --color-info-background: var(--color-blue-50);
+    --color-info-border: var(--color-blue-200);
+
+    --color-warning-text: var(--color-orange-900);
+    --color-warning-background: var(--color-orange-50);
+    --color-warning-border: var(--color-orange-200);
+  }
+}
+
+@layer components {
+  :root {
+    /* Input */
+
+    --input-background: var(--color-background);
+    --input-border: var(--color-gray-300);
+    --input-foreground: var(--color-text);
+    --input-padding: --spacing(2);
+    --input-placeholderForeground: var(--color-gray-500);
+    --inputOption-activeBackground: var(--color-primary-200);
+    --inputOption-activeBorder: var(--color-primary-500);
+    --inputOption-activeForeground: var(--color-text);
+    --inputOption-hoverBackground: var(--color-primary-100);
+    --inputValidation-errorBackground: var(--color-error-background);
+    --inputValidation-errorForeground: var(--color-error-text);
+    --inputValidation-errorBorder: var(--color-error-border);
+    --inputValidation-infoBackground: var(--color-info-background);
+    --inputValidation-infoForeground: var(--color-info-text);
+    --inputValidation-infoBorder: var(--color-info-border);
+    --inputValidation-warningBackground: var(--color-warning-background);
+    --inputValidation-warningForeground: var(--color-warning-text);
+    --inputValidation-warningBorder: var(--color-warning-border);
 
     /* Button */
     --btn-radius: var(--radius-md);
