@@ -7,7 +7,7 @@
  */
 
 @layer components {
-  .btn {
+  .dbv-ui-button {
     display: inline-flex;
     text-align: center;
     text-decoration: none;
@@ -29,29 +29,29 @@
     }
   }
 
-  .btn--small {
+  .dbv-ui-button--small {
     padding-inline: calc(var(--btn-padding-inline) * 0.5);
     padding-block: calc(var(--btn-padding-block) * 0.5);
-    font-size: calc(var(--font-size-base) * 0.875);
+    font-size: calc(var(--btn-font-size) * 0.875);
   }
 
-  .btn--medium {
-    font-size: var(--font-size-base);
+  .dbv-ui-button--medium {
+    font-size: var(--btn-font-size);
   }
 
-  .btn--large {
+  .dbv-ui-button--large {
     padding-inline: calc(var(--btn-padding-inline) * 1.25);
     padding-block: calc(var(--btn-padding-block) * 1.25);
-    font-size: calc(var(--font-size-base) * 1.125);
+    font-size: calc(var(--btn-font-size) * 1.125);
   }
 
-  .btn--xlarge {
+  .dbv-ui-button--xlarge {
     padding-inline: calc(var(--btn-padding-inline) * 1.5);
     padding-block: calc(var(--btn-padding-block) * 1.5);
-    font-size: calc(var(--font-size-base) * 1.25);
+    font-size: calc(var(--btn-font-size) * 1.25);
   }
 
-  .btn--primary {
+  .dbv-ui-button--primary {
     --btn-loader-color: color-mix(in srgb, var(--btn-background) 65%, var(--color-white));
     --btn-loader-background: color-mix(in srgb, var(--btn-foreground) 85%, transparent);
 
@@ -63,12 +63,14 @@
         background-color: var(--btn-background-hover);
       }
     }
-    &:active {
-      background-color: var(--btn-background-active);
-    }
   }
 
-  .btn--secondary {
+  .dbv-ui-button--primary:active,
+  .dbv-ui-button--primary[data-active] {
+    background-color: var(--btn-background-active);
+  }
+
+  .dbv-ui-button--secondary {
     --btn-loader-color: color-mix(in srgb, var(--btn-secondary-foreground) 75%, var(--color-gray-600));
     --btn-loader-background: color-mix(in srgb, var(--color-white) 75%, transparent);
 
@@ -88,7 +90,7 @@
     }
   }
 
-  .btn--danger {
+  .dbv-ui-button--danger {
     --btn-loader-color: color-mix(in srgb, var(--btn-danger-background) 65%, var(--color-white));
     --btn-loader-background: color-mix(in srgb, var(--btn-danger-foreground) 85%, transparent);
 
@@ -105,7 +107,7 @@
     }
   }
 
-  .btn-loader {
+  .dbv-ui-button-loader {
     position: absolute;
     top: 0;
     left: 0;
@@ -119,14 +121,15 @@
     pointer-events: none;
   }
 
-  .btn-loader::after {
+  .dbv-ui-button-loader::after {
+    --loader-width: calc(var(--btn-font-size) * 0.2);
     content: '';
-    border: 3px solid var(--btn-loader-background);
-    border-top: 3px solid var(--btn-loader-color);
+    border: var(--loader-width) solid var(--btn-loader-background);
+    border-top: var(--loader-width) solid var(--btn-loader-color);
     border-radius: 50%;
     opacity: 1;
-    width: calc(var(--font-size-base) * 1.2);
-    height: calc(var(--font-size-base) * 1.2);
+    width: calc(var(--btn-font-size) * 1.2);
+    height: calc(var(--btn-font-size) * 1.2);
     animation: spin 2s linear infinite;
   }
 
@@ -139,7 +142,7 @@
     }
   }
 
-  .btn-icon {
+  .dbv-ui-button-icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -147,11 +150,11 @@
     fill: currentColor;
   }
 
-  .btn-icon--left {
+  .dbv-ui-button-icon--left {
     margin-inline-start: calc(var(--btn-padding-inline) / 4 * -1);
   }
 
-  .btn-icon--right {
+  .dbv-ui-button-icon--right {
     margin-inline-end: calc(var(--btn-padding-inline) / 4 * -1);
   }
 }

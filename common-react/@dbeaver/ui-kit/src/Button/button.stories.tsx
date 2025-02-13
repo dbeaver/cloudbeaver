@@ -57,7 +57,9 @@ export const All = () => (
     </div>
     <h3 className="text-lg my-2">Sizes</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
-      <Button size="small">Small</Button>
+      <Button className="bg-purple-500 active:bg-purple-700" size="small">
+        Small
+      </Button>
       <Button size="medium">Medium</Button>
       <Button size="large">Large</Button>
       <Button size="xlarge">XLarge</Button>

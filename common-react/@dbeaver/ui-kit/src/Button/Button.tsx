@@ -15,11 +15,11 @@ export interface UiKitButtonProps extends ButtonProps {
 }
 
 export function Button({ className, variant = 'primary', size = 'medium', loading, children, onClick, ...props }: UiKitButtonProps) {
-  const classToApply = `btn btn--${variant} btn--${size}` + (className ? ` ${className}` : '');
+  const classToApply = `dbv-ui-button dbv-ui-button--${variant} dbv-ui-button--${size}` + (className ? ` ${className}` : '');
 
   return (
-    <AriaButton onClick={loading ? () => null : onClick} className={classToApply} {...props}>
-      {loading && <span className="btn-loader" />}
+    <AriaButton aria-label={loading ? 'Loading' : ''} onClick={loading ? () => null : onClick} className={classToApply} {...props}>
+      {loading && <span className="dbv-ui-button-loader" />}
       {children}
     </AriaButton>
   );
@@ -30,6 +30,6 @@ export interface ButtonIconProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 Button.Icon = function ButtonIcon({ className, children, position }: ButtonIconProps) {
-  const classToApply = `btn-icon` + (position ? ` btn-icon--${position}` : '') + (className ? ` ${className}` : '');
+  const classToApply = `dbv-ui-button-icon` + (position ? ` dbv-ui-button-icon--${position}` : '') + (className ? ` ${className}` : '');
   return <span className={classToApply}>{children}</span>;
 };
