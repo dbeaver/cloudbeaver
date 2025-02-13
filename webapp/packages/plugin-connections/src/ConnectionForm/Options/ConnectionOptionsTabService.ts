@@ -11,6 +11,7 @@ import React from 'react';
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
   ConnectionInfoProjectKey,
+  ConnectionInfoResource,
   createConnectionParam,
   DatabaseAuthModelsResource,
   type DatabaseConnection,
@@ -52,6 +53,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     private readonly userInfoResource: UserInfoResource,
     private readonly localizationService: LocalizationService,
     private readonly authProvidersResource: AuthProvidersResource,
+    private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
   ) {
     super();
@@ -160,12 +162,14 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     const driver = await this.dbDriverResource.load(state.config.driverId, ['includeProviderProperties']);
+    const driverDatabases = await this.connectionInfoResource.searchDatabases(driver.defaultDatabase || 'localhost');
+    const driverDatabase = driverDatabases.find(db => db.defaultDriver === driver.id || db.possibleDrivers.includes(driver.id));
 
     state.config.authModelId = driver?.defaultAuthModel;
     state.config.configurationType = getDefaultConfigurationType(driver);
 
-    state.config.host = driver?.defaultServer || 'localhost';
-    state.config.port = driver?.defaultPort;
+    state.config.host = driverDatabase?.host || driver.defaultServer || 'localhost';
+    state.config.port = isNotNullDefined(driverDatabase?.port) ? String(driverDatabase.port) : driver?.defaultPort;
     state.config.databaseName = driver?.defaultDatabase;
     state.config.url = driver?.sampleURL;
 
