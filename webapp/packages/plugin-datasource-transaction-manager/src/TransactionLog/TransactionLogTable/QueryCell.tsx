@@ -10,14 +10,17 @@ import { observer } from 'mobx-react-lite';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import type { TransactionLogInfoItem } from '@cloudbeaver/core-sdk';
-import { type RenderCellProps } from '@cloudbeaver/plugin-data-grid';
+import { Link } from '@cloudbeaver/core-blocks';
 
-import classes from './QueryCell.module.css';
 import { QueryDetailsDialog } from './QueryDetailsDialog.js';
 
-export const QueryCell = observer<RenderCellProps<TransactionLogInfoItem>>(function QueryCell(props) {
+interface Props {
+  row: TransactionLogInfoItem;
+}
+
+export const QueryCell = observer<Props>(function QueryCell({ row }) {
   const commonDialogService = useService(CommonDialogService);
-  const value = props.row.queryString;
+  const value = row.queryString;
 
   async function openDetails() {
     await commonDialogService.open(QueryDetailsDialog, {
@@ -26,8 +29,8 @@ export const QueryCell = observer<RenderCellProps<TransactionLogInfoItem>>(funct
   }
 
   return (
-    <div title={value} className={classes['cell']} onDoubleClick={openDetails}>
+    <Link title={value} inline onClick={openDetails}>
       {value}
-    </div>
+    </Link>
   );
 });

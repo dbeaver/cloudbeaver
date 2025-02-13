@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, Group, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, useTranslate } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
@@ -25,10 +25,8 @@ export const QueryDetailsDialog: DialogComponent<IPayload> = observer(function Q
   return (
     <CommonDialogWrapper size="large" fixedWidth>
       <CommonDialogHeader title={translate('plugin_datasource_transaction_manager_logs_table_column_text')} onReject={props.rejectDialog} />
-      <CommonDialogBody>
-        <Group box small maximum overflow>
-          <SQLCodeEditorLoader value={props.payload.text} extensions={extensions} readonly />
-        </Group>
+      <CommonDialogBody noBodyPadding noOverflow>
+        <SQLCodeEditorLoader value={props.payload.text} extensions={extensions} readonly />
       </CommonDialogBody>
       <CommonDialogFooter>
         <Button mod={['outlined']} onClick={props.rejectDialog}>

@@ -1,28 +1,63 @@
 // import { useSyncExternalStore } from 'react';
-import DataGridBase, { type ColumnOrColumnGroup } from 'react-data-grid';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
+import DataGridBase, { type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle } from 'react-data-grid';
 import 'react-data-grid/lib/styles.css';
+import { rowRenderer } from './renderers/rowRenderer.js';
+import { cellRenderer } from './renderers/cellRenderer.js';
+import { DataGridCellHeaderContext, type IDataGridHeaderCellContext } from './DataGridHeaderCellContext.js';
+import { DataGridCellContext, type IDataGridCellContext } from './DataGridCellContext.js';
+import textEditor from './editors/textEditor.js';
+import type { IInnerRow } from './IInnerRow.js';
 
-export interface DataGridProps {
-  getHeaderHeight?: () => number;
+export interface ICellPosition {
+  rowIdx: number;
+  colIdx: number;
+}
+
+export interface DataGridProps extends IDataGridCellContext, IDataGridHeaderCellContext {
   getRowHeight?: (rowIdx: number) => number;
-  getHeaderText: (colIdx: number) => string;
-  getCellText: (rowIdx: number, colIdx: number) => string;
+  getRowId?: (rowIdx: number) => React.Key;
   getColumnCount: () => number;
   getRowCount: () => number;
-  subscribeToStore: (onStoreChange: () => void) => () => void;
+  subscribeToStore?: (onStoreChange: () => void) => () => void;
+  onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;
+  onFocus?: (position: ICellPosition) => void;
+  onEditorOpen?: (position: ICellPosition) => void;
   className?: string;
 }
 
-export const DataGrid: React.FC<DataGridProps> = function DataGrid({
-  getHeaderText,
-  getCellText,
-  getColumnCount,
-  getRowCount,
-  getHeaderHeight,
-  getRowHeight,
-  subscribeToStore,
-  className,
-}) {
+export interface DataGridRef {
+  selectCell: (position: ICellPosition) => void;
+  scrollToCell: (position: Partial<ICellPosition>) => void;
+  openEditor: (position: ICellPosition) => void;
+}
+
+export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid(
+  {
+    getHeaderElement,
+    getHeaderWidth,
+    getHeaderText,
+    getHeaderTooltip,
+    getHeaderResizable,
+    getHeaderHeight,
+    getHeaderPinned,
+    getCell,
+    getCellText,
+    getCellElement,
+    getCellTooltip,
+    getCellEditable,
+    getColumnCount,
+    getRowCount,
+    getRowId,
+    getRowHeight,
+    onScroll,
+    onFocus,
+    onCellChange,
+    subscribeToStore,
+    className,
+  },
+  ref,
+) {
   // const store = useSyncExternalStore(subscribeToStore, () => {
   //   return {
   //     columns: getColumnCount(),
@@ -30,16 +65,65 @@ export const DataGrid: React.FC<DataGridProps> = function DataGrid({
   //   };
   // });
 
-  const columns = new Array<ColumnOrColumnGroup<any, unknown>>(getColumnCount()).fill(null as any).map(
-    (_, i) =>
-      ({
-        key: i + '',
-        name: getHeaderText(i),
-        renderCell: ({ rowIdx }) => getCellText(rowIdx, i),
-      }) as ColumnOrColumnGroup<any, unknown>,
+  const innerGridRef = useRef<DataGridHandle>(null);
+  const columns = new Array<ColumnOrColumnGroup<IInnerRow, unknown>>(getColumnCount())
+    .fill(null as any)
+    .map((_, i): ColumnOrColumnGroup<IInnerRow, unknown> => {
+      const width = getHeaderWidth?.(i);
+      return {
+        key: String(i),
+        name: '',
+        resizable: getHeaderResizable?.(i) ?? true,
+        width,
+        minWidth: 24,
+        editable: row => getCellEditable?.(row.idx, i) ?? false,
+        maxWidth: 900, // TODO: there is a bug with auto-resize if this value is too high or not set
+        frozen: getHeaderPinned?.(i),
+        renderHeaderCell: ({ column }) => getHeaderElement?.(column.idx) ?? getHeaderText?.(column.idx) ?? '',
+        renderCell: ({ rowIdx }) => getCell(rowIdx, i),
+        renderEditCell: ({ rowIdx, column, onClose }) => textEditor({ rowIdx, colIdx: column.idx, onClose: () => onClose() }),
+      };
+    });
+
+  useImperativeHandle(ref, () => ({
+    selectCell: (position: ICellPosition) => {
+      innerGridRef.current?.selectCell({ idx: position.colIdx, rowIdx: position.rowIdx });
+    },
+    scrollToCell: (position: Partial<ICellPosition>) => {
+      innerGridRef.current?.scrollToCell({ idx: position.colIdx, rowIdx: position.rowIdx });
+    },
+    openEditor: (position: ICellPosition) => {
+      innerGridRef.current?.selectCell({ idx: position.colIdx, rowIdx: position.rowIdx }, true);
+    },
+  }));
+
+  const rows = new Array<IInnerRow>(getRowCount()).fill({ idx: 0 }).map((_, i) => ({
+    idx: i,
+  }));
+
+  function handleCellFocus(args: CellSelectArgs<IInnerRow, unknown>) {
+    onFocus?.({ colIdx: args.column.idx, rowIdx: args.rowIdx });
+  }
+
+  return (
+    <DataGridCellContext value={{ getCell, getCellText, getCellElement, getCellTooltip, onCellChange }}>
+      <DataGridCellHeaderContext value={{ getHeaderText, getHeaderTooltip }}>
+        <DataGridBase
+          ref={innerGridRef}
+          columns={columns}
+          rows={rows}
+          className={className}
+          headerRowHeight={getHeaderHeight?.()}
+          onScroll={onScroll}
+          rowHeight={getRowHeight ? row => getRowHeight(row.idx) : undefined}
+          rowKeyGetter={getRowId ? row => getRowId(row.idx) : undefined}
+          onSelectedCellChange={handleCellFocus}
+          renderers={{
+            renderRow: rowRenderer,
+            renderCell: cellRenderer,
+          }}
+        />
+      </DataGridCellHeaderContext>
+    </DataGridCellContext>
   );
-
-  const rows = new Array(getRowCount()).fill({});
-
-  return <DataGridBase columns={columns} rows={rows} className={className} headerRowHeight={getHeaderHeight?.()} rowHeight={getRowHeight} />;
-};
+});

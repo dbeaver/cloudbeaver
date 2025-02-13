@@ -11,65 +11,20 @@ import { useCallback, useState } from 'react';
 import { type IScrollState, Link, s, useControlledScroll, useExecutor, useS, useTable, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
-import { isDefined, TextTools } from '@cloudbeaver/core-utils';
 import { DataGrid } from '@cloudbeaver/plugin-data-grid';
 
 import { getValue } from '../../helpers.js';
 import { ObjectPropertyTableFooter } from '../ObjectPropertyTableFooter.js';
-import { CellFormatter } from './CellFormatter.js';
-import type { IDataColumn } from './Column.js';
-import { ColumnIcon } from './Columns/ColumnIcon/ColumnIcon.js';
-import { ColumnSelect } from './Columns/ColumnSelect/ColumnSelect.js';
-import { HeaderRenderer } from './HeaderRenderer.js';
 import classes from './Table.module.css';
-import { TableContext } from './TableContext.js';
-import { useTableData } from './useTableData.js';
-
-const CELL_FONT = '400 12px Roboto';
-const COLUMN_FONT = '700 12px Roboto';
-const CELL_PADDING = 16;
-const CELL_BORDER = 2;
+import { ObjectMenuCell } from './ObjectMenuCell.js';
+import { SelectorFormatter } from './Columns/ColumnSelect/SelectorFormatter.js';
 
 export interface TableProps {
   objects: DBObject[];
   hasNextPage: boolean;
   loadMore: () => void;
 }
-
-function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
-  const columnNames = columns.map(column => column.displayName?.toUpperCase()).filter(isDefined);
-  const rowStrings: string[] = Array(columns.length).fill('');
-
-  for (const row of rows.slice(0, 100)) {
-    if (row.object?.properties) {
-      for (let i = 0; i < row.object.properties.length; i++) {
-        const value = getValue(row.object.properties[i]!.value);
-
-        if (value.length > rowStrings[i]!.length) {
-          rowStrings[i] = value;
-        }
-      }
-    }
-  }
-
-  const columnsWidth = TextTools.getWidth({
-    font: COLUMN_FONT,
-    text: columnNames,
-  }).map(width => width + CELL_PADDING + CELL_BORDER);
-
-  const cellsWidth = TextTools.getWidth({
-    font: CELL_FONT,
-    text: rowStrings,
-  }).map(width => width + CELL_PADDING + CELL_BORDER);
-
-  const widthData = columnNames.map((_, i) => Math.max(columnsWidth[i]!, cellsWidth[i] ?? 0));
-
-  return widthData;
-}
-
-const CUSTOM_COLUMNS = [ColumnSelect, ColumnIcon];
 
 export const Table = observer<TableProps>(function Table({ objects, hasNextPage, loadMore }) {
   const styles = useS(classes);
@@ -86,25 +41,10 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
 
   const baseObject = objects.slice().sort((a, b) => (b.object?.properties?.length || 0) - (a.object?.properties?.length || 0));
 
-  const properties = baseObject[0]?.object?.properties ?? [];
-  const measuredCells = getMeasuredCells(properties, objects);
-
-  const dataColumns: IDataColumn[] = properties.map((property, index) => ({
-    key: property.id!,
-    name: property.displayName ?? '',
-    description: property.description,
-    columnDataIndex: null,
-    width: Math.min(300, measuredCells[index]!),
-    minWidth: 40,
-    resizable: true,
-    renderCell: props => <CellFormatter {...props} />,
-    renderHeaderCell: props => <HeaderRenderer {...props} />,
-  }));
-
-  const tableData = useTableData(dataColumns, CUSTOM_COLUMNS);
+  const columns = baseObject[0]?.object?.properties ?? [];
 
   const handleScroll = useCallback(
-    async (event: React.UIEvent<HTMLDivElement>) => {
+    (event: React.UIEvent<HTMLDivElement>) => {
       if (isAtBottom(event)) {
         loadMore();
       }
@@ -125,28 +65,70 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
     return null;
   }
 
+  function getCell(rowIdx: number, colIdx: number) {
+    colIdx--;
+
+    if (colIdx === -1) {
+      return <SelectorFormatter object={objects[rowIdx]!} tableState={tableState} />;
+    }
+
+    if (colIdx === 0) {
+      return <ObjectMenuCell object={objects[rowIdx]!} />;
+    }
+
+    const value = objects[rowIdx]?.object?.properties?.[colIdx]?.value;
+
+    return value !== undefined ? getValue(value) : '';
+  }
+
+  function getCellTooltip(rowIdx: number, colIdx: number) {
+    const value = objects[rowIdx]?.object?.properties?.[colIdx--]?.value;
+
+    return value !== undefined ? getValue(value) : '';
+  }
+
+  function getHeaderWidth(colIdx: number) {
+    if (colIdx === 0) {
+      return 40;
+    }
+    return null;
+  }
+
+  function getHeaderText(colIdx: number) {
+    colIdx--;
+    if (colIdx < 0) {
+      return '';
+    }
+    return columns[colIdx]?.displayName ?? '';
+  }
+
+  function getHeaderResizable(colIdx: number) {
+    return colIdx !== 0;
+  }
+
   return (
-    <TableContext.Provider value={{ tableData, tableState }}>
-      <div ref={setTableContainerRef} className={s(styles, { container: true })}>
-        <DataGrid
-          className={s(styles, { dataGrid: true })}
-          rows={objects}
-          // @ts-ignore
-          rowKeyGetter={row => row.id}
-          columns={tableData.columns}
-          rowHeight={40}
-          onScroll={handleScroll}
-        />
-        {hasNextPage && (
-          <div className={s(styles, { info: true })}>
-            <Link title={translate('app_navigationTree_limited')} onClick={loadMore}>
-              {translate('ui_load_more')}
-            </Link>
-          </div>
-        )}
-        <ObjectPropertyTableFooter className={s(styles, { objectPropertyTableFooter: true })} state={tableState} />
-      </div>
-    </TableContext.Provider>
+    <div ref={setTableContainerRef} className={s(styles, { container: true })}>
+      <DataGrid
+        className={s(styles, { dataGrid: true })}
+        getCell={getCell}
+        getCellTooltip={getCellTooltip}
+        getHeaderWidth={getHeaderWidth}
+        getHeaderResizable={getHeaderResizable}
+        getColumnCount={() => columns.length + 1}
+        getHeaderText={getHeaderText}
+        getRowHeight={() => 40}
+        getRowCount={() => objects.length}
+        onScroll={handleScroll}
+      />
+      {hasNextPage && (
+        <div className={s(styles, { info: true })}>
+          <Link title={translate('app_navigationTree_limited')} onClick={loadMore}>
+            {translate('ui_load_more')}
+          </Link>
+        </div>
+      )}
+      <ObjectPropertyTableFooter className={s(styles, { objectPropertyTableFooter: true })} state={tableState} />
+    </div>
   );
 });
 

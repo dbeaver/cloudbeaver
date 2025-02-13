@@ -8,37 +8,11 @@
 import { observer } from 'mobx-react-lite';
 
 import { s, TextPlaceholder, useAutoLoad, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { type DynamicTraceProperty } from '@cloudbeaver/core-sdk';
-import { type Column, DataGrid } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid } from '@cloudbeaver/plugin-data-grid';
 import { type DataPresentationComponent, type IDatabaseDataOptions, isResultSetDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 import classes from './DVResultTraceDetailsPresentation.module.css';
-import { HeaderCell } from './ResultTraceDetailsTable/HeaderCell.js';
 import { useResultTraceDetails } from './useResultTraceDetails.js';
-
-const COLUMNS: Column<DynamicTraceProperty>[] = [
-  {
-    key: 'name',
-    name: 'ui_name',
-    resizable: true,
-    renderCell: props => <div>{props.row.name}</div>,
-    renderHeaderCell: props => <HeaderCell {...props} />,
-  },
-  {
-    key: 'value',
-    name: 'ui_value',
-    resizable: true,
-    renderCell: props => <div>{props.row.value ?? ''}</div>,
-    renderHeaderCell: props => <HeaderCell {...props} />,
-  },
-  {
-    key: 'description',
-    name: 'ui_description',
-    resizable: true,
-    renderCell: props => <div>{props.row.description ?? ''}</div>,
-    renderHeaderCell: props => <HeaderCell {...props} />,
-  },
-];
 
 export const DVResultTraceDetailsPresentation: DataPresentationComponent = observer(function DVResultTraceDetailsPresentation({
   model,
@@ -52,22 +26,41 @@ export const DVResultTraceDetailsPresentation: DataPresentationComponent = obser
   const state = useResultTraceDetails(model, resultIndex);
 
   useAutoLoad(DVResultTraceDetailsPresentation, state, undefined, undefined, true);
+  const trace = state.trace;
 
-  if (!state.trace?.length) {
+  if (!trace?.length) {
     return <TextPlaceholder>{translate('plugin_data_viewer_result_trace_no_data_placeholder')}</TextPlaceholder>;
+  }
+
+  function getCell(rowIdx: number, colIdx: number) {
+    switch (colIdx) {
+      case 0:
+        return trace![rowIdx]?.name ?? '';
+      case 1:
+        return trace![rowIdx]?.value ?? '';
+      case 2:
+        return trace![rowIdx]?.description ?? '';
+    }
+
+    return '';
+  }
+
+  function getHeaderText(colIdx: number) {
+    switch (colIdx) {
+      case 0:
+        return translate('ui_name');
+      case 1:
+        return translate('ui_value');
+      case 2:
+        return translate('ui_description');
+    }
+
+    return '';
   }
 
   return (
     <div className={s(styles, { container: true })}>
-      <DataGrid
-        rows={state.trace}
-        rowKeyGetter={
-          // @ts-ignore
-          row => row.name
-        }
-        columns={COLUMNS}
-        rowHeight={30}
-      />
+      <DataGrid getCell={getCell} getColumnCount={() => 3} getHeaderText={getHeaderText} getRowHeight={() => 30} getRowCount={() => trace.length} />
     </div>
   );
 });

@@ -23,7 +23,7 @@
   "dependencies": {
     "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
-    "@cloudbeaver/plugin-react-data-grid": "workspace:*",
+    "@dbeaver/react-data-grid": "workspace:*",
     "clsx": "^2",
     "mobx": "^6",
     "mobx-react-lite": "^4",

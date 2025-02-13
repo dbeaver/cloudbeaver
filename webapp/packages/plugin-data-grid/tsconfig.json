@@ -8,6 +8,9 @@
   },
   "references": [
     {
+      "path": "../../../common-react/@dbeaver/react-data-grid"
+    },
+    {
       "path": "../core-blocks"
     },
     {
@@ -15,9 +18,6 @@
     },
     {
       "path": "../core-di"
-    },
-    {
-      "path": "../plugin-react-data-grid"
     }
   ],
   "include": [

@@ -7,8 +7,15 @@
  */
 
 .input {
-  composes: theme-typography--body2 theme-text-text-primary-on-light from global;
+  composes: theme-text-text-primary-on-light from global;
   font: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-decoration: inherit;
+  text-transform: inherit;
 }
 
 .editor {

@@ -7,11 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { s, useS } from '@cloudbeaver/core-blocks';
+import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { TransactionLogInfoItem } from '@cloudbeaver/core-sdk';
-import { type Column, DataGrid } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid } from '@cloudbeaver/plugin-data-grid';
 
-import { HeaderCell } from './HeaderCell.js';
 import { QueryCell } from './QueryCell.js';
 import { TimeCell } from './TimeCell.js';
 import classes from './TransactionLogTable.module.css';
@@ -20,67 +19,68 @@ interface Props {
   log: TransactionLogInfoItem[];
 }
 
-const QUERY_COLUMN_WIDTH = 300;
+const QUERY_COLUMN_WIDTH = 250;
 
-const COLUMNS: Column<TransactionLogInfoItem>[] = [
-  {
-    key: 'time',
-    name: 'plugin_datasource_transaction_manager_logs_table_column_time',
-    resizable: true,
-    renderCell: props => <TimeCell {...props} />,
-    renderHeaderCell: props => <HeaderCell {...props} />,
-  },
-  {
-    key: 'type',
-    name: 'plugin_datasource_transaction_manager_logs_table_column_type',
-    resizable: true,
-    renderCell: props => <div>{props.row.type}</div>,
-    renderHeaderCell: props => <HeaderCell {...props} />,
-  },
-  {
-    key: 'text',
-    name: 'plugin_datasource_transaction_manager_logs_table_column_text',
-    resizable: true,
-    width: QUERY_COLUMN_WIDTH,
-    renderCell: props => <QueryCell {...props} />,
-    renderHeaderCell: props => <HeaderCell {...props} />,
-  },
-  {
-    key: 'duration',
-    name: 'plugin_datasource_transaction_manager_logs_table_column_duration',
-    resizable: true,
-    renderCell: props => <div>{props.row.durationMs}</div>,
-    renderHeaderCell: props => <HeaderCell {...props} />,
-  },
-  {
-    key: 'rows',
-    name: 'plugin_datasource_transaction_manager_logs_table_column_rows',
-    resizable: true,
-    renderCell: props => <div>{props.row.rows}</div>,
-    renderHeaderCell: props => <HeaderCell {...props} />,
-  },
-  {
-    key: 'result',
-    name: 'plugin_datasource_transaction_manager_logs_table_column_result',
-    resizable: true,
-    renderCell: props => <div>{props.row.result}</div>,
-    renderHeaderCell: props => <HeaderCell {...props} />,
-  },
-];
-
-export const TransactionLogTable = observer<Props>(function TransactionLogTable(props) {
+export const TransactionLogTable = observer<Props>(function TransactionLogTable({ log }) {
   const styles = useS(classes);
+  const translate = useTranslate();
+
+  function getCell(rowIdx: number, colIdx: number) {
+    switch (colIdx) {
+      case 0:
+        return <TimeCell row={log[rowIdx]!} />;
+      case 1:
+        return log![rowIdx]?.type ?? '';
+      case 2:
+        return <QueryCell row={log[rowIdx]!} />;
+      case 3:
+        return String(log![rowIdx]?.durationMs ?? '');
+      case 4:
+        return String(log![rowIdx]?.rows ?? '');
+      case 5:
+        return log![rowIdx]?.result ?? '';
+    }
+
+    return '';
+  }
+
+  function getHeaderText(colIdx: number) {
+    switch (colIdx) {
+      case 0:
+        return translate('plugin_datasource_transaction_manager_logs_table_column_time');
+      case 1:
+        return translate('plugin_datasource_transaction_manager_logs_table_column_type');
+      case 2:
+        return translate('plugin_datasource_transaction_manager_logs_table_column_text');
+      case 3:
+        return translate('plugin_datasource_transaction_manager_logs_table_column_duration');
+      case 4:
+        return translate('plugin_datasource_transaction_manager_logs_table_column_rows');
+      case 5:
+        return translate('plugin_datasource_transaction_manager_logs_table_column_result');
+    }
+
+    return '';
+  }
+
+  function getHeaderWidth(colIdx: number) {
+    switch (colIdx) {
+      case 2:
+        return QUERY_COLUMN_WIDTH;
+      default:
+        return null;
+    }
+  }
 
   return (
     <div className={s(styles, { container: true })}>
       <DataGrid
-        rows={props.log}
-        rowKeyGetter={
-          // @ts-ignore
-          row => row.id
-        }
-        columns={COLUMNS}
-        rowHeight={30}
+        getCell={getCell}
+        getHeaderWidth={getHeaderWidth}
+        getColumnCount={() => 6}
+        getHeaderText={getHeaderText}
+        getRowHeight={() => 30}
+        getRowCount={() => log.length}
       />
     </div>
   );
