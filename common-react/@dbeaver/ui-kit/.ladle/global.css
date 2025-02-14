@@ -3,3 +3,7 @@
     color: var(--color-blue-600);
   }
 }
+
+:root[data-theme='dark'] {
+  color: white;
+}

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,11 @@
     padding-inline: calc(var(--btn-padding-inline) * 0.5);
     padding-block: calc(var(--btn-padding-block) * 0.5);
     font-size: calc(var(--btn-font-size) * 0.875);
+    height: var(--control-height-small);
   }
 
   .dbv-ui-button--medium {
+    height: var(--control-height-medium);
     font-size: var(--btn-font-size);
   }
 
@@ -43,12 +45,14 @@
     padding-inline: calc(var(--btn-padding-inline) * 1.25);
     padding-block: calc(var(--btn-padding-block) * 1.25);
     font-size: calc(var(--btn-font-size) * 1.125);
+    height: var(--control-height-large);
   }
 
   .dbv-ui-button--xlarge {
     padding-inline: calc(var(--btn-padding-inline) * 1.5);
     padding-block: calc(var(--btn-padding-block) * 1.5);
     font-size: calc(var(--btn-font-size) * 1.25);
+    height: var(--control-height-xlarge);
   }
 
   .dbv-ui-button--primary {

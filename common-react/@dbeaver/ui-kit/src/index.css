@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,13 @@
   :root {
     /* General */
     --font-size-base: 1rem;
-    --spacing: 4px;
+
+    /* Sizes */
+    --control-height-base: 2rem;
+    --control-height-small: calc(var(--control-height-base) * 0.75);
+    --control-height-medium: var(--control-height-base);
+    --control-height-large: calc(var(--control-height-base) * 1.25);
+    --control-height-xlarge: calc(var(--control-height-base) * 1.5);
 
     /* Colors */
     --color-foreground: var(--color-gray-900);
@@ -47,10 +53,11 @@
 @layer theme {
   :root {
     /* Input */
+    --input-font-size: calc(var(--font-size-base) * 0.875);
     --input-background: var(--color-background);
     --input-border: var(--color-gray-300);
     --input-foreground: var(--color-text);
-    --input-padding: --spacing(2);
+    --input-padding: --spacing(1.1);
     --input-placeholder-foreground: var(--color-gray-500);
     --input-option-active-background: var(--color-primary-200);
     --input-option-active-border: var(--color-primary-500);
@@ -69,7 +76,7 @@
     /* Button */
     --btn-radius: var(--radius-md);
     --btn-padding-inline: --spacing(2.5);
-    --btn-padding-block: --spacing(1);
+    --btn-padding-block: --spacing(1.4);
     --btn-font-weight: var(--font-weight-normal);
     --btn-font-size: calc(var(--font-size-base) * 0.875);
 
