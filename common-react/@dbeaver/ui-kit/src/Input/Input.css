@@ -1,0 +1,68 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.dbv-ui-input-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.dbv-ui-input {
+  background: var(--input-background);
+  border: 1px solid var(--input-border);
+  color: var(--input-foreground);
+  padding: var(--input-padding);
+  font-size: var(--input-font-size);
+  height: var(--control-height-medium);
+}
+
+.dbv-ui-input--small {
+  height: var(--control-height-small);
+}
+
+.dbv-ui-input--large {
+  height: var(--control-height-large);
+}
+
+.dbv-ui-input::placeholder {
+  color: var(--input-placeholder-foreground);
+}
+
+.dbv-ui-input-option--active {
+  background: var(--input-option-active-background);
+  border: 1px solid var(--input-option-active-border);
+  color: var(--input-option-active-foreground);
+}
+
+.dbv-ui-input-option:hover {
+  background: var(--input-option-hover-background);
+}
+
+.dbv-ui-input-validation--error {
+  background: var(--input-validation-error-background);
+  border: 1px solid var(--input-validation-errorBorder);
+}
+
+.dbv-ui-input-validation--warning {
+  background: var(--input-validation-warning-background);
+  border: 1px solid var(--input-validation-warning-border);
+}
+
+.dbv-ui-input-validation-message {
+  position: absolute;
+  z-index: 1;
+  bottom: calc(var(--font-size-base) * -1.25);
+  font-size: (--font-size-small);
+}
+
+.dbv-ui-input-validation-message--error {
+  color: var(--input-validation-error-foreground);
+}
+
+.dbv-ui-input-validation-message--warning {
+  color: var(--input-validation-warning-foreground);
+}
