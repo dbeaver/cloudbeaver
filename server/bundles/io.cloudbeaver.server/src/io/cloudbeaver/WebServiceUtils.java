@@ -380,7 +380,8 @@ public class WebServiceUtils extends WebCommonUtils {
     public static WebPropertyInfo[] getObjectFilteredProperties(
         @NotNull WebSession session,
         @NotNull DBPObject object,
-        @Nullable WebPropertyFilter filter
+        @Nullable WebPropertyFilter filter,
+        boolean showProtected
     ) {
         PropertyCollector propertyCollector = new PropertyCollector(object, true);
         propertyCollector.setLocale(session.getLocale());
@@ -391,6 +392,7 @@ public class WebServiceUtils extends WebCommonUtils {
                 continue;
             }
             WebPropertyInfo webProperty = new WebPropertyInfo(session, prop, propertyCollector);
+            webProperty.setShowProtected(showProtected);
             if (filter != null) {
                 if (!CommonUtils.isEmpty(filter.getFeatures()) && !webProperty.hasAnyFeature(filter.getFeatures())) {
                     continue;

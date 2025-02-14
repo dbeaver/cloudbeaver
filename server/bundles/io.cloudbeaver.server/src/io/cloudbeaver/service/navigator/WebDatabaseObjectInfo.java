@@ -33,7 +33,6 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.dbeaver.model.struct.rdb.DBSTable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 
@@ -98,7 +97,7 @@ public class WebDatabaseObjectInfo {
             filter = new WebPropertyFilter();
             filter.setFeatures(List.of(DBConstants.PROP_FEATURE_NAME));
         }
-        return WebServiceUtils.getObjectFilteredProperties(session, object, filter);
+        return WebServiceUtils.getObjectFilteredProperties(session, object, filter, false);
     }
 
     private boolean isDataSourceEditable(@NotNull DBPDataSourceContainer container) {
