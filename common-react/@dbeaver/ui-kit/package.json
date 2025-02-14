@@ -18,15 +18,15 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "rimraf": "^6",
-    "typescript": "^5",
-    "@ladle/react": "^5",
-    "@tailwindcss/vite": "^4",
-    "@wroud/vite-plugin-asset-resolver": "^0"
+    "typescript": "^5"
   },
   "dependencies": {
-    "@ariakit/react": "^0",
+    "@ariakit/react": "^0.4.15",
+    "@ladle/react": "^5.0.1",
+    "@tailwindcss/vite": "^4.0.3",
+    "@wroud/vite-plugin-asset-resolver": "^0.1.5",
     "react": "^19",
     "react-dom": "^19",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4.0.3"
   }
 }
