@@ -36,8 +36,7 @@
 }
 
 .container .grid {
-  width: fit-content;
-  max-width: 100%;
+  width: 100%;
   :global(.rdg-table-header__readonly-status) {
     background-color: var(--data-grid-readonly-status-color) !important;
   }

@@ -4,7 +4,7 @@ export interface IDataGridHeaderCellContext {
   getHeaderElement?: (colIdx: number) => React.ReactNode;
   getHeaderText?: (colIdx: number) => string;
   getHeaderTooltip?: (colIdx: number) => string;
-  getHeaderWidth?: (colIdx: number) => number | 'auto' | null;
+  getHeaderWidth?: (colIdx: number) => number | string | null;
   getHeaderResizable?: (colIdx: number) => boolean;
   getHeaderHeight?: () => number;
   getHeaderPinned?: (colIdx: number) => boolean;

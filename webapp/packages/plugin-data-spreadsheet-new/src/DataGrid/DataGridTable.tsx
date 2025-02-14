@@ -65,7 +65,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   const clipboardService = useService(ClipboardService);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const editorRef = useRef<HTMLDivElement>(null);
   const dataGridDivRef = useRef<HTMLDivElement | null>(null);
   const focusedCell = useRef<ICellPosition | null>(null);
   const focusSyncRef = useRef<ICellPosition | null>(null);
@@ -375,11 +374,10 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       resultIndex,
       simple,
       isGridInFocus,
-      getEditorPortal: () => editorRef.current,
       getDataGridApi: () => dataGridRef.current,
       focus: restoreFocus,
     }),
-    [model, actions, resultIndex, simple, editorRef, dataGridRef, gridContainerRef, restoreFocus],
+    [model, actions, resultIndex, simple, dataGridRef, gridContainerRef, restoreFocus],
   );
 
   if (!tableData.columns.length) {
@@ -476,6 +474,16 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return !(handleByBooleanFormatter || tableData.isCellReadonly(cell));
   }
 
+  function getColumnKey(colIdx: number) {
+    const column = tableData.columns[colIdx];
+
+    if (column?.key) {
+      return ResultSetDataKeysUtils.serialize(column.key);
+    }
+
+    return `_${String(colIdx)}`;
+  }
+
   return (
     <DataGridContext.Provider value={gridContext}>
       <DataGridSelectionContext.Provider value={gridSelectionContext}>
@@ -502,6 +510,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               getHeaderPinned={getHeaderPinned}
               getHeaderResizable={getHeaderResizable}
               getRowHeight={() => rowHeight}
+              getColumnKey={getColumnKey}
               getColumnCount={() => tableData.columns.length}
               getRowCount={() => tableData.rows.length}
               getRowId={rowIdx => (tableData.rows[rowIdx] ? ResultSetDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
@@ -509,7 +518,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               onScroll={handleScroll}
               onCellChange={handleCellChange}
             />
-            <div ref={editorRef} />
           </div>
         </TableDataContext.Provider>
       </DataGridSelectionContext.Provider>

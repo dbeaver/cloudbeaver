@@ -1,4 +1,3 @@
-// import { useSyncExternalStore } from 'react';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import DataGridBase, { type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle } from 'react-data-grid';
 import 'react-data-grid/lib/styles.css';
@@ -14,11 +13,12 @@ export interface ICellPosition {
   colIdx: number;
 }
 
-export interface DataGridProps extends IDataGridCellContext, IDataGridHeaderCellContext {
+export interface DataGridProps extends IDataGridCellContext, IDataGridHeaderCellContext, React.PropsWithChildren {
   getRowHeight?: (rowIdx: number) => number;
   getRowId?: (rowIdx: number) => React.Key;
-  getColumnCount: () => number;
   getRowCount: () => number;
+  getColumnCount: () => number;
+  getColumnKey?: (colIdx: number) => string;
   subscribeToStore?: (onStoreChange: () => void) => () => void;
   onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;
   onFocus?: (position: ICellPosition) => void;
@@ -47,6 +47,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     getCellTooltip,
     getCellEditable,
     getColumnCount,
+    getColumnKey,
     getRowCount,
     getRowId,
     getRowHeight,
@@ -54,6 +55,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     onFocus,
     onCellChange,
     subscribeToStore,
+    children,
     className,
   },
   ref,
@@ -65,13 +67,15 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   //   };
   // });
 
+  const gridKey = useRef(0);
+  const rowsCount = useRef(getRowCount());
   const innerGridRef = useRef<DataGridHandle>(null);
   const columns = new Array<ColumnOrColumnGroup<IInnerRow, unknown>>(getColumnCount())
     .fill(null as any)
     .map((_, i): ColumnOrColumnGroup<IInnerRow, unknown> => {
-      const width = getHeaderWidth?.(i);
+      const width = getHeaderWidth?.(i) ?? 'max-content';
       return {
-        key: String(i),
+        key: getColumnKey?.(i) ?? String(i),
         name: '',
         resizable: getHeaderResizable?.(i) ?? true,
         width,
@@ -97,7 +101,17 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     },
   }));
 
-  const rows = new Array<IInnerRow>(getRowCount()).fill({ idx: 0 }).map((_, i) => ({
+  if (rowsCount.current !== getRowCount()) {
+    const previousRowCount = rowsCount.current;
+    rowsCount.current = getRowCount();
+
+    if (previousRowCount === 0) {
+      // we trigger columns size recalculation when rows are added
+      gridKey.current++;
+    }
+  }
+
+  const rows = new Array<IInnerRow>(rowsCount.current).fill({ idx: 0 }).map((_, i) => ({
     idx: i,
   }));
 
@@ -109,6 +123,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     <DataGridCellContext value={{ getCell, getCellText, getCellElement, getCellTooltip, onCellChange }}>
       <DataGridCellHeaderContext value={{ getHeaderText, getHeaderTooltip }}>
         <DataGridBase
+          key={gridKey.current}
           ref={innerGridRef}
           columns={columns}
           rows={rows}
@@ -121,6 +136,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
           renderers={{
             renderRow: rowRenderer,
             renderCell: cellRenderer,
+            noRowsFallback: children,
           }}
         />
       </DataGridCellHeaderContext>

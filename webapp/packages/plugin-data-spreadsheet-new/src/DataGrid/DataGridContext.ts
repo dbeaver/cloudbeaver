@@ -21,7 +21,6 @@ export interface IDataGridContext {
   resultIndex: number;
   simple: boolean;
   isGridInFocus: () => boolean;
-  getEditorPortal: () => HTMLDivElement | null;
   getDataGridApi: () => DataGridRef | null;
   focus: () => void;
 }
