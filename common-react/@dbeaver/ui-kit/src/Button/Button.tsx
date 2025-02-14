@@ -24,12 +24,15 @@ export function Button({ className, variant = 'primary', size = 'medium', loadin
     </AriaButton>
   );
 }
-
 export interface ButtonIconProps extends React.HTMLAttributes<HTMLSpanElement> {
-  /* This property is needed to adjust icon placement inside a button. The icon with placement="start" will cut the inline-start padding. placement="end" will affect the padding-inline-end accordingly. This property supports RTL and LTR, so you don't need to think about it. */
   placement?: 'start' | 'end';
 }
 
+/**
+ *  Button Icon component - used to place an icon inside a button, renders span element.;
+ *
+ * @param props.placement This property is needed to adjust icon placement inside a button. The icon with placement="start" will cut the inline-start padding. placement="end" will affect the padding-inline-end accordingly. This property supports RTL and LTR, so you don't need to think about it.
+ */
 Button.Icon = function ButtonIcon({ className, children, placement }: ButtonIconProps) {
   const classToApply = `dbv-kit-button-icon` + (placement ? ` dbv-kit-button-icon--${placement}` : '') + (className ? ` ${className}` : '');
   return <span className={classToApply}>{children}</span>;
