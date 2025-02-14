@@ -7,6 +7,6 @@
  */
 import './index.css';
 
-export { Button, type UiKitButtonProps } from './Button/Button.js';
-export { Checkbox, type UIKitCheckboxProps } from './Checkbox/Checkbox.js';
-export { Input, type UIKitInputProps } from './Input/Input.js';
+export { Button, type ButtonProps } from './Button/Button.js';
+export { Checkbox, type CheckboxProps } from './Checkbox/Checkbox.js';
+export { Input, type InputProps } from './Input/Input.js';

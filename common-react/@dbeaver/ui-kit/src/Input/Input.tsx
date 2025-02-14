@@ -9,20 +9,18 @@
 import type { ComponentPropsWithRef } from 'react';
 import './Input.css';
 
-export interface UIKitInputProps extends Omit<ComponentPropsWithRef<'input'>, 'size'> {
+export interface InputProps extends Omit<ComponentPropsWithRef<'input'>, 'size'> {
   size?: 'small' | 'medium' | 'large';
   error?: string;
   warning?: string;
 }
 
-export const Input: React.FC<UIKitInputProps> = function Input({ error, warning, size, ...props }) {
+export const Input: React.FC<InputProps> = function Input({ error, warning, size, ...props }) {
   const classNameToApply =
     `dbv-ui-input dbv-ui-input--${size ?? 'medium'} ${error ? 'dbv-ui-input-validation--error' : ''} ${warning ? 'dbv-ui-input-validation--warning' : ''}`.trim();
   return (
     <div className="dbv-ui-input-wrapper">
       <input className={classNameToApply} {...props} />
-      {error && <div className="dbv-ui-input-validation-message dbv-ui-input-validation-message--error">{error}</div>}
-      {warning && <div className="dbv-ui-input-validation-message dbv-ui-input-validation-message--warning">{warning}</div>}
     </div>
   );
 };

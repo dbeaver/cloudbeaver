@@ -5,16 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Button as AriaButton, type ButtonProps } from '@ariakit/react';
+import { Button as AriaButton, type ButtonProps as AriaKitButtonProps } from '@ariakit/react';
 import './Button.css';
 
-export interface UiKitButtonProps extends Omit<ButtonProps, 'clickOnEnter' | 'clickOnSpace'> {
+export interface ButtonProps extends Omit<AriaKitButtonProps, 'clickOnEnter' | 'clickOnSpace'> {
   variant?: 'primary' | 'secondary' | 'danger';
   size?: 'small' | 'medium' | 'large' | 'xlarge';
   loading?: boolean;
 }
 
-export function Button({ className, variant = 'primary', size = 'medium', loading, children, onClick, ...props }: UiKitButtonProps) {
+export function Button({ className, variant = 'primary', size = 'medium', loading, children, onClick, ...props }: ButtonProps) {
   const classToApply = `dbv-ui-button dbv-ui-button--${variant} dbv-ui-button--${size}` + (className ? ` ${className}` : '');
 
   return (

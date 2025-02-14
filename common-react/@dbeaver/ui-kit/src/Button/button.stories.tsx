@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Button, type UiKitButtonProps } from '../index.js';
+import { Button, type ButtonProps } from '../index.js';
 import type { Story } from '@ladle/react';
 
 export const All = () => (
@@ -153,7 +153,7 @@ export const All = () => (
   </div>
 );
 
-const Primary: Story<UiKitButtonProps> = props => <Button {...props}>Primary</Button>;
+const Primary: Story<ButtonProps> = props => <Button {...props}>Primary</Button>;
 export const Interactive = Primary.bind({});
 
 Interactive.argTypes = {
