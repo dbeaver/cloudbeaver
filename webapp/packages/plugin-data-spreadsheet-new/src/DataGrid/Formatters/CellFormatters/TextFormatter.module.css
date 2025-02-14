@@ -9,6 +9,7 @@
 .textFormatter {
   display: flex;
   align-items: center;
+  overflow: hidden;
 
   & .a {
     display: flex;
