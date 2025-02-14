@@ -7,11 +7,12 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
+import { observable, reaction, type IReactionDisposer } from 'mobx';
 
-import { s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
+import { getComputed, s, TextPlaceholder, useObjectRef, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+// import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { ClipboardService } from '@cloudbeaver/core-ui';
+// import { ClipboardService } from '@cloudbeaver/core-ui';
 import { throttle } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import { DataGrid, type DataGridRef, type ICellPosition, type IDataGridCellRenderer } from '@cloudbeaver/plugin-data-grid';
@@ -63,7 +64,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const translate = useTranslate();
   const styles = useS(classes);
 
-  const clipboardService = useService(ClipboardService);
+  // const clipboardService = useService(ClipboardService);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const dataGridDivRef = useRef<HTMLDivElement | null>(null);
   const focusedCell = useRef<ICellPosition | null>(null);
@@ -186,9 +187,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       return;
     }
 
-    const colIdx = tableData.getColumnIndexFromColumnKey(cell.column);
-    const rowIdx = tableData.getRowIndexFromKey(cell.row);
-
     switch (event.nativeEvent.code) {
       case 'Escape': {
         tableData.editor.revert(...activeElements);
@@ -206,54 +204,56 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       }
     }
 
-    const editingState = tableData.editor.getElementState(cell);
+    // const colIdx = tableData.getColumnIndexFromColumnKey(cell.column);
+    // const rowIdx = tableData.getRowIndexFromKey(cell.row);
+    // const editingState = tableData.editor.getElementState(cell);
 
-    switch (event.nativeEvent.code) {
-      case 'Delete': {
-        const filteredRows = activeRows.filter(cell => tableData.editor.getElementState(cell) !== DatabaseEditChangeType.delete);
+    // switch (event.nativeEvent.code) {
+    //   case 'Delete': {
+    //     const filteredRows = activeRows.filter(cell => tableData.editor.getElementState(cell) !== DatabaseEditChangeType.delete);
 
-        if (filteredRows.length > 0) {
-          const editor = tableData.editor;
-          const firstRow = filteredRows[0]!;
-          const editingState = tableData.editor.getElementState(firstRow);
+    //     if (filteredRows.length > 0) {
+    //       const editor = tableData.editor;
+    //       const firstRow = filteredRows[0]!;
+    //       const editingState = tableData.editor.getElementState(firstRow);
 
-          editor.delete(...filteredRows);
+    //       editor.delete(...filteredRows);
 
-          if (editingState === DatabaseEditChangeType.add) {
-            if (rowIdx - 1 > 0) {
-              handlers.selectCell({ colIdx, rowIdx: rowIdx - 1 });
-            }
-          } else {
-            if (rowIdx + 1 < tableData.rows.length) {
-              handlers.selectCell({ colIdx, rowIdx: rowIdx + 1 });
-            }
-          }
-        }
+    //       if (editingState === DatabaseEditChangeType.add) {
+    //         if (rowIdx - 1 > 0) {
+    //           handlers.selectCell({ colIdx, rowIdx: rowIdx - 1 });
+    //         }
+    //       } else {
+    //         if (rowIdx + 1 < tableData.rows.length) {
+    //           handlers.selectCell({ colIdx, rowIdx: rowIdx + 1 });
+    //         }
+    //       }
+    //     }
 
-        return;
-      }
-      case 'KeyV': {
-        if (editingState === DatabaseEditChangeType.delete) {
-          return;
-        }
+    //     return;
+    //   }
+    //   case 'KeyV': {
+    //     if (editingState === DatabaseEditChangeType.delete) {
+    //       return;
+    //     }
 
-        if (event.ctrlKey || event.metaKey) {
-          if (!clipboardService.clipboardAvailable || clipboardService.state === 'denied' || tableData.isCellReadonly(cell)) {
-            return;
-          }
+    //     if (event.ctrlKey || event.metaKey) {
+    //       if (!clipboardService.clipboardAvailable || clipboardService.state === 'denied' || tableData.isCellReadonly(cell)) {
+    //         return;
+    //       }
 
-          clipboardService
-            .read()
-            .then(value => tableData.editor.set(cell, value))
-            .catch();
-          return;
-        }
-      }
-    }
+    //       clipboardService
+    //         .read()
+    //         .then(value => tableData.editor.set(cell, value))
+    //         .catch();
+    //       return;
+    //     }
+    //   }
+    // }
 
-    if (editingState === DatabaseEditChangeType.delete) {
-      return;
-    }
+    // if (editingState === DatabaseEditChangeType.delete) {
+    //   return;
+    // }
   }
 
   useLayoutEffect(() => {
@@ -378,6 +378,34 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       focus: restoreFocus,
     }),
     [model, actions, resultIndex, simple, dataGridRef, gridContainerRef, restoreFocus],
+  );
+
+  const storeSync = useObservableRef(
+    () => ({
+      reactionDisposer: null as IReactionDisposer | null,
+      subscribeToStoreSync(onStoreChange: () => void) {
+        if (this.reactionDisposer) {
+          this.reactionDisposer?.();
+        }
+        this.reactionDisposer = reaction(
+          // sync mobx with plain react
+          () => [getComputed(() => this.tableData.columns.length), getComputed(() => this.tableData.rows.length)],
+          onStoreChange,
+          {
+            fireImmediately: false,
+          },
+        );
+
+        return () => {
+          this.reactionDisposer?.();
+        };
+      },
+    }),
+    {
+      tableData: observable.ref,
+    },
+    { tableData },
+    ['subscribeToStoreSync'],
   );
 
   if (!tableData.columns.length) {
@@ -514,6 +542,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               getColumnCount={() => tableData.columns.length}
               getRowCount={() => tableData.rows.length}
               getRowId={rowIdx => (tableData.rows[rowIdx] ? ResultSetDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
+              subscribeToStore={storeSync.subscribeToStoreSync}
               onFocus={handleFocusChange}
               onScroll={handleScroll}
               onCellChange={handleCellChange}

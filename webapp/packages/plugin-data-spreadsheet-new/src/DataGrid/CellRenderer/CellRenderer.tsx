@@ -41,11 +41,11 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       get column(): IColumnInfo {
         return this.tableDataContext.getColumn(this.colIdx)!;
       },
-      get row(): IResultSetRowKey {
-        return this.tableDataContext.getRow(this.rowIdx)!;
+      get row(): IResultSetRowKey | undefined {
+        return this.tableDataContext.getRow(this.rowIdx);
       },
       get cell(): IResultSetElementKey | undefined {
-        if (this.column.key === null) {
+        if (this.column.key === null || this.row === undefined) {
           return undefined;
         }
         return { row: this.row, column: this.column.key };

@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useRef, useSyncExternalStore } from 'react';
 import DataGridBase, { type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle } from 'react-data-grid';
 import 'react-data-grid/lib/styles.css';
 import { rowRenderer } from './renderers/rowRenderer.js';
@@ -60,12 +60,24 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   },
   ref,
 ) {
-  // const store = useSyncExternalStore(subscribeToStore, () => {
-  //   return {
-  //     columns: getColumnCount(),
-  //     rows: getRowCount(),
-  //   };
-  // });
+  const storeSync = useRef(0);
+  const subscribeToStoreSync = useCallback(
+    (onStoreChange: () => void) => {
+      const dispose = subscribeToStore?.(() => {
+        storeSync.current++;
+        onStoreChange();
+      });
+
+      return () => {
+        dispose?.();
+      };
+    },
+    [subscribeToStore],
+  );
+
+  useSyncExternalStore(subscribeToStoreSync, () => {
+    return storeSync.current;
+  });
 
   const gridKey = useRef(0);
   const rowsCount = useRef(getRowCount());

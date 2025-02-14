@@ -21,14 +21,13 @@ export const BooleanFormatter = observer<ICellFormatterProps>(function BooleanFo
   const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const cellContext = useContext(CellContext);
+  const styles = useS(style);
 
   const cell = cellContext.cell;
 
   if (!context || !tableDataContext || !cell) {
-    throw new Error('Contexts required');
+    return null;
   }
-
-  const styles = useS(style);
 
   const formatter = tableDataContext.format;
   const value = getComputed(() => formatter.get(cell));

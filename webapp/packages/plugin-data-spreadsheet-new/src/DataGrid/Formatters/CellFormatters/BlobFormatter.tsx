@@ -22,12 +22,11 @@ export const BlobFormatter = observer<ICellFormatterProps>(function BlobFormatte
   const tableDataContext = useContext(TableDataContext);
   const cellContext = useContext(CellContext);
   const cell = cellContext.cell;
+  const styles = useS(style);
 
   if (!context || !tableDataContext || !cell) {
-    throw new Error('Contexts required');
+    return null;
   }
-
-  const styles = useS(style);
 
   const formatter = tableDataContext.format;
   const rawValue = getComputed(() => formatter.get(cell));

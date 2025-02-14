@@ -19,12 +19,12 @@ import type { ICellFormatterProps } from '../ICellFormatterProps.js';
 export const TextFormatter = observer<ICellFormatterProps>(function TextFormatter() {
   const tableDataContext = useContext(TableDataContext);
   const cellContext = useContext(CellContext);
+  const style = useS(styles);
 
   if (!cellContext.cell) {
-    throw new Error('Contexts required');
+    return null;
   }
 
-  const style = useS(styles);
   const formatter = tableDataContext.format;
   const nullValue = getComputed(() => formatter.get(cellContext.cell!) === null);
   const textValue = getComputed(() => formatter.getText(cellContext.cell!));
