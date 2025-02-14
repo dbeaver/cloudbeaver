@@ -15,11 +15,11 @@ export interface ButtonProps extends Omit<AriaKitButtonProps, 'clickOnEnter' | '
 }
 
 export function Button({ className, variant = 'primary', size = 'medium', loading, children, onClick, ...props }: ButtonProps) {
-  const classToApply = `dbv-ui-button dbv-ui-button--${variant} dbv-ui-button--${size}` + (className ? ` ${className}` : '');
+  const classToApply = `dbv-kit-button dbv-kit-button--${variant} dbv-kit-button--${size}` + (className ? ` ${className}` : '');
 
   return (
     <AriaButton aria-label={loading ? 'Loading' : ''} onClick={loading ? () => null : onClick} className={classToApply} {...props}>
-      {loading && <span className="dbv-ui-button-loader" />}
+      {loading && <span className="dbv-kit-button-loader" />}
       {children}
     </AriaButton>
   );
@@ -30,6 +30,6 @@ export interface ButtonIconProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 Button.Icon = function ButtonIcon({ className, children, position }: ButtonIconProps) {
-  const classToApply = `dbv-ui-button-icon` + (position ? ` dbv-ui-button-icon--${position}` : '') + (className ? ` ${className}` : '');
+  const classToApply = `dbv-kit-button-icon` + (position ? ` dbv-kit-button-icon--${position}` : '') + (className ? ` ${className}` : '');
   return <span className={classToApply}>{children}</span>;
 };

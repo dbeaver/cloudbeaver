@@ -13,8 +13,8 @@ export interface CheckboxProps extends AriaKitCheckboxProps {}
 
 export function Checkbox({ className, children, disabled, ...props }: CheckboxProps) {
   return (
-    <label className="dbv-ui-checkbox-label">
-      <AriaCheckbox disabled={disabled} className={className ?? '' + ' ' + 'dbv-ui-checkbox'} {...props} />
+    <label className="dbv-kit-checkbox-label">
+      <AriaCheckbox disabled={disabled} className={className ?? '' + ' ' + 'dbv-kit-checkbox'} {...props} />
       {children}
     </label>
   );

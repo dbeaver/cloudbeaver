@@ -5,13 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.dbv-ui-checkbox {
+.dbv-kit-checkbox {
   accent-color: var(--checkbox-background);
   width: 16px;
   height: 16px;
 }
 
-.dbv-ui-checkbox-label {
+.dbv-kit-checkbox-label {
   display: inline-flex;
   align-items: center;
   gap: var(--checkbox-gap);

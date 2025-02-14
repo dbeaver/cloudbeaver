@@ -7,7 +7,7 @@
  */
 
 @layer components {
-  .dbv-ui-button {
+  .dbv-kit-button {
     display: inline-flex;
     text-align: center;
     text-decoration: none;
@@ -29,33 +29,33 @@
     }
   }
 
-  .dbv-ui-button--small {
+  .dbv-kit-button--small {
     padding-inline: calc(var(--btn-padding-inline) * 0.5);
     padding-block: calc(var(--btn-padding-block) * 0.5);
     font-size: calc(var(--btn-font-size) * 0.875);
     height: var(--control-height-small);
   }
 
-  .dbv-ui-button--medium {
+  .dbv-kit-button--medium {
     height: var(--control-height-medium);
     font-size: var(--btn-font-size);
   }
 
-  .dbv-ui-button--large {
+  .dbv-kit-button--large {
     padding-inline: calc(var(--btn-padding-inline) * 1.25);
     padding-block: calc(var(--btn-padding-block) * 1.25);
     font-size: calc(var(--btn-font-size) * 1.125);
     height: var(--control-height-large);
   }
 
-  .dbv-ui-button--xlarge {
+  .dbv-kit-button--xlarge {
     padding-inline: calc(var(--btn-padding-inline) * 1.5);
     padding-block: calc(var(--btn-padding-block) * 1.5);
     font-size: calc(var(--btn-font-size) * 1.25);
     height: var(--control-height-xlarge);
   }
 
-  .dbv-ui-button--primary {
+  .dbv-kit-button--primary {
     --btn-loader-color: color-mix(in srgb, var(--btn-background) 65%, var(--color-white));
     --btn-loader-background: color-mix(in srgb, var(--btn-foreground) 85%, transparent);
 
@@ -69,12 +69,12 @@
     }
   }
 
-  .dbv-ui-button--primary:active,
-  .dbv-ui-button--primary[data-active] {
+  .dbv-kit-button--primary:active,
+  .dbv-kit-button--primary[data-active] {
     background-color: var(--btn-background-active);
   }
 
-  .dbv-ui-button--secondary {
+  .dbv-kit-button--secondary {
     --btn-loader-color: color-mix(in srgb, var(--btn-secondary-foreground) 75%, var(--color-gray-600));
     --btn-loader-background: color-mix(in srgb, var(--color-white) 75%, transparent);
 
@@ -94,7 +94,7 @@
     }
   }
 
-  .dbv-ui-button--danger {
+  .dbv-kit-button--danger {
     --btn-loader-color: color-mix(in srgb, var(--btn-danger-background) 65%, var(--color-white));
     --btn-loader-background: color-mix(in srgb, var(--btn-danger-foreground) 85%, transparent);
 
@@ -111,7 +111,7 @@
     }
   }
 
-  .dbv-ui-button-loader {
+  .dbv-kit-button-loader {
     position: absolute;
     top: 0;
     left: 0;
@@ -125,7 +125,7 @@
     pointer-events: none;
   }
 
-  .dbv-ui-button-loader::after {
+  .dbv-kit-button-loader::after {
     --loader-width: calc(var(--btn-font-size) * 0.2);
     content: '';
     border: var(--loader-width) solid var(--btn-loader-background);
@@ -146,7 +146,7 @@
     }
   }
 
-  .dbv-ui-button-icon {
+  .dbv-kit-button-icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -154,11 +154,11 @@
     fill: currentColor;
   }
 
-  .dbv-ui-button-icon--left {
+  .dbv-kit-button-icon--left {
     margin-inline-start: calc(var(--btn-padding-inline) / 4 * -1);
   }
 
-  .dbv-ui-button-icon--right {
+  .dbv-kit-button-icon--right {
     margin-inline-end: calc(var(--btn-padding-inline) / 4 * -1);
   }
 }
