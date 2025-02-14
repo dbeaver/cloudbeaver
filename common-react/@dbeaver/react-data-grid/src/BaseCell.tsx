@@ -1,7 +1,8 @@
-import { use } from 'react';
+import { use, useMemo } from 'react';
 import { Cell, type CellRendererProps } from 'react-data-grid';
 import { DataGridCellContext } from './DataGridCellContext.js';
 import { createCellMouseEvent } from './eventUtils.js';
+import { DataGridCellInnerContext, type IDataGridCellInnerContext } from './DataGridCellInnerContext.js';
 
 export const BaseCell = function BaseCell<TRow, TSummaryRow>(props: CellRendererProps<TRow, TSummaryRow>) {
   const cellContext = use(DataGridCellContext);
@@ -52,7 +53,7 @@ export const BaseCell = function BaseCell<TRow, TSummaryRow>(props: CellRenderer
   const cellElement = cellContext?.getCellElement?.(
     props.rowIdx,
     props.column.idx,
-    { ...props, onClick: handleClick, onDoubleClick: handleDoubleClick, onContextMenu: handleContextMenu },
+    { ...props, isFocused: props.isCellSelected, onClick: handleClick, onDoubleClick: handleDoubleClick, onContextMenu: handleContextMenu },
     ({ onClick, onDoubleClick, onContextMenu, ...rest }) => {
       return (
         <Cell
@@ -62,9 +63,12 @@ export const BaseCell = function BaseCell<TRow, TSummaryRow>(props: CellRenderer
           onDoubleClick={(_, event) => onDoubleClick?.(event)}
           onContextMenu={(_, event) => onContextMenu?.(event)}
           {...rest}
+          isCellSelected={props.isCellSelected || rest.isFocused || false}
         />
       );
     },
   );
-  return cellElement ?? <Cell title={tooltip} {...props} />;
+
+  const innerCellContext = useMemo<IDataGridCellInnerContext>(() => ({ isFocused: props.isCellSelected }), [props.isCellSelected]);
+  return <DataGridCellInnerContext value={innerCellContext}>{cellElement ?? <Cell title={tooltip} {...props} />}</DataGridCellInnerContext>;
 };
