@@ -6,6 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+@import './_base.css';
+@import './_sizes.css';
+@import './_variants.css';
+
 @layer components {
   .dbv-kit-button {
     display: inline-flex;
@@ -14,7 +18,6 @@
     cursor: pointer;
     user-select: none;
     position: relative;
-    gap: calc(var(--btn-padding-inline) / 4);
     align-items: center;
 
     border-radius: var(--btn-radius);
@@ -30,29 +33,35 @@
   }
 
   .dbv-kit-button--small {
-    padding-inline: calc(var(--btn-padding-inline) * 0.5);
-    padding-block: calc(var(--btn-padding-block) * 0.5);
-    font-size: calc(var(--btn-font-size) * 0.875);
-    height: var(--control-height-small);
+    padding-inline: var(--btn-small-padding-inline);
+    padding-block: var(--btn-small-padding-block);
+    font-size: var(--btn-small-font-size);
+    height: var(--btn-small-height);
+    gap: var(--btn-small-gap);
   }
 
   .dbv-kit-button--medium {
-    height: var(--control-height-medium);
-    font-size: var(--btn-font-size);
+    padding-inline: var(--btn-medium-padding-inline);
+    padding-block: var(--btn-medium-padding-block);
+    font-size: var(--btn-medium-font-size);
+    height: var(--btn-medium-height);
+    gap: var(--btn-medium-gap);
   }
 
   .dbv-kit-button--large {
-    padding-inline: calc(var(--btn-padding-inline) * 1.25);
-    padding-block: calc(var(--btn-padding-block) * 1.25);
-    font-size: calc(var(--btn-font-size) * 1.125);
-    height: var(--control-height-large);
+    padding-inline: var(--btn-large-padding-inline);
+    padding-block: var(--btn-large-padding-block);
+    font-size: var(--btn-large-font-size);
+    height: var(--btn-large-height);
+    gap: var(--btn-large-gap);
   }
 
   .dbv-kit-button--xlarge {
-    padding-inline: calc(var(--btn-padding-inline) * 1.5);
-    padding-block: calc(var(--btn-padding-block) * 1.5);
-    font-size: calc(var(--btn-font-size) * 1.25);
-    height: var(--control-height-xlarge);
+    padding-inline: var(--btn-xlarge-padding-inline);
+    padding-block: var(--btn-xlarge-padding-block);
+    font-size: var(--btn-xlarge-font-size);
+    height: var(--btn-xlarge-height);
+    gap: var(--btn-xlarge-gap);
   }
 
   .dbv-kit-button--primary {

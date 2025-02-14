@@ -61,20 +61,20 @@ export const All = () => (
         Small
       </Button>
       <Button size="medium">Medium</Button>
-      <Button size="large">Large</Button>
-      <Button size="xlarge">XLarge</Button>
+      <Button size="large">Large button</Button>
+      <Button size="xlarge">EXTRA Large button</Button>
     </div>
     <h3 className="text-lg my-2">Icons</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
-      <Button>
+      <Button size="large">
         <Button.Icon placement="start">🎾</Button.Icon>
         Tennis
       </Button>
-      <Button>
+      <Button size="small">
         Love
         <Button.Icon placement="end">❤️</Button.Icon>
       </Button>
-      <Button>
+      <Button size="xlarge">
         <Button.Icon placement="start">🎾</Button.Icon>
         Tennis is Love
         <Button.Icon placement="end">❤️</Button.Icon>
