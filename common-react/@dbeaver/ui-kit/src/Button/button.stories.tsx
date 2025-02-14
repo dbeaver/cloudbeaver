@@ -67,17 +67,17 @@ export const All = () => (
     <h3 className="text-lg my-2">Icons</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
       <Button>
-        <Button.Icon position="left">🎾</Button.Icon>
+        <Button.Icon placement="start">🎾</Button.Icon>
         Tennis
       </Button>
       <Button>
         Love
-        <Button.Icon position="right">❤️</Button.Icon>
+        <Button.Icon placement="end">❤️</Button.Icon>
       </Button>
       <Button>
-        <Button.Icon position="left">🎾</Button.Icon>
+        <Button.Icon placement="start">🎾</Button.Icon>
         Tennis is Love
-        <Button.Icon position="right">❤️</Button.Icon>
+        <Button.Icon placement="end">❤️</Button.Icon>
       </Button>
       <Button className="text-lime-300">
         Have you seen
@@ -100,7 +100,7 @@ export const All = () => (
     </div>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
       <Button loading>
-        <Button.Icon className="w-8 h-4" position="left">
+        <Button.Icon className="w-8 h-4" placement="start">
           <svg width="16" height="16" fill="none">
             <g strokeWidth="0"></g>
             <g strokeLinecap="round" strokeLinejoin="round"></g>
@@ -117,15 +117,15 @@ export const All = () => (
         UFO
       </Button>
       <Button variant="secondary" loading>
-        <Button.Icon position="left">🎾</Button.Icon>
+        <Button.Icon placement="start">🎾</Button.Icon>
         Tennis
       </Button>
       <Button disabled>
-        <Button.Icon position="left">🎾</Button.Icon>
+        <Button.Icon placement="start">🎾</Button.Icon>
         Tennis
       </Button>
       <Button variant="danger">
-        <Button.Icon position="left">🎾</Button.Icon>
+        <Button.Icon placement="start">🎾</Button.Icon>
         Tennis
       </Button>
       <Button>

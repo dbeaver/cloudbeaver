@@ -154,11 +154,11 @@
     fill: currentColor;
   }
 
-  .dbv-kit-button-icon--left {
+  .dbv-kit-button-icon--start {
     margin-inline-start: calc(var(--btn-padding-inline) / 4 * -1);
   }
 
-  .dbv-kit-button-icon--right {
+  .dbv-kit-button-icon--end {
     margin-inline-end: calc(var(--btn-padding-inline) / 4 * -1);
   }
 }

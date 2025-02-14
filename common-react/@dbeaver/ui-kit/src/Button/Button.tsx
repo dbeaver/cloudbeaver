@@ -26,10 +26,11 @@ export function Button({ className, variant = 'primary', size = 'medium', loadin
 }
 
 export interface ButtonIconProps extends React.HTMLAttributes<HTMLSpanElement> {
-  position?: 'left' | 'right';
+  /* This property is needed to adjust icon placement inside a button. The icon with placement="start" will cut the inline-start padding. placement="end" will affect the padding-inline-end accordingly. This property supports RTL and LTR, so you don't need to think about it. */
+  placement?: 'start' | 'end';
 }
 
-Button.Icon = function ButtonIcon({ className, children, position }: ButtonIconProps) {
-  const classToApply = `dbv-kit-button-icon` + (position ? ` dbv-kit-button-icon--${position}` : '') + (className ? ` ${className}` : '');
+Button.Icon = function ButtonIcon({ className, children, placement }: ButtonIconProps) {
+  const classToApply = `dbv-kit-button-icon` + (placement ? ` dbv-kit-button-icon--${placement}` : '') + (className ? ` ${className}` : '');
   return <span className={classToApply}>{children}</span>;
 };
