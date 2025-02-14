@@ -59,7 +59,7 @@ export const ExportNotification = observer<Props>(function ExportNotification({ 
               <Button type="button" mod={['outlined']} onClick={state.delete}>
                 {translate('ui_processing_cancel')}
               </Button>
-              <Button render={<a />} href={state.downloadUrl} mod={['unelevated']} download onClick={state.download}>
+              <Button tag="a" href={state.downloadUrl} mod={['unelevated']} download onClick={state.download}>
                 {translate('data_transfer_notification_download')}
               </Button>
             </>

@@ -5,9 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { createElement } from 'react';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { Button as UIKitButton, type UiKitButtonProps } from '@dbeaver/ui-kit';
+import { Button as UIKitButton } from '@dbeaver/ui-kit';
 
 import style from './Button.module.css';
 import { IconOrImage } from './IconOrImage.js';
@@ -26,7 +27,7 @@ export type ButtonProps = (React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAn
   icon?: string;
   viewBox?: string;
   mod?: ButtonMod;
-  render?: UiKitButtonProps['render'];
+  tag?: 'button' | 'a' | 'div';
   href?: string;
   target?: '_blank' | '_self' | '_parent' | '_top';
   loader?: boolean;
@@ -39,7 +40,7 @@ export const Button = observer<ButtonProps>(function Button({
   icon,
   viewBox,
   mod,
-  render,
+  tag = 'button',
   type = 'button',
   disabled = false,
   loading,
@@ -79,10 +80,11 @@ export const Button = observer<ButtonProps>(function Button({
     disabled = true;
   }
 
+  const Tag = createElement(tag);
   return (
     <UIKitButton
+      render={Tag}
       {...rest}
-      render={render}
       type={type}
       disabled={disabled}
       className={s(

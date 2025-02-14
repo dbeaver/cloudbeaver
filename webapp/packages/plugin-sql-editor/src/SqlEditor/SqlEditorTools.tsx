@@ -80,7 +80,7 @@ export const SqlEditorTools = observer<Props>(function SqlEditorTools({ data, st
               reset
               onChange={handleScriptUpload}
             >
-              <ActionIconButton render={<div />} name="/icons/import.svg" disabled={data.readonly} img />
+              <ActionIconButton tag="div" name="/icons/import.svg" disabled={data.readonly} img />
             </UploadArea>
           )}
         </>

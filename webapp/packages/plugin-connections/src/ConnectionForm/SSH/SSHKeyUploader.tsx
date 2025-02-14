@@ -52,7 +52,7 @@ export const SSHKeyUploader = observer<Props>(function SSHKeyUploader({ state, s
       </Textarea>
       <GroupItem>
         <UploadArea disabled={disabled || readonly} reset onChange={handleKeyUpload}>
-          <Button render={<div />} disabled={disabled || readonly} mod={['outlined']}>
+          <Button tag="div" disabled={disabled || readonly} mod={['outlined']}>
             {translate('ui_file')}
           </Button>
         </UploadArea>
