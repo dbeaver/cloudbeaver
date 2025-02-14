@@ -68,7 +68,7 @@ export const TransactionLogTable = observer<Props>(function TransactionLogTable(
       case 2:
         return QUERY_COLUMN_WIDTH;
       default:
-        return null;
+        return 'auto';
     }
   }
 
