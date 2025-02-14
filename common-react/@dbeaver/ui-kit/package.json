@@ -15,18 +15,18 @@
   "packageManager": "yarn@4.6.0",
   "devDependencies": {
     "@dbeaver/tsconfig": "workspace:^",
+    "@tailwindcss/vite": "^4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@wroud/vite-plugin-asset-resolver": "^0",
     "rimraf": "^6",
     "typescript": "^5"
   },
   "dependencies": {
-    "@ariakit/react": "^0.4.15",
-    "@ladle/react": "^5.0.1",
-    "@tailwindcss/vite": "^4.0.3",
-    "@wroud/vite-plugin-asset-resolver": "^0.1.5",
+    "@ariakit/react": "^0",
+    "@ladle/react": "^5",
     "react": "^19",
     "react-dom": "^19",
-    "tailwindcss": "^4.0.3"
+    "tailwindcss": "^4"
   }
 }
