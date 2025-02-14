@@ -251,7 +251,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     },
   );
 
-  let currentTabInfo: ITabInfo<T, never> | undefined;
+  let currentTabInfo: ITabInfo<T, unknown> | undefined;
   if (container) {
     if (state.selectedId) {
       currentTabInfo = value.getTabInfo(state.selectedId);
@@ -260,8 +260,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
 
   useAutoLoad(
     TabsState,
-    container
-      ?.getDisplayed(props)
+    container?.tabInfoList
       .map(tab => tab.getLoader?.(context, props))
       .filter(isDefined)
       .flat() || [],

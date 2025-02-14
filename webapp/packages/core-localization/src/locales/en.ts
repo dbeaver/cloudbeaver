@@ -138,6 +138,10 @@ export default [
   ['ui_you', 'You'],
   ['ui_ms', 'ms'],
   ['ui_not_found', 'Not found'],
+  ['ui_connection', 'Connection'],
+  ['ui_catalog', 'Catalog'],
+  ['ui_schema', 'Schema'],
+  ['ui_project', 'Project'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],

@@ -76,6 +76,7 @@ export interface INodeNavigationContext {
   name?: string;
   icon?: string;
   canOpen: boolean;
+  features: string[];
 
   markOpen(): void;
   getParents: () => string[];
@@ -328,12 +329,14 @@ export class NavNodeManagerService extends Bootstrap {
     let name: string | undefined;
     let icon: string | undefined;
     let canOpen = false;
+    let features: string[] | undefined;
 
     const node = this.getNode(nodeId);
     if (node) {
       name = node.name;
       icon = node.icon;
       projectId ||= node.projectId;
+      features = node.features;
 
       if (NodeManagerUtils.isDatabaseObject(nodeId)) {
         if (node.folder) {
@@ -385,6 +388,7 @@ export class NavNodeManagerService extends Bootstrap {
       folderId,
       name,
       icon,
+      features: features ?? [],
 
       markOpen,
       getParents,

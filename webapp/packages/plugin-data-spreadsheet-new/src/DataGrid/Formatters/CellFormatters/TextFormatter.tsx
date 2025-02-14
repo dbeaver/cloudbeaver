@@ -8,18 +8,16 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useEffect, useRef } from 'react';
 
-import { getComputed, IconOrImage, importLazyComponent, Loader, s, useS } from '@cloudbeaver/core-blocks';
+import { getComputed, IconOrImage, Loader, s, useS } from '@cloudbeaver/core-blocks';
 import { isValidUrl } from '@cloudbeaver/core-utils';
 import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
 import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { EditingContext } from '../../../Editing/EditingContext.js';
-import type { IEditorRef } from '../../CellEditor.js';
+import { CellEditor, type IEditorRef } from '../../CellEditor.js';
 import { CellContext } from '../../CellRenderer/CellContext.js';
 import { TableDataContext } from '../../TableDataContext.js';
 import styles from './TextFormatter.module.css';
-
-const CellEditor = importLazyComponent(() => import('../../CellEditor.js').then(module => module.CellEditor));
 
 export const TextFormatter = observer<RenderCellProps<IResultSetRowKey>>(function TextFormatter({ row, column }) {
   const editorRef = useRef<IEditorRef>(null);

@@ -571,6 +571,10 @@ export function useElementsTree(options: IOptions): IElementsTree {
         }
       },
       async show(nodeId: string, path: string[]): Promise<void> {
+        if (!path.includes(this.baseRoot)) {
+          return;
+        }
+
         const preloaded = await this.loadPath(path, nodeId);
 
         if (preloaded !== nodeId) {

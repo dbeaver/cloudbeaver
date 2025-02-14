@@ -1,0 +1,45 @@
+{
+  "name": "@cloudbeaver/plugin-system-information-administration",
+  "type": "module",
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rimraf --glob dist",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "test": "core-cli-test",
+    "validate-dependencies": "core-cli-validate-dependencies"
+  },
+  "dependencies": {
+    "@cloudbeaver/core-administration": "workspace:*",
+    "@cloudbeaver/core-blocks": "workspace:*",
+    "@cloudbeaver/core-di": "workspace:*",
+    "@cloudbeaver/core-localization": "workspace:*",
+    "@cloudbeaver/core-resource": "workspace:*",
+    "@cloudbeaver/core-root": "workspace:*",
+    "@cloudbeaver/core-sdk": "workspace:*",
+    "@cloudbeaver/core-ui": "workspace:*",
+    "@cloudbeaver/plugin-product-information-administration": "workspace:*",
+    "mobx": "^6",
+    "mobx-react-lite": "^4",
+    "react": "^19",
+    "react-dom": "^19",
+    "tslib": "^2"
+  },
+  "devDependencies": {
+    "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/tsconfig": "workspace:*",
+    "@types/react": "^19",
+    "typescript": "^5",
+    "typescript-plugin-css-modules": "^5"
+  }
+}

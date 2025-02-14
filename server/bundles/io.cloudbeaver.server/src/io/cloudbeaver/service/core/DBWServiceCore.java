@@ -41,6 +41,12 @@ public interface DBWServiceCore extends DBWService {
     @WebAction(authRequired = false, initializationRequired = false)
     WebServerConfig getServerConfig() throws DBWebException;
 
+    /**
+     * Returns information of system.
+     */
+    @WebAction(authRequired = false)
+    WebPropertyInfo[] getSystemInformationProperties(@NotNull WebSession webSession);
+
     @WebAction(authRequired = false)
     WebProductSettings getProductSettings(@NotNull WebSession webSession);
 

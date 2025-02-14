@@ -17,7 +17,7 @@ export interface IComplexLoaderData<T> {
 
 export interface ComplexLoaderProps<T> {
   loader: IComplexLoaderData<T>;
-  children: (content: T) => JSX.Element;
+  children: (content: T) => React.JSX.Element;
 }
 
 export function useComplexLoader<T>(loader: IComplexLoaderData<T>): T {

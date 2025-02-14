@@ -11,9 +11,6 @@
       "path": "../core-cli"
     },
     {
-      "path": "../core-client-activity"
-    },
-    {
       "path": "../core-di"
     },
     {
@@ -23,9 +20,6 @@
       "path": "../core-localization"
     },
     {
-      "path": "../core-root"
-    },
-    {
       "path": "../core-sdk"
     },
     {
@@ -33,9 +27,6 @@
     },
     {
       "path": "../core-utils"
-    },
-    {
-      "path": "../tests-runner"
     }
   ],
   "include": [

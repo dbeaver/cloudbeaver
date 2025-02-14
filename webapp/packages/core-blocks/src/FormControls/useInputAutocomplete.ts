@@ -46,7 +46,7 @@ const SEARCH_FIELDS: Array<keyof InputAutocompleteProposal> = ['displayString', 
 const CONTEXT_INPUT_OFFSET_Y = 3;
 
 export const useInputAutocomplete = (
-  inputRef: RefObject<HTMLInputElement | HTMLTextAreaElement>,
+  inputRef: RefObject<HTMLInputElement | HTMLTextAreaElement | null>,
   { sourceHints, separator = DEFAULT_SEPARATOR, matchStrategy = 'contains', predicate }: InputAutocompleteOptions,
 ): Readonly<State> => {
   const search = useSearch({
@@ -55,7 +55,7 @@ export const useInputAutocomplete = (
     matchStrategy,
     predicate,
   });
-  const menuRef = useRef<IMenuState>();
+  const menuRef = useRef<IMenuState>(null);
   const state = useObservableRef(
     () => ({
       position: { x: 0, y: 0 } as IContextMenuPositionCoords,

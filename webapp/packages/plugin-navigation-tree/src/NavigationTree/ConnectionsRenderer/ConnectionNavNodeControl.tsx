@@ -59,6 +59,8 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
       treeNodeContext.select();
     }
 
+    const temporary = node.objectFeatures.includes(EObjectFeature.dataSourceTemporary);
+
     return (
       <TreeNodeControl
         ref={ref}
@@ -70,7 +72,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
         <TreeNodeIcon>
           <ConnectionImageWithMask icon={icon} connected={connected} maskId="tree-node-icon" />
         </TreeNodeIcon>
-        <TreeNodeName title={title} className={s(styles, { treeNodeName: true })}>
+        <TreeNodeName title={title} className={s(styles, { treeNodeName: true, temporary })}>
           <Loader suspense inline fullSize>
             <div className={s(styles, { nameBox: true })}>{name}</div>
           </Loader>

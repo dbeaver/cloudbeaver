@@ -185,6 +185,9 @@
       "path": "../plugin-sso"
     },
     {
+      "path": "../plugin-system-information-administration"
+    },
+    {
       "path": "../plugin-task-manager"
     },
     {
