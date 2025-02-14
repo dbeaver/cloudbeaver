@@ -8,7 +8,7 @@
 import { Button as AriaButton, type ButtonProps } from '@ariakit/react';
 import './Button.css';
 
-export interface UiKitButtonProps extends ButtonProps {
+export interface UiKitButtonProps extends Omit<ButtonProps, 'clickOnEnter' | 'clickOnSpace'> {
   variant?: 'primary' | 'secondary' | 'danger';
   size?: 'small' | 'medium' | 'large' | 'xlarge';
   loading?: boolean;

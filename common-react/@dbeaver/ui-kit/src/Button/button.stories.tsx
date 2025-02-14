@@ -144,6 +144,16 @@ export const All = () => (
         Paragraph
       </Button>
     </div>
+    <h3 className="text-lg my-2">Change on focus</h3>
+    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
+      <Button
+        onFocusVisible={e => (e.currentTarget.textContent = 'Click me!')}
+        render={<a href="http://localhost:61000/?story=button--all" />}
+        size="small"
+      >
+        Link button
+      </Button>
+    </div>
   </div>
 );
 
