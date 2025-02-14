@@ -134,7 +134,7 @@ export const All = () => (
     </div>
     <h3 className="text-lg my-2">Custom renders</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
-      <Button render={<a target="_blank" href="http://localhost:61000/?story=button--all" />} size="small">
+      <Button render={<a target="_blank" href="/" />} size="small">
         Link button
       </Button>
       <Button variant="secondary" render={<a />}>
@@ -146,11 +146,7 @@ export const All = () => (
     </div>
     <h3 className="text-lg my-2">Change on focus</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
-      <Button
-        onFocusVisible={e => (e.currentTarget.textContent = 'Click me!')}
-        render={<a href="http://localhost:61000/?story=button--all" />}
-        size="small"
-      >
+      <Button onFocusVisible={e => (e.currentTarget.textContent = 'Click me!')} render={<a href="/" />} size="small">
         Link button
       </Button>
     </div>
