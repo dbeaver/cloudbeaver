@@ -28,11 +28,13 @@
 
     &:disabled {
       cursor: not-allowed;
-      opacity: 0.5;
+      opacity: var(--btn-disabled-opacity);
     }
   }
 
   .dbv-kit-button--small {
+    --btn-icon-margin-inline: calc(var(--btn-small-padding-inline) * -0.25);
+
     padding-inline: var(--btn-small-padding-inline);
     padding-block: var(--btn-small-padding-block);
     font-size: var(--btn-small-font-size);
@@ -41,6 +43,8 @@
   }
 
   .dbv-kit-button--medium {
+    --btn-icon-margin-inline: calc(var(--btn-medium-padding-inline) * -0.25);
+
     padding-inline: var(--btn-medium-padding-inline);
     padding-block: var(--btn-medium-padding-block);
     font-size: var(--btn-medium-font-size);
@@ -49,6 +53,8 @@
   }
 
   .dbv-kit-button--large {
+    --btn-icon-margin-inline: calc(var(--btn-large-padding-inline) * -0.25);
+
     padding-inline: var(--btn-large-padding-inline);
     padding-block: var(--btn-large-padding-block);
     font-size: var(--btn-large-font-size);
@@ -57,6 +63,8 @@
   }
 
   .dbv-kit-button--xlarge {
+    --btn-icon-margin-inline: calc(var(--btn-xlarge-padding-inline) * -0.25);
+
     padding-inline: var(--btn-xlarge-padding-inline);
     padding-block: var(--btn-xlarge-padding-block);
     font-size: var(--btn-xlarge-font-size);
@@ -164,10 +172,10 @@
   }
 
   .dbv-kit-button-icon--start {
-    margin-inline-start: calc(var(--btn-padding-inline) / 4 * -1);
+    margin-inline-start: var(--btn-icon-margin-inline);
   }
 
   .dbv-kit-button-icon--end {
-    margin-inline-end: calc(var(--btn-padding-inline) / 4 * -1);
+    margin-inline-end: var(--btn-icon-margin-inline);
   }
 }

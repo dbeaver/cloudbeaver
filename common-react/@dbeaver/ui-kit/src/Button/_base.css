@@ -8,5 +8,6 @@
     --btn-gap: calc(var(--btn-padding-inline) / 4);
     --btn-font-weight: var(--font-weight-normal);
     --btn-font-size: calc(var(--font-size-base) * 0.875);
+    --btn-disabled-opacity: 0.5;
   }
 }
