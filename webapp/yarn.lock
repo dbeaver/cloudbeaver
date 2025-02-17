@@ -4055,6 +4055,32 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-system-information-administration@workspace:*, @cloudbeaver/plugin-system-information-administration@workspace:packages/plugin-system-information-administration":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-system-information-administration@workspace:packages/plugin-system-information-administration"
+  dependencies:
+    "@cloudbeaver/core-administration": "workspace:*"
+    "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-ui": "workspace:*"
+    "@cloudbeaver/plugin-product-information-administration": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@types/react": "npm:^19"
+    mobx: "npm:^6"
+    mobx-react-lite: "npm:^4"
+    react: "npm:^19"
+    react-dom: "npm:^19"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-task-manager@workspace:*, @cloudbeaver/plugin-task-manager@workspace:packages/plugin-task-manager":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-task-manager@workspace:packages/plugin-task-manager"
@@ -4344,6 +4370,7 @@ __metadata:
     "@cloudbeaver/plugin-sql-editor-screen": "workspace:*"
     "@cloudbeaver/plugin-sql-generator": "workspace:*"
     "@cloudbeaver/plugin-sso": "workspace:*"
+    "@cloudbeaver/plugin-system-information-administration": "workspace:*"
     "@cloudbeaver/plugin-task-manager": "workspace:*"
     "@cloudbeaver/plugin-theme": "workspace:*"
     "@cloudbeaver/plugin-tools-panel": "workspace:*"

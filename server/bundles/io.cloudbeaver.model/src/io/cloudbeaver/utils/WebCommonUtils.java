@@ -43,7 +43,7 @@ public class WebCommonUtils {
         PropertyCollector propertyCollector = new PropertyCollector(details, false);
         propertyCollector.collectProperties();
         return Arrays.stream(propertyCollector.getProperties())
-            .filter(p -> !(p instanceof ObjectPropertyDescriptor && ((ObjectPropertyDescriptor) p).isHidden()))
+            .filter(p -> !(p instanceof ObjectPropertyDescriptor objProp && objProp.isHidden()))
             .map(p -> new WebPropertyInfo(session, p, propertyCollector)).toArray(WebPropertyInfo[]::new);
     }
 
