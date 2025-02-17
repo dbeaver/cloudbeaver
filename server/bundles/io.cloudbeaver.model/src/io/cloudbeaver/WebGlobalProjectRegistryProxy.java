@@ -43,13 +43,17 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSourcePersistentRegistry, DBPDataSourceRegistryCache {
+/**
+ * Proxy for a global project data source registry.
+ * We need to filter some data sources in case of inaccessibility (not enough permissions).
+ */
+public class WebGlobalProjectRegistryProxy implements DBPDataSourceRegistry, DataSourcePersistentRegistry, DBPDataSourceRegistryCache {
     @NotNull
     private final DataSourceFilter dataSourceFilter;
     @NotNull
     private final DataSourceRegistry<?> dataSourceRegistry;
 
-    public WebDataSourceRegistryProxy(@NotNull DataSourceRegistry<?> dataSourceRegistry, @NotNull DataSourceFilter filter) {
+    public WebGlobalProjectRegistryProxy(@NotNull DataSourceRegistry<?> dataSourceRegistry, @NotNull DataSourceFilter filter) {
         this.dataSourceRegistry = dataSourceRegistry;
         this.dataSourceFilter = filter;
     }
