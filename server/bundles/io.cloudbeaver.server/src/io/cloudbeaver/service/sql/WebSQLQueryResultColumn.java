@@ -49,7 +49,7 @@ public class WebSQLQueryResultColumn {
 
     @Property
     public String getName() {
-        return attrMeta.getFullyQualifiedName(DBPEvaluationContext.UI);
+        return WebSQLUtils.getColumnName(attrMeta);
     }
 
     @Property
