@@ -20,6 +20,7 @@ package io.cloudbeaver.service.sql.impl;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.WebTransactionLogInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.WebServiceBindingBase;
@@ -42,7 +43,6 @@ import org.jkiss.dbeaver.model.exec.trace.DBCTraceProperty;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
-import io.cloudbeaver.model.WebTransactionLogInfo;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.*;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
@@ -293,6 +293,43 @@ public class WebServiceSQL implements DBWServiceSQL {
             throw new DBWebException("Invalid result ID " + resultId);
         }
         return true;
+    }
+
+    @NotNull
+    @Override
+    public WebAsyncTaskInfo asyncUpdateResultsDataBatch(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @Nullable List<WebSQLResultsRow> updatedRows,
+        @Nullable List<WebSQLResultsRow> deletedRows,
+        @Nullable List<WebSQLResultsRow> addedRows,
+        @Nullable WebDataFormat dataFormat
+    ) throws DBWebException {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
+            @Override
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
+                try {
+                    monitor.beginTask("Update result set data", 1);
+                    monitor.subTask("Update result set data from id " + resultsId);
+                    WebSQLExecuteInfo executeResults = updateResultsDataBatch(
+                        contextInfo,
+                        resultsId,
+                        updatedRows,
+                        deletedRows,
+                        addedRows,
+                        dataFormat
+                    );
+                    this.result = executeResults.getStatusMessage();
+                    this.extendedResults = executeResults;
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        return webSession.createAndRunAsyncTask("Updating result set data from " + resultsId, runnable);
     }
 
     @Override

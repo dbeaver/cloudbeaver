@@ -123,12 +123,27 @@ public interface DBWServiceSQL extends DBWService {
     Boolean closeResult(@NotNull WebSQLContextInfo sqlContext, @NotNull String resultId) throws DBWebException;
 
     @WebAction
+    @Deprecated // use async function
     WebSQLExecuteInfo updateResultsDataBatch(
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows, WebDataFormat dataFormat) throws DBWebException;
+
+    /**
+     * Creates async task for updating results data.
+     */
+    @WebAction
+    WebAsyncTaskInfo asyncUpdateResultsDataBatch(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @Nullable List<WebSQLResultsRow> updatedRows,
+        @Nullable List<WebSQLResultsRow> deletedRows,
+        @Nullable List<WebSQLResultsRow> addedRows,
+        @Nullable WebDataFormat dataFormat
+    ) throws DBWebException;
 
     @WebAction
     String readLobValue(
