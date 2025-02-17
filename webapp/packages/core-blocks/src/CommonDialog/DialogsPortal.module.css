@@ -19,7 +19,7 @@
   right: 0px;
   bottom: 0px;
   left: 0px;
-  z-index: 1000;
+  z-index: 999;
   display: flex;
   overflow: auto;
 }
