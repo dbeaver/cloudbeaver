@@ -181,7 +181,12 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
           <Group gap>
-            <Alert title={translate('core_connections_connection_driver_not_installed')} message={translate('plugin_connections_connection_driver_not_installed_message')} />
+            {isAdmin && !driver?.driverInstalled && (
+              <Alert
+                title={translate('core_connections_connection_driver_not_installed')}
+                message={translate('plugin_connections_connection_driver_not_installed_message')}
+              />
+            )}
             <Group form box gap>
               <Container wrap gap>
                 <Combobox
