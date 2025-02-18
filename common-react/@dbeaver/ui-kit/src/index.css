@@ -72,13 +72,5 @@
     --input-validation-warning-background: var(--color-warning-background);
     --input-validation-warning-foreground: var(--color-warning-text);
     --input-validation-warning-border: var(--color-warning-border);
-
-    /* Checkbox */
-    --checkbox-background: var(--color-primary-500);
-    --checkbox-foreground: var(--color-text);
-    --checkbox-border: var(--color-orange-500);
-    --checkbox-selectBackground: var(--color-orange-500);
-    --checkbox-selectBorder: var(--color-primary-500);
-    --checkbox-gap: --spacing(1);
   }
 }

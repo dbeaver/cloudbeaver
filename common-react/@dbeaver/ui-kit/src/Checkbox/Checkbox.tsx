@@ -7,14 +7,13 @@
  */
 
 import { Checkbox as AriaCheckbox, type CheckboxProps as AriaKitCheckboxProps } from '@ariakit/react';
-import './Checkbox.css';
 
 export interface CheckboxProps extends AriaKitCheckboxProps {}
 
-export function Checkbox({ className, children, disabled, ...props }: CheckboxProps) {
+export function Checkbox({ children, ...props }: CheckboxProps) {
   return (
     <label className="dbv-kit-checkbox-label">
-      <AriaCheckbox disabled={disabled} className={className ?? '' + ' ' + 'dbv-kit-checkbox'} {...props} />
+      <AriaCheckbox {...props} />
       {children}
     </label>
   );
