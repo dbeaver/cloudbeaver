@@ -7,7 +7,7 @@
  */
 
 import { use } from 'react';
-import classes from './TextEditor2.module.css';
+import classes from './TextEditor.module.css';
 import { DataGridCellContext } from '../DataGridCellContext.js';
 import { useGridReactiveValue } from '../useGridReactiveValue.js';
 
