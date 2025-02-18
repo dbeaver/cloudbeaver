@@ -13,7 +13,7 @@ export interface InputProps extends Omit<ComponentPropsWithRef<'input'>, 'size'>
   size?: 'small' | 'medium' | 'large' | 'xlarge';
 }
 
-export const Input: React.FC<InputProps> = function Input({ size, className ...props }) {
+export const Input: React.FC<InputProps> = function Input({ size, className, ...props }) {
   const classNameToApply =
     `dbv-kit-input dbv-kit-input__${size ?? 'medium'} ${className}`.trim();
   return (
