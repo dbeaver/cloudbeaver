@@ -26,13 +26,13 @@
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
+    "@tailwindcss/vite": "^4",
     "@types/fs-extra": "^11",
     "@types/node": "^20",
     "tslib": "^2",
     "typescript": "^5"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4",
     "@vitejs/plugin-react": "^4",
     "@wroud/vite-plugin-asset-resolver": "^0",
     "@wroud/vite-plugin-tsc": "^0",

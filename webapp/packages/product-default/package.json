@@ -33,7 +33,6 @@
     "react": "^19",
     "react-dom": "^19",
     "reflect-metadata": "^0",
-    "tailwindcss": "^4",
     "tslib": "^2",
     "vite": "^6"
   },
@@ -44,6 +43,7 @@
     "@cloudbeaver/browserslist-config": "workspace:*",
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
+    "tailwindcss": "^4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "concurrently": "^9",
