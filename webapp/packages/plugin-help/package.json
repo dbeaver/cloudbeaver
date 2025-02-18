@@ -36,7 +36,6 @@
     "@cloudbeaver/plugin-sql-editor": "workspace:*",
     "@cloudbeaver/plugin-sql-editor-navigation-tab-script": "workspace:*",
     "@cloudbeaver/plugin-top-app-bar": "workspace:*",
-    "@dbeaver/ui-kit": "workspace:*",
     "react": "^19",
     "tslib": "^2"
   },
