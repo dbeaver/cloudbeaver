@@ -5,14 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { reaction } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 import { type IScrollState, Link, s, useControlledScroll, useExecutor, useS, useTable, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
-import { DataGrid } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 
 import { getValue } from '../../helpers.js';
 import { ObjectPropertyTableFooter } from '../ObjectPropertyTableFooter.js';
@@ -43,15 +44,6 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
 
   const columns = baseObject[0]?.object?.properties ?? [];
 
-  const handleScroll = useCallback(
-    (event: React.UIEvent<HTMLDivElement>) => {
-      if (isAtBottom(event)) {
-        loadMore();
-      }
-    },
-    [loadMore],
-  );
-
   useExecutor({
     executor: navTreeResource.onItemDelete,
     handlers: [
@@ -61,9 +53,16 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
     ],
   });
 
-  if (objects.length === 0) {
-    return null;
-  }
+  const columnCount = useCreateGridReactiveValue(
+    () => columns.length + 1,
+    onValueChange => reaction(() => columns.length + 1, onValueChange),
+    [columns],
+  );
+  const rowCount = useCreateGridReactiveValue(
+    () => objects.length,
+    onValueChange => reaction(() => objects.length, onValueChange),
+    [objects],
+  );
 
   function getCell(rowIdx: number, colIdx: number) {
     colIdx--;
@@ -80,12 +79,23 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
 
     return value !== undefined ? getValue(value) : '';
   }
+  const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), [
+    objects,
+    tableState,
+  ]);
 
   function getCellTooltip(rowIdx: number, colIdx: number) {
-    const value = objects[rowIdx]?.object?.properties?.[colIdx--]?.value;
+    colIdx--;
+    const value = objects[rowIdx]?.object?.properties?.[colIdx]?.value;
 
     return value !== undefined ? getValue(value) : '';
   }
+
+  const cellTooltip = useCreateGridReactiveValue(
+    getCellTooltip,
+    (onValueChange, rowIdx, colIdx) => reaction(() => getCellTooltip(rowIdx, colIdx), onValueChange),
+    [objects],
+  );
 
   function getHeaderWidth(colIdx: number) {
     if (colIdx === 0) {
@@ -102,23 +112,31 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
     return columns[colIdx]?.displayName ?? '';
   }
 
+  const headerText = useCreateGridReactiveValue(getHeaderText, (onValueChange, colIdx) => reaction(() => getHeaderText(colIdx), onValueChange), [
+    columns,
+  ]);
+
   function getHeaderResizable(colIdx: number) {
     return colIdx !== 0;
+  }
+
+  if (objects.length === 0) {
+    return null;
   }
 
   return (
     <div ref={setTableContainerRef} className={s(styles, { container: true })}>
       <DataGrid
         className={s(styles, { dataGrid: true })}
-        getCell={getCell}
-        getCellTooltip={getCellTooltip}
+        cell={cell}
+        cellTooltip={cellTooltip}
         getHeaderWidth={getHeaderWidth}
         getHeaderResizable={getHeaderResizable}
-        getColumnCount={() => columns.length + 1}
-        getHeaderText={getHeaderText}
+        columnCount={columnCount}
+        headerText={headerText}
         getRowHeight={() => 40}
-        getRowCount={() => objects.length}
-        onScroll={handleScroll}
+        rowCount={rowCount}
+        onScrollToBottom={loadMore}
       />
       {hasNextPage && (
         <div className={s(styles, { info: true })}>
@@ -131,8 +149,3 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
     </div>
   );
 });
-
-function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
-  const target = event.target as HTMLDivElement;
-  return target.clientHeight + target.scrollTop + target.clientHeight * 0.3 > target.scrollHeight;
-}

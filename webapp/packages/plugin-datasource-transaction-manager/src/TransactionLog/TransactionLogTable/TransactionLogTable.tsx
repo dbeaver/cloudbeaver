@@ -5,11 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { reaction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { TransactionLogInfoItem } from '@cloudbeaver/core-sdk';
-import { DataGrid } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 
 import { QueryCell } from './QueryCell.js';
 import { TimeCell } from './TimeCell.js';
@@ -24,6 +25,13 @@ const QUERY_COLUMN_WIDTH = 250;
 export const TransactionLogTable = observer<Props>(function TransactionLogTable({ log }) {
   const styles = useS(classes);
   const translate = useTranslate();
+
+  const columnCount = useCreateGridReactiveValue(() => 6, null, []);
+  const rowCount = useCreateGridReactiveValue(
+    () => log.length,
+    onValueChange => reaction(() => log.length, onValueChange),
+    [log],
+  );
 
   function getCell(rowIdx: number, colIdx: number) {
     switch (colIdx) {
@@ -43,6 +51,7 @@ export const TransactionLogTable = observer<Props>(function TransactionLogTable(
 
     return '';
   }
+  const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), [log]);
 
   function getHeaderText(colIdx: number) {
     switch (colIdx) {
@@ -63,6 +72,8 @@ export const TransactionLogTable = observer<Props>(function TransactionLogTable(
     return '';
   }
 
+  const headerText = useCreateGridReactiveValue(getHeaderText, (onValueChange, colIdx) => reaction(() => getHeaderText(colIdx), onValueChange), []);
+
   function getHeaderWidth(colIdx: number) {
     switch (colIdx) {
       case 2:
@@ -75,12 +86,12 @@ export const TransactionLogTable = observer<Props>(function TransactionLogTable(
   return (
     <div className={s(styles, { container: true })}>
       <DataGrid
-        getCell={getCell}
+        cell={cell}
         getHeaderWidth={getHeaderWidth}
-        getColumnCount={() => 6}
-        getHeaderText={getHeaderText}
+        columnCount={columnCount}
+        headerText={headerText}
         getRowHeight={() => 30}
-        getRowCount={() => log.length}
+        rowCount={rowCount}
       />
     </div>
   );

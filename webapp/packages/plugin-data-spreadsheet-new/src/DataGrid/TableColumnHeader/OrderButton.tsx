@@ -7,8 +7,9 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ActionIconButton, s, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, useTranslate } from '@cloudbeaver/core-blocks';
 import { DatabaseDataConstraintAction, EOrder, getNextOrder, type IDatabaseDataModel, ResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
+import { clsx } from '@cloudbeaver/core-utils';
 
 interface Props {
   model: IDatabaseDataModel<ResultSetDataSource>;
@@ -48,7 +49,7 @@ export const OrderButton = observer<Props>(function OrderButton({ model, resultI
       name={icon}
       tabIndex={-1}
       viewBox="0 0 16 16"
-      className={s({}, {}, currentOrder === null && 'rdg-table-header__order-button_unordered', className)}
+      className={clsx(currentOrder === null && 'rdg-table-header__order-button_unordered', className)}
       disabled={disabled}
       onMouseDown={preventFocus}
       onClick={handleSort}

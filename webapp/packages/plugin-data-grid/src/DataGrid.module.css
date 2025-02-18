@@ -24,10 +24,6 @@
   :global(.rdg-cell) {
     outline: 0 !important;
 
-    /*&:last-child {
-      border-inline-end: none;
-    }*/
-
     &[aria-selected='true'] {
       box-shadow: inset 0 0 0 1px #808080;
     }

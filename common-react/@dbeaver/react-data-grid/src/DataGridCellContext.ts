@@ -1,4 +1,5 @@
 import { createContext } from 'react';
+import type { IGridReactiveValue } from './IGridReactiveValue.js';
 
 export interface IDataGridCellProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   isFocused: boolean;
@@ -9,10 +10,13 @@ export interface IDataGridCellRenderer {
 }
 
 export interface IDataGridCellContext {
-  getCellElement?: (rowIdx: number, colIdx: number, props: IDataGridCellProps, renderDefaultCell: IDataGridCellRenderer) => React.ReactNode;
-  getCell: (rowIdx: number, colIdx: number) => React.ReactNode;
-  getCellText?: (rowIdx: number, colIdx: number) => string;
-  getCellTooltip?: (rowIdx: number, colIdx: number) => string;
+  cellElement?: IGridReactiveValue<
+    React.ReactNode,
+    [rowIdx: number, colIdx: number, props: IDataGridCellProps, renderDefaultCell: IDataGridCellRenderer]
+  >;
+  cell?: IGridReactiveValue<React.ReactNode, [rowIdx: number, colIdx: number]>;
+  cellText?: IGridReactiveValue<string, [rowIdx: number, colIdx: number]>;
+  cellTooltip?: IGridReactiveValue<string, [rowIdx: number, colIdx: number]>;
   getCellEditable?: (rowIdx: number, colIdx: number) => boolean;
   onCellChange?: (rowIdx: number, colIdx: number, value: any) => void;
 }

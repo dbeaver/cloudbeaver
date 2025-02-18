@@ -7,15 +7,20 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
-import { observable, reaction, type IReactionDisposer } from 'mobx';
+import { reaction } from 'mobx';
 
-import { getComputed, s, TextPlaceholder, useObjectRef, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 // import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 // import { ClipboardService } from '@cloudbeaver/core-ui';
-import { throttle } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
-import { DataGrid, type DataGridRef, type ICellPosition, type IDataGridCellRenderer } from '@cloudbeaver/plugin-data-grid';
+import {
+  DataGrid,
+  useCreateGridReactiveValue,
+  type DataGridRef,
+  type ICellPosition,
+  type IDataGridCellRenderer,
+} from '@cloudbeaver/plugin-data-grid';
 import {
   DATA_CONTEXT_DV_PRESENTATION,
   type DatabaseDataSelectActionsData,
@@ -52,15 +57,18 @@ interface IInnerState {
   lastScrollTop: number;
 }
 
-function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
-  const { clientHeight, scrollTop, scrollHeight } = event.target as HTMLDivElement;
-  return clientHeight + scrollTop + 100 > scrollHeight;
-}
-
 const rowHeight = 24;
 const headerHeight = 32;
 
-export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({ model, actions, resultIndex, simple, className, ...rest }) {
+export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({
+  model,
+  actions,
+  resultIndex,
+  simple,
+  className,
+  dataFormat,
+  ...rest
+}) {
   const translate = useTranslate();
   const styles = useS(classes);
 
@@ -348,24 +356,14 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     }
   };
 
-  const handleScroll = useCallback(
-    throttle(async (event: React.UIEvent<HTMLDivElement>) => {
-      const scrollTop = (event.target as HTMLDivElement).scrollTop;
-      const toBottom = scrollTop > innerState.lastScrollTop;
+  const handleScrollToBottom = useCallback(async () => {
+    const result = model.source.getResult(resultIndex);
+    if (result?.loadedFully) {
+      return;
+    }
 
-      innerState.lastScrollTop = scrollTop;
-
-      if (toBottom && isAtBottom(event)) {
-        const result = model.source.getResult(resultIndex);
-        if (result?.loadedFully) {
-          return;
-        }
-
-        await model.requestDataPortion(0, model.countGain + model.source.count);
-      }
-    }, 200),
-    [model, resultIndex],
-  );
+    await model.requestDataPortion(0, model.countGain + model.source.count);
+  }, [model, resultIndex]);
 
   const gridContext = useMemo<IDataGridContext>(
     () => ({
@@ -380,41 +378,21 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     [model, actions, resultIndex, simple, dataGridRef, gridContainerRef, restoreFocus],
   );
 
-  const storeSync = useObservableRef(
-    () => ({
-      reactionDisposer: null as IReactionDisposer | null,
-      subscribeToStoreSync(onStoreChange: () => void) {
-        if (this.reactionDisposer) {
-          this.reactionDisposer?.();
-        }
-        this.reactionDisposer = reaction(
-          // sync mobx with plain react
-          () => [getComputed(() => this.tableData.columns.length), getComputed(() => this.tableData.rows.length)],
-          onStoreChange,
-          {
-            fireImmediately: false,
-          },
-        );
-
-        return () => {
-          this.reactionDisposer?.();
-        };
-      },
-    }),
-    {
-      tableData: observable.ref,
-    },
-    { tableData },
-    ['subscribeToStoreSync'],
+  const columnsCount = useCreateGridReactiveValue(
+    () => tableData.columns.length,
+    onValueChange => reaction(() => tableData.columns.length, onValueChange),
+    [tableData],
   );
-
-  if (!tableData.columns.length) {
-    return <TextPlaceholder>{translate('data_grid_table_empty_placeholder')}</TextPlaceholder>;
-  }
+  const rowsCount = useCreateGridReactiveValue(
+    () => tableData.rows.length,
+    onValueChange => reaction(() => tableData.rows.length, onValueChange),
+    [tableData],
+  );
 
   function getCell(rowIdx: number, colIdx: number) {
     return <CellFormatter rowIdx={rowIdx} colIdx={colIdx} />;
   }
+  const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), []);
 
   function getCellText(rowIdx: number, colIdx: number) {
     const row = tableData.rows[rowIdx];
@@ -426,6 +404,12 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
     return tableData.format.getText({ row, column });
   }
+
+  const cellText = useCreateGridReactiveValue(
+    getCellText,
+    (onValueChange, rowIdx, colIdx) => reaction(() => getCellText(rowIdx, colIdx), onValueChange),
+    [tableData],
+  );
 
   function getHeaderWidth(colIdx: number) {
     if (colIdx === 0) {
@@ -446,7 +430,11 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }
 
   function getHeaderElement(colIdx: number) {
-    const column = tableData.getColumn(colIdx)!;
+    const column = tableData.getColumn(colIdx);
+
+    if (!column) {
+      return null;
+    }
 
     if (tableData.isIndexColumn(column)) {
       return <TableIndexColumnHeader />;
@@ -455,9 +443,22 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return <TableColumnHeader colIdx={colIdx} />;
   }
 
+  const headerElement = useCreateGridReactiveValue(
+    getHeaderElement,
+    (onValueChange, colIdx) => reaction(() => getHeaderElement(colIdx), onValueChange),
+    [tableData],
+  );
+
   function getCellElement(rowIdx: number, colIdx: number, props: HTMLAttributes<HTMLDivElement>, renderDefaultCell: IDataGridCellRenderer) {
     return <CellRenderer rowIdx={rowIdx} colIdx={colIdx} props={props} renderDefaultCell={renderDefaultCell} />;
   }
+
+  const cellElement = useCreateGridReactiveValue(
+    getCellElement,
+    (onValueChange, rowIdx, colIdx, props, renderDefaultCell) =>
+      reaction(() => getCellElement(rowIdx, colIdx, props, renderDefaultCell), onValueChange),
+    [],
+  );
 
   function handleCellChange(rowIdx: number, colIdx: number, value: string) {
     const row = tableData.rows[rowIdx];
@@ -512,6 +513,10 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return `_${String(colIdx)}`;
   }
 
+  if (!tableData.columns.length) {
+    return <TextPlaceholder>{translate('data_grid_table_empty_placeholder')}</TextPlaceholder>;
+  }
+
   return (
     <DataGridContext.Provider value={gridContext}>
       <DataGridSelectionContext.Provider value={gridSelectionContext}>
@@ -528,23 +533,22 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
             <DataGrid
               ref={dataGridRef}
               className={s(styles, { grid: true }, className)}
-              getCell={getCell}
-              getCellText={getCellText}
-              getCellElement={getCellElement}
+              cell={cell}
+              cellText={cellText}
+              cellElement={cellElement}
               getCellEditable={isCellEditable}
-              getHeaderElement={getHeaderElement}
+              headerElement={headerElement}
               getHeaderHeight={() => headerHeight}
               getHeaderWidth={getHeaderWidth}
               getHeaderPinned={getHeaderPinned}
               getHeaderResizable={getHeaderResizable}
               getRowHeight={() => rowHeight}
               getColumnKey={getColumnKey}
-              getColumnCount={() => tableData.columns.length}
-              getRowCount={() => tableData.rows.length}
+              columnCount={columnsCount}
+              rowCount={rowsCount}
               getRowId={rowIdx => (tableData.rows[rowIdx] ? ResultSetDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
-              subscribeToStore={storeSync.subscribeToStoreSync}
               onFocus={handleFocusChange}
-              onScroll={handleScroll}
+              onScrollToBottom={handleScrollToBottom}
               onCellChange={handleCellChange}
             />
           </div>

@@ -5,10 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { reaction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
 import { s, TextPlaceholder, useAutoLoad, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { DataGrid } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
 import { type DataPresentationComponent, type IDatabaseDataOptions, isResultSetDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 import classes from './DVResultTraceDetailsPresentation.module.css';
@@ -28,9 +29,12 @@ export const DVResultTraceDetailsPresentation: DataPresentationComponent = obser
   useAutoLoad(DVResultTraceDetailsPresentation, state, undefined, undefined, true);
   const trace = state.trace;
 
-  if (!trace?.length) {
-    return <TextPlaceholder>{translate('plugin_data_viewer_result_trace_no_data_placeholder')}</TextPlaceholder>;
-  }
+  const columnsCount = useCreateGridReactiveValue(() => 3, null, []);
+  const rowCount = useCreateGridReactiveValue(
+    () => trace?.length || 0,
+    onValueChange => reaction(() => trace?.length || 0, onValueChange),
+    [trace],
+  );
 
   function getCell(rowIdx: number, colIdx: number) {
     switch (colIdx) {
@@ -45,6 +49,10 @@ export const DVResultTraceDetailsPresentation: DataPresentationComponent = obser
     return '';
   }
 
+  const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), [
+    trace,
+  ]);
+
   function getHeaderText(colIdx: number) {
     switch (colIdx) {
       case 0:
@@ -58,9 +66,15 @@ export const DVResultTraceDetailsPresentation: DataPresentationComponent = obser
     return '';
   }
 
+  const headerText = useCreateGridReactiveValue(getHeaderText, (onValueChange, colIdx) => reaction(() => getHeaderText(colIdx), onValueChange), []);
+
+  if (!trace?.length) {
+    return <TextPlaceholder>{translate('plugin_data_viewer_result_trace_no_data_placeholder')}</TextPlaceholder>;
+  }
+
   return (
     <div className={s(styles, { container: true })}>
-      <DataGrid getCell={getCell} getColumnCount={() => 3} getHeaderText={getHeaderText} getRowHeight={() => 30} getRowCount={() => trace.length} />
+      <DataGrid cell={cell} columnCount={columnsCount} headerText={headerText} getRowHeight={() => 30} rowCount={rowCount} />
     </div>
   );
 });

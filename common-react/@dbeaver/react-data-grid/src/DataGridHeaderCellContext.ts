@@ -1,9 +1,9 @@
 import { createContext } from 'react';
+import type { IGridReactiveValue } from './IGridReactiveValue.js';
 
 export interface IDataGridHeaderCellContext {
-  getHeaderElement?: (colIdx: number) => React.ReactNode;
-  getHeaderText?: (colIdx: number) => string;
-  getHeaderTooltip?: (colIdx: number) => string;
+  headerElement?: IGridReactiveValue<React.ReactNode, [colIdx: number]>;
+  headerText?: IGridReactiveValue<string, [colIdx: number]>;
   getHeaderWidth?: (colIdx: number) => number | string | null;
   getHeaderResizable?: (colIdx: number) => boolean;
   getHeaderHeight?: () => number;

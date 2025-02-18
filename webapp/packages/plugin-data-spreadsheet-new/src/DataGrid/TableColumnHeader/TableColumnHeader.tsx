@@ -75,8 +75,6 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
     dataGridContext.focus();
   }
 
-  const hasIcon = icon;
-
   return (
     <div
       ref={dnd.setRef}
@@ -88,7 +86,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
       {dataReadonly && colIdx === 0 && (
         <div className={s(styles, { readonlyStatus: true, independent: true }, 'rdg-table-header__readonly-status')} />
       )}
-      {hasIcon && (
+      {icon && (
         <div className={s(styles, { icon: true })}>
           {icon && <StaticImage icon={icon} className={s(styles, { staticImage: true })} />}
           {columnReadOnly && !dataReadonly && <div className={s(styles, { readonlyStatus: true }, 'rdg-table-header__readonly-status')} />}

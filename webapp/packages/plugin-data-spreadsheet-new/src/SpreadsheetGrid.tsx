@@ -7,8 +7,8 @@
  */
 import type { IDataPresentationProps } from '@cloudbeaver/plugin-data-viewer';
 
-import { DataGridLoader } from './DataGrid/DataGridLoader.js';
+import { DataGridTable } from './DataGrid/DataGridTableLoader.js';
 
 export const SpreadsheetGrid: React.FC<IDataPresentationProps> = function SpreadsheetGrid(props) {
-  return <DataGridLoader {...props} />;
+  return <DataGridTable {...props} />;
 };

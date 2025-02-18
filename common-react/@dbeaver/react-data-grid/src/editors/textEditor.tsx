@@ -7,8 +7,9 @@
  */
 
 import { use } from 'react';
-import classes from './textEditor.module.css';
+import classes from './TextEditor.module.css';
 import { DataGridCellContext } from '../DataGridCellContext.js';
+import { useGridReactiveValue } from '../useGridReactiveValue.js';
 
 function autoFocusAndSelect(input: HTMLInputElement | null) {
   input?.focus();
@@ -21,10 +22,10 @@ export interface IProps {
   onClose: () => void;
 }
 
-export default function textEditor({ rowIdx, colIdx, onClose }: IProps) {
+export function TextEditor({ rowIdx, colIdx, onClose }: IProps) {
   const cellContext = use(DataGridCellContext);
 
-  const value = cellContext?.getCellText?.(rowIdx, colIdx) ?? '';
+  const value = useGridReactiveValue(cellContext?.cellText, rowIdx, colIdx) ?? '';
 
   return (
     <input
