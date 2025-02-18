@@ -20,6 +20,8 @@
 
 .editor {
   composes: theme-border-color-background from global;
+}
+.specific.editor {
   position: relative;
   box-sizing: border-box;
   display: flex;
@@ -28,8 +30,8 @@
   border: solid 1px;
 }
 
-.editor:focus-within,
-.editorActive {
+.specific.editor:focus-within,
+.specific.editorActive {
   border-color: #52c41a !important;
 }
 
