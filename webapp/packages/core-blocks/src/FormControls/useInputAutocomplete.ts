@@ -61,7 +61,6 @@ export const useInputAutocomplete = (
       position: { x: 0, y: 0 } as IContextMenuPositionCoords,
       inputValue: '',
       isFound: false,
-      isTyped: false,
       selectionStart: 0 as number | null,
       replaceCurrentWord(replacement: string) {
         const cursorPosition = this.selectionStart;
@@ -101,7 +100,7 @@ export const useInputAutocomplete = (
         return substring.split(separator).at(-1) ?? '';
       },
       get proposals() {
-        if (this.isFound || !this.currentWord || !this.isTyped) {
+        if (this.isFound || !this.currentWord) {
           return [];
         }
 
@@ -112,7 +111,6 @@ export const useInputAutocomplete = (
       proposals: computed,
       selectionStart: observable.ref,
       isFound: observable.ref,
-      isTyped: observable.ref,
       currentWord: computed,
       replaceCurrentWord: action.bound,
       position: observable.ref,
@@ -129,7 +127,6 @@ export const useInputAutocomplete = (
         state.selectionStart = target.selectionStart;
         state.inputValue = target.value;
         state.isFound = false;
-        state.isTyped = true;
         state.search.setSearch(state.currentWord);
       }, INPUT_DELAY),
     [state],
@@ -146,7 +143,7 @@ export const useInputAutocomplete = (
         break;
       default:
       case 'Tab':
-        state.isTyped = false;
+        state.selectionStart = null;
         break;
     }
   }
@@ -156,7 +153,7 @@ export const useInputAutocomplete = (
       return;
     }
 
-    state.isTyped = false;
+    state.selectionStart = null;
   }
 
   useEffect(() => {
