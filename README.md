@@ -25,6 +25,17 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 24.3.5. 2025-02-17
+- Administration:
+  -    Added system information data to the Product Information tab in the Administration panel. This provides administrators with quick access to essential system details, such as the server deployment type (e.g., Docker, Kubernetes), install path, Java version, and Java parameters;
+  -    The global access server URL has been added to the console log, making it easier to locate server installation information directly within the logs;
+  -    EntityID or objectGUID is now used to create new LDAP users in CloudBeaver to ensure uniqueness. This change enhances user identification and prevents conflicts while maintaining backward compatibility for existing users.
+- General:
+  -    Tooltips for metadata objects and SQL Editor tabs now include additional details about catalogs, schemas, and connections.
+- Drivers:
+  -    MariaDB driver has been updated to version 3.5.1;
+  -    SQLite driver has been updated to version 3.48.0.0.
+
 ### 24.3.4. 2025-02-03
 - Connections:
   -    Added a possibility to switch a database connection to the read-only mode. This mode can be activated in the connection dialog. Administrators can set this mode for any connections, the regular users can set it for their own private connections only;
