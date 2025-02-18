@@ -6,6 +6,9 @@
     "@dbeaver/*",
     "../common-typescript"
   ],
+  "scripts": {
+    "clear": "rimraf -g '@dbeaver/*/{dist,lib}'"
+  },
   "devDependencies": {
     "@dbeaver/prettier-config": "workspace:^",
     "@wroud/ts-template": "^0",
