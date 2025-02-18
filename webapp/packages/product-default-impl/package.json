@@ -78,6 +78,7 @@
     "@cloudbeaver/plugin-sql-editor-screen": "workspace:*",
     "@cloudbeaver/plugin-sql-generator": "workspace:*",
     "@cloudbeaver/plugin-sso": "workspace:*",
+    "@cloudbeaver/plugin-system-information-administration": "workspace:*",
     "@cloudbeaver/plugin-task-manager": "workspace:*",
     "@cloudbeaver/plugin-theme": "workspace:*",
     "@cloudbeaver/plugin-tools-panel": "workspace:*",
