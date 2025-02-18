@@ -22,7 +22,8 @@
     "@wroud/vite-plugin-asset-resolver": "^0",
     "rimraf": "^6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "^6"
   },
   "dependencies": {
     "@ariakit/react": "^0",
