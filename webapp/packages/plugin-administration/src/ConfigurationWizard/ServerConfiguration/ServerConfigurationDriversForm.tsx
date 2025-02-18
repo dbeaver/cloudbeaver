@@ -10,7 +10,7 @@ import { useCallback } from 'react';
 
 import {
   Combobox,
-  ConfirmationDialogDelete,
+  ConfirmationDialogWarning,
   Group,
   GroupTitle,
   type ITag,
@@ -72,9 +72,9 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
 
       // TODO also check for if it is unsafe driver
       if (driver?.embedded && isInitiallyDisabledDriver) {
-        const result = await commonDialogService.open(ConfirmationDialogDelete, {
-          title: 'ui_data_enabling_confirmation',
-          message: translate('administration_disabled_drivers_enable_insecure_driver_message', undefined, { driverName: driver?.name || id }),
+        const result = await commonDialogService.open(ConfirmationDialogWarning, {
+          title: 'administration_disabled_drivers_enable_unsafe_driver_title',
+          message: translate('administration_disabled_drivers_enable_unsafe_driver_message', undefined, { driverName: driver?.name || id }),
           confirmActionText: 'ui_enable',
         });
 

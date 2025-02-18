@@ -62,7 +62,6 @@ export default [
   ['ui_data_saving_error', '保存出错'],
   ['ui_data_remove_confirmation', '移除确认'],
   ['ui_data_delete_confirmation', '删除确认'],
-  ['ui_data_enabling_confirmation', 'Enabling confirmation'],
   ['ui_no_matches_placeholder', '您的搜索没有返回匹配项。'],
   ['ui_information', '信息'],
   ['ui_clipboard', '剪贴板'],

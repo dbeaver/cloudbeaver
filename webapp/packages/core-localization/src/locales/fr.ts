@@ -59,7 +59,6 @@ export default [
   ['ui_data_saving_error', 'Erreur de sauvegarde'],
   ['ui_data_remove_confirmation', 'Confirmation de suppression'],
   ['ui_data_delete_confirmation', 'Confirmation de suppression'],
-  ['ui_data_enabling_confirmation', 'Enabling confirmation'],
   ['ui_no_matches_placeholder', "Votre recherche n'a retourné aucun résultat."],
   ['ui_information', 'Information'],
   ['ui_clipboard', 'Presse-papiers'],

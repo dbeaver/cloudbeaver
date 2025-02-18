@@ -50,5 +50,6 @@ export default [
 
   ['administration_disabled_drivers_title', 'Отключенные драйверы'],
   ['administration_disabled_drivers_search_placeholder', 'Поиск по драйверу...'],
-  ['administration_disabled_drivers_enable_insecure_driver_message', 'Вы собираетесь включить небезопасный драйвер "{arg:driverName}". Вы уверены?'],
+  ['administration_disabled_drivers_enable_unsafe_driver_title', 'Включение небезопасного драйвера'],
+  ['administration_disabled_drivers_enable_unsafe_driver_message', 'Вы собираетесь включить небезопасный драйвер "{arg:driverName}". Вы уверены?'],
 ];

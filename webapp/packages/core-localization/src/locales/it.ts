@@ -62,7 +62,6 @@ export default [
   ['ui_data_saving_error', 'Errore di salvataggio'],
   ['ui_data_remove_confirmation', 'Remove confirmation'],
   ['ui_data_delete_confirmation', 'Conferma di eliminazione'],
-  ['ui_data_enabling_confirmation', 'Enabling confirmation'],
   ['ui_no_matches_placeholder', 'La tua ricerca non ha prodotto risultati.'],
   ['ui_information', 'Informazioni'],
   ['ui_clipboard', 'Appunti'],

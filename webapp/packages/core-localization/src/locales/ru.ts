@@ -62,7 +62,6 @@ export default [
   ['ui_no_matches_placeholder', 'По вашему запросу ничего не найдено.'],
   ['ui_data_remove_confirmation', 'Подтвердите удаление'],
   ['ui_data_delete_confirmation', 'Подтвердите удаление'],
-  ['ui_data_enabling_confirmation', 'Подтвердите включение'],
   ['ui_information', 'Информация'],
   ['ui_clipboard', 'Буфер обмена'],
   ['ui_copy_to_clipboard', 'Копировать'],

@@ -90,5 +90,6 @@ export default [
 
   ['administration_disabled_drivers_title', 'Disabled drivers'],
   ['administration_disabled_drivers_search_placeholder', 'Search for the driver...'],
-  ['administration_disabled_drivers_enable_insecure_driver_message', 'You are about to enable insecure "{arg:driverName}" driver. Are you sure?'],
+  ['administration_disabled_drivers_enable_unsafe_driver_title', 'Enable unsafe driver'],
+  ['administration_disabled_drivers_enable_unsafe_driver_message', 'You are about to enable unsafe "{arg:driverName}" driver. Are you sure?'],
 ];

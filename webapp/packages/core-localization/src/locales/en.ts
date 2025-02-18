@@ -65,7 +65,6 @@ export default [
   ['ui_data_saving_error', 'Save error'],
   ['ui_data_remove_confirmation', 'Remove confirmation'],
   ['ui_data_delete_confirmation', 'Delete confirmation'],
-  ['ui_data_enabling_confirmation', 'Enabling confirmation'],
   ['ui_no_matches_placeholder', 'Your search returned no matches.'],
   ['ui_information', 'Information'],
   ['ui_clipboard', 'Clipboard'],
