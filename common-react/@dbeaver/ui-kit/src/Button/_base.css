@@ -9,5 +9,6 @@
     --btn-font-weight: var(--font-weight-normal);
     --btn-font-size: calc(var(--font-size-base) * 0.875);
     --btn-disabled-opacity: 0.5;
+    --btn-loader-animation: var(--animate-spin);
   }
 }

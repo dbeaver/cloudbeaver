@@ -152,16 +152,7 @@
     opacity: 1;
     width: calc(var(--btn-font-size) * 1.2);
     height: calc(var(--btn-font-size) * 1.2);
-    animation: spin 2s linear infinite;
-  }
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
+    animation: var(--btn-loader-animation);
   }
 
   .dbv-kit-button-icon {
