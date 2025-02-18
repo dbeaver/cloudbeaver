@@ -145,6 +145,8 @@ export const useInputAutocomplete = (
         state.menuRef.current?.first();
         break;
       default:
+      case 'Tab':
+        state.isTyped = false;
         break;
     }
   }
