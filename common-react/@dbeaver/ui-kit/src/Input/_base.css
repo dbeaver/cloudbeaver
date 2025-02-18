@@ -7,6 +7,7 @@
     --input-background: var(--color-background);
     --input-border: var(--color-gray-300);
     --input-foreground: var(--color-text);
+    --input-height: var(--control-height-medium);
     --input-padding: --spacing(1.1);
     --input-placeholder-foreground: var(--color-gray-500);
     --input-option-active-background: var(--color-primary-200);

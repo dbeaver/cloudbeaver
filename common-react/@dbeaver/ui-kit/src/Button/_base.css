@@ -5,8 +5,10 @@
     --btn-radius: var(--radius-md);
     --btn-padding-inline: --spacing(2.5);
     --btn-border-width: 1px;
+    --btn-border-color: transparent;
     --btn-gap: calc(var(--btn-padding-inline) / 4);
     --btn-font-weight: var(--font-weight-normal);
+    --btn-height: var(--control-height-medium);
     --btn-font-size: calc(var(--font-size-base) * 0.875);
     --btn-disabled-opacity: 0.5;
     --btn-loader-animation: var(--animate-spin);

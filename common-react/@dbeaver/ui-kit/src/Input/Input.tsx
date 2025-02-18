@@ -10,12 +10,12 @@ import type { ComponentPropsWithRef } from 'react';
 import './Input.css';
 
 export interface InputProps extends Omit<ComponentPropsWithRef<'input'>, 'size'> {
-  size?: 'small' | 'medium' | 'large';
+  size?: 'small' | 'medium' | 'large' | 'xlarge';
 }
 
-export const Input: React.FC<InputProps> = function Input({ error, warning, size, ...props }) {
+export const Input: React.FC<InputProps> = function Input({ size, className ...props }) {
   const classNameToApply =
-    `dbv-kit-input dbv-kit-input--${size ?? 'medium'} ${error ? 'dbv-kit-input-validation--error' : ''} ${warning ? 'dbv-kit-input-validation--warning' : ''}`.trim();
+    `dbv-kit-input dbv-kit-input__${size ?? 'medium'} ${className}`.trim();
   return (
     <div className="dbv-kit-input-wrapper">
       <input className={classNameToApply} {...props} />

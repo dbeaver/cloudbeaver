@@ -21,10 +21,14 @@
     align-items: center;
     white-space: nowrap;
 
+    height: var(--btn-height);
     border-radius: var(--btn-radius);
     padding-inline: var(--btn-padding-inline);
 
+    font-size: var(--btn-font-size);
     font-weight: var(--btn-font-weight);
+
+    gap: var(--btn-gap);
 
     &:disabled {
       cursor: not-allowed;
@@ -36,39 +40,39 @@
   /* Sizes */
 
   .dbv-kit-button__small {
+    --btn-padding-inline: var(--btn-small-padding-inline);
+    --btn-font-size: var(--btn-small-font-size);
+    --btn-height: var(--btn-small-height);
+    --btn-gap: var(--btn-small-gap);
+    
     --btn-icon-margin-inline: calc(var(--btn-small-padding-inline) * -0.25);
-
-    padding-inline: var(--btn-small-padding-inline);
-    font-size: var(--btn-small-font-size);
-    height: var(--btn-small-height);
-    gap: var(--btn-small-gap);
   }
 
   .dbv-kit-button__medium {
-    --btn-icon-margin-inline: calc(var(--btn-medium-padding-inline) * -0.25);
+    --btn-padding-inline: var(--btn-medium-padding-inline);
+    --btn-font-size: var(--btn-medium-font-size);
+    --btn-height: var(--btn-medium-height);
+    --btn-gap: var(--btn-medium-gap);
 
-    padding-inline: var(--btn-medium-padding-inline);
-    font-size: var(--btn-medium-font-size);
-    height: var(--btn-medium-height);
-    gap: var(--btn-medium-gap);
+    --btn-icon-margin-inline: calc(var(--btn-medium-padding-inline) * -0.25);
   }
 
   .dbv-kit-button__large {
-    --btn-icon-margin-inline: calc(var(--btn-large-padding-inline) * -0.25);
+    --btn-padding-inline: var(--btn-large-padding-inline);
+    --btn-font-size: var(--btn-large-font-size);
+    --btn-height: var(--btn-large-height);
+    --btn-gap: var(--btn-large-gap);
 
-    padding-inline: var(--btn-large-padding-inline);
-    font-size: var(--btn-large-font-size);
-    height: var(--btn-large-height);
-    gap: var(--btn-large-gap);
+    --btn-icon-margin-inline: calc(var(--btn-large-padding-inline) * -0.25);
   }
 
   .dbv-kit-button__xlarge {
-    --btn-icon-margin-inline: calc(var(--btn-xlarge-padding-inline) * -0.25);
+    --btn-padding-inline: var(--btn-xlarge-padding-inline);
+    --btn-font-size: var(--btn-xlarge-font-size);
+    --btn-height: var(--btn-xlarge-height);
+    --btn-gap: var(--btn-xlarge-gap);
 
-    padding-inline: var(--btn-xlarge-padding-inline);
-    font-size: var(--btn-xlarge-font-size);
-    height: var(--btn-xlarge-height);
-    gap: var(--btn-xlarge-gap);
+    --btn-icon-margin-inline: calc(var(--btn-xlarge-padding-inline) * -0.25);
   }
 
   /* ---------------------------- */

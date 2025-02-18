@@ -16,28 +16,6 @@ export const InputExample = () => {
         <Input placeholder="Password" type="password" />
         <Button>Log in</Button>
       </div>
-
-      <div>
-        <Input error="This user already exists" placeholder="Username" />
-        <Input placeholder="Password" type="password" />
-        <Button>Register</Button>
-      </div>
-
-      <div>
-        <Input warning="This user already exists" placeholder="Username" />
-        <Input placeholder="Password" type="password" />
-        <Button>Register</Button>
-      </div>
-
-      <div>
-        <Input error="This user already exists" placeholder="Username" />
-        <Input placeholder="Password" type="password" />
-        <Button>Register</Button>
-      </div>
     </>
   );
-};
-
-export const InputWithWarning = () => {
-  return <Input warning="This is a warning" />;
 };

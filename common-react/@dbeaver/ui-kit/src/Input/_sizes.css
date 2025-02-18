@@ -1,26 +1,22 @@
 @layer base {
   :root {
     /* Small input */
-    --input-small-padding-inline: calc(var(--input-padding) * 0.5);
-    --input-small-padding-block: calc(var(--input-padding) * 0.5);
+    --input-small-padding: calc(var(--input-padding) * 0.5);
     --input-small-font-size: calc(var(--input-font-size) * 0.875);
     --input-small-height: var(--control-height-small);
 
     /* Medium input */
-    --input-medium-padding-inline: var(--input-padding);
-    --input-medium-padding-block: var(--input-padding);
+    --input-medium-padding: var(--input-padding);
     --input-medium-font-size: var(--input-font-size);
     --input-medium-height: var(--control-height-medium);
 
     /* Large input */
-    --input-large-padding-inline: calc(var(--input-padding) * 1.25);
-    --input-large-padding-block: calc(var(--input-padding) * 1.25);
+    --input-large-padding: calc(var(--input-padding) * 1.25);
     --input-large-font-size: calc(var(--input-font-size) * 1.125);
     --input-large-height: var(--control-height-large);
 
     /* Extra large input */
-    --input-xlarge-padding-inline: calc(var(--input-padding) * 1.5);
-    --input-xlarge-padding-block: calc(var(--input-padding) * 1.5);
+    --input-xlarge-padding: calc(var(--input-padding) * 1.5);
     --input-xlarge-font-size: calc(var(--input-font-size) * 1.25);
     --input-xlarge-height: var(--control-height-xlarge);
   }
