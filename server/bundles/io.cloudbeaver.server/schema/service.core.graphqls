@@ -570,6 +570,7 @@ input ConnectionConfig {
 extend type Query {
     # Return server config
     serverConfig: ServerConfig!
+    systemInfo: [ObjectPropertyInfo!]! @since(version: "24.3.5")
 
     # Return product settings
     productSettings: ProductSettings! @since(version: "24.0.1")

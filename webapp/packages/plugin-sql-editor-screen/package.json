@@ -34,14 +34,14 @@
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "^19",
+    "react-dom": "^19",
     "tslib": "^2"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
-    "@types/react": "^18",
+    "@types/react": "^19",
     "typescript": "^5"
   }
 }

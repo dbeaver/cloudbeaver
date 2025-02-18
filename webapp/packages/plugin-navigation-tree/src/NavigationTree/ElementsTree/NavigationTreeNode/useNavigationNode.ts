@@ -20,7 +20,7 @@ import type { NavTreeControlComponent } from '../NavigationNodeComponent.js';
 import type { IElementsTree } from '../useElementsTree.js';
 
 export interface INavigationNode {
-  ref: React.RefObject<HTMLDivElement>;
+  ref: React.RefObject<HTMLDivElement | null>;
   control?: NavTreeControlComponent;
   disabled: boolean;
   group: boolean;

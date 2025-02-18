@@ -33,6 +33,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
+import org.jkiss.dbeaver.model.DBPConnectionInformation;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
@@ -86,6 +87,8 @@ public class CBDatabase {
     private final ServletApplication application;
     private final WebDatabaseConfig databaseConfiguration;
     private PoolingDataSource<PoolableConnection> cbDataSource;
+    private DBPConnectionInformation cbConnectionInformation;
+
     private transient volatile Connection exclusiveConnection;
 
     private String instanceId;
@@ -200,7 +203,16 @@ public class CBDatabase {
 
         try (Connection connection = cbDataSource.getConnection()) {
             DatabaseMetaData metaData = connection.getMetaData();
-            log.debug("\tConnected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
+            final String dbName = metaData.getDatabaseProductName();
+            final String dbVersion = metaData.getDatabaseProductVersion();
+            log.debug("\tConnected to " + dbName + " " + dbVersion);
+
+            cbConnectionInformation = new DBPConnectionInformation(
+                databaseConfiguration.getUrl(),
+                databaseConfiguration.getDriver(),
+                dbName,
+                dbVersion
+            );
 
             if (dialect instanceof SQLDialectSchemaController && CommonUtils.isNotEmpty(schemaName)) {
                 var dialectSchemaController = (SQLDialectSchemaController) dialect;
@@ -598,6 +610,14 @@ public class CBDatabase {
         var v2DefaultUrl = "jdbc:h2:" + v2Path;
         return v1DefaultUrl.equals(databaseConfiguration.getUrl())
             || v2DefaultUrl.equals(databaseConfiguration.getUrl());
+    }
+
+    /**
+     * Returns internal database metadata.
+     */
+    @NotNull
+    public DBPConnectionInformation getMetaDataInfo() {
+        return cbConnectionInformation;
     }
 
     protected WebDatabaseConfig getDatabaseConfiguration() {

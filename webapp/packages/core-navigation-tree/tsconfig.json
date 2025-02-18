@@ -11,22 +11,13 @@
       "path": "../core-authentication"
     },
     {
-      "path": "../core-browser"
-    },
-    {
       "path": "../core-cli"
-    },
-    {
-      "path": "../core-client-activity"
     },
     {
       "path": "../core-data-context"
     },
     {
       "path": "../core-di"
-    },
-    {
-      "path": "../core-events"
     },
     {
       "path": "../core-executor"
@@ -47,28 +38,16 @@
       "path": "../core-root"
     },
     {
-      "path": "../core-routing"
-    },
-    {
       "path": "../core-sdk"
     },
     {
       "path": "../core-settings"
     },
     {
-      "path": "../core-storage"
-    },
-    {
       "path": "../core-ui"
     },
     {
       "path": "../core-utils"
-    },
-    {
-      "path": "../core-view"
-    },
-    {
-      "path": "../tests-runner"
     }
   ],
   "include": [

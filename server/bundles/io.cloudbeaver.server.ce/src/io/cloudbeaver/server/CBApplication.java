@@ -23,6 +23,7 @@ import io.cloudbeaver.model.WebServerConfig;
 import io.cloudbeaver.model.app.BaseServletApplication;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.model.app.ServletAuthConfiguration;
+import io.cloudbeaver.model.app.ServletSystemInformationCollector;
 import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.model.config.SMControllerConfiguration;
@@ -56,11 +57,8 @@ import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
-import org.jkiss.dbeaver.utils.GeneralUtils;
-import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.StandardConstants;
 
 import java.io.File;
 import java.io.IOException;
@@ -112,6 +110,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
     private CBSessionManager sessionManager;
 
     private final Map<String, String> initActions = new ConcurrentHashMap<>();
+    private ServletSystemInformationCollector systemInformationCollector;
 
     private CBJettyServer jettyServer;
 
@@ -247,15 +246,18 @@ public abstract class CBApplication<T extends CBServerConfig> extends
             log.error("Error setting workspace location to " + getWorkspaceDirectory().toAbsolutePath(), e);
             return;
         }
-
-        log.debug(GeneralUtils.getProductName() + " " + GeneralUtils.getProductVersion() + " is starting"); //$NON-NLS-1$
-        log.debug("\tOS: " + System.getProperty(StandardConstants.ENV_OS_NAME) + " " + System.getProperty(
-            StandardConstants.ENV_OS_VERSION) + " (" + System.getProperty(StandardConstants.ENV_OS_ARCH) + ")");
-        log.debug("\tJava version: " + System.getProperty(StandardConstants.ENV_JAVA_VERSION) + " by " + System.getProperty(
-            StandardConstants.ENV_JAVA_VENDOR) + " (" + System.getProperty(StandardConstants.ENV_JAVA_ARCH) + "bit)");
-        log.debug("\tInstall path: '" + SystemVariablesResolver.getInstallPath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        log.debug("\tGlobal workspace: '" + instanceLoc.getURL() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
-        log.debug("\tMemory available " + (runtime.totalMemory() / (1024 * 1024)) + "Mb/" + (runtime.maxMemory() / (1024 * 1024)) + "Mb");
+        this.systemInformationCollector = createSystemInformationCollector();
+        this.systemInformationCollector.setWorkspacePath(instanceLoc.getURL().toString());
+        
+        log.debug("%s %s is starting".formatted(
+            systemInformationCollector.getProductName(),
+            systemInformationCollector.getProductVersion())
+        ); //$NON-NLS-1$
+        log.debug("\tOS: " + systemInformationCollector.getOsInfo());
+        log.debug("\tJava version: " + systemInformationCollector.getJavaVersion());
+        log.debug("\tInstall path: '" + systemInformationCollector.getInstallPath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+        log.debug("\tGlobal workspace: '" + systemInformationCollector.getWorkspacePath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+        log.debug("\tMemory available " + systemInformationCollector.getMemoryAvailable());
 
         DBWorkbench.getPlatform().getApplication();
 
@@ -321,6 +323,11 @@ public abstract class CBApplication<T extends CBServerConfig> extends
             }
             grantPermissionsToConnections();
         }
+        try {
+            this.systemInformationCollector.collectInternalDatabaseUseInformation();
+        } catch (DBException e) {
+            log.error("Error collecting system information", e);
+        }
 
         eventController.scheduleCheckJob();
 
@@ -329,6 +336,10 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         log.debug("Shutdown");
 
         return;
+    }
+
+    protected ServletSystemInformationCollector<?> createSystemInformationCollector() {
+        return new ServletSystemInformationCollector<>(this);
     }
 
     protected void initializeAdditionalConfiguration() {
@@ -784,5 +795,11 @@ public abstract class CBApplication<T extends CBServerConfig> extends
     @Override
     public ConnectionController getConnectionController() {
         return new ConnectionControllerCE();
+    }
+
+    @NotNull
+    @Override
+    public ServletSystemInformationCollector<?> getSystemInformationCollector() {
+        return systemInformationCollector;
     }
 }

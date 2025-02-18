@@ -98,9 +98,10 @@ export class ObjectViewerNavTreeLinkMenuService extends Bootstrap {
         }
         const navNode = this.connectionSchemaManagerService.activeNavNode;
 
-        if (navNode?.path.includes(tree.baseRoot)) {
-          tree.show(navNode.nodeId, navNode.path);
+        if (navNode) {
+          await this.navigationTreeService.showNode(navNode.nodeId, navNode.path);
         }
+
         break;
       }
     }

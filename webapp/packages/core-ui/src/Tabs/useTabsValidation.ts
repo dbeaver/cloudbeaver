@@ -13,7 +13,7 @@ import { ExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 import { TabsContext } from './TabsContext.js';
 import { TabsValidationContext } from './TabsValidationContext.js';
 
-export function useTabsValidation(tabId: string): React.RefObject<HTMLDivElement> {
+export function useTabsValidation(tabId: string): React.RefObject<HTMLDivElement | null> {
   const tabContextState = useContext(TabsContext);
   const formContext = useContext(FormContext);
 

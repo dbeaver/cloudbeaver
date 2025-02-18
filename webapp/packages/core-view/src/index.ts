@@ -30,6 +30,7 @@ export * from './Action/Actions/ACTION_ZOOM_OUT.js';
 export * from './Action/Actions/ACTION_DOWNLOAD.js';
 export * from './Action/Actions/ACTION_UPLOAD.js';
 export * from './Action/Actions/ACTION_IMPORT.js';
+export * from './Action/Actions/ACTION_COPY.js';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_OPEN_IN_TAB.js';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_REDO.js';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_UNDO.js';

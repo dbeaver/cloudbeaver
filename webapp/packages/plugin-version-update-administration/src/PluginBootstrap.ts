@@ -27,7 +27,7 @@ export class PluginBootstrap extends Bootstrap {
       key: 'version-update',
       name: 'plugin_version_update_administration_tab_title',
       panel: () => VersionUpdate,
-      order: 2,
+      order: 3,
     });
 
     this.versionUpdateService.registerGeneralInstruction(() => DockerUpdateInstructions);

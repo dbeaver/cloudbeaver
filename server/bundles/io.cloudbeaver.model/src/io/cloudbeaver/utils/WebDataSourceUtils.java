@@ -32,6 +32,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceDisconnectEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -157,6 +158,14 @@ public class WebDataSourceUtils {
         if (dataSource.isConnected()) {
             try {
                 dataSource.disconnect(webSession.getProgressMonitor());
+                webSession.addSessionEvent(
+                    new WSDataSourceDisconnectEvent(
+                        dataSource.getProject().getId(),
+                        dataSource.getId(),
+                        webSession.getSessionId(),
+                        webSession.getUserId()
+                    )
+                );
                 return true;
             } catch (DBException e) {
                 log.error("Error closing connection", e);

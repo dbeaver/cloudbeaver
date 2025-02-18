@@ -1,0 +1,13 @@
+query getSystemInfo {
+  info: systemInfo {
+    id
+    displayName
+    category
+    value
+    length
+    features
+    dataType
+    order
+    required
+  }
+}

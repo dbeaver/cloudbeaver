@@ -16,9 +16,6 @@
       "path": "../core-cli"
     },
     {
-      "path": "../core-client-activity"
-    },
-    {
       "path": "../core-data-context"
     },
     {
@@ -50,9 +47,6 @@
     },
     {
       "path": "../core-utils"
-    },
-    {
-      "path": "../tests-runner"
     }
   ],
   "include": [

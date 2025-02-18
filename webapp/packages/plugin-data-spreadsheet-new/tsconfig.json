@@ -8,15 +8,6 @@
   },
   "references": [
     {
-      "path": "../core-administration"
-    },
-    {
-      "path": "../core-app"
-    },
-    {
-      "path": "../core-authentication"
-    },
-    {
       "path": "../core-blocks"
     },
     {
@@ -24,12 +15,6 @@
     },
     {
       "path": "../core-cli"
-    },
-    {
-      "path": "../core-client-activity"
-    },
-    {
-      "path": "../core-connections"
     },
     {
       "path": "../core-data-context"
@@ -50,25 +35,10 @@
       "path": "../core-localization"
     },
     {
-      "path": "../core-navigation-tree"
-    },
-    {
-      "path": "../core-projects"
-    },
-    {
-      "path": "../core-root"
-    },
-    {
-      "path": "../core-routing"
-    },
-    {
       "path": "../core-sdk"
     },
     {
       "path": "../core-settings"
-    },
-    {
-      "path": "../core-storage"
     },
     {
       "path": "../core-ui"
@@ -84,21 +54,6 @@
     },
     {
       "path": "../plugin-data-viewer"
-    },
-    {
-      "path": "../plugin-datasource-context-switch"
-    },
-    {
-      "path": "../plugin-navigation-tabs"
-    },
-    {
-      "path": "../plugin-navigation-tree"
-    },
-    {
-      "path": "../plugin-object-viewer"
-    },
-    {
-      "path": "../tests-runner"
     }
   ],
   "include": [
