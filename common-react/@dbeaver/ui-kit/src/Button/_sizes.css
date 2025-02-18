@@ -2,28 +2,24 @@
   :root {
     /*Small button*/
     --btn-small-padding-inline: calc(var(--btn-padding-inline) * 0.5);
-    --btn-small-padding-block: calc(var(--btn-padding-block) * 0.5);
     --btn-small-font-size: calc(var(--btn-font-size) * 0.875);
     --btn-small-height: var(--control-height-small);
     --btn-small-gap: calc(var(--btn-gap) * 0.5);
 
     /*Medium button*/
     --btn-medium-padding-inline: var(--btn-padding-inline);
-    --btn-medium-padding-block: var(--btn-padding-block);
     --btn-medium-font-size: var(--btn-font-size);
     --btn-medium-height: var(--control-height-medium);
     --btn-medium-gap: var(--btn-gap);
 
     /*Large button*/
     --btn-large-padding-inline: calc(var(--btn-padding-inline) * 1.25);
-    --btn-large-padding-block: calc(var(--btn-padding-block) * 1.25);
     --btn-large-font-size: calc(var(--btn-font-size) * 1.125);
     --btn-large-height: var(--control-height-large);
     --btn-large-gap: calc(var(--btn-gap) * 1.25);
 
     /*Extra large button*/
     --btn-xlarge-padding-inline: calc(var(--btn-padding-inline) * 1.5);
-    --btn-xlarge-padding-block: calc(var(--btn-padding-block) * 1.5);
     --btn-xlarge-font-size: calc(var(--btn-font-size) * 1.25);
     --btn-xlarge-height: var(--control-height-xlarge);
     --btn-xlarge-gap: calc(var(--btn-gap) * 1.5);

@@ -23,7 +23,6 @@
 
     border-radius: var(--btn-radius);
     padding-inline: var(--btn-padding-inline);
-    padding-block: var(--btn-padding-block);
 
     font-weight: var(--btn-font-weight);
 
@@ -33,11 +32,13 @@
     }
   }
 
+  /* ---------------------------- */
+  /* Sizes */
+
   .dbv-kit-button__small {
     --btn-icon-margin-inline: calc(var(--btn-small-padding-inline) * -0.25);
 
     padding-inline: var(--btn-small-padding-inline);
-    padding-block: var(--btn-small-padding-block);
     font-size: var(--btn-small-font-size);
     height: var(--btn-small-height);
     gap: var(--btn-small-gap);
@@ -47,7 +48,6 @@
     --btn-icon-margin-inline: calc(var(--btn-medium-padding-inline) * -0.25);
 
     padding-inline: var(--btn-medium-padding-inline);
-    padding-block: var(--btn-medium-padding-block);
     font-size: var(--btn-medium-font-size);
     height: var(--btn-medium-height);
     gap: var(--btn-medium-gap);
@@ -57,7 +57,6 @@
     --btn-icon-margin-inline: calc(var(--btn-large-padding-inline) * -0.25);
 
     padding-inline: var(--btn-large-padding-inline);
-    padding-block: var(--btn-large-padding-block);
     font-size: var(--btn-large-font-size);
     height: var(--btn-large-height);
     gap: var(--btn-large-gap);
@@ -67,11 +66,13 @@
     --btn-icon-margin-inline: calc(var(--btn-xlarge-padding-inline) * -0.25);
 
     padding-inline: var(--btn-xlarge-padding-inline);
-    padding-block: var(--btn-xlarge-padding-block);
     font-size: var(--btn-xlarge-font-size);
     height: var(--btn-xlarge-height);
     gap: var(--btn-xlarge-gap);
   }
+
+  /* ---------------------------- */
+  /* Variants */
 
   .dbv-kit-button__primary {
     --btn-loader-color: color-mix(in srgb, var(--btn-background) 65%, var(--color-white));
@@ -92,16 +93,12 @@
     }
   }
 
-  
-
   .dbv-kit-button__secondary {
     --btn-loader-color: color-mix(in srgb, var(--btn-secondary-foreground) 75%, var(--color-gray-600));
     --btn-loader-background: color-mix(in srgb, var(--color-white) 75%, transparent);
 
-    padding-block: calc(var(--btn-padding-block) - 1px);
-
     background-color: var(--btn-secondary-background);
-    border: 1px solid var(--btn-secondary-border-color);
+    border: var(--btn-border-width) solid var(--btn-secondary-border-color);
     color: var(--btn-secondary-foreground);
 
     &:hover {
@@ -109,6 +106,7 @@
         background-color: var(--btn-secondary-background-hover);
       }
     }
+
     &:active {
       background-color: var(--btn-secondary-background-active);
     }
@@ -126,10 +124,14 @@
         background-color: var(--btn-danger-background-hover);
       }
     }
+
     &:active {
       background-color: var(--btn-danger-background-active);
     }
   }
+
+  /* ---------------------------- */
+  /* Loader */
 
   .dbv-kit-button_loader {
     position: absolute;
@@ -143,19 +145,22 @@
     justify-content: center;
     border-radius: inherit;
     pointer-events: none;
+
+    &::after {
+      --loader-width: calc(var(--btn-font-size) * 0.2);
+      content: '';
+      border: var(--loader-width) solid var(--btn-loader-background);
+      border-top: var(--loader-width) solid var(--btn-loader-color);
+      border-radius: 50%;
+      opacity: 1;
+      width: calc(var(--btn-font-size) * 1.2);
+      height: calc(var(--btn-font-size) * 1.2);
+      animation: var(--btn-loader-animation);
+    }
   }
 
-  .dbv-kit-button_loader::after {
-    --loader-width: calc(var(--btn-font-size) * 0.2);
-    content: '';
-    border: var(--loader-width) solid var(--btn-loader-background);
-    border-top: var(--loader-width) solid var(--btn-loader-color);
-    border-radius: 50%;
-    opacity: 1;
-    width: calc(var(--btn-font-size) * 1.2);
-    height: calc(var(--btn-font-size) * 1.2);
-    animation: var(--btn-loader-animation);
-  }
+  /* ---------------------------- */
+  /* Icon */
 
   .dbv-kit-button_icon {
     display: flex;

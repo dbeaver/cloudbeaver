@@ -4,7 +4,7 @@
   :root {
     --btn-radius: var(--radius-md);
     --btn-padding-inline: --spacing(2.5);
-    --btn-padding-block: --spacing(1.4);
+    --btn-border-width: 1px;
     --btn-gap: calc(var(--btn-padding-inline) / 4);
     --btn-font-weight: var(--font-weight-normal);
     --btn-font-size: calc(var(--font-size-base) * 0.875);
