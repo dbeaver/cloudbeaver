@@ -61,6 +61,7 @@ export const useInputAutocomplete = (
       position: { x: 0, y: 0 } as IContextMenuPositionCoords,
       inputValue: '',
       isFound: false,
+      isTyped: false,
       selectionStart: 0 as number | null,
       replaceCurrentWord(replacement: string) {
         const cursorPosition = this.selectionStart;
@@ -100,7 +101,7 @@ export const useInputAutocomplete = (
         return substring.split(separator).at(-1) ?? '';
       },
       get proposals() {
-        if (this.isFound || !this.currentWord) {
+        if (this.isFound || !this.currentWord || !this.isTyped) {
           return [];
         }
 
@@ -111,6 +112,7 @@ export const useInputAutocomplete = (
       proposals: computed,
       selectionStart: observable.ref,
       isFound: observable.ref,
+      isTyped: observable.ref,
       currentWord: computed,
       replaceCurrentWord: action.bound,
       position: observable.ref,
@@ -127,6 +129,7 @@ export const useInputAutocomplete = (
         state.selectionStart = target.selectionStart;
         state.inputValue = target.value;
         state.isFound = false;
+        state.isTyped = true;
         state.search.setSearch(state.currentWord);
       }, INPUT_DELAY),
     [state],
@@ -146,15 +149,25 @@ export const useInputAutocomplete = (
     }
   }
 
+  function handleClickOutsideOfInput(event: MouseEvent) {
+    if (inputRef.current?.contains(event.target as Node)) {
+      return;
+    }
+
+    state.isTyped = false;
+  }
+
   useEffect(() => {
     const input = state.inputRef.current!;
 
     input.addEventListener('input', handleInput);
     input.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('click', handleClickOutsideOfInput);
 
     return () => {
       input.removeEventListener('keydown', handleKeyDown);
       input.removeEventListener('input', handleInput);
+      document.removeEventListener('click', handleClickOutsideOfInput);
     };
   });
 
