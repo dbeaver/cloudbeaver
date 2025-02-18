@@ -49,28 +49,3 @@
     --color-warning-border: var(--color-orange-200);
   }
 }
-
-@layer theme {
-  :root {
-    /* Input */
-    --input-font-size: calc(var(--font-size-base) * 0.875);
-    --input-background: var(--color-background);
-    --input-border: var(--color-gray-300);
-    --input-foreground: var(--color-text);
-    --input-padding: --spacing(1.1);
-    --input-placeholder-foreground: var(--color-gray-500);
-    --input-option-active-background: var(--color-primary-200);
-    --input-option-active-border: var(--color-primary-500);
-    --input-option-active-foreground: var(--color-text);
-    --input-option-hover-background: var(--color-primary-100);
-    --input-validation-error-background: var(--color-error-background);
-    --input-validation-error-foreground: var(--color-error-text);
-    --input-validation-error-border: var(--color-error-border);
-    --input-validation-info-background: var(--color-info-background);
-    --input-validation-info-foreground: var(--color-info-text);
-    --input-validation-info-order: var(--color-info-border);
-    --input-validation-warning-background: var(--color-warning-background);
-    --input-validation-warning-foreground: var(--color-warning-text);
-    --input-validation-warning-border: var(--color-warning-border);
-  }
-}

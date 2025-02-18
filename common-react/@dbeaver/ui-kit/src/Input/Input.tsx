@@ -5,6 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+@import './_base.css';
+@import './_sizes.css';
+@import './_variants.css';
 
 import type { ComponentPropsWithRef } from 'react';
 import './Input.css';

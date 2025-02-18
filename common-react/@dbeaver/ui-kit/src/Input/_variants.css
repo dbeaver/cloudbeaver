@@ -1,0 +1,15 @@
+@layer base {
+  :root {
+    --input-validation-error-background: var(--color-error-background);
+    --input-validation-error-foreground: var(--color-error-text);
+    --input-validation-error-border: var(--color-error-border);
+
+    --input-validation-info-background: var(--color-info-background);
+    --input-validation-info-foreground: var(--color-info-text);
+    --input-validation-info-order: var(--color-info-border);
+    
+    --input-validation-warning-background: var(--color-warning-background);
+    --input-validation-warning-foreground: var(--color-warning-text);
+    --input-validation-warning-border: var(--color-warning-border);
+  }
+}
