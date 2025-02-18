@@ -155,7 +155,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
             </Group>
             <Placeholder container={serverConfigurationService.configurationContainer} configurationWizard={configurationWizard} state={part.state} />
             <ServerConfigurationSecurityForm serverConfig={part.state.serverConfig} />
-            <ServerConfigurationDriversForm serverConfig={part.state.serverConfig} />
+            <ServerConfigurationDriversForm initialServerConfig={part.initialState.serverConfig} serverConfig={part.state.serverConfig} />
           </Container>
         </Form>
       </Container>

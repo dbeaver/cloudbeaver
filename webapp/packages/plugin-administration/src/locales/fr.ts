@@ -91,4 +91,5 @@ export default [
 
   ['administration_disabled_drivers_title', 'Pilotes désactivés'],
   ['administration_disabled_drivers_search_placeholder', 'Rechercher le pilote...'],
+  ['administration_disabled_drivers_enable_insecure_driver_message', 'You are about to enable insecure "{arg:driverName}" driver. Are you sure?'],
 ];
