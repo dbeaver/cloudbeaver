@@ -2,13 +2,18 @@
 
 @layer base {
   :root {
-    --btn-radius: var(--radius-md);
+    --btn-height: var(--control-height-medium);
     --btn-padding-inline: --spacing(2.5);
+    --btn-gap: calc(var(--btn-padding-inline) / 4);
+    --btn-foreground: var(--color-white);
+    --btn-background: var(--color-primary-600);
+    --btn-background-hover: var(--color-primary-700);
+    --btn-background-active: var(--color-primary-800);
     --btn-border-width: 1px;
     --btn-border-color: transparent;
-    --btn-gap: calc(var(--btn-padding-inline) / 4);
+    --btn-border-style: solid;
+    --btn-radius: var(--radius-md);
     --btn-font-weight: var(--font-weight-normal);
-    --btn-height: var(--control-height-medium);
     --btn-font-size: calc(var(--font-size-base) * 0.875);
     --btn-disabled-opacity: 0.5;
     --btn-loader-animation: var(--animate-spin);

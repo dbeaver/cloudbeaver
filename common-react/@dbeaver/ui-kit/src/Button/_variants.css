@@ -1,10 +1,10 @@
 @layer base {
   :root {
     /* Primary Button */
-    --btn-foreground: var(--color-white);
-    --btn-background: var(--color-primary-600);
-    --btn-background-hover: var(--color-primary-700);
-    --btn-background-active: var(--color-primary-800);
+    --btn-primary-foreground: var(--color-white);
+    --btn-primary-background: var(--color-primary-600);
+    --btn-primary-background-hover: var(--color-primary-700);
+    --btn-primary-background-active: var(--color-primary-800);
 
     /* Secondary Button */
     --btn-secondary-foreground: var(--color-primary-600);

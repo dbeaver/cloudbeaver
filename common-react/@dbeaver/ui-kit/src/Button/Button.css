@@ -22,17 +22,33 @@
     white-space: nowrap;
 
     height: var(--btn-height);
-    border-radius: var(--btn-radius);
     padding-inline: var(--btn-padding-inline);
+    gap: var(--btn-gap);
+
+    background-color: var(--btn-background);
+    color: var(--btn-foreground);
+
+    border-radius: var(--btn-radius);
+    border-width: var(--btn-border-width);
+    border-color: var(--btn-border-color);
+    border-style: var(--btn-border-style);
 
     font-size: var(--btn-font-size);
     font-weight: var(--btn-font-weight);
 
-    gap: var(--btn-gap);
-
     &:disabled {
-      cursor: not-allowed;
       opacity: var(--btn-disabled-opacity);
+    }
+
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--btn-background-hover);
+      }
+    }
+
+    &:active,
+    &[data-active] {
+      background-color: var(--btn-background-active);
     }
   }
 
@@ -79,59 +95,34 @@
   /* Variants */
 
   .dbv-kit-button__primary {
+    --btn-background: var(--btn-primary-background);
+    --btn-foreground: var(--btn-primary-foreground);
+    --btn-background-hover: var(--btn-primary-background-hover);
+    --btn-background-active: var(--btn-primary-background-active);
+
     --btn-loader-color: color-mix(in srgb, var(--btn-background) 65%, var(--color-white));
     --btn-loader-background: color-mix(in srgb, var(--btn-foreground) 85%, transparent);
-
-    background-color: var(--btn-background);
-    color: var(--btn-foreground);
-
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--btn-background-hover);
-      }
-    }
-
-    &:active,
-    &[data-active] {
-      background-color: var(--btn-background-active);
-    }
   }
 
   .dbv-kit-button__secondary {
+    --btn-background: var(--btn-secondary-background);
+    --btn-foreground: var(--btn-secondary-foreground);
+    --btn-background-hover: var(--btn-secondary-background-hover);
+    --btn-background-active: var(--btn-secondary-background-active);
+    --btn-border-color: var(--btn-secondary-border-color);
+
     --btn-loader-color: color-mix(in srgb, var(--btn-secondary-foreground) 75%, var(--color-gray-600));
     --btn-loader-background: color-mix(in srgb, var(--color-white) 75%, transparent);
-
-    background-color: var(--btn-secondary-background);
-    border: var(--btn-border-width) solid var(--btn-secondary-border-color);
-    color: var(--btn-secondary-foreground);
-
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--btn-secondary-background-hover);
-      }
-    }
-
-    &:active {
-      background-color: var(--btn-secondary-background-active);
-    }
   }
 
   .dbv-kit-button__danger {
+    --btn-background: var(--btn-danger-background);
+    --btn-foreground: var(--btn-danger-foreground);
+    --btn-background-hover: var(--btn-danger-background-hover);
+    --btn-background-active: var(--btn-danger-background-active);
+
     --btn-loader-color: color-mix(in srgb, var(--btn-danger-background) 65%, var(--color-white));
     --btn-loader-background: color-mix(in srgb, var(--btn-danger-foreground) 85%, transparent);
-
-    background-color: var(--btn-danger-background);
-    color: var(--btn-danger-foreground);
-
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--btn-danger-background-hover);
-      }
-    }
-
-    &:active {
-      background-color: var(--btn-danger-background-active);
-    }
   }
 
   /* ---------------------------- */
@@ -139,10 +130,10 @@
 
   .dbv-kit-button_loader {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: calc(var(--btn-border-width) * -1);
+    left: calc(var(--btn-border-width) * -1);
+    width: calc(100% + var(--btn-border-width) * 2);
+    height: calc(100% + var(--btn-border-width) * 2);
     background: color-mix(in srgb, var(--btn-loader-background) 75%, var(--color-gray-100));
     display: flex;
     align-items: center;
