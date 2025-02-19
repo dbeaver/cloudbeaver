@@ -10,12 +10,17 @@ import { ConnectionsManagerService, getFolderPath } from '@cloudbeaver/core-conn
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { DATA_CONTEXT_NAV_NODE, isConnectionFolder, isProjectNode, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, isConnectionFolder, isProjectNode } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ActionService, DATA_CONTEXT_MENU, type IAction, MenuService } from '@cloudbeaver/core-view';
 import { ACTION_TREE_CREATE_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
-import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, TreeSelectionService } from '@cloudbeaver/plugin-navigation-tree';
+import {
+  DATA_CONTEXT_ELEMENTS_TREE,
+  MENU_ELEMENTS_TREE_TOOLS,
+  MENU_NAVIGATION_TREE_CREATE,
+  TreeSelectionService,
+} from '@cloudbeaver/plugin-navigation-tree';
 
 import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM.js';
 import { CustomConnectionSettingsService } from './CustomConnectionSettingsService.js';
@@ -42,25 +47,28 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
       getItems: (context, items) => [...items, ACTION_CONNECTION_CUSTOM],
     });
 
-    this.menuService.addCreator({
-      menus: [MENU_ELEMENTS_TREE_TOOLS],
-      isApplicable: context => {
-        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
+    // TODO: https://dbeaver.atlassian.net/browse/CB-6272
+    // this.menuService.addCreator({
+    //   menus: [MENU_ELEMENTS_TREE_TOOLS],
+    //   isApplicable: context => {
+    //     const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
 
-        return tree.baseRoot === ROOT_NODE_PATH;
-      },
-      getItems: (context, items) => {
-        if (!items.includes(ACTION_TREE_CREATE_CONNECTION)) {
-          return [...items, ACTION_TREE_CREATE_CONNECTION];
-        }
+    //     return tree.baseRoot === ROOT_NODE_PATH;
+    //   },
+    //   getItems: (context, items) => {
+    //     if (!items.includes(ACTION_TREE_CREATE_CONNECTION)) {
+    //       return [...items, ACTION_TREE_CREATE_CONNECTION];
+    //     }
 
-        return items;
-      },
-    });
+    //     return items;
+    //   },
+    // });
 
     this.menuService.addCreator({
       contexts: [DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_ELEMENTS_TREE],
-      root: true,
+      // TODO: https://dbeaver.atlassian.net/browse/CB-6272
+      menus: [MENU_NAVIGATION_TREE_CREATE],
+      // root: true,
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;

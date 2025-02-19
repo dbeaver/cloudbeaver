@@ -55,7 +55,7 @@ import { ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cl
 import {
   DATA_CONTEXT_ELEMENTS_TREE,
   MENU_ELEMENTS_TREE_TOOLS,
-  NavigationTreeService,
+  MENU_NAVIGATION_TREE_CREATE,
   TreeSelectionService,
 } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
@@ -78,7 +78,8 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly projectsNavNodeService: ProjectsNavNodeService,
-    private readonly navigationTreeService: NavigationTreeService,
+    // TODO: https://dbeaver.atlassian.net/browse/CB-6272
+    // private readonly navigationTreeService: NavigationTreeService,
     private readonly treeSelectionService: TreeSelectionService,
   ) {
     super();
@@ -160,8 +161,9 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      root: true,
-      // menus: [MENU_NAVIGATION_TREE_CREATE],
+      // TODO: https://dbeaver.atlassian.net/browse/CB-6272
+      // root: true,
+      menus: [MENU_NAVIGATION_TREE_CREATE],
       contexts: [DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_ELEMENTS_TREE],
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
@@ -337,9 +339,10 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
                 : getProjectNodeId(result.projectId),
             );
 
-            const newFolderId = getConnectionFolderId(createConnectionFolderParam(result.projectId, createPath(result.folder, result.name)));
-            await this.navNodeInfoResource.loadNodeParents(newFolderId);
-            await this.navigationTreeService.showNode(newFolderId, this.navNodeInfoResource.getParents(newFolderId));
+            // TODO: https://dbeaver.atlassian.net/browse/CB-6272
+            // const newFolderId = getConnectionFolderId(createConnectionFolderParam(result.projectId, createPath(result.folder, result.name)));
+            // await this.navNodeInfoResource.loadNodeParents(newFolderId);
+            // await this.navigationTreeService.showNode(newFolderId, this.navNodeInfoResource.getParents(newFolderId));
           } catch (exception: any) {
             this.notificationService.logException(exception, "Can't create folder");
           }

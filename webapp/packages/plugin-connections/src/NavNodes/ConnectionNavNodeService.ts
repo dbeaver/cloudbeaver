@@ -16,7 +16,6 @@ import {
   NavTreeResource,
   NodeManagerUtils,
 } from '@cloudbeaver/core-navigation-tree';
-import { NavigationTreeService } from '@cloudbeaver/plugin-navigation-tree';
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
 import { isResourceAlias, type ResourceKey, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { ServerEventId } from '@cloudbeaver/core-root';
@@ -42,7 +41,8 @@ export class ConnectionNavNodeService extends Dependency {
     private readonly containerResource: ContainerResource,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navNodeManagerService: NavNodeManagerService,
-    private readonly navigationTreeService: NavigationTreeService,
+    // TODO: https://dbeaver.atlassian.net/browse/CB-6272
+    // private readonly navigationTreeService: NavigationTreeService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly connectionFolderEventHandler: ConnectionFolderEventHandler,
   ) {
@@ -250,8 +250,9 @@ export class ConnectionNavNodeService extends Dependency {
 
       this.navTreeResource.insertToNode(parentId, insertIndex, connection.nodePath);
     } finally {
-      await this.navNodeInfoResource.loadNodeParents(connection.nodePath);
-      await this.navigationTreeService.showNode(connection.nodePath, this.navNodeInfoResource.getParents(connection.nodePath));
+      // TODO: https://dbeaver.atlassian.net/browse/CB-6272
+      // await this.navNodeInfoResource.loadNodeParents(connection.nodePath);
+      // await this.navigationTreeService.showNode(connection.nodePath, this.navNodeInfoResource.getParents(connection.nodePath));
     }
   }
 
