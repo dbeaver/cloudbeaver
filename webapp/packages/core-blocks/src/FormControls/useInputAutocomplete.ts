@@ -38,7 +38,6 @@ interface State {
   position: IContextMenuPositionCoords;
   inputValue: string;
   menuRef: RefObject<IMenuState>;
-  isFocused: boolean;
 }
 
 const DEFAULT_SEPARATOR = ' ';
@@ -63,7 +62,6 @@ export const useInputAutocomplete = (
       inputValue: '',
       isFound: false,
       selectionStart: 0 as number | null,
-      isFocused: false,
       replaceCurrentWord(replacement: string) {
         const cursorPosition = this.selectionStart;
         const words = this.inputValue.split(separator);
@@ -102,7 +100,7 @@ export const useInputAutocomplete = (
         return substring.split(separator).at(-1) ?? '';
       },
       get proposals() {
-        if (this.isFound || !this.currentWord || !this.isFocused) {
+        if (this.isFound || !this.currentWord) {
           return [];
         }
 
@@ -117,7 +115,6 @@ export const useInputAutocomplete = (
       replaceCurrentWord: action.bound,
       position: observable.ref,
       inputValue: observable.ref,
-      isFocused: observable.ref,
     },
     { inputRef, search, menuRef },
   );
@@ -130,7 +127,6 @@ export const useInputAutocomplete = (
         state.selectionStart = target.selectionStart;
         state.inputValue = target.value;
         state.isFound = false;
-        state.isFocused = true;
         state.search.setSearch(state.currentWord);
       }, INPUT_DELAY),
     [state],
@@ -147,14 +143,14 @@ export const useInputAutocomplete = (
         break;
       case 'Tab':
         state.selectionStart = null;
-        state.isFocused = false;
         break;
       default:
+        break;
     }
   }
 
   function handleFocus() {
-    state.isFocused = true;
+    state.selectionStart = state.inputRef.current?.selectionStart || null;
   }
 
   useEffect(() => {
@@ -200,7 +196,6 @@ export const useInputAutocomplete = (
 
   useLayoutEffect(() => {
     if (state.inputRef.current !== document.activeElement) {
-      state.isFocused = false;
       state.selectionStart = null;
     }
   });
