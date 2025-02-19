@@ -10,7 +10,7 @@ import { ConnectionsManagerService, getFolderPath } from '@cloudbeaver/core-conn
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { DATA_CONTEXT_NAV_NODE, isConnectionFolder, isProjectNode } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, isConnectionFolder, isProjectNode, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ActionService, DATA_CONTEXT_MENU, type IAction, MenuService } from '@cloudbeaver/core-view';
@@ -44,6 +44,11 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_ELEMENTS_TREE_TOOLS],
+      isApplicable: context => {
+        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
+
+        return tree.baseRoot === ROOT_NODE_PATH;
+      },
       getItems: (context, items) => {
         if (!items.includes(ACTION_TREE_CREATE_CONNECTION)) {
           return [...items, ACTION_TREE_CREATE_CONNECTION];

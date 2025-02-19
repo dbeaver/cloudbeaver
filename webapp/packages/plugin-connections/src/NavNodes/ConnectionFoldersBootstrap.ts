@@ -52,7 +52,12 @@ import {
 } from '@cloudbeaver/core-resource';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, TreeSelectionService } from '@cloudbeaver/plugin-navigation-tree';
+import {
+  DATA_CONTEXT_ELEMENTS_TREE,
+  MENU_ELEMENTS_TREE_TOOLS,
+  NavigationTreeService,
+  TreeSelectionService,
+} from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 
 import { ACTION_TREE_CREATE_FOLDER } from '../Actions/ACTION_TREE_CREATE_FOLDER.js';
@@ -73,6 +78,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly projectsNavNodeService: ProjectsNavNodeService,
+    private readonly navigationTreeService: NavigationTreeService,
     private readonly treeSelectionService: TreeSelectionService,
   ) {
     super();
@@ -330,6 +336,10 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
                 ? getConnectionFolderId(createConnectionFolderParam(result.projectId, result.folder))
                 : getProjectNodeId(result.projectId),
             );
+
+            const newFolderId = getConnectionFolderId(createConnectionFolderParam(result.projectId, createPath(result.folder, result.name)));
+            await this.navNodeInfoResource.loadNodeParents(newFolderId);
+            await this.navigationTreeService.showNode(newFolderId, this.navNodeInfoResource.getParents(newFolderId));
           } catch (exception: any) {
             this.notificationService.logException(exception, "Can't create folder");
           }
