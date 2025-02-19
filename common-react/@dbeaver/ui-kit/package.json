@@ -9,8 +9,7 @@
   },
   "scripts": {
     "build": "tsc -b",
-    "clean": "rimraf --glob dist",
-    "lint": "eslint ./src/ --ext .ts,.tsx"
+    "clean": "rimraf --glob dist"
   },
   "packageManager": "yarn@4.6.0",
   "devDependencies": {
