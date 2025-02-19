@@ -28,10 +28,7 @@ import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class WebDriverRegistry {
@@ -78,13 +75,24 @@ public class WebDriverRegistry {
      */
     public void refreshApplicableDrivers() {
         this.applicableDrivers.clear();
+        this.getSupportedFileOpenExtension().clear();
         this.applicableDrivers.addAll(
             DataSourceProviderRegistry.getInstance().getEnabledDataSourceProviders().stream()
                 .map(DBPDataSourceProviderDescriptor::getEnabledDrivers)
                 .flatMap(List::stream)
                 .filter(this::isDriverApplicable)
+                .peek(this::refreshFileExtensions)
                 .toList());
+
         log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
+    }
+
+    @NotNull
+    public Map<String, Set<DBPDriver>> getSupportedFileOpenExtension() {
+        return new HashMap<>();
+    }
+
+    protected void refreshFileExtensions(DBPDriver dbpDriver) {
     }
 
     protected boolean isDriverApplicable(@NotNull DBPDriver driver) {

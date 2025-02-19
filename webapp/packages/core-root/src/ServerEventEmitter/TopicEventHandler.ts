@@ -34,7 +34,7 @@ export abstract class TopicEventHandler<
   private readonly serverSubject?: Observable<TEvent>;
   private readonly subject: Subject<TEvent>;
   constructor(
-    private readonly topic: string,
+    topic: string,
     private readonly emitter: IServerEventEmitter<SourceEvent>,
   ) {
     this.onInit = new SyncExecutor();

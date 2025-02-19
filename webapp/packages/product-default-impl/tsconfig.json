@@ -1,0 +1,233 @@
+{
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../core-blocks"
+    },
+    {
+      "path": "../core-bootstrap"
+    },
+    {
+      "path": "../core-cli"
+    },
+    {
+      "path": "../core-di"
+    },
+    {
+      "path": "../core-localization"
+    },
+    {
+      "path": "../core-version-update"
+    },
+    {
+      "path": "../plugin-administration"
+    },
+    {
+      "path": "../plugin-app-logo"
+    },
+    {
+      "path": "../plugin-app-logo-administration"
+    },
+    {
+      "path": "../plugin-authentication"
+    },
+    {
+      "path": "../plugin-authentication-administration"
+    },
+    {
+      "path": "../plugin-browser"
+    },
+    {
+      "path": "../plugin-connection-custom"
+    },
+    {
+      "path": "../plugin-connection-search"
+    },
+    {
+      "path": "../plugin-connection-template"
+    },
+    {
+      "path": "../plugin-connections"
+    },
+    {
+      "path": "../plugin-connections-administration"
+    },
+    {
+      "path": "../plugin-data-export"
+    },
+    {
+      "path": "../plugin-data-grid"
+    },
+    {
+      "path": "../plugin-data-import"
+    },
+    {
+      "path": "../plugin-data-spreadsheet-new"
+    },
+    {
+      "path": "../plugin-data-viewer"
+    },
+    {
+      "path": "../plugin-data-viewer-result-set-grouping"
+    },
+    {
+      "path": "../plugin-data-viewer-result-trace-details"
+    },
+    {
+      "path": "../plugin-datasource-context-switch"
+    },
+    {
+      "path": "../plugin-datasource-transaction-manager"
+    },
+    {
+      "path": "../plugin-ddl-viewer"
+    },
+    {
+      "path": "../plugin-devtools"
+    },
+    {
+      "path": "../plugin-gis-viewer"
+    },
+    {
+      "path": "../plugin-help"
+    },
+    {
+      "path": "../plugin-holidays"
+    },
+    {
+      "path": "../plugin-holidays-administration"
+    },
+    {
+      "path": "../plugin-localization"
+    },
+    {
+      "path": "../plugin-log-viewer"
+    },
+    {
+      "path": "../plugin-navigation-tabs"
+    },
+    {
+      "path": "../plugin-navigation-tree"
+    },
+    {
+      "path": "../plugin-navigation-tree-filters"
+    },
+    {
+      "path": "../plugin-navigation-tree-rm"
+    },
+    {
+      "path": "../plugin-object-viewer"
+    },
+    {
+      "path": "../plugin-object-viewer-nav-tree-link"
+    },
+    {
+      "path": "../plugin-product"
+    },
+    {
+      "path": "../plugin-product-information-administration"
+    },
+    {
+      "path": "../plugin-projects"
+    },
+    {
+      "path": "../plugin-resource-manager"
+    },
+    {
+      "path": "../plugin-resource-manager-administration"
+    },
+    {
+      "path": "../plugin-resource-manager-scripts"
+    },
+    {
+      "path": "../plugin-root"
+    },
+    {
+      "path": "../plugin-session-expiration"
+    },
+    {
+      "path": "../plugin-settings-administration"
+    },
+    {
+      "path": "../plugin-settings-menu"
+    },
+    {
+      "path": "../plugin-settings-menu-administration"
+    },
+    {
+      "path": "../plugin-settings-panel"
+    },
+    {
+      "path": "../plugin-sql-editor"
+    },
+    {
+      "path": "../plugin-sql-editor-navigation-tab"
+    },
+    {
+      "path": "../plugin-sql-editor-navigation-tab-script"
+    },
+    {
+      "path": "../plugin-sql-editor-new"
+    },
+    {
+      "path": "../plugin-sql-editor-screen"
+    },
+    {
+      "path": "../plugin-sql-generator"
+    },
+    {
+      "path": "../plugin-sso"
+    },
+    {
+      "path": "../plugin-system-information-administration"
+    },
+    {
+      "path": "../plugin-task-manager"
+    },
+    {
+      "path": "../plugin-theme"
+    },
+    {
+      "path": "../plugin-tools-panel"
+    },
+    {
+      "path": "../plugin-top-app-bar"
+    },
+    {
+      "path": "../plugin-top-app-bar-administration"
+    },
+    {
+      "path": "../plugin-user-profile"
+    },
+    {
+      "path": "../plugin-user-profile-administration"
+    },
+    {
+      "path": "../plugin-user-profile-settings"
+    },
+    {
+      "path": "../plugin-version"
+    },
+    {
+      "path": "../plugin-version-update-administration"
+    }
+  ],
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "lib/**/*",
+    "dist/**/*"
+  ]
+}

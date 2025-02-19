@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type geojson from 'geojson';
 import * as ReactLeaflet from 'react-leaflet';
 
 declare module 'react-leaflet' {
   interface GeoJSONProps {
-    data?: geojson.GeoJsonObject;
+    data?: any;
   }
 }

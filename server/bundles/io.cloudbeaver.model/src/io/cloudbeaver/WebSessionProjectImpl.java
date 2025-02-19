@@ -35,7 +35,6 @@ import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class WebSessionProjectImpl extends WebProjectImpl {
@@ -206,7 +205,7 @@ public class WebSessionProjectImpl extends WebProjectImpl {
             .filter(Objects::nonNull)
             .collect(Collectors.toMap(
                 DBPDataSourceContainer::getId,
-                Function.identity())
+                registry::createDataSource)
             );
         if (WSDataSourceEvent.CREATED.equals(eventId) || WSDataSourceEvent.UPDATED.equals(eventId)) {
             registry.refreshConfig(dataSourceIds);
@@ -221,8 +220,14 @@ public class WebSessionProjectImpl extends WebProjectImpl {
                     addConnection(ds);
                     sendDataSourceUpdatedEvent = true;
                 }
-                case WSDataSourceEvent.UPDATED -> // if settings were changed we need to send event
-                    sendDataSourceUpdatedEvent |= !ds.equalSettings(oldDataSources.get(dsId));
+                case WSDataSourceEvent.UPDATED ->  {
+                    boolean connectionUpdated = !ds.equalSettings(oldDataSources.get(dsId));
+                    if (connectionUpdated) {
+                        sendDataSourceUpdatedEvent = true;
+                        WebDataSourceUtils.disconnectDataSource(webSession, ds);
+                    }
+                    // if settings were changed we need to send event
+                }
                 case WSDataSourceEvent.DELETED -> {
                     WebDataSourceUtils.disconnectDataSource(webSession, ds);
                     if (registry instanceof DBPDataSourceRegistryCache dsrc) {

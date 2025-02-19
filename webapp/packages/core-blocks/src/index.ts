@@ -7,6 +7,8 @@
  */
 export { useHotkeys } from 'react-hotkeys-hook';
 
+export * from './AuthenticationProviderLoader.js';
+export * from './useAuthenticationAction.js';
 export * from './CommonDialog/CommonDialog/CommonDialogBody.js';
 export * from './CommonDialog/CommonDialog/CommonDialogFooter.js';
 export * from './CommonDialog/CommonDialog/CommonDialogHeader.js';
@@ -20,8 +22,6 @@ export * from './CommonDialog/DialogsPortal.js';
 export * from './ErrorDetailsDialog/ErrorDetailsDialog.js';
 
 export * from './ComponentsRegistry/CRegistryLoader.js';
-// we don't expect to use this component directly only as a wrapper for another component
-// eslint-disable-next-line @cloudbeaver/no-sync-component-import
 export * from './ComponentsRegistry/registry.js';
 export * from './ComponentsRegistry/CRegistryList.js';
 export * from './ComponentsRegistry/IComponentsTreeNodeValidator.js';
@@ -67,7 +67,7 @@ export { default as MenuPanelStyles } from './Menu/MenuPanel.module.css';
 export * from './Menu/MenuSeparator.js';
 export { default as MenuSeparatorStyles } from './Menu/MenuSeparator.module.css';
 export * from './Menu/MenuStateContext.js';
-export * from './Menu/useMouseContextMenu.js';
+export * from './Menu/useContextMenuPosition.js';
 
 export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoFormLoader.js';
 export * from './ObjectPropertyInfo/useObjectPropertyCategories.js';
@@ -254,3 +254,7 @@ export * from './importLazyComponent.js';
 export * from './ClickableLoader.js';
 export * from './FormControls/TagsComboboxLoader.js';
 export * from './Flex/Flex.js';
+export * from './FormControls/useInputAutocomplete.js';
+export * from './FormControls/InputAutocompletionMenu.js';
+export * from './useSearch.js';
+export * from './useObjectInfoTooltip.js';

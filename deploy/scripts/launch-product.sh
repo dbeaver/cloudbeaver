@@ -11,7 +11,7 @@ if [ "$(id -u)" -eq 0 ]; then
     TARGET_UID=${TARGET_UID:-$DBEAVER_UID}
     TARGET_GID=${TARGET_GID:-$DBEAVER_GID}
 
-    chown -R $DBEAVER_UID:$DBEAVER_GID $PWD
+    chown -R $DBEAVER_UID:$DBEAVER_GID $PWD/workspace
     # Execute run-server.sh as the dbeaver user with the JAVA_HOME and PATH environment variables
     exec su "$TARGET_USER" -c "JAVA_HOME=$JAVA_HOME PATH=$PATH ./run-server.sh"
 else

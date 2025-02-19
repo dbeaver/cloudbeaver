@@ -15,7 +15,7 @@ See our [WIKI](https://github.com/dbeaver/cloudbeaver/wiki) for more details.
 ## Run in Docker
 
 - [Official Docker repository](https://hub.docker.com/r/dbeaver/cloudbeaver)
-- [Running instructions](https://github.com/dbeaver/cloudbeaver/wiki/Run-Docker-Container)
+- [Deployment instructions](https://github.com/dbeaver/cloudbeaver/wiki/CloudBeaver-Deployment)
 
 ## Demo server
 
@@ -24,6 +24,29 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 [Database access instructions](https://github.com/dbeaver/cloudbeaver/wiki/Demo-Server)
 
 ## Changelog
+
+### 24.3.5. 2025-02-17
+- Administration:
+  -    Added system information data to the Product Information tab in the Administration panel. This provides administrators with quick access to essential system details, such as the server deployment type (e.g., Docker, Kubernetes), install path, Java version, and Java parameters;
+  -    The global access server URL has been added to the console log, making it easier to locate server installation information directly within the logs;
+  -    EntityID or objectGUID is now used to create new LDAP users in CloudBeaver to ensure uniqueness. This change enhances user identification and prevents conflicts while maintaining backward compatibility for existing users.
+- General:
+  -    Tooltips for metadata objects and SQL Editor tabs now include additional details about catalogs, schemas, and connections.
+- Drivers:
+  -    MariaDB driver has been updated to version 3.5.1;
+  -    SQLite driver has been updated to version 3.48.0.0.
+
+### 24.3.4. 2025-02-03
+- Connections:
+  -    Added a possibility to switch a database connection to the read-only mode. This mode can be activated in the connection dialog. Administrators can set this mode for any connections, the regular users can set it for their own private connections only;
+  -    An ability to use advanced database settings in the URL connection mode was added for Oracle and SQL Server connections.
+- General:
+  -    Introduced auto-suggestions for column names in the Data Editor filter field to avoid typing mistakes;
+  -    Fixed the display of objects with long names (more than 32 characters) in the Navigator tree - now, such names will be displayed entirely and not in a cropped format;
+  -    Added the ability to use default spreadsheet names (e.g. Sheet0, Sheet1) for export to XLSX.
+- Deployment:
+  -    CloudBeaver base Java image was switched to the JDK 21 version. The new Java version will be applied automatically after the product update if you use standard deployment and upgrade scripts;
+  -    Changed the permissions of the Docker volumes directory from the "root" user to the "dbeaver" user (uid=8978). To enhance security and prevent any insecure actions by the "root" user. These changes will only affect existing deployments.
 
 ### 24.3.3. 2025-01-20
 - Administration:

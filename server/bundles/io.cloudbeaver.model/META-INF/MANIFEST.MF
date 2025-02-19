@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Model
 Bundle-SymbolicName: io.cloudbeaver.model;singleton:=true
-Bundle-Version: 1.0.70.qualifier
-Bundle-Release-Date: 20250203
+Bundle-Version: 1.0.72.qualifier
+Bundle-Release-Date: 20250303
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
@@ -29,6 +29,7 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.model,
  io.cloudbeaver.model.app,
  io.cloudbeaver.model.config,
+ io.cloudbeaver.model.events,
  io.cloudbeaver.model.fs,
  io.cloudbeaver.model.log,
  io.cloudbeaver.model.rm,

@@ -33,6 +33,10 @@
   text-overflow: ellipsis;
 }
 
+.treeNodeName.temporary {
+  font-style: italic;
+}
+
 .portal {
   position: relative;
   box-sizing: border-box;

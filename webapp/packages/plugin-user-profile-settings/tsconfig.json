@@ -1,43 +1,47 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "composite": true
   },
   "references": [
     {
-      "path": "../core-blocks/tsconfig.json"
+      "path": "../core-blocks"
     },
     {
-      "path": "../core-di/tsconfig.json"
+      "path": "../core-cli"
     },
     {
-      "path": "../core-dialogs/tsconfig.json"
+      "path": "../core-di"
     },
     {
-      "path": "../core-events/tsconfig.json"
+      "path": "../core-dialogs"
     },
     {
-      "path": "../core-executor/tsconfig.json"
+      "path": "../core-events"
     },
     {
-      "path": "../core-localization/tsconfig.json"
+      "path": "../core-executor"
     },
     {
-      "path": "../core-settings-user/tsconfig.json"
+      "path": "../core-localization"
     },
     {
-      "path": "../core-view/tsconfig.json"
+      "path": "../core-settings-user"
     },
     {
-      "path": "../plugin-settings-menu/tsconfig.json"
+      "path": "../core-view"
     },
     {
-      "path": "../plugin-settings-panel/tsconfig.json"
+      "path": "../plugin-settings-menu"
     },
     {
-      "path": "../plugin-user-profile/tsconfig.json"
+      "path": "../plugin-settings-panel"
+    },
+    {
+      "path": "../plugin-user-profile"
     }
   ],
   "include": [

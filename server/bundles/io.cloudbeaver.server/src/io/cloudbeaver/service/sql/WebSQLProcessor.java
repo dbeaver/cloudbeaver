@@ -889,13 +889,18 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
         @NotNull Integer lobColumnIndex,
-        @Nullable WebSQLResultsRow row
+        @NotNull WebSQLResultsRow row
     ) throws DBException {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
-        checkRowIdentifier(resultsInfo, rowIdentifier);
-        String tableName = rowIdentifier.getEntity().getName();
+        String tableName;
+        if (rowIdentifier == null && resultsInfo.isSingleRow()) {
+            tableName = resultsInfo.getDataContainer().getName();
+        } else {
+            checkRowIdentifier(resultsInfo, rowIdentifier);
+            tableName = rowIdentifier.getEntity().getName();
+        }
         WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(tableName, resultsInfo.getDataContainer(), lobColumnIndex);
         readCellDataValue(monitor, resultsInfo, row, dataReceiver);
         try {
@@ -909,55 +914,75 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull DBRProgressMonitor monitor,
         @NotNull WebSQLResultsInfo resultsInfo,
         @Nullable WebSQLResultsRow row,
-        @NotNull WebSQLCellValueReceiver dataReceiver) throws DBException {
+        @NotNull WebSQLCellValueReceiver dataReceiver
+    ) throws DBException {
         DBSDataContainer dataContainer = resultsInfo.getDataContainer();
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
-            WebExecutionSource executionSource = new WebExecutionSource(dataContainer, executionContext, this);
             DBDDataFilter dataFilter = new DBDDataFilter();
-            DBDAttributeBinding[] keyAttributes = resultsInfo.getDefaultRowIdentifier().getAttributes().toArray(new DBDAttributeBinding[0]);
-            Object[] rowValues = new Object[keyAttributes.length];
-            List<DBDAttributeConstraint> constraints = new ArrayList<>();
-            for (int i = 0; i < keyAttributes.length; i++) {
-                DBDAttributeBinding keyAttribute = keyAttributes[i];
-                boolean isDocumentValue = keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
-                if (isDocumentValue) {
-                    rowValues[i] =
-                        makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row, null);
-                } else {
-                    Object inputCellValue = row.getData()[keyAttribute.getOrdinalPosition()];
-
-                    rowValues[i] = keyAttribute.getValueHandler().getValueFromObject(
-                        session,
-                        keyAttribute,
-                        convertInputCellValue(session, keyAttribute,
-                            inputCellValue, false),
-                        false,
-                        true);
-                }
-                final DBDAttributeConstraint constraint = new DBDAttributeConstraint(keyAttribute);
-                constraint.setOperator(DBCLogicalOperator.EQUALS);
-                constraint.setValue(rowValues[i]);
-                constraints.add(constraint);
+            if (!resultsInfo.isSingleRow()) {
+                addKeyAttributes(resultsInfo, row, dataContainer, session, dataFilter);
             }
-            dataFilter.addConstraints(constraints);
-            DBCStatistics statistics = dataContainer.readData(
+            WebExecutionSource executionSource = new WebExecutionSource(dataContainer, executionContext, this);
+            dataContainer.readData(
                 executionSource, session, dataReceiver, dataFilter,
                 0, 1, DBSDataContainer.FLAG_NONE, 1);
         }
     }
 
+    private void addKeyAttributes(
+        @NotNull WebSQLResultsInfo resultsInfo,
+        @Nullable WebSQLResultsRow row,
+        @NotNull DBSDataContainer dataContainer,
+        @NotNull DBCSession session,
+        @NotNull DBDDataFilter dataFilter
+    ) throws DBException {
+        DBDAttributeBinding[] keyAttributes = resultsInfo.getDefaultRowIdentifier().getAttributes().toArray(new DBDAttributeBinding[0]);
+        Object[] rowValues = new Object[keyAttributes.length];
+        List<DBDAttributeConstraint> constraints = new ArrayList<>();
+        for (int i = 0; i < keyAttributes.length; i++) {
+            DBDAttributeBinding keyAttribute = keyAttributes[i];
+            boolean isDocumentValue = keyAttributes.length == 1
+                                      && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT
+                                      && dataContainer instanceof DBSDocumentLocator;
+            if (isDocumentValue) {
+                rowValues[i] =
+                    makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row, null);
+            } else {
+                Object inputCellValue = row.getData()[keyAttribute.getOrdinalPosition()];
+
+                rowValues[i] = keyAttribute.getValueHandler().getValueFromObject(
+                    session,
+                    keyAttribute,
+                    convertInputCellValue(session, keyAttribute,
+                        inputCellValue, false),
+                    false,
+                    true);
+            }
+            final DBDAttributeConstraint constraint = new DBDAttributeConstraint(keyAttribute);
+            constraint.setOperator(DBCLogicalOperator.EQUALS);
+            constraint.setValue(rowValues[i]);
+            constraints.add(constraint);
+        }
+        dataFilter.addConstraints(constraints);
+    }
+
+    /**
+     * Reads cell value as string from provided row and column index.
+     */
     @NotNull
     public String readStringValue(
         @NotNull DBRProgressMonitor monitor,
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
         @NotNull Integer columnIndex,
-        @Nullable WebSQLResultsRow row
+        @NotNull WebSQLResultsRow row
     ) throws DBException {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
-        DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
-        checkRowIdentifier(resultsInfo, rowIdentifier);
+        if (!resultsInfo.isSingleRow()) {
+            DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
+            checkRowIdentifier(resultsInfo, rowIdentifier);
+        }
         WebSQLCellValueReceiver dataReceiver = new WebSQLCellValueReceiver(resultsInfo.getDataContainer(), columnIndex);
         readCellDataValue(monitor, resultsInfo, row, dataReceiver);
         return new String(dataReceiver.getBinaryValue(monitor), StandardCharsets.UTF_8);

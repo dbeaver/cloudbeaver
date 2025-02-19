@@ -10,7 +10,6 @@ import { createContext } from 'react';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import type { Column } from '@cloudbeaver/plugin-data-grid';
 import type {
-  DatabaseDataConstraintAction,
   DatabaseEditChangeType,
   IResultSetColumnKey,
   IResultSetElementKey,
@@ -23,7 +22,7 @@ import type {
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-declare module 'react-data-grid' {
+declare module '@cloudbeaver/plugin-data-grid' {
   interface Column<TRow, TSummaryRow = unknown> {
     columnDataIndex: IResultSetColumnKey | null;
     onRenderHeader?(key: IResultSetColumnKey): void;

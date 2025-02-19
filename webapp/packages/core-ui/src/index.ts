@@ -88,8 +88,6 @@ export * from './SideBarPanel/LeftBarPanelService.js';
 export * from './SideBarPanel/SideBarPanelLoader.js';
 export * from './SideBarPanel/SideBarPanelService.js';
 
-export * from './AuthenticationProviderLoader.js';
-export * from './useAuthenticationAction.js';
 export * from './Screens/AppScreen/BaseOptionsPanelService.js';
 
 export { manifest as coreUIManifest } from './manifest.js';

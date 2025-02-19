@@ -14,6 +14,7 @@ const MAX_KEEP_ALIVE_INTERVAL = 32767;
 const DEFAULT_CONFIG: ConnectionConfig = {
   keepAliveInterval: 0,
   autocommit: true,
+  readOnly: false,
 };
 
 interface Props {
@@ -52,6 +53,17 @@ export const AdvancedPropertiesForm = observer<Props>(function AdvancedPropertie
             readOnly={readonly}
           >
             {translate('connections_connection_autocommit')}
+          </FieldCheckbox>
+
+          <FieldCheckbox
+            name="readOnly"
+            state={config}
+            defaultChecked={DEFAULT_CONFIG.readOnly}
+            title={translate('connections_connection_read_only')}
+            disabled={disabled}
+            readOnly={readonly}
+          >
+            {translate('connections_connection_read_only')}
           </FieldCheckbox>
         </Container>
       </Expandable>

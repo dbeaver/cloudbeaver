@@ -9,14 +9,15 @@
   "version": "0.1.0",
   "description": "",
   "license": "Apache-2.0",
-  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "scripts": {
     "build": "tsc -b",
     "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "test": "core-cli-test",
-    "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "yarn run clean && typescript-resolve-references"
+    "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
     "@timohausmann/quadtree-ts": "^2",
@@ -25,6 +26,7 @@
     "i18next": "^24",
     "md5": "^2",
     "mobx": "^6",
+    "tslib": "^2",
     "underscore": "^1",
     "uuid": "^11",
     "whatwg-mimetype": "^4",
@@ -32,8 +34,9 @@
     "zod-i18n-map": "^2",
     "zod-validation-error": "^3"
   },
-  "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/tsconfig": "workspace:*",
     "@jest/globals": "^29",
     "@types/jest": "^29",
     "@types/md5": "^2",

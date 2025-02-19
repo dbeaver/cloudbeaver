@@ -32,7 +32,7 @@ export const FolderExplorerPath = observer<Props>(function FolderExplorerPath({ 
     return null;
   }
 
-  const pathElements: JSX.Element[] = [];
+  const pathElements: React.JSX.Element[] = [];
   let skip = false;
   let skipTitle = '';
 

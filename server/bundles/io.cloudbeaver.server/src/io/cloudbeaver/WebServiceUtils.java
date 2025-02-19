@@ -24,8 +24,10 @@ import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.app.ServletApplication;
+import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.utils.ConfigurationUtils;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.server.WebAppUtils;
@@ -132,6 +134,7 @@ public class WebServiceUtils extends WebCommonUtils {
         newDataSource.setSavePassword(true);
         newDataSource.setName(config.getName());
         newDataSource.setDescription(config.getDescription());
+        newDataSource.setConnectionReadOnly(config.isReadOnly());
         if (config.getFolder() != null) {
             newDataSource.setFolder(registry.getFolder(config.getFolder()));
         }
@@ -399,5 +402,20 @@ public class WebServiceUtils extends WebCommonUtils {
             webProps.add(webProperty);
         }
         return webProps.toArray(new WebPropertyInfo[0]);
+    }
+
+    /**
+     * Check whether driver is enabled
+     *
+     * @param driver driver
+     * @return true if driver is enabled
+     */
+    public static boolean isDriverEnabled(@NotNull DBPDriver driver) {
+        WebAppConfiguration config = WebAppUtils.getWebApplication().getAppConfiguration();
+        return ConfigurationUtils.isDriverEnabled(
+            driver,
+            config.getEnabledDrivers(),
+            config.getDisabledDrivers()
+        );
     }
 }

@@ -26,7 +26,7 @@ export type ConnectionDialect = SqlDialectInfo;
 export class ConnectionDialectResource extends CachedMapResource<IConnectionInfoParams, ConnectionDialect> {
   constructor(
     private readonly graphQLService: GraphQLService,
-    private readonly projectsService: ProjectsService,
+    projectsService: ProjectsService,
     connectionInfoResource: ConnectionInfoResource,
   ) {
     super();

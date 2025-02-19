@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+/// <reference types="vite/client" />
 import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -96,7 +97,7 @@ export class DevToolsService {
 
 function getDefaultDevToolsSettings(): IDevToolsSettings {
   return {
-    enabled: process.env['NODE_ENV'] === 'development',
+    enabled: import.meta.env.DEV,
     override: false,
     distributed: null,
     configuration: null,
