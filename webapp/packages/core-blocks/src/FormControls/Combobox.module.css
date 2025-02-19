@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@
   max-height: 300px;
   overflow: auto;
   outline: none;
-  z-index: 999;
+  z-index: 998;
   border-radius: var(--theme-form-element-radius);
 
   & .menuItem {

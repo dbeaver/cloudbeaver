@@ -592,13 +592,18 @@ public class WebServiceSQL implements DBWServiceSQL {
         try {
 
             WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+            List<SQLGroupingAttribute> groupingAttributes = Arrays.stream(resultsInfo.getAttributes())
+                .filter(attr -> columnsList.contains(WebSQLUtils.getColumnName(attr)))
+                .map(SQLGroupingAttribute::makeBound)
+                .toList();
+
             var dataSource = contextInfo.getProcessor().getConnection().getDataSource();
             var groupingQueryGenerator = new SQLGroupingQueryGenerator(
                 dataSource,
                 resultsInfo.getDataContainer(),
                 getSqlDialectFromConnection(dataSource.getContainer()),
                 contextInfo.getProcessor().getSyntaxManager(),
-                columnsList.stream().map(s -> SQLGroupingAttribute.makeCustom(dataSource, s)).toList(),
+                groupingAttributes,
                 functions == null ? List.of(SQLGroupingQueryGenerator.DEFAULT_FUNCTION) : functions, // backward compatibility
                 CommonUtils.getBoolean(showDuplicatesOnly, false));
             return groupingQueryGenerator.generateGroupingQuery(resultsInfo.getQueryText());
