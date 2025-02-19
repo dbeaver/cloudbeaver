@@ -16,15 +16,15 @@
 }
 
 .dbv-kit-input {
-  background: var(--input-background);
-  border: 1px solid var(--input-border);
-  color: var(--input-foreground);
-  padding: var(--input-padding);
-  font-size: var(--input-font-size);
-  height: var(--input-height);
+  background: var(--dbv-kit-input-background);
+  border: 1px solid var(--dbv-kit-input-border);
+  color: var(--dbv-kit-input-foreground);
+  padding: var(--dbv-kit-input-padding);
+  font-size: var(--dbv-kit-input-font-size);
+  height: var(--dbv-kit-input-height);
 
   &::placeholder {
-    color: var(--input-placeholder-foreground);
+    color: var(--dbv-kit-input-placeholder-foreground);
   }
 }
 
@@ -32,19 +32,19 @@
 /* Sizes */
 
 .dbv-kit-input__small {
-  --input-height: var(--input-small-height);
-  --input-padding: var(--input-small-padding);
-  --input-font-size: var(--input-small-font-size);
+  --dbv-kit-input-height: var(--dbv-kit-input-small-height);
+  --dbv-kit-input-padding: var(--dbv-kit-input-small-padding);
+  --dbv-kit-input-font-size: var(--dbv-kit-input-small-font-size);
 }
 
 .dbv-kit-input__large {
-  --input-height: var(--input-large-height);
-  --input-padding: var(--input-large-padding);
-  --input-font-size: var(--input-large-font-size);
+  --dbv-kit-input-height: var(--dbv-kit-input-large-height);
+  --dbv-kit-input-padding: var(--dbv-kit-input-large-padding);
+  --dbv-kit-input-font-size: var(--dbv-kit-input-large-font-size);
 }
 
 .dbv-kit-input__xlarge {
-  --input-height: var(--input-xlarge-height);
-  --input-padding: var(--input-xlarge-padding);
-  --input-font-size: var(--input-xlarge-font-size);
+  --dbv-kit-input-height: var(--dbv-kit-input-xlarge-height);
+  --dbv-kit-input-padding: var(--dbv-kit-input-xlarge-padding);
+  --dbv-kit-input-font-size: var(--dbv-kit-input-xlarge-font-size);
 }

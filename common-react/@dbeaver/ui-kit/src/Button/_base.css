@@ -2,20 +2,20 @@
 
 @layer base {
   :root {
-    --btn-height: var(--control-height-medium);
-    --btn-padding-inline: --spacing(2.5);
-    --btn-gap: calc(var(--btn-padding-inline) / 4);
-    --btn-foreground: var(--color-white);
-    --btn-background: var(--color-primary-600);
-    --btn-background-hover: var(--color-primary-700);
-    --btn-background-active: var(--color-primary-800);
-    --btn-border-width: 1px;
-    --btn-border-color: transparent;
-    --btn-border-style: solid;
-    --btn-radius: var(--radius-md);
-    --btn-font-weight: var(--font-weight-normal);
-    --btn-font-size: calc(var(--font-size-base) * 0.875);
-    --btn-disabled-opacity: 0.5;
-    --btn-loader-animation: var(--animate-spin);
+    --dbv-kit-btn-height: var(--dbv-kit-control-height-medium);
+    --dbv-kit-btn-padding-inline: --spacing(2.5);
+    --dbv-kit-btn-gap: calc(var(--dbv-kit-btn-padding-inline) / 4);
+    --dbv-kit-btn-foreground: var(--color-white);
+    --dbv-kit-btn-background: var(--dbv-kit-color-primary-600);
+    --dbv-kit-btn-background-hover: var(--dbv-kit-color-primary-700);
+    --dbv-kit-btn-background-active: var(--dbv-kit-color-primary-800);
+    --dbv-kit-btn-border-width: 1px;
+    --dbv-kit-btn-border-color: transparent;
+    --dbv-kit-btn-border-style: solid;
+    --dbv-kit-btn-radius: var(--radius-md);
+    --dbv-kit-btn-font-weight: var(--font-weight-normal);
+    --dbv-kit-btn-font-size: calc(var(--dbv-kit-font-size-base) * 0.875);
+    --dbv-kit-btn-disabled-opacity: 0.5;
+    --dbv-kit-btn-loader-animation: var(--animate-spin);
   }
 }

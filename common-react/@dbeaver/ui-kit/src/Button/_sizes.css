@@ -1,27 +1,27 @@
 @layer base {
   :root {
     /*Small button*/
-    --btn-small-padding-inline: calc(var(--btn-padding-inline) * 0.5);
-    --btn-small-font-size: calc(var(--btn-font-size) * 0.875);
-    --btn-small-height: var(--control-height-small);
-    --btn-small-gap: calc(var(--btn-gap) * 0.5);
+    --dbv-kit-btn-small-padding-inline: calc(var(--dbv-kit-btn-padding-inline) * 0.5);
+    --dbv-kit-btn-small-font-size: calc(var(--dbv-kit-btn-font-size) * 0.875);
+    --dbv-kit-btn-small-height: var(--dbv-kit-control-height-small);
+    --dbv-kit-btn-small-gap: calc(var(--dbv-kit-btn-gap) * 0.5);
 
     /*Medium button*/
-    --btn-medium-padding-inline: var(--btn-padding-inline);
-    --btn-medium-font-size: var(--btn-font-size);
-    --btn-medium-height: var(--control-height-medium);
-    --btn-medium-gap: var(--btn-gap);
+    --dbv-kit-btn-medium-padding-inline: var(--dbv-kit-btn-padding-inline);
+    --dbv-kit-btn-medium-font-size: var(--dbv-kit-btn-font-size);
+    --dbv-kit-btn-medium-height: var(--dbv-kit-control-height-medium);
+    --dbv-kit-btn-medium-gap: var(--dbv-kit-btn-gap);
 
     /*Large button*/
-    --btn-large-padding-inline: calc(var(--btn-padding-inline) * 1.25);
-    --btn-large-font-size: calc(var(--btn-font-size) * 1.125);
-    --btn-large-height: var(--control-height-large);
-    --btn-large-gap: calc(var(--btn-gap) * 1.25);
+    --dbv-kit-btn-large-padding-inline: calc(var(--dbv-kit-btn-padding-inline) * 1.25);
+    --dbv-kit-btn-large-font-size: calc(var(--dbv-kit-btn-font-size) * 1.125);
+    --dbv-kit-btn-large-height: var(--dbv-kit-control-height-large);
+    --dbv-kit-btn-large-gap: calc(var(--dbv-kit-btn-gap) * 1.25);
 
     /*Extra large button*/
-    --btn-xlarge-padding-inline: calc(var(--btn-padding-inline) * 1.5);
-    --btn-xlarge-font-size: calc(var(--btn-font-size) * 1.25);
-    --btn-xlarge-height: var(--control-height-xlarge);
-    --btn-xlarge-gap: calc(var(--btn-gap) * 1.5);
+    --dbv-kit-btn-xlarge-padding-inline: calc(var(--dbv-kit-btn-padding-inline) * 1.5);
+    --dbv-kit-btn-xlarge-font-size: calc(var(--dbv-kit-btn-font-size) * 1.25);
+    --dbv-kit-btn-xlarge-height: var(--dbv-kit-control-height-xlarge);
+    --dbv-kit-btn-xlarge-gap: calc(var(--dbv-kit-btn-gap) * 1.5);
   }
 }

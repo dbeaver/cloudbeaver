@@ -1,22 +1,22 @@
 @layer base {
   :root {
     /* Primary Button */
-    --btn-primary-foreground: var(--color-white);
-    --btn-primary-background: var(--color-primary-600);
-    --btn-primary-background-hover: var(--color-primary-700);
-    --btn-primary-background-active: var(--color-primary-800);
+    --dbv-kit-btn-primary-foreground: var(--color-white);
+    --dbv-kit-btn-primary-background: var(--dbv-kit-color-primary-600);
+    --dbv-kit-btn-primary-background-hover: var(--dbv-kit-color-primary-700);
+    --dbv-kit-btn-primary-background-active: var(--dbv-kit-color-primary-800);
 
     /* Secondary Button */
-    --btn-secondary-foreground: var(--color-primary-600);
-    --btn-secondary-background: transparent;
-    --btn-secondary-background-hover: var(--color-primary-50);
-    --btn-secondary-background-active: var(--color-primary-100);
-    --btn-secondary-border-color: var(--color-primary-600);
+    --dbv-kit-btn-secondary-foreground: var(--dbv-kit-color-primary-600);
+    --dbv-kit-btn-secondary-background: transparent;
+    --dbv-kit-btn-secondary-background-hover: var(--dbv-kit-color-primary-50);
+    --dbv-kit-btn-secondary-background-active: var(--dbv-kit-color-primary-100);
+    --dbv-kit-btn-secondary-border-color: var(--dbv-kit-color-primary-600);
 
     /* Danger Button */
-    --btn-danger-foreground: var(--color-white);
-    --btn-danger-background: var(--color-red-600);
-    --btn-danger-background-hover: var(--color-red-700);
-    --btn-danger-background-active: var(--color-red-800);
+    --dbv-kit-btn-danger-foreground: var(--color-white);
+    --dbv-kit-btn-danger-background: var(--color-red-600);
+    --dbv-kit-btn-danger-background-hover: var(--color-red-700);
+    --dbv-kit-btn-danger-background-active: var(--color-red-800);
   }
 }

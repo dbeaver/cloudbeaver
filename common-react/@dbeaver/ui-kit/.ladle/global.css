@@ -1,4 +1,4 @@
-@layer base {
+@layer theme {
   a {
     color: var(--color-blue-600);
   }

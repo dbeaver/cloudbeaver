@@ -12,40 +12,41 @@
 @layer base {
   :root {
     /* General */
-    --font-size-base: 1rem;
+    --dbv-kit-font-size-base: 1rem;
 
     /* Sizes */
-    --control-height-base: 2rem;
-    --control-height-small: calc(var(--control-height-base) * 0.75);
-    --control-height-medium: var(--control-height-base);
-    --control-height-large: calc(var(--control-height-base) * 1.25);
-    --control-height-xlarge: calc(var(--control-height-base) * 1.5);
+    --dbv-kit-control-height-base: 2rem;
+    --dbv-kit-control-height-small: calc(var(--dbv-kit-control-height-base) * 0.75);
+    --dbv-kit-control-height-medium: var(--dbv-kit-control-height-base);
+    --dbv-kit-control-height-large: calc(var(--dbv-kit-control-height-base) * 1.25);
+    --dbv-kit-control-height-xlarge: calc(var(--dbv-kit-control-height-base) * 1.5);
 
     /* Colors */
-    --color-foreground: var(--color-gray-900);
-    --color-background: var(--color-gray-50);
+    --dbv-kit-color-foreground: var(--color-gray-900);
+    --dbv-kit-color-background: var(--color-gray-50);
 
-    --color-text: var(--color-gray-900);
+    --dbv-kit-color-text: var(--color-gray-900);
+    --dbv-kit-color-outline: var(--color-yellow-600);
 
-    --color-primary-50: var(--color-blue-50);
-    --color-primary-100: var(--color-blue-100);
-    --color-primary-200: var(--color-blue-200);
-    --color-primary-500: var(--color-blue-500);
-    --color-primary-600: var(--color-blue-600);
-    --color-primary-700: var(--color-blue-700);
-    --color-primary-800: var(--color-blue-800);
-    --color-primary-900: var(--color-blue-900);
+    --dbv-kit-color-primary-50: var(--color-blue-50);
+    --dbv-kit-color-primary-100: var(--color-blue-100);
+    --dbv-kit-color-primary-200: var(--color-blue-200);
+    --dbv-kit-color-primary-500: var(--color-blue-500);
+    --dbv-kit-color-primary-600: var(--color-blue-600);
+    --dbv-kit-color-primary-700: var(--color-blue-700);
+    --dbv-kit-color-primary-800: var(--color-blue-800);
+    --dbv-kit-color-primary-900: var(--color-blue-900);
 
-    --color-error-text: var(--color-red-900);
-    --color-error-background: var(--color-red-50);
-    --color-error-border: var(--color-red-200);
+    --dbv-kit-color-error-text: var(--color-red-900);
+    --dbv-kit-color-error-background: var(--color-red-50);
+    --dbv-kit-color-error-border: var(--color-red-200);
 
-    --color-info-text: var(--color-blue-900);
-    --color-info-background: var(--color-blue-50);
-    --color-info-border: var(--color-blue-200);
+    --dbv-kit-color-info-text: var(--color-blue-900);
+    --dbv-kit-color-info-background: var(--color-blue-50);
+    --dbv-kit-color-info-border: var(--color-blue-200);
 
-    --color-warning-text: var(--color-orange-900);
-    --color-warning-background: var(--color-orange-50);
-    --color-warning-border: var(--color-orange-200);
+    --dbv-kit-color-warning-text: var(--color-orange-900);
+    --dbv-kit-color-warning-background: var(--color-orange-50);
+    --dbv-kit-color-warning-border: var(--color-orange-200);
   }
 }

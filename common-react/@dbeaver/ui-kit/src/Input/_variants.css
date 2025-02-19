@@ -1,15 +1,15 @@
 @layer base {
   :root {
-    --input-validation-error-background: var(--color-error-background);
-    --input-validation-error-foreground: var(--color-error-text);
-    --input-validation-error-border: var(--color-error-border);
+    --dbv-kit-input-validation-error-background: var(--dbv-kit-color-error-background);
+    --dbv-kit-input-validation-error-foreground: var(--dbv-kit-color-error-text);
+    --dbv-kit-input-validation-error-border: var(--dbv-kit-color-error-border);
 
-    --input-validation-info-background: var(--color-info-background);
-    --input-validation-info-foreground: var(--color-info-text);
-    --input-validation-info-order: var(--color-info-border);
-    
-    --input-validation-warning-background: var(--color-warning-background);
-    --input-validation-warning-foreground: var(--color-warning-text);
-    --input-validation-warning-border: var(--color-warning-border);
+    --dbv-kit-input-validation-info-background: var(--dbv-kit-color-info-background);
+    --dbv-kit-input-validation-info-foreground: var(--dbv-kit-color-info-text);
+    --dbv-kit-input-validation-info-order: var(--dbv-kit-color-info-border);
+
+    --dbv-kit-input-validation-warning-background: var(--dbv-kit-color-warning-background);
+    --dbv-kit-input-validation-warning-foreground: var(--dbv-kit-color-warning-text);
+    --dbv-kit-input-validation-warning-border: var(--dbv-kit-color-warning-border);
   }
 }

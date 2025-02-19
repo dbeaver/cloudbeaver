@@ -21,34 +21,40 @@
     align-items: center;
     white-space: nowrap;
 
-    height: var(--btn-height);
-    padding-inline: var(--btn-padding-inline);
-    gap: var(--btn-gap);
+    height: var(--dbv-kit-btn-height);
+    padding-inline: var(--dbv-kit-btn-padding-inline);
+    gap: var(--dbv-kit-btn-gap);
 
-    background-color: var(--btn-background);
-    color: var(--btn-foreground);
+    background-color: var(--dbv-kit-btn-background);
+    color: var(--dbv-kit-btn-foreground);
 
-    border-radius: var(--btn-radius);
-    border-width: var(--btn-border-width);
-    border-color: var(--btn-border-color);
-    border-style: var(--btn-border-style);
+    border-radius: var(--dbv-kit-btn-radius);
+    border-width: var(--dbv-kit-btn-border-width);
+    border-color: var(--dbv-kit-btn-border-color);
+    border-style: var(--dbv-kit-btn-border-style);
 
-    font-size: var(--btn-font-size);
-    font-weight: var(--btn-font-weight);
+    font-size: var(--dbv-kit-btn-font-size);
+    font-weight: var(--dbv-kit-btn-font-weight);
 
     &:disabled {
-      opacity: var(--btn-disabled-opacity);
+      opacity: var(--dbv-kit-btn-disabled-opacity);
     }
 
     &:not([aria-label='Loading']):hover {
       @media (hover: hover) {
-        background-color: var(--btn-background-hover);
+        background-color: var(--dbv-kit-btn-background-hover);
       }
     }
 
     &:active,
     &[data-active] {
-      background-color: var(--btn-background-active);
+      background-color: var(--dbv-kit-btn-background-active);
+    }
+
+    &:focus,
+    &:focus-visible,
+    &[data-focus-visible] {
+      outline: 2px solid var(--dbv-kit-color-outline);
     }
   }
 
@@ -56,73 +62,73 @@
   /* Sizes */
 
   .dbv-kit-button__small {
-    --btn-padding-inline: var(--btn-small-padding-inline);
-    --btn-font-size: var(--btn-small-font-size);
-    --btn-height: var(--btn-small-height);
-    --btn-gap: var(--btn-small-gap);
+    --dbv-kit-btn-padding-inline: var(--dbv-kit-btn-small-padding-inline);
+    --dbv-kit-btn-font-size: var(--dbv-kit-btn-small-font-size);
+    --dbv-kit-btn-height: var(--dbv-kit-btn-small-height);
+    --dbv-kit-btn-gap: var(--dbv-kit-btn-small-gap);
 
-    --btn-icon-margin-inline: calc(var(--btn-small-padding-inline) * -0.25);
+    --dbv-kit-btn-icon-margin-inline: calc(var(--dbv-kit-btn-small-padding-inline) * -0.25);
   }
 
   .dbv-kit-button__medium {
-    --btn-padding-inline: var(--btn-medium-padding-inline);
-    --btn-font-size: var(--btn-medium-font-size);
-    --btn-height: var(--btn-medium-height);
-    --btn-gap: var(--btn-medium-gap);
+    --dbv-kit-btn-padding-inline: var(--dbv-kit-btn-medium-padding-inline);
+    --dbv-kit-btn-font-size: var(--dbv-kit-btn-medium-font-size);
+    --dbv-kit-btn-height: var(--dbv-kit-btn-medium-height);
+    --dbv-kit-btn-gap: var(--dbv-kit-btn-medium-gap);
 
-    --btn-icon-margin-inline: calc(var(--btn-medium-padding-inline) * -0.25);
+    --dbv-kit-btn-icon-margin-inline: calc(var(--dbv-kit-btn-medium-padding-inline) * -0.25);
   }
 
   .dbv-kit-button__large {
-    --btn-padding-inline: var(--btn-large-padding-inline);
-    --btn-font-size: var(--btn-large-font-size);
-    --btn-height: var(--btn-large-height);
-    --btn-gap: var(--btn-large-gap);
+    --dbv-kit-btn-padding-inline: var(--dbv-kit-btn-large-padding-inline);
+    --dbv-kit-btn-font-size: var(--dbv-kit-btn-large-font-size);
+    --dbv-kit-btn-height: var(--dbv-kit-btn-large-height);
+    --dbv-kit-btn-gap: var(--dbv-kit-btn-large-gap);
 
-    --btn-icon-margin-inline: calc(var(--btn-large-padding-inline) * -0.25);
+    --dbv-kit-btn-icon-margin-inline: calc(var(--dbv-kit-btn-large-padding-inline) * -0.25);
   }
 
   .dbv-kit-button__xlarge {
-    --btn-padding-inline: var(--btn-xlarge-padding-inline);
-    --btn-font-size: var(--btn-xlarge-font-size);
-    --btn-height: var(--btn-xlarge-height);
-    --btn-gap: var(--btn-xlarge-gap);
+    --dbv-kit-btn-padding-inline: var(--dbv-kit-btn-xlarge-padding-inline);
+    --dbv-kit-btn-font-size: var(--dbv-kit-btn-xlarge-font-size);
+    --dbv-kit-btn-height: var(--dbv-kit-btn-xlarge-height);
+    --dbv-kit-btn-gap: var(--dbv-kit-btn-xlarge-gap);
 
-    --btn-icon-margin-inline: calc(var(--btn-xlarge-padding-inline) * -0.25);
+    --dbv-kit-btn-icon-margin-inline: calc(var(--dbv-kit-btn-xlarge-padding-inline) * -0.25);
   }
 
   /* ---------------------------- */
   /* Variants */
 
   .dbv-kit-button__primary {
-    --btn-background: var(--btn-primary-background);
-    --btn-foreground: var(--btn-primary-foreground);
-    --btn-background-hover: var(--btn-primary-background-hover);
-    --btn-background-active: var(--btn-primary-background-active);
+    --dbv-kit-btn-background: var(--dbv-kit-btn-primary-background);
+    --dbv-kit-btn-foreground: var(--dbv-kit-btn-primary-foreground);
+    --dbv-kit-btn-background-hover: var(--dbv-kit-btn-primary-background-hover);
+    --dbv-kit-btn-background-active: var(--dbv-kit-btn-primary-background-active);
 
-    --btn-loader-color: color-mix(in srgb, var(--btn-background) 65%, var(--color-white));
-    --btn-loader-background: color-mix(in srgb, var(--btn-foreground) 85%, transparent);
+    --dbv-kit-btn-loader-color: color-mix(in srgb, var(--dbv-kit-btn-background) 65%, var(--color-white));
+    --dbv-kit-btn-loader-background: color-mix(in srgb, var(--dbv-kit-btn-foreground) 85%, transparent);
   }
 
   .dbv-kit-button__secondary {
-    --btn-background: var(--btn-secondary-background);
-    --btn-foreground: var(--btn-secondary-foreground);
-    --btn-background-hover: var(--btn-secondary-background-hover);
-    --btn-background-active: var(--btn-secondary-background-active);
-    --btn-border-color: var(--btn-secondary-border-color);
+    --dbv-kit-btn-background: var(--dbv-kit-btn-secondary-background);
+    --dbv-kit-btn-foreground: var(--dbv-kit-btn-secondary-foreground);
+    --dbv-kit-btn-background-hover: var(--dbv-kit-btn-secondary-background-hover);
+    --dbv-kit-btn-background-active: var(--dbv-kit-btn-secondary-background-active);
+    --dbv-kit-btn-border-color: var(--dbv-kit-btn-secondary-border-color);
 
-    --btn-loader-color: color-mix(in srgb, var(--btn-secondary-foreground) 75%, var(--color-gray-600));
-    --btn-loader-background: color-mix(in srgb, var(--color-white) 75%, transparent);
+    --dbv-kit-btn-loader-color: color-mix(in srgb, var(--dbv-kit-btn-secondary-foreground) 75%, var(--color-gray-600));
+    --dbv-kit-btn-loader-background: color-mix(in srgb, var(--color-white) 75%, transparent);
   }
 
   .dbv-kit-button__danger {
-    --btn-background: var(--btn-danger-background);
-    --btn-foreground: var(--btn-danger-foreground);
-    --btn-background-hover: var(--btn-danger-background-hover);
-    --btn-background-active: var(--btn-danger-background-active);
+    --dbv-kit-btn-background: var(--dbv-kit-btn-danger-background);
+    --dbv-kit-btn-foreground: var(--dbv-kit-btn-danger-foreground);
+    --dbv-kit-btn-background-hover: var(--dbv-kit-btn-danger-background-hover);
+    --dbv-kit-btn-background-active: var(--dbv-kit-btn-danger-background-active);
 
-    --btn-loader-color: color-mix(in srgb, var(--btn-danger-background) 65%, var(--color-white));
-    --btn-loader-background: color-mix(in srgb, var(--btn-danger-foreground) 85%, transparent);
+    --dbv-kit-btn-loader-color: color-mix(in srgb, var(--dbv-kit-btn-danger-background) 65%, var(--color-white));
+    --dbv-kit-btn-loader-background: color-mix(in srgb, var(--dbv-kit-btn-danger-foreground) 85%, transparent);
   }
 
   /* ---------------------------- */
@@ -130,11 +136,11 @@
 
   .dbv-kit-button_loader {
     position: absolute;
-    top: calc(var(--btn-border-width) * -1);
-    left: calc(var(--btn-border-width) * -1);
-    width: calc(100% + var(--btn-border-width) * 2);
-    height: calc(100% + var(--btn-border-width) * 2);
-    background: color-mix(in srgb, var(--btn-loader-background) 75%, var(--color-gray-100));
+    top: calc(var(--dbv-kit-btn-border-width) * -1);
+    left: calc(var(--dbv-kit-btn-border-width) * -1);
+    width: calc(100% + var(--dbv-kit-btn-border-width) * 2);
+    height: calc(100% + var(--dbv-kit-btn-border-width) * 2);
+    background: color-mix(in srgb, var(--dbv-kit-btn-loader-background) 75%, var(--color-gray-100));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -142,15 +148,15 @@
     pointer-events: none;
 
     &::after {
-      --loader-width: calc(var(--btn-font-size) * 0.2);
+      --loader-width: calc(var(--dbv-kit-btn-font-size) * 0.2);
       content: '';
-      border: var(--loader-width) solid var(--btn-loader-background);
-      border-top: var(--loader-width) solid var(--btn-loader-color);
+      border: var(--loader-width) solid var(--dbv-kit-btn-loader-background);
+      border-top: var(--loader-width) solid var(--dbv-kit-btn-loader-color);
       border-radius: 50%;
       opacity: 1;
-      width: calc(var(--btn-font-size) * 1.2);
-      height: calc(var(--btn-font-size) * 1.2);
-      animation: var(--btn-loader-animation);
+      width: calc(var(--dbv-kit-btn-font-size) * 1.2);
+      height: calc(var(--dbv-kit-btn-font-size) * 1.2);
+      animation: var(--dbv-kit-btn-loader-animation);
     }
   }
 
@@ -166,10 +172,10 @@
   }
 
   .dbv-kit-button_icon__start {
-    margin-inline-start: var(--btn-icon-margin-inline);
+    margin-inline-start: var(--dbv-kit-btn-icon-margin-inline);
   }
 
   .dbv-kit-button_icon__end {
-    margin-inline-end: var(--btn-icon-margin-inline);
+    margin-inline-end: var(--dbv-kit-btn-icon-margin-inline);
   }
 }
