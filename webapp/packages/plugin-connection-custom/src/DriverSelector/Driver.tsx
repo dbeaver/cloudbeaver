@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ interface Props {
 
 export const Driver = observer<Props>(function Driver({ driver, onSelect }) {
   const translate = useTranslate();
-  const select = useCallback(() => onSelect(driver.id), [driver]);
+  const select = useCallback(() => onSelect(driver.id), [driver.id, onSelect]);
   const styles = useS(style);
 
   return (
@@ -35,7 +35,7 @@ export const Driver = observer<Props>(function Driver({ driver, onSelect }) {
       <ListItemIcon className={s(styles, { icon: true })}>
         <StaticImage icon={driver.icon} className={s(styles, { staticImage: true })} />
         {!driver.driverInstalled && (
-          <div className={s(styles, { indicator: true })} title={translate('plugin_connection_custom_drivers_driver_not_installed')}>
+          <div className={s(styles, { indicator: true })} title={translate('core_connections_connection_driver_not_installed')}>
             <IconOrImage icon="/icons/info_icon_sm.svg" />
           </div>
         )}
