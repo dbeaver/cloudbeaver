@@ -43,12 +43,12 @@
     "@cloudbeaver/browserslist-config": "workspace:*",
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
-    "tailwindcss": "^4",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "concurrently": "^9",
     "rimraf": "^6",
     "sass-embedded": "^1",
+    "tailwindcss": "^4",
     "typescript": "^5"
   }
 }
