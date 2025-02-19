@@ -45,5 +45,5 @@ export default [
     'There are multiple credentials available for authentication.\nPlease choose credentials you want to use.',
   ],
   ['plugin_connections_connection_create_menu_title', 'Connection'],
-  ['plugin_connections_connection_driver_not_installed', 'Driver is not installed. You can install it in the "Administration" part.'],
+  ['plugin_connections_connection_driver_not_installed_message', 'Driver is not installed. You can install it in the "Administration" part.'],
 ];
