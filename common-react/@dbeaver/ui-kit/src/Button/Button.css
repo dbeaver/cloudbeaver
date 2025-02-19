@@ -40,7 +40,7 @@
       opacity: var(--btn-disabled-opacity);
     }
 
-    &:hover {
+    &:not([aria-label='Loading']):hover {
       @media (hover: hover) {
         background-color: var(--btn-background-hover);
       }
@@ -60,7 +60,7 @@
     --btn-font-size: var(--btn-small-font-size);
     --btn-height: var(--btn-small-height);
     --btn-gap: var(--btn-small-gap);
-    
+
     --btn-icon-margin-inline: calc(var(--btn-small-padding-inline) * -0.25);
   }
 
