@@ -2,6 +2,14 @@
   a {
     color: var(--color-blue-600);
   }
+
+  code {
+    color: var(--color-yellow-600);
+  }
+
+  .comment {
+    color: var(--color-gray-400);
+  }
 }
 
 :root[data-theme='dark'] {
