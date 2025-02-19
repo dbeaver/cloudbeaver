@@ -83,10 +83,6 @@ export class ConnectionsAdministrationService extends Bootstrap {
     this.connectionDetailsPlaceholder.add(SSH, 2);
   }
 
-  override async load(): Promise<void> {
-    await this.connectionInfoResource.load();
-  }
-
   private async refreshUserConnections(configuration: boolean, outside: boolean, outsideAdminPage: boolean): Promise<void> {
     // TODO: we have to track users' leaving the page
     if (outside) {

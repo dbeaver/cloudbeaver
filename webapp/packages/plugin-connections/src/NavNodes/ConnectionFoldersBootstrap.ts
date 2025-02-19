@@ -52,12 +52,7 @@ import {
 } from '@cloudbeaver/core-resource';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ACTION_NEW_FOLDER, ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
-import {
-  DATA_CONTEXT_ELEMENTS_TREE,
-  MENU_ELEMENTS_TREE_TOOLS,
-  MENU_NAVIGATION_TREE_CREATE,
-  TreeSelectionService,
-} from '@cloudbeaver/plugin-navigation-tree';
+import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, TreeSelectionService } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 
 import { ACTION_TREE_CREATE_FOLDER } from '../Actions/ACTION_TREE_CREATE_FOLDER.js';
@@ -159,17 +154,10 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      menus: [MENU_NAVIGATION_TREE_CREATE],
+      root: true,
+      // menus: [MENU_NAVIGATION_TREE_CREATE],
       contexts: [DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_ELEMENTS_TREE],
-      getItems: (context, items) => [...items, ACTION_TREE_CREATE_FOLDER],
-    });
-
-    this.actionService.addHandler({
-      id: 'nav-tree-create-create-folders-handler',
-      menus: [MENU_NAVIGATION_TREE_CREATE],
-      contexts: [DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_ELEMENTS_TREE],
-      actions: [ACTION_TREE_CREATE_FOLDER],
-      isActionApplicable: (context, action) => {
+      isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
         const targetNode = this.treeSelectionService.getFirstSelectedNode(
@@ -181,8 +169,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         );
 
         if (
-          action !== ACTION_TREE_CREATE_FOLDER ||
-          ![isConnectionNode, isConnectionFolder, isProjectNode].some(check => check(node)) ||
+          ![isConnectionFolder, isProjectNode].some(check => check(node)) ||
           !this.userInfoResource.isAuthenticated() ||
           tree.baseRoot !== ROOT_NODE_PATH ||
           targetNode === undefined
@@ -192,6 +179,14 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
         return true;
       },
+      getItems: (context, items) => [...items, ACTION_TREE_CREATE_FOLDER],
+    });
+
+    this.actionService.addHandler({
+      id: 'nav-tree-create-create-folders-handler',
+      // menus: [MENU_NAVIGATION_TREE_CREATE],
+      contexts: [DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_ELEMENTS_TREE],
+      actions: [ACTION_TREE_CREATE_FOLDER],
       getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       handler: this.elementsTreeActionHandler.bind(this),
     });
@@ -301,7 +296,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         }
 
         const result = await this.commonDialogService.open(FolderDialog, {
-          value: this.localizationService.translate('ui_folder_new'),
+          value: this.localizationService.translate('ui_folder_new_default_name'),
           projectId: targetNode.projectId,
           folder: parentFolderParam?.folderId,
           title: 'core_view_action_new_folder',

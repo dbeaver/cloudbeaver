@@ -6,16 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { ConnectionsManagerService, getFolderPath, isConnectionNode } from '@cloudbeaver/core-connections';
+import { ConnectionsManagerService, getFolderPath } from '@cloudbeaver/core-connections';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { DATA_CONTEXT_NAV_NODE, isConnectionFolder, isProjectNode } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
-import { ActionService, type IAction, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, DATA_CONTEXT_MENU, type IAction, MenuService } from '@cloudbeaver/core-view';
 import { ACTION_TREE_CREATE_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
-import { DATA_CONTEXT_ELEMENTS_TREE, MENU_NAVIGATION_TREE_CREATE, TreeSelectionService } from '@cloudbeaver/plugin-navigation-tree';
+import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, TreeSelectionService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM.js';
 import { CustomConnectionSettingsService } from './CustomConnectionSettingsService.js';
@@ -43,11 +43,31 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      menus: [MENU_NAVIGATION_TREE_CREATE],
+      menus: [MENU_ELEMENTS_TREE_TOOLS],
+      getItems: (context, items) => {
+        if (!items.includes(ACTION_TREE_CREATE_CONNECTION)) {
+          return [...items, ACTION_TREE_CREATE_CONNECTION];
+        }
+
+        return items;
+      },
+    });
+
+    this.menuService.addCreator({
+      contexts: [DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_ELEMENTS_TREE],
+      root: true,
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
+        const targetNode = this.treeSelectionService.getFirstSelectedNode(
+          tree,
+          getProjectNodeId,
+          project => project.canEditDataSources,
+          isProjectNode,
+          isConnectionFolder,
+        );
 
-        if (![isConnectionNode, isConnectionFolder, isProjectNode].some(check => check(node)) || this.isConnectionFeatureDisabled(true)) {
+        if (![isConnectionFolder, isProjectNode].some(check => check(node)) || this.isConnectionFeatureDisabled(true) || targetNode === undefined) {
           return false;
         }
 
@@ -58,9 +78,14 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'nav-tree-create-create-connection-handler',
-      menus: [MENU_NAVIGATION_TREE_CREATE],
       actions: [ACTION_TREE_CREATE_CONNECTION],
-      contexts: [DATA_CONTEXT_ELEMENTS_TREE],
+      getActionInfo: (context, action) => {
+        const menu = context.get(DATA_CONTEXT_MENU);
+        if (menu === MENU_ELEMENTS_TREE_TOOLS) {
+          return { ...action.info, icon: '/icons/add_sm.svg' };
+        }
+        return action.info;
+      },
       getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       handler: this.createConnectionHandler.bind(this),
     });

@@ -34,14 +34,14 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
   const menu = useMenu({ menu: MENU_NAV_TREE });
   const mouse = useMouse<HTMLDivElement>();
   const [menuOpened, switchState] = useState(false);
-  const connection = connectionsInfoResource.getConnectionForNode(node.id);
+  const connectionKey = connectionsInfoResource.getConnectionIdForNodeId(node.projectId!, node.id);
   const contextMenuPosition = useContextMenuPosition();
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_NAV_NODE, node, id);
 
-    if (connection) {
-      context.set(DATA_CONTEXT_CONNECTION, connection, id);
+    if (connectionKey) {
+      context.set(DATA_CONTEXT_CONNECTION, connectionKey, id);
     }
   });
 
