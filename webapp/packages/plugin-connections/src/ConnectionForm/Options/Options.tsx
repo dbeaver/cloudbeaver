@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,17 +10,16 @@ import { useContext, useRef } from 'react';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import {
+  Alert,
   ColoredContainer,
   Combobox,
   Container,
   FieldCheckbox,
-  Flex,
   Form,
   FormFieldDescription,
   getComputed,
   Group,
   GroupTitle,
-  IconOrImage,
   InputField,
   Link,
   ObjectPropertyInfoForm,
@@ -181,82 +180,85 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     <Form ref={formRef} className={s(style, { form: true })} disabled={driverMap.isLoading()} onChange={handleFormChange}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
-          <Group form gap>
-            <Container wrap gap>
-              <Combobox
-                name="driverId"
-                state={config}
-                items={drivers}
-                keySelector={driver => driver.id}
-                valueSelector={driver => driver.name ?? ''}
-                titleSelector={driver => driver.description}
-                iconSelector={driver => driver.icon}
-                searchable={drivers.length > 10}
-                readOnly={readonly || edit || drivers.length < 2}
-                disabled={disabled}
-                loading={driverMap.isLoading()}
-                tiny
-                fill
-              >
-                <Flex gap="xs">
-                  {isAdmin && !driver?.driverInstalled && (
-                    <IconOrImage icon="/icons/info_icon_sm.svg" title={translate('plugin_connections_connection_driver_not_installed')} />
-                  )}
-                  {translate('connections_connection_driver')}
-                </Flex>
-              </Combobox>
-              {configurationTypes.length > 1 && (
-                <FormFieldDescription label={translate('connections_connection_configuration')} tiny>
-                  <Container gap>
-                    <RadioGroup name="configurationType" state={config}>
-                      {configurationTypes.map(conf => (
-                        <Radio
-                          key={conf.value}
-                          id={conf.value}
-                          value={conf.value}
-                          mod={['primary', 'small']}
-                          readOnly={readonly || configurationTypes.length < 2}
-                          disabled={readonly}
-                          keepSize
-                        >
-                          {conf.name}
-                        </Radio>
-                      ))}
-                    </RadioGroup>
-                  </Container>
-                </FormFieldDescription>
-              )}
-            </Container>
-            {config.configurationType === DriverConfigurationType.Url && (
-              <InputField
-                type="text"
-                name="url"
-                state={config}
-                readOnly={readonly || disabled}
-                autoComplete={`section-${config.driverId || 'driver'} section-jdbc`}
-              >
-                {translate('plugin_connections_connection_form_part_main_url_jdbc')}
-              </InputField>
+          <Group gap>
+            {isAdmin && !driver?.driverInstalled && (
+              <Alert
+                title={translate('core_connections_connection_driver_not_installed')}
+                message={translate('plugin_connections_connection_driver_not_installed_message')}
+              />
             )}
+            <Group form box gap>
+              <Container wrap gap>
+                <Combobox
+                  name="driverId"
+                  state={config}
+                  items={drivers}
+                  keySelector={driver => driver.id}
+                  valueSelector={driver => driver.name ?? ''}
+                  titleSelector={driver => driver.description}
+                  iconSelector={driver => driver.icon}
+                  searchable={drivers.length > 10}
+                  readOnly={readonly || edit || drivers.length < 2}
+                  disabled={disabled}
+                  loading={driverMap.isLoading()}
+                  tiny
+                  fill
+                >
+                  {translate('connections_connection_driver')}
+                </Combobox>
+                {configurationTypes.length > 1 && (
+                  <FormFieldDescription label={translate('connections_connection_configuration')} tiny>
+                    <Container gap>
+                      <RadioGroup name="configurationType" state={config}>
+                        {configurationTypes.map(conf => (
+                          <Radio
+                            key={conf.value}
+                            id={conf.value}
+                            value={conf.value}
+                            mod={['primary', 'small']}
+                            readOnly={readonly || configurationTypes.length < 2}
+                            disabled={readonly}
+                            keepSize
+                          >
+                            {conf.name}
+                          </Radio>
+                        ))}
+                      </RadioGroup>
+                    </Container>
+                  </FormFieldDescription>
+                )}
+              </Container>
+              {config.configurationType === DriverConfigurationType.Url && (
+                <InputField
+                  type="text"
+                  name="url"
+                  state={config}
+                  readOnly={readonly || disabled}
+                  autoComplete={`section-${config.driverId || 'driver'} section-jdbc`}
+                >
+                  {translate('plugin_connections_connection_form_part_main_url_jdbc')}
+                </InputField>
+              )}
 
-            {config.configurationType === DriverConfigurationType.Manual &&
-              (driver?.useCustomPage ? (
-                <ObjectPropertyInfoForm
-                  state={config.mainPropertyValues}
-                  properties={driver.mainProperties ?? EMPTY_ARRAY}
-                  disabled={disabled}
-                  readOnly={readonly}
-                />
-              ) : (
-                <ParametersForm
-                  config={config}
-                  embedded={driver?.embedded}
-                  requiresServerName={driver?.requiresServerName}
-                  disabled={disabled}
-                  readOnly={readonly}
-                  originLocal={originLocal}
-                />
-              ))}
+              {config.configurationType === DriverConfigurationType.Manual &&
+                (driver?.useCustomPage ? (
+                  <ObjectPropertyInfoForm
+                    state={config.mainPropertyValues}
+                    properties={driver.mainProperties ?? EMPTY_ARRAY}
+                    disabled={disabled}
+                    readOnly={readonly}
+                  />
+                ) : (
+                  <ParametersForm
+                    config={config}
+                    embedded={driver?.embedded}
+                    requiresServerName={driver?.requiresServerName}
+                    disabled={disabled}
+                    readOnly={readonly}
+                    originLocal={originLocal}
+                  />
+                ))}
+            </Group>
           </Group>
           <Group form gap>
             <Container wrap gap>
