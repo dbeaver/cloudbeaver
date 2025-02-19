@@ -11,8 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { getComputed, s, SContext, type StyleRegistry, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { resourceKeyList } from '@cloudbeaver/core-resource';
+import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { TabPanel, TabsBox, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { ConnectionShieldLazy } from '@cloudbeaver/plugin-connections';
@@ -39,7 +38,6 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   const translate = useTranslate();
   const dbObjectPagesService = useService(DBObjectPageService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const navTreeResource = useService(NavTreeResource);
   const innerTabState = useTabLocalState(() => new MetadataMap<string, any>());
   const style = useS(styles);
 
@@ -55,7 +53,6 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
         tab.handlerState.tabTitle = data.name;
       });
     },
-    freeze: navTreeResource.isOutdated(resourceKeyList(navNodeInfoResource.getParents(objectId))),
     active: getComputed(() => !!connection.tryGetData?.connected && !connection.outdated),
   });
 

@@ -23,6 +23,7 @@ import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCSession;
@@ -254,5 +255,13 @@ public class WebSQLUtils {
             }
         }
         return value;
+    }
+
+    /**
+     * Returns fully qualified name for a column.
+     */
+    @NotNull
+    public static String getColumnName(@NotNull DBDAttributeBinding binding) {
+        return binding.getFullyQualifiedName(DBPEvaluationContext.UI);
     }
 }
