@@ -122,6 +122,9 @@ public interface DBWServiceSQL extends DBWService {
     @WebAction
     Boolean closeResult(@NotNull WebSQLContextInfo sqlContext, @NotNull String resultId) throws DBWebException;
 
+    /**
+     * Updates result set data (sync function).
+     */
     @WebAction
     @Deprecated // use async function
     WebSQLExecuteInfo updateResultsDataBatch(
@@ -129,7 +132,9 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull String resultsId,
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
-        @Nullable List<WebSQLResultsRow> addedRows, WebDataFormat dataFormat) throws DBWebException;
+        @Nullable List<WebSQLResultsRow> addedRows,
+        @Nullable WebDataFormat dataFormat
+    ) throws DBWebException;
 
     /**
      * Creates async task for updating results data.
@@ -145,6 +150,9 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable WebDataFormat dataFormat
     ) throws DBWebException;
 
+    /**
+     * Reads cell LOB value from result set.
+     */
     @WebAction
     String readLobValue(
         @NotNull WebSQLContextInfo contextInfo,
