@@ -84,9 +84,6 @@ export const useInputAutocomplete = (
 
         this.isFound = true;
       },
-      get isInputFocused(): boolean {
-        return this.inputRef.current?.contains(document.activeElement) ?? false;
-      },
       get currentWord(): string {
         const cursorPosition = this.selectionStart;
 
@@ -103,7 +100,7 @@ export const useInputAutocomplete = (
         return substring.split(separator).at(-1) ?? '';
       },
       get proposals() {
-        if (this.isFound || !this.currentWord || !this.isInputFocused) {
+        if (this.isFound || !this.currentWord) {
           return [];
         }
 
@@ -114,7 +111,6 @@ export const useInputAutocomplete = (
       proposals: computed,
       selectionStart: observable.ref,
       isFound: observable.ref,
-      isInputFocused: computed,
       currentWord: computed,
       replaceCurrentWord: action.bound,
       position: observable.ref,
@@ -145,11 +141,19 @@ export const useInputAutocomplete = (
       case 'ArrowUp':
         state.menuRef.current?.first();
         break;
+      default:
       case 'Tab':
         state.selectionStart = null;
         break;
-      default:
     }
+  }
+
+  function handleClickOutsideOfInput(event: MouseEvent) {
+    if (inputRef.current?.contains(event.target as Node)) {
+      return;
+    }
+
+    state.selectionStart = null;
   }
 
   useEffect(() => {
@@ -157,10 +161,12 @@ export const useInputAutocomplete = (
 
     input.addEventListener('input', handleInput);
     input.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('click', handleClickOutsideOfInput);
 
     return () => {
       input.removeEventListener('keydown', handleKeyDown);
       input.removeEventListener('input', handleInput);
+      document.removeEventListener('click', handleClickOutsideOfInput);
     };
   });
 
