@@ -164,8 +164,14 @@ export class ConnectionOptionsTabService extends Bootstrap {
     state.config.authModelId = driver?.defaultAuthModel;
     state.config.configurationType = getDefaultConfigurationType(driver);
 
-    state.config.host = driver?.defaultServer || 'localhost';
-    state.config.port = driver?.defaultPort;
+    if (!state.config.host) {
+      state.config.host = driver?.defaultServer || 'localhost';
+    }
+
+    if (!state.config.port) {
+      state.config.port = driver?.defaultPort;
+    }
+
     state.config.databaseName = driver?.defaultDatabase;
     state.config.url = driver?.sampleURL;
 
