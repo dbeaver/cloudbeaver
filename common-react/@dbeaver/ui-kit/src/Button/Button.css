@@ -1,11 +1,3 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
-
 @import './_base.css';
 @import './_sizes.css';
 @import './_variants.css';
@@ -106,7 +98,7 @@
     --dbv-kit-btn-background-hover: var(--dbv-kit-btn-primary-background-hover);
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-primary-background-active);
 
-    --dbv-kit-btn-loader-color: color-mix(in srgb, var(--dbv-kit-btn-background) 65%, var(--color-white));
+    --dbv-kit-btn-loader-color: color-mix(in srgb, var(--dbv-kit-btn-background) 65%, var(--tw-color-white));
     --dbv-kit-btn-loader-background: color-mix(in srgb, var(--dbv-kit-btn-foreground) 85%, transparent);
   }
 
@@ -117,8 +109,8 @@
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-secondary-background-active);
     --dbv-kit-btn-border-color: var(--dbv-kit-btn-secondary-border-color);
 
-    --dbv-kit-btn-loader-color: color-mix(in srgb, var(--dbv-kit-btn-secondary-foreground) 75%, var(--color-gray-600));
-    --dbv-kit-btn-loader-background: color-mix(in srgb, var(--color-white) 75%, transparent);
+    --dbv-kit-btn-loader-color: color-mix(in srgb, var(--dbv-kit-btn-secondary-foreground) 75%, var(--tw-color-gray-600));
+    --dbv-kit-btn-loader-background: color-mix(in srgb, var(--tw-color-white) 75%, transparent);
   }
 
   .dbv-kit-button__danger {
@@ -127,7 +119,7 @@
     --dbv-kit-btn-background-hover: var(--dbv-kit-btn-danger-background-hover);
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-danger-background-active);
 
-    --dbv-kit-btn-loader-color: color-mix(in srgb, var(--dbv-kit-btn-danger-background) 65%, var(--color-white));
+    --dbv-kit-btn-loader-color: color-mix(in srgb, var(--dbv-kit-btn-danger-background) 65%, var(--tw-color-white));
     --dbv-kit-btn-loader-background: color-mix(in srgb, var(--dbv-kit-btn-danger-foreground) 85%, transparent);
   }
 
@@ -140,7 +132,7 @@
     left: calc(var(--dbv-kit-btn-border-width) * -1);
     width: calc(100% + var(--dbv-kit-btn-border-width) * 2);
     height: calc(100% + var(--dbv-kit-btn-border-width) * 2);
-    background: color-mix(in srgb, var(--dbv-kit-btn-loader-background) 75%, var(--color-gray-100));
+    background: color-mix(in srgb, var(--dbv-kit-btn-loader-background) 75%, var(--tw-color-gray-100));
     display: flex;
     align-items: center;
     justify-content: center;

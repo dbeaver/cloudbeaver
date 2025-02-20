@@ -1,17 +1,10 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
 @layer base, theme, components, utilities;
 
 @layer base {
   :root {
     /* General */
     --dbv-kit-font-size-base: 1rem;
-    --dbv-kit-control-border-radius: var(--radius-md);
+    --dbv-kit-control-border-radius: var(--tw-radius-md);
     --dbv-kit-control-border-width: 1px;
 
     /* Sizes */
@@ -22,31 +15,31 @@
     --dbv-kit-control-height-xlarge: calc(var(--dbv-kit-control-height-base) * 1.5);
 
     /* Colors */
-    --dbv-kit-color-foreground: var(--color-gray-900);
-    --dbv-kit-color-background: var(--color-gray-50);
+    --dbv-kit-color-foreground: var(--tw-color-gray-900);
+    --dbv-kit-color-background: var(--tw-color-gray-50);
 
-    --dbv-kit-color-text: var(--color-gray-900);
-    --dbv-kit-color-outline: var(--color-yellow-600);
+    --dbv-kit-color-text: var(--tw-color-gray-900);
+    --dbv-kit-color-outline: var(--tw-color-yellow-600);
 
-    --dbv-kit-color-primary-50: var(--color-blue-50);
-    --dbv-kit-color-primary-100: var(--color-blue-100);
-    --dbv-kit-color-primary-200: var(--color-blue-200);
-    --dbv-kit-color-primary-500: var(--color-blue-500);
-    --dbv-kit-color-primary-600: var(--color-blue-600);
-    --dbv-kit-color-primary-700: var(--color-blue-700);
-    --dbv-kit-color-primary-800: var(--color-blue-800);
-    --dbv-kit-color-primary-900: var(--color-blue-900);
+    --dbv-kit-color-primary-50: var(--tw-color-blue-50);
+    --dbv-kit-color-primary-100: var(--tw-color-blue-100);
+    --dbv-kit-color-primary-200: var(--tw-color-blue-200);
+    --dbv-kit-color-primary-500: var(--tw-color-blue-500);
+    --dbv-kit-color-primary-600: var(--tw-color-blue-600);
+    --dbv-kit-color-primary-700: var(--tw-color-blue-700);
+    --dbv-kit-color-primary-800: var(--tw-color-blue-800);
+    --dbv-kit-color-primary-900: var(--tw-color-blue-900);
 
-    --dbv-kit-color-error-text: var(--color-red-900);
-    --dbv-kit-color-error-background: var(--color-red-50);
-    --dbv-kit-color-error-border: var(--color-red-200);
+    --dbv-kit-color-error-text: var(--tw-color-red-900);
+    --dbv-kit-color-error-background: var(--tw-color-red-50);
+    --dbv-kit-color-error-border: var(--tw-color-red-200);
 
-    --dbv-kit-color-info-text: var(--color-blue-900);
-    --dbv-kit-color-info-background: var(--color-blue-50);
-    --dbv-kit-color-info-border: var(--color-blue-200);
+    --dbv-kit-color-info-text: var(--tw-color-blue-900);
+    --dbv-kit-color-info-background: var(--tw-color-blue-50);
+    --dbv-kit-color-info-border: var(--tw-color-blue-200);
 
-    --dbv-kit-color-warning-text: var(--color-orange-900);
-    --dbv-kit-color-warning-background: var(--color-orange-50);
-    --dbv-kit-color-warning-border: var(--color-orange-200);
+    --dbv-kit-color-warning-text: var(--tw-color-orange-900);
+    --dbv-kit-color-warning-background: var(--tw-color-orange-50);
+    --dbv-kit-color-warning-border: var(--tw-color-orange-200);
   }
 }

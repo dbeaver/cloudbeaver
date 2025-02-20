@@ -1,16 +1,16 @@
-@import 'tailwindcss';
+@import 'tailwindcss' prefix(tw);
 
 @layer theme {
   a {
-    color: var(--color-blue-600);
+    color: var(--tw-color-blue-600);
   }
 
   code {
-    color: var(--color-yellow-600);
+    color: var(--tw-color-yellow-600);
   }
 
   .comment {
-    color: var(--color-gray-400);
+    color: var(--tw-color-gray-400);
   }
 }
 

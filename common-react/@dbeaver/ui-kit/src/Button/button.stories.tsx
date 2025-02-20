@@ -1,16 +1,9 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
 import { Button, type ButtonProps } from '../index.js';
 import type { Story } from '@ladle/react';
 
 export const All = () => (
   <div>
-    <h2 className="text-2xl">Button</h2>
+    <h2 className="tw:text-2xl">Button</h2>
     <p>
       Underlying components docs: <br />
       <a target="_blank" href="https://ariakit.org/reference/button">
@@ -20,17 +13,17 @@ export const All = () => (
       <br />
       Visual parameters:
       <dl>
-        <dt className="font-bold">variant</dt>
+        <dt className="tw:font-bold">variant</dt>
         <dd>primary | secondary | danger</dd>
-        <dt className="font-bold">size</dt>
+        <dt className="tw:font-bold">size</dt>
         <dd>small | medium | large | xlarge</dd>
-        <dt className="font-bold">loading</dt>
+        <dt className="tw:font-bold">loading</dt>
         <dd>boolean</dd>
       </dl>
     </p>
     <hr />
     <br />
-    <h3 className="text-lg my-2">Variants</h3>
+    <h3 className="tw:text-lg tw:my-2">Variants</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
       <Button>Primary</Button>
       <Button loading>Loading</Button>
@@ -55,16 +48,16 @@ export const All = () => (
         Disabled
       </Button>
     </div>
-    <h3 className="text-lg my-2">Sizes</h3>
+    <h3 className="tw:text-lg tw:my-2">Sizes</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
-      <Button className="bg-purple-500 active:bg-purple-700" size="small">
+      <Button className="tw:bg-purple-500 active:tw:bg-purple-700" size="small">
         Small
       </Button>
       <Button size="medium">Medium</Button>
       <Button size="large">Large button</Button>
       <Button size="xlarge">EXTRA Large button</Button>
     </div>
-    <h3 className="text-lg my-2">Icons</h3>
+    <h3 className="tw:text-lg tw:my-2">Icons</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
       <Button size="large">
         <Button.Icon placement="start">🎾</Button.Icon>
@@ -79,7 +72,7 @@ export const All = () => (
         Tennis is Love
         <Button.Icon placement="end">❤️</Button.Icon>
       </Button>
-      <Button className="text-lime-300">
+      <Button className="tw:text-lime-300">
         Have you seen
         <Button.Icon className="w-2">
           <svg width="16" height="16" fill="none">
@@ -100,7 +93,7 @@ export const All = () => (
     </div>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
       <Button loading>
-        <Button.Icon className="w-8 h-4" placement="start">
+        <Button.Icon className="tw:w-8 tw:h-4" placement="start">
           <svg width="16" height="16" fill="none">
             <g strokeWidth="0"></g>
             <g strokeLinecap="round" strokeLinejoin="round"></g>
@@ -132,7 +125,7 @@ export const All = () => (
         <Button.Icon>🎾</Button.Icon>
       </Button>
     </div>
-    <h3 className="text-lg my-2">Custom renders</h3>
+    <h3 className="tw:text-lg tw:my-2">Custom renders</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
       <Button render={<a target="_blank" href="/" />} size="small">
         Link button
@@ -144,7 +137,7 @@ export const All = () => (
         Paragraph
       </Button>
     </div>
-    <h3 className="text-lg my-2">Change on focus</h3>
+    <h3 className="tw:text-lg tw:my-2">Change on focus</h3>
     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
       <Button onFocusVisible={e => (e.currentTarget.textContent = 'Click me!')} render={<a href="/" />} size="small">
         Link button
