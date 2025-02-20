@@ -28,11 +28,12 @@
     font-size: var(--dbv-kit-btn-font-size);
     font-weight: var(--dbv-kit-btn-font-weight);
 
-    &:disabled {
-      opacity: var(--dbv-kit-btn-disabled-opacity);
+    &:focus-visible,
+    &[data-focus-visible] {
+      outline: 2px solid var(--dbv-kit-color-outline);
     }
 
-    &:not([aria-label='Loading']):hover {
+    &:hover {
       @media (hover: hover) {
         background-color: var(--dbv-kit-btn-background-hover);
       }
@@ -43,9 +44,8 @@
       background-color: var(--dbv-kit-btn-background-active);
     }
 
-    &:focus-visible,
-    &[data-focus-visible] {
-      outline: 2px solid var(--dbv-kit-color-outline);
+    &:disabled {
+      opacity: var(--dbv-kit-btn-disabled-opacity);
     }
   }
 
