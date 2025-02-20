@@ -111,7 +111,6 @@ export const useInputAutocomplete = (
         return this.search.searchResult;
       },
       resetState() {
-        this.inputValue = '';
         this.selectionStart = null;
         this.position = { x: 0, y: 0 };
       },
@@ -157,22 +156,26 @@ export const useInputAutocomplete = (
     }
   }
 
+  function handleOutsideClick() {
+    if (state.inputRef.current?.contains(document.activeElement)) {
+      return;
+    }
+
+    state.resetState();
+  }
+
   useEffect(() => {
     const input = state.inputRef.current!;
 
     input.addEventListener('input', handleInput);
     input.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('click', handleOutsideClick);
 
     return () => {
       input.removeEventListener('keydown', handleKeyDown);
       input.removeEventListener('input', handleInput);
+      document.removeEventListener('click', handleOutsideClick);
     };
-  });
-
-  useEffect(() => {
-    if (!menuRef.current?.visible) {
-      state.resetState();
-    }
   });
 
   useLayoutEffect(() => {
