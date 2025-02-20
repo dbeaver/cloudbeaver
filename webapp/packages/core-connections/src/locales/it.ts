@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -102,4 +102,5 @@ export default [
   ['core_connections_settings_disable', 'Disable'],
   ['core_connections_settings_disable_description', 'Disable the ability to create new connections'],
   ['connections_templates_deprecated_message', 'Template connections are deprecated and will be removed in future releases'],
+  ['core_connections_connection_driver_not_installed', 'Driver is not installed'],
 ];
