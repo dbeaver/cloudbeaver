@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -136,7 +136,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
         {configurationWizard && (
           <Group form>
             <GroupItem>
-              <h3>{translate('administration_configuration_wizard_configuration_title')}</h3>
+              <h3 className="tw:text-xl tw:font-semibold">{translate('administration_configuration_wizard_configuration_title')}</h3>
             </GroupItem>
             <GroupItem>
               <p className={s(styles, { message: true })}>{translate('administration_configuration_wizard_configuration_message')}</p>
