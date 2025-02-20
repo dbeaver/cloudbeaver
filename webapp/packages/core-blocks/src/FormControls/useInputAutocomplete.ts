@@ -63,27 +63,30 @@ export const useInputAutocomplete = (
       isFound: false,
       selectionStart: 0 as number | null,
       replaceCurrentWord(replacement: string) {
-        const cursorPosition = this.selectionStart;
-        const words = this.inputValue.split(separator);
+        try {
+          const cursorPosition = this.selectionStart;
+          const words = this.inputValue.split(separator);
 
-        if (!this.currentWord || !isNotNullDefined(words) || !isNotNullDefined(cursorPosition)) {
-          return;
+          if (!this.currentWord || !isNotNullDefined(words) || !isNotNullDefined(cursorPosition)) {
+            return;
+          }
+
+          const start = cursorPosition - this.currentWord.length;
+          const end = cursorPosition;
+
+          this.inputValue = this.inputValue.slice(0, start) + replacement + this.inputValue.slice(end);
+          this.selectionStart = start + replacement.length;
+
+          if (this.inputRef.current) {
+            this.inputRef.current.value = this.inputValue;
+            this.inputRef.current.focus();
+            this.inputRef.current.setSelectionRange(this.selectionStart, this.selectionStart);
+          }
+
+          this.isFound = true;
+        } finally {
+          this.resetState();
         }
-
-        const start = cursorPosition - this.currentWord.length;
-        const end = cursorPosition;
-
-        this.inputValue = this.inputValue.slice(0, start) + replacement + this.inputValue.slice(end);
-        this.selectionStart = start + replacement.length;
-
-        if (this.inputRef.current) {
-          this.inputRef.current.value = this.inputValue;
-          this.inputRef.current.focus();
-          this.inputRef.current.setSelectionRange(this.selectionStart, this.selectionStart);
-        }
-
-        this.isFound = true;
-        this.resetState();
       },
       get currentWord(): string {
         const cursorPosition = this.selectionStart;
