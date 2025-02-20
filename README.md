@@ -15,7 +15,7 @@ See our [WIKI](https://github.com/dbeaver/cloudbeaver/wiki) for more details.
 ## Run in Docker
 
 - [Official Docker repository](https://hub.docker.com/r/dbeaver/cloudbeaver)
-- [Running instructions](https://github.com/dbeaver/cloudbeaver/wiki/Run-Docker-Container)
+- [Deployment instructions](https://github.com/dbeaver/cloudbeaver/wiki/CloudBeaver-Deployment)
 
 ## Demo server
 

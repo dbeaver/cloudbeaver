@@ -49,7 +49,7 @@ public class WebSessionGlobalProjectImpl extends WebSessionProjectImpl {
     @NotNull
     @Override
     protected DBPDataSourceRegistry createDataSourceRegistry() {
-        return new WebDataSourceRegistryProxy(
+        return new WebGlobalProjectRegistryProxy(
             createRegistryWithCredentialsProvider(),
             this::isDataSourceAccessible
         );

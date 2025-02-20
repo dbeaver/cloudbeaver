@@ -13,7 +13,7 @@ import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { EAdminPermission, PermissionsService, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { type RouterState, ScreenService } from '@cloudbeaver/core-routing';
 import { StorageService } from '@cloudbeaver/core-storage';
-import { type DefaultValueGetter, GlobalConstants, MetadataMap, schema } from '@cloudbeaver/core-utils';
+import { type DefaultValueGetter, GlobalConstants, isNotNullDefined, MetadataMap, schema } from '@cloudbeaver/core-utils';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService.js';
 import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute.js';
@@ -119,11 +119,38 @@ export class AdministrationScreenService {
     // this is need for this.isConfigurationMode
     await this.serverConfigResource.load();
 
+    const uniqueItems = this.administrationItemService.getUniqueItems(this.isConfigurationMode);
+    const item = uniqueItems.find(i => i.name === this.activeScreen?.item);
+
     if (!this.isAdministrationPageActive) {
       return;
     }
 
-    if (!this.activeScreen || !this.administrationItemService.getItem(this.activeScreen.item, this.isConfigurationMode)) {
+    if (!this.activeScreen || !item) {
+      this.navigateToRoot();
+      return;
+    }
+
+    const loaders = [item]
+      .map(loader => loader?.getLoader?.())
+      .filter(isNotNullDefined)
+      .flat();
+
+    for (const loader of loaders) {
+      if (loader.isError()) {
+        continue;
+      }
+
+      if (!loader.isLoaded() || loader.isOutdated?.() === true) {
+        try {
+          await loader.load();
+        } catch {}
+      }
+    }
+
+    const loadedItem = this.administrationItemService.getItem(this.activeScreen.item, this.isConfigurationMode);
+
+    if (!loadedItem) {
       this.navigateToRoot();
     }
   }
