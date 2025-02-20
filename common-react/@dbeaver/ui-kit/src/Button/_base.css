@@ -9,10 +9,10 @@
     --dbv-kit-btn-background: var(--dbv-kit-color-primary-600);
     --dbv-kit-btn-background-hover: var(--dbv-kit-color-primary-700);
     --dbv-kit-btn-background-active: var(--dbv-kit-color-primary-800);
-    --dbv-kit-btn-border-width: 1px;
+    --dbv-kit-btn-border-width: var(--dbv-kit-control-border-width);
     --dbv-kit-btn-border-color: transparent;
     --dbv-kit-btn-border-style: solid;
-    --dbv-kit-btn-radius: var(--radius-md);
+    --dbv-kit-btn-radius: var(--dbv-kit-control-border-radius);
     --dbv-kit-btn-font-weight: var(--font-weight-normal);
     --dbv-kit-btn-font-size: calc(var(--dbv-kit-font-size-base) * 0.875);
     --dbv-kit-btn-disabled-opacity: 0.5;

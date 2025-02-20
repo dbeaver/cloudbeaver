@@ -17,7 +17,9 @@
 
 .dbv-kit-input {
   background: var(--dbv-kit-input-background);
-  border: 1px solid var(--dbv-kit-input-border);
+  border-color: var(--dbv-kit-input-border-color);
+  border-width: var(--dbv-kit-input-border-width);
+  border-style: var(--dbv-kit-input-border-style);
   color: var(--dbv-kit-input-foreground);
   padding: var(--dbv-kit-input-padding);
   font-size: var(--dbv-kit-input-font-size);

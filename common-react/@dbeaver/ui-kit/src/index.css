@@ -13,6 +13,8 @@
   :root {
     /* General */
     --dbv-kit-font-size-base: 1rem;
+    --dbv-kit-control-border-radius: var(--rounded-md);
+    --dbv-kit-control-border-width: 1px;
 
     /* Sizes */
     --dbv-kit-control-height-base: 2rem;
