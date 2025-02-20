@@ -83,6 +83,7 @@ export const useInputAutocomplete = (
         }
 
         this.isFound = true;
+        this.resetState();
       },
       get currentWord(): string {
         const cursorPosition = this.selectionStart;
@@ -106,12 +107,18 @@ export const useInputAutocomplete = (
 
         return this.search.searchResult;
       },
+      resetState() {
+        this.inputValue = '';
+        this.selectionStart = null;
+        this.position = { x: 0, y: 0 };
+      },
     }),
     {
       proposals: computed,
       selectionStart: observable.ref,
       isFound: observable.ref,
       currentWord: computed,
+      resetState: action.bound,
       replaceCurrentWord: action.bound,
       position: observable.ref,
       inputValue: observable.ref,
@@ -136,21 +143,23 @@ export const useInputAutocomplete = (
     switch (event.key) {
       case 'Escape':
         state.menuRef.current?.hide();
+        state.resetState();
         break;
       case 'ArrowDown':
       case 'ArrowUp':
         state.menuRef.current?.first();
-        break;
-      case 'Tab':
-        state.selectionStart = null;
         break;
       default:
         break;
     }
   }
 
-  function handleFocus() {
-    state.selectionStart = state.inputRef.current?.selectionStart || null;
+  function handleOutsideClick() {
+    if (state.inputRef.current?.contains(document.activeElement)) {
+      return;
+    }
+
+    state.resetState();
   }
 
   useEffect(() => {
@@ -158,12 +167,12 @@ export const useInputAutocomplete = (
 
     input.addEventListener('input', handleInput);
     input.addEventListener('keydown', handleKeyDown);
-    input.addEventListener('focus', handleFocus);
+    document.addEventListener('click', handleOutsideClick);
 
     return () => {
       input.removeEventListener('keydown', handleKeyDown);
       input.removeEventListener('input', handleInput);
-      input.removeEventListener('focus', handleFocus);
+      document.removeEventListener('click', handleOutsideClick);
     };
   });
 
@@ -193,12 +202,6 @@ export const useInputAutocomplete = (
       y: spanRect.height + CONTEXT_INPUT_OFFSET_Y,
     };
   }, [state.inputValue]);
-
-  useLayoutEffect(() => {
-    if (state.inputRef.current !== document.activeElement) {
-      state.selectionStart = null;
-    }
-  });
 
   return state as Readonly<State>;
 };
