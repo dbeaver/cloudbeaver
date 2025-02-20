@@ -7,8 +7,6 @@
  */
 @layer base, theme, components, utilities;
 
-@import 'tailwindcss';
-
 @layer base {
   :root {
     /* General */

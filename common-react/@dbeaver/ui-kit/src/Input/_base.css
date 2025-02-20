@@ -1,5 +1,3 @@
-@import 'tailwindcss';
-
 @layer base {
   :root {
     --dbv-kit-input-radius: var(--dbv-kit-control-border-radius);
@@ -10,7 +8,7 @@
     --dbv-kit-input-border-style: solid;
     --dbv-kit-input-foreground: var(--dbv-kit-color-text);
     --dbv-kit-input-height: var(--dbv-kit-control-height-medium);
-    --dbv-kit-input-padding: --spacing(1.1);
+    --dbv-kit-input-padding: calc(var(--spacing) * 1.1);
     --dbv-kit-input-placeholder-foreground: var(--color-gray-500);
     --dbv-kit-input-option-active-background: var(--dbv-kit-color-primary-200);
     --dbv-kit-input-option-active-border: var(--dbv-kit-color-primary-500);
