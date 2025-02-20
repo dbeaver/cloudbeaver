@@ -16,7 +16,10 @@ import { getAssets } from './getAssets.js';
 
 export function copyAssetsPlugin(): Plugin {
   // let rootPath = fileURLToPath(import.meta.url);
-  return DynamicPublicDirectory(getAssets(fs.join(process.cwd(), 'package.json')).map(v => fs.normalize(`${v}/**`))) as any;
+  const assets = getAssets(fs.join(process.cwd(), 'package.json')).map(v => fs.normalize(`${v}/**`));
+  console.log(assets);
+
+  return DynamicPublicDirectory(assets) as any;
   // return {
   //   name: 'copy-assets',
   //   configResolved(config) {
