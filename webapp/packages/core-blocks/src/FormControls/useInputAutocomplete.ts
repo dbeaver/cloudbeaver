@@ -150,6 +150,7 @@ export const useInputAutocomplete = (
       case 'ArrowDown':
       case 'ArrowUp':
         state.menuRef.current?.first();
+        break;
       case 'Tab':
         state.resetState();
         break;
