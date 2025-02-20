@@ -28,7 +28,7 @@
     background-color: var(--dbv-kit-btn-background);
     color: var(--dbv-kit-btn-foreground);
 
-    border-radius: var(--dbv-kit-btn-radius);
+    border-radius: var(--dbv-kit-btn-border-radius);
     border-width: var(--dbv-kit-btn-border-width);
     border-color: var(--dbv-kit-btn-border-color);
     border-style: var(--dbv-kit-btn-border-style);

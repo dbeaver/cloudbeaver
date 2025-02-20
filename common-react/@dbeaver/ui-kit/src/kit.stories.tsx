@@ -168,7 +168,7 @@ export const ButtonTokens = () => {
           <span className="comment">// Button border color and style</span>
         </div>
         <div>
-          <code>--dbv-kit-btn-radius:</code> var(--radius-md); <span className="comment">// Button border radius</span>
+          <code>--dbv-kit-btn-border-radius:</code> var(--radius-md); <span className="comment">// Button border radius</span>
         </div>
         <div>
           <code>--dbv-kit-btn-font-weight:</code> var(--font-weight-normal); <span className="comment">// Button font weight</span>
@@ -187,51 +187,39 @@ export const ButtonTokens = () => {
       <div className="my-4">
         <h2 className="text-xl font-semibold">Specific buttons tokens</h2>
         <h3 className="text-lg font-semibold">Button Sizes</h3>
-        <p className="text-base" style={{ height: 'var(--dbv-kit-btn-small-height)', backgroundColor: 'var(--dbv-kit-btn-background)' }}>
-          Small button height: <code>--dbv-kit-btn-small-height</code>
-        </p>
-        <p className="text-base" style={{ height: 'var(--dbv-kit-btn-medium-height)', backgroundColor: 'var(--dbv-kit-btn-background)' }}>
-          Medium button height: <code>--dbv-kit-btn-medium-height</code>
-        </p>
-        <p className="text-base" style={{ height: 'var(--dbv-kit-btn-large-height)', backgroundColor: 'var(--dbv-kit-btn-background)' }}>
-          Large button height: <code>--dbv-kit-btn-large-height</code>
-        </p>
-        <p className="text-base" style={{ height: 'var(--dbv-kit-btn-xlarge-height)', backgroundColor: 'var(--dbv-kit-btn-background)' }}>
-          Extra large button height: <code>--dbv-kit-btn-xlarge-height</code>
-        </p>
         <p className="text-base">
           The <code>--dbv-kit-btn-*-height</code> tokens are used to define the height of buttons for different size variants. Default buttons use{' '}
           <code>--control-height-*</code> variable as the base height.
         </p>
+        <p className="text-base" style={{ height: 'var(--dbv-kit-btn-small-height)' }}>
+          Small button height: <code>--dbv-kit-btn-small-height</code>
+        </p>
+        <p className="text-base" style={{ height: 'var(--dbv-kit-btn-medium-height)' }}>
+          Medium button height: <code>--dbv-kit-btn-medium-height</code>
+        </p>
+        <p className="text-base" style={{ height: 'var(--dbv-kit-btn-large-height)' }}>
+          Large button height: <code>--dbv-kit-btn-large-height</code>
+        </p>
+        <p className="text-base" style={{ height: 'var(--dbv-kit-btn-xlarge-height)' }}>
+          Extra large button height: <code>--dbv-kit-btn-xlarge-height</code>
+        </p>
       </div>
       <div className="my-4">
         <h3 className="text-lg font-semibold">Button Padding</h3>
-        <p
-          className="text-base"
-          style={{ paddingInline: 'var(--dbv-kit-btn-small-padding-inline)', backgroundColor: 'var(--dbv-kit-btn-background)' }}
-        >
-          Small button padding: <code>--dbv-kit-btn-small-padding-inline</code>
-        </p>
-        <p
-          className="text-base"
-          style={{ paddingInline: 'var(--dbv-kit-btn-medium-padding-inline)', backgroundColor: 'var(--dbv-kit-btn-background)' }}
-        >
-          Medium button padding: <code>--dbv-kit-btn-medium-padding-inline</code>
-        </p>
-        <p
-          className="text-base"
-          style={{ paddingInline: 'var(--dbv-kit-btn-large-padding-inline)', backgroundColor: 'var(--dbv-kit-btn-background)' }}
-        >
-          Large button padding: <code>--dbv-kit-btn-large-padding-inline</code>
-        </p>
-        <p
-          className="text-base"
-          style={{ paddingInline: 'var(--dbv-kit-btn-xlarge-padding-inline)', backgroundColor: 'var(--dbv-kit-btn-background)' }}
-        >
-          Extra large button padding: <code>--dbv-kit-btn-xlarge-padding-inline</code>
-        </p>
         <p className="text-base">
           The <code>--dbv-kit-btn-*-padding-inline</code> tokens are used to define the padding of buttons for different size variants.
+        </p>
+        <p className="text-base">
+          Small button padding: <code>--dbv-kit-btn-small-padding-inline</code>
+        </p>
+        <p className="text-base">
+          Medium button padding: <code>--dbv-kit-btn-medium-padding-inline</code>
+        </p>
+        <p className="text-base">
+          Large button padding: <code>--dbv-kit-btn-large-padding-inline</code>
+        </p>
+        <p className="text-base">
+          Extra large button padding: <code>--dbv-kit-btn-xlarge-padding-inline</code>
         </p>
       </div>
       <div className="my-4">
