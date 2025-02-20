@@ -336,7 +336,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     return this.add(connection, true);
   }
 
-  async searchDatabases(hosts: string[]): Promise<AdminConnectionSearchInfo[]> {
+  async searchDatabases(hosts: string | string[]): Promise<AdminConnectionSearchInfo[]> {
     const { databases } = await this.graphQLService.sdk.searchDatabases({ hosts });
 
     return databases;
