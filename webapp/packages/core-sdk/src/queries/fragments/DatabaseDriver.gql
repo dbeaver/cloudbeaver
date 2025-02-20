@@ -25,6 +25,7 @@ fragment DatabaseDriver on DriverInfo {
   driverId
   driverInstalled
   downloadable
+  safeEmbeddedDriver
 
   mainProperties @include(if: $includeMainProperties) {
     ...DriverPropertyInfo

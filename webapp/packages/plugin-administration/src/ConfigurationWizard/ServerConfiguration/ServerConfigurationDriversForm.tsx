@@ -70,8 +70,7 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
       const driver = driversResource.resource.get(id);
       const isInitiallyDisabledDriver = initialServerConfig.disabledDrivers?.includes(id);
 
-      // TODO also check for if it is unsafe driver
-      if (driver?.embedded && isInitiallyDisabledDriver) {
+      if (driver?.embedded && !driver?.safeEmbeddedDriver && isInitiallyDisabledDriver) {
         const result = await commonDialogService.open(ConfirmationDialogWarning, {
           title: 'administration_disabled_drivers_enable_unsafe_driver_title',
           message: translate('administration_disabled_drivers_enable_unsafe_driver_message', undefined, { driverName: driver?.name || id }),
