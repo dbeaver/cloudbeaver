@@ -43,7 +43,6 @@
       background-color: var(--dbv-kit-btn-background-active);
     }
 
-    &:focus,
     &:focus-visible,
     &[data-focus-visible] {
       outline: 2px solid var(--dbv-kit-color-outline);
