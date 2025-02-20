@@ -15,6 +15,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { CreateConnectionService } from './CreateConnectionService.js';
+import { CachedMapAllKey, getCachedDataResourceLoaderState, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
 export interface IConnectionDetailsPlaceholderProps {
   connection: DatabaseConnection;
@@ -68,6 +69,10 @@ export class ConnectionsAdministrationService extends Bootstrap {
           onDeActivate: this.deactivateCreateMethod.bind(this),
           canDeActivate: this.canDeActivateCreate.bind(this),
         },
+      ],
+      getLoader: () => [
+        getCachedDataResourceLoaderState(this.serverConfigResource, () => undefined),
+        getCachedMapResourceLoaderState(this.connectionInfoResource, () => CachedMapAllKey),
       ],
       isHidden: () => this.serverConfigResource.distributed || !this.connectionInfoResource.values.some(connection => connection.template),
       getContentComponent: () => ConnectionsAdministration,

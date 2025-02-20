@@ -20,6 +20,7 @@ package io.cloudbeaver.service.sql.impl;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.WebTransactionLogInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.WebServiceBindingBase;
@@ -42,7 +43,6 @@ import org.jkiss.dbeaver.model.exec.trace.DBCTraceProperty;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
-import io.cloudbeaver.model.WebTransactionLogInfo;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.*;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
@@ -555,13 +555,18 @@ public class WebServiceSQL implements DBWServiceSQL {
         try {
 
             WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+            List<SQLGroupingAttribute> groupingAttributes = Arrays.stream(resultsInfo.getAttributes())
+                .filter(attr -> columnsList.contains(WebSQLUtils.getColumnName(attr)))
+                .map(SQLGroupingAttribute::makeBound)
+                .toList();
+
             var dataSource = contextInfo.getProcessor().getConnection().getDataSource();
             var groupingQueryGenerator = new SQLGroupingQueryGenerator(
                 dataSource,
                 resultsInfo.getDataContainer(),
                 getSqlDialectFromConnection(dataSource.getContainer()),
                 contextInfo.getProcessor().getSyntaxManager(),
-                columnsList.stream().map(s -> SQLGroupingAttribute.makeCustom(dataSource, s)).toList(),
+                groupingAttributes,
                 functions == null ? List.of(SQLGroupingQueryGenerator.DEFAULT_FUNCTION) : functions, // backward compatibility
                 CommonUtils.getBoolean(showDuplicatesOnly, false));
             return groupingQueryGenerator.generateGroupingQuery(resultsInfo.getQueryText());
