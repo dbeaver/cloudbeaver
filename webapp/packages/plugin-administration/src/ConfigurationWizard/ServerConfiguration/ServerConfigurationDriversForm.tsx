@@ -8,19 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
-import {
-  Combobox,
-  ConfirmationDialogWarning,
-  Group,
-  GroupTitle,
-  type ITag,
-  s,
-  Tag,
-  Tags,
-  useResource,
-  useS,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { Combobox, ConfirmationDialog, Group, GroupTitle, type ITag, s, Tag, Tags, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
@@ -71,10 +59,12 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
       const isInitiallyDisabledDriver = initialServerConfig.disabledDrivers?.includes(id);
 
       if (driver?.embedded && !driver?.safeEmbeddedDriver && isInitiallyDisabledDriver) {
-        const result = await commonDialogService.open(ConfirmationDialogWarning, {
+        const result = await commonDialogService.open(ConfirmationDialog, {
           title: 'ui_security_warning',
           message: translate('administration_disabled_drivers_enable_unsafe_driver_message', undefined, { driverName: driver?.name || id }),
           confirmActionText: 'ui_enable',
+          icon: '/icons/warning_icon.svg',
+          bigIcon: true,
           size: 'medium',
         });
 

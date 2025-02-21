@@ -16,7 +16,6 @@ export * from './CommonDialog/CommonDialog/CommonDialogWrapper.js';
 export * from './CommonDialog/ConfirmationDialog.js';
 export { default as ConfirmationDialogStyles } from './CommonDialog/ConfirmationDialog.module.css';
 export * from './CommonDialog/ConfirmationDialogDelete.js';
-export * from './CommonDialog/ConfirmationDialogWarning.js';
 export * from './CommonDialog/RenameDialog.js';
 export * from './CommonDialog/DialogsPortal.js';
 
