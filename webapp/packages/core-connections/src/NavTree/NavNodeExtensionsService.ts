@@ -40,13 +40,17 @@ export class NavNodeExtensionsService {
   }
 
   getConnection(navNodeId: string): IConnectionInfoParams | undefined {
-    const connection = this.connectionInfoResource.getConnectionForNode(navNodeId);
+    const node = this.navNodeInfoResource.get(navNodeId);
+    if (!node?.projectId) {
+      return;
+    }
+    const connectionKey = this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, navNodeId);
 
-    if (!connection) {
+    if (!connectionKey) {
       return;
     }
 
-    return createConnectionParam(connection);
+    return connectionKey;
   }
 
   getDBObjectCatalog(navNodeId: string) {
