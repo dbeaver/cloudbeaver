@@ -185,7 +185,7 @@ public class WebDatabaseDriverInfo {
     public WebPropertyInfo[] getDriverProperties() throws DBWebException {
         try {
             DBPConnectionConfiguration cfg = new DBPConnectionConfiguration();
-            cfg.setUrl(driver.getSampleURL());
+            cfg.setUrl(CommonUtils.notEmpty(driver.getSampleURL()));
             cfg.setHostName(DBConstants.HOST_LOCALHOST);
             cfg.setHostPort(driver.getDefaultPort());
             cfg.setDatabaseName(driver.getDefaultDatabase());
