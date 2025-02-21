@@ -67,7 +67,7 @@
   max-height: 300px;
   overflow: auto;
   outline: none;
-  z-index: 998;
+  z-index: 999;
   border-radius: var(--theme-form-element-radius);
 
   & .menuItem {
