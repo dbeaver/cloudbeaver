@@ -11,7 +11,7 @@ import { ConfirmationDialog, type ConfirmationDialogPayload } from '../CommonDia
 
 export const ConfirmationDialogWarning: DialogComponent<ConfirmationDialogPayload, DialogueStateResult | string> =
   function ConfirmationDialogWarning({ payload, ...rest }) {
-    const bigIcon = payload.bigIcon ?? payload.subTitle === undefined ?? true;
+    const bigIcon = payload?.bigIcon ?? payload?.subTitle === undefined ?? true;
     let icon = payload.icon ?? '/icons/warning_icon_sm.svg';
 
     if (bigIcon) {

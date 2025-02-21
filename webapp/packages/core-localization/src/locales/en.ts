@@ -55,6 +55,7 @@ export default [
   ['ui_search', 'Search...'],
   ['ui_delete', 'Delete'],
   ['ui_enable', 'Enable'],
+  ['ui_security_warning', 'Security Warning'],
   ['ui_deleting', 'Deleting...'],
   ['ui_add', 'Add'],
   ['ui_revert', 'Revert'],

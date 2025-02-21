@@ -16,8 +16,10 @@ import { useS } from '../../useS.js';
 import { DialogContext } from '../DialogContext.js';
 import styles from './CommonDialogWrapper.module.css';
 
+export type CommonDialogWrapperSize = 'small' | 'medium' | 'large';
+
 export interface CommonDialogWrapperProps {
-  size?: 'small' | 'medium' | 'large';
+  size?: CommonDialogWrapperSize;
   'aria-label'?: string;
   fixedSize?: boolean;
   fixedWidth?: boolean;

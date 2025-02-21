@@ -72,9 +72,10 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
 
       if (driver?.embedded && !driver?.safeEmbeddedDriver && isInitiallyDisabledDriver) {
         const result = await commonDialogService.open(ConfirmationDialogWarning, {
-          title: 'administration_disabled_drivers_enable_unsafe_driver_title',
+          title: 'ui_security_warning',
           message: translate('administration_disabled_drivers_enable_unsafe_driver_message', undefined, { driverName: driver?.name || id }),
           confirmActionText: 'ui_enable',
+          size: 'medium',
         });
 
         if (result === DialogueStateResult.Rejected) {
