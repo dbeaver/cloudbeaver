@@ -49,38 +49,35 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
     [serverConfig.disabledDrivers],
   );
 
-  const handleRemove = useCallback(
-    async (id: string) => {
-      if (!serverConfig.disabledDrivers) {
+  async function handleRemove(id: string) {
+    if (!serverConfig.disabledDrivers) {
+      return;
+    }
+
+    const driver = driversResource.resource.get(id);
+    const isInitiallyDisabledDriver = initialServerConfig.disabledDrivers?.includes(id);
+
+    if (driver?.embedded && !driver?.safeEmbeddedDriver && isInitiallyDisabledDriver) {
+      const result = await commonDialogService.open(ConfirmationDialog, {
+        title: 'ui_security_warning',
+        message: translate('administration_disabled_drivers_enable_unsafe_driver_message', undefined, { driverName: driver?.name || id }),
+        confirmActionText: 'ui_enable',
+        icon: '/icons/warning_icon.svg',
+        bigIcon: true,
+        size: 'medium',
+      });
+
+      if (result === DialogueStateResult.Rejected) {
         return;
       }
+    }
 
-      const driver = driversResource.resource.get(id);
-      const isInitiallyDisabledDriver = initialServerConfig.disabledDrivers?.includes(id);
+    const index = serverConfig.disabledDrivers.indexOf(id);
 
-      if (driver?.embedded && !driver?.safeEmbeddedDriver && isInitiallyDisabledDriver) {
-        const result = await commonDialogService.open(ConfirmationDialog, {
-          title: 'ui_security_warning',
-          message: translate('administration_disabled_drivers_enable_unsafe_driver_message', undefined, { driverName: driver?.name || id }),
-          confirmActionText: 'ui_enable',
-          icon: '/icons/warning_icon.svg',
-          bigIcon: true,
-          size: 'medium',
-        });
-
-        if (result === DialogueStateResult.Rejected) {
-          return;
-        }
-      }
-
-      const index = serverConfig.disabledDrivers.indexOf(id);
-
-      if (index !== -1) {
-        serverConfig.disabledDrivers.splice(index, 1);
-      }
-    },
-    [serverConfig.disabledDrivers],
-  );
+    if (index !== -1) {
+      serverConfig.disabledDrivers.splice(index, 1);
+    }
+  }
 
   return (
     <Group maximum gap>
