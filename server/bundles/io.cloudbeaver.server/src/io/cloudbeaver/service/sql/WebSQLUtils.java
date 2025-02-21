@@ -37,9 +37,8 @@ import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.Base64;
 import org.jkiss.utils.CommonUtils;
 
-import java.io.ByteArrayOutputStream;
+import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -131,9 +130,9 @@ public class WebSQLUtils {
     private static Map<String, Object> serializeDocumentValue(WebSession session, DBDDocument document) throws DBCException {
         String documentData;
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            document.serializeDocument(session.getProgressMonitor(), baos, StandardCharsets.UTF_8);
-            documentData = new String(baos.toByteArray(), StandardCharsets.UTF_8);
+            StringWriter writer = new StringWriter();
+            document.serializeDocument(session.getProgressMonitor(), writer);
+            documentData = writer.toString();
         } catch (Exception e) {
             throw new DBCException("Error serializing document", e);
         }

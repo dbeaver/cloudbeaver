@@ -63,26 +63,30 @@ export const useInputAutocomplete = (
       isFound: false,
       selectionStart: 0 as number | null,
       replaceCurrentWord(replacement: string) {
-        const cursorPosition = this.selectionStart;
-        const words = this.inputValue.split(separator);
+        try {
+          const cursorPosition = this.selectionStart;
+          const words = this.inputValue.split(separator);
 
-        if (!this.currentWord || !isNotNullDefined(words) || !isNotNullDefined(cursorPosition)) {
-          return;
+          if (!this.currentWord || !isNotNullDefined(words) || !isNotNullDefined(cursorPosition)) {
+            return;
+          }
+
+          const start = cursorPosition - this.currentWord.length;
+          const end = cursorPosition;
+
+          this.inputValue = this.inputValue.slice(0, start) + replacement + this.inputValue.slice(end);
+          this.selectionStart = start + replacement.length;
+
+          if (this.inputRef.current) {
+            this.inputRef.current.value = this.inputValue;
+            this.inputRef.current.focus();
+            this.inputRef.current.setSelectionRange(this.selectionStart, this.selectionStart);
+          }
+
+          this.isFound = true;
+        } finally {
+          this.resetState();
         }
-
-        const start = cursorPosition - this.currentWord.length;
-        const end = cursorPosition;
-
-        this.inputValue = this.inputValue.slice(0, start) + replacement + this.inputValue.slice(end);
-        this.selectionStart = start + replacement.length;
-
-        if (this.inputRef.current) {
-          this.inputRef.current.value = this.inputValue;
-          this.inputRef.current.focus();
-          this.inputRef.current.setSelectionRange(this.selectionStart, this.selectionStart);
-        }
-
-        this.isFound = true;
       },
       get currentWord(): string {
         const cursorPosition = this.selectionStart;
@@ -106,12 +110,17 @@ export const useInputAutocomplete = (
 
         return this.search.searchResult;
       },
+      resetState() {
+        this.selectionStart = null;
+        this.position = { x: 0, y: 0 };
+      },
     }),
     {
       proposals: computed,
       selectionStart: observable.ref,
       isFound: observable.ref,
       currentWord: computed,
+      resetState: action.bound,
       replaceCurrentWord: action.bound,
       position: observable.ref,
       inputValue: observable.ref,
@@ -136,14 +145,26 @@ export const useInputAutocomplete = (
     switch (event.key) {
       case 'Escape':
         state.menuRef.current?.hide();
+        state.resetState();
         break;
       case 'ArrowDown':
       case 'ArrowUp':
         state.menuRef.current?.first();
         break;
+      case 'Tab':
+        state.resetState();
+        break;
       default:
         break;
     }
+  }
+
+  function handleOutsideClick() {
+    if (state.inputRef.current?.contains(document.activeElement)) {
+      return;
+    }
+
+    state.resetState();
   }
 
   useEffect(() => {
@@ -151,10 +172,12 @@ export const useInputAutocomplete = (
 
     input.addEventListener('input', handleInput);
     input.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('click', handleOutsideClick);
 
     return () => {
       input.removeEventListener('keydown', handleKeyDown);
       input.removeEventListener('input', handleInput);
+      document.removeEventListener('click', handleOutsideClick);
     };
   });
 
