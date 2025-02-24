@@ -85,6 +85,10 @@ export const Button = observer<ButtonProps>(function Button({
     <UIKitButton
       render={Tag}
       {...rest}
+      loading={loading}
+      loader={
+        <Loader className={s(styles, { loader: true })} small />
+      }
       type={type}
       disabled={disabled}
       className={s(
@@ -108,7 +112,6 @@ export const Button = observer<ButtonProps>(function Button({
         </div>
       )}
       <span className={s(styles, { buttonLabel: true })}>{children}</span>
-      <Loader className={s(styles, { loader: true })} small />
     </UIKitButton>
   );
 });
