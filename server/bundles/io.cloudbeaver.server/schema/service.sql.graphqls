@@ -359,6 +359,19 @@ extend type Mutation {
     sqlResultClose(projectId: ID, connectionId: ID!, contextId: ID!, resultId: ID!): Boolean!
 
     # Update multiple cell values
+    @since(version: "25.0.0")
+    asyncUpdateResultsDataBatch(
+        projectId: ID!,
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!,
+
+        updatedRows: [SQLResultRow!],
+        deletedRows: [SQLResultRow!],
+        addedRows: [SQLResultRow!],
+    ): AsyncTaskInfo!
+
+    @deprecated(reason: "25.0.0") # use async function
     updateResultsDataBatch(
         projectId: ID,
         connectionId: ID!,

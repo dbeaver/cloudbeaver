@@ -49,7 +49,7 @@ public class WebSQLQueryResultColumn {
 
     @Property
     public String getName() {
-        return attrMeta.getFullyQualifiedName(DBPEvaluationContext.UI);
+        return WebSQLUtils.getColumnName(attrMeta);
     }
 
     @Property
@@ -112,7 +112,7 @@ public class WebSQLQueryResultColumn {
 
     @Property
     public boolean isReadOnly() {
-        return DBExecUtils.isAttributeReadOnly(attrMeta);
+        return DBExecUtils.isAttributeReadOnly(attrMeta, true);
     }
 
     @Property

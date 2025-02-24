@@ -20,6 +20,7 @@ package io.cloudbeaver.service.sql.impl;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
+import io.cloudbeaver.model.WebTransactionLogInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.WebServiceBindingBase;
@@ -42,7 +43,6 @@ import org.jkiss.dbeaver.model.exec.trace.DBCTraceProperty;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
-import io.cloudbeaver.model.WebTransactionLogInfo;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.*;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
@@ -295,6 +295,44 @@ public class WebServiceSQL implements DBWServiceSQL {
         return true;
     }
 
+    @NotNull
+    @Override
+    public WebAsyncTaskInfo asyncUpdateResultsDataBatch(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @Nullable List<WebSQLResultsRow> updatedRows,
+        @Nullable List<WebSQLResultsRow> deletedRows,
+        @Nullable List<WebSQLResultsRow> addedRows,
+        @Nullable WebDataFormat dataFormat
+    ) throws DBWebException {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
+            @Override
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
+                try {
+                    monitor.beginTask("Update result set data", 1);
+                    monitor.subTask("Update result set data from id " + resultsId);
+                    WebSQLExecuteInfo executeResults = updateResultsDataBatch(
+                        monitor,
+                        contextInfo,
+                        resultsId,
+                        updatedRows,
+                        deletedRows,
+                        addedRows,
+                        dataFormat
+                    );
+                    this.result = executeResults.getStatusMessage();
+                    this.extendedResults = executeResults;
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        return webSession.createAndRunAsyncTask("Updating result set data from " + resultsId, runnable);
+    }
+
     @Override
     public WebSQLExecuteInfo updateResultsDataBatch(
         @NotNull WebSQLContextInfo contextInfo,
@@ -302,27 +340,47 @@ public class WebServiceSQL implements DBWServiceSQL {
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows,
-        @Nullable WebDataFormat dataFormat) throws DBWebException
-    {
+        @Nullable WebDataFormat dataFormat
+    ) throws DBWebException {
         try {
-            WebSQLExecuteInfo[] result = new WebSQLExecuteInfo[1];
-
-            DBExecUtils.tryExecuteRecover(
-                contextInfo.getProcessor().getWebSession().getProgressMonitor(),
-                contextInfo.getProcessor().getConnection().getDataSource(),
-                monitor -> {
-                    try {
-                        result[0] = contextInfo.getProcessor().updateResultsDataBatch(
-                            monitor, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat);
-                    } catch (Exception e) {
-                        throw new InvocationTargetException(e);
-                    }
-                }
+            return updateResultsDataBatch(
+                contextInfo.getWebSession().getProgressMonitor(),
+                contextInfo,
+                resultsId,
+                updatedRows,
+                deletedRows,
+                addedRows,
+                dataFormat
             );
-            return result[0];
         } catch (DBException e) {
             throw new DBWebException("Error updating resultset data", e);
         }
+    }
+
+    private WebSQLExecuteInfo updateResultsDataBatch(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @Nullable List<WebSQLResultsRow> updatedRows,
+        @Nullable List<WebSQLResultsRow> deletedRows,
+        @Nullable List<WebSQLResultsRow> addedRows,
+        @Nullable WebDataFormat dataFormat
+    ) throws DBException {
+        WebSQLExecuteInfo[] result = new WebSQLExecuteInfo[1];
+
+        DBExecUtils.tryExecuteRecover(
+            monitor,
+            contextInfo.getProcessor().getConnection().getDataSource(),
+            monitor1 -> {
+                try {
+                    result[0] = contextInfo.getProcessor().updateResultsDataBatch(
+                        monitor1, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat);
+                } catch (Exception e) {
+                    throw new InvocationTargetException(e);
+                }
+            }
+        );
+        return result[0];
     }
 
     @FunctionalInterface
@@ -555,13 +613,18 @@ public class WebServiceSQL implements DBWServiceSQL {
         try {
 
             WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+            List<SQLGroupingAttribute> groupingAttributes = Arrays.stream(resultsInfo.getAttributes())
+                .filter(attr -> columnsList.contains(WebSQLUtils.getColumnName(attr)))
+                .map(SQLGroupingAttribute::makeBound)
+                .toList();
+
             var dataSource = contextInfo.getProcessor().getConnection().getDataSource();
             var groupingQueryGenerator = new SQLGroupingQueryGenerator(
                 dataSource,
                 resultsInfo.getDataContainer(),
                 getSqlDialectFromConnection(dataSource.getContainer()),
                 contextInfo.getProcessor().getSyntaxManager(),
-                columnsList.stream().map(s -> SQLGroupingAttribute.makeCustom(dataSource, s)).toList(),
+                groupingAttributes,
                 functions == null ? List.of(SQLGroupingQueryGenerator.DEFAULT_FUNCTION) : functions, // backward compatibility
                 CommonUtils.getBoolean(showDuplicatesOnly, false));
             return groupingQueryGenerator.generateGroupingQuery(resultsInfo.getQueryText());
