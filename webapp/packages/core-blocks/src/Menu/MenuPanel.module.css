@@ -7,7 +7,7 @@
  */
 .menu {
   outline: none;
-  z-index: 998;
+  z-index: 999;
 }
 .menuBox {
   composes: theme-background-surface theme-text-on-surface theme-group-element-radius theme-typography--body2 theme-elevation-z5 from global;

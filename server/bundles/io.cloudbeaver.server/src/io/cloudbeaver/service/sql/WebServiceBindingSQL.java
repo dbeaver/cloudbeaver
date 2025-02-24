@@ -164,6 +164,15 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                     getResultsRow(env, "deletedRows"),
                     getResultsRow(env, "addedRows"),
                     getDataFormat(env)))
+            .dataFetcher("asyncUpdateResultsDataBatch", env ->
+                getService(env).asyncUpdateResultsDataBatch(
+                    getWebSession(env),
+                    getSQLContext(env),
+                    env.getArgument("resultsId"),
+                    getResultsRow(env, "updatedRows"),
+                    getResultsRow(env, "deletedRows"),
+                    getResultsRow(env, "addedRows"),
+                    getDataFormat(env)))
             .dataFetcher("updateResultsDataBatchScript", env ->
                 getService(env).updateResultsDataBatchScript(
                     getSQLContext(env),

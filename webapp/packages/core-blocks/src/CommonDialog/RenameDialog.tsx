@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
         <Form ref={focusedRef} onSubmit={() => resolveDialog(state.name)}>
           <Container center>
             <InputField name="name" state={state} error={!state.valid} description={errorMessage} onChange={() => state.validate().catch(() => {})}>
-              {translate('ui_name') + ':'}
+              {translate('ui_name')}
             </InputField>
           </Container>
         </Form>

@@ -106,4 +106,5 @@ export default [
   ['core_connections_settings_disable_description', 'Отключить возможность создания новых подключений'],
   ['connections_templates_deprecated_message', 'Шаблоны подключений больше не поддерживаются и будут удалены в будущих релизах'],
   ['core_connections_connection_driver_not_installed', 'Драйвер не установлен'],
+  ['core_connections_connection_temporary', 'Временное подключение'],
 ];
