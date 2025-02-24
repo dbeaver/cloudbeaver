@@ -1,16 +1,46 @@
 @import 'tailwindcss' prefix(tw);
 
 @layer theme {
+  main {
+    background-color: var(--dbv-kit-color-background);
+  }
+
   a {
     color: var(--tw-color-blue-600);
   }
 
   code {
-    color: var(--tw-color-yellow-600);
+    color: var(--tw-color-orange-700);
   }
 
   .comment {
     color: var(--tw-color-gray-400);
+  }
+
+  h1,
+  h2,
+  h3,
+  h3,
+  h5 {
+    font-weight: var(--tw-font-weight-semibold);
+  }
+
+  h1 {
+    font-size: var(--tw-text-2xl);
+  }
+
+  h2 {
+    font-size: var(--tw-text-xl);
+  }
+
+  h3 {
+    font-size: var(--tw-text-lg);
+  }
+
+  p {
+    font-size: var(--tw-text-base);
+    margin-block-start: 0.5em;
+    margin-block-end: 0.5em;
   }
 }
 
