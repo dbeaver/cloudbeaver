@@ -30,11 +30,11 @@ interface Props {
 export const Menu = observer<Props>(function Menu({ value, node }) {
   const styles = useS(classes);
   const navNodeManagerService = useService(NavNodeManagerService);
-  const connectionsInfoResource = useService(ConnectionInfoResource);
+  const connectionInfoResource = useService(ConnectionInfoResource);
   const menu = useMenu({ menu: MENU_NAV_TREE });
   const mouse = useMouse<HTMLDivElement>();
   const [menuOpened, switchState] = useState(false);
-  const connectionKey = connectionsInfoResource.getConnectionIdForNodeId(node.projectId!, node.id);
+  const connectionKey = connectionInfoResource.getConnectionIdForNodeId(node.projectId!, node.id);
   const contextMenuPosition = useContextMenuPosition();
 
   useDataContextLink(menu.context, (context, id) => {

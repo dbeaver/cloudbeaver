@@ -9,6 +9,7 @@ import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   compareConnectionsInfo,
+  ConnectionInfoActiveProjectKey,
   ConnectionInfoResource,
   ConnectionsManagerService,
   ConnectionsSettingsService,
@@ -20,7 +21,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
@@ -93,13 +94,13 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         const activeConnectionKey = this.connectionSchemaManagerService.activeConnectionKey;
 
         if (!activeConnectionKey) {
-          return [...this.appAuthService.loaders, getCachedMapResourceLoaderState(this.connectionInfoResource, () => CachedMapAllKey)];
+          return [...this.appAuthService.loaders, getCachedMapResourceLoaderState(this.connectionInfoResource, () => ConnectionInfoActiveProjectKey)];
         }
 
         return [
           ...this.appAuthService.loaders,
           ...this.connectionSchemaManagerService.currentObjectLoaders,
-          getCachedMapResourceLoaderState(this.connectionInfoResource, () => CachedMapAllKey),
+          getCachedMapResourceLoaderState(this.connectionInfoResource, () => ConnectionInfoActiveProjectKey),
           getCachedMapResourceLoaderState(this.containerResource, () => ({
             ...activeConnectionKey,
             catalogId: this.connectionSchemaManagerService.activeObjectCatalogId,

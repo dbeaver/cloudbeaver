@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { type ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
 
 import { getComputed } from '../getComputed.js';
+import { useObjectRef } from '../useObjectRef.js';
 
 export function useAutoLoad(
   component: { name: string },
@@ -18,6 +19,7 @@ export function useAutoLoad(
   lazy = false,
   throwExceptions = false,
 ) {
+  const unmountedRef = useObjectRef({ unmounted: false });
   const [loadFunctionName] = useState(`${component.name}.useAutoLoad(...)` as const);
   if (!Array.isArray(state)) {
     state = [state] as ReadonlyArray<ILoadableState>;
@@ -32,7 +34,7 @@ export function useAutoLoad(
 
   const obj = {
     [loadFunctionName]: async () => {
-      if (!enabled) {
+      if (!enabled || unmountedRef.unmounted) {
         return;
       }
 
@@ -70,4 +72,11 @@ export function useAutoLoad(
   useEffect(() => {
     obj[loadFunctionName]!();
   });
+
+  useEffect(
+    () => () => {
+      unmountedRef.unmounted = true;
+    },
+    [],
+  );
 }
