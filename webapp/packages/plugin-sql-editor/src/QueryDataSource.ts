@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ import {
   ResultDataFormat,
   type SqlExecuteInfo,
   type SqlQueryResults,
-  type UpdateResultsDataBatchMutationVariables,
+  type AsyncUpdateResultsDataBatchMutationVariables,
 } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 import {
@@ -81,7 +81,9 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
   }
 
   async save(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
-    if (!this.options || !this.executionContext?.context) {
+    const executionContext = this.executionContext;
+
+    if (!this.options || !executionContext?.context) {
       return prevResults;
     }
 
@@ -91,13 +93,13 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
           continue;
         }
 
-        const executionContextInfo = this.executionContext.context;
+        const executionContextInfo = executionContext.context;
         const projectId = this.options.connectionKey.projectId;
         const connectionId = this.options.connectionKey.connectionId;
         const contextId = executionContextInfo.id;
         const resultsId = result.id;
 
-        const updateVariables: UpdateResultsDataBatchMutationVariables = {
+        const updateVariables: AsyncUpdateResultsDataBatchMutationVariables = {
           projectId,
           connectionId,
           contextId,
@@ -126,12 +128,26 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
           editor.fillBatch(updateVariables);
         }
 
-        const response = await this.graphQLService.sdk.updateResultsDataBatch(updateVariables);
+        const task = this.asyncTaskInfoService.create(async () => {
+          const { taskInfo } = await this.graphQLService.sdk.asyncUpdateResultsDataBatch(updateVariables);
+          return taskInfo;
+        });
+
+        this.currentTask = executionContext.run(
+          async () => {
+            const info = await this.asyncTaskInfoService.run(task);
+            const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: info.id });
+
+            return result;
+          },
+          () => this.asyncTaskInfoService.cancel(task.id),
+          () => this.asyncTaskInfoService.remove(task.id),
+        );
+
+        const response = await this.currentTask;
 
         if (editor) {
-          const responseResult = this.transformResults(executionContextInfo, response.result.results, 0).find(
-            newResult => newResult.id === result.id,
-          );
+          const responseResult = this.transformResults(executionContextInfo, response.results, 0).find(newResult => newResult.id === result.id);
 
           if (responseResult) {
             editor.applyUpdate(responseResult);
@@ -140,7 +156,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
 
         this.requestInfo = {
           ...this.requestInfo,
-          requestDuration: response.result.duration,
+          requestDuration: response.duration,
           requestMessage: 'plugin_data_viewer_result_set_save_success',
           source: this.options.query,
         };

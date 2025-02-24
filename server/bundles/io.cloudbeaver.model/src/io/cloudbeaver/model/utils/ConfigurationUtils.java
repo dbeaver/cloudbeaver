@@ -18,8 +18,10 @@ package io.cloudbeaver.model.utils;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.utils.ArrayUtils;
+import org.jkiss.utils.CommonUtils;
 
 public class ConfigurationUtils {
     private ConfigurationUtils() {
@@ -36,7 +38,7 @@ public class ConfigurationUtils {
         if (ArrayUtils.contains(disabledDrivers, driver.getFullId())) {
             return false;
         }
-        return !driver.isEmbedded();
+        return !driver.isEmbedded() || CommonUtils.toBoolean(driver.getDriverParameter(DBConstants.PARAM_SAFE_EMBEDDED_DRIVER), false);
     }
 
 }

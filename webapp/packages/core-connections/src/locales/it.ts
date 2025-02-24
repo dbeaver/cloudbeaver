@@ -103,4 +103,5 @@ export default [
   ['core_connections_settings_disable_description', 'Disable the ability to create new connections'],
   ['connections_templates_deprecated_message', 'Template connections are deprecated and will be removed in future releases'],
   ['core_connections_connection_driver_not_installed', 'Driver is not installed'],
+  ['core_connections_connection_temporary', 'Temporary connection'],
 ];
