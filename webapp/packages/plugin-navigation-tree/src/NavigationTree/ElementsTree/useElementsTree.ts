@@ -21,14 +21,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { type NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import {
-  CachedMapAllKey,
-  CachedResourceOffsetPageKey,
-  CachedResourceOffsetPageTargetKey,
-  getNextPageOffset,
-  ResourceKeyUtils,
-} from '@cloudbeaver/core-resource';
+import { ProjectsService } from '@cloudbeaver/core-projects';
+import { CachedResourceOffsetPageKey, CachedResourceOffsetPageTargetKey, getNextPageOffset, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import type { IDNDData } from '@cloudbeaver/core-ui';
 import { type ILoadableState, MetadataMap, throttle } from '@cloudbeaver/core-utils';
 
@@ -745,12 +739,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   useResource(useElementsTree, navTreeResource, options.baseRoot, {
     onData: () => loadTreeThreshold(),
-  });
-
-  useResource(useElementsTree, ProjectInfoResource, CachedMapAllKey, {
-    onData: () => {
-      loadTreeThreshold();
-    },
   });
 
   useExecutor({

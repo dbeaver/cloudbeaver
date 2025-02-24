@@ -183,9 +183,10 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
       configuration,
     });
 
-    this.resetIncludes();
-    this.setData(await this.loader());
-    this.sessionResource.markOutdated();
+    runInAction(() => {
+      this.resetIncludes();
+      this.sessionResource.markOutdated();
+    });
 
     return result;
   }
