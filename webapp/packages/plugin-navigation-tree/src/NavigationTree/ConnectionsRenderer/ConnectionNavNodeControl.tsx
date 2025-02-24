@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import {
   TreeNodeName,
   useContextMenuPosition,
   useS,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
@@ -32,6 +33,7 @@ import { TreeNodeMenuLoader } from '../ElementsTree/NavigationTreeNode/TreeNodeM
 export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(
   forwardRef(function ConnectionNavNodeControl({ node, nodeInfo, dndElement, dndPlaceholder, className, onClick }, ref) {
     const styles = useS(style);
+    const translate = useTranslate();
     const contextMenuPosition = useContextMenuPosition();
     const treeNodeContext = useContext(TreeNodeContext);
     const navNodeInfoResource = useService(NavNodeInfoResource);
@@ -44,6 +46,8 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
     let icon = nodeInfo.icon;
     const name = nodeInfo.name;
     const title = nodeInfo.name;
+
+    let tooltip = `${translate('ui_name')}: ${title}`;
 
     if (error) {
       icon = '/icons/error_icon_sm.svg';
@@ -61,6 +65,10 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
 
     const temporary = node.objectFeatures.includes(EObjectFeature.dataSourceTemporary);
 
+    if (temporary) {
+      tooltip += `\n${translate('ui_type')}: ${translate('core_connections_connection_temporary')}`;
+    }
+
     return (
       <TreeNodeControl
         ref={ref}
@@ -72,7 +80,7 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
         <TreeNodeIcon>
           <ConnectionImageWithMask icon={icon} connected={connected} maskId="tree-node-icon" />
         </TreeNodeIcon>
-        <TreeNodeName title={title} className={s(styles, { treeNodeName: true, temporary })}>
+        <TreeNodeName title={tooltip} className={s(styles, { treeNodeName: true, temporary })}>
           <Loader suspense inline fullSize>
             <div className={s(styles, { nameBox: true })}>{name}</div>
           </Loader>
