@@ -53,6 +53,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     private readonly localizationService: LocalizationService,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
+    // private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored,
   ) {
     super();
 
@@ -68,6 +69,14 @@ export class ConnectionOptionsTabService extends Bootstrap {
       order: 1,
       panel: () => Options,
     });
+
+    // TODO uncomment it once Options component is refactored
+    // this.connectionFormServiceRefactored.parts.add({
+    //   key: 'options',
+    //   order: 1,
+    //   name: 'plugin_connections_connection_form_part_main',
+    //   panel: () => Options,
+    // });
 
     this.connectionFormService.prepareConfigTask.addHandler(this.prepareConfig.bind(this));
 
