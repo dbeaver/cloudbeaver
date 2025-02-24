@@ -10,6 +10,7 @@
     cursor: pointer;
     user-select: none;
     position: relative;
+    justify-content: center;
     align-items: center;
     white-space: nowrap;
 
@@ -30,7 +31,7 @@
 
     &:focus-visible,
     &[data-focus-visible] {
-      outline: 2px solid var(--dbv-kit-color-outline);
+      outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-color-outline);
     }
 
     &:hover {

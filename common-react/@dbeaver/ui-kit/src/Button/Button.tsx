@@ -17,8 +17,13 @@ export interface ButtonProps extends Omit<AriaKitButtonProps, 'clickOnEnter' | '
 export function Button({ className, variant = 'primary', size = 'medium', loading, children, onClick, ...props }: ButtonProps) {
   const classToApply = `dbv-kit-button dbv-kit-button__${variant} dbv-kit-button__${size}` + (className ? ` ${className}` : '');
 
+  if (loading) {
+    props['aria-busy'] = true;
+    props['aria-label'] = 'Loading';
+  }
+
   return (
-    <AriaButton aria-label={loading ? 'Loading' : ''} onClick={loading ? () => null : onClick} className={classToApply} {...props}>
+    <AriaButton onClick={loading ? () => null : onClick} className={classToApply} {...props}>
       {loading && <span className="dbv-kit-button_loader" />}
       {children}
     </AriaButton>
@@ -34,6 +39,6 @@ export interface ButtonIconProps extends React.HTMLAttributes<HTMLSpanElement> {
  * @param props.placement This property is needed to adjust icon placement inside a button. The icon with placement="start" will cut the inline-start padding. placement="end" will affect the padding-inline-end accordingly. This property supports RTL and LTR, so you don't need to think about it.
  */
 Button.Icon = function ButtonIcon({ className, children, placement }: ButtonIconProps) {
-  const classToApply = `dbv-kit-button_icon` + (placement ? ` dbv-kit-button-icon__${placement}` : '') + (className ? ` ${className}` : '');
+  const classToApply = `dbv-kit-button_icon` + (placement ? ` dbv-kit-button_icon__${placement}` : '') + (className ? ` ${className}` : '');
   return <span className={classToApply}>{children}</span>;
 };
