@@ -27,7 +27,11 @@ export const OriginInfoTab = React.lazy(async () => {
 
 @injectable()
 export class ConnectionOriginInfoTabService extends Bootstrap {
-  constructor(private readonly connectionFormService: ConnectionFormService) {
+  constructor(
+    private readonly connectionFormService: ConnectionFormService,
+    // private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored,
+    // private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
+  ) {
     super();
   }
 
@@ -40,6 +44,29 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
       stateGetter: () => () => ({}),
       isHidden: (tabId, props) => (props?.state.originInfo ? isLocalConnection(props.state.originInfo.origin) : true),
     });
+
+    // TODO uncomment once refactored
+    // this.connectionFormServiceRefactored.parts.add({
+    //   key: 'origin',
+    //   order: 3,
+    //   tab: () => OriginInfoTab,
+    //   panel: () => OriginInfo,
+    //   isHidden: (tabId, props) => {
+    //     const projectId = props?.formState.state.connectionInfoParams?.projectId;
+    //     const connectionId = props?.formState.state.connectionInfoParams?.connectionId;
+
+    //     if (!projectId || !connectionId) {
+    //       return true;
+    //     }
+
+    //     const originInfo = this.connectionInfoOriginResource.get(createConnectionParam(projectId, connectionId));
+
+    //     return originInfo ? isLocalConnection(originInfo.origin) : true;
+    //   },
+    // });
+
+    // TODO uncomment once refactored
+    // this.connectionFormServiceRefactored.actionsContainer.add(ConnectionFormAuthenticationAction, 0);
 
     this.connectionFormService.actionsContainer.add(ConnectionFormAuthenticationAction, 0);
   }
