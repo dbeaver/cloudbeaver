@@ -1,6 +1,7 @@
 import type { Story } from '@ladle/react';
 import { Button, type ButtonProps } from '../../../index.js';
 import { ButtonTokens } from './button-tokens.js';
+import { useState } from 'react';
 
 export const Docs = () => (
   <div>
@@ -9,14 +10,17 @@ export const Docs = () => (
     <h2>Class names</h2>
     <p>
       <code>.dbv-kit-button</code> - the main class name for the button component. <br />
-      <code>.dbv-kit-button__primary</code> - the class name for the primary variant. <br />
-      <code>.dbv-kit-button__secondary</code> - the class name for the secondary variant. <br />
-      <code>.dbv-kit-button__danger</code> - the class name for the danger variant. <br />
-      <code>.dbv-kit-button__small</code> - the class name for the small size. <br />
-      <code>.dbv-kit-button__medium</code> - the class name for the medium size. <br />
-      <code>.dbv-kit-button__large</code> - the class name for the large size. <br />
-      <code>.dbv-kit-button__xlarge</code> - the class name for the extra large size. <br />
-      <code>.dbv-kit-button-loading</code> - the class name for the loading state. <br />
+      <code>.dbv-kit-button--primary</code> - the class name for the primary variant. <br />
+      <code>.dbv-kit-button--secondary</code> - the class name for the secondary variant. <br />
+      <code>.dbv-kit-button--danger</code> - the class name for the danger variant. <br />
+      <code>.dbv-kit-button--small</code> - the class name for the small size. <br />
+      <code>.dbv-kit-button--medium</code> - the class name for the medium size. <br />
+      <code>.dbv-kit-button--large</code> - the class name for the large size. <br />
+      <code>.dbv-kit-button--xlarge</code> - the class name for the extra large size. <br />
+      <hr></hr>
+      <code>.dbv-kit-button__icon</code> - the class name for the icon component. <br />
+      <code>.dbv-kit-button__icon--start</code> - the class name for the icon with placement="start". <br />
+      <code>.dbv-kit-button__icon--end</code> - the class name for the icon with placement="end". <br />
     </p>
     <p>
       Underlying components docs: <br />
@@ -42,29 +46,22 @@ export const Variants = () => (
   <div>
     <h3 className="tw:text-lg tw:my-2">Variants</h3>
     <p>Button component has 3 predefined variants: primary, secondary, and danger.</p>
-    <div className="tw:bg-gray-100 tw:p-4 tw:my-4">
+    <div className="codeblock tw:bg-gray-100 tw:p-4 tw:my-4">
       <code>&lt;Button variant="primary"/&gt;</code>
     </div>
-    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
+    <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
       <Button>Primary</Button>
-      <Button loading>Loading</Button>
       <Button disabled>Disabled</Button>
     </div>
 
-    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
+    <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
       <Button variant="secondary">Secondary</Button>
-      <Button variant="secondary" loading>
-        Loading
-      </Button>
       <Button variant="secondary" disabled>
         Disabled
       </Button>
     </div>
-    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
+    <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
       <Button variant="danger">Danger</Button>
-      <Button variant="danger" loading>
-        Loading
-      </Button>
       <Button variant="danger" disabled>
         Disabled
       </Button>
@@ -146,18 +143,20 @@ export const Icons = () => (
   <div>
     <h2>Icons</h2>
     <h3>&lt;Button.Icon&gt;</h3>
-    <code>.dbv-kit-button_icon</code>
+    <code>.dbv-kit-button__icon</code>
     <p>
       To properly place an icon inside a button, you have to use Button.Icon component. That component will compensate outer padding to balance the
       button view. You need to specify the placement property to adjust the icon position.
     </p>
-    <dd>
-      <dl className="tw:font-semibold">placement</dl>
+    <dl>
+      <dt className="tw:font-semibold">placement</dt>
       <dd>start | end</dd>
-    </dd>
-    <div className="tw:bg-gray-100 tw:p-4 tw:my-4">
+    </dl>
+    <div className="codeblock">
       <code>
-        &lt;Button className="my-custom-button"&gt; <br /> &nbsp;&nbsp;&lt;Button.Icon placement="start"/&gt; Text
+        &lt;Button&gt; <br /> &nbsp;&nbsp;&lt;Button.Icon placement="start"/&gt;
+        <br />
+        &nbsp; Text
         <br /> &lt;Button/&gt;
       </code>
     </div>
@@ -173,13 +172,21 @@ export const Icons = () => (
       </div>
       <p>
         The left button uses Button.Icon component and looks more balanced. If you feel that in your case it's not needed, feel free to not use the
-        component.
+        <b> Button.Icon </b> component.
       </p>
     </div>
 
+    <h3>Tokens</h3>
+    <div>
+      <code>--dbv-kit-btn-icon-margin-inline</code> - the margin between the icon and the text, by default calculated based on{' '}
+      <code>--dbv-kit-btn-padding-inline</code> for each size.
+    </div>
+
     <h3>Examples</h3>
-    <p>Here are some examples of how to use the Button component with icons. Don't forget to check the source code by pressing "s"</p>
-    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
+    <p>
+      Here are some examples of how to use the Button component with icons. Don't forget to check the source code by pressing <kbd>s</kbd>
+    </p>
+    <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
       <Button size="small">
         Love
         <Button.Icon placement="end">❤️</Button.Icon>
@@ -215,7 +222,7 @@ export const Icons = () => (
         <Button.Icon placement="end">❤️</Button.Icon>
       </Button>
     </div>
-    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
+    <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
       <Button loading>
         <Button.Icon className="tw:w-8 tw:h-4" placement="start">
           <svg width="16" height="16" fill="none">
@@ -254,34 +261,103 @@ export const Icons = () => (
 
 Icons.storyName = '3Icons';
 
-export const CustomRendering = () => (
-  <div>
-    <h3 className="tw:text-lg tw:my-2">Custom renders</h3>
-    <p>
-      Button can be rendered as different HTML element using <code>render</code> property. Read more{' '}
-      <a href="https://ariakit.org/reference/button#render">in AriaKit documentation</a>
-    </p>
-    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
-      <Button render={<a target="_blank" href="/" />} size="small">
-        Link button
-      </Button>
-      <Button variant="secondary" render={<a />}>
-        Link secondary
-      </Button>
-      <Button render={({ children, className }) => <p className={className}>{children} render</p>} size="medium">
-        Paragraph
-      </Button>
-    </div>
-    <h3 className="tw:text-lg tw:my-2">Change on focus</h3>
-    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBlockEnd: '20px' }}>
-      <Button onFocusVisible={e => (e.currentTarget.textContent = 'Click me!')} render={<a href="/" />} size="small">
-        Link button
-      </Button>
-    </div>
-  </div>
+const CustomLoader = () => (
+  <Button.Icon placement="start">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="tw:animate-spin tw:p-1">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="31.415, 31.415" />
+    </svg>
+  </Button.Icon>
 );
 
-CustomRendering.storyName = '4Custom rendering';
+export const Loading = () => {
+  const [loading, setLoading] = useState(true);
+
+  function toggleLoading() {
+    setLoading(prev => !prev);
+  }
+
+  return (
+    <div>
+      <h2>Loading</h2>
+      <h3>Design tokens</h3>
+      <p>
+        <code>--dbv-kit-btn-loader-base-color:</code> var(--tw-color-white);{' '}
+        <span className="comment">
+          // This color used in loader to mix with other button colors like{' '}
+          <i> color: color-mix(in srgb, var(--dbv-kit-btn-foreground) 25%, var(--dbv-kit-btn-loader-base-color));</i> It should be light in light mode
+          and one of the dark colors for dark theme.
+        </span>
+      </p>
+      <div>
+        <code>--dbv-kit-btn-loader-animation:</code> var(--animate-spin); <span className="comment"> Button loader animation</span>
+      </div>
+      <label>
+        Enable loaders <input type="checkbox" checked={loading} onChange={toggleLoading} />
+      </label>
+      <h3>Default loader</h3>
+      <p>Button component has a default loader that appears when the loading property is set to true.</p>
+      <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
+        <Button loading={loading}>Primary</Button>
+        <Button variant="secondary" loading={loading}>
+          Secondary
+        </Button>
+        <Button variant="danger" loading={loading}>
+          Danger
+        </Button>
+      </div>
+      <h3> Custom loader</h3>
+
+      <p>Buttons support custom loaders.</p>
+
+      <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
+        <Button loading={loading} loader={<span className="tw:flex tw:items-center tw:animate-spin">⚽️</span>}>
+          Loading
+        </Button>
+
+        <Button loading={loading} loader={<span className="tw:absolute tw:animate-bounce">🚴</span>}>
+          Loading
+        </Button>
+
+        <Button loading={loading} loader={<CustomLoader />}>
+          Custom SVG Loader
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+Loading.storyName = '4Loading';
+
+export const CustomRendering = () => {
+  return (
+    <div>
+      <h3 className="tw:text-lg tw:my-2">Custom renders</h3>
+      <p>
+        Button can be rendered as different HTML element using <code>render</code> property. Read more{' '}
+        <a href="https://ariakit.org/reference/button#render">in AriaKit documentation</a>
+      </p>
+      <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
+        <Button render={<a target="_blank" href="/" />} size="small">
+          Link button
+        </Button>
+        <Button variant="secondary" render={<a />}>
+          Link secondary
+        </Button>
+        <Button render={({ children, className }) => <p className={className}>{children} render</p>} size="medium">
+          Paragraph
+        </Button>
+      </div>
+      <h3 className="tw:text-lg tw:my-2">Change on focus</h3>
+      <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
+        <Button onFocusVisible={e => (e.currentTarget.textContent = 'Click me!')} render={<a href="/" />} size="small">
+          Link button
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+CustomRendering.storyName = '5Custom rendering';
 
 const Primary: Story<ButtonProps> = props => <Button {...props}>Primary</Button>;
 export const Interactive = Primary.bind({});
@@ -309,8 +385,8 @@ Interactive.argTypes = {
   },
 };
 
-Interactive.storyName = '5Interactive';
+Interactive.storyName = '6Interactive';
 
 export const Tokens = ButtonTokens;
 
-Tokens.storyName = '6Tokens';
+Tokens.storyName = '7Tokens';

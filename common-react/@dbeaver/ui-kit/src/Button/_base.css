@@ -14,6 +14,7 @@
     --dbv-kit-btn-font-weight: var(--tw-font-weight-normal);
     --dbv-kit-btn-font-size: calc(var(--dbv-kit-font-size-base) * 0.875);
     --dbv-kit-btn-disabled-opacity: 0.5;
+    --dbv-kit-btn-loader-base-color: var(--tw-color-white);
     --dbv-kit-btn-loader-animation: var(--tw-animate-spin);
   }
 }

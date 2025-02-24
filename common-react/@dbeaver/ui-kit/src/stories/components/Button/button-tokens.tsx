@@ -6,52 +6,60 @@ export const ButtonTokens = () => {
       <h2 className="tw:text-xl tw:font-semibold">Common buttons tokens</h2>
       <div className="tw:my-4">
         <div>
-          <code>--dbv-kit-btn-height:</code> var(--dbv-kit-control-height-medium); <span className="comment">// Default button height</span>
+          <code>--dbv-kit-btn-height:</code> var(--dbv-kit-control-height-medium); <span className="comment"> Default button height</span>
         </div>
         <div>
           <code>--dbv-kit-btn-padding-inline:</code> --spacing(2.5);
-          <span className="comment"> // Medium button inline paddings, other sizes are calculated based on that variable</span>
+          <span className="comment"> Medium button inline paddings, other sizes are calculated based on that variable</span>
         </div>
         <div>
           <code>--dbv-kit-btn-gap:</code> calc(var(--dbv-kit-btn-padding-inline) /4);{' '}
-          <span className="comment"> // Gap between button elements (mostly text and icon) </span>
+          <span className="comment"> Gap between button elements (mostly text and icon) </span>
         </div>
         <div>
-          <code>--dbv-kit-btn-foreground:</code> var(--color-white); <span className="comment">// Default button text color</span>
+          <code>--dbv-kit-btn-foreground:</code> var(--color-white); <span className="comment"> Default button text color</span>
         </div>
         <div>
-          <code>--dbv-kit-btn-background:</code> var(--dbv-kit-color-primary-600); <span className="comment">// Default button background color</span>
+          <code>--dbv-kit-btn-background:</code> var(--dbv-kit-color-primary-600); <span className="comment"> Default button background color</span>
         </div>
         <div>
           <code>--dbv-kit-btn-background-hover:</code> var(--dbv-kit-color-primary-700);{' '}
-          <span className="comment">// Button hover background color</span>
+          <span className="comment"> Button hover background color</span>
         </div>
         <div>
           <code>--dbv-kit-btn-background-active:</code> var(--dbv-kit-color-primary-800);{' '}
-          <span className="comment">// Button active background color</span>
+          <span className="comment"> Button active background color</span>
         </div>
         <div>
-          <code>--dbv-kit-btn-border-width:</code> 1px; <span className="comment">// Button border width</span>
+          <code>--dbv-kit-btn-border-width:</code> 1px; <span className="comment"> Button border width</span>
         </div>
         <div>
           <code>--dbv-kit-btn-border-color:</code> transparent; --dbv-kit-btn-border-style: solid;{' '}
-          <span className="comment">// Button border color and style</span>
+          <span className="comment"> Button border color and style</span>
         </div>
         <div>
-          <code>--dbv-kit-btn-border-radius:</code> var(--radius-md); <span className="comment">// Button border radius</span>
+          <code>--dbv-kit-btn-border-radius:</code> var(--radius-md); <span className="comment"> Button border radius</span>
         </div>
         <div>
-          <code>--dbv-kit-btn-font-weight:</code> var(--font-weight-normal); <span className="comment">// Button font weight</span>
+          <code>--dbv-kit-btn-font-weight:</code> var(--font-weight-normal); <span className="comment"> Button font weight</span>
         </div>
         <div>
           <code>--dbv-kit-btn-font-size:</code> calc(var(--dbv-kit-font-size-base) * 0.875);{' '}
-          <span className="comment">// Button font size, default for medium-sized button, other sizes calculated based on that value</span>
+          <span className="comment"> Button font size, default for medium-sized button, other sizes calculated based on that value</span>
         </div>
         <div>
-          <code>--dbv-kit-btn-disabled-opacity:</code> 0.5; <span className="comment">// Button opacity when disabled</span>
+          <code>--dbv-kit-btn-disabled-opacity:</code> 0.5; <span className="comment"> Button opacity when disabled</span>
         </div>
         <div>
-          <code>--dbv-kit-btn-loader-animation:</code> var(--animate-spin); <span className="comment">// Button loader animation</span>
+          <code>--dbv-kit-btn-loader-base-color:</code> var(--tw-color-white);{' '}
+          <span className="comment">
+            // This color used in loader to mix with other button colors like{' '}
+            <i> color: color-mix(in srgb, var(--dbv-kit-btn-foreground) 25%, var(--dbv-kit-btn-loader-base-color));</i> It should be light in light
+            mode and one of the dark colors for dark theme.
+          </span>
+        </div>
+        <div>
+          <code>--dbv-kit-btn-loader-animation:</code> var(--animate-spin); <span className="comment"> Button loader animation</span>
         </div>
       </div>
       <div className="tw:my-4">

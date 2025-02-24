@@ -14,8 +14,7 @@ export interface InputProps extends Omit<ComponentPropsWithRef<'input'>, 'size'>
 }
 
 export const Input: React.FC<InputProps> = function Input({ size, className, ...props }) {
-  const classNameToApply =
-    `dbv-kit-input dbv-kit-input__${size ?? 'medium'} ${className}`.trim();
+  const classNameToApply = `dbv-kit-input dbv-kit-input--${size ?? 'medium'} ${className}`.trim();
   return (
     <div className="dbv-kit-input-wrapper">
       <input className={classNameToApply} {...props} />

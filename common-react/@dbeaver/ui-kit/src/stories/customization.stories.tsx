@@ -5,7 +5,6 @@ export const HowToCustomize = () => {
     <div>
       <h1>How to customize</h1>
       <p>DBeaver UI Kit components have basic styles and use some defaults from Tailwind CSS. To change styling you can use different approaches.</p>
-
       <h2>Global CSS Tokens</h2>
       <p>
         UI kit uses several global CSS tokens described on the <a href="/?story=design-tokens--global">Global Tokens page</a>. These tokens help
@@ -17,28 +16,56 @@ export const HowToCustomize = () => {
       </p>
       <h2>Component CSS Tokens</h2>
       <p>
-        Some components have their own tokens. For example, the Button component <a href="?story=design-tokens--buttons">has tokens </a> for button
-        sizes, padding, and colors. You can change these tokens to customize the Button component. Search for the component you want to customize in
-        Design Tokens section.
+        Some components have their own tokens. For example, the Button component <a href="?story=button--7-tokens">has tokens </a> for button sizes,
+        padding, and colors. You can change these tokens to customize the Button component.
       </p>
       <h2>Component CSS Classes</h2>
       <p>
-        Each component accepts the standard className and style props which enable using vanilla CSS, utility classes (e.g. Tailwind), CSS-in-JS (e.g.
-        Styled Components), etc. Each component in the UI kit has a default CSS class name following the dbv-kit-[componentName(lowercase)] naming
-        convention that you can use to customize the component.
+        Each component in the UI kit has a default CSS class name following the <strong> dbv-kit-[component name(in lowercase)]</strong> naming
+        convention that you can use to customize the component. You can find the default class name in the component's documentation.
       </p>
-      <div className="tw:bg-gray-100 tw:p-4 tw:my-4">
+      For button:
+      <div className="codeblock tw:p-4 tw:my-4">
         <code>
           .dbv-kit-button &#123; <br />
           /* Your custom styles */ <br /> &#125;
         </code>
       </div>
-
+      For input:
+      <div className="codeblock tw:p-4 tw:my-4">
+        <code>
+          .dbv-kit-input &#123; <br />
+          /* Your custom styles */ <br /> &#125;
+        </code>
+      </div>
       <p>
-        A custom className can be specified and will be <strong>appended</strong> to a class list of a component
+        Some components have additional classes for different states or sizes. For example, the Button component has classes for different sizes:
+        <code>.dbv-kit-button--small</code>, <code>.dbv-kit-button--large</code>. We use{' '}
+        <a href="https://getbem.com/" target="_blank">
+          BEM
+        </a>{' '}
+        convention for class names. If a component has a modifier, it will be separated by two dashes. If component has a child element, it will be
+        separated by two underscores, for example
+        <div className="codeblock">
+          <code>.dbv-kit-button__icon</code> - <i> icon is a child element of the button</i>
+        </div>
+        <div className="codeblock">
+          <code>.dbv-kit-button--large</code> - <i> large is a size modifier</i>
+        </div>
+        or
+        <div className="codeblock">
+          <code>.dbv-kit-button__icon--start</code> - <i> icon is a child element of the button and has a start placement</i>
+        </div>
       </p>
-      <div className="tw:bg-gray-100 tw:p-4 tw:my-4">
-        <code>&lt;Button className="my-custom-button" /&gt;</code>
+      <p>
+        Each component accepts the standard className and style props which enable using vanilla CSS, utility classes (e.g. Tailwind), CSS-in-JS (e.g.
+        Styled Components), etc. A custom className can be specified and will be <strong>appended</strong> to a class list of a component
+      </p>
+      <div className="codeblock">
+        <code>&lt;Button className="my-custom-button"&gt;Button&lt;Button&gt;</code>
+      </div>
+      <div className="codeblock">
+        <code>&lt;Button style=&#123;&#123;background: red&#125;&#125;&gt;Button&lt;Button&gt;</code>
       </div>
     </div>
   );

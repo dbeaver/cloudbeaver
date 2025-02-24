@@ -53,7 +53,7 @@
   /* ---------------------------- */
   /* Sizes */
 
-  .dbv-kit-button__small {
+  .dbv-kit-button--small {
     --dbv-kit-btn-padding-inline: var(--dbv-kit-btn-small-padding-inline);
     --dbv-kit-btn-font-size: var(--dbv-kit-btn-small-font-size);
     --dbv-kit-btn-height: var(--dbv-kit-btn-small-height);
@@ -62,7 +62,7 @@
     --dbv-kit-btn-icon-margin-inline: calc(var(--dbv-kit-btn-small-padding-inline) * -0.25);
   }
 
-  .dbv-kit-button__medium {
+  .dbv-kit-button--medium {
     --dbv-kit-btn-padding-inline: var(--dbv-kit-btn-medium-padding-inline);
     --dbv-kit-btn-font-size: var(--dbv-kit-btn-medium-font-size);
     --dbv-kit-btn-height: var(--dbv-kit-btn-medium-height);
@@ -71,7 +71,7 @@
     --dbv-kit-btn-icon-margin-inline: calc(var(--dbv-kit-btn-medium-padding-inline) * -0.25);
   }
 
-  .dbv-kit-button__large {
+  .dbv-kit-button--large {
     --dbv-kit-btn-padding-inline: var(--dbv-kit-btn-large-padding-inline);
     --dbv-kit-btn-font-size: var(--dbv-kit-btn-large-font-size);
     --dbv-kit-btn-height: var(--dbv-kit-btn-large-height);
@@ -80,7 +80,7 @@
     --dbv-kit-btn-icon-margin-inline: calc(var(--dbv-kit-btn-large-padding-inline) * -0.25);
   }
 
-  .dbv-kit-button__xlarge {
+  .dbv-kit-button--xlarge {
     --dbv-kit-btn-padding-inline: var(--dbv-kit-btn-xlarge-padding-inline);
     --dbv-kit-btn-font-size: var(--dbv-kit-btn-xlarge-font-size);
     --dbv-kit-btn-height: var(--dbv-kit-btn-xlarge-height);
@@ -92,51 +92,59 @@
   /* ---------------------------- */
   /* Variants */
 
-  .dbv-kit-button__primary {
+  .dbv-kit-button--primary {
     --dbv-kit-btn-background: var(--dbv-kit-btn-primary-background);
     --dbv-kit-btn-foreground: var(--dbv-kit-btn-primary-foreground);
     --dbv-kit-btn-background-hover: var(--dbv-kit-btn-primary-background-hover);
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-primary-background-active);
 
-    --dbv-kit-btn-loader-color: color-mix(in srgb, var(--dbv-kit-btn-background) 65%, var(--tw-color-white));
-    --dbv-kit-btn-loader-background: color-mix(in srgb, var(--dbv-kit-btn-foreground) 85%, transparent);
+    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-background-hover);
+    --dbv-kit-btn-loader-background: color-mix(in srgb, var(--dbv-kit-btn-loader-base-color) 85%, transparent);
   }
 
-  .dbv-kit-button__secondary {
+  .dbv-kit-button--secondary {
     --dbv-kit-btn-background: var(--dbv-kit-btn-secondary-background);
     --dbv-kit-btn-foreground: var(--dbv-kit-btn-secondary-foreground);
     --dbv-kit-btn-background-hover: var(--dbv-kit-btn-secondary-background-hover);
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-secondary-background-active);
     --dbv-kit-btn-border-color: var(--dbv-kit-btn-secondary-border-color);
 
-    --dbv-kit-btn-loader-color: color-mix(in srgb, var(--dbv-kit-btn-secondary-foreground) 75%, var(--tw-color-gray-600));
-    --dbv-kit-btn-loader-background: color-mix(in srgb, var(--tw-color-white) 75%, transparent);
+    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-secondary-foreground);
+    --dbv-kit-btn-loader-background: var(--dbv-kit-btn-secondary-background-active);
   }
 
-  .dbv-kit-button__danger {
+  .dbv-kit-button--danger {
     --dbv-kit-btn-background: var(--dbv-kit-btn-danger-background);
     --dbv-kit-btn-foreground: var(--dbv-kit-btn-danger-foreground);
     --dbv-kit-btn-background-hover: var(--dbv-kit-btn-danger-background-hover);
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-danger-background-active);
 
-    --dbv-kit-btn-loader-color: color-mix(in srgb, var(--dbv-kit-btn-danger-background) 65%, var(--tw-color-white));
-    --dbv-kit-btn-loader-background: color-mix(in srgb, var(--dbv-kit-btn-danger-foreground) 85%, transparent);
+    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-danger-background);
+    --dbv-kit-btn-loader-background: var(--dbv-kit-btn-loader-base-color);
   }
 
   /* ---------------------------- */
   /* Loader */
 
-  .dbv-kit-button_loader {
+  .dbv-kit-button[data-loading='true'] {
+    opacity: 0.75;
+    color: color-mix(in srgb, var(--dbv-kit-btn-foreground) 25%, var(--dbv-kit-btn-loader-base-color));
+    background-color: color-mix(in srgb, var(--dbv-kit-btn-loader-base-color) 75%, var(--dbv-kit-btn-background));
+
+    &:hover,
+    &:active,
+    &[data-active] {
+      background-color: color-mix(in srgb, var(--dbv-kit-btn-loader-base-color) 85%, var(--dbv-kit-btn-background));
+    }
+  }
+
+  .dbv-kit-button__loader {
     position: absolute;
-    top: calc(var(--dbv-kit-btn-border-width) * -1);
-    left: calc(var(--dbv-kit-btn-border-width) * -1);
-    width: calc(100% + var(--dbv-kit-btn-border-width) * 2);
-    height: calc(100% + var(--dbv-kit-btn-border-width) * 2);
-    background: color-mix(in srgb, var(--dbv-kit-btn-loader-background) 75%, var(--tw-color-gray-100));
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: inherit;
     pointer-events: none;
 
     &::after {
@@ -146,8 +154,8 @@
       border-top: var(--loader-width) solid var(--dbv-kit-btn-loader-color);
       border-radius: 50%;
       opacity: 1;
-      width: calc(var(--dbv-kit-btn-font-size) * 1.2);
-      height: calc(var(--dbv-kit-btn-font-size) * 1.2);
+      width: calc(var(--dbv-kit-btn-font-size) * 1.25);
+      height: calc(var(--dbv-kit-btn-font-size) * 1.25);
       animation: var(--dbv-kit-btn-loader-animation);
     }
   }
@@ -155,7 +163,7 @@
   /* ---------------------------- */
   /* Icon */
 
-  .dbv-kit-button_icon {
+  .dbv-kit-button__icon {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -163,11 +171,11 @@
     fill: currentColor;
   }
 
-  .dbv-kit-button_icon__start {
+  .dbv-kit-button__icon--start {
     margin-inline-start: var(--dbv-kit-btn-icon-margin-inline);
   }
 
-  .dbv-kit-button_icon__end {
+  .dbv-kit-button__icon--end {
     margin-inline-end: var(--dbv-kit-btn-icon-margin-inline);
   }
 }

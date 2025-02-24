@@ -20,16 +20,16 @@ export const GlobalTokens = () => {
 
       <div className="tw:my-4">
         <h2 className="tw:text-xl tw:font-semibold">Control Heights</h2>
-        <p className="tw:text-base" style={{ height: 'var(--dbv-kit-control-height-small)', backgroundColor: 'var(--dbv-kit-color-background)' }}>
+        <p className="tw:text-base" style={{ height: 'var(--dbv-kit-control-height-small)' }}>
           Small control height: <code>--dbv-kit-control-height-small</code>
         </p>
-        <p className="tw:text-base" style={{ height: 'var(--dbv-kit-control-height-medium)', backgroundColor: 'var(--dbv-kit-color-background)' }}>
+        <p className="tw:text-base" style={{ height: 'var(--dbv-kit-control-height-medium)' }}>
           Medium control height: <code>--dbv-kit-control-height-medium</code>
         </p>
-        <p className="tw:text-base" style={{ height: 'var(--dbv-kit-control-height-large)', backgroundColor: 'var(--dbv-kit-color-background)' }}>
+        <p className="tw:text-base" style={{ height: 'var(--dbv-kit-control-height-large)' }}>
           Large control height: <code>--dbv-kit-control-height-large</code>
         </p>
-        <p className="tw:text-base" style={{ height: 'var(--dbv-kit-control-height-xlarge)', backgroundColor: 'var(--dbv-kit-color-background)' }}>
+        <p className="tw:text-base" style={{ height: 'var(--dbv-kit-control-height-xlarge)' }}>
           Extra large control height: <code>--dbv-kit-control-height-xlarge</code>
         </p>
         <p className="tw:text-base">
