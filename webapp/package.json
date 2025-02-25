@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "workspaces": [
+    "../common-react",
     "../common-typescript",
     "packages/*"
   ],
