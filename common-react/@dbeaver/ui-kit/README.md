@@ -9,7 +9,7 @@
 To get started with Ladle in the DBeaver UI Kit, write in terminal:
 
 ```bash
-yarn ladle serve
+yarn docs
 ```
 
 Then open the provided URL to see components.

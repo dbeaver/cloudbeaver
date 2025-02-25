@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "tsc -b",
+    "docs": "ladle serve",
     "clean": "rimraf --glob dist"
   },
   "packageManager": "yarn@4.6.0",
