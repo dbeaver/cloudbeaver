@@ -59,7 +59,7 @@ export const TransactionLogDialog: DialogComponent<IPayload> = observer(function
   return (
     <CommonDialogWrapper size="large" fixedWidth>
       <CommonDialogHeader title={title} onReject={props.rejectDialog} />
-      <CommonDialogBody>
+      <CommonDialogBody noOverflow noBodyPadding>
         <TransactionLogTable log={state.log ?? []} />
       </CommonDialogBody>
       <CommonDialogFooter>

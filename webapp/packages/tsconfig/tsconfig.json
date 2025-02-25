@@ -2,13 +2,13 @@
   "extends": "@dbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "lib": [
-      "dom",
+      "DOM",
       "DOM.AsyncIterable",
       "DOM.Iterable",
       "ESNext"
     ],
-    "allowArbitraryExtensions": true,
     "jsx": "react-jsx",
+    "allowArbitraryExtensions": true,
     "useDefineForClassFields": false, // leads to "TypeError: Cannot redefine property requestInfo" in QueryDataSource.ts
     /* legacy decorators */
     "experimentalDecorators": true,
@@ -16,10 +16,11 @@
     // project references
     "incremental": true,
     "declaration": true,
+    /* optimization */
     "disableReferencedProjectLoad": true,
     "disableSolutionSearching": true,
     "types": [
-      "../../global.d.ts"
+      "@cloudbeaver/tsconfig/globals.d.ts"
     ],
     "plugins": [
       {

@@ -7,18 +7,18 @@
  */
 import { createContext } from 'react';
 
-import type { IMouseHook } from '@cloudbeaver/core-blocks';
 import type { DatabaseEditChangeType, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
-import type { CellPosition } from '../../Editing/EditingContext.js';
+import type { IColumnInfo } from '../TableDataContext.js';
+import type { ICellPosition } from '@cloudbeaver/plugin-data-grid';
 
 export interface ICellContext {
-  mouse: IMouseHook<HTMLDivElement>;
-  cell: IResultSetElementKey | undefined;
-  position: CellPosition;
-  isEditing: boolean;
-  isSelected: boolean;
+  isHovered: boolean;
   isFocused: boolean;
+  isSelected: boolean;
+  column: IColumnInfo;
+  cell: IResultSetElementKey | undefined;
+  position: ICellPosition;
   editionState: DatabaseEditChangeType | null;
 }
 

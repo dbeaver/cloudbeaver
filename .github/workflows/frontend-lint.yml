@@ -29,6 +29,12 @@ jobs:
           cache: "yarn"
           cache-dependency-path: "./cloudbeaver/webapp/yarn.lock"
 
+      # - run: yarn install --immutable
+      #   working-directory: ./cloudbeaver/common-typescript
+
+      # - run: yarn install --immutable
+      #   working-directory: ./cloudbeaver/common-react
+
       - run: |
           yarn install --immutable
           git fetch origin "${{ github.base_ref }}" --depth=1

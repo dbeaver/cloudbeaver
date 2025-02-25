@@ -6,16 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
+import { reaction } from 'mobx';
 
 import { s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
+// import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { Executor } from '@cloudbeaver/core-executor';
-import { ClipboardService } from '@cloudbeaver/core-ui';
-import { throttle } from '@cloudbeaver/core-utils';
+// import { ClipboardService } from '@cloudbeaver/core-ui';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
-import { type CellSelectArgs, DataGrid, type DataGridHandle, type Position } from '@cloudbeaver/plugin-data-grid';
+import {
+  DataGrid,
+  useCreateGridReactiveValue,
+  type DataGridRef,
+  type ICellPosition,
+  type IDataGridCellRenderer,
+} from '@cloudbeaver/plugin-data-grid';
 import {
   DATA_CONTEXT_DV_PRESENTATION,
   type DatabaseDataSelectActionsData,
@@ -27,17 +32,15 @@ import {
   type IResultSetEditActionData,
   type IResultSetElementKey,
   type IResultSetPartialKey,
-  type IResultSetRowKey,
+  isBooleanValuePresentationAvailable,
   ResultSetDataKeysUtils,
   ResultSetDataSource,
   ResultSetSelectAction,
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { type CellPosition, EditingContext } from '../Editing/EditingContext.js';
-import { useEditing } from '../Editing/useEditing.js';
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
-import { DataGridContext, type IColumnResizeInfo, type IDataGridContext } from './DataGridContext.js';
+import { DataGridContext, type IDataGridContext } from './DataGridContext.js';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext.js';
 import classes from './DataGridTable.module.css';
@@ -46,30 +49,35 @@ import { TableDataContext } from './TableDataContext.js';
 import { useGridDragging } from './useGridDragging.js';
 import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy.js';
 import { useTableData } from './useTableData.js';
+import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
+import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
 
 interface IInnerState {
   lastCount: number;
   lastScrollTop: number;
 }
 
-function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
-  const { clientHeight, scrollTop, scrollHeight } = event.target as HTMLDivElement;
-  return clientHeight + scrollTop + 100 > scrollHeight;
-}
+const rowHeight = 24;
+const headerHeight = 32;
 
-const rowHeight = 25;
-const headerHeight = 28;
-const MAX_CELL_TEXT_SIZE = 100 * 1024;
-
-export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({ model, actions, resultIndex, simple, className, ...rest }) {
+export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({
+  model,
+  actions,
+  resultIndex,
+  simple,
+  className,
+  dataFormat,
+  ...rest
+}) {
   const translate = useTranslate();
   const styles = useS(classes);
 
-  const clipboardService = useService(ClipboardService);
+  // const clipboardService = useService(ClipboardService);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const editorRef = useRef<HTMLDivElement>(null);
   const dataGridDivRef = useRef<HTMLDivElement | null>(null);
-  const dataGridRef = useRef<DataGridHandle>(null);
+  const focusedCell = useRef<ICellPosition | null>(null);
+  const focusSyncRef = useRef<ICellPosition | null>(null);
+  const dataGridRef = useRef<DataGridRef>(null);
   const innerState = useObjectRef<IInnerState>(
     () => ({
       lastCount: 0,
@@ -77,61 +85,11 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     }),
     false,
   );
-  const [columnResize] = useState(() => new Executor<IColumnResizeInfo>());
 
   const selectionAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetSelectAction);
   const viewAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetViewAction);
 
-  const focusSyncRef = useRef<CellPosition | null>(null);
-
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
-  const editingContext = useEditing({
-    readonly: model.isReadonly(resultIndex) || model.isDisabled(resultIndex),
-    onEdit: (position, code, key) => {
-      const column = tableData.getColumn(position.idx);
-      const row = tableData.getRow(position.rowIdx);
-
-      if (!column?.columnDataIndex || !row) {
-        return false;
-      }
-
-      const cellKey: IResultSetElementKey = { row, column: column.columnDataIndex };
-
-      if (tableData.isCellReadonly(cellKey)) {
-        return false;
-      }
-
-      switch (code) {
-        case 'Backspace':
-          tableData.editor.set(cellKey, '');
-          break;
-        case 'Enter':
-          break;
-        default:
-          if (key) {
-            if (/^[\d\p{L}]$/iu.test(key) && key.length === 1) {
-              tableData.editor.set(cellKey, key);
-            } else {
-              return false;
-            }
-          }
-      }
-
-      const isTruncated = tableData.dataContent.isTextTruncated(cellKey) || tableData.dataContent.isBlobTruncated(cellKey);
-      const isHugeText = tableData.format.getText(cellKey).length > MAX_CELL_TEXT_SIZE;
-
-      if (isHugeText || isTruncated) {
-        actions.setValuePresentation('value-text-presentation');
-        return false;
-      }
-
-      return true;
-    },
-    onCloseEditor: () => {
-      restoreFocus();
-    },
-  });
-
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
 
   function restoreFocus() {
@@ -168,8 +126,8 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }
 
   const handlers = useObjectRef(() => ({
-    selectCell(pos: Position, scroll = false): void {
-      if (dataGridRef.current?.selectedCell.idx !== pos.idx || dataGridRef.current.selectedCell.rowIdx !== pos.rowIdx || scroll) {
+    selectCell(pos: ICellPosition, scroll = false): void {
+      if (focusedCell.current?.colIdx !== pos.colIdx || focusedCell.current?.rowIdx !== pos.rowIdx || scroll) {
         dataGridRef.current?.selectCell(pos);
       }
     },
@@ -186,7 +144,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
       if (!key?.column || !key?.row) {
         if (initial) {
-          focusSyncRef.current = { idx: 0, rowIdx: -1 };
+          focusSyncRef.current = { colIdx: 0, rowIdx: -1 };
           this.selectCell(focusSyncRef.current);
         } else {
           focusSyncRef.current = null;
@@ -194,19 +152,19 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         return;
       }
 
-      const idx = tableData.getColumnIndexFromColumnKey(key.column!);
+      const colIdx = tableData.getColumnIndexFromColumnKey(key.column!);
       const rowIdx = tableData.getRowIndexFromKey(key.row!);
 
-      focusSyncRef.current = { idx, rowIdx };
+      focusSyncRef.current = { colIdx, rowIdx };
 
-      this.selectCell({ idx, rowIdx });
+      this.selectCell({ colIdx, rowIdx });
     },
   }));
 
   const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction as unknown as DatabaseSelectAction, gridSelectionContext);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
-      handlers.selectCell({ idx: startPosition.colIdx, rowIdx: startPosition.rowIdx });
+      handlers.selectCell(startPosition);
     },
     onDragOver: (startPosition, currentPosition, event) => {
       gridSelectionContext.selectRange(startPosition, currentPosition, event.ctrlKey || event.metaKey, true);
@@ -226,7 +184,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     // we can't edit table cells if table doesn't have row identifier, but we can edit new created rows before insert (CB-6063)
     const canEdit = model.hasElementIdentifier(resultIndex) || !!(cell && tableData.editor.getElementState(cell) === DatabaseEditChangeType.add);
 
-    if (EventContext.has(event, EventStopPropagationFlag) || !canEdit || tableData.isReadOnly() || model.isReadonly(resultIndex)) {
+    if (EventContext.has(event, EventStopPropagationFlag) || !canEdit || model.isReadonly(resultIndex)) {
       return;
     }
 
@@ -234,14 +192,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     const activeRows = selectionAction.getActiveRows();
 
     if (!cell) {
-      return;
-    }
-
-    const idx = tableData.getColumnIndexFromColumnKey(cell.column);
-    const rowIdx = tableData.getRowIndexFromKey(cell.row);
-    const position: CellPosition = { idx, rowIdx };
-
-    if (editingContext.isEditing(position)) {
       return;
     }
 
@@ -262,56 +212,56 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       }
     }
 
-    const editingState = tableData.editor.getElementState(cell);
+    // const colIdx = tableData.getColumnIndexFromColumnKey(cell.column);
+    // const rowIdx = tableData.getRowIndexFromKey(cell.row);
+    // const editingState = tableData.editor.getElementState(cell);
 
-    switch (event.nativeEvent.code) {
-      case 'Delete': {
-        const filteredRows = activeRows.filter(cell => tableData.editor.getElementState(cell) !== DatabaseEditChangeType.delete);
+    // switch (event.nativeEvent.code) {
+    //   case 'Delete': {
+    //     const filteredRows = activeRows.filter(cell => tableData.editor.getElementState(cell) !== DatabaseEditChangeType.delete);
 
-        if (filteredRows.length > 0) {
-          const editor = tableData.editor;
-          const firstRow = filteredRows[0]!;
-          const editingState = tableData.editor.getElementState(firstRow);
+    //     if (filteredRows.length > 0) {
+    //       const editor = tableData.editor;
+    //       const firstRow = filteredRows[0]!;
+    //       const editingState = tableData.editor.getElementState(firstRow);
 
-          editor.delete(...filteredRows);
+    //       editor.delete(...filteredRows);
 
-          if (editingState === DatabaseEditChangeType.add) {
-            if (rowIdx - 1 > 0) {
-              handlers.selectCell({ idx, rowIdx: rowIdx - 1 });
-            }
-          } else {
-            if (rowIdx + 1 < tableData.rows.length) {
-              handlers.selectCell({ idx, rowIdx: rowIdx + 1 });
-            }
-          }
-        }
+    //       if (editingState === DatabaseEditChangeType.add) {
+    //         if (rowIdx - 1 > 0) {
+    //           handlers.selectCell({ colIdx, rowIdx: rowIdx - 1 });
+    //         }
+    //       } else {
+    //         if (rowIdx + 1 < tableData.rows.length) {
+    //           handlers.selectCell({ colIdx, rowIdx: rowIdx + 1 });
+    //         }
+    //       }
+    //     }
 
-        return;
-      }
-      case 'KeyV': {
-        if (editingState === DatabaseEditChangeType.delete) {
-          return;
-        }
+    //     return;
+    //   }
+    //   case 'KeyV': {
+    //     if (editingState === DatabaseEditChangeType.delete) {
+    //       return;
+    //     }
 
-        if (event.ctrlKey || event.metaKey) {
-          if (!clipboardService.clipboardAvailable || clipboardService.state === 'denied' || tableData.isCellReadonly(cell)) {
-            return;
-          }
+    //     if (event.ctrlKey || event.metaKey) {
+    //       if (!clipboardService.clipboardAvailable || clipboardService.state === 'denied' || tableData.isCellReadonly(cell)) {
+    //         return;
+    //       }
 
-          clipboardService
-            .read()
-            .then(value => tableData.editor.set(cell, value))
-            .catch();
-          return;
-        }
-      }
-    }
+    //       clipboardService
+    //         .read()
+    //         .then(value => tableData.editor.set(cell, value))
+    //         .catch();
+    //       return;
+    //     }
+    //   }
+    // }
 
-    if (editingState === DatabaseEditChangeType.delete) {
-      return;
-    }
-
-    editingContext.edit({ idx, rowIdx }, event.nativeEvent.code, event.key);
+    // if (editingState === DatabaseEditChangeType.delete) {
+    //   return;
+    // }
   }
 
   useLayoutEffect(() => {
@@ -323,20 +273,13 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
       const key = data.value[data.value.length - 1]!.key;
 
-      const idx = tableData.getColumnIndexFromColumnKey(key.column);
+      const colIdx = tableData.getColumnIndexFromColumnKey(key.column);
       const rowIdx = tableData.getRowIndexFromKey(key.row);
-
-      if (data.revert) {
-        editingContext.closeEditor({
-          rowIdx,
-          idx,
-        });
-      }
 
       if (selectionAction.isFocused(key)) {
         const rowTop = rowIdx * rowHeight;
         const gridDiv = dataGridDivRef.current;
-        dataGridRef.current?.scrollToCell({ idx });
+        dataGridRef.current?.scrollToCell({ colIdx });
 
         if (gridDiv) {
           if (rowTop < gridDiv.scrollTop - rowHeight + headerHeight) {
@@ -352,7 +295,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         return;
       }
 
-      handlers.selectCell({ idx, rowIdx });
+      handlers.selectCell({ colIdx, rowIdx });
     }
 
     tableData.editor.action.addHandler(syncEditor);
@@ -372,7 +315,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return () => {
       tableData.editor.action.removeHandler(syncEditor);
     };
-  }, [tableData.editor, editingContext, selectionAction]);
+  }, [tableData.editor, selectionAction]);
 
   useEffect(() => {
     const gridDiv = dataGridDivRef.current;
@@ -390,11 +333,12 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     innerState.lastCount = model.source.count;
   }, [model.source.count]);
 
-  const handleFocusChange = (event: CellSelectArgs<IResultSetRowKey>) => {
-    const columnIndex = event.column.idx;
-    const rowIndex = event.rowIdx;
+  const handleFocusChange = (position: ICellPosition) => {
+    focusedCell.current = position;
+    const columnIndex = position.colIdx;
+    const rowIndex = position.rowIdx;
 
-    if (focusSyncRef.current && focusSyncRef.current.idx === columnIndex && focusSyncRef.current.rowIdx === rowIndex) {
+    if (focusSyncRef.current && focusSyncRef.current.colIdx === columnIndex && focusSyncRef.current.rowIdx === rowIndex) {
       focusSyncRef.current = null;
       return;
     }
@@ -402,49 +346,172 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     const column = tableData.getColumn(columnIndex);
     const row = tableData.getRow(rowIndex);
 
-    if (column?.columnDataIndex && row) {
+    if (column?.key && row) {
       selectionAction.focus({
         row,
-        column: { ...column.columnDataIndex },
+        column: { ...column.key },
       });
     } else {
       selectionAction.focus(null);
     }
   };
 
-  const handleScroll = useCallback(
-    throttle(async (event: React.UIEvent<HTMLDivElement>) => {
-      const scrollTop = (event.target as HTMLDivElement).scrollTop;
-      const toBottom = scrollTop > innerState.lastScrollTop;
+  const handleScrollToBottom = useCallback(async () => {
+    const result = model.source.getResult(resultIndex);
+    if (result?.loadedFully) {
+      return;
+    }
 
-      innerState.lastScrollTop = scrollTop;
-
-      if (toBottom && isAtBottom(event)) {
-        const result = model.source.getResult(resultIndex);
-        if (result?.loadedFully) {
-          return;
-        }
-
-        await model.requestDataPortion(0, model.countGain + model.source.count);
-      }
-    }, 200),
-    [model, resultIndex],
-  );
+    await model.requestDataPortion(0, model.countGain + model.source.count);
+  }, [model, resultIndex]);
 
   const gridContext = useMemo<IDataGridContext>(
     () => ({
       model,
       actions,
-      columnResize,
       resultIndex,
       simple,
       isGridInFocus,
-      getEditorPortal: () => editorRef.current,
       getDataGridApi: () => dataGridRef.current,
       focus: restoreFocus,
     }),
-    [model, actions, resultIndex, simple, editorRef, dataGridRef, gridContainerRef, restoreFocus],
+    [model, actions, resultIndex, simple, dataGridRef, gridContainerRef, restoreFocus],
   );
+
+  const columnsCount = useCreateGridReactiveValue(
+    () => tableData.columns.length,
+    onValueChange => reaction(() => tableData.columns.length, onValueChange),
+    [tableData],
+  );
+  const rowsCount = useCreateGridReactiveValue(
+    () => tableData.rows.length,
+    onValueChange => reaction(() => tableData.rows.length, onValueChange),
+    [tableData],
+  );
+
+  function getCell(rowIdx: number, colIdx: number) {
+    return <CellFormatter rowIdx={rowIdx} colIdx={colIdx} />;
+  }
+  const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), []);
+
+  function getCellText(rowIdx: number, colIdx: number) {
+    const row = tableData.rows[rowIdx];
+    const column = tableData.getColumn(colIdx)?.key;
+
+    if (!row || !column) {
+      return '';
+    }
+
+    return tableData.format.getText({ row, column });
+  }
+
+  const cellText = useCreateGridReactiveValue(
+    getCellText,
+    (onValueChange, rowIdx, colIdx) => reaction(() => getCellText(rowIdx, colIdx), onValueChange),
+    [tableData],
+  );
+
+  function getHeaderWidth(colIdx: number) {
+    if (colIdx === 0) {
+      return 60;
+    }
+    return null;
+  }
+
+  function getHeaderPinned(colIdx: number) {
+    if (colIdx === 0) {
+      return true;
+    }
+    return false;
+  }
+
+  function getHeaderResizable(colIdx: number) {
+    return colIdx !== 0;
+  }
+
+  function getHeaderElement(colIdx: number) {
+    const column = tableData.getColumn(colIdx);
+
+    if (!column) {
+      return null;
+    }
+
+    if (tableData.isIndexColumn(column)) {
+      return <TableIndexColumnHeader />;
+    }
+
+    return <TableColumnHeader colIdx={colIdx} />;
+  }
+
+  const headerElement = useCreateGridReactiveValue(
+    getHeaderElement,
+    (onValueChange, colIdx) => reaction(() => getHeaderElement(colIdx), onValueChange),
+    [tableData],
+  );
+
+  function getCellElement(rowIdx: number, colIdx: number, props: HTMLAttributes<HTMLDivElement>, renderDefaultCell: IDataGridCellRenderer) {
+    return <CellRenderer rowIdx={rowIdx} colIdx={colIdx} props={props} renderDefaultCell={renderDefaultCell} />;
+  }
+
+  const cellElement = useCreateGridReactiveValue(
+    getCellElement,
+    (onValueChange, rowIdx, colIdx, props, renderDefaultCell) =>
+      reaction(() => getCellElement(rowIdx, colIdx, props, renderDefaultCell), onValueChange),
+    [],
+  );
+
+  function handleCellChange(rowIdx: number, colIdx: number, value: string) {
+    const row = tableData.rows[rowIdx];
+    const column = tableData.getColumn(colIdx)?.key;
+
+    if (!row || !column) {
+      return;
+    }
+
+    tableData.editor.set({ row, column }, value);
+  }
+
+  function isCellEditable(rowIdx: number, colIdx: number): boolean {
+    const row = tableData.rows[rowIdx];
+    const column = tableData.getColumn(colIdx)?.key;
+
+    if (!row || !column) {
+      return false;
+    }
+
+    const cell = { row, column };
+
+    const editionState = tableData.getEditionState(cell);
+
+    if (!gridContext.model.hasElementIdentifier(tableData.view.resultIndex) && editionState !== DatabaseEditChangeType.add) {
+      return false;
+    }
+
+    if (tableData.format.isBinary(cell) || tableData.format.isGeometry(cell) || tableData.dataContent.isTextTruncated(cell)) {
+      return false;
+    }
+
+    const resultColumn = tableData.getColumnInfo(cell.column);
+    const value = tableData.getCellValue(cell);
+
+    if (!resultColumn || value === undefined) {
+      return false;
+    }
+
+    const handleByBooleanFormatter = isBooleanValuePresentationAvailable(value, resultColumn);
+
+    return !(handleByBooleanFormatter || tableData.isCellReadonly(cell));
+  }
+
+  function getColumnKey(colIdx: number) {
+    const column = tableData.columns[colIdx];
+
+    if (column?.key) {
+      return ResultSetDataKeysUtils.serialize(column.key);
+    }
+
+    return `_${String(colIdx)}`;
+  }
 
   if (!tableData.columns.length) {
     return <TextPlaceholder>{translate('data_grid_table_empty_placeholder')}</TextPlaceholder>;
@@ -453,44 +520,39 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   return (
     <DataGridContext.Provider value={gridContext}>
       <DataGridSelectionContext.Provider value={gridSelectionContext}>
-        <EditingContext.Provider value={editingContext}>
-          <TableDataContext.Provider value={tableData}>
-            <div
-              ref={setContainersRef}
-              tabIndex={-1}
-              {...rest}
-              className={s(styles, { container: true }, className)}
-              onKeyDown={handleKeyDown}
-              onMouseDown={onMouseDownHandler}
-              onMouseMove={onMouseMoveHandler}
-            >
-              <DataGrid
-                ref={dataGridRef}
-                className={s(styles, { grid: true }, className)}
-                columns={tableData.columns}
-                defaultColumnOptions={{
-                  minWidth: 80,
-                  resizable: true,
-                  // @ts-ignore
-                  renderCell: props => <CellFormatter {...props} />,
-                }}
-                rows={tableData.rows}
-                rowKeyGetter={ResultSetDataKeysUtils.serialize}
-                headerRowHeight={headerHeight}
-                rowHeight={rowHeight}
-                renderers={{
-                  // @ts-ignore
-                  renderCell: (key, props) => <CellRenderer key={key} {...props} />,
-                }}
-                onSelectedCellChange={handleFocusChange}
-                // @ts-ignore
-                onColumnResize={(idx, width) => columnResize.execute({ column: idx, width })}
-                onScroll={handleScroll}
-              />
-              <div ref={editorRef} />
-            </div>
-          </TableDataContext.Provider>
-        </EditingContext.Provider>
+        <TableDataContext.Provider value={tableData}>
+          <div
+            ref={setContainersRef}
+            tabIndex={-1}
+            {...rest}
+            className={s(styles, { container: true }, className)}
+            onKeyDown={handleKeyDown}
+            onMouseDown={onMouseDownHandler}
+            onMouseMove={onMouseMoveHandler}
+          >
+            <DataGrid
+              ref={dataGridRef}
+              className={s(styles, { grid: true }, className)}
+              cell={cell}
+              cellText={cellText}
+              cellElement={cellElement}
+              getCellEditable={isCellEditable}
+              headerElement={headerElement}
+              getHeaderHeight={() => headerHeight}
+              getHeaderWidth={getHeaderWidth}
+              getHeaderPinned={getHeaderPinned}
+              getHeaderResizable={getHeaderResizable}
+              getRowHeight={() => rowHeight}
+              getColumnKey={getColumnKey}
+              columnCount={columnsCount}
+              rowCount={rowsCount}
+              getRowId={rowIdx => (tableData.rows[rowIdx] ? ResultSetDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
+              onFocus={handleFocusChange}
+              onScrollToBottom={handleScrollToBottom}
+              onCellChange={handleCellChange}
+            />
+          </div>
+        </TableDataContext.Provider>
       </DataGridSelectionContext.Provider>
     </DataGridContext.Provider>
   );

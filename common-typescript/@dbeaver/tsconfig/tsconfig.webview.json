@@ -7,9 +7,10 @@
       "DOM",
       "DOM.AsyncIterable",
       "DOM.Iterable",
-      "esnext"
+      "ESNext"
     ],
     "jsx": "react-jsx",
+    "allowArbitraryExtensions": true,
     "module": "nodenext",
     "skipLibCheck": true,
     "moduleResolution": "NodeNext",
@@ -32,6 +33,21 @@
     /* Source maps */
     "sourceMap": true,
     /* project references */
-    "declarationMap": true
+    "declarationMap": true,
+    /* optimization */
+    "disableReferencedProjectLoad": true,
+    "disableSolutionSearching": true,
+    "types": [
+      "@dbeaver/tsconfig/vite-env.d.ts"
+    ],
+    "plugins": [
+      {
+        // https://github.com/mrmckeb/typescript-plugin-css-modules/issues/222
+        "name": "typescript-plugin-css-modules",
+        "options": {
+          "goToDefinition": true
+        }
+      }
+    ]
   }
 }
