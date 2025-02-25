@@ -1,0 +1,26 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
+import type { IFormState } from '@cloudbeaver/core-ui';
+import type { IConnectionFormRefactoredState } from '../ConnectionFormServiceRefactored.js';
+import { ConnectionFormDriverPropertiesPart } from './ConnectionFormDriverPropertiesPart.js';
+import { ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
+
+const DATA_CONTEXT_CONNECTION_FORM_DRIVER_PROPERTIES_PART = createDataContext<ConnectionFormDriverPropertiesPart>(
+  'Connection Form Driver Properties Part',
+);
+
+export function getConnectionFormSSHPart(formState: IFormState<IConnectionFormRefactoredState>): ConnectionFormDriverPropertiesPart {
+  return formState.getPart(DATA_CONTEXT_CONNECTION_FORM_DRIVER_PROPERTIES_PART, context => {
+    const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
+    const connectionInfoResource = di.getService(ConnectionInfoResource);
+    const dbDriverResource = di.getService(DBDriverResource);
+
+    return new ConnectionFormDriverPropertiesPart(formState, connectionInfoResource, dbDriverResource);
+  });
+}

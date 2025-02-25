@@ -14,7 +14,7 @@ import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 
-const DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART = createDataContext<ConnectionFormOptionsPart>('Connection Options Form Part');
+const DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART = createDataContext<ConnectionFormOptionsPart>('Connection Form Options Part');
 
 export function getConnectionFormOptionsPart(formState: IFormState<IConnectionFormRefactoredState>): ConnectionFormOptionsPart {
   return formState.getPart(DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART, context => {

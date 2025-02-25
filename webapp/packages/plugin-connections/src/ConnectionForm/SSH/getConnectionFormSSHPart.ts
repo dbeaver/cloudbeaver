@@ -11,7 +11,7 @@ import { ConnectionFormSSHPart } from './ConnectionFormSSHPart.js';
 import type { IConnectionFormRefactoredState } from '../ConnectionFormServiceRefactored.js';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 
-const DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART = createDataContext<ConnectionFormSSHPart>('Connection Options Form Part');
+const DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART = createDataContext<ConnectionFormSSHPart>('Connection Form SSH Part');
 
 export function getConnectionFormSSHPart(formState: IFormState<IConnectionFormRefactoredState>): ConnectionFormSSHPart {
   return formState.getPart(DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART, context => {

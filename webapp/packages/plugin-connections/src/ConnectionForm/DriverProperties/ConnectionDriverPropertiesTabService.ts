@@ -24,6 +24,7 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
   constructor(
     private readonly connectionFormService: ConnectionFormService,
     private readonly dbDriverResource: DBDriverResource,
+    // private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored,
   ) {
     super();
 
@@ -47,6 +48,28 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
       },
     });
 
+    // TODO uncomment once refactored
+    // this.connectionFormServiceRefactored.parts.add({
+    //   key: 'driver_properties',
+    //   name: 'plugin_connections_connection_form_part_properties',
+    //   title: 'plugin_connections_connection_form_part_properties',
+    //   order: 2,
+    //   panel: () => DriverPropertiesLoader,
+    //   isDisabled: (tabId, props) => {
+    //     if (!props?.formState) {
+    //       return true;
+    //     }
+
+    //     const optionsPart = getConnectionFormOptionsPart(props.formState);
+
+    //     if (optionsPart.state.connectionConfig.driverId) {
+    //       return !optionsPart.state.connectionConfig.driverId;
+    //     }
+
+    //     return true;
+    //   },
+    // });
+
     this.connectionFormService.prepareConfigTask.addHandler(this.prepareConfig.bind(this));
 
     this.connectionFormService.formStateTask.addHandler(this.formState.bind(this));
@@ -56,6 +79,7 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
     this.connectionFormService.configureTask.addHandler(this.configure.bind(this));
   }
 
+  // TODO include this
   private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const configuration = contexts.getContext(connectionFormConfigureContext);
 

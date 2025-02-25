@@ -7,6 +7,7 @@
  */
 import { schema } from '@cloudbeaver/core-utils';
 
+// // TODO add here driverId, submitType
 export const CONNECTION_INFO_PARAM_SCHEMA = schema
   .object({
     projectId: schema.string(),
