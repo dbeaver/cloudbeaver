@@ -4712,6 +4712,7 @@ __metadata:
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     "@wroud/vite-plugin-asset-resolver": "npm:^0"
+    "@wroud/vite-plugin-tsc": "npm:^0.11.6"
     react: "npm:^19"
     react-dom: "npm:^19"
     rimraf: "npm:^6"
@@ -8747,6 +8748,21 @@ __metadata:
     typescript: "*"
     vite: "*"
   checksum: 10c0/96950e1cbd857d61efe6d08c91e16d4355d05724181366aa6d606e6a3dffcd8dc72ae2853bf397003d50311e77ea4d61c3d7dc17ea73a446c060417d6b5d4a2d
+  languageName: node
+  linkType: hard
+
+"@wroud/vite-plugin-tsc@npm:^0.11.6":
+  version: 0.11.6
+  resolution: "@wroud/vite-plugin-tsc@npm:0.11.6"
+  dependencies:
+    detect-package-manager: "npm:^3"
+    execa: "npm:^9"
+    picocolors: "npm:^1"
+    strip-ansi: "npm:^7"
+  peerDependencies:
+    typescript: "*"
+    vite: "*"
+  checksum: 10c0/78398b5e381521fa3fcc89e059e704182beb2030807dad588aeb6c58f5bcaed8fa792823c6827ed0dd0b0242680d98f4ec25ccd3123ebd6e8927dc734e2f964a
   languageName: node
   linkType: hard
 
