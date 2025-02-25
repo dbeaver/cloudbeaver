@@ -74,13 +74,12 @@ export class ConnectionSSHTabService extends Bootstrap {
     //     if (!props?.formState) {
     //       return true;
     //     }
-
     //     const optionsPart = getConnectionFormOptionsPart(props.formState);
-    //     if (optionsPart.state.connectionConfig.driverId) {
-    //       const driver = optionsPart.state.connectionConfig.driverId
-    //         ? this.dbDriverResource.get(optionsPart.state.connectionConfig.driverId)
-    //         : undefined;
-    //       const urlType = optionsPart.state.connectionConfig.configurationType === DriverConfigurationType.Url;
+    //     const driverId = props.formState.state.driverId;
+
+    //     if (driverId) {
+    //       const driver = driverId ? this.dbDriverResource.get(driverId) : undefined;
+    //       const urlType = optionsPart.state.configurationType === DriverConfigurationType.Url;
 
     //       return urlType || !driver?.applicableNetworkHandlers.includes(SSH_TUNNEL_ID);
     //     }

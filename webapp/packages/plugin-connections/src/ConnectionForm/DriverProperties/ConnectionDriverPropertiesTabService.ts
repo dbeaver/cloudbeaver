@@ -60,10 +60,8 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
     //       return true;
     //     }
 
-    //     const optionsPart = getConnectionFormOptionsPart(props.formState);
-
-    //     if (optionsPart.state.connectionConfig.driverId) {
-    //       return !optionsPart.state.connectionConfig.driverId;
+    //     if (props.formState.state.driverId) {
+    //       return false;
     //     }
 
     //     return true;

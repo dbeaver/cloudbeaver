@@ -41,6 +41,7 @@ export class ConnectionSSLTabService extends Bootstrap {
     private readonly connectionFormService: ConnectionFormService,
     private readonly dbDriverResource: DBDriverResource,
     private readonly networkHandlerResource: NetworkHandlerResource,
+    // private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored,
   ) {
     super();
 
@@ -66,6 +67,23 @@ export class ConnectionSSLTabService extends Bootstrap {
         return true;
       },
     });
+
+    // TODO uncomment once refactored
+    // this.connectionFormServiceRefactored.parts.add({
+    //   key: 'ssl',
+    //   order: 4,
+    //   tab: () => SSLTab,
+    //   panel: () => SSLPanel,
+    //   isHidden: (_, props) => {
+    //     if (props?.formState.state.driverId) {
+    //       const driver = this.dbDriverResource.get(props.formState.state.driverId);
+    //       const handler = getSSLDriverHandler(this.networkHandlerResource.values, driver?.applicableNetworkHandlers ?? []);
+    //       return !handler;
+    //     }
+
+    //     return true;
+    //   },
+    // });
 
     this.connectionFormService.prepareConfigTask.addHandler(this.prepareConfig.bind(this));
 
