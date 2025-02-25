@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebServletHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBPlatform;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -81,16 +82,13 @@ public class CBStaticServlet extends DefaultServlet {
         }
         String uri = request.getPathInfo();
         try {
-            WebSession webSession = CBApplication.getInstance().getSessionManager().getWebSession(
-                request, response, false);
-            performAutoLoginIfNeeded(request, webSession);
-            WebActionParameters webActionParameters = WebActionParameters.fromSession(webSession, false);
-            if (CBApplication.getInstance().getAppConfiguration().isRedirectOnFederatedAuth()
-                && (CommonUtils.isEmpty(uri) || uri.equals("/") || uri.equals("/index.html"))
+            CBApplication<?> cbApplication = CBPlatform.getInstance().getApplication();
+            finishSessionLoginIfNeeded(request, response);
+            if (cbApplication.getAppConfiguration().isRedirectOnFederatedAuth()
+                && isRootServiceUri(uri)
                 && request.getParameterMap().isEmpty()
-                && (webActionParameters == null || !webActionParameters.getParameters().containsValue(AUTO_LOGIN_ACTION))
             ) {
-                if (processSessionStart(request, response, webSession)) {
+                if (performAutoLogin(request, response)) {
                     return;
                 }
             }
@@ -100,12 +98,18 @@ public class CBStaticServlet extends DefaultServlet {
         patchStaticContentIfNeeded(request, response);
     }
 
-    private void performAutoLoginIfNeeded(HttpServletRequest request, WebSession webSession) {
+    private static boolean isRootServiceUri(String uri) {
+        return CommonUtils.isEmpty(uri) || uri.equals("/") || uri.equals("/index.html");
+    }
+
+    private void finishSessionLoginIfNeeded(HttpServletRequest request, HttpServletResponse response) throws DBWebException {
         boolean isAutoLogin = CommonUtils.toBoolean(request.getParameter(CBAuthConstants.CB_AUTO_LOGIN_REQUEST_PARAM));
         if (!isAutoLogin) {
             return;
         }
 
+        WebSession webSession = CBApplication.getInstance().getSessionManager().getWebSession(
+            request, response, false);
         if (webSession.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
             log.warn("Auto login failed: user already authorized");
             return;
@@ -123,8 +127,8 @@ public class CBStaticServlet extends DefaultServlet {
         WebActionParameters.saveToSession(webSession, authActionParams);
     }
 
-    private boolean processSessionStart(HttpServletRequest request, HttpServletResponse response, WebSession webSession) {
-        CBApplication application = CBApplication.getInstance();
+    private boolean performAutoLogin(HttpServletRequest request, HttpServletResponse response) {
+        CBApplication<?> application = CBApplication.getInstance();
         if (application.isConfigurationMode()) {
             return false;
         }
@@ -148,6 +152,12 @@ public class CBStaticServlet extends DefaultServlet {
                 }
 
                 try {
+                    WebSession webSession = CBApplication.getInstance().getSessionManager().getWebSession(
+                        request, response, false);
+                    WebActionParameters webActionParameters = WebActionParameters.fromSession(webSession, false);
+                    if (webActionParameters != null && webActionParameters.getParameters().containsValue(AUTO_LOGIN_ACTION)) {
+                        return false;
+                    }
                     // We have the only provider
                     // Forward to signon URL
                     SMAuthProvider<?> authProviderInstance = authProvider.getInstance();

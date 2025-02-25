@@ -91,4 +91,8 @@ export default [
 
   ['administration_disabled_drivers_title', 'Pilotes désactivés'],
   ['administration_disabled_drivers_search_placeholder', 'Rechercher le pilote...'],
+  [
+    'administration_disabled_drivers_enable_unsafe_driver_message',
+    'Enabling this database driver may allow access to files on the server where this application is running. This could potentially expose sensitive system files or other protected data.\n\nOnly proceed if you fully understand the implications and trust the database configuration. Unauthorized or improper use of this driver may lead to security risks.\n\nDo you want to enable the "{arg:driverName}" driver?',
+  ],
 ];
