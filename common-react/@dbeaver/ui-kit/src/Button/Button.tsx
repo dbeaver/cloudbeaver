@@ -20,7 +20,6 @@ export function Button({ className, variant = 'primary', size = 'medium', loadin
 
   if (loading) {
     props['aria-busy'] = true;
-    props['aria-label'] = 'Loading';
     props['data-loading'] = true;
   }
 
