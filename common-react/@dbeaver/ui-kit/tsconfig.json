@@ -1,8 +1,9 @@
 {
   "extends": "@dbeaver/tsconfig/tsconfig.webview.json",
   "compilerOptions": {
+    "tsBuildInfoFile": "./lib/.tsbuildinfo",
     "rootDir": "src",
-    "outDir": "dist",
+    "outDir": "lib",
     "incremental": true,
     "composite": true
   },
