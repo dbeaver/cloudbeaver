@@ -28,7 +28,7 @@ import java.time.Duration;
 public class ServerConfigurationTimeLimitFilter implements Filter {
     private static final Log log = Log.getLog(ServerConfigurationTimeLimitFilter.class);
 
-    private static final int MINUTES_OF_INACTION_BEFORE_DISABLING_REQUEST_PROCESSING = 2;
+    private static final int MINUTES_OF_INACTION_BEFORE_DISABLING_REQUEST_PROCESSING = 60;
     private final CBApplication<?> application;
 
     public ServerConfigurationTimeLimitFilter(CBApplication<?> application) {
