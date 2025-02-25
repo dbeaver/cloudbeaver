@@ -48,7 +48,17 @@ jobs:
         with:
           node-version: "lts/*"
           cache: "yarn"
-          cache-dependency-path: "./cloudbeaver/webapp/yarn.lock"
+          cache-dependency-path: |
+            cloudbeaver/common-*/yarn.lock
+            cloudbeaver/webapp/yarn.lock
+
+      - name: restore cloudbeaver-common typescript cache
+        uses: actions/cache@v4
+        with:
+          path: "cloudbeaver/common-*/**/*/lib"
+          key: ${{ runner.os }}-common-dist-${{ hashFiles('cloudbeaver/common-*/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-common-dist-
 
       - name: restore typescript cache
         uses: actions/cache@v4
