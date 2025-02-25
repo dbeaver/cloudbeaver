@@ -97,6 +97,21 @@ public interface ServletApplication extends DBPApplication {
     @NotNull
     ServletSystemInformationCollector getSystemInformationCollector();
 
+    /**
+     * Disables the processing of incoming requests.
+     * Once called, the application will stop handling new requests,
+     * but it will remain running.
+     */
+    void disableRequestProcessing();
+
+    /**
+     * Checks whether request processing is currently enabled.
+     *
+     * @return {@code true} if the application is still accepting and processing requests,
+     *         {@code false} if request processing has been disabled.
+     */
+    boolean isRequestProcessingEnabled();
+
     default void getStatusInfo(Map<String, Object> infoMap) {
 
     }

@@ -21,6 +21,7 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
+import io.cloudbeaver.server.jetty.filters.ServerConfigurationTimeLimitFilter;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.server.servlets.WebStatusServlet;
@@ -29,10 +30,7 @@ import io.cloudbeaver.server.websockets.CBWebSocketServerConfigurator;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServiceBindingWebSocket;
 import jakarta.websocket.server.ServerEndpointConfig;
-import org.eclipse.jetty.ee10.servlet.ErrorPageErrorHandler;
-import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.servlet.ServletHolder;
-import org.eclipse.jetty.ee10.servlet.ServletMapping;
+import org.eclipse.jetty.ee10.servlet.*;
 import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.util.resource.ResourceFactory;
@@ -95,6 +93,8 @@ public class CBJettyServer {
                 Path contentRootPath = Path.of(serverConfiguration.getContentRoot());
                 ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
                 servletContextHandler.setBaseResourceAsPath(contentRootPath);
+                servletContextHandler.addFilter(
+                    new FilterHolder(new ServerConfigurationTimeLimitFilter()), "/*", null);
                 String rootURI = serverConfiguration.getRootURI();
                 servletContextHandler.setContextPath(rootURI);
 

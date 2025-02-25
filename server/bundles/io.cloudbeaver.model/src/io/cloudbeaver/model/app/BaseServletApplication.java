@@ -57,6 +57,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     private static final Log log = Log.getLog(BaseServletApplication.class);
 
     private String instanceId;
+    private boolean isRequestProcessingEnabled = true;
 
     @Override
     public RMController createResourceController(
@@ -257,6 +258,16 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     @Override
     public boolean isEnvironmentVariablesAccessible() {
         return false;
+    }
+
+    @Override
+    public void disableRequestProcessing() {
+        isRequestProcessingEnabled = false;
+    }
+
+    @Override
+    public boolean isRequestProcessingEnabled() {
+        return isRequestProcessingEnabled;
     }
 
     protected void closeResource(String name, Runnable closeFunction) {
