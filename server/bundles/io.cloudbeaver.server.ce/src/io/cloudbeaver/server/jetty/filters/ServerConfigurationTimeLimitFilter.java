@@ -40,10 +40,9 @@ public class ServerConfigurationTimeLimitFilter implements Filter {
         boolean isOutOfTime = System.currentTimeMillis() - application.getApplicationStartTime()
             > Duration.ofMinutes(MINUTES_OF_INACTION_BEFORE_DISABLING_REQUEST_PROCESSING).toMillis();
         if (application.isConfigurationMode() && isOutOfTime) {
-            log.warn("Server configuration time has expired. A restart server is required to continue");
+            log.warn("Server configuration time has expired. A server restart is required to continue.");
             buildErrorResponse((HttpServletResponse) response);
             return;
-
         }
         chain.doFilter(request, response);
     }
@@ -52,6 +51,6 @@ public class ServerConfigurationTimeLimitFilter implements Filter {
         HttpServletResponse httpResponse = response;
         httpResponse.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         httpResponse.setContentType("application/text");
-        httpResponse.getWriter().write("Server configuration time has expired. A restart server is required to continue");
+        httpResponse.getWriter().write("Server configuration time has expired. A server restart is required to continue.");
     }
 }
