@@ -99,7 +99,7 @@
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-primary-background-active);
 
     --dbv-kit-btn-loader-color: var(--dbv-kit-btn-background-hover);
-    --dbv-kit-btn-loader-background: color-mix(in srgb, var(--dbv-kit-btn-loader-base-color) 85%, transparent);
+    --dbv-kit-btn-loader-background: var(--dbv-kit-btn-loader-base-color);
   }
 
   .dbv-kit-button--secondary {
@@ -128,13 +128,13 @@
 
   .dbv-kit-button[data-loading='true'] {
     opacity: 0.75;
-    color: color-mix(in srgb, var(--dbv-kit-btn-foreground) 25%, var(--dbv-kit-btn-loader-base-color));
-    background-color: color-mix(in srgb, var(--dbv-kit-btn-loader-base-color) 75%, var(--dbv-kit-btn-background));
+    color: color-mix(in oklch, var(--dbv-kit-btn-foreground) 25%, var(--dbv-kit-btn-loader-base-color));
+    background-color: color-mix(in oklch, var(--dbv-kit-btn-loader-base-color) 75%, var(--dbv-kit-btn-background));
 
     &:hover,
     &:active,
     &[data-active] {
-      background-color: color-mix(in srgb, var(--dbv-kit-btn-loader-base-color) 85%, var(--dbv-kit-btn-background));
+      background-color: color-mix(in oklch, var(--dbv-kit-btn-loader-base-color) 85%, var(--dbv-kit-btn-background));
     }
   }
 
