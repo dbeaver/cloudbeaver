@@ -266,6 +266,7 @@ type DriverInfo {
     downloadable: Boolean! @since(version: "24.3.3")
     driverInstalled: Boolean!
     driverLibraries: [DriverLibraryInfo!]!
+    safeEmbeddedDriver: Boolean! @since(version: "25.0.0")
 }
 
 type DriverLibraryInfo {

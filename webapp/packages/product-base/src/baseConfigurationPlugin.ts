@@ -15,6 +15,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { baseHtmlPlugin } from './baseHtmlPlugin.js';
 import { copyAssetsPlugin } from './copy-assets/copyAssetsPlugin.js';
 import { manualChunks } from './manualChunks.js';
+import tailwindcss from '@tailwindcss/vite';
 
 export function baseConfigurationPlugin(mode: string, packageJson: any): PluginOption {
   const isProduction = mode === 'production';
@@ -88,6 +89,7 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
       },
     },
     react(),
+    tailwindcss(),
     isProduction
       ? [
           VitePWA({

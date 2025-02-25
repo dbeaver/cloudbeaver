@@ -1,0 +1,46 @@
+@layer base, theme, components, utilities;
+
+@layer base {
+  :root {
+    /* General */
+    --dbv-kit-font-size-base: 1rem;
+    --dbv-kit-control-border-radius: var(--tw-radius-md);
+    --dbv-kit-control-border-width: 1px;
+    --dbv-kit-control-outline-width: 2px;
+
+    /* Sizes */
+    --dbv-kit-control-height-base: 2rem;
+    --dbv-kit-control-height-small: calc(var(--dbv-kit-control-height-base) * 0.75);
+    --dbv-kit-control-height-medium: var(--dbv-kit-control-height-base);
+    --dbv-kit-control-height-large: calc(var(--dbv-kit-control-height-base) * 1.25);
+    --dbv-kit-control-height-xlarge: calc(var(--dbv-kit-control-height-base) * 1.5);
+
+    /* Colors */
+    --dbv-kit-color-foreground: var(--tw-color-gray-900);
+    --dbv-kit-color-background: var(--tw-color-gray-50);
+
+    --dbv-kit-color-text: var(--tw-color-gray-900);
+    --dbv-kit-color-outline: var(--tw-color-yellow-600);
+
+    --dbv-kit-color-primary-50: var(--tw-color-blue-50);
+    --dbv-kit-color-primary-100: var(--tw-color-blue-100);
+    --dbv-kit-color-primary-200: var(--tw-color-blue-200);
+    --dbv-kit-color-primary-500: var(--tw-color-blue-500);
+    --dbv-kit-color-primary-600: var(--tw-color-blue-600);
+    --dbv-kit-color-primary-700: var(--tw-color-blue-700);
+    --dbv-kit-color-primary-800: var(--tw-color-blue-800);
+    --dbv-kit-color-primary-900: var(--tw-color-blue-900);
+
+    --dbv-kit-color-error-text: var(--tw-color-red-900);
+    --dbv-kit-color-error-background: var(--tw-color-red-50);
+    --dbv-kit-color-error-border: var(--tw-color-red-200);
+
+    --dbv-kit-color-info-text: var(--tw-color-blue-900);
+    --dbv-kit-color-info-background: var(--tw-color-blue-50);
+    --dbv-kit-color-info-border: var(--tw-color-blue-200);
+
+    --dbv-kit-color-warning-text: var(--tw-color-orange-900);
+    --dbv-kit-color-warning-background: var(--tw-color-orange-50);
+    --dbv-kit-color-warning-border: var(--tw-color-orange-200);
+  }
+}

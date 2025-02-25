@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
 
 .tabIcon {
   display: flex;
-  height: 24px;
+  height: 32px;
   padding-left: 8px;
   justify-content: center;
   align-items: center;
@@ -16,6 +16,7 @@
   & .staticImage,
   & .iconOrImage,
   & img {
+    max-width: 16px;
     width: 16px;
     height: 16px;
   }

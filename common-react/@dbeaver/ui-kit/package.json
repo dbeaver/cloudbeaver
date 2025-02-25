@@ -1,0 +1,34 @@
+{
+  "name": "@dbeaver/ui-kit",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": "./lib/index.js"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "docs": "ladle serve",
+    "clean": "rimraf --glob dist"
+  },
+  "packageManager": "yarn@4.6.0",
+  "devDependencies": {
+    "@dbeaver/tsconfig": "workspace:^",
+    "@ladle/react": "^5",
+    "@tailwindcss/vite": "^4",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@wroud/vite-plugin-asset-resolver": "^0",
+    "@wroud/vite-plugin-tsc": "^0.11.6",
+    "rimraf": "^6",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vite": "^6"
+  },
+  "dependencies": {
+    "@ariakit/react": "^0",
+    "react": "^19",
+    "react-dom": "^19"
+  }
+}

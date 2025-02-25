@@ -26,6 +26,7 @@
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
+    "@tailwindcss/vite": "^4",
     "@types/fs-extra": "^11",
     "@types/node": "^20",
     "tslib": "^2",

@@ -8,24 +8,28 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
-import { Combobox, Group, GroupTitle, type ITag, s, Tag, Tags, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Combobox, ConfirmationDialog, Group, GroupTitle, type ITag, s, Tag, Tags, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 import { isDefined } from '@cloudbeaver/core-utils';
 
 import style from './ServerConfigurationDriversForm.module.css';
+import { useService } from '@cloudbeaver/core-di';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
 interface Props {
   serverConfig: ServerConfigInput;
+  initialServerConfig: ServerConfigInput;
 }
 
-export const ServerConfigurationDriversForm = observer<Props>(function ServerConfigurationDriversForm({ serverConfig }) {
+export const ServerConfigurationDriversForm = observer<Props>(function ServerConfigurationDriversForm({ serverConfig, initialServerConfig }) {
   const styles = useS(style);
   const translate = useTranslate();
   const driversResource = useResource(ServerConfigurationDriversForm, DBDriverResource, CachedMapAllKey);
 
   const drivers = driversResource.data.filter(isDefined).sort(driversResource.resource.compare);
+  const commonDialogService = useService(CommonDialogService);
 
   const tags: ITag[] = driversResource.resource
     .get(resourceKeyList(serverConfig.disabledDrivers || []))
@@ -45,20 +49,35 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
     [serverConfig.disabledDrivers],
   );
 
-  const handleRemove = useCallback(
-    (id: string) => {
-      if (!serverConfig.disabledDrivers) {
+  async function handleRemove(id: string) {
+    if (!serverConfig.disabledDrivers) {
+      return;
+    }
+
+    const driver = driversResource.resource.get(id);
+    const isInitiallyDisabledDriver = initialServerConfig.disabledDrivers?.includes(id);
+
+    if (driver?.embedded && !driver?.safeEmbeddedDriver && isInitiallyDisabledDriver) {
+      const result = await commonDialogService.open(ConfirmationDialog, {
+        title: 'ui_security_warning',
+        message: translate('administration_disabled_drivers_enable_unsafe_driver_message', undefined, { driverName: driver?.name || id }),
+        confirmActionText: 'ui_enable',
+        icon: '/icons/warning_icon.svg',
+        bigIcon: true,
+        size: 'medium',
+      });
+
+      if (result === DialogueStateResult.Rejected) {
         return;
       }
+    }
 
-      const index = serverConfig.disabledDrivers.indexOf(id);
+    const index = serverConfig.disabledDrivers.indexOf(id);
 
-      if (index !== -1) {
-        serverConfig.disabledDrivers.splice(index, 1);
-      }
-    },
-    [serverConfig.disabledDrivers],
-  );
+    if (index !== -1) {
+      serverConfig.disabledDrivers.splice(index, 1);
+    }
+  }
 
   return (
     <Group maximum gap>

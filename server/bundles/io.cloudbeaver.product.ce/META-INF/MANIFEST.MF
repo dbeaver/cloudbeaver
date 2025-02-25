@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Community Product
 Bundle-SymbolicName: io.cloudbeaver.product.ce;singleton:=true
-Bundle-Version: 25.0.0.qualifier
-Bundle-Release-Date: 20250303
+Bundle-Version: 25.0.1.qualifier
+Bundle-Release-Date: 20250325
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
