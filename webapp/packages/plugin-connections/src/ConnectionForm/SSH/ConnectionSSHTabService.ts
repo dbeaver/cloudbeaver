@@ -34,6 +34,7 @@ export class ConnectionSSHTabService extends Bootstrap {
   constructor(
     private readonly connectionFormService: ConnectionFormService,
     private readonly dbDriverResource: DBDriverResource,
+    // private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored,
   ) {
     super();
 
@@ -61,6 +62,32 @@ export class ConnectionSSHTabService extends Bootstrap {
         return true;
       },
     });
+
+    // TODO uncomment it once refactored
+    // this.connectionFormServiceRefactored.parts.add({
+    //   key: 'ssh',
+    //   name: 'plugin_connections_connection_form_part_main',
+    //   order: 3,
+    //   tab: () => SSHTab,
+    //   panel: () => SSHPanel,
+    //   isHidden: (tabId, props) => {
+    //     if (!props?.formState) {
+    //       return true;
+    //     }
+
+    //     const optionsPart = getConnectionFormOptionsPart(props.formState);
+    //     if (optionsPart.state.connectionConfig.driverId) {
+    //       const driver = optionsPart.state.connectionConfig.driverId
+    //         ? this.dbDriverResource.get(optionsPart.state.connectionConfig.driverId)
+    //         : undefined;
+    //       const urlType = optionsPart.state.connectionConfig.configurationType === DriverConfigurationType.Url;
+
+    //       return urlType || !driver?.applicableNetworkHandlers.includes(SSH_TUNNEL_ID);
+    //     }
+
+    //     return true;
+    //   },
+    // });
 
     this.connectionFormService.prepareConfigTask.addHandler(this.prepareConfig.bind(this));
 
@@ -104,6 +131,7 @@ export class ConnectionSSHTabService extends Bootstrap {
     }
   }
 
+  // TODO make a solution to include all required data
   private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const configuration = contexts.getContext(connectionFormConfigureContext);
 

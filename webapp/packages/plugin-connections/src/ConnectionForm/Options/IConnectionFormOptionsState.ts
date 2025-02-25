@@ -8,7 +8,8 @@
 import { DriverConfigurationType, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import { schema } from '@cloudbeaver/core-utils';
 
-const networkHandler = schema.object({
+// TODO export to separate file
+export const CONNECTION_NETWORK_HANDLER_SCHEMA = schema.object({
   id: schema.string(),
   authType: schema.enum([NetworkHandlerAuthType.Agent, NetworkHandlerAuthType.Password, NetworkHandlerAuthType.PublicKey]).optional(),
   enabled: schema.boolean().optional(),
@@ -35,7 +36,7 @@ export const CONNECTION_FORM_OPTIONS_SCHEMA = schema.object({
   keepAliveInterval: schema.number().optional(),
   mainPropertyValues: schema.record(schema.any()).optional(),
   name: schema.string().optional(),
-  networkHandlersConfig: schema.array(networkHandler).optional(),
+  networkHandlersConfig: schema.array(CONNECTION_NETWORK_HANDLER_SCHEMA).optional(),
   port: schema.string().optional(),
   properties: schema.record(schema.any()).optional(),
   providerProperties: schema.record(schema.any()).optional(),

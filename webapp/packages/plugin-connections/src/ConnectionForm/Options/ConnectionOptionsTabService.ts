@@ -255,6 +255,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
   }
 
+  // TODO make a solution to include all required data
   private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const configuration = contexts.getContext(connectionFormConfigureContext);
 

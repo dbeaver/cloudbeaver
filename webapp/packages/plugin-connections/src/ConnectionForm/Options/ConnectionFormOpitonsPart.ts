@@ -26,6 +26,7 @@ import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import { getConnectionName } from './getConnectionName.js';
 import type { LocalizationService } from '@cloudbeaver/core-localization';
 import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
+import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
@@ -234,6 +235,7 @@ export class ConnectionFormOptionsPart extends FormPart<ConnectionFormOptionsPar
       return;
     }
 
+    const credentialsState = contexts.getContext(connectionCredentialsStateContext);
     const driver = await this.dbDriverResource.load(this.state.connectionConfig.driverId, ['includeProviderProperties', 'includeMainProperties']);
 
     if (this.formState.mode === 'edit') {
@@ -285,7 +287,7 @@ export class ConnectionFormOptionsPart extends FormPart<ConnectionFormOptionsPar
       }
 
       if (!this.state.connectionConfig.saveCredentials) {
-        this.state.connectionConfig.authModelId = driver.defaultAuthModel;
+        credentialsState.requireAuthModel(this.state.connectionConfig.authModelId || driver.defaultAuthModel);
       }
     }
 
