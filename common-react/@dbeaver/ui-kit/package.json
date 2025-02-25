@@ -5,7 +5,7 @@
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./lib/index.js"
   },
   "scripts": {
     "build": "tsc -b",
