@@ -9,13 +9,13 @@ import { useRef } from 'react';
 import { IServiceProvider, useService } from '@cloudbeaver/core-di';
 import { ConnectionFormStateRefactored } from './ConnectionFormStateRefactored.js';
 import { ConnectionFormServiceRefactored } from './ConnectionFormServiceRefactored.js';
-import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import type { IConnectionFormStateRefactored } from './IConnectionFormStateRefactored.js';
 
-const EMPTY_CONNECTION_INFO_PARAMS: IConnectionInfoParams = { projectId: '', connectionId: '' };
+const EMPTY_CONNECTION_INFO_PARAMS: IConnectionFormStateRefactored = { projectId: '', connectionId: '', driverId: '', submitType: 'submit' };
 
 // TODO is nullable return allowed?
 export function useConnectionFormStateRefactored(
-  connectionInfoParams: IConnectionInfoParams | null,
+  state: IConnectionFormStateRefactored | null,
   configure?: (state: ConnectionFormStateRefactored) => any,
 ): ConnectionFormStateRefactored | null {
   const serviceProvider = useService(IServiceProvider);
@@ -23,12 +23,11 @@ export function useConnectionFormStateRefactored(
   const ref = useRef<null | ConnectionFormStateRefactored>(null);
 
   if (
-    ref.current?.state.connectionInfoParams.connectionId !== connectionInfoParams?.connectionId ||
-    ref.current?.state.connectionInfoParams.projectId !== connectionInfoParams?.projectId
+    ref.current?.state.connectionId !== state?.connectionId ||
+    ref.current?.state.projectId !== state?.projectId ||
+    ref.current?.state.driverId !== state?.driverId
   ) {
-    ref.current = new ConnectionFormStateRefactored(serviceProvider, service, {
-      connectionInfoParams: connectionInfoParams || EMPTY_CONNECTION_INFO_PARAMS,
-    });
+    ref.current = new ConnectionFormStateRefactored(serviceProvider, service, state || EMPTY_CONNECTION_INFO_PARAMS);
     configure?.(ref.current);
   }
 

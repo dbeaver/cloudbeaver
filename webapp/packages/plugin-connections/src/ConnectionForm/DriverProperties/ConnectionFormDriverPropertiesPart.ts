@@ -6,66 +6,49 @@
  * you may not use this file except in compliance with the License.
  */
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
-import { type IConnectionFormRefactoredState } from '../ConnectionFormServiceRefactored.js';
-import type { IConnectionFromDriverPropertiesState } from './IConnectionFromDriverPropertiesState.js';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import type { DBDriverResource } from '@cloudbeaver/core-connections';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
 
-const getDefaultState = () =>
-  ({
-    properties: {},
-  }) as IConnectionFromDriverPropertiesState;
-
-export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionFromDriverPropertiesState, IConnectionFormRefactoredState> {
+export class ConnectionFormDriverPropertiesPart extends FormPart<void, IConnectionFormStateRefactored> {
   constructor(
-    formState: IFormState<IConnectionFormRefactoredState>,
-    private readonly connectionInfoResource: ConnectionInfoResource,
+    formState: IFormState<IConnectionFormStateRefactored>,
     private readonly dbDriverResource: DBDriverResource,
   ) {
-    super(formState, getDefaultState());
+    super(formState);
   }
 
-  protected override async loader(): Promise<void> {
-    const info = await this.connectionInfoResource.load({
-      connectionId: this.formState.state.connectionInfoParams.connectionId,
-      projectId: this.formState.state.connectionInfoParams.projectId,
-    });
+  protected override async loader(): Promise<void> {}
 
-    this.setInitialState({
-      properties: info?.properties,
-    });
-  }
-
-  protected override saveChanges(
-    data: IFormState<IConnectionFormRefactoredState>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormRefactoredState>>,
-  ): Promise<void> {
-    return Promise.resolve();
-  }
+  protected override async saveChanges(
+    data: IFormState<IConnectionFormStateRefactored>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
+  ): Promise<void> {}
 
   protected override format(
-    data: IFormState<IConnectionFormRefactoredState>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormRefactoredState>>,
+    data: IFormState<IConnectionFormStateRefactored>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): void | Promise<void> {
-    const optionsPart = getConnectionFormOptionsPart(this.formState);
-    const config = optionsPart.state.connectionConfig;
+    const driverId = this.formState.state.driverId;
+    const config = getConnectionFormOptionsPart(this.formState).state;
 
-    // TODO move driverId to formState
-    if (config.driverId) {
-      const driver = this.dbDriverResource.get(config.driverId);
+    if (!config.properties) {
+      config.properties = {};
+    }
+
+    if (driverId) {
+      const driver = this.dbDriverResource.get(driverId);
       const defaultDriverProperties = new Set(driver?.driverProperties?.map(property => property.id) ?? []);
 
-      for (let key of Object.keys(this.state.properties)) {
-        const value = this.state.properties[key];
+      for (let key of Object.keys(config.properties)) {
+        const value = config.properties[key];
         if (!defaultDriverProperties?.has(key)) {
           key = key.trim();
         }
 
-        this.state.properties[key] = typeof value === 'string' ? value.trim() : value;
+        config.properties[key] = typeof value === 'string' ? value.trim() : value;
       }
-
-      config.properties = { ...this.state.properties };
     }
   }
 }

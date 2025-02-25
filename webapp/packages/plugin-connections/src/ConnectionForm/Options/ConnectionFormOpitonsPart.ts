@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { FormPart, formStateContext, formStatusContext, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
-import { type IConnectionFormRefactoredState } from '../ConnectionFormServiceRefactored.js';
 import { DriverConfigurationType, isObjectPropertyInfoStateEqual, type ConnectionConfig, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
@@ -25,57 +24,50 @@ import { getUniqueName, isNotNullDefined, isValuesEqual } from '@cloudbeaver/cor
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import { getConnectionName } from './getConnectionName.js';
 import type { LocalizationService } from '@cloudbeaver/core-localization';
-import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
+import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
+import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
 const MAIN_PROPERTY_PORT_KEY = 'port';
 const MAIN_PROPERTY_SERVER_KEY = 'server';
 
-interface ConnectionFormOptionsPartState {
-  connectionConfig: IConnectionFormOptionsState;
-  submitType: 'submit' | 'test';
-}
-
 const defaultStateGetter = () =>
   ({
-    connectionConfig: {
-      authModelId: '',
-      autocommit: false,
-      configurationType: DriverConfigurationType.Manual,
-      connectionId: '',
-      credentials: {},
-      dataSourceId: '',
-      databaseName: '',
-      description: '',
-      driverId: '',
-      folder: '',
-      host: '',
-      keepAliveInterval: 0,
-      mainPropertyValues: {},
-      name: '',
-      networkHandlersConfig: [],
-      port: '',
-      properties: {},
-      providerProperties: {},
-      readOnly: false,
-      saveCredentials: false,
-      selectedSecretId: '',
-      serverName: '',
-      sharedCredentials: false,
-      template: false,
-      templateId: '',
-      url: '',
-      userName: '',
-      userPassword: '',
-    },
-    submitType: 'submit',
-  }) as ConnectionFormOptionsPartState;
+    authModelId: '',
+    autocommit: false,
+    configurationType: DriverConfigurationType.Manual,
+    connectionId: '',
+    credentials: {},
+    dataSourceId: '',
+    databaseName: '',
+    description: '',
+    driverId: '',
+    folder: '',
+    host: '',
+    keepAliveInterval: 0,
+    mainPropertyValues: {},
+    name: '',
+    networkHandlersConfig: [],
+    port: '',
+    properties: {},
+    providerProperties: {},
+    readOnly: false,
+    saveCredentials: false,
+    selectedSecretId: '',
+    serverName: '',
+    sharedCredentials: false,
+    template: false,
+    templateId: '',
+    url: '',
+    userName: '',
+    userPassword: '',
+  }) as IConnectionFormOptionsState;
 
-export class ConnectionFormOptionsPart extends FormPart<ConnectionFormOptionsPartState, IConnectionFormRefactoredState> {
+export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsState, IConnectionFormStateRefactored> {
   constructor(
-    formState: IFormState<IConnectionFormRefactoredState>,
+    formState: IFormState<IConnectionFormStateRefactored>,
     private readonly dbDriverResource: DBDriverResource,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
@@ -88,59 +80,54 @@ export class ConnectionFormOptionsPart extends FormPart<ConnectionFormOptionsPar
   }
 
   override get isChanged(): boolean {
-    const info = this.connectionInfoResource.get(
-      createConnectionParam(this.formState.state.connectionInfoParams.projectId, this.formState.state.connectionInfoParams.connectionId),
-    );
+    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.connectionId));
 
     if (!info) {
       return super.isChanged;
     }
 
-    const driver = this.state.connectionConfig.driverId ? this.dbDriverResource.get(this.state.connectionConfig.driverId) : undefined;
+    const driver = this.formState.state.driverId ? this.dbDriverResource.get(this.formState.state.driverId) : undefined;
 
     return (
       super.isChanged ||
       // TODO do I need it?
-      !isValuesEqual(this.state.connectionConfig.name, info.name, '') ||
-      !isValuesEqual(this.state.connectionConfig.configurationType, info.configurationType, DriverConfigurationType.Manual) ||
-      !isValuesEqual(this.state.connectionConfig.description, info.description, '') ||
-      !isValuesEqual(this.state.connectionConfig.template, info.template, true) ||
-      !isValuesEqual(this.state.connectionConfig.folder, info.folder, undefined) ||
-      !isValuesEqual(this.state.connectionConfig.driverId, info.driverId, '') ||
-      (this.state.connectionConfig.url !== undefined && !isValuesEqual(this.state.connectionConfig.url, info.url, '')) ||
-      (this.state.connectionConfig.host !== undefined && !isValuesEqual(this.state.connectionConfig.host, info.host, '')) ||
-      (this.state.connectionConfig.port !== undefined && !isValuesEqual(this.state.connectionConfig.port, info.port, '')) ||
-      (this.state.connectionConfig.serverName !== undefined && !isValuesEqual(this.state.connectionConfig.serverName, info.serverName, '')) ||
-      (this.state.connectionConfig.databaseName !== undefined && !isValuesEqual(this.state.connectionConfig.databaseName, info.databaseName, '')) ||
-      this.state.connectionConfig.credentials !== undefined ||
-      (this.state.connectionConfig.authModelId !== undefined && !isValuesEqual(this.state.connectionConfig.authModelId, info.authModel, '')) ||
-      (this.state.connectionConfig.saveCredentials !== undefined && this.state.connectionConfig.saveCredentials !== info.credentialsSaved) ||
-      (this.state.connectionConfig.sharedCredentials !== undefined && this.state.connectionConfig.sharedCredentials !== info.sharedCredentials) ||
-      (this.state.connectionConfig.providerProperties !== undefined &&
-        !isObjectPropertyInfoStateEqual(driver?.providerProperties ?? [], this.state.connectionConfig.providerProperties, info.providerProperties)) ||
-      (this.state.connectionConfig.mainPropertyValues !== undefined &&
-        !isObjectPropertyInfoStateEqual(driver?.mainProperties ?? [], this.state.connectionConfig.mainPropertyValues, info.mainPropertyValues)) ||
-      (this.state.connectionConfig.keepAliveInterval !== undefined &&
-        !isValuesEqual(this.state.connectionConfig.keepAliveInterval, info.keepAliveInterval)) ||
-      (this.state.connectionConfig.autocommit !== undefined && !isValuesEqual(this.state.connectionConfig.autocommit, info.autocommit))
+      !isValuesEqual(this.state.name, info.name, '') ||
+      !isValuesEqual(this.state.configurationType, info.configurationType, DriverConfigurationType.Manual) ||
+      !isValuesEqual(this.state.description, info.description, '') ||
+      !isValuesEqual(this.state.template, info.template, true) ||
+      !isValuesEqual(this.state.folder, info.folder, undefined) ||
+      !isValuesEqual(this.state.driverId, info.driverId, '') ||
+      (this.state.url !== undefined && !isValuesEqual(this.state.url, info.url, '')) ||
+      (this.state.host !== undefined && !isValuesEqual(this.state.host, info.host, '')) ||
+      (this.state.port !== undefined && !isValuesEqual(this.state.port, info.port, '')) ||
+      (this.state.serverName !== undefined && !isValuesEqual(this.state.serverName, info.serverName, '')) ||
+      (this.state.databaseName !== undefined && !isValuesEqual(this.state.databaseName, info.databaseName, '')) ||
+      this.state.credentials !== undefined ||
+      (this.state.authModelId !== undefined && !isValuesEqual(this.state.authModelId, info.authModel, '')) ||
+      (this.state.saveCredentials !== undefined && this.state.saveCredentials !== info.credentialsSaved) ||
+      (this.state.sharedCredentials !== undefined && this.state.sharedCredentials !== info.sharedCredentials) ||
+      (this.state.providerProperties !== undefined &&
+        !isObjectPropertyInfoStateEqual(driver?.providerProperties ?? [], this.state.providerProperties, info.providerProperties)) ||
+      (this.state.mainPropertyValues !== undefined &&
+        !isObjectPropertyInfoStateEqual(driver?.mainProperties ?? [], this.state.mainPropertyValues, info.mainPropertyValues)) ||
+      (this.state.keepAliveInterval !== undefined && !isValuesEqual(this.state.keepAliveInterval, info.keepAliveInterval)) ||
+      (this.state.autocommit !== undefined && !isValuesEqual(this.state.autocommit, info.autocommit))
     );
   }
 
   protected override async loader(): Promise<void> {
-    const info = this.connectionInfoResource.get(
-      createConnectionParam(this.formState.state.connectionInfoParams.projectId, this.formState.state.connectionInfoParams.connectionId),
-    );
+    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.connectionId));
 
     if (!info) {
       const defaultConnectionConfig = await this.getDefaults();
       this.setInitialState({
         ...defaultStateGetter(),
-        connectionConfig: defaultConnectionConfig || this.state.connectionConfig,
+        ...defaultConnectionConfig,
       });
       return;
     }
 
-    const config = defaultStateGetter().connectionConfig;
+    const config = defaultStateGetter();
 
     config.connectionId = info.id;
     config.configurationType = info.configurationType;
@@ -184,22 +171,18 @@ export class ConnectionFormOptionsPart extends FormPart<ConnectionFormOptionsPar
 
     this.setInitialState({
       ...defaultStateGetter(),
-      connectionConfig: config,
+      ...config,
     });
   }
 
   private async formAuthState(
-    data: IFormState<IConnectionFormRefactoredState>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormRefactoredState>>,
+    data: IFormState<IConnectionFormStateRefactored>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ) {
     const stateContext = contexts.getContext(formStateContext);
-    const driver = await this.dbDriverResource.load(this.state.connectionConfig.driverId!, ['includeProviderProperties', 'includeMainProperties']);
-    const info = this.connectionInfoResource.get(
-      createConnectionParam(this.formState.state.connectionInfoParams.projectId, this.formState.state.connectionInfoParams.connectionId),
-    );
-    const authModel = await this.databaseAuthModelsResource.load(
-      this.state.connectionConfig.authModelId ?? info?.authModel ?? driver.defaultAuthModel,
-    );
+    const driver = await this.dbDriverResource.load(this.state.driverId!, ['includeProviderProperties', 'includeMainProperties']);
+    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.connectionId));
+    const authModel = await this.databaseAuthModelsResource.load(this.state.authModelId ?? info?.authModel ?? driver.defaultAuthModel);
 
     const providerId = authModel.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
 
@@ -228,95 +211,89 @@ export class ConnectionFormOptionsPart extends FormPart<ConnectionFormOptionsPar
   }
 
   protected override async format(
-    data: IFormState<IConnectionFormRefactoredState>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormRefactoredState>>,
+    data: IFormState<IConnectionFormStateRefactored>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): Promise<void> {
-    if (!this.state.connectionConfig.driverId || !this.formState.state.connectionInfoParams.projectId) {
+    if (!this.state.driverId || !this.formState.state.projectId) {
       return;
     }
 
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
-    const driver = await this.dbDriverResource.load(this.state.connectionConfig.driverId, ['includeProviderProperties', 'includeMainProperties']);
+    const driver = await this.dbDriverResource.load(this.state.driverId, ['includeProviderProperties', 'includeMainProperties']);
 
     if (this.formState.mode === 'edit') {
-      this.state.connectionConfig.connectionId = this.formState.state.connectionInfoParams.connectionId;
+      this.state.connectionId = this.formState.state.connectionId;
     }
 
-    this.state.connectionConfig.name = this.state.connectionConfig.name?.trim();
+    this.state.name = this.state.name?.trim();
 
-    if (this.state.connectionConfig.name && this.formState.mode === 'create') {
-      const connections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(this.formState.state.connectionInfoParams.projectId));
+    if (this.state.name && this.formState.mode === 'create') {
+      const connections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(this.formState.state.projectId));
       const connectionNames = connections.map(connection => connection.name);
 
-      this.state.connectionConfig.name = getUniqueName(this.state.connectionConfig.name, connectionNames);
+      this.state.name = getUniqueName(this.state.name, connectionNames);
     }
 
-    this.state.connectionConfig.description = this.state.connectionConfig.description?.trim();
-    this.state.connectionConfig.keepAliveInterval = Number(this.state.connectionConfig.keepAliveInterval);
+    this.state.description = this.state.description?.trim();
+    this.state.keepAliveInterval = Number(this.state.keepAliveInterval);
 
-    if (this.state.connectionConfig.configurationType === DriverConfigurationType.Url) {
-      this.state.connectionConfig.url = this.state.connectionConfig.url?.trim();
+    if (this.state.configurationType === DriverConfigurationType.Url) {
+      this.state.url = this.state.url?.trim();
     }
 
-    this.state.connectionConfig.mainPropertyValues = toJS(this.state.connectionConfig.mainPropertyValues);
+    this.state.mainPropertyValues = toJS(this.state.mainPropertyValues);
 
-    if (this.state.connectionConfig.configurationType === DriverConfigurationType.Manual && !driver.useCustomPage) {
-      this.state.connectionConfig.mainPropertyValues![MAIN_PROPERTY_DATABASE_KEY] = this.state.connectionConfig.databaseName?.trim();
+    if (this.state.configurationType === DriverConfigurationType.Manual && !driver.useCustomPage) {
+      this.state.mainPropertyValues![MAIN_PROPERTY_DATABASE_KEY] = this.state.databaseName?.trim();
 
       if (!driver.embedded) {
-        this.state.connectionConfig.mainPropertyValues![MAIN_PROPERTY_HOST_KEY] = this.state.connectionConfig.host?.trim();
-        this.state.connectionConfig.mainPropertyValues![MAIN_PROPERTY_PORT_KEY] = this.state.connectionConfig.port?.trim();
+        this.state.mainPropertyValues![MAIN_PROPERTY_HOST_KEY] = this.state.host?.trim();
+        this.state.mainPropertyValues![MAIN_PROPERTY_PORT_KEY] = this.state.port?.trim();
       }
 
       if (driver.requiresServerName) {
-        this.state.connectionConfig.mainPropertyValues![MAIN_PROPERTY_SERVER_KEY] = this.state.connectionConfig.serverName?.trim();
+        this.state.mainPropertyValues![MAIN_PROPERTY_SERVER_KEY] = this.state.serverName?.trim();
       }
     }
 
-    if ((this.state.connectionConfig.authModelId || driver.defaultAuthModel) && !driver.anonymousAccess) {
-      this.state.connectionConfig.authModelId = this.state.connectionConfig.authModelId || driver.defaultAuthModel;
-      this.state.connectionConfig.saveCredentials = this.state.connectionConfig.saveCredentials || this.state.connectionConfig.sharedCredentials;
+    if ((this.state.authModelId || driver.defaultAuthModel) && !driver.anonymousAccess) {
+      this.state.authModelId = this.state.authModelId || driver.defaultAuthModel;
+      this.state.saveCredentials = this.state.saveCredentials || this.state.sharedCredentials;
 
-      const info = this.connectionInfoResource.get(
-        createConnectionParam(this.formState.state.connectionInfoParams.projectId, this.formState.state.connectionInfoParams.connectionId),
-      );
-      const properties = await this.getConnectionAuthModelProperties(this.state.connectionConfig.authModelId, info);
+      const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.connectionId));
+      const properties = await this.getConnectionAuthModelProperties(this.state.authModelId, info);
 
-      if (this.state.connectionConfig.credentials && isCredentialsChanged(properties, this.state.connectionConfig.credentials)) {
-        this.state.connectionConfig.credentials = prepareDynamicProperties(properties, toJS(this.state.connectionConfig.credentials));
+      if (this.state.credentials && isCredentialsChanged(properties, this.state.credentials)) {
+        this.state.credentials = prepareDynamicProperties(properties, toJS(this.state.credentials));
       }
 
-      if (!this.state.connectionConfig.saveCredentials) {
-        credentialsState.requireAuthModel(this.state.connectionConfig.authModelId || driver.defaultAuthModel);
+      if (!this.state.saveCredentials) {
+        credentialsState.requireAuthModel(this.state.authModelId || driver.defaultAuthModel);
       }
     }
 
-    if (driver.providerProperties.length > 0 && this.state.connectionConfig.providerProperties) {
-      this.state.connectionConfig.providerProperties = prepareDynamicProperties(
+    if (driver.providerProperties.length > 0 && this.state.providerProperties) {
+      this.state.providerProperties = prepareDynamicProperties(
         driver.providerProperties,
-        toJS(this.state.connectionConfig.providerProperties),
-        this.state.connectionConfig.configurationType,
+        toJS(this.state.providerProperties),
+        this.state.configurationType,
       );
     }
 
-    if (driver.useCustomPage && driver.mainProperties.length > 0 && this.state.connectionConfig.mainPropertyValues) {
-      this.state.connectionConfig.mainPropertyValues = prepareDynamicProperties(
-        driver.mainProperties,
-        this.state.connectionConfig.mainPropertyValues,
-        this.state.connectionConfig.configurationType,
-      );
+    if (driver.useCustomPage && driver.mainProperties.length > 0 && this.state.mainPropertyValues) {
+      this.state.mainPropertyValues = prepareDynamicProperties(driver.mainProperties, this.state.mainPropertyValues, this.state.configurationType);
     }
   }
 
   private async getDefaults(): Promise<ConnectionConfig | undefined> {
-    if (!this.state.connectionConfig.driverId) {
+    if (!this.state.driverId) {
       // TODO remove it?
       throw new Error('Driver id is not provided');
     }
 
-    const defaultConnectionConfig: ConnectionConfig = { ...this.state.connectionConfig };
+    const defaultConnectionConfig: ConnectionConfig = { ...this.state };
 
-    const driver = await this.dbDriverResource.load(this.state.connectionConfig.driverId, ['includeProviderProperties']);
+    const driver = await this.dbDriverResource.load(this.state.driverId, ['includeProviderProperties']);
 
     defaultConnectionConfig.authModelId = driver?.defaultAuthModel;
     defaultConnectionConfig.configurationType = getDefaultConfigurationType(driver);
@@ -333,7 +310,7 @@ export class ConnectionFormOptionsPart extends FormPart<ConnectionFormOptionsPar
     defaultConnectionConfig.url = driver?.sampleURL;
 
     if (isJDBCConnection(driver)) {
-      defaultConnectionConfig.name = this.state.connectionConfig.url;
+      defaultConnectionConfig.name = this.state.url;
     } else {
       defaultConnectionConfig.name = getConnectionName(
         driver.name || '',
@@ -347,36 +324,32 @@ export class ConnectionFormOptionsPart extends FormPart<ConnectionFormOptionsPar
   }
 
   protected override async validate(
-    data: IFormState<IConnectionFormRefactoredState>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormRefactoredState>>,
+    data: IFormState<IConnectionFormStateRefactored>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): Promise<void> {
     const validation = contexts.getContext(formValidationContext);
 
-    if (
-      this.state.connectionConfig.configurationType === DriverConfigurationType.Manual &&
-      this.state.connectionConfig.host?.length === 0 &&
-      this.state.connectionConfig.driverId
-    ) {
-      const driver = await this.dbDriverResource.load(this.state.connectionConfig.driverId);
+    if (this.state.configurationType === DriverConfigurationType.Manual && this.state.host?.length === 0 && this.state.driverId) {
+      const driver = await this.dbDriverResource.load(this.state.driverId);
       if (!driver.embedded) {
         validation.error('plugin_connections_connection_form_host_invalid');
       }
     }
 
-    if (!this.state.connectionConfig.name?.length) {
+    if (!this.state.name?.length) {
       validation.error('plugin_connections_connection_form_name_invalid');
     }
 
-    if (this.state.connectionConfig.driverId && this.state.connectionConfig.configurationType) {
-      const driver = await this.dbDriverResource.load(this.state.connectionConfig.driverId, ['includeProviderProperties']);
+    if (this.state.driverId && this.state.configurationType) {
+      const driver = await this.dbDriverResource.load(this.state.driverId, ['includeProviderProperties']);
 
-      if (!driver.configurationTypes.includes(this.state.connectionConfig.configurationType)) {
+      if (!driver.configurationTypes.includes(this.state.configurationType)) {
         validation.error('plugin_connections_connection_form_host_configuration_invalid');
       }
     }
 
-    if (this.formState.state.connectionInfoParams.projectId !== null && this.formState.mode === 'create') {
-      const project = this.projectInfoResource.get(this.formState.state.connectionInfoParams.projectId);
+    if (this.formState.state.projectId !== null && this.formState.mode === 'create') {
+      const project = this.projectInfoResource.get(this.formState.state.projectId);
 
       if (!project?.canEditDataSources) {
         validation.error('plugin_connections_connection_form_project_invalid');
@@ -389,36 +362,33 @@ export class ConnectionFormOptionsPart extends FormPart<ConnectionFormOptionsPar
   }
 
   protected override async saveChanges(
-    data: IFormState<IConnectionFormRefactoredState>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormRefactoredState>>,
+    data: IFormState<IConnectionFormStateRefactored>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): Promise<void> {
     const status = contexts.getContext(formStatusContext);
 
-    if (!this.formState.state.connectionInfoParams.projectId) {
+    if (!this.formState.state.projectId) {
       status.error('connections_connection_create_fail');
       return;
     }
 
     try {
-      if (this.state.submitType === 'submit') {
+      if (this.formState.state.submitType === 'submit') {
         if (this.formState.mode === 'edit') {
           const connection = await this.connectionInfoResource.update(
-            createConnectionParam(this.formState.state.connectionInfoParams.projectId, this.formState.state.connectionInfoParams.connectionId!),
-            this.state.connectionConfig,
+            createConnectionParam(this.formState.state.projectId, this.formState.state.connectionId!),
+            this.state,
           );
           status.info('Connection was updated');
           status.info(connection.name);
         } else {
-          const connection = await this.connectionInfoResource.create(
-            this.formState.state.connectionInfoParams.projectId,
-            this.state.connectionConfig,
-          );
-          this.formState.state.connectionInfoParams.connectionId = connection.id;
+          const connection = await this.connectionInfoResource.create(this.formState.state.projectId, this.state);
+          this.formState.state.connectionId = connection.id;
           status.info('Connection was created');
           status.info(connection.name);
         }
       } else {
-        const info = await this.connectionInfoResource.test(this.formState.state.connectionInfoParams.projectId, this.state.connectionConfig);
+        const info = await this.connectionInfoResource.test(this.formState.state.projectId, this.state);
         status.info('Connection is established');
         status.info('Client version: ' + info.clientVersion);
         status.info('Server version: ' + info.serverVersion);
@@ -427,7 +397,7 @@ export class ConnectionFormOptionsPart extends FormPart<ConnectionFormOptionsPar
 
       await this.formAuthState(data, contexts);
     } catch (exception: any) {
-      if (this.state.submitType === 'submit') {
+      if (this.formState.state.submitType === 'submit') {
         status.error('connections_connection_create_fail', exception);
       } else {
         status.error('connections_connection_test_fail', exception);

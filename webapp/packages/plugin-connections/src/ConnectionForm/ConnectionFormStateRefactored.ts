@@ -8,10 +8,11 @@
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import { FormState } from '@cloudbeaver/core-ui';
 
-import type { ConnectionFormServiceRefactored, IConnectionFormRefactoredState } from './ConnectionFormServiceRefactored.js';
+import type { ConnectionFormServiceRefactored } from './ConnectionFormServiceRefactored.js';
+import type { IConnectionFormStateRefactored } from './IConnectionFormStateRefactored.js';
 
-export class ConnectionFormStateRefactored extends FormState<IConnectionFormRefactoredState> {
-  constructor(serviceProvider: IServiceProvider, service: ConnectionFormServiceRefactored, config: IConnectionFormRefactoredState) {
+export class ConnectionFormStateRefactored extends FormState<IConnectionFormStateRefactored> {
+  constructor(serviceProvider: IServiceProvider, service: ConnectionFormServiceRefactored, config: IConnectionFormStateRefactored) {
     super(serviceProvider, service, config);
   }
 }

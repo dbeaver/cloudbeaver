@@ -6,17 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
-import { type IConnectionFormRefactoredState } from '../ConnectionFormServiceRefactored.js';
+
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { DriverConfigurationType, NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 import { ConnectionInfoResource, createConnectionParam, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { toJS } from 'mobx';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
+import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
 
-export class ConnectionFormSSHPart extends FormPart<void, IConnectionFormRefactoredState> {
+export class ConnectionFormSSHPart extends FormPart<void, IConnectionFormStateRefactored> {
   constructor(
-    formState: IFormState<IConnectionFormRefactoredState>,
+    formState: IFormState<IConnectionFormStateRefactored>,
     private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super(formState);
@@ -27,18 +28,16 @@ export class ConnectionFormSSHPart extends FormPart<void, IConnectionFormRefacto
       return;
     }
     // TODO should we load instead of get?
-    const info = this.connectionInfoResource.get(
-      createConnectionParam(this.formState.state.connectionInfoParams.projectId, this.formState.state.connectionInfoParams.connectionId),
-    );
+    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.connectionId));
     const initialConfig = info?.networkHandlersConfig?.find(handler => handler.id === SSH_TUNNEL_ID);
     const optionsPart = getConnectionFormOptionsPart(this.formState);
 
-    if (!optionsPart.state.connectionConfig.networkHandlersConfig) {
-      optionsPart.state.connectionConfig.networkHandlersConfig = [];
+    if (!optionsPart.state.networkHandlersConfig) {
+      optionsPart.state.networkHandlersConfig = [];
     }
 
-    if (!optionsPart.state.connectionConfig.networkHandlersConfig.some(state => state.id === SSH_TUNNEL_ID)) {
-      optionsPart.state.connectionConfig.networkHandlersConfig.push({
+    if (!optionsPart.state.networkHandlersConfig.some(state => state.id === SSH_TUNNEL_ID)) {
+      optionsPart.state.networkHandlersConfig.push({
         id: SSH_TUNNEL_ID,
         enabled: false,
         authType: NetworkHandlerAuthType.Password,
@@ -59,23 +58,21 @@ export class ConnectionFormSSHPart extends FormPart<void, IConnectionFormRefacto
   }
 
   protected override saveChanges(
-    data: IFormState<IConnectionFormRefactoredState>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormRefactoredState>>,
+    data: IFormState<IConnectionFormStateRefactored>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): Promise<void> {
     return Promise.resolve();
   }
 
   protected override format(
-    data: IFormState<IConnectionFormRefactoredState>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormRefactoredState>>,
+    data: IFormState<IConnectionFormStateRefactored>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): void | Promise<void> {
     const optionsPart = getConnectionFormOptionsPart(this.formState);
-    const config = optionsPart.state.connectionConfig;
+    const config = optionsPart.state;
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
     const urlType = config.configurationType === DriverConfigurationType.Url;
-    const info = this.connectionInfoResource.get(
-      createConnectionParam(this.formState.state.connectionInfoParams.projectId, this.formState.state.connectionInfoParams.connectionId),
-    );
+    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.connectionId));
 
     if (urlType || !config.networkHandlersConfig || config.networkHandlersConfig.length === 0) {
       return;
@@ -119,20 +116,18 @@ export class ConnectionFormSSHPart extends FormPart<void, IConnectionFormRefacto
   }
 
   protected override validate(
-    data: IFormState<IConnectionFormRefactoredState>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormRefactoredState>>,
+    data: IFormState<IConnectionFormStateRefactored>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): void | Promise<void> {
     const validation = contexts.getContext(formValidationContext);
     const optionsPart = getConnectionFormOptionsPart(this.formState);
-    const info = this.connectionInfoResource.get(
-      createConnectionParam(this.formState.state.connectionInfoParams.projectId, this.formState.state.connectionInfoParams.connectionId),
-    );
+    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.connectionId));
 
-    if (!optionsPart.state.connectionConfig.networkHandlersConfig) {
+    if (!optionsPart.state.networkHandlersConfig) {
       return;
     }
 
-    const handler = optionsPart.state.connectionConfig.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
+    const handler = optionsPart.state.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
 
     if (!handler) {
       return;

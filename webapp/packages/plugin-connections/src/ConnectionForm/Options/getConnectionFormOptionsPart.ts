@@ -8,15 +8,15 @@
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
 import type { IFormState } from '@cloudbeaver/core-ui';
 import { ConnectionFormOptionsPart } from './ConnectionFormOpitonsPart.js';
-import type { IConnectionFormRefactoredState } from '../ConnectionFormServiceRefactored.js';
 import { ConnectionInfoResource, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { LocalizationService } from '@cloudbeaver/core-localization';
+import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
 
 const DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART = createDataContext<ConnectionFormOptionsPart>('Connection Form Options Part');
 
-export function getConnectionFormOptionsPart(formState: IFormState<IConnectionFormRefactoredState>): ConnectionFormOptionsPart {
+export function getConnectionFormOptionsPart(formState: IFormState<IConnectionFormStateRefactored>): ConnectionFormOptionsPart {
   return formState.getPart(DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
     const dbDriverResource = di.getService(DBDriverResource);
