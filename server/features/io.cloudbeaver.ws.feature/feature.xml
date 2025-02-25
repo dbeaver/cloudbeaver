@@ -2,7 +2,7 @@
 <feature
         id="io.cloudbeaver.ws.feature"
         label="%featureName"
-        version="1.0.70.qualifier"
+        version="1.0.71.qualifier"
         provider-name="%providerName"
         plugin="io.cloudbeaver.model">
 

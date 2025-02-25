@@ -51,6 +51,8 @@ export default [
   ['ui_errors_details', '详情'],
   ['ui_search', '搜索...'],
   ['ui_delete', '删除'],
+  ['ui_enable', 'Enable'],
+  ['ui_security_warning', 'Security Warning'],
   ['ui_deleting', 'Deleting...'],
   ['ui_add', '添加'],
   ['ui_revert', '恢复'],
