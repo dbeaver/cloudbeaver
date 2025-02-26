@@ -40,7 +40,7 @@ jobs:
       - name: Clone Deps Repositories
         uses: dbeaver/github-actions/clone-repositories@devel
         with:
-          project_deps_path: './cloudbeaver/project.deps'
+          project_deps_path: "./cloudbeaver/project.deps"
           token: ${{ secrets.DEVOPS_ISSUE_RO_TOKEN }}
 
       - run: corepack enable
@@ -48,7 +48,17 @@ jobs:
         with:
           node-version: "lts/*"
           cache: "yarn"
-          cache-dependency-path: './cloudbeaver/webapp/yarn.lock'
+          cache-dependency-path: |
+            cloudbeaver/common-*/yarn.lock
+            cloudbeaver/webapp/yarn.lock
+
+      - name: restore cloudbeaver-common typescript cache
+        uses: actions/cache@v4
+        with:
+          path: "cloudbeaver/common-*/**/*/lib"
+          key: ${{ runner.os }}-common-dist-${{ hashFiles('cloudbeaver/common-*/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-common-dist-
 
       - name: restore typescript cache
         uses: actions/cache@v4
@@ -60,6 +70,12 @@ jobs:
 
       - if: inputs.clean-cache
         run: yarn clear
+
+      # - run: yarn install --immutable
+      #   working-directory: ./cloudbeaver/common-typescript
+
+      # - run: yarn install --immutable
+      #   working-directory: ./cloudbeaver/common-react
 
       - run: yarn install --immutable
 

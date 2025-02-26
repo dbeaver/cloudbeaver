@@ -18,9 +18,6 @@
 
   composes: theme-typography--caption from global;
   outline: 0;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
   overflow: auto;
   user-select: none;
   -webkit-user-select: none;
@@ -39,6 +36,7 @@
 }
 
 .container .grid {
+  width: 100%;
   :global(.rdg-table-header__readonly-status) {
     background-color: var(--data-grid-readonly-status-color) !important;
   }

@@ -1,0 +1,23 @@
+@layer base {
+  :root {
+    /* Small input */
+    --dbv-kit-input-small-padding: calc(var(--dbv-kit-input-padding) * 0.5);
+    --dbv-kit-input-small-font-size: calc(var(--dbv-kit-input-font-size) * 0.875);
+    --dbv-kit-input-small-height: var(--dbv-kit-control-height-small);
+
+    /* Medium input */
+    --dbv-kit-input-medium-padding: var(--dbv-kit-input-padding);
+    --dbv-kit-input-medium-font-size: var(--dbv-kit-input-font-size);
+    --dbv-kit-input-medium-height: var(--dbv-kit-control-height-medium);
+
+    /* Large input */
+    --dbv-kit-input-large-padding: calc(var(--dbv-kit-input-padding) * 1.25);
+    --dbv-kit-input-large-font-size: calc(var(--dbv-kit-input-font-size) * 1.125);
+    --dbv-kit-input-large-height: var(--dbv-kit-control-height-large);
+
+    /* Extra large input */
+    --dbv-kit-input-xlarge-padding: calc(var(--dbv-kit-input-padding) * 1.5);
+    --dbv-kit-input-xlarge-font-size: calc(var(--dbv-kit-input-font-size) * 1.25);
+    --dbv-kit-input-xlarge-height: var(--dbv-kit-control-height-xlarge);
+  }
+}

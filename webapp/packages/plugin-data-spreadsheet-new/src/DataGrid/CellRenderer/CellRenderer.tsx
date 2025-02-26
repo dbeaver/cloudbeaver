@@ -7,84 +7,87 @@
  */
 import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect } from 'react';
+import { useContext, type HTMLAttributes } from 'react';
 
-import { getComputed, useCombinedHandler, useMouse, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
+import { getComputed, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@cloudbeaver/core-utils';
-import { type CalculatedColumn, Cell, type CellRendererProps } from '@cloudbeaver/plugin-data-grid';
-import {
-  DatabaseEditChangeType,
-  type IResultSetElementKey,
-  type IResultSetRowKey,
-  isBooleanValuePresentationAvailable,
-} from '@cloudbeaver/plugin-data-viewer';
+import { type IDataGridCellRenderer, type ICellPosition } from '@cloudbeaver/plugin-data-grid';
+import { DatabaseEditChangeType, type IResultSetElementKey, type IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 
-import { type CellPosition, EditingContext } from '../../Editing/EditingContext.js';
 import { DataGridContext } from '../DataGridContext.js';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
-import { TableDataContext } from '../TableDataContext.js';
+import { TableDataContext, type IColumnInfo } from '../TableDataContext.js';
 import { CellContext } from './CellContext.js';
 
-export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown>>(function CellRenderer(props) {
-  const { rowIdx, row, column, isCellSelected, onDoubleClick, selectCell } = props;
+interface Props {
+  rowIdx: number;
+  colIdx: number;
+  props: HTMLAttributes<HTMLDivElement>;
+  renderDefaultCell: IDataGridCellRenderer;
+}
+
+export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colIdx, props, renderDefaultCell }) {
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
-  const editingContext = useContext(EditingContext);
-  const mouse = useMouse<HTMLDivElement>({});
 
   const cellContext = useObservableRef(
     () => ({
-      mouse,
-      get position(): CellPosition {
-        return { idx: this.column.idx, rowIdx: this.rowIdx };
+      isHovered: false,
+      get position(): ICellPosition {
+        return { colIdx: this.colIdx, rowIdx: this.rowIdx };
+      },
+      get column(): IColumnInfo {
+        return this.tableDataContext.getColumn(this.colIdx)!;
+      },
+      get row(): IResultSetRowKey | undefined {
+        return this.tableDataContext.getRow(this.rowIdx);
       },
       get cell(): IResultSetElementKey | undefined {
-        if (this.column.columnDataIndex === null) {
+        if (this.column.key === null || this.row === undefined) {
           return undefined;
         }
-        return { row: this.row, column: this.column.columnDataIndex };
+        return { row: this.row, column: this.column.key };
       },
-      get isEditing(): boolean {
-        return editingContext.isEditing(this.position) || false;
+      get isFocused(): boolean {
+        return this.props['aria-selected'] === 'true';
       },
       get isSelected(): boolean {
-        return selectionContext.isSelected(this.position.rowIdx, this.position.idx) || false;
+        return this.selectionContext.isSelected(this.position.rowIdx, this.position.colIdx) || false;
       },
       get hasFocusedElementInRow(): boolean {
         const focusedElement = this.focusedElementPosition;
         return focusedElement?.rowIdx === this.position.rowIdx;
       },
       get focusedElementPosition() {
-        return selectionContext.getFocusedElementPosition();
-      },
-      get isFocused(): boolean {
-        return this.isEditing ? false : this.isCellSelected;
+        return this.selectionContext.getFocusedElementPosition();
       },
       get editionState(): DatabaseEditChangeType | null {
         if (!this.cell) {
           return null;
         }
 
-        return tableDataContext.getEditionState(this.cell);
+        return this.tableDataContext.getEditionState(this.cell);
       },
     }),
     {
-      row: observable.ref,
-      column: observable.ref,
+      isHovered: observable.ref,
+      colIdx: observable.ref,
       rowIdx: observable.ref,
-      isCellSelected: observable.ref,
+      row: computed,
+      column: computed,
       position: computed,
       cell: computed,
       hasFocusedElementInRow: computed,
       focusedElementPosition: computed,
-      isEditing: computed,
       isSelected: computed,
-      isFocused: computed,
       editionState: computed,
+      tableDataContext: observable.ref,
+      selectionContext: observable.ref,
+      props: observable.ref,
     },
-    { row, column, rowIdx, isCellSelected },
+    { colIdx, rowIdx, tableDataContext, selectionContext, props },
   );
 
   const isDatabaseActionApplied = getComputed(() =>
@@ -95,40 +98,11 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
     clsx({
       'rdg-cell-custom-highlighted-row': cellContext.hasFocusedElementInRow && !isDatabaseActionApplied,
       'rdg-cell-custom-selected': cellContext.isSelected,
-      'rdg-cell-custom-editing': cellContext.isEditing,
       'rdg-cell-custom-added': cellContext.editionState === DatabaseEditChangeType.add,
       'rdg-cell-custom-deleted': cellContext.editionState === DatabaseEditChangeType.delete,
       'rdg-cell-custom-edited': cellContext.editionState === DatabaseEditChangeType.update,
     }),
   );
-
-  function isEditable(column: CalculatedColumn<IResultSetRowKey>): boolean {
-    if (
-      !cellContext.cell ||
-      (!dataGridContext.model.hasElementIdentifier(tableDataContext.view.resultIndex) && cellContext.editionState !== DatabaseEditChangeType.add)
-    ) {
-      return false;
-    }
-
-    if (
-      tableDataContext.format.isBinary(cellContext.cell) ||
-      tableDataContext.format.isGeometry(cellContext.cell) ||
-      tableDataContext.dataContent.isTextTruncated(cellContext.cell)
-    ) {
-      return false;
-    }
-
-    const resultColumn = tableDataContext.getColumnInfo(cellContext.cell.column);
-    const value = tableDataContext.getCellValue(cellContext.cell);
-
-    if (!resultColumn || value === undefined) {
-      return false;
-    }
-
-    const handleByBooleanFormatter = isBooleanValuePresentationAvailable(value, resultColumn);
-
-    return !(handleByBooleanFormatter || tableDataContext.isCellReadonly(cellContext.cell));
-  }
 
   const state = useObjectRef(
     () => ({
@@ -145,7 +119,7 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
 
         this.selectionContext.select(
           {
-            colIdx: this.column.idx,
+            colIdx: this.colIdx,
             rowIdx: this.rowIdx,
           },
           event.ctrlKey || event.metaKey,
@@ -153,46 +127,27 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
           false,
         );
       },
-      doubleClick(args: any, event: React.MouseEvent<HTMLDivElement>) {
-        if (
-          !this.isEditable(this.column) ||
-          // !this.dataGridContext.isGridInFocus()
-          EventContext.has(event, EventStopPropagationFlag)
-        ) {
-          return;
-        }
-
-        this.editingContext.edit(cellContext.position);
-      },
     }),
     {
-      row,
-      column,
+      colIdx,
       rowIdx,
       selectionContext,
       dataGridContext,
-      editingContext,
-      isEditable,
-      selectCell,
     },
-    ['doubleClick', 'mouseUp', 'mouseDown'],
+    ['mouseUp', 'mouseDown'],
   );
-
-  useEffect(() => () => editingContext.closeEditor(cellContext.position), []);
-  const handleDoubleClick = useCombinedHandler(state.doubleClick, onDoubleClick);
 
   return (
     <CellContext.Provider value={cellContext}>
-      <Cell
-        ref={mouse.reference}
-        className={classes}
-        data-row-index={rowIdx}
-        data-column-index={column.idx}
-        onMouseDown={state.mouseDown}
-        onMouseUp={state.mouseUp}
-        {...props}
-        onDoubleClick={handleDoubleClick}
-      />
+      {renderDefaultCell({
+        className: classes,
+        'data-row-index': rowIdx,
+        'data-column-index': colIdx,
+        onMouseDown: state.mouseDown,
+        onMouseUp: state.mouseUp,
+        onMouseEnter: () => (cellContext.isHovered = true),
+        onMouseLeave: () => (cellContext.isHovered = false),
+      })}
     </CellContext.Provider>
   );
 });

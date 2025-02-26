@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,8 @@ export default [
   ['ui_errors_details', 'Détails'],
   ['ui_search', 'Rechercher...'],
   ['ui_delete', 'Supprimer'],
+  ['ui_enable', 'Enable'],
+  ['ui_security_warning', 'Security Warning'],
   ['ui_deleting', 'Deleting...'],
   ['ui_add', 'Ajouter'],
   ['ui_refresh', 'Actualiser'],
@@ -136,6 +138,7 @@ export default [
   ['ui_catalog', 'Catalog'],
   ['ui_schema', 'Schema'],
   ['ui_project', 'Project'],
+  ['ui_type', 'Type'],
 
   ['root_permission_denied', "Vous n'avez pas les permissions"],
   ['root_permission_no_permission', "Vous n'avez pas la permission pour cette action"],

@@ -82,8 +82,8 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
 
       if (columns.length === 0) {
         for (const column of props.tableData.columns) {
-          if (column.columnDataIndex !== null) {
-            rowSelection.push(column.columnDataIndex);
+          if (column.key !== null) {
+            rowSelection.push(column.key);
           }
         }
       }
@@ -129,7 +129,7 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
       selectRows(
         startRow,
         lastRow,
-        isIndexColumnInRange ? undefined : columnsInRange.filter(column => column.columnDataIndex !== null).map(column => column.columnDataIndex!),
+        isIndexColumnInRange ? undefined : columnsInRange.filter(column => column.key !== null).map(column => column.key!),
         multiple,
         temporary,
       );
@@ -141,7 +141,7 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
 
     state.temporarySelection.clear();
 
-    const column = tableData.getColumn(colIdx)?.columnDataIndex ?? undefined;
+    const column = tableData.getColumn(colIdx)?.key ?? undefined;
 
     const selected = selectionAction.isElementSelected({ column });
 
@@ -158,7 +158,7 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
   }
 
   function isSelected(rowIdx: number, colIdx: number) {
-    const column = props.tableData.getColumn(colIdx)?.columnDataIndex ?? undefined;
+    const column = props.tableData.getColumn(colIdx)?.key ?? undefined;
 
     const row = props.tableData.getRow(rowIdx);
 
@@ -221,7 +221,7 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
       return;
     }
 
-    const isIndexColumn = props.tableData.isIndexColumn(column.key);
+    const isIndexColumn = props.tableData.isIndexColumn(column);
     const row = props.tableData.getRow(cell.rowIdx);
 
     if (!row) {
@@ -233,8 +233,8 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
       return;
     }
 
-    if (column.columnDataIndex !== null) {
-      selectCell({ row, column: column.columnDataIndex }, multiple);
+    if (column.key !== null) {
+      selectCell({ row, column: column.key }, multiple);
     }
   }
 

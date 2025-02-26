@@ -112,7 +112,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
     useImperativeHandle(ref, () => inputRef.current!);
 
     return (
-      <div className={s(style, { editor: true, editorActive: active }, className)} onClick={onClick} onDoubleClick={onDoubleClick}>
+      <div className={s(style, { editor: true, specific: true, editorActive: active }, className)} onClick={onClick} onDoubleClick={onDoubleClick}>
         <div className={s(style, { editorContainer: true })}>
           <input
             ref={inputRef}

@@ -1,0 +1,33 @@
+:global(.rdg-cell) .editor {
+  appearance: none;
+
+  box-sizing: border-box;
+  min-height: initial;
+  inline-size: 100%;
+  block-size: 100%;
+  padding-block: 0;
+  padding-inline: 6px;
+  border: 2px solid #ccc;
+  vertical-align: top;
+  color: var(--rdg-color);
+  background-color: var(--rdg-background-color);
+
+  font: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-decoration: inherit;
+  text-transform: inherit;
+
+  &:focus {
+    border-color: var(--rdg-selection-color);
+    outline: none;
+  }
+
+  &::placeholder {
+    color: #999;
+    opacity: 1;
+  }
+}

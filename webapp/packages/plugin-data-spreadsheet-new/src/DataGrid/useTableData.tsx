@@ -8,7 +8,6 @@
 import { computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
-import type { Column } from '@cloudbeaver/plugin-data-grid';
 import {
   type IDatabaseDataModel,
   type IResultSetColumnKey,
@@ -23,30 +22,13 @@ import {
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { IndexFormatter } from './Formatters/IndexFormatter.js';
-import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
-import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
-import type { ITableData } from './TableDataContext.js';
-import { useTableDataMeasurements } from './useTableDataMeasurements.js';
-
-export const indexColumn: Column<IResultSetRowKey, any> = {
-  key: 'index',
-  columnDataIndex: null,
-  name: '#',
-  minWidth: 60,
-  width: 60,
-  resizable: false,
-  frozen: true,
-  renderHeaderCell: props => <TableIndexColumnHeader {...props} />,
-  renderCell: props => <IndexFormatter {...props} />,
-};
+import type { IColumnInfo, ITableData } from './TableDataContext.js';
 
 export function useTableData(
   model: IDatabaseDataModel<ResultSetDataSource>,
   resultIndex: number,
   gridDIVElement: React.RefObject<HTMLDivElement | null>,
 ): ITableData {
-  const measurements = useTableDataMeasurements(model, resultIndex);
   const format = model.source.getAction(resultIndex, ResultSetFormatAction);
   const data = model.source.getAction(resultIndex, ResultSetDataAction);
   const editor = model.source.getAction(resultIndex, ResultSetEditAction);
@@ -69,37 +51,12 @@ export function useTableData(
           return [];
         }
 
-        const columns: Array<Column<IResultSetRowKey, any>> = this.columnKeys.map<Column<IResultSetRowKey, any>>((col, index) => ({
-          key: ResultSetDataKeysUtils.serialize(col),
-          columnDataIndex: col,
-          name: this.getColumnInfo(col)?.label || '?',
-          editable: true,
-          width: measurements.getColumnWidth(col),
-          renderHeaderCell: props => <TableColumnHeader {...props} />,
-          onRenderHeader: measurements.scheduleUpdate,
+        const columns: Array<IColumnInfo> = this.columnKeys.map<IColumnInfo>(col => ({
+          key: col,
         }));
-        columns.unshift(indexColumn);
+        columns.unshift({ key: null });
 
         return columns;
-      },
-      getMetrics(columnIndex) {
-        if (columnIndex < 0 || columnIndex > this.columns.length) {
-          return undefined;
-        }
-
-        let left = 0;
-        for (let i = 0; i < columnIndex; i++) {
-          const column = this.columns[i]!;
-          left += column.width as number;
-        }
-
-        const column = this.getColumn(columnIndex)!;
-
-        return {
-          left,
-          right: left + (column.width as number),
-          width: column.width as number,
-        };
       },
       getRow(rowIndex) {
         return this.rows[rowIndex];
@@ -108,7 +65,7 @@ export function useTableData(
         return this.columns[columnIndex];
       },
       getColumnByDataIndex(key) {
-        return this.columns.find(column => column.columnDataIndex !== null && ResultSetDataKeysUtils.isEqual(column.columnDataIndex, key))!;
+        return this.columns.find(column => column.key !== null && ResultSetDataKeysUtils.isEqual(column.key, key))!;
       },
       getColumnInfo(key) {
         return this.data.getColumn(key);
@@ -116,16 +73,13 @@ export function useTableData(
       getCellValue(key) {
         return this.view.getCellValue(key);
       },
-      getColumnIndexFromKey(key) {
-        return this.columns.findIndex(column => column.key === key);
-      },
       getColumnIndexFromColumnKey(columnKey) {
-        return this.columns.findIndex(column => column.columnDataIndex !== null && ResultSetDataKeysUtils.isEqual(columnKey, column.columnDataIndex));
+        return this.columns.findIndex(column => column.key !== null && ResultSetDataKeysUtils.isEqual(columnKey, column.key));
       },
       getRowIndexFromKey(rowKey) {
         return this.rows.findIndex(row => ResultSetDataKeysUtils.isEqual(rowKey, row));
       },
-      getColumnsInRange(startIndex, endIndex): Column<IResultSetRowKey, any>[] {
+      getColumnsInRange(startIndex, endIndex): IColumnInfo[] {
         if (startIndex === endIndex) {
           return [this.columns[startIndex]!];
         }
@@ -144,10 +98,10 @@ export function useTableData(
         return this.editor.isElementEdited(key);
       },
       isIndexColumn(columnKey) {
-        return columnKey === indexColumn.key;
+        return columnKey.key === null;
       },
       isIndexColumnInRange(columnsRange) {
-        return columnsRange.some(column => this.isIndexColumn(column.key));
+        return columnsRange.some(column => this.isIndexColumn(column));
       },
       isReadOnly() {
         return this.columnKeys.every(column => this.getColumnInfo(column)?.readOnly);
@@ -157,9 +111,7 @@ export function useTableData(
           return true;
         }
 
-        const column = this.getColumnByDataIndex(key.column);
-
-        return !column.editable || this.format.isReadOnly(key);
+        return this.format.isReadOnly(key);
       },
     }),
     {

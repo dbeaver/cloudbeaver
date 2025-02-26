@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 .container {
-  composes: theme-typography--caption theme-border-color-background from global;
-  border: 1px solid;
+  composes: theme-typography--caption from global;
   height: 100%;
 }

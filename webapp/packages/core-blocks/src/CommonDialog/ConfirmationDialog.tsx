@@ -16,11 +16,12 @@ import { useS } from '../useS.js';
 import { CommonDialogBody } from './CommonDialog/CommonDialogBody.js';
 import { CommonDialogFooter } from './CommonDialog/CommonDialogFooter.js';
 import { CommonDialogHeader } from './CommonDialog/CommonDialogHeader.js';
-import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper.js';
+import { CommonDialogWrapper, type CommonDialogWrapperSize } from './CommonDialog/CommonDialogWrapper.js';
 import style from './ConfirmationDialog.module.css';
 
 export interface ConfirmationDialogPayload {
   icon?: string;
+  size?: CommonDialogWrapperSize;
   title: string;
   subTitle?: string;
   bigIcon?: boolean;
@@ -39,10 +40,10 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Dial
   className,
 }) {
   const styles = useS(style);
-  const { icon, title, subTitle, bigIcon, viewBox, message, confirmActionText, cancelActionText } = payload;
+  const { icon, title, subTitle, size = 'small', bigIcon, viewBox, message, confirmActionText, cancelActionText } = payload;
 
   return (
-    <CommonDialogWrapper size="small" className={className} fixedWidth>
+    <CommonDialogWrapper size={size} className={className} fixedWidth>
       <CommonDialogHeader title={title} subTitle={subTitle} icon={icon} viewBox={viewBox} bigIcon={bigIcon} onReject={rejectDialog} />
       <CommonDialogBody>
         <Translate token={message} />
