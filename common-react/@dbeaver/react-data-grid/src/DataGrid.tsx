@@ -1,6 +1,5 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import DataGridBase, { type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle } from 'react-data-grid';
-import 'react-data-grid/lib/styles.css';
 import { rowRenderer } from './renderers/rowRenderer.js';
 import { cellRenderer } from './renderers/cellRenderer.js';
 import { DataGridCellHeaderContext, type IDataGridHeaderCellContext } from './DataGridHeaderCellContext.js';
@@ -12,6 +11,7 @@ import { mapCellContentRenderer } from './mapCellContentRenderer.js';
 import { mapRenderHeaderCell } from './mapRenderHeaderCell.js';
 import { mapEditCellRenderer } from './mapEditCellRenderer.js';
 import { DataGridRowContext, type IDataGridRowContext } from './DataGridRowContext.js';
+import './DataGrid.css';
 
 export interface ICellPosition {
   rowIdx: number;
