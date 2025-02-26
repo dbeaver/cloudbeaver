@@ -1,0 +1,6 @@
+.cool-checkbox {
+  --dbv-kit-checkbox-background-checked: black;
+  --dbv-kit-checkbox-background-hover: gray;
+  --dbv-kit-checkbox-border-color-checked: black;
+  --dbv-kit-checkbox-border-color: black;
+}
