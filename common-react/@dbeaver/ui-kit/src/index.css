@@ -7,6 +7,7 @@
     --dbv-kit-control-border-radius: var(--tw-radius-md);
     --dbv-kit-control-border-width: 1px;
     --dbv-kit-control-outline-width: 2px;
+    --dbv-kit-control-disabled-opacity: 0.5;
 
     /* Sizes */
     --dbv-kit-control-height-base: 2rem;
@@ -18,8 +19,6 @@
     /* Colors */
     --dbv-kit-color-foreground: var(--tw-color-gray-900);
     --dbv-kit-color-background: var(--tw-color-gray-50);
-
-    --dbv-kit-color-text: var(--tw-color-gray-900);
     --dbv-kit-color-outline: var(--tw-color-yellow-600);
 
     --dbv-kit-color-primary-50: var(--tw-color-blue-50);

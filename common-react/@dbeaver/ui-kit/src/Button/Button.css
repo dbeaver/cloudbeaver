@@ -46,7 +46,7 @@
     }
 
     &:disabled {
-      opacity: var(--dbv-kit-btn-disabled-opacity);
+      opacity: var(--dbv-kit-control-disabled-opacity);
     }
   }
 

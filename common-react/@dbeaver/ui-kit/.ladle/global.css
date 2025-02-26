@@ -2,7 +2,7 @@
 
 @layer theme {
   main {
-    color: var(--dbv-kit-color-text);
+    color: var(--dbv-kit-color-foreground);
     background-color: var(--tw-color-gray-50);
   }
 
@@ -75,10 +75,17 @@
   .comment {
     color: var(--tw-color-gray-500);
   }
+
+  .color-sample {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border-radius: 0.25em;
+  }
 }
 
 :root[data-theme='dark'] {
-  --dbv-kit-color-text: var(--tw-color-gray-200);
+  --dbv-kit-color-foreground: var(--tw-color-gray-200);
   --dbv-kit-btn-loader-base-color: var(--tw-color-gray-900);
 
   /* Primary Button */
