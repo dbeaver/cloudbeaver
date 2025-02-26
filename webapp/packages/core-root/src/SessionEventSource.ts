@@ -113,13 +113,13 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
     });
 
     this.closeSubject.subscribe(event => {
-      console.info(`Websocket closed: ${event.reason}`);
+      console.warn(`Websocket closed (${event.code}): ${event.reason}`);
     });
 
     this.eventsSubject = merge(this.oldEventsSubject, ready$.pipe(switchMap(() => this.subject))).pipe(this.handleErrors());
 
     this.errorSubject.pipe(debounceTime(1000)).subscribe(error => {
-      console.error(error);
+      console.error('Websocket:', error);
     });
 
     this.errorHandler = this.errorHandler.bind(this);
