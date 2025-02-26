@@ -23,6 +23,9 @@
       "path": "../core-connections"
     },
     {
+      "path": "../core-data-context"
+    },
+    {
       "path": "../core-di"
     },
     {

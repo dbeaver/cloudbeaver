@@ -1,0 +1,81 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+import { FormPart, formStatusContext, type IFormState } from '@cloudbeaver/core-ui';
+import type { IConnectionFormStateRefactored } from '../../../../plugin-connections/src/ConnectionForm/IConnectionFormStateRefactored.js';
+import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import type { IConnectionFormAccessState } from './IConnectionFormAccessState.js';
+import { createConnectionParam, type ConnectionInfoResource } from '@cloudbeaver/core-connections';
+
+const getDefaultState = () =>
+  ({
+    grantedSubjects: [],
+  }) as IConnectionFormAccessState;
+
+export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessState, IConnectionFormStateRefactored> {
+  constructor(
+    formState: IFormState<IConnectionFormStateRefactored>,
+    private readonly connectionInfoResource: ConnectionInfoResource,
+  ) {
+    super(formState, getDefaultState());
+  }
+
+  protected override async loader(): Promise<void> {
+    const connectionId = this.formState.state.connectionId;
+    const projectId = this.formState.state.projectId;
+
+    if (!connectionId || !projectId || !this.loaded) {
+      return;
+    }
+
+    const key = createConnectionParam(projectId, connectionId);
+    const subjects = await this.connectionInfoResource.loadAccessSubjects(key);
+
+    this.setInitialState({
+      ...getDefaultState(),
+      grantedSubjects: subjects.map(subject => subject.subjectId),
+    });
+  }
+
+  protected override async saveChanges(
+    data: IFormState<IConnectionFormStateRefactored>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
+  ): Promise<void> {
+    const status = contexts.getContext(formStatusContext);
+    const connectionId = this.formState.state.connectionId;
+
+    if (this.formState.state.submitType === 'test' || !data.state.projectId || !status.saved || !connectionId || !this.loaded) {
+      return;
+    }
+
+    const key = createConnectionParam(data.state.projectId, connectionId);
+
+    const currentGrantedSubjects = await this.connectionInfoResource.loadAccessSubjects(key);
+    const currentGrantedSubjectIds = currentGrantedSubjects.map(subject => subject.subjectId);
+
+    const { subjectsToRevoke, subjectsToGrant } = getSubjectDifferences(currentGrantedSubjectIds, this.state.grantedSubjects);
+
+    if (subjectsToRevoke.length === 0 && subjectsToGrant.length === 0) {
+      return;
+    }
+
+    if (subjectsToRevoke.length > 0) {
+      await this.connectionInfoResource.deleteConnectionsAccess(key, subjectsToRevoke);
+    }
+
+    if (subjectsToGrant.length > 0) {
+      await this.connectionInfoResource.addConnectionsAccess(key, subjectsToGrant);
+    }
+  }
+}
+
+function getSubjectDifferences(current: string[], next: string[]): { subjectsToRevoke: string[]; subjectsToGrant: string[] } {
+  const subjectsToRevoke = current.filter(subjectId => !next.includes(subjectId));
+  const subjectsToGrant = next.filter(subjectId => !current.includes(subjectId));
+
+  return { subjectsToRevoke, subjectsToGrant };
+}

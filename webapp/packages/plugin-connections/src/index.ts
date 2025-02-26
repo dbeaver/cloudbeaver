@@ -21,6 +21,8 @@ export * from './ConnectionForm/ConnectionFormLoader.js';
 export * from './ConnectionForm/ConnectionFormService.js';
 export * from './ConnectionForm/ConnectionFormState.js';
 export * from './ConnectionForm/IConnectionFormProps.js';
+export * from './ConnectionForm/IConnectionFormStateRefactored.js';
+export * from './ConnectionForm/ConnectionFormServiceRefactored.js';
 export * from './ConnectionForm/useConnectionFormState.js';
 export * from './ConnectionForm/SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID.js';
 export * from './ConnectionForm/ConnectionAuthModelCredentials/ConnectionAuthModelCredentialsForm.js';

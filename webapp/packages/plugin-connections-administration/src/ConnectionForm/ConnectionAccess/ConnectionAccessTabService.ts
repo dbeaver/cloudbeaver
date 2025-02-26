@@ -40,6 +40,7 @@ export class ConnectionAccessTabService extends Bootstrap {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly permissionsResource: PermissionsService,
     private readonly projectInfoResource: ProjectInfoResource,
+    // private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored,
   ) {
     super();
     this.key = 'access';
@@ -56,6 +57,18 @@ export class ConnectionAccessTabService extends Bootstrap {
       isDisabled: (tabId, props) => !props?.state.config.driverId || this.administrationScreenService.isConfigurationMode,
       panel: () => ConnectionAccess,
     });
+
+    // TODO uncomment it once refactored
+    // this.connectionFormServiceRefactored.parts.add({
+    //   key: this.key,
+    //   name: 'connections_connection_edit_access',
+    //   title: 'connections_connection_edit_access',
+    //   order: 4,
+    //   stateGetter: props => () => getConnectionFormAccessPart(props.formState),
+    //   isHidden: (_, context) => !context || !this.isAccessTabActive(context.formState.state.projectId),
+    //   isDisabled: (tabId, props) => !props?.formState.state.driverId || this.administrationScreenService.isConfigurationMode,
+    //   panel: () => ConnectionAccess,
+    // });
 
     this.connectionFormService.formSubmittingTask.addHandler(executorHandlerFilter(data => this.isAccessTabActive(data.state), this.save.bind(this)));
 
