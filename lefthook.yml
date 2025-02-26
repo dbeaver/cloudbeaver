@@ -1,0 +1,5 @@
+pre-commit:
+  parallel: true
+  scripts:
+    "license-checker.sh":
+      runner: bash

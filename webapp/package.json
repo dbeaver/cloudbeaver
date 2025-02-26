@@ -21,9 +21,7 @@
     "lint": "eslint",
     "validate-dependencies": "core-cli-validate-dependencies './packages/*/'",
     "add-plugin": "core-cli-add-plugin",
-    "prepare": "cd .. && husky ./webapp/.husky",
-    "version:set": "yarn workspaces foreach -Ap --include '@cloudbeaver/product-*' run version:set",
-    "postinstall": "husky"
+    "version:set": "yarn workspaces foreach -Ap --include '@cloudbeaver/product-*' run version:set"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
@@ -37,7 +35,7 @@
     "@types/react-dom": "^19",
     "concurrently": "^9",
     "eslint": "^9",
-    "husky": "^9",
+    "lefthook": "^1",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "msw": "^2",
