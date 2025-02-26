@@ -1,9 +1,9 @@
-export const ButtonTokens = () => {
+export const Tokens = () => {
   return (
     <div className="tw:p-4 tw:my-4">
-      <h1 className="tw:text-2xl tw:font-bold">Button CSS Tokens</h1>
-      <p className="tw:text-base">This UI kit uses several CSS tokens to style buttons.</p>
-      <h2 className="tw:text-xl tw:font-semibold">Common buttons tokens</h2>
+      <h1>Button CSS Tokens</h1>
+      <p>This UI kit uses several CSS tokens to style buttons.</p>
+      <h2>Common buttons tokens</h2>
       <div className="tw:my-4">
         <div>
           <code>--dbv-kit-btn-height:</code> var(--dbv-kit-control-height-medium); <span className="comment"> Default button height</span>
@@ -63,127 +63,95 @@ export const ButtonTokens = () => {
         </div>
       </div>
       <div className="tw:my-4">
-        <h2 className="tw:text-xl tw:font-semibold">Specific buttons tokens</h2>
-        <h3 className="tw:text-lg tw:font-semibold">Button Sizes</h3>
-        <p className="tw:text-base">
+        <h2>Specific buttons tokens</h2>
+        <h3>Button Sizes</h3>
+        <p>
           The <code>--dbv-kit-btn-*-height</code> tokens are used to define the height of buttons for different size variants. Default buttons use{' '}
           <code>--control-height-*</code> variable as the base height.
         </p>
-        <p className="tw:text-base" style={{ height: 'var(--dbv-kit-btn-small-height)' }}>
+        <p style={{ height: 'var(--dbv-kit-btn-small-height)' }}>
           Small button height: <code>--dbv-kit-btn-small-height</code>
         </p>
-        <p className="tw:text-base" style={{ height: 'var(--dbv-kit-btn-medium-height)' }}>
+        <p style={{ height: 'var(--dbv-kit-btn-medium-height)' }}>
           Medium button height: <code>--dbv-kit-btn-medium-height</code>
         </p>
-        <p className="tw:text-base" style={{ height: 'var(--dbv-kit-btn-large-height)' }}>
+        <p style={{ height: 'var(--dbv-kit-btn-large-height)' }}>
           Large button height: <code>--dbv-kit-btn-large-height</code>
         </p>
-        <p className="tw:text-base" style={{ height: 'var(--dbv-kit-btn-xlarge-height)' }}>
+        <p style={{ height: 'var(--dbv-kit-btn-xlarge-height)' }}>
           Extra large button height: <code>--dbv-kit-btn-xlarge-height</code>
         </p>
       </div>
       <div className="tw:my-4">
-        <h3 className="tw:text-lg tw:font-semibold">Button Padding</h3>
-        <p className="tw:text-base">
+        <h3>Button Padding</h3>
+        <p>
           The <code>--dbv-kit-btn-*-padding-inline</code> tokens are used to define the padding of buttons for different size variants.
         </p>
-        <p className="tw:text-base">
+        <p>
           Small button padding: <code>--dbv-kit-btn-small-padding-inline</code>
         </p>
-        <p className="tw:text-base">
+        <p>
           Medium button padding: <code>--dbv-kit-btn-medium-padding-inline</code>
         </p>
-        <p className="tw:text-base">
+        <p>
           Large button padding: <code>--dbv-kit-btn-large-padding-inline</code>
         </p>
-        <p className="tw:text-base">
+        <p>
           Extra large button padding: <code>--dbv-kit-btn-xlarge-padding-inline</code>
         </p>
       </div>
       <div className="tw:my-4">
-        <h3 className="tw:text-lg tw:font-semibold">Button Colors</h3>
-        <p
-          className="tw:text-base"
-          style={{ backgroundColor: 'var(--dbv-kit-btn-primary-background)', color: 'var(--dbv-kit-btn-primary-foreground)' }}
-        >
+        <h3>Button Colors</h3>
+        <p style={{ backgroundColor: 'var(--dbv-kit-btn-primary-background)', color: 'var(--dbv-kit-btn-primary-foreground)' }}>
           Primary button background: <code>--dbv-kit-btn-primary-background</code>
         </p>
-        <p
-          className="tw:text-base"
-          style={{ backgroundColor: 'var(--dbv-kit-btn-primary-background-hover)', color: 'var(--dbv-kit-btn-primary-foreground)' }}
-        >
+        <p style={{ backgroundColor: 'var(--dbv-kit-btn-primary-background-hover)', color: 'var(--dbv-kit-btn-primary-foreground)' }}>
           Primary button background (hover): <code>--dbv-kit-btn-primary-background-hover</code>
         </p>
-        <p
-          className="tw:text-base"
-          style={{ backgroundColor: 'var(--dbv-kit-btn-primary-background-active)', color: 'var(--dbv-kit-btn-primary-foreground)' }}
-        >
+        <p style={{ backgroundColor: 'var(--dbv-kit-btn-primary-background-active)', color: 'var(--dbv-kit-btn-primary-foreground)' }}>
           Primary button background (active): <code>--dbv-kit-btn-primary-background-active</code>
         </p>
-        <p
-          className="tw:text-base"
-          style={{ backgroundColor: 'var(--dbv-kit-btn-secondary-background)', color: 'var(--dbv-kit-btn-secondary-foreground)' }}
-        >
+        <p style={{ backgroundColor: 'var(--dbv-kit-btn-secondary-background)', color: 'var(--dbv-kit-btn-secondary-foreground)' }}>
           Secondary button background: <code>--dbv-kit-btn-secondary-background</code>
         </p>
-        <p
-          className="tw:text-base"
-          style={{ backgroundColor: 'var(--dbv-kit-btn-secondary-background-hover)', color: 'var(--dbv-kit-btn-secondary-foreground)' }}
-        >
+        <p style={{ backgroundColor: 'var(--dbv-kit-btn-secondary-background-hover)', color: 'var(--dbv-kit-btn-secondary-foreground)' }}>
           Secondary button background (hover): <code>--dbv-kit-btn-secondary-background-hover</code>
         </p>
-        <p
-          className="tw:text-base"
-          style={{ backgroundColor: 'var(--dbv-kit-btn-secondary-background-active)', color: 'var(--dbv-kit-btn-secondary-foreground)' }}
-        >
+        <p style={{ backgroundColor: 'var(--dbv-kit-btn-secondary-background-active)', color: 'var(--dbv-kit-btn-secondary-foreground)' }}>
           Secondary button background (active): <code>--dbv-kit-btn-secondary-background-active</code>
         </p>
-        <p className="tw:text-base" style={{ borderColor: 'var(--dbv-kit-btn-secondary-border-color)', borderWidth: '1px', borderStyle: 'solid' }}>
+        <p style={{ borderColor: 'var(--dbv-kit-btn-secondary-border-color)', borderWidth: '1px', borderStyle: 'solid' }}>
           Secondary button border color: <code>--dbv-kit-btn-secondary-border-color</code>
         </p>
-        <p
-          className="tw:text-base"
-          style={{ backgroundColor: 'var(--dbv-kit-btn-danger-background)', color: 'var(--dbv-kit-btn-danger-foreground)' }}
-        >
+        <p style={{ backgroundColor: 'var(--dbv-kit-btn-danger-background)', color: 'var(--dbv-kit-btn-danger-foreground)' }}>
           Danger button background: <code>--dbv-kit-btn-danger-background</code>
         </p>
-        <p
-          className="tw:text-base"
-          style={{ backgroundColor: 'var(--dbv-kit-btn-danger-background-hover)', color: 'var(--dbv-kit-btn-danger-foreground)' }}
-        >
+        <p style={{ backgroundColor: 'var(--dbv-kit-btn-danger-background-hover)', color: 'var(--dbv-kit-btn-danger-foreground)' }}>
           Danger button background (hover): <code>--dbv-kit-btn-danger-background-hover</code>
         </p>
-        <p
-          className="tw:text-base"
-          style={{ backgroundColor: 'var(--dbv-kit-btn-danger-background-active)', color: 'var(--dbv-kit-btn-danger-foreground)' }}
-        >
+        <p style={{ backgroundColor: 'var(--dbv-kit-btn-danger-background-active)', color: 'var(--dbv-kit-btn-danger-foreground)' }}>
           Danger button background (active): <code>--dbv-kit-btn-danger-background-active</code>
         </p>
-        <p className="tw:text-base">
+        <p>
           The <code>--dbv-kit-btn-*-background</code> and <code>--dbv-kit-btn-*-foreground</code> tokens are used to define the background and text
           color of buttons for different variants (primary, secondary, danger).
         </p>
-        <p className="tw:text-base">
+        <p>
           To set another background or text color for your button, you can override the respective <code>--dbv-kit-btn-*</code> tokens in your CSS.
         </p>
       </div>
       <div className="tw:my-4">
-        <h3 className="tw:text-lg tw:font-semibold">Button Borders</h3>
-        <p
-          className="tw:text-base"
-          style={{ borderWidth: 'var(--dbv-kit-btn-border-width)', borderColor: 'var(--dbv-kit-btn-border-color)', borderStyle: 'solid' }}
-        >
+        <h3>Button Borders</h3>
+        <p style={{ borderWidth: 'var(--dbv-kit-btn-border-width)', borderColor: 'var(--dbv-kit-btn-border-color)', borderStyle: 'solid' }}>
           Button border width: <code>--dbv-kit-btn-border-width</code>
         </p>
-        <p className="tw:text-base">
+        <p>
           The <code>--dbv-kit-btn-border-width</code> token is used to define the border width of buttons.
         </p>
-        <p className="tw:text-base">
+        <p>
           To change the border size of your button, you can override the <code>--dbv-kit-btn-border-width</code> token in your CSS.
         </p>
       </div>
     </div>
   );
 };
-
-ButtonTokens.storyName = 'Buttons';

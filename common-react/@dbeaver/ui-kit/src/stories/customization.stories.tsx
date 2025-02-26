@@ -7,7 +7,7 @@ export const HowToCustomize = () => {
       <p>DBeaver UI Kit components have basic styles and use some defaults from Tailwind CSS. To change styling you can use different approaches.</p>
       <h2>Global CSS Tokens</h2>
       <p>
-        UI kit uses several global CSS tokens described on the <a href="/?story=design-tokens--global">Global Tokens page</a>. These tokens help
+        UI kit uses several global CSS tokens described on the <a href="/?story=customization--tokens">Global Tokens page</a>. These tokens help
         maintain consistency across the UI components. All DBeaver UI tokens are prefixed with <code>--dbv-kit-</code>. You can use these tokens to
         customize the UI kit to fit your application's design. For example, changing the <code>--dbv-kit-font-size-base</code> token will change the
         base font size for text in the UI kit. And changing the <code>--dbv-kit-control-height-base</code> token will change all control heights. If
@@ -16,7 +16,7 @@ export const HowToCustomize = () => {
       </p>
       <h2>Component CSS Tokens</h2>
       <p>
-        Some components have their own tokens. For example, the Button component <a href="?story=button--7-tokens">has tokens </a> for button sizes,
+        Some components have their own tokens. For example, the Button component <a href="?story=button--tokens">has tokens </a> for button sizes,
         padding, and colors. You can change these tokens to customize the Button component.
       </p>
       <h2>Component CSS Classes</h2>

@@ -9,7 +9,39 @@
 import { Checkbox } from '../../../Checkbox/Checkbox.js';
 import './styles.css';
 
-export const CheckboxStory = () => (
+export const Documentation = () => (
+  <div>
+    <h1>Checkbox</h1>
+    <p>
+      The Checkbox component is a simple checkbox that can be used in different contexts. It has several visual parameters that can be customized.
+    </p>
+    <h2>Class names</h2>
+    <p>
+      <code>.dbv-kit-checkbox</code> - the main class name for the checkbox component. <br />
+      <code>.dbv-kit-checkbox--small</code> - the class name for the small size. <br />
+      <code>.dbv-kit-checkbox--medium</code> - the class name for the medium size. <br />
+      <code>.dbv-kit-checkbox--large</code> - the class name for the large size. <br />
+      <code>.dbv-kit-checkbox--xlarge</code> - the class name for the extra large size. <br />
+      <code>.dbv-kit-checkbox__check</code> - the class name for the checkmark component. <br />
+      <code>.dbv-kit-checkbox__text</code> - the class name for the text component. <br />
+    </p>
+    <p>
+      Underlying components docs: <br />
+      <a target="_blank" href="https://ariakit.org/reference/checkbox">
+        https://ariakit.org/reference/checkbox
+      </a>
+    </p>
+    <h3>Props:</h3>
+    <dl>
+      <dt className="tw:font-bold">size</dt>
+      <dd>small | medium | large | xlarge</dd>
+      <dt className="tw:font-bold">icon</dt>
+      <dd>React.ReactNode</dd>
+    </dl>
+  </div>
+);
+
+export const States = () => (
   <div className="tw:flex tw:flex-col tw:space-y-4">
     <Checkbox> Unchecked </Checkbox>
     <Checkbox defaultChecked> Default Checked </Checkbox>
@@ -50,3 +82,129 @@ export const WithCustomIcon = () => (
     </Checkbox>
   </div>
 );
+
+export const Tokens = () => {
+  return (
+    <div className="tw:p-4 tw:my-4">
+      <h1>Checkbox CSS Tokens</h1>
+      <p>This UI kit uses several CSS tokens to style checkboxes.</p>
+      <h2>Common checkbox tokens</h2>
+      <div className="tw:my-4">
+        <div>
+          <code>--dbv-kit-checkbox-height:</code> var(--dbv-kit-control-height-medium); <span className="comment"> Default checkbox height</span>
+        </div>
+        <div>
+          <code>--dbv-kit-checkbox-gap:</code> calc(var(--tw-spacing) * 1.25); <span className="comment"> Gap between checkbox elements</span>
+        </div>
+        <div>
+          <code>--dbv-kit-checkbox-foreground:</code> var(--tw-color-white); <span className="comment"> Default checkbox text color</span>
+        </div>
+        <div>
+          <code>--dbv-kit-checkbox-background:</code> transparent; <span className="comment"> Default checkbox background color</span>
+        </div>
+        <div>
+          <code>--dbv-kit-checkbox-background-checked:</code> var(--dbv-kit-color-primary-600);{' '}
+          <span className="comment"> Checkbox background color when checked</span>
+        </div>
+        <div>
+          <code>--dbv-kit-checkbox-background-hover:</code> var(--dbv-kit-color-primary-100);{' '}
+          <span className="comment"> Checkbox background color on hover</span>
+        </div>
+        <div>
+          <code>--dbv-kit-checkbox-background-active:</code> var(--dbv-kit-color-primary-800);{' '}
+          <span className="comment"> Checkbox background color when active</span>
+        </div>
+        <div>
+          <code>--dbv-kit-checkbox-border-width:</code> var(--dbv-kit-control-border-width); <span className="comment"> Checkbox border width</span>
+        </div>
+        <div>
+          <code>--dbv-kit-checkbox-border-radius:</code> var(--dbv-kit-control-border-radius);{' '}
+          <span className="comment"> Checkbox border radius</span>
+        </div>
+        <div>
+          <code>--dbv-kit-checkbox-border-style:</code> solid; <span className="comment"> Checkbox border style</span>
+        </div>
+        <div>
+          <code>--dbv-kit-checkbox-border-color:</code> var(--tw-color-gray-300); <span className="comment"> Checkbox border color</span>
+        </div>
+        <div>
+          <code>--dbv-kit-checkbox-border-color-checked:</code> var(--dbv-kit-color-primary-600);{' '}
+          <span className="comment"> Checkbox border color when checked</span>
+        </div>
+        <div>
+          <code>--dbv-kit-checkbox-font-weight:</code> var(--tw-font-weight-normal); <span className="comment"> Checkbox font weight</span>
+        </div>
+        <div>
+          <code>--dbv-kit-checkbox-font-size:</code> calc(var(--dbv-kit-font-size-base) * 0.875); <span className="comment"> Checkbox font size</span>
+        </div>
+      </div>
+      <div className="tw:my-4">
+        <h2>Specific checkbox tokens</h2>
+        <h3>Checkbox Sizes</h3>
+        <p>
+          The <code>--dbv-kit-checkbox-*-height</code> tokens are used to define the height of checkboxes for different size variants.
+        </p>
+        <p style={{ height: 'var(--dbv-kit-checkbox-small-height)' }}>
+          Small checkbox height: <code>--dbv-kit-checkbox-small-height</code>
+        </p>
+        <p style={{ height: 'var(--dbv-kit-checkbox-medium-height)' }}>
+          Medium checkbox height: <code>--dbv-kit-checkbox-medium-height</code>
+        </p>
+        <p style={{ height: 'var(--dbv-kit-checkbox-large-height)' }}>
+          Large checkbox height: <code>--dbv-kit-checkbox-large-height</code>
+        </p>
+        <p style={{ height: 'var(--dbv-kit-checkbox-xlarge-height)' }}>
+          Extra large checkbox height: <code>--dbv-kit-checkbox-xlarge-height</code>
+        </p>
+      </div>
+      <div className="tw:my-4">
+        <h3>Checkbox Gap</h3>
+        <p>
+          The <code>--dbv-kit-checkbox-*-gap</code> tokens are used to define the gap between checkbox elements for different size variants.
+        </p>
+        <p>
+          Small checkbox gap: <code>--dbv-kit-checkbox-small-gap</code>
+        </p>
+        <p>
+          Medium checkbox gap: <code>--dbv-kit-checkbox-medium-gap</code>
+        </p>
+        <p>
+          Large checkbox gap: <code>--dbv-kit-checkbox-large-gap</code>
+        </p>
+        <p>
+          Extra large checkbox gap: <code>--dbv-kit-checkbox-xlarge-gap</code>
+        </p>
+      </div>
+      <div className="tw:my-4">
+        <h3>Checkbox Colors</h3>
+        <p style={{ backgroundColor: 'var(--dbv-kit-checkbox-background-checked)', color: 'var(--dbv-kit-checkbox-foreground)' }}>
+          Checked checkbox background: <code>--dbv-kit-checkbox-background-checked</code>
+        </p>
+        <p style={{ backgroundColor: 'var(--dbv-kit-checkbox-background-hover)', color: 'var(--dbv-kit-checkbox-foreground)' }}>
+          Checkbox background (hover): <code>--dbv-kit-checkbox-background-hover</code>
+        </p>
+        <p style={{ backgroundColor: 'var(--dbv-kit-checkbox-background-active)', color: 'var(--dbv-kit-checkbox-foreground)' }}>
+          Checkbox background (active): <code>--dbv-kit-checkbox-background-active</code>
+        </p>
+        <p style={{ borderColor: 'var(--dbv-kit-checkbox-border-color)', borderWidth: '1px', borderStyle: 'solid' }}>
+          Checkbox border color: <code>--dbv-kit-checkbox-border-color</code>
+        </p>
+        <p style={{ borderColor: 'var(--dbv-kit-checkbox-border-color-checked)', borderWidth: '1px', borderStyle: 'solid' }}>
+          Checked checkbox border color: <code>--dbv-kit-checkbox-border-color-checked</code>
+        </p>
+      </div>
+      <div className="tw:my-4">
+        <h3>Checkbox Borders</h3>
+        <p>
+          Checkbox border width: <code>--dbv-kit-checkbox-border-width</code>
+        </p>
+        <p>
+          The <code>--dbv-kit-checkbox-border-width</code> token is used to define the border width of checkboxes.
+        </p>
+        <p>
+          To change the border size of your checkbox, you can override the <code>--dbv-kit-checkbox-border-width</code> token in your CSS.
+        </p>
+      </div>
+    </div>
+  );
+};
