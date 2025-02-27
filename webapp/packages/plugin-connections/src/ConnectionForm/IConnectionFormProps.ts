@@ -59,11 +59,6 @@ export interface IConnectionFormProps {
   onCancel?: () => void;
 }
 
-export interface IConnectionFormFillConfigData {
-  updated: boolean;
-  state: IConnectionFormState;
-}
-
 export interface IConnectionFormSubmitData {
   submitType: 'submit' | 'test';
   state: IConnectionFormState;

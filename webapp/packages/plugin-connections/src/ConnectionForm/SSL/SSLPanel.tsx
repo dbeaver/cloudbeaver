@@ -7,31 +7,43 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { useResource } from '@cloudbeaver/core-blocks';
+import { useAutoLoad, useResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { TabContainerTabComponent } from '@cloudbeaver/core-ui';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps.js';
 import { getSSLDefaultConfig } from './getSSLDefaultConfig.js';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { SSL } from './SSL.js';
+import type { ConnectionFormRefactoredProps } from '../ConnectionFormServiceRefactored.js';
+import { getConnectionFormSSLPart } from './getConnectionFormSSLPart.js';
 
-export const SSLPanel: TabContainerTabComponent<IConnectionFormProps> = observer(function SSLPanel(props) {
+export const SSLPanel: TabContainerTabComponent<ConnectionFormRefactoredProps> = observer(function SSLPanel(props) {
   const networkHandlerResource = useResource(SSLPanel, NetworkHandlerResource, CachedMapAllKey);
-  const dbDriverResource = useResource(SSLPanel, DBDriverResource, props.state.config.driverId ?? null);
+  const dbDriverResource = useResource(SSLPanel, DBDriverResource, props.formState.state.config.driverId ?? null);
+  const SSLPart = getConnectionFormSSLPart(props.formState);
 
   const handler = getSSLDriverHandler(networkHandlerResource.resource.values, dbDriverResource.data?.applicableNetworkHandlers ?? []);
 
-  if (props.state.configured && handler && !props.state.config.networkHandlersConfig?.some(state => state.id === handler?.id)) {
-    props.state.config.networkHandlersConfig?.push(getSSLDefaultConfig(handler.id));
+  if (SSLPart.isLoaded() && handler && !props.formState.state.config.networkHandlersConfig?.some(state => state.id === handler?.id)) {
+    props.formState.state.config.networkHandlersConfig?.push(getSSLDefaultConfig(handler.id));
   }
 
-  const handlerState = props.state.config.networkHandlersConfig?.find(h => h.id === handler?.id);
+  const handlerState = props.formState.state.config.networkHandlersConfig?.find(h => h.id === handler?.id);
+
+  useAutoLoad(SSLPanel, [SSLPart]);
 
   if (!handler || !handlerState) {
     return null;
   }
 
-  return <SSL {...props} handler={handler} handlerState={handlerState} />;
+  return (
+    <SSL
+      {...props}
+      sharedCredentials={Boolean(props.formState.state.config.sharedCredentials)}
+      template={Boolean(props.formState.state.config.template)}
+      handler={handler}
+      handlerState={handlerState}
+    />
+  );
 });

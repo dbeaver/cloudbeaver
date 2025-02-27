@@ -9,24 +9,29 @@ import { observer } from 'mobx-react-lite';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { Button, getComputed, type PlaceholderComponent, useResource, useTranslate, useAuthenticationAction } from '@cloudbeaver/core-blocks';
-import { DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, createConnectionParam, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import type { ConnectionFormRefactoredProps } from '../ConnectionFormServiceRefactored.js';
+import { useService } from '@cloudbeaver/core-di';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps.js';
-
-export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormAuthenticationAction({ state }) {
+export const AuthenticationButton: PlaceholderComponent<ConnectionFormRefactoredProps> = observer(function ConnectionFormAuthenticationAction({
+  formState,
+}) {
   const translate = useTranslate();
-  const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, state.config.driverId || null);
+  const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, formState.state.config.driverId || null);
+  const connectionInfoService = useService(ConnectionInfoResource);
+  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
 
   const driver = driverMap.data;
   const { data: authModel } = useResource(
     ConnectionFormAuthenticationAction,
     DatabaseAuthModelsResource,
-    getComputed(() => state.config.authModelId || state.info?.authModel || driver?.defaultAuthModel || null),
+    getComputed(() => formState.state.config.authModelId || info?.authModel || driver?.defaultAuthModel || null),
   );
 
   const authentication = useAuthenticationAction({
-    providerId: authModel?.requiredAuth ?? state.info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
-    onAuthenticate: () => state.loadConnectionInfo(),
+    providerId: authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
+    // TODO should we remove it?
+    // onAuthenticate: () => state.loadConnectionInfo(),
   });
 
   if (authentication.authorized) {
@@ -34,27 +39,29 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
   }
 
   return (
-    <Button type="button" disabled={state.disabled} mod={['outlined']} onClick={authentication.auth}>
+    <Button type="button" disabled={formState.isDisabled} mod={['outlined']} onClick={authentication.auth}>
       {translate('authentication_authenticate')}
     </Button>
   );
 });
 
-export const ConnectionFormAuthenticationAction: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormAuthenticationAction({
-  state,
-}) {
-  const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, state.config.driverId || null);
+export const ConnectionFormAuthenticationAction: PlaceholderComponent<ConnectionFormRefactoredProps> = observer(
+  function ConnectionFormAuthenticationAction({ formState }) {
+    const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, formState.state.config.driverId || null);
+    const connectionInfoService = useService(ConnectionInfoResource);
+    const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
 
-  const driver = driverMap.data;
-  const { data: authModel } = useResource(
-    ConnectionFormAuthenticationAction,
-    DatabaseAuthModelsResource,
-    getComputed(() => state.config.authModelId || state.info?.authModel || driver?.defaultAuthModel || null),
-  );
+    const driver = driverMap.data;
+    const { data: authModel } = useResource(
+      ConnectionFormAuthenticationAction,
+      DatabaseAuthModelsResource,
+      getComputed(() => formState.state.config.authModelId || info?.authModel || driver?.defaultAuthModel || null),
+    );
 
-  if (!authModel?.requiredAuth && !state.info?.requiredAuth) {
-    return null;
-  }
+    if (!authModel?.requiredAuth && !info?.requiredAuth) {
+      return null;
+    }
 
-  return <AuthenticationButton state={state} />;
-});
+    return <AuthenticationButton formState={formState} />;
+  },
+);

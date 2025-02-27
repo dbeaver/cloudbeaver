@@ -6,22 +6,22 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
 
 import { ExceptionMessage, Form, Loader, Placeholder, s, StatusMessage, useExecutor, useForm, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
+import { formStatusContext, formValidationContext, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormActionsContext, type IConnectionFormActionsContext } from './ConnectFormActionsContext.js';
 import style from './ConnectionForm.module.css';
-import { ConnectionFormService } from './ConnectionFormService.js';
 import { connectionConfigContext } from './Contexts/connectionConfigContext.js';
-import type { IConnectionFormState } from './IConnectionFormProps.js';
+import type { ConnectionFormStateRefactored } from './ConnectionFormStateRefactored.js';
+import { getFirstException } from '@cloudbeaver/core-utils';
+import { ConnectionFormServiceRefactored } from './ConnectionFormServiceRefactored.js';
 
 export interface ConnectionFormProps {
-  state: IConnectionFormState;
+  state: ConnectionFormStateRefactored;
   onCancel?: () => void;
   onSave?: (config: ConnectionConfig) => void;
   className?: string;
@@ -29,15 +29,21 @@ export interface ConnectionFormProps {
 
 export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionForm({ state, onCancel, onSave = () => {}, className }) {
   const props = useObjectRef({ onSave });
-  const service = useService(ConnectionFormService);
+  const service = useService(ConnectionFormServiceRefactored);
   const styles = useS(style);
 
   const form = useForm({
     onSubmit: event => {
       if (event?.type === 'test') {
-        state.test();
+        state.setState({
+          ...state.state,
+          submitType: 'test',
+        });
       } else {
-        state.save();
+        state.setState({
+          ...state.state,
+          submitType: 'submit',
+        });
       }
     },
   });
@@ -48,51 +54,48 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   }));
 
   useExecutor({
-    executor: state.submittingTask,
+    executor: state.submitTask,
     postHandlers: [
       function save(data, contexts) {
-        const validation = contexts.getContext(service.connectionValidationContext);
-        const state = contexts.getContext(service.connectionStatusContext);
+        const validation = contexts.getContext(formValidationContext);
+        const state = contexts.getContext(formStatusContext);
         const config = contexts.getContext(connectionConfigContext);
 
-        if (validation.valid && state.saved && data.submitType === 'submit') {
+        if (validation.valid && state.saved && data.state.submitType === 'submit') {
           props.onSave(config);
         }
       },
     ],
   });
 
-  useEffect(() => {
-    state.loadConnectionInfo();
-  }, [state]);
-
-  if (state.initError) {
-    return <ExceptionMessage exception={state.initError} onRetry={() => state.loadConnectionInfo()} />;
+  if (getFirstException(state.exception)) {
+    return <ExceptionMessage exception={getFirstException(state.exception)} />;
   }
 
-  if (!state.configured) {
-    return (
-      <div className={s(styles, { box: true }, className)}>
-        <Loader />
-      </div>
-    );
-  }
+  // should we delete it?
+  // if (!state.configured) {
+  //   return (
+  //     <div className={s(styles, { box: true }, className)}>
+  //       <Loader />
+  //     </div>
+  //   );
+  // }
 
   return (
     <Form context={form} contents>
-      <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
+      <TabsState container={service.parts} localState={state.parts} formState={state}>
         <div className={s(styles, { box: true }, className)}>
           <div className={s(styles, { connectionTopBar: true })}>
             <div className={s(styles, { connectionTopBarTabs: true })}>
               <div className={s(styles, { connectionStatusMessage: true })}>
                 <StatusMessage type={ENotificationType.Info} message={state.statusMessage} />
               </div>
-              <TabList className={s(styles, { tabList: true })} disabled={state.disabled} underline big />
+              <TabList className={s(styles, { tabList: true })} disabled={state.isDisabled} underline big />
             </div>
             <div className={s(styles, { connectionTopBarActions: true })}>
               <Loader suspense inline hideMessage hideException>
                 <ConnectionFormActionsContext.Provider value={actionsContext}>
-                  <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+                  <Placeholder container={service.actionsContainer} formState={state} />
                 </ConnectionFormActionsContext.Provider>
               </Loader>
             </div>

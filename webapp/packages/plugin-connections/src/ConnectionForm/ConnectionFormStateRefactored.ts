@@ -8,7 +8,7 @@
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import { FormState } from '@cloudbeaver/core-ui';
 
-import type { ConnectionFormServiceRefactored } from './ConnectionFormServiceRefactored.js';
+import { ConnectionFormServiceRefactored } from './ConnectionFormServiceRefactored.js';
 import type { IConnectionFormStateRefactored } from './IConnectionFormStateRefactored.js';
 
 export class ConnectionFormStateRefactored extends FormState<IConnectionFormStateRefactored> {

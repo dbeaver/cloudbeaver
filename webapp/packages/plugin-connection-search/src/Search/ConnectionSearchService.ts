@@ -8,20 +8,14 @@
 import { makeObservable, observable } from 'mobx';
 
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
-import {
-  ConnectionInfoOriginResource,
-  ConnectionInfoResource,
-  ConnectionsManagerService,
-  createConnectionParam,
-} from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
+import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
-import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
-import { ConnectionFormService, ConnectionFormState, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormServiceRefactored, ConnectionFormStateRefactored } from '@cloudbeaver/plugin-connections';
 
 import { SearchDatabase } from './SearchDatabase.js';
 
@@ -34,18 +28,16 @@ export class ConnectionSearchService {
 
   disabled = false;
 
-  formState: IConnectionFormState | null = null;
+  formState: ConnectionFormStateRefactored | null = null;
 
   constructor(
     private readonly notificationService: NotificationService,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly connectionFormService: ConnectionFormService,
+    private readonly serviceProvider: IServiceProvider,
     private readonly optionsPanelService: OptionsPanelService,
+    private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored,
     private readonly commonDialogService: CommonDialogService,
-    private readonly projectsService: ProjectsService,
-    private readonly projectInfoResource: ProjectInfoResource,
     private readonly connectionsManagerService: ConnectionsManagerService,
-    private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
   ) {
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
 
@@ -114,16 +106,14 @@ export class ConnectionSearchService {
     if (
       !this.formState ||
       !this.optionsPanelService.isOpen(formGetter) ||
-      (this.formState.config.connectionId &&
-        this.formState.projectId !== null &&
-        !this.connectionInfoResource.has(createConnectionParam(this.formState.projectId, this.formState.config.connectionId)))
+      (this.formState.state.config.connectionId &&
+        this.formState.state.projectId !== null &&
+        !this.connectionInfoResource.has(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId)))
     ) {
       return true;
     }
 
-    const state = await this.formState.checkFormState();
-
-    if (!state?.edited) {
+    if (!this.formState.isChanged) {
       return true;
     }
 
@@ -157,32 +147,29 @@ export class ConnectionSearchService {
     }
 
     if (!this.formState) {
-      this.formState = new ConnectionFormState(
-        this.projectsService,
-        this.projectInfoResource,
-        this.connectionFormService,
-        this.connectionInfoResource,
-        this.connectionInfoOriginResource,
-      );
+      this.formState = new ConnectionFormStateRefactored(this.serviceProvider, this.connectionFormServiceRefactored, {
+        config: {
+          ...this.connectionInfoResource.getEmptyConfig(),
+          host: database.host,
+          port: String(database.port),
+          driverId: database.defaultDriver,
+        },
+        // TODO remove it?
+        submitType: null,
+        projectId: projects[0]!.id,
+        availableDrivers: database.possibleDrivers,
+        type: 'public',
+      });
 
-      this.formState.closeTask.addHandler(this.goBack.bind(this));
+      // this.formState.closeTask.addHandler(this.goBack.bind(this));
     }
 
-    this.formState
-      .setOptions('create', 'public')
-      .setConfig(projects[0]!.id, {
-        ...this.connectionInfoResource.getEmptyConfig(),
-        driverId: database.defaultDriver,
-        host: database.host,
-        port: `${database.port}`,
-      })
-      .setAvailableDrivers(database.possibleDrivers);
-
-    this.formState.load();
+    // this.formState.load();
   }
 
   private clearFormState() {
-    this.formState?.dispose();
+    // TODO dispose form state once we have this API
+    // this.formState?.dispose();
     this.formState = null;
   }
 }

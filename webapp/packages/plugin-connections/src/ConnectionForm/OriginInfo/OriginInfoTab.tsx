@@ -7,16 +7,23 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Translate } from '@cloudbeaver/core-blocks';
+import { Translate, useResource } from '@cloudbeaver/core-blocks';
 import { Tab, type TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps.js';
+import type { ConnectionFormRefactoredProps } from '../ConnectionFormServiceRefactored.js';
+import { ConnectionInfoOriginResource, createConnectionParam } from '@cloudbeaver/core-connections';
 
-export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = observer(function OriginInfoTab({ state: { originInfo }, ...rest }) {
+export const OriginInfoTab: TabContainerTabComponent<ConnectionFormRefactoredProps> = observer(function OriginInfoTab({ formState, ...rest }) {
+  const originInfo = useResource(
+    OriginInfoTab,
+    ConnectionInfoOriginResource,
+    createConnectionParam(formState.state.projectId, formState.state.config.connectionId!),
+  );
+
   return (
     <Tab {...rest}>
       <TabTitle>
-        <Translate token={originInfo?.origin?.displayName || 'Origin'} />
+        <Translate token={originInfo.data?.origin?.displayName || 'Origin'} />
       </TabTitle>
     </Tab>
   );

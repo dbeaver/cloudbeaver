@@ -9,6 +9,7 @@ import { schema } from '@cloudbeaver/core-utils';
 
 const CONNECTION_FORM_ACCESS_SCHEMA = schema.object({
   grantedSubjects: schema.array(schema.string()),
+  editing: schema.boolean(),
 });
 
 export type IConnectionFormAccessState = schema.infer<typeof CONNECTION_FORM_ACCESS_SCHEMA>;

@@ -10,11 +10,16 @@ import { observer } from 'mobx-react-lite';
 import { SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps.js';
 import { SSH } from './SSH.js';
+import type { ConnectionFormRefactoredProps } from '../ConnectionFormServiceRefactored.js';
+import { useAutoLoad } from '@cloudbeaver/core-blocks';
+import { getConnectionFormSSHPart } from './getConnectionFormSSHPart.js';
 
-export const SSHPanel: TabContainerPanelComponent<IConnectionFormProps> = observer(function SSHPanel(props) {
-  const state = props.state.config.networkHandlersConfig?.find(state => state.id === SSH_TUNNEL_ID);
+export const SSHPanel: TabContainerPanelComponent<ConnectionFormRefactoredProps> = observer(function SSHPanel(props) {
+  const SSHPart = getConnectionFormSSHPart(props.formState);
+  const state = props.formState.state.config.networkHandlersConfig?.find(state => state.id === SSH_TUNNEL_ID);
+
+  useAutoLoad(SSHPanel, SSHPart);
 
   if (!state) {
     return null;

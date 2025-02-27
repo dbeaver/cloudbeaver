@@ -34,8 +34,17 @@ import {
   useS,
   useTranslate,
   useAuthenticationAction,
+  useAutoLoad,
 } from '@cloudbeaver/core-blocks';
-import { DatabaseAuthModelsResource, type DBDriver, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
+import {
+  ConnectionInfoOriginResource,
+  ConnectionInfoResource,
+  createConnectionParam,
+  DatabaseAuthModelsResource,
+  type DBDriver,
+  DBDriverResource,
+  isLocalConnection,
+} from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { EAdminPermission, ServerConfigResource } from '@cloudbeaver/core-root';
@@ -46,14 +55,14 @@ import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
 import { ConnectionAuthModelCredentialsForm } from '../ConnectionAuthModelCredentials/ConnectionAuthModelCredentialsForm.js';
 import { ConnectionAuthModelSelector } from '../ConnectionAuthModelCredentials/ConnectionAuthModelSelector.js';
-import { ConnectionFormService } from '../ConnectionFormService.js';
-import type { IConnectionFormProps } from '../IConnectionFormProps.js';
 import { CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID } from '../SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID.js';
 import { AdvancedPropertiesForm } from './AdvancedPropertiesForm.js';
 import styles from './Options.module.css';
 import { ParametersForm } from './ParametersForm.js';
 import { ProviderPropertiesForm } from './ProviderPropertiesForm.js';
 import { useOptions } from './useOptions.js';
+import type { ConnectionFormRefactoredProps } from '../ConnectionFormServiceRefactored.js';
+import { getConnectionFormOptionsPart } from './getConnectionFormOptionsPart.js';
 
 const PROFILE_AUTH_MODEL_ID = 'profile';
 
@@ -77,30 +86,34 @@ const driverConfiguration: IDriverConfiguration[] = [
     isVisible: driver => driver.configurationTypes.includes(DriverConfigurationType.Url),
   },
 ];
-
-export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({ state }) {
+// TODO fix the bug with incorrect selected driverId by default in combobox. also type
+export const Options: TabContainerPanelComponent<ConnectionFormRefactoredProps> = observer(function Options({ formState }) {
   const isAdmin = usePermission(EAdminPermission.admin);
   const serverConfigResource = useResource(Options, ServerConfigResource, undefined);
   const projectInfoResource = useService(ProjectInfoResource);
-  const service = useService(ConnectionFormService);
   const formRef = useRef<HTMLFormElement>(null);
   const translate = useTranslate();
-  const { info, originInfo, config, availableDrivers, submittingTask: submittingHandlers, disabled } = state;
   const style = useS(styles);
   const tabsState = useContext(TabsContext);
-  const isSharedProject = projectInfoResource.isProjectShared(state.projectId);
+  const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
+  const connectionInfoService = useService(ConnectionInfoResource);
+  const connectionInfoOriginResource = useService(ConnectionInfoOriginResource);
+  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
+  const originInfo = connectionInfoOriginResource.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
+  const optionsPart = getConnectionFormOptionsPart(formState);
+  const config = optionsPart.state;
 
   //@TODO it's here until the profile implementation in the CloudBeaver
-  const readonly = state.readonly || info?.authModel === PROFILE_AUTH_MODEL_ID;
+  const readonly = formState.isDisabled || info?.authModel === PROFILE_AUTH_MODEL_ID;
 
-  useFormValidator(submittingHandlers.for(service.formValidationTask), formRef.current);
-  const optionsHook = useOptions(state);
+  useFormValidator(formState.validationTask, formRef.current);
+  const optionsHook = useOptions(optionsPart.state, info, formState.mode);
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
   const driverMap = useResource(
     Options,
     DBDriverResource,
-    { key: config.driverId || null, includes: ['includeProviderProperties', 'includeMainProperties'] as const },
+    { key: formState.state.config.driverId || null, includes: ['includeProviderProperties', 'includeMainProperties'] as const },
     {
       onData: data => {
         optionsHook.setDefaults(data);
@@ -152,7 +165,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     providerId: authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
   });
 
-  const edit = state.mode === 'edit';
+  const edit = formState.mode === 'edit';
   const originLocal = !info || (originInfo?.origin && isLocalConnection(originInfo.origin));
 
   const drivers = driverMap.resource.enabledDrivers.filter(({ id, driverInstalled }) => {
@@ -160,8 +173,15 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
       return false;
     }
 
-    return availableDrivers.includes(id);
+    return formState.state.availableDrivers.includes(id);
   });
+
+  function setProject(projectId: string) {
+    formState.setState({
+      ...formState.state,
+      projectId,
+    });
+  }
 
   let properties = authModel?.properties;
 
@@ -175,6 +195,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     event.preventDefault();
     tabsState?.open(CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID);
   }
+
+  useAutoLoad(Options, optionsPart);
 
   return (
     <Form ref={formRef} className={s(style, { form: true })} disabled={driverMap.isLoading()} onChange={handleFormChange}>
@@ -199,7 +221,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   iconSelector={driver => driver.icon}
                   searchable={drivers.length > 10}
                   readOnly={readonly || edit || drivers.length < 2}
-                  disabled={disabled}
+                  disabled={formState.isDisabled}
                   loading={driverMap.isLoading()}
                   tiny
                   fill
@@ -233,7 +255,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   type="text"
                   name="url"
                   state={config}
-                  readOnly={readonly || disabled}
+                  readOnly={readonly || formState.isDisabled}
                   autoComplete={`section-${config.driverId || 'driver'} section-jdbc`}
                 >
                   {translate('plugin_connections_connection_form_part_main_url_jdbc')}
@@ -245,7 +267,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   <ObjectPropertyInfoForm
                     state={config.mainPropertyValues}
                     properties={driver.mainProperties ?? EMPTY_ARRAY}
-                    disabled={disabled}
+                    disabled={formState.isDisabled}
                     readOnly={readonly}
                   />
                 ) : (
@@ -253,7 +275,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                     config={config}
                     embedded={driver?.embedded}
                     requiresServerName={driver?.requiresServerName}
-                    disabled={disabled}
+                    disabled={formState.isDisabled}
                     readOnly={readonly}
                     originLocal={originLocal}
                   />
@@ -262,16 +284,16 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           </Group>
           <Group form gap>
             <Container wrap gap>
-              <InputField type="text" name="name" minLength={1} state={config} readOnly={readonly || disabled} required fill>
+              <InputField type="text" name="name" minLength={1} state={config} readOnly={readonly || formState.isDisabled} required fill>
                 {translate('connections_connection_name')}
               </InputField>
               {!config.template && (
                 <ProjectSelect
-                  value={state.projectId}
+                  value={formState.state.projectId}
                   readOnly={readonly || edit}
-                  disabled={disabled}
+                  disabled={formState.isDisabled}
                   autoHide
-                  onChange={projectId => state.setProject(projectId)}
+                  onChange={setProject}
                 />
               )}
               {!config.template && (
@@ -289,7 +311,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 </InputField>
               )}
             </Container>
-            <Textarea name="description" rows={3} state={config} readOnly={readonly || disabled}>
+            <Textarea name="description" rows={3} state={config} readOnly={readonly || formState.isDisabled}>
               {translate('connections_connection_description')}
             </Textarea>
           </Group>
@@ -304,7 +326,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   name="sharedCredentials"
                   title={translate('connections_connection_share_credentials_tooltip')}
                   state={config}
-                  disabled={disabled || readonly}
+                  disabled={formState.isDisabled || readonly}
                   keepSize
                 >
                   {translate('connections_connection_share_credentials')}
@@ -315,7 +337,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 applicableAuthModels={applicableAuthModels}
                 readonlyAuthModelId={!originLocal}
                 readonly={readonly}
-                disabled={disabled}
+                disabled={formState.isDisabled}
                 onAuthModelChange={handleAuthModelSelect}
               />
               {!sharedCredentials ? (
@@ -325,7 +347,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                       credentials={config.credentials}
                       properties={properties}
                       readonly={readonly}
-                      disabled={disabled}
+                      disabled={formState.isDisabled}
                     />
                   )}
                 </>
@@ -342,7 +364,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   id={config.connectionId + 'authNeeded'}
                   name="saveCredentials"
                   state={config}
-                  disabled={disabled || readonly || config.sharedCredentials}
+                  disabled={formState.isDisabled || readonly || config.sharedCredentials}
                   mod={['primary']}
                   title={translate(
                     !isSharedProject || serverConfigResource.data?.distributed
@@ -361,10 +383,10 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
             </Group>
           )}
           {driver?.providerProperties && (
-            <ProviderPropertiesForm config={config} properties={driver.providerProperties} disabled={disabled} readonly={readonly} />
+            <ProviderPropertiesForm config={config} properties={driver.providerProperties} disabled={formState.isDisabled} readonly={readonly} />
           )}
 
-          <AdvancedPropertiesForm config={config} disabled={disabled} readonly={readonly} />
+          <AdvancedPropertiesForm config={config} disabled={formState.isDisabled} readonly={readonly} />
         </Container>
       </ColoredContainer>
     </Form>

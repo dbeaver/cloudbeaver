@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { schema } from '@cloudbeaver/core-utils';
-import { CONNECTION_NETWORK_HANDLER_SCHEMA } from '../Options/IConnectionFormOptionsState.js';
+import { CONNECTION_NETWORK_HANDLER_SCHEMA } from '../Options/IConnectionNetworkHanler.js';
 
 export const CONNECTION_FORM_SSH_SCHEMA = schema.object({}).extend(CONNECTION_NETWORK_HANDLER_SCHEMA.shape);
 

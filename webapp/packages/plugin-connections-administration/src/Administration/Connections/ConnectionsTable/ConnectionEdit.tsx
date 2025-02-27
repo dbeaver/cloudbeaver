@@ -9,40 +9,43 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 
 import { Loader, s, useS } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoOriginResource, ConnectionInfoResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { useService } from '@cloudbeaver/core-di';
-import { ConnectionFormLoader, useConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ConnectionFormLoader, useConnectionFormStateRefactored } from '@cloudbeaver/plugin-connections';
 
 import styles from './ConnectionEdit.module.css';
+import { FormMode } from '@cloudbeaver/core-ui';
 
 interface Props {
   item: IConnectionInfoParams;
 }
 
 export const ConnectionEdit = observer<Props>(function ConnectionEditNew({ item }) {
-  const connectionInfoResource = useService(ConnectionInfoResource);
-  const connectionInfoOriginResource = useService(ConnectionInfoOriginResource);
-  // const tableContext = useContext(TableContext);
-  // const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext, item]);
-
-  const data = useConnectionFormState(connectionInfoResource, connectionInfoOriginResource, state => state.setOptions('edit', 'admin'));
+  const data = useConnectionFormStateRefactored(item, state => {
+    state.setMode(FormMode.Edit);
+    state.setState({
+      ...state.state,
+      config: {
+        ...state.state.config,
+        connectionId: item.connectionId,
+      },
+      projectId: item.projectId,
+      type: 'admin',
+    });
+  });
   const style = useS(styles);
 
   const projectId = item.projectId;
   const connectionId = item.connectionId;
 
   useMemo(() => {
-    data.setConfig(projectId, { connectionId });
+    data.state.config.connectionId = connectionId;
+    data.state.projectId = projectId;
   }, [data, projectId, connectionId]);
 
   return (
     <div className={s(style, { box: true })}>
       <Loader className={s(style, { loader: true })} suspense>
-        <ConnectionFormLoader
-          state={data}
-          // onCancel={collapse}
-          // onSave={collapse}
-        />
+        <ConnectionFormLoader state={data} />
       </Loader>
     </div>
   );

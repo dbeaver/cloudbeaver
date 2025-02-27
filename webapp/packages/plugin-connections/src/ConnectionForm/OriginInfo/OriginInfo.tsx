@@ -23,29 +23,31 @@ import {
 } from '@cloudbeaver/core-blocks';
 import {
   ConnectionInfoOriginDetailsResource,
+  ConnectionInfoOriginResource,
+  ConnectionInfoResource,
   createConnectionParam,
   DatabaseAuthModelsResource,
   DBDriverResource,
 } from '@cloudbeaver/core-connections';
 import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps.js';
 import styles from './OriginInfo.module.css';
+import type { ConnectionFormRefactoredProps } from '../ConnectionFormServiceRefactored.js';
+import { useService } from '@cloudbeaver/core-di';
 
-export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = observer(function OriginInfo({
-  tabId,
-  state: { info, resource, config },
-}) {
+export const OriginInfo: TabContainerPanelComponent<ConnectionFormRefactoredProps> = observer(function OriginInfo({ tabId, formState }) {
   const tab = useTab(tabId);
   const translate = useTranslate();
   const userInfoLoader = useResource(OriginInfo, UserInfoResource, undefined);
   const state = useTabState<Record<string, any>>();
   const style = useS(styles);
-  const driverLoader = useResource(OriginInfo, DBDriverResource, config.driverId ?? null);
+  const connectionInfoService = useService(ConnectionInfoResource);
+  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
+  const driverLoader = useResource(OriginInfo, DBDriverResource, formState.state.config.driverId ?? null);
   const authModeLoader = useResource(
     OriginInfo,
     DatabaseAuthModelsResource,
-    config.authModelId ?? info?.authModel ?? driverLoader.data?.defaultAuthModel ?? null,
+    formState.state.config.authModelId ?? info?.authModel ?? driverLoader.data?.defaultAuthModel ?? null,
   );
 
   const providerId = authModeLoader.data?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
@@ -56,7 +58,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   const connectionOriginDetailsResource = useResource(OriginInfo, ConnectionInfoOriginDetailsResource, connectionId, {
     active: isAuthenticated,
   });
-  const connection = useResource(OriginInfo, resource, connectionId, {
+  const connection = useResource(OriginInfo, ConnectionInfoOriginResource, connectionId, {
     active: isAuthenticated,
     onData: connection => {
       runInAction(() => {

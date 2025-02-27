@@ -48,7 +48,7 @@ export const CreateConnection = observer<Props>(function CreateConnection({ meth
   const style = useS(styles);
   const createConnectionService = useService(CreateConnectionService);
   const translate = useTranslate();
-  const driver = useResource(CreateConnection, DBDriverResource, createConnectionService.data?.config.driverId || null);
+  const driver = useResource(CreateConnection, DBDriverResource, createConnectionService.data?.state.config.driverId || null);
 
   if (createConnectionService.data) {
     return (

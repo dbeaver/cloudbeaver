@@ -27,21 +27,23 @@ import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { NetworkHandlerConfigInput, NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
+import type { IFormState, TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { isSafari } from '@cloudbeaver/core-utils';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps.js';
 import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR.js';
 import styles from './SSL.module.css';
+import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 
-interface Props extends IConnectionFormProps {
+interface Props {
   handler: NetworkHandlerDescriptor;
   handlerState: NetworkHandlerConfigInput;
+  formState: IFormState<IConnectionFormStateRefactored>;
+  sharedCredentials: boolean;
+  template: boolean;
 }
 
-export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ state: formState, handler, handlerState }) {
-  const { info, readonly, disabled: formDisabled, loading } = formState;
-
+export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ formState, sharedCredentials, template, handler, handlerState }) {
   const translate = useTranslate();
 
   const style = useS(styles);
@@ -49,25 +51,20 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(handler.properties);
   const serverConfigResource = useResource(SSL, ServerConfigResource, undefined);
 
-  const disabled = formDisabled || loading;
+  const disabled = formState.isDisabled;
   const enabled = handlerState.enabled || false;
+  const connectionInfoService = useService(ConnectionInfoResource);
+  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
   const initialHandler = info?.networkHandlersConfig?.find(h => h.id === handler.id);
   const autofillToken = isSafari ? 'section-connection-authentication-ssl section-ssl' : 'new-password';
   const projectInfoResource = useService(ProjectInfoResource);
-  const isSharedProject = projectInfoResource.isProjectShared(formState.projectId);
+  const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
 
   return (
     <Form className={s(style, { form: true })}>
       <ColoredContainer parent>
         <Group gap form large vertical>
-          <Switch
-            id="ssl-enable-switch"
-            name="enabled"
-            state={handlerState}
-            description={handler.description}
-            mod={['primary']}
-            disabled={disabled || readonly}
-          >
+          <Switch id="ssl-enable-switch" name="enabled" state={handlerState} description={handler.description} mod={['primary']} disabled={disabled}>
             {translate('plugin_connections_connection_ssl_enable')}
           </Switch>
           {isUncategorizedExists && (
@@ -75,7 +72,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
               state={handlerState.properties}
               properties={handler.properties}
               category={null}
-              disabled={disabled || readonly || !enabled}
+              disabled={disabled || !enabled}
               isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
               autofillToken={autofillToken}
               hideEmptyPlaceholder
@@ -91,7 +88,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
                 state={handlerState.properties}
                 properties={handler.properties}
                 category={category}
-                disabled={disabled || readonly || !enabled}
+                disabled={disabled || !enabled}
                 isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
                 autofillToken={autofillToken}
                 hideEmptyPlaceholder
@@ -101,12 +98,12 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
             </React.Fragment>
           ))}
 
-          {credentialsSavingEnabled && !formState.config.template && !formState.config.sharedCredentials && (
+          {credentialsSavingEnabled && !template && !sharedCredentials && (
             <FieldCheckbox
               id={handler.id + '_savePassword'}
               name="savePassword"
               state={handlerState}
-              disabled={disabled || !enabled || readonly || formState.config.sharedCredentials}
+              disabled={disabled || !enabled || sharedCredentials}
               title={translate(
                 !isSharedProject || serverConfigResource.data?.distributed
                   ? 'connections_connection_authentication_save_credentials_for_user_tooltip'

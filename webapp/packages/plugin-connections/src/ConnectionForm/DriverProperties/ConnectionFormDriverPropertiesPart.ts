@@ -8,8 +8,8 @@
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { DBDriverResource } from '@cloudbeaver/core-connections';
-import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import { connectionFormConfigureContext } from '../connectionFormConfigureContext.js';
 
 export class ConnectionFormDriverPropertiesPart extends FormPart<void, IConnectionFormStateRefactored> {
   constructor(
@@ -21,6 +21,15 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<void, IConnecti
 
   protected override async loader(): Promise<void> {}
 
+  protected override configure(
+    data: IFormState<IConnectionFormStateRefactored>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
+  ): void | Promise<void> {
+    const configuration = contexts.getContext(connectionFormConfigureContext);
+
+    configuration.include('includeProperties', 'includeProviderProperties');
+  }
+
   protected override async saveChanges(
     data: IFormState<IConnectionFormStateRefactored>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
@@ -30,15 +39,14 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<void, IConnecti
     data: IFormState<IConnectionFormStateRefactored>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): void | Promise<void> {
-    const driverId = this.formState.state.driverId;
-    const config = getConnectionFormOptionsPart(this.formState).state;
+    const config = this.formState.state.config;
 
     if (!config.properties) {
       config.properties = {};
     }
 
-    if (driverId) {
-      const driver = this.dbDriverResource.get(driverId);
+    if (config.driverId) {
+      const driver = this.dbDriverResource.get(config.driverId);
       const defaultDriverProperties = new Set(driver?.driverProperties?.map(property => property.id) ?? []);
 
       for (let key of Object.keys(config.properties)) {

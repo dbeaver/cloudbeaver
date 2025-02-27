@@ -19,13 +19,14 @@ import {
   type NetworkHandlerResource,
 } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 import { getSSLDefaultConfig } from './getSSLDefaultConfig.js';
 import { toJS } from 'mobx';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
 import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED.js';
 import { SSL_CODE_NAME } from './SSL_CODE_NAME.js';
+import { connectionFormConfigureContext } from '../connectionFormConfigureContext.js';
 
+// TODO should I have networkHandler state here?
 export class ConnectionFormSSLPart extends FormPart<void, IConnectionFormStateRefactored> {
   constructor(
     formState: IFormState<IConnectionFormStateRefactored>,
@@ -37,18 +38,16 @@ export class ConnectionFormSSLPart extends FormPart<void, IConnectionFormStateRe
   }
 
   protected override async loader(): Promise<void> {
-    if (!this.isChanged || !this.formState.state.driverId) {
+    if (!this.isChanged || !this.formState.state.config.driverId) {
       return;
     }
 
-    const driver = await this.dbDriverResource.load(this.formState.state.driverId);
+    const driver = await this.dbDriverResource.load(this.formState.state.config.driverId);
     const handlers = await this.networkHandlerResource.load(CachedMapAllKey);
-
-    const optionsPart = getConnectionFormOptionsPart(this.formState);
     const handler = getSSLDriverHandler(handlers, driver?.applicableNetworkHandlers ?? []);
     const info = this.connectionInfoResource.get(
       createConnectionParam({
-        id: this.formState.state.connectionId,
+        id: this.formState.state.config.connectionId!,
         projectId: this.formState.state.projectId,
       }),
     );
@@ -59,31 +58,39 @@ export class ConnectionFormSSLPart extends FormPart<void, IConnectionFormStateRe
 
     const initialConfig = info?.networkHandlersConfig?.find(h => h.id === handler.id);
 
-    if (!optionsPart?.state.networkHandlersConfig) {
-      optionsPart.state.networkHandlersConfig = [];
+    if (!this.formState.state.config.networkHandlersConfig) {
+      this.formState.state.config.networkHandlersConfig = [];
     }
 
-    if (!optionsPart?.state.networkHandlersConfig.some(state => state.id === handler.id)) {
+    if (!this.formState.state.config.networkHandlersConfig.some(state => state.id === handler.id)) {
       const config: NetworkHandlerConfigInput = initialConfig ? toJS(initialConfig) : getSSLDefaultConfig(handler.id);
 
       if (config.secureProperties) {
         config.properties = { ...config.properties, ...config.secureProperties };
       }
 
-      optionsPart?.state.networkHandlersConfig.push(config);
+      this.formState.state.config.networkHandlersConfig.push(config);
     }
   }
 
+  protected override configure(
+    data: IFormState<IConnectionFormStateRefactored>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
+  ): void | Promise<void> {
+    const configuration = contexts.getContext(connectionFormConfigureContext);
+
+    configuration.include('includeNetworkHandlersConfig');
+  }
+
   protected override async format(
-    data: IFormState<{ projectId: string; connectionId: string; driverId: string; submitType: 'submit' | 'test' }>,
-    contexts: IExecutionContextProvider<IFormState<{ projectId: string; connectionId: string; driverId: string; submitType: 'submit' | 'test' }>>,
+    data: IFormState<IConnectionFormStateRefactored>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): Promise<void> {
-    const optionsPart = getConnectionFormOptionsPart(this.formState);
-    const config = optionsPart.state;
+    const config = this.formState.state.config;
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
     const info = this.connectionInfoResource.get(
       createConnectionParam({
-        id: data.state.connectionId,
+        id: data.state.config.connectionId!,
         projectId: data.state.projectId,
       }),
     );
@@ -160,6 +167,7 @@ export class ConnectionFormSSLPart extends FormPart<void, IConnectionFormStateRe
 
       trimSSLConfig(handlerConfig);
       config.networkHandlersConfig.push(handlerConfig);
+      this.formState.state.config.networkHandlersConfig = config.networkHandlersConfig;
     }
   }
 

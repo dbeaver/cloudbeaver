@@ -11,9 +11,9 @@ import { Translate, useResource } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { Tab, type TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps.js';
+import type { ConnectionFormRefactoredProps } from '../ConnectionFormServiceRefactored.js';
 
-export const SSHTab: TabContainerTabComponent<IConnectionFormProps> = observer(function SSHTab(props) {
+export const SSHTab: TabContainerTabComponent<ConnectionFormRefactoredProps> = observer(function SSHTab(props) {
   const handler = useResource(SSHTab, NetworkHandlerResource, SSH_TUNNEL_ID);
 
   return (

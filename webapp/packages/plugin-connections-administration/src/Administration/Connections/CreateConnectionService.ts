@@ -8,12 +8,10 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { ConnectionInfoOriginResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
-import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { TabsContainer } from '@cloudbeaver/core-ui';
-import { ConnectionFormService, ConnectionFormState, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormServiceRefactored, ConnectionFormStateRefactored } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService.js';
 
@@ -27,18 +25,15 @@ export interface ICreateMethodOptions {
 @injectable()
 export class CreateConnectionService {
   disabled = false;
-  data: IConnectionFormState | null;
+  data: ConnectionFormStateRefactored | null;
 
   readonly tabsContainer: TabsContainer<void, ICreateMethodOptions>;
 
   constructor(
     private readonly connectionsAdministrationNavService: ConnectionsAdministrationNavService,
     private readonly administrationScreenService: AdministrationScreenService,
-    private readonly connectionFormService: ConnectionFormService,
-    private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly projectsService: ProjectsService,
-    private readonly projectInfoResource: ProjectInfoResource,
-    private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
+    private readonly serviceProvider: IServiceProvider,
+    private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored,
   ) {
     this.data = null;
     this.tabsContainer = new TabsContainer('Connection Creation mode');
@@ -110,26 +105,20 @@ export class CreateConnectionService {
   }
 
   setConnectionTemplate(projectId: string, config: ConnectionConfig, availableDrivers: string[]): void {
-    this.data = new ConnectionFormState(
-      this.projectsService,
-      this.projectInfoResource,
-      this.connectionFormService,
-      this.connectionInfoResource,
-      this.connectionInfoOriginResource,
-    );
+    this.data = new ConnectionFormStateRefactored(this.serviceProvider, this.connectionFormServiceRefactored, {
+      projectId,
+      availableDrivers,
+      config,
+      submitType: null,
+      type: 'admin',
+    });
 
-    this.data.closeTask.addHandler(this.cancelCreate.bind(this));
-
-    this.data
-      .setOptions('create', 'admin')
-      .setConfig(projectId, config)
-      .setAvailableDrivers(availableDrivers || []);
-
-    this.data.load();
+    // this.data.closeTask.addHandler(this.cancelCreate.bind(this));
   }
 
   clearConnectionTemplate(): void {
-    this.data?.dispose();
+    // TODO dispose it once we have this API
+    // this.data?.dispose();
     this.data = null;
   }
 

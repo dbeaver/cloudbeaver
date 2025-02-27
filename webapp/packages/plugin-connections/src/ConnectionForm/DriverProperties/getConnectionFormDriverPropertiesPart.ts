@@ -15,7 +15,7 @@ const DATA_CONTEXT_CONNECTION_FORM_DRIVER_PROPERTIES_PART = createDataContext<Co
   'Connection Form Driver Properties Part',
 );
 
-export function getConnectionFormSSHPart(formState: IFormState<IConnectionFormStateRefactored>): ConnectionFormDriverPropertiesPart {
+export function getConnectionFormDriverPropertiesPart(formState: IFormState<IConnectionFormStateRefactored>): ConnectionFormDriverPropertiesPart {
   return formState.getPart(DATA_CONTEXT_CONNECTION_FORM_DRIVER_PROPERTIES_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
     const dbDriverResource = di.getService(DBDriverResource);

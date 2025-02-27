@@ -10,10 +10,12 @@ import type { IConnectionFormStateRefactored } from '../../../../plugin-connecti
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { IConnectionFormAccessState } from './IConnectionFormAccessState.js';
 import { createConnectionParam, type ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { action, makeObservable } from 'mobx';
 
 const getDefaultState = () =>
   ({
     grantedSubjects: [],
+    editing: false,
   }) as IConnectionFormAccessState;
 
 export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessState, IConnectionFormStateRefactored> {
@@ -22,13 +24,20 @@ export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessStat
     private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super(formState, getDefaultState());
+
+    makeObservable(this, {
+      edit: action.bound,
+      revoke: action.bound,
+      grant: action.bound,
+    });
   }
 
   protected override async loader(): Promise<void> {
-    const connectionId = this.formState.state.connectionId;
+    const connectionId = this.formState.state.config.connectionId;
     const projectId = this.formState.state.projectId;
 
     if (!connectionId || !projectId || !this.loaded) {
+      this.setInitialState(getDefaultState());
       return;
     }
 
@@ -46,7 +55,7 @@ export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessStat
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): Promise<void> {
     const status = contexts.getContext(formStatusContext);
-    const connectionId = this.formState.state.connectionId;
+    const connectionId = this.formState.state.config.connectionId;
 
     if (this.formState.state.submitType === 'test' || !data.state.projectId || !status.saved || !connectionId || !this.loaded) {
       return;
@@ -70,6 +79,18 @@ export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessStat
     if (subjectsToGrant.length > 0) {
       await this.connectionInfoResource.addConnectionsAccess(key, subjectsToGrant);
     }
+  }
+
+  edit() {
+    this.state.editing = !this.state.editing;
+  }
+
+  revoke(subjectIds: string[]) {
+    this.state.grantedSubjects = this.state.grantedSubjects.filter(subject => !subjectIds.includes(subject));
+  }
+
+  grant(subjectIds: string[]) {
+    this.state.grantedSubjects.push(...subjectIds);
   }
 }
 

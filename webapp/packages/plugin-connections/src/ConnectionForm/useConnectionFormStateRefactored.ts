@@ -10,24 +10,33 @@ import { IServiceProvider, useService } from '@cloudbeaver/core-di';
 import { ConnectionFormStateRefactored } from './ConnectionFormStateRefactored.js';
 import { ConnectionFormServiceRefactored } from './ConnectionFormServiceRefactored.js';
 import type { IConnectionFormStateRefactored } from './IConnectionFormStateRefactored.js';
+import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
 
-const EMPTY_CONNECTION_INFO_PARAMS: IConnectionFormStateRefactored = { projectId: '', connectionId: '', driverId: '', submitType: 'submit' };
+const EMPTY_CONNECTION_INFO_PARAMS: IConnectionFormStateRefactored = {
+  projectId: '',
+  config: {},
+  submitType: 'submit',
+  availableDrivers: [],
+  type: 'admin',
+};
 
-// TODO is nullable return allowed?
 export function useConnectionFormStateRefactored(
-  state: IConnectionFormStateRefactored | null,
+  params: IConnectionInfoParams,
   configure?: (state: ConnectionFormStateRefactored) => any,
-): ConnectionFormStateRefactored | null {
+): ConnectionFormStateRefactored {
   const serviceProvider = useService(IServiceProvider);
   const service = useService(ConnectionFormServiceRefactored);
-  const ref = useRef<null | ConnectionFormStateRefactored>(null);
+  const ref = useRef<ConnectionFormStateRefactored>(null);
 
-  if (
-    ref.current?.state.connectionId !== state?.connectionId ||
-    ref.current?.state.projectId !== state?.projectId ||
-    ref.current?.state.driverId !== state?.driverId
-  ) {
-    ref.current = new ConnectionFormStateRefactored(serviceProvider, service, state || EMPTY_CONNECTION_INFO_PARAMS);
+  if (ref.current?.state.config.connectionId !== params.connectionId || ref.current?.state.projectId !== params.projectId) {
+    ref.current = new ConnectionFormStateRefactored(serviceProvider, service, {
+      ...EMPTY_CONNECTION_INFO_PARAMS,
+      projectId: params.projectId,
+      config: {
+        ...EMPTY_CONNECTION_INFO_PARAMS.config,
+        connectionId: params.connectionId,
+      },
+    });
     configure?.(ref.current);
   }
 

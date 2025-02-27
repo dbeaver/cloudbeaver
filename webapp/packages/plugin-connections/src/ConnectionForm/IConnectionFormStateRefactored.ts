@@ -7,13 +7,15 @@
  */
 
 import { schema } from '@cloudbeaver/core-utils';
+import { CONNECTION_CONFIG_SCHEMA } from './Options/IConnectionConfig.js';
 
 export const CONNECTION_FORM_STATE_SCHEMA = schema
   .object({
     projectId: schema.string(),
-    connectionId: schema.string(),
-    driverId: schema.string(),
-    submitType: schema.enum(['submit', 'test']),
+    config: CONNECTION_CONFIG_SCHEMA,
+    submitType: schema.enum(['submit', 'test']).nullable(),
+    availableDrivers: schema.array(schema.string()),
+    type: schema.enum(['admin', 'public']),
   })
   .required()
   .strict();

@@ -10,13 +10,12 @@ import { runInAction } from 'mobx';
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { type DBDriver, DBDriverResource, isJDBCConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import type { DatabaseAuthModel } from '@cloudbeaver/core-sdk';
-
-import type { IConnectionFormState } from '../IConnectionFormProps.js';
+import type { ConnectionConfig, DatabaseAuthModel, DatabaseConnectionFragment } from '@cloudbeaver/core-sdk';
 import { getConnectionName } from './getConnectionName.js';
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
+import type { FormMode } from '@cloudbeaver/core-ui';
 
-export function useOptions(state: IConnectionFormState) {
+export function useOptions(config: ConnectionConfig, info: DatabaseConnectionFragment | undefined, mode: FormMode) {
   const dbDriverResource = useService(DBDriverResource);
   const refObject = useObjectRef(
     () => ({
@@ -24,16 +23,16 @@ export function useOptions(state: IConnectionFormState) {
       prevDriverId: null as string | null,
     }),
     {
-      state,
+      config,
+      info,
+      mode,
     },
   );
 
   return useObjectRef({
     updateNameTemplate(driver: DBDriver | undefined) {
       runInAction(() => {
-        const {
-          state: { config, info },
-        } = refObject;
+        const { config, info } = refObject;
 
         if (isJDBCConnection(driver, info)) {
           refObject.prevName = config.url || '';
@@ -54,10 +53,7 @@ export function useOptions(state: IConnectionFormState) {
     },
     setDefaults(driver: DBDriver | undefined) {
       runInAction(() => {
-        const {
-          state: { config, info },
-          prevDriverId,
-        } = refObject;
+        const { config, info, prevDriverId } = refObject;
 
         if (info || driver?.id !== config.driverId) {
           return;
@@ -72,7 +68,7 @@ export function useOptions(state: IConnectionFormState) {
         refObject.prevDriverId = driver?.id || null;
 
         if (!config.configurationType || !driver?.configurationTypes.includes(config.configurationType)) {
-          state.config.configurationType = getDefaultConfigurationType(driver);
+          config.configurationType = getDefaultConfigurationType(driver);
         }
 
         if ((!prevDriver && config.host === undefined) || config.host === prevDriver?.defaultServer) {
@@ -103,9 +99,7 @@ export function useOptions(state: IConnectionFormState) {
       });
     },
     setAuthModel(model: DatabaseAuthModel) {
-      const {
-        state: { config, info },
-      } = refObject;
+      const { config, info } = refObject;
 
       config.credentials = {};
 
@@ -119,14 +113,12 @@ export function useOptions(state: IConnectionFormState) {
         }
       }
 
-      refObject.state.checkFormState();
+      // TODO trigger form reload or Options part reload
+      // refObject.state.checkFormState();
     },
 
     isNameAutoFill() {
-      const {
-        prevName,
-        state: { config, mode },
-      } = refObject;
+      const { prevName, config, mode } = refObject;
 
       const isAutoFill = config.name === prevName || prevName === null;
 
