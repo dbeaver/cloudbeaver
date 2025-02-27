@@ -52,6 +52,13 @@ export const States = () => (
     <Checkbox accessibleWhenDisabled disabled defaultChecked>
       Default Checked Accessible When Disabled
     </Checkbox>
+    <Checkbox>
+      Insert spaces when pressing <code>Tab</code>. This setting is overridden based on the file contents when{' '}
+      <a data-href="#" href="#">
+        Editor: Detect Indentation
+      </a>{' '}
+      is on.
+    </Checkbox>
   </div>
 );
 
@@ -69,14 +76,14 @@ export const WithCustomIcon = () => (
     <Checkbox>Default</Checkbox>
     <Checkbox
       icon={
-        <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 16 16" height="1.25em" width="1.25em">
+        <svg fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 16 16">
           <polyline points="3,8 7,12 14,4" />
         </svg>
       }
     >
       With Custom Icon
     </Checkbox>
-    <Checkbox icon={'✓'}>With Custom Font Icon</Checkbox>
+    <Checkbox icon={<span className="tw:flex tw:justify-center tw:font-semibold">✓</span>}>With Custom Font Icon</Checkbox>
     <Checkbox size="large" className="cool-checkbox" icon={'👌'}>
       With Custom Icon And Styles
     </Checkbox>
@@ -89,15 +96,21 @@ export const Tokens = () => {
       <h1>Checkbox CSS Tokens</h1>
       <p>This UI kit uses several CSS tokens to style checkboxes.</p>
       <h2>Common checkbox tokens</h2>
+      Affect all sizes of checkboxes.
       <div className="tw:my-4">
+        <h3>General</h3>
         <div>
           <code>--dbv-kit-checkbox-height:</code> var(--dbv-kit-control-height-medium); <span className="comment"> Default checkbox height</span>
         </div>
         <div>
           <code>--dbv-kit-checkbox-gap:</code> calc(var(--tw-spacing) * 1.25); <span className="comment"> Gap between checkbox elements</span>
         </div>
+        <h3>Colors</h3>
         <div>
-          <code>--dbv-kit-checkbox-foreground:</code> var(--tw-color-white); <span className="comment"> Default checkbox text color</span>
+          <code>--dbv-kit-checkbox-icon-color:</code> var(--tw-color-white); <span className="comment"> Default checkbox icon color</span>
+        </div>
+        <div>
+          <code>--dbv-kit-checkbox-foreground:</code> var(--tw-color-black); <span className="comment"> Default checkbox text color</span>
         </div>
         <div>
           <code>--dbv-kit-checkbox-background:</code> transparent; <span className="comment"> Default checkbox background color</span>
@@ -114,6 +127,7 @@ export const Tokens = () => {
           <code>--dbv-kit-checkbox-background-active:</code> var(--dbv-kit-color-primary-800);{' '}
           <span className="comment"> Checkbox background color when active</span>
         </div>
+        <h3>Borders</h3>
         <div>
           <code>--dbv-kit-checkbox-border-width:</code> var(--dbv-kit-control-border-width); <span className="comment"> Checkbox border width</span>
         </div>
@@ -131,6 +145,7 @@ export const Tokens = () => {
           <code>--dbv-kit-checkbox-border-color-checked:</code> var(--dbv-kit-color-primary-600);{' '}
           <span className="comment"> Checkbox border color when checked</span>
         </div>
+        <h3>Font</h3>
         <div>
           <code>--dbv-kit-checkbox-font-weight:</code> var(--tw-font-weight-normal); <span className="comment"> Checkbox font weight</span>
         </div>
@@ -173,6 +188,25 @@ export const Tokens = () => {
         </p>
         <p>
           Extra large checkbox gap: <code>--dbv-kit-checkbox-xlarge-gap</code>
+        </p>
+      </div>
+      <div className="tw:my-4">
+        <h3>Checkbox Font Sizes </h3>
+        <p>
+          {' '}
+          <code>--dbv-kit-checkbox-small-font-size</code>: calc(var(--dbv-kit-checkbox-font-size) * 0.875);
+        </p>
+        <p>
+          {' '}
+          <code>--dbv-kit-checkbox-medium-font-size</code>: var(--dbv-kit-checkbox-font-size);
+        </p>
+        <p>
+          {' '}
+          <code>--dbv-kit-checkbox-large-font-size</code>: calc(var(--dbv-kit-checkbox-font-size) * 1.125);
+        </p>
+        <p>
+          {' '}
+          <code>--dbv-kit-checkbox-xlarge-font-size</code>: calc(var(--dbv-kit-checkbox-font-size) * 1.25);
         </p>
       </div>
       <div className="tw:my-4">

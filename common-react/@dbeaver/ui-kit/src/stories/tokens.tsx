@@ -78,53 +78,54 @@ export const GlobalTokens = () => {
           <code>--dbv-kit-color-primary-200</code> - Primary color (200){' '}
           <span className="color-sample" style={{ backgroundColor: 'var(--dbv-kit-color-primary-200)' }}></span>
         </p>
-        <p className="tw:text-base text-white">
+        <p>
           <code>--dbv-kit-color-primary-500</code> - Primary color (500){' '}
           <span className="color-sample" style={{ backgroundColor: 'var(--dbv-kit-color-primary-500)' }}></span>
         </p>
-        <p className="tw:text-base text-white">
+        <p>
           <code>--dbv-kit-color-primary-600</code> - Primary color (600){' '}
           <span className="color-sample" style={{ backgroundColor: 'var(--dbv-kit-color-primary-600)' }}></span>
         </p>
-        <p className="tw:text-base text-white">
+        <p>
           <code>--dbv-kit-color-primary-700</code> - Primary color (700){' '}
           <span className="color-sample" style={{ backgroundColor: 'var(--dbv-kit-color-primary-700)' }}></span>
         </p>
-        <p className="tw:text-base text-white">
+        <p>
           <code>--dbv-kit-color-primary-800</code> - Primary color (800){' '}
           <span className="color-sample" style={{ backgroundColor: 'var(--dbv-kit-color-primary-800)' }}></span>
         </p>
-        <p className="tw:text-base text-white">
+        <p>
           <code>--dbv-kit-color-primary-900</code> - Primary color (900){' '}
           <span className="color-sample" style={{ backgroundColor: 'var(--dbv-kit-color-primary-900)' }}></span>
         </p>
+        <p>
+          <code>--dbv-kit-color-outline:</code> Default control outline color used for focused elements{' '}
+          <span className="color-sample" style={{ backgroundColor: 'var(--dbv-kit-color-outline)' }}></span>
+        </p>
         <p
-          className="tw:text-base tw:my-1"
           style={{
             backgroundColor: 'var(--dbv-kit-color-error-background)',
             color: 'var(--dbv-kit-color-error-text)',
-            border: '2px solid  var(--dbv-kit-color-error-border)',
+            border: '4px solid  var(--dbv-kit-color-error-border)',
           }}
         >
           Error color: <code>--dbv-kit-color-error-background</code> / <code>--dbv-kit-color-error-text</code> /{' '}
           <code>--dbv-kit-color-error-border</code>
         </p>
         <p
-          className="tw:text-base tw:my-1"
           style={{
             backgroundColor: 'var(--dbv-kit-color-info-background)',
             color: 'var(--dbv-kit-color-info-text)',
-            border: '2px solid var(--dbv-kit-color-info-border)',
+            border: '4px solid var(--dbv-kit-color-info-border)',
           }}
         >
           Info color: <code>--dbv-kit-color-info-background</code> / <code>--dbv-kit-color-info-text</code> / <code>--dbv-kit-color-info-border</code>
         </p>
         <p
-          className="tw:text-base tw:my-1"
           style={{
             backgroundColor: 'var(--dbv-kit-color-warning-background)',
             color: 'var(--dbv-kit-color-warning-text)',
-            border: '2px solid var(--dbv-kit-color-warning-border)',
+            border: '4px solid var(--dbv-kit-color-warning-border)',
           }}
         >
           Warning color: <code>--dbv-kit-color-warning-background</code> / <code>--dbv-kit-color-warning-text</code> /{' '}
@@ -132,7 +133,12 @@ export const GlobalTokens = () => {
         </p>
       </div>
       <h2>Others</h2>
-      <code>--dbv-kit-control-disabled-opacity:</code> opacity level for disabled controls, default is 0.5
+      <p>
+        <code>--dbv-kit-control-disabled-opacity:</code> opacity level for disabled controls, default is 0.5
+      </p>
+      <p>
+        <code>--dbv-kit-outline-offset:</code> outline offset for focused elements
+      </p>
     </div>
   );
 };

@@ -31,7 +31,8 @@
 
     &:focus-visible,
     &[data-focus-visible] {
-      outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-color-outline);
+      outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-btn-outline-color);
+      outline-offset: var(--dbv-kit-btn-outline-offset);
     }
 
     &:hover {
@@ -121,6 +122,7 @@
 
     --dbv-kit-btn-loader-color: var(--dbv-kit-btn-danger-background);
     --dbv-kit-btn-loader-background: var(--dbv-kit-btn-loader-base-color);
+    --dbv-kit-btn-outline-color: var(--dbv-kit-btn-danger-color-outline);
   }
 
   /* ---------------------------- */

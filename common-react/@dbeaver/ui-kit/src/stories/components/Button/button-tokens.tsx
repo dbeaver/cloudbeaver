@@ -4,7 +4,8 @@ export const Tokens = () => {
       <h1>Button CSS Tokens</h1>
       <p>This UI kit uses several CSS tokens to style buttons.</p>
       <h2>Common buttons tokens</h2>
-      <div className="tw:my-4">
+      <section className="tw:my-4">
+        <h3>Size and space</h3>
         <div>
           <code>--dbv-kit-btn-height:</code> var(--dbv-kit-control-height-medium); <span className="comment"> Default button height</span>
         </div>
@@ -16,6 +17,10 @@ export const Tokens = () => {
           <code>--dbv-kit-btn-gap:</code> calc(var(--dbv-kit-btn-padding-inline) /4);{' '}
           <span className="comment"> Gap between button elements (mostly text and icon) </span>
         </div>
+        <div>
+          <code>--dbv-kit-btn-outline-offset:</code> 1px; <span className="comment"> Button outline offset</span>
+        </div>
+        <h3>Basic colors</h3>
         <div>
           <code>--dbv-kit-btn-foreground:</code> var(--color-white); <span className="comment"> Default button text color</span>
         </div>
@@ -30,9 +35,11 @@ export const Tokens = () => {
           <code>--dbv-kit-btn-background-active:</code> var(--dbv-kit-color-primary-800);{' '}
           <span className="comment"> Button active background color</span>
         </div>
+        <h3>Border</h3>
         <div>
           <code>--dbv-kit-btn-border-width:</code> 1px; <span className="comment"> Button border width</span>
         </div>
+
         <div>
           <code>--dbv-kit-btn-border-color:</code> transparent; --dbv-kit-btn-border-style: solid;{' '}
           <span className="comment"> Button border color and style</span>
@@ -40,6 +47,7 @@ export const Tokens = () => {
         <div>
           <code>--dbv-kit-btn-border-radius:</code> var(--radius-md); <span className="comment"> Button border radius</span>
         </div>
+        <h3>Font</h3>
         <div>
           <code>--dbv-kit-btn-font-weight:</code> var(--font-weight-normal); <span className="comment"> Button font weight</span>
         </div>
@@ -47,9 +55,8 @@ export const Tokens = () => {
           <code>--dbv-kit-btn-font-size:</code> calc(var(--dbv-kit-font-size-base) * 0.875);{' '}
           <span className="comment"> Button font size, default for medium-sized button, other sizes calculated based on that value</span>
         </div>
-        <div>
-          <code>--dbv-kit-btn-disabled-opacity:</code> 0.5; <span className="comment"> Button opacity when disabled</span>
-        </div>
+
+        <h3>Loader</h3>
         <div>
           <code>--dbv-kit-btn-loader-base-color:</code> var(--tw-color-white);{' '}
           <span className="comment">
@@ -61,7 +68,11 @@ export const Tokens = () => {
         <div>
           <code>--dbv-kit-btn-loader-animation:</code> var(--animate-spin); <span className="comment"> Button loader animation</span>
         </div>
-      </div>
+        <h3>Others</h3>
+        <div>
+          <code>--dbv-kit-btn-disabled-opacity:</code> 0.5; <span className="comment"> Button opacity when disabled</span>
+        </div>
+      </section>
       <div className="tw:my-4">
         <h2>Specific buttons tokens</h2>
         <h3>Button Sizes</h3>

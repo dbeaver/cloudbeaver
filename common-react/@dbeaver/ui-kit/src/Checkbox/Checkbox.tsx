@@ -17,7 +17,7 @@ export interface CheckboxProps extends Omit<AriaKitCheckboxProps, 'render' | 'si
 }
 
 export function Checkbox({ children, className, icon, size = 'medium', ...props }: CheckboxProps) {
-  const [checked, setChecked] = useState(props.defaultChecked ?? false);
+  const [checked, setChecked] = useState(props.defaultChecked ?? props.checked ?? false);
   const [focusVisible, setFocusVisible] = useState(false);
   return (
     <label
@@ -43,8 +43,8 @@ export function Checkbox({ children, className, icon, size = 'medium', ...props 
       <div className="dbv-kit-checkbox__check" data-checked={checked} data-focus-visible={focusVisible || undefined}>
         {checked &&
           (icon ?? (
-            <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 16 16" height="1.25em" width="1.25em">
-              <polyline points="4,8 7,11 13,4" />
+            <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 16 16">
+              <polyline points="3,7 7,11 13,4" />
             </svg>
           ))}
       </div>
