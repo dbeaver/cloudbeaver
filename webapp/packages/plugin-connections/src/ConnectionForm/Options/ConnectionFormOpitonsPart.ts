@@ -121,22 +121,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   protected override async loader(): Promise<void> {
     const connectionId = this.formState.state.config.connectionId;
     const projectId = this.formState.state.projectId;
-    let info = connectionId ? this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, connectionId)) : undefined;
 
-    if (projectId && connectionId) {
-      const key = createConnectionParam(projectId, connectionId);
-      info = await this.connectionInfoResource.load(key, [
-        'includeAuthProperties',
-        'includeCredentialsSaved',
-        'customIncludeOptions',
-        'includeNetworkHandlersConfig',
-        'includeProperties',
-        'includeProviderProperties',
-      ]);
-      await this.connectionInfoOriginResource.load(key);
-    }
-
-    if (!info) {
+    if (this.formState.mode === 'create') {
       const defaultConnectionConfig = await this.getDefaults();
       const config = {
         ...defaultStateGetter(),
@@ -150,6 +136,24 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       this.setInitialState(config);
       return;
     }
+
+    if (!projectId || !connectionId) {
+      throw new Error('Project id or connection id is not provided');
+    }
+
+    const key = createConnectionParam(projectId, connectionId);
+
+    const [info] = await Promise.all([
+      this.connectionInfoResource.load(key, [
+        'includeAuthProperties',
+        'includeCredentialsSaved',
+        'customIncludeOptions',
+        'includeNetworkHandlersConfig',
+        'includeProperties',
+        'includeProviderProperties',
+      ]),
+      this.connectionInfoOriginResource.load(key),
+    ]);
 
     const config = defaultStateGetter();
 
@@ -193,6 +197,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       config.mainPropertyValues = { ...info.mainPropertyValues };
     }
 
+    this.formState.state.availableDrivers = [info.driverId];
     this.formState.state.config = config;
     this.setInitialState(config);
   }

@@ -113,7 +113,7 @@ export const Options: TabContainerPanelComponent<ConnectionFormRefactoredProps> 
   const driverMap = useResource(
     Options,
     DBDriverResource,
-    { key: formState.state.config.driverId || null, includes: ['includeProviderProperties', 'includeMainProperties'] as const },
+    { key: formState.state.config.driverId || config.driverId || null, includes: ['includeProviderProperties', 'includeMainProperties'] as const },
     {
       onData: data => {
         optionsHook.setDefaults(data);
@@ -168,14 +168,19 @@ export const Options: TabContainerPanelComponent<ConnectionFormRefactoredProps> 
   const edit = formState.mode === 'edit';
   const originLocal = !info || (originInfo?.origin && isLocalConnection(originInfo.origin));
 
+  console.log({ enabledDrivers: driverMap.resource.enabledDrivers });
+
   const drivers = driverMap.resource.enabledDrivers.filter(({ id, driverInstalled }) => {
     if (!edit && !isAdmin && !driverInstalled) {
       return false;
     }
 
+    console.log({ availableDrivers: formState.state.availableDrivers, id });
     // TODO fix the bug with no selected driverId by default in combobox cause there are empty availableDrivers
     return formState.state.availableDrivers.includes(id);
   });
+
+  console.log({ drivers });
 
   function setProject(projectId: string) {
     formState.setState({
