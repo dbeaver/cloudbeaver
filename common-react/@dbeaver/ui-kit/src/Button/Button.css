@@ -2,7 +2,7 @@
 @import './_sizes.css';
 @import './_variants.css';
 
-@layer components {
+@layer base {
   .dbv-kit-button {
     display: inline-flex;
     text-align: center;
