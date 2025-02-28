@@ -70,9 +70,10 @@ export class PublicConnectionFormService {
   }
 
   change(projectId: string, config: ConnectionConfig, availableDrivers?: string[]): void {
-    // if (this.formState) {
-    //   this.formState.dispose();
-    // }
+    if (this.formState) {
+      // this.formState.dispose();
+      this.clearFormState();
+    }
 
     if (!this.formState) {
       this.formState = new ConnectionFormStateRefactored(this.serviceProvider, this.connectionFormServiceRefactored, {
