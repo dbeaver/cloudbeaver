@@ -173,6 +173,7 @@ export const Options: TabContainerPanelComponent<ConnectionFormRefactoredProps> 
       return false;
     }
 
+    // TODO fix the bug with no selected driverId by default in combobox cause there are empty availableDrivers
     return formState.state.availableDrivers.includes(id);
   });
 

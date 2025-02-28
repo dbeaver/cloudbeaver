@@ -24,7 +24,6 @@ import { toJS } from 'mobx';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
 import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED.js';
 import { SSL_CODE_NAME } from './SSL_CODE_NAME.js';
-import { connectionFormConfigureContext } from '../connectionFormConfigureContext.js';
 
 // TODO should I have networkHandler state here?
 export class ConnectionFormSSLPart extends FormPart<void, IConnectionFormStateRefactored> {
@@ -71,15 +70,6 @@ export class ConnectionFormSSLPart extends FormPart<void, IConnectionFormStateRe
 
       this.formState.state.config.networkHandlersConfig.push(config);
     }
-  }
-
-  protected override configure(
-    data: IFormState<IConnectionFormStateRefactored>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
-  ): void | Promise<void> {
-    const configuration = contexts.getContext(connectionFormConfigureContext);
-
-    configuration.include('includeNetworkHandlersConfig');
   }
 
   protected override async format(

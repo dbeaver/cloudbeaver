@@ -9,6 +9,7 @@ import { FormPart, formStateContext, formStatusContext, formValidationContext, t
 import { DriverConfigurationType, type ConnectionConfig, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
+  ConnectionInfoOriginResource,
   ConnectionInfoProjectKey,
   ConnectionInfoResource,
   createConnectionParam,
@@ -27,7 +28,6 @@ import type { LocalizationService } from '@cloudbeaver/core-localization';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
 import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
 import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
-import { connectionFormConfigureContext } from '../connectionFormConfigureContext.js';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
@@ -74,19 +74,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly localizationService: LocalizationService,
   ) {
     super(formState, defaultStateGetter());
-  }
-
-  protected override configure(
-    data: IFormState<IConnectionFormStateRefactored>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
-  ): void | Promise<void> {
-    const configuration = contexts.getContext(connectionFormConfigureContext);
-
-    configuration.include('includeAuthProperties', 'includeCredentialsSaved', 'customIncludeOptions');
   }
 
   // TODO should we have it?
@@ -128,7 +120,21 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
   protected override async loader(): Promise<void> {
     const connectionId = this.formState.state.config.connectionId;
-    const info = connectionId ? this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, connectionId)) : undefined;
+    const projectId = this.formState.state.projectId;
+    let info = connectionId ? this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, connectionId)) : undefined;
+
+    if (projectId && connectionId) {
+      const key = createConnectionParam(projectId, connectionId);
+      info = await this.connectionInfoResource.load(key, [
+        'includeAuthProperties',
+        'includeCredentialsSaved',
+        'customIncludeOptions',
+        'includeNetworkHandlersConfig',
+        'includeProperties',
+        'includeProviderProperties',
+      ]);
+      await this.connectionInfoOriginResource.load(key);
+    }
 
     if (!info) {
       const defaultConnectionConfig = await this.getDefaults();
@@ -137,11 +143,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
         ...defaultConnectionConfig,
       };
 
-      this.setInitialState(config);
       this.formState.state.config = {
         ...config,
         ...this.formState.state.config,
       };
+      this.setInitialState(config);
       return;
     }
 
@@ -187,8 +193,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       config.mainPropertyValues = { ...info.mainPropertyValues };
     }
 
-    this.setInitialState(config);
     this.formState.state.config = config;
+    this.setInitialState(config);
   }
 
   private async formAuthState(

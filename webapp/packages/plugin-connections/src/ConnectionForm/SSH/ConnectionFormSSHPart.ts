@@ -13,7 +13,6 @@ import { ConnectionInfoResource, createConnectionParam, SSH_TUNNEL_ID } from '@c
 import { toJS } from 'mobx';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
 import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
-import { connectionFormConfigureContext } from '../connectionFormConfigureContext.js';
 
 export class ConnectionFormSSHPart extends FormPart<void, IConnectionFormStateRefactored> {
   constructor(
@@ -51,15 +50,6 @@ export class ConnectionFormSSHPart extends FormPart<void, IConnectionFormStateRe
         },
       });
     }
-  }
-
-  protected override configure(
-    data: IFormState<IConnectionFormStateRefactored>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
-  ): void | Promise<void> {
-    const configuration = contexts.getContext(connectionFormConfigureContext);
-
-    configuration.include('includeNetworkHandlersConfig');
   }
 
   protected override saveChanges(

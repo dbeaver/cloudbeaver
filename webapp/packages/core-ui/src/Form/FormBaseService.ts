@@ -23,7 +23,6 @@ export class FormBaseService<TState, TProps extends IFormProps<TState> = IFormPr
   readonly onFormat: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onValidate: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onSubmit: IExecutorHandlersCollection<IFormState<TState>>;
-  readonly onConfigure: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onLoaded: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onState: IExecutorHandlersCollection<TState>;
 
@@ -37,7 +36,6 @@ export class FormBaseService<TState, TProps extends IFormProps<TState> = IFormPr
     this.onFormat = new ExecutorHandlersCollection();
     this.onValidate = new ExecutorHandlersCollection();
     this.onSubmit = new ExecutorHandlersCollection();
-    this.onConfigure = new ExecutorHandlersCollection();
     this.onLoaded = new ExecutorHandlersCollection();
     this.onState = new ExecutorHandlersCollection();
 
