@@ -19,7 +19,9 @@ export interface CheckboxProps extends Omit<AriaKitCheckboxProps, 'render' | 'si
 }
 
 export function Checkbox({ children, className, icon, indeterminate, indeterminateIcon, size = 'medium', ...props }: CheckboxProps) {
-  const [checked, setChecked] = useState(props.defaultChecked ?? props.checked ?? false);
+  const [innerChecked, setInnerChecked] = useState(props.defaultChecked ?? false);
+  const checked = props.checked ?? innerChecked;
+
   const [focusVisible, setFocusVisible] = useState(false);
   return (
     <label
@@ -36,7 +38,7 @@ export function Checkbox({ children, className, icon, indeterminate, indetermina
           onFocusVisible={() => setFocusVisible(true)}
           onBlur={() => setFocusVisible(false)}
           onChange={event => {
-            setChecked(event.target.checked);
+            setInnerChecked(event.target.checked);
             props.onChange?.(event);
           }}
         />

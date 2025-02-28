@@ -49,6 +49,8 @@ export const States = () => {
   return (
     <div className="tw:flex tw:flex-col tw:items-start tw:space-y-4">
       <Checkbox> Unchecked </Checkbox>
+      <Checkbox checked={false}> Unchecked (Controlled) </Checkbox>
+      <Checkbox checked>Checked (Controlled)</Checkbox>
       <Checkbox defaultChecked> Default Checked </Checkbox>
       <Checkbox disabled> Disabled </Checkbox>
       <Checkbox disabled defaultChecked>
