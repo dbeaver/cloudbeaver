@@ -61,7 +61,8 @@
       border-color: var(--dbv-kit-checkbox-border-color-checked);
     }
 
-    &[data-checked='true'] {
+    &[data-checked='true'],
+    &[data-indeterminate='true'] {
       background-color: var(--dbv-kit-checkbox-background-checked);
       border-color: var(--dbv-kit-checkbox-border-color-checked);
       stroke-dashoffset: 0;

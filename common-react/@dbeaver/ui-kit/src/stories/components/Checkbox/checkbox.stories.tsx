@@ -6,8 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { useState } from 'react';
 import { Checkbox } from '../../../Checkbox/Checkbox.js';
 import './styles.css';
+import { Button } from '../../../index.js';
 
 export const Documentation = () => (
   <div>
@@ -41,26 +43,35 @@ export const Documentation = () => (
   </div>
 );
 
-export const States = () => (
-  <div className="tw:flex tw:flex-col tw:space-y-4">
-    <Checkbox> Unchecked </Checkbox>
-    <Checkbox defaultChecked> Default Checked </Checkbox>
-    <Checkbox disabled> Disabled </Checkbox>
-    <Checkbox disabled defaultChecked>
-      Disabled Default Checked
-    </Checkbox>
-    <Checkbox accessibleWhenDisabled disabled defaultChecked>
-      Default Checked Accessible When Disabled
-    </Checkbox>
-    <Checkbox>
-      Insert spaces when pressing <code>Tab</code>. This setting is overridden based on the file contents when{' '}
-      <a data-href="#" href="#">
-        Editor: Detect Indentation
-      </a>{' '}
-      is on.
-    </Checkbox>
-  </div>
-);
+export const States = () => {
+  const [indeterminate, setIndeterminate] = useState(false);
+
+  return (
+    <div className="tw:flex tw:flex-col tw:items-start tw:space-y-4">
+      <Checkbox> Unchecked </Checkbox>
+      <Checkbox defaultChecked> Default Checked </Checkbox>
+      <Checkbox disabled> Disabled </Checkbox>
+      <Checkbox disabled defaultChecked>
+        Disabled Default Checked
+      </Checkbox>
+      <Checkbox accessibleWhenDisabled disabled defaultChecked>
+        Default Checked Accessible When Disabled
+      </Checkbox>
+      <Button onClick={() => setIndeterminate(prev => !prev)}>Set Indeterminate</Button>
+      <Checkbox indeterminate={indeterminate}>Indeterminate</Checkbox>
+      <Checkbox indeterminate={indeterminate} indeterminateIcon={<div className="tw:flex tw:relative tw:-top-[1px] tw:font-bold">▫</div>}>
+        Indeterminate Custom
+      </Checkbox>
+      <Checkbox>
+        Insert spaces when pressing <code>Tab</code>. This setting is overridden based on the file contents when{' '}
+        <a data-href="#" href="#">
+          Editor: Detect Indentation
+        </a>{' '}
+        is on.
+      </Checkbox>
+    </div>
+  );
+};
 
 export const Sizes = () => (
   <div className="tw:flex tw:flex-col tw:space-y-4">
