@@ -86,7 +86,6 @@ const driverConfiguration: IDriverConfiguration[] = [
     isVisible: driver => driver.configurationTypes.includes(DriverConfigurationType.Url),
   },
 ];
-// TODO fix the bug with incorrect selected driverId by default in combobox. also type
 export const Options: TabContainerPanelComponent<ConnectionFormRefactoredProps> = observer(function Options({ formState }) {
   const isAdmin = usePermission(EAdminPermission.admin);
   const serverConfigResource = useResource(Options, ServerConfigResource, undefined);
@@ -107,7 +106,7 @@ export const Options: TabContainerPanelComponent<ConnectionFormRefactoredProps> 
   const readonly = formState.isDisabled || info?.authModel === PROFILE_AUTH_MODEL_ID;
 
   useFormValidator(formState.validationTask, formRef.current);
-  const optionsHook = useOptions(optionsPart.state, info, formState.mode);
+  const optionsHook = useOptions(formState, optionsPart.state);
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
   const driverMap = useResource(
@@ -168,19 +167,13 @@ export const Options: TabContainerPanelComponent<ConnectionFormRefactoredProps> 
   const edit = formState.mode === 'edit';
   const originLocal = !info || (originInfo?.origin && isLocalConnection(originInfo.origin));
 
-  console.log({ enabledDrivers: driverMap.resource.enabledDrivers });
-
   const drivers = driverMap.resource.enabledDrivers.filter(({ id, driverInstalled }) => {
     if (!edit && !isAdmin && !driverInstalled) {
       return false;
     }
 
-    console.log({ availableDrivers: formState.state.availableDrivers, id });
-    // TODO fix the bug with no selected driverId by default in combobox cause there are empty availableDrivers
     return formState.state.availableDrivers.includes(id);
   });
-
-  console.log({ drivers });
 
   function setProject(projectId: string) {
     formState.setState({
@@ -202,6 +195,15 @@ export const Options: TabContainerPanelComponent<ConnectionFormRefactoredProps> 
     tabsState?.open(CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID);
   }
 
+  async function reloadForm(driverId: string | undefined) {
+    if (!driverId) {
+      return;
+    }
+
+    formState.state.config.driverId = driverId;
+    await formState.reload();
+  }
+
   useAutoLoad(Options, optionsPart);
 
   return (
@@ -221,6 +223,7 @@ export const Options: TabContainerPanelComponent<ConnectionFormRefactoredProps> 
                   name="driverId"
                   state={config}
                   items={drivers}
+                  onSelect={reloadForm}
                   keySelector={driver => driver.id}
                   valueSelector={driver => driver.name ?? ''}
                   titleSelector={driver => driver.description}

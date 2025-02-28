@@ -8,14 +8,19 @@
 import { runInAction } from 'mobx';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
-import { type DBDriver, DBDriverResource, isJDBCConnection } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, createConnectionParam, type DBDriver, DBDriverResource, isJDBCConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import type { ConnectionConfig, DatabaseAuthModel, DatabaseConnectionFragment } from '@cloudbeaver/core-sdk';
+import type { ConnectionConfig, DatabaseAuthModel } from '@cloudbeaver/core-sdk';
 import { getConnectionName } from './getConnectionName.js';
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
-import type { FormMode } from '@cloudbeaver/core-ui';
+import type { IFormState } from '@cloudbeaver/core-ui';
+import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
 
-export function useOptions(config: ConnectionConfig, info: DatabaseConnectionFragment | undefined, mode: FormMode) {
+export function useOptions(formState: IFormState<IConnectionFormStateRefactored>, config: ConnectionConfig) {
+  const mode = formState.mode;
+  const connectionInfoService = useService(ConnectionInfoResource);
+  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
+
   const dbDriverResource = useService(DBDriverResource);
   const refObject = useObjectRef(
     () => ({
@@ -26,6 +31,7 @@ export function useOptions(config: ConnectionConfig, info: DatabaseConnectionFra
       config,
       info,
       mode,
+      formState,
     },
   );
 
@@ -99,7 +105,7 @@ export function useOptions(config: ConnectionConfig, info: DatabaseConnectionFra
       });
     },
     setAuthModel(model: DatabaseAuthModel) {
-      const { config, info } = refObject;
+      const { config, info, formState } = refObject;
 
       config.credentials = {};
 
@@ -113,8 +119,7 @@ export function useOptions(config: ConnectionConfig, info: DatabaseConnectionFra
         }
       }
 
-      // TODO trigger form reload or Options part reload
-      // refObject.state.checkFormState();
+      formState.reload();
     },
 
     isNameAutoFill() {

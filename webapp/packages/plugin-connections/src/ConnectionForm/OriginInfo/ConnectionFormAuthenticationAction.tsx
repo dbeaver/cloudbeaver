@@ -30,8 +30,7 @@ export const AuthenticationButton: PlaceholderComponent<ConnectionFormRefactored
 
   const authentication = useAuthenticationAction({
     providerId: authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
-    // TODO should we remove it?
-    // onAuthenticate: () => state.loadConnectionInfo(),
+    onAuthenticate: () => formState.reload(),
   });
 
   if (authentication.authorized) {

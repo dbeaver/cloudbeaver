@@ -83,9 +83,6 @@ export class PublicConnectionFormService {
         submitType: 'submit',
         type: 'public',
       });
-
-      // TODO what do we do with this handler?
-      // this.formState.closeTask.addHandler(this.close.bind(this, true));
     }
 
     this.formState.setMode(config.connectionId ? FormMode.Edit : FormMode.Create);

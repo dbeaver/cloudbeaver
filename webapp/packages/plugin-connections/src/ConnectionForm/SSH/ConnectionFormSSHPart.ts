@@ -23,7 +23,6 @@ export class ConnectionFormSSHPart extends FormPart<void, IConnectionFormStateRe
   }
 
   protected override async loader(): Promise<void> {
-    // TODO should we load instead of get?
     const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
     const initialConfig = info?.networkHandlersConfig?.find(handler => handler.id === SSH_TUNNEL_ID);
 
