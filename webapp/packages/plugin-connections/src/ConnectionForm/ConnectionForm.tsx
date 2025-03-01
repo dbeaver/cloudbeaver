@@ -33,7 +33,7 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   const styles = useS(style);
 
   const form = useForm({
-    onSubmit: event => {
+    onSubmit: async event => {
       if (event?.type === 'test') {
         state.setState({
           ...state.state,
@@ -45,12 +45,19 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
           submitType: 'submit',
         });
       }
+
+      const saved = await state.save();
+
+      if (saved) {
+        // TODO handle notifications for tests and submits
+      }
     },
   });
 
   const actionsContext = useObjectRef<IConnectionFormActionsContext>(() => ({
     save: async () => form.submit(new SubmitEvent('submit')),
     test: async () => form.submit(new SubmitEvent('test')),
+    onCancel,
   }));
 
   useExecutor({

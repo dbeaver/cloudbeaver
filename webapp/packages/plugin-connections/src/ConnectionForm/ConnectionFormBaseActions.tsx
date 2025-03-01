@@ -10,15 +10,15 @@ import { useContext } from 'react';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { Button, getComputed, type PlaceholderComponent, useResource, useTranslate, useAuthenticationAction } from '@cloudbeaver/core-blocks';
-import { DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, createConnectionParam, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { ConnectionFormActionsContext } from './ConnectFormActionsContext.js';
-import type { IConnectionFormProps } from './IConnectionFormProps.js';
+import type { IConnectionFormPropsRefactored } from './IConnectionFormStateRefactored.js';
+import { useService } from '@cloudbeaver/core-di';
 
-export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormBaseActions({
-  state,
-  onCancel,
+export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormPropsRefactored> = observer(function ConnectionFormBaseActions({
+  formState,
 }) {
   const actions = useContext(ConnectionFormActionsContext);
 
@@ -27,36 +27,39 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
   }
 
   const translate = useTranslate();
-  const driverMap = useResource(ConnectionFormBaseActions, DBDriverResource, state.config.driverId || null);
+  const driverMap = useResource(ConnectionFormBaseActions, DBDriverResource, formState.state.config.driverId || null);
+
+  const connectionInfoService = useService(ConnectionInfoResource);
+  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
 
   const driver = driverMap.data;
   const serverConfigResource = useResource(ConnectionFormBaseActions, ServerConfigResource, undefined);
   const { data: authModel } = useResource(
     ConnectionFormBaseActions,
     DatabaseAuthModelsResource,
-    getComputed(() => state.config.authModelId || state.info?.authModel || driver?.defaultAuthModel || null),
+    getComputed(() => formState.state.config.authModelId || info?.authModel || driver?.defaultAuthModel || null),
   );
   const authentication = useAuthenticationAction({
-    providerId: authModel?.requiredAuth ?? state.info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
+    providerId: authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
   });
 
   const authorized = authentication.providerId === AUTH_PROVIDER_LOCAL_ID || authentication.authorized;
-  const disableTest = serverConfigResource.data?.distributed && !!state.config.sharedCredentials;
+  const disableTest = serverConfigResource.data?.distributed && !!formState.state.config.sharedCredentials;
 
   return (
     <>
-      {onCancel && (
-        <Button type="button" disabled={state.disabled} mod={['outlined']} onClick={onCancel}>
+      {actions.onCancel && (
+        <Button type="button" disabled={formState.isDisabled} mod={['outlined']} onClick={actions.onCancel}>
           {translate('ui_processing_cancel')}
         </Button>
       )}
       {!disableTest && (
-        <Button type="button" disabled={state.disabled || !authorized} mod={['outlined']} loader onClick={actions['test']}>
+        <Button type="button" disabled={formState.isDisabled || !authorized} mod={['outlined']} loader onClick={actions['test']}>
           {translate('connections_connection_test')}
         </Button>
       )}
-      <Button type="button" disabled={state.disabled || state.readonly} mod={['unelevated']} loader onClick={actions['save']}>
-        {translate(state.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_create')}
+      <Button type="button" disabled={formState.isDisabled} mod={['unelevated']} loader onClick={actions['save']}>
+        {translate(formState.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_create')}
       </Button>
     </>
   );

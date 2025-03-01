@@ -18,7 +18,6 @@ export * from './ConnectionForm/Contexts/connectionCredentialsStateContext.js';
 export * from './ConnectionForm/ConnectionFormBaseActionsLoader.js';
 export * from './ConnectionForm/connectionFormConfigureContext.js';
 export * from './ConnectionForm/ConnectionFormLoader.js';
-export * from './ConnectionForm/IConnectionFormProps.js';
 export * from './ConnectionForm/IConnectionFormStateRefactored.js';
 export * from './ConnectionForm/ConnectionFormStateRefactored.js';
 export * from './ConnectionForm/useConnectionFormStateRefactored.js';

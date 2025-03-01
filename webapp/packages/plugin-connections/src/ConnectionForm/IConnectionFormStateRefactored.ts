@@ -8,6 +8,7 @@
 
 import { schema } from '@cloudbeaver/core-utils';
 import { CONNECTION_CONFIG_SCHEMA } from './Options/IConnectionConfig.js';
+import type { IFormProps } from '@cloudbeaver/core-ui';
 
 export const CONNECTION_FORM_STATE_SCHEMA = schema
   .object({
@@ -21,3 +22,4 @@ export const CONNECTION_FORM_STATE_SCHEMA = schema
   .strict();
 
 export type IConnectionFormStateRefactored = schema.infer<typeof CONNECTION_FORM_STATE_SCHEMA>;
+export type IConnectionFormPropsRefactored = IFormProps<IConnectionFormStateRefactored>;

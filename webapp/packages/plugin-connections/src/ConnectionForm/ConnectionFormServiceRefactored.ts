@@ -10,6 +10,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { FormBaseService, type IFormProps } from '@cloudbeaver/core-ui';
 import type { IConnectionFormStateRefactored } from './IConnectionFormStateRefactored.js';
+import { ConnectionFormBaseActionsLoader } from './ConnectionFormBaseActionsLoader.js';
 
 export type ConnectionFormRefactoredProps = IFormProps<IConnectionFormStateRefactored>;
 
@@ -17,5 +18,7 @@ export type ConnectionFormRefactoredProps = IFormProps<IConnectionFormStateRefac
 export class ConnectionFormServiceRefactored extends FormBaseService<IConnectionFormStateRefactored, ConnectionFormRefactoredProps> {
   constructor(localizationService: LocalizationService, notificationService: NotificationService) {
     super(localizationService, notificationService, 'Connection form');
+
+    this.actionsContainer.add(ConnectionFormBaseActionsLoader);
   }
 }
