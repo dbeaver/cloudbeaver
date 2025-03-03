@@ -17,7 +17,7 @@
       cursor: pointer;
 
       .dbv-kit-checkbox__check {
-        border-color: var(--dbv-kit-checkbox-border-color-checked);
+        background-color: var(--dbv-kit-checkbox-background-checked);
         box-shadow: 0 0 0 2px var(--dbv-kit-checkbox-hover-shadow-color);
       }
     }
@@ -58,13 +58,11 @@
     }
 
     &:hover {
-      border-color: var(--dbv-kit-checkbox-border-color-checked);
+      background-color: var(--dbv-kit-checkbox-background-checked);
     }
 
     &[data-checked='true'],
     &[data-indeterminate='true'] {
-      background-color: var(--dbv-kit-checkbox-background-checked);
-      border-color: var(--dbv-kit-checkbox-border-color-checked);
       stroke-dashoffset: 0;
     }
   }
