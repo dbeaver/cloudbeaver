@@ -10,3 +10,13 @@ import './index.css';
 export { Button, type ButtonProps } from './Button/Button.js';
 export { Checkbox, type CheckboxProps } from './Checkbox/Checkbox.js';
 export { Input, type InputProps } from './Input/Input.js';
+export {
+  Select,
+  useSelectContext,
+  useSelectStore,
+  type SelectProviderProps,
+  type SelectProps,
+  type SelectLabelProps,
+  type SelectPopoverProps,
+  type SelectItemProps,
+} from './Select/Select.js';
