@@ -34,7 +34,7 @@ export const SearchDatabase: React.FC = observer(function SearchDatabase() {
     return (
       <Loader className={s(styles, { loader: true })} suspense>
         <ConnectionFormLoader
-          state={connectionSearchService.formState}
+          formState={connectionSearchService.formState}
           onSave={() => connectionSearchService.saveConnection()}
           onCancel={() => connectionSearchService.goBack()}
         />

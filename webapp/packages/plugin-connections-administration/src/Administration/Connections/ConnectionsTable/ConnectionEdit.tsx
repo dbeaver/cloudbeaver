@@ -45,7 +45,7 @@ export const ConnectionEdit = observer<Props>(function ConnectionEditNew({ item 
   return (
     <div className={s(style, { box: true })}>
       <Loader className={s(style, { loader: true })} suspense>
-        <ConnectionFormLoader state={data} />
+        <ConnectionFormLoader formState={data} />
       </Loader>
     </div>
   );

@@ -24,16 +24,7 @@ export const PublicConnectionForm: React.FC = observer(function PublicConnection
 
   return (
     <Loader className={s(style, { loader: true })} loading={service.formState === null}>
-      {() =>
-        service.formState && (
-          <ConnectionFormLoader
-            // key={service.formState.id}
-            state={service.formState}
-            onSave={save}
-            onCancel={close}
-          />
-        )
-      }
+      {() => service.formState && <ConnectionFormLoader formState={service.formState} onSave={save} onCancel={close} />}
     </Loader>
   );
 });

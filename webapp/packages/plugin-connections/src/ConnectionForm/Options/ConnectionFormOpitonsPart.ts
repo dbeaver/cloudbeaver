@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { FormPart, formStateContext, formStatusContext, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
+import { FormMode, FormPart, formStateContext, formStatusContext, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import { DriverConfigurationType, type ConnectionConfig, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
@@ -401,38 +401,28 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       return;
     }
 
-    try {
-      if (this.formState.state.submitType === 'submit') {
-        if (this.formState.mode === 'edit') {
-          const connection = await this.connectionInfoResource.update(
-            createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!),
-            this.state,
-          );
-          status.info('Connection was updated');
-          status.info(connection.name);
-        } else {
-          const connection = await this.connectionInfoResource.create(this.formState.state.projectId, this.state);
-          this.state.connectionId = connection.id;
-          this.formState.state.config.connectionId = connection.id;
-          status.info('Connection was created');
-          status.info(connection.name);
-        }
+    if (this.formState.state.submitType === 'submit') {
+      if (this.formState.mode === 'edit') {
+        await this.connectionInfoResource.update(
+          createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!),
+          this.state,
+        );
       } else {
-        const info = await this.connectionInfoResource.test(this.formState.state.projectId, this.state);
-        status.info('Connection is established');
-        status.info('Client version: ' + info.clientVersion);
-        status.info('Server version: ' + info.serverVersion);
-        status.info('Connection time: ' + info.connectTime);
+        const connection = await this.connectionInfoResource.create(this.formState.state.projectId, this.state);
+        this.state.connectionId = connection.id;
+        this.formState.state.config.connectionId = connection.id;
+        this.formState.setMode(FormMode.Edit);
       }
-
-      await this.formAuthState(data, contexts);
-    } catch (exception: any) {
-      if (this.formState.state.submitType === 'submit') {
-        status.error('connections_connection_create_fail', exception);
-      } else {
-        status.error('connections_connection_test_fail', exception);
-      }
+    } else {
+      // TODO message this in ConnectionForm.tsx
+      const info = await this.connectionInfoResource.test(this.formState.state.projectId, this.state);
+      status.info('Connection is established');
+      status.info('Client version: ' + info.clientVersion);
+      status.info('Server version: ' + info.serverVersion);
+      status.info('Connection time: ' + info.connectTime);
     }
+
+    await this.formAuthState(data, contexts);
   }
 }
 

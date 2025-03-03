@@ -75,7 +75,7 @@ export const CreateConnection = observer<Props>(function CreateConnection({ meth
         <Container overflow>
           <Loader className={s(style, { loader: true })} suspense>
             <ConnectionFormLoader
-              state={createConnectionService.data}
+              formState={createConnectionService.data}
               onCancel={createConnectionService.clearConnectionTemplate}
               onSave={createConnectionService.clearConnectionTemplate}
             />
