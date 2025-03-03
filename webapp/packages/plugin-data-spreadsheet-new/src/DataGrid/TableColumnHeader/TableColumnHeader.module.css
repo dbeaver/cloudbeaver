@@ -17,6 +17,7 @@
 .icon {
   display: flex;
   position: relative;
+  flex-shrink: 0;
 }
 .staticImage {
   height: 16px;

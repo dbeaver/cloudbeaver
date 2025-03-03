@@ -1,4 +1,4 @@
-import { createContext, forwardRef, memo, useCallback, useContext, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createContext, memo, useCallback, useContext, useEffect, useId, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import clsx from "clsx";
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
@@ -95,8 +95,8 @@ function onEditorNavigation({ key, target }) {
 
 //#endregion
 //#region src/utils/renderMeasuringCells.tsx
-const measuringCellClassname = "mlln6zg7-0-0-beta-47";
-function renderMeasuringCells(viewportColumns) {
+const measuringCellClassname = "mlln6zg7-0-0-beta-48";
+function renderMeasuringCells(viewportColumns, columnsToMeasure) {
 	return viewportColumns.map(({ key, idx, minWidth, maxWidth }) => jsx("div", {
 		className: measuringCellClassname,
 		style: {
@@ -104,7 +104,8 @@ function renderMeasuringCells(viewportColumns) {
 			minWidth,
 			maxWidth
 		},
-		"data-measuring-cell-key": key
+		"data-measuring-cell-key": key,
+		"data-measuring-cell": columnsToMeasure.has(key) || undefined
 	}, key));
 }
 
@@ -246,9 +247,9 @@ function canExitGrid({ maxColIdx, minRowIdx, maxRowIdx, selectedPosition: { rowI
 
 //#endregion
 //#region src/style/cell.ts
-const cell = "cj343x07-0-0-beta-47";
+const cell = "cj343x07-0-0-beta-48";
 const cellClassname = `rdg-cell ${cell}`;
-const cellFrozen = "csofj7r7-0-0-beta-47";
+const cellFrozen = "csofj7r7-0-0-beta-48";
 const cellFrozenClassname = `rdg-cell-frozen ${cellFrozen}`;
 
 //#endregion
@@ -301,7 +302,7 @@ function getHeaderCellRowSpan(column, rowIdx) {
 
 //#endregion
 //#region src/cellRenderers/renderCheckbox.tsx
-const checkbox = "c1bn88vv7-0-0-beta-47";
+const checkbox = "c1bn88vv7-0-0-beta-48";
 const checkboxClassname = `rdg-checkbox-input ${checkbox}`;
 function renderCheckbox({ onChange, indeterminate,...props }) {
 	function handleChange(e) {
@@ -320,9 +321,9 @@ function renderCheckbox({ onChange, indeterminate,...props }) {
 
 //#endregion
 //#region src/cellRenderers/renderToggleGroup.tsx
-const groupCellContent = "g1s9ylgp7-0-0-beta-47";
+const groupCellContent = "g1s9ylgp7-0-0-beta-48";
 const groupCellContentClassname = `rdg-group-cell-content ${groupCellContent}`;
-const caret = "cz54e4y7-0-0-beta-47";
+const caret = "cz54e4y7-0-0-beta-48";
 const caretClassname = `rdg-caret ${caret}`;
 function renderToggleGroup(props) {
 	return jsx(ToggleGroup, { ...props });
@@ -358,9 +359,8 @@ function renderValue(props) {
 }
 
 //#endregion
-//#region src/DataGridDefaultRenderersProvider.ts
+//#region src/DataGridDefaultRenderersContext.ts
 const DataGridDefaultRenderersContext = createContext(undefined);
-const DataGridDefaultRenderersProvider = DataGridDefaultRenderersContext.Provider;
 function useDefaultRenderers() {
 	return useContext(DataGridDefaultRenderersContext);
 }
@@ -383,9 +383,7 @@ function SelectCellFormatter({ value, tabIndex, indeterminate, disabled, onChang
 //#endregion
 //#region src/hooks/useRowSelection.ts
 const RowSelectionContext = createContext(undefined);
-const RowSelectionProvider = RowSelectionContext.Provider;
 const RowSelectionChangeContext = createContext(undefined);
-const RowSelectionChangeProvider = RowSelectionChangeContext.Provider;
 function useRowSelection() {
 	const rowSelectionContext = useContext(RowSelectionContext);
 	const rowSelectionChangeContext = useContext(RowSelectionChangeContext);
@@ -397,9 +395,7 @@ function useRowSelection() {
 	};
 }
 const HeaderRowSelectionContext = createContext(undefined);
-const HeaderRowSelectionProvider = HeaderRowSelectionContext.Provider;
 const HeaderRowSelectionChangeContext = createContext(undefined);
-const HeaderRowSelectionChangeProvider = HeaderRowSelectionChangeContext.Provider;
 function useHeaderRowSelection() {
 	const headerRowSelectionContext = useContext(HeaderRowSelectionContext);
 	const headerRowSelectionChangeContext = useContext(HeaderRowSelectionChangeContext);
@@ -650,25 +646,53 @@ function updateColumnParent(column, index, level) {
 }
 
 //#endregion
-//#region src/hooks/useLayoutEffect.ts
-const useLayoutEffect$1 = typeof window === "undefined" ? useEffect : useLayoutEffect;
-
-//#endregion
 //#region src/hooks/useColumnWidths.ts
-function useColumnWidths(columns, viewportColumns, templateColumns, gridRef, gridWidth, resizedColumnWidths, measuredColumnWidths, setResizedColumnWidths, setMeasuredColumnWidths, onColumnResize) {
+function useColumnWidths(columns, rows, viewportColumns, templateColumns, gridRef, gridWidth, resizedColumnWidths, measuredColumnWidths, setResizedColumnWidths, setMeasuredColumnWidths, onColumnResize) {
+	const prevRowsRef = useRef(rows);
+	const [resizedColumnsToMeasure, setResizedColumnsToMeasure] = useState(() => new Map());
 	const prevGridWidthRef = useRef(gridWidth);
 	const columnsCanFlex = columns.length === viewportColumns.length;
 	const ignorePreviouslyMeasuredColumns = columnsCanFlex && gridWidth !== prevGridWidthRef.current;
 	const newTemplateColumns = [...templateColumns];
-	const columnsToMeasure = [];
-	for (const { key, idx, width } of viewportColumns) if (typeof width === "string" && (ignorePreviouslyMeasuredColumns || !measuredColumnWidths.has(key)) && !resizedColumnWidths.has(key)) {
-		newTemplateColumns[idx] = width;
-		columnsToMeasure.push(key);
+	const columnsToMeasure = new Set();
+	const resetMeasuredColumns = prevRowsRef.current.length !== rows.length && (prevRowsRef.current.length === 0 || rows.length === 0);
+	for (const { key, idx, width } of viewportColumns) {
+		if (typeof width === "string" && (ignorePreviouslyMeasuredColumns || !measuredColumnWidths.has(key) || resetMeasuredColumns) && !resizedColumnWidths.has(key)) {
+			newTemplateColumns[idx] = width;
+			columnsToMeasure.add(key);
+		}
+		if (resizedColumnsToMeasure.size > 0) {
+			const tempWidth = resizedColumnsToMeasure.get(key);
+			if (tempWidth !== undefined) if (typeof tempWidth === "number") {
+				newTemplateColumns[idx] = `${tempWidth}px`;
+				columnsToMeasure.delete(key);
+			} else {
+				newTemplateColumns[idx] = tempWidth;
+				columnsToMeasure.add(key);
+			}
+			else if (columnsCanFlex && typeof width === "string" && !resizedColumnWidths.has(key)) {
+				newTemplateColumns[idx] = width;
+				columnsToMeasure.add(key);
+			}
+		}
 	}
 	const gridTemplateColumns = newTemplateColumns.join(" ");
-	useLayoutEffect$1(() => {
+	useLayoutEffect(() => {
 		prevGridWidthRef.current = gridWidth;
-		updateMeasuredWidths(columnsToMeasure);
+		if (resizedColumnsToMeasure.size > 0) {
+			for (const [resizingKey] of resizedColumnsToMeasure) {
+				const measuredWidth = measureColumnWidth(gridRef, resizingKey);
+				setResizedColumnWidths((resizedColumnWidths$1) => {
+					const newResizedColumnWidths = new Map(resizedColumnWidths$1);
+					newResizedColumnWidths.set(resizingKey, measuredWidth);
+					return newResizedColumnWidths;
+				});
+				const column = columns.find((c) => c.key === resizingKey);
+				onColumnResize?.(column, measuredWidth);
+			}
+			setResizedColumnsToMeasure(new Map());
+		}
+		if (columnsToMeasure.size > 0) updateMeasuredWidths([...columnsToMeasure]);
 	});
 	function updateMeasuredWidths(columnsToMeasure$1) {
 		if (columnsToMeasure$1.length === 0) return;
@@ -686,28 +710,14 @@ function useColumnWidths(columns, viewportColumns, templateColumns, gridRef, gri
 	}
 	function handleColumnResize(column, nextWidth) {
 		const { key: resizingKey } = column;
-		const newTemplateColumns$1 = [...templateColumns];
-		const columnsToMeasure$1 = [];
-		for (const { key, idx, width } of viewportColumns) if (resizingKey === key) {
-			const width$1 = typeof nextWidth === "number" ? `${nextWidth}px` : nextWidth;
-			newTemplateColumns$1[idx] = width$1;
-		} else if (columnsCanFlex && typeof width === "string" && !resizedColumnWidths.has(key)) {
-			newTemplateColumns$1[idx] = width;
-			columnsToMeasure$1.push(key);
-		}
-		gridRef.current.style.gridTemplateColumns = newTemplateColumns$1.join(" ");
-		const measuredWidth = typeof nextWidth === "number" ? nextWidth : measureColumnWidth(gridRef, resizingKey);
-		flushSync(() => {
-			setResizedColumnWidths((resizedColumnWidths$1) => {
-				const newResizedColumnWidths = new Map(resizedColumnWidths$1);
-				newResizedColumnWidths.set(resizingKey, measuredWidth);
-				return newResizedColumnWidths;
-			});
-			updateMeasuredWidths(columnsToMeasure$1);
+		setResizedColumnsToMeasure((resizedColumnsToMeasure$1) => {
+			const newResizedColumnsToMeasure = new Map(resizedColumnsToMeasure$1);
+			newResizedColumnsToMeasure.set(resizingKey, nextWidth);
+			return newResizedColumnsToMeasure;
 		});
-		onColumnResize?.(column, measuredWidth);
 	}
 	return {
+		columnsToMeasure,
 		gridTemplateColumns,
 		handleColumnResize
 	};
@@ -725,7 +735,7 @@ function useGridDimensions() {
 	const [inlineSize, setInlineSize] = useState(1);
 	const [blockSize, setBlockSize] = useState(1);
 	const [horizontalScrollbarHeight, setHorizontalScrollbarHeight] = useState(0);
-	useLayoutEffect$1(() => {
+	useLayoutEffect(() => {
 		const { ResizeObserver } = window;
 		if (ResizeObserver == null) return;
 		const { clientWidth, clientHeight, offsetWidth, offsetHeight } = gridRef.current;
@@ -918,11 +928,11 @@ function useViewportRows({ rows, rowHeight, clientHeight, scrollTop, enableVirtu
 
 //#endregion
 //#region src/Cell.tsx
-const cellCopied = "c6ra8a37-0-0-beta-47";
+const cellCopied = "c6ra8a37-0-0-beta-48";
 const cellCopiedClassname = `rdg-cell-copied ${cellCopied}`;
-const cellDraggedOver = "cq910m07-0-0-beta-47";
+const cellDraggedOver = "cq910m07-0-0-beta-48";
 const cellDraggedOverClassname = `rdg-cell-dragged-over ${cellDraggedOver}`;
-function Cell({ column, colSpan, isCellSelected, isCopied, isDraggedOver, row: row$1, rowIdx, className, onClick, onDoubleClick, onContextMenu, onRowChange, selectCell, style,...props }, ref) {
+function Cell({ column, colSpan, isCellSelected, isCopied, isDraggedOver, row: row$1, rowIdx, className, onClick, onDoubleClick, onContextMenu, onRowChange, selectCell, style,...props }) {
 	const { tabIndex, childTabIndex, onFocus } = useRovingTabIndex(isCellSelected);
 	const { cellClass } = column;
 	className = getCellClassname(column, {
@@ -987,7 +997,6 @@ function Cell({ column, colSpan, isCellSelected, isCopied, isDraggedOver, row: r
 			"aria-colspan": colSpan,
 			"aria-selected": isCellSelected,
 			"aria-readonly": !isEditable || undefined,
-			ref,
 			tabIndex,
 			className,
 			style: {
@@ -1010,7 +1019,7 @@ function Cell({ column, colSpan, isCellSelected, isCopied, isDraggedOver, row: r
 		}
 );
 }
-const CellComponent = memo(forwardRef(Cell));
+const CellComponent = memo(Cell);
 var Cell_default = CellComponent;
 function defaultRenderCell(key, props) {
 	return jsx(CellComponent, { ...props }, key);
@@ -1018,8 +1027,8 @@ function defaultRenderCell(key, props) {
 
 //#endregion
 //#region src/DragHandle.tsx
-const cellDragHandle = "c1w9bbhr7-0-0-beta-47";
-const cellDragHandleFrozenClassname = "c1creorc7-0-0-beta-47";
+const cellDragHandle = "c1w9bbhr7-0-0-beta-48";
+const cellDragHandleFrozenClassname = "c1creorc7-0-0-beta-48";
 const cellDragHandleClassname = `rdg-cell-drag-handle ${cellDragHandle}`;
 function DragHandle({ gridRowStart, rows, column, columnWidth, maxColIdx, isLastRow, selectedPosition, latestDraggedOverRowIdx, isCellEditable, onRowsChange, onFill, onClick, setDragging, setDraggedOverRowIdx }) {
 	const { idx, rowIdx } = selectedPosition;
@@ -1101,7 +1110,7 @@ function DragHandle({ gridRowStart, rows, column, columnWidth, maxColIdx, isLast
 
 //#endregion
 //#region src/EditCell.tsx
-const cellEditing = "cis5rrm7-0-0-beta-47";
+const cellEditing = "cis5rrm7-0-0-beta-48";
 function EditCell({ column, colSpan, row: row$1, rowIdx, onRowChange, closeEditor, onKeyDown, navigate }) {
 	const frameRequestRef = useRef(undefined);
 	const commitOnOutsideClick = column.editorOptions?.commitOnOutsideClick !== false;
@@ -1214,8 +1223,8 @@ function GroupedColumnHeaderCell({ column, rowIdx, isCellSelected, selectCell })
 
 //#endregion
 //#region src/renderHeaderCell.tsx
-const headerSortCellClassname = "h44jtk67-0-0-beta-47";
-const headerSortName = "hcgkhxz7-0-0-beta-47";
+const headerSortCellClassname = "h44jtk67-0-0-beta-48";
+const headerSortName = "hcgkhxz7-0-0-beta-48";
 const headerSortNameClassname = `rdg-header-sort-name ${headerSortName}`;
 function renderHeaderCell({ column, sortDirection, priority }) {
 	if (!column.sortable) return column.name;
@@ -1241,14 +1250,14 @@ function SortableHeaderCell({ sortDirection, priority, children }) {
 
 //#endregion
 //#region src/HeaderCell.tsx
-const cellSortableClassname = "c6l2wv17-0-0-beta-47";
-const cellResizable = "c1kqdw7y7-0-0-beta-47";
+const cellSortableClassname = "c6l2wv17-0-0-beta-48";
+const cellResizable = "c1kqdw7y7-0-0-beta-48";
 const cellResizableClassname = `rdg-cell-resizable ${cellResizable}`;
-const resizeHandleClassname = "r1y6ywlx7-0-0-beta-47";
+const resizeHandleClassname = "r1y6ywlx7-0-0-beta-48";
 const cellDraggableClassname = "rdg-cell-draggable";
-const cellDragging = "c1bezg5o7-0-0-beta-47";
+const cellDragging = "c1bezg5o7-0-0-beta-48";
 const cellDraggingClassname = `rdg-cell-dragging ${cellDragging}`;
-const cellOver = "c1vc96037-0-0-beta-47";
+const cellOver = "c1vc96037-0-0-beta-48";
 const cellOverClassname = `rdg-cell-drag-over ${cellOver}`;
 function HeaderCell({ column, colSpan, rowIdx, isCellSelected, onColumnResize, onColumnsReorder, sortColumns, onSortColumnsChange, selectCell, shouldFocusGrid, direction, dragDropKey }) {
 	const [isDragging, setIsDragging] = useState(false);
@@ -1416,17 +1425,17 @@ function isEventPertinent(event) {
 
 //#endregion
 //#region src/style/row.ts
-const row = "r1upfr807-0-0-beta-47";
+const row = "r1upfr807-0-0-beta-48";
 const rowClassname = `rdg-row ${row}`;
-const rowSelected = "r190mhd37-0-0-beta-47";
+const rowSelected = "r190mhd37-0-0-beta-48";
 const rowSelectedClassname = "rdg-row-selected";
-const rowSelectedWithFrozenCell = "r139qu9m7-0-0-beta-47";
+const rowSelectedWithFrozenCell = "r139qu9m7-0-0-beta-48";
 const topSummaryRowClassname = "rdg-top-summary-row";
 const bottomSummaryRowClassname = "rdg-bottom-summary-row";
 
 //#endregion
 //#region src/HeaderRow.tsx
-const headerRow = "h10tskcx7-0-0-beta-47";
+const headerRow = "h10tskcx7-0-0-beta-48";
 const headerRowClassname = `rdg-header-row ${headerRow}`;
 function HeaderRow({ rowIdx, columns, onColumnResize, onColumnsReorder, sortColumns, onSortColumnsChange, lastFrozenColumnIndex, selectedCellIdx, selectCell, shouldFocusGrid, direction }) {
 	const dragDropKey = useId();
@@ -1503,7 +1512,7 @@ var GroupedColumnHeaderRow_default = memo(GroupedColumnHeaderRow);
 
 //#endregion
 //#region src/Row.tsx
-function Row({ className, rowIdx, gridRowStart, selectedCellIdx, isRowSelectionDisabled, isRowSelected, copiedCellIdx, draggedOverCellIdx, lastFrozenColumnIndex, row: row$1, viewportColumns, selectedCellEditor, onCellClick, onCellDoubleClick, onCellContextMenu, rowClass, setDraggedOverRowIdx, onMouseEnter, onRowChange, selectCell,...props }, ref) {
+function Row({ className, rowIdx, gridRowStart, selectedCellIdx, isRowSelectionDisabled, isRowSelected, copiedCellIdx, draggedOverCellIdx, lastFrozenColumnIndex, row: row$1, viewportColumns, selectedCellEditor, onCellClick, onCellDoubleClick, onCellContextMenu, rowClass, setDraggedOverRowIdx, onMouseEnter, onRowChange, selectCell,...props }) {
 	const renderCell = useDefaultRenderers().renderCell;
 	const handleRowChange = useLatestFunc((column, newRow) => {
 		onRowChange(column, rowIdx, newRow);
@@ -1543,11 +1552,10 @@ function Row({ className, rowIdx, gridRowStart, selectedCellIdx, isRowSelectionD
 		isRowSelected,
 		isRowSelectionDisabled
 	}), [isRowSelectionDisabled, isRowSelected]);
-	return jsx(RowSelectionProvider, {
+	return jsx(RowSelectionContext, {
 		value: selectionValue,
 		children: jsx("div", {
 			role: "row",
-			ref,
 			className,
 			onMouseEnter: handleDragEnter,
 			style: getRowStyle(gridRowStart),
@@ -1556,7 +1564,7 @@ function Row({ className, rowIdx, gridRowStart, selectedCellIdx, isRowSelectionD
 		})
 	});
 }
-const RowComponent = memo(forwardRef(Row));
+const RowComponent = memo(Row);
 var Row_default = RowComponent;
 function defaultRenderRow(key, props) {
 	return jsx(RowComponent, { ...props }, key);
@@ -1566,10 +1574,10 @@ function defaultRenderRow(key, props) {
 //#region src/ScrollToCell.tsx
 function ScrollToCell({ scrollToPosition: { idx, rowIdx }, gridRef, setScrollToCellPosition }) {
 	const ref = useRef(null);
-	useLayoutEffect$1(() => {
+	useLayoutEffect(() => {
 		scrollIntoView(ref.current);
 	});
-	useLayoutEffect$1(() => {
+	useLayoutEffect(() => {
 		function removeScrollToCell() {
 			setScrollToCellPosition(null);
 		}
@@ -1593,7 +1601,7 @@ function ScrollToCell({ scrollToPosition: { idx, rowIdx }, gridRef, setScrollToC
 
 //#endregion
 //#region src/sortStatus.tsx
-const arrow = "a3ejtar7-0-0-beta-47";
+const arrow = "a3ejtar7-0-0-beta-48";
 const arrowClassname = `rdg-sort-arrow ${arrow}`;
 function renderSortStatus({ sortDirection, priority }) {
 	return jsxs(Fragment, { children: [renderSortIcon({ sortDirection }), renderSortPriority({ priority })] });
@@ -1615,16 +1623,16 @@ function renderSortPriority({ priority }) {
 
 //#endregion
 //#region src/style/core.ts
-const root = "rnvodz57-0-0-beta-47";
+const root = "rnvodz57-0-0-beta-48";
 const rootClassname = `rdg ${root}`;
-const viewportDragging = "vlqv91k7-0-0-beta-47";
+const viewportDragging = "vlqv91k7-0-0-beta-48";
 const viewportDraggingClassname = `rdg-viewport-dragging ${viewportDragging}`;
-const focusSinkClassname = "f1lsfrzw7-0-0-beta-47";
-const focusSinkHeaderAndSummaryClassname = "f1cte0lg7-0-0-beta-47";
+const focusSinkClassname = "f1lsfrzw7-0-0-beta-48";
+const focusSinkHeaderAndSummaryClassname = "f1cte0lg7-0-0-beta-48";
 
 //#endregion
 //#region src/SummaryCell.tsx
-const summaryCellClassname = "s8wc6fl7-0-0-beta-47";
+const summaryCellClassname = "s8wc6fl7-0-0-beta-48";
 function SummaryCell({ column, colSpan, row: row$1, rowIdx, isCellSelected, selectCell }) {
 	const { tabIndex, childTabIndex, onFocus } = useRovingTabIndex(isCellSelected);
 	const { summaryCellClass } = column;
@@ -1656,8 +1664,8 @@ var SummaryCell_default = memo(SummaryCell);
 
 //#endregion
 //#region src/SummaryRow.tsx
-const summaryRow = "skuhp557-0-0-beta-47";
-const topSummaryRow = "tf8l5ub7-0-0-beta-47";
+const summaryRow = "skuhp557-0-0-beta-48";
+const topSummaryRow = "tf8l5ub7-0-0-beta-48";
 const summaryRowClassname = `rdg-summary-row ${summaryRow}`;
 function SummaryRow({ rowIdx, gridRowStart, row: row$1, viewportColumns, top, bottom, lastFrozenColumnIndex, selectedCellIdx, isTop, selectCell, "aria-rowindex": ariaRowIndex }) {
 	const cells = [];
@@ -1698,15 +1706,8 @@ var SummaryRow_default = memo(SummaryRow);
 
 //#endregion
 //#region src/DataGrid.tsx
-/**
-* Main API Component to render a data grid of rows and columns
-*
-* @example
-*
-* <DataGrid columns={columns} rows={rows} />
-*/
-function DataGrid(props, ref) {
-	const { columns: rawColumns, rows, topSummaryRows, bottomSummaryRows, rowKeyGetter, onRowsChange, rowHeight: rawRowHeight, headerRowHeight: rawHeaderRowHeight, summaryRowHeight: rawSummaryRowHeight, selectedRows, isRowSelectionDisabled, onSelectedRowsChange, sortColumns, onSortColumnsChange, defaultColumnOptions, onCellClick, onCellDoubleClick, onCellContextMenu, onCellKeyDown, onSelectedCellChange, onScroll, onColumnResize, onColumnsReorder, onFill, onCopy, onPaste, enableVirtualization: rawEnableVirtualization, renderers, className, style, rowClass, direction: rawDirection, role: rawRole, "aria-label": ariaLabel, "aria-labelledby": ariaLabelledBy, "aria-description": ariaDescription, "aria-describedby": ariaDescribedBy, "aria-rowcount": rawAriaRowCount, "data-testid": testId, "data-cy": dataCy } = props;
+function DataGrid(props) {
+	const { ref, columns: rawColumns, rows, topSummaryRows, bottomSummaryRows, rowKeyGetter, onRowsChange, rowHeight: rawRowHeight, headerRowHeight: rawHeaderRowHeight, summaryRowHeight: rawSummaryRowHeight, selectedRows, isRowSelectionDisabled, onSelectedRowsChange, sortColumns, onSortColumnsChange, defaultColumnOptions, onCellClick, onCellDoubleClick, onCellContextMenu, onCellKeyDown, onSelectedCellChange, onScroll, onColumnResize, onColumnsReorder, onFill, onCopy, onPaste, enableVirtualization: rawEnableVirtualization, renderers, className, style, rowClass, direction: rawDirection, role: rawRole, "aria-label": ariaLabel, "aria-labelledby": ariaLabelledBy, "aria-description": ariaDescription, "aria-describedby": ariaDescribedBy, "aria-rowcount": rawAriaRowCount, "data-testid": testId, "data-cy": dataCy } = props;
 	/**
 	* defaults
 	*/
@@ -1822,7 +1823,7 @@ function DataGrid(props, ref) {
 		topSummaryRows,
 		bottomSummaryRows
 	});
-	const { gridTemplateColumns, handleColumnResize } = useColumnWidths(columns, viewportColumns, templateColumns, gridRef, gridWidth, resizedColumnWidths, measuredColumnWidths, setResizedColumnWidths, setMeasuredColumnWidths, onColumnResize);
+	const { gridTemplateColumns, columnsToMeasure, handleColumnResize } = useColumnWidths(columns, rows, viewportColumns, templateColumns, gridRef, gridWidth, resizedColumnWidths, measuredColumnWidths, setResizedColumnWidths, setMeasuredColumnWidths, onColumnResize);
 	const minColIdx = isTreeGrid ? -1 : 0;
 	const maxColIdx = columns.length - 1;
 	const selectedCellIsWithinSelectionBounds = isCellWithinSelectionBounds(selectedPosition);
@@ -1864,13 +1865,13 @@ function DataGrid(props, ref) {
 	/**
 	* effects
 	*/
-	useLayoutEffect$1(() => {
+	useLayoutEffect(() => {
 		if (focusSinkRef.current !== null && selectedCellIsWithinSelectionBounds && selectedPosition.idx === -1) {
 			focusSinkRef.current.focus({ preventScroll: true });
 			scrollIntoView(focusSinkRef.current);
 		}
 	}, [selectedCellIsWithinSelectionBounds, selectedPosition]);
-	useLayoutEffect$1(() => {
+	useLayoutEffect(() => {
 		if (shouldFocusCell) {
 			setShouldFocusCell(false);
 			focusCellOrCellContent();
@@ -2361,11 +2362,11 @@ function DataGrid(props, ref) {
 		"data-testid": testId,
 		"data-cy": dataCy,
 		children: [
-			jsxs(DataGridDefaultRenderersProvider, {
+			jsxs(DataGridDefaultRenderersContext, {
 				value: defaultGridComponents,
-				children: [jsx(HeaderRowSelectionChangeProvider, {
+				children: [jsx(HeaderRowSelectionChangeContext, {
 					value: selectHeaderRowLatest,
-					children: jsxs(HeaderRowSelectionProvider, {
+					children: jsxs(HeaderRowSelectionContext, {
 						value: headerSelectionValue,
 						children: [Array.from({ length: groupedColumnHeaderRowsCount }, (_, index) => jsx(GroupedColumnHeaderRow_default, {
 							rowIdx: index + 1,
@@ -2407,7 +2408,7 @@ function DataGrid(props, ref) {
 							selectCell: selectCellLatest
 						}, rowIdx);
 					}),
-					jsx(RowSelectionChangeProvider, {
+					jsx(RowSelectionChangeContext, {
 						value: selectRowLatest,
 						children: getViewportRows()
 					}),
@@ -2434,7 +2435,7 @@ function DataGrid(props, ref) {
 				] })]
 			}),
 			renderDragHandle(),
-			renderMeasuringCells(viewportColumns),
+			renderMeasuringCells(viewportColumns, columnsToMeasure),
 			isTreeGrid && jsx("div", {
 				ref: focusSinkRef,
 				tabIndex: isGroupRowFocused ? 0 : -1,
@@ -2459,7 +2460,6 @@ function getCellToScroll(gridEl) {
 function isSamePosition(p1, p2) {
 	return p1.idx === p2.idx && p1.rowIdx === p2.rowIdx;
 }
-var DataGrid_default = forwardRef(DataGrid);
 
 //#endregion
 //#region src/GroupCell.tsx
@@ -2496,7 +2496,7 @@ var GroupCell_default = memo(GroupCell);
 
 //#endregion
 //#region src/GroupRow.tsx
-const groupRow = "g1yxluv37-0-0-beta-47";
+const groupRow = "g1yxluv37-0-0-beta-48";
 const groupRowClassname = `rdg-group-row ${groupRow}`;
 function GroupedRow({ className, row: row$1, rowIdx, viewportColumns, selectedCellIdx, isRowSelected, selectCell, gridRowStart, groupBy, toggleGroup, isRowSelectionDisabled,...props }) {
 	const idx = viewportColumns[0].key === SELECT_COLUMN_KEY ? row$1.level + 1 : row$1.level;
@@ -2511,7 +2511,7 @@ function GroupedRow({ className, row: row$1, rowIdx, viewportColumns, selectedCe
 		isRowSelected
 	}), [isRowSelected]);
 	return jsx(
-		RowSelectionProvider,
+		RowSelectionContext,
 		// aria-level is 1-based
 		// aria-posinset is 1-based
 		{
@@ -2546,7 +2546,7 @@ var GroupRow_default = memo(GroupedRow);
 
 //#endregion
 //#region src/TreeDataGrid.tsx
-function TreeDataGrid({ columns: rawColumns, rows: rawRows, rowHeight: rawRowHeight, rowKeyGetter: rawRowKeyGetter, onCellKeyDown: rawOnCellKeyDown, onRowsChange, selectedRows: rawSelectedRows, onSelectedRowsChange: rawOnSelectedRowsChange, renderers, groupBy: rawGroupBy, rowGrouper, expandedGroupIds, onExpandedGroupIdsChange,...props }, ref) {
+function TreeDataGrid({ columns: rawColumns, rows: rawRows, rowHeight: rawRowHeight, rowKeyGetter: rawRowKeyGetter, onCellKeyDown: rawOnCellKeyDown, onRowsChange, selectedRows: rawSelectedRows, onSelectedRowsChange: rawOnSelectedRowsChange, renderers, groupBy: rawGroupBy, rowGrouper, expandedGroupIds, onExpandedGroupIdsChange,...props }) {
 	const defaultRenderers = useDefaultRenderers();
 	const rawRenderRow = renderers?.renderRow ?? defaultRenderers?.renderRow ?? defaultRenderRow;
 	const headerAndTopSummaryRowsCount = 1 + (props.topSummaryRows?.length ?? 0);
@@ -2794,11 +2794,10 @@ function TreeDataGrid({ columns: rawColumns, rows: rawRows, rowHeight: rawRowHei
 			selectedCellEditor
 		});
 	}
-	return jsx(DataGrid_default, {
+	return jsx(DataGrid, {
 		...props,
 		role: "treegrid",
 		"aria-rowcount": rowsCount + 1 + (props.topSummaryRows?.length ?? 0) + (props.bottomSummaryRows?.length ?? 0),
-		ref,
 		columns,
 		rows,
 		rowHeight,
@@ -2816,11 +2815,10 @@ function TreeDataGrid({ columns: rawColumns, rows: rawRows, rowHeight: rawRowHei
 function isReadonlyArray(arr) {
 	return Array.isArray(arr);
 }
-var TreeDataGrid_default = forwardRef(TreeDataGrid);
 
 //#endregion
 //#region src/editors/textEditor.tsx
-const textEditorInternalClassname = "t7vyx3i7-0-0-beta-47";
+const textEditorInternalClassname = "t7vyx3i7-0-0-beta-48";
 const textEditorClassname = `rdg-text-editor ${textEditorInternalClassname}`;
 function autoFocusAndSelect(input) {
 	input?.focus();
@@ -2840,5 +2838,5 @@ function textEditor({ row: row$1, column, onRowChange, onClose }) {
 }
 
 //#endregion
-export { Cell_default as Cell, DataGridDefaultRenderersProvider, Row_default as Row, SELECT_COLUMN_KEY, SelectCellFormatter, SelectColumn, ToggleGroup, TreeDataGrid_default as TreeDataGrid, DataGrid_default as default, renderCheckbox, renderHeaderCell, renderSortIcon, renderSortPriority, renderToggleGroup, renderValue, textEditor, useHeaderRowSelection, useRowSelection };
+export { Cell_default as Cell, DataGrid, DataGridDefaultRenderersContext, Row_default as Row, SELECT_COLUMN_KEY, SelectCellFormatter, SelectColumn, ToggleGroup, TreeDataGrid, renderCheckbox, renderHeaderCell, renderSortIcon, renderSortPriority, renderToggleGroup, renderValue, textEditor, useHeaderRowSelection, useRowSelection };
 //# sourceMappingURL=bundle.js.map
