@@ -105,7 +105,6 @@ export class ConnectionFormSSHPart extends FormPart<void, IConnectionFormStateRe
 
       handlerConfig = getTrimmedSSHConfig(handlerConfig);
       config.networkHandlersConfig.push(handlerConfig);
-      this.formState.state.config.networkHandlersConfig = config.networkHandlersConfig;
     }
   }
 

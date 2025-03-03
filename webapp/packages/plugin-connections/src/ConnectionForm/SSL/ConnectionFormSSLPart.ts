@@ -37,7 +37,7 @@ export class ConnectionFormSSLPart extends FormPart<void, IConnectionFormStateRe
   }
 
   protected override async loader(): Promise<void> {
-    if (!this.isChanged || !this.formState.state.config.driverId) {
+    if (!this.formState.state.config.driverId) {
       return;
     }
 
@@ -157,7 +157,6 @@ export class ConnectionFormSSLPart extends FormPart<void, IConnectionFormStateRe
 
       trimSSLConfig(handlerConfig);
       config.networkHandlersConfig.push(handlerConfig);
-      this.formState.state.config.networkHandlersConfig = config.networkHandlersConfig;
     }
   }
 

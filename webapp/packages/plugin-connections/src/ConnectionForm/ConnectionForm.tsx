@@ -57,7 +57,6 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
           if (formState.mode === 'create') {
             notificationService.notify(
               {
-                // TODO add message
                 title: 'connections_connection_create_success',
                 message: info?.name,
               },
@@ -66,7 +65,6 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
           } else {
             notificationService.notify(
               {
-                // TODO add message
                 title: 'connections_connection_update_success',
                 message: info?.name,
               },
