@@ -1,3 +1,6 @@
+lefthook: |
+  cd webapp
+  yarn lefthook
 pre-commit:
   parallel: true
   scripts:
