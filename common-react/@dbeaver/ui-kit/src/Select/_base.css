@@ -20,6 +20,7 @@
     --dbv-kit-select-popover-background: var(--dbv-kit-color-background);
     --dbv-kit-select-popover-foreground: var(--dbv-kit-color-foreground);
     --dbv-kit-select-popover-shadow: var(--tw-shadow-md);
+    --dbv-kit-select-popover-height: 15rem;
 
     --dbv-kit-select-item-foreground: var(--tw-color-gray-500);
     --dbv-kit-select-item-padding-inline: calc(var(--tw-spacing) * 3);

@@ -46,7 +46,7 @@
   .dbv-kit-select__popover {
     z-index: 1000;
     min-width: 100%;
-    max-height: 10rem;
+    max-height: var(--dbv-kit-select-popover-height);
     overflow-y: auto;
     background-color: var(--dbv-kit-select-popover-background);
     color: var(--dbv-kit-select-popover-foreground);
@@ -55,7 +55,6 @@
     border-width: var(--dbv-kit-select-border-width);
     border-style: var(--dbv-kit-select-border-style);
     box-shadow: var(--dbv-kit-select-popover-shadow);
-    padding: 0.25rem 0;
     outline: 0;
 
     opacity: 0;
