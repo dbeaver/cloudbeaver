@@ -55,7 +55,6 @@
     border-width: var(--dbv-kit-select-border-width);
     border-style: var(--dbv-kit-select-border-style);
     box-shadow: var(--dbv-kit-select-popover-shadow);
-    margin-top: 2px;
     padding: 0.25rem 0;
     outline: 0;
 
