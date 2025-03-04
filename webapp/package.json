@@ -21,7 +21,8 @@
     "lint": "eslint",
     "validate-dependencies": "core-cli-validate-dependencies './packages/*/'",
     "add-plugin": "core-cli-add-plugin",
-    "version:set": "yarn workspaces foreach -Ap --include '@cloudbeaver/product-*' run version:set"
+    "version:set": "yarn workspaces foreach -Ap --include '@cloudbeaver/product-*' run version:set",
+    "postinstall": "yarn lefthook install"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
