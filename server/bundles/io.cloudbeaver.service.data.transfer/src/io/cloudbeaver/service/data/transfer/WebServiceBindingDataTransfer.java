@@ -21,10 +21,10 @@ import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServletContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
+import io.cloudbeaver.service.data.transfer.impl.WebDataTransferImportServlet;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferParameters;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferServlet;
 import io.cloudbeaver.service.data.transfer.impl.WebServiceDataTransfer;
-import io.cloudbeaver.service.data.transfer.impl.WebDataTransferImportServlet;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import org.jkiss.dbeaver.DBException;
 
@@ -54,10 +54,6 @@ public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServ
                 WebServiceBindingSQL.getSQLContext(env),
                 env.getArgument("resultsId"),
                 new WebDataTransferParameters(env.getArgument("parameters"))
-            ))
-            .dataFetcher("dataTransferRemoveDataFile", env -> getService(env).dataTransferRemoveDataFile(
-                getWebSession(env),
-                env.getArgument("dataFileId")
             ))
             .dataFetcher("dataTransferDefaultExportSettings", env -> getService(env).defaultExportSettings())
         ;

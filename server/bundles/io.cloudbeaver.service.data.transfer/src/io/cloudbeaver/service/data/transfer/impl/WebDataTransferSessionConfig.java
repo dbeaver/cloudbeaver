@@ -36,16 +36,8 @@ public class WebDataTransferSessionConfig {
         }
     }
 
-    public void removeTask(WebDataTransferTaskConfig taskConfig) {
-        synchronized (tasks) {
-            tasks.remove(taskConfig.getDataFileId());
-            taskConfig.deleteFile();
-        }
-    }
-
     public WebDataTransferSessionConfig deleteExportFiles() {
         synchronized (tasks) {
-            tasks.values().forEach(WebDataTransferTaskConfig::deleteFile);
             tasks.clear();
         }
         return this;
