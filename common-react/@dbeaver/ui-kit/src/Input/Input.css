@@ -1,0 +1,52 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+@import './_base.css';
+@import './_sizes.css';
+@import './_variants.css';
+
+.dbv-kit-input-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.dbv-kit-input {
+  background: var(--dbv-kit-input-background);
+  border-color: var(--dbv-kit-input-border-color);
+  border-width: var(--dbv-kit-input-border-width);
+  border-style: var(--dbv-kit-input-border-style);
+  color: var(--dbv-kit-input-foreground);
+  padding: var(--dbv-kit-input-padding);
+  font-size: var(--dbv-kit-input-font-size);
+  height: var(--dbv-kit-input-height);
+
+  &::placeholder {
+    color: var(--dbv-kit-input-placeholder-foreground);
+  }
+}
+
+/* ---------------------------- */
+/* Sizes */
+
+.dbv-kit-input--small {
+  --dbv-kit-input-height: var(--dbv-kit-input-small-height);
+  --dbv-kit-input-padding: var(--dbv-kit-input-small-padding);
+  --dbv-kit-input-font-size: var(--dbv-kit-input-small-font-size);
+}
+
+.dbv-kit-input--large {
+  --dbv-kit-input-height: var(--dbv-kit-input-large-height);
+  --dbv-kit-input-padding: var(--dbv-kit-input-large-padding);
+  --dbv-kit-input-font-size: var(--dbv-kit-input-large-font-size);
+}
+
+.dbv-kit-input--xlarge {
+  --dbv-kit-input-height: var(--dbv-kit-input-xlarge-height);
+  --dbv-kit-input-padding: var(--dbv-kit-input-xlarge-padding);
+  --dbv-kit-input-font-size: var(--dbv-kit-input-xlarge-font-size);
+}

@@ -1,0 +1,181 @@
+@import './_base.css';
+@import './_sizes.css';
+@import './_variants.css';
+
+@layer components {
+  .dbv-kit-button {
+    display: inline-flex;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+
+    height: var(--dbv-kit-btn-height);
+    padding-inline: var(--dbv-kit-btn-padding-inline);
+    gap: var(--dbv-kit-btn-gap);
+
+    background-color: var(--dbv-kit-btn-background);
+    color: var(--dbv-kit-btn-foreground);
+
+    border-radius: var(--dbv-kit-btn-border-radius);
+    border-width: var(--dbv-kit-btn-border-width);
+    border-color: var(--dbv-kit-btn-border-color);
+    border-style: var(--dbv-kit-btn-border-style);
+
+    font-size: var(--dbv-kit-btn-font-size);
+    font-weight: var(--dbv-kit-btn-font-weight);
+
+    &:focus-visible,
+    &[data-focus-visible] {
+      outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-color-outline);
+    }
+
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--dbv-kit-btn-background-hover);
+      }
+    }
+
+    &:active,
+    &[data-active] {
+      background-color: var(--dbv-kit-btn-background-active);
+    }
+
+    &:disabled {
+      opacity: var(--dbv-kit-btn-disabled-opacity);
+    }
+  }
+
+  /* ---------------------------- */
+  /* Sizes */
+
+  .dbv-kit-button--small {
+    --dbv-kit-btn-padding-inline: var(--dbv-kit-btn-small-padding-inline);
+    --dbv-kit-btn-font-size: var(--dbv-kit-btn-small-font-size);
+    --dbv-kit-btn-height: var(--dbv-kit-btn-small-height);
+    --dbv-kit-btn-gap: var(--dbv-kit-btn-small-gap);
+
+    --dbv-kit-btn-icon-margin-inline: calc(var(--dbv-kit-btn-small-padding-inline) * -0.25);
+  }
+
+  .dbv-kit-button--medium {
+    --dbv-kit-btn-padding-inline: var(--dbv-kit-btn-medium-padding-inline);
+    --dbv-kit-btn-font-size: var(--dbv-kit-btn-medium-font-size);
+    --dbv-kit-btn-height: var(--dbv-kit-btn-medium-height);
+    --dbv-kit-btn-gap: var(--dbv-kit-btn-medium-gap);
+
+    --dbv-kit-btn-icon-margin-inline: calc(var(--dbv-kit-btn-medium-padding-inline) * -0.25);
+  }
+
+  .dbv-kit-button--large {
+    --dbv-kit-btn-padding-inline: var(--dbv-kit-btn-large-padding-inline);
+    --dbv-kit-btn-font-size: var(--dbv-kit-btn-large-font-size);
+    --dbv-kit-btn-height: var(--dbv-kit-btn-large-height);
+    --dbv-kit-btn-gap: var(--dbv-kit-btn-large-gap);
+
+    --dbv-kit-btn-icon-margin-inline: calc(var(--dbv-kit-btn-large-padding-inline) * -0.25);
+  }
+
+  .dbv-kit-button--xlarge {
+    --dbv-kit-btn-padding-inline: var(--dbv-kit-btn-xlarge-padding-inline);
+    --dbv-kit-btn-font-size: var(--dbv-kit-btn-xlarge-font-size);
+    --dbv-kit-btn-height: var(--dbv-kit-btn-xlarge-height);
+    --dbv-kit-btn-gap: var(--dbv-kit-btn-xlarge-gap);
+
+    --dbv-kit-btn-icon-margin-inline: calc(var(--dbv-kit-btn-xlarge-padding-inline) * -0.25);
+  }
+
+  /* ---------------------------- */
+  /* Variants */
+
+  .dbv-kit-button--primary {
+    --dbv-kit-btn-background: var(--dbv-kit-btn-primary-background);
+    --dbv-kit-btn-foreground: var(--dbv-kit-btn-primary-foreground);
+    --dbv-kit-btn-background-hover: var(--dbv-kit-btn-primary-background-hover);
+    --dbv-kit-btn-background-active: var(--dbv-kit-btn-primary-background-active);
+
+    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-background-hover);
+    --dbv-kit-btn-loader-background: var(--dbv-kit-btn-loader-base-color);
+  }
+
+  .dbv-kit-button--secondary {
+    --dbv-kit-btn-background: var(--dbv-kit-btn-secondary-background);
+    --dbv-kit-btn-foreground: var(--dbv-kit-btn-secondary-foreground);
+    --dbv-kit-btn-background-hover: var(--dbv-kit-btn-secondary-background-hover);
+    --dbv-kit-btn-background-active: var(--dbv-kit-btn-secondary-background-active);
+    --dbv-kit-btn-border-color: var(--dbv-kit-btn-secondary-border-color);
+
+    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-secondary-foreground);
+    --dbv-kit-btn-loader-background: var(--dbv-kit-btn-secondary-background-active);
+  }
+
+  .dbv-kit-button--danger {
+    --dbv-kit-btn-background: var(--dbv-kit-btn-danger-background);
+    --dbv-kit-btn-foreground: var(--dbv-kit-btn-danger-foreground);
+    --dbv-kit-btn-background-hover: var(--dbv-kit-btn-danger-background-hover);
+    --dbv-kit-btn-background-active: var(--dbv-kit-btn-danger-background-active);
+
+    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-danger-background);
+    --dbv-kit-btn-loader-background: var(--dbv-kit-btn-loader-base-color);
+  }
+
+  /* ---------------------------- */
+  /* Loader */
+
+  .dbv-kit-button[data-loading='true'] {
+    opacity: 0.75;
+    color: color-mix(in oklch, var(--dbv-kit-btn-foreground) 25%, var(--dbv-kit-btn-loader-base-color));
+    background-color: color-mix(in oklch, var(--dbv-kit-btn-loader-base-color) 75%, var(--dbv-kit-btn-background));
+
+    &:hover,
+    &:active,
+    &[data-active] {
+      background-color: color-mix(in oklch, var(--dbv-kit-btn-loader-base-color) 85%, var(--dbv-kit-btn-background));
+    }
+  }
+
+  .dbv-kit-button__loader {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+
+    &::after {
+      --loader-width: calc(var(--dbv-kit-btn-font-size) * 0.2);
+      content: '';
+      border: var(--loader-width) solid var(--dbv-kit-btn-loader-background);
+      border-top: var(--loader-width) solid var(--dbv-kit-btn-loader-color);
+      border-radius: 50%;
+      opacity: 1;
+      width: calc(var(--dbv-kit-btn-font-size) * 1.25);
+      height: calc(var(--dbv-kit-btn-font-size) * 1.25);
+      animation: var(--dbv-kit-btn-loader-animation);
+    }
+  }
+
+  /* ---------------------------- */
+  /* Icon */
+
+  .dbv-kit-button__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    fill: currentColor;
+  }
+
+  .dbv-kit-button__icon--start {
+    margin-inline-start: var(--dbv-kit-btn-icon-margin-inline);
+  }
+
+  .dbv-kit-button__icon--end {
+    margin-inline-end: var(--dbv-kit-btn-icon-margin-inline);
+  }
+}

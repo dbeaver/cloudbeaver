@@ -1,0 +1,118 @@
+@import 'tailwindcss' prefix(tw);
+
+@layer theme {
+  main {
+    color: var(--dbv-kit-color-text);
+    background-color: var(--tw-color-gray-50);
+  }
+
+  a {
+    color: var(--tw-color-blue-600);
+    text-decoration: underline;
+
+    &:hover {
+      color: var(--tw-color-blue-700);
+      text-decoration-thickness: 2px;
+    }
+  }
+
+  code {
+    color: var(--tw-color-orange-700);
+  }
+
+  h1,
+  h2,
+  h3,
+  h3,
+  h5 {
+    font-weight: var(--tw-font-weight-semibold);
+    margin-block-start: 1em;
+    margin-block-end: 0.5em;
+  }
+
+  h1 {
+    font-size: var(--tw-text-2xl);
+  }
+
+  h2 {
+    font-size: var(--tw-text-xl);
+  }
+
+  h3 {
+    font-size: var(--tw-text-lg);
+  }
+
+  p {
+    font-size: var(--tw-text-base);
+    margin-block-start: 0.5em;
+    margin-block-end: 0.5em;
+  }
+
+  kbd {
+    background-color: #eee;
+    border-radius: 3px;
+    border: 1px solid #b4b4b4;
+    box-shadow:
+      0 1px 1px rgba(0, 0, 0, 0.2),
+      0 2px 0 0 rgba(255, 255, 255, 0.7) inset;
+    color: #333;
+    display: inline-block;
+    font-size: 0.85em;
+    font-weight: 700;
+    line-height: 1;
+    padding: 2px 4px;
+    white-space: nowrap;
+  }
+
+  .codeblock {
+    background-color: var(--tw-color-gray-100);
+    padding: 1em;
+    border-radius: 0.25em;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+  }
+
+  .comment {
+    color: var(--tw-color-gray-500);
+  }
+}
+
+:root[data-theme='dark'] {
+  --dbv-kit-color-text: var(--tw-color-gray-200);
+  --dbv-kit-btn-loader-base-color: var(--tw-color-gray-900);
+
+  /* Primary Button */
+  --dbv-kit-btn-primary-foreground: var(--tw-color-gray-100);
+  --dbv-kit-btn-primary-background: var(--dbv-kit-color-primary-700);
+  --dbv-kit-btn-primary-background-hover: var(--dbv-kit-color-primary-600);
+  --dbv-kit-btn-primary-background-active: var(--dbv-kit-color-primary-500);
+
+  /* Secondary Button */
+  --dbv-kit-btn-secondary-foreground: var(--tw-color-gray-100);
+  --dbv-kit-btn-secondary-background: transparent;
+  --dbv-kit-btn-secondary-background-hover: var(--tw-color-gray-800);
+  --dbv-kit-btn-secondary-background-active: var(--tw-color-gray-700);
+  --dbv-kit-btn-secondary-border-color: var(--tw-color-gray-200);
+
+  /* Danger Button */
+  --dbv-kit-btn-danger-foreground: var(--tw-color-gray-100);
+  --dbv-kit-btn-danger-background: var(--tw-color-red-700);
+  --dbv-kit-btn-danger-background-hover: var(--tw-color-red-600);
+  --dbv-kit-btn-danger-background-active: var(--tw-color-red-500);
+
+  main {
+    background-color: var(--tw-color-gray-900);
+  }
+
+  code {
+    color: var(--tw-color-orange-400);
+  }
+
+  a {
+    color: var(--tw-color-blue-300);
+  }
+
+  .codeblock {
+    background-color: var(--tw-color-gray-800);
+  }
+}

@@ -1,4 +1,9 @@
 {
   "name": "@dbeaver/tsconfig",
-  "packageManager": "yarn@4.6.0"
+  "packageManager": "yarn@4.6.0",
+  "dependencies": {
+    "typescript": "^5",
+    "typescript-plugin-css-modules": "^5",
+    "vite": "^6"
+  }
 }

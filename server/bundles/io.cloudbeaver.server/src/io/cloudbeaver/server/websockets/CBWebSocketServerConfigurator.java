@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,16 +74,19 @@ public class CBWebSocketServerConfigurator extends ServerEndpointConfig.Configur
         // possible desktop client session
         try {
             var headlessSession = createHeadlessSession(requestInfo, request);
-            if (headlessSession == null) {
-                log.debug("Couldn't create headless session");
-                return;
+            if (headlessSession != null) {
+                sec.getUserProperties().put(PROP_WEB_SESSION, headlessSession);
+            } else  {
+                log.trace("Couldn't create headless session");
             }
-            sec.getUserProperties().put(PROP_WEB_SESSION, headlessSession);
         } catch (SMAccessTokenExpiredException e) {
             sec.getUserProperties().put(PROP_TOKEN_EXPIRED, true);
         } catch (DBException e) {
             log.error("Error resolve websocket session", e);
             throw new RuntimeException(e.getMessage(), e);
+        }
+        if (sec.getUserProperties().get(PROP_WEB_SESSION) == null) {
+            throw new RuntimeException("No web session found for websocket request");
         }
     }
 

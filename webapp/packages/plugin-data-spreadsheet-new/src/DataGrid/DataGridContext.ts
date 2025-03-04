@@ -7,8 +7,7 @@
  */
 import { createContext } from 'react';
 
-import type { IExecutor } from '@cloudbeaver/core-executor';
-import type { DataGridHandle } from '@cloudbeaver/plugin-data-grid';
+import type { DataGridRef } from '@cloudbeaver/plugin-data-grid';
 import type { IDatabaseDataModel, IDataTableActions } from '@cloudbeaver/plugin-data-viewer';
 
 export interface IColumnResizeInfo {
@@ -21,10 +20,8 @@ export interface IDataGridContext {
   actions: IDataTableActions;
   resultIndex: number;
   simple: boolean;
-  columnResize: IExecutor<IColumnResizeInfo>;
   isGridInFocus: () => boolean;
-  getEditorPortal: () => HTMLDivElement | null;
-  getDataGridApi: () => DataGridHandle | null;
+  getDataGridApi: () => DataGridRef | null;
   focus: () => void;
 }
 
