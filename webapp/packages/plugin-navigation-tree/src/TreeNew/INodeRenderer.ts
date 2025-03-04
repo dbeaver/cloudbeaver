@@ -13,7 +13,6 @@ export interface INodeComponentBaseProps {
 
 export interface INodeControlBaseProps extends React.RefAttributes<HTMLDivElement> {
   nodeId: string;
-  className?: string;
 }
 
 export type NodeControlComponent =
