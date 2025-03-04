@@ -14,8 +14,8 @@
     --dbv-kit-select-font-weight: var(--tw-font-weight-normal);
     --dbv-kit-select-font-size: calc(var(--dbv-kit-font-size-base) * 0.875);
 
-    --dbv-kit-select-label-foreground: var(--tw-color-gray-500);
-    --dbv-kit-select-label-padding-inline: var(--dbv-kit-select-padding-inline);
+    --dbv-kit-select-label-foreground: var(--tw-color-gray-600);
+    --dbv-kit-select-label-padding-inline: var(--tw-spacing);
 
     --dbv-kit-select-popover-background: var(--dbv-kit-color-background);
     --dbv-kit-select-popover-foreground: var(--dbv-kit-color-foreground);
@@ -24,5 +24,7 @@
     --dbv-kit-select-item-foreground: var(--tw-color-gray-500);
     --dbv-kit-select-item-padding-inline: calc(var(--tw-spacing) * 3);
     --dbv-kit-select-item-padding-block: var(--tw-spacing);
+    --dbv-kit-select-item-hover-background: var(--tw-color-gray-200);
+    --dbv-kit-select-item-selected-background: var(--dbv-kit-color-primary-100);
   }
 }

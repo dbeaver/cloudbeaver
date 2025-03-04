@@ -58,6 +58,20 @@
     margin-top: 2px;
     padding: 0.25rem 0;
     outline: 0;
+
+    opacity: 0;
+    transform-origin: top;
+    transition-property: opacity, scale, translate;
+    transition-timing-function: var(--tw-ease-in-out);
+    transition-duration: 150ms;
+    scale: 0.95;
+    translate: 0 -0.5rem;
+
+    &[data-enter] {
+      opacity: 1;
+      scale: 1;
+      translate: 0;
+    }
   }
 
   .dbv-kit-select__item {
@@ -69,16 +83,19 @@
     cursor: pointer;
     border: none;
     background: none;
-    color: inherit;
-    font: inherit;
+
+    &[aria-disabled='true'] {
+      opacity: 0.5; /* TODO: change to --dbv-kit-control-disabled-opacity when #87 is merged */
+      user-select: none;
+    }
 
     &[aria-selected='true'] {
-      background-color: var(--dbv-kit-color-primary-100);
+      background-color: var(--dbv-kit-select-item-selected-background);
     }
 
     &[data-focus-visible],
     &[data-active-item] {
-      background-color: var(--tw-color-gray-200);
+      background-color: var(--dbv-kit-select-item-hover-background);
     }
   }
 }

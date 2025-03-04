@@ -5,11 +5,13 @@ export const Default = () => {
     <>
       <h3>Theme</h3>
       <Select.Provider>
-        <Select />
+        <Select className="tw:w-[300px]" />
         <Select.Popover>
           <Select.Item value="Light">🌕 Light</Select.Item>
           <Select.Item value="Dark">🌘 Dark</Select.Item>
-          <Select.Item value="System">🌓 System</Select.Item>
+          <Select.Item disabled value="System">
+            🌓 System
+          </Select.Item>
         </Select.Popover>
         <Select.Label>Application color theme</Select.Label>
       </Select.Provider>

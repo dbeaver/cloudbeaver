@@ -4,11 +4,15 @@ import {
   SelectPopover as AriaSelectPopover,
   SelectItem as AriaSelectItem,
   SelectLabel as AriaSelectLabel,
+  SelectValue as AriaSelectValue,
+  SelectArrow as AriaSelectArrow,
   type SelectProviderProps,
   type SelectProps,
   type SelectLabelProps,
   type SelectPopoverProps,
   type SelectItemProps,
+  type SelectValueProps,
+  type SelectArrowProps,
   useSelectContext,
   useSelectStore,
 } from '@ariakit/react';
@@ -55,9 +59,13 @@ export {
   type SelectLabelProps,
   type SelectPopoverProps,
   type SelectItemProps,
+  type SelectValueProps,
+  type SelectArrowProps,
 };
 
 Select.Provider = SelectProvider;
 Select.Popover = SelectPopover;
 Select.Item = SelectItem;
 Select.Label = SelectLabel;
+Select.Value = AriaSelectValue;
+Select.Arrow = AriaSelectArrow;
