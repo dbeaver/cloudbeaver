@@ -1,0 +1,21 @@
+@layer base {
+  .dbv-kit-select__empty {
+    padding: 0.5rem;
+    color: var(--tw-color-gray-500, #757575);
+    text-align: center;
+  }
+
+  .dbv-kit-select-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .dbv-kit-select__label--required {
+    &:after {
+      content: '*';
+      color: var(--tw-color-red-600, red);
+      margin-left: 0.125rem;
+    }
+  }
+}
