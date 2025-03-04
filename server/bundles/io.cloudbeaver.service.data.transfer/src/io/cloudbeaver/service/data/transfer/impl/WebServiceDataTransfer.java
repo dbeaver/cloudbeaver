@@ -240,13 +240,9 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             throw new DBException("Invalid processor. " + IStreamDataExporter.class.getSimpleName() + " expected");
         }
 
-        StreamTransferConsumer consumer = new StreamTransferConsumer();
-
-        StreamConsumerSettings settings = makeStreamConsumerSettings(parameters);
-        Map<String, Object> properties = new HashMap<>();
-
         Map<String, Object> processorProperties = parameters.getProcessorProperties();
         if (processorProperties == null) processorProperties = Collections.emptyMap();
+        Map<String, Object> properties = new HashMap<>();
         for (DBPPropertyDescriptor prop : processor.getProperties()) {
             Object propValue = processorProperties.get(CommonUtils.toString(prop.getId()));
             properties.put(prop.getId(), propValue != null ? propValue : prop.getDefaultValue());
@@ -254,14 +250,15 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         // Remove extension property (we specify file name directly)
         properties.remove(StreamConsumerSettings.PROP_FILE_EXTENSION);
 
-
-        DatabaseTransferProducer producer = new DatabaseTransferProducer(
-            dataContainer,
-            parameters.getFilter() == null ? null : parameters.getFilter().makeDataFilter(resultsInfo));
         DatabaseProducerSettings producerSettings = new DatabaseProducerSettings();
         producerSettings.setExtractType(DatabaseProducerSettings.ExtractType.SINGLE_QUERY);
         producerSettings.setQueryRowCount(false);
         producerSettings.setOpenNewConnections(CommonUtils.getOption(parameters.getDbProducerSettings(), "openNewConnection"));
+        StreamTransferConsumer consumer = new StreamTransferConsumer();
+        StreamConsumerSettings settings = makeStreamConsumerSettings(parameters);
+        DatabaseTransferProducer producer = new DatabaseTransferProducer(
+            dataContainer,
+            parameters.getFilter() == null ? null : parameters.getFilter().makeDataFilter(resultsInfo));
 
         consumer.initTransfer(
             dataContainer,
