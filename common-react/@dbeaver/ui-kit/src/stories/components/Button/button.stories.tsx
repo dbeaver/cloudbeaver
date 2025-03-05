@@ -1,9 +1,9 @@
 import type { Story } from '@ladle/react';
 import { Button, type ButtonProps } from '../../../index.js';
-import { ButtonTokens } from './button-tokens.js';
 import { useState } from 'react';
 
-export const Docs = () => (
+export { Tokens } from './button-tokens.js';
+export const Documentation = () => (
   <div>
     <h1>Button</h1>
     <p>The Button component is a simple button that can be used in different contexts. It has several visual parameters that can be customized.</p>
@@ -39,8 +39,6 @@ export const Docs = () => (
     </dl>
   </div>
 );
-
-Docs.storyName = '0Documentation';
 
 export const Variants = () => (
   <div>
@@ -103,8 +101,6 @@ export const Variants = () => (
   </div>
 );
 
-Variants.storyName = '1Variants';
-
 export const Sizes = () => (
   <div>
     <h2 className="tw:text-lg tw:my-2">Sizes</h2>
@@ -136,8 +132,6 @@ export const Sizes = () => (
     </div>
   </div>
 );
-
-Sizes.storyName = '2Sizes';
 
 export const Icons = () => (
   <div>
@@ -259,8 +253,6 @@ export const Icons = () => (
   </div>
 );
 
-Icons.storyName = '3Icons';
-
 const CustomLoader = () => (
   <Button.Icon placement="start">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="tw:animate-spin tw:p-1">
@@ -326,9 +318,7 @@ export const Loading = () => {
   );
 };
 
-Loading.storyName = '4Loading';
-
-export const CustomRendering = () => {
+export const WithCustomRendering = () => {
   return (
     <div>
       <h3 className="tw:text-lg tw:my-2">Custom renders</h3>
@@ -357,8 +347,6 @@ export const CustomRendering = () => {
   );
 };
 
-CustomRendering.storyName = '5Custom rendering';
-
 const Primary: Story<ButtonProps> = props => <Button {...props}>Primary</Button>;
 export const Interactive = Primary.bind({});
 
@@ -384,9 +372,3 @@ Interactive.argTypes = {
     defaultValue: false,
   },
 };
-
-Interactive.storyName = '6Interactive';
-
-export const Tokens = ButtonTokens;
-
-Tokens.storyName = '7Tokens';

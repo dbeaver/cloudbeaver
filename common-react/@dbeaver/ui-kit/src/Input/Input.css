@@ -28,6 +28,12 @@
   &::placeholder {
     color: var(--dbv-kit-input-placeholder-foreground);
   }
+
+  &:focus-visible,
+  &[data-focus-visible] {
+    outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-color-outline);
+    outline-offset: var(--dbv-kit-outline-offset);
+  }
 }
 
 /* ---------------------------- */
