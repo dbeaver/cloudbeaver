@@ -56,26 +56,17 @@ export interface SelectFieldProps<T = string, ItemType = SelectOption<T>> {
   selectedRender?: (value: T | undefined, item: ItemType | undefined) => React.ReactNode;
 }
 
-// Utility function to get value by path or using getter function
-function getValueByPath<Item, Value>(item: Item, pathOrGetter: PropertyGetter<Item, Value> | undefined, defaultGetter: (item: Item) => Value): Value {
-  if (!pathOrGetter) {
+// Utility function to get value by it's key or using getter function
+function getValueByPath<Item, Value>(item: Item, keyOrGetter: PropertyGetter<Item, Value> | undefined, defaultGetter: (item: Item) => Value): Value {
+  if (!keyOrGetter) {
     return defaultGetter(item);
   }
 
-  if (typeof pathOrGetter === 'function') {
-    return pathOrGetter(item);
+  if (typeof keyOrGetter === 'function') {
+    return keyOrGetter(item);
   }
 
-  // Handle property path like 'user.address.city'
-  const path = pathOrGetter.split('.');
-  let value: any = item;
-
-  for (const prop of path) {
-    if (value === null || value === undefined) return defaultGetter(item);
-    value = value[prop];
-  }
-
-  return value !== undefined ? (value as Value) : defaultGetter(item);
+  return item[keyOrGetter as keyof Item];
 }
 
 export function SelectField<T = string, ItemType extends {} = SelectOption<T>>({
