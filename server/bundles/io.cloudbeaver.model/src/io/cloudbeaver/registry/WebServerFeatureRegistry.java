@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,7 @@ public class WebServerFeatureRegistry {
         return instance;
     }
 
-    private String[] serverFeatures = new String[0];
+    private String[] serverFeatures = ZeroSizedArrays.OF_STRING;
 
     private WebServerFeatureRegistry() {
     }

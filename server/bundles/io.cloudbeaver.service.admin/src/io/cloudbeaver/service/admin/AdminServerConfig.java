@@ -19,6 +19,7 @@ package io.cloudbeaver.service.admin;
 import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.util.Arrays;
 import java.util.List;
@@ -77,13 +78,13 @@ public class AdminServerConfig {
         this.sessionExpireTime = JSONUtils.getLong(params, "sessionExpireTime", -1);
 
         if (params.containsKey("enabledDrivers")) {
-            this.enabledDrivers = JSONUtils.getStringList(params, "enabledDrivers").toArray(new String[0]);
+            this.enabledDrivers = JSONUtils.getStringList(params, "enabledDrivers").toArray(ZeroSizedArrays.OF_STRING);
         } else {
             this.enabledDrivers = appConfig.getEnabledDrivers();
         }
 
         if (params.containsKey("disabledDrivers")) {
-            this.disabledDrivers = JSONUtils.getStringList(params, "disabledDrivers").toArray(new String[0]);
+            this.disabledDrivers = JSONUtils.getStringList(params, "disabledDrivers").toArray(ZeroSizedArrays.OF_STRING);
         } else {
             this.disabledDrivers = appConfig.getDisabledDrivers();
         }

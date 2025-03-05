@@ -52,6 +52,7 @@ import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.text.MessageFormat;
 import java.util.*;
@@ -429,7 +430,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public List<AdminConnectionSearchInfo> searchConnections(@NotNull WebSession webSession, @NotNull List<String> hostNames) throws DBWebException {
-        ConnectionSearcher searcher = new ConnectionSearcher(webSession, hostNames.toArray(new String[0]));
+        ConnectionSearcher searcher = new ConnectionSearcher(webSession, hostNames.toArray(ZeroSizedArrays.OF_STRING));
         searcher.run(webSession.getProgressMonitor());
         return searcher.getFoundConnections();
     }
@@ -560,7 +561,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 appConfig.setSupportsCustomConnections(config.isCustomConnectionsEnabled());
                 appConfig.setPublicCredentialsSaveEnabled(config.isPublicCredentialsSaveEnabled());
                 appConfig.setAdminCredentialsSaveEnabled(config.isAdminCredentialsSaveEnabled());
-                appConfig.setEnabledFeatures(config.getEnabledFeatures().toArray(new String[0]));
+                appConfig.setEnabledFeatures(config.getEnabledFeatures().toArray(ZeroSizedArrays.OF_STRING));
                 // custom logic for enabling embedded drivers
                 updateDisabledDriversConfig(appConfig, config.getDisabledDrivers());
                 appConfig.setResourceManagerEnabled(config.isResourceManagerEnabled());
@@ -568,9 +569,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
                 if (CommonUtils.isEmpty(config.getEnabledAuthProviders())) {
                     // All of them
-                    appConfig.setEnabledAuthProviders(new String[0]);
+                    appConfig.setEnabledAuthProviders(ZeroSizedArrays.OF_STRING);
                 } else {
-                    appConfig.setEnabledAuthProviders(config.getEnabledAuthProviders().toArray(new String[0]));
+                    appConfig.setEnabledAuthProviders(config.getEnabledAuthProviders().toArray(ZeroSizedArrays.OF_STRING));
                 }
 
                 appConfig.setDefaultNavigatorSettings(

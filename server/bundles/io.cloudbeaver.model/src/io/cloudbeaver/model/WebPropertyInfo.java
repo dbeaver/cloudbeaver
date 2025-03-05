@@ -31,6 +31,7 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -46,7 +47,7 @@ public class WebPropertyInfo {
 
     private Object[] validValues;
 
-    private String[] supportedConfigurationTypes = new String[0];
+    private String[] supportedConfigurationTypes = ZeroSizedArrays.OF_STRING;
 
     private Object defaultValue;
 
@@ -168,7 +169,7 @@ public class WebPropertyInfo {
     @Property
     public String[] getFeatures() {
         String[] features = property.getFeatures();
-        return features == null ? new String[0] : features;
+        return features == null ? ZeroSizedArrays.OF_STRING : features;
     }
 
     @Property

@@ -56,6 +56,7 @@ import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.registry.settings.ProductSettingsRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -215,7 +216,7 @@ public class WebServiceCore implements DBWServiceCore {
                 DBWConstants.PERMISSION_ADMIN
             };
         }
-        return webSession.getSessionPermissions().toArray(new String[0]);
+        return webSession.getSessionPermissions().toArray(ZeroSizedArrays.OF_STRING);
     }
 
     @Override

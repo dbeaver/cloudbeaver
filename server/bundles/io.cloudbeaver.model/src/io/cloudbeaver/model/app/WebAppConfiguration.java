@@ -19,6 +19,7 @@ package io.cloudbeaver.model.app;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.util.Map;
 
@@ -37,11 +38,11 @@ public interface WebAppConfiguration extends ServletAppConfiguration {
     boolean isAdminCredentialsSaveEnabled();
 
     default String[] getDisabledBetaFeatures() {
-        return new String[0];
+        return ZeroSizedArrays.OF_STRING;
     }
 
     default String[] getEnabledAuthProviders() {
-        return new String[0];
+        return ZeroSizedArrays.OF_STRING;
     }
 
     @NotNull

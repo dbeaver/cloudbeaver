@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.impl.LocalizedPropertyDescriptor;
+import org.jkiss.utils.ZeroSizedArrays;
 
 public class WebAuthProviderProperty extends LocalizedPropertyDescriptor {
     private final String[] requiredFeatures;
@@ -32,7 +33,7 @@ public class WebAuthProviderProperty extends LocalizedPropertyDescriptor {
         super(category, config);
         this.authProviderId = authProviderId;
         String featuresAttr = config.getAttribute("requiredFeatures");
-        this.requiredFeatures = featuresAttr == null ? new String[0] : featuresAttr.split(",");
+        this.requiredFeatures = featuresAttr == null ? ZeroSizedArrays.OF_STRING : featuresAttr.split(",");
         this.type = config.getAttribute("type");
     }
 

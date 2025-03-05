@@ -47,6 +47,7 @@ import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -281,7 +282,7 @@ public class WebConnectionInfo {
             features.add(FEATURE_MANAGEABLE);
         }
 
-        return features.toArray(new String[0]);
+        return features.toArray(ZeroSizedArrays.OF_STRING);
     }
 
     @Property

@@ -34,6 +34,7 @@ import org.jkiss.dbeaver.model.security.SMAuthProviderDescriptor;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.util.*;
 
@@ -96,7 +97,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         requiredFeatures = CommonUtils.isEmpty(rfList) ? null : rfList.split(",");
 
         String typesAttr = cfg.getAttribute("categories");
-        this.types = CommonUtils.isEmpty(typesAttr) ? new String[0] : typesAttr.split(",");
+        this.types = CommonUtils.isEmpty(typesAttr) ? ZeroSizedArrays.OF_STRING : typesAttr.split(",");
     }
 
     @NotNull

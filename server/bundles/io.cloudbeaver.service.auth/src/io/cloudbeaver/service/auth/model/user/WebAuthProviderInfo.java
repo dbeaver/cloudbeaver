@@ -28,6 +28,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.SMAuthCredentialsProfile;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,7 +122,7 @@ public class WebAuthProviderInfo {
 
     public String[] getRequiredFeatures() {
         String[] rf = descriptor.getRequiredFeatures();
-        return rf == null ? new String[0] : rf;
+        return rf == null ? ZeroSizedArrays.OF_STRING : rf;
     }
 
     public WebAuthProviderConfiguration getTemplateConfiguration() {

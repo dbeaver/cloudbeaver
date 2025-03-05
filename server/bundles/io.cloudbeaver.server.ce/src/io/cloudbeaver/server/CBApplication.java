@@ -60,6 +60,7 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.io.File;
 import java.io.IOException;
@@ -765,7 +766,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
             }
             disabledDrivers.add(driver.getFullId());
         }
-        config.setDisabledDrivers(disabledDrivers.toArray(new String[0]));
+        config.setDisabledDrivers(disabledDrivers.toArray(ZeroSizedArrays.OF_STRING));
     }
 
     @Override

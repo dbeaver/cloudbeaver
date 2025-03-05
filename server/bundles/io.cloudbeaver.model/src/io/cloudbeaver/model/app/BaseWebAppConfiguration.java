@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.registry.WebFeatureRegistry;
 import org.jkiss.code.NotNull;
 import org.jkiss.utils.ArrayUtils;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -41,7 +42,7 @@ public abstract class BaseWebAppConfiguration implements ServletAppConfiguration
         this.plugins = new LinkedHashMap<>();
         this.resourceManagerEnabled = true;
         this.enabledFeatures = null;
-        this.disabledBetaFeatures = new String[0];
+        this.disabledBetaFeatures = ZeroSizedArrays.OF_STRING;
         this.showReadOnlyConnectionInfo = false;
         this.secretManagerEnabled = false;
     }

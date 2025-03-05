@@ -58,6 +58,7 @@ import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEv
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.lang.reflect.Type;
 import java.sql.*;
@@ -476,7 +477,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                         teamIDs.add(dbResult.getString(1));
                     }
                     teamIDs.add(defaultUserTeam);
-                    user.setUserTeams(teamIDs.toArray(new String[0]));
+                    user.setUserTeams(teamIDs.toArray(ZeroSizedArrays.OF_STRING));
                 }
             }
             return user;
@@ -943,7 +944,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         boolean isCaseInsensitive
     ) throws DBCException {
         Map<String, String> identCredentials = new LinkedHashMap<>();
-        String[] propNames = authParameters.keySet().toArray(new String[0]);
+        String[] propNames = authParameters.keySet().toArray(ZeroSizedArrays.OF_STRING);
         for (AuthPropertyDescriptor prop : authProvider.getCredentialParameters(propNames)) {
             if (prop.isIdentifying()) {
                 String propId = CommonUtils.toString(prop.getId());
@@ -1070,7 +1071,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                         providerIds.add(dbResult.getString(1));
                     }
 
-                    return providerIds.toArray(new String[0]);
+                    return providerIds.toArray(ZeroSizedArrays.OF_STRING);
                 }
             }
         } catch (SQLException e) {
@@ -1265,7 +1266,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     protected String[] getDefaultTeamPermissions() {
-        return new String[0];
+        return ZeroSizedArrays.OF_STRING;
     }
 
     @Override

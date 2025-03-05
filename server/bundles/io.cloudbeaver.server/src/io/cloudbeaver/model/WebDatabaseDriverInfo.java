@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.properties.PropertySourceCustom;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -226,7 +227,7 @@ public class WebDatabaseDriverInfo {
                 .filter(h -> !h.isDesktopHandler())
                 .map(NetworkHandlerDescriptor::getId).toArray(String[]::new);
         }
-        return new String[0];
+        return ZeroSizedArrays.OF_STRING;
     }
 
     @Property

@@ -31,6 +31,7 @@ import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.dbeaver.model.struct.rdb.DBSTable;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -165,7 +166,7 @@ public class WebDatabaseObjectInfo {
                 }
             }
         }
-        return features.toArray(new String[0]);
+        return features.toArray(ZeroSizedArrays.OF_STRING);
     }
 
     private void getObjectFeatures(DBSObject object, List<String> features) {

@@ -31,6 +31,7 @@ import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.util.*;
 
@@ -81,8 +82,8 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
         this.publicCredentialsSaveEnabled = true;
         this.adminCredentialsSaveEnabled = true;
         this.redirectOnFederatedAuth = false;
-        this.enabledDrivers = new String[0];
-        this.disabledDrivers = new String[0];
+        this.enabledDrivers = ZeroSizedArrays.OF_STRING;
+        this.disabledDrivers = ZeroSizedArrays.OF_STRING;
         this.defaultNavigatorSettings = DEFAULT_VIEW_SETTINGS;
         this.resourceQuotas = new LinkedHashMap<>();
         this.enableReverseProxyAuth = false;

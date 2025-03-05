@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.model.sql.SQLDialect;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.Pair;
+import org.jkiss.utils.ZeroSizedArrays;
 
 /**
  * Web SQL dialect.
@@ -46,15 +47,15 @@ public class WebSQLDialectInfo {
     }
 
     public String[] getDataTypes() {
-        return dialect.getDataTypes(dataSource).toArray(new String[0]);
+        return dialect.getDataTypes(dataSource).toArray(ZeroSizedArrays.OF_STRING);
     }
 
     public String[] getFunctions() {
-        return dialect.getFunctions().toArray(new String[0]);
+        return dialect.getFunctions().toArray(ZeroSizedArrays.OF_STRING);
     }
 
     public String[] getReservedWords() {
-        return dialect.getReservedWords().toArray(new String[0]);
+        return dialect.getReservedWords().toArray(ZeroSizedArrays.OF_STRING);
     }
 
     public String[][] getQuoteStrings() {

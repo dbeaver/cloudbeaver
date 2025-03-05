@@ -18,6 +18,7 @@ package io.cloudbeaver.model.app;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.util.Map;
 
@@ -48,7 +49,7 @@ public interface ServletAppConfiguration {
 
     @NotNull
     default String[] getEnabledFeatures() {
-        return new String[0];
+        return ZeroSizedArrays.OF_STRING;
     }
 
     default boolean isSupportsCustomConnections() {

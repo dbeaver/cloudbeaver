@@ -53,6 +53,7 @@ import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -250,7 +251,7 @@ public class WebNavigatorNodeInfo {
             }
         }
         if (node instanceof DBNRoot) {
-            return features.toArray(new String[0]);
+            return features.toArray(ZeroSizedArrays.OF_STRING);
         }
         if (node instanceof DBNResourceManagerResource && !isDistributedSpecialFolderNode()) {
             if (hasNodePermission(RMProjectPermission.RESOURCE_EDIT)) {
@@ -263,7 +264,7 @@ public class WebNavigatorNodeInfo {
                 features.add(NODE_FEATURE_CAN_CREATE_CONNECTION_FROM_NODE);
             }
         }
-        return features.toArray(new String[0]);
+        return features.toArray(ZeroSizedArrays.OF_STRING);
     }
 
     private boolean canCreateConnectionFromFileName(String fileName) {
