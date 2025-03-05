@@ -11,7 +11,7 @@
     /* Outline */
     --dbv-kit-color-outline: var(--tw-color-blue-500);
     --dbv-kit-control-outline-width: 2px;
-    --dbv-kit-outline-offset: 1px;
+    --dbv-kit-control-outline-offset: 2px;
 
     /* Sizes */
     --dbv-kit-control-height-base: 2rem;
