@@ -49,12 +49,13 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
         });
       }
 
+      const initialMode = formState.mode;
       const saved = await formState.save();
       const info = connectionInfoResource.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
 
       if (saved) {
         if (formState.state.submitType === 'submit') {
-          if (formState.mode === 'create') {
+          if (initialMode === 'create') {
             notificationService.notify(
               {
                 title: 'connections_connection_create_success',
