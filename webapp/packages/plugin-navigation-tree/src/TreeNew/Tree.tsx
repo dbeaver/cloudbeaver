@@ -58,7 +58,7 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
   });
 
   return (
-    <div className={className} ref={mountOptimization.setRootRef} style={{ overflow: 'auto', position: 'relative' }}>
+    <div ref={mountOptimization.setRootRef} className={className} style={{ overflow: 'auto', position: 'relative' }}>
       <NodeSizeCacheContext.Provider value={elementsSizeCache}>
         <TreeDataContext.Provider value={data}>
           <TreeVirtualizationContext.Provider value={mountOptimization}>
