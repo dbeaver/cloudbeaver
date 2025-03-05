@@ -32,6 +32,7 @@ import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.runtime.properties.PropertySourceMap;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.util.Collections;
 import java.util.Map;
@@ -125,7 +126,7 @@ public class WebUserOriginInfo implements WebObjectOrigin {
                     true,
                     entry.getValue().getClass(),
                     null,
-                    new Object[0]
+                    ZeroSizedArrays.OF_OBJECT
                 )
             )
             .map(propDescriptor -> new WebPropertyInfo(session, propDescriptor, propSource))

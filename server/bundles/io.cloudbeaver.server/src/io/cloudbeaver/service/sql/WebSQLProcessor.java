@@ -52,6 +52,7 @@ import org.jkiss.dbeaver.model.websocket.event.WSTransactionalCountEvent;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -746,7 +747,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                                 keyAttributes,
                                 executionSource);
                         deleteBatch.add(new Object[] {document});
-                        resultBatches.put(deleteBatch, new Object[0]);
+                        resultBatches.put(deleteBatch, ZeroSizedArrays.OF_OBJECT);
                     } else {
                         for (int i = 0; i < allAttributes.length; i++) {
                             if (isDocumentKey || ArrayUtils.contains(keyAttributes, allAttributes[i])) {
@@ -760,7 +761,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                                 delKeyAttributes.keySet().toArray(new DBSAttributeBase[0]),
                                 executionSource);
                         deleteBatch.add(delKeyAttributes.values().toArray());
-                        resultBatches.put(deleteBatch, new Object[0]);
+                        resultBatches.put(deleteBatch, ZeroSizedArrays.OF_OBJECT);
                     }
                 }
             }
