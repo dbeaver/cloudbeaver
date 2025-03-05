@@ -38,7 +38,7 @@ export const Field = () => {
         <h3>Default</h3>
         <SelectField
           label="Default Select Field"
-          options={[
+          items={[
             { value: '1', label: '1' },
             { value: '2', label: 'Item 2' },
           ]}
@@ -49,7 +49,7 @@ export const Field = () => {
         <SelectField
           label="Label here"
           description="Some field description here"
-          options={[
+          items={[
             { value: '1', label: '1' },
             { value: '2', label: 'Item 2' },
           ]}
@@ -67,7 +67,7 @@ export const Field = () => {
               {option.label}
             </span>
           )}
-          options={options}
+          items={options}
           value={value}
           onChange={setValue}
           required
@@ -76,29 +76,23 @@ export const Field = () => {
       </div>
       <div>
         <h3>Simple key getters</h3>
-        <SelectField
-          options={users}
-          valueGetter="id"
-          itemRender="profile.displayName"
-          disabledGetter="permissions.isBlocked"
-          onChange={handleChange}
-        />
+        <SelectField items={users} itemValue="id" itemRender="profile.displayName" itemDisabled="permissions.isBlocked" onChange={handleChange} />
       </div>
       <div>
         <h3>
           Complex getters (see sources <kbd>s</kbd>)
         </h3>
         <SelectField
-          options={complexData}
-          valueGetter={item => item.id.toString()}
+          items={complexData}
+          itemValue={item => item.id.toString()}
           itemRender={item => `${item.firstName} ${item.lastName} (${item.department.code}) (${item.permissions.level})`}
-          disabledGetter={item => !item.isActive || item.permissions.level < 3}
+          itemDisabled={item => !item.isActive || item.permissions.level < 3}
           onChange={handleChange}
         />
       </div>
       <div>
         <h3>Empty options array</h3>
-        <SelectField label="Choose something" options={[]} width="300px" />
+        <SelectField label="Choose something" items={[]} width="300px" />
       </div>
     </div>
   );
