@@ -44,21 +44,14 @@ export class DataExportProcessService {
     process.process.cancel();
   }
 
-  async delete(exportId: string): Promise<void> {
+  delete(exportId: string): void {
     const process = this.exportProcesses.get(exportId);
+
     if (!process) {
       return;
     }
-    try {
-      const dataFileId = process.process.getPayload();
-      if (dataFileId) {
-        await this.graphQLService.sdk.removeDataTransferFile({ dataFileId });
-      }
-    } catch (exception: any) {
-      this.notificationService.logException(exception, 'Error occurred while deleting file');
-    } finally {
-      this.exportProcesses.remove(exportId);
-    }
+
+    this.exportProcesses.remove(exportId);
   }
 
   download(exportId: string): void {
