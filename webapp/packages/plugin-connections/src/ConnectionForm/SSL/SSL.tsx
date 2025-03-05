@@ -27,23 +27,20 @@ import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { NetworkHandlerConfigInput, NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
-import type { IFormState, TabContainerPanelComponent } from '@cloudbeaver/core-ui';
+import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { isSafari } from '@cloudbeaver/core-utils';
 
 import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR.js';
 import styles from './SSL.module.css';
-import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionFormPropsRefactored } from '../IConnectionFormStateRefactored.js';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 
-interface Props {
+interface Props extends IConnectionFormPropsRefactored {
   handler: NetworkHandlerDescriptor;
   handlerState: NetworkHandlerConfigInput;
-  formState: IFormState<IConnectionFormStateRefactored>;
-  sharedCredentials: boolean;
-  template: boolean;
 }
 
-export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ formState, sharedCredentials, template, handler, handlerState }) {
+export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ formState, handler, handlerState }) {
   const translate = useTranslate();
 
   const style = useS(styles);
@@ -73,7 +70,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
               properties={handler.properties}
               category={null}
               disabled={disabled || !enabled}
-              isSaved={p => !!p.id && initialHandler?.secureProperties?.[p.id] === SAVED_VALUE_INDICATOR}
+              isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
               autofillToken={autofillToken}
               hideEmptyPlaceholder
               showRememberTip
@@ -89,7 +86,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
                 properties={handler.properties}
                 category={category}
                 disabled={disabled || !enabled}
-                isSaved={p => !!p.id && initialHandler?.secureProperties?.[p.id] === SAVED_VALUE_INDICATOR}
+                isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
                 autofillToken={autofillToken}
                 hideEmptyPlaceholder
                 showRememberTip
@@ -98,12 +95,14 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
             </React.Fragment>
           ))}
 
-          {credentialsSavingEnabled && !template && !sharedCredentials && (
+          {/* TODO use formState.state.config??? */}
+          {credentialsSavingEnabled && !formState.state.config.template && !formState.state.config.sharedCredentials && (
             <FieldCheckbox
               id={handler.id + '_savePassword'}
               name="savePassword"
               state={handlerState}
-              disabled={disabled || !enabled || sharedCredentials}
+              // TODO use formState.config???
+              disabled={disabled || !enabled || formState.state.config.sharedCredentials}
               title={translate(
                 !isSharedProject || serverConfigResource.data?.distributed
                   ? 'connections_connection_authentication_save_credentials_for_user_tooltip'

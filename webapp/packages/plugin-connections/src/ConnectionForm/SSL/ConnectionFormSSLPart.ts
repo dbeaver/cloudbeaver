@@ -9,8 +9,8 @@ import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
-import type { NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
-import { isNotNullDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
+import { type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import {
   createConnectionParam,
@@ -19,21 +19,28 @@ import {
   type NetworkHandlerResource,
 } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { getSSLDefaultConfig } from './getSSLDefaultConfig.js';
 import { toJS } from 'mobx';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
 import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED.js';
 import { SSL_CODE_NAME } from './SSL_CODE_NAME.js';
+import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
+import { getSSLDefaultConfig } from './getSSLDefaultConfig.js';
 
-// TODO should I have networkHandler state here?
-export class ConnectionFormSSLPart extends FormPart<void, IConnectionFormStateRefactored> {
+const DEFAULT_SSL_NETWORK_HANDLER: INetworkHandlerConfig = {
+  id: SSL_CODE_NAME,
+  enabled: false,
+  properties: {},
+  secureProperties: {},
+};
+
+export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConnectionFormStateRefactored> {
   constructor(
     formState: IFormState<IConnectionFormStateRefactored>,
     private readonly dbDriverResource: DBDriverResource,
     private readonly networkHandlerResource: NetworkHandlerResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
-    super(formState);
+    super(formState, DEFAULT_SSL_NETWORK_HANDLER);
   }
 
   protected override async loader(): Promise<void> {
@@ -43,70 +50,54 @@ export class ConnectionFormSSLPart extends FormPart<void, IConnectionFormStateRe
 
     const driver = await this.dbDriverResource.load(this.formState.state.config.driverId);
     const handlers = await this.networkHandlerResource.load(CachedMapAllKey);
+
     const handler = getSSLDriverHandler(handlers, driver?.applicableNetworkHandlers ?? []);
-    const info = this.connectionInfoResource.get(
-      createConnectionParam({
-        id: this.formState.state.config.connectionId!,
-        projectId: this.formState.state.projectId,
-      }),
-    );
 
     if (!handler) {
       return;
     }
 
+    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
     const initialConfig = info?.networkHandlersConfig?.find(h => h.id === handler.id);
 
-    if (!this.formState.state.config.networkHandlersConfig) {
-      this.formState.state.config.networkHandlersConfig = [];
-    }
-
-    if (!this.formState.state.config.networkHandlersConfig.some(state => state.id === handler.id)) {
+    if (!this.formState.state.config.networkHandlersConfig?.some(state => state.id === handler.id)) {
       const config: NetworkHandlerConfigInput = initialConfig ? toJS(initialConfig) : getSSLDefaultConfig(handler.id);
 
       if (config.secureProperties) {
         config.properties = { ...config.properties, ...config.secureProperties };
       }
 
-      this.formState.state.config.networkHandlersConfig.push(config);
+      this.setInitialState(config);
+      return;
     }
+
+    this.setInitialState(initialConfig ?? DEFAULT_SSL_NETWORK_HANDLER);
   }
 
   protected override async format(
     data: IFormState<IConnectionFormStateRefactored>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): Promise<void> {
-    const config = this.formState.state.config;
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
-    const info = this.connectionInfoResource.get(
-      createConnectionParam({
-        id: data.state.config.connectionId!,
-        projectId: data.state.projectId,
-      }),
-    );
 
-    if (!config.networkHandlersConfig || config.networkHandlersConfig.length === 0 || !config.driverId) {
+    if (!this.isChanged || !this.formState.state.config.driverId) {
       return;
     }
 
-    const driver = await this.dbDriverResource.load(config.driverId);
+    const driver = await this.dbDriverResource.load(this.formState.state.config.driverId);
     const handlers = await this.networkHandlerResource.load(CachedMapAllKey);
-    const handler = config.networkHandlersConfig.find(
-      handler => driver?.applicableNetworkHandlers.includes(handler.id) && handlers.some(h => h.id === handler.id && h.codeName === SSL_CODE_NAME),
-    );
+    const handler = driver?.applicableNetworkHandlers.includes(this.state.id) ? this.state : undefined;
     const descriptor = handlers.find(h => h.id === handler?.id);
 
     if (!handler) {
       return;
     }
 
-    const initial = info?.networkHandlersConfig?.find(h => h.id === handler.id);
     const handlerConfig: NetworkHandlerConfigInput = toJS(handler);
-    handlerConfig.savePassword = handler.savePassword || config.sharedCredentials;
+    // TODO should I have formstate.config here?
+    handlerConfig.savePassword = handler.savePassword || this.formState.state.config.sharedCredentials;
 
-    const changed = isChanged(handlerConfig, initial);
-
-    if (changed && descriptor) {
+    if (this.isChanged && descriptor) {
       for (const descriptorProperty of descriptor.properties) {
         if (!descriptorProperty.id) {
           continue;
@@ -123,7 +114,7 @@ export class ConnectionFormSSLPart extends FormPart<void, IConnectionFormStateRe
 
         if (secured) {
           const value = handlerConfig.properties[key];
-          const propertyChanged = initial?.secureProperties?.[key] !== value;
+          const propertyChanged = this.initialState?.secureProperties?.[key] !== value;
 
           if (propertyChanged) {
             handlerConfig.secureProperties[key] = toJS(value);
@@ -150,33 +141,39 @@ export class ConnectionFormSSLPart extends FormPart<void, IConnectionFormStateRe
       credentialsState.requireNetworkHandler(handler.id);
     }
 
-    if (changed) {
-      if (!config.networkHandlersConfig) {
-        config.networkHandlersConfig = [];
-      }
-
-      trimSSLConfig(handlerConfig);
-      config.networkHandlersConfig.push(handlerConfig);
+    if (this.isChanged) {
+      this.state = trimSSLConfig(handlerConfig);
     }
   }
 
-  protected override saveChanges(
+  protected override async saveChanges(
     data: IFormState<IConnectionFormStateRefactored>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): Promise<void> {
-    return Promise.resolve();
+    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
+
+    await this.connectionInfoResource.update(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!), {
+      connectionId: this.formState.state.config.connectionId,
+      networkHandlersConfig: [
+        ...(info?.networkHandlersConfig ?? []),
+        {
+          ...this.state,
+          id: this.state.id,
+        },
+      ],
+    });
   }
 }
 
-function trimSSLConfig(input: NetworkHandlerConfigInput) {
+function trimSSLConfig(input: INetworkHandlerConfig): INetworkHandlerConfig {
   const { secureProperties } = input;
 
   if (!secureProperties) {
-    return;
+    return input;
   }
 
   if (!Object.keys(secureProperties).length) {
-    return;
+    return input;
   }
 
   for (const key in secureProperties) {
@@ -184,22 +181,6 @@ function trimSSLConfig(input: NetworkHandlerConfigInput) {
       secureProperties[key] = secureProperties[key]?.trim();
     }
   }
-}
 
-function isChanged(handler: NetworkHandlerConfigInput, initial?: NetworkHandlerConfigInput) {
-  if (!initial && !handler.enabled) {
-    return false;
-  }
-
-  const initialProperties = { ...(initial?.properties ?? {}), ...(initial?.secureProperties ?? {}) };
-
-  if (
-    handler.enabled !== initial?.enabled ||
-    handler.savePassword !== initial?.savePassword ||
-    !isObjectsEqual(handler.properties, initialProperties)
-  ) {
-    return true;
-  }
-
-  return false;
+  return input;
 }
