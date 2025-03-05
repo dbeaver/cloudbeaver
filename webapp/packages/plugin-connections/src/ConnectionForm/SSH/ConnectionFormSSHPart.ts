@@ -30,6 +30,7 @@ const DEFAULT_SSH_NETWORK_HANDLER: INetworkHandlerConfig = {
     sshConnectTimeout: '10000',
   },
 };
+
 export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConnectionFormStateRefactored> {
   constructor(
     formState: IFormState<IConnectionFormStateRefactored>,
@@ -38,78 +39,63 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     super(formState, DEFAULT_SSH_NETWORK_HANDLER);
   }
 
-  override get isChanged(): boolean {
-    if (!this.state.enabled) {
-      return false;
-    }
-
-    if (
-      this.state.properties?.['host'] !== this.initialState?.properties?.['host'] ||
-      this.state.properties?.['aliveInterval'] !== this.initialState?.properties?.['aliveInterval'] ||
-      this.state.properties?.['sshConnectTimeout'] !== this.initialState?.properties?.['sshConnectTimeout']
-    ) {
-      return true;
-    }
-
-    return super.isChanged;
-  }
-
   protected override async loader(): Promise<void> {
     if (!this.formState.state.config.connectionId || !this.formState.state.projectId) {
       this.setInitialState(DEFAULT_SSH_NETWORK_HANDLER);
       return;
     }
 
-    const info = await this.connectionInfoResource.load(
-      createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!),
+    const connection = await this.connectionInfoResource.load(
+      createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId),
     );
-    const sshNetworkHandler = info?.networkHandlersConfig?.find(handler => handler.id === SSH_TUNNEL_ID);
 
-    this.setInitialState(sshNetworkHandler ?? DEFAULT_SSH_NETWORK_HANDLER);
+    this.setInitialState(connection?.networkHandlersConfig?.find(h => h.id === SSH_TUNNEL_ID) ?? DEFAULT_SSH_NETWORK_HANDLER);
   }
 
   protected override async saveChanges(
     data: IFormState<IConnectionFormStateRefactored>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): Promise<void> {
-    // const info = await this.connectionInfoResource.load(
-    //   createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!),
-    // );
-    // const networkHandlersConfig = info?.networkHandlersConfig ?? [];
-    // const sshNetworkHandlerIndex = networkHandlersConfig.findIndex(handler => handler.id === SSH_TUNNEL_ID);
-    // const updatedNetworkHandlersConfig = [
-    //   ...networkHandlersConfig.slice(0, sshNetworkHandlerIndex),
-    //   this.state,
-    //   ...networkHandlersConfig.slice(sshNetworkHandlerIndex + 1),
-    // ];
-    // await this.connectionInfoResource.update(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!), {
-    //   networkHandlersConfig: updatedNetworkHandlersConfig,
-    // });
+    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
+
+    await this.connectionInfoResource.update(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!), {
+      connectionId: this.formState.state.config.connectionId,
+      networkHandlersConfig: [
+        ...(info?.networkHandlersConfig ?? []),
+        {
+          ...this.state,
+          id: SSH_TUNNEL_ID,
+        },
+      ],
+    });
   }
 
   protected override format(
     data: IFormState<IConnectionFormStateRefactored>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): void | Promise<void> {
-    const config = this.formState.state.config;
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
-    const urlType = config.configurationType === DriverConfigurationType.Url;
+    // TODO replace this.formState.state.config with options formPart?
+    const urlType = this.formState.state.config.configurationType === DriverConfigurationType.Url;
 
     if (urlType) {
       return;
     }
 
-    let handlerConfig: INetworkHandlerConfig | undefined;
+    let handlerConfig: NetworkHandlerConfigInput | undefined;
 
-    if (this.isChanged) {
+    const passwordChanged = this.state.password !== this.initialState?.password;
+    const keyChanged = this.state.key !== this.initialState?.key;
+
+    if (this.isChanged || passwordChanged || keyChanged) {
       handlerConfig = {
         ...this.state,
-        savePassword: this.state.savePassword || config.sharedCredentials,
-        key: this.state.authType === NetworkHandlerAuthType.PublicKey ? this.state.key : undefined,
-        password: this.state.password,
+        savePassword: this.state.savePassword || this.formState.state.config.sharedCredentials,
+        key: this.state.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? this.state.key : undefined,
+        password: passwordChanged ? this.state.password : undefined,
       };
 
-      delete handlerConfig?.secureProperties;
+      delete handlerConfig.secureProperties;
     }
 
     if (this.state.enabled && !this.state.savePassword) {
@@ -117,7 +103,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     }
 
     if (handlerConfig) {
-      this.setState(getTrimmedSSHConfig(handlerConfig));
+      this.state = getTrimmedSSHConfig(handlerConfig);
     }
   }
 
@@ -127,13 +113,17 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   ): void | Promise<void> {
     const validation = contexts.getContext(formValidationContext);
 
+    if (!this.isChanged) {
+      return;
+    }
+
     if (this.state.enabled) {
       if (this.isChanged) {
         if (this.state.savePassword && !this.state.userName?.length) {
           validation.error("Field SSH 'User' can't be empty");
         }
 
-        if (!this.state.properties?.['host'].length) {
+        if (!this.state.properties?.['host']?.length) {
           validation.error("Field SSH 'Host' can't be empty");
         }
 
@@ -145,12 +135,12 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
 
       const keyAuth = this.state.authType === NetworkHandlerAuthType.PublicKey;
       const keySaved = this.initialState?.key === '';
-
       if (keyAuth && this.state.savePassword && !keySaved && !this.state.key?.length) {
         validation.error("Field SSH 'Private key' can't be empty");
       }
 
       const passwordSaved = this.initialState?.password === '' && this.initialState?.authType === this.state.authType;
+
       if (!keyAuth && this.state.savePassword && !passwordSaved && !this.state.password?.length) {
         validation.error("Field SSH 'Password' can't be empty");
       }
