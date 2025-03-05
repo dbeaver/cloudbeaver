@@ -66,7 +66,7 @@ function getValueByPath<Item, Value>(item: Item, keyOrGetter: PropertyGetter<Ite
     return keyOrGetter(item);
   }
 
-  return item[keyOrGetter as keyof Item];
+  return item[keyOrGetter as keyof Item] as Value;
 }
 
 export function SelectField<T = string, ItemType extends {} = SelectOption<T>>({
