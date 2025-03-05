@@ -758,7 +758,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                         }
                         DBSDataManipulator.ExecuteBatch deleteBatch = dataManipulator.deleteData(
                                 session,
-                                delKeyAttributes.keySet().toArray(new DBSAttributeBase[0]),
+                                delKeyAttributes.keySet().toArray(DBSAttributeBase.ZERO_SIZE_ARRAY),
                                 executionSource);
                         deleteBatch.add(delKeyAttributes.values().toArray());
                         resultBatches.put(deleteBatch, ZeroSizedArrays.OF_OBJECT);
