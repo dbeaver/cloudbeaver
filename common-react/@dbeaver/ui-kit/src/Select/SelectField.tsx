@@ -8,8 +8,11 @@ export interface SelectOption<T = string> {
   disabled?: boolean;
 }
 
-type PropertyPath = string;
-type PropertyGetter<ItemType, ValueType> = PropertyPath | ((item: ItemType) => ValueType);
+type PropertyPath<ItemType, ValueType> = {
+  [K in keyof ItemType]: ItemType[K] extends ValueType ? K : never;
+}[keyof ItemType];
+
+type PropertyGetter<ItemType, ValueType> = PropertyPath<ItemType, ValueType> | ((item: ItemType) => ValueType);
 
 export interface SelectFieldProps<T = string, ItemType = SelectOption<T>> {
   /** Options array - can be SelectOption objects or arbitrary objects */
