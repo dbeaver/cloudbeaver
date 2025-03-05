@@ -48,7 +48,7 @@ export const Field = () => {
         <h3>Select field with label at the end</h3>
         <SelectField
           label="Label here"
-          description="end"
+          description="Some field description here"
           options={[
             { value: '1', label: '1' },
             { value: '2', label: 'Item 2' },
