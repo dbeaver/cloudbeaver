@@ -4,9 +4,9 @@ import { SelectField } from '../../../Select/SelectField.js';
 export const Field = () => {
   const [value, setValue] = useState('apple');
   const users = [
-    { id: 1, profile: { displayName: 'John' }, permissions: { isBlocked: false } },
-    { id: 2, profile: { displayName: 'Jane' }, permissions: { isBlocked: true } },
-    { id: 3, profile: { displayName: 'Doe' }, permissions: { isBlocked: false } },
+    { id: 1, displayName: 'John', isBlocked: false },
+    { id: 2, displayName: 'Jane', isBlocked: true },
+    { id: 3, displayName: 'Doe', isBlocked: false },
   ];
 
   const complexData = [
@@ -76,7 +76,7 @@ export const Field = () => {
       </div>
       <div>
         <h3>Simple key getters</h3>
-        <SelectField items={users} itemValue="id" itemRender="profile.displayName" itemDisabled="permissions.isBlocked" onChange={handleChange} />
+        <SelectField items={users} itemValue="id" itemRender="displayName" itemDisabled="isBlocked" onChange={handleChange} />
       </div>
       <div>
         <h3>
