@@ -11,7 +11,7 @@ import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { GraphQLService, type SessionStateFragment } from '@cloudbeaver/core-sdk';
 
 import { ServerConfigResource } from './ServerConfigResource.js';
-import { ServerEventId } from './SessionEventSource.js';
+import { ServerEventId, SessionEventSource } from './SessionEventSource.js';
 import { type ISessionStateEvent, SessionInfoEventHandler } from './SessionInfoEventHandler.js';
 
 export type SessionState = SessionStateFragment;
@@ -26,6 +26,7 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
 
   constructor(
     private readonly graphQLService: GraphQLService,
+    sessionEventSource: SessionEventSource,
     private readonly sessionInfoEventHandler: SessionInfoEventHandler,
     serverConfigResource: ServerConfigResource,
     private readonly localizationService: LocalizationService,
@@ -34,6 +35,7 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
 
     this.handleSessionStateEvent = this.handleSessionStateEvent.bind(this);
 
+    sessionEventSource.onActivate.addHandler(() => this.load());
     sessionInfoEventHandler.onEvent(ServerEventId.CbSessionState, this.handleSessionStateEvent, undefined, this);
 
     this.action = null;
