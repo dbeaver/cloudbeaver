@@ -575,7 +575,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             }
 
             sqlBuilder.append(
-                SQLUtils.generateScript(executionContext.getDataSource(), actions.toArray(new DBEPersistAction[0]), false)
+                SQLUtils.generateScript(executionContext.getDataSource(), actions.toArray(DBEPersistAction.ZERO_SIZE_ARRAY), false)
             );
         }
         return sqlBuilder.toString();
