@@ -45,8 +45,6 @@ export interface SelectFieldProps<T = string, ItemType = SelectOption<T>> {
 
   required?: boolean;
 
-  width?: string | number;
-
   className?: string;
 
   /**
@@ -80,7 +78,6 @@ export function SelectField<T = string, ItemType extends {} = SelectOption<T>>({
   description,
   disabled,
   required,
-  width,
   className,
   selectedRender,
 }: SelectFieldProps<T, ItemType>) {
@@ -114,7 +111,7 @@ export function SelectField<T = string, ItemType extends {} = SelectOption<T>>({
   const labelClassName = required ? ' dbv-kit-select__label--required ' : undefined;
 
   return (
-    <div className={`dbv-kit-select-field ${className || ''}`} style={{ width }}>
+    <div className={`dbv-kit-select-field ${className || ''}`}>
       <SelectProvider value={currentValue as any} setValue={val => handleChange(val as T)}>
         {label && <SelectLabel className={labelClassName}>{label}</SelectLabel>}
 

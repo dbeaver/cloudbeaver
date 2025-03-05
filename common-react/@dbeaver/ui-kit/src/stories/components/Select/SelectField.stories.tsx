@@ -71,7 +71,7 @@ export const Field = () => {
           value={value}
           onChange={setValue}
           required
-          width="300px"
+          className="tw:w-[300px]"
         />
       </div>
       <div>
@@ -92,7 +92,7 @@ export const Field = () => {
       </div>
       <div>
         <h3>Empty options array</h3>
-        <SelectField label="Choose something" items={[]} width="300px" />
+        <SelectField label="Choose something" items={[]} className="tw:w-[300px]" />
       </div>
     </div>
   );
