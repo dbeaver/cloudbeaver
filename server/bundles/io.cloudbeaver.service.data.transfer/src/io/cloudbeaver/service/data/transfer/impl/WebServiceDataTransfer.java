@@ -141,6 +141,13 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
     }
 
     @Override
+    @Deprecated
+    public Boolean dataTransferRemoveDataFile(WebSession webSession, String dataFileId) throws DBWebException {
+        //deprecated
+        return true;
+    }
+
+    @Override
     public void exportStreamDataTransferExportToResponse(
         @NotNull WebSession session,
         @NotNull WebDataTransferTaskConfig taskConfig,

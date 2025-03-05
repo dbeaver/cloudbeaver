@@ -55,6 +55,10 @@ public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServ
                 env.getArgument("resultsId"),
                 new WebDataTransferParameters(env.getArgument("parameters"))
             ))
+            .dataFetcher("dataTransferRemoveDataFile", env -> getService(env).dataTransferRemoveDataFile(
+                getWebSession(env),
+                env.getArgument("dataFileId")
+            ))
             .dataFetcher("dataTransferDefaultExportSettings", env -> getService(env).defaultExportSettings())
         ;
 

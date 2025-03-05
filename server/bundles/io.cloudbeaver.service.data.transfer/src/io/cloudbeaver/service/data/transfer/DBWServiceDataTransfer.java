@@ -65,6 +65,14 @@ public interface DBWServiceDataTransfer extends DBWService {
         String resultsId,
         WebDataTransferParameters parameters) throws DBWebException;
 
+    /**
+     * It's deprecated because now we use streaming file to response directly, and we don't need to clean up any files
+     * after data transfer.
+     */
+    @WebAction
+    @Deprecated
+    Boolean dataTransferRemoveDataFile(WebSession session, String dataFileId) throws DBWebException;
+
     WebDataTransferDefaultExportSettings defaultExportSettings();
 
     /**
