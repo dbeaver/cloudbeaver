@@ -38,7 +38,7 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): Promise<void> {
     await this.connectionInfoResource.update(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!), {
-      ...this.formState.state.config,
+      connectionId: this.formState.state.config.connectionId,
       properties: this.state,
     });
   }
@@ -47,22 +47,24 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     data: IFormState<IConnectionFormStateRefactored>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): void | Promise<void> {
-    if (this.formState.state.config.driverId) {
-      const driver = this.dbDriverResource.get(this.formState.state.config.driverId);
+    const driverId = this.formState.state.config.driverId;
+
+    if (driverId) {
+      const driver = this.dbDriverResource.get(driverId);
+      const trimmedProperties: IConnectionProperties = {};
+
       const defaultDriverProperties = new Set(driver?.driverProperties?.map(property => property.id) ?? []);
 
-      for (let key of Object.keys(this.state ?? {})) {
-        const value = this.state?.[key];
+      for (let key of Object.keys(this.state!)) {
+        const value = this.state![key];
         if (!defaultDriverProperties?.has(key)) {
           key = key.trim();
         }
 
-        if (!this.state?.[key]) {
-          continue;
-        }
-
-        this.state[key] = typeof value === 'string' ? value.trim() : value;
+        trimmedProperties[key] = typeof value === 'string' ? value.trim() : value;
       }
+
+      this.state = trimmedProperties;
     }
   }
 }
