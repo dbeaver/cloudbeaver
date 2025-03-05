@@ -605,7 +605,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             WebExecutionSource executionSource = new WebExecutionSource(dataManipulator, executionContext, this);
 
             DBDAttributeBinding[] allAttributes = resultsInfo.getAttributes();
-            DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
+            DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(DBDAttributeBinding.ZERO_SIZE_ARRAY);
 
             WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
             updatedResultSet.setResultsInfo(resultsInfo);
@@ -712,7 +712,7 @@ public class WebSQLProcessor implements WebSessionProvider {
 
                     DBSDataManipulator.ExecuteBatch insertBatch = dataManipulator.insertData(
                         session,
-                        insertAttributes.keySet().toArray(new DBDAttributeBinding[0]),
+                        insertAttributes.keySet().toArray(DBDAttributeBinding.ZERO_SIZE_ARRAY),
                         needKeys(keyAttributes, addedValues) ? keyReceiver : null,
                         executionSource,
                         new LinkedHashMap<>());
@@ -938,7 +938,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull DBCSession session,
         @NotNull DBDDataFilter dataFilter
     ) throws DBException {
-        DBDAttributeBinding[] keyAttributes = resultsInfo.getDefaultRowIdentifier().getAttributes().toArray(new DBDAttributeBinding[0]);
+        DBDAttributeBinding[] keyAttributes = resultsInfo.getDefaultRowIdentifier().getAttributes().toArray(DBDAttributeBinding.ZERO_SIZE_ARRAY);
         Object[] rowValues = new Object[keyAttributes.length];
         List<DBDAttributeConstraint> constraints = new ArrayList<>();
         for (int i = 0; i < keyAttributes.length; i++) {

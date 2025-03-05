@@ -113,7 +113,7 @@ public class WebSQLResultsInfo {
             }
             List<DBDAttributeBinding> nestedBindings = binding.getNestedBindings();
             if (nestedBindings != null && !nestedBindings.isEmpty()) {
-                attrList = nestedBindings.toArray(new DBDAttributeBinding[0]);
+                attrList = nestedBindings.toArray(DBDAttributeBinding.ZERO_SIZE_ARRAY);
             }
         }
         return binding == null ? null : binding.getAttribute();

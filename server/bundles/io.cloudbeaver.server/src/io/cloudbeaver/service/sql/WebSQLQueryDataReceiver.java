@@ -185,7 +185,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
 
         // Convert original rows into new rows with leaf attributes
         // Extract values for leaf attributes from original row
-        DBDAttributeBinding[] leafAttributes = leafBindings.toArray(new DBDAttributeBinding[0]);
+        DBDAttributeBinding[] leafAttributes = leafBindings.toArray(DBDAttributeBinding.ZERO_SIZE_ARRAY);
         List<WebSQLQueryResultSetRow> newRows = new ArrayList<>();
         for (WebSQLQueryResultSetRow row : rows) {
             Object[] newRow = new Object[leafBindings.size()];
