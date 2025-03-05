@@ -97,7 +97,7 @@ export function SelectField<T = string, ItemType extends {} = SelectOption<T>>({
     if (value !== undefined) return value;
 
     const firstEnabledOption = items.find(item => !isItemDisabled(item));
-    return items.length > 0 ? getItemValue(firstEnabledOption || items[0]!) : undefined;
+    return firstEnabledOption ? getItemValue(firstEnabledOption) : undefined;
   });
 
   const handleChange = (newValue: T) => {
