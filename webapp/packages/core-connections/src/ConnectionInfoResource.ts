@@ -474,6 +474,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     await this.performUpdate(key, [], async () => {
       const { connection } = await this.graphQLService.sdk.updateConnection({
         projectId: key.projectId,
+        connectionId: key.connectionId,
         config,
         ...this.getDefaultIncludes(),
         ...this.getIncludesMap(key),

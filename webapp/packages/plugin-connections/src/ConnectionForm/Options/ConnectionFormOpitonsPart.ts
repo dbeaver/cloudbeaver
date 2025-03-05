@@ -165,10 +165,10 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     config.template = info.template;
     config.driverId = info.driverId;
 
-    config.host = info.mainPropertyValues[MAIN_PROPERTY_HOST_KEY];
-    config.port = info.mainPropertyValues[MAIN_PROPERTY_PORT_KEY];
-    config.serverName = info.mainPropertyValues[MAIN_PROPERTY_SERVER_KEY];
-    config.databaseName = info.mainPropertyValues[MAIN_PROPERTY_DATABASE_KEY];
+    config.host = info.host || info.mainPropertyValues[MAIN_PROPERTY_HOST_KEY];
+    config.port = info.port || info.mainPropertyValues[MAIN_PROPERTY_PORT_KEY];
+    config.serverName = info.serverName || info.mainPropertyValues[MAIN_PROPERTY_SERVER_KEY];
+    config.databaseName = info.databaseName || info.mainPropertyValues[MAIN_PROPERTY_DATABASE_KEY];
 
     config.url = info.url;
     config.folder = info.folder;
@@ -180,9 +180,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     config.keepAliveInterval = info.keepAliveInterval;
     config.autocommit = info.autocommit;
     config.readOnly = info.readOnly;
-
-    // so driver properties tab has initial values
-    config.properties = info.properties;
 
     if (info.authProperties && config.credentials) {
       for (const property of info.authProperties) {
@@ -398,16 +395,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): Promise<void> {
     const status = contexts.getContext(formStatusContext);
-    const state: IConnectionFormOptionsState = {
-      ...this.state,
-      // merges properties from DriverPropertiesPart
-      properties: {
-        ...this.state.properties,
-        ...this.formState.state.config.properties,
-      },
-      // merges network handlers from SSHPart and SSLPart
-      networkHandlersConfig: [...(this.state.networkHandlersConfig ?? []), ...(this.formState.state.config.networkHandlersConfig ?? [])],
-    };
 
     if (!this.formState.state.projectId) {
       status.error('connections_connection_create_fail');
@@ -421,14 +408,13 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
           this.state,
         );
       } else {
-        const connection = await this.connectionInfoResource.create(this.formState.state.projectId, state);
-        this.state.connectionId = connection.id;
-        this.formState.state.config.connectionId = connection.id;
+        await this.connectionInfoResource.create(this.formState.state.projectId, this.state);
+        this.formState.state.config = this.state;
         this.formState.setMode(FormMode.Edit);
       }
     } else {
       // TODO message this in ConnectionForm.tsx
-      const info = await this.connectionInfoResource.test(this.formState.state.projectId, state);
+      const info = await this.connectionInfoResource.test(this.formState.state.projectId, this.state);
       status.info('Connection is established');
       status.info('Client version: ' + info.clientVersion);
       status.info('Server version: ' + info.serverVersion);

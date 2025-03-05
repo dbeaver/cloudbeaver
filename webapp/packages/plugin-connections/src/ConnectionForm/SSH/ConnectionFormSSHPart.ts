@@ -13,49 +13,78 @@ import { ConnectionInfoResource, createConnectionParam, SSH_TUNNEL_ID } from '@c
 import { toJS } from 'mobx';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
 import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
 
-export class ConnectionFormSSHPart extends FormPart<void, IConnectionFormStateRefactored> {
+const DEFAULT_SSH_NETWORK_HANDLER: INetworkHandlerConfig = {
+  id: SSH_TUNNEL_ID,
+  enabled: false,
+  authType: NetworkHandlerAuthType.Password,
+  password: '',
+  savePassword: false,
+  userName: '',
+  key: '',
+  properties: {
+    port: 22,
+    host: '',
+    aliveInterval: '0',
+    sshConnectTimeout: '10000',
+  },
+};
+export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConnectionFormStateRefactored> {
   constructor(
     formState: IFormState<IConnectionFormStateRefactored>,
     private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
-    super(formState);
+    super(formState, DEFAULT_SSH_NETWORK_HANDLER);
+  }
+
+  override get isChanged(): boolean {
+    if (!this.state.enabled) {
+      return false;
+    }
+
+    if (
+      this.state.properties?.['host'] !== this.initialState?.properties?.['host'] ||
+      this.state.properties?.['aliveInterval'] !== this.initialState?.properties?.['aliveInterval'] ||
+      this.state.properties?.['sshConnectTimeout'] !== this.initialState?.properties?.['sshConnectTimeout']
+    ) {
+      return true;
+    }
+
+    return super.isChanged;
   }
 
   protected override async loader(): Promise<void> {
-    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
-    const initialConfig = info?.networkHandlersConfig?.find(handler => handler.id === SSH_TUNNEL_ID);
-
-    if (!this.formState.state.config.networkHandlersConfig) {
-      this.formState.state.config.networkHandlersConfig = [];
+    if (!this.formState.state.config.connectionId || !this.formState.state.projectId) {
+      this.setInitialState(DEFAULT_SSH_NETWORK_HANDLER);
+      return;
     }
 
-    if (!this.formState.state.config.networkHandlersConfig.some(state => state.id === SSH_TUNNEL_ID)) {
-      this.formState.state.config.networkHandlersConfig.push({
-        id: SSH_TUNNEL_ID,
-        enabled: false,
-        authType: NetworkHandlerAuthType.Password,
-        password: '',
-        savePassword: false,
-        userName: '',
-        key: '',
-        ...initialConfig,
-        properties: {
-          port: 22,
-          host: '',
-          aliveInterval: '0',
-          sshConnectTimeout: '10000',
-          ...initialConfig?.properties,
-        },
-      });
-    }
+    const info = await this.connectionInfoResource.load(
+      createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!),
+    );
+    const sshNetworkHandler = info?.networkHandlersConfig?.find(handler => handler.id === SSH_TUNNEL_ID);
+
+    this.setInitialState(sshNetworkHandler ?? DEFAULT_SSH_NETWORK_HANDLER);
   }
 
-  protected override saveChanges(
+  protected override async saveChanges(
     data: IFormState<IConnectionFormStateRefactored>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): Promise<void> {
-    return Promise.resolve();
+    // const info = await this.connectionInfoResource.load(
+    //   createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!),
+    // );
+    // const networkHandlersConfig = info?.networkHandlersConfig ?? [];
+    // const sshNetworkHandlerIndex = networkHandlersConfig.findIndex(handler => handler.id === SSH_TUNNEL_ID);
+    // const updatedNetworkHandlersConfig = [
+    //   ...networkHandlersConfig.slice(0, sshNetworkHandlerIndex),
+    //   this.state,
+    //   ...networkHandlersConfig.slice(sshNetworkHandlerIndex + 1),
+    // ];
+    // await this.connectionInfoResource.update(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!), {
+    //   networkHandlersConfig: updatedNetworkHandlersConfig,
+    // });
   }
 
   protected override format(
@@ -65,46 +94,30 @@ export class ConnectionFormSSHPart extends FormPart<void, IConnectionFormStateRe
     const config = this.formState.state.config;
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
     const urlType = config.configurationType === DriverConfigurationType.Url;
-    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
 
-    if (urlType || !config.networkHandlersConfig || config.networkHandlersConfig.length === 0) {
+    if (urlType) {
       return;
     }
 
-    let handlerConfig: NetworkHandlerConfigInput | undefined;
+    let handlerConfig: INetworkHandlerConfig | undefined;
 
-    const handler = config.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
-
-    if (!handler) {
-      return;
-    }
-
-    const initial = info?.networkHandlersConfig?.find(h => h.id === handler.id);
-    const passwordChanged = isPasswordChanged(handler, initial);
-    const keyChanged = isKeyChanged(handler, initial);
-
-    if (isChanged(handler, initial) || passwordChanged || keyChanged) {
+    if (this.isChanged) {
       handlerConfig = {
-        ...handler,
-        savePassword: handler.savePassword || config.sharedCredentials,
-        key: handler.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? handler.key : undefined,
-        password: passwordChanged ? handler.password : undefined,
+        ...this.state,
+        savePassword: this.state.savePassword || config.sharedCredentials,
+        key: this.state.authType === NetworkHandlerAuthType.PublicKey ? this.state.key : undefined,
+        password: this.state.password,
       };
 
       delete handlerConfig?.secureProperties;
     }
 
-    if (handler.enabled && !handler.savePassword) {
-      credentialsState.requireNetworkHandler(handler.id);
+    if (this.state.enabled && !this.state.savePassword) {
+      credentialsState.requireNetworkHandler(this.state.id);
     }
 
     if (handlerConfig) {
-      if (!config.networkHandlersConfig) {
-        config.networkHandlersConfig = [];
-      }
-
-      handlerConfig = getTrimmedSSHConfig(handlerConfig);
-      config.networkHandlersConfig.push(handlerConfig);
+      this.setState(getTrimmedSSHConfig(handlerConfig));
     }
   }
 
@@ -113,73 +126,36 @@ export class ConnectionFormSSHPart extends FormPart<void, IConnectionFormStateRe
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): void | Promise<void> {
     const validation = contexts.getContext(formValidationContext);
-    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
 
-    if (!this.formState.state.config.networkHandlersConfig) {
-      return;
-    }
-
-    const handler = this.formState.state.config.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
-
-    if (!handler) {
-      return;
-    }
-
-    if (handler.enabled) {
-      const initial = info?.networkHandlersConfig?.find(h => h.id === handler.id);
-
-      if (isChanged(handler, initial)) {
-        if (handler.savePassword && !handler.userName?.length) {
+    if (this.state.enabled) {
+      if (this.isChanged) {
+        if (this.state.savePassword && !this.state.userName?.length) {
           validation.error("Field SSH 'User' can't be empty");
         }
 
-        if (!handler.properties?.['host'].length) {
+        if (!this.state.properties?.['host'].length) {
           validation.error("Field SSH 'Host' can't be empty");
         }
 
-        const port = Number(handler.properties?.['port']);
+        const port = Number(this.state.properties?.['port']);
         if (Number.isNaN(port) || port < 1) {
           validation.error("Field SSH 'Port' can't be empty");
         }
       }
 
-      const keyAuth = handler.authType === NetworkHandlerAuthType.PublicKey;
-      const keySaved = initial?.key === '';
+      const keyAuth = this.state.authType === NetworkHandlerAuthType.PublicKey;
+      const keySaved = this.initialState?.key === '';
 
-      if (keyAuth && handler.savePassword && !keySaved && !handler.key?.length) {
+      if (keyAuth && this.state.savePassword && !keySaved && !this.state.key?.length) {
         validation.error("Field SSH 'Private key' can't be empty");
       }
 
-      const passwordSaved = initial?.password === '' && initial.authType === handler.authType;
-      if (!keyAuth && handler.savePassword && !passwordSaved && !handler.password?.length) {
+      const passwordSaved = this.initialState?.password === '' && this.initialState?.authType === this.state.authType;
+      if (!keyAuth && this.state.savePassword && !passwordSaved && !this.state.password?.length) {
         validation.error("Field SSH 'Password' can't be empty");
       }
     }
   }
-}
-
-function isChanged(handler: NetworkHandlerConfigInput, initial?: NetworkHandlerConfigInput) {
-  if (!initial && !handler.enabled) {
-    return false;
-  }
-
-  const port = Number(initial?.properties?.port);
-  const formPort = Number(handler.properties?.port);
-
-  if (
-    handler.enabled !== initial?.enabled ||
-    handler.authType !== initial?.authType ||
-    handler.savePassword !== initial?.savePassword ||
-    handler.userName !== initial?.userName ||
-    handler.properties?.host !== initial?.properties?.host ||
-    port !== formPort ||
-    handler.properties?.aliveInterval !== initial?.properties?.aliveInterval ||
-    handler.properties?.sshConnectTimeout !== initial?.properties?.sshConnectTimeout
-  ) {
-    return true;
-  }
-
-  return false;
 }
 
 function getTrimmedSSHConfig(input: NetworkHandlerConfigInput): NetworkHandlerConfigInput {
@@ -199,22 +175,4 @@ function getTrimmedSSHConfig(input: NetworkHandlerConfigInput): NetworkHandlerCo
   }
 
   return trimmedInput;
-}
-
-function isPasswordChanged(handler: NetworkHandlerConfigInput, initial?: NetworkHandlerConfigInput) {
-  if (!initial && !handler.enabled) {
-    return false;
-  }
-
-  return (
-    (((initial?.password === null && handler.password !== null) || initial?.password === '') && handler.password !== '') || !!handler.password?.length
-  );
-}
-
-function isKeyChanged(handler: NetworkHandlerConfigInput, initial?: NetworkHandlerConfigInput) {
-  if (!initial && !handler.enabled) {
-    return false;
-  }
-
-  return (((initial?.key === null && handler.key !== null) || initial?.key === '') && handler.key !== '') || !!handler.key?.length;
 }

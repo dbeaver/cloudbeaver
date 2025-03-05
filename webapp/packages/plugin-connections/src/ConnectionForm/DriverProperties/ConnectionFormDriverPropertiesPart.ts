@@ -7,45 +7,61 @@
  */
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { type DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, createConnectionParam, type DBDriverResource } from '@cloudbeaver/core-connections';
 import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionProperties } from '../Options/IConnectionConfig.js';
 
-export class ConnectionFormDriverPropertiesPart extends FormPart<void, IConnectionFormStateRefactored> {
+export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProperties, IConnectionFormStateRefactored> {
   constructor(
     formState: IFormState<IConnectionFormStateRefactored>,
     private readonly dbDriverResource: DBDriverResource,
+    private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
-    super(formState);
+    super(formState, {});
   }
 
-  protected override async loader(): Promise<void> {}
+  protected override async loader(): Promise<void> {
+    if (!this.formState.state.config.connectionId || !this.formState.state.projectId) {
+      this.setInitialState({});
+      return;
+    }
+
+    const connection = await this.connectionInfoResource.load(
+      createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId),
+    );
+
+    this.setInitialState(connection?.properties ?? {});
+  }
 
   protected override async saveChanges(
     data: IFormState<IConnectionFormStateRefactored>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
-  ): Promise<void> {}
+  ): Promise<void> {
+    await this.connectionInfoResource.update(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!), {
+      ...this.formState.state.config,
+      properties: this.state,
+    });
+  }
 
   protected override format(
     data: IFormState<IConnectionFormStateRefactored>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): void | Promise<void> {
-    const config = this.formState.state.config;
-
-    if (!config.properties) {
-      config.properties = {};
-    }
-
-    if (config.driverId) {
-      const driver = this.dbDriverResource.get(config.driverId);
+    if (this.formState.state.config.driverId) {
+      const driver = this.dbDriverResource.get(this.formState.state.config.driverId);
       const defaultDriverProperties = new Set(driver?.driverProperties?.map(property => property.id) ?? []);
 
-      for (let key of Object.keys(config.properties)) {
-        const value = config.properties[key];
+      for (let key of Object.keys(this.state ?? {})) {
+        const value = this.state?.[key];
         if (!defaultDriverProperties?.has(key)) {
           key = key.trim();
         }
 
-        config.properties[key] = typeof value === 'string' ? value.trim() : value;
+        if (!this.state?.[key]) {
+          continue;
+        }
+
+        this.state[key] = typeof value === 'string' ? value.trim() : value;
       }
     }
   }

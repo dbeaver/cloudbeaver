@@ -52,7 +52,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
   const serverConfigResource = useResource(SSH, ServerConfigResource, undefined);
   const connectionInfoService = useService(ConnectionInfoResource);
   const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
-
+  // TODO probably replace with initialState from part
   const initialConfig = info?.networkHandlersConfig?.find(handler => handler.id === SSH_TUNNEL_ID);
 
   const resource = useResource(SSH, NetworkHandlerResource, SSH_TUNNEL_ID, {

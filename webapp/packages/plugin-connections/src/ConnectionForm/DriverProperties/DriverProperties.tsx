@@ -52,12 +52,12 @@ export const DriverProperties: TabContainerPanelComponent<ConnectionFormRefactor
 
   runInAction(() => {
     if (driver.data) {
-      for (const key of Object.keys(formState.state.config.properties ?? {})) {
+      for (const key of Object.keys(driverPropertiesPart.state ?? {})) {
         if (driver.data.driverProperties.some(property => property.id === key) || state.propertiesList.some(property => property.key === key)) {
           continue;
         }
 
-        state.add(key, formState.state.config.properties![key]);
+        state.add(key, driverPropertiesPart.state![key]);
       }
     }
   });
@@ -88,7 +88,7 @@ export const DriverProperties: TabContainerPanelComponent<ConnectionFormRefactor
         <PropertiesTable
           className={s(style, { propertiesTable: true })}
           properties={joinedProperties.get()}
-          propertiesState={formState.state.config.properties}
+          propertiesState={driverPropertiesPart.state}
           readOnly={formState.isDisabled}
           filterable
           onAdd={state.add}
