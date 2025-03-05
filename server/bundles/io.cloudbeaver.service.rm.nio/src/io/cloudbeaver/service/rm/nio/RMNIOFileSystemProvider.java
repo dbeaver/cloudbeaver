@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.ZeroSizedArrays;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -106,7 +107,7 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
                 byte[] data = rmController.getResourceContents(rmPath.getRmProjectId(), rmPath.getResourcePath());
                 return new RMByteArrayChannel(data, rmPath, options);
             } else {
-                return new RMByteArrayChannel(new byte[0], rmPath, options);
+                return new RMByteArrayChannel(ZeroSizedArrays.OF_BYTE, rmPath, options);
             }
         } catch (DBException e) {
             throw new IOException("Failed to read resource: " + e.getMessage(), e);
