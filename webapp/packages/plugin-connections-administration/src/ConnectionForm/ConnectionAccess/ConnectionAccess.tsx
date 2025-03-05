@@ -27,7 +27,7 @@ import { ConnectionInfoOriginResource, ConnectionInfoResource, createConnectionP
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
-import type { ConnectionFormRefactoredProps } from '@cloudbeaver/plugin-connections';
+import type { IConnectionFormPropsRefactored } from '@cloudbeaver/plugin-connections';
 
 import styles from './ConnectionAccess.module.css';
 import { ConnectionAccessGrantedList } from './ConnectionAccessGrantedList.js';
@@ -35,19 +35,14 @@ import { ConnectionAccessList } from './ConnectionAccessList.js';
 import { useService } from '@cloudbeaver/core-di';
 import { getConnectionFormAccessPart } from './getConnectionFormAccessPart.js';
 
-export const ConnectionAccess: TabContainerPanelComponent<ConnectionFormRefactoredProps> = observer(function ConnectionAccess({ tabId, formState }) {
-  const connectionInfoService = useService(ConnectionInfoResource);
-  const connectionOriginInfoService = useService(ConnectionInfoOriginResource);
-  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
-  const originInfo = connectionOriginInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
-  const accessPart = getConnectionFormAccessPart(formState);
-
+export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormPropsRefactored> = observer(function ConnectionAccess({ tabId, formState }) {
   const translate = useTranslate();
   const style = useS(styles);
 
   const { selected } = useTab(tabId);
+  const accessPart = getConnectionFormAccessPart(formState);
 
-  useAutoLoad(ConnectionAccess, [accessPart], selected);
+  useAutoLoad(ConnectionAccess, accessPart, selected);
 
   const users = useResource(ConnectionAccess, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()), {
     active: selected,
@@ -68,15 +63,19 @@ export const ConnectionAccess: TabContainerPanelComponent<ConnectionFormRefactor
     return null;
   }
 
+  const connectionInfoService = useService(ConnectionInfoResource);
+  const originInfoService = useService(ConnectionInfoOriginResource);
+  const connectionInfo = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
+  const originInfo = originInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
   const loading = users.isLoading() || teams.isLoading() || accessPart.isLoading();
-  const cloud = info && originInfo?.origin ? isCloudConnection(originInfo.origin) : false;
+  const cloud = connectionInfo && originInfo?.origin ? isCloudConnection(originInfo.origin) : false;
   const disabled = loading || !accessPart.isLoaded() || formState.isDisabled || cloud;
-  let infoToken: TLocalizationToken = '';
+  let info: TLocalizationToken | null = null;
 
-  if (formState.mode === 'edit' && accessPart.isChanged) {
-    infoToken = 'ui_save_reminder';
+  if (formState.mode === 'edit' && formState.isChanged) {
+    info = 'ui_save_reminder';
   } else if (cloud) {
-    infoToken = 'cloud_connections_access_placeholder';
+    info = 'cloud_connections_access_placeholder';
   }
 
   return (
@@ -89,7 +88,7 @@ export const ConnectionAccess: TabContainerPanelComponent<ConnectionFormRefactor
             </Group>
           ) : (
             <>
-              {info && <InfoItem info={infoToken} />}
+              {info && <InfoItem info={info} />}
               <Container gap overflow>
                 <ConnectionAccessGrantedList
                   grantedUsers={grantedUsers.get()}

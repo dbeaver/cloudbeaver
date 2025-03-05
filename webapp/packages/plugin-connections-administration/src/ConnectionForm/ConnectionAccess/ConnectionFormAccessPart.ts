@@ -36,7 +36,7 @@ export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessStat
     const connectionId = this.formState.state.config.connectionId;
     const projectId = this.formState.state.projectId;
 
-    if (!connectionId || !projectId || !this.loaded) {
+    if (!connectionId || !projectId) {
       this.setInitialState(getDefaultState());
       return;
     }
