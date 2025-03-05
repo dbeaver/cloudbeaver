@@ -105,15 +105,17 @@ export function SelectField<T = string, ItemType extends {} = SelectOption<T>>({
     onChange?.(newValue);
   };
 
-  const selectedItem = items.find(item => getItemValue(item) === selectedValue);
+  const currentValue = value !== undefined ? value : selectedValue;
 
-  const displayValue = selectedItem ? (selectedRender ? selectedRender(selectedValue, selectedItem) : renderItem(selectedItem)) : '';
+  const selectedItem = items.find(item => getItemValue(item) === currentValue);
+
+  const displayValue = selectedItem ? (selectedRender ? selectedRender(currentValue, selectedItem) : renderItem(selectedItem)) : '';
 
   const labelClassName = required ? ' dbv-kit-select__label--required ' : undefined;
 
   return (
     <div className={`dbv-kit-select-field ${className || ''}`} style={{ width }}>
-      <SelectProvider value={selectedValue as any} setValue={val => handleChange(val as T)}>
+      <SelectProvider value={currentValue as any} setValue={val => handleChange(val as T)}>
         {label && <SelectLabel className={labelClassName}>{label}</SelectLabel>}
 
         <Select disabled={disabled}>
