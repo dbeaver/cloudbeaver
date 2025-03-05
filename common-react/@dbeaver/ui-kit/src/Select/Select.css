@@ -20,11 +20,11 @@
     font-weight: var(--dbv-kit-select-font-weight);
     font-size: var(--dbv-kit-select-font-size);
     outline-width: var(--dbv-kit-control-outline-width);
-    outline-offset: 2px; /* TODO: use --dbv-kit-control-outline-offset when #87 is merged */
+    outline-offset: var(--dbv-kit-control-outline-offset);
     outline-color: var(--dbv-kit-color-outline);
 
     &[aria-disabled='true'] {
-      opacity: 0.5 /* TODO: change to --dbv-kit-control-disabled-opacity when #87 is merged */;
+      opacity: var(--dbv-kit-control-disabled-opacity);
     }
     &[data-focus-visible],
     &:focus-visible {
@@ -83,7 +83,7 @@
     background: none;
 
     &[aria-disabled='true'] {
-      opacity: 0.5; /* TODO: change to --dbv-kit-control-disabled-opacity when #87 is merged */
+      opacity: var(--dbv-kit-control-disabled-opacity);
       user-select: none;
     }
 
@@ -93,6 +93,7 @@
 
     &[data-focus-visible],
     &[data-active-item] {
+      color: var(--dbv-kit-select-item-hover-foreground);
       background-color: var(--dbv-kit-select-item-hover-background);
     }
   }

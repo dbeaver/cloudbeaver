@@ -26,6 +26,7 @@
     --dbv-kit-select-item-padding-inline: calc(var(--tw-spacing) * 3);
     --dbv-kit-select-item-padding-block: var(--tw-spacing);
     --dbv-kit-select-item-hover-background: var(--tw-color-gray-200);
+    --dbv-kit-select-item-hover-foreground: var(--dbv-kit-select-foreground);
     --dbv-kit-select-item-selected-background: var(--dbv-kit-color-primary-100);
   }
 }
