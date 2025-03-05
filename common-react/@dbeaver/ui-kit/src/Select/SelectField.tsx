@@ -15,49 +15,38 @@ export interface SelectFieldProps<T = string, ItemType = SelectOption<T>> {
   /** Options array - can be SelectOption objects or arbitrary objects */
   items: ItemType[];
 
-  /** Current value */
-  value?: T;
-
-  /** Value change handler */
-  onChange?: (value: T) => void;
-
   /**
-   * Function or property path to extract value from items
-   * Examples: 'id', 'user.id', (item) => item.id.toString()
+   * Function or object's key to extract value from items
+   * Examples: 'id', (item) => item.id.toString()
    */
   itemValue?: PropertyGetter<ItemType, T>;
 
   /**
-   * Function or property path to extract label or render content from items
-   * Examples: 'name', 'user.name', (item) => <span className="custom">{item.firstName}</span>
+   * Function or object's key to extract label or render content from items
+   * Examples: 'name', (item) => <span className="custom">{item.firstName}</span>
    */
   itemRender?: PropertyGetter<ItemType, React.ReactNode>;
 
   /**
-   * Function or property path to extract disabled state
-   * Examples: 'isDisabled', 'permissions.canSelect', (item) => !item.isActive
+   * Function or object's key to extract disabled state
+   * Examples: 'isDisabled', (item) => !item.isActive
    */
   itemDisabled?: PropertyGetter<ItemType, boolean>;
 
-  /** Select label */
+  value?: T;
+
+  onChange?: (value: T) => void;
+
   label?: React.ReactNode;
 
-  /** Select description */
   description?: React.ReactNode;
 
-  /** Placeholder */
-  placeholder?: string;
-
-  /** Makes field disabled */
   disabled?: boolean;
 
-  /** Is field required */
   required?: boolean;
 
-  /** Select's width */
   width?: string | number;
 
-  /** Custom class name */
   className?: string;
 
   /**
@@ -103,7 +92,6 @@ export function SelectField<T = string, ItemType extends {} = SelectOption<T>>({
   width,
   className,
   selectedRender,
-  placeholder,
 }: SelectFieldProps<T, ItemType>) {
   const getItemValue = (item: ItemType): T =>
     getValueByPath<ItemType, T>(item, itemValue, i => ('value' in i ? (i as unknown as SelectOption<T>).value : (i as unknown as T)));
@@ -128,11 +116,7 @@ export function SelectField<T = string, ItemType extends {} = SelectOption<T>>({
 
   const selectedItem = items.find(item => getItemValue(item) === selectedValue);
 
-  const displayValue = selectedItem
-    ? selectedRender
-      ? selectedRender(selectedValue, selectedItem)
-      : renderItem(selectedItem)
-    : placeholder || label;
+  const displayValue = selectedItem ? (selectedRender ? selectedRender(selectedValue, selectedItem) : renderItem(selectedItem)) : '';
 
   const labelClassName = required ? ' dbv-kit-select__label--required ' : undefined;
 
