@@ -148,8 +148,8 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
     }
 
     @Override
-    public void exportStreamDataTransferExportToResponse(
-        @NotNull WebSession session,
+    public void exportDataTransferToStream(
+        @NotNull DBRProgressMonitor monitor,
         @NotNull WebDataTransferTaskConfig taskConfig,
         @NotNull OutputStream outputStream
     ) throws DBException {
@@ -160,7 +160,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
 
         try {
-            exportData(session.getProgressMonitor(), processor, dataContainer, parameters, resultsInfo, outputStream);
+            exportData(monitor, processor, dataContainer, parameters, resultsInfo, outputStream);
         } catch (Exception e) {
             throw new DBException("Error exporting data", e);
         }

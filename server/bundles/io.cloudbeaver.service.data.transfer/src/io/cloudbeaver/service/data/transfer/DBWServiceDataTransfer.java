@@ -30,6 +30,7 @@ import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.sql.WebSQLResultsInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 import java.io.OutputStream;
 import java.nio.file.Path;
@@ -78,8 +79,8 @@ public interface DBWServiceDataTransfer extends DBWService {
     /**
      * Usefully for exporting directly to http response and avoid to create temp files.
      */
-    void exportStreamDataTransferExportToResponse(
-        @NotNull WebSession session,
+    void exportDataTransferToStream(
+        @NotNull DBRProgressMonitor monitor,
         @NotNull WebDataTransferTaskConfig taskConfig,
         @NotNull OutputStream outputStream
     ) throws DBException;
