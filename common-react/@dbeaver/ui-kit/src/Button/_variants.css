@@ -18,5 +18,6 @@
     --dbv-kit-btn-danger-background: var(--tw-color-red-600);
     --dbv-kit-btn-danger-background-hover: var(--tw-color-red-700);
     --dbv-kit-btn-danger-background-active: var(--tw-color-red-800);
+    --dbv-kit-btn-danger-color-outline: var(--tw-color-red-300);
   }
 }
