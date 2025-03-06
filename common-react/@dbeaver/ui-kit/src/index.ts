@@ -20,4 +20,4 @@ export {
   type SelectPopoverProps,
   type SelectItemProps,
 } from './Select/Select.js';
-export { SelectField, type SelectFieldProps, type SelectOption } from './Select/SelectField.js';
+export { SelectField, type SelectFieldProps, type SelectItem } from './Select/SelectField.js';

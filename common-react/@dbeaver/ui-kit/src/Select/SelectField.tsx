@@ -2,37 +2,33 @@ import { useState } from 'react';
 import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel } from './Select.js';
 import './SelectField.css';
 
-export interface SelectOption<T = string> {
+export interface SelectItem<T> {
   value: T;
   label: string;
   disabled?: boolean;
 }
 
-type PropertyPath<ItemType, ValueType> = {
-  [K in keyof ItemType]: ItemType[K] extends ValueType ? K : never;
-}[keyof ItemType];
+type PropertyGetter<ItemType, ValueType> = (item: ItemType) => ValueType;
 
-type PropertyGetter<ItemType, ValueType> = PropertyPath<ItemType, ValueType> | ((item: ItemType) => ValueType);
-
-export interface SelectFieldProps<T = string, ItemType = SelectOption<T>> {
+export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
   /** Options array - can be SelectOption objects or arbitrary objects */
   items: ItemType[];
 
   /**
-   * Function or object's key to extract value from items
-   * Examples: 'id', (item) => item.id.toString()
+   * Function to extract value from items
+   * Example: (item) => item.id
    */
   itemValue?: PropertyGetter<ItemType, T>;
 
   /**
-   * Function or object's key to extract label or render content from items
-   * Examples: 'name', (item) => <span className="custom">{item.firstName}</span>
+   * Function to extract label or render content from items
+   * Example: (item) => item.firstName + ' ' + item.lastName
    */
   itemRender?: PropertyGetter<ItemType, React.ReactNode>;
 
   /**
-   * Function or object's key to extract disabled state
-   * Examples: 'isDisabled', (item) => !item.isActive
+   * Function to extract disabled state
+   * Example: (item) => !item.isActive
    */
   itemDisabled?: PropertyGetter<ItemType, boolean>;
 
@@ -57,25 +53,17 @@ export interface SelectFieldProps<T = string, ItemType = SelectOption<T>> {
   selectedRender?: (value: T | undefined, item: ItemType | undefined) => React.ReactNode;
 
   /**
-   * Custom arrow icon that will be rendered instead default one
+   * Custom arrow icon React Node that will be rendered instead default one
    */
   arrowIcon?: React.ReactNode;
 }
 
 // Utility function to get value by it's key or using getter function
-function getValueByPath<Item, Value>(item: Item, keyOrGetter: PropertyGetter<Item, Value> | undefined, defaultGetter: (item: Item) => Value): Value {
-  if (!keyOrGetter) {
-    return defaultGetter(item);
-  }
-
-  if (typeof keyOrGetter === 'function') {
-    return keyOrGetter(item);
-  }
-
-  return item[keyOrGetter as keyof Item] as Value;
+function getValueByPath<Item, Value>(item: Item, getter: PropertyGetter<Item, Value> | undefined, defaultGetter: (item: Item) => Value): Value {
+  return getter ? getter(item) : defaultGetter(item);
 }
 
-export function SelectField<T = string, ItemType extends {} = SelectOption<T>>({
+export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   items,
   value,
   onChange,
@@ -91,19 +79,19 @@ export function SelectField<T = string, ItemType extends {} = SelectOption<T>>({
   arrowIcon,
 }: SelectFieldProps<T, ItemType>) {
   const getItemValue = (item: ItemType): T =>
-    getValueByPath<ItemType, T>(item, itemValue, i => ('value' in i ? (i as unknown as SelectOption<T>).value : (i as unknown as T)));
+    getValueByPath<ItemType, T>(item, itemValue, i => ('value' in i ? (i as unknown as SelectItem<T>).value : (i as unknown as T)));
 
   const renderItem = (item: ItemType): React.ReactNode =>
-    getValueByPath<ItemType, React.ReactNode>(item, itemRender, i => ('label' in i ? (i as unknown as SelectOption<T>).label : String(i)));
+    getValueByPath<ItemType, React.ReactNode>(item, itemRender, i => ('label' in i ? (i as unknown as SelectItem<T>).label : String(i)));
 
   const isItemDisabled = (item: ItemType): boolean =>
-    getValueByPath<ItemType, boolean>(item, itemDisabled, i => ('disabled' in i ? Boolean((i as unknown as SelectOption<T>).disabled) : false));
+    getValueByPath<ItemType, boolean>(item, itemDisabled, i => ('disabled' in i ? Boolean((i as unknown as SelectItem<T>).disabled) : false));
 
   const [selectedValue, setSelectedValue] = useState<T | undefined>(() => {
     if (value !== undefined) return value;
 
-    const firstEnabledOption = items.find(item => !isItemDisabled(item));
-    return firstEnabledOption ? getItemValue(firstEnabledOption) : undefined;
+    const firstEnabledItem = items.find(item => !isItemDisabled(item));
+    return firstEnabledItem ? getItemValue(firstEnabledItem) : undefined;
   });
 
   const handleChange = (newValue: T) => {
@@ -132,7 +120,7 @@ export function SelectField<T = string, ItemType extends {} = SelectOption<T>>({
 
         <SelectPopover gutter={4} unmountOnHide>
           {items.length === 0 ? (
-            <div className="dbv-kit-select__empty">No options</div>
+            <div className="dbv-kit-select__empty">No items</div>
           ) : (
             items.map(item => (
               <SelectItem

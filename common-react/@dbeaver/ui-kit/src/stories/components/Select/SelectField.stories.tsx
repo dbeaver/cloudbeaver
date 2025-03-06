@@ -3,11 +3,6 @@ import { SelectField } from '../../../Select/SelectField.js';
 
 export const Field = () => {
   const [value, setValue] = useState('apple');
-  const users = [
-    { id: 1, displayName: 'John', isBlocked: false },
-    { id: 2, displayName: 'Jane', isBlocked: true },
-    { id: 3, displayName: 'Doe', isBlocked: false },
-  ];
 
   const complexData = [
     { id: 1, firstName: 'John', lastName: 'Doe', department: { code: 'HR' }, isActive: true, permissions: { level: 1 } },
@@ -17,7 +12,7 @@ export const Field = () => {
     { id: 5, firstName: 'Charlie', lastName: 'Doe', department: { code: 'HR' }, isActive: true, permissions: { level: 3 } },
   ];
 
-  const handleChange = (value: any) => {
+  const handleChange = (value: number) => {
     console.log(value);
   };
 
@@ -73,10 +68,6 @@ export const Field = () => {
           required
           className="tw:w-[300px]"
         />
-      </div>
-      <div>
-        <h3>Simple key getters</h3>
-        <SelectField items={users} itemValue="id" itemRender="displayName" itemDisabled="isBlocked" onChange={handleChange} />
       </div>
       <div>
         <h3>
