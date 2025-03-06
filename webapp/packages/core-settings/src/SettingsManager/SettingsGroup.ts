@@ -9,11 +9,15 @@ import { makeObservable, observable } from 'mobx';
 
 import { uuid } from '@cloudbeaver/core-utils';
 
+const DEFAULT_ORDER = Number.MAX_SAFE_INTEGER;
+
 export class SettingsGroup {
+  readonly id: string;
+
   get level(): number {
     return (this.parent?.level ?? -1) + 1;
   }
-  readonly id: string;
+
   get subGroups(): ReadonlyArray<SettingsGroup> {
     return this.subGroupsData;
   }
@@ -24,6 +28,7 @@ export class SettingsGroup {
   constructor(
     readonly name: string,
     readonly parent?: SettingsGroup,
+    readonly order = DEFAULT_ORDER,
   ) {
     this.id = uuid();
     this.subGroupsData = [];
@@ -44,8 +49,8 @@ export class SettingsGroup {
     return this.groups.get(id);
   }
 
-  createSubGroup(name: string): SettingsGroup {
-    const subGroup = new SettingsGroup(name, this);
+  createSubGroup(name: string, order = DEFAULT_ORDER): SettingsGroup {
+    const subGroup = new SettingsGroup(name, this, order);
 
     this.subGroupsData.push(subGroup);
 

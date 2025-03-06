@@ -27,7 +27,7 @@ interface Props {
 export const SettingsList = observer<Props>(function SettingsList({ treeData, treeFilter, source, settings, onSettingsOpen }) {
   const translate = useTranslate();
   const ref = useTreeScrollSync(treeData, onSettingsOpen);
-  const groups = Array.from(getGroupsFromTree(treeData, treeData.getChildren(treeData.rootId)));
+  const groups = Array.from(getGroupsFromTree(treeData, treeData.getChildren(treeData.rootId))).sort((a, b) => a.order - b.order);
 
   return (
     <Container ref={ref} gap overflow>
