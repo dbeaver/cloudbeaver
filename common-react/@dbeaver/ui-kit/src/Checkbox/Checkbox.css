@@ -44,7 +44,7 @@
     border-width: var(--dbv-kit-checkbox-border-width);
     border-style: var(--dbv-kit-checkbox-border-style);
     color: var(--dbv-kit-checkbox-icon-color);
-    outline-offset: var(--dbv-kit-outline-offset);
+    outline-offset: var(--dbv-kit-control-outline-offset);
     outline-width: var(--dbv-kit-control-outline-width);
     outline-color: var(--dbv-kit-color-outline);
     transition-property: stroke-dashoffset;

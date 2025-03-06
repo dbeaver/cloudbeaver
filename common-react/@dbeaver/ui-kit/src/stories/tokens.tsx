@@ -137,7 +137,7 @@ export const GlobalTokens = () => {
         <code>--dbv-kit-control-disabled-opacity:</code> opacity level for disabled controls, default is 0.5
       </p>
       <p>
-        <code>--dbv-kit-outline-offset:</code> outline offset for focused elements
+        <code>--dbv-kit-control-outline-offset:</code> outline offset for focused elements
       </p>
     </div>
   );

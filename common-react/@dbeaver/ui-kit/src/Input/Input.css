@@ -1,10 +1,3 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
 @import './_base.css';
 @import './_sizes.css';
 @import './_variants.css';
@@ -17,6 +10,7 @@
 
 .dbv-kit-input {
   background: var(--dbv-kit-input-background);
+  border-radius: var(--dbv-kit-input-radius);
   border-color: var(--dbv-kit-input-border-color);
   border-width: var(--dbv-kit-input-border-width);
   border-style: var(--dbv-kit-input-border-style);
@@ -32,7 +26,7 @@
   &:focus-visible,
   &[data-focus-visible] {
     outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-color-outline);
-    outline-offset: var(--dbv-kit-outline-offset);
+    outline-offset: var(--dbv-kit-control-outline-offset);
   }
 }
 

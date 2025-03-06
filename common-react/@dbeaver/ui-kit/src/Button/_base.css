@@ -3,7 +3,7 @@
     --dbv-kit-btn-height: var(--dbv-kit-control-height-medium);
     --dbv-kit-btn-padding-inline: calc(var(--tw-spacing) * 2.5);
     --dbv-kit-btn-gap: calc(var(--dbv-kit-btn-padding-inline) / 4);
-    --dbv-kit-btn-outline-offset: var(--dbv-kit-outline-offset);
+    --dbv-kit-btn-outline-offset: var(--dbv-kit-control-outline-offset);
 
     --dbv-kit-btn-foreground: var(--tw-color-white);
     --dbv-kit-btn-background: var(--dbv-kit-color-primary-600);
