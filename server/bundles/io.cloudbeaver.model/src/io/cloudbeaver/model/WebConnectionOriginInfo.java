@@ -80,7 +80,7 @@ public class WebConnectionOriginInfo implements WebObjectOrigin {
         try {
             DBPObject details = origin.getObjectDetails(session.getProgressMonitor(), session.getSessionContext(), dataSourceContainer);
             if (details == null) {
-                return new WebPropertyInfo[0];
+                return WebPropertyInfo.ZERO_SIZE_ARRAY;
             }
             return WebCommonUtils.getObjectProperties(session, details);
         } catch (DBException e) {

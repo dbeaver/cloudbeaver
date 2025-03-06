@@ -89,7 +89,7 @@ public class WebUserOriginInfo implements WebObjectOrigin {
     @Override
     public WebPropertyInfo[] getDetails() throws DBWebException {
         if (user == null) {
-            return new WebPropertyInfo[0];
+            return WebPropertyInfo.ZERO_SIZE_ARRAY;
         }
         try {
             SMAuthProvider<?> authProvider = this.authProviderDescriptor.getInstance();
@@ -102,7 +102,7 @@ public class WebUserOriginInfo implements WebObjectOrigin {
         } catch (Exception e) {
             log.error(e);
         }
-        return new WebPropertyInfo[0];
+        return WebPropertyInfo.ZERO_SIZE_ARRAY;
     }
 
     protected Map<String, Object> loadCredentials() throws DBException {
@@ -113,7 +113,7 @@ public class WebUserOriginInfo implements WebObjectOrigin {
         WebSession session, Map<String, Object> creds
     ) {
         if (CommonUtils.isEmpty(creds)) {
-            return new WebPropertyInfo[0];
+            return WebPropertyInfo.ZERO_SIZE_ARRAY;
         }
         var propSource = new PropertySourceMap(creds);
         return creds.entrySet()

@@ -193,7 +193,7 @@ public class WebDatabaseDriverInfo {
             cfg.setUrl(driver.getConnectionURL(cfg));
             DBPPropertyDescriptor[] properties = driver.getDataSourceProvider().getConnectionProperties(webSession.getProgressMonitor(), driver, cfg);
             if (properties == null) {
-                return new WebPropertyInfo[0];
+                return WebPropertyInfo.ZERO_SIZE_ARRAY;
             }
 
             PropertySourceCustom propertySource = new PropertySourceCustom(
@@ -204,7 +204,7 @@ public class WebDatabaseDriverInfo {
                 .map(p -> new WebPropertyInfo(webSession, p, propertySource)).toArray(WebPropertyInfo[]::new);
         } catch (DBException e) {
             log.error("Error reading driver properties", e);
-            return new WebPropertyInfo[0];
+            return WebPropertyInfo.ZERO_SIZE_ARRAY;
         }
     }
 
@@ -261,7 +261,7 @@ public class WebDatabaseDriverInfo {
         WebPropertyInfo[] additionalWebProperty = Optional.of(WebAppUtils.getWebApplication())
             .filter(app -> app.getAppConfiguration().isSecretManagerEnabled())
             .map(app -> app.getConnectionController().getExternalInfo(webSession))
-            .orElse(new WebPropertyInfo[0]);
+            .orElse(WebPropertyInfo.ZERO_SIZE_ARRAY);
 
         WebPropertyInfo[] providerProperties = Arrays.stream(driver.getProviderPropertyDescriptors())
             .map(p -> new WebPropertyInfo(webSession, p, null))

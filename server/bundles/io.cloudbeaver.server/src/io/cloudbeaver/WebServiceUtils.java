@@ -401,7 +401,7 @@ public class WebServiceUtils extends WebCommonUtils {
             }
             webProps.add(webProperty);
         }
-        return webProps.toArray(new WebPropertyInfo[0]);
+        return webProps.toArray(WebPropertyInfo.ZERO_SIZE_ARRAY);
     }
 
     /**

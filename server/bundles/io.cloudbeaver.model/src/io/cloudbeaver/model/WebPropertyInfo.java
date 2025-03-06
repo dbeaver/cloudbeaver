@@ -40,6 +40,11 @@ import java.util.*;
  * Web connection info
  */
 public class WebPropertyInfo {
+    /**
+     * A constant zero-sized array for sharing.
+     */
+    public static final WebPropertyInfo[] ZERO_SIZE_ARRAY = new WebPropertyInfo[0];
+
     private WebSession session;
     private DBPPropertyDescriptor property;
     private DBPPropertySource propertySource;

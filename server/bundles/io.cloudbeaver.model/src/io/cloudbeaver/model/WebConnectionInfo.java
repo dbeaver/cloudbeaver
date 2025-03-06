@@ -344,7 +344,7 @@ public class WebConnectionInfo {
         String authModelId = getAuthModel();
         DBPAuthModelDescriptor authModel = DBWorkbench.getPlatform().getDataSourceProviderRegistry().getAuthModel(authModelId);
         if (authModel == null) {
-            return new WebPropertyInfo[0];
+            return WebPropertyInfo.ZERO_SIZE_ARRAY;
         }
 
         // Fill user provided credentials
