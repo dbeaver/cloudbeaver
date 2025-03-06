@@ -9,8 +9,6 @@ import { makeObservable, observable } from 'mobx';
 
 import { uuid } from '@cloudbeaver/core-utils';
 
-const DEFAULT_ORDER = Number.MAX_SAFE_INTEGER;
-
 export class SettingsGroup {
   readonly id: string;
   order: number;
@@ -31,7 +29,7 @@ export class SettingsGroup {
     readonly parent?: SettingsGroup,
   ) {
     this.id = uuid();
-    this.order = DEFAULT_ORDER;
+    this.order = Number.MAX_SAFE_INTEGER;
     this.subGroupsData = [];
     this.groups = parent?.groups || new Map();
     this.groups.set(this.id, this);
