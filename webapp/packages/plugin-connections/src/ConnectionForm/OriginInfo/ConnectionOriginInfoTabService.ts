@@ -42,7 +42,6 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
           return true;
         }
 
-        // TODO it is better to preload it
         const originInfo = this.connectionInfoOriginResource.get(createConnectionParam(projectId, connectionId));
 
         return originInfo ? isLocalConnection(originInfo.origin) : true;

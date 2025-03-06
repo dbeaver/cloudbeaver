@@ -1,0 +1,43 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+import { type IFormState } from '@cloudbeaver/core-ui';
+
+import {
+  ConnectionInfoOriginDetailsResource,
+  ConnectionInfoResource,
+  DatabaseAuthModelsResource,
+  DBDriverResource,
+} from '@cloudbeaver/core-connections';
+import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import { ConnectionFormOriginInfoFormPart } from './ConnectionFormOriginInfoFormPart.js';
+import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
+
+const DATA_CONTEXT_CONNECTION_FORM_ORIGIN_INFO_FORM_PART = createDataContext<ConnectionFormOriginInfoFormPart>(
+  'Connection Form Origin Info Form Part',
+);
+
+export function getConnectionFormOriginInfoFormPart(formState: IFormState<IConnectionFormStateRefactored>): ConnectionFormOriginInfoFormPart {
+  return formState.getPart(DATA_CONTEXT_CONNECTION_FORM_ORIGIN_INFO_FORM_PART, context => {
+    const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
+    const connectionInfoOriginDetailsResource = di.getService(ConnectionInfoOriginDetailsResource);
+    const userInfoResource = di.getService(UserInfoResource);
+    const databaseAuthModelsResource = di.getService(DatabaseAuthModelsResource);
+    const connectionInfoResource = di.getService(ConnectionInfoResource);
+    const dbDriverResource = di.getService(DBDriverResource);
+
+    return new ConnectionFormOriginInfoFormPart(
+      formState,
+      connectionInfoOriginDetailsResource,
+      userInfoResource,
+      databaseAuthModelsResource,
+      connectionInfoResource,
+      dbDriverResource,
+    );
+  });
+}

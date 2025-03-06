@@ -10,10 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { Button, getComputed, type PlaceholderComponent, useResource, useTranslate, useAuthenticationAction } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
-import type { ConnectionFormRefactoredProps } from '../ConnectionFormServiceRefactored.js';
+
+import type { IConnectionFormPropsRefactored } from '../IConnectionFormStateRefactored.js';
 import { useService } from '@cloudbeaver/core-di';
 
-export const AuthenticationButton: PlaceholderComponent<ConnectionFormRefactoredProps> = observer(function ConnectionFormAuthenticationAction({
+export const AuthenticationButton: PlaceholderComponent<IConnectionFormPropsRefactored> = observer(function ConnectionFormAuthenticationAction({
   formState,
 }) {
   const translate = useTranslate();
@@ -44,7 +45,7 @@ export const AuthenticationButton: PlaceholderComponent<ConnectionFormRefactored
   );
 });
 
-export const ConnectionFormAuthenticationAction: PlaceholderComponent<ConnectionFormRefactoredProps> = observer(
+export const ConnectionFormAuthenticationAction: PlaceholderComponent<IConnectionFormPropsRefactored> = observer(
   function ConnectionFormAuthenticationAction({ formState }) {
     const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, formState.state.config.driverId || null);
     const connectionInfoService = useService(ConnectionInfoResource);
