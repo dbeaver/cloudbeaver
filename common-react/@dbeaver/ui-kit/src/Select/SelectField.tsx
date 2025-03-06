@@ -55,6 +55,11 @@ export interface SelectFieldProps<T = string, ItemType = SelectOption<T>> {
    * Only needed for special formatting of the selected value different from list items
    */
   selectedRender?: (value: T | undefined, item: ItemType | undefined) => React.ReactNode;
+
+  /**
+   * Custom arrow icon that will be rendered instead default one
+   */
+  arrowIcon?: React.ReactNode;
 }
 
 // Utility function to get value by it's key or using getter function
@@ -83,6 +88,7 @@ export function SelectField<T = string, ItemType extends {} = SelectOption<T>>({
   required,
   className,
   selectedRender,
+  arrowIcon,
 }: SelectFieldProps<T, ItemType>) {
   const getItemValue = (item: ItemType): T =>
     getValueByPath<ItemType, T>(item, itemValue, i => ('value' in i ? (i as unknown as SelectOption<T>).value : (i as unknown as T)));
@@ -120,7 +126,7 @@ export function SelectField<T = string, ItemType extends {} = SelectOption<T>>({
 
         <Select disabled={disabled}>
           {displayValue}
-          <Select.Arrow />
+          {arrowIcon ?? <Select.Arrow />}
         </Select>
         {description && <span className="dbv-kit-select__description">{description}</span>}
 

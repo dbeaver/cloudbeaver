@@ -84,7 +84,7 @@ export const Field = () => {
         </h3>
         <SelectField
           items={complexData}
-          itemValue={item => item.id.toString()}
+          itemValue={item => item.id}
           itemRender={item => `${item.firstName} ${item.lastName} (${item.department.code}) (${item.permissions.level})`}
           itemDisabled={item => !item.isActive || item.permissions.level < 3}
           onChange={handleChange}
