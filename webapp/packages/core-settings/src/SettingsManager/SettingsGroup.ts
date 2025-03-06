@@ -13,6 +13,7 @@ const DEFAULT_ORDER = Number.MAX_SAFE_INTEGER;
 
 export class SettingsGroup {
   readonly id: string;
+  order: number;
 
   get level(): number {
     return (this.parent?.level ?? -1) + 1;
@@ -28,9 +29,9 @@ export class SettingsGroup {
   constructor(
     readonly name: string,
     readonly parent?: SettingsGroup,
-    readonly order = DEFAULT_ORDER,
   ) {
     this.id = uuid();
+    this.order = DEFAULT_ORDER;
     this.subGroupsData = [];
     this.groups = parent?.groups || new Map();
     this.groups.set(this.id, this);
@@ -49,12 +50,17 @@ export class SettingsGroup {
     return this.groups.get(id);
   }
 
-  createSubGroup(name: string, order = DEFAULT_ORDER): SettingsGroup {
-    const subGroup = new SettingsGroup(name, this, order);
+  createSubGroup(name: string): SettingsGroup {
+    const subGroup = new SettingsGroup(name, this);
 
     this.subGroupsData.push(subGroup);
 
     return subGroup;
+  }
+
+  setOrder(order: number): this {
+    this.order = order;
+    return this;
   }
 
   deleteSubGroup(id: string): boolean {

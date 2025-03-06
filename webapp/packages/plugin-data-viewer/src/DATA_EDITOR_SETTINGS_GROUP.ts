@@ -7,9 +7,4 @@
  */
 import { ROOT_SETTINGS_GROUP } from '@cloudbeaver/core-settings';
 
-const DATA_EDITOR_SETTINGS_GROUP_ORDER = 2;
-
-export const DATA_EDITOR_SETTINGS_GROUP = ROOT_SETTINGS_GROUP.createSubGroup(
-  'plugin_data_viewer_data_viewer_settings_group',
-  DATA_EDITOR_SETTINGS_GROUP_ORDER,
-);
+export const DATA_EDITOR_SETTINGS_GROUP = ROOT_SETTINGS_GROUP.createSubGroup('plugin_data_viewer_data_viewer_settings_group').setOrder(2);

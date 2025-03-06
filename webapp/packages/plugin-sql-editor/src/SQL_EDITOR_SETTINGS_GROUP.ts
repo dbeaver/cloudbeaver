@@ -7,8 +7,4 @@
  */
 import { ROOT_SETTINGS_GROUP } from '@cloudbeaver/core-settings';
 
-const SQL_EDITOR_SETTINGS_GROUP_ORDER = 5;
-export const SQL_EDITOR_SETTINGS_GROUP = ROOT_SETTINGS_GROUP.createSubGroup(
-  'plugin_sql_editor_sql_editor_settings_group',
-  SQL_EDITOR_SETTINGS_GROUP_ORDER,
-);
+export const SQL_EDITOR_SETTINGS_GROUP = ROOT_SETTINGS_GROUP.createSubGroup('plugin_sql_editor_sql_editor_settings_group').setOrder(5);
