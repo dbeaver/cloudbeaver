@@ -11,7 +11,7 @@ import { Input } from '../../../Input/Input.js';
 export const InputExample = () => {
   return (
     <>
-      <div>
+      <div className="tw:space-y-2">
         <Input placeholder="Username" />
         <Input placeholder="Password" type="password" />
         <Button>Log in</Button>
