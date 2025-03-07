@@ -72,6 +72,6 @@ public class WebDataTransferServlet extends WebServiceServletBase {
         response.setHeader("Content-Type", processor.getContentType());
         response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
 
-        dtManager.exportStreamDataTransferExportToResponse(session, taskInfo, response.getOutputStream());
+        dtManager.exportDataTransferToStream(session.getProgressMonitor(), taskInfo, response.getOutputStream());
     }
 }
