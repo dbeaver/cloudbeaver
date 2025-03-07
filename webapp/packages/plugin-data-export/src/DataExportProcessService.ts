@@ -36,7 +36,7 @@ export class DataExportProcessService {
     private readonly notificationService: NotificationService,
   ) {}
 
-  async cancel(exportId: string): Promise<void> {
+  cancel(exportId: string): void {
     const process = this.exportProcesses.get(exportId);
     if (!process) {
       return;
