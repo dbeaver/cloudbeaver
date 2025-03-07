@@ -21,7 +21,7 @@
     font-size: var(--dbv-kit-select-font-size);
     outline-width: var(--dbv-kit-control-outline-width);
     outline-offset: var(--dbv-kit-control-outline-offset);
-    outline-color: var(--dbv-kit-color-outline);
+    outline-color: var(--dbv-kit-control-outline-color);
 
     &[aria-disabled='true'] {
       opacity: var(--dbv-kit-control-disabled-opacity);

@@ -11,7 +11,7 @@
     line-height: var(--dbv-kit-checkbox-height);
     font-size: var(--dbv-kit-checkbox-font-size);
     color: var(--dbv-kit-checkbox-foreground);
-    outline: var(--dbv-kit-color-outline);
+    outline: var(--dbv-kit-control-outline-color);
 
     &:hover {
       cursor: pointer;
@@ -46,7 +46,7 @@
     color: var(--dbv-kit-checkbox-icon-color);
     outline-offset: var(--dbv-kit-control-outline-offset);
     outline-width: var(--dbv-kit-control-outline-width);
-    outline-color: var(--dbv-kit-color-outline);
+    outline-color: var(--dbv-kit-control-outline-color);
     transition-property: stroke-dashoffset;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;

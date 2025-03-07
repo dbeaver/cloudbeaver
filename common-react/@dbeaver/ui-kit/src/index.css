@@ -9,7 +9,7 @@
     --dbv-kit-control-disabled-opacity: 0.5;
 
     /* Outline */
-    --dbv-kit-color-outline: var(--tw-color-blue-500);
+    --dbv-kit-control-outline-color: var(--tw-color-blue-500);
     --dbv-kit-control-outline-width: 2px;
     --dbv-kit-control-outline-offset: 2px;
 

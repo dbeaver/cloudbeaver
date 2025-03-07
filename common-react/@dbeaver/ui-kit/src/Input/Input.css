@@ -25,7 +25,7 @@
 
   &:focus-visible,
   &[data-focus-visible] {
-    outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-color-outline);
+    outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-control-outline-color);
     outline-offset: var(--dbv-kit-control-outline-offset);
   }
 }
