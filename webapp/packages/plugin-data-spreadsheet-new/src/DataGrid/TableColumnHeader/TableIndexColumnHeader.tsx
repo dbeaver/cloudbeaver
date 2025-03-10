@@ -9,14 +9,13 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { getComputed, IconOrImage, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import type { RenderHeaderCellProps } from '@cloudbeaver/plugin-data-grid';
 
 import { DataGridContext } from '../DataGridContext.js';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
 import { TableDataContext } from '../TableDataContext.js';
 import style from './TableIndexColumnHeader.module.css';
 
-export const TableIndexColumnHeader = observer<RenderHeaderCellProps<any>>(function TableIndexColumnHeader(props) {
+export const TableIndexColumnHeader = observer(function TableIndexColumnHeader() {
   const dataGridContext = useContext(DataGridContext);
   const selectionContext = useContext(DataGridSelectionContext);
   const tableDataContext = useContext(TableDataContext);
@@ -28,10 +27,7 @@ export const TableIndexColumnHeader = observer<RenderHeaderCellProps<any>>(funct
   }
 
   const readonly = getComputed(
-    () =>
-      tableDataContext.isReadOnly() ||
-      dataGridContext.model.isReadonly(dataGridContext.resultIndex) ||
-      !dataGridContext.model.hasElementIdentifier(dataGridContext.resultIndex),
+    () => dataGridContext.model.isReadonly(dataGridContext.resultIndex) || !dataGridContext.model.hasElementIdentifier(dataGridContext.resultIndex),
   );
 
   function handleClick(event: React.MouseEvent<HTMLDivElement>) {
@@ -44,7 +40,7 @@ export const TableIndexColumnHeader = observer<RenderHeaderCellProps<any>>(funct
       {readonly && (
         <IconOrImage title={translate('data_grid_table_readonly_tooltip')} icon="/icons/lock.png" className={s(styles, { iconOrImage: true })} />
       )}
-      {props.column.name}
+      #
     </div>
   );
 });

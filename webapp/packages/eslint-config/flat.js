@@ -38,7 +38,7 @@ export default tseslint.config(
       react: {
         createClass: 'createReactClass',
         pragma: 'React',
-        version: '18',
+        version: '19',
       },
     },
     rules: {

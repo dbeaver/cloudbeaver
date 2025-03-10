@@ -9,27 +9,24 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { getComputed, s, useS } from '@cloudbeaver/core-blocks';
-import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
-import { type IResultSetRowKey, isResultSetContentValue } from '@cloudbeaver/plugin-data-viewer';
+import { isResultSetContentValue } from '@cloudbeaver/plugin-data-viewer';
 
-import { EditingContext } from '../../../Editing/EditingContext.js';
 import { CellContext } from '../../CellRenderer/CellContext.js';
 import { DataGridContext } from '../../DataGridContext.js';
 import { TableDataContext } from '../../TableDataContext.js';
 import style from './BlobFormatter.module.css';
+import type { ICellFormatterProps } from '../ICellFormatterProps.js';
 
-export const BlobFormatter = observer<RenderCellProps<IResultSetRowKey>>(function BlobFormatter({ column, row }) {
+export const BlobFormatter = observer<ICellFormatterProps>(function BlobFormatter() {
   const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
-  const editingContext = useContext(EditingContext);
   const cellContext = useContext(CellContext);
   const cell = cellContext.cell;
-
-  if (!context || !tableDataContext || !editingContext || !cell) {
-    throw new Error('Contexts required');
-  }
-
   const styles = useS(style);
+
+  if (!context || !tableDataContext || !cell) {
+    return null;
+  }
 
   const formatter = tableDataContext.format;
   const rawValue = getComputed(() => formatter.get(cell));

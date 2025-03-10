@@ -26,7 +26,7 @@ export const NodeControl: NodeControlComponent = observer(
       <TreeNodeControl ref={ref} style={{ height }}>
         <TreeNodeExpand leaf={node.leaf} />
         <TreeNodeIcon icon={node.icon} />
-        <TreeNodeName title={node.tooltip}>{node.name}</TreeNodeName>
+        <TreeNodeName title={node.tooltip ?? node.name}>{node.name}</TreeNodeName>
       </TreeNodeControl>
     );
   }),

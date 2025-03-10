@@ -9,7 +9,6 @@ import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
 import { getCommonAndOSSpecificKeys, type IKeyBinding, KEY_BINDING_OPEN_IN_TAB, KEY_BINDING_REDO, KEY_BINDING_UNDO } from '@cloudbeaver/core-view';
 import {
   KEY_BINDING_ADD_NEW_ROW,
-  KEY_BINDING_DELETE_ROW,
   KEY_BINDING_DUPLICATE_ROW,
   KEY_BINDING_REVERT_INLINE_EDITOR_CHANGES,
 } from '@cloudbeaver/plugin-data-spreadsheet-new';
@@ -39,10 +38,11 @@ export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
     label: 'data_viewer_shortcut_duplicate_row',
     code: transformKeys(KEY_BINDING_DUPLICATE_ROW),
   },
-  {
-    label: 'data_viewer_shortcut_delete_row',
-    code: transformKeys(KEY_BINDING_DELETE_ROW),
-  },
+  // disabled
+  // {
+  //   label: 'data_viewer_shortcut_delete_row',
+  //   code: transformKeys(KEY_BINDING_DELETE_ROW),
+  // },
 ];
 
 export const SQL_EDITOR_SHORTCUTS: IShortcut[] = [

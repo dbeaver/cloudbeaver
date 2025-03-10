@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 .cell {
-  cursor: pointer;
   text-overflow: ellipsis;
   overflow: hidden;
 }
