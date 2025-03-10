@@ -56,7 +56,10 @@ export const Settings = observer<ISettingsProps>(function Settings({ source, acc
       };
     },
     getChildren(id) {
-      return (ROOT_SETTINGS_GROUP.get(id)?.subGroups || []).filter(filterExistsGroups).map(group => group.id);
+      return (ROOT_SETTINGS_GROUP.get(id)?.subGroups || [])
+        .filter(filterExistsGroups)
+        .sort((a, b) => a.order - b.order)
+        .map(group => group.id);
     },
     load() {
       return Promise.resolve();
