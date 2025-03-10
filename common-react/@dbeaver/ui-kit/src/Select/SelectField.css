@@ -1,0 +1,27 @@
+@layer base {
+  .dbv-kit-select__empty {
+    padding: 0.5rem;
+    color: var(--tw-color-gray-500);
+    text-align: center;
+  }
+
+  .dbv-kit-select-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .dbv-kit-select__label--required {
+    &:after {
+      content: '*';
+      color: var(--tw-color-red-600);
+      margin-left: 0.125rem;
+    }
+  }
+
+  .dbv-kit-select__description {
+    padding-inline-start: var(--dbv-kit-select-padding-inline);
+    color: var(--tw-color-gray-500);
+    font-size: var(--dbv-kit-select-font-size);
+  }
+}
