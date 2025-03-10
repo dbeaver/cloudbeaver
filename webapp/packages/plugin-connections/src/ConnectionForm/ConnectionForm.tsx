@@ -46,28 +46,18 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
 
       if (saved) {
         if (formState.state.submitType === 'submit') {
-          if (initialMode === 'create') {
-            notificationService.notify(
-              {
-                title: 'connections_connection_create_success',
-                message: info?.name,
-              },
-              ENotificationType.Success,
-            );
-          } else {
-            notificationService.notify(
-              {
-                title: 'connections_connection_update_success',
-                message: info?.name,
-              },
-              ENotificationType.Success,
-            );
-          }
+          notificationService.notify(
+            {
+              title: initialMode === 'create' ? 'connections_connection_create_success' : 'connections_connection_update_success',
+              message: info?.name,
+            },
+            ENotificationType.Success,
+          );
         }
       } else {
         if (formState.state.submitType === 'submit') {
           notificationService.logException(exception, 'connections_connection_create_fail');
-        } else {
+        } else if (exception) {
           notificationService.logException(exception, 'connections_connection_test_fail');
         }
       }
@@ -100,7 +90,7 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
                 '\nConnection time: ' +
                 testContext.connectTime,
             },
-            ENotificationType.Info,
+            ENotificationType.Success,
           );
         }
 

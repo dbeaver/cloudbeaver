@@ -7,7 +7,7 @@
  */
 import { FormMode, FormPart, formStateContext, formStatusContext, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import { DriverConfigurationType, type ConnectionConfig, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
   ConnectionInfoOriginResource,
   ConnectionInfoProjectKey,
@@ -429,6 +429,9 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       testContext.clientVersion = info.clientVersion ?? null;
       testContext.serverVersion = info.serverVersion ?? null;
       testContext.connectTime = info.connectTime ?? null;
+
+      // to prevent form from resetting the state after saving
+      ExecutorInterrupter.interrupt(contexts);
     }
 
     await this.formAuthState(state, contexts);
