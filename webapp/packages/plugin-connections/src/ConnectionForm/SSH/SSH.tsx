@@ -27,7 +27,7 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, createConnectionParam, NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
+import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
@@ -50,10 +50,6 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
   const [loading, setLoading] = useState(false);
   const { credentialsSavingEnabled } = useAdministrationSettings();
   const serverConfigResource = useResource(SSH, ServerConfigResource, undefined);
-  const connectionInfoService = useService(ConnectionInfoResource);
-  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
-  // TODO probably replace with initialState from part
-  const initialConfig = info?.networkHandlersConfig?.find(handler => handler.id === SSH_TUNNEL_ID);
 
   const resource = useResource(SSH, NetworkHandlerResource, SSH_TUNNEL_ID, {
     onData: handler => {
@@ -73,19 +69,19 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
     setLoading(false);
   };
 
+  const SSHPart = getConnectionFormSSHPart(formState);
   const style = useS(styles);
   const translate = useTranslate();
   const disabled = formState.isDisabled || loading;
   const enabled = handlerState.enabled || false;
   const keyAuth = handlerState.authType === NetworkHandlerAuthType.PublicKey;
-  const passwordFilled = (initialConfig?.password === null && handlerState.password !== '') || !!handlerState.password?.length;
+  const passwordFilled = (SSHPart.initialState?.password === null && handlerState.password !== '') || !!handlerState.password?.length;
   const testAvailable = keyAuth ? !!handlerState.key?.length : passwordFilled;
   const passwordLabel = keyAuth ? 'Passphrase' : translate('connections_network_handler_ssh_tunnel_password');
-  const passwordSaved = initialConfig?.password === '' && initialConfig.authType === handlerState.authType;
-  const keySaved = initialConfig?.key === '';
+  const passwordSaved = SSHPart.initialState?.password === '' && SSHPart.initialState.authType === handlerState.authType;
+  const keySaved = SSHPart.initialState?.key === '';
   const projectInfoResource = useService(ProjectInfoResource);
   const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
-  const SSHPart = getConnectionFormSSHPart(formState);
 
   const aliveIntervalLabel = translate('connections_network_handler_ssh_tunnel_advanced_settings_alive_interval');
   const connectTimeoutLabel = translate('connections_network_handler_ssh_tunnel_advanced_settings_connect_timeout');
@@ -94,7 +90,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
     handlerState.password = '';
   }, []);
 
-  useAutoLoad(SSH, [SSHPart]);
+  useAutoLoad(SSH, SSHPart);
 
   return (
     <Form className={s(style, { form: true })}>

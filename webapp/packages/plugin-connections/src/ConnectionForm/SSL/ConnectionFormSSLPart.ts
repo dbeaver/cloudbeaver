@@ -25,6 +25,7 @@ import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED.js';
 import { SSL_CODE_NAME } from './SSL_CODE_NAME.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
 import { getSSLDefaultConfig } from './getSSLDefaultConfig.js';
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
 const DEFAULT_SSL_NETWORK_HANDLER: INetworkHandlerConfig = {
   id: SSL_CODE_NAME,
@@ -79,6 +80,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): Promise<void> {
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
+    const optionsPart = getConnectionFormOptionsPart(this.formState);
 
     if (!this.isChanged || !this.formState.state.config.driverId) {
       return;
@@ -94,8 +96,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     }
 
     const handlerConfig: NetworkHandlerConfigInput = toJS(handler);
-    // TODO should I have formstate.config here?
-    handlerConfig.savePassword = handler.savePassword || this.formState.state.config.sharedCredentials;
+    handlerConfig.savePassword = handler.savePassword || optionsPart.state.sharedCredentials;
 
     if (this.isChanged && descriptor) {
       for (const descriptorProperty of descriptor.properties) {
@@ -143,26 +144,24 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
 
     if (this.isChanged) {
       this.state = trimSSLConfig(handlerConfig);
+      const sslConfigIndex = optionsPart.state.networkHandlersConfig?.findIndex(h => (handlerConfig.id || SSL_CODE_NAME) === h.id);
+
+      if (!isNotNullDefined(sslConfigIndex)) {
+        return;
+      }
+
+      if (sslConfigIndex !== -1) {
+        optionsPart.state.networkHandlersConfig![sslConfigIndex] = this.state;
+      } else {
+        optionsPart.state.networkHandlersConfig?.push(this.state);
+      }
     }
   }
 
   protected override async saveChanges(
     data: IFormState<IConnectionFormStateRefactored>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
-  ): Promise<void> {
-    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
-
-    await this.connectionInfoResource.update(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!), {
-      connectionId: this.formState.state.config.connectionId,
-      networkHandlersConfig: [
-        ...(info?.networkHandlersConfig ?? []),
-        {
-          ...this.state,
-          id: this.state.id,
-        },
-      ],
-    });
-  }
+  ): Promise<void> {}
 }
 
 function trimSSLConfig(input: INetworkHandlerConfig): INetworkHandlerConfig {

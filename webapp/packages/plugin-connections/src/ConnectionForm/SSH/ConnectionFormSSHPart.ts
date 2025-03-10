@@ -14,15 +14,17 @@ import { toJS } from 'mobx';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
 import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 const DEFAULT_SSH_NETWORK_HANDLER: INetworkHandlerConfig = {
   id: SSH_TUNNEL_ID,
   enabled: false,
   authType: NetworkHandlerAuthType.Password,
-  password: '',
+  password: undefined,
   savePassword: false,
-  userName: '',
-  key: '',
+  userName: undefined,
+  key: undefined,
   properties: {
     port: 22,
     host: '',
@@ -55,28 +57,15 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   protected override async saveChanges(
     data: IFormState<IConnectionFormStateRefactored>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
-  ): Promise<void> {
-    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
-
-    await this.connectionInfoResource.update(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!), {
-      connectionId: this.formState.state.config.connectionId,
-      networkHandlersConfig: [
-        ...(info?.networkHandlersConfig ?? []),
-        {
-          ...this.state,
-          id: SSH_TUNNEL_ID,
-        },
-      ],
-    });
-  }
+  ): Promise<void> {}
 
   protected override format(
     data: IFormState<IConnectionFormStateRefactored>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
   ): void | Promise<void> {
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
-    // TODO replace this.formState.state.config with options formPart?
-    const urlType = this.formState.state.config.configurationType === DriverConfigurationType.Url;
+    const optionsPart = getConnectionFormOptionsPart(this.formState);
+    const urlType = optionsPart.state.configurationType === DriverConfigurationType.Url;
 
     if (urlType) {
       return;
@@ -104,6 +93,17 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
 
     if (handlerConfig) {
       this.state = getTrimmedSSHConfig(handlerConfig);
+      const sshConfigIndex = optionsPart.state.networkHandlersConfig?.findIndex(h => h.id === SSH_TUNNEL_ID);
+
+      if (!isNotNullDefined(sshConfigIndex)) {
+        return;
+      }
+
+      if (sshConfigIndex !== -1) {
+        optionsPart.state.networkHandlersConfig![sshConfigIndex] = this.state;
+      } else {
+        optionsPart.state.networkHandlersConfig?.push(this.state);
+      }
     }
   }
 

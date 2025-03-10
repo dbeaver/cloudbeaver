@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ExceptionMessage, Form, Loader, Placeholder, s, StatusMessage, useExecutor, useForm, useObjectRef, useS } from '@cloudbeaver/core-blocks';
+import { Form, Loader, Placeholder, s, StatusMessage, useExecutor, useForm, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
@@ -15,11 +15,11 @@ import { formStatusContext, formValidationContext, TabList, TabPanelList, TabsSt
 
 import { ConnectionFormActionsContext, type IConnectionFormActionsContext } from './ConnectFormActionsContext.js';
 import style from './ConnectionForm.module.css';
-import { connectionConfigContext } from './Contexts/connectionConfigContext.js';
 import type { ConnectionFormStateRefactored } from './ConnectionFormStateRefactored.js';
 import { getFirstException } from '@cloudbeaver/core-utils';
 import { ConnectionFormServiceRefactored } from './ConnectionFormServiceRefactored.js';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
+import { connectionTestContext } from './Contexts/connectionTestContext.js';
 
 export interface ConnectionFormProps {
   formState: ConnectionFormStateRefactored;
@@ -34,20 +34,11 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   const styles = useS(style);
   const notificationService = useService(NotificationService);
   const connectionInfoResource = useService(ConnectionInfoResource);
+  const exception = getFirstException(formState.exception);
 
   const form = useForm({
     onSubmit: async event => {
-      if (event?.type === 'test') {
-        formState.setState({
-          ...formState.state,
-          submitType: 'test',
-        });
-      } else {
-        formState.setState({
-          ...formState.state,
-          submitType: 'submit',
-        });
-      }
+      formState.state.submitType = event?.type === 'test' ? 'test' : 'submit';
 
       const initialMode = formState.mode;
       const saved = await formState.save();
@@ -73,38 +64,11 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
             );
           }
         }
-
-        if (formState.state.submitType === 'test') {
-          // const message = [
-          //   ['Connection is established', ''],
-          //   ['Client version', info?.clientVersion],
-          //   ['Server version', info?.serverVersion],
-          //   ['Connection time', info?.connectTime],
-          // ];
-          // notificationService.notify(
-          //   {
-          //     title: 'Connection is established',
-          //     message:
-          //       'Client version: ' + info?.clientVersion + '\nServer version: ' + info?.serverVersion + '\nConnection time: ' + info?.connectTime,
-          //   },
-          //   ENotificationType.Info,
-          // );
-        }
       } else {
         if (formState.state.submitType === 'submit') {
-          notificationService.notify(
-            {
-              title: 'connections_connection_create_fail',
-            },
-            ENotificationType.Error,
-          );
+          notificationService.logException(exception, 'connections_connection_create_fail');
         } else {
-          notificationService.notify(
-            {
-              title: 'connections_connection_test_fail',
-            },
-            ENotificationType.Error,
-          );
+          notificationService.logException(exception, 'connections_connection_test_fail');
         }
       }
     },
@@ -122,18 +86,30 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
       function save(data, contexts) {
         const validation = contexts.getContext(formValidationContext);
         const state = contexts.getContext(formStatusContext);
-        const config = contexts.getContext(connectionConfigContext);
+        const testContext = contexts.getContext(connectionTestContext);
+
+        if (data.state.submitType === 'test' && !data.isError) {
+          notificationService.notify(
+            {
+              title: 'Connection is established',
+              message:
+                'Client version: ' +
+                testContext.clientVersion +
+                '\nServer version: ' +
+                testContext.serverVersion +
+                '\nConnection time: ' +
+                testContext.connectTime,
+            },
+            ENotificationType.Info,
+          );
+        }
 
         if (validation.valid && state.saved && data.state.submitType === 'submit') {
-          props.onSave(config);
+          props.onSave(data.state.config);
         }
       },
     ],
   });
-
-  if (getFirstException(formState.exception)) {
-    return <ExceptionMessage exception={getFirstException(formState.exception)} />;
-  }
 
   return (
     <Form context={form} contents>
@@ -142,7 +118,12 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
           <div className={s(styles, { connectionTopBar: true })}>
             <div className={s(styles, { connectionTopBarTabs: true })}>
               <div className={s(styles, { connectionStatusMessage: true })}>
-                <StatusMessage type={ENotificationType.Info} message={formState.statusMessage} />
+                <StatusMessage
+                  multipleRows
+                  type={exception ? ENotificationType.Error : ENotificationType.Info}
+                  message={formState.statusMessage}
+                  exception={exception}
+                />
               </div>
               <TabList className={s(styles, { tabList: true })} disabled={formState.isDisabled} underline big />
             </div>

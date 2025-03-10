@@ -16,7 +16,6 @@ import { useService } from '@cloudbeaver/core-di';
 
 export const OriginInfoTab: TabContainerTabComponent<IConnectionFormPropsRefactored> = observer(function OriginInfoTab({ formState, ...rest }) {
   const connectionInfoOriginService = useService(ConnectionInfoOriginResource);
-  // TODO useResource?
   const info = connectionInfoOriginService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
 
   return (

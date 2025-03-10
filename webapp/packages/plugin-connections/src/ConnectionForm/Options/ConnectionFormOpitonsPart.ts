@@ -28,6 +28,7 @@ import type { LocalizationService } from '@cloudbeaver/core-localization';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
 import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
 import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import { connectionTestContext } from '../Contexts/connectionTestContext.js';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
@@ -407,6 +408,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   ): Promise<void> {
     const status = contexts.getContext(formStatusContext);
     const state = this.formState.state;
+    const testContext = contexts.getContext(connectionTestContext);
 
     if (!state.projectId) {
       status.error('connections_connection_create_fail');
@@ -422,12 +424,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
         this.formState.setMode(FormMode.Edit);
       }
     } else {
-      // TODO also notify about that
       const info = await this.connectionInfoResource.test(state.projectId, this.state);
-      status.info('Connection is established');
-      status.info('Client version: ' + info.clientVersion);
-      status.info('Server version: ' + info.serverVersion);
-      status.info('Connection time: ' + info.connectTime);
+
+      testContext.clientVersion = info.clientVersion ?? null;
+      testContext.serverVersion = info.serverVersion ?? null;
+      testContext.connectTime = info.connectTime ?? null;
     }
 
     await this.formAuthState(state, contexts);

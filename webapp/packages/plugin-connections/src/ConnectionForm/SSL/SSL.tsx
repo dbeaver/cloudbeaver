@@ -18,6 +18,7 @@ import {
   s,
   Switch,
   useAdministrationSettings,
+  useAutoLoad,
   useObjectPropertyCategories,
   useResource,
   useS,
@@ -34,6 +35,7 @@ import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR.js';
 import styles from './SSL.module.css';
 import type { IConnectionFormPropsRefactored } from '../IConnectionFormStateRefactored.js';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
 interface Props extends IConnectionFormPropsRefactored {
   handler: NetworkHandlerDescriptor;
@@ -56,6 +58,9 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
   const autofillToken = isSafari ? 'section-connection-authentication-ssl section-ssl' : 'new-password';
   const projectInfoResource = useService(ProjectInfoResource);
   const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
+  const optionsPart = getConnectionFormOptionsPart(formState);
+
+  useAutoLoad(SSL, optionsPart);
 
   return (
     <Form className={s(style, { form: true })}>
@@ -95,14 +100,12 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
             </React.Fragment>
           ))}
 
-          {/* TODO use formState.state.config??? */}
-          {credentialsSavingEnabled && !formState.state.config.template && !formState.state.config.sharedCredentials && (
+          {credentialsSavingEnabled && !optionsPart.state.template && !optionsPart.state.sharedCredentials && (
             <FieldCheckbox
               id={handler.id + '_savePassword'}
               name="savePassword"
               state={handlerState}
-              // TODO use formState.config???
-              disabled={disabled || !enabled || formState.state.config.sharedCredentials}
+              disabled={disabled || !enabled || optionsPart.state.sharedCredentials}
               title={translate(
                 !isSharedProject || serverConfigResource.data?.distributed
                   ? 'connections_connection_authentication_save_credentials_for_user_tooltip'
