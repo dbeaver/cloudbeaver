@@ -1,11 +1,3 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
-
 .layoutGrid {
   composes: layout-grid from global;
   width: 100%;
@@ -28,4 +20,6 @@
 .message {
   line-height: 2;
   white-space: pre-wrap;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
 }

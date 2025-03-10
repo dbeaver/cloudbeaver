@@ -1,12 +1,14 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { createElement } from 'react';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { Button as UIKitButton } from '@dbeaver/ui-kit';
 
 import style from './Button.module.css';
 import { IconOrImage } from './IconOrImage.js';
@@ -78,12 +80,15 @@ export const Button = observer<ButtonProps>(function Button({
     disabled = true;
   }
 
-  const Button = tag;
+  const Tag = createElement(tag);
   return (
-    <Button
-      role="button"
-      tabIndex={0}
+    <UIKitButton
+      render={Tag}
       {...rest}
+      loading={loading}
+      loader={
+        <Loader className={s(styles, { loader: true })} small />
+      }
       type={type}
       disabled={disabled}
       className={s(
@@ -107,7 +112,6 @@ export const Button = observer<ButtonProps>(function Button({
         </div>
       )}
       <span className={s(styles, { buttonLabel: true })}>{children}</span>
-      <Loader className={s(styles, { loader: true })} small />
-    </Button>
+    </UIKitButton>
   );
 });

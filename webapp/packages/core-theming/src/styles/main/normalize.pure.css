@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -179,6 +179,7 @@ button {
 /**
  * 1. Change the font styles in all browsers.
  * 2. Remove the margin in Firefox and Safari.
+ * 3. To not inherit from `html`.
  */
 
 button,
@@ -194,6 +195,8 @@ textarea {
   /* 1 */
   margin: 0;
   /* 2 */
+  letter-spacing: normal;
+  /* 3 */
 }
 
 /**

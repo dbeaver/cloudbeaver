@@ -9,28 +9,25 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { getComputed, s, useS } from '@cloudbeaver/core-blocks';
-import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
-import { DatabaseEditChangeType, type IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseEditChangeType } from '@cloudbeaver/plugin-data-viewer';
 
-import { EditingContext } from '../../../Editing/EditingContext.js';
 import { CellContext } from '../../CellRenderer/CellContext.js';
 import { DataGridContext } from '../../DataGridContext.js';
 import { TableDataContext } from '../../TableDataContext.js';
 import style from './BooleanFormatter.module.css';
+import type { ICellFormatterProps } from '../ICellFormatterProps.js';
 
-export const BooleanFormatter = observer<RenderCellProps<IResultSetRowKey>>(function BooleanFormatter({ column, row }) {
+export const BooleanFormatter = observer<ICellFormatterProps>(function BooleanFormatter() {
   const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
-  const editingContext = useContext(EditingContext);
   const cellContext = useContext(CellContext);
+  const styles = useS(style);
 
   const cell = cellContext.cell;
 
-  if (!context || !tableDataContext || !editingContext || !cell) {
-    throw new Error('Contexts required');
+  if (!context || !tableDataContext || !cell) {
+    return null;
   }
-
-  const styles = useS(style);
 
   const formatter = tableDataContext.format;
   const value = getComputed(() => formatter.get(cell));
@@ -39,8 +36,6 @@ export const BooleanFormatter = observer<RenderCellProps<IResultSetRowKey>>(func
   const stringifiedValue = getComputed(() => formatter.getDisplayString(cell));
   const valueRepresentation = value === null ? stringifiedValue : `[${booleanValue ? 'v' : ' '}]`;
   const disabled =
-    !column.editable ||
-    editingContext.readonly ||
     formatter.isReadOnly(cell) ||
     (!context.model.hasElementIdentifier(context.resultIndex) && cellContext.editionState !== DatabaseEditChangeType.add);
 

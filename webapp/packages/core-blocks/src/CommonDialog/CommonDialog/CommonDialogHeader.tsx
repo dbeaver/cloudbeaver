@@ -39,7 +39,7 @@ export const CommonDialogHeader = observer<Props>(function CommonDialogHeader({
   const computedStyles = useS(styles);
 
   return (
-    <header title={tooltip} className={s(computedStyles, { header: true }, className)}>
+    <header title={translate(tooltip ?? title)} className={s(computedStyles, { header: true }, className)}>
       <div className={s(computedStyles, { iconContainer: true })}>
         {icon && <IconOrImage className={s(computedStyles, { icon: true, bigIcon })} icon={icon} viewBox={viewBox} />}
       </div>

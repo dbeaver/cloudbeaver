@@ -50,6 +50,8 @@ export default [
   ['ui_errors_details', 'Информация'],
   ['ui_search', 'Поиск...'],
   ['ui_delete', 'Удалить'],
+  ['ui_enable', 'Включить'],
+  ['ui_security_warning', 'Угроза безопасности'],
   ['ui_deleting', 'Удаляется...'],
   ['ui_add', 'Добавить'],
   ['ui_revert', 'Отменить изменения'],

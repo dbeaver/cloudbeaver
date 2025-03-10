@@ -324,4 +324,9 @@ public class WebDatabaseDriverInfo {
     public boolean getUseCustomPage() {
         return !ArrayUtils.isEmpty(driver.getMainPropertyDescriptors());
     }
+
+    @Property
+    public boolean isSafeEmbeddedDriver() {
+        return CommonUtils.toBoolean(driver.getDriverParameter(DBConstants.PARAM_SAFE_EMBEDDED_DRIVER));
+    }
 }

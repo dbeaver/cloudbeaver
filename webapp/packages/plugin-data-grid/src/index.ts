@@ -13,14 +13,11 @@ export { dataGridPlugin };
 export { DataGrid } from './DataGridLazy.js';
 
 export {
-  type CellSelectArgs,
-  type DataGridHandle,
-  type Position,
-  type Column,
-  type RenderHeaderCellProps,
-  type RenderEditCellProps,
-  type RenderCellProps,
-  type CalculatedColumn,
-  Cell,
-  type CellRendererProps,
-} from '@cloudbeaver/plugin-react-data-grid';
+  DataGridCellInnerContext,
+  useCreateGridReactiveValue,
+  type IGridReactiveValue,
+  type DataGridRef,
+  type ICellPosition,
+  type IDataGridCellRenderer,
+  type IDataGridCellProps,
+} from '@dbeaver/react-data-grid';

@@ -7,9 +7,12 @@
  */
 import {
   catchError,
+  concatMap,
   debounceTime,
+  defer,
   delayWhen,
   filter,
+  from,
   interval,
   map,
   merge,
@@ -19,13 +22,15 @@ import {
   repeat,
   retry,
   share,
+  shareReplay,
   Subject,
+  switchMap,
   throwError,
 } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { Executor, type IExecutor, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import {
   CbClientEventId as ClientEventId,
   EnvironmentService,
@@ -58,6 +63,7 @@ const RETRY_INTERVAL = 30 * 1000;
 @injectable()
 export class SessionEventSource implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   readonly eventsSubject: Observable<ISessionEvent>;
+  readonly onActivate: IExecutor;
   readonly onInit: ISyncExecutor;
 
   private readonly closeSubject: Subject<CloseEvent>;
@@ -75,6 +81,7 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
     private readonly sessionExpireService: SessionExpireService,
     environmentService: EnvironmentService,
   ) {
+    this.onActivate = new Executor();
     this.onInit = new SyncExecutor();
     this.oldEventsSubject = new Subject();
     this.disconnectSubject = new Subject();
@@ -91,21 +98,28 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
       openObserver: this.openSubject,
     });
 
+    const ready$ = defer(() => from(this.onActivate.execute())).pipe(shareReplay(1));
+
     this.emitSubject = new Subject();
-    this.emitSubject.pipe(this.handleDisconnected()).subscribe(this.subject);
+    this.emitSubject
+      .pipe(
+        this.handleDisconnected(),
+        concatMap(value => ready$.pipe(concatMap(() => from([value])))),
+      )
+      .subscribe(this.subject);
 
     this.openSubject.subscribe(() => {
       this.onInit.execute();
     });
 
     this.closeSubject.subscribe(event => {
-      console.info(`Websocket closed: ${event.reason}`);
+      console.warn(`Websocket closed (${event.code}): ${event.reason}`);
     });
 
-    this.eventsSubject = merge(this.oldEventsSubject, this.subject).pipe(this.handleErrors());
+    this.eventsSubject = merge(this.oldEventsSubject, ready$.pipe(switchMap(() => this.subject))).pipe(this.handleErrors());
 
     this.errorSubject.pipe(debounceTime(1000)).subscribe(error => {
-      console.error(error);
+      console.error('Websocket:', error);
     });
 
     this.errorHandler = this.errorHandler.bind(this);

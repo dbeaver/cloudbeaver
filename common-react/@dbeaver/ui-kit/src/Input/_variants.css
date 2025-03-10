@@ -1,0 +1,15 @@
+@layer base {
+  :root {
+    --dbv-kit-input-validation-error-background: var(--dbv-kit-color-error-background);
+    --dbv-kit-input-validation-error-foreground: var(--dbv-kit-color-error-text);
+    --dbv-kit-input-validation-error-border: var(--dbv-kit-color-error-border);
+
+    --dbv-kit-input-validation-info-background: var(--dbv-kit-color-info-background);
+    --dbv-kit-input-validation-info-foreground: var(--dbv-kit-color-info-text);
+    --dbv-kit-input-validation-info-order: var(--dbv-kit-color-info-border);
+
+    --dbv-kit-input-validation-warning-background: var(--dbv-kit-color-warning-background);
+    --dbv-kit-input-validation-warning-foreground: var(--dbv-kit-color-warning-text);
+    --dbv-kit-input-validation-warning-border: var(--dbv-kit-color-warning-border);
+  }
+}

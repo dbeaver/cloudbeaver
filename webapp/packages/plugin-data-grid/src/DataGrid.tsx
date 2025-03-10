@@ -9,13 +9,12 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 import { forwardRef } from 'react';
 
-import ReactDataGrid from '@cloudbeaver/plugin-react-data-grid';
-import '@cloudbeaver/plugin-react-data-grid/react-data-grid-dist/lib/styles.css';
+import { DataGrid as BaseDataGrid } from '@dbeaver/react-data-grid';
 
 import classes from './DataGrid.module.css';
 
 export const DataGrid = observer(
   forwardRef(function DataGrid(props, ref) {
-    return <ReactDataGrid {...props} ref={ref} className={clsx(classes['dataGrid'], props.className)} />;
+    return <BaseDataGrid {...props} ref={ref} className={clsx(classes['dataGrid'], props.className)} />;
   }),
-) as typeof ReactDataGrid;
+) as typeof BaseDataGrid;

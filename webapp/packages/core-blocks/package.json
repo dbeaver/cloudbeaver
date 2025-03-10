@@ -31,6 +31,7 @@
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/core-theming": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
+    "@dbeaver/ui-kit": "workspace:^",
     "go-split": "^3",
     "minisearch": "^7",
     "mobx": "^6",
