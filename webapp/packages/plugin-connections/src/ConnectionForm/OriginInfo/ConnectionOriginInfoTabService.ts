@@ -9,7 +9,7 @@
 import { ConnectionInfoOriginResource, createConnectionParam, isLocalConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { ConnectionFormServiceRefactored } from '../ConnectionFormServiceRefactored.js';
+import { ConnectionFormService } from '../ConnectionFormService.js';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 export const ConnectionFormAuthenticationAction = importLazyComponent(() =>
@@ -22,14 +22,14 @@ export const OriginInfoTab = importLazyComponent(() => import('./OriginInfoTab.j
 @injectable()
 export class ConnectionOriginInfoTabService extends Bootstrap {
   constructor(
-    private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored,
+    private readonly connectionFormService: ConnectionFormService,
     private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
   ) {
     super();
   }
 
   override register(): void {
-    this.connectionFormServiceRefactored.parts.add({
+    this.connectionFormService.parts.add({
       key: 'origin',
       order: 3,
       tab: () => OriginInfoTab,
@@ -48,6 +48,6 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
       },
     });
 
-    this.connectionFormServiceRefactored.actionsContainer.add(ConnectionFormAuthenticationAction, 0);
+    this.connectionFormService.actionsContainer.add(ConnectionFormAuthenticationAction, 0);
   }
 }

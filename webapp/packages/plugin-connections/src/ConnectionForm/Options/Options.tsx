@@ -61,8 +61,8 @@ import styles from './Options.module.css';
 import { ParametersForm } from './ParametersForm.js';
 import { ProviderPropertiesForm } from './ProviderPropertiesForm.js';
 import { useOptions } from './useOptions.js';
-import type { ConnectionFormRefactoredProps } from '../ConnectionFormServiceRefactored.js';
 import { getConnectionFormOptionsPart } from './getConnectionFormOptionsPart.js';
+import type { IConnectionFormProps } from '../IConnectionFormState.js';
 
 const PROFILE_AUTH_MODEL_ID = 'profile';
 
@@ -86,7 +86,7 @@ const driverConfiguration: IDriverConfiguration[] = [
     isVisible: driver => driver.configurationTypes.includes(DriverConfigurationType.Url),
   },
 ];
-export const Options: TabContainerPanelComponent<ConnectionFormRefactoredProps> = observer(function Options({ formState }) {
+export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({ formState }) {
   const isAdmin = usePermission(EAdminPermission.admin);
   const serverConfigResource = useResource(Options, ServerConfigResource, undefined);
   const projectInfoResource = useService(ProjectInfoResource);

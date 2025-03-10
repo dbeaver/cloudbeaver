@@ -38,12 +38,12 @@ import { isSafari } from '@cloudbeaver/core-utils';
 import { authTypes } from './authTypes.js';
 import styles from './SSH.module.css';
 import { SSHKeyUploader } from './SSHKeyUploader.js';
-import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { getConnectionFormSSHPart } from './getConnectionFormSSHPart.js';
 
 interface Props {
   handlerState: NetworkHandlerConfigInput;
-  formState: IFormState<IConnectionFormStateRefactored>;
+  formState: IFormState<IConnectionFormState>;
 }
 
 export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ formState, handlerState }) {

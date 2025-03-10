@@ -15,10 +15,10 @@ import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import styles from './DriverProperties.module.css';
-import type { ConnectionFormRefactoredProps } from '../ConnectionFormServiceRefactored.js';
 import { getConnectionFormDriverPropertiesPart } from './getConnectionFormDriverPropertiesPart.js';
+import type { IConnectionFormProps } from '../IConnectionFormState.js';
 
-export const DriverProperties: TabContainerPanelComponent<ConnectionFormRefactoredProps> = observer(function DriverProperties({ tabId, formState }) {
+export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> = observer(function DriverProperties({ tabId, formState }) {
   const { selected } = useTab(tabId);
   const style = useS(styles);
   const driverPropertiesPart = getConnectionFormDriverPropertiesPart(formState);

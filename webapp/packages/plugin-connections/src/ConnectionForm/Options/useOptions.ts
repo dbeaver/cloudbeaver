@@ -14,9 +14,9 @@ import type { ConnectionConfig, DatabaseAuthModel } from '@cloudbeaver/core-sdk'
 import { getConnectionName } from './getConnectionName.js';
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import type { IFormState } from '@cloudbeaver/core-ui';
-import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionFormState } from '../IConnectionFormState.js';
 
-export function useOptions(formState: IFormState<IConnectionFormStateRefactored>, config: ConnectionConfig) {
+export function useOptions(formState: IFormState<IConnectionFormState>, config: ConnectionConfig) {
   const mode = formState.mode;
   const connectionInfoService = useService(ConnectionInfoResource);
   const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));

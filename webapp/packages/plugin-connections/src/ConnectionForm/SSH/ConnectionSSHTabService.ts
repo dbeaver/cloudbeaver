@@ -11,7 +11,7 @@ import { DBDriverResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 
-import { ConnectionFormServiceRefactored } from '../ConnectionFormServiceRefactored.js';
+import { ConnectionFormService } from '../ConnectionFormService.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
 export const SSHTab = React.lazy(async () => {
@@ -27,13 +27,13 @@ export const SSHPanel = React.lazy(async () => {
 export class ConnectionSSHTabService extends Bootstrap {
   constructor(
     private readonly dbDriverResource: DBDriverResource,
-    private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored,
+    private readonly connectionFormService: ConnectionFormService,
   ) {
     super();
   }
 
   override register(): void {
-    this.connectionFormServiceRefactored.parts.add({
+    this.connectionFormService.parts.add({
       key: 'ssh',
       name: 'plugin_connections_connection_form_part_main',
       order: 3,

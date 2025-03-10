@@ -9,11 +9,11 @@ import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-d
 import type { IFormState } from '@cloudbeaver/core-ui';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { ConnectionFormAccessPart } from './ConnectionFormAccessPart.js';
-import type { IConnectionFormStateRefactored } from '@cloudbeaver/plugin-connections';
+import type { IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 const DATA_CONTEXT_CONNECTION_FORM_ACCESS_PART = createDataContext<ConnectionFormAccessPart>('Connection Form Access Part');
 
-export function getConnectionFormAccessPart(formState: IFormState<IConnectionFormStateRefactored>): ConnectionFormAccessPart {
+export function getConnectionFormAccessPart(formState: IFormState<IConnectionFormState>): ConnectionFormAccessPart {
   return formState.getPart(DATA_CONTEXT_CONNECTION_FORM_ACCESS_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
     const connectionInfoResource = di.getService(ConnectionInfoResource);

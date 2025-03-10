@@ -11,12 +11,10 @@ import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { Button, getComputed, type PlaceholderComponent, useResource, useTranslate, useAuthenticationAction } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 
-import type { IConnectionFormPropsRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { useService } from '@cloudbeaver/core-di';
 
-export const AuthenticationButton: PlaceholderComponent<IConnectionFormPropsRefactored> = observer(function ConnectionFormAuthenticationAction({
-  formState,
-}) {
+export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormAuthenticationAction({ formState }) {
   const translate = useTranslate();
   const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, formState.state.config.driverId || null);
   const connectionInfoService = useService(ConnectionInfoResource);
@@ -45,23 +43,23 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormPropsRefa
   );
 });
 
-export const ConnectionFormAuthenticationAction: PlaceholderComponent<IConnectionFormPropsRefactored> = observer(
-  function ConnectionFormAuthenticationAction({ formState }) {
-    const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, formState.state.config.driverId || null);
-    const connectionInfoService = useService(ConnectionInfoResource);
-    const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
+export const ConnectionFormAuthenticationAction: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormAuthenticationAction({
+  formState,
+}) {
+  const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, formState.state.config.driverId || null);
+  const connectionInfoService = useService(ConnectionInfoResource);
+  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
 
-    const driver = driverMap.data;
-    const { data: authModel } = useResource(
-      ConnectionFormAuthenticationAction,
-      DatabaseAuthModelsResource,
-      getComputed(() => formState.state.config.authModelId || info?.authModel || driver?.defaultAuthModel || null),
-    );
+  const driver = driverMap.data;
+  const { data: authModel } = useResource(
+    ConnectionFormAuthenticationAction,
+    DatabaseAuthModelsResource,
+    getComputed(() => formState.state.config.authModelId || info?.authModel || driver?.defaultAuthModel || null),
+  );
 
-    if (!authModel?.requiredAuth && !info?.requiredAuth) {
-      return null;
-    }
+  if (!authModel?.requiredAuth && !info?.requiredAuth) {
+    return null;
+  }
 
-    return <AuthenticationButton formState={formState} />;
-  },
-);
+  return <AuthenticationButton formState={formState} />;
+});

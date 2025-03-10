@@ -27,7 +27,7 @@ import { ConnectionInfoOriginResource, ConnectionInfoResource, createConnectionP
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
-import type { IConnectionFormPropsRefactored } from '@cloudbeaver/plugin-connections';
+import type { IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 
 import styles from './ConnectionAccess.module.css';
 import { ConnectionAccessGrantedList } from './ConnectionAccessGrantedList.js';
@@ -35,7 +35,7 @@ import { ConnectionAccessList } from './ConnectionAccessList.js';
 import { useService } from '@cloudbeaver/core-di';
 import { getConnectionFormAccessPart } from './getConnectionFormAccessPart.js';
 
-export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormPropsRefactored> = observer(function ConnectionAccess({ tabId, formState }) {
+export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAccess({ tabId, formState }) {
   const translate = useTranslate();
   const style = useS(styles);
 

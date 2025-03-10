@@ -8,7 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 
-import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { IConnectionFormOriginInfoState } from './IConnectionFormOriginInfoState.js';
 import {
   ConnectionInfoResource,
@@ -23,9 +23,9 @@ import { computed, makeObservable } from 'mobx';
 const defaultStateGetter = () => ({}) as IConnectionFormOriginInfoState;
 
 @injectable()
-export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOriginInfoState, IConnectionFormStateRefactored> {
+export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOriginInfoState, IConnectionFormState> {
   constructor(
-    formState: IFormState<IConnectionFormStateRefactored>,
+    formState: IFormState<IConnectionFormState>,
     private readonly connectionInfoOriginDetailsResource: ConnectionInfoOriginDetailsResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
@@ -100,7 +100,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     this.setInitialState(state);
   }
 
-  protected override async saveChanges(data: IFormState<IConnectionFormStateRefactored>): Promise<void> {
+  protected override async saveChanges(data: IFormState<IConnectionFormState>): Promise<void> {
     return Promise.resolve();
   }
 }

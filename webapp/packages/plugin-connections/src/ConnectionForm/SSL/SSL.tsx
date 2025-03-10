@@ -33,11 +33,11 @@ import { isSafari } from '@cloudbeaver/core-utils';
 
 import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR.js';
 import styles from './SSL.module.css';
-import type { IConnectionFormPropsRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
-interface Props extends IConnectionFormPropsRefactored {
+interface Props extends IConnectionFormProps {
   handler: NetworkHandlerDescriptor;
   handlerState: NetworkHandlerConfigInput;
 }

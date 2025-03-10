@@ -12,7 +12,7 @@ import { DriverConfigurationType, NetworkHandlerAuthType, type NetworkHandlerCon
 import { ConnectionInfoResource, createConnectionParam, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { toJS } from 'mobx';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
-import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
@@ -33,9 +33,9 @@ const DEFAULT_SSH_NETWORK_HANDLER: INetworkHandlerConfig = {
   },
 };
 
-export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConnectionFormStateRefactored> {
+export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConnectionFormState> {
   constructor(
-    formState: IFormState<IConnectionFormStateRefactored>,
+    formState: IFormState<IConnectionFormState>,
     private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super(formState, DEFAULT_SSH_NETWORK_HANDLER);
@@ -55,13 +55,13 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   protected override async saveChanges(
-    data: IFormState<IConnectionFormStateRefactored>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
+    data: IFormState<IConnectionFormState>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {}
 
   protected override format(
-    data: IFormState<IConnectionFormStateRefactored>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
+    data: IFormState<IConnectionFormState>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): void | Promise<void> {
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
     const optionsPart = getConnectionFormOptionsPart(this.formState);
@@ -108,8 +108,8 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   protected override validate(
-    data: IFormState<IConnectionFormStateRefactored>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
+    data: IFormState<IConnectionFormState>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): void | Promise<void> {
     const validation = contexts.getContext(formValidationContext);
 

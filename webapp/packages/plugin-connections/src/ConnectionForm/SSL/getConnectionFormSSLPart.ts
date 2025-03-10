@@ -8,12 +8,12 @@
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
 import type { IFormState } from '@cloudbeaver/core-ui';
 import { ConnectionFormSSLPart } from './ConnectionFormSSLPart.js';
-import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { ConnectionInfoResource, DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-connections';
 
 const DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART = createDataContext<ConnectionFormSSLPart>('Connection Form SSL Part');
 
-export function getConnectionFormSSLPart(formState: IFormState<IConnectionFormStateRefactored>): ConnectionFormSSLPart {
+export function getConnectionFormSSLPart(formState: IFormState<IConnectionFormState>): ConnectionFormSSLPart {
   return formState.getPart(DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
     const dbDriverResource = di.getService(DBDriverResource);

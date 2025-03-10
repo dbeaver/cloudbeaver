@@ -27,11 +27,11 @@ import { ConnectionInfoOriginDetailsResource, ConnectionInfoResource, createConn
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import styles from './OriginInfo.module.css';
-import type { IConnectionFormPropsRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { useService } from '@cloudbeaver/core-di';
 import { getConnectionFormOriginInfoFormPart } from './getConnectionFormOriginInfoFormPart.js';
 
-export const OriginInfo: TabContainerPanelComponent<IConnectionFormPropsRefactored> = observer(function OriginInfo({ tabId, formState }) {
+export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = observer(function OriginInfo({ tabId, formState }) {
   const tab = useTab(tabId);
   const translate = useTranslate();
   const originInfoPart = getConnectionFormOriginInfoFormPart(formState);

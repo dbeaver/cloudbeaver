@@ -11,7 +11,7 @@ import { DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-conn
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
-import { ConnectionFormServiceRefactored } from '../ConnectionFormServiceRefactored.js';
+import { ConnectionFormService } from '../ConnectionFormService.js';
 
 export const SSLTab = React.lazy(async () => {
   const { SSLTab } = await import('./SSLTab.js');
@@ -27,13 +27,13 @@ export class ConnectionSSLTabService extends Bootstrap {
   constructor(
     private readonly dbDriverResource: DBDriverResource,
     private readonly networkHandlerResource: NetworkHandlerResource,
-    private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored,
+    private readonly connectionFormService: ConnectionFormService,
   ) {
     super();
   }
 
   override register(): void {
-    this.connectionFormServiceRefactored.parts.add({
+    this.connectionFormService.parts.add({
       key: 'ssl',
       order: 4,
       tab: () => SSLTab,

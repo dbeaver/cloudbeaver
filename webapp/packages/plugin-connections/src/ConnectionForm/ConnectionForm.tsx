@@ -15,14 +15,14 @@ import { formStatusContext, formValidationContext, TabList, TabPanelList, TabsSt
 
 import { ConnectionFormActionsContext, type IConnectionFormActionsContext } from './ConnectFormActionsContext.js';
 import style from './ConnectionForm.module.css';
-import type { ConnectionFormStateRefactored } from './ConnectionFormStateRefactored.js';
+import type { ConnectionFormState } from './ConnectionFormState.js';
 import { getFirstException } from '@cloudbeaver/core-utils';
-import { ConnectionFormServiceRefactored } from './ConnectionFormServiceRefactored.js';
+import { ConnectionFormService } from './ConnectionFormService.js';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { connectionTestContext } from './Contexts/connectionTestContext.js';
 
 export interface ConnectionFormProps {
-  formState: ConnectionFormStateRefactored;
+  formState: ConnectionFormState;
   onCancel?: () => void;
   onSave?: (config: ConnectionConfig) => void;
   className?: string;
@@ -30,7 +30,7 @@ export interface ConnectionFormProps {
 
 export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionForm({ formState, onCancel, onSave = () => {}, className }) {
   const props = useObjectRef({ onSave });
-  const service = useService(ConnectionFormServiceRefactored);
+  const service = useService(ConnectionFormService);
   const styles = useS(style);
   const notificationService = useService(NotificationService);
   const connectionInfoResource = useService(ConnectionInfoResource);

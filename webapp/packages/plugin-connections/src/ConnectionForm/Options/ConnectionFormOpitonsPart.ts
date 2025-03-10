@@ -27,7 +27,7 @@ import { getConnectionName } from './getConnectionName.js';
 import type { LocalizationService } from '@cloudbeaver/core-localization';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
 import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
-import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { connectionTestContext } from '../Contexts/connectionTestContext.js';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
@@ -66,9 +66,9 @@ const defaultStateGetter = () =>
     userPassword: '',
   }) as IConnectionFormOptionsState;
 
-export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsState, IConnectionFormStateRefactored> {
+export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsState, IConnectionFormState> {
   constructor(
-    formState: IFormState<IConnectionFormStateRefactored>,
+    formState: IFormState<IConnectionFormState>,
     private readonly dbDriverResource: DBDriverResource,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
@@ -81,7 +81,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     super(formState, defaultStateGetter());
   }
 
-  private async formAuthState(data: IConnectionFormStateRefactored, contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>) {
+  private async formAuthState(data: IConnectionFormState, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
     const stateContext = contexts.getContext(formStateContext);
 
     if (!this.formState.state.projectId || !this.formState.state.config.connectionId) {
@@ -221,8 +221,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   }
 
   protected override async format(
-    data: IFormState<IConnectionFormStateRefactored>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
+    data: IFormState<IConnectionFormState>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
 
@@ -365,8 +365,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   }
 
   protected override async validate(
-    data: IFormState<IConnectionFormStateRefactored>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
+    data: IFormState<IConnectionFormState>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
     const validation = contexts.getContext(formValidationContext);
 
@@ -403,8 +403,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   }
 
   protected override async saveChanges(
-    data: IFormState<IConnectionFormStateRefactored>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
+    data: IFormState<IConnectionFormState>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
     const status = contexts.getContext(formStatusContext);
     const state = this.formState.state;

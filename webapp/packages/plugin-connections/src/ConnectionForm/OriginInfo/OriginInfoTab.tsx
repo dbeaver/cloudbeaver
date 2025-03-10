@@ -10,11 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { Translate } from '@cloudbeaver/core-blocks';
 import { Tab, type TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
 
-import type { IConnectionFormPropsRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { ConnectionInfoOriginResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 
-export const OriginInfoTab: TabContainerTabComponent<IConnectionFormPropsRefactored> = observer(function OriginInfoTab({ formState, ...rest }) {
+export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = observer(function OriginInfoTab({ formState, ...rest }) {
   const connectionInfoOriginService = useService(ConnectionInfoOriginResource);
   const info = connectionInfoOriginService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
 

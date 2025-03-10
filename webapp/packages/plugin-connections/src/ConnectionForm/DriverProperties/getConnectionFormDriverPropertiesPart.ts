@@ -9,13 +9,13 @@ import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-d
 import type { IFormState } from '@cloudbeaver/core-ui';
 import { ConnectionFormDriverPropertiesPart } from './ConnectionFormDriverPropertiesPart.js';
 import { ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
-import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionFormState } from '../IConnectionFormState.js';
 
 const DATA_CONTEXT_CONNECTION_FORM_DRIVER_PROPERTIES_PART = createDataContext<ConnectionFormDriverPropertiesPart>(
   'Connection Form Driver Properties Part',
 );
 
-export function getConnectionFormDriverPropertiesPart(formState: IFormState<IConnectionFormStateRefactored>): ConnectionFormDriverPropertiesPart {
+export function getConnectionFormDriverPropertiesPart(formState: IFormState<IConnectionFormState>): ConnectionFormDriverPropertiesPart {
   return formState.getPart(DATA_CONTEXT_CONNECTION_FORM_DRIVER_PROPERTIES_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
     const dbDriverResource = di.getService(DBDriverResource);

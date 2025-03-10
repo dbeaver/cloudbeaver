@@ -11,7 +11,7 @@ import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { EAdminPermission, PermissionsService } from '@cloudbeaver/core-root';
-import { ConnectionFormServiceRefactored } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormService } from '@cloudbeaver/plugin-connections';
 import { getConnectionFormAccessPart } from './getConnectionFormAccessPart.js';
 
 const ConnectionAccess = React.lazy(async () => {
@@ -24,7 +24,7 @@ export class ConnectionAccessTabService extends Bootstrap {
   private readonly key: string;
 
   constructor(
-    private readonly ConnectionFormServiceRefactored: ConnectionFormServiceRefactored,
+    private readonly ConnectionFormService: ConnectionFormService,
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly permissionsResource: PermissionsService,
     private readonly projectInfoResource: ProjectInfoResource,
@@ -34,7 +34,7 @@ export class ConnectionAccessTabService extends Bootstrap {
   }
 
   override register(): void {
-    this.ConnectionFormServiceRefactored.parts.add({
+    this.ConnectionFormService.parts.add({
       key: this.key,
       name: 'connections_connection_edit_access',
       title: 'connections_connection_edit_access',

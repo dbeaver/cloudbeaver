@@ -13,7 +13,7 @@ import {
   DatabaseAuthModelsResource,
   DBDriverResource,
 } from '@cloudbeaver/core-connections';
-import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { ConnectionFormOriginInfoFormPart } from './ConnectionFormOriginInfoFormPart.js';
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
@@ -22,7 +22,7 @@ const DATA_CONTEXT_CONNECTION_FORM_ORIGIN_INFO_FORM_PART = createDataContext<Con
   'Connection Form Origin Info Form Part',
 );
 
-export function getConnectionFormOriginInfoFormPart(formState: IFormState<IConnectionFormStateRefactored>): ConnectionFormOriginInfoFormPart {
+export function getConnectionFormOriginInfoFormPart(formState: IFormState<IConnectionFormState>): ConnectionFormOriginInfoFormPart {
   return formState.getPart(DATA_CONTEXT_CONNECTION_FORM_ORIGIN_INFO_FORM_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
     const connectionInfoOriginDetailsResource = di.getService(ConnectionInfoOriginDetailsResource);

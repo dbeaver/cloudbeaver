@@ -14,12 +14,10 @@ import { ConnectionInfoResource, createConnectionParam, DatabaseAuthModelsResour
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { ConnectionFormActionsContext } from './ConnectFormActionsContext.js';
-import type { IConnectionFormPropsRefactored } from './IConnectionFormStateRefactored.js';
+import type { IConnectionFormProps } from './IConnectionFormState.js';
 import { useService } from '@cloudbeaver/core-di';
 
-export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormPropsRefactored> = observer(function ConnectionFormBaseActions({
-  formState,
-}) {
+export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormBaseActions({ formState }) {
   const actions = useContext(ConnectionFormActionsContext);
 
   if (!actions) {

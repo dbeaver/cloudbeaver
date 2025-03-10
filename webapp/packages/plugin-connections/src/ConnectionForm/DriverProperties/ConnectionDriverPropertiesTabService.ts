@@ -9,16 +9,16 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { DriverPropertiesLoader } from './DriverPropertiesLoader.js';
-import { ConnectionFormServiceRefactored } from '../ConnectionFormServiceRefactored.js';
+import { ConnectionFormService } from '../ConnectionFormService.js';
 
 @injectable()
 export class ConnectionDriverPropertiesTabService extends Bootstrap {
-  constructor(private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored) {
+  constructor(private readonly connectionFormService: ConnectionFormService) {
     super();
   }
 
   override register(): void {
-    this.connectionFormServiceRefactored.parts.add({
+    this.connectionFormService.parts.add({
       key: 'driver_properties',
       name: 'plugin_connections_connection_form_part_properties',
       title: 'plugin_connections_connection_form_part_properties',

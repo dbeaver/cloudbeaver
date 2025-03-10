@@ -11,7 +11,7 @@ import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { TabsContainer } from '@cloudbeaver/core-ui';
-import { ConnectionFormServiceRefactored, ConnectionFormStateRefactored } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormService, ConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService.js';
 
@@ -25,7 +25,7 @@ export interface ICreateMethodOptions {
 @injectable()
 export class CreateConnectionService {
   disabled = false;
-  data: ConnectionFormStateRefactored | null;
+  data: ConnectionFormState | null;
 
   readonly tabsContainer: TabsContainer<void, ICreateMethodOptions>;
 
@@ -33,7 +33,7 @@ export class CreateConnectionService {
     private readonly connectionsAdministrationNavService: ConnectionsAdministrationNavService,
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly serviceProvider: IServiceProvider,
-    private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored,
+    private readonly connectionFormService: ConnectionFormService,
   ) {
     this.data = null;
     this.tabsContainer = new TabsContainer('Connection Creation mode');
@@ -105,7 +105,7 @@ export class CreateConnectionService {
   }
 
   setConnectionTemplate(projectId: string, config: ConnectionConfig, availableDrivers: string[]): void {
-    this.data = new ConnectionFormStateRefactored(this.serviceProvider, this.connectionFormServiceRefactored, {
+    this.data = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
       projectId,
       availableDrivers,
       config,

@@ -12,11 +12,11 @@ import { ConnectionInfoOriginResource, ConnectionInfoResource, DatabaseAuthModel
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionFormState } from '../IConnectionFormState.js';
 
 const DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART = createDataContext<ConnectionFormOptionsPart>('Connection Form Options Part');
 
-export function getConnectionFormOptionsPart(formState: IFormState<IConnectionFormStateRefactored>): ConnectionFormOptionsPart {
+export function getConnectionFormOptionsPart(formState: IFormState<IConnectionFormState>): ConnectionFormOptionsPart {
   return formState.getPart(DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
     const dbDriverResource = di.getService(DBDriverResource);

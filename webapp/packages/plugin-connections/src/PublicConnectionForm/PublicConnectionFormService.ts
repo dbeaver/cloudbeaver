@@ -19,8 +19,8 @@ import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { FormMode, OptionsPanelService } from '@cloudbeaver/core-ui';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
-import { ConnectionFormStateRefactored } from '../ConnectionForm/ConnectionFormStateRefactored.js';
-import { ConnectionFormServiceRefactored } from '../ConnectionForm/ConnectionFormServiceRefactored.js';
+import { ConnectionFormState } from '../ConnectionForm/ConnectionFormState.js';
+import { ConnectionFormService } from '../ConnectionForm/ConnectionFormService.js';
 
 const PublicConnectionForm = importLazyComponent(() => import('./PublicConnectionForm.js').then(m => m.PublicConnectionForm));
 
@@ -28,14 +28,14 @@ const formGetter = () => PublicConnectionForm;
 
 @injectable()
 export class PublicConnectionFormService {
-  formState: ConnectionFormStateRefactored | null;
+  formState: ConnectionFormState | null;
 
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
     private readonly optionsPanelService: OptionsPanelService,
     private readonly serviceProvider: IServiceProvider,
-    private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored,
+    private readonly connectionFormService: ConnectionFormService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly userInfoResource: UserInfoResource,
@@ -76,7 +76,7 @@ export class PublicConnectionFormService {
     }
 
     if (!this.formState) {
-      this.formState = new ConnectionFormStateRefactored(this.serviceProvider, this.connectionFormServiceRefactored, {
+      this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
         projectId,
         availableDrivers: availableDrivers ?? [],
         config,

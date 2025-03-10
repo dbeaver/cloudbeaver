@@ -21,5 +21,5 @@ export const CONNECTION_FORM_STATE_SCHEMA = schema
   .required()
   .strict();
 
-export type IConnectionFormStateRefactored = schema.infer<typeof CONNECTION_FORM_STATE_SCHEMA>;
-export type IConnectionFormPropsRefactored = IFormProps<IConnectionFormStateRefactored>;
+export type IConnectionFormState = schema.infer<typeof CONNECTION_FORM_STATE_SCHEMA>;
+export type IConnectionFormProps = IFormProps<IConnectionFormState>;

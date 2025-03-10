@@ -9,7 +9,7 @@ import React from 'react';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { ConnectionFormServiceRefactored } from '../ConnectionFormServiceRefactored.js';
+import { ConnectionFormService } from '../ConnectionFormService.js';
 
 export const Options = React.lazy(async () => {
   const { Options } = await import('./Options.js');
@@ -18,12 +18,12 @@ export const Options = React.lazy(async () => {
 
 @injectable()
 export class ConnectionOptionsTabService extends Bootstrap {
-  constructor(private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored) {
+  constructor(private readonly connectionFormService: ConnectionFormService) {
     super();
   }
 
   override register(): void {
-    this.connectionFormServiceRefactored.parts.add({
+    this.connectionFormService.parts.add({
       key: 'options',
       name: 'plugin_connections_connection_form_part_main',
       order: 1,

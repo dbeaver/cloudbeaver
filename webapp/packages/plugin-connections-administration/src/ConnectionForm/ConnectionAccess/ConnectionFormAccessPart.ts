@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { FormPart, formStatusContext, type IFormState } from '@cloudbeaver/core-ui';
-import type { IConnectionFormStateRefactored } from '../../../../plugin-connections/src/ConnectionForm/IConnectionFormStateRefactored.js';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { IConnectionFormAccessState } from './IConnectionFormAccessState.js';
 import { createConnectionParam, type ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { action, makeObservable } from 'mobx';
+import type { IConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 const getDefaultState = () =>
   ({
@@ -18,9 +18,9 @@ const getDefaultState = () =>
     editing: false,
   }) as IConnectionFormAccessState;
 
-export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessState, IConnectionFormStateRefactored> {
+export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessState, IConnectionFormState> {
   constructor(
-    formState: IFormState<IConnectionFormStateRefactored>,
+    formState: IFormState<IConnectionFormState>,
     private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super(formState, getDefaultState());
@@ -51,8 +51,8 @@ export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessStat
   }
 
   protected override async saveChanges(
-    data: IFormState<IConnectionFormStateRefactored>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
+    data: IFormState<IConnectionFormState>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
     const status = contexts.getContext(formStatusContext);
     const connectionId = this.formState.state.config.connectionId;

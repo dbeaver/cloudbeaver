@@ -13,9 +13,9 @@ import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { Tab, type TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
 
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
-import type { ConnectionFormRefactoredProps } from '../ConnectionFormServiceRefactored.js';
+import type { IConnectionFormProps } from '../IConnectionFormState.js';
 
-export const SSLTab: TabContainerTabComponent<ConnectionFormRefactoredProps> = observer(function SSLTab(props) {
+export const SSLTab: TabContainerTabComponent<IConnectionFormProps> = observer(function SSLTab(props) {
   const networkHandlerResource = useResource(SSLTab, NetworkHandlerResource, CachedMapAllKey);
   const dbDriverResource = useResource(SSLTab, DBDriverResource, props.formState.state.config.driverId ?? null);
 

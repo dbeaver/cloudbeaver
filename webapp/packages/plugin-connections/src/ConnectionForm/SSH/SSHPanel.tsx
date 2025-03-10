@@ -10,11 +10,11 @@ import { observer } from 'mobx-react-lite';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import { SSH } from './SSH.js';
-import type { ConnectionFormRefactoredProps } from '../ConnectionFormServiceRefactored.js';
 import { useAutoLoad } from '@cloudbeaver/core-blocks';
 import { getConnectionFormSSHPart } from './getConnectionFormSSHPart.js';
+import type { IConnectionFormProps } from '../IConnectionFormState.js';
 
-export const SSHPanel: TabContainerPanelComponent<ConnectionFormRefactoredProps> = observer(function SSHPanel(props) {
+export const SSHPanel: TabContainerPanelComponent<IConnectionFormProps> = observer(function SSHPanel(props) {
   const SSHPart = getConnectionFormSSHPart(props.formState);
 
   useAutoLoad(SSHPanel, SSHPart);

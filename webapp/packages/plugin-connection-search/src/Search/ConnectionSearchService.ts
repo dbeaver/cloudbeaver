@@ -15,7 +15,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
-import { ConnectionFormServiceRefactored, ConnectionFormStateRefactored } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormService, ConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 import { SearchDatabase } from './SearchDatabase.js';
 
@@ -28,14 +28,14 @@ export class ConnectionSearchService {
 
   disabled = false;
 
-  formState: ConnectionFormStateRefactored | null = null;
+  formState: ConnectionFormState | null = null;
 
   constructor(
     private readonly notificationService: NotificationService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly serviceProvider: IServiceProvider,
     private readonly optionsPanelService: OptionsPanelService,
-    private readonly connectionFormServiceRefactored: ConnectionFormServiceRefactored,
+    private readonly connectionFormService: ConnectionFormService,
     private readonly commonDialogService: CommonDialogService,
     private readonly connectionsManagerService: ConnectionsManagerService,
   ) {
@@ -147,7 +147,7 @@ export class ConnectionSearchService {
     }
 
     if (!this.formState) {
-      this.formState = new ConnectionFormStateRefactored(this.serviceProvider, this.connectionFormServiceRefactored, {
+      this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
         config: {
           ...this.connectionInfoResource.getEmptyConfig(),
           host: database.host,

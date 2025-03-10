@@ -10,7 +10,7 @@ import { useMemo } from 'react';
 
 import { Loader, s, useS } from '@cloudbeaver/core-blocks';
 import { type IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { ConnectionFormLoader, useConnectionFormStateRefactored } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormLoader, useConnectionFormState } from '@cloudbeaver/plugin-connections';
 
 import styles from './ConnectionEdit.module.css';
 import { FormMode } from '@cloudbeaver/core-ui';
@@ -20,7 +20,7 @@ interface Props {
 }
 
 export const ConnectionEdit = observer<Props>(function ConnectionEditNew({ item }) {
-  const data = useConnectionFormStateRefactored(item, state => {
+  const data = useConnectionFormState(item, state => {
     state.setMode(FormMode.Edit);
     state.setState({
       ...state.state,

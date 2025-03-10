@@ -8,7 +8,7 @@
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { IConnectionFormStateRefactored } from '../IConnectionFormStateRefactored.js';
+import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
@@ -34,9 +34,9 @@ const DEFAULT_SSL_NETWORK_HANDLER: INetworkHandlerConfig = {
   secureProperties: {},
 };
 
-export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConnectionFormStateRefactored> {
+export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConnectionFormState> {
   constructor(
-    formState: IFormState<IConnectionFormStateRefactored>,
+    formState: IFormState<IConnectionFormState>,
     private readonly dbDriverResource: DBDriverResource,
     private readonly networkHandlerResource: NetworkHandlerResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
@@ -76,8 +76,8 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   protected override async format(
-    data: IFormState<IConnectionFormStateRefactored>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
+    data: IFormState<IConnectionFormState>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
     const optionsPart = getConnectionFormOptionsPart(this.formState);
@@ -159,8 +159,8 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   protected override async saveChanges(
-    data: IFormState<IConnectionFormStateRefactored>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormStateRefactored>>,
+    data: IFormState<IConnectionFormState>,
+    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {}
 }
 
