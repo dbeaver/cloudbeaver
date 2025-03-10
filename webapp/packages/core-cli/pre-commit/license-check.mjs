@@ -2,38 +2,19 @@ import { exec, execSync } from 'child_process';
 import fs from 'fs';
 import { resolve } from 'path';
 import { createInterface } from 'readline';
+import yaml from 'js-yaml';
 
-const snippetPath = resolve(process.argv[2]);
-const snippetName = process.argv[3];
-const snippets = JSON.parse(fs.readFileSync(snippetPath, 'utf8'));
-const licenseSnippet = snippets[snippetName];
+const configurationPath = resolve(process.cwd(), 'webapp/licensifyrc.yml');
 
-const scopes = licenseSnippet.scope.split(',');
-const license = licenseSnippet.body;
+const content = fs.readFileSync(configurationPath, 'utf8');
+const config = yaml.load(content);
+const template = config.text;
 const extensions = new Set();
+const currentYear = new Date().getFullYear();
+const license = template.replace('${currentYear}', String(currentYear)).trim().split('\n');
 
-for (const scope of scopes) {
-  switch (scope.trim()) {
-    case 'typescript':
-      extensions.add('.ts');
-      break;
-    case 'typescriptreact':
-      extensions.add('.tsx');
-      break;
-    case 'javascript':
-      extensions.add('.js');
-      break;
-    case 'javascriptreact':
-      extensions.add('.jsx');
-      break;
-    case 'css':
-      extensions.add('.css');
-      break;
-    case 'scss':
-      extensions.add('.scss');
-      break;
-  }
-}
+extensions.add('.ts');
+extensions.add('.tsx');
 
 const output = exec('git diff --cached --name-only --diff-filter=ACMR -- webapp/**/*');
 const rl = createInterface(output.stdout);

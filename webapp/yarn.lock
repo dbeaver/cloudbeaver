@@ -1885,6 +1885,7 @@ __metadata:
     "@swc/core": "npm:^1"
     "@swc/jest": "npm:^0"
     "@testing-library/jest-dom": "npm:^6"
+    "@types/js-yaml": "npm:^4"
     "@types/node": "npm:^20"
     enquirer: "npm:^2"
     execa: "npm:^9"
@@ -1893,6 +1894,7 @@ __metadata:
     hygen: "npm:^6"
     jest: "npm:^29"
     jest-environment-jsdom: "npm:^29"
+    js-yaml: "npm:^4.1.0"
     tslib: "npm:^2"
     typescript: "npm:^5"
     upath: "npm:^2"
@@ -8257,7 +8259,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/js-yaml@npm:^4.0.0":
+"@types/js-yaml@npm:^4, @types/js-yaml@npm:^4.0.0":
   version: 4.0.9
   resolution: "@types/js-yaml@npm:4.0.9"
   checksum: 10c0/24de857aa8d61526bbfbbaa383aa538283ad17363fcd5bb5148e2c7f604547db36646440e739d78241ed008702a8920665d1add5618687b6743858fae00da211

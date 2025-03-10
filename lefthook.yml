@@ -1,8 +1,9 @@
 lefthook: |
   cd webapp
   yarn lefthook
+source_dir: webapp/packages/core-cli
 pre-commit:
   parallel: true
   scripts:
-    "license-checker.sh":
-      runner: bash
+    "license-check.mjs":
+      runner: node
