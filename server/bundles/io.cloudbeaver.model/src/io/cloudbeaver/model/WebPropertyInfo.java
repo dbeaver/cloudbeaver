@@ -259,6 +259,18 @@ public class WebPropertyInfo {
         return null;
     }
 
+    /**
+     * Returns expression for a visibility of a property.
+     */
+    @Nullable
+    @Property
+    public String getVisibleExpr() {
+        if (property instanceof ObjectPropertyDescriptor objectPropertyDescriptor) {
+            return objectPropertyDescriptor.getVisibleExpr();
+        }
+        return null;
+    }
+
     //TODO: delete after refactoring on front-end
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
