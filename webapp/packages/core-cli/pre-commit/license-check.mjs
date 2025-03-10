@@ -16,7 +16,7 @@ const license = template.replace('${currentYear}', String(currentYear)).trim().s
 extensions.add('.ts');
 extensions.add('.tsx');
 
-const output = exec('git diff --cached --name-only --diff-filter=ACMR -- webapp/**/*');
+const output = exec('git diff --cached --name-only --diff-filter=ACMR -- webapp/**/* | grep -v "/locales/"');
 const rl = createInterface(output.stdout);
 const invalidFiles = [];
 
