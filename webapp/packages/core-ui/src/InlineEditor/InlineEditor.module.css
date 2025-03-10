@@ -7,12 +7,21 @@
  */
 
 .input {
-  composes: theme-typography--body2 theme-text-text-primary-on-light from global;
+  composes: theme-text-text-primary-on-light from global;
   font: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-decoration: inherit;
+  text-transform: inherit;
 }
 
 .editor {
   composes: theme-border-color-background from global;
+}
+.specific.editor {
   position: relative;
   box-sizing: border-box;
   display: flex;
@@ -21,8 +30,8 @@
   border: solid 1px;
 }
 
-.editor:focus-within,
-.editorActive {
+.specific.editor:focus-within,
+.specific.editorActive {
   border-color: #52c41a !important;
 }
 

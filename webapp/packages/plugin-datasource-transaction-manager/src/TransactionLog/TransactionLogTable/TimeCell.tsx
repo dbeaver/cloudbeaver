@@ -9,12 +9,15 @@ import { observer } from 'mobx-react-lite';
 
 import type { TransactionLogInfoItem } from '@cloudbeaver/core-sdk';
 import { isSameDay } from '@cloudbeaver/core-utils';
-import { type RenderCellProps } from '@cloudbeaver/plugin-data-grid';
 
-export const TimeCell = observer<RenderCellProps<TransactionLogInfoItem>>(function TimeCell(props) {
-  const date = new Date(props.row.time);
+interface Props {
+  row: TransactionLogInfoItem;
+}
+
+export const TimeCell = observer<Props>(function TimeCell({ row }) {
+  const date = new Date(row.time);
   const fullTime = date.toLocaleString();
   const displayTime = isSameDay(date, new Date()) ? date.toLocaleTimeString() : fullTime;
 
-  return <div>{displayTime}</div>;
+  return displayTime;
 });

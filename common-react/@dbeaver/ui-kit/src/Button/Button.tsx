@@ -7,10 +7,11 @@
  */
 import { Button as AriaButton, type ButtonProps as AriaKitButtonProps } from '@ariakit/react';
 import './Button.css';
+import type { ControlSize } from '../types/controls.js';
 
 export interface ButtonProps extends Omit<AriaKitButtonProps, 'clickOnEnter' | 'clickOnSpace'> {
   variant?: 'primary' | 'secondary' | 'danger';
-  size?: 'small' | 'medium' | 'large' | 'xlarge';
+  size?: ControlSize;
   loading?: boolean;
   loader?: React.ReactNode;
 }

@@ -2534,8 +2534,8 @@ __metadata:
   resolution: "@cloudbeaver/eslint-config@workspace:packages/eslint-config"
   dependencies:
     "@cloudbeaver/eslint-plugin": "workspace:*"
-    "@eslint/js": "npm:^9.19.0"
-    "@stylistic/eslint-plugin": "npm:^3.0.1"
+    "@eslint/js": "npm:^9"
+    "@stylistic/eslint-plugin": "npm:^3"
     "@typescript-eslint/eslint-plugin": "npm:^8"
     "@typescript-eslint/parser": "npm:^8"
     eslint: "npm:^9"
@@ -2970,8 +2970,8 @@ __metadata:
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
-    "@cloudbeaver/plugin-react-data-grid": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/react-data-grid": "workspace:*"
     "@types/react": "npm:^19"
     clsx: "npm:^2"
     mobx: "npm:^6"
@@ -3664,18 +3664,6 @@ __metadata:
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
-  languageName: unknown
-  linkType: soft
-
-"@cloudbeaver/plugin-react-data-grid@workspace:*, @cloudbeaver/plugin-react-data-grid@workspace:packages/plugin-react-data-grid":
-  version: 0.0.0-use.local
-  resolution: "@cloudbeaver/plugin-react-data-grid@workspace:packages/plugin-react-data-grid"
-  dependencies:
-    "@cloudbeaver/core-cli": "workspace:*"
-    "@cloudbeaver/tsconfig": "workspace:*"
-    react-data-grid: "file:react-data-grid-dist"
-    tslib: "npm:^2"
-    typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
@@ -4680,7 +4668,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/react-data-grid@workspace:../common-react/@dbeaver/react-data-grid":
+"@dbeaver/react-data-grid@workspace:*, @dbeaver/react-data-grid@workspace:../common-react/@dbeaver/react-data-grid":
   version: 0.0.0-use.local
   resolution: "@dbeaver/react-data-grid@workspace:../common-react/@dbeaver/react-data-grid"
   dependencies:
@@ -4688,7 +4676,7 @@ __metadata:
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     react: "npm:^19"
-    react-data-grid: "npm:7.0.0-beta.47"
+    react-data-grid: "file:./artifacts"
     react-dom: "npm:^19"
     rimraf: "npm:^6"
     typescript: "npm:^5"
@@ -4698,6 +4686,10 @@ __metadata:
 "@dbeaver/tsconfig@workspace:*, @dbeaver/tsconfig@workspace:../common-typescript/@dbeaver/tsconfig, @dbeaver/tsconfig@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/tsconfig@workspace:../common-typescript/@dbeaver/tsconfig"
+  dependencies:
+    typescript: "npm:^5"
+    typescript-plugin-css-modules: "npm:^5"
+    vite: "npm:^6"
   languageName: unknown
   linkType: soft
 
@@ -4935,6 +4927,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@eslint/core@npm:^0.11.0":
+  version: 0.11.0
+  resolution: "@eslint/core@npm:0.11.0"
+  dependencies:
+    "@types/json-schema": "npm:^7.0.15"
+  checksum: 10c0/1e0671d035c908175f445864a7864cf6c6a8b67a5dfba8c47b2ac91e2d3ed36e8c1f2fd81d98a73264f8677055559699d4adb0f97d86588e616fc0dc9a4b86c9
+  languageName: node
+  linkType: hard
+
 "@eslint/eslintrc@npm:^3.2.0":
   version: 3.2.0
   resolution: "@eslint/eslintrc@npm:3.2.0"
@@ -4959,7 +4960,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:^9.19.0":
+"@eslint/js@npm:9.20.0, @eslint/js@npm:^9":
   version: 9.20.0
   resolution: "@eslint/js@npm:9.20.0"
   checksum: 10c0/10e7b5b9e628b5192e8fc6b0ecd27cf48322947e83e999ff60f9f9e44ac8d499138bcb9383cbfa6e51e780d53b4e76ccc2d1753b108b7173b8404fd484d37328
@@ -7286,9 +7287,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stylistic/eslint-plugin@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "@stylistic/eslint-plugin@npm:3.0.1"
+"@stylistic/eslint-plugin@npm:^3":
+  version: 3.1.0
+  resolution: "@stylistic/eslint-plugin@npm:3.1.0"
   dependencies:
     "@typescript-eslint/utils": "npm:^8.13.0"
     eslint-visitor-keys: "npm:^4.2.0"
@@ -7297,7 +7298,7 @@ __metadata:
     picomatch: "npm:^4.0.2"
   peerDependencies:
     eslint: ">=8.40.0"
-  checksum: 10c0/6eda8f5f463cc1fca30aec9e0311fd69a1ca84904856e0a3f0108bff411448592a35696dc2b5060fffe0d9c85ce67026cb479d6435bcdb083a29c9d9cb9ebb18
+  checksum: 10c0/e593d78103a89e0555c119625c0ba8c80c8d2c7add0e85215f6be9929002207067df53714785c2c75b8b9e6df774d25c7dead211aed89a57cb45b5cec902a19e
   languageName: node
   linkType: hard
 
@@ -8713,8 +8714,8 @@ __metadata:
   linkType: hard
 
 "@wroud/ts-template@npm:^0":
-  version: 0.5.1
-  resolution: "@wroud/ts-template@npm:0.5.1"
+  version: 0.5.2
+  resolution: "@wroud/ts-template@npm:0.5.2"
   dependencies:
     execa: "npm:^9"
     picocolors: "npm:^1"
@@ -8723,7 +8724,7 @@ __metadata:
   bin:
     ts-template: ./lib/cli.js
     tst: ./lib/cli.js
-  checksum: 10c0/09a76cd64337f91fb3aba812a1f6eeb083f6df955e6cd4c2d1cd3f676c6a0473d4ce818dad64869fbbe8c356f6832fbec5b2232a596acabeea841359ed692fc1
+  checksum: 10c0/da7e2bfc796981f0669704da9d8033dc83bc143065c0857bc7abf1a39898c95d8bd14002214612d947aaf2a681d6355de412fabd64769abd73e5011345a95a40
   languageName: node
   linkType: hard
 
@@ -9915,19 +9916,19 @@ __metadata:
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     concurrently: "npm:^9"
-    eslint: "npm:^9"
+    eslint: "npm:^9.20.1"
     husky: "npm:^9"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     msw: "npm:^2"
     path-browserify: "npm:^1"
-    prettier: "npm:^3"
+    prettier: "npm:^3.5.1"
     react: "npm:^19"
     react-dom: "npm:^19"
     reakit: "npm:^1"
     reflect-metadata: "npm:^0"
     rimraf: "npm:^6"
-    typescript: "npm:^5"
+    typescript: "npm:^5.7.3"
     typescript-plugin-css-modules: "npm:^5"
   languageName: unknown
   linkType: soft
@@ -10033,9 +10034,9 @@ __metadata:
   dependencies:
     "@dbeaver/prettier-config": "workspace:^"
     "@wroud/ts-template": "npm:^0"
-    prettier: "npm:^3"
+    prettier: "npm:^3.5.1"
     rimraf: "npm:^6"
-    typescript: "npm:^5"
+    typescript: "npm:^5.7.3"
   languageName: unknown
   linkType: soft
 
@@ -10051,7 +10052,8 @@ __metadata:
   resolution: "common-typescript@workspace:../common-typescript"
   dependencies:
     "@dbeaver/prettier-config": "workspace:^"
-    prettier: "npm:^3"
+    prettier: "npm:^3.5.1"
+    typescript: "npm:^5.7.3"
   languageName: unknown
   linkType: soft
 
@@ -11624,6 +11626,55 @@ __metadata:
   bin:
     eslint: bin/eslint.js
   checksum: 10c0/3b0dfaeff6a831de086884a3e2432f18468fe37c69f35e1a0a9a2833d9994a65b6dd2a524aaee28f361c849035ad9d15e3841029b67d261d0abd62c7de6d51f5
+  languageName: node
+  linkType: hard
+
+"eslint@npm:^9.20.1":
+  version: 9.20.1
+  resolution: "eslint@npm:9.20.1"
+  dependencies:
+    "@eslint-community/eslint-utils": "npm:^4.2.0"
+    "@eslint-community/regexpp": "npm:^4.12.1"
+    "@eslint/config-array": "npm:^0.19.0"
+    "@eslint/core": "npm:^0.11.0"
+    "@eslint/eslintrc": "npm:^3.2.0"
+    "@eslint/js": "npm:9.20.0"
+    "@eslint/plugin-kit": "npm:^0.2.5"
+    "@humanfs/node": "npm:^0.16.6"
+    "@humanwhocodes/module-importer": "npm:^1.0.1"
+    "@humanwhocodes/retry": "npm:^0.4.1"
+    "@types/estree": "npm:^1.0.6"
+    "@types/json-schema": "npm:^7.0.15"
+    ajv: "npm:^6.12.4"
+    chalk: "npm:^4.0.0"
+    cross-spawn: "npm:^7.0.6"
+    debug: "npm:^4.3.2"
+    escape-string-regexp: "npm:^4.0.0"
+    eslint-scope: "npm:^8.2.0"
+    eslint-visitor-keys: "npm:^4.2.0"
+    espree: "npm:^10.3.0"
+    esquery: "npm:^1.5.0"
+    esutils: "npm:^2.0.2"
+    fast-deep-equal: "npm:^3.1.3"
+    file-entry-cache: "npm:^8.0.0"
+    find-up: "npm:^5.0.0"
+    glob-parent: "npm:^6.0.2"
+    ignore: "npm:^5.2.0"
+    imurmurhash: "npm:^0.1.4"
+    is-glob: "npm:^4.0.0"
+    json-stable-stringify-without-jsonify: "npm:^1.0.1"
+    lodash.merge: "npm:^4.6.2"
+    minimatch: "npm:^3.1.2"
+    natural-compare: "npm:^1.4.0"
+    optionator: "npm:^0.9.3"
+  peerDependencies:
+    jiti: "*"
+  peerDependenciesMeta:
+    jiti:
+      optional: true
+  bin:
+    eslint: bin/eslint.js
+  checksum: 10c0/056789dd5a00897730376f8c0a191e22840e97b7276916068ec096341cb2ec3a918c8bd474bf94ccd7b457ad9fbc16e5c521a993c7cc6ebcf241933e2fd378b0
   languageName: node
   linkType: hard
 
@@ -16926,6 +16977,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prettier@npm:^3.5.1":
+  version: 3.5.1
+  resolution: "prettier@npm:3.5.1"
+  bin:
+    prettier: bin/prettier.cjs
+  checksum: 10c0/9f6f810eae455d6e4213845151a484a2338f2e0d6a8b84ee8e13a83af8a2421ef6c1e31e61e4b135671fb57b9541f6624648880cc2061ac803e243ac898c0123
+  languageName: node
+  linkType: hard
+
 "pretty-bytes@npm:^5.3.0":
   version: 5.6.0
   resolution: "pretty-bytes@npm:5.6.0"
@@ -17125,27 +17185,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-data-grid@file:react-data-grid-dist::locator=%40cloudbeaver%2Fplugin-react-data-grid%40workspace%3Apackages%2Fplugin-react-data-grid":
+"react-data-grid@file:./artifacts::locator=%40dbeaver%2Freact-data-grid%40workspace%3A..%2Fcommon-react%2F%40dbeaver%2Freact-data-grid":
   version: 7.0.0-beta.47
-  resolution: "react-data-grid@file:react-data-grid-dist#react-data-grid-dist::hash=d2aa00&locator=%40cloudbeaver%2Fplugin-react-data-grid%40workspace%3Apackages%2Fplugin-react-data-grid"
+  resolution: "react-data-grid@file:./artifacts#./artifacts::hash=ebde6a&locator=%40dbeaver%2Freact-data-grid%40workspace%3A..%2Fcommon-react%2F%40dbeaver%2Freact-data-grid"
   dependencies:
     clsx: "npm:^2.0.0"
   peerDependencies:
     react: ^18.0 || ^19.0
     react-dom: ^18.0 || ^19.0
-  checksum: 10c0/6c53c0330728cba488176f9ab256cded4a574a493b9acbf7b8d4dab8dc5a75b1be83c752a703f5adf74a37443dce0ee84e7eb00d1fc6b9699aacfc07f63f950d
-  languageName: node
-  linkType: hard
-
-"react-data-grid@npm:7.0.0-beta.47":
-  version: 7.0.0-beta.47
-  resolution: "react-data-grid@npm:7.0.0-beta.47"
-  dependencies:
-    clsx: "npm:^2.0.0"
-  peerDependencies:
-    react: ^18.0 || ^19.0
-    react-dom: ^18.0 || ^19.0
-  checksum: 10c0/d6bf758cd7d55a692c141e425920f62b64a3e899759bd912befe4ebf97a66234615ace78a441451683a5580ddd3b63dddf85dec9fbb583fa1e7008530799b1b4
+  checksum: 10c0/6a1ee314f8cdd603ffa72c778e4aee72f3cd5922a56df1d3f7b095d541a8056946598dde34bddff4de442bef9c732174fb1e8853d6ab3a901001973ba109de7d
   languageName: node
   linkType: hard
 
@@ -19599,6 +19647,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript@npm:^5.7.3":
+  version: 5.7.3
+  resolution: "typescript@npm:5.7.3"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/b7580d716cf1824736cc6e628ab4cd8b51877408ba2be0869d2866da35ef8366dd6ae9eb9d0851470a39be17cbd61df1126f9e211d8799d764ea7431d5435afa
+  languageName: node
+  linkType: hard
+
 "typescript@patch:typescript@npm%3A^5#optional!builtin<compat/typescript>":
   version: 5.7.2
   resolution: "typescript@patch:typescript@npm%3A5.7.2#optional!builtin<compat/typescript>::version=5.7.2&hash=5786d5"
@@ -19606,6 +19664,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 10c0/f3b8082c9d1d1629a215245c9087df56cb784f9fb6f27b5d55577a20e68afe2a889c040aacff6d27e35be165ecf9dca66e694c42eb9a50b3b2c451b36b5675cb
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@npm%3A^5.7.3#optional!builtin<compat/typescript>":
+  version: 5.7.3
+  resolution: "typescript@patch:typescript@npm%3A5.7.3#optional!builtin<compat/typescript>::version=5.7.3&hash=5786d5"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/6fd7e0ed3bf23a81246878c613423730c40e8bdbfec4c6e4d7bf1b847cbb39076e56ad5f50aa9d7ebd89877999abaee216002d3f2818885e41c907caaa192cc4
   languageName: node
   linkType: hard
 

@@ -7,10 +7,9 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { IconOrImage, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, useTranslate } from '@cloudbeaver/core-blocks';
 import { DatabaseDataConstraintAction, EOrder, getNextOrder, type IDatabaseDataModel, ResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
-
-import style from './OrderButton.module.css';
+import { clsx } from '@cloudbeaver/core-utils';
 
 interface Props {
   model: IDatabaseDataModel<ResultSetDataSource>;
@@ -24,7 +23,6 @@ export const OrderButton = observer<Props>(function OrderButton({ model, resultI
   const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
   const currentOrder = constraints.getOrder(attributePosition);
   const disabled = model.isDisabled(resultIndex) || model.isLoading();
-  const styles = useS(style);
 
   let icon = 'order-arrow-unknown';
   if (currentOrder === EOrder.asc) {
@@ -34,6 +32,7 @@ export const OrderButton = observer<Props>(function OrderButton({ model, resultI
   }
 
   const handleSort = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     const nextOrder = getNextOrder(currentOrder);
     await model.request(() => {
       constraints.setOrder(attributePosition, nextOrder, e.ctrlKey || e.metaKey);
@@ -45,14 +44,15 @@ export const OrderButton = observer<Props>(function OrderButton({ model, resultI
   }
 
   return (
-    <button
+    <ActionIconButton
       title={translate('data_grid_table_tooltip_column_header_order')}
-      className={s(styles, { orderButton: true }, className)}
+      name={icon}
+      tabIndex={-1}
+      viewBox="0 0 16 16"
+      className={clsx(currentOrder === null && 'rdg-table-header__order-button_unordered', className)}
       disabled={disabled}
       onMouseDown={preventFocus}
       onClick={handleSort}
-    >
-      <IconOrImage icon={icon} viewBox="0 0 16 16" className={s(styles, {}, currentOrder === null && 'rdg-table-header__order-button_unordered')} />
-    </button>
+    />
   );
 });

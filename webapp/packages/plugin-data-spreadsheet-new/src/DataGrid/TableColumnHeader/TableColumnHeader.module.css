@@ -11,13 +11,7 @@
   align-items: center;
   align-content: center;
   width: 100%;
-}
-.container {
-  display: flex;
-  align-items: center;
-  flex: 1 1 auto;
-  overflow: hidden;
-  gap: 8px;
+  gap: 4px;
   cursor: pointer;
 }
 .icon {
@@ -30,6 +24,8 @@
 .name {
   font-weight: 400;
   flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .readonlyStatus {
   position: absolute;
@@ -39,6 +35,11 @@
   height: 8px;
   border-radius: 50%;
   border: 1px solid;
+
+  &.independent {
+    top: 2px;
+    left: 2px;
+  }
 }
 .dragging {
   opacity: 0.5;

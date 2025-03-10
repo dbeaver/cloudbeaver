@@ -8,7 +8,6 @@
 import { createContext } from 'react';
 
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
-import type { Column } from '@cloudbeaver/plugin-data-grid';
 import type {
   DatabaseEditChangeType,
   IResultSetColumnKey,
@@ -22,18 +21,8 @@ import type {
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-declare module '@cloudbeaver/plugin-data-grid' {
-  interface Column<TRow, TSummaryRow = unknown> {
-    columnDataIndex: IResultSetColumnKey | null;
-    onRenderHeader?(key: IResultSetColumnKey): void;
-    icon?: string;
-  }
-}
-
-interface IColumnMetrics {
-  width: number;
-  left: number;
-  right: number;
+export interface IColumnInfo {
+  key: IResultSetColumnKey | null;
 }
 
 export interface ITableData {
@@ -42,26 +31,23 @@ export interface ITableData {
   data: ResultSetDataAction;
   editor: ResultSetEditAction;
   view: ResultSetViewAction;
-  columns: Array<Column<IResultSetRowKey, any>>;
+  columns: Array<IColumnInfo>;
   columnKeys: IResultSetColumnKey[];
   rows: IResultSetRowKey[];
   gridDiv: HTMLDivElement | null;
   inBounds: (position: IResultSetElementKey) => boolean;
-  getMetrics: (columnIndex: number) => IColumnMetrics | undefined;
   getRow: (rowIndex: number) => IResultSetRowKey | undefined;
-  getColumn: (columnIndex: number) => Column<IResultSetRowKey, any> | undefined;
-  getColumnByDataIndex: (key: IResultSetColumnKey) => Column<IResultSetRowKey, any>;
+  getColumn: (columnIndex: number) => IColumnInfo | undefined;
+  getColumnByDataIndex: (key: IResultSetColumnKey) => IColumnInfo;
   getCellValue: (key: IResultSetElementKey) => IResultSetValue | undefined;
   getColumnInfo: (key: IResultSetColumnKey) => SqlResultColumn | undefined;
-  getColumnsInRange: (startIndex: number, endIndex: number) => Array<Column<IResultSetRowKey, any>>;
-  getColumnIndexFromKey: (columnKey: string) => number;
+  getColumnsInRange: (startIndex: number, endIndex: number) => Array<IColumnInfo>;
   getColumnIndexFromColumnKey: (column: IResultSetColumnKey) => number;
   getRowIndexFromKey: (row: IResultSetRowKey) => number;
   getEditionState: (key: IResultSetElementKey) => DatabaseEditChangeType | null;
   isCellEdited: (key: IResultSetElementKey) => boolean;
-  isIndexColumn: (columnKey: string) => boolean;
-  isIndexColumnInRange: (columnsRange: Array<Column<IResultSetRowKey, any>>) => boolean;
-  isReadOnly: () => boolean;
+  isIndexColumn: (columnKey: IColumnInfo) => boolean;
+  isIndexColumnInRange: (columnsRange: Array<IColumnInfo>) => boolean;
   isCellReadonly: (key: Partial<IResultSetElementKey>) => boolean;
 }
 
