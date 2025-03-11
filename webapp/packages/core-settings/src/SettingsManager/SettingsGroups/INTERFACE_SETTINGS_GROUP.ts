@@ -7,4 +7,4 @@
  */
 import { ROOT_SETTINGS_GROUP } from './ROOT_SETTINGS_GROUP.js';
 
-export const INTERFACE_SETTINGS_GROUP = ROOT_SETTINGS_GROUP.createSubGroup('core_plugin_interface_settings_group');
+export const INTERFACE_SETTINGS_GROUP = ROOT_SETTINGS_GROUP.createSubGroup('core_plugin_interface_settings_group').setOrder(1);
