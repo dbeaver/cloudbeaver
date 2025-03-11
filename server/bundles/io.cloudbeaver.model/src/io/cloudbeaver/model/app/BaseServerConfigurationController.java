@@ -44,7 +44,7 @@ public abstract class BaseServerConfigurationController<T extends ServletServerC
     protected BaseServerConfigurationController(@NotNull Path homeDirectory) {
         this.homeDirectory = homeDirectory;
         this.workspacePath = initWorkspacePath();
-        log.info("Workspace path initialized: " + workspacePath.toAbsolutePath());
+        log.debug("Workspace path initialized: " + workspacePath.toAbsolutePath());
     }
 
     @NotNull

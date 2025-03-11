@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.BaseWebProjectImpl;
-import io.cloudbeaver.model.rm.lock.RMFileLockController;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -28,6 +27,7 @@ import org.jkiss.dbeaver.model.DBPDataSourceFolder;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
+import org.jkiss.dbeaver.model.fs.lock.FileLockController;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMEvent;
@@ -57,11 +57,11 @@ public abstract class BaseLocalResourceController implements RMController {
     @NotNull
     protected final DBPWorkspace workspace;
     @NotNull
-    protected final RMFileLockController lockController;
+    protected final FileLockController lockController;
 
     protected BaseLocalResourceController(
         @NotNull DBPWorkspace workspace,
-        @NotNull RMFileLockController lockController
+        @NotNull FileLockController lockController
     ) {
         this.workspace = workspace;
         this.lockController = lockController;
@@ -150,7 +150,7 @@ public abstract class BaseLocalResourceController implements RMController {
         @NotNull String configuration,
         @Nullable List<String> dataSourceIds
     ) throws DBException {
-        try (var lock = lockController.lockProject(projectId, "updateProjectDataSources")) {
+        try (var lock = lockController.lock(projectId, "updateProjectDataSources")) {
             DBPProject project = getWebProject(projectId, false);
             return doFileWriteOperation(projectId, project.getMetadataFolder(false),
                 () -> {
@@ -180,7 +180,7 @@ public abstract class BaseLocalResourceController implements RMController {
         @NotNull String projectId,
         @NotNull String[] dataSourceIds
     ) throws DBException {
-        try (var projectLock = lockController.lockProject(projectId, "deleteDatasources")) {
+        try (var projectLock = lockController.lock(projectId, "deleteDatasources")) {
             DBPProject project = getWebProject(projectId, false);
             doFileWriteOperation(projectId, project.getMetadataFolder(false), () -> {
                 DBPDataSourceRegistry registry = project.getDataSourceRegistry();
@@ -205,7 +205,7 @@ public abstract class BaseLocalResourceController implements RMController {
         @NotNull String projectId,
         @NotNull String folderPath
     ) throws DBException {
-        try (var projectLock = lockController.lockProject(projectId, "createDatasourceFolder")) {
+        try (var projectLock = lockController.lock(projectId, "createDatasourceFolder")) {
             DBPProject project = getWebProject(projectId, false);
             log.debug("Creating data source folder '" + folderPath + "' in project '" + projectId + "'");
             doFileWriteOperation(projectId, project.getMetadataFolder(false),
@@ -230,7 +230,7 @@ public abstract class BaseLocalResourceController implements RMController {
         @NotNull String[] folderPaths,
         boolean dropContents
     ) throws DBException {
-        try (var projectLock = lockController.lockProject(projectId, "createDatasourceFolder")) {
+        try (var projectLock = lockController.lock(projectId, "createDatasourceFolder")) {
             DBPProject project = getWebProject(projectId, false);
             doFileWriteOperation(projectId, project.getMetadataFolder(false),
                 () -> {
@@ -257,7 +257,7 @@ public abstract class BaseLocalResourceController implements RMController {
         @NotNull String oldPath,
         @NotNull String newPath
     ) throws DBException {
-        try (var projectLock = lockController.lockProject(projectId, "createDatasourceFolder")) {
+        try (var projectLock = lockController.lock(projectId, "createDatasourceFolder")) {
             DBPProject project = getWebProject(projectId, false);
             log.debug("Moving data source folder from '" + oldPath + "' to '" + newPath + "' in project '" + projectId + "'");
             doFileWriteOperation(projectId, project.getMetadataFolder(false),
