@@ -13,7 +13,6 @@ export * from './ConnectionForm/Options/ConnectionOptionsTabService.js';
 export * from './ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService.js';
 export * from './ConnectionForm/SSH/ConnectionSSHTabService.js';
 export * from './ConnectionForm/OriginInfo/ConnectionOriginInfoTabService.js';
-export * from './ConnectionForm/Contexts/connectionCredentialsStateContext.js';
 export * from './ConnectionForm/ConnectionFormBaseActionsLoader.js';
 export * from './ConnectionForm/ConnectionFormLoader.js';
 export * from './ConnectionForm/IConnectionFormState.js';

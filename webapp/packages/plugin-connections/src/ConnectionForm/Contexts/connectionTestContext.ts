@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-interface IConnectionTestContext {
+export interface IConnectionTestContext {
   clientVersion: string | null;
   serverVersion: string | null;
   connectTime: string | null;

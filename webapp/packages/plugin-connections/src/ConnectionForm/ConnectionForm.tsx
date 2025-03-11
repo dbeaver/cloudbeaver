@@ -19,7 +19,7 @@ import type { ConnectionFormState } from './ConnectionFormState.js';
 import { getFirstException } from '@cloudbeaver/core-utils';
 import { ConnectionFormService } from './ConnectionFormService.js';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
-import { connectionTestContext } from './Contexts/connectionTestContext.js';
+import { connectionTestContext, type IConnectionTestContext } from './Contexts/connectionTestContext.js';
 
 export interface ConnectionFormProps {
   formState: ConnectionFormState;
@@ -70,6 +70,24 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
     onCancel,
   }));
 
+  function getTestMessageInfo(testContext: IConnectionTestContext) {
+    let message = '';
+
+    if (testContext.clientVersion) {
+      message += 'Client version: ' + testContext.clientVersion + '\n';
+    }
+
+    if (testContext.serverVersion) {
+      message += 'Server version: ' + testContext.serverVersion + '\n';
+    }
+
+    if (testContext.connectTime) {
+      message += 'Connection time: ' + testContext.connectTime + '\n';
+    }
+
+    return message;
+  }
+
   useExecutor({
     executor: formState.submitTask,
     postHandlers: [
@@ -77,18 +95,13 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
         const validation = contexts.getContext(formValidationContext);
         const state = contexts.getContext(formStatusContext);
         const testContext = contexts.getContext(connectionTestContext);
+        const message = getTestMessageInfo(testContext);
 
-        if (data.state.submitType === 'test' && !data.isError) {
+        if (data.state.submitType === 'test' && !data.isError && message.length) {
           notificationService.notify(
             {
               title: 'Connection is established',
-              message:
-                'Client version: ' +
-                testContext.clientVersion +
-                '\nServer version: ' +
-                testContext.serverVersion +
-                '\nConnection time: ' +
-                testContext.connectTime,
+              message,
             },
             ENotificationType.Success,
           );

@@ -20,15 +20,16 @@ import {
 } from '@cloudbeaver/core-connections';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { toJS } from 'mobx';
+import { observable, runInAction, toJS } from 'mobx';
 import { getUniqueName, isNotNullDefined } from '@cloudbeaver/core-utils';
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import { getConnectionName } from './getConnectionName.js';
 import type { LocalizationService } from '@cloudbeaver/core-localization';
-import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
 import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { connectionTestContext } from '../Contexts/connectionTestContext.js';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
@@ -77,8 +78,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly localizationService: LocalizationService,
+    private readonly commonDialogService: CommonDialogService,
   ) {
     super(formState, defaultStateGetter());
+
+    this.formState.validationTask.addPostHandler(this.askCredentials.bind(this));
   }
 
   private async formAuthState(data: IConnectionFormState, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
@@ -106,6 +110,44 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       });
       stateContext.setInfo(message);
       stateContext.readonly = this.formState.mode === 'edit';
+    }
+  }
+
+  private async askCredentials(data: IFormState<IConnectionFormState>, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
+    const authModelId = this.state.authModelId ?? this.formState.state.config.authModelId ?? null;
+    const networkHandlers = this.state.networkHandlersConfig ?? [];
+
+    if (data.state.submitType !== 'test' || (!authModelId && !networkHandlers.length)) {
+      return;
+    }
+
+    runInAction(() => {
+      if (authModelId) {
+        if (!this.state.credentials) {
+          this.state.credentials = { ...this.formState.state.config.credentials };
+        }
+
+        this.state.credentials = observable(this.state.credentials);
+      }
+
+      if (networkHandlers.length > 0) {
+        if (!this.state.networkHandlersConfig) {
+          this.state.networkHandlersConfig = toJS(this.formState.state.config.networkHandlersConfig) || [];
+        }
+
+        this.state.networkHandlersConfig = observable(this.state.networkHandlersConfig);
+      }
+    });
+
+    const result = await this.commonDialogService.open(ConnectionAuthenticationDialogLoader, {
+      config: this.state,
+      authModelId: authModelId,
+      networkHandlers: networkHandlers.map(handler => handler.id),
+      projectId: this.formState.state.projectId,
+    });
+
+    if (result === DialogueStateResult.Rejected) {
+      ExecutorInterrupter.interrupt(contexts);
     }
   }
 
@@ -224,8 +266,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
-    const credentialsState = contexts.getContext(connectionCredentialsStateContext);
-
     if (!this.state.driverId || !this.formState.state.projectId) {
       return;
     }
@@ -283,7 +323,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       }
 
       if (!this.state.saveCredentials) {
-        credentialsState.requireAuthModel(this.state.authModelId);
+        this.formState.state.config.authModelId = this.state.authModelId;
       }
     }
 

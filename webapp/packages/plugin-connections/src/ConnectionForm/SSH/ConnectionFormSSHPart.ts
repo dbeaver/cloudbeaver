@@ -11,7 +11,6 @@ import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { DriverConfigurationType, NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { ConnectionInfoResource, createConnectionParam, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { toJS } from 'mobx';
-import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
@@ -63,7 +62,6 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): void | Promise<void> {
-    const credentialsState = contexts.getContext(connectionCredentialsStateContext);
     const optionsPart = getConnectionFormOptionsPart(this.formState);
     const urlType = optionsPart.state.configurationType === DriverConfigurationType.Url;
 
@@ -87,11 +85,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       delete handlerConfig.secureProperties;
     }
 
-    if (this.state.enabled && !this.state.savePassword) {
-      credentialsState.requireNetworkHandler(this.state.id);
-    }
-
-    if (handlerConfig) {
+    if (handlerConfig && this.state.enabled && !this.state.savePassword) {
       this.state = getTrimmedSSHConfig(handlerConfig);
       const sshConfigIndex = optionsPart.state.networkHandlersConfig?.findIndex(h => h.id === SSH_TUNNEL_ID);
 

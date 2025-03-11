@@ -20,7 +20,6 @@ import {
 } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { toJS } from 'mobx';
-import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext.js';
 import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED.js';
 import { SSL_CODE_NAME } from './SSL_CODE_NAME.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
@@ -79,7 +78,6 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
-    const credentialsState = contexts.getContext(connectionCredentialsStateContext);
     const optionsPart = getConnectionFormOptionsPart(this.formState);
 
     if (!this.isChanged || !this.formState.state.config.driverId) {
@@ -138,11 +136,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       }
     }
 
-    if (handler.enabled && !handler.savePassword) {
-      credentialsState.requireNetworkHandler(handler.id);
-    }
-
-    if (this.isChanged) {
+    if (this.isChanged && handler.enabled && !handler.savePassword) {
       this.state = trimSSLConfig(handlerConfig);
       const sslConfigIndex = optionsPart.state.networkHandlersConfig?.findIndex(h => (handlerConfig.id || SSL_CODE_NAME) === h.id);
 

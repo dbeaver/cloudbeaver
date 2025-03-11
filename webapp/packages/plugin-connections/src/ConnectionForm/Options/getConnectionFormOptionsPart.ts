@@ -13,6 +13,7 @@ import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
 const DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART = createDataContext<ConnectionFormOptionsPart>('Connection Form Options Part');
 
@@ -27,6 +28,7 @@ export function getConnectionFormOptionsPart(formState: IFormState<IConnectionFo
     const authProvidersResource = di.getService(AuthProvidersResource);
     const localizationService = di.getService(LocalizationService);
     const connectionInfoOriginResource = di.getService(ConnectionInfoOriginResource);
+    const commonDialogService = di.getService(CommonDialogService);
 
     return new ConnectionFormOptionsPart(
       formState,
@@ -38,6 +40,7 @@ export function getConnectionFormOptionsPart(formState: IFormState<IConnectionFo
       connectionInfoOriginResource,
       authProvidersResource,
       localizationService,
+      commonDialogService,
     );
   });
 }
