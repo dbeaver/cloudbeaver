@@ -12,7 +12,7 @@
 
     --dbv-kit-radio-height: var(--dbv-kit-control-height-medium);
     --dbv-kit-radio-ring-size: 0.5625;
-    --dbv-kit-radio-dot-size: 0.375;
+    --dbv-kit-radio-dot-size: 0.25;
     --dbv-kit-radio-font-size: calc(var(--dbv-kit-font-size-base) * 0.875);
     --dbv-kit-radio-gap: var(--tw-spacing);
 
