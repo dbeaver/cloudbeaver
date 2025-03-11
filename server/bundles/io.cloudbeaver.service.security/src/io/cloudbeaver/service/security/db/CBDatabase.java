@@ -54,7 +54,6 @@ import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.SecurityUtils;
 
-import javax.sql.DataSource;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -65,6 +64,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.sql.DataSource;
 
 /**
  * Database management
@@ -72,15 +72,16 @@ import java.util.stream.Collectors;
 public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     private static final Log log = Log.getLog(CBDatabase.class);
 
-    public static final SQLSchemaConfig SCHEMA_CREATE_CONFIG = new SQLSchemaConfig(
+    private static final int LEGACY_SCHEMA_VERSION = 1;
+    private static final int CURRENT_SCHEMA_VERSION = 22;
+
+    private static final SQLSchemaConfig SCHEMA_CREATE_CONFIG = new SQLSchemaConfig(
         "CB",
         "db/cb_schema_create.sql",
         "db/cb_schema_update_",
-        22,
+        CURRENT_SCHEMA_VERSION,
         0
     );
-
-    private static final int LEGACY_SCHEMA_VERSION = 1;
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
