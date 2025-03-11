@@ -20,6 +20,7 @@ const DEFAULT_SSH_NETWORK_HANDLER: INetworkHandlerConfig = {
   id: SSH_TUNNEL_ID,
   enabled: false,
   authType: NetworkHandlerAuthType.Password,
+  // should initially undefined cause if it's empty string it counts as saved password
   password: undefined,
   savePassword: false,
   userName: '',

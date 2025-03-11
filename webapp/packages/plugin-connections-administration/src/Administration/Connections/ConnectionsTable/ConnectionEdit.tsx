@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
 
 import { Loader, s, useS } from '@cloudbeaver/core-blocks';
 import { type IConnectionInfoParams } from '@cloudbeaver/core-connections';
@@ -14,6 +13,7 @@ import { ConnectionFormLoader, useConnectionFormState } from '@cloudbeaver/plugi
 
 import styles from './ConnectionEdit.module.css';
 import { FormMode } from '@cloudbeaver/core-ui';
+import { runInAction } from 'mobx';
 
 interface Props {
   item: IConnectionInfoParams;
@@ -22,27 +22,14 @@ interface Props {
 export const ConnectionEdit = observer<Props>(function ConnectionEditNew({ item }) {
   const data = useConnectionFormState(item, state => {
     state.setMode(FormMode.Edit);
-    // TODO refactor it?
-    state.setState({
-      ...state.state,
-      config: {
-        ...state.state.config,
-        connectionId: item.connectionId,
-      },
-      projectId: item.projectId,
-      type: 'admin',
+
+    runInAction(() => {
+      state.state.config.connectionId = item.connectionId;
+      state.state.projectId = item.projectId;
+      state.state.type = 'admin';
     });
   });
   const style = useS(styles);
-
-  const projectId = item.projectId;
-  const connectionId = item.connectionId;
-
-  // TODO remove it?
-  useMemo(() => {
-    data.state.config.connectionId = connectionId;
-    data.state.projectId = projectId;
-  }, [data, projectId, connectionId]);
 
   return (
     <div className={s(style, { box: true })}>
