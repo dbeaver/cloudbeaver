@@ -112,8 +112,6 @@ export class CreateConnectionService {
       submitType: null,
       type: 'admin',
     });
-
-    // this.data.closeTask.addHandler(this.cancelCreate.bind(this));
   }
 
   clearConnectionTemplate(): void {

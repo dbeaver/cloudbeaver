@@ -140,7 +140,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     DatabaseAuthModelsResource,
     getComputed(() => config.authModelId || info?.authModel || driver?.defaultAuthModel || null),
     {
-      onData: data => optionsHook.setAuthModel(data),
+      onData: optionsHook.setAuthModel,
     },
   );
 
@@ -157,7 +157,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
       return;
     }
 
-    optionsHook.setAuthModel(model);
+    await optionsHook.setAuthModel(model);
   }
 
   const authentication = useAuthenticationAction({
@@ -176,10 +176,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   });
 
   function setProject(projectId: string) {
-    formState.setState({
-      ...formState.state,
-      projectId,
-    });
+    formState.state.projectId = projectId;
   }
 
   let properties = authModel?.properties;

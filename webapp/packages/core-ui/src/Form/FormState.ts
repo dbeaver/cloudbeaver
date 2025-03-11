@@ -151,7 +151,7 @@ export class FormState<TState> implements IFormState<TState> {
 
   async reload() {
     for (const part of this.parts.values()) {
-      await part.load();
+      await part.reload();
     }
   }
 

@@ -154,17 +154,12 @@ export class ConnectionSearchService {
           port: String(database.port),
           driverId: database.defaultDriver,
         },
-        // TODO remove it?
         submitType: null,
         projectId: projects[0]!.id,
         availableDrivers: database.possibleDrivers,
         type: 'public',
       });
-
-      // this.formState.closeTask.addHandler(this.goBack.bind(this));
     }
-
-    // this.formState.load();
   }
 
   private clearFormState() {

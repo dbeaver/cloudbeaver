@@ -104,7 +104,7 @@ export function useOptions(formState: IFormState<IConnectionFormState>, config: 
         }
       });
     },
-    setAuthModel(model: DatabaseAuthModel) {
+    async setAuthModel(model: DatabaseAuthModel) {
       const { config, info, formState } = refObject;
 
       config.credentials = {};
@@ -119,7 +119,7 @@ export function useOptions(formState: IFormState<IConnectionFormState>, config: 
         }
       }
 
-      formState.reload();
+      await formState.reload();
     },
 
     isNameAutoFill() {

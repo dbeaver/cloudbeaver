@@ -22,6 +22,7 @@ interface Props {
 export const ConnectionEdit = observer<Props>(function ConnectionEditNew({ item }) {
   const data = useConnectionFormState(item, state => {
     state.setMode(FormMode.Edit);
+    // TODO refactor it?
     state.setState({
       ...state.state,
       config: {
@@ -37,6 +38,7 @@ export const ConnectionEdit = observer<Props>(function ConnectionEditNew({ item 
   const projectId = item.projectId;
   const connectionId = item.connectionId;
 
+  // TODO remove it?
   useMemo(() => {
     data.state.config.connectionId = connectionId;
     data.state.projectId = projectId;

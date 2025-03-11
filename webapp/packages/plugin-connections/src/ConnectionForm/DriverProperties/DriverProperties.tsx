@@ -52,12 +52,12 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
 
   runInAction(() => {
     if (driver.data) {
-      for (const key of Object.keys(driverPropertiesPart.state ?? {})) {
+      for (const key of Object.keys(driverPropertiesPart.state)) {
         if (driver.data.driverProperties.some(property => property.id === key) || state.propertiesList.some(property => property.key === key)) {
           continue;
         }
 
-        state.add(key, driverPropertiesPart.state![key]);
+        state.add(key, driverPropertiesPart.state[key]);
       }
     }
   });

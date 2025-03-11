@@ -9,7 +9,7 @@ import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 import { schema } from '@cloudbeaver/core-utils';
 import { CONNECTION_NETWORK_HANDLER_SCHEMA } from './IConnectionNetworkHanler.js';
 
-export const CONNECTION_PROPERTIES_SCHEMA = schema.record(schema.any()).optional();
+export const CONNECTION_PROPERTIES_SCHEMA = schema.record(schema.any());
 
 export const CONNECTION_CONFIG_SCHEMA = schema.object({
   authModelId: schema.string().optional(),
@@ -28,7 +28,7 @@ export const CONNECTION_CONFIG_SCHEMA = schema.object({
   name: schema.string().optional(),
   networkHandlersConfig: schema.array(CONNECTION_NETWORK_HANDLER_SCHEMA).optional(),
   port: schema.string().optional(),
-  properties: CONNECTION_PROPERTIES_SCHEMA,
+  properties: CONNECTION_PROPERTIES_SCHEMA.optional(),
   providerProperties: schema.record(schema.any()).optional(),
   readOnly: schema.boolean().optional(),
   saveCredentials: schema.boolean().optional(),

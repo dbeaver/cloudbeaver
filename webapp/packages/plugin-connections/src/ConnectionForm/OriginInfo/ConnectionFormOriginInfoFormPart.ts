@@ -41,7 +41,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
   }
 
   get providerId(): string | null {
-    if (!this.formState.state.config.connectionId || !this.formState.state.projectId || !this.formState.state.config.driverId) {
+    if (!this.formState.state.projectId || !this.formState.state.config.driverId) {
       return null;
     }
 
@@ -51,7 +51,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
       return null;
     }
 
-    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId));
+    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
     const authModel = this.databaseAuthModelsResource.get(
       this.formState.state.config.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null,
     );
@@ -61,7 +61,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
   }
 
   get isAuthenticated(): boolean {
-    if (!this.formState.state.config.connectionId || !this.formState.state.projectId || !this.formState.state.config.driverId || !this.providerId) {
+    if (!this.providerId) {
       return false;
     }
 
@@ -100,7 +100,5 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     this.setInitialState(state);
   }
 
-  protected override async saveChanges(data: IFormState<IConnectionFormState>): Promise<void> {
-    return Promise.resolve();
-  }
+  protected override async saveChanges(data: IFormState<IConnectionFormState>): Promise<void> {}
 }

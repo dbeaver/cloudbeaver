@@ -11,18 +11,20 @@ import { ConnectionInfoResource, createConnectionParam, type DBDriverResource } 
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { IConnectionProperties } from '../Options/IConnectionConfig.js';
 
+const getDefaultState = (): IConnectionProperties => ({});
+
 export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProperties, IConnectionFormState> {
   constructor(
     formState: IFormState<IConnectionFormState>,
     private readonly dbDriverResource: DBDriverResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
-    super(formState, {});
+    super(formState, getDefaultState());
   }
 
   protected override async loader(): Promise<void> {
     if (!this.formState.state.config.connectionId || !this.formState.state.projectId) {
-      this.setInitialState({});
+      this.setInitialState(getDefaultState());
       return;
     }
 
@@ -30,7 +32,7 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
       createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId),
     );
 
-    this.setInitialState(connection?.properties ?? {});
+    this.setInitialState(connection?.properties ?? getDefaultState());
   }
 
   protected override async saveChanges(

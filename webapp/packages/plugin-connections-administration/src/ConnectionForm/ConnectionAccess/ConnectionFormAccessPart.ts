@@ -72,13 +72,17 @@ export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessStat
       return;
     }
 
+    const promises = [];
+
     if (subjectsToRevoke.length > 0) {
-      await this.connectionInfoResource.deleteConnectionsAccess(key, subjectsToRevoke);
+      promises.push(this.connectionInfoResource.deleteConnectionsAccess(key, subjectsToRevoke));
     }
 
     if (subjectsToGrant.length > 0) {
-      await this.connectionInfoResource.addConnectionsAccess(key, subjectsToGrant);
+      promises.push(this.connectionInfoResource.addConnectionsAccess(key, subjectsToGrant));
     }
+
+    await Promise.all(promises);
   }
 
   edit() {
