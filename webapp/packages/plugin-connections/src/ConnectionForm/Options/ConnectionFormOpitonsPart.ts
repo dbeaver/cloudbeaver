@@ -235,14 +235,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     this.formState.state.config.authModelId = driver?.defaultAuthModel;
     this.formState.state.config.configurationType = getDefaultConfigurationType(driver);
-
-    if (!this.formState.state.config.host) {
-      this.formState.state.config.host = driver?.defaultServer || 'localhost';
-    }
-
-    if (!this.formState.state.config.port) {
-      this.formState.state.config.port = driver?.defaultPort;
-    }
+    this.formState.state.config.host = driver?.defaultServer || 'localhost';
+    this.formState.state.config.port = driver?.defaultPort;
 
     this.formState.state.config.databaseName = driver?.defaultDatabase;
 
