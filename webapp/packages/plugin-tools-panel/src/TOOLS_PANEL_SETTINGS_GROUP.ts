@@ -7,4 +7,4 @@
  */
 import { ROOT_SETTINGS_GROUP } from '@cloudbeaver/core-settings';
 
-export const TOOLS_PANEL_SETTINGS_GROUP = ROOT_SETTINGS_GROUP.createSubGroup('plugin_tools_panel_tools_settings_group');
+export const TOOLS_PANEL_SETTINGS_GROUP = ROOT_SETTINGS_GROUP.createSubGroup('plugin_tools_panel_tools_settings_group').setOrder(4);
