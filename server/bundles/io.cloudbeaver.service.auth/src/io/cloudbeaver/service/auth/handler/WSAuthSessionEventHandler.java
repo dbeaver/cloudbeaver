@@ -35,16 +35,16 @@ public class WSAuthSessionEventHandler implements WSEventHandler<WSAuthEvent> {
     @Override
     public void handleEvent(@NotNull WSAuthEvent event) {
         SMAuthInfo authInfo = event.getAuthInfo();
-        WebApplication webApplication =  WebAppUtils.getWebApplication();
+        WebApplication webApplication = WebAppUtils.getWebApplication();
         WebAppSessionManager sessionManager = webApplication.getSessionManager();
 
         switch (authInfo.getAuthStatus()) {
             case SUCCESS:
-                if(authInfo.getAuthPermissions() == null) {
+                if (authInfo.getAuthPermissions() == null) {
                     log.error("No auth permissions available in SUCCESS auth");
                     return;
                 }
-                String sessionId = authInfo.getAuthPermissions().getSessionId();
+                String sessionId = authInfo.getAppSessionId();
                 BaseWebSession baseWebSession = sessionManager.getSession(sessionId);
                 if (baseWebSession == null) {
                     log.trace("No session found in current node with id '" + sessionId + "'");
@@ -59,13 +59,14 @@ public class WSAuthSessionEventHandler implements WSEventHandler<WSAuthEvent> {
                             authInfo,
                             linkCredentialsWithActiveUser
                         ).authenticateSession();
-                        webSession.addSessionEvent(new WebSessionAuthEvent(newInfos));
+                        //                        webSession.addSessionEvent(new WebSessionAuthEvent(newInfos));
                     } catch (DBException e) {
                         webSession.addSessionError(e);
                     }
                 } else if (baseWebSession instanceof WebHeadlessSession headlessSession) {
                     headlessSession.addSessionEvent(event);
-                } break;
+                }
+                break;
             case IN_PROGRESS, ERROR, EXPIRED:
                 log.error("Invalid auth status: " + authInfo.getAuthStatus());
             default:

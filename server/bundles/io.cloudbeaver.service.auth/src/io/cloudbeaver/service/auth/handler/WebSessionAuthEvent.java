@@ -25,15 +25,15 @@ import java.util.List;
 
 public class WebSessionAuthEvent extends WSAbstractEvent {
     @NotNull
-    private final List<WebAuthInfo> newAuthInfos;
+    private final List<WebAuthInfo> userTokens;
 
-    protected WebSessionAuthEvent(@NotNull List<WebAuthInfo> newAuthInfos) {
+    protected WebSessionAuthEvent(@NotNull List<WebAuthInfo> userTokens) {
         super("cb_web_session_auth", WSConstants.TOPIC_SESSION);
-        this.newAuthInfos = newAuthInfos;
+        this.userTokens = userTokens;
     }
 
     @NotNull
-    public List<WebAuthInfo> getNewAuthInfos() {
-        return newAuthInfos;
+    public List<WebAuthInfo> getUserTokens() {
+        return userTokens;
     }
 }
