@@ -71,6 +71,7 @@ export class PublicConnectionFormService {
 
   change(projectId: string, config: ConnectionConfig, availableDrivers?: string[]): void {
     if (this.formState) {
+      // TODO uncomment once we have dispose API
       // this.formState.dispose();
       this.clearFormState();
     }

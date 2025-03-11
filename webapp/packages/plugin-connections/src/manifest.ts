@@ -18,6 +18,7 @@ export const connectionPlugin: PluginManifest = {
     () => import('./PublicConnectionForm/PublicConnectionFormService.js').then(m => m.PublicConnectionFormService),
     () => import('./LocaleService.js').then(m => m.LocaleService),
     () => import('./ConnectionAuthService.js').then(m => m.ConnectionAuthService),
+    () => import('./ConnectionForm/ConnectionFormService.js').then(m => m.ConnectionFormService),
     () => import('./ConnectionForm/Options/ConnectionOptionsTabService.js').then(m => m.ConnectionOptionsTabService),
     () => import('./ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService.js').then(m => m.ConnectionDriverPropertiesTabService),
     () => import('./ConnectionForm/SSH/ConnectionSSHTabService.js').then(m => m.ConnectionSSHTabService),
@@ -25,6 +26,5 @@ export const connectionPlugin: PluginManifest = {
     () => import('./NavNodes/ConnectionFoldersBootstrap.js').then(m => m.ConnectionFoldersBootstrap),
     () => import('./ConnectionForm/SSL/ConnectionSSLTabService.js').then(m => m.ConnectionSSLTabService),
     () => import('./PluginConnectionsSettingsService.js').then(m => m.PluginConnectionsSettingsService),
-    () => import('./ConnectionForm/ConnectionFormService.js').then(m => m.ConnectionFormService),
   ],
 };
