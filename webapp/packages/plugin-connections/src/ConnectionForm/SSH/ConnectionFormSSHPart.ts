@@ -24,7 +24,8 @@ const DEFAULT_SSH_NETWORK_HANDLER: INetworkHandlerConfig = {
   password: undefined,
   savePassword: false,
   userName: '',
-  key: '',
+  // should initially undefined cause if it's empty string it counts as saved private key
+  key: undefined,
   properties: {
     port: 22,
     host: '',

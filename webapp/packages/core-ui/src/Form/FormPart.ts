@@ -99,6 +99,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
       }
 
       this.isSaving = true;
+      this.exception = null;
 
       await this.saveChanges(data, contexts);
       if (ExecutorInterrupter.isInterrupted(contexts)) {
@@ -106,7 +107,6 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
       }
 
       this.loaded = false;
-      this.exception = null;
     } catch (exception: any) {
       this.exception = exception;
       throw exception;
