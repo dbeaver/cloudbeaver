@@ -2,7 +2,7 @@
 @import './_sizes.css';
 @import './_variants.css';
 
-@layer components {
+@layer base {
   .dbv-kit-button {
     display: inline-flex;
     text-align: center;
@@ -31,7 +31,8 @@
 
     &:focus-visible,
     &[data-focus-visible] {
-      outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-color-outline);
+      outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-btn-outline-color);
+      outline-offset: var(--dbv-kit-btn-outline-offset);
     }
 
     &:hover {
@@ -46,7 +47,7 @@
     }
 
     &:disabled {
-      opacity: var(--dbv-kit-btn-disabled-opacity);
+      opacity: var(--dbv-kit-control-disabled-opacity);
     }
   }
 
@@ -121,6 +122,7 @@
 
     --dbv-kit-btn-loader-color: var(--dbv-kit-btn-danger-background);
     --dbv-kit-btn-loader-background: var(--dbv-kit-btn-loader-base-color);
+    --dbv-kit-btn-outline-color: var(--dbv-kit-btn-danger-color-outline);
   }
 
   /* ---------------------------- */
