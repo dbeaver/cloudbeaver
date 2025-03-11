@@ -45,6 +45,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
 
   protected override async loader(): Promise<void> {
     if (!this.formState.state.config.driverId) {
+      this.setInitialState(DEFAULT_SSL_NETWORK_HANDLER);
       return;
     }
 
@@ -54,6 +55,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     const handler = getSSLDriverHandler(handlers, driver?.applicableNetworkHandlers ?? []);
 
     if (!handler) {
+      this.setInitialState(DEFAULT_SSL_NETWORK_HANDLER);
       return;
     }
 
@@ -136,7 +138,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       }
     }
 
-    if (this.isChanged && handler.enabled && !handler.savePassword) {
+    if (this.isChanged) {
       this.state = trimSSLConfig(handlerConfig);
       const sslConfigIndex = optionsPart.state.networkHandlersConfig?.findIndex(h => (handlerConfig.id || SSL_CODE_NAME) === h.id);
 

@@ -22,8 +22,8 @@ const DEFAULT_SSH_NETWORK_HANDLER: INetworkHandlerConfig = {
   authType: NetworkHandlerAuthType.Password,
   password: undefined,
   savePassword: false,
-  userName: undefined,
-  key: undefined,
+  userName: '',
+  key: '',
   properties: {
     port: 22,
     host: '',
@@ -85,7 +85,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       delete handlerConfig.secureProperties;
     }
 
-    if (handlerConfig && this.state.enabled && !this.state.savePassword) {
+    if (handlerConfig) {
       this.state = getTrimmedSSHConfig(handlerConfig);
       const sshConfigIndex = optionsPart.state.networkHandlersConfig?.findIndex(h => h.id === SSH_TUNNEL_ID);
 

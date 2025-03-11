@@ -10,6 +10,7 @@ import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ConnectionInfoResource, createConnectionParam, type DBDriverResource } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { IConnectionProperties } from '../Options/IConnectionConfig.js';
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
 const getDefaultState = (): IConnectionProperties => ({});
 
@@ -28,7 +29,7 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
       return;
     }
 
-    const connection = await this.connectionInfoResource.load(
+    const connection = this.connectionInfoResource.get(
       createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId),
     );
 
@@ -38,18 +39,14 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
   protected override async saveChanges(
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
-  ): Promise<void> {
-    await this.connectionInfoResource.update(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!), {
-      connectionId: this.formState.state.config.connectionId,
-      properties: this.state,
-    });
-  }
+  ): Promise<void> {}
 
   protected override format(
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): void | Promise<void> {
     const driverId = this.formState.state.config.driverId;
+    const optionsPart = getConnectionFormOptionsPart(this.formState);
 
     if (driverId) {
       const driver = this.dbDriverResource.get(driverId);
@@ -67,6 +64,10 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
       }
 
       this.state = trimmedProperties;
+      optionsPart.state.properties = {
+        ...optionsPart.state.properties,
+        ...this.state,
+      };
     }
   }
 }

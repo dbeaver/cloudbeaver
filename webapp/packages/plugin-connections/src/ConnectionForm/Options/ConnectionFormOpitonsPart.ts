@@ -88,8 +88,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   private async formAuthState(data: IConnectionFormState, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
     const stateContext = contexts.getContext(formStateContext);
 
-    if (!this.formState.state.projectId || !this.formState.state.config.connectionId) {
-      console.error('formAuth state: projectId or connectionId is not defined');
+    if (!this.formState.state.projectId) {
       return;
     }
 
@@ -204,6 +203,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     config.keepAliveInterval = info.keepAliveInterval;
     config.autocommit = info.autocommit;
     config.readOnly = info.readOnly;
+    config.properties = { ...info.properties };
 
     if (info.authProperties) {
       for (const property of info.authProperties) {
@@ -266,12 +266,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
-    if (!this.state.driverId || !this.formState.state.projectId) {
-      return;
-    }
-
-    const driver = await this.dbDriverResource.load(this.state.driverId, ['includeProviderProperties', 'includeMainProperties']);
-
     this.state.name = this.state.name?.trim();
 
     if (this.state.name && this.formState.mode === 'create') {
@@ -289,7 +283,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (this.state.configurationType === DriverConfigurationType.Url) {
       this.state.url = this.state.url?.trim();
     } else {
-      // MANUAL config type saves without host, port, database data in the main properties if url is set
+      // so form can be correctly saved in MANUAL configuration mode (host, port, database, etc.)
       delete this.state.url;
     }
 
@@ -298,6 +292,12 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (!this.state.mainPropertyValues) {
       this.state.mainPropertyValues = {};
     }
+
+    if (!this.state.driverId || !this.formState.state.projectId) {
+      return;
+    }
+
+    const driver = await this.dbDriverResource.load(this.state.driverId, ['includeProviderProperties', 'includeMainProperties']);
 
     if (this.state.configurationType === DriverConfigurationType.Manual && !driver.useCustomPage) {
       this.state.mainPropertyValues[MAIN_PROPERTY_DATABASE_KEY] = this.state.databaseName?.trim();
@@ -429,17 +429,13 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       }
     }
 
-    if (this.formState.state.projectId !== null && this.formState.mode === 'create') {
+    if (!this.formState.state.projectId && this.formState.mode === 'create') {
       const project = this.projectInfoResource.get(this.formState.state.projectId);
 
       if (!project?.canEditDataSources) {
         validation.error('plugin_connections_connection_form_project_invalid');
       }
     }
-
-    // if (this.state.folder && !this.state.folder.match(CONNECTION_FOLDER_NAME_VALIDATION)) {
-    //   validation.error('connections_connection_folder_validation');
-    // }
   }
 
   protected override async saveChanges(

@@ -24,13 +24,11 @@ export const SSLPanel: TabContainerTabComponent<IConnectionFormProps> = observer
   const handler = getSSLDriverHandler(networkHandlerResource.resource.values, dbDriverResource.data?.applicableNetworkHandlers ?? []);
   const SSLPart = getConnectionFormSSLPart(props.formState);
 
-  const handlerState = SSLPart.state;
-
   useAutoLoad(SSLPanel, SSLPart);
 
-  if (!handler || !handlerState) {
+  if (!handler || !SSLPart.state) {
     return null;
   }
 
-  return <SSL {...props} handler={handler} handlerState={handlerState} />;
+  return <SSL {...props} handler={handler} handlerState={SSLPart.state} />;
 });
