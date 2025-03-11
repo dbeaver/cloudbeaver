@@ -53,6 +53,7 @@ import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
+import org.jkiss.dbeaver.model.websocket.event.session.WSAuthEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
 import org.jkiss.utils.ArrayUtils;
@@ -2136,7 +2137,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     @Override
     public SMAuthInfo finishAuthentication(@NotNull String authId) throws DBException {
         SMAuthInfo authInfo = getAuthStatus(authId);
-        return finishAuthentication(authInfo, false, authInfo.isForceSessionsLogout());
+        SMAuthInfo finalAuthInfo = finishAuthentication(authInfo, false, authInfo.isForceSessionsLogout());
+        application.getEventController().addEvent(new WSAuthEvent(authInfo));
+        return finalAuthInfo;
     }
 
     protected SMAuthInfo finishAuthentication(
