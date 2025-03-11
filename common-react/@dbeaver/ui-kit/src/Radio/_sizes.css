@@ -1,0 +1,27 @@
+@layer base {
+  :root {
+    /* Small radio */
+    --dbv-kit-radio-small-gap: calc(var(--dbv-kit-radio-gap) * 0.5);
+    --dbv-kit-radio-small-font-size: calc(var(--dbv-kit-radio-font-size) * 0.875);
+    --dbv-kit-radio-small-height: var(--dbv-kit-control-height-small);
+    --dbv-kit-radio-small-dot-size: 0.25;
+
+    /* Medium radio */
+    --dbv-kit-radio-medium-gap: var(--dbv-kit-radio-gap);
+    --dbv-kit-radio-medium-font-size: var(--dbv-kit-radio-font-size);
+    --dbv-kit-radio-medium-height: var(--dbv-kit-control-height-medium);
+    --dbv-kit-radio-medium-dot-size: 0.25;
+
+    /* Large radio */
+    --dbv-kit-radio-large-gap: calc(var(--dbv-kit-radio-gap) * 1.25);
+    --dbv-kit-radio-large-font-size: calc(var(--dbv-kit-radio-font-size) * 1.125);
+    --dbv-kit-radio-large-height: var(--dbv-kit-control-height-large);
+    --dbv-kit-radio-large-dot-size: 0.25;
+
+    /* Extra large radio */
+    --dbv-kit-radio-xlarge-gap: calc(var(--dbv-kit-radio-gap) * 1.5);
+    --dbv-kit-radio-xlarge-font-size: calc(var(--dbv-kit-radio-font-size) * 1.25);
+    --dbv-kit-radio-xlarge-height: var(--dbv-kit-control-height-xlarge);
+    --dbv-kit-radio-xlarge-dot-size: 0.3;
+  }
+}
