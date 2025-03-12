@@ -73,6 +73,6 @@ extend type Query {
         parameters: DataTransferParameters!
     ): AsyncTaskInfo!
 
-    dataTransferRemoveDataFile(dataFileId: String!): Boolean
+    dataTransferRemoveDataFile(dataFileId: String!): Boolean @deprecated(reason: "25.0.1")
 
 }

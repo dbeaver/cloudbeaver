@@ -15,6 +15,7 @@ import {
   SnackbarFooter,
   SnackbarStatus,
   SnackbarWrapper,
+  Text,
   useErrorDetails,
   useS,
   useTranslate,
@@ -37,14 +38,16 @@ export const ExportNotification = observer<Props>(function ExportNotification({ 
   const errorDetails = useErrorDetails(state.task?.process.getRejectionReason() ?? null);
 
   const { title, status, message } = state.status;
+  const isReadyToDownload = status === ENotificationType.Info && !!state.downloadUrl;
 
   return (
     <SnackbarWrapper persistent={status === ENotificationType.Loading} onClose={state.delete}>
       <SnackbarStatus status={status} />
       <SnackbarContent>
         <SnackbarBody title={translate(title)}>
+          {isReadyToDownload && <Text className={s(style, { subText: true })}>{translate('plugin_data_export_download_process_info')}</Text>}
           {message && <div className={s(style, { message: true })}>{message}</div>}
-          <div className={s(style, { sourceName: true })}>
+          <div className={s(style, { subText: true, sourceName: true })}>
             {state.sourceName}
             {state.task?.context.query && (
               <pre className={s(style, { pre: true })} title={state.task.context.query}>
@@ -54,7 +57,7 @@ export const ExportNotification = observer<Props>(function ExportNotification({ 
           </div>
         </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
-          {status === ENotificationType.Info && state.downloadUrl && (
+          {isReadyToDownload && (
             <>
               <Button type="button" mod={['outlined']} onClick={state.delete}>
                 {translate('ui_processing_cancel')}

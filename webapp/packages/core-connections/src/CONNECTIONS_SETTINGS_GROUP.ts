@@ -7,4 +7,4 @@
  */
 import { ROOT_SETTINGS_GROUP } from '@cloudbeaver/core-settings';
 
-export const CONNECTIONS_SETTINGS_GROUP = ROOT_SETTINGS_GROUP.createSubGroup('core_connections_connections_settings_group');
+export const CONNECTIONS_SETTINGS_GROUP = ROOT_SETTINGS_GROUP.createSubGroup('core_connections_connections_settings_group').setOrder(3);
