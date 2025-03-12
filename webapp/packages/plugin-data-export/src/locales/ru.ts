@@ -16,4 +16,5 @@ export default [
   ['data_transfer_dialog_select_processor_fail', 'Не удалось выбрать обработчик данных'],
 
   ['data_transfer_output_settings_compress', 'Сжатие'],
+  ['plugin_data_export_download_process_info', 'Начало загрузки может занять некоторое время'],
 ];

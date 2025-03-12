@@ -603,7 +603,7 @@ public class WebSession extends BaseWebSession
         addSessionEvent(new WSSessionLogUpdatedEvent(
             this.userContext.getSmSessionId(),
             this.userContext.getUserId(),
-            MessageType.ERROR,
+            message.getType(),
             message.getMessage()));
     }
 

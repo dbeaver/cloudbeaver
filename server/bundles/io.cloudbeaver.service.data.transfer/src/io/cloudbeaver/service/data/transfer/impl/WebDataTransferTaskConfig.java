@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,36 @@
  */
 package io.cloudbeaver.service.data.transfer.impl;
 
+import io.cloudbeaver.service.sql.WebSQLResultsInfo;
 import org.jkiss.dbeaver.Log;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 
 public class WebDataTransferTaskConfig {
 
     private static final Log log = Log.getLog(WebDataTransferTaskConfig.class);
 
-    private Path dataFile;
+    private String fileNameKey;
     private WebDataTransferParameters parameters;
     private String exportFileName;
+    private DBSDataContainer dataContainer;
+    private WebSQLResultsInfo resultsInfo;
 
-    public WebDataTransferTaskConfig(Path dataFile, WebDataTransferParameters parameters) {
-        this.dataFile = dataFile;
+    public WebDataTransferTaskConfig(
+        String fileNameKey,
+        WebDataTransferParameters parameters,
+        String exportFileName,
+        DBSDataContainer dataContainer,
+        WebSQLResultsInfo webSQLResultsInfo
+    ) {
+        this.fileNameKey = fileNameKey;
         this.parameters = parameters;
-    }
-
-    public Path getDataFile() {
-        return dataFile;
+        this.exportFileName = exportFileName;
+        this.dataContainer = dataContainer;
+        this.resultsInfo = webSQLResultsInfo;
     }
 
     public String getDataFileId() {
-        return dataFile.getFileName().toString();
+        return fileNameKey;
     }
 
     public WebDataTransferParameters getParameters() {
@@ -51,15 +56,11 @@ public class WebDataTransferTaskConfig {
         return exportFileName;
     }
 
-    public void setExportFileName(String exportFileName) {
-        this.exportFileName = exportFileName;
+    public DBSDataContainer getDataContainer() {
+        return dataContainer;
     }
 
-    public void deleteFile() {
-        try {
-            Files.delete(dataFile);
-        } catch (IOException e) {
-            log.error("Error deleting export file " + dataFile.toAbsolutePath(), e);
-        }
+    public WebSQLResultsInfo getResultsInfo() {
+        return resultsInfo;
     }
 }
