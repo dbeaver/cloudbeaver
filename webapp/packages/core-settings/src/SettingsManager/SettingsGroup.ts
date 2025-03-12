@@ -10,10 +10,13 @@ import { makeObservable, observable } from 'mobx';
 import { uuid } from '@cloudbeaver/core-utils';
 
 export class SettingsGroup {
+  readonly id: string;
+  order: number;
+
   get level(): number {
     return (this.parent?.level ?? -1) + 1;
   }
-  readonly id: string;
+
   get subGroups(): ReadonlyArray<SettingsGroup> {
     return this.subGroupsData;
   }
@@ -26,6 +29,7 @@ export class SettingsGroup {
     readonly parent?: SettingsGroup,
   ) {
     this.id = uuid();
+    this.order = Number.MAX_SAFE_INTEGER;
     this.subGroupsData = [];
     this.groups = parent?.groups || new Map();
     this.groups.set(this.id, this);
@@ -50,6 +54,11 @@ export class SettingsGroup {
     this.subGroupsData.push(subGroup);
 
     return subGroup;
+  }
+
+  setOrder(order: number): this {
+    this.order = order;
+    return this;
   }
 
   deleteSubGroup(id: string): boolean {

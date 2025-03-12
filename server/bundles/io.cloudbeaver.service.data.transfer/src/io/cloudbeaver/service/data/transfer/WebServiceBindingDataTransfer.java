@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServletContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
+import io.cloudbeaver.service.data.transfer.impl.WebDataTransferImportServlet;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferParameters;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferServlet;
 import io.cloudbeaver.service.data.transfer.impl.WebServiceDataTransfer;
-import io.cloudbeaver.service.data.transfer.impl.WebDataTransferImportServlet;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import org.jkiss.dbeaver.DBException;
 
