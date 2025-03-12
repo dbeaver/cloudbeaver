@@ -7,15 +7,15 @@
  */
 
 export interface IConnectionTestContext {
-  clientVersion: string | null;
-  serverVersion: string | null;
-  connectTime: string | null;
+  clientVersion: string | undefined;
+  serverVersion: string | undefined;
+  connectTime: string | undefined;
 }
 
 export function connectionTestContext(): IConnectionTestContext {
   return {
-    clientVersion: null,
-    serverVersion: null,
-    connectTime: null,
+    clientVersion: undefined,
+    serverVersion: undefined,
+    connectTime: undefined,
   };
 }

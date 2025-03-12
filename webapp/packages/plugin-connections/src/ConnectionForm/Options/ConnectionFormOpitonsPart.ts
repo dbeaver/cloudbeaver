@@ -456,9 +456,9 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     } else {
       const info = await this.connectionInfoResource.test(state.projectId, this.state);
 
-      testContext.clientVersion = info.clientVersion ?? null;
-      testContext.serverVersion = info.serverVersion ?? null;
-      testContext.connectTime = info.connectTime ?? null;
+      testContext.clientVersion = info.clientVersion;
+      testContext.serverVersion = info.serverVersion;
+      testContext.connectTime = info.connectTime;
 
       // to prevent form from resetting the state after saving
       ExecutorInterrupter.interrupt(contexts);
