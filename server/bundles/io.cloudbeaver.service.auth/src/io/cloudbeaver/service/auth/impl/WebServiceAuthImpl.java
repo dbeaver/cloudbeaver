@@ -124,8 +124,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             SMAuthInfo smAuthInfo = webSession.getSecurityController().getAuthStatus(authId);
             switch (smAuthInfo.getAuthStatus()) {
                 case SUCCESS:
-//                    List<WebAuthInfo> newInfos = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser).authenticateSession();
-//                    return new WebAuthStatus(smAuthInfo.getAuthStatus(), newInfos);
+                    List<WebAuthInfo> newInfos = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser).authenticateSession();
+                    return new WebAuthStatus(smAuthInfo.getAuthStatus(), newInfos);
                 case IN_PROGRESS:
                     return new WebAuthStatus(smAuthInfo.getAuthAttemptId(), smAuthInfo.getRedirectUrl(), smAuthInfo.getAuthStatus());
                 case ERROR:

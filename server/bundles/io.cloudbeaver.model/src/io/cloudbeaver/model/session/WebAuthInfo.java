@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * WebAuthInfo
  */
-public class WebAuthInfo implements SMSessionPrincipal {
+public class WebAuthInfo implements SMSessionPrincipal, WebUserAuthToken {
 
     private static final Log log = Log.getLog(WebAuthInfo.class);
 

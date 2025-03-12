@@ -16,24 +16,37 @@
  */
 package io.cloudbeaver.service.auth.handler;
 
-import io.cloudbeaver.model.session.WebAuthInfo;
+import io.cloudbeaver.DBWebException;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.WSAbstractEvent;
 
 import java.util.List;
 
 public class WebSessionAuthEvent extends WSAbstractEvent {
-    @NotNull
-    private final List<WebAuthInfo> userTokens;
+    @Nullable
+    private final List<WebUserAuthTokenInfo> userTokens;
 
-    protected WebSessionAuthEvent(@NotNull List<WebAuthInfo> userTokens) {
+    private final DBWebException error;
+
+    protected WebSessionAuthEvent(@NotNull List<WebUserAuthTokenInfo> userTokens) {
         super("cb_web_session_auth", WSConstants.TOPIC_SESSION);
         this.userTokens = userTokens;
+       this.error = null;
+    }
+    protected WebSessionAuthEvent(@NotNull DBWebException error) {
+        super("cb_web_session_auth", WSConstants.TOPIC_SESSION);
+        this.userTokens = null;
+        this.error = error;
     }
 
-    @NotNull
-    public List<WebAuthInfo> getUserTokens() {
+    @Nullable
+    public List<WebUserAuthTokenInfo> getUserTokens() {
         return userTokens;
+    }
+
+    public DBWebException getError() {
+        return error;
     }
 }

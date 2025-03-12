@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.auth.handler;
 
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.*;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.WebAppUtils;
@@ -37,37 +38,40 @@ public class WSAuthSessionEventHandler implements WSEventHandler<WSAuthEvent> {
         SMAuthInfo authInfo = event.getAuthInfo();
         WebApplication webApplication = WebAppUtils.getWebApplication();
         WebAppSessionManager sessionManager = webApplication.getSessionManager();
-
+        if (authInfo.getAuthPermissions() == null) {
+            log.error("No auth permissions available in SUCCESS auth");
+            return;
+        }
+        String sessionId = authInfo.getAppSessionId();
+        BaseWebSession baseWebSession = sessionManager.getSession(sessionId);
+        if (!(baseWebSession instanceof WebSession webSession)) {
+            log.trace("No web session found in current node with id '" + sessionId + "'");
+            return;
+        }
         switch (authInfo.getAuthStatus()) {
             case SUCCESS:
-                if (authInfo.getAuthPermissions() == null) {
-                    log.error("No auth permissions available in SUCCESS auth");
-                    return;
+                boolean linkCredentialsWithActiveUser = !webApplication.isConfigurationMode()
+                    && !webSession.isAuthorizedInSecurityManager();
+                try {
+                    List<WebAuthInfo> newInfos = new WebSessionAuthProcessor(
+                        webSession,
+                        authInfo,
+                        linkCredentialsWithActiveUser
+                    ).authenticateSession();
+                    List<WebUserAuthTokenInfo> tokenInfos = newInfos
+                        .stream()
+                        .map(WebUserAuthTokenInfo::new)
+                        .toList();
+                    webSession.addSessionEvent(new WebSessionAuthEvent(tokenInfos));
+                } catch (DBException e) {
+                    webSession.addSessionError(e);
                 }
-                String sessionId = authInfo.getAppSessionId();
-                BaseWebSession baseWebSession = sessionManager.getSession(sessionId);
-                if (baseWebSession == null) {
-                    log.trace("No session found in current node with id '" + sessionId + "'");
-                    return;
-                }
-                if (baseWebSession instanceof WebSession webSession) {
-                    boolean linkCredentialsWithActiveUser = !webApplication.isConfigurationMode()
-                        && !webSession.isAuthorizedInSecurityManager();
-                    try {
-                        List<WebAuthInfo> newInfos = new WebSessionAuthProcessor(
-                            webSession,
-                            authInfo,
-                            linkCredentialsWithActiveUser
-                        ).authenticateSession();
-                        //                        webSession.addSessionEvent(new WebSessionAuthEvent(newInfos));
-                    } catch (DBException e) {
-                        webSession.addSessionError(e);
-                    }
-                } else if (baseWebSession instanceof WebHeadlessSession headlessSession) {
-                    headlessSession.addSessionEvent(event);
-                }
+
                 break;
-            case IN_PROGRESS, ERROR, EXPIRED:
+            case ERROR:
+                webSession.addSessionEvent(new WebSessionAuthEvent(new DBWebException(authInfo.getError(), authInfo.getErrorCode())));
+                break;
+            case IN_PROGRESS, EXPIRED:
                 log.error("Invalid auth status: " + authInfo.getAuthStatus());
             default:
                 log.error("Unknown auth status: " + authInfo.getAuthStatus());
