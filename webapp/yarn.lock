@@ -1894,13 +1894,14 @@ __metadata:
     hygen: "npm:^6"
     jest: "npm:^29"
     jest-environment-jsdom: "npm:^29"
-    js-yaml: "npm:^4.1.0"
+    js-yaml: "npm:^4"
     tslib: "npm:^2"
     typescript: "npm:^5"
     upath: "npm:^2"
   bin:
     core-cli-add-plugin: ./bin/add-plugin.js
     core-cli-analyzer: ./bin/analyzer.js
+    core-cli-check-license: ./dist/cli/license-check.js
     core-cli-dependency-graph: ./bin/dependency-graph.js
     core-cli-set-version: ./bin/set-version.mjs
     core-cli-test: ./bin/test.js
@@ -14439,7 +14440,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:^4.0.0, js-yaml@npm:^4.1.0":
+"js-yaml@npm:^4, js-yaml@npm:^4.0.0, js-yaml@npm:^4.1.0":
   version: 4.1.0
   resolution: "js-yaml@npm:4.1.0"
   dependencies:

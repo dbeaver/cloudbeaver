@@ -1,10 +1,12 @@
 lefthook: |
   cd webapp
   yarn lefthook
-source_dir: webapp/packages/core-cli
 output: false
 pre-commit:
-  parallel: true
-  scripts:
-    "license-check.mjs":
-      runner: node
+  commands:
+    check-license:
+      root: webapp
+      glob: "*.{ts,tsx}"
+      exclude:
+        - "**/locales/**"
+      run: yarn core-cli-check-license {staged_files}
