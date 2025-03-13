@@ -44,7 +44,6 @@ import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.model.sql.db.InternalDB;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaConfig;
-import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.storage.H2Migrator;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -54,6 +53,7 @@ import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.SecurityUtils;
 
+import javax.sql.DataSource;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -64,7 +64,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.sql.DataSource;
 
 /**
  * Database management
@@ -72,15 +71,15 @@ import javax.sql.DataSource;
 public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     private static final Log log = Log.getLog(CBDatabase.class);
 
-    private static final int LEGACY_SCHEMA_VERSION = 1;
-    private static final int CURRENT_SCHEMA_VERSION = 22;
+    private static final int CURRENT_SCHEMA_VERSION = 26;
 
     private static final SQLSchemaConfig SCHEMA_CREATE_CONFIG = new SQLSchemaConfig(
         "CB",
         "db/cb_schema_create.sql",
         "db/cb_schema_update_",
         CURRENT_SCHEMA_VERSION,
-        0
+        0,
+        new CBSchemaVersionManager(CURRENT_SCHEMA_VERSION, "CB_CE")
     );
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
@@ -96,8 +95,22 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     private SMAdminController adminSecurityController;
 
     public CBDatabase(@NotNull ServletApplication application, @NotNull WebDatabaseConfig databaseConfiguration) {
-        super("Security Manager", databaseConfiguration, SCHEMA_CREATE_CONFIG);
+        this(application, databaseConfiguration, List.of(SCHEMA_CREATE_CONFIG));
+    }
+
+    public CBDatabase(
+        @NotNull ServletApplication application,
+        @NotNull WebDatabaseConfig databaseConfiguration,
+        @NotNull List<SQLSchemaConfig> sqlSchemaConfigList
+    ) {
+        super("Security Manager", databaseConfiguration, appendSchemaConfig(sqlSchemaConfigList) );
         this.application = application;
+    }
+
+    private static List<SQLSchemaConfig> appendSchemaConfig(List<SQLSchemaConfig> sqlSchemaConfigList) {
+        List<SQLSchemaConfig> sqlSchemaConfigs = new ArrayList<>(sqlSchemaConfigList);
+        sqlSchemaConfigs.addFirst(SCHEMA_CREATE_CONFIG);
+        return sqlSchemaConfigs;
     }
 
     public void setAdminSecurityController(SMAdminController adminSecurityController) {
@@ -196,9 +209,13 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
             throw new DBException("CB database connection is not defined");
         }
         createSchemaIfNotExists(connection);
-        updateSchema(monitor, connection, CBDatabase.class.getClassLoader(), new CBSchemaVersionManager());
+        updateSchema(monitor, connection, getClassLoader());
 
         validateInstancePersistentState(connection);
+    }
+
+    protected ClassLoader getClassLoader() {
+        return CBDatabase.class.getClassLoader();
     }
 
     // TODO: use a common code for the connection pool init
@@ -319,115 +336,64 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         closeConnection();
     }
 
-    private class CBSchemaVersionManager implements SQLSchemaVersionManager {
+    //TODO move out
+    public void fillInitialSchemaData(DBRProgressMonitor monitor, Connection connection)
+    throws DBException, SQLException {
+        // Set exclusive connection. Otherwise security controller will open a new one and won't see new schema objects.
+        exclusiveConnection = new DelegatingConnection<Connection>(connection) {
+            @Override
+            public void close() throws SQLException {
+                // do nothing
+            }
+        };
 
-        @Override
-        public int getCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName)
-            throws DBException, SQLException {
-            // Check and update schema
-            try {
-                int version = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
-                    normalizeTableNames("SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO")));
-                return version == 0 ? 1 : version;
-            } catch (SQLException e) {
-                try {
-                    Object legacyVersion = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
-                        normalizeTableNames("SELECT SCHEMA_VERSION FROM {table_prefix}CB_SERVER")));
-                    // Table CB_SERVER exist - this is a legacy schema
-                    return LEGACY_SCHEMA_VERSION;
-                } catch (SQLException ex) {
-                    // Empty schema. Create it from scratch
-                    return -1;
+        try {
+            // Fill initial data
+
+            CBDatabaseInitialData initialData = getInitialData();
+            if (initialData == null) {
+                return;
+            }
+
+            String adminName = initialData.getAdminName();
+            String adminPassword = initialData.getAdminPassword();
+            List<SMTeam> initialTeams = initialData.getTeams();
+            String defaultTeam = application.getAppConfiguration().getDefaultUserTeam();
+            if (CommonUtils.isNotEmpty(defaultTeam)) {
+                Set<String> initialTeamNames = initialTeams == null
+                    ? Set.of()
+                    : initialTeams.stream().map(SMTeam::getTeamId).collect(Collectors.toSet());
+                if (!initialTeamNames.contains(defaultTeam)) {
+                    throw new DBException("Initial teams configuration doesn't contain default team " + defaultTeam);
                 }
             }
-        }
-
-        @Override
-        public int getLatestSchemaVersion() {
-            return SCHEMA_CREATE_CONFIG.schemaVersionActual();
-        }
-
-        @Override
-        public void updateCurrentSchemaVersion(
-            DBRProgressMonitor monitor,
-            @NotNull Connection connection,
-            @NotNull String schemaName,
-            int version
-        ) throws DBException, SQLException {
-            var updateCount = JDBCUtils.executeUpdate(
-                connection,
-                normalizeTableNames("UPDATE {table_prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP"),
-                version
-            );
-            if (updateCount <= 0) {
-                JDBCUtils.executeSQL(
-                    connection,
-                    normalizeTableNames(
-                        "INSERT INTO {table_prefix}CB_SCHEMA_INFO (VERSION,UPDATE_TIME) VALUES(?,CURRENT_TIMESTAMP)"),
-                    version
-                );
-            }
-        }
-
-        @Override
-        //TODO move out
-        public void fillInitialSchemaData(DBRProgressMonitor monitor, Connection connection)
-            throws DBException, SQLException {
-            // Set exclusive connection. Otherwise security controller will open a new one and won't see new schema objects.
-            exclusiveConnection = new DelegatingConnection<Connection>(connection) {
-                @Override
-                public void close() throws SQLException {
-                    // do nothing
-                }
-            };
-
-            try {
-                // Fill initial data
-
-                CBDatabaseInitialData initialData = getInitialData();
-                if (initialData == null) {
-                    return;
-                }
-
-                String adminName = initialData.getAdminName();
-                String adminPassword = initialData.getAdminPassword();
-                List<SMTeam> initialTeams = initialData.getTeams();
-                String defaultTeam = application.getAppConfiguration().getDefaultUserTeam();
-                if (CommonUtils.isNotEmpty(defaultTeam)) {
-                    Set<String> initialTeamNames = initialTeams == null
-                        ? Set.of()
-                        : initialTeams.stream().map(SMTeam::getTeamId).collect(Collectors.toSet());
-                    if (!initialTeamNames.contains(defaultTeam)) {
-                        throw new DBException("Initial teams configuration doesn't contain default team " + defaultTeam);
+            if (!CommonUtils.isEmpty(initialTeams)) {
+                // Create teams
+                for (SMTeam team : initialTeams) {
+                    adminSecurityController.createTeam(
+                        team.getTeamId(),
+                        team.getName(),
+                        team.getDescription(),
+                        adminName
+                    );
+                    if (!application.isMultiNode()) {
+                        adminSecurityController.setSubjectPermissions(
+                            team.getTeamId(),
+                            new ArrayList<>(team.getPermissions()),
+                            "initial-data-configuration"
+                        );
                     }
                 }
-                if (!CommonUtils.isEmpty(initialTeams)) {
-                    // Create teams
-                    for (SMTeam team : initialTeams) {
-                        adminSecurityController.createTeam(team.getTeamId(),
-                            team.getName(),
-                            team.getDescription(),
-                            adminName);
-                        if (!application.isMultiNode()) {
-                            adminSecurityController.setSubjectPermissions(
-                                team.getTeamId(),
-                                new ArrayList<>(team.getPermissions()),
-                                "initial-data-configuration"
-                            );
-                        }
-                    }
-                }
-
-                if (!CommonUtils.isEmpty(adminName)) {
-                    // Create admin user
-                    createAdminUser(adminName, adminPassword);
-                }
-            } finally {
-                exclusiveConnection = null;
             }
+
+            if (!CommonUtils.isEmpty(adminName)) {
+                // Create admin user
+                createAdminUser(adminName, adminPassword);
+            }
+        } finally {
+            exclusiveConnection = null;
         }
     }
-
     //////////////////////////////////////////
     // Persistence
 
