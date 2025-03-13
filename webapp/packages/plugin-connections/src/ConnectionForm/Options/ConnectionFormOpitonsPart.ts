@@ -30,6 +30,7 @@ import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { connectionTestContext } from '../Contexts/connectionTestContext.js';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
+import type { NotificationService } from '@cloudbeaver/core-events';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
@@ -60,6 +61,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly localizationService: LocalizationService,
     private readonly commonDialogService: CommonDialogService,
+    private readonly notificationService: NotificationService,
   ) {
     super(formState, defaultStateGetter());
 
@@ -290,7 +292,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
       const properties = await this.getConnectionAuthModelProperties(this.state.authModelId, info);
 
-      // TODO should I delete crenetials otherwise?
       if (isCredentialsChanged(properties, this.state.credentials!)) {
         this.state.credentials = prepareDynamicProperties(properties, toJS(this.state.credentials!));
       }
@@ -381,14 +382,18 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
         this.formState.setMode(FormMode.Edit);
       }
     } else {
-      const info = await this.connectionInfoResource.test(state.projectId, this.state);
+      try {
+        const info = await this.connectionInfoResource.test(state.projectId, this.state);
 
-      testContext.clientVersion = info.clientVersion;
-      testContext.serverVersion = info.serverVersion;
-      testContext.connectTime = info.connectTime;
-
-      // to prevent form from resetting the state after saving
-      ExecutorInterrupter.interrupt(contexts);
+        testContext.clientVersion = info.clientVersion;
+        testContext.serverVersion = info.serverVersion;
+        testContext.connectTime = info.connectTime;
+      } catch (error) {
+        this.notificationService.logException(error as Error, 'connections_connection_test_fail');
+      } finally {
+        // to prevent form from resetting the state after saving
+        ExecutorInterrupter.interrupt(contexts);
+      }
     }
   }
 }

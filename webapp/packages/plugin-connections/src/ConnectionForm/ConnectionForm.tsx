@@ -60,8 +60,6 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
 
         if (formState.state.submitType === 'submit') {
           notificationService.logException(error, 'connections_connection_create_fail');
-        } else if (error) {
-          notificationService.logException(error, 'connections_connection_test_fail');
         }
       }
     },
