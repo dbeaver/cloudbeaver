@@ -111,6 +111,7 @@ export class CreateConnectionService {
       config,
       submitType: null,
       type: 'admin',
+      requiredNetworkHandlersIds: [],
     });
   }
 

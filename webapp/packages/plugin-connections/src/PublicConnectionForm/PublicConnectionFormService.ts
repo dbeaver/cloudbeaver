@@ -83,6 +83,7 @@ export class PublicConnectionFormService {
         config,
         submitType: 'submit',
         type: 'public',
+        requiredNetworkHandlersIds: [],
       });
     }
 

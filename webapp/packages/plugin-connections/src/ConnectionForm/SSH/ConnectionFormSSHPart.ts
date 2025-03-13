@@ -14,7 +14,6 @@ import { toJS } from 'mobx';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
-import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 const DEFAULT_SSH_NETWORK_HANDLER: INetworkHandlerConfig = {
   id: SSH_TUNNEL_ID,
@@ -64,8 +63,8 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): void | Promise<void> {
+    const urlType = this.formState.state.config.configurationType === DriverConfigurationType.Url;
     const optionsPart = getConnectionFormOptionsPart(this.formState);
-    const urlType = optionsPart.state.configurationType === DriverConfigurationType.Url;
 
     if (urlType) {
       return;
@@ -73,13 +72,13 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
 
     let handlerConfig: NetworkHandlerConfigInput | undefined;
 
-    const passwordChanged = this.state.password !== this.initialState?.password;
-    const keyChanged = this.state.key !== this.initialState?.key;
+    const passwordChanged = isPasswordChanged(this.state, this.initialState);
+    const keyChanged = isKeyChanged(this.state, this.initialState);
 
     if (this.isChanged || passwordChanged || keyChanged) {
       handlerConfig = {
         ...this.state,
-        savePassword: this.state.savePassword || this.formState.state.config.sharedCredentials,
+        savePassword: this.state.savePassword || optionsPart.state.sharedCredentials,
         key: this.state.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? this.state.key : undefined,
         password: passwordChanged ? this.state.password : undefined,
       };
@@ -87,19 +86,15 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       delete handlerConfig.secureProperties;
     }
 
+    if (this.state.enabled && !this.state.savePassword) {
+      this.formState.state.requiredNetworkHandlersIds.push(this.state.id);
+    } else if (!this.state.enabled) {
+      this.formState.state.requiredNetworkHandlersIds = this.formState.state.requiredNetworkHandlersIds.filter(id => id !== this.state.id);
+    }
+
     if (handlerConfig) {
-      this.state = getTrimmedSSHConfig(handlerConfig);
-      const sshConfigIndex = optionsPart.state.networkHandlersConfig?.findIndex(h => h.id === SSH_TUNNEL_ID);
-
-      if (!isNotNullDefined(sshConfigIndex)) {
-        return;
-      }
-
-      if (sshConfigIndex !== -1) {
-        optionsPart.state.networkHandlersConfig![sshConfigIndex] = this.state;
-      } else {
-        optionsPart.state.networkHandlersConfig?.push(this.state);
-      }
+      handlerConfig = getTrimmedSSHConfig(handlerConfig);
+      optionsPart.state.networkHandlersConfig!.push(handlerConfig);
     }
   }
 
@@ -161,4 +156,22 @@ function getTrimmedSSHConfig(input: NetworkHandlerConfigInput): NetworkHandlerCo
   }
 
   return trimmedInput;
+}
+
+function isPasswordChanged(handler: NetworkHandlerConfigInput, initial?: NetworkHandlerConfigInput) {
+  if (!initial && !handler.enabled) {
+    return false;
+  }
+
+  return (
+    (((initial?.password === null && handler.password !== null) || initial?.password === '') && handler.password !== '') || !!handler.password?.length
+  );
+}
+
+function isKeyChanged(handler: NetworkHandlerConfigInput, initial?: NetworkHandlerConfigInput) {
+  if (!initial && !handler.enabled) {
+    return false;
+  }
+
+  return (((initial?.key === null && handler.key !== null) || initial?.key === '') && handler.key !== '') || !!handler.key?.length;
 }

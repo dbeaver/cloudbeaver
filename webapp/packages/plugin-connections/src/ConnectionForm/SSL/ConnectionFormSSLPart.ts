@@ -49,6 +49,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
+    const optionsPart = getConnectionFormOptionsPart(this.formState);
     const driver = await this.dbDriverResource.load(this.formState.state.config.driverId);
     const handlers = await this.networkHandlerResource.load(CachedMapAllKey);
 
@@ -62,7 +63,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
     const initialConfig = info?.networkHandlersConfig?.find(h => h.id === handler.id);
 
-    if (!this.formState.state.config.networkHandlersConfig?.some(state => state.id === handler.id)) {
+    if (!optionsPart.state.networkHandlersConfig?.some(state => state.id === handler.id)) {
       const config: NetworkHandlerConfigInput = initialConfig ? toJS(initialConfig) : getSSLDefaultConfig(handler.id);
 
       if (config.secureProperties) {
@@ -80,23 +81,16 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
+    if (!this.formState.state.config.driverId) {
+      return;
+    }
+
     const optionsPart = getConnectionFormOptionsPart(this.formState);
-
-    if (!this.isChanged || !this.formState.state.config.driverId) {
-      return;
-    }
-
-    const driver = await this.dbDriverResource.load(this.formState.state.config.driverId);
     const handlers = await this.networkHandlerResource.load(CachedMapAllKey);
-    const handler = driver?.applicableNetworkHandlers.includes(this.state.id) ? this.state : undefined;
-    const descriptor = handlers.find(h => h.id === handler?.id);
+    const descriptor = handlers.find(h => h.id === this.state?.id);
 
-    if (!handler) {
-      return;
-    }
-
-    const handlerConfig: NetworkHandlerConfigInput = toJS(handler);
-    handlerConfig.savePassword = handler.savePassword || optionsPart.state.sharedCredentials;
+    const handlerConfig: NetworkHandlerConfigInput = toJS(this.state);
+    handlerConfig.savePassword = this.state.savePassword || optionsPart.state.sharedCredentials;
 
     if (this.isChanged && descriptor) {
       for (const descriptorProperty of descriptor.properties) {
@@ -138,19 +132,16 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       }
     }
 
-    if (this.isChanged) {
-      this.state = trimSSLConfig(handlerConfig);
-      const sslConfigIndex = optionsPart.state.networkHandlersConfig?.findIndex(h => (handlerConfig.id || SSL_CODE_NAME) === h.id);
+    if (this.state.enabled && !this.state.savePassword) {
+      this.formState.state.requiredNetworkHandlersIds.push(this.state.id);
+    } else if (!this.state.enabled) {
+      this.formState.state.requiredNetworkHandlersIds = this.formState.state.requiredNetworkHandlersIds.filter(id => id !== this.state.id);
+    }
 
-      if (!isNotNullDefined(sslConfigIndex)) {
-        return;
-      }
+    if (handlerConfig) {
+      trimSSLConfig(handlerConfig);
 
-      if (sslConfigIndex !== -1) {
-        optionsPart.state.networkHandlersConfig![sslConfigIndex] = this.state;
-      } else {
-        optionsPart.state.networkHandlersConfig?.push(this.state);
-      }
+      optionsPart.state.networkHandlersConfig!.push(handlerConfig);
     }
   }
 

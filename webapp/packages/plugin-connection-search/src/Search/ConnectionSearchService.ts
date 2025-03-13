@@ -158,6 +158,7 @@ export class ConnectionSearchService {
         projectId: projects[0]!.id,
         availableDrivers: database.possibleDrivers,
         type: 'public',
+        requiredNetworkHandlersIds: [],
       });
     }
   }
