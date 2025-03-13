@@ -70,21 +70,17 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    let handlerConfig: NetworkHandlerConfigInput | undefined;
-
     const passwordChanged = isPasswordChanged(this.state, this.initialState);
     const keyChanged = isKeyChanged(this.state, this.initialState);
 
-    if (this.isChanged || passwordChanged || keyChanged) {
-      handlerConfig = {
-        ...this.state,
-        savePassword: this.state.savePassword || optionsPart.state.sharedCredentials,
-        key: this.state.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? this.state.key : undefined,
-        password: passwordChanged ? this.state.password : undefined,
-      };
+    let handlerConfig: NetworkHandlerConfigInput = {
+      ...this.state,
+      savePassword: this.state.savePassword || optionsPart.state.sharedCredentials,
+      key: this.state.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? this.state.key : undefined,
+      password: passwordChanged ? this.state.password : undefined,
+    };
 
-      delete handlerConfig.secureProperties;
-    }
+    delete handlerConfig.secureProperties;
 
     if (this.state.enabled && !this.state.savePassword) {
       this.formState.state.requiredNetworkHandlersIds.push(this.state.id);
