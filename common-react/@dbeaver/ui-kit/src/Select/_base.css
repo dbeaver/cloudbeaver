@@ -1,0 +1,32 @@
+@layer base {
+  :root {
+    --dbv-kit-select-height: var(--dbv-kit-control-height-medium);
+    --dbv-kit-select-padding-inline: calc(var(--tw-spacing) * 2.5);
+
+    --dbv-kit-select-foreground: var(--dbv-kit-color-foreground);
+    --dbv-kit-select-background: var(--dbv-kit-color-background);
+
+    --dbv-kit-select-border-width: var(--dbv-kit-control-border-width);
+    --dbv-kit-select-border-color: var(--tw-color-gray-400);
+    --dbv-kit-select-border-style: solid;
+    --dbv-kit-select-border-radius: var(--dbv-kit-control-border-radius);
+
+    --dbv-kit-select-font-weight: var(--tw-font-weight-normal);
+    --dbv-kit-select-font-size: calc(var(--dbv-kit-font-size-base) * 0.875);
+
+    --dbv-kit-select-label-foreground: var(--tw-color-gray-600);
+    --dbv-kit-select-label-padding-inline: var(--tw-spacing);
+
+    --dbv-kit-select-popover-background: var(--dbv-kit-color-background);
+    --dbv-kit-select-popover-foreground: var(--dbv-kit-color-foreground);
+    --dbv-kit-select-popover-shadow: var(--tw-shadow-md);
+    --dbv-kit-select-popover-height: 15rem;
+
+    --dbv-kit-select-item-foreground: var(--tw-color-gray-500);
+    --dbv-kit-select-item-padding-inline: calc(var(--tw-spacing) * 3);
+    --dbv-kit-select-item-padding-block: var(--tw-spacing);
+    --dbv-kit-select-item-hover-background: var(--tw-color-gray-200);
+    --dbv-kit-select-item-hover-foreground: var(--dbv-kit-select-foreground);
+    --dbv-kit-select-item-selected-background: var(--dbv-kit-color-primary-100);
+  }
+}
