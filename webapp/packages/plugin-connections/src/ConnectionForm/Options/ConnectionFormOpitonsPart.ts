@@ -7,7 +7,7 @@
  */
 import { FormMode, FormPart, formStateContext, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import { DriverConfigurationType, type ConnectionConfig, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, type IExecutionContextProvider, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import {
   ConnectionInfoOriginResource,
   ConnectionInfoProjectKey,
@@ -64,11 +64,12 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     super(formState, defaultStateGetter());
 
     this.formState.validationTask.addPostHandler(this.askCredentials.bind(this));
+    this.formState.loadedTask.addPostHandler(this.formAuthState.bind(this));
   }
 
-  private async formAuthState(data: IConnectionFormState, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
+  private async formAuthState(data: IFormState<IConnectionFormState>, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
     const stateContext = contexts.getContext(formStateContext);
-    const info = this.connectionInfoResource.get(createConnectionParam(data.projectId, data.config.connectionId!));
+    const info = this.connectionInfoResource.get(createConnectionParam(data.state.projectId, data.state.config.connectionId!));
 
     if (!this.formState.state.config.driverId || !this.formState.state.projectId) {
       return;
@@ -389,8 +390,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       // to prevent form from resetting the state after saving
       ExecutorInterrupter.interrupt(contexts);
     }
-
-    await this.formAuthState(state, contexts);
   }
 }
 
