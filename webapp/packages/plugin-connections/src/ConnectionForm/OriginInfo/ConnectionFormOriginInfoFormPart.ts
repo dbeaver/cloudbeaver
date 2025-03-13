@@ -70,6 +70,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
 
   protected override async loader(): Promise<void> {
     const state = defaultStateGetter();
+
     if (!this.formState.state.config.connectionId || !this.formState.state.projectId || !this.formState.state.config.driverId) {
       this.setInitialState(state);
       return;

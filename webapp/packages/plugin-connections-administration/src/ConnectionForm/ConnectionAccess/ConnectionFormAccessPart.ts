@@ -11,6 +11,7 @@ import type { IConnectionFormAccessState } from './IConnectionFormAccessState.js
 import { createConnectionParam, type ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { action, makeObservable } from 'mobx';
 import type { IConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { getSubjectDifferences } from '@cloudbeaver/core-utils';
 
 const getDefaultState = () =>
   ({
@@ -96,11 +97,4 @@ export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessStat
   grant(subjectIds: string[]) {
     this.state.grantedSubjects.push(...subjectIds);
   }
-}
-
-function getSubjectDifferences(current: string[], next: string[]): { subjectsToRevoke: string[]; subjectsToGrant: string[] } {
-  const subjectsToRevoke = current.filter(subjectId => !next.includes(subjectId));
-  const subjectsToGrant = next.filter(subjectId => !current.includes(subjectId));
-
-  return { subjectsToRevoke, subjectsToGrant };
 }

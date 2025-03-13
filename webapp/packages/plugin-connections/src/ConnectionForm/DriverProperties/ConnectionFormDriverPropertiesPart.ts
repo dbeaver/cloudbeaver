@@ -51,7 +51,6 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     if (driverId) {
       const driver = this.dbDriverResource.get(driverId);
       const trimmedProperties: IConnectionProperties = {};
-
       const defaultDriverProperties = new Set(driver?.driverProperties?.map(property => property.id) ?? []);
 
       for (let key of Object.keys(this.state!)) {

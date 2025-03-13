@@ -26,12 +26,13 @@ import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.
 import { getSSLDefaultConfig } from './getSSLDefaultConfig.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
-const DEFAULT_SSL_NETWORK_HANDLER: INetworkHandlerConfig = {
-  id: SSL_CODE_NAME,
-  enabled: false,
-  properties: {},
-  secureProperties: {},
-};
+const getDefaultState = () =>
+  ({
+    id: SSL_CODE_NAME,
+    enabled: false,
+    properties: {},
+    secureProperties: {},
+  }) as INetworkHandlerConfig;
 
 export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConnectionFormState> {
   constructor(
@@ -40,23 +41,24 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     private readonly networkHandlerResource: NetworkHandlerResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
-    super(formState, DEFAULT_SSL_NETWORK_HANDLER);
+    super(formState, getDefaultState());
   }
 
   protected override async loader(): Promise<void> {
     if (!this.formState.state.config.driverId) {
-      this.setInitialState(DEFAULT_SSL_NETWORK_HANDLER);
+      this.setInitialState(getDefaultState());
       return;
     }
 
     const optionsPart = getConnectionFormOptionsPart(this.formState);
-    const driver = await this.dbDriverResource.load(this.formState.state.config.driverId);
-    const handlers = await this.networkHandlerResource.load(CachedMapAllKey);
-
+    const [driver, handlers] = await Promise.all([
+      this.dbDriverResource.load(this.formState.state.config.driverId),
+      this.networkHandlerResource.load(CachedMapAllKey),
+    ]);
     const handler = getSSLDriverHandler(handlers, driver?.applicableNetworkHandlers ?? []);
 
     if (!handler) {
-      this.setInitialState(DEFAULT_SSL_NETWORK_HANDLER);
+      this.setInitialState(getDefaultState());
       return;
     }
 
@@ -74,7 +76,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    this.setInitialState(initialConfig ?? DEFAULT_SSL_NETWORK_HANDLER);
+    this.setInitialState(initialConfig ?? getDefaultState());
   }
 
   protected override async format(

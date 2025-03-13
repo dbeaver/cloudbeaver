@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Form, Loader, Placeholder, s, StatusMessage, useExecutor, useForm, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Form, Loader, Placeholder, s, StatusMessage, useExecutor, useForm, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
@@ -19,7 +19,6 @@ import type { ConnectionFormState } from './ConnectionFormState.js';
 import { getFirstException } from '@cloudbeaver/core-utils';
 import { ConnectionFormService } from './ConnectionFormService.js';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
-import { connectionTestContext, type IConnectionTestContext } from './Contexts/connectionTestContext.js';
 
 export interface ConnectionFormProps {
   formState: ConnectionFormState;
@@ -34,7 +33,6 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   const styles = useS(style);
   const notificationService = useService(NotificationService);
   const connectionInfoResource = useService(ConnectionInfoResource);
-  const translate = useTranslate();
   const exception = getFirstException(formState.exception);
 
   const form = useForm({
@@ -71,48 +69,12 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
     onCancel,
   }));
 
-  function getTestMessageInfo(testContext: IConnectionTestContext) {
-    let message = '';
-
-    if (testContext.clientVersion) {
-      message += translate('plugin_connections_connection_client_version', undefined, {
-        version: testContext.clientVersion,
-      });
-    }
-
-    if (testContext.serverVersion) {
-      message += translate('plugin_connections_connection_server_version', undefined, {
-        version: testContext.serverVersion,
-      });
-    }
-
-    if (testContext.connectTime) {
-      message += translate('plugin_connections_connection_connection_time', undefined, {
-        version: testContext.connectTime,
-      });
-    }
-
-    return message;
-  }
-
   useExecutor({
     executor: formState.submitTask,
     postHandlers: [
       function save(data, contexts) {
         const validation = contexts.getContext(formValidationContext);
         const state = contexts.getContext(formStatusContext);
-        const testContext = contexts.getContext(connectionTestContext);
-        const message = getTestMessageInfo(testContext);
-
-        if (data.state.submitType === 'test' && !data.isError && message.length) {
-          notificationService.notify(
-            {
-              title: 'plugin_connections_connection_established',
-              message,
-            },
-            ENotificationType.Success,
-          );
-        }
 
         if (validation.valid && state.saved && data.state.submitType === 'submit') {
           props.onSave(data.state.config);

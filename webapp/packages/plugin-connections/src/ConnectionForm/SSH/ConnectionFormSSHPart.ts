@@ -15,35 +15,36 @@ import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
-const DEFAULT_SSH_NETWORK_HANDLER: INetworkHandlerConfig = {
-  id: SSH_TUNNEL_ID,
-  enabled: false,
-  authType: NetworkHandlerAuthType.Password,
-  // should initially undefined cause if it's empty string it counts as saved password
-  password: undefined,
-  savePassword: false,
-  userName: '',
-  // should initially undefined cause if it's empty string it counts as saved private key
-  key: undefined,
-  properties: {
-    port: 22,
-    host: '',
-    aliveInterval: '0',
-    sshConnectTimeout: '10000',
-  },
-};
+const getDefaultState = () =>
+  ({
+    id: SSH_TUNNEL_ID,
+    enabled: false,
+    authType: NetworkHandlerAuthType.Password,
+    // should initially undefined cause if it's empty string it counts as saved password
+    password: undefined,
+    savePassword: false,
+    userName: '',
+    // should initially undefined cause if it's empty string it counts as saved private key
+    key: undefined,
+    properties: {
+      port: 22,
+      host: '',
+      aliveInterval: '0',
+      sshConnectTimeout: '10000',
+    },
+  }) as INetworkHandlerConfig;
 
 export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConnectionFormState> {
   constructor(
     formState: IFormState<IConnectionFormState>,
     private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
-    super(formState, DEFAULT_SSH_NETWORK_HANDLER);
+    super(formState, getDefaultState());
   }
 
   protected override async loader(): Promise<void> {
     if (!this.formState.state.config.connectionId || !this.formState.state.projectId) {
-      this.setInitialState(DEFAULT_SSH_NETWORK_HANDLER);
+      this.setInitialState(getDefaultState());
       return;
     }
 
@@ -51,7 +52,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId),
     );
 
-    this.setInitialState(connection?.networkHandlersConfig?.find(h => h.id === SSH_TUNNEL_ID) ?? DEFAULT_SSH_NETWORK_HANDLER);
+    this.setInitialState(connection?.networkHandlersConfig?.find(h => h.id === SSH_TUNNEL_ID) ?? getDefaultState());
   }
 
   protected override async saveChanges(
@@ -104,33 +105,35 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    if (this.state.enabled) {
-      if (this.isChanged) {
-        if (this.state.savePassword && !this.state.userName?.length) {
-          validation.error("Field SSH 'User' can't be empty");
-        }
+    if (!this.state.enabled) {
+      return;
+    }
 
-        if (!this.state.properties?.['host']?.length) {
-          validation.error("Field SSH 'Host' can't be empty");
-        }
-
-        const port = Number(this.state.properties?.['port']);
-        if (Number.isNaN(port) || port < 1) {
-          validation.error("Field SSH 'Port' can't be empty");
-        }
+    if (this.isChanged) {
+      if (this.state.savePassword && !this.state.userName?.length) {
+        validation.error("Field SSH 'User' can't be empty");
       }
 
-      const keyAuth = this.state.authType === NetworkHandlerAuthType.PublicKey;
-      const keySaved = this.initialState?.key === '';
-      if (keyAuth && this.state.savePassword && !keySaved && !this.state.key?.length) {
-        validation.error("Field SSH 'Private key' can't be empty");
+      if (!this.state.properties?.['host']?.length) {
+        validation.error("Field SSH 'Host' can't be empty");
       }
 
-      const passwordSaved = this.initialState?.password === '' && this.initialState?.authType === this.state.authType;
-
-      if (!keyAuth && this.state.savePassword && !passwordSaved && !this.state.password?.length) {
-        validation.error("Field SSH 'Password' can't be empty");
+      const port = Number(this.state.properties?.['port']);
+      if (Number.isNaN(port) || port < 1) {
+        validation.error("Field SSH 'Port' can't be empty");
       }
+    }
+
+    const keyAuth = this.state.authType === NetworkHandlerAuthType.PublicKey;
+    const keySaved = this.initialState?.key === '';
+    if (keyAuth && this.state.savePassword && !keySaved && !this.state.key?.length) {
+      validation.error("Field SSH 'Private key' can't be empty");
+    }
+
+    const passwordSaved = this.initialState?.password === '' && this.initialState?.authType === this.state.authType;
+
+    if (!keyAuth && this.state.savePassword && !passwordSaved && !this.state.password?.length) {
+      validation.error("Field SSH 'Password' can't be empty");
     }
   }
 }
