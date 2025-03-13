@@ -7,7 +7,7 @@
  */
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { TeamsResource, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
 import {
@@ -26,7 +26,7 @@ import {
 import { ConnectionInfoOriginResource, ConnectionInfoResource, createConnectionParam, isCloudConnection } from '@cloudbeaver/core-connections';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
-import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
+import { FormMode, type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import type { IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 
 import styles from './ConnectionAccess.module.css';
@@ -41,6 +41,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
 
   const { selected } = useTab(tabId);
   const accessPart = getConnectionFormAccessPart(formState);
+  const [initialFormMode] = useState<FormMode>(formState.mode);
 
   useAutoLoad(ConnectionAccess, accessPart, selected);
 
@@ -72,7 +73,7 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
   const disabled = loading || !accessPart.isLoaded() || formState.isDisabled || cloud;
   let info: TLocalizationToken | null = null;
 
-  if (formState.mode === 'edit' && formState.isChanged) {
+  if (initialFormMode === FormMode.Edit && accessPart.isChanged) {
     info = 'ui_save_reminder';
   } else if (cloud) {
     info = 'cloud_connections_access_placeholder';
