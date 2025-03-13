@@ -146,7 +146,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     this.setState(toJS(this.initialState));
   }
 
-  private async handleValidation(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>) {
+  private async handleValidation(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<void> {
     try {
       this.exception = null;
       await this.validate(data, contexts);
