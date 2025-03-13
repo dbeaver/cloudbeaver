@@ -7,7 +7,7 @@
  */
 import { FormMode, FormPart, formStateContext, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import { DriverConfigurationType, type ConnectionConfig, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { ExecutorInterrupter, type IExecutionContextProvider, type IExecutorHandler } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
   ConnectionInfoOriginResource,
   ConnectionInfoProjectKey,

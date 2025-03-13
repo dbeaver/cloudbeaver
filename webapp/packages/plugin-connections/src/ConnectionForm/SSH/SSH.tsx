@@ -40,6 +40,7 @@ import styles from './SSH.module.css';
 import { SSHKeyUploader } from './SSHKeyUploader.js';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { getConnectionFormSSHPart } from './getConnectionFormSSHPart.js';
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
 interface Props {
   handlerState: NetworkHandlerConfigInput;
@@ -82,6 +83,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
   const keySaved = SSHPart.initialState?.key === '';
   const projectInfoResource = useService(ProjectInfoResource);
   const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
+  const optionsPart = getConnectionFormOptionsPart(formState);
 
   const aliveIntervalLabel = translate('connections_network_handler_ssh_tunnel_advanced_settings_alive_interval');
   const connectTimeoutLabel = translate('connections_network_handler_ssh_tunnel_advanced_settings_connect_timeout');
@@ -90,7 +92,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
     handlerState.password = '';
   }, []);
 
-  useAutoLoad(SSH, SSHPart);
+  useAutoLoad(SSH, [SSHPart, optionsPart]);
 
   return (
     <Form className={s(style, { form: true })}>
@@ -160,7 +162,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
             </InputField>
             {keyAuth && <SSHKeyUploader state={handlerState} saved={keySaved} disabled={disabled || !enabled} readonly={formState.isDisabled} />}
           </Container>
-          {credentialsSavingEnabled && !formState.state.config.template && !formState.state.config.sharedCredentials && (
+          {credentialsSavingEnabled && !optionsPart.state.template && !optionsPart.state.sharedCredentials && (
             <FieldCheckbox
               id={SSH_TUNNEL_ID + '_savePassword'}
               title={translate(
