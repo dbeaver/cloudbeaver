@@ -89,6 +89,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     private static final String V2_DB_NAME = "cb.h2v2.dat";
 
     private final ServletApplication application;
+    private CBDatabaseInitialData initialData;
 
     private transient volatile Connection exclusiveConnection;
 
@@ -131,6 +132,10 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         LoggingProgressMonitor monitor = new LoggingProgressMonitor(log);
         driver = migrateDatabaseIfNeeded(monitor, dataSourceProviderRegistry);
 
+
+        // read initial data before connecting to database
+        // config file must be valid
+        readInitialDataConfigurationFile();
 
         this.dataSource = initConnectionPool(driver.getDriverInstance(monitor), driver.getFullName());
         this.dialect = driver.getScriptDialect().createInstance();
@@ -231,7 +236,6 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         }
 
         log.info("Configure CB database security");
-        CBDatabaseInitialData initialData = getInitialData();
         if (initialData != null && !CommonUtils.isEmpty(initialData.getAdminName())
             && !CommonUtils.equalObjects(initialData.getAdminName(), adminName)
         ) {
@@ -252,11 +256,10 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         }
     }
 
-    @Nullable
-    CBDatabaseInitialData getInitialData() throws DBException {
+    private void readInitialDataConfigurationFile() throws DBException {
         String initialDataPath = databaseConfig.getInitialDataConfiguration();
         if (CommonUtils.isEmpty(initialDataPath)) {
-            return null;
+            return;
         }
 
         initialDataPath = ServletAppUtils.getRelativePath(
@@ -265,7 +268,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
             Gson gson = new GsonBuilder()
                 .setStrictness(Strictness.LENIENT)
                 .create();
-            return gson.fromJson(reader, CBDatabaseInitialData.class);
+            this.initialData = gson.fromJson(reader, CBDatabaseInitialData.class);
         } catch (Exception e) {
             throw new DBException("Error loading initial data configuration", e);
         }
@@ -383,8 +386,6 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
 
             try {
                 // Fill initial data
-
-                CBDatabaseInitialData initialData = getInitialData();
                 if (initialData == null) {
                     return;
                 }
