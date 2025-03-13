@@ -23,7 +23,7 @@
     "add-plugin": "core-cli-add-plugin",
     "check-license": "core-cli-check-license",
     "version:set": "yarn workspaces foreach -Ap --include '@cloudbeaver/product-*' run version:set",
-    "prepare": "[ -z $CI ] && yarn lefthook install || true"
+    "postinstall": "[ -z $CI ] && yarn lefthook install || true"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
