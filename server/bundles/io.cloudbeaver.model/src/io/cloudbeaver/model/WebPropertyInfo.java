@@ -264,12 +264,18 @@ public class WebPropertyInfo {
      */
     @Nullable
     @Property
-    public String getVisibleExpr() {
-        if (property instanceof ObjectPropertyDescriptor objectPropertyDescriptor) {
-            return objectPropertyDescriptor.getVisibleExpr();
+    public List<Condition> getConditions() {
+        if (!(property instanceof ObjectPropertyDescriptor objectPropertyDescriptor)) {
+            return null;
         }
-        return null;
+        List<Condition> conditions = new ArrayList<>();
+        String visibleExpr = objectPropertyDescriptor.getVisibleExpr();
+        if (CommonUtils.isNotEmpty(visibleExpr)) {
+            conditions.add(new Condition(visibleExpr, Condition.Type.SHOW));
+        }
+        return conditions;
     }
+
 
     //TODO: delete after refactoring on front-end
     public void setDefaultValue(String defaultValue) {
@@ -285,5 +291,11 @@ public class WebPropertyInfo {
         this.supportedConfigurationTypes = supportedConfigurationTypes;
     }
 
-
+    public record Condition(@NotNull String expression, @NotNull Type conditionType) {
+        public enum Type {
+            SHOW,
+            HIDE,
+            ACTIVE
+        }
+    }
 }
