@@ -40,6 +40,7 @@ public class WebSQLQueryResultSet {
     private boolean hasChildrenCollection;
     private boolean isSupportsDataFilter;
     private boolean hasDynamicTrace;
+    private boolean readOnly;
 
     public WebSQLQueryResultSet() {
     }
@@ -141,5 +142,14 @@ public class WebSQLQueryResultSet {
 
     public void setHasDynamicTrace(boolean hasDynamicTrace) {
         this.hasDynamicTrace = hasDynamicTrace;
+    }
+
+    @Property
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
     }
 }
