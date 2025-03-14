@@ -165,4 +165,5 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
 
   protected abstract loader(): Promise<void>;
   protected abstract saveChanges(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<void>;
+  dispose(): void | Promise<void> {}
 }
