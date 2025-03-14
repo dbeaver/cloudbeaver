@@ -159,7 +159,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         webResultSet.setHasChildrenCollection(resultSet instanceof DBDSubCollectionResultSet);
         webResultSet.setSupportsDataFilter(dataContainer.isFeatureSupported(DBSDataContainer.FEATURE_DATA_FILTER));
         webResultSet.setHasDynamicTrace(trace instanceof DBCTraceDynamic);
-        webResultSet.setReadOnly(dataContainer.getDataSource().getInfo().isReadOnlyData());
+        webResultSet.setReadOnlyInfo(contextInfo.getProcessor().getExecutionContext());
 
         WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, trace, bindings, rows.size() == 1);
         webResultSet.setResultsInfo(resultsInfo);
