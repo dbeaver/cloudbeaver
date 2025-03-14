@@ -71,8 +71,6 @@ export class PublicConnectionFormService {
 
   change(projectId: string, config: ConnectionConfig, availableDrivers?: string[]): void {
     if (this.formState) {
-      // TODO uncomment once we have dispose API
-      // this.formState.dispose();
       this.clearFormState();
     }
 
@@ -85,6 +83,7 @@ export class PublicConnectionFormService {
         type: 'public',
         requiredNetworkHandlersIds: [],
       });
+      this.formState.disposeTask.addHandler(this.close.bind(this, true));
     }
 
     this.formState.setMode(config.connectionId ? FormMode.Edit : FormMode.Create);
@@ -205,8 +204,7 @@ export class PublicConnectionFormService {
   }
 
   private clearFormState() {
-    // TODO dispose the form once we have this API
-    // this.formState?.dispose();
+    this.formState?.dispose();
     this.formState = null;
   }
 }

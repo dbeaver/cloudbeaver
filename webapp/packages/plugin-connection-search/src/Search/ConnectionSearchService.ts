@@ -160,12 +160,12 @@ export class ConnectionSearchService {
         type: 'public',
         requiredNetworkHandlersIds: [],
       });
+      this.formState.disposeTask.addHandler(this.goBack.bind(this));
     }
   }
 
   private clearFormState() {
-    // TODO dispose form state once we have this API
-    // this.formState?.dispose();
+    this.formState?.dispose();
     this.formState = null;
   }
 }

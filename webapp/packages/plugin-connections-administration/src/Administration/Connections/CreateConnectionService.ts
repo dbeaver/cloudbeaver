@@ -113,11 +113,11 @@ export class CreateConnectionService {
       type: 'admin',
       requiredNetworkHandlersIds: [],
     });
+    this.data.disposeTask.addHandler(this.cancelCreate.bind(this));
   }
 
   clearConnectionTemplate(): void {
-    // TODO dispose it once we have this API
-    // this.data?.dispose();
+    this.data?.dispose();
     this.data = null;
   }
 

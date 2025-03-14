@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { IServiceProvider, useService } from '@cloudbeaver/core-di';
 import { ConnectionFormState } from './ConnectionFormState.js';
 import { ConnectionFormService } from './ConnectionFormService.js';
@@ -37,6 +37,13 @@ export function useConnectionFormState(params: IConnectionInfoParams, configure?
     });
     configure?.(ref.current);
   }
+
+  useEffect(
+    () => () => {
+      ref.current?.dispose();
+    },
+    [],
+  );
 
   return ref.current;
 }
