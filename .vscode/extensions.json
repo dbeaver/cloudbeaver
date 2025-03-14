@@ -19,7 +19,6 @@
     "yzhang.markdown-all-in-one",
     "GraphQL.vscode-graphql-syntax",
     "mrmlnc.vscode-json5",
-    "esbenp.prettier-vscode",
-    "stelesh.git-workspace-helper"
+    "esbenp.prettier-vscode"
   ]
 }

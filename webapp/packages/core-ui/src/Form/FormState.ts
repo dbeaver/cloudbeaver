@@ -97,7 +97,6 @@ export class FormState<TState> implements IFormState<TState> {
       setPartsState: action,
       setState: action,
       updateFormState: action,
-      save: action,
       isChanged: computed,
       partsValues: computed<IFormPart<any>[]>({
         equals: isArraysEqual,
