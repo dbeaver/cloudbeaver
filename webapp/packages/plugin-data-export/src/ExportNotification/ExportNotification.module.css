@@ -14,8 +14,11 @@
   white-space: pre-line;
 }
 
-.sourceName {
+.subText {
   composes: theme-typography--body2 from global;
+}
+
+.sourceName {
   padding-top: 16px;
   max-height: 50px;
   overflow: hidden;

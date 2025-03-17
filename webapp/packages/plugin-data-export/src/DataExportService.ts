@@ -24,10 +24,6 @@ export class DataExportService {
     await this.dataExportProcessService.cancel(exportId);
   }
 
-  async delete(exportId: string): Promise<void> {
-    await this.dataExportProcessService.delete(exportId);
-  }
-
   download(exportId: string): void {
     this.dataExportProcessService.download(exportId);
   }

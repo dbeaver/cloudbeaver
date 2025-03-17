@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,28 +17,30 @@
 package io.cloudbeaver.model.rm.lock;
 
 import io.cloudbeaver.model.app.ServletApplication;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.fs.lock.FileLockController;
 
 import java.nio.file.Path;
 
-public class TestLockController extends RMFileLockController {
+public class TestLockController extends FileLockController {
     public TestLockController(ServletApplication application) throws DBException {
-        super(application);
+        super(application.getApplicationInstanceId());
     }
 
     public TestLockController(ServletApplication application, int maxTimeout) throws DBException {
-        super(application, maxTimeout);
+        super(application.getApplicationInstanceId(), maxTimeout);
     }
 
     //avoid mockito access method error
     @Override
-    public void awaitingUnlock(String projectId, Path projectLockFile) throws InterruptedException, DBException {
-        super.awaitingUnlock(projectId, projectLockFile);
+    public void awaitingUnlock(@NotNull Path projectLockFile) throws InterruptedException, DBException {
+        super.awaitingUnlock(projectLockFile);
     }
 
     //avoid mockito access method error
     @Override
-    public boolean isLocked(Path lockFilePath) {
+    public boolean isLocked(@NotNull Path lockFilePath) {
         return super.isLocked(lockFilePath);
     }
 }
