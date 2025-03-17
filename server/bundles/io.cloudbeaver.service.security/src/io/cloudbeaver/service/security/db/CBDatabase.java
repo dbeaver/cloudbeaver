@@ -44,6 +44,9 @@ import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.model.sql.db.InternalDB;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaConfig;
+import org.jkiss.dbeaver.model.sql.db.InternalDB;
+import org.jkiss.dbeaver.model.sql.schema.SQLSchemaConfig;
+import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.storage.H2Migrator;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -64,6 +67,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.sql.DataSource;
 
 /**
  * Database management
@@ -82,12 +86,24 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         new CBSchemaVersionManager(CURRENT_SCHEMA_VERSION, "CB_CE")
     );
 
+    private static final SQLSchemaConfig SCHEMA_CREATE_CONFIG = new SQLSchemaConfig(
+        "CB",
+        "db/cb_schema_create.sql",
+        "db/cb_schema_update_",
+        CURRENT_SCHEMA_VERSION,
+        0
+    );
+
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
     private static final String V1_DB_NAME = "cb.h2.dat";
     private static final String V2_DB_NAME = "cb.h2v2.dat";
 
     private final ServletApplication application;
+    private final WebDatabaseConfig databaseConfiguration;
+    private PoolingDataSource<PoolableConnection> cbDataSource;
+    private DBPConnectionInformation cbConnectionInformation;
+    private CBDatabaseInitialData initialData;
 
     private transient volatile Connection exclusiveConnection;
 
@@ -105,6 +121,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     ) {
         super("Security Manager", databaseConfiguration, appendSchemaConfig(sqlSchemaConfigList) );
         this.application = application;
+        this.databaseConfiguration = databaseConfiguration;
     }
 
     private static List<SQLSchemaConfig> appendSchemaConfig(List<SQLSchemaConfig> sqlSchemaConfigList) {
@@ -144,6 +161,12 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         LoggingProgressMonitor monitor = new LoggingProgressMonitor(log);
         driver = migrateDatabaseIfNeeded(monitor, dataSourceProviderRegistry);
 
+        driver = migrateDatabaseIfNeeded(monitor, dataSourceProviderRegistry);
+
+
+        // read initial data before connecting to database
+        // config file must be valid
+        readInitialDataConfigurationFile();
 
         this.dataSource = initConnectionPool(driver.getDriverInstance(monitor), driver.getFullName());
         this.dialect = driver.getScriptDialect().createInstance();
@@ -209,7 +232,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
             throw new DBException("CB database connection is not defined");
         }
         createSchemaIfNotExists(connection);
-        updateSchema(monitor, connection, getClassLoader());
+        updateSchema(monitor, connection, CBDatabase.class.getClassLoader(), new CBSchemaVersionManager());
 
         validateInstancePersistentState(connection);
     }
@@ -248,7 +271,6 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         }
 
         log.info("Configure CB database security");
-        CBDatabaseInitialData initialData = getInitialData();
         if (initialData != null && !CommonUtils.isEmpty(initialData.getAdminName())
             && !CommonUtils.equalObjects(initialData.getAdminName(), adminName)
         ) {
@@ -269,11 +291,10 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         }
     }
 
-    @Nullable
-    CBDatabaseInitialData getInitialData() throws DBException {
+    private void readInitialDataConfigurationFile() throws DBException {
         String initialDataPath = databaseConfig.getInitialDataConfiguration();
         if (CommonUtils.isEmpty(initialDataPath)) {
-            return null;
+            return;
         }
 
         initialDataPath = ServletAppUtils.getRelativePath(
@@ -282,7 +303,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
             Gson gson = new GsonBuilder()
                 .setStrictness(Strictness.LENIENT)
                 .create();
-            return gson.fromJson(reader, CBDatabaseInitialData.class);
+            this.initialData = gson.fromJson(reader, CBDatabaseInitialData.class);
         } catch (Exception e) {
             throw new DBException("Error loading initial data configuration", e);
         }
@@ -350,7 +371,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         try {
             // Fill initial data
 
-            CBDatabaseInitialData initialData = getInitialData();
+
             if (initialData == null) {
                 return;
             }

@@ -1,0 +1,12 @@
+lefthook: |
+  cd webapp
+  yarn lefthook
+output: false
+pre-commit:
+  commands:
+    check-license:
+      root: webapp
+      glob: "*.{ts,tsx}"
+      exclude:
+        - "**/locales/**"
+      run: yarn core-cli-check-license {staged_files}

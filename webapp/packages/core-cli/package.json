@@ -24,6 +24,7 @@
   "bin": {
     "core-cli-add-plugin": "./bin/add-plugin.js",
     "core-cli-analyzer": "./bin/analyzer.js",
+    "core-cli-check-license": "./dist/cli/license-check.js",
     "core-cli-dependency-graph": "./bin/dependency-graph.js",
     "core-cli-set-version": "./bin/set-version.mjs",
     "core-cli-test": "./bin/test.js",
@@ -45,6 +46,7 @@
     "@swc/core": "^1",
     "@swc/jest": "^0",
     "@testing-library/jest-dom": "^6",
+    "@types/js-yaml": "^4",
     "@types/node": "^20",
     "enquirer": "^2",
     "execa": "^9",
@@ -53,6 +55,7 @@
     "hygen": "^6",
     "jest": "^29",
     "jest-environment-jsdom": "^29",
+    "js-yaml": "^4",
     "typescript": "^5",
     "upath": "^2"
   }
