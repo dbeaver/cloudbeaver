@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -101,7 +101,8 @@ export abstract class Resource<
 
       return key.isEqual(nextKey);
     } else if (isResourceAlias(key) || isResourceAlias(nextKey)) {
-      return true;
+      return false; // TODO: we can't predict if alias have collision with key so we can't intersect them.
+      // But we definitely need to implement it later to prevent unexpected behavior
     }
 
     if (isResourceKeyList(key) || isResourceKeyList(nextKey)) {
