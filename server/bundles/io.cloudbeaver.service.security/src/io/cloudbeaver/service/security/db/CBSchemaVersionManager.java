@@ -86,9 +86,13 @@ public class CBSchemaVersionManager implements SQLSchemaVersionManager {
     }
 
     protected Integer tryGetVersion(Connection connection, String sql, Object... params) {
+        return tryGetVersion(connection, sql, 1, params);
+    }
+
+    protected Integer tryGetVersion(Connection connection, String sql, Integer defaultVersion, Object... params) {
         try {
             Object result = JDBCUtils.executeQuery(connection, sql, params);
-            return result == null ? 1 : CommonUtils.toInt(result);
+            return result == null ? defaultVersion : CommonUtils.toInt(result);
         } catch (Exception e) {
             try {
                 connection.rollback();
@@ -98,6 +102,7 @@ public class CBSchemaVersionManager implements SQLSchemaVersionManager {
             return null;
         }
     }
+
 
     protected String getSchemaId() {
         return schemaId;
