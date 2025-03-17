@@ -10,7 +10,7 @@ import { schema } from '@cloudbeaver/core-utils';
 
 export const CONNECTION_NETWORK_HANDLER_SCHEMA = schema.object({
   id: schema.string(),
-  authType: schema.enum([NetworkHandlerAuthType.Agent, NetworkHandlerAuthType.Password, NetworkHandlerAuthType.PublicKey]).optional(),
+  authType: schema.nativeEnum(NetworkHandlerAuthType).optional(),
   enabled: schema.boolean().optional(),
   key: schema.string().optional(),
   password: schema.string().optional(),

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
         if (formState.state.submitType === 'submit') {
           notificationService.notify(
             {
-              title: initialMode === 'create' ? 'connections_connection_create_success' : 'connections_connection_update_success',
+              title: initialMode === 'create' ? 'core_connections_connection_create_success' : 'core_connections_connection_update_success',
               message: info?.name,
             },
             ENotificationType.Success,

@@ -7,20 +7,24 @@
  */
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { ConnectionInfoResource, createConnectionParam, type DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { IConnectionProperties } from '../Options/IConnectionConfig.js';
-import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
-const getDefaultState = (): IConnectionProperties => ({});
+function getDefaultState(): IConnectionProperties {
+  return {};
+}
 
 export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProperties, IConnectionFormState> {
   constructor(
     formState: IFormState<IConnectionFormState>,
-    private readonly dbDriverResource: DBDriverResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super(formState, getDefaultState());
+  }
+
+  override isOutdated(): boolean {
+    return this.connectionInfoResource.isOutdated(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
   }
 
   protected override async loader(): Promise<void> {
@@ -33,7 +37,12 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
       createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId),
     );
 
-    this.setInitialState(connection?.properties ?? getDefaultState());
+    if (connection?.properties) {
+      this.setInitialState({ ...connection.properties });
+      return;
+    }
+
+    this.setInitialState(getDefaultState());
   }
 
   protected override async saveChanges(
@@ -45,28 +54,10 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): void | Promise<void> {
-    const driverId = this.formState.state.config.driverId;
-    const optionsPart = getConnectionFormOptionsPart(this.formState);
-
-    if (driverId) {
-      const driver = this.dbDriverResource.get(driverId);
-      const trimmedProperties: IConnectionProperties = {};
-      const defaultDriverProperties = new Set(driver?.driverProperties?.map(property => property.id) ?? []);
-
-      for (let key of Object.keys(this.state!)) {
-        const value = this.state![key];
-        if (!defaultDriverProperties?.has(key)) {
-          key = key.trim();
-        }
-
-        trimmedProperties[key] = typeof value === 'string' ? value.trim() : value;
+    for (let key of Object.keys(this.state!)) {
+      if (typeof this.state[key] === 'string') {
+        this.state[key] = this.state[key].trim();
       }
-
-      this.state = trimmedProperties;
-      optionsPart.state.properties = {
-        ...optionsPart.state.properties,
-        ...this.state,
-      };
     }
   }
 }

@@ -44,6 +44,16 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     super(formState, getDefaultState());
   }
 
+  override isOutdated(): boolean {
+    const isDriverOutdated = this.dbDriverResource.isOutdated(this.formState.state.config.driverId);
+    const isNetworkHandlerOutdated = this.networkHandlerResource.isOutdated(this.state.id);
+    const isConnectionOutdated = this.connectionInfoResource.isOutdated(
+      createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!),
+    );
+
+    return isDriverOutdated || isNetworkHandlerOutdated || isConnectionOutdated;
+  }
+
   protected override async loader(): Promise<void> {
     if (!this.formState.state.config.driverId) {
       this.setInitialState(getDefaultState());

@@ -42,6 +42,10 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     super(formState, getDefaultState());
   }
 
+  override isOutdated(): boolean {
+    return this.connectionInfoResource.isOutdated(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
+  }
+
   protected override async loader(): Promise<void> {
     if (!this.formState.state.config.connectionId || !this.formState.state.projectId) {
       this.setInitialState(getDefaultState());
@@ -101,27 +105,21 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   ): void | Promise<void> {
     const validation = contexts.getContext(formValidationContext);
 
-    if (!this.isChanged) {
+    if (!this.isChanged || !this.state.enabled) {
       return;
     }
 
-    if (!this.state.enabled) {
-      return;
+    if (this.state.savePassword && !this.state.userName?.length) {
+      validation.error("Field SSH 'User' can't be empty");
     }
 
-    if (this.isChanged) {
-      if (this.state.savePassword && !this.state.userName?.length) {
-        validation.error("Field SSH 'User' can't be empty");
-      }
+    if (!this.state.properties?.['host']?.length) {
+      validation.error("Field SSH 'Host' can't be empty");
+    }
 
-      if (!this.state.properties?.['host']?.length) {
-        validation.error("Field SSH 'Host' can't be empty");
-      }
-
-      const port = Number(this.state.properties?.['port']);
-      if (Number.isNaN(port) || port < 1) {
-        validation.error("Field SSH 'Port' can't be empty");
-      }
+    const port = Number(this.state.properties?.['port']);
+    if (Number.isNaN(port) || port < 1) {
+      validation.error("Field SSH 'Port' can't be empty");
     }
 
     const keyAuth = this.state.authType === NetworkHandlerAuthType.PublicKey;

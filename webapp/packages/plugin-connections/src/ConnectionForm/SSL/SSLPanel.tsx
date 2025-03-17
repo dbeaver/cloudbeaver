@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@ export const SSLPanel: TabContainerTabComponent<IConnectionFormProps> = observer
   const dbDriverResource = useResource(SSLPanel, DBDriverResource, props.formState.state.config.driverId ?? null);
 
   const handler = getSSLDriverHandler(networkHandlerResource.resource.values, dbDriverResource.data?.applicableNetworkHandlers ?? []);
-  const SSLPart = getConnectionFormSSLPart(props.formState);
+  const sslPart = getConnectionFormSSLPart(props.formState);
 
-  useAutoLoad(SSLPanel, SSLPart);
+  useAutoLoad(SSLPanel, sslPart);
 
-  if (!handler || !SSLPart.state) {
+  if (!handler || !sslPart.state) {
     return null;
   }
 
-  return <SSL {...props} handler={handler} handlerState={SSLPart.state} />;
+  return <SSL {...props} handler={handler} handlerState={sslPart.state} />;
 });

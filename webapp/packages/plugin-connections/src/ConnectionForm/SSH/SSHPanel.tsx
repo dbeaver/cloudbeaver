@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@ import { getConnectionFormSSHPart } from './getConnectionFormSSHPart.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 
 export const SSHPanel: TabContainerPanelComponent<IConnectionFormProps> = observer(function SSHPanel(props) {
-  const SSHPart = getConnectionFormSSHPart(props.formState);
+  const sshPart = getConnectionFormSSHPart(props.formState);
 
-  useAutoLoad(SSHPanel, SSHPart);
+  useAutoLoad(SSHPanel, sshPart);
 
-  if (!SSHPart.state) {
+  if (!sshPart.state) {
     return null;
   }
 
-  return <SSH {...props} handlerState={SSHPart.state} />;
+  return <SSH {...props} handlerState={sshPart.state} />;
 });

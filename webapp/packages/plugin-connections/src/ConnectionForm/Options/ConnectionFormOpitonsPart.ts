@@ -9,7 +9,6 @@ import { FormMode, FormPart, formStateContext, formValidationContext, type IForm
 import { DriverConfigurationType, type ConnectionConfig, type ObjectPropertyInfo, type TestConnectionMutation } from '@cloudbeaver/core-sdk';
 import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
-  ConnectionInfoOriginResource,
   ConnectionInfoProjectKey,
   ConnectionInfoResource,
   createConnectionParam,
@@ -56,7 +55,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly localizationService: LocalizationService,
     private readonly commonDialogService: CommonDialogService,
@@ -66,6 +64,10 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     this.formState.validationTask.addPostHandler(this.askCredentials.bind(this));
     this.formState.loadedTask.addPostHandler(this.formAuthState.bind(this));
+  }
+
+  override isOutdated(): boolean {
+    return this.connectionInfoResource.isOutdated(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
   }
 
   private async formAuthState(data: IFormState<IConnectionFormState>, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
@@ -131,17 +133,17 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       return;
     }
 
-    const [info] = await Promise.all([
-      this.connectionInfoResource.load(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId), [
+    const info = await this.connectionInfoResource.load(
+      createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId),
+      [
         'includeAuthProperties',
         'includeCredentialsSaved',
         'customIncludeOptions',
         'includeProperties',
         'includeProviderProperties',
         'includeNetworkHandlersConfig',
-      ]),
-      this.connectionInfoOriginResource.load(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId)),
-    ]);
+      ],
+    );
 
     const config: ConnectionConfig = defaultStateGetter();
 

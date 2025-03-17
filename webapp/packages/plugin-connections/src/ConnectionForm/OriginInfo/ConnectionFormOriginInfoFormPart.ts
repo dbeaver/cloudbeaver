@@ -19,6 +19,7 @@ import {
 } from '@cloudbeaver/core-connections';
 import { AUTH_PROVIDER_LOCAL_ID, type UserInfoResource } from '@cloudbeaver/core-authentication';
 import { computed, makeObservable } from 'mobx';
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
 const defaultStateGetter = () => ({}) as IConnectionFormOriginInfoState;
 
@@ -37,6 +38,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     makeObservable(this, {
       providerId: computed,
       isAuthenticated: computed,
+      authModelId: computed,
     });
   }
 
@@ -51,7 +53,8 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
       return null;
     }
 
-    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
+    const optionsPart = getConnectionFormOptionsPart(this.formState);
+    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, optionsPart.state.connectionId!));
     const authModel = this.databaseAuthModelsResource.get(
       this.formState.state.config.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null,
     );
@@ -68,26 +71,55 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     return this.userInfoResource.hasToken(this.providerId);
   }
 
+  override isOutdated(): boolean {
+    const isDriverOutdated = this.dbDriverResource.isOutdated(this.formState.state.config.driverId);
+    const optionsPart = getConnectionFormOptionsPart(this.formState);
+    const connectionId = optionsPart.state.connectionId;
+
+    const isConnectionOutdated = connectionId
+      ? this.connectionInfoResource.isOutdated(createConnectionParam(this.formState.state.projectId, connectionId))
+      : false;
+    const isAuthModelOutdated = this.authModelId ? this.databaseAuthModelsResource.isOutdated(this.authModelId) : false;
+    // TODO why is app goes to infinite loop when this is uncommented?
+    // const isOriginInfoOutdated = connectionId
+    //   ? this.connectionInfoOriginDetailsResource.isOutdated(createConnectionParam(this.formState.state.projectId, connectionId))
+    //   : false;
+
+    return isDriverOutdated || isConnectionOutdated || isAuthModelOutdated || this.userInfoResource.isOutdated() || optionsPart.isOutdated();
+  }
+
+  get authModelId(): string | null {
+    const driver = this.dbDriverResource.get(this.formState.state.config.driverId!)!;
+    const optionsPart = getConnectionFormOptionsPart(this.formState);
+    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, optionsPart.state.connectionId!));
+
+    return this.formState.state.config.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null;
+  }
+
   protected override async loader(): Promise<void> {
     const state = defaultStateGetter();
+    const optionsPart = getConnectionFormOptionsPart(this.formState);
+    const connectionId = optionsPart.state.connectionId;
 
-    if (!this.formState.state.config.connectionId || !this.formState.state.projectId || !this.formState.state.config.driverId) {
+    if (!connectionId || !this.formState.state.projectId || !this.formState.state.config.driverId) {
       this.setInitialState(state);
       return;
     }
 
-    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId));
-    const driver = await this.dbDriverResource.load(this.formState.state.config.driverId);
-    await this.databaseAuthModelsResource.load(this.formState.state.config.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null);
+    await this.dbDriverResource.load(this.formState.state.config.driverId);
+
+    if (!this.authModelId) {
+      throw new Error('Auth model is not defined');
+    }
+
+    await Promise.all([this.databaseAuthModelsResource.load(this.authModelId), this.userInfoResource.load()]);
 
     if (!this.isAuthenticated) {
       this.setInitialState(state);
       return;
     }
 
-    const originInfo = await this.connectionInfoOriginDetailsResource.load(
-      createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId),
-    );
+    const originInfo = await this.connectionInfoOriginDetailsResource.load(createConnectionParam(this.formState.state.projectId, connectionId));
 
     if (!originInfo.origin.details) {
       this.setInitialState(state);

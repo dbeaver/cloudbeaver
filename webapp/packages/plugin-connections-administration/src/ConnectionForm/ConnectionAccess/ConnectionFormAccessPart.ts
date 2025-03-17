@@ -29,6 +29,19 @@ export class ConnectionFormAccessPart extends FormPart<string[], IConnectionForm
     });
   }
 
+  override isOutdated(): boolean {
+    const connectionId = this.formState.state.config.connectionId;
+    const projectId = this.formState.state.projectId;
+
+    if (!connectionId || !projectId) {
+      return false;
+    }
+
+    const key = createConnectionParam(projectId, connectionId);
+
+    return this.connectionInfoResource.isOutdated(key);
+  }
+
   protected override async loader(): Promise<void> {
     const connectionId = this.formState.state.config.connectionId;
     const projectId = this.formState.state.projectId;
@@ -41,10 +54,7 @@ export class ConnectionFormAccessPart extends FormPart<string[], IConnectionForm
     const key = createConnectionParam(projectId, connectionId);
     const subjects = await this.connectionInfoResource.loadAccessSubjects(key);
 
-    this.setInitialState({
-      ...getDefaultState(),
-      ...subjects.map(subject => subject.subjectId),
-    });
+    this.setInitialState(subjects.map(subject => subject.subjectId));
   }
 
   protected override async saveChanges(
@@ -59,15 +69,7 @@ export class ConnectionFormAccessPart extends FormPart<string[], IConnectionForm
     }
 
     const key = createConnectionParam(data.state.projectId, connectionId);
-
-    const currentGrantedSubjects = await this.connectionInfoResource.loadAccessSubjects(key);
-    const currentGrantedSubjectIds = currentGrantedSubjects.map(subject => subject.subjectId);
-
-    const { subjectsToRevoke, subjectsToGrant } = getSubjectDifferences(currentGrantedSubjectIds, this.state);
-
-    if (subjectsToRevoke.length === 0 && subjectsToGrant.length === 0) {
-      return;
-    }
+    const { subjectsToRevoke, subjectsToGrant } = getSubjectDifferences(this.initialState, this.state);
 
     const promises = [];
 
