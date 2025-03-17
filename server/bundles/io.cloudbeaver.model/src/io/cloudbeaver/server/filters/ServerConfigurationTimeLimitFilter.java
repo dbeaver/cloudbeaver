@@ -32,7 +32,7 @@ import java.util.List;
 public class ServerConfigurationTimeLimitFilter extends SimplePerformantInstrumentation {
     private static final Log log = Log.getLog(ServerConfigurationTimeLimitFilter.class);
 
-    private static final int MINUTES_OF_INACTION_BEFORE_DISABLING_REQUEST_PROCESSING = 1;
+    private static final int MINUTES_OF_INACTION_BEFORE_DISABLING_REQUEST_PROCESSING = 60;
     private final ServletApplication application;
 
     public ServerConfigurationTimeLimitFilter(ServletApplication application) {
