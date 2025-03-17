@@ -312,7 +312,7 @@ public class WebDatabaseDriverInfo {
 
     @Property
     public boolean isDriverInstalled() {
-        return driver.isDriverInstalled();
+        return driver.getDefaultDriverLoader().isDriverInstalled();
     }
 
     @Property
