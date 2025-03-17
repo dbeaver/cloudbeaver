@@ -2,6 +2,7 @@ package io.cloudbeaver.service.security.db;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
@@ -12,6 +13,7 @@ import java.sql.SQLException;
 
 public class CBSchemaVersionManager implements SQLSchemaVersionManager {
 
+    private static final Log log = Log.getLog(CBSchemaVersionManager.class);
     private static final int LEGACY_SCHEMA_VERSION = 1;
     private final int currentSchemaVersion;
     private final String schemaId;
@@ -25,30 +27,30 @@ public class CBSchemaVersionManager implements SQLSchemaVersionManager {
     public int getCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName)
     throws DBException, SQLException {
         // Check and update schema
-        try {
-            Object result = JDBCUtils.executeQuery(
-                connection,
-                CommonUtils.normalizeTableNames("SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO WHERE ID = ?", schemaName),
-                getId()
-            );
-            if (result == null) {
-                return -1;
-            }
-            int version = CommonUtils.toInt(result);
-            return version == 0 ? 1 : version;
-        } catch (SQLException e) {
-            try {
-                Object legacyVersion = CommonUtils.toInt(JDBCUtils.executeQuery(
-                    connection,
-                    CommonUtils.normalizeTableNames("SELECT SCHEMA_VERSION FROM {table_prefix}CB_SERVER", schemaName)
-                ));
-                // Table CB_SERVER exist - this is a legacy schema
-                return LEGACY_SCHEMA_VERSION;
-            } catch (SQLException ex) {
-                // Empty schema. Create it from scratch
-                return -1;
-            }
+        //fixme у предыдущей версии баз нет поля ID по которому сравнивать
+        Integer version = tryGetVersion(
+            connection,
+            CommonUtils.normalizeTableNames("SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO WHERE ID = ?", schemaName), getSchemaId()
+        );
+        if (version != null) {
+            return version;
         }
+        version = tryGetVersion(
+            connection,
+            CommonUtils.normalizeTableNames("SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO", schemaName)
+        );
+        if (version != null) {
+            return version;
+        }
+        version = tryGetVersion(
+            connection,
+            CommonUtils.normalizeTableNames("SELECT SCHEMA_VERSION FROM {table_prefix}CB_SERVER", schemaName)
+        );
+        if (version != null) {
+            return LEGACY_SCHEMA_VERSION;
+        }
+        // Empty schema. Create it from scratch
+        return -1;
     }
 
     @Override
@@ -70,7 +72,7 @@ public class CBSchemaVersionManager implements SQLSchemaVersionManager {
                 schemaName
             ),
             version,
-            getId()
+            getSchemaId()
         );
         if (updateCount <= 0) {
             JDBCUtils.executeSQL(
@@ -78,13 +80,26 @@ public class CBSchemaVersionManager implements SQLSchemaVersionManager {
                 CommonUtils.normalizeTableNames(
                     "INSERT INTO {table_prefix}CB_SCHEMA_INFO (VERSION,UPDATE_TIME, ID) VALUES(?,CURRENT_TIMESTAMP, ?)", schemaName),
                 version,
-                getId()
+                getSchemaId()
             );
         }
     }
 
-    @NotNull
-    protected String getId(){
+    protected Integer tryGetVersion(Connection connection, String sql, Object... params) {
+        try {
+            Object result = JDBCUtils.executeQuery(connection, sql, params);
+            return result == null ? 1 : CommonUtils.toInt(result);
+        } catch (Exception e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                log.error("Can't rollback after unsuccessful try to get version of current schema", ex);
+            }
+            return null;
+        }
+    }
+
+    protected String getSchemaId() {
         return schemaId;
     }
 }

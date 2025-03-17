@@ -71,7 +71,7 @@ import java.util.stream.Collectors;
 public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     private static final Log log = Log.getLog(CBDatabase.class);
 
-    private static final int CURRENT_SCHEMA_VERSION = 26;
+    private static final int CURRENT_SCHEMA_VERSION = 23;
 
     private static final SQLSchemaConfig SCHEMA_CREATE_CONFIG = new SQLSchemaConfig(
         "CB",
