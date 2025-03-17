@@ -1,1 +1,0 @@
-node ./webapp/scripts/license-check.mjs ./.vscode/license.code-snippets license
