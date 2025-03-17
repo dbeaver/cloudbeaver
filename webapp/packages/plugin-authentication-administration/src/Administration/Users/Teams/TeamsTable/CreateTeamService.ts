@@ -39,6 +39,7 @@ export class CreateTeamService {
   }
 
   fillData(): void {
+    this.dispose();
     this.data = new TeamsAdministrationFormState(this.serviceProvider, this.service, {
       teamId: null,
     });
