@@ -341,7 +341,9 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         closeConnection();
     }
 
-    //TODO move out
+    /**
+     * Fill initial schema data after schema creation
+     */
     public void fillInitialSchemaData(DBRProgressMonitor monitor, Connection connection)
     throws DBException, SQLException {
         // Set exclusive connection. Otherwise security controller will open a new one and won't see new schema objects.
