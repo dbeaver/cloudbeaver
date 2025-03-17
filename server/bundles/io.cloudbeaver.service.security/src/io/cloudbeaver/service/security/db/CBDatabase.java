@@ -88,6 +88,7 @@ public class CBDatabase {
     private final WebDatabaseConfig databaseConfiguration;
     private PoolingDataSource<PoolableConnection> cbDataSource;
     private DBPConnectionInformation cbConnectionInformation;
+    private CBDatabaseInitialData initialData;
 
     private transient volatile Connection exclusiveConnection;
 
@@ -186,6 +187,10 @@ public class CBDatabase {
             migrator.migrateDatabaseIfNeeded(V1_DB_NAME, V2_DB_NAME);
         }
 
+        // read initial data before connecting to database
+        // config file must be valid
+        readInitialDataConfigurationFile();
+
         // reload the driver and url due to a possible configuration update
         driver = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
         if (driver == null) {
@@ -283,7 +288,6 @@ public class CBDatabase {
         }
 
         log.info("Configure CB database security");
-        CBDatabaseInitialData initialData = getInitialData();
         if (initialData != null && !CommonUtils.isEmpty(initialData.getAdminName())
             && !CommonUtils.equalObjects(initialData.getAdminName(), adminName)
         ) {
@@ -304,11 +308,10 @@ public class CBDatabase {
         }
     }
 
-    @Nullable
-    CBDatabaseInitialData getInitialData() throws DBException {
+    private void readInitialDataConfigurationFile() throws DBException {
         String initialDataPath = databaseConfiguration.getInitialDataConfiguration();
         if (CommonUtils.isEmpty(initialDataPath)) {
-            return null;
+            return;
         }
 
         initialDataPath = ServletAppUtils.getRelativePath(
@@ -317,7 +320,7 @@ public class CBDatabase {
             Gson gson = new GsonBuilder()
                 .setStrictness(Strictness.LENIENT)
                 .create();
-            return gson.fromJson(reader, CBDatabaseInitialData.class);
+            this.initialData = gson.fromJson(reader, CBDatabaseInitialData.class);
         } catch (Exception e) {
             throw new DBException("Error loading initial data configuration", e);
         }
@@ -442,8 +445,6 @@ public class CBDatabase {
 
             try {
                 // Fill initial data
-
-                CBDatabaseInitialData initialData = getInitialData();
                 if (initialData == null) {
                     return;
                 }

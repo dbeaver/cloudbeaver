@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
@@ -30,14 +29,9 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.exec.DBCResultSet;
-import org.jkiss.dbeaver.model.exec.DBCSession;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
-import org.jkiss.dbeaver.model.sql.DBQuotaException;
-import org.jkiss.dbeaver.model.sql.DBSQLException;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSDataManipulator;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
@@ -51,13 +45,11 @@ import org.jkiss.dbeaver.tools.transfer.stream.*;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.BatchUpdateException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,8 +57,6 @@ import java.util.stream.Collectors;
  * Web service implementation
  */
 public class WebServiceDataTransfer implements DBWServiceDataTransfer {
-
-    public static final String QUOTA_PROP_FILE_LIMIT = "dataExportFileSizeLimit";
 
     private static final Log log = Log.getLog(WebServiceDataTransfer.class);
 
@@ -146,78 +136,65 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
     }
 
     @Override
-    public Boolean dataTransferRemoveDataFile(WebSession webSession, String dataFileId) throws DBWebException {
-        WebDataTransferSessionConfig dtConfig = WebDataTransferUtils.getSessionDataTransferConfig(webSession);
-        WebDataTransferTaskConfig taskInfo = dtConfig.getTask(dataFileId);
-        if (taskInfo == null) {
-            throw new DBWebException("Session task '" + dataFileId + "' not found");
-        }
-        Path dataFile = taskInfo.getDataFile();
-        if (dataFile != null) {
-            try {
-                Files.delete(dataFile);
-            } catch (IOException e) {
-                log.warn("Error deleting data file '" + dataFile.toAbsolutePath() + "'", e);
-            }
-        }
-        dtConfig.removeTask(taskInfo);
-
-        return true;
-    }
-
-    @Override
     public WebDataTransferDefaultExportSettings defaultExportSettings() {
         return new WebDataTransferDefaultExportSettings();
     }
 
-    private WebAsyncTaskInfo asyncExportFromDataContainer(WebSQLProcessor sqlProcessor, WebDataTransferParameters parameters, DBSDataContainer dataContainer,
-                                                          @Nullable WebSQLResultsInfo resultsInfo) {
+    @Override
+    @Deprecated
+    public Boolean dataTransferRemoveDataFile(WebSession webSession, String dataFileId) throws DBWebException {
+        //deprecated
+        return true;
+    }
+
+    @Override
+    public void exportDataTransferToStream(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull WebDataTransferTaskConfig taskConfig,
+        @NotNull OutputStream outputStream
+    ) throws DBException {
+
+        WebDataTransferParameters parameters = taskConfig.getParameters();
+        DBSDataContainer dataContainer = taskConfig.getDataContainer();
+        WebSQLResultsInfo resultsInfo = taskConfig.getResultsInfo();
+        DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
+
+        try {
+            exportData(monitor, processor, dataContainer, parameters, resultsInfo, outputStream);
+        } catch (Exception e) {
+            throw new DBException("Error exporting data", e);
+        }
+    }
+
+    private WebAsyncTaskInfo asyncExportFromDataContainer(
+        @NotNull WebSQLProcessor sqlProcessor,
+        @NotNull WebDataTransferParameters parameters,
+        @NotNull DBSDataContainer dataContainer,
+        @Nullable WebSQLResultsInfo resultsInfo
+    ) {
         sqlProcessor.getWebSession().addInfoMessage("Export data");
         DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
-        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
-            @Override
-            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
-                monitor.beginTask("Export data", 1);
-                try {
-                    monitor.subTask("Export data using " + processor.getName());
-                    Path exportFile = dataExportFolder.resolve(
-                            makeUniqueFileName(sqlProcessor, processor, parameters.getProcessorProperties()));
-                    try {
-                        exportData(monitor, processor, dataContainer, parameters, resultsInfo, exportFile);
-                    } catch (Exception e) {
-                        if (Files.exists(exportFile)) {
-                            try {
-                                Files.delete(exportFile);
-                            } catch (IOException ex) {
-                                log.error("Error deleting export file " + exportFile.toAbsolutePath(), e);
-                            }
-                        }
-                        if (e instanceof DBException) {
-                            throw e;
-                        }
-                        throw new DBException("Error exporting data", e);
-                    }
-                    var outputSettings = parameters.getOutputSettings();
-                    Path finallyExportFile = outputSettings.isCompress()
-                        ? exportFile.resolveSibling(WebDataTransferUtils.normalizeFileName(
-                            exportFile.getFileName().toString(), outputSettings))
-                        : exportFile;
-                    WebDataTransferTaskConfig taskConfig = new WebDataTransferTaskConfig(finallyExportFile, parameters);
-                    String exportFileName = CommonUtils.isEmpty(outputSettings.getFileName()) ?
-                        CommonUtils.escapeFileName(CommonUtils.truncateString(dataContainer.getName(), 32)) :
-                        outputSettings.getFileName();
-                    taskConfig.setExportFileName(exportFileName);
-                    WebDataTransferUtils.getSessionDataTransferConfig(sqlProcessor.getWebSession()).addTask(taskConfig);
+        String uniqueFileName = makeUniqueFileName(sqlProcessor, processor, parameters.getProcessorProperties());
+        var outputSettings = parameters.getOutputSettings();
+        String fileNameKey = WebDataTransferUtils.normalizeFileName(uniqueFileName, outputSettings);
+        String exportFileName = CommonUtils.isEmpty(outputSettings.getFileName())
+                                ? CommonUtils.escapeFileName(CommonUtils.truncateString(dataContainer.getName(), 32))
+                                : outputSettings.getFileName();
+        WebDataTransferTaskConfig taskConfig = new WebDataTransferTaskConfig(
+            fileNameKey, parameters, exportFileName, dataContainer, resultsInfo);
 
-                    result = finallyExportFile.getFileName().toString();
-                } catch (Throwable e) {
-                    throw new InvocationTargetException(e);
-                } finally {
-                    monitor.done();
+        WebDataTransferUtils.getSessionDataTransferConfig(sqlProcessor.getWebSession())
+            .addTask(taskConfig);
+
+        //fixme fake task for keeping api
+        return sqlProcessor.getWebSession().createAndRunAsyncTask(
+            "Data export", new WebAsyncTaskProcessor<>() {
+                @Override
+                public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
+                    result = fileNameKey;
                 }
             }
-        };
-        return sqlProcessor.getWebSession().createAndRunAsyncTask("Data export", runnable);
+        );
     }
 
     public WebAsyncTaskInfo asyncImportDataContainer(@NotNull String processorId,
@@ -263,33 +240,49 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         DBSDataContainer dataContainer,
         WebDataTransferParameters parameters,
         WebSQLResultsInfo resultsInfo,
-        Path exportFile) throws DBException, IOException
-    {
+        OutputStream outputStream
+    ) throws DBException, IOException {
         IDataTransferProcessor processorInstance = processor.getInstance();
-        if (!(processorInstance instanceof IStreamDataExporter)) {
+        if (!(processorInstance instanceof IStreamDataExporter exporter)) {
             throw new DBException("Invalid processor. " + IStreamDataExporter.class.getSimpleName() + " expected");
         }
-        IStreamDataExporter exporter = (IStreamDataExporter) processorInstance;
 
-        Number fileSizeLimit = CBApplication.getInstance().getAppConfiguration().getResourceQuota(QUOTA_PROP_FILE_LIMIT);
+        Map<String, Object> processorProperties = parameters.getProcessorProperties();
+        if (processorProperties == null) processorProperties = Collections.emptyMap();
+        Map<String, Object> properties = new HashMap<>();
+        for (DBPPropertyDescriptor prop : processor.getProperties()) {
+            Object propValue = processorProperties.get(CommonUtils.toString(prop.getId()));
+            properties.put(prop.getId(), propValue != null ? propValue : prop.getDefaultValue());
+        }
+        // Remove extension property (we specify file name directly)
+        properties.remove(StreamConsumerSettings.PROP_FILE_EXTENSION);
 
-        StreamTransferConsumer consumer = new StreamTransferConsumer() {
-            @Override
-            public void fetchRow(@NotNull DBCSession session, @NotNull DBCResultSet resultSet) throws DBCException {
-                super.fetchRow(session, resultSet);
-                if (fileSizeLimit != null && getBytesWritten() > fileSizeLimit.longValue()) {
-                    throw new DBQuotaException(
-                        "Data export quota exceeded \n Please increase the resourceQuotas parameter in configuration",
-                        QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), getBytesWritten()
-                    );
-                }
-            }
-        };
+        DatabaseProducerSettings producerSettings = new DatabaseProducerSettings();
+        producerSettings.setExtractType(DatabaseProducerSettings.ExtractType.SINGLE_QUERY);
+        producerSettings.setQueryRowCount(false);
+        producerSettings.setOpenNewConnections(CommonUtils.getOption(parameters.getDbProducerSettings(), "openNewConnection"));
+        StreamTransferConsumer consumer = new StreamTransferConsumer();
+        StreamConsumerSettings settings = makeStreamConsumerSettings(parameters);
+        DatabaseTransferProducer producer = new DatabaseTransferProducer(
+            dataContainer,
+            parameters.getFilter() == null ? null : parameters.getFilter().makeDataFilter(resultsInfo));
 
+        consumer.initTransfer(
+            dataContainer,
+            settings,
+            new IDataTransferConsumer.TransferParameters(processor.isBinaryFormat(), processor.isHTMLFormat(), outputStream),
+            exporter,
+            properties,
+            producer.getProject());
+
+        producer.transferData(monitor, consumer, null, producerSettings, null);
+
+        consumer.finishTransfer(monitor, false);
+    }
+
+    @NotNull
+    private StreamConsumerSettings makeStreamConsumerSettings(@NotNull WebDataTransferParameters parameters) {
         StreamConsumerSettings settings = new StreamConsumerSettings();
-
-        settings.setOutputFolder(exportFile.getParent().toAbsolutePath().toString());
-        settings.setOutputFilePattern(exportFile.getFileName().toString());
 
         WebDataTransferOutputSettings outputSettings = parameters.getOutputSettings();
         settings.setOutputEncodingBOM(outputSettings.isInsertBom());
@@ -300,38 +293,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         if (!CommonUtils.isEmpty(outputSettings.getTimestampPattern())) {
             settings.setOutputTimestampPattern(outputSettings.getTimestampPattern());
         }
-
-        Map<String, Object> properties = new HashMap<>();
-
-        Map<String, Object> processorProperties = parameters.getProcessorProperties();
-        if (processorProperties == null) processorProperties = Collections.emptyMap();
-        for (DBPPropertyDescriptor prop : processor.getProperties()) {
-            Object propValue = processorProperties.get(CommonUtils.toString(prop.getId()));
-            properties.put(prop.getId(), propValue != null ? propValue : prop.getDefaultValue());
-        }
-        // Remove extension property (we specify file name directly)
-        properties.remove(StreamConsumerSettings.PROP_FILE_EXTENSION);
-
-
-        DatabaseTransferProducer producer = new DatabaseTransferProducer(
-            dataContainer,
-            parameters.getFilter() == null ? null : parameters.getFilter().makeDataFilter(resultsInfo));
-        DatabaseProducerSettings producerSettings = new DatabaseProducerSettings();
-        producerSettings.setExtractType(DatabaseProducerSettings.ExtractType.SINGLE_QUERY);
-        producerSettings.setQueryRowCount(false);
-        producerSettings.setOpenNewConnections(CommonUtils.getOption(parameters.getDbProducerSettings(), "openNewConnection"));
-
-        consumer.initTransfer(
-            dataContainer,
-            settings,
-            new IDataTransferConsumer.TransferParameters(processor.isBinaryFormat(), processor.isHTMLFormat()),
-            exporter,
-            properties,
-            producer.getProject());
-
-        producer.transferData(monitor, consumer, null, producerSettings, null);
-
-        consumer.finishTransfer(monitor, false);
+        return settings;
     }
 
     private void importData(

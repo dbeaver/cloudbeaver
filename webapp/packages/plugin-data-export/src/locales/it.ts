@@ -15,4 +15,5 @@ export default [
   ['data_transfer_dialog_select_processor_fail', 'Failed to select processor'],
 
   ['data_transfer_output_settings_compress', 'Compression'],
+  ['plugin_data_export_download_process_info', 'The download process may take some time to start'],
 ];
