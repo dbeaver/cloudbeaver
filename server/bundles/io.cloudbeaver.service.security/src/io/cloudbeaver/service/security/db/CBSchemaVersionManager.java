@@ -26,8 +26,7 @@ public class CBSchemaVersionManager implements SQLSchemaVersionManager {
     @Override
     public int getCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName)
     throws DBException, SQLException {
-        // Check and update schema
-        //fixme у предыдущей версии баз нет поля ID по которому сравнивать
+
         Integer version = tryGetVersion(
             connection,
             CommonUtils.normalizeTableNames("SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO WHERE ID = ?", schemaName), getSchemaId()

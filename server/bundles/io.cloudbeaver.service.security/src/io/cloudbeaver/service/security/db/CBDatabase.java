@@ -44,9 +44,6 @@ import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.dbeaver.model.sql.db.InternalDB;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaConfig;
-import org.jkiss.dbeaver.model.sql.db.InternalDB;
-import org.jkiss.dbeaver.model.sql.schema.SQLSchemaConfig;
-import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.storage.H2Migrator;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -67,7 +64,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.sql.DataSource;
 
 /**
  * Database management
@@ -78,20 +74,12 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     private static final int CURRENT_SCHEMA_VERSION = 23;
 
     private static final SQLSchemaConfig SCHEMA_CREATE_CONFIG = new SQLSchemaConfig(
-        "CB",
+        "CB_CE",
         "db/cb_schema_create.sql",
         "db/cb_schema_update_",
         CURRENT_SCHEMA_VERSION,
         0,
         new CBSchemaVersionManager(CURRENT_SCHEMA_VERSION, "CB_CE")
-    );
-
-    private static final SQLSchemaConfig SCHEMA_CREATE_CONFIG = new SQLSchemaConfig(
-        "CB",
-        "db/cb_schema_create.sql",
-        "db/cb_schema_update_",
-        CURRENT_SCHEMA_VERSION,
-        0
     );
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
@@ -100,9 +88,6 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     private static final String V2_DB_NAME = "cb.h2v2.dat";
 
     private final ServletApplication application;
-    private final WebDatabaseConfig databaseConfiguration;
-    private PoolingDataSource<PoolableConnection> cbDataSource;
-    private DBPConnectionInformation cbConnectionInformation;
     private CBDatabaseInitialData initialData;
 
     private transient volatile Connection exclusiveConnection;
@@ -111,7 +96,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     private SMAdminController adminSecurityController;
 
     public CBDatabase(@NotNull ServletApplication application, @NotNull WebDatabaseConfig databaseConfiguration) {
-        this(application, databaseConfiguration, List.of(SCHEMA_CREATE_CONFIG));
+        this(application, databaseConfiguration, Collections.emptyList());
     }
 
     public CBDatabase(
@@ -121,7 +106,6 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     ) {
         super("Security Manager", databaseConfiguration, appendSchemaConfig(sqlSchemaConfigList) );
         this.application = application;
-        this.databaseConfiguration = databaseConfiguration;
     }
 
     private static List<SQLSchemaConfig> appendSchemaConfig(List<SQLSchemaConfig> sqlSchemaConfigList) {
@@ -232,7 +216,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
             throw new DBException("CB database connection is not defined");
         }
         createSchemaIfNotExists(connection);
-        updateSchema(monitor, connection, CBDatabase.class.getClassLoader(), new CBSchemaVersionManager());
+        updateSchema(monitor, connection, getClassLoader());
 
         validateInstancePersistentState(connection);
     }
