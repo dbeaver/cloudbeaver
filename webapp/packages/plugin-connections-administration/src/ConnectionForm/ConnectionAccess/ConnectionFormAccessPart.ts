@@ -7,19 +7,16 @@
  */
 import { FormPart, formStatusContext, type IFormState } from '@cloudbeaver/core-ui';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { IConnectionFormAccessState } from './IConnectionFormAccessState.js';
 import { createConnectionParam, type ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { action, makeObservable } from 'mobx';
 import type { IConnectionFormState } from '@cloudbeaver/plugin-connections';
 import { getSubjectDifferences } from '@cloudbeaver/core-utils';
 
-const getDefaultState = () =>
-  ({
-    grantedSubjects: [],
-    editing: false,
-  }) as IConnectionFormAccessState;
+function getDefaultState(): string[] {
+  return [];
+}
 
-export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessState, IConnectionFormState> {
+export class ConnectionFormAccessPart extends FormPart<string[], IConnectionFormState> {
   constructor(
     formState: IFormState<IConnectionFormState>,
     private readonly connectionInfoResource: ConnectionInfoResource,
@@ -27,7 +24,6 @@ export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessStat
     super(formState, getDefaultState());
 
     makeObservable(this, {
-      edit: action.bound,
       revoke: action.bound,
       grant: action.bound,
     });
@@ -47,7 +43,7 @@ export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessStat
 
     this.setInitialState({
       ...getDefaultState(),
-      grantedSubjects: subjects.map(subject => subject.subjectId),
+      ...subjects.map(subject => subject.subjectId),
     });
   }
 
@@ -67,7 +63,7 @@ export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessStat
     const currentGrantedSubjects = await this.connectionInfoResource.loadAccessSubjects(key);
     const currentGrantedSubjectIds = currentGrantedSubjects.map(subject => subject.subjectId);
 
-    const { subjectsToRevoke, subjectsToGrant } = getSubjectDifferences(currentGrantedSubjectIds, this.state.grantedSubjects);
+    const { subjectsToRevoke, subjectsToGrant } = getSubjectDifferences(currentGrantedSubjectIds, this.state);
 
     if (subjectsToRevoke.length === 0 && subjectsToGrant.length === 0) {
       return;
@@ -86,15 +82,11 @@ export class ConnectionFormAccessPart extends FormPart<IConnectionFormAccessStat
     await Promise.all(promises);
   }
 
-  edit() {
-    this.state.editing = !this.state.editing;
-  }
-
   revoke(subjectIds: string[]) {
-    this.state.grantedSubjects = this.state.grantedSubjects.filter(subject => !subjectIds.includes(subject));
+    this.state = this.state.filter(subject => !subjectIds.includes(subject));
   }
 
   grant(subjectIds: string[]) {
-    this.state.grantedSubjects.push(...subjectIds);
+    this.state.push(...subjectIds);
   }
 }

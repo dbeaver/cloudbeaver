@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 
@@ -19,6 +19,7 @@ import {
   s,
   TextPlaceholder,
   useAutoLoad,
+  useObservableRef,
   useResource,
   useS,
   useTranslate,
@@ -38,6 +39,19 @@ import { getConnectionFormAccessPart } from './getConnectionFormAccessPart.js';
 export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAccess({ tabId, formState }) {
   const translate = useTranslate();
   const style = useS(styles);
+  const state = useObservableRef(
+    () => ({
+      editing: false,
+      toggleEdit() {
+        this.editing = !this.editing;
+      },
+    }),
+    {
+      editing: observable.ref,
+      toggleEdit: action.bound,
+    },
+    false,
+  );
 
   const { selected } = useTab(tabId);
   const accessPart = getConnectionFormAccessPart(formState);
@@ -51,13 +65,13 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
   const teams = useResource(ConnectionAccess, TeamsResource, CachedMapAllKey, { active: selected });
 
   const grantedUsers = useMemo(
-    () => computed(() => users.resource.values.filter(user => accessPart.state.grantedSubjects.includes(user.userId))),
-    [accessPart.state.grantedSubjects, users.resource],
+    () => computed(() => users.resource.values.filter(user => accessPart.state.includes(user.userId))),
+    [accessPart.state, users.resource],
   );
 
   const grantedTeams = useMemo(
-    () => computed(() => teams.resource.values.filter(team => accessPart.state.grantedSubjects.includes(team.teamId))),
-    [accessPart.state.grantedSubjects, teams.resource],
+    () => computed(() => teams.resource.values.filter(team => accessPart.state.includes(team.teamId))),
+    [accessPart.state, teams.resource],
   );
 
   if (!selected) {
@@ -95,14 +109,14 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
                   grantedUsers={grantedUsers.get()}
                   grantedTeams={grantedTeams.get()}
                   disabled={disabled}
-                  onEdit={accessPart.edit}
+                  onEdit={state.toggleEdit}
                   onRevoke={accessPart.revoke}
                 />
-                {accessPart.state.editing && (
+                {state.editing && (
                   <ConnectionAccessList
                     userList={users.resource.values}
                     teamList={teams.resource.values}
-                    grantedSubjects={accessPart.state.grantedSubjects}
+                    grantedSubjects={accessPart.state}
                     disabled={disabled}
                     onGrant={accessPart.grant}
                   />
