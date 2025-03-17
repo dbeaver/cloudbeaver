@@ -74,7 +74,7 @@ export class UsersAdministrationService extends Bootstrap {
     this.userDetailsInfoPlaceholder.add(UserCredentialsList, 0);
   }
 
-  private async cancelUserCreate(param: string | null, configurationWizard: boolean, outside: boolean) {
+  private cancelUserCreate(param: string | null, configurationWizard: boolean, outside: boolean) {
     if (param === 'create') {
       this.createUserService.close();
     }
@@ -84,7 +84,7 @@ export class UsersAdministrationService extends Bootstrap {
     }
   }
 
-  private async cancelTeamCreate(param: string | null, configurationWizard: boolean, outside: boolean) {
+  private cancelTeamCreate(param: string | null, configurationWizard: boolean, outside: boolean) {
     if (param === 'create') {
       this.createTeamService.dispose();
     }
@@ -94,7 +94,7 @@ export class UsersAdministrationService extends Bootstrap {
     }
   }
 
-  private async loadTeams(param: string | null) {
+  private loadTeams(param: string | null) {
     if (param === 'create') {
       this.createTeamService.fillData();
     }
