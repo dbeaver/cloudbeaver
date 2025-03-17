@@ -145,8 +145,6 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         LoggingProgressMonitor monitor = new LoggingProgressMonitor(log);
         driver = migrateDatabaseIfNeeded(monitor, dataSourceProviderRegistry);
 
-        driver = migrateDatabaseIfNeeded(monitor, dataSourceProviderRegistry);
-
 
         // read initial data before connecting to database
         // config file must be valid
