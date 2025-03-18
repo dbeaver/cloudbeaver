@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -86,11 +86,15 @@ export class DataGridContextMenuCellEditingService {
         const isComplex = format.isBinary(key) || format.isGeometry(key);
         const isTruncated = content.isTextTruncated(key);
         const selectedElements = select?.getSelectedElements() || [];
-        // we can't edit table cells if table doesn't have row identifier, but we can edit new created rows before insert (CB-6063)
-        const canEdit = model.hasElementIdentifier(resultIndex) || editor.getElementState(key) === DatabaseEditChangeType.add;
+        // If we somehow added a new row, we can always edit it
+        const canEdit = editor.getElementState(key) === DatabaseEditChangeType.add;
+
+        if (model.isReadonly(resultIndex)) {
+          return false;
+        }
 
         if (action === ACTION_EDIT) {
-          if (!column || cellValue === undefined || format.isReadOnly(key) || isComplex || isTruncated || !canEdit) {
+          if (!column || cellValue === undefined || (format.isReadOnly(key) && !canEdit) || isComplex || isTruncated) {
             return false;
           }
 
@@ -98,7 +102,13 @@ export class DataGridContextMenuCellEditingService {
         }
 
         if (action === ACTION_DATA_GRID_EDITING_SET_TO_NULL) {
-          return cellValue !== undefined && !format.isReadOnly(key) && !view.getColumn(key.column)?.required && !format.isNull(key) && canEdit;
+          return (
+            cellValue !== undefined &&
+            !(format.isReadOnly(key) && !canEdit) &&
+            !view.getColumn(key.column)?.required &&
+            !format.isNull(key) &&
+            canEdit
+          );
         }
 
         if (action === ACTION_DATA_GRID_EDITING_ADD_ROW || action === ACTION_DATA_GRID_EDITING_DUPLICATE_ROW) {
@@ -106,11 +116,11 @@ export class DataGridContextMenuCellEditingService {
         }
 
         if (action === ACTION_DATA_GRID_EDITING_DELETE_ROW) {
-          return !format.isReadOnly(key) && canEdit && editor.getElementState(key) !== DatabaseEditChangeType.delete;
+          return !(format.isReadOnly(key) && !canEdit) && editor.getElementState(key) !== DatabaseEditChangeType.delete;
         }
 
         if (action === ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW) {
-          if (model.isReadonly(resultIndex) || !canEdit || !editor.hasFeature('delete')) {
+          if ((format.isReadOnly(key) && !canEdit) || !editor.hasFeature('delete')) {
             return false;
           }
 
