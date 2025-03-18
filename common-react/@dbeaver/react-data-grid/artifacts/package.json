@@ -1,6 +1,6 @@
 {
   "name": "react-data-grid",
-  "version": "7.0.0-beta.48",
+  "version": "7.0.0-beta.50",
   "type": "module",
   "exports": {
     "./lib/styles.css": "./lib/styles.css",

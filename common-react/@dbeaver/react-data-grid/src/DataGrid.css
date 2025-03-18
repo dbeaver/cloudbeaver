@@ -2,6 +2,6 @@
 
 @layer components.rdg.MeasuringCell {
   [data-measuring-cell] {
-    max-width: var(--rdg-max-auto-size, 400px);
+    max-width: var(--rdg-max-auto-size, 350px);
   }
 }

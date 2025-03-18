@@ -26,6 +26,7 @@ export declare interface CalculatedColumn<TRow, TSummaryRow = unknown> extends C
     readonly draggable: boolean;
     readonly frozen: boolean;
     readonly renderCell: (props: RenderCellProps<TRow, TSummaryRow>) => ReactNode;
+    readonly renderHeaderCell: (props: RenderHeaderCellProps<TRow, TSummaryRow>) => ReactNode;
 }
 
 export declare type CalculatedColumnOrColumnGroup<R, SR> = CalculatedColumnParent<R, SR> | CalculatedColumn<R, SR>;
@@ -262,7 +263,7 @@ export declare interface DataGridProps<R, SR = unknown, K extends Key = Key> ext
     'data-cy'?: Maybe<string>;
 }
 
-export declare type DefaultColumnOptions<R, SR> = Pick<Column<R, SR>, 'renderCell' | 'width' | 'minWidth' | 'maxWidth' | 'resizable' | 'sortable' | 'draggable'>;
+export declare type DefaultColumnOptions<R, SR> = Pick<Column<R, SR>, 'renderCell' | 'renderHeaderCell' | 'width' | 'minWidth' | 'maxWidth' | 'resizable' | 'sortable' | 'draggable'>;
 
 declare type Direction = 'ltr' | 'rtl';
 
