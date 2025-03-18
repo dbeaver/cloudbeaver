@@ -53,7 +53,6 @@ import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.SecurityUtils;
 
-import javax.sql.DataSource;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -64,6 +63,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.sql.DataSource;
 
 /**
  * Database management
@@ -79,7 +79,8 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         "db/cb_schema_update_",
         CURRENT_SCHEMA_VERSION,
         0,
-        new CBSchemaVersionManager(CURRENT_SCHEMA_VERSION, "CB_CE")
+        new CBSchemaVersionManager(CURRENT_SCHEMA_VERSION, "CB_CE"),
+        CBDatabase.class.getClassLoader()
     );
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
@@ -104,7 +105,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         @NotNull WebDatabaseConfig databaseConfiguration,
         @NotNull List<SQLSchemaConfig> sqlSchemaConfigList
     ) {
-        super("Security Manager", databaseConfiguration, appendSchemaConfig(sqlSchemaConfigList) );
+        super("Security Manager", databaseConfiguration, appendSchemaConfig(sqlSchemaConfigList));
         this.application = application;
     }
 
@@ -214,13 +215,9 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
             throw new DBException("CB database connection is not defined");
         }
         createSchemaIfNotExists(connection);
-        updateSchema(monitor, connection, getClassLoader());
+        updateSchema(monitor, connection);
 
         validateInstancePersistentState(connection);
-    }
-
-    protected ClassLoader getClassLoader() {
-        return CBDatabase.class.getClassLoader();
     }
 
     // TODO: use a common code for the connection pool init
@@ -339,9 +336,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         closeConnection();
     }
 
-    /**
-     * Fill initial schema data after schema creation
-     */
+    @Override
     public void fillInitialSchemaData(DBRProgressMonitor monitor, Connection connection)
     throws DBException, SQLException {
         // Set exclusive connection. Otherwise security controller will open a new one and won't see new schema objects.
