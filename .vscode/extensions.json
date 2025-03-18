@@ -19,6 +19,7 @@
     "yzhang.markdown-all-in-one",
     "GraphQL.vscode-graphql-syntax",
     "mrmlnc.vscode-json5",
-    "esbenp.prettier-vscode"
+    "esbenp.prettier-vscode",
+    "devnaumov.licensify"
   ]
 }
