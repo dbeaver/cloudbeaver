@@ -111,7 +111,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
 
     private static List<SQLSchemaConfig> appendSchemaConfig(List<SQLSchemaConfig> sqlSchemaConfigList) {
         List<SQLSchemaConfig> sqlSchemaConfigs = new ArrayList<>(sqlSchemaConfigList);
-        sqlSchemaConfigs.addFirst(SCHEMA_CREATE_CONFIG);
+        sqlSchemaConfigs.add(0, SCHEMA_CREATE_CONFIG);
         return sqlSchemaConfigs;
     }
 
