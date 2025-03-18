@@ -24,12 +24,16 @@ public class CBSchemaVersionManager implements SQLSchemaVersionManager {
     }
 
     @Override
-    public int getCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName)
-    throws DBException, SQLException {
+    public int getCurrentSchemaVersion(
+        DBRProgressMonitor monitor,
+        Connection connection,
+        String schemaName
+    ) throws DBException, SQLException {
 
         Integer version = tryGetVersion(
             connection,
-            CommonUtils.normalizeTableNames("SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO WHERE ID = ?", schemaName), getSchemaId()
+            CommonUtils.normalizeTableNames("SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO WHERE MODULE_ID = ?", schemaName),
+            getSchemaId()
         );
         if (version != null) {
             return version;
@@ -67,7 +71,7 @@ public class CBSchemaVersionManager implements SQLSchemaVersionManager {
         var updateCount = JDBCUtils.executeUpdate(
             connection,
             CommonUtils.normalizeTableNames(
-                "UPDATE {table_prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP WHERE ID = ?",
+                "UPDATE {table_prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP WHERE MODULE_ID = ?",
                 schemaName
             ),
             version,
@@ -77,9 +81,11 @@ public class CBSchemaVersionManager implements SQLSchemaVersionManager {
             JDBCUtils.executeSQL(
                 connection,
                 CommonUtils.normalizeTableNames(
-                    "INSERT INTO {table_prefix}CB_SCHEMA_INFO (VERSION,UPDATE_TIME, ID) VALUES(?,CURRENT_TIMESTAMP, ?)", schemaName),
-                version,
-                getSchemaId()
+                    "INSERT INTO {table_prefix}CB_SCHEMA_INFO (MODULE_ID, VERSION,UPDATE_TIME) VALUES(?, ?, CURRENT_TIMESTAMP)",
+                    schemaName
+                ),
+                getSchemaId(),
+                version
             );
         }
     }
