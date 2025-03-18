@@ -100,9 +100,14 @@ export abstract class Resource<
       nextKey = this.aliases.transformToAlias(nextKey);
 
       return key.isEqual(nextKey);
-    } else if (isResourceAlias(key) || isResourceAlias(nextKey)) {
-      return false; // TODO: we can't predict if alias have collision with key so we can't intersect them.
-      // But we definitely need to implement it later to prevent unexpected behavior
+    }
+
+    if (isResourceAlias(key)) {
+      key = this.aliases.transformToKey(key);
+    }
+
+    if (isResourceAlias(nextKey)) {
+      nextKey = this.aliases.transformToKey(nextKey);
     }
 
     if (isResourceKeyList(key) || isResourceKeyList(nextKey)) {
