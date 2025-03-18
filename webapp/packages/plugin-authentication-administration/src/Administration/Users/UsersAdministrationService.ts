@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -59,16 +59,12 @@ export class UsersAdministrationService extends Bootstrap {
         },
         {
           name: EUsersAdministrationSub.Users,
-          onDeActivate: this.cancelCreate.bind(this),
+          onDeActivate: this.cancelUserCreate.bind(this),
         },
         {
           name: EUsersAdministrationSub.Teams,
           onActivate: this.loadTeams.bind(this),
-          onDeActivate: (param, configurationWizard, outside) => {
-            if (outside) {
-              this.teamsResource.cleanNewFlags();
-            }
-          },
+          onDeActivate: this.cancelTeamCreate.bind(this),
         },
       ],
       defaultSub: EUsersAdministrationSub.Users,
@@ -78,7 +74,7 @@ export class UsersAdministrationService extends Bootstrap {
     this.userDetailsInfoPlaceholder.add(UserCredentialsList, 0);
   }
 
-  private async cancelCreate(param: string | null, configurationWizard: boolean, outside: boolean) {
+  private cancelUserCreate(param: string | null, configurationWizard: boolean, outside: boolean) {
     if (param === 'create') {
       this.createUserService.close();
     }
@@ -88,7 +84,17 @@ export class UsersAdministrationService extends Bootstrap {
     }
   }
 
-  private async loadTeams(param: string | null) {
+  private cancelTeamCreate(param: string | null, configurationWizard: boolean, outside: boolean) {
+    if (param === 'create') {
+      this.createTeamService.dispose();
+    }
+
+    if (outside) {
+      this.teamsResource.cleanNewFlags();
+    }
+  }
+
+  private loadTeams(param: string | null) {
     if (param === 'create') {
       this.createTeamService.fillData();
     }

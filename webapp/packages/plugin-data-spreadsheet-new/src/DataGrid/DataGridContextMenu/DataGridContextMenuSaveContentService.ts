@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@ import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_RESULT_KEY,
+  DatabaseEditChangeType,
   DataViewerService,
   isResultSetDataSource,
   ResultSetDataContentAction,
@@ -54,13 +55,18 @@ export class DataGridContextMenuSaveContentService {
         const source = model.source as unknown as ResultSetDataSource;
         const content = source.getAction(resultIndex, ResultSetDataContentAction);
         const format = source.getAction(resultIndex, ResultSetFormatAction);
+        const editor = source.getAction(resultIndex, ResultSetEditAction);
 
         if (action === ACTION_DOWNLOAD) {
           return !content.isDownloadable(key) || !this.dataViewerService.canExportData;
         }
 
         if (action === ACTION_UPLOAD) {
-          return !format.isBinary(key) || model.isReadonly(resultIndex);
+          return (
+            !format.isBinary(key) ||
+            model.isReadonly(resultIndex) ||
+            (format.isReadOnly(key) && editor.getElementState(key) !== DatabaseEditChangeType.add)
+          );
         }
 
         return true;
