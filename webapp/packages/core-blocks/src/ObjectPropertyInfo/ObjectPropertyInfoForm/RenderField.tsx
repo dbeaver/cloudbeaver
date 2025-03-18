@@ -7,8 +7,14 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { getObjectPropertyType, getObjectPropertyValueType, type ObjectPropertyInfo, type ObjectPropertyType } from '@cloudbeaver/core-sdk';
-import { removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
+import {
+  ConditionType,
+  getObjectPropertyType,
+  getObjectPropertyValueType,
+  type ObjectPropertyInfo,
+  type ObjectPropertyType,
+} from '@cloudbeaver/core-sdk';
+import { EMPTY_ARRAY, removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 
 import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox.js';
 import { Combobox } from '../../FormControls/Combobox.js';
@@ -19,6 +25,7 @@ import { isControlPresented } from '../../FormControls/isControlPresented.js';
 import { Textarea } from '../../FormControls/Textarea.js';
 import { Link } from '../../Link.js';
 import { useTranslate } from '../../localization/useTranslate.js';
+import { evaluate } from '../evaluate.js';
 
 const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 
@@ -59,21 +66,36 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   editable = true,
   autofillToken = '',
   disabled,
-  readOnly,
   autoHide,
   showRememberTip,
   saved,
   className,
   canShowPassword,
   onFocus,
+  ...rest
 }) {
   const translate = useTranslate();
 
   const controlType = getObjectPropertyType(property);
   const type = getObjectPropertyValueType(property);
   const isPassword = type === 'password';
-  const required = property.required && !readOnly;
+  let readonly = rest.readOnly;
 
+  if (state) {
+    for (const condition of property.conditions ?? EMPTY_ARRAY) {
+      const result = evaluate(condition.expression, state);
+
+      if (condition.conditionType === ConditionType.Show && result === false) {
+        return null;
+      }
+
+      if (condition.conditionType === ConditionType.Active && result === false) {
+        readonly = true;
+      }
+    }
+  }
+
+  const required = property.required && !readonly;
   const value = getValue(property.value, controlType);
   const defaultValue = getValue(property.defaultValue, controlType);
 
@@ -108,7 +130,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           state={state}
           defaultChecked={defaultValue}
           title={property.description}
-          disabled={disabled || readOnly}
+          disabled={disabled || readonly}
           className={className}
           groupGap
         >
@@ -123,7 +145,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         checked={value}
         defaultChecked={defaultValue}
         title={property.description}
-        disabled={disabled || readOnly}
+        disabled={disabled || readonly}
         className={className}
         groupGap
       >
@@ -145,7 +167,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           defaultValue={defaultValue}
           title={property.description}
           disabled={disabled}
-          readOnly={readOnly}
+          readOnly={readonly}
           description={property.hint}
           className={className}
         >
@@ -164,7 +186,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         defaultValue={defaultValue}
         title={property.description}
         disabled={disabled}
-        readOnly={readOnly}
+        readOnly={readonly}
         description={property.hint}
         className={className}
       >
@@ -205,7 +227,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           name={property.id!}
           state={state}
           disabled={disabled}
-          readOnly={readOnly}
+          readOnly={readonly}
           className={className}
         >
           {property.displayName ?? ''}
@@ -221,7 +243,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         placeholder={passwordSavedMessage}
         name={property.id!}
         value={value}
-        readOnly={readOnly || disabled}
+        readOnly={readonly || disabled}
         className={className}
       >
         {property.displayName ?? ''}
@@ -242,7 +264,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         autoHide={autoHide}
         description={property.hint}
         placeholder={passwordSavedMessage}
-        readOnly={readOnly || disabled}
+        readOnly={readonly || disabled}
         autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
         className={className}
         canShowPassword={canShowPassword}
@@ -264,7 +286,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       defaultValue={defaultValue}
       description={property.hint}
       placeholder={passwordSavedMessage}
-      readOnly={readOnly || disabled}
+      readOnly={readonly || disabled}
       autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
       className={className}
       canShowPassword={canShowPassword}

@@ -259,3 +259,4 @@ export * from './FormControls/InputAutocompletionMenu.js';
 export * from './useSearch.js';
 export * from './useObjectInfoTooltip.js';
 export * from './Alert.js';
+export * from './ObjectPropertyInfo/evaluate.js';

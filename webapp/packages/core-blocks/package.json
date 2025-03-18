@@ -42,6 +42,7 @@
     "react-minisearch": "^7",
     "reakit": "^1",
     "reakit-utils": "^0",
+    "subscript": "^9.1.0",
     "tslib": "^2"
   },
   "devDependencies": {
