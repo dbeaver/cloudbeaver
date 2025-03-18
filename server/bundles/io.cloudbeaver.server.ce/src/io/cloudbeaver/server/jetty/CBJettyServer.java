@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
+import io.cloudbeaver.server.filters.ServerConfigurationTimeLimitFilter;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.server.servlets.WebStatusServlet;
@@ -115,7 +116,13 @@ public class CBJettyServer {
 
                 servletContextHandler.addServlet(new ServletHolder("status", new WebStatusServlet()), "/status");
 
-                servletContextHandler.addServlet(new ServletHolder("graphql", new GraphQLEndpoint()), serverConfiguration.getServicesURI() + "gql/*");
+                servletContextHandler.addServlet(
+                    new ServletHolder(
+                        "graphql",
+                        new GraphQLEndpoint(new ServerConfigurationTimeLimitFilter(application))
+                    ),
+                    serverConfiguration.getServicesURI() + "gql/*"
+                );
                 servletContextHandler.addEventListener(new CBServerContextListener(application));
 
                 // Add extensions from services
