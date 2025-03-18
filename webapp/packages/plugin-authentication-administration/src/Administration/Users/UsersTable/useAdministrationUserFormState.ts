@@ -18,7 +18,7 @@ export function useAdministrationUserFormState(id: string | null, configure?: (s
   const serviceProvider = useService(IServiceProvider);
   const ref = useRef<null | AdministrationUserFormState>(null);
 
-  if (ref.current?.id !== id) {
+  if (ref.current?.state.userId !== id) {
     ref.current?.dispose();
     ref.current = new AdministrationUserFormState(serviceProvider, service, {
       userId: id,
