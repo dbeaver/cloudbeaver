@@ -1885,6 +1885,7 @@ __metadata:
     "@swc/core": "npm:^1"
     "@swc/jest": "npm:^0"
     "@testing-library/jest-dom": "npm:^6"
+    "@types/js-yaml": "npm:^4"
     "@types/node": "npm:^20"
     enquirer: "npm:^2"
     execa: "npm:^9"
@@ -1893,12 +1894,14 @@ __metadata:
     hygen: "npm:^6"
     jest: "npm:^29"
     jest-environment-jsdom: "npm:^29"
+    js-yaml: "npm:^4"
     tslib: "npm:^2"
     typescript: "npm:^5"
     upath: "npm:^2"
   bin:
     core-cli-add-plugin: ./bin/add-plugin.js
     core-cli-analyzer: ./bin/analyzer.js
+    core-cli-check-license: ./dist/cli/license-check.js
     core-cli-dependency-graph: ./bin/dependency-graph.js
     core-cli-set-version: ./bin/set-version.mjs
     core-cli-test: ./bin/test.js
@@ -8257,7 +8260,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/js-yaml@npm:^4.0.0":
+"@types/js-yaml@npm:^4, @types/js-yaml@npm:^4.0.0":
   version: 4.0.9
   resolution: "@types/js-yaml@npm:4.0.9"
   checksum: 10c0/24de857aa8d61526bbfbbaa383aa538283ad17363fcd5bb5148e2c7f604547db36646440e739d78241ed008702a8920665d1add5618687b6743858fae00da211
@@ -9917,7 +9920,7 @@ __metadata:
     "@types/react-dom": "npm:^19"
     concurrently: "npm:^9"
     eslint: "npm:^9.20.1"
-    husky: "npm:^9"
+    lefthook: "npm:^1"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     msw: "npm:^2"
@@ -13014,15 +13017,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^9":
-  version: 9.1.7
-  resolution: "husky@npm:9.1.7"
-  bin:
-    husky: bin.js
-  checksum: 10c0/35bb110a71086c48906aa7cd3ed4913fb913823715359d65e32e0b964cb1e255593b0ae8014a5005c66a68e6fa66c38dcfa8056dbbdfb8b0187c0ffe7ee3a58f
-  languageName: node
-  linkType: hard
-
 "hygen@npm:^6":
   version: 6.2.11
   resolution: "hygen@npm:6.2.11"
@@ -14446,7 +14440,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:^4.0.0, js-yaml@npm:^4.1.0":
+"js-yaml@npm:^4, js-yaml@npm:^4.0.0, js-yaml@npm:^4.1.0":
   version: 4.1.0
   resolution: "js-yaml@npm:4.1.0"
   dependencies:
@@ -14696,6 +14690,117 @@ __metadata:
   version: 1.9.4
   resolution: "leaflet@npm:1.9.4"
   checksum: 10c0/f639441dbb7eb9ae3fcd29ffd7d3508f6c6106892441634b0232fafb9ffb1588b05a8244ec7085de2c98b5ed703894df246898477836cfd0ce5b96d4717b5ca1
+  languageName: node
+  linkType: hard
+
+"lefthook-darwin-arm64@npm:1.10.10":
+  version: 1.10.10
+  resolution: "lefthook-darwin-arm64@npm:1.10.10"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"lefthook-darwin-x64@npm:1.10.10":
+  version: 1.10.10
+  resolution: "lefthook-darwin-x64@npm:1.10.10"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"lefthook-freebsd-arm64@npm:1.10.10":
+  version: 1.10.10
+  resolution: "lefthook-freebsd-arm64@npm:1.10.10"
+  conditions: os=freebsd & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"lefthook-freebsd-x64@npm:1.10.10":
+  version: 1.10.10
+  resolution: "lefthook-freebsd-x64@npm:1.10.10"
+  conditions: os=freebsd & cpu=x64
+  languageName: node
+  linkType: hard
+
+"lefthook-linux-arm64@npm:1.10.10":
+  version: 1.10.10
+  resolution: "lefthook-linux-arm64@npm:1.10.10"
+  conditions: os=linux & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"lefthook-linux-x64@npm:1.10.10":
+  version: 1.10.10
+  resolution: "lefthook-linux-x64@npm:1.10.10"
+  conditions: os=linux & cpu=x64
+  languageName: node
+  linkType: hard
+
+"lefthook-openbsd-arm64@npm:1.10.10":
+  version: 1.10.10
+  resolution: "lefthook-openbsd-arm64@npm:1.10.10"
+  conditions: os=openbsd & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"lefthook-openbsd-x64@npm:1.10.10":
+  version: 1.10.10
+  resolution: "lefthook-openbsd-x64@npm:1.10.10"
+  conditions: os=openbsd & cpu=x64
+  languageName: node
+  linkType: hard
+
+"lefthook-windows-arm64@npm:1.10.10":
+  version: 1.10.10
+  resolution: "lefthook-windows-arm64@npm:1.10.10"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"lefthook-windows-x64@npm:1.10.10":
+  version: 1.10.10
+  resolution: "lefthook-windows-x64@npm:1.10.10"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"lefthook@npm:^1":
+  version: 1.10.10
+  resolution: "lefthook@npm:1.10.10"
+  dependencies:
+    lefthook-darwin-arm64: "npm:1.10.10"
+    lefthook-darwin-x64: "npm:1.10.10"
+    lefthook-freebsd-arm64: "npm:1.10.10"
+    lefthook-freebsd-x64: "npm:1.10.10"
+    lefthook-linux-arm64: "npm:1.10.10"
+    lefthook-linux-x64: "npm:1.10.10"
+    lefthook-openbsd-arm64: "npm:1.10.10"
+    lefthook-openbsd-x64: "npm:1.10.10"
+    lefthook-windows-arm64: "npm:1.10.10"
+    lefthook-windows-x64: "npm:1.10.10"
+  dependenciesMeta:
+    lefthook-darwin-arm64:
+      optional: true
+    lefthook-darwin-x64:
+      optional: true
+    lefthook-freebsd-arm64:
+      optional: true
+    lefthook-freebsd-x64:
+      optional: true
+    lefthook-linux-arm64:
+      optional: true
+    lefthook-linux-x64:
+      optional: true
+    lefthook-openbsd-arm64:
+      optional: true
+    lefthook-openbsd-x64:
+      optional: true
+    lefthook-windows-arm64:
+      optional: true
+    lefthook-windows-x64:
+      optional: true
+  bin:
+    lefthook: bin/index.js
+  checksum: 10c0/bd67c5582f7d3480db5f19c71ce7f5e6f0e0b0c8b6c94557cb5d45f535dabb3aa26315c2c328059499cf5d99ab71ce79257fd7ef32af8878d4e00e2710399618
   languageName: node
   linkType: hard
 

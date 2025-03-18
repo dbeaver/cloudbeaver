@@ -24,11 +24,15 @@ import io.cloudbeaver.service.DBWService;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferDefaultExportSettings;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferParameters;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferStreamProcessor;
+import io.cloudbeaver.service.data.transfer.impl.WebDataTransferTaskConfig;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.sql.WebSQLResultsInfo;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -62,8 +66,22 @@ public interface DBWServiceDataTransfer extends DBWService {
         String resultsId,
         WebDataTransferParameters parameters) throws DBWebException;
 
+    /**
+     * It's deprecated because now we use streaming file to response directly, and we don't need to clean up any files
+     * after data transfer.
+     */
     @WebAction
+    @Deprecated
     Boolean dataTransferRemoveDataFile(WebSession session, String dataFileId) throws DBWebException;
 
     WebDataTransferDefaultExportSettings defaultExportSettings();
+
+    /**
+     * Usefully for exporting directly to http response and avoid to create temp files.
+     */
+    void exportDataTransferToStream(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull WebDataTransferTaskConfig taskConfig,
+        @NotNull OutputStream outputStream
+    ) throws DBException;
 }

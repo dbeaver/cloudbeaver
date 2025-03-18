@@ -19,7 +19,6 @@ package io.cloudbeaver.model.rm.local;
 import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.model.app.ServletApplication;
-import io.cloudbeaver.model.rm.lock.RMFileLockController;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.ServletAppUtils;
@@ -32,6 +31,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.fs.lock.FileLockController;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.*;
@@ -83,7 +83,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         Path sharedProjectsPath,
         Supplier<SMController> smControllerSupplier
     ) throws DBException {
-        super(workspace, new RMFileLockController(ServletAppUtils.getServletApplication()));
+        super(workspace, new FileLockController(ServletAppUtils.getServletApplication().getApplicationInstanceId()));
         this.credentialsProvider = credentialsProvider;
         this.rootPath = rootPath;
         this.userProjectsPath = userProjectsPath;
@@ -297,7 +297,7 @@ public class LocalResourceController extends BaseLocalResourceController {
 
     @Override
     public void deleteProject(@NotNull String projectId) throws DBException {
-        try (var projectLock = lockController.lockProject(projectId, "deleteProject")) {
+        try (var projectLock = lockController.lock(projectId, "deleteProject")) {
             RMProject project = makeProjectFromId(projectId, false);
             Path targetPath = getProjectPath(projectId);
             if (!Files.exists(targetPath)) {
@@ -395,7 +395,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         @NotNull String resourcePath,
         boolean isFolder
     ) throws DBException {
-        try (var ignoredLock = lockController.lockProject(projectId, "createResource")) {
+        try (var ignoredLock = lockController.lock(projectId, "createResource")) {
             validateResourcePath(resourcePath);
             Path targetPath = getTargetPath(projectId, resourcePath);
             if (Files.exists(targetPath)) {
@@ -427,7 +427,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         @NotNull String oldResourcePath,
         @NotNull String newResourcePath
     ) throws DBException {
-        try (var ignoredLock = lockController.lockProject(projectId, "moveResource")) {
+        try (var ignoredLock = lockController.lock(projectId, "moveResource")) {
             var normalizedOldResourcePath = CommonUtils.normalizeResourcePath(oldResourcePath);
             var normalizedNewResourcePath = CommonUtils.normalizeResourcePath(newResourcePath);
             if (log.isDebugEnabled()) {
@@ -499,7 +499,7 @@ public class LocalResourceController extends BaseLocalResourceController {
 
     @Override
     public void deleteResource(@NotNull String projectId, @NotNull String resourcePath, boolean recursive) throws DBException {
-        try (var ignoredLock = lockController.lockProject(projectId, "deleteResource")) {
+        try (var ignoredLock = lockController.lock(projectId, "deleteResource")) {
             if (log.isDebugEnabled()) {
                 log.debug("Removing resource from '" + resourcePath + "' in project '" + projectId + "'" + (recursive ? " recursive" : ""));
             }
@@ -587,7 +587,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         @NotNull byte[] data,
         boolean forceOverwrite
     ) throws DBException {
-        try (var ignoredLock = lockController.lockProject(projectId, "setResourceContents")) {
+        try (var ignoredLock = lockController.lock(projectId, "setResourceContents")) {
             validateResourcePath(resourcePath);
             Number fileSizeLimit = ServletAppUtils.getServletApplication()
                 .getAppConfiguration()
@@ -632,7 +632,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         @NotNull String propertyName,
         @Nullable Object propertyValue
     ) throws DBException {
-        try (var ignoredLock = lockController.lockProject(projectId, "resourcePropertyUpdate")) {
+        try (var ignoredLock = lockController.lock(projectId, "resourcePropertyUpdate")) {
             validateResourcePath(resourcePath);
             BaseWebProjectImpl webProject = getWebProject(projectId, false);
             doFileWriteOperation(projectId, webProject.getMetadataFilePath(),
@@ -653,7 +653,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         @NotNull String resourcePath,
         @NotNull Map<String, Object> properties
     ) throws DBException {
-        try (var ignoredLock = lockController.lockProject(projectId, "resourcePropertyUpdate")) {
+        try (var ignoredLock = lockController.lock(projectId, "resourcePropertyUpdate")) {
             validateResourcePath(resourcePath);
             BaseWebProjectImpl webProject = getWebProject(projectId, false);
             doFileWriteOperation(projectId, webProject.getMetadataFilePath(),
