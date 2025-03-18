@@ -32,8 +32,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBConstants;
-import org.jkiss.dbeaver.model.DBPConnectionInformation;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
@@ -44,17 +42,14 @@ import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
-import org.jkiss.dbeaver.model.sql.SQLDialect;
-import org.jkiss.dbeaver.model.sql.SQLDialectSchemaController;
-import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
-import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
+import org.jkiss.dbeaver.model.sql.db.InternalDB;
+import org.jkiss.dbeaver.model.sql.schema.SQLSchemaConfig;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.storage.H2Migrator;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
-import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.SecurityUtils;
@@ -63,21 +58,30 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
+import javax.sql.DataSource;
 
 /**
  * Database management
  */
-public class CBDatabase {
+public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     private static final Log log = Log.getLog(CBDatabase.class);
-
-    public static final String SCHEMA_CREATE_SQL_PATH = "db/cb_schema_create.sql";
-    public static final String SCHEMA_UPDATE_SQL_PATH = "db/cb_schema_update_";
 
     private static final int LEGACY_SCHEMA_VERSION = 1;
     private static final int CURRENT_SCHEMA_VERSION = 22;
+
+    private static final SQLSchemaConfig SCHEMA_CREATE_CONFIG = new SQLSchemaConfig(
+        "CB",
+        "db/cb_schema_create.sql",
+        "db/cb_schema_update_",
+        CURRENT_SCHEMA_VERSION,
+        0
+    );
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
@@ -85,20 +89,16 @@ public class CBDatabase {
     private static final String V2_DB_NAME = "cb.h2v2.dat";
 
     private final ServletApplication application;
-    private final WebDatabaseConfig databaseConfiguration;
-    private PoolingDataSource<PoolableConnection> cbDataSource;
-    private DBPConnectionInformation cbConnectionInformation;
     private CBDatabaseInitialData initialData;
 
     private transient volatile Connection exclusiveConnection;
 
     private String instanceId;
     private SMAdminController adminSecurityController;
-    private SQLDialect dialect;
 
-    public CBDatabase(ServletApplication application, WebDatabaseConfig databaseConfiguration) {
+    public CBDatabase(@NotNull ServletApplication application, @NotNull WebDatabaseConfig databaseConfiguration) {
+        super("Security Manager", databaseConfiguration, SCHEMA_CREATE_CONFIG);
         this.application = application;
-        this.databaseConfiguration = databaseConfiguration;
     }
 
     public void setAdminSecurityController(SMAdminController adminSecurityController) {
@@ -113,165 +113,113 @@ public class CBDatabase {
         if (exclusiveConnection != null) {
             return exclusiveConnection;
         }
-        return cbDataSource.getConnection();
-    }
-
-    public PoolingDataSource<PoolableConnection> getConnectionPool() {
-        return cbDataSource;
+        return dataSource.getConnection();
     }
 
     public void initialize() throws DBException {
         log.debug("Initiate management database");
-        if (CommonUtils.isEmpty(databaseConfiguration.getDriver())) {
-            throw new DBException("No database driver configured for CloudBeaver database");
-        }
         var dataSourceProviderRegistry = DataSourceProviderRegistry.getInstance();
-        DBPDriver driver = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
-        if (driver == null) {
-            throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
+        DBPDriver driver = getDatabaseDriver(dataSourceProviderRegistry);
+        if (isDefaultH2Configuration(databaseConfig)) {
+            //force use default values even if they are explicitly specified
+            databaseConfig.setUser(null);
+            databaseConfig.setPassword(null);
+            databaseConfig.setSchema(null);
         }
+
+        setDefaultUserAndPassword(driver);
 
         LoggingProgressMonitor monitor = new LoggingProgressMonitor(log);
+        driver = migrateDatabaseIfNeeded(monitor, dataSourceProviderRegistry);
 
-        if (isDefaultH2Configuration(databaseConfiguration)) {
-            //force use default values even if they are explicitly specified
-            databaseConfiguration.setUser(null);
-            databaseConfiguration.setPassword(null);
-            databaseConfiguration.setSchema(null);
-        }
-
-        String dbUser = databaseConfiguration.getUser();
-        String dbPassword = databaseConfiguration.getPassword();
-        String schemaName = databaseConfiguration.getSchema();
-
-        if (CommonUtils.isEmpty(dbUser) && driver.isEmbedded()) {
-            File pwdFile = application.getDataDirectory(true).resolve(DEFAULT_DB_PWD_FILE).toFile();
-            if (!driver.isAnonymousAccess()) {
-                // No database credentials specified
-                dbUser = DEFAULT_DB_USER_NAME;
-
-                // Load or generate random password
-                if (pwdFile.exists()) {
-                    try (FileReader fr = new FileReader(pwdFile)) {
-                        dbPassword = IOUtils.readToString(fr);
-                    } catch (Exception e) {
-                        log.error(e);
-                    }
-                }
-                if (CommonUtils.isEmpty(dbPassword)) {
-                    dbPassword = SecurityUtils.generatePassword(8);
-                    try {
-                        IOUtils.writeFileFromString(pwdFile, dbPassword);
-                    } catch (IOException e) {
-                        log.error(e);
-                    }
-                }
-            }
-        }
-
-        String dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), SystemVariablesResolver.INSTANCE);
-        Properties dbProperties = new Properties();
-        if (!CommonUtils.isEmpty(dbUser)) {
-            dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_USER, dbUser);
-            if (!CommonUtils.isEmpty(dbPassword)) {
-                dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_PASSWORD, dbPassword);
-            }
-        }
-
-        if (H2Migrator.isH2Database(databaseConfiguration)) {
-            var migrator = new H2Migrator(monitor,
-                dataSourceProviderRegistry,
-                databaseConfiguration,
-                dbURL,
-                dbProperties);
-            migrator.migrateDatabaseIfNeeded(V1_DB_NAME, V2_DB_NAME);
-        }
 
         // read initial data before connecting to database
         // config file must be valid
         readInitialDataConfigurationFile();
 
-        // reload the driver and url due to a possible configuration update
-        driver = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
-        if (driver == null) {
-            throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
-        }
-        Driver driverInstance = driver.getDriverInstance(monitor);
-        dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), SystemVariablesResolver.INSTANCE);
+        this.dataSource = initConnectionPool(driver.getDriverInstance(monitor), driver.getFullName());
+        this.dialect = driver.getScriptDialect().createInstance();
 
-        try {
-            this.cbDataSource = initConnectionPool(driver, dbURL, dbProperties, driverInstance);
-        } catch (SQLException e) {
-            throw new DBException("Error initializing connection pool");
-        }
-        dialect = driver.getScriptDialect().createInstance();
-
-        try (Connection connection = cbDataSource.getConnection()) {
-            DatabaseMetaData metaData = connection.getMetaData();
-            final String dbName = metaData.getDatabaseProductName();
-            final String dbVersion = metaData.getDatabaseProductVersion();
-            log.debug("\tConnected to " + dbName + " " + dbVersion);
-
-            cbConnectionInformation = new DBPConnectionInformation(
-                databaseConfiguration.getUrl(),
-                databaseConfiguration.getDriver(),
-                dbName,
-                dbVersion
-            );
-
-            if (dialect instanceof SQLDialectSchemaController && CommonUtils.isNotEmpty(schemaName)) {
-                var dialectSchemaController = (SQLDialectSchemaController) dialect;
-                var schemaExistQuery = dialectSchemaController.getSchemaExistQuery(schemaName);
-                boolean schemaExist = JDBCUtils.executeQuery(connection, schemaExistQuery) != null;
-                if (!schemaExist) {
-                    log.info("Schema " + schemaName + " not exist, create new one");
-                    String createSchemaQuery = dialectSchemaController.getCreateSchemaQuery(
-                        schemaName
-                    );
-                    JDBCUtils.executeStatement(connection, createSchemaQuery);
-                }
-            }
-            SQLSchemaManager schemaManager = new SQLSchemaManager(
-                "CB",
-                new ClassLoaderScriptSource(
-                    CBDatabase.class.getClassLoader(),
-                    SCHEMA_CREATE_SQL_PATH,
-                    SCHEMA_UPDATE_SQL_PATH
-                ),
-                monitor1 -> connection,
-                new CBSchemaVersionManager(),
-                dialect,
-                null,
-                schemaName,
-                CURRENT_SCHEMA_VERSION,
-                0,
-                databaseConfiguration
-            );
-            schemaManager.updateSchema(monitor);
-
-            validateInstancePersistentState(connection);
+        try (Connection connection = dataSource.getConnection()) {
+            initSchema(monitor, connection);
         } catch (Exception e) {
             throw new DBException("Error updating management database schema", e);
         }
         log.debug("\tManagement database connection established");
     }
 
-    protected PoolingDataSource<PoolableConnection> initConnectionPool(
-        DBPDriver driver,
-        String dbURL,
-        Properties dbProperties,
-        Driver driverInstance
-    ) throws SQLException, DBException {
+    @NotNull
+    private DBPDriver migrateDatabaseIfNeeded(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DataSourceProviderRegistry dataSourceProviderRegistry
+    ) throws DBException {
+        if (H2Migrator.isH2Database(databaseConfig)) {
+            var migrator = new H2Migrator(
+                monitor,
+                dataSourceProviderRegistry,
+                databaseConfig,
+                getProperties()
+            );
+            migrator.migrateDatabaseIfNeeded(V1_DB_NAME, V2_DB_NAME);
+        }
+        // reload the driver and url due to a possible configuration update
+        return getDatabaseDriver(dataSourceProviderRegistry);
+    }
+
+    private void setDefaultUserAndPassword(@NotNull DBPDriver driver) {
+        if (!CommonUtils.isEmpty(databaseConfig.getUser()) || !driver.isEmbedded()) {
+            return;
+        }
+        // No database credentials specified
+        databaseConfig.setUser(DEFAULT_DB_USER_NAME);
+
+        if (driver.isAnonymousAccess()) {
+            return;
+        }
+        File pwdFile = application.getDataDirectory(true).resolve(DEFAULT_DB_PWD_FILE).toFile();
+        // Load or generate random password
+        if (pwdFile.exists()) {
+            try (FileReader fr = new FileReader(pwdFile)) {
+                databaseConfig.setPassword(IOUtils.readToString(fr));
+            } catch (Exception e) {
+                log.error(e);
+            }
+        }
+        if (CommonUtils.isEmpty(databaseConfig.getPassword())) {
+            databaseConfig.setPassword(SecurityUtils.generatePassword(8));
+            try {
+                IOUtils.writeFileFromString(pwdFile, databaseConfig.getPassword());
+            } catch (IOException e) {
+                log.error(e);
+            }
+        }
+    }
+
+    @Override
+    protected void initializeSchema(@NotNull DBRProgressMonitor monitor, @Nullable Connection connection) throws Exception {
+        if (connection == null) {
+            throw new DBException("CB database connection is not defined");
+        }
+        createSchemaIfNotExists(connection);
+        updateSchema(monitor, connection, CBDatabase.class.getClassLoader(), new CBSchemaVersionManager());
+
+        validateInstancePersistentState(connection);
+    }
+
+    // TODO: use a common code for the connection pool init
+    @NotNull
+    protected DataSource initConnectionPool(@NotNull Driver driverInstance, @NotNull String driverName) {
+        final String dbURL = databaseConfig.getResolvedUrl();
         // Create connection pool with custom connection factory
-        log.debug("\tInitiate connection pool with management database (" + driver.getFullName() + "; " + dbURL + ")");
-        DriverConnectionFactory conFactory = new DriverConnectionFactory(driverInstance, dbURL, dbProperties);
+        log.debug("\tInitiate connection pool with management database (" + driverName + "; " + dbURL + ")");
+        DriverConnectionFactory conFactory = new DriverConnectionFactory(driverInstance, dbURL, getProperties());
         PoolableConnectionFactory pcf = new PoolableConnectionFactory(conFactory, null);
-        pcf.setValidationQuery(databaseConfiguration.getPool().getValidationQuery());
+        pcf.setValidationQuery(databaseConfig.getPool().getValidationQuery());
 
         GenericObjectPoolConfig<PoolableConnection> config = new GenericObjectPoolConfig<>();
-        config.setMinIdle(databaseConfiguration.getPool().getMinIdleConnections());
-        config.setMaxIdle(databaseConfiguration.getPool().getMaxIdleConnections());
-        config.setMaxTotal(databaseConfiguration.getPool().getMaxConnections());
+        config.setMinIdle(databaseConfig.getPool().getMinIdleConnections());
+        config.setMaxIdle(databaseConfig.getPool().getMaxIdleConnections());
+        config.setMaxTotal(databaseConfig.getPool().getMaxConnections());
         GenericObjectPool<PoolableConnection> connectionPool = new GenericObjectPool<>(pcf, config);
         pcf.setPool(connectionPool);
         return new PoolingDataSource<>(connectionPool);
@@ -309,13 +257,13 @@ public class CBDatabase {
     }
 
     private void readInitialDataConfigurationFile() throws DBException {
-        String initialDataPath = databaseConfiguration.getInitialDataConfiguration();
+        String initialDataPath = databaseConfig.getInitialDataConfiguration();
         if (CommonUtils.isEmpty(initialDataPath)) {
             return;
         }
 
         initialDataPath = ServletAppUtils.getRelativePath(
-            databaseConfiguration.getInitialDataConfiguration(), application.getHomeDirectory());
+            databaseConfig.getInitialDataConfiguration(), application.getHomeDirectory());
         try (Reader reader = new InputStreamReader(new FileInputStream(initialDataPath), StandardCharsets.UTF_8)) {
             Gson gson = new GsonBuilder()
                 .setStrictness(Strictness.LENIENT)
@@ -371,14 +319,7 @@ public class CBDatabase {
     }
 
     public void shutdown() {
-        log.debug("Shutdown database");
-        if (cbDataSource != null) {
-            try {
-                cbDataSource.close();
-            } catch (SQLException e) {
-                log.error(e);
-            }
-        }
+        closeConnection();
     }
 
     private class CBSchemaVersionManager implements SQLSchemaVersionManager {
@@ -406,7 +347,7 @@ public class CBDatabase {
 
         @Override
         public int getLatestSchemaVersion() {
-            return CURRENT_SCHEMA_VERSION;
+            return SCHEMA_CREATE_CONFIG.schemaVersionActual();
         }
 
         @Override
@@ -590,19 +531,6 @@ public class CBDatabase {
         return id.toString();
     }
 
-    /**
-     * Replaces all predefined prefixes in sql query.
-     */
-    @NotNull
-    public String normalizeTableNames(@NotNull String sql) {
-        return CommonUtils.normalizeTableNames(sql, databaseConfiguration.getSchema());
-    }
-
-    @NotNull
-    public SQLDialect getDialect() {
-        return dialect;
-    }
-
     public static boolean isDefaultH2Configuration(WebDatabaseConfig databaseConfiguration) {
         var workspace = ServletAppUtils.getServletApplication().getWorkspaceDirectory();
         var v1Path = workspace.resolve(".data").resolve(V1_DB_NAME);
@@ -611,18 +539,6 @@ public class CBDatabase {
         var v2DefaultUrl = "jdbc:h2:" + v2Path;
         return v1DefaultUrl.equals(databaseConfiguration.getUrl())
             || v2DefaultUrl.equals(databaseConfiguration.getUrl());
-    }
-
-    /**
-     * Returns internal database metadata.
-     */
-    @NotNull
-    public DBPConnectionInformation getMetaDataInfo() {
-        return cbConnectionInformation;
-    }
-
-    protected WebDatabaseConfig getDatabaseConfiguration() {
-        return databaseConfiguration;
     }
 
     protected ServletApplication getApplication() {
