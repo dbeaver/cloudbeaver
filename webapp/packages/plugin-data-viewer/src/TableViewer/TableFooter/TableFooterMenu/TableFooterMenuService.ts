@@ -103,8 +103,8 @@ export class TableFooterMenuService {
             const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
             const selectedElements = getActiveElements(model, resultIndex);
 
-            // we can edit newly created rows
-            const canEdit = selectedElements.every(key => editor?.getElementState(key) === DatabaseEditChangeType.add);
+            const canEdit =
+              model.hasElementIdentifier(resultIndex) || selectedElements.every(key => editor?.getElementState(key) === DatabaseEditChangeType.add);
 
             if (!editor || !canEdit) {
               return true;
