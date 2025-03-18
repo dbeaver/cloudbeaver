@@ -157,17 +157,21 @@ export class ConfigurationWizardService {
   }
 
   private async finish() {
-    for (const step of this.steps) {
-      if (step?.configurationWizardOptions?.onConfigurationFinish) {
-        await step.configurationWizardOptions.onConfigurationFinish();
+    try {
+      for (const step of this.steps) {
+        if (step?.configurationWizardOptions?.onConfigurationFinish) {
+          await step.configurationWizardOptions.onConfigurationFinish();
+        }
       }
-    }
 
-    this.administrationScreenService.clearItemsState();
-    this.administrationScreenService.navigateToRoot();
-    this.notificationService.logSuccess({
-      title: 'administration_configuration_wizard_finish_success_title',
-      message: 'administration_configuration_wizard_finish_success_message',
-    });
+      this.administrationScreenService.clearItemsState();
+      this.administrationScreenService.navigateToRoot();
+      this.notificationService.logSuccess({
+        title: 'administration_configuration_wizard_finish_success_title',
+        message: 'administration_configuration_wizard_finish_success_message',
+      });
+    } catch (exception: any) {
+      this.notificationService.logException(exception, 'core_administration_configuration_wizard_finish_fail_title');
+    }
   }
 }

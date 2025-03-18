@@ -11,6 +11,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import { formValidationContext } from '@cloudbeaver/core-ui';
+import { getFirstException } from '@cloudbeaver/core-utils';
 
 import { ADMINISTRATION_SERVER_CONFIGURATION_ITEM } from './ServerConfiguration/ADMINISTRATION_SERVER_CONFIGURATION_ITEM.js';
 import { ServerConfigurationFormStateManager } from './ServerConfiguration/ServerConfigurationFormStateManager.js';
@@ -71,8 +72,20 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
           return true;
         },
         onConfigurationFinish: async () => {
-          await this.serverConfigurationFormStateManager.formState?.save();
-          await this.sessionDataResource.refresh();
+          const state = this.serverConfigurationFormStateManager.formState;
+          if (state) {
+            const saved = await state.save();
+
+            if (!saved) {
+              const error = getFirstException(state.exception);
+
+              if (error) {
+                throw getFirstException(error);
+              }
+            }
+
+            await this.sessionDataResource.refresh();
+          }
         },
         onLoad: () => {
           this.serverConfigurationFormStateManager.create();
