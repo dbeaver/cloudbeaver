@@ -338,8 +338,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     }
 
     @Override
-    public void fillInitialSchemaData(DBRProgressMonitor monitor, Connection connection)
-    throws DBException, SQLException {
+    public void fillInitialSchemaData(DBRProgressMonitor monitor, Connection connection) throws DBException, SQLException {
         // Set exclusive connection. Otherwise security controller will open a new one and won't see new schema objects.
         exclusiveConnection = new DelegatingConnection<Connection>(connection) {
             @Override
