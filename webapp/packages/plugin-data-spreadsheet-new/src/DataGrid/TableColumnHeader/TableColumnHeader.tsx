@@ -41,6 +41,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
   }
 
   const dataReadonly = getComputed(() => model.isReadonly(resultIndex));
+  const hasElementIdentifier = getComputed(() => model.hasElementIdentifier(resultIndex));
   const sortingDisabled = getComputed(() => !constraintsAction?.supported || model.isDisabled(resultIndex));
 
   let resultColumn: SqlResultColumn | undefined;
@@ -89,7 +90,9 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
       {icon && (
         <div className={s(styles, { icon: true })}>
           <StaticImage icon={icon} className={s(styles, { staticImage: true })} />
-          {columnReadOnly && !dataReadonly && <div className={s(styles, { readonlyStatus: true }, 'rdg-table-header__readonly-status')} />}
+          {columnReadOnly && hasElementIdentifier && !dataReadonly && (
+            <div className={s(styles, { readonlyStatus: true }, 'rdg-table-header__readonly-status')} />
+          )}
         </div>
       )}
       <div className={s(styles, { name: true })}>{columnName}</div>
