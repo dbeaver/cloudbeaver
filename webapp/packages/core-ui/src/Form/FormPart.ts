@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
 
     this.formState.submitTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.save.bind(this)));
     this.formState.formatTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.format.bind(this)));
-    this.formState.validationTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.validate.bind(this)));
+    this.formState.validationTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.handleValidation.bind(this)));
 
     makeObservable<this, 'loaded' | 'loading' | 'setInitialState'>(this, {
       initialState: observable,
@@ -146,6 +146,15 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     this.setState(toJS(this.initialState));
   }
 
+  private async handleValidation(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<void> {
+    try {
+      this.exception = null;
+      await this.validate(data, contexts);
+    } catch (exception: any) {
+      this.exception = exception;
+    }
+  }
+
   protected setInitialState(initialState: TPartState) {
     this.initialState = initialState;
 
@@ -165,4 +174,5 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
 
   protected abstract loader(): Promise<void>;
   protected abstract saveChanges(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<void>;
+  dispose(): void | Promise<void> {}
 }

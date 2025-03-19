@@ -16,8 +16,11 @@
  */
 package io.cloudbeaver.service.sql;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
+import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
+import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.meta.Property;
 
 import java.util.Collections;
@@ -40,6 +43,8 @@ public class WebSQLQueryResultSet {
     private boolean hasChildrenCollection;
     private boolean isSupportsDataFilter;
     private boolean hasDynamicTrace;
+    private boolean readOnly;
+    private String readOnlyStatus;
 
     public WebSQLQueryResultSet() {
     }
@@ -141,5 +146,23 @@ public class WebSQLQueryResultSet {
 
     public void setHasDynamicTrace(boolean hasDynamicTrace) {
         this.hasDynamicTrace = hasDynamicTrace;
+    }
+
+    @Property
+    public boolean isReadOnly() {
+        return readOnly;
+    }
+
+    @Property
+    public String getReadOnlyStatus() {
+        return readOnlyStatus;
+    }
+
+    /**
+     * Sets info about read-only status of a result set.
+     */
+    public void setReadOnlyInfo(@NotNull DBCExecutionContext executionContext) {
+        this.readOnly = DBExecUtils.isResultSetReadOnly(executionContext);
+        this.readOnlyStatus = DBExecUtils.getResultSetReadOnlyStatus(executionContext.getDataSource().getContainer());
     }
 }

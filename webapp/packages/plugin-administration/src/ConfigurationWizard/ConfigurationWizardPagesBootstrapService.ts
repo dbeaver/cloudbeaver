@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import { formValidationContext } from '@cloudbeaver/core-ui';
+import { getFirstException } from '@cloudbeaver/core-utils';
 
 import { ADMINISTRATION_SERVER_CONFIGURATION_ITEM } from './ServerConfiguration/ADMINISTRATION_SERVER_CONFIGURATION_ITEM.js';
 import { ServerConfigurationFormStateManager } from './ServerConfiguration/ServerConfigurationFormStateManager.js';
@@ -71,8 +72,20 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
           return true;
         },
         onConfigurationFinish: async () => {
-          await this.serverConfigurationFormStateManager.formState?.save();
-          await this.sessionDataResource.refresh();
+          const state = this.serverConfigurationFormStateManager.formState;
+          if (state) {
+            const saved = await state.save();
+
+            if (!saved) {
+              const error = getFirstException(state.exception);
+
+              if (error) {
+                throw getFirstException(error);
+              }
+            }
+
+            await this.sessionDataResource.refresh();
+          }
         },
         onLoad: () => {
           this.serverConfigurationFormStateManager.create();
@@ -82,6 +95,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
       onLoad: () => {
         this.serverConfigurationFormStateManager.create();
       },
+      onDeActivate: this.serverConfigurationFormStateManager.destroy.bind(this.serverConfigurationFormStateManager),
       canDeActivate: async configurationWizard => {
         const state = this.serverConfigurationFormStateManager.formState;
 

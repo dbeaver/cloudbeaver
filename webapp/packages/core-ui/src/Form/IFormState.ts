@@ -25,7 +25,7 @@ export interface IFormState<TState> {
   readonly isDisabled: boolean;
   readonly exception: Error | (Error | null)[] | null;
 
-  readonly promise: Promise<any> | null;
+  readonly savingPromise: Promise<any> | null;
 
   readonly statusMessage: string | string[] | null;
   readonly statusType: ENotificationType | null;
@@ -49,4 +49,5 @@ export interface IFormState<TState> {
   save(): Promise<boolean>;
   reset(): void;
   cancel(): void;
+  dispose(): void | Promise<void>;
 }
