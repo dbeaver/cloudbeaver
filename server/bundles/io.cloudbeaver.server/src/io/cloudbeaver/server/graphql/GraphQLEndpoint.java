@@ -19,7 +19,7 @@ package io.cloudbeaver.server.graphql;
 import com.google.gson.*;
 import graphql.*;
 import graphql.execution.*;
-import graphql.execution.instrumentation.SimplePerformantInstrumentation;
+import graphql.execution.instrumentation.Instrumentation;
 import graphql.language.SourceLocation;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLSchema;
@@ -51,7 +51,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class GraphQLEndpoint extends HttpServlet {
@@ -73,13 +76,13 @@ public class GraphQLEndpoint extends HttpServlet {
         .create();
     private GraphQLBindingContext bindingContext;
 
-    public GraphQLEndpoint() {
+    public GraphQLEndpoint(Instrumentation instrumentation) {
         GraphQLSchema schema = buildSchema();
 
         PropertyDataFetcherHelper.setUseLambdaFactory(false);
         graphQL = GraphQL
             .newGraphQL(schema)
-            .instrumentation(new SimplePerformantInstrumentation())
+            .instrumentation(instrumentation)
             .queryExecutionStrategy(new WebExecutionStrategy())
             .mutationExecutionStrategy(new WebExecutionStrategy())
             .build();

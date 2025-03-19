@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   });
   const autoLineWrapping = getDefaultLineWrapping(contentType);
   const lineWrapping = state.lineWrapping ?? autoLineWrapping;
-  const isReadonly = isTextValueReadonly({ model, resultIndex, contentAction, cell: firstSelectedCell, formatAction });
+  const isReadonly = isTextValueReadonly({ model, resultIndex, contentAction, cell: firstSelectedCell, formatAction, editAction });
   const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell) && dataViewerService.canExportData;
 
   function valueChangeHandler(newValue: string) {

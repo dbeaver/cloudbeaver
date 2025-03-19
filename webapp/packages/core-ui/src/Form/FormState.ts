@@ -29,7 +29,7 @@ export class FormState<TState> implements IFormState<TState> {
   statusMessage: string | string[] | null;
   statusType: ENotificationType | null;
 
-  promise: Promise<any> | null;
+  savingPromise: Promise<any> | null;
 
   get isDisabled(): boolean {
     return this.partsValues.some(part => part.isSaving || part?.isLoading?.());
@@ -48,6 +48,7 @@ export class FormState<TState> implements IFormState<TState> {
   readonly submitTask: IExecutor<IFormState<TState>>;
   readonly formatTask: IExecutor<IFormState<TState>>;
   readonly validationTask: IExecutor<IFormState<TState>>;
+  readonly disposeTask: IExecutor<IFormState<TState>>;
 
   constructor(serviceProvider: IServiceProvider, service: FormBaseService<TState, any>, state: TState) {
     this.id = uuid();
@@ -61,7 +62,7 @@ export class FormState<TState> implements IFormState<TState> {
     this.statusMessage = null;
     this.statusType = null;
 
-    this.promise = null;
+    this.savingPromise = null;
 
     this.formStateTask = new Executor<TState>(state, () => true);
     this.formStateTask.addCollection(service.onState).addPostHandler(this.updateFormState.bind(this));
@@ -78,6 +79,8 @@ export class FormState<TState> implements IFormState<TState> {
     this.submitTask = new Executor(this as IFormState<TState>, () => true);
     this.submitTask.addCollection(service.onSubmit).before(this.validationTask);
 
+    this.disposeTask = new Executor(this as IFormState<TState>, () => true);
+
     this.dataContext.set(DATA_CONTEXT_LOADABLE_STATE, loadableStateContext(), this.id);
     this.dataContext.set(DATA_CONTEXT_FORM_STATE, this, this.id);
     dataContextAddDIProvider(this.dataContext, serviceProvider, this.id);
@@ -85,7 +88,7 @@ export class FormState<TState> implements IFormState<TState> {
     makeObservable<this, 'updateFormState'>(this, {
       mode: observable,
       parts: observable.ref,
-      promise: observable.ref,
+      savingPromise: observable.ref,
       state: observable,
       isSaving: computed,
       exception: computed,
@@ -171,14 +174,18 @@ export class FormState<TState> implements IFormState<TState> {
 
   async save(): Promise<boolean> {
     try {
-      const context = await this.submitTask.execute(this);
+      this.savingPromise = this.submitTask.execute(this);
+      const context = await this.savingPromise;
 
       if (ExecutorInterrupter.isInterrupted(context)) {
         return false;
       }
 
       return true;
-    } catch (exception: any) {}
+    } catch (exception: any) {
+    } finally {
+      this.savingPromise = null;
+    }
 
     return false;
   }
@@ -201,5 +208,17 @@ export class FormState<TState> implements IFormState<TState> {
 
     this.statusMessage = context.statusMessage;
     this.statusType = context.statusType;
+  }
+
+  async dispose(): Promise<void> {
+    if (this.savingPromise) {
+      await this.savingPromise;
+    }
+
+    for (const part of this.parts.values()) {
+      await part.dispose();
+    }
+
+    await this.disposeTask.execute(this);
   }
 }
