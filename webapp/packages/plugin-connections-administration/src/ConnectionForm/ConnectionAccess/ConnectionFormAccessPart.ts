@@ -7,7 +7,7 @@
  */
 import { FormPart, formStatusContext, type IFormState } from '@cloudbeaver/core-ui';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { createConnectionParam, type ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { type ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { action, makeObservable } from 'mobx';
 import { getConnectionFormOptionsPart, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
 import { getSubjectDifferences } from '@cloudbeaver/core-utils';
@@ -29,18 +29,21 @@ export class ConnectionFormAccessPart extends FormPart<string[], IConnectionForm
     });
   }
 
-  protected override async loader(): Promise<void> {
-    const optionsPart = getConnectionFormOptionsPart(this.formState);
-    const connectionId = optionsPart.state.connectionId;
-    const projectId = this.formState.state.projectId;
+  private get optionsPart() {
+    return getConnectionFormOptionsPart(this.formState);
+  }
 
-    if (!connectionId || !projectId) {
+  override isOutdated(): boolean {
+    return this.optionsPart.isOutdated();
+  }
+
+  protected override async loader(): Promise<void> {
+    if (!this.optionsPart.connectionKey) {
       this.setInitialState(getDefaultState());
       return;
     }
 
-    const key = createConnectionParam(projectId, connectionId);
-    const subjects = await this.connectionInfoResource.loadAccessSubjects(key);
+    const subjects = await this.connectionInfoResource.loadAccessSubjects(this.optionsPart.connectionKey);
 
     this.setInitialState(subjects.map(subject => subject.subjectId));
   }
@@ -50,24 +53,21 @@ export class ConnectionFormAccessPart extends FormPart<string[], IConnectionForm
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
     const status = contexts.getContext(formStatusContext);
-    const optionsPart = getConnectionFormOptionsPart(this.formState);
-    const connectionId = optionsPart.state.connectionId;
 
-    if (this.formState.state.submitType === 'test' || !data.state.projectId || !status.saved || !connectionId || !this.loaded) {
+    if (this.formState.state.submitType === 'test' || !data.state.projectId || !status.saved || !this.optionsPart.connectionKey || !this.loaded) {
       return;
     }
 
-    const key = createConnectionParam(data.state.projectId, connectionId);
     const { subjectsToRevoke, subjectsToGrant } = getSubjectDifferences(this.initialState, this.state);
 
     const promises = [];
 
     if (subjectsToRevoke.length > 0) {
-      promises.push(this.connectionInfoResource.deleteConnectionsAccess(key, subjectsToRevoke));
+      promises.push(this.connectionInfoResource.deleteConnectionsAccess(this.optionsPart.connectionKey, subjectsToRevoke));
     }
 
     if (subjectsToGrant.length > 0) {
-      promises.push(this.connectionInfoResource.addConnectionsAccess(key, subjectsToGrant));
+      promises.push(this.connectionInfoResource.addConnectionsAccess(this.optionsPart.connectionKey, subjectsToGrant));
     }
 
     await Promise.all(promises);

@@ -49,7 +49,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { EAdminPermission, ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
-import { type TabContainerPanelComponent, TabsContext } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, TabsContext, useTab } from '@cloudbeaver/core-ui';
 import { EMPTY_ARRAY } from '@cloudbeaver/core-utils';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
@@ -86,54 +86,66 @@ const driverConfiguration: IDriverConfiguration[] = [
     isVisible: driver => driver.configurationTypes.includes(DriverConfigurationType.Url),
   },
 ];
-export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({ formState }) {
+export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({ formState, tabId }) {
+  const { selected } = useTab(tabId);
   const isAdmin = usePermission(EAdminPermission.admin);
-  const serverConfigResource = useResource(Options, ServerConfigResource, undefined);
+  const serverConfigResource = useResource(Options, ServerConfigResource, undefined, {
+    active: selected,
+  });
   const projectInfoResource = useService(ProjectInfoResource);
   const formRef = useRef<HTMLFormElement>(null);
   const translate = useTranslate();
   const style = useS(styles);
   const tabsState = useContext(TabsContext);
   const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
-  const connectionInfoService = useService(ConnectionInfoResource);
-  const connectionInfoOriginResource = useService(ConnectionInfoOriginResource);
   const optionsPart = getConnectionFormOptionsPart(formState);
-  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!));
-  const key = createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!);
-  const originInfo = key ? connectionInfoOriginResource.get(key) : null;
+  const connectionInfoService = useResource(
+    Options,
+    ConnectionInfoResource,
+    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
+    {
+      active: selected && !!formState.state.projectId && !!optionsPart.state.connectionId,
+    },
+  );
+  const connectionInfoOriginResource = useResource(
+    Options,
+    ConnectionInfoOriginResource,
+    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
+    {
+      active: selected && !!formState.state.projectId && !!optionsPart.state.connectionId,
+    },
+  );
 
   //@TODO it's here until the profile implementation in the CloudBeaver
-  const readonly = formState.isDisabled || info?.authModel === PROFILE_AUTH_MODEL_ID;
+  const readonly = formState.isDisabled || connectionInfoService.data?.authModel === PROFILE_AUTH_MODEL_ID;
 
   useFormValidator(formState.validationTask, formRef.current);
   const { credentialsSavingEnabled } = useAdministrationSettings();
 
-  const driverMap = useResource(Options, DBDriverResource, {
-    key: optionsPart.state.driverId || null,
-    includes: ['includeProviderProperties', 'includeMainProperties'] as const,
-  });
+  const driverMap = useResource(
+    Options,
+    DBDriverResource,
+    {
+      key: optionsPart.state.driverId || null,
+      includes: ['includeProviderProperties', 'includeMainProperties'] as const,
+    },
+    {
+      active: selected,
+    },
+  );
 
   const driver = driverMap.data;
   const configurationTypes = driverConfiguration.filter(configuration => driver && configuration.isVisible(driver));
-
-  function handleFormChange(value?: unknown, name?: string) {
-    if (name !== 'name' && optionsPart.isNameAutoFill()) {
-      optionsPart.updateNameTemplate(driver);
-    }
-
-    if (optionsPart.state.template) {
-      optionsPart.state.folder = undefined;
-    }
-  }
 
   const applicableAuthModels = driver?.applicableAuthModels ?? [];
 
   const authModelLoader = useResource(
     Options,
     DatabaseAuthModelsResource,
-    getComputed(() => optionsPart.state.authModelId || info?.authModel || driver?.defaultAuthModel || null),
+    getComputed(() => optionsPart.state.authModelId || connectionInfoService.data?.authModel || driver?.defaultAuthModel || null),
     {
       onData: optionsPart.setAuthModel.bind(optionsPart),
+      active: selected,
     },
   );
 
@@ -154,11 +166,12 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   }
 
   const authentication = useAuthenticationAction({
-    providerId: authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
+    providerId: authModel?.requiredAuth ?? connectionInfoService.data?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
   });
 
   const edit = formState.mode === 'edit';
-  const originLocal = !info || (originInfo?.origin && isLocalConnection(originInfo.origin));
+  const originLocal =
+    !connectionInfoService.data || (connectionInfoOriginResource.data?.origin && isLocalConnection(connectionInfoOriginResource.data.origin));
 
   const drivers = driverMap.resource.enabledDrivers.filter(({ id, driverInstalled }) => {
     if (!edit && !isAdmin && !driverInstalled) {
@@ -174,8 +187,12 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
 
   let properties = authModel?.properties;
 
-  if (info?.authProperties && info.authProperties.length > 0 && optionsPart.state.authModelId === info.authModel) {
-    properties = info.authProperties;
+  if (
+    connectionInfoService.data?.authProperties &&
+    connectionInfoService.data.authProperties.length > 0 &&
+    optionsPart.state.authModelId === connectionInfoService.data.authModel
+  ) {
+    properties = connectionInfoService.data.authProperties;
   }
 
   const sharedCredentials = optionsPart.state.sharedCredentials && serverConfigResource.data?.distributed;
@@ -197,10 +214,10 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     await formState.reload();
   }
 
-  useAutoLoad(Options, optionsPart);
+  useAutoLoad(Options, optionsPart, selected);
 
   return (
-    <Form ref={formRef} className={s(style, { form: true })} disabled={driverMap.isLoading()} onChange={handleFormChange}>
+    <Form ref={formRef} className={s(style, { form: true })} disabled={driverMap.isLoading()}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
           <Group gap>

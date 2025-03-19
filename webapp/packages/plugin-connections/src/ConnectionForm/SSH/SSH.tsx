@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
-import type { IFormState, TabContainerPanelComponent } from '@cloudbeaver/core-ui';
+import { useTab, type IFormState, type TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { isSafari } from '@cloudbeaver/core-utils';
 
 import { authTypes } from './authTypes.js';
@@ -47,12 +47,16 @@ interface Props {
   formState: IFormState<IConnectionFormState>;
 }
 
-export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ formState, handlerState }) {
+export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ formState, handlerState, tabId }) {
+  const { selected } = useTab(tabId);
   const [loading, setLoading] = useState(false);
   const { credentialsSavingEnabled } = useAdministrationSettings();
-  const serverConfigResource = useResource(SSH, ServerConfigResource, undefined);
+  const serverConfigResource = useResource(SSH, ServerConfigResource, undefined, {
+    active: selected,
+  });
 
   const resource = useResource(SSH, NetworkHandlerResource, SSH_TUNNEL_ID, {
+    active: selected,
     onData: handler => {
       if (Object.keys(handlerState).length === 0) {
         for (const property of handler.properties) {
@@ -92,7 +96,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
     handlerState.password = '';
   }, []);
 
-  useAutoLoad(SSH, [SSHPart, optionsPart]);
+  useAutoLoad(SSH, [SSHPart, optionsPart], selected);
 
   return (
     <Form className={s(style, { form: true })}>

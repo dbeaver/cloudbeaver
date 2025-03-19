@@ -7,7 +7,7 @@
  */
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { IConnectionProperties } from '../Options/IConnectionConfig.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
@@ -25,17 +25,21 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     super(formState, getDefaultState());
   }
 
-  get optionsPart() {
+  private get optionsPart() {
     return getConnectionFormOptionsPart(this.formState);
   }
 
+  override isOutdated(): boolean {
+    return this.optionsPart.isOutdated();
+  }
+
   protected override async loader(): Promise<void> {
-    if (!this.optionsPart.state.connectionId || !this.formState.state.projectId) {
+    if (!this.optionsPart.connectionKey) {
       this.setInitialState(getDefaultState());
       return;
     }
 
-    const connection = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.optionsPart.state.connectionId!));
+    const connection = this.connectionInfoResource.get(this.optionsPart.connectionKey);
 
     if (connection?.properties) {
       this.setInitialState({ ...connection.properties });

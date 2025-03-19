@@ -103,7 +103,7 @@ export class ConnectionSearchService {
     this.close();
   };
 
-  get optionsPart() {
+  private get optionsPart() {
     return this.formState ? getConnectionFormOptionsPart(this.formState) : null;
   }
 

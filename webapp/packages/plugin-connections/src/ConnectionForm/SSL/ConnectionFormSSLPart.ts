@@ -12,12 +12,7 @@ import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
-import {
-  createConnectionParam,
-  type ConnectionInfoResource,
-  type DBDriverResource,
-  type NetworkHandlerResource,
-} from '@cloudbeaver/core-connections';
+import { type ConnectionInfoResource, type DBDriverResource, type NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { toJS } from 'mobx';
 import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED.js';
@@ -44,8 +39,14 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     super(formState, getDefaultState());
   }
 
-  get optionsPart() {
+  private get optionsPart() {
     return getConnectionFormOptionsPart(this.formState);
+  }
+
+  override isOutdated(): boolean {
+    return (
+      this.optionsPart.isOutdated() || this.dbDriverResource.isOutdated(this.optionsPart.state.driverId) || this.networkHandlerResource.isOutdated()
+    );
   }
 
   protected override async loader(): Promise<void> {
@@ -65,7 +66,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.optionsPart.state.connectionId!));
+    const info = this.optionsPart.connectionKey ? this.connectionInfoResource.get(this.optionsPart.connectionKey) : null;
     const initialConfig = info?.networkHandlersConfig?.find(h => h.id === handler.id);
 
     if (!this.optionsPart.state.networkHandlersConfig?.some(state => state.id === handler.id)) {

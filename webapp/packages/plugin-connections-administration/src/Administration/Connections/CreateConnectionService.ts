@@ -104,7 +104,7 @@ export class CreateConnectionService {
     this.activateMethod(defaultId);
   }
 
-  get optionsPart() {
+  private get optionsPart() {
     return this.data ? getConnectionFormOptionsPart(this.data) : null;
   }
 

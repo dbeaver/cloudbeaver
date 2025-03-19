@@ -9,7 +9,7 @@ import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/c
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { DriverConfigurationType, NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
-import { ConnectionInfoResource, createConnectionParam, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { toJS } from 'mobx';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
@@ -42,19 +42,21 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     super(formState, getDefaultState());
   }
 
-  get optionsPart() {
+  private get optionsPart() {
     return getConnectionFormOptionsPart(this.formState);
   }
 
+  override isOutdated(): boolean {
+    return this.optionsPart.isOutdated();
+  }
+
   protected override async loader(): Promise<void> {
-    if (!this.optionsPart.state.connectionId || !this.formState.state.projectId) {
+    if (!this.optionsPart.connectionKey) {
       this.setInitialState(getDefaultState());
       return;
     }
 
-    const connection = await this.connectionInfoResource.load(
-      createConnectionParam(this.formState.state.projectId, this.optionsPart.state.connectionId!),
-    );
+    const connection = await this.connectionInfoResource.load(this.optionsPart.connectionKey);
 
     this.setInitialState(connection?.networkHandlersConfig?.find(h => h.id === SSH_TUNNEL_ID) ?? getDefaultState());
   }

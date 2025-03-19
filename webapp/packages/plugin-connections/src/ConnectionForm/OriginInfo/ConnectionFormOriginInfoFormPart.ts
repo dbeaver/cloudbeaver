@@ -12,7 +12,6 @@ import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { IConnectionFormOriginInfoState } from './IConnectionFormOriginInfoState.js';
 import {
   ConnectionInfoResource,
-  createConnectionParam,
   DatabaseAuthModelsResource,
   DBDriverResource,
   type ConnectionInfoOriginDetailsResource,
@@ -42,7 +41,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     });
   }
 
-  get optionsPart() {
+  private get optionsPart() {
     return getConnectionFormOptionsPart(this.formState);
   }
 
@@ -57,7 +56,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
       return null;
     }
 
-    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.optionsPart.state.connectionId!));
+    const info = this.optionsPart.connectionKey ? this.connectionInfoResource.get(this.optionsPart.connectionKey) : null;
     const authModel = this.databaseAuthModelsResource.get(this.optionsPart.state.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null);
     const providerId = authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
 
@@ -73,24 +72,21 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
   }
 
   get authModelId(): string | null {
-    const optionsPart = getConnectionFormOptionsPart(this.formState);
-    const driver = this.dbDriverResource.get(optionsPart.state.driverId!)!;
-    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, optionsPart.state.connectionId!));
+    const driver = this.dbDriverResource.get(this.optionsPart.state.driverId!)!;
+    const info = this.optionsPart.connectionKey ? this.connectionInfoResource.get(this.optionsPart.connectionKey) : null;
 
-    return optionsPart.state.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null;
+    return this.optionsPart.state.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null;
   }
 
   protected override async loader(): Promise<void> {
     const state = defaultStateGetter();
-    const optionsPart = getConnectionFormOptionsPart(this.formState);
-    const connectionId = optionsPart.state.connectionId;
 
-    if (!connectionId || !this.formState.state.projectId || !optionsPart.state.driverId) {
+    if (!this.optionsPart.connectionKey || !this.optionsPart.state.driverId) {
       this.setInitialState(state);
       return;
     }
 
-    await this.dbDriverResource.load(optionsPart.state.driverId);
+    await this.dbDriverResource.load(this.optionsPart.state.driverId);
 
     if (!this.authModelId) {
       throw new Error('Auth model is not defined');
@@ -103,7 +99,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
       return;
     }
 
-    const originInfo = await this.connectionInfoOriginDetailsResource.load(createConnectionParam(this.formState.state.projectId, connectionId));
+    const originInfo = await this.connectionInfoOriginDetailsResource.load(this.optionsPart.connectionKey);
 
     if (!originInfo.origin.details) {
       this.setInitialState(state);

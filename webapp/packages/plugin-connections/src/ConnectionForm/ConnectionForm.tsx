@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Form, Loader, Placeholder, s, StatusMessage, useExecutor, useForm, useObjectRef, useS } from '@cloudbeaver/core-blocks';
+import { Form, Loader, Placeholder, s, StatusMessage, useExecutor, useForm, useObjectRef, useResource, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
@@ -33,7 +33,15 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   const service = useService(ConnectionFormService);
   const styles = useS(style);
   const notificationService = useService(NotificationService);
-  const connectionInfoResource = useService(ConnectionInfoResource);
+  const optionsPart = getConnectionFormOptionsPart(formState);
+  const connectionInfoResource = useResource(
+    ConnectionForm,
+    ConnectionInfoResource,
+    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
+    {
+      active: !!formState.state.projectId && !!optionsPart.state.connectionId,
+    },
+  );
   const exception = getFirstException(formState.exception);
 
   const form = useForm({
@@ -42,15 +50,13 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
 
       const initialMode = formState.mode;
       const saved = await formState.save();
-      const optionsPart = getConnectionFormOptionsPart(formState);
-      const info = connectionInfoResource.get(createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!));
 
       if (saved) {
         if (formState.state.submitType === 'submit') {
           notificationService.notify(
             {
               title: initialMode === 'create' ? 'core_connections_connection_create_success' : 'core_connections_connection_update_success',
-              message: info?.name,
+              message: connectionInfoResource.data?.name,
             },
             ENotificationType.Success,
           );
@@ -77,7 +83,6 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
       function save(data, contexts) {
         const validation = contexts.getContext(formValidationContext);
         const state = contexts.getContext(formStatusContext);
-        const optionsPart = getConnectionFormOptionsPart(data);
 
         if (validation.valid && state.saved && data.state.submitType === 'submit') {
           props.onSave(optionsPart.state);

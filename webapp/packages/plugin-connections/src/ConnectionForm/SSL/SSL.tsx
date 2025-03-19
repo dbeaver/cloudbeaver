@@ -37,31 +37,41 @@ import styles from './SSL.module.css';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import { useTab } from '@cloudbeaver/core-ui';
 
 interface Props extends IConnectionFormProps {
   handler: NetworkHandlerDescriptor;
   handlerState: NetworkHandlerConfigInput;
 }
 
-export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ formState, handler, handlerState }) {
+export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ formState, handler, handlerState, tabId }) {
   const translate = useTranslate();
-
+  const { selected } = useTab(tabId);
   const style = useS(styles);
   const { credentialsSavingEnabled } = useAdministrationSettings();
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(handler.properties);
-  const serverConfigResource = useResource(SSL, ServerConfigResource, undefined);
+  const serverConfigResource = useResource(SSL, ServerConfigResource, undefined, {
+    active: selected,
+  });
 
   const disabled = formState.isDisabled;
   const enabled = handlerState.enabled || false;
-  const connectionInfoService = useService(ConnectionInfoResource);
   const optionsPart = getConnectionFormOptionsPart(formState);
-  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!));
+  const connectionInfoService = useResource(
+    SSL,
+    ConnectionInfoResource,
+    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
+    {
+      active: selected && !!formState.state.projectId && !!optionsPart.state.connectionId,
+    },
+  );
+  const info = connectionInfoService.data;
   const initialHandler = info?.networkHandlersConfig?.find(h => h.id === handler.id);
   const autofillToken = isSafari ? 'section-connection-authentication-ssl section-ssl' : 'new-password';
   const projectInfoResource = useService(ProjectInfoResource);
   const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
 
-  useAutoLoad(SSL, optionsPart);
+  useAutoLoad(SSL, optionsPart, enabled);
 
   return (
     <Form className={s(style, { form: true })}>

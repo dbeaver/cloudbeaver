@@ -137,7 +137,7 @@ export class PublicConnectionFormService {
     }
   }
 
-  get optionsPart() {
+  private get optionsPart() {
     return this.formState ? getConnectionFormOptionsPart(this.formState) : null;
   }
 

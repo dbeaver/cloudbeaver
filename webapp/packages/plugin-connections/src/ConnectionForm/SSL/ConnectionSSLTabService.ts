@@ -12,6 +12,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { ConnectionFormService } from '../ConnectionFormService.js';
+import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
 export const SSLTab = React.lazy(async () => {
   const { SSLTab } = await import('./SSLTab.js');
@@ -38,6 +39,10 @@ export class ConnectionSSLTabService extends Bootstrap {
       order: 4,
       tab: () => SSLTab,
       panel: () => SSLPanel,
+      getLoader: () => [
+        getCachedMapResourceLoaderState(this.dbDriverResource, () => CachedMapAllKey),
+        getCachedMapResourceLoaderState(this.networkHandlerResource, () => CachedMapAllKey),
+      ],
       isHidden: (_, props) => {
         const optionsPart = props?.formState ? getConnectionFormOptionsPart(props.formState) : null;
 

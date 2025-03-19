@@ -27,7 +27,7 @@ import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import styles from './OriginInfo.module.css';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
-import { useService } from '@cloudbeaver/core-di';
+
 import { getConnectionFormOriginInfoFormPart } from './getConnectionFormOriginInfoFormPart.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
@@ -36,20 +36,29 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   const translate = useTranslate();
   const originInfoPart = getConnectionFormOriginInfoFormPart(formState);
   const style = useS(styles);
-  const connectionInfoService = useService(ConnectionInfoResource);
   const optionsPart = getConnectionFormOptionsPart(formState);
-  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!));
-  const providerLoader = useResource(OriginInfo, AuthProvidersResource, originInfoPart.providerId);
+  const connectionInfoService = useResource(
+    OriginInfo,
+    ConnectionInfoResource,
+    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
+    {
+      active: !!formState.state.projectId && !!optionsPart.state.connectionId && tab.selected,
+    },
+  );
+  const info = connectionInfoService.data;
+  const providerLoader = useResource(OriginInfo, AuthProvidersResource, originInfoPart.providerId, {
+    active: tab.selected,
+  });
   const connectionId = tab.selected && info ? createConnectionParam(info.projectId, info.id) : null;
   const isAuthenticated = getComputed(() => originInfoPart.isAuthenticated);
   const connectionOriginDetailsResource = useResource(OriginInfo, ConnectionInfoOriginDetailsResource, connectionId, {
-    active: isAuthenticated,
+    active: tab.selected && isAuthenticated,
   });
-  const connection = useResource(OriginInfo, connectionInfoService, connectionId, {
-    active: isAuthenticated,
+  const connection = useResource(OriginInfo, ConnectionInfoResource, connectionId, {
+    active: tab.selected && isAuthenticated,
   });
 
-  useAutoLoad(OriginInfo, originInfoPart);
+  useAutoLoad(OriginInfo, originInfoPart, tab.selected);
 
   if (connection.isLoading()) {
     return (
