@@ -16,10 +16,12 @@ import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { SSL } from './SSL.js';
 import { getConnectionFormSSLPart } from './getConnectionFormSSLPart.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
 export const SSLPanel: TabContainerTabComponent<IConnectionFormProps> = observer(function SSLPanel(props) {
   const networkHandlerResource = useResource(SSLPanel, NetworkHandlerResource, CachedMapAllKey);
-  const dbDriverResource = useResource(SSLPanel, DBDriverResource, props.formState.state.config.driverId ?? null);
+  const optionsPart = getConnectionFormOptionsPart(props.formState);
+  const dbDriverResource = useResource(SSLPanel, DBDriverResource, optionsPart.state.driverId ?? null);
 
   const handler = getSSLDriverHandler(networkHandlerResource.resource.values, dbDriverResource.data?.applicableNetworkHandlers ?? []);
   const sslPart = getConnectionFormSSLPart(props.formState);

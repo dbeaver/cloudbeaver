@@ -12,7 +12,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ConnectionFormService } from '../ConnectionFormService.js';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
-
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 export const ConnectionFormAuthenticationAction = importLazyComponent(() =>
   import('./ConnectionFormAuthenticationAction.js').then(m => m.ConnectionFormAuthenticationAction),
 );
@@ -38,7 +38,8 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
       getLoader: () => getCachedMapResourceLoaderState(this.connectionInfoOriginResource, () => CachedMapAllKey),
       isHidden: (tabId, props) => {
         const projectId = props?.formState.state.projectId;
-        const connectionId = props?.formState.state.config.connectionId;
+        const optionsPart = props?.formState ? getConnectionFormOptionsPart(props.formState) : null;
+        const connectionId = optionsPart?.state.connectionId;
 
         if (!projectId || !connectionId) {
           return true;

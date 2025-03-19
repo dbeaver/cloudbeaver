@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -40,9 +40,10 @@ export class ConnectionSSHTabService extends Bootstrap {
       tab: () => SSHTab,
       panel: () => SSHPanel,
       isHidden: (tabId, props) => {
-        if (props?.formState.state.config.driverId) {
-          const driver = this.dbDriverResource.get(props?.formState.state.config.driverId);
-          const optionsPart = getConnectionFormOptionsPart(props.formState);
+        const optionsPart = props?.formState ? getConnectionFormOptionsPart(props.formState) : null;
+
+        if (optionsPart?.state.driverId) {
+          const driver = this.dbDriverResource.get(optionsPart.state.driverId);
           const urlType = optionsPart.state.configurationType === DriverConfigurationType.Url;
 
           return urlType || !driver?.applicableNetworkHandlers.includes(SSH_TUNNEL_ID);

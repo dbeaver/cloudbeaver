@@ -1,10 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
@@ -53,12 +54,12 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
   const disabled = formState.isDisabled;
   const enabled = handlerState.enabled || false;
   const connectionInfoService = useService(ConnectionInfoResource);
-  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
+  const optionsPart = getConnectionFormOptionsPart(formState);
+  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!));
   const initialHandler = info?.networkHandlersConfig?.find(h => h.id === handler.id);
   const autofillToken = isSafari ? 'section-connection-authentication-ssl section-ssl' : 'new-password';
   const projectInfoResource = useService(ProjectInfoResource);
   const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
-  const optionsPart = getConnectionFormOptionsPart(formState);
 
   useAutoLoad(SSL, optionsPart);
 

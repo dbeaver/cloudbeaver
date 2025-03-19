@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 
 import { AuthProvidersResource } from '@cloudbeaver/core-authentication';
@@ -30,6 +29,7 @@ import styles from './OriginInfo.module.css';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { useService } from '@cloudbeaver/core-di';
 import { getConnectionFormOriginInfoFormPart } from './getConnectionFormOriginInfoFormPart.js';
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
 export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = observer(function OriginInfo({ tabId, formState }) {
   const tab = useTab(tabId);
@@ -37,7 +37,8 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   const originInfoPart = getConnectionFormOriginInfoFormPart(formState);
   const style = useS(styles);
   const connectionInfoService = useService(ConnectionInfoResource);
-  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
+  const optionsPart = getConnectionFormOptionsPart(formState);
+  const info = connectionInfoService.get(createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!));
   const providerLoader = useResource(OriginInfo, AuthProvidersResource, originInfoPart.providerId);
   const connectionId = tab.selected && info ? createConnectionParam(info.projectId, info.id) : null;
   const isAuthenticated = getComputed(() => originInfoPart.isAuthenticated);

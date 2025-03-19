@@ -10,6 +10,8 @@ import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { IConnectionProperties } from '../Options/IConnectionConfig.js';
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import { runInAction } from 'mobx';
 
 function getDefaultState(): IConnectionProperties {
   return {};
@@ -23,19 +25,17 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     super(formState, getDefaultState());
   }
 
-  override isOutdated(): boolean {
-    return this.connectionInfoResource.isOutdated(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
+  get optionsPart() {
+    return getConnectionFormOptionsPart(this.formState);
   }
 
   protected override async loader(): Promise<void> {
-    if (!this.formState.state.config.connectionId || !this.formState.state.projectId) {
+    if (!this.optionsPart.state.connectionId || !this.formState.state.projectId) {
       this.setInitialState(getDefaultState());
       return;
     }
 
-    const connection = this.connectionInfoResource.get(
-      createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId),
-    );
+    const connection = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.optionsPart.state.connectionId!));
 
     if (connection?.properties) {
       this.setInitialState({ ...connection.properties });
@@ -59,5 +59,14 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
         this.state[key] = this.state[key].trim();
       }
     }
+
+    const optionsPart = getConnectionFormOptionsPart(this.formState);
+
+    runInAction(() => {
+      optionsPart.state.properties = {
+        ...optionsPart.state.properties,
+        ...this.state,
+      };
+    });
   }
 }

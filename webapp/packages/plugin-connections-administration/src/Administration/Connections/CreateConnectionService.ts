@@ -5,13 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable, runInAction } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { TabsContainer } from '@cloudbeaver/core-ui';
-import { ConnectionFormService, ConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormService, ConnectionFormState, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService.js';
 
@@ -104,15 +104,25 @@ export class CreateConnectionService {
     this.activateMethod(defaultId);
   }
 
+  get optionsPart() {
+    return this.data ? getConnectionFormOptionsPart(this.data) : null;
+  }
+
   setConnectionTemplate(projectId: string, config: ConnectionConfig, availableDrivers: string[]): void {
     this.data?.dispose();
     this.data = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
       projectId,
       availableDrivers,
-      config,
       submitType: null,
       type: 'admin',
       requiredNetworkHandlersIds: [],
+    });
+
+    runInAction(() => {
+      this.optionsPart!.state = {
+        ...this.optionsPart!.state,
+        ...config,
+      };
     });
     this.data.disposeTask.addHandler(this.cancelCreate.bind(this));
   }

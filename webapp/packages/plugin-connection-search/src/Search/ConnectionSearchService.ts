@@ -1,11 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { makeObservable, observable } from 'mobx';
+
+import { makeObservable, observable, runInAction } from 'mobx';
 
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
@@ -15,7 +16,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
-import { ConnectionFormService, ConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormService, ConnectionFormState, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 
 import { SearchDatabase } from './SearchDatabase.js';
 
@@ -102,13 +103,17 @@ export class ConnectionSearchService {
     this.close();
   };
 
+  get optionsPart() {
+    return this.formState ? getConnectionFormOptionsPart(this.formState) : null;
+  }
+
   private async showUnsavedChangesDialog(): Promise<boolean> {
     if (
       !this.formState ||
       !this.optionsPanelService.isOpen(formGetter) ||
-      (this.formState.state.config.connectionId &&
+      (this.optionsPart?.state.connectionId &&
         this.formState.state.projectId !== null &&
-        !this.connectionInfoResource.has(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId)))
+        !this.connectionInfoResource.has(createConnectionParam(this.formState.state.projectId, this.optionsPart.state.connectionId)))
     ) {
       return true;
     }
@@ -148,18 +153,19 @@ export class ConnectionSearchService {
 
     if (!this.formState) {
       this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
-        config: {
-          ...this.connectionInfoResource.getEmptyConfig(),
-          host: database.host,
-          port: String(database.port),
-          driverId: database.defaultDriver,
-        },
         submitType: null,
         projectId: projects[0]!.id,
         availableDrivers: database.possibleDrivers,
         type: 'public',
         requiredNetworkHandlersIds: [],
       });
+
+      runInAction(() => {
+        this.optionsPart!.state.host = database.host;
+        this.optionsPart!.state.port = String(database.port);
+        this.optionsPart!.state.driverId = database.defaultDriver;
+      });
+
       this.formState.disposeTask.addHandler(this.goBack.bind(this));
     }
   }

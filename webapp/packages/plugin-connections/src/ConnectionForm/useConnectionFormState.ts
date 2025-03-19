@@ -11,10 +11,11 @@ import { ConnectionFormState } from './ConnectionFormState.js';
 import { ConnectionFormService } from './ConnectionFormService.js';
 import type { IConnectionFormState } from './IConnectionFormState.js';
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { getConnectionFormOptionsPart } from './Options/getConnectionFormOptionsPart.js';
+import { runInAction } from 'mobx';
 
 const EMPTY_CONNECTION_INFO_PARAMS: IConnectionFormState = {
   projectId: '',
-  config: {},
   submitType: 'submit',
   availableDrivers: [],
   type: 'admin',
@@ -25,17 +26,21 @@ export function useConnectionFormState(params: IConnectionInfoParams, configure?
   const serviceProvider = useService(IServiceProvider);
   const service = useService(ConnectionFormService);
   const ref = useRef<ConnectionFormState>(null);
+  let optionsPart = ref.current ? getConnectionFormOptionsPart(ref.current) : null;
 
-  if (ref.current?.state.config.connectionId !== params.connectionId || ref.current?.state.projectId !== params.projectId) {
+  if (optionsPart?.state.connectionId !== params.connectionId || ref.current?.state.projectId !== params.projectId) {
     ref.current?.dispose();
     ref.current = new ConnectionFormState(serviceProvider, service, {
       ...EMPTY_CONNECTION_INFO_PARAMS,
       projectId: params.projectId,
-      config: {
-        ...EMPTY_CONNECTION_INFO_PARAMS.config,
-        connectionId: params.connectionId,
-      },
     });
+
+    optionsPart = getConnectionFormOptionsPart(ref.current);
+
+    runInAction(() => {
+      optionsPart!.state.connectionId = params.connectionId;
+    });
+
     configure?.(ref.current);
   }
 

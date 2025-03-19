@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
@@ -29,11 +30,10 @@ import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { FormMode, type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import type { IConnectionFormProps } from '@cloudbeaver/plugin-connections';
-
+import { getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 import styles from './ConnectionAccess.module.css';
 import { ConnectionAccessGrantedList } from './ConnectionAccessGrantedList.js';
 import { ConnectionAccessList } from './ConnectionAccessList.js';
-import { useService } from '@cloudbeaver/core-di';
 import { getConnectionFormAccessPart } from './getConnectionFormAccessPart.js';
 
 export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAccess({ tabId, formState }) {
@@ -74,14 +74,12 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
     [accessPart.state, teams.resource],
   );
 
-  if (!selected) {
-    return null;
-  }
-
-  const connectionInfoService = useService(ConnectionInfoResource);
-  const originInfoService = useService(ConnectionInfoOriginResource);
-  const connectionInfo = connectionInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
-  const originInfo = originInfoService.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
+  const optionsPart = getConnectionFormOptionsPart(formState);
+  const key = createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!);
+  const connectionInfoResource = useResource(ConnectionAccess, ConnectionInfoResource, key);
+  const originInfoResource = useResource(ConnectionAccess, ConnectionInfoOriginResource, key);
+  const connectionInfo = connectionInfoResource.data;
+  const originInfo = originInfoResource.data;
   const loading = users.isLoading() || teams.isLoading() || accessPart.isLoading();
   const cloud = connectionInfo && originInfo?.origin ? isCloudConnection(originInfo.origin) : false;
   const disabled = loading || !accessPart.isLoaded() || formState.isDisabled || cloud;
@@ -91,6 +89,10 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
     info = 'ui_save_reminder';
   } else if (cloud) {
     info = 'cloud_connections_access_placeholder';
+  }
+
+  if (!selected) {
+    return null;
   }
 
   return (

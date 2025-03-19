@@ -19,6 +19,7 @@ import type { ConnectionFormState } from './ConnectionFormState.js';
 import { getFirstException } from '@cloudbeaver/core-utils';
 import { ConnectionFormService } from './ConnectionFormService.js';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
+import { getConnectionFormOptionsPart } from './Options/getConnectionFormOptionsPart.js';
 
 export interface ConnectionFormProps {
   formState: ConnectionFormState;
@@ -41,7 +42,8 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
 
       const initialMode = formState.mode;
       const saved = await formState.save();
-      const info = connectionInfoResource.get(createConnectionParam(formState.state.projectId, formState.state.config.connectionId!));
+      const optionsPart = getConnectionFormOptionsPart(formState);
+      const info = connectionInfoResource.get(createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!));
 
       if (saved) {
         if (formState.state.submitType === 'submit') {
@@ -75,9 +77,10 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
       function save(data, contexts) {
         const validation = contexts.getContext(formValidationContext);
         const state = contexts.getContext(formStatusContext);
+        const optionsPart = getConnectionFormOptionsPart(data);
 
         if (validation.valid && state.saved && data.state.submitType === 'submit') {
-          props.onSave(data.state.config);
+          props.onSave(optionsPart.state);
         }
       },
     ],

@@ -44,25 +44,18 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     super(formState, getDefaultState());
   }
 
-  override isOutdated(): boolean {
-    const isDriverOutdated = this.dbDriverResource.isOutdated(this.formState.state.config.driverId);
-    const isNetworkHandlerOutdated = this.networkHandlerResource.isOutdated(this.state.id);
-    const isConnectionOutdated = this.connectionInfoResource.isOutdated(
-      createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!),
-    );
-
-    return isDriverOutdated || isNetworkHandlerOutdated || isConnectionOutdated;
+  get optionsPart() {
+    return getConnectionFormOptionsPart(this.formState);
   }
 
   protected override async loader(): Promise<void> {
-    if (!this.formState.state.config.driverId) {
+    if (!this.optionsPart.state.driverId) {
       this.setInitialState(getDefaultState());
       return;
     }
 
-    const optionsPart = getConnectionFormOptionsPart(this.formState);
     const [driver, handlers] = await Promise.all([
-      this.dbDriverResource.load(this.formState.state.config.driverId),
+      this.dbDriverResource.load(this.optionsPart.state.driverId),
       this.networkHandlerResource.load(CachedMapAllKey),
     ]);
     const handler = getSSLDriverHandler(handlers, driver?.applicableNetworkHandlers ?? []);
@@ -72,10 +65,10 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
+    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.optionsPart.state.connectionId!));
     const initialConfig = info?.networkHandlersConfig?.find(h => h.id === handler.id);
 
-    if (!optionsPart.state.networkHandlersConfig?.some(state => state.id === handler.id)) {
+    if (!this.optionsPart.state.networkHandlersConfig?.some(state => state.id === handler.id)) {
       const config: NetworkHandlerConfigInput = initialConfig ? toJS(initialConfig) : getSSLDefaultConfig(handler.id);
 
       if (config.secureProperties) {
@@ -93,11 +86,12 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
-    if (!this.formState.state.config.driverId) {
+    const optionsPart = getConnectionFormOptionsPart(this.formState);
+
+    if (!optionsPart.state.driverId) {
       return;
     }
 
-    const optionsPart = getConnectionFormOptionsPart(this.formState);
     const handlers = await this.networkHandlerResource.load(CachedMapAllKey);
     const descriptor = handlers.find(h => h.id === this.state?.id);
 

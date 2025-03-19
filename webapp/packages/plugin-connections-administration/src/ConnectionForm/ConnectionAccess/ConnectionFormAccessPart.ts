@@ -9,7 +9,7 @@ import { FormPart, formStatusContext, type IFormState } from '@cloudbeaver/core-
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { createConnectionParam, type ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { action, makeObservable } from 'mobx';
-import type { IConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { getConnectionFormOptionsPart, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
 import { getSubjectDifferences } from '@cloudbeaver/core-utils';
 
 function getDefaultState(): string[] {
@@ -29,21 +29,9 @@ export class ConnectionFormAccessPart extends FormPart<string[], IConnectionForm
     });
   }
 
-  override isOutdated(): boolean {
-    const connectionId = this.formState.state.config.connectionId;
-    const projectId = this.formState.state.projectId;
-
-    if (!connectionId || !projectId) {
-      return false;
-    }
-
-    const key = createConnectionParam(projectId, connectionId);
-
-    return this.connectionInfoResource.isOutdated(key);
-  }
-
   protected override async loader(): Promise<void> {
-    const connectionId = this.formState.state.config.connectionId;
+    const optionsPart = getConnectionFormOptionsPart(this.formState);
+    const connectionId = optionsPart.state.connectionId;
     const projectId = this.formState.state.projectId;
 
     if (!connectionId || !projectId) {
@@ -62,7 +50,8 @@ export class ConnectionFormAccessPart extends FormPart<string[], IConnectionForm
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
     const status = contexts.getContext(formStatusContext);
-    const connectionId = this.formState.state.config.connectionId;
+    const optionsPart = getConnectionFormOptionsPart(this.formState);
+    const connectionId = optionsPart.state.connectionId;
 
     if (this.formState.state.submitType === 'test' || !data.state.projectId || !status.saved || !connectionId || !this.loaded) {
       return;

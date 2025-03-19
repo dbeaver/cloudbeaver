@@ -12,12 +12,13 @@ import { Tab, type TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-
 
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { ConnectionInfoOriginResource, createConnectionParam } from '@cloudbeaver/core-connections';
-
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = observer(function OriginInfoTab({ formState, ...rest }) {
+  const optionsPart = getConnectionFormOptionsPart(formState);
   const connectionInfoOriginResource = useResource(
     OriginInfoTab,
     ConnectionInfoOriginResource,
-    createConnectionParam(formState.state.projectId, formState.state.config.connectionId!),
+    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
   );
 
   return (

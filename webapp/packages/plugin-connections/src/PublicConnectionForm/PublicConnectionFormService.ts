@@ -1,11 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable } from 'mobx';
+
+import { action, makeObservable, observable, runInAction } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
@@ -21,6 +22,7 @@ import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 import { ConnectionFormState } from '../ConnectionForm/ConnectionFormState.js';
 import { ConnectionFormService } from '../ConnectionForm/ConnectionFormService.js';
+import { getConnectionFormOptionsPart } from '../ConnectionForm/Options/getConnectionFormOptionsPart.js';
 
 const PublicConnectionForm = importLazyComponent(() => import('./PublicConnectionForm.js').then(m => m.PublicConnectionForm));
 
@@ -74,11 +76,18 @@ export class PublicConnectionFormService {
       this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
         projectId,
         availableDrivers: availableDrivers ?? [],
-        config,
         submitType: 'submit',
         type: 'public',
         requiredNetworkHandlersIds: [],
       });
+
+      runInAction(() => {
+        this.optionsPart!.state = {
+          ...this.optionsPart!.state,
+          ...config,
+        };
+      });
+
       this.formState.disposeTask.addHandler(this.close.bind(this, true));
     }
 
@@ -114,9 +123,11 @@ export class PublicConnectionFormService {
   }
 
   async save(): Promise<void> {
+    const optionsPart = this.formState ? getConnectionFormOptionsPart(this.formState) : null;
+
     const key =
-      this.formState && this.formState.state.config.connectionId && this.formState.state.projectId !== null
-        ? createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId)
+      this.formState && optionsPart?.state.connectionId && this.formState.state.projectId !== null
+        ? createConnectionParam(this.formState.state.projectId, optionsPart.state.connectionId)
         : null;
 
     await this.close(true);
@@ -126,24 +137,26 @@ export class PublicConnectionFormService {
     }
   }
 
+  get optionsPart() {
+    return this.formState ? getConnectionFormOptionsPart(this.formState) : null;
+  }
+
   private readonly closeRemoved: IExecutorHandler<ResourceKey<IConnectionInfoParams>> = (data, contexts) => {
-    if (!this.formState || !this.formState.state.config.connectionId || this.formState.state.projectId === null) {
+    if (!this.formState || !this.optionsPart?.state.connectionId || this.formState.state.projectId === null) {
       return;
     }
 
-    if (!this.connectionInfoResource.has(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId))) {
+    if (!this.connectionInfoResource.has(createConnectionParam(this.formState.state.projectId, this.optionsPart.state.connectionId!))) {
       this.close(true);
     }
   };
 
   private readonly closeDeleted: IExecutorHandler<ResourceKeySimple<IConnectionInfoParams>> = (data, contexts) => {
-    if (!this.formState || !this.formState.state.config.connectionId || this.formState.state.projectId === null) {
+    if (!this.formState || !this.optionsPart?.state.connectionId || this.formState.state.projectId === null) {
       return;
     }
 
-    if (
-      this.connectionInfoResource.isIntersect(data, createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId))
-    ) {
+    if (this.connectionInfoResource.isIntersect(data, createConnectionParam(this.formState.state.projectId, this.optionsPart.state.connectionId!))) {
       this.close(true);
     }
   };
@@ -157,12 +170,14 @@ export class PublicConnectionFormService {
   };
 
   private async showUnsavedChangesDialog(): Promise<boolean> {
+    const optionsPart = this.formState ? getConnectionFormOptionsPart(this.formState) : null;
+
     if (
       !this.formState ||
       !this.optionsPanelService.isOpen(formGetter) ||
-      (this.formState.state.config.connectionId &&
+      (optionsPart?.state.connectionId &&
         this.formState.state.projectId !== null &&
-        !this.connectionInfoResource.has(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId)))
+        !this.connectionInfoResource.has(createConnectionParam(this.formState.state.projectId, optionsPart.state.connectionId)))
     ) {
       return true;
     }

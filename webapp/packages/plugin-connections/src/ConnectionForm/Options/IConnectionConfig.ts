@@ -42,5 +42,4 @@ export const CONNECTION_CONFIG_SCHEMA = schema.object({
   userPassword: schema.string().optional(),
 });
 
-export type IConnectionConfig = schema.infer<typeof CONNECTION_CONFIG_SCHEMA>;
 export type IConnectionProperties = schema.infer<typeof CONNECTION_PROPERTIES_SCHEMA>;

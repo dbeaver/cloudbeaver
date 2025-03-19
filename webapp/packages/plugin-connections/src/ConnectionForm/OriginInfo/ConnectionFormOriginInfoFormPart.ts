@@ -42,22 +42,23 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     });
   }
 
+  get optionsPart() {
+    return getConnectionFormOptionsPart(this.formState);
+  }
+
   get providerId(): string | null {
-    if (!this.formState.state.projectId || !this.formState.state.config.driverId) {
+    if (!this.formState.state.projectId || !this.optionsPart.state.driverId) {
       return null;
     }
 
-    const driver = this.dbDriverResource.get(this.formState.state.config.driverId);
+    const driver = this.dbDriverResource.get(this.optionsPart.state.driverId);
 
     if (!driver) {
       return null;
     }
 
-    const optionsPart = getConnectionFormOptionsPart(this.formState);
-    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, optionsPart.state.connectionId!));
-    const authModel = this.databaseAuthModelsResource.get(
-      this.formState.state.config.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null,
-    );
+    const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.optionsPart.state.connectionId!));
+    const authModel = this.databaseAuthModelsResource.get(this.optionsPart.state.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null);
     const providerId = authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
 
     return providerId;
@@ -71,29 +72,12 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     return this.userInfoResource.hasToken(this.providerId);
   }
 
-  override isOutdated(): boolean {
-    const isDriverOutdated = this.dbDriverResource.isOutdated(this.formState.state.config.driverId);
-    const optionsPart = getConnectionFormOptionsPart(this.formState);
-    const connectionId = optionsPart.state.connectionId;
-
-    const isConnectionOutdated = connectionId
-      ? this.connectionInfoResource.isOutdated(createConnectionParam(this.formState.state.projectId, connectionId))
-      : false;
-    const isAuthModelOutdated = this.authModelId ? this.databaseAuthModelsResource.isOutdated(this.authModelId) : false;
-    // TODO why is app goes to infinite loop when this is uncommented?
-    // const isOriginInfoOutdated = connectionId
-    //   ? this.connectionInfoOriginDetailsResource.isOutdated(createConnectionParam(this.formState.state.projectId, connectionId))
-    //   : false;
-
-    return isDriverOutdated || isConnectionOutdated || isAuthModelOutdated || this.userInfoResource.isOutdated() || optionsPart.isOutdated();
-  }
-
   get authModelId(): string | null {
-    const driver = this.dbDriverResource.get(this.formState.state.config.driverId!)!;
     const optionsPart = getConnectionFormOptionsPart(this.formState);
+    const driver = this.dbDriverResource.get(optionsPart.state.driverId!)!;
     const info = this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, optionsPart.state.connectionId!));
 
-    return this.formState.state.config.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null;
+    return optionsPart.state.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null;
   }
 
   protected override async loader(): Promise<void> {
@@ -101,12 +85,12 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     const optionsPart = getConnectionFormOptionsPart(this.formState);
     const connectionId = optionsPart.state.connectionId;
 
-    if (!connectionId || !this.formState.state.projectId || !this.formState.state.config.driverId) {
+    if (!connectionId || !this.formState.state.projectId || !optionsPart.state.driverId) {
       this.setInitialState(state);
       return;
     }
 
-    await this.dbDriverResource.load(this.formState.state.config.driverId);
+    await this.dbDriverResource.load(optionsPart.state.driverId);
 
     if (!this.authModelId) {
       throw new Error('Auth model is not defined');

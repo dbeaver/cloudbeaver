@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,13 @@ import { uuid } from '@cloudbeaver/core-utils';
 import styles from './DriverProperties.module.css';
 import { getConnectionFormDriverPropertiesPart } from './getConnectionFormDriverPropertiesPart.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
 export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> = observer(function DriverProperties({ tabId, formState }) {
   const { selected } = useTab(tabId);
   const style = useS(styles);
   const driverPropertiesPart = getConnectionFormDriverPropertiesPart(formState);
-
+  const optionsPart = getConnectionFormOptionsPart(formState);
   const [state] = useState(() => {
     const propertiesList: IProperty[] = observable([]);
 
@@ -44,7 +45,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
   });
 
   const driver = useResource(DriverProperties, DBDriverResource, {
-    key: (selected && formState.state.config.driverId) || null,
+    key: (selected && optionsPart.state.driverId) || null,
     includes: ['includeDriverProperties'] as const,
   });
 

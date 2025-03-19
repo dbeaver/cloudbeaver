@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,7 +9,7 @@ import React from 'react';
 
 import { DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { ConnectionFormService } from '../ConnectionFormService.js';
 
@@ -39,8 +39,10 @@ export class ConnectionSSLTabService extends Bootstrap {
       tab: () => SSLTab,
       panel: () => SSLPanel,
       isHidden: (_, props) => {
-        if (props?.formState.state.config.driverId) {
-          const driver = this.dbDriverResource.get(props?.formState.state.config.driverId);
+        const optionsPart = props?.formState ? getConnectionFormOptionsPart(props.formState) : null;
+
+        if (optionsPart?.state.driverId) {
+          const driver = this.dbDriverResource.get(optionsPart.state.driverId);
           const handler = getSSLDriverHandler(this.networkHandlerResource.values, driver?.applicableNetworkHandlers ?? []);
           return !handler;
         }

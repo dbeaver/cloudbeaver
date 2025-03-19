@@ -42,18 +42,18 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     super(formState, getDefaultState());
   }
 
-  override isOutdated(): boolean {
-    return this.connectionInfoResource.isOutdated(createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId!));
+  get optionsPart() {
+    return getConnectionFormOptionsPart(this.formState);
   }
 
   protected override async loader(): Promise<void> {
-    if (!this.formState.state.config.connectionId || !this.formState.state.projectId) {
+    if (!this.optionsPart.state.connectionId || !this.formState.state.projectId) {
       this.setInitialState(getDefaultState());
       return;
     }
 
     const connection = await this.connectionInfoResource.load(
-      createConnectionParam(this.formState.state.projectId, this.formState.state.config.connectionId),
+      createConnectionParam(this.formState.state.projectId, this.optionsPart.state.connectionId!),
     );
 
     this.setInitialState(connection?.networkHandlersConfig?.find(h => h.id === SSH_TUNNEL_ID) ?? getDefaultState());
@@ -68,8 +68,8 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): void | Promise<void> {
-    const urlType = this.formState.state.config.configurationType === DriverConfigurationType.Url;
     const optionsPart = getConnectionFormOptionsPart(this.formState);
+    const urlType = optionsPart.state.configurationType === DriverConfigurationType.Url;
 
     if (urlType) {
       return;
