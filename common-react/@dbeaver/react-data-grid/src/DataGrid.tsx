@@ -140,6 +140,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
               renderCell: cellRenderer,
               noRowsFallback: children,
             }}
+            minimumRowsToRender={100}
           />
         </DataGridCellHeaderContext>
       </DataGridCellContext>

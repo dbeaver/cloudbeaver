@@ -253,6 +253,10 @@ export declare interface DataGridProps<R, SR = unknown, K extends Key = Key> ext
     /** @default true */
     enableVirtualization?: Maybe<boolean>;
     /**
+     * The minimum number of rows to render when virtualization is enabled
+     */
+    minimumRowsToRender?: Maybe<number>;
+    /**
      * Miscellaneous
      */
     renderers?: Maybe<Renderers<NoInfer<R>, NoInfer<SR>>>;

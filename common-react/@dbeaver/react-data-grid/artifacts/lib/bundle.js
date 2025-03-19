@@ -893,7 +893,7 @@ function useViewportColumns({ columns, colSpanColumns, rows, topSummaryRows, bot
 
 //#endregion
 //#region src/hooks/useViewportRows.ts
-function useViewportRows({ rows, rowHeight, clientHeight, scrollTop, enableVirtualization }) {
+function useViewportRows({ rows, rowHeight, clientHeight, scrollTop, enableVirtualization, minimumRowsToRender }) {
 	const { totalRowHeight, gridTemplateRows, getRowTop, getRowHeight, findRowIdx } = useMemo(() => {
 		if (typeof rowHeight === "number") return {
 			totalRowHeight: rowHeight * rows.length,
@@ -945,6 +945,13 @@ function useViewportRows({ rows, rowHeight, clientHeight, scrollTop, enableVirtu
 		const rowVisibleEndIdx = findRowIdx(scrollTop + clientHeight);
 		rowOverscanStartIdx = max(0, rowVisibleStartIdx - overscanThreshold);
 		rowOverscanEndIdx = min(rows.length - 1, rowVisibleEndIdx + overscanThreshold);
+		const extraRows = max(0, minimumRowsToRender - (rowOverscanEndIdx - rowOverscanStartIdx + 1));
+		if (extraRows > 0) {
+			const extraOnSide = floor(extraRows / 2);
+			const startRowsShift = rowOverscanStartIdx - extraOnSide;
+			rowOverscanStartIdx = max(0, startRowsShift);
+			rowOverscanEndIdx = min(rows.length - 1, rowOverscanEndIdx + extraOnSide - min(0, startRowsShift));
+		}
 	}
 	return {
 		rowOverscanStartIdx,
@@ -1705,7 +1712,7 @@ var SummaryRow_default = memo(SummaryRow);
 //#endregion
 //#region src/DataGrid.tsx
 function DataGrid(props) {
-	const { ref, columns: rawColumns, rows, topSummaryRows, bottomSummaryRows, rowKeyGetter, onRowsChange, rowHeight: rawRowHeight, headerRowHeight: rawHeaderRowHeight, summaryRowHeight: rawSummaryRowHeight, selectedRows, isRowSelectionDisabled, onSelectedRowsChange, sortColumns, onSortColumnsChange, defaultColumnOptions, onCellClick, onCellDoubleClick, onCellContextMenu, onCellKeyDown, onSelectedCellChange, onScroll, onColumnResize, onColumnsReorder, onFill, onCopy, onPaste, enableVirtualization: rawEnableVirtualization, renderers, className, style, rowClass, direction: rawDirection, role: rawRole, "aria-label": ariaLabel, "aria-labelledby": ariaLabelledBy, "aria-description": ariaDescription, "aria-describedby": ariaDescribedBy, "aria-rowcount": rawAriaRowCount, "data-testid": testId, "data-cy": dataCy } = props;
+	const { ref, columns: rawColumns, rows, topSummaryRows, bottomSummaryRows, rowKeyGetter, onRowsChange, rowHeight: rawRowHeight, headerRowHeight: rawHeaderRowHeight, summaryRowHeight: rawSummaryRowHeight, selectedRows, isRowSelectionDisabled, onSelectedRowsChange, sortColumns, onSortColumnsChange, defaultColumnOptions, onCellClick, onCellDoubleClick, onCellContextMenu, onCellKeyDown, onSelectedCellChange, onScroll, onColumnResize, onColumnsReorder, onFill, onCopy, onPaste, enableVirtualization: rawEnableVirtualization, minimumRowsToRender: rawMinimumRowsToRender, renderers, className, style, rowClass, direction: rawDirection, role: rawRole, "aria-label": ariaLabel, "aria-labelledby": ariaLabelledBy, "aria-description": ariaDescription, "aria-describedby": ariaDescribedBy, "aria-rowcount": rawAriaRowCount, "data-testid": testId, "data-cy": dataCy } = props;
 	/**
 	* defaults
 	*/
@@ -1720,6 +1727,7 @@ function DataGrid(props) {
 	const renderCheckbox$1 = renderers?.renderCheckbox ?? defaultRenderers?.renderCheckbox ?? renderCheckbox;
 	const noRowsFallback = renderers?.noRowsFallback ?? defaultRenderers?.noRowsFallback;
 	const enableVirtualization = rawEnableVirtualization ?? true;
+	const minimumRowsToRender = rawMinimumRowsToRender ?? 30;
 	const direction = rawDirection ?? "ltr";
 	/**
 	* states
@@ -1807,7 +1815,8 @@ function DataGrid(props) {
 		rowHeight,
 		clientHeight,
 		scrollTop,
-		enableVirtualization
+		enableVirtualization,
+		minimumRowsToRender
 	});
 	const viewportColumns = useViewportColumns({
 		columns,
