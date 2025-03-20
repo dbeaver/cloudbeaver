@@ -154,10 +154,10 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
   protected override async loader(): Promise<void> {
     if (this.formState.mode === 'create') {
-      await this.setDefaults();
+      const defaults = await this.getDefaults();
 
       this.setInitialState({
-        ...defaultStateGetter(),
+        ...defaults,
         ...this.state,
       });
       return;
@@ -251,33 +251,36 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     this.state.authModelId = model.id;
   }
 
-  private async setDefaults() {
+  private async getDefaults() {
+    const config = defaultStateGetter();
     if (!this.state.driverId) {
-      this.state.name = 'New connection';
-      return;
+      config.name = 'New connection';
+      return config;
     }
 
     const driver = await this.dbDriverResource.load(this.state.driverId, ['includeProviderProperties']);
 
-    this.state.authModelId = driver?.defaultAuthModel;
-    this.state.configurationType = getDefaultConfigurationType(driver);
+    config.authModelId = driver?.defaultAuthModel;
+    config.configurationType = getDefaultConfigurationType(driver);
 
     if (!this.state.host) {
-      this.state.host = driver?.defaultServer || 'localhost';
+      config.host = driver?.defaultServer || 'localhost';
     }
 
     if (!this.state.port) {
-      this.state.port = driver?.defaultPort;
+      config.port = driver?.defaultPort;
     }
 
-    this.state.databaseName = driver?.defaultDatabase;
-    this.state.url = driver?.sampleURL;
+    config.databaseName = driver?.defaultDatabase;
+    config.url = driver?.sampleURL;
 
     if (isJDBCConnection(driver)) {
-      this.state.name = this.state.url;
+      config.name = config.url;
     } else {
-      this.state.name = getConnectionName(driver.name || '', this.state.host, this.state.port, driver.defaultPort);
+      config.name = getConnectionName(driver.name || '', config.host, config.port, driver.defaultPort);
     }
+
+    return config;
   }
 
   protected override async format(

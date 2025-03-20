@@ -7,7 +7,7 @@
  */
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
 import type { IFormState } from '@cloudbeaver/core-ui';
-import { ConnectionFormOptionsPart } from './ConnectionFormOpitonsPart.js';
+import { ConnectionFormOptionsPart } from './ConnectionFormOptionsPart.js';
 import { ConnectionInfoResource, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
