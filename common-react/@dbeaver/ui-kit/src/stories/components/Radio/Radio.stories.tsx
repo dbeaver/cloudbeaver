@@ -139,7 +139,7 @@ export const RadioGroupControlled = () => {
   }, []);
 
   return (
-    <RadioGroup value={value} setValue={val => setValue(val as string)}>
+    <RadioGroup aria-label="Controlled radio group" value={value} setValue={val => setValue(val as string)}>
       <Radio value={'1'}>Item 1</Radio>
       <Radio value={'2'}>Item 2</Radio>
       <Radio value={'3'}>Item 3</Radio>
@@ -148,7 +148,7 @@ export const RadioGroupControlled = () => {
 };
 
 export const RadioGroupUncontrolled = () => (
-  <RadioGroup>
+  <RadioGroup label="Uncontrolled">
     <Radio value={'1'}>Item 1</Radio>
     <Radio value={'2'}>Item 2</Radio>
     <Radio value={'3'}>Item 3</Radio>
@@ -156,7 +156,7 @@ export const RadioGroupUncontrolled = () => (
 );
 
 export const Vertical = () => (
-  <RadioGroup vertical>
+  <RadioGroup label="Vertical" vertical>
     <Radio value={'1'}>Item 1</Radio>
     <Radio value={'2'}>Item 2</Radio>
     <Radio value={'3'}>Item 3</Radio>
@@ -172,7 +172,7 @@ export const Required = () => (
 );
 
 export const LabelsReactComponents = () => (
-  <RadioGroup vertical>
+  <RadioGroup label="" vertical>
     <Radio value={'1'}>
       <div className="tw:flex tw:hover:bg-orange-100 tw:transition tw:duration-300 tw:ease-in-out">
         <div className="tw:bg-orange-500 tw:text-white tw:px-2">Orange</div>
@@ -209,7 +209,7 @@ export const GroupWithCustomLabel = () => (
 
 export const Sizes = () => (
   <div className="tw:space-y-4">
-    <RadioGroup>
+    <RadioGroup label="Small">
       <Radio size="small" value={'1'}>
         Small
       </Radio>
@@ -220,38 +220,44 @@ export const Sizes = () => (
         Small
       </Radio>
     </RadioGroup>
-    <RadioGroup
-      size="medium"
-      name="medium"
-      items={[
-        { label: 'Medium', value: '1' },
-        { label: 'Medium', value: '2' },
-        { label: 'Medium', value: '3' },
-      ]}
-    />
-    <RadioGroup
-      size="large"
-      name="large"
-      items={[
-        { label: 'Large', value: '1' },
-        { label: 'Large', value: '2' },
-        { label: 'Large', value: '3' },
-      ]}
-    />
-    <RadioGroup
-      size="xlarge"
-      name="xlarge"
-      items={[
-        { label: 'Extra Large', value: '1' },
-        { label: 'Extra Large', value: '2' },
-        { label: 'Extra Large', value: '3' },
-      ]}
-    />
+    <RadioGroup label="Medium">
+      <Radio size="medium" value={'1'}>
+        Medium
+      </Radio>
+      <Radio size="medium" value={'2'}>
+        Medium
+      </Radio>
+      <Radio size="medium" value={'3'}>
+        Medium
+      </Radio>
+    </RadioGroup>
+    <RadioGroup label="Large">
+      <Radio size="large" value={'1'}>
+        Large
+      </Radio>
+      <Radio size="large" value={'2'}>
+        Large
+      </Radio>
+      <Radio size="large" value={'3'}>
+        Large
+      </Radio>
+    </RadioGroup>
+    <RadioGroup label="Extra Large">
+      <Radio size="xlarge" value={'1'}>
+        Extra Large
+      </Radio>
+      <Radio size="xlarge" value={'2'}>
+        Extra Large
+      </Radio>
+      <Radio size="xlarge" value={'3'}>
+        Extra Large
+      </Radio>
+    </RadioGroup>
   </div>
 );
 
 export const RadioDisabled = () => (
-  <RadioGroup>
+  <RadioGroup label="Disabled">
     <Radio value={'1'} disabled>
       Disabled
     </Radio>

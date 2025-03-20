@@ -8,63 +8,50 @@
 
 import { useId } from 'react';
 import './RadioGroup.css';
-import { _RadioGroup, _RadioProvider, Radio, type RadioProviderProps } from './index.js';
-import type { ControlSize } from '../types/controls.js';
-
-type ConditionalRadioProps =
-  | {
-      items: Array<{ value: string; label: string }>;
-      name: string;
-      size?: ControlSize;
-      children?: never;
-    }
-  | {
-      items?: never;
-      name?: never;
-      size?: never;
-      children: React.ReactNode;
-    };
+import { _RadioGroup, _RadioProvider, type RadioProviderProps } from './index.js';
 
 type LabelProps =
   | {
-      labelledBy?: string;
+      labelledBy: string;
       label?: never;
+      ['aria-label']?: never;
     }
   | {
       labelledBy?: never;
-      label?: React.ReactNode;
+      label: React.ReactNode;
+      ['aria-label']?: never;
+    }
+  | {
+      labelledBy?: never;
+      label?: never;
+      ['aria-label']: string;
     };
 
 type RadioGroupProps = Pick<RadioProviderProps, 'value' | 'setValue' | 'store' | 'setActiveId' | 'rtl' | 'defaultValue'> &
-  ConditionalRadioProps &
   LabelProps & {
     required?: boolean;
     className?: string;
     vertical?: boolean;
+    children: React.ReactNode;
   };
 
-export function RadioGroup({ className, children, items, labelledBy, label, size = 'medium', name, ...props }: RadioGroupProps) {
+export function RadioGroup({ className, children, labelledBy, label, ['aria-label']: ariaLabel, ...props }: RadioGroupProps) {
   const labelId = useId();
   const labelledById = label ? labelId : labelledBy;
   return (
     <_RadioProvider {...props}>
       <div>
         {label && (
-          <label id={labelId} className={`dbv-kit-radio-group__label ${props.required ? 'dbv-kit-radio-group__label--required' : ''}`}>
+          <div id={labelId} className={`dbv-kit-radio-group__label ${props.required ? 'dbv-kit-radio-group__label--required' : ''}`}>
             {label}
-          </label>
+          </div>
         )}
         <_RadioGroup
           aria-labelledby={labelledById}
+          aria-label={ariaLabel}
           className={`dbv-kit-radio-group ${className ?? ''} ${props.vertical ? 'dbv-kit-radio-group--vertical' : ''}`}
         >
-          {items
-            ? items.map(option => (
-                <Radio key={option.value} name={name} size={size} value={option.value}>
-                  {option.label}
-                </Radio>
-              ))
-            : children}
+          {children}
         </_RadioGroup>
       </div>
     </_RadioProvider>

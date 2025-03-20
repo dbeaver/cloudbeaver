@@ -40,15 +40,10 @@ export const SimpleForm = () => {
         </Radio>
       </RadioGroup>
 
-      <RadioGroup
-        name="children"
-        vertical
-        label="Children"
-        items={[
-          { label: 'Have children', value: 'Yes' },
-          { label: 'No', value: 'No' },
-        ]}
-      />
+      <RadioGroup vertical label="Children">
+        <Radio value="Yes">Have children</Radio>
+        <Radio value="No">No</Radio>
+      </RadioGroup>
       <div>
         <Checkbox className="tw:flex-row-reverse">Veteran of the console.war</Checkbox>
       </div>
