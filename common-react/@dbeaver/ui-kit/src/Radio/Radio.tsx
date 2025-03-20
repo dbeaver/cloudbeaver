@@ -19,7 +19,7 @@ export function Radio({ children, className, size = 'medium', ...props }: RadioP
     <label className={`dbv-kit-radio dbv-kit-radio--${size} ${className || ''}`}>
       <_Radio className="dbv-kit-radio__input" {...props} />
       <div className="dbv-kit-radio__control" />
-      <span className="dbv-kit-radio__text">{children}</span>
+      <span className="dbv-kit-radio__title">{children}</span>
     </label>
   );
 }

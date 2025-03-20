@@ -41,7 +41,7 @@ export const Documentation = () => {
       </p>
       <h3>Text</h3>
       <p>
-        <code>.dbv-kit-radio__text</code> - Applied to the text element of the radio component.
+        <code>.dbv-kit-radio__title</code> - Applied to the visible title element of the radio component.
       </p>
       <h2>CSS Variables</h2>
       <h3>Radio Component Variables</h3>

@@ -106,7 +106,7 @@
     }
   }
 
-  .dbv-kit-radio__text {
+  .dbv-kit-radio__title {
     display: inline-block;
     vertical-align: middle;
     line-height: var(--dbv-kit-radio-height);
