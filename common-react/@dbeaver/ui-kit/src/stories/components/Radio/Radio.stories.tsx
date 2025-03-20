@@ -126,16 +126,6 @@ export const Documentation = () => {
   );
 };
 
-export const InnerComponentsUsage = () => (
-  <_RadioProvider defaultValue={'2'}>
-    <_RadioGroup className="tw:flex tw:space-x-4">
-      <Radio value={'1'}>Item 1</Radio>
-      <Radio value={'2'}>Item 2</Radio>
-      <Radio value={'3'}>Item 3</Radio>
-    </_RadioGroup>
-  </_RadioProvider>
-);
-
 export const RadioGroupControlled = () => {
   const [value, setValue] = useState('2');
 
@@ -190,7 +180,7 @@ export const LabelsReactComponents = () => (
       </div>
     </Radio>
     <Radio value={'2'}>
-      <div className="tw:flex tw:flex-col tw:hover:bg-green-100">
+      <div className="tw:flex tw:hover:bg-green-100">
         <div className="tw:bg-green-300 tw:text-green-900 tw:px-2">Apple</div>
         <div className="tw:ml-2 tw:text-gray-500">Vital</div>
       </div>
