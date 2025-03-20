@@ -22,7 +22,6 @@ import {
   DBDriverResource,
   isJDBCConnection,
   type DatabaseConnection,
-  type IConnectionInfoParams,
 } from '@cloudbeaver/core-connections';
 import type { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
@@ -36,7 +35,6 @@ import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
 import type { NotificationService } from '@cloudbeaver/core-events';
-import type { ResourceKeySimple } from '@cloudbeaver/core-resource';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
@@ -74,19 +72,10 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     this.formState.validationTask.addPostHandler(this.askCredentials.bind(this));
     this.formState.loadedTask.addPostHandler(this.formAuthState.bind(this));
-    this.connectionInfoResource.onItemUpdate.removeHandler(this.syncInfo.bind(this));
 
     makeObservable(this, {
       setAuthModel: action.bound,
     });
-  }
-
-  private async syncInfo(key: ResourceKeySimple<IConnectionInfoParams>) {
-    if (!this.connectionKey || !this.connectionInfoResource.isIntersect(key, this.connectionKey)) {
-      return;
-    }
-
-    await this.reload();
   }
 
   private async formAuthState(data: IFormState<IConnectionFormState>, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
@@ -146,26 +135,29 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   }
 
   override isOutdated(): boolean {
-    if (!this.state.connectionId || !this.formState.state.projectId) {
+    if (!this.formState.state.projectId) {
       return false;
     }
 
     const project = this.projectInfoResource.get(this.formState.state.projectId);
-
-    return (
-      this.connectionInfoResource.isOutdated(createConnectionParam(this.formState.state.projectId, this.state.connectionId)) ||
+    const isProjectOutdated =
       this.projectInfoResource.isOutdated(this.formState.state.projectId) ||
       !project?.canEditDataSources ||
-      !this.projectsService.activeProjects.includes(project)
-    );
+      !this.projectsService.activeProjects.includes(project);
+
+    if (!this.connectionKey) {
+      return isProjectOutdated;
+    }
+
+    return this.connectionInfoResource.isOutdated(this.connectionKey) || isProjectOutdated;
   }
 
   protected override async loader(): Promise<void> {
     if (this.formState.mode === 'create') {
-      const defaults = await this.getDefaults();
+      await this.setDefaults();
 
       this.setInitialState({
-        ...defaults,
+        ...defaultStateGetter(),
         ...this.state,
       });
       return;
@@ -259,37 +251,33 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     this.state.authModelId = model.id;
   }
 
-  private async getDefaults() {
-    const config = defaultStateGetter();
-
+  private async setDefaults() {
     if (!this.state.driverId) {
-      config.name = 'New connection';
-      return config;
+      this.state.name = 'New connection';
+      return;
     }
 
     const driver = await this.dbDriverResource.load(this.state.driverId, ['includeProviderProperties']);
 
-    config.authModelId = driver?.defaultAuthModel;
-    config.configurationType = getDefaultConfigurationType(driver);
+    this.state.authModelId = driver?.defaultAuthModel;
+    this.state.configurationType = getDefaultConfigurationType(driver);
 
     if (!this.state.host) {
-      config.host = driver?.defaultServer || 'localhost';
+      this.state.host = driver?.defaultServer || 'localhost';
     }
 
     if (!this.state.port) {
-      config.port = driver?.defaultPort;
+      this.state.port = driver?.defaultPort;
     }
 
-    config.databaseName = driver?.defaultDatabase;
-    config.url = driver?.sampleURL;
+    this.state.databaseName = driver?.defaultDatabase;
+    this.state.url = driver?.sampleURL;
 
     if (isJDBCConnection(driver)) {
-      config.name = config.url;
+      this.state.name = this.state.url;
     } else {
-      config.name = getConnectionName(driver.name || '', config.host, config.port, driver.defaultPort);
+      this.state.name = getConnectionName(driver.name || '', this.state.host, this.state.port, driver.defaultPort);
     }
-
-    return config;
   }
 
   protected override async format(

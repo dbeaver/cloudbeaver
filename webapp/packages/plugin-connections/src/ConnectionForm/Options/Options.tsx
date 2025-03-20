@@ -99,7 +99,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const tabsState = useContext(TabsContext);
   const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
   const optionsPart = getConnectionFormOptionsPart(formState);
-  const connectionInfoService = useResource(
+  const connectionInfoResource = useResource(
     Options,
     ConnectionInfoResource,
     createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
@@ -117,7 +117,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   );
 
   //@TODO it's here until the profile implementation in the CloudBeaver
-  const readonly = formState.isDisabled || connectionInfoService.data?.authModel === PROFILE_AUTH_MODEL_ID;
+  const readonly = formState.isDisabled || connectionInfoResource.data?.authModel === PROFILE_AUTH_MODEL_ID;
 
   useFormValidator(formState.validationTask, formRef.current);
   const { credentialsSavingEnabled } = useAdministrationSettings();
@@ -142,7 +142,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const authModelLoader = useResource(
     Options,
     DatabaseAuthModelsResource,
-    getComputed(() => optionsPart.state.authModelId || connectionInfoService.data?.authModel || driver?.defaultAuthModel || null),
+    getComputed(() => optionsPart.state.authModelId || connectionInfoResource.data?.authModel || driver?.defaultAuthModel || null),
     {
       onData: optionsPart.setAuthModel.bind(optionsPart),
       active: selected,
@@ -166,12 +166,12 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   }
 
   const authentication = useAuthenticationAction({
-    providerId: authModel?.requiredAuth ?? connectionInfoService.data?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
+    providerId: authModel?.requiredAuth ?? connectionInfoResource.data?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
   });
 
   const edit = formState.mode === 'edit';
   const originLocal =
-    !connectionInfoService.data || (connectionInfoOriginResource.data?.origin && isLocalConnection(connectionInfoOriginResource.data.origin));
+    !connectionInfoResource.data || (connectionInfoOriginResource.data?.origin && isLocalConnection(connectionInfoOriginResource.data.origin));
 
   const drivers = driverMap.resource.enabledDrivers.filter(({ id, driverInstalled }) => {
     if (!edit && !isAdmin && !driverInstalled) {
@@ -188,11 +188,11 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   let properties = authModel?.properties;
 
   if (
-    connectionInfoService.data?.authProperties &&
-    connectionInfoService.data.authProperties.length > 0 &&
-    optionsPart.state.authModelId === connectionInfoService.data.authModel
+    connectionInfoResource.data?.authProperties &&
+    connectionInfoResource.data.authProperties.length > 0 &&
+    optionsPart.state.authModelId === connectionInfoResource.data.authModel
   ) {
-    properties = connectionInfoService.data.authProperties;
+    properties = connectionInfoResource.data.authProperties;
   }
 
   const sharedCredentials = optionsPart.state.sharedCredentials && serverConfigResource.data?.distributed;
@@ -208,7 +208,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     }
 
     runInAction(() => {
-      optionsPart.state.driverId = driverId;
+      optionsPart.state = {
+        driverId,
+      };
     });
 
     await formState.reload();
