@@ -7,7 +7,11 @@
  */
 
 import subscript from 'subscript';
+import { err, token } from 'subscript/parse';
+
 import 'subscript/feature/bool.js';
+
+token('null', 20, a => (a ? err() : [, null]));
 
 interface IContext {
   object: Record<string, any>;
