@@ -19,14 +19,17 @@ package io.cloudbeaver.registry;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.DBPConditionalProperty;
 import org.jkiss.dbeaver.model.impl.LocalizedPropertyDescriptor;
 
-public class WebAuthProviderProperty extends LocalizedPropertyDescriptor {
+public class WebAuthProviderProperty extends LocalizedPropertyDescriptor implements DBPConditionalProperty {
     private final String[] requiredFeatures;
     @Nullable
     private final String type;
 
     private final String authProviderId;
+    private final String visibleExpr;
+    private final String activeExpr;
 
     public WebAuthProviderProperty(String category, IConfigurationElement config, String authProviderId) {
         super(category, config);
@@ -34,6 +37,8 @@ public class WebAuthProviderProperty extends LocalizedPropertyDescriptor {
         String featuresAttr = config.getAttribute("requiredFeatures");
         this.requiredFeatures = featuresAttr == null ? new String[0] : featuresAttr.split(",");
         this.type = config.getAttribute("type");
+        this.visibleExpr = config.getAttribute("visibleExpr");
+        this.activeExpr = config.getAttribute("activeExpr");
     }
 
     @NotNull
@@ -44,6 +49,18 @@ public class WebAuthProviderProperty extends LocalizedPropertyDescriptor {
     @Nullable
     public String getType() {
         return type;
+    }
+
+    @Nullable
+    @Override
+    public String getVisibleExpression() {
+        return visibleExpr;
+    }
+
+    @Nullable
+    @Override
+    public String getActiveExpression() {
+        return activeExpr;
     }
 
     @Override

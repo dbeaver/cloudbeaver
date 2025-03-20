@@ -265,13 +265,17 @@ public class WebPropertyInfo {
     @Nullable
     @Property
     public List<Condition> getConditions() {
-        if (!(property instanceof ObjectPropertyDescriptor objectPropertyDescriptor)) {
+        if (!(property instanceof DBPConditionalProperty conditionalProperty)) {
             return null;
         }
         List<Condition> conditions = new ArrayList<>();
-        String visibleExpr = objectPropertyDescriptor.getVisibleExpr();
+        String visibleExpr = conditionalProperty.getVisibleExpression();
         if (CommonUtils.isNotEmpty(visibleExpr)) {
             conditions.add(new Condition(visibleExpr, Condition.Type.SHOW));
+        }
+        String activeExpr = conditionalProperty.getActiveExpression();
+        if (CommonUtils.isNotEmpty(activeExpr)) {
+            conditions.add(new Condition(activeExpr, Condition.Type.ACTIVE));
         }
         return conditions;
     }
