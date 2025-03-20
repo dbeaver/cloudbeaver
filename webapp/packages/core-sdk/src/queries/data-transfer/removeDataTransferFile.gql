@@ -1,5 +1,0 @@
-query removeDataTransferFile(
-  $dataFileId: String!
-) {
-  result: dataTransferRemoveDataFile(dataFileId: $dataFileId)
-}
