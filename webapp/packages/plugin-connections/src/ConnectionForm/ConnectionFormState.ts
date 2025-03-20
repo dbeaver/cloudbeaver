@@ -14,41 +14,5 @@ import type { IConnectionFormState } from './IConnectionFormState.js';
 export class ConnectionFormState extends FormState<IConnectionFormState> {
   constructor(serviceProvider: IServiceProvider, service: ConnectionFormService, config: IConnectionFormState) {
     super(serviceProvider, service, config);
-
-    // const projectInfoResource = serviceProvider.getService(ProjectInfoResource);
-    // const projectsService = serviceProvider.getService(ProjectsService);
-    // const resource = serviceProvider.getService(ConnectionInfoResource);
-
-    // resource.onItemUpdate.removeHandler(this.syncInfo.bind(this));
-    // projectInfoResource.onDataUpdate.removeHandler(this.syncProject.bind(this));
-    // projectsService.onActiveProjectChange.removeHandler(this.syncProject.bind(this));
   }
-
-  // private async syncInfo(key: ResourceKeySimple<IConnectionInfoParams>) {
-  //   const resource = this.serviceProvider.getService(ConnectionInfoResource);
-
-  //   if (
-  //     !this.state.config.connectionId ||
-  //     this.state.projectId === null ||
-  //     !resource.isIntersect(key, createConnectionParam(this.state.projectId, this.state.config.connectionId))
-  //   ) {
-  //     return;
-  //   }
-
-  //   await this.reload();
-  // }
-
-  // private async syncProject() {
-  //   if (!this.state.projectId) {
-  //     return;
-  //   }
-
-  //   const projectInfoResource = this.serviceProvider.getService(ProjectInfoResource);
-  //   const projectsService = this.serviceProvider.getService(ProjectsService);
-
-  //   const project = projectInfoResource.get(this.state.projectId);
-  //   if (!project?.canEditDataSources || !projectsService.activeProjects.includes(project)) {
-  //     await this.dispose();
-  //   }
-  // }
 }

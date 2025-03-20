@@ -22,8 +22,9 @@ import {
   DBDriverResource,
   isJDBCConnection,
   type DatabaseConnection,
+  type IConnectionInfoParams,
 } from '@cloudbeaver/core-connections';
-import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import type { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 import { getUniqueName, isNotNullDefined } from '@cloudbeaver/core-utils';
@@ -35,6 +36,7 @@ import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
 import type { NotificationService } from '@cloudbeaver/core-events';
+import type { ResourceKeySimple } from '@cloudbeaver/core-resource';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
@@ -66,15 +68,25 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     private readonly localizationService: LocalizationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
+    private readonly projectsService: ProjectsService,
   ) {
     super(formState, defaultStateGetter());
 
     this.formState.validationTask.addPostHandler(this.askCredentials.bind(this));
     this.formState.loadedTask.addPostHandler(this.formAuthState.bind(this));
+    this.connectionInfoResource.onItemUpdate.removeHandler(this.syncInfo.bind(this));
 
     makeObservable(this, {
       setAuthModel: action.bound,
     });
+  }
+
+  private async syncInfo(key: ResourceKeySimple<IConnectionInfoParams>) {
+    if (!this.connectionKey || !this.connectionInfoResource.isIntersect(key, this.connectionKey)) {
+      return;
+    }
+
+    await this.reload();
   }
 
   private async formAuthState(data: IFormState<IConnectionFormState>, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
@@ -138,7 +150,14 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       return false;
     }
 
-    return this.connectionInfoResource.isOutdated(createConnectionParam(this.formState.state.projectId, this.state.connectionId));
+    const project = this.projectInfoResource.get(this.formState.state.projectId);
+
+    return (
+      this.connectionInfoResource.isOutdated(createConnectionParam(this.formState.state.projectId, this.state.connectionId)) ||
+      this.projectInfoResource.isOutdated(this.formState.state.projectId) ||
+      !project?.canEditDataSources ||
+      !this.projectsService.activeProjects.includes(project)
+    );
   }
 
   protected override async loader(): Promise<void> {
