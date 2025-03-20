@@ -108,8 +108,8 @@ export class CreateConnectionService {
     return this.data ? getConnectionFormOptionsPart(this.data) : null;
   }
 
-  setConnectionTemplate(projectId: string, config: ConnectionConfig, availableDrivers: string[]): void {
-    this.data?.dispose();
+  async setConnectionTemplate(projectId: string, config: ConnectionConfig, availableDrivers: string[]): Promise<void> {
+    this.clearConnectionTemplate();
     this.data = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
       projectId,
       availableDrivers,
@@ -128,6 +128,7 @@ export class CreateConnectionService {
   }
 
   clearConnectionTemplate(): void {
+    this.data?.disposeTask.removeHandler(this.cancelCreate.bind(this));
     this.data?.dispose();
     this.data = null;
   }

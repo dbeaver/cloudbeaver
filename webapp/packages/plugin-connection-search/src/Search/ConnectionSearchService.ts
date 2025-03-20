@@ -151,27 +151,28 @@ export class ConnectionSearchService {
       return;
     }
 
-    if (!this.formState) {
-      this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
-        submitType: null,
-        projectId: projects[0]!.id,
-        availableDrivers: database.possibleDrivers,
-        type: 'public',
-        requiredNetworkHandlersIds: [],
-      });
+    this.formState?.dispose();
+    this.formState?.disposeTask.removeHandler(this.goBack.bind(this));
+    this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
+      submitType: null,
+      projectId: projects[0]!.id,
+      availableDrivers: database.possibleDrivers,
+      type: 'public',
+      requiredNetworkHandlersIds: [],
+    });
 
-      runInAction(() => {
-        this.optionsPart!.state.host = database.host;
-        this.optionsPart!.state.port = String(database.port);
-        this.optionsPart!.state.driverId = database.defaultDriver;
-      });
+    runInAction(() => {
+      this.optionsPart!.state.host = database.host;
+      this.optionsPart!.state.port = String(database.port);
+      this.optionsPart!.state.driverId = database.defaultDriver;
+    });
 
-      this.formState.disposeTask.addHandler(this.goBack.bind(this));
-    }
+    this.formState.disposeTask.addHandler(this.goBack.bind(this));
   }
 
   private clearFormState() {
     this.formState?.dispose();
+    this.formState?.disposeTask.removeHandler(this.goBack.bind(this));
     this.formState = null;
   }
 }

@@ -72,24 +72,22 @@ export class PublicConnectionFormService {
   }
 
   change(projectId: string, config: ConnectionConfig, availableDrivers?: string[]): void {
-    if (!this.formState) {
-      this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
-        projectId,
-        availableDrivers: availableDrivers ?? [],
-        submitType: 'submit',
-        type: 'public',
-        requiredNetworkHandlersIds: [],
-      });
+    this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
+      projectId,
+      availableDrivers: availableDrivers ?? [],
+      submitType: 'submit',
+      type: 'public',
+      requiredNetworkHandlersIds: [],
+    });
 
-      runInAction(() => {
-        this.optionsPart!.state = {
-          ...this.optionsPart!.state,
-          ...config,
-        };
-      });
+    runInAction(() => {
+      this.optionsPart!.state = {
+        ...this.optionsPart!.state,
+        ...config,
+      };
+    });
 
-      this.formState.disposeTask.addHandler(this.close.bind(this, true));
-    }
+    this.formState.disposeTask.addHandler(this.close.bind(this, true));
 
     this.formState.setMode(config.connectionId ? FormMode.Edit : FormMode.Create);
   }
@@ -215,6 +213,7 @@ export class PublicConnectionFormService {
   }
 
   private clearFormState() {
+    this.formState?.disposeTask.removeHandler(this.close.bind(this, true));
     this.formState?.dispose();
     this.formState = null;
   }
