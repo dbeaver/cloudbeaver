@@ -25,7 +25,7 @@ import {
 } from '@cloudbeaver/core-connections';
 import type { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
+import { action, makeObservable, observable, toJS } from 'mobx';
 import { getUniqueName, isNotNullDefined } from '@cloudbeaver/core-utils';
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import { getConnectionName } from './getConnectionName.js';
@@ -104,19 +104,26 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   }
 
   private async askCredentials(data: IFormState<IConnectionFormState>, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
-    if (this.formState.state.submitType !== 'test' || (!this.state.authModelId && !this.formState.state.requiredNetworkHandlersIds.length)) {
+    const shouldNotAskCredentials = this.state.saveCredentials && !this.formState.state.requiredNetworkHandlersIds.length;
+
+    if (this.formState.state.submitType !== 'test' || shouldNotAskCredentials) {
       return;
     }
 
-    runInAction(() => {
-      if (this.state.authModelId) {
-        this.state.credentials = observable(this.state.credentials!);
-      }
-    });
+    const config = { ...this.state };
+
+    if (this.state.saveCredentials) {
+      delete config.authModelId;
+      delete config.credentials;
+    }
+
+    if (!this.formState.state.requiredNetworkHandlersIds.length) {
+      delete config.networkHandlersConfig;
+    }
 
     const result = await this.commonDialogService.open(ConnectionAuthenticationDialogLoader, {
-      config: this.state,
-      authModelId: this.state.authModelId ?? null,
+      config,
+      authModelId: config.authModelId ?? null,
       networkHandlers: this.formState.state.requiredNetworkHandlersIds,
       projectId: data.state.projectId,
     });
