@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,6 +9,7 @@ import { computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import {
+  DatabaseEditChangeType,
   type IDatabaseDataModel,
   type IResultSetColumnKey,
   type IResultSetElementKey,
@@ -104,14 +105,14 @@ export function useTableData(
         return columnsRange.some(column => this.isIndexColumn(column));
       },
       isReadOnly() {
-        return this.columnKeys.every(column => this.getColumnInfo(column)?.readOnly);
+        return dataContent.source.isReadonly(resultIndex);
       },
-      isCellReadonly(key: Partial<IResultSetElementKey>) {
+      isCellReadonly(key: IResultSetElementKey) {
         if (!key.column) {
           return true;
         }
 
-        return this.format.isReadOnly(key);
+        return this.format.isReadOnly(key) && this.editor.getElementState(key) !== DatabaseEditChangeType.add;
       },
     }),
     {

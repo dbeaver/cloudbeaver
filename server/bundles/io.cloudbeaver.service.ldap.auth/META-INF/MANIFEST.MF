@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Cloudbeaver Web Service - LDAP
 Bundle-Vendor: DBeaver Corp
 Bundle-SymbolicName: io.cloudbeaver.service.ldap.auth;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.1.qualifier
 Bundle-Release-Date: 20240506
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import { isResultSetDataModel } from '../../ResultSet/isResultSetDataModel.js';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService.js';
 import classes from './BooleanValuePresentation.module.css';
 import { preprocessBooleanValue } from './preprocessBooleanValue.js';
+import { DatabaseEditChangeType } from '../../DatabaseDataModel/Actions/IDatabaseDataEditAction.js';
 
 export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePanelProps> = observer(function BooleanValuePresentation({
   model: unknownModel,
@@ -53,10 +54,8 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
   const nullable = column?.required === false;
   const readonly =
     model.isReadonly(resultIndex) ||
-    !model.hasElementIdentifier(resultIndex) ||
     model.isDisabled(resultIndex) ||
-    formatAction.isReadOnly(firstSelectedCell);
-
+    (formatAction.isReadOnly(firstSelectedCell) && editAction.getElementState(firstSelectedCell) !== DatabaseEditChangeType.add);
   return (
     <div className={classes['container']}>
       <Radio
