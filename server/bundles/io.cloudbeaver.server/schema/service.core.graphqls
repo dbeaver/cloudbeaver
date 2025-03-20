@@ -64,9 +64,8 @@ type Condition @since(version: "25.0.1") {
 }
 
 enum ConditionType @since(version: "25.0.1") {
-    SHOW, # showing property condition
     HIDE, # hiding property condition
-    ACTIVE # ability to set a property value
+    READ_ONLY # restriction for setting a property value
 }
 
 # Async types

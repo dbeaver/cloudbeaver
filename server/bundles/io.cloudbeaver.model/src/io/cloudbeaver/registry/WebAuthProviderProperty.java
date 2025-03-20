@@ -28,8 +28,8 @@ public class WebAuthProviderProperty extends LocalizedPropertyDescriptor impleme
     private final String type;
 
     private final String authProviderId;
-    private final String visibleExpr;
-    private final String activeExpr;
+    private final String hideExpr;
+    private final String readOnlyExpr;
 
     public WebAuthProviderProperty(String category, IConfigurationElement config, String authProviderId) {
         super(category, config);
@@ -37,8 +37,8 @@ public class WebAuthProviderProperty extends LocalizedPropertyDescriptor impleme
         String featuresAttr = config.getAttribute("requiredFeatures");
         this.requiredFeatures = featuresAttr == null ? new String[0] : featuresAttr.split(",");
         this.type = config.getAttribute("type");
-        this.visibleExpr = config.getAttribute("visibleExpr");
-        this.activeExpr = config.getAttribute("activeExpr");
+        this.hideExpr = config.getAttribute("hideExpr");
+        this.readOnlyExpr = config.getAttribute("readOnlyExpr");
     }
 
     @NotNull
@@ -53,14 +53,14 @@ public class WebAuthProviderProperty extends LocalizedPropertyDescriptor impleme
 
     @Nullable
     @Override
-    public String getVisibleExpression() {
-        return visibleExpr;
+    public String getHideExpression() {
+        return hideExpr;
     }
 
     @Nullable
     @Override
-    public String getActiveExpression() {
-        return activeExpr;
+    public String getReadOnlyExpression() {
+        return readOnlyExpr;
     }
 
     @Override

@@ -269,13 +269,13 @@ public class WebPropertyInfo {
             return null;
         }
         List<Condition> conditions = new ArrayList<>();
-        String visibleExpr = conditionalProperty.getVisibleExpression();
+        String visibleExpr = conditionalProperty.getHideExpression();
         if (CommonUtils.isNotEmpty(visibleExpr)) {
-            conditions.add(new Condition(visibleExpr, Condition.Type.SHOW));
+            conditions.add(new Condition(visibleExpr, Condition.Type.HIDE));
         }
-        String activeExpr = conditionalProperty.getActiveExpression();
+        String activeExpr = conditionalProperty.getReadOnlyExpression();
         if (CommonUtils.isNotEmpty(activeExpr)) {
-            conditions.add(new Condition(activeExpr, Condition.Type.ACTIVE));
+            conditions.add(new Condition(activeExpr, Condition.Type.READ_ONLY));
         }
         return conditions;
     }
@@ -297,9 +297,8 @@ public class WebPropertyInfo {
 
     public record Condition(@NotNull String expression, @NotNull Type conditionType) {
         public enum Type {
-            SHOW,
             HIDE,
-            ACTIVE
+            READ_ONLY
         }
     }
 }
