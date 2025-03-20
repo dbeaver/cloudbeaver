@@ -39,13 +39,13 @@
   }
 }
 
-.dbv-kit-input__label {
+.dbv-kit-input__title {
   color: var(--dbv-kit-input-label-foreground);
   padding-inline-start: var(--dbv-kit-input-label-padding);
   margin-block-end: var(--tw-spacing);
 }
 
-.dbv-kit-input__label--required {
+.dbv-kit-input__title--required {
   &:after {
     content: '*';
     color: var(--dbv-kit-color-control-required);

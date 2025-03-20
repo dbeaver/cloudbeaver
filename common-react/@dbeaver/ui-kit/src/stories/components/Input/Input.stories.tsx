@@ -45,10 +45,10 @@ export const Documentation = () => {
 
       <h3>Label</h3>
       <p>
-        <code>.dbv-kit-input__label</code> - Applied to the label element of the input component.
+        <code>.dbv-kit-input__title</code> - Applied to the label element of the input component.
       </p>
       <p>
-        <code>.dbv-kit-input__label--required</code> - Applied to the label when the input is required, adds an asterisk indicator.
+        <code>.dbv-kit-input__title--required</code> - Applied to the label when the input is required, adds an asterisk indicator.
       </p>
 
       <h2>CSS Variables</h2>
@@ -134,13 +134,120 @@ export const Documentation = () => {
   );
 };
 
-export const InputExample = () => {
+export const InputText = () => {
   return (
     <>
       <div className="tw:space-y-2">
         <Input placeholder="Username" />
         <Input placeholder="Password" type="password" />
         <Button>Log in</Button>
+      </div>
+    </>
+  );
+};
+
+export const InputNumber = () => {
+  return (
+    <>
+      <div className="tw:space-y-2">
+        <Input type="number" label="Age" defaultValue={18} />
+        <Button>Enter</Button>
+      </div>
+    </>
+  );
+};
+
+export const InputEmail = () => {
+  return (
+    <>
+      <datalist id="ice-cream-emails">
+        <option value="Chocolate@gmail.com"></option>
+        <option value="Coconut@gmail.com"></option>
+        <option value="Mint@gmail.com"></option>
+        <option value="Strawberry@gmail.com"></option>
+        <option value="Vanilla@gmail.com"></option>
+      </datalist>
+      <div className="tw:space-y-2">
+        <Input list="ice-cream-emails" type="email" label="E-mail" placeholder="john@gmail.com" />
+        <Button>Send</Button>
+      </div>
+    </>
+  );
+};
+
+export const InputMonth = () => {
+  return (
+    <>
+      <div className="tw:space-y-2">
+        <Input type="month" label="Month" />
+        <Button>Set</Button>
+      </div>
+    </>
+  );
+};
+
+export const InputWeek = () => {
+  return (
+    <>
+      <div className="tw:space-y-2">
+        <Input type="week" label="Week" />
+        <Button>Set</Button>
+      </div>
+    </>
+  );
+};
+
+export const InputDate = () => {
+  return (
+    <>
+      <div className="tw:space-y-2">
+        <Input label="Birth date" type="date" />
+        <Button>Set</Button>
+      </div>
+    </>
+  );
+};
+
+export const InputTime = () => {
+  return (
+    <>
+      <div className="tw:space-y-2">
+        <Input type="time" label="Time" />
+        <Button>Set</Button>
+      </div>
+    </>
+  );
+};
+
+export const InputRange = () => {
+  return (
+    <>
+      This is not a custom component, but a native HTML input range element.
+      <div className="tw:space-y-2">
+        <Input type="range" label="Range" min={1} max={100} />
+        <Button>Set</Button>
+      </div>
+    </>
+  );
+};
+
+export const InputSearch = () => {
+  return (
+    <>
+      <div className="tw:space-y-2">
+        <Input type="search" label="Search" />
+        <Button>Find</Button>
+      </div>
+    </>
+  );
+};
+
+export const InputTel = () => {
+  return (
+    <>
+      <div className="tw:space-y-2">
+        <Input type="tel" label="Phone" />
+        <Button>Call</Button>
       </div>
     </>
   );
