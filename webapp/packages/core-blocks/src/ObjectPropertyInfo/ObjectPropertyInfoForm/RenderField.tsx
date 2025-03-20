@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 interface RenderFieldProps {
   property: ObjectPropertyInfo;
   state?: Record<string, any>;
+  context?: Record<string, any>;
   defaultState?: Record<string, any>;
   editable?: boolean;
   autofillToken?: string;
@@ -62,6 +63,7 @@ function getValue(value: any, controlType: ObjectPropertyType) {
 export const RenderField = observer<RenderFieldProps>(function RenderField({
   property,
   state,
+  context = state,
   defaultState,
   editable = true,
   autofillToken = '',
@@ -76,28 +78,28 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
 }) {
   const translate = useTranslate();
 
+  let readonly = rest.readOnly;
+
   const controlType = getObjectPropertyType(property);
   const type = getObjectPropertyValueType(property);
   const isPassword = type === 'password';
-  let readonly = rest.readOnly;
+  const required = property.required && !readonly;
+  const value = getValue(property.value, controlType);
+  const defaultValue = getValue(property.defaultValue, controlType);
 
-  if (state) {
+  if (context) {
     for (const condition of property.conditions ?? EMPTY_ARRAY) {
-      const result = evaluate(condition.expression, state);
+      const result = evaluate(condition.expression, context);
 
-      if (condition.conditionType === ConditionType.Show && result === false) {
+      if (condition.conditionType === ConditionType.Hide && result === true) {
         return null;
       }
 
-      if (condition.conditionType === ConditionType.Active && result === false) {
+      if (condition.conditionType === ConditionType.ReadOnly && result === true) {
         readonly = true;
       }
     }
   }
-
-  const required = property.required && !readonly;
-  const value = getValue(property.value, controlType);
-  const defaultValue = getValue(property.defaultValue, controlType);
 
   if (controlType === 'link') {
     return (

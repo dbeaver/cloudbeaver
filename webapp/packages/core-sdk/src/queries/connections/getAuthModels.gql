@@ -19,8 +19,7 @@ query getAuthModels {
       features
       order
       conditions {
-        expression
-        conditionType
+        ...Condition
       }
     }
   }

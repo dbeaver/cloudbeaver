@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import { RenderField } from './RenderField.js';
 export interface ObjectPropertyFormProps extends ILayoutSizeProps {
   properties: ReadonlyArray<ObjectPropertyInfo>;
   state?: Record<string, any>;
+  context?: Record<string, any>;
   defaultState?: Record<string, any>;
   category?: string | null;
   editable?: boolean;
@@ -43,6 +44,7 @@ export interface ObjectPropertyFormProps extends ILayoutSizeProps {
 export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function ObjectPropertyInfoForm({
   properties,
   state,
+  context,
   defaultState,
   category,
   disableAutoCompleteForPasswords = false,
@@ -90,6 +92,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
             className={s(sizeStyles, { ...(geLayoutSize ? geLayoutSize(property) : layoutProps) }, className)}
             property={property}
             state={state}
+            context={context}
             defaultState={defaultState}
             editable={editable}
             autofillToken={property.features.includes('password') && disableAutoCompleteForPasswords ? 'new-password' : autofillToken}
