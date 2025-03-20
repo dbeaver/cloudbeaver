@@ -118,16 +118,24 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             );
 
             List<SMUserProvisioning> resultList = new ArrayList<>();
-            while (byFilter.hasMoreElements()){
+            while (byFilter.hasMoreElements()) {
                 SearchResult result = byFilter.next();
+                Attributes attributes = result.getAttributes();
+                Attribute cn = attributes.get("cn");
 
+                Map<String, String> metaParameters = Map.of("firstName", "Ivan", "lastName", "Ivanov");
+                SMUserProvisioning build = SMUserProvisioning.builder()
+                    .userId("userId")
+                    .authRole("authRole")
+                    .metaParameters(metaParameters)
+                    .build();
+                resultList.add(build);
             }
 
+            return resultList;
         } catch (Exception e) {
             throw new DBException("LDAP authentication failed: " + e.getMessage(), e);
         }
-
-        return List.of();
     }
 
     @Override
