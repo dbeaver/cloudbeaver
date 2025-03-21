@@ -40,7 +40,7 @@ export function RadioGroup({ className, children, labelledBy, label, ['aria-labe
   const labelledById = label ? labelId : labelledBy;
   return (
     <_RadioProvider {...props}>
-      <div>
+      <div className="dbv-kit-radio-group__container">
         {label && (
           <div id={labelId} className={`dbv-kit-radio-group__label ${props.required ? 'dbv-kit-radio-group__label--required' : ''}`}>
             {label}
