@@ -83,9 +83,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   const controlType = getObjectPropertyType(property);
   const type = getObjectPropertyValueType(property);
   const isPassword = type === 'password';
-  const required = property.required && !readonly;
-  const value = getValue(property.value, controlType);
-  const defaultValue = getValue(property.defaultValue, controlType);
 
   if (context) {
     for (const condition of property.conditions ?? EMPTY_ARRAY) {
@@ -100,6 +97,10 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       }
     }
   }
+
+  const required = property.required && !readonly;
+  const value = getValue(property.value, controlType);
+  const defaultValue = getValue(property.defaultValue, controlType);
 
   if (controlType === 'link') {
     return (
