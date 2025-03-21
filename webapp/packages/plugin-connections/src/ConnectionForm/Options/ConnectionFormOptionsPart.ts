@@ -23,7 +23,7 @@ import {
   isJDBCConnection,
   type DatabaseConnection,
 } from '@cloudbeaver/core-connections';
-import type { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { action, makeObservable, observable, toJS } from 'mobx';
 import { getUniqueName, isNotNullDefined } from '@cloudbeaver/core-utils';
@@ -66,7 +66,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     private readonly localizationService: LocalizationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
-    private readonly projectsService: ProjectsService,
   ) {
     super(formState, defaultStateGetter());
 
@@ -139,24 +138,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     return createConnectionParam(this.formState.state.projectId, this.state.connectionId);
-  }
-
-  override isOutdated(): boolean {
-    if (!this.formState.state.projectId) {
-      return false;
-    }
-
-    const project = this.projectInfoResource.get(this.formState.state.projectId);
-    const isProjectOutdated =
-      this.projectInfoResource.isOutdated(this.formState.state.projectId) ||
-      !project?.canEditDataSources ||
-      !this.projectsService.activeProjects.includes(project);
-
-    if (!this.connectionKey) {
-      return isProjectOutdated;
-    }
-
-    return this.connectionInfoResource.isOutdated(this.connectionKey) || isProjectOutdated;
   }
 
   protected override async loader(): Promise<void> {

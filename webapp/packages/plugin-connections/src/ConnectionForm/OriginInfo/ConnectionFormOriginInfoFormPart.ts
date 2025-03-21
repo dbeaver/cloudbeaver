@@ -45,10 +45,6 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     return getConnectionFormOptionsPart(this.formState);
   }
 
-  override isOutdated(): boolean {
-    return this.optionsPart.isOutdated();
-  }
-
   get providerId(): string | null {
     if (!this.formState.state.projectId || !this.optionsPart.state.driverId) {
       return null;
