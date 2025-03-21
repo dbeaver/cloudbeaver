@@ -9,7 +9,7 @@ import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-d
 import type { IFormState } from '@cloudbeaver/core-ui';
 import { ConnectionFormOptionsPart } from './ConnectionFormOptionsPart.js';
 import { ConnectionInfoResource, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
@@ -30,6 +30,7 @@ export function getConnectionFormOptionsPart(formState: IFormState<IConnectionFo
     const localizationService = di.getService(LocalizationService);
     const commonDialogService = di.getService(CommonDialogService);
     const notificationService = di.getService(NotificationService);
+    const projectsService = di.getService(ProjectsService);
 
     return new ConnectionFormOptionsPart(
       formState,
@@ -42,6 +43,7 @@ export function getConnectionFormOptionsPart(formState: IFormState<IConnectionFo
       localizationService,
       commonDialogService,
       notificationService,
+      projectsService,
     );
   });
 }

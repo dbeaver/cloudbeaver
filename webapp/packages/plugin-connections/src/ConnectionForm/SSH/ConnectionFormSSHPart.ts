@@ -46,6 +46,10 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     return getConnectionFormOptionsPart(this.formState);
   }
 
+  override isOutdated(): boolean {
+    return this.optionsPart.isOutdated();
+  }
+
   protected override async loader(): Promise<void> {
     if (!this.optionsPart.connectionKey) {
       this.setInitialState(getDefaultState());
