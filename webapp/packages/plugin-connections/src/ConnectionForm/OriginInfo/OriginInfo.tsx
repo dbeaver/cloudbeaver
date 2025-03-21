@@ -58,7 +58,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
     active: tab.selected && isAuthenticated,
   });
 
-  useAutoLoad(OriginInfo, originInfoPart, tab.selected);
+  useAutoLoad(OriginInfo, originInfoPart);
 
   if (connection.isLoading()) {
     return (

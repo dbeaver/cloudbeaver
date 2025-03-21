@@ -81,7 +81,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
     [driver.data],
   );
 
-  useAutoLoad(DriverProperties, driverPropertiesPart, selected);
+  useAutoLoad(DriverProperties, driverPropertiesPart);
 
   return (
     <ColoredContainer className={s(style, { coloredContainer: true })} parent>
