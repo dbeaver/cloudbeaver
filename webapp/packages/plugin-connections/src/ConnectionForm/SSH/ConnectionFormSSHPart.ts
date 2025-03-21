@@ -56,7 +56,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    const connection = await this.connectionInfoResource.load(this.optionsPart.connectionKey);
+    const connection = this.connectionInfoResource.get(this.optionsPart.connectionKey);
 
     this.setInitialState(connection?.networkHandlersConfig?.find(h => h.id === SSH_TUNNEL_ID) ?? getDefaultState());
   }

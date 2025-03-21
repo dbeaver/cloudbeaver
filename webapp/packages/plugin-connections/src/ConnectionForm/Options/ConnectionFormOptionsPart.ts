@@ -310,7 +310,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     this.state.name = this.state.name?.trim();
 
     if (this.state.name && this.formState.mode === 'create') {
-      const connections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(this.formState.state.projectId));
+      const connections = this.connectionInfoResource.get(ConnectionInfoProjectKey(this.formState.state.projectId)).filter(isNotNullDefined);
       const connectionNames = connections.map(connection => connection.name);
 
       this.state.name = getUniqueName(this.state.name, connectionNames);

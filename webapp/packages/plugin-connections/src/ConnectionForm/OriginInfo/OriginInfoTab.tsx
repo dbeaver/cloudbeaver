@@ -8,20 +8,19 @@
 import { observer } from 'mobx-react-lite';
 
 import { Translate, useResource } from '@cloudbeaver/core-blocks';
-import { Tab, type TabContainerTabComponent, TabTitle, useTab } from '@cloudbeaver/core-ui';
+import { Tab, type TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { ConnectionInfoOriginResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = observer(function OriginInfoTab({ formState, ...rest }) {
   const optionsPart = getConnectionFormOptionsPart(formState);
-  const { selected } = useTab(rest.tabId);
   const connectionInfoOriginResource = useResource(
     OriginInfoTab,
     ConnectionInfoOriginResource,
     createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
     {
-      active: selected && !!formState.state.projectId && !!optionsPart.state.connectionId,
+      active: !!formState.state.projectId && !!optionsPart.state.connectionId,
     },
   );
 
