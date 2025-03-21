@@ -11,7 +11,8 @@ import { err, token } from 'subscript/parse';
 
 import 'subscript/feature/bool.js';
 
-token('null', 20, a => (a ? err() : [, null]));
+token('undefined', 20, a => (a ? err() : [, undefined]));
+token('null', 20, a => (a ? err() : [, undefined]));
 
 interface IContext {
   object: Record<string, any>;
