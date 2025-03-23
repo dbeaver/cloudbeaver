@@ -16,7 +16,8 @@ import {
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { ConnectionFormOriginInfoFormPart } from './ConnectionFormOriginInfoFormPart.js';
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 
 const DATA_CONTEXT_CONNECTION_FORM_ORIGIN_INFO_FORM_PART = createDataContext<ConnectionFormOriginInfoFormPart>(
   'Connection Form Origin Info Form Part',
@@ -30,6 +31,8 @@ export function getConnectionFormOriginInfoFormPart(formState: IFormState<IConne
     const databaseAuthModelsResource = di.getService(DatabaseAuthModelsResource);
     const connectionInfoResource = di.getService(ConnectionInfoResource);
     const dbDriverResource = di.getService(DBDriverResource);
+    const authProvidersResource = di.getService(AuthProvidersResource);
+    const localizationService = di.getService(LocalizationService);
 
     return new ConnectionFormOriginInfoFormPart(
       formState,
@@ -38,6 +41,8 @@ export function getConnectionFormOriginInfoFormPart(formState: IFormState<IConne
       databaseAuthModelsResource,
       connectionInfoResource,
       dbDriverResource,
+      authProvidersResource,
+      localizationService,
     );
   });
 }

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
+import { FormPart, formStateContext, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { IConnectionFormOriginInfoState } from './IConnectionFormOriginInfoState.js';
@@ -16,9 +16,11 @@ import {
   DBDriverResource,
   type ConnectionInfoOriginDetailsResource,
 } from '@cloudbeaver/core-connections';
-import { AUTH_PROVIDER_LOCAL_ID, type UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, type UserInfoResource } from '@cloudbeaver/core-authentication';
 import { computed, makeObservable } from 'mobx';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import type { LocalizationService } from '@cloudbeaver/core-localization';
 
 const defaultStateGetter = () => ({}) as IConnectionFormOriginInfoState;
 
@@ -31,6 +33,8 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly dbDriverResource: DBDriverResource,
+    private readonly authProvidersResource: AuthProvidersResource,
+    private readonly localizationService: LocalizationService,
   ) {
     super(formState, defaultStateGetter());
 
@@ -39,6 +43,8 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
       isAuthenticated: computed,
       authModelId: computed,
     });
+
+    this.formState.loadedTask.addHandler(this.formAuthState.bind(this));
   }
 
   private get optionsPart() {
@@ -80,6 +86,24 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     const info = this.optionsPart.connectionKey ? this.connectionInfoResource.get(this.optionsPart.connectionKey) : null;
 
     return this.optionsPart.state.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null;
+  }
+
+  private async formAuthState(data: IFormState<IConnectionFormState>, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
+    const stateContext = contexts.getContext(formStateContext);
+
+    const info = this.optionsPart.connectionKey ? this.connectionInfoResource.get(this.optionsPart.connectionKey) : null;
+    const driver = await this.dbDriverResource.load(this.optionsPart.state.driverId!, ['includeProviderProperties', 'includeMainProperties']);
+    const [authModel] = await Promise.all([this.databaseAuthModelsResource.load(driver.defaultAuthModel), this.userInfoResource.load()]);
+    const providerId = authModel.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
+
+    if (!this.userInfoResource.hasToken(providerId)) {
+      const provider = await this.authProvidersResource.load(providerId);
+      const message = this.localizationService.translate('plugin_connections_connection_cloud_auth_required', undefined, {
+        providerLabel: provider.label,
+      });
+      stateContext.setInfo(message);
+      stateContext.readonly = this.formState.mode === 'edit';
+    }
   }
 
   protected override async loader(): Promise<void> {

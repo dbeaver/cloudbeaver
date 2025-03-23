@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { FormMode, FormPart, formStateContext, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
+import { FormMode, FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 import {
   DriverConfigurationType,
   type ConnectionConfig,
@@ -24,7 +24,6 @@ import {
   type DatabaseConnection,
 } from '@cloudbeaver/core-connections';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { action, makeObservable, observable, toJS } from 'mobx';
 import { getUniqueName, isNotNullDefined } from '@cloudbeaver/core-utils';
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
@@ -60,9 +59,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     private readonly dbDriverResource: DBDriverResource,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
-    private readonly userInfoResource: UserInfoResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly authProvidersResource: AuthProvidersResource,
     private readonly localizationService: LocalizationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
@@ -70,36 +67,10 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     super(formState, defaultStateGetter());
 
     this.formState.validationTask.addPostHandler(this.askCredentials.bind(this));
-    this.formState.loadedTask.addPostHandler(this.formAuthState.bind(this));
 
     makeObservable(this, {
       setAuthModel: action.bound,
     });
-  }
-
-  private async formAuthState(data: IFormState<IConnectionFormState>, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
-    const stateContext = contexts.getContext(formStateContext);
-
-    if (!this.state.driverId || !this.formState.state.projectId) {
-      return;
-    }
-
-    const info =
-      this.state.connectionId && this.formState.state.projectId
-        ? this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.state.connectionId))
-        : null;
-    const driver = await this.dbDriverResource.load(this.state.driverId, ['includeProviderProperties', 'includeMainProperties']);
-    const [authModel] = await Promise.all([this.databaseAuthModelsResource.load(driver.defaultAuthModel), this.userInfoResource.load()]);
-    const providerId = authModel.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
-
-    if (!this.userInfoResource.hasToken(providerId)) {
-      const provider = await this.authProvidersResource.load(providerId);
-      const message = this.localizationService.translate('plugin_connections_connection_cloud_auth_required', undefined, {
-        providerLabel: provider.label,
-      });
-      stateContext.setInfo(message);
-      stateContext.readonly = this.formState.mode === 'edit';
-    }
   }
 
   private async askCredentials(data: IFormState<IConnectionFormState>, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
