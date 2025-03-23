@@ -58,7 +58,7 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): void | Promise<void> {
-    for (let key of Object.keys(this.state!)) {
+    for (const key of Object.keys(this.state!)) {
       if (typeof this.state[key] === 'string') {
         this.state[key] = this.state[key].trim();
       }

@@ -29,7 +29,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { NetworkHandlerConfigInput, NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { isSafari } from '@cloudbeaver/core-utils';
 
 import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR.js';
@@ -37,7 +37,6 @@ import styles from './SSL.module.css';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
-import { useTab } from '@cloudbeaver/core-ui';
 
 interface Props extends IConnectionFormProps {
   handler: NetworkHandlerDescriptor;
