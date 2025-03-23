@@ -319,9 +319,17 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
           : undefined;
 
       const properties = await this.getConnectionAuthModelProperties(this.state.authModelId, info);
+      const passwordProperty = properties.find(property => property.features.includes('password'));
+      const isPasswordEmpty =
+        passwordProperty &&
+        (this.state.credentials?.[passwordProperty.id!] === passwordProperty.defaultValue || !this.state.credentials?.[passwordProperty.id!]);
 
       if (isCredentialsChanged(properties, this.state.credentials!)) {
         this.state.credentials = prepareDynamicProperties(properties, toJS(this.state.credentials!));
+      }
+
+      if (isPasswordEmpty) {
+        delete this.state.credentials?.[passwordProperty.id!];
       }
     }
 
