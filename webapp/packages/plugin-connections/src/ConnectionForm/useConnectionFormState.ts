@@ -26,7 +26,7 @@ export function useConnectionFormState(params: IConnectionInfoParams, configure?
   const serviceProvider = useService(IServiceProvider);
   const service = useService(ConnectionFormService);
   const ref = useRef<ConnectionFormState>(null);
-  let optionsPart = ref.current ? getConnectionFormOptionsPart(ref.current) : null;
+  const optionsPart = ref.current ? getConnectionFormOptionsPart(ref.current) : null;
 
   if (optionsPart?.state.connectionId !== params.connectionId || ref.current?.state.projectId !== params.projectId) {
     ref.current?.dispose();
