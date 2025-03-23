@@ -35,10 +35,10 @@ export function useConnectionFormState(params: IConnectionInfoParams, configure?
       projectId: params.projectId,
     });
 
-    optionsPart = getConnectionFormOptionsPart(ref.current);
-
     runInAction(() => {
-      optionsPart!.state.connectionId = params.connectionId;
+      if (optionsPart) {
+        optionsPart.state.connectionId = params.connectionId;
+      }
     });
 
     configure?.(ref.current);

@@ -10,7 +10,7 @@ import { action, makeObservable, observable, runInAction } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionsManagerService, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -121,12 +121,7 @@ export class PublicConnectionFormService {
   }
 
   async save(): Promise<void> {
-    const optionsPart = this.formState ? getConnectionFormOptionsPart(this.formState) : null;
-
-    const key =
-      this.formState && optionsPart?.state.connectionId && this.formState.state.projectId !== null
-        ? createConnectionParam(this.formState.state.projectId, optionsPart.state.connectionId)
-        : null;
+    const key = this.optionsPart?.connectionKey;
 
     await this.close(true);
 
@@ -140,21 +135,21 @@ export class PublicConnectionFormService {
   }
 
   private readonly closeRemoved: IExecutorHandler<ResourceKey<IConnectionInfoParams>> = (data, contexts) => {
-    if (!this.formState || !this.optionsPart?.state.connectionId || this.formState.state.projectId === null) {
+    if (!this.formState || !this.optionsPart?.connectionKey) {
       return;
     }
 
-    if (!this.connectionInfoResource.has(createConnectionParam(this.formState.state.projectId, this.optionsPart.state.connectionId!))) {
+    if (!this.connectionInfoResource.has(this.optionsPart.connectionKey)) {
       this.close(true);
     }
   };
 
   private readonly closeDeleted: IExecutorHandler<ResourceKeySimple<IConnectionInfoParams>> = (data, contexts) => {
-    if (!this.formState || !this.optionsPart?.state.connectionId || this.formState.state.projectId === null) {
+    if (!this.formState || !this.optionsPart?.connectionKey) {
       return;
     }
 
-    if (this.connectionInfoResource.isIntersect(data, createConnectionParam(this.formState.state.projectId, this.optionsPart.state.connectionId!))) {
+    if (this.connectionInfoResource.isIntersect(data, this.optionsPart.connectionKey)) {
       this.close(true);
     }
   };
@@ -168,14 +163,10 @@ export class PublicConnectionFormService {
   };
 
   private async showUnsavedChangesDialog(): Promise<boolean> {
-    const optionsPart = this.formState ? getConnectionFormOptionsPart(this.formState) : null;
-
     if (
       !this.formState ||
       !this.optionsPanelService.isOpen(formGetter) ||
-      (optionsPart?.state.connectionId &&
-        this.formState.state.projectId !== null &&
-        !this.connectionInfoResource.has(createConnectionParam(this.formState.state.projectId, optionsPart.state.connectionId)))
+      (this.optionsPart?.connectionKey && !this.connectionInfoResource.has(this.optionsPart.connectionKey))
     ) {
       return true;
     }

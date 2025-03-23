@@ -237,15 +237,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     config.authModelId = driver?.defaultAuthModel;
     config.configurationType = getDefaultConfigurationType(driver);
-
-    if (!this.state.host) {
-      config.host = driver?.defaultServer || 'localhost';
-    }
-
-    if (!this.state.port) {
-      config.port = driver?.defaultPort;
-    }
-
+    config.host = this.state.host || driver?.defaultServer || 'localhost';
+    config.port = this.state.port || driver?.defaultPort;
     config.databaseName = driver?.defaultDatabase;
     config.url = driver?.sampleURL;
 

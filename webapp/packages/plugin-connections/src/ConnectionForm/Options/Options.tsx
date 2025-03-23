@@ -39,7 +39,6 @@ import {
 import {
   ConnectionInfoOriginResource,
   ConnectionInfoResource,
-  createConnectionParam,
   DatabaseAuthModelsResource,
   type DBDriver,
   DBDriverResource,
@@ -99,22 +98,12 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const tabsState = useContext(TabsContext);
   const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
   const optionsPart = getConnectionFormOptionsPart(formState);
-  const connectionInfoResource = useResource(
-    Options,
-    ConnectionInfoResource,
-    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
-    {
-      active: selected && !!formState.state.projectId && !!optionsPart.state.connectionId,
-    },
-  );
-  const connectionInfoOriginResource = useResource(
-    Options,
-    ConnectionInfoOriginResource,
-    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
-    {
-      active: selected && !!formState.state.projectId && !!optionsPart.state.connectionId,
-    },
-  );
+  const connectionInfoResource = useResource(Options, ConnectionInfoResource, optionsPart.connectionKey, {
+    active: selected && !!optionsPart.connectionKey,
+  });
+  const connectionInfoOriginResource = useResource(Options, ConnectionInfoOriginResource, optionsPart.connectionKey, {
+    active: selected && !!optionsPart.connectionKey,
+  });
 
   //@TODO it's here until the profile implementation in the CloudBeaver
   const readonly = formState.isDisabled || connectionInfoResource.data?.authModel === PROFILE_AUTH_MODEL_ID;

@@ -35,7 +35,7 @@ import { isSafari } from '@cloudbeaver/core-utils';
 import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR.js';
 import styles from './SSL.module.css';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
-import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
 interface Props extends IConnectionFormProps {
@@ -56,14 +56,9 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
   const disabled = formState.isDisabled;
   const enabled = handlerState.enabled || false;
   const optionsPart = getConnectionFormOptionsPart(formState);
-  const connectionInfoService = useResource(
-    SSL,
-    ConnectionInfoResource,
-    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
-    {
-      active: selected && !!formState.state.projectId && !!optionsPart.state.connectionId,
-    },
-  );
+  const connectionInfoService = useResource(SSL, ConnectionInfoResource, optionsPart.connectionKey, {
+    active: selected && !!optionsPart.connectionKey,
+  });
   const info = connectionInfoService.data;
   const initialHandler = info?.networkHandlersConfig?.find(h => h.id === handler.id);
   const autofillToken = isSafari ? 'section-connection-authentication-ssl section-ssl' : 'new-password';

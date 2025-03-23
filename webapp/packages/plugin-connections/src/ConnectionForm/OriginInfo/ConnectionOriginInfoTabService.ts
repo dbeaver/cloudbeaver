@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ConnectionInfoOriginResource, createConnectionParam, isLocalConnection } from '@cloudbeaver/core-connections';
+import { ConnectionInfoOriginResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { ConnectionFormService } from '../ConnectionFormService.js';
@@ -37,15 +37,9 @@ export class ConnectionOriginInfoTabService extends Bootstrap {
       panel: () => OriginInfo,
       getLoader: () => getCachedMapResourceLoaderState(this.connectionInfoOriginResource, () => CachedMapAllKey),
       isHidden: (tabId, props) => {
-        const projectId = props?.formState.state.projectId;
         const optionsPart = props?.formState ? getConnectionFormOptionsPart(props.formState) : null;
-        const connectionId = optionsPart?.state.connectionId;
-
-        if (!projectId || !connectionId) {
-          return true;
-        }
-
-        const originInfo = this.connectionInfoOriginResource.get(createConnectionParam(projectId, connectionId));
+        const key = optionsPart?.connectionKey;
+        const originInfo = key ? this.connectionInfoOriginResource.get(key) : null;
 
         if (!originInfo) {
           return true;

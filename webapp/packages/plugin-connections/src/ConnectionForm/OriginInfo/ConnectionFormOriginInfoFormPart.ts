@@ -51,8 +51,14 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     return getConnectionFormOptionsPart(this.formState);
   }
 
+  // do not include connectionInfoOriginDetailsResource cause it is already synced with connectionInfoResource
   override isOutdated(): boolean {
-    return this.optionsPart.isOutdated();
+    return (
+      this.optionsPart.isOutdated() ||
+      this.dbDriverResource.isOutdated(this.optionsPart.state.driverId) ||
+      !!(this.authModelId && this.databaseAuthModelsResource.isOutdated(this.authModelId)) ||
+      this.userInfoResource.isOutdated()
+    );
   }
 
   get providerId(): string | null {
@@ -68,9 +74,8 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
 
     const info = this.optionsPart.connectionKey ? this.connectionInfoResource.get(this.optionsPart.connectionKey) : null;
     const authModel = this.databaseAuthModelsResource.get(this.optionsPart.state.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null);
-    const providerId = authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
 
-    return providerId;
+    return authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
   }
 
   get isAuthenticated(): boolean {

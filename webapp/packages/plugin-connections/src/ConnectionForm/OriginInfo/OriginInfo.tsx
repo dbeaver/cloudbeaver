@@ -22,7 +22,7 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoOriginDetailsResource, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
+import { ConnectionInfoOriginDetailsResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import styles from './OriginInfo.module.css';
@@ -37,24 +37,14 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   const originInfoPart = getConnectionFormOriginInfoFormPart(formState);
   const style = useS(styles);
   const optionsPart = getConnectionFormOptionsPart(formState);
-  const connectionInfoService = useResource(
-    OriginInfo,
-    ConnectionInfoResource,
-    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
-    {
-      active: !!formState.state.projectId && !!optionsPart.state.connectionId && tab.selected,
-    },
-  );
-  const info = connectionInfoService.data;
   const providerLoader = useResource(OriginInfo, AuthProvidersResource, originInfoPart.providerId, {
     active: tab.selected,
   });
-  const connectionId = tab.selected && info ? createConnectionParam(info.projectId, info.id) : null;
   const isAuthenticated = getComputed(() => originInfoPart.isAuthenticated);
-  const connectionOriginDetailsResource = useResource(OriginInfo, ConnectionInfoOriginDetailsResource, connectionId, {
+  const connectionOriginDetailsResource = useResource(OriginInfo, ConnectionInfoOriginDetailsResource, optionsPart.connectionKey, {
     active: tab.selected && isAuthenticated,
   });
-  const connection = useResource(OriginInfo, ConnectionInfoResource, connectionId, {
+  const connection = useResource(OriginInfo, ConnectionInfoResource, optionsPart.connectionKey, {
     active: tab.selected && isAuthenticated,
   });
 
