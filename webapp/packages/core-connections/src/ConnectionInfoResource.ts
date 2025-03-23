@@ -168,7 +168,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
     connectionStateEventHandler.onEvent<IWsDataSourceDisconnectEvent>(
       ServerEventId.CbDatasourceDisconnected,
-      async data => {
+      data => {
         const key: IConnectionInfoParams = {
           projectId: data.projectId,
           connectionId: data.connectionId,
@@ -184,7 +184,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
     connectionStateEventHandler.onEvent<IWsDataSourceConnectEvent>(
       ServerEventId.CbDatasourceConnected,
-      async data => {
+      data => {
         const key: IConnectionInfoParams = {
           projectId: data.projectId,
           connectionId: data.connectionId,

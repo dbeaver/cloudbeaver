@@ -72,8 +72,8 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   });
 
   const actionsContext = useObjectRef<IConnectionFormActionsContext>(() => ({
-    save: async () => form.submit(new SubmitEvent('submit')),
-    test: async () => form.submit(new SubmitEvent('test')),
+    save: () => form.submit(new SubmitEvent('submit')),
+    test: () => form.submit(new SubmitEvent('test')),
     onCancel,
   }));
 
@@ -99,10 +99,10 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
             <div className={s(styles, { connectionTopBarTabs: true })}>
               <div className={s(styles, { connectionStatusMessage: true })}>
                 <StatusMessage
-                  multipleRows
                   type={exception ? ENotificationType.Error : ENotificationType.Info}
                   message={formState.statusMessage}
                   exception={exception}
+                  multipleRows
                 />
               </div>
               <TabList className={s(styles, { tabList: true })} disabled={formState.isDisabled} underline big />

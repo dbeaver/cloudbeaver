@@ -8,7 +8,7 @@
 
 import { makeObservable, observable, runInAction } from 'mobx';
 
-import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -18,7 +18,7 @@ import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { ConnectionFormService, ConnectionFormState, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 
-import { SearchDatabase } from './SearchDatabase.js';
+const SearchDatabase = importLazyComponent(() => import('./SearchDatabase.js').then(module => module.SearchDatabase));
 
 const formGetter = () => SearchDatabase;
 

@@ -29,8 +29,7 @@ import { ConnectionInfoOriginResource, ConnectionInfoResource, createConnectionP
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { FormMode, type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
-import type { IConnectionFormProps } from '@cloudbeaver/plugin-connections';
-import { getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
+import { getConnectionFormOptionsPart, type IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 import styles from './ConnectionAccess.module.css';
 import { ConnectionAccessGrantedList } from './ConnectionAccessGrantedList.js';
 import { ConnectionAccessList } from './ConnectionAccessList.js';

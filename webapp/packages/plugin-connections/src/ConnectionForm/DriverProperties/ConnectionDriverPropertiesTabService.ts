@@ -7,9 +7,11 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { DriverPropertiesLoader } from './DriverPropertiesLoader.js';
 import { ConnectionFormService } from '../ConnectionFormService.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+
+const DriverProperties = importLazyComponent(() => import('./DriverProperties.js').then(m => m.DriverProperties));
 
 @injectable()
 export class ConnectionDriverPropertiesTabService extends Bootstrap {
@@ -23,7 +25,7 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
       name: 'plugin_connections_connection_form_part_properties',
       title: 'plugin_connections_connection_form_part_properties',
       order: 2,
-      panel: () => DriverPropertiesLoader,
+      panel: () => DriverProperties,
       isDisabled: (tabId, props) => {
         const optionsPart = props?.formState ? getConnectionFormOptionsPart(props.formState) : null;
 

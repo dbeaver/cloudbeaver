@@ -10,7 +10,9 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { FormBaseService } from '@cloudbeaver/core-ui';
 import type { IConnectionFormProps, IConnectionFormState } from './IConnectionFormState.js';
-import { ConnectionFormBaseActionsLoader } from './ConnectionFormBaseActionsLoader.js';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+
+const ConnectionFormBaseActionsLoader = importLazyComponent(() => import('./ConnectionFormBaseActions.js').then(m => m.ConnectionFormBaseActions));
 
 @injectable()
 export class ConnectionFormService extends FormBaseService<IConnectionFormState, IConnectionFormProps> {
