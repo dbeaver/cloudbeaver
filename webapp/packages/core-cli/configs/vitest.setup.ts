@@ -7,6 +7,7 @@
  */
 import { expect } from 'vitest';
 import * as matchers from 'jest-extended';
+import '@testing-library/jest-dom';
 
 // different machine has its own timezones and some tests can fail because of it
 process.env.TZ = 'UTC';

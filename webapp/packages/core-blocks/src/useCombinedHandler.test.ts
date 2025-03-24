@@ -1,23 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, jest, test } from '@jest/globals';
+import { describe, expect, test, vitest } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
 import { useCombinedHandler } from './useCombinedHandler.js';
 
-jest.mock('./useObjectRef', () => ({
-  useObjectRef: jest.fn(value => value),
-}));
-
 describe('useCombinedHandler', () => {
   test('should call all provided handlers', () => {
-    const handler1 = jest.fn();
-    const handler2 = jest.fn();
+    const handler1 = vitest.fn();
+    const handler2 = vitest.fn();
 
     const { result } = renderHook(() => useCombinedHandler(handler1, handler2));
 
@@ -40,8 +36,8 @@ describe('useCombinedHandler', () => {
   });
 
   test('should allow the combined handler to be called multiple times', () => {
-    const handler1 = jest.fn();
-    const handler2 = jest.fn();
+    const handler1 = vitest.fn();
+    const handler2 = vitest.fn();
 
     const { result } = renderHook(() => useCombinedHandler(handler1, handler2));
 
@@ -56,8 +52,8 @@ describe('useCombinedHandler', () => {
   });
 
   test('should work with asynchronous handlers', async () => {
-    const handler1 = jest.fn(async arg => await Promise.resolve(arg));
-    const handler2 = jest.fn(async arg => await Promise.resolve(arg));
+    const handler1 = vitest.fn(async arg => await Promise.resolve(arg));
+    const handler2 = vitest.fn(async arg => await Promise.resolve(arg));
 
     const { result } = renderHook(() => useCombinedHandler(handler1, handler2));
 

@@ -16,14 +16,13 @@
   },
   "dependencies": {
     "@cloudbeaver/core-di": "workspace:*",
-    "@jest/globals": "^29",
     "@testing-library/dom": "^10",
-    "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
     "mobx": "^6",
     "react": "^19",
     "react-dom": "^19",
-    "tslib": "^2"
+    "tslib": "^2",
+    "vitest": "^3"
   },
   "sideEffects": [
     "src/**/*.css",
@@ -33,8 +32,6 @@
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
-    "@jest/globals": "^29",
-    "@types/jest": "^29",
     "@types/react": "^19",
     "typescript": "^5"
   }

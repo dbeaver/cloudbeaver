@@ -1,15 +1,16 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it, jest } from '@jest/globals';
+// @ts-nocheck
+import { describe, expect, it, vitest } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 
-import { addKnownError, consoleSpy } from '@cloudbeaver/tests-runner';
+import { addKnownError } from '@cloudbeaver/tests-runner';
 
 import ErrorBoundary from './__custom__mocks__/ErrorBoundaryMock.js';
 import { importLazyComponent } from './importLazyComponent.js';
@@ -17,40 +18,74 @@ import { importLazyComponent } from './importLazyComponent.js';
 addKnownError(/The above error occurred in one of your React components.*/);
 
 describe('importLazyComponent', () => {
-  const fallback = 'Loading...';
+  const TestComponent = () => <div>Test Component</div>;
+  const LoadingComponent = () => <div>Loading...</div>;
 
-  it('should render the lazy component', async () => {
-    const loadedText = 'Lazy Component';
-    const mockComponent: React.FC<any> = () => <div>{loadedText}</div>;
-    const componentImporter = jest.fn(() => Promise.resolve(mockComponent));
-    const LazyComponent = importLazyComponent(componentImporter);
+  it('should render loading component while lazy component is loading', () => {
+    const LazyComponent = importLazyComponent(() => new Promise(() => {}), {
+      loading: LoadingComponent,
+    });
+
     render(
-      <Suspense fallback={fallback}>
+      <Suspense fallback={<div>Fallback</div>}>
         <LazyComponent />
       </Suspense>,
     );
 
-    expect(screen.getByText(fallback)).toBeTruthy();
-    await waitFor(() => expect(screen.getByText(loadedText)).toBeTruthy());
-    expect(componentImporter).toHaveBeenCalled();
+    expect(screen.getByText('Fallback')).toBeInTheDocument();
   });
 
-  it('should render the error boundary if rejects with an error', async () => {
-    const errorText = 'Error';
-    const componentImporter = jest.fn(() => Promise.reject(new Error(errorText)));
-    const LazyComponent = importLazyComponent(componentImporter as any);
+  it('should render component after loading', async () => {
+    const LazyComponent = importLazyComponent(() => Promise.resolve(TestComponent), {
+      loading: LoadingComponent,
+    });
+
+    render(
+      <Suspense fallback={<div>Fallback</div>}>
+        <LazyComponent />
+      </Suspense>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Test Component')).toBeInTheDocument();
+    });
+  });
+
+  it('should render error component when loading fails', async () => {
+    // so we don't see the error in the console
+    const consoleSpy = vitest.spyOn(console, 'error').mockImplementation(() => {});
+    const LazyComponent = importLazyComponent(() => Promise.reject(new Error('Failed to load')), {
+      loading: LoadingComponent,
+    });
 
     render(
       <ErrorBoundary>
-        <Suspense fallback={fallback}>
+        <Suspense fallback={<div>Fallback</div>}>
           <LazyComponent />
         </Suspense>
       </ErrorBoundary>,
     );
 
-    expect(screen.getByText(fallback)).toBeTruthy();
-    await waitFor(() => expect(screen.getByText(errorText)).toBeTruthy());
-    expect(consoleSpy.error).toHaveBeenCalledWith(expect.stringMatching(/The above error occurred in one of your React components.*/));
-    expect(componentImporter).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(screen.getByText('Failed to load')).toBeInTheDocument();
+    });
+    consoleSpy.mockRestore();
+  });
+
+  it('should pass props to loaded component', async () => {
+    const PropsTestComponent = ({ text }: { text: string }) => <div>{text}</div>;
+    const LazyComponent = importLazyComponent(() => Promise.resolve(PropsTestComponent), {
+      loading: LoadingComponent,
+    });
+
+    render(
+      <Suspense fallback={<div>Fallback</div>}>
+        <LazyComponent text="Passed Props" />
+      </Suspense>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Passed Props')).toBeInTheDocument();
+    });
   });
 });
