@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it, vitest } from 'vitest';
 
 import { blobToBase64 } from './blobToBase64.js';
 
@@ -25,20 +25,20 @@ describe('blobToBase64', () => {
   });
 
   it('calls readAsDataURL', async () => {
-    const readAsDataURL = jest.fn(blob => Promise.resolve(blob));
-    Object.defineProperty(global, 'FileReader', {
+    const readAsDataURL = vitest.fn(blob => Promise.resolve(blob));
+    Object.defineProperty(globalThis, 'FileReader', {
       writable: true,
-      value: jest.fn().mockImplementation(() => ({
+      value: vitest.fn().mockImplementation(() => ({
         readAsDataURL,
       })),
     });
-    jest.useFakeTimers();
+    vitest.useFakeTimers();
 
     const blob = new Blob(['test'], { type: 'text/plain' });
 
     blobToBase64(blob);
 
     expect(readAsDataURL).toHaveBeenCalledWith(blob);
-    jest.useRealTimers();
+    vitest.useRealTimers();
   });
 });

@@ -1,22 +1,20 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it, vitest } from 'vitest';
 
 import { CancellablePromise } from './CancellablePromise.js';
-import { PromiseCancelledError } from './PromiseCancelledError.js';
 
 describe('CancellablePromise', () => {
-  jest.mock('./PromiseCancelledError', () => ({
-    PromiseCancelledError: jest.fn(),
+  vitest.mock('./PromiseCancelledError', () => ({
+    PromiseCancelledError: vitest.fn().mockImplementation(() => Error('Promise cancelled')),
   }));
 
   it('cancels promise', async () => {
-    const PromiseCancelledErrorMockInstance = new PromiseCancelledError();
     const promise = new CancellablePromise<void>(resolve => {
       const token = setTimeout(() => resolve(), 0);
       return () => {
@@ -26,7 +24,7 @@ describe('CancellablePromise', () => {
 
     promise.cancel();
 
-    await expect(promise).rejects.toThrow(PromiseCancelledErrorMockInstance);
+    await expect(promise).rejects.toThrow('Promise cancelled');
   });
 
   it('should resolve promise', async () => {

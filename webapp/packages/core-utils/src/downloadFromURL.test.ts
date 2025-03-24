@@ -1,21 +1,21 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, it, vitest, type Mock } from 'vitest';
 
 import { downloadFromURL } from './downloadFromURL.js';
 
 type MockXHR = {
-  open: jest.Mock;
-  send: jest.Mock;
-  setRequestHeader: jest.Mock;
+  open: Mock;
+  send: Mock;
+  setRequestHeader: Mock;
   responseType: string;
-  onload: jest.Mock;
-  onerror: jest.Mock;
+  onload: Mock;
+  onerror: Mock;
   response: Blob | null;
 };
 
@@ -24,20 +24,20 @@ describe('downloadFromURL', () => {
 
   beforeEach(() => {
     mockXHR = {
-      open: jest.fn(),
-      send: jest.fn(),
-      setRequestHeader: jest.fn(),
+      open: vitest.fn(),
+      send: vitest.fn(),
+      setRequestHeader: vitest.fn(),
       responseType: '',
-      onload: jest.fn(),
-      onerror: jest.fn(),
+      onload: vitest.fn(),
+      onerror: vitest.fn(),
       response: null,
     };
 
-    (global as any).XMLHttpRequest = jest.fn(() => mockXHR);
+    (globalThis as any).XMLHttpRequest = vitest.fn(() => mockXHR);
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vitest.restoreAllMocks();
   });
 
   it('should open and send request to the specified URL', async () => {
