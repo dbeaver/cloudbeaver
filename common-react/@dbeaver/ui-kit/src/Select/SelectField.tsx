@@ -1,3 +1,11 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
 import { useState } from 'react';
 import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel } from './Select.js';
 import './SelectField.css';
@@ -40,6 +48,8 @@ export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
 
   description?: React.ReactNode;
 
+  name?: string;
+
   disabled?: boolean;
 
   required?: boolean;
@@ -77,6 +87,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   className,
   selectedRender,
   arrowIcon,
+  name,
 }: SelectFieldProps<T, ItemType>) {
   const getItemValue = (item: ItemType): T =>
     getValueByPath<ItemType, T>(item, itemValue, i => ('value' in i ? (i as unknown as SelectItem<T>).value : (i as unknown as T)));
@@ -112,7 +123,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
       <SelectProvider value={currentValue as any} setValue={val => handleChange(val as T)}>
         {label && <SelectLabel className={labelClassName}>{label}</SelectLabel>}
 
-        <Select disabled={disabled}>
+        <Select name={name} disabled={disabled}>
           {displayValue}
           {arrowIcon ?? <Select.Arrow />}
         </Select>
