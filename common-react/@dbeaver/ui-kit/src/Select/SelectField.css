@@ -14,7 +14,7 @@
   .dbv-kit-select__label--required {
     &:after {
       content: '*';
-      color: var(--tw-color-red-600);
+      color: var(--dbv-kit-color-control-required);
       margin-left: 0.125rem;
     }
   }
