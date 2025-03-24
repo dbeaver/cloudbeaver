@@ -3155,6 +3155,24 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
+    @Override
+    public void blockUserByBruteForceProtection(@NotNull String userId) throws DBException {
+        try (Connection dbCon = database.openConnection()) {
+            var currentPermissions = getUserPermissions(userId);
+            if (currentPermissions.contains(DBWConstants.PERMISSION_ADMIN)) {
+                return;
+            }
+            enableUser(
+                dbCon,
+                userId,
+                false
+            );
+            killAllExistsUserSessions(userId);
+        } catch (SQLException e) {
+            throw new DBCException("Error while blocking user", e);
+        }
+    }
+
     private static void appendStringParameters(StringBuilder sql, @NotNull Collection<String> subjectIds) {
         boolean first = true;
         for (String id : subjectIds) {
