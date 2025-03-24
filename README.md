@@ -25,6 +25,9 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 25.0.1 2025-03-24
+- Improved performance of the export/import functionality by optimizing disk memory consumption;
+- Enhanced initial configuration on stage security: if the initial setup time exceeds 1 hour, the server must be restarted.
 
 ### 25.0 2025-03-03
 ### Changes since 24.3.0:
