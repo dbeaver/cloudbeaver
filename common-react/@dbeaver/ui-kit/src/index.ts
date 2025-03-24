@@ -7,6 +7,17 @@
  */
 import './index.css';
 
+/* AriaKit Utility Components */
+export {
+  VisuallyHidden,
+  FocusTrap,
+  type FocusTrapOptions,
+  type FocusTrapProps,
+  FocusTrapRegion,
+  type FocusTrapRegionOptions,
+  type FocusTrapRegionProps,
+} from '@ariakit/react';
+
 export { Button, type ButtonProps } from './Button/Button.js';
 export { Checkbox, type CheckboxProps } from './Checkbox/Checkbox.js';
 export { Input, type InputProps } from './Input/Input.js';
