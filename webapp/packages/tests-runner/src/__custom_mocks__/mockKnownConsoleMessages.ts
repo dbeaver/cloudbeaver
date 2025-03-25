@@ -34,7 +34,7 @@ beforeAll(() => {
   });
   errorSpy = vitest.spyOn(console, 'error').mockImplementation((...args) => {
     if (args[0] && String(args[0]).includes('Expected:')) {
-      // skip exceptions from jest expect
+      // skip exceptions from vitest expect
       return;
     }
     if (args[0] && String(args[0]).includes('Error: Uncaught')) {

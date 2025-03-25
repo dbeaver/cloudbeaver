@@ -33,7 +33,6 @@
     "@cloudbeaver/core-executor": "workspace:*",
     "@cloudbeaver/tests-runner": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
-    "@types/jest": "^29",
     "typescript": "^5",
     "vitest": "^3"
   }

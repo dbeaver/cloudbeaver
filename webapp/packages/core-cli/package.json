@@ -24,11 +24,11 @@
   "bin": {
     "core-cli-add-plugin": "./bin/add-plugin.js",
     "core-cli-analyzer": "./bin/analyzer.js",
-    "core-cli-check-license": "./dist/cli/license-check.js",
+    "core-cli-check-license": "./lib/cli/license-check.js",
     "core-cli-dependency-graph": "./bin/dependency-graph.js",
     "core-cli-set-version": "./bin/set-version.mjs",
     "core-cli-test": "./bin/test.js",
-    "core-cli-validate-dependencies": "./dist/cli/validate-dependencies.js"
+    "core-cli-validate-dependencies": "./lib/cli/validate-dependencies.js"
   },
   "scripts": {
     "build": "tsc -b",
