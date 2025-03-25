@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,8 @@ import authenticationAdministration from '@cloudbeaver/plugin-authentication-adm
 import { browserPlugin } from '@cloudbeaver/plugin-browser';
 import connectionCustom from '@cloudbeaver/plugin-connection-custom';
 import connectionSearch from '@cloudbeaver/plugin-connection-search';
-import connectionTemplate from '@cloudbeaver/plugin-connection-template';
 import { objectViewerNavTreeLinkPlugin } from '@cloudbeaver/plugin-object-viewer-nav-tree-link';
 import connectionPlugin from '@cloudbeaver/plugin-connections';
-import connectionAdministration from '@cloudbeaver/plugin-connections-administration';
 import { dataExportManifest } from '@cloudbeaver/plugin-data-export';
 import { dataGridPlugin } from '@cloudbeaver/plugin-data-grid';
 import { dataImportPluginManifest } from '@cloudbeaver/plugin-data-import';
@@ -88,7 +86,6 @@ const PLUGINS: PluginManifest[] = [
   theme,
   localization,
   connectionCustom,
-  connectionTemplate,
   connectionSearch,
   dataExportManifest,
   dataImportPluginManifest,
@@ -107,7 +104,6 @@ const PLUGINS: PluginManifest[] = [
   userProfileAdministration,
   objectViewerNavTreeLinkPlugin,
   connectionPlugin,
-  connectionAdministration,
   versionUpdate,
   productPlugin,
   settingsMenu,

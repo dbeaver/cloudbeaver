@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -253,7 +253,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
     makeObservable<this, 'nodeIdMap'>(this, {
       nodeIdMap: observable,
-      createFromTemplate: action,
       create: action,
       createFromNode: action,
       add: action,
@@ -271,7 +270,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
   getEmptyConfig(): ConnectionConfig {
     return {
-      template: false,
       saveCredentials: false,
     };
   }
@@ -350,17 +348,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       ...this.getIncludesMap(),
     });
 
-    return this.add(connection);
-  }
-
-  async createFromTemplate(projectId: string, templateId: string, connectionName: string): Promise<Connection> {
-    const { connection } = await this.graphQLService.sdk.createConnectionFromTemplate({
-      projectId,
-      templateId,
-      connectionName,
-      ...this.getDefaultIncludes(),
-      ...this.getIncludesMap(),
-    });
     return this.add(connection);
   }
 

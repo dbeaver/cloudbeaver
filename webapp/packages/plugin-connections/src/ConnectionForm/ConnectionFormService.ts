@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -171,8 +171,7 @@ export class ConnectionFormService {
       const messages = validation.messages.map(message => this.localizationService.translate(message));
       this.notificationService.notify(
         {
-          title:
-            data.state.mode === 'edit' ? 'connections_administration_connection_save_error' : 'connections_administration_connection_create_error',
+          title: data.state.mode === 'edit' ? 'core_connections_connection_save_error' : 'core_connections_connection_create_error',
           message: messages.join('\n'),
         },
         validation.valid ? ENotificationType.Info : ENotificationType.Error,

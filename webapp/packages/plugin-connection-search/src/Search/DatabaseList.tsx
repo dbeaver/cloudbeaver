@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -38,13 +38,13 @@ export const DatabaseList = observer<Props>(function DatabaseList({ databases, h
     }
   }, [onSearch]);
 
-  const placeholderMessage = isSearched ? 'connections_not_found' : 'connections_administration_search_database_tip';
+  const placeholderMessage = isSearched ? 'connections_not_found' : 'core_connections_search_database_tip';
 
   return (
     <Form ref={focusedRef} className={s(styles, { form: true }, className)} onSubmit={onSearch}>
       <ItemListSearch
         value={hosts}
-        placeholder={translate('connections_administration_search_database_tip')}
+        placeholder={translate('core_connections_search_database_tip')}
         disabled={disabled}
         permanentSearchIcon
         onChange={onChange}

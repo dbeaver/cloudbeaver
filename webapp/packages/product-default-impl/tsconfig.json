@@ -50,13 +50,7 @@
       "path": "../plugin-connection-search"
     },
     {
-      "path": "../plugin-connection-template"
-    },
-    {
       "path": "../plugin-connections"
-    },
-    {
-      "path": "../plugin-connections-administration"
     },
     {
       "path": "../plugin-data-export"
@@ -218,16 +212,6 @@
       "path": "../plugin-version-update-administration"
     }
   ],
-  "include": [
-    "__custom_mocks__/**/*",
-    "src/**/*",
-    "src/**/*.json",
-    "src/**/*.css",
-    "src/**/*.scss"
-  ],
-  "exclude": [
-    "**/node_modules",
-    "lib/**/*",
-    "dist/**/*"
-  ]
+  "include": ["__custom_mocks__/**/*", "src/**/*", "src/**/*.json", "src/**/*.css", "src/**/*.scss"],
+  "exclude": ["**/node_modules", "lib/**/*", "dist/**/*"]
 }

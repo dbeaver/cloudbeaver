@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -135,7 +135,7 @@ export class ConnectionNavNodeService extends Dependency {
 
     connectionInfos = Array.isArray(connectionInfos) ? connectionInfos : [connectionInfos];
     for (const connectionInfo of connectionInfos) {
-      if (!connectionInfo?.nodePath || connectionInfo.template) {
+      if (!connectionInfo?.nodePath) {
         return;
       }
 
@@ -176,7 +176,7 @@ export class ConnectionNavNodeService extends Dependency {
     ResourceKeyUtils.forEach(key, key => {
       const connectionInfo = this.connectionInfoResource.get(key);
 
-      if (!connectionInfo || connectionInfo.template) {
+      if (!connectionInfo) {
         return;
       }
 
@@ -192,7 +192,7 @@ export class ConnectionNavNodeService extends Dependency {
   }
 
   private async connectionCreateHandler(connection: Connection) {
-    if (!connection.nodePath || connection.template) {
+    if (!connection.nodePath) {
       return;
     }
 

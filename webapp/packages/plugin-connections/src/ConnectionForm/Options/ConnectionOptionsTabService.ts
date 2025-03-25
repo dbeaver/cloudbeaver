@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -210,7 +210,6 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     state.config.name = state.info.name;
     state.config.description = state.info.description;
-    state.config.template = state.info.template;
     state.config.driverId = state.info.driverId;
 
     state.config.host = state.info.mainPropertyValues[MAIN_PROPERTY_HOST_KEY];
@@ -278,13 +277,12 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     tempConfig.description = state.config.description?.trim();
-    tempConfig.template = state.config.template;
     tempConfig.driverId = state.config.driverId;
     tempConfig.keepAliveInterval = Number(state.config.keepAliveInterval);
     tempConfig.autocommit = state.config.autocommit;
     tempConfig.readOnly = state.config.readOnly;
 
-    if (!state.config.template && state.config.folder) {
+    if (state.config.folder) {
       tempConfig.folder = state.config.folder;
     }
 
@@ -411,7 +409,6 @@ export class ConnectionOptionsTabService extends Bootstrap {
       !isValuesEqual(config.name, data.info.name, '') ||
       !isValuesEqual(config.configurationType, data.info.configurationType, DriverConfigurationType.Manual) ||
       !isValuesEqual(config.description, data.info.description, '') ||
-      !isValuesEqual(config.template, data.info.template, true) ||
       !isValuesEqual(config.folder, data.info.folder, undefined) ||
       !isValuesEqual(config.driverId, data.info.driverId, '') ||
       (config.url !== undefined && !isValuesEqual(config.url, data.info.url, '')) ||

@@ -115,10 +115,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     if (name !== 'name' && optionsHook.isNameAutoFill()) {
       optionsHook.updateNameTemplate(driver);
     }
-
-    if (config.template) {
-      config.folder = undefined;
-    }
   }
 
   const applicableAuthModels = driver?.applicableAuthModels ?? [];
@@ -265,29 +261,25 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               <InputField type="text" name="name" minLength={1} state={config} readOnly={readonly || disabled} required fill>
                 {translate('connections_connection_name')}
               </InputField>
-              {!config.template && (
-                <ProjectSelect
-                  value={state.projectId}
-                  readOnly={readonly || edit}
-                  disabled={disabled}
-                  autoHide
-                  onChange={projectId => state.setProject(projectId)}
-                />
-              )}
-              {!config.template && (
-                <InputField
-                  type="text"
-                  name="folder"
-                  state={config}
-                  autoComplete={`section-${config.driverId || 'driver'} section-folder`}
-                  autoHide
-                  readOnly
-                  tiny
-                  fill
-                >
-                  {translate('plugin_connections_connection_form_part_main_folder')}
-                </InputField>
-              )}
+              <ProjectSelect
+                value={state.projectId}
+                readOnly={readonly || edit}
+                disabled={disabled}
+                autoHide
+                onChange={projectId => state.setProject(projectId)}
+              />
+              <InputField
+                type="text"
+                name="folder"
+                state={config}
+                autoComplete={`section-${config.driverId || 'driver'} section-folder`}
+                autoHide
+                readOnly
+                tiny
+                fill
+              >
+                {translate('plugin_connections_connection_form_part_main_folder')}
+              </InputField>
             </Container>
             <Textarea name="description" rows={3} state={config} readOnly={readonly || disabled}>
               {translate('connections_connection_description')}
@@ -337,7 +329,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   </Link>
                 </FormFieldDescription>
               )}
-              {!sharedCredentials && authModel && credentialsSavingEnabled && !config.template && (
+              {!sharedCredentials && authModel && credentialsSavingEnabled && (
                 <FieldCheckbox
                   id={config.connectionId + 'authNeeded'}
                   name="saveCredentials"
