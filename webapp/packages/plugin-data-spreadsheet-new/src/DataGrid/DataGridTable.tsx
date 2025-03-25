@@ -179,38 +179,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     context.set(DATA_CONTEXT_DV_PRESENTATION, { type: DataViewerPresentationType.Data }, id);
   });
 
-  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-    gridSelectedCellCopy.onKeydownHandler(event);
-
-    // const colIdx = tableData.getColumnIndexFromColumnKey(cell.column);
-    // const rowIdx = tableData.getRowIndexFromKey(cell.row);
-    // const editingState = tableData.editor.getElementState(cell);
-
-    // switch (event.nativeEvent.code) {
-    //   case 'KeyV': {
-    //     if (editingState === DatabaseEditChangeType.delete) {
-    //       return;
-    //     }
-
-    //     if (event.ctrlKey || event.metaKey) {
-    //       if (!clipboardService.clipboardAvailable || clipboardService.state === 'denied' || tableData.isCellReadonly(cell)) {
-    //         return;
-    //       }
-
-    //       clipboardService
-    //         .read()
-    //         .then(value => tableData.editor.set(cell, value))
-    //         .catch();
-    //       return;
-    //     }
-    //   }
-    // }
-
-    // if (editingState === DatabaseEditChangeType.delete) {
-    //   return;
-    // }
-  }
-
   useLayoutEffect(() => {
     function syncEditor(data: IResultSetEditActionData) {
       const editor = tableData.editor;
@@ -264,22 +232,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     };
   }, [tableData.editor, selectionAction]);
 
-  useEffect(() => {
-    const gridDiv = dataGridDivRef.current;
-
-    if (
-      gridDiv &&
-      innerState.lastCount > model.source.count &&
-      model.source.count * rowHeight < gridDiv.scrollTop + gridDiv.clientHeight - headerHeight
-    ) {
-      gridDiv.scrollTo({
-        top: model.source.count * rowHeight - gridDiv.clientHeight + headerHeight - 1,
-      });
-    }
-
-    innerState.lastCount = model.source.count;
-  }, [model.source.count]);
-
   const handleFocusChange = (position: ICellPosition) => {
     focusedCell.current = position;
     const columnIndex = position.colIdx;
@@ -302,6 +254,24 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       selectionAction.focus(null);
     }
   };
+
+  useEffect(() => {
+    const gridDiv = dataGridDivRef.current;
+
+    handleFocusChange(focusedCell.current ?? { colIdx: 1, rowIdx: 0 });
+
+    if (
+      gridDiv &&
+      innerState.lastCount > model.source.count &&
+      model.source.count * rowHeight < gridDiv.scrollTop + gridDiv.clientHeight - headerHeight
+    ) {
+      gridDiv.scrollTo({
+        top: model.source.count * rowHeight - gridDiv.clientHeight + headerHeight - 1,
+      });
+    }
+
+    innerState.lastCount = model.source.count;
+  }, [model.source.count]);
 
   const handleScrollToBottom = useCallback(async () => {
     const result = model.source.getResult(resultIndex);
@@ -465,7 +435,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }
 
   const handleCellKeyDown: DataGridProps['onCellKeyDown'] = ({ rowIdx, column }, event) => {
-    console.log('handleCellKeyDown', event, rowIdx, column);
+    gridSelectedCellCopy.onKeydownHandler(event);
     const cell = selectionAction.getFocusedElement();
     // we can't edit table cells if table doesn't have row identifier, but we can edit new created rows before insert (CB-6063)
     const canEdit = model.hasElementIdentifier(resultIndex) || !!(cell && tableData.editor.getElementState(cell) === DatabaseEditChangeType.add);
@@ -500,7 +470,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       case 'Delete': {
         event.preventGridDefault();
 
-        const colIdx = tableData.getColumnIndexFromColumnKey(cell.column);
+        const colIdx = column.idx;
 
         const filteredRows = activeRows.filter(cell => tableData.editor.getElementState(cell) !== DatabaseEditChangeType.delete);
 
@@ -534,7 +504,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
             tabIndex={-1}
             {...rest}
             className={s(styles, { container: true }, className)}
-            onKeyDown={handleKeyDown}
             onMouseDown={onMouseDownHandler}
             onMouseMove={onMouseMoveHandler}
           >
