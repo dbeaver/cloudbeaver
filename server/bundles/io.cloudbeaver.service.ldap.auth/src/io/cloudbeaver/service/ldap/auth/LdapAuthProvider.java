@@ -37,6 +37,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.user.SMUserProvisioning;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
 import javax.naming.Context;
@@ -90,6 +91,17 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return userData;
     }
 
+    //todo out to utils
+    public static String getAttributeValueSafe(Attributes attributes, String attrName) {
+        try {
+            Attribute attr = attributes.get(attrName);
+            return attr != null ? (String) attr.get() : "";
+        } catch (NamingException e) {
+            //fixme log
+            return "";
+        }
+    }
+
     @NotNull
     @Override
     public List<SMUserProvisioning> listExternalUsers(
@@ -97,52 +109,13 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         @NotNull SMAuthProviderCustomConfiguration customConfiguration,
         @NotNull SMProvisioningFilter filter
     ) throws DBException {
-
-        LdapSettings ldapSettings = new LdapSettings(customConfiguration);
-        Hashtable<String, String> environment = creteAuthEnvironment(ldapSettings);
-        Hashtable<String, String> serviceUserContext = creteAuthEnvironment(ldapSettings);
-        serviceUserContext.put(Context.SECURITY_PRINCIPAL, ldapSettings.getBindUserDN());
-        serviceUserContext.put(Context.SECURITY_CREDENTIALS, ldapSettings.getBindUserPassword());
-        DirContext serviceContext;
-
-        try {
-            SearchControls searchControls = new SearchControls();
-            searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            searchControls.setReturningAttributes(null);
-            serviceContext = new InitialDirContext(serviceUserContext);
-            NamingEnumeration<SearchResult> byFilter = findByFilter(
-                serviceContext,
-                ldapSettings,
-                "(objectClass=inetOrgPerson)",
-                searchControls
-            );
-
-            List<SMUserProvisioning> resultList = new ArrayList<>();
-            while (byFilter.hasMoreElements()) {
-                SearchResult result = byFilter.next();
-                Attributes attributes = result.getAttributes();
-                Attribute cn = attributes.get("cn");
-
-                Map<String, String> metaParameters = Map.of("firstName", "Ivan", "lastName", "Ivanov");
-                SMUserProvisioning build = SMUserProvisioning.builder()
-                    .userId("userId")
-                    .authRole("authRole")
-                    .metaParameters(metaParameters)
-                    .build();
-                resultList.add(build);
-            }
-
-            return resultList;
-        } catch (Exception e) {
-            throw new DBException("LDAP authentication failed: " + e.getMessage(), e);
-        }
+        return List.of();
     }
 
     @Override
-    public boolean isAuthRoleProvided(SMAuthProviderCustomConfiguration configuration) {
-        return SMProvisioner.super.isAuthRoleProvided(configuration);
+    public boolean isSupportProvisioning() {
+        return !DBWorkbench.getPlatform().getApplication().isCommunity();
     }
-
     /**
      * Find user and validate in ldap by uniq parameter from identityProviders
      *
@@ -215,7 +188,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     }
 
     @NotNull
-    private static Hashtable<String, String> creteAuthEnvironment(LdapSettings ldapSettings) {
+    protected static Hashtable<String, String> creteAuthEnvironment(LdapSettings ldapSettings) {
         Hashtable<String, String> environment = new Hashtable<>();
         environment.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 
@@ -246,7 +219,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return null;
     }
 
-    private NamingEnumeration<SearchResult> findByFilter(
+    protected NamingEnumeration<SearchResult> findByFilter(
         @NotNull DirContext serviceContext,
         @NotNull LdapSettings ldapSettings,
         @NotNull String searchFilter,
@@ -260,14 +233,14 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         }
     }
 
-    private String getBaseDN(DirContext serviceContext, LdapSettings ldapSettings) throws DBException {
+    protected String getBaseDN(DirContext serviceContext, LdapSettings ldapSettings) throws DBException {
         if (CommonUtils.isEmpty(ldapSettings.getBaseDN())) {
             return getRootDN(serviceContext);
         }
         return ldapSettings.getBaseDN();
     }
 
-    private String buildSearchFilter(LdapSettings ldapSettings, String userIdentifier) {
+    protected String buildSearchFilter(LdapSettings ldapSettings, String userIdentifier) {
         String userFilter = String.format("(%s=%s)", ldapSettings.getLoginAttribute(), userIdentifier);
         if (CommonUtils.isNotEmpty(ldapSettings.getFilter())) {
             return String.format("(&%s%s)", userFilter, ldapSettings.getFilter());

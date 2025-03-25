@@ -36,7 +36,7 @@ public class LdapSettings {
     private final String loginAttribute;
 
 
-    protected LdapSettings(
+    public LdapSettings(
         SMAuthProviderCustomConfiguration providerConfiguration
     ) {
         this.providerConfiguration = providerConfiguration;
