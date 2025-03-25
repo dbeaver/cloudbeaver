@@ -1,5 +1,11 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
-import DataGridBase, { type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle } from 'react-data-grid';
+import DataGridBase, {
+  type ColumnOrColumnGroup,
+  type CellSelectArgs,
+  type DataGridHandle,
+  type CellKeyboardEvent,
+  type CellKeyDownArgs,
+} from 'react-data-grid';
 import { rowRenderer } from './renderers/rowRenderer.js';
 import { cellRenderer } from './renderers/cellRenderer.js';
 import { DataGridCellHeaderContext, type IDataGridHeaderCellContext } from './DataGridHeaderCellContext.js';
@@ -26,6 +32,7 @@ export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext
   onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;
   onFocus?: (position: ICellPosition) => void;
   onEditorOpen?: (position: ICellPosition) => void;
+  onCellKeyDown?: (args: CellKeyDownArgs<IInnerRow>, event: CellKeyboardEvent) => void;
   className?: string;
 }
 
@@ -59,6 +66,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     onCellChange,
     children,
     className,
+    onCellKeyDown,
   },
   ref,
 ) {
@@ -136,6 +144,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
             rowHeight={getRowHeight ? row => getRowHeight(row.idx) : undefined}
             rowKeyGetter={getRowId ? row => getRowId(row.idx) : undefined}
             onSelectedCellChange={handleCellFocus}
+            onCellKeyDown={onCellKeyDown}
             renderers={{
               renderRow: rowRenderer,
               renderCell: cellRenderer,
