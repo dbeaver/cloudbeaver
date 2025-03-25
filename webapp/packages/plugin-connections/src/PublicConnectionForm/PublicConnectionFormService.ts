@@ -204,7 +204,6 @@ export class PublicConnectionFormService {
   }
 
   private clearFormState() {
-    this.formState?.disposeTask.removeHandler(this.close.bind(this, true));
     this.formState?.dispose();
     this.formState = null;
   }

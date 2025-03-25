@@ -52,6 +52,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
   }
 
   // do not include connectionInfoOriginDetailsResource cause it is already synced with connectionInfoResource
+  // this will lead to the infinite loop of loading
   override isOutdated(): boolean {
     return (
       this.optionsPart.isOutdated() ||

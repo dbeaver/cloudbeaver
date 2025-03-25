@@ -65,13 +65,10 @@ export class FormState<TState> implements IFormState<TState> {
     this.savingPromise = null;
 
     this.formStateTask = new Executor<TState>(state, () => true);
+    this.formStateTask.addCollection(service.onState).addPostHandler(this.updateFormState.bind(this));
 
     this.loadedTask = new Executor(this as IFormState<TState>, () => true);
-    this.loadedTask
-      .addCollection(service.onLoaded)
-      .next(this.formStateTask)
-      .addPostHandler(this.onLoadedHandler.bind(this))
-      .addPostHandler(this.updateFormState.bind(this));
+    this.loadedTask.addCollection(service.onLoaded).next(this.formStateTask).addPostHandler(this.onLoadedHandler.bind(this));
 
     this.formatTask = new Executor(this as IFormState<TState>, () => true);
     this.formatTask.addCollection(service.onFormat);
@@ -201,6 +198,11 @@ export class FormState<TState> implements IFormState<TState> {
   }
 
   private onLoadedHandler(data: IFormState<TState>, contexts: IExecutionContextProvider<IFormState<TState>>): void {
+    const context = contexts.getContext(formStateContext);
+
+    this.statusMessage = context.statusMessage;
+    this.statusType = context.statusType;
+
     for (const part of this.parts.values()) {
       if (!part.isLoaded()) {
         ExecutorInterrupter.interrupt(contexts);
@@ -209,7 +211,7 @@ export class FormState<TState> implements IFormState<TState> {
     }
   }
 
-  private updateFormState(data: IFormState<TState>, contexts: IExecutionContextProvider<IFormState<TState>>): void {
+  private updateFormState(data: TState, contexts: IExecutionContextProvider<TState>): void {
     const context = contexts.getContext(formStateContext);
 
     if (this.mode === FormMode.Create) {
@@ -229,6 +231,6 @@ export class FormState<TState> implements IFormState<TState> {
       await part.dispose();
     }
 
-    this.disposeTask.execute(this);
+    await this.disposeTask.execute(this);
   }
 }

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable, runInAction } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
@@ -118,17 +118,11 @@ export class CreateConnectionService {
       requiredNetworkHandlersIds: [],
     });
 
-    runInAction(() => {
-      this.optionsPart!.state = {
-        ...this.optionsPart!.state,
-        ...config,
-      };
-    });
+    Object.assign(this.optionsPart!.state, config);
     this.data.disposeTask.addHandler(this.cancelCreate.bind(this));
   }
 
   clearConnectionTemplate(): void {
-    this.data?.disposeTask.removeHandler(this.cancelCreate.bind(this));
     this.data?.dispose();
     this.data = null;
   }

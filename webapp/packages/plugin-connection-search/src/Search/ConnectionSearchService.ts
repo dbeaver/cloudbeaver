@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { makeObservable, observable, runInAction } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
@@ -52,6 +52,7 @@ export class ConnectionSearchService {
       databases: observable,
       disabled: observable,
       formState: observable.shallow,
+      select: action,
     });
   }
 
@@ -152,7 +153,6 @@ export class ConnectionSearchService {
     }
 
     this.formState?.dispose();
-    this.formState?.disposeTask.removeHandler(this.goBack.bind(this));
     this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
       submitType: null,
       projectId: projects[0]!.id,
@@ -161,18 +161,15 @@ export class ConnectionSearchService {
       requiredNetworkHandlersIds: [],
     });
 
-    runInAction(() => {
-      this.optionsPart!.state.host = database.host;
-      this.optionsPart!.state.port = String(database.port);
-      this.optionsPart!.state.driverId = database.defaultDriver;
-    });
+    this.optionsPart!.state.host = database.host;
+    this.optionsPart!.state.port = String(database.port);
+    this.optionsPart!.state.driverId = database.defaultDriver;
 
     this.formState.disposeTask.addHandler(this.goBack.bind(this));
   }
 
   private clearFormState() {
     this.formState?.dispose();
-    this.formState?.disposeTask.removeHandler(this.goBack.bind(this));
     this.formState = null;
   }
 }
