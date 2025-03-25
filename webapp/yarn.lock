@@ -4330,6 +4330,7 @@ __metadata:
   resolution: "@cloudbeaver/tsconfig@workspace:packages/tsconfig"
   dependencies:
     "@dbeaver/tsconfig": "workspace:*"
+    "@testing-library/jest-dom": "npm:^6"
   languageName: unknown
   linkType: soft
 

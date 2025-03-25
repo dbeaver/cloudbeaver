@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-// @ts-nocheck
+
 import { describe, expect, it, vitest } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { Suspense } from 'react';
@@ -19,12 +19,9 @@ addKnownError(/The above error occurred in one of your React components.*/);
 
 describe('importLazyComponent', () => {
   const TestComponent = () => <div>Test Component</div>;
-  const LoadingComponent = () => <div>Loading...</div>;
 
   it('should render loading component while lazy component is loading', () => {
-    const LazyComponent = importLazyComponent(() => new Promise(() => {}), {
-      loading: LoadingComponent,
-    });
+    const LazyComponent = importLazyComponent(() => new Promise<typeof TestComponent>(() => {}));
 
     render(
       <Suspense fallback={<div>Fallback</div>}>
@@ -36,9 +33,7 @@ describe('importLazyComponent', () => {
   });
 
   it('should render component after loading', async () => {
-    const LazyComponent = importLazyComponent(() => Promise.resolve(TestComponent), {
-      loading: LoadingComponent,
-    });
+    const LazyComponent = importLazyComponent(() => Promise.resolve(TestComponent));
 
     render(
       <Suspense fallback={<div>Fallback</div>}>
@@ -54,9 +49,7 @@ describe('importLazyComponent', () => {
   it('should render error component when loading fails', async () => {
     // so we don't see the error in the console
     const consoleSpy = vitest.spyOn(console, 'error').mockImplementation(() => {});
-    const LazyComponent = importLazyComponent(() => Promise.reject(new Error('Failed to load')), {
-      loading: LoadingComponent,
-    });
+    const LazyComponent = importLazyComponent(() => Promise.reject(new Error('Failed to load'))) as React.ComponentType<any>;
 
     render(
       <ErrorBoundary>
@@ -74,9 +67,7 @@ describe('importLazyComponent', () => {
 
   it('should pass props to loaded component', async () => {
     const PropsTestComponent = ({ text }: { text: string }) => <div>{text}</div>;
-    const LazyComponent = importLazyComponent(() => Promise.resolve(PropsTestComponent), {
-      loading: LoadingComponent,
-    });
+    const LazyComponent = importLazyComponent(() => Promise.resolve(PropsTestComponent));
 
     render(
       <Suspense fallback={<div>Fallback</div>}>

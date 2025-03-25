@@ -20,7 +20,8 @@
     "disableReferencedProjectLoad": true,
     "disableSolutionSearching": true,
     "types": [
-      "@cloudbeaver/tsconfig/globals.d.ts"
+      "@cloudbeaver/tsconfig/globals.d.ts",
+      "@cloudbeaver/tsconfig/test.d.ts"
     ],
     "plugins": [
       {
