@@ -1794,6 +1794,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
         var authSessionInfo = readAuthAttemptSessionInfo(authId);
         updateAuthStatus(authId, authStatus, authInfo, error, authSessionInfo.getSmSessionId(), errorCode);
+        if (authStatus == SMAuthStatus.ERROR) {
+            SMAuthInfo errorInfo = getAuthStatus(authId, false);
+            application.getEventController().addEvent(
+                new WSAuthEvent(errorInfo)
+            );
+        }
     }
 
     private void updateAuthStatus(
