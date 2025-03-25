@@ -1,3 +1,11 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
 import {
   SelectProvider as AriaSelectProvider,
   Select as AriaSelect,
@@ -23,27 +31,27 @@ export function SelectProvider({ children, ...props }: SelectProviderProps) {
   return <AriaSelectProvider {...props}>{children}</AriaSelectProvider>;
 }
 
-export function Select({ className, ref, ...props }: SelectProps) {
-  return <AriaSelect ref={ref} className={`dbv-kit-select ${className || ''}`} {...props} />;
+export function Select({ className, ...props }: SelectProps) {
+  return <AriaSelect className={`dbv-kit-select ${className || ''}`} {...props} />;
 }
 
-export function SelectPopover({ children, ref, className, ...props }: SelectPopoverProps) {
+export function SelectPopover({ children, className, ...props }: SelectPopoverProps) {
   return (
-    <AriaSelectPopover ref={ref} className={`dbv-kit-select__popover ${className || ''}`} sameWidth={props.sameWidth ?? true} {...props}>
+    <AriaSelectPopover className={`dbv-kit-select__popover ${className || ''}`} sameWidth={props.sameWidth ?? true} {...props}>
       {children}
     </AriaSelectPopover>
   );
 }
 
-export function SelectItem({ children, ref, className, ...props }: SelectItemProps) {
+export function SelectItem({ children, className, ...props }: SelectItemProps) {
   return (
-    <AriaSelectItem ref={ref} className={`dbv-kit-select__item ${className || ''}`} {...props}>
+    <AriaSelectItem className={`dbv-kit-select__item ${className || ''}`} {...props}>
       {children}
     </AriaSelectItem>
   );
 }
 
-export function SelectLabel({ children, ref, className, ...props }: SelectLabelProps) {
+export function SelectLabel({ children, className, ...props }: SelectLabelProps) {
   return (
     <AriaSelectLabel className={`dbv-kit-select__label ${className || ''}`} {...props}>
       {children}

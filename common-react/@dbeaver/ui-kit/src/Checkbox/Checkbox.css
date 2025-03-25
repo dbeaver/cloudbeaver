@@ -11,13 +11,12 @@
     line-height: var(--dbv-kit-checkbox-height);
     font-size: var(--dbv-kit-checkbox-font-size);
     color: var(--dbv-kit-checkbox-foreground);
-    outline: var(--dbv-kit-color-outline);
+    outline: var(--dbv-kit-control-outline-color);
 
     &:hover {
       cursor: pointer;
 
       .dbv-kit-checkbox__check {
-        border-color: var(--dbv-kit-checkbox-border-color-checked);
         box-shadow: 0 0 0 2px var(--dbv-kit-checkbox-hover-shadow-color);
       }
     }
@@ -33,11 +32,12 @@
   }
 
   .dbv-kit-checkbox__check {
+    --check-size: round(calc(var(--dbv-kit-checkbox-height) * var(--dbv-kit-checkbox-check-size)), 2px);
     margin-top: calc(var(--dbv-kit-checkbox-height) * (calc(1 - var(--dbv-kit-checkbox-check-size)) / 2));
-    height: calc(var(--dbv-kit-checkbox-height) * var(--dbv-kit-checkbox-check-size));
-    line-height: calc(var(--dbv-kit-checkbox-height) * var(--dbv-kit-checkbox-check-size));
-    width: calc(var(--dbv-kit-checkbox-height) * var(--dbv-kit-checkbox-check-size));
-    min-width: calc(var(--dbv-kit-checkbox-height) * var(--dbv-kit-checkbox-check-size));
+    height: var(--check-size);
+    line-height: var(--check-size);
+    width: var(--check-size);
+    min-width: var(--check-size);
     border-radius: var(--dbv-kit-checkbox-border-radius);
     background-color: var(--dbv-kit-checkbox-background);
     border-color: var(--dbv-kit-checkbox-border-color);
@@ -46,7 +46,7 @@
     color: var(--dbv-kit-checkbox-icon-color);
     outline-offset: var(--dbv-kit-control-outline-offset);
     outline-width: var(--dbv-kit-control-outline-width);
-    outline-color: var(--dbv-kit-color-outline);
+    outline-color: var(--dbv-kit-control-outline-color);
     transition-property: stroke-dashoffset;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
@@ -55,10 +55,6 @@
 
     &[data-focus-visible] {
       outline-style: solid;
-    }
-
-    &:hover {
-      border-color: var(--dbv-kit-checkbox-border-color-checked);
     }
 
     &[data-checked='true'],
