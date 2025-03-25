@@ -81,7 +81,8 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         CURRENT_SCHEMA_VERSION,
         0,
         new CBSchemaVersionManager(CURRENT_SCHEMA_VERSION, SCHEMA_ID),
-        CBDatabase.class.getClassLoader()
+        CBDatabase.class.getClassLoader(),
+        null
     );
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
@@ -108,6 +109,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     ) {
         super("Security Manager", databaseConfiguration, appendSchemaConfig(sqlSchemaConfigList));
         this.application = application;
+        SCHEMA_CREATE_CONFIG.setInitialSchemaFiller(this::fillInitialSchemaData);
     }
 
     private static List<SQLSchemaConfig> appendSchemaConfig(List<SQLSchemaConfig> sqlSchemaConfigList) {
@@ -337,7 +339,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         closeConnection();
     }
 
-    @Override
+
     public void fillInitialSchemaData(DBRProgressMonitor monitor, Connection connection) throws DBException, SQLException {
         // Set exclusive connection. Otherwise security controller will open a new one and won't see new schema objects.
         exclusiveConnection = new DelegatingConnection<Connection>(connection) {
