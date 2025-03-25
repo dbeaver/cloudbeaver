@@ -1,15 +1,15 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, it, vitest } from 'vitest';
 
 import { ClientActivityService, INACTIVE_PERIOD_TIME } from './ClientActivityService.js';
 
-jest.useFakeTimers();
+vitest.useFakeTimers();
 
 describe('ClientActivityService', () => {
   let clientActivityService: ClientActivityService;
@@ -17,13 +17,13 @@ describe('ClientActivityService', () => {
   beforeEach(() => {
     clientActivityService = new ClientActivityService();
 
-    jest.spyOn(global, 'setTimeout');
-    jest.spyOn(global, 'clearTimeout');
+    vitest.spyOn(globalThis, 'setTimeout');
+    vitest.spyOn(globalThis, 'clearTimeout');
   });
 
   afterEach(() => {
-    jest.clearAllTimers();
-    jest.restoreAllMocks();
+    vitest.clearAllTimers();
+    vitest.restoreAllMocks();
   });
 
   it('should initialize with isActive set to false', () => {
@@ -39,7 +39,7 @@ describe('ClientActivityService', () => {
     clientActivityService.updateActivity();
     expect(clientActivityService.isActive).toBe(true);
 
-    jest.advanceTimersByTime(INACTIVE_PERIOD_TIME);
+    vitest.advanceTimersByTime(INACTIVE_PERIOD_TIME);
 
     expect(clientActivityService.isActive).toBe(false);
   });
@@ -48,7 +48,7 @@ describe('ClientActivityService', () => {
     clientActivityService.updateActivity();
     expect(setTimeout).toHaveBeenCalledTimes(1);
 
-    jest.advanceTimersByTime(Math.random() * INACTIVE_PERIOD_TIME - 1);
+    vitest.advanceTimersByTime(Math.random() * INACTIVE_PERIOD_TIME - 1);
 
     clientActivityService.updateActivity();
     expect(clearTimeout).toHaveBeenCalledTimes(1);
@@ -58,7 +58,7 @@ describe('ClientActivityService', () => {
   it('should clear timer and reset activity when resetActivity is called', () => {
     clientActivityService.updateActivity();
 
-    jest.advanceTimersByTime(Math.random() * INACTIVE_PERIOD_TIME - 1);
+    vitest.advanceTimersByTime(Math.random() * INACTIVE_PERIOD_TIME - 1);
 
     clientActivityService.resetActivity();
 
@@ -67,12 +67,12 @@ describe('ClientActivityService', () => {
   });
 
   it('should call onActiveStateChange executor with correct value', () => {
-    const onActiveStateChangeSpy = jest.spyOn(clientActivityService.onActiveStateChange, 'execute');
+    const onActiveStateChangeSpy = vitest.spyOn(clientActivityService.onActiveStateChange, 'execute');
 
     clientActivityService.updateActivity();
     expect(onActiveStateChangeSpy).toHaveBeenCalledWith(true);
 
-    jest.advanceTimersByTime(INACTIVE_PERIOD_TIME);
+    vitest.advanceTimersByTime(INACTIVE_PERIOD_TIME);
     expect(onActiveStateChangeSpy).toHaveBeenCalledWith(false);
   });
 });

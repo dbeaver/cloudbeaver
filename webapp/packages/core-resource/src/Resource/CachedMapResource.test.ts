@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { beforeEach, describe, expect, vitest, test } from 'vitest';
 import { toJS } from 'mobx';
 
 import { CachedMapResource } from './CachedMapResource.js';
@@ -173,7 +173,7 @@ describe('CachedMapResource', () => {
   });
 
   test('should run onDataOutdated handlers on data outdate', () => {
-    const handler = jest.fn();
+    const handler = vitest.fn();
 
     mapResource.set('key1', { id: 'key1', value: 1 });
     mapResource.set('key2', { id: 'key2', value: 2 });
@@ -188,7 +188,7 @@ describe('CachedMapResource', () => {
   });
 
   test('should run onDataUpdate handlers on data update', () => {
-    const handler = jest.fn();
+    const handler = vitest.fn();
 
     mapResource.set('key1', { id: 'key1', value: 1 });
     mapResource.set('key2', { id: 'key2', value: 2 });
@@ -203,7 +203,7 @@ describe('CachedMapResource', () => {
   });
 
   test('should run onItemDelete handlers on data delete', () => {
-    const handler = jest.fn();
+    const handler = vitest.fn();
 
     mapResource.set('key1', { id: 'key1', value: 1 });
     mapResource.set('key2', { id: 'key2', value: 2 });
@@ -218,7 +218,7 @@ describe('CachedMapResource', () => {
   });
 
   test('should run onItemUpdate handlers on item update', () => {
-    const handler = jest.fn();
+    const handler = vitest.fn();
 
     mapResource.set('key1', { id: 'key1', value: 1 });
     mapResource.set('key2', { id: 'key2', value: 2 });
@@ -233,7 +233,7 @@ describe('CachedMapResource', () => {
   });
 
   test('should run onDataError handlers on data error', async () => {
-    const handler = jest.fn();
+    const handler = vitest.fn();
 
     mapResource.set('key1', { id: 'key1', value: 1 });
     mapResource.set('key2', { id: 'key2', value: 2 });
