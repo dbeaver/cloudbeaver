@@ -95,7 +95,14 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
       onLoad: () => {
         this.serverConfigurationFormStateManager.create();
       },
-      onDeActivate: this.serverConfigurationFormStateManager.destroy.bind(this.serverConfigurationFormStateManager),
+      onDeActivate: (configurationWizard, administration, nextAdministrationItem) => {
+        // so onFinish can be called with all required data from the form during easy config mode
+        if (configurationWizard) {
+          return;
+        }
+
+        this.serverConfigurationFormStateManager.destroy();
+      },
       canDeActivate: async configurationWizard => {
         const state = this.serverConfigurationFormStateManager.formState;
 
