@@ -9,7 +9,7 @@
     --dbv-kit-control-disabled-opacity: 0.5;
 
     /* Outline */
-    --dbv-kit-color-outline: var(--tw-color-blue-500);
+    --dbv-kit-control-outline-color: var(--tw-color-blue-500);
     --dbv-kit-control-outline-width: 2px;
     --dbv-kit-control-outline-offset: 2px;
 
@@ -23,6 +23,10 @@
     /* Colors */
     --dbv-kit-color-foreground: var(--tw-color-gray-900);
     --dbv-kit-color-background: var(--tw-color-gray-50);
+    --dbv-kit-color-control-inactive: var(--tw-color-gray-300);
+    --dbv-kit-color-control-hover: var(--tw-color-gray-400);
+    --dbv-kit-color-control-label: var(--tw-color-gray-600);
+    --dbv-kit-color-control-required: var(--tw-color-red-600);
 
     --dbv-kit-color-primary-50: var(--tw-color-blue-50);
     --dbv-kit-color-primary-100: var(--tw-color-blue-100);

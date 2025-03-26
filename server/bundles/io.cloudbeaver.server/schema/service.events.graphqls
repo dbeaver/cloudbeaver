@@ -37,7 +37,8 @@ enum CBServerEventId {
 
     cb_transaction_count @since(version: "24.3.3")
 
-    cb_session_task_info_updated @since(version: "24.3.1")
+    cb_session_task_info_updated @since(version: "24.3.1"),
+    cb_web_session_auth @since(version: "25.0.1")
 }
 
 # Events sent by client
@@ -224,6 +225,12 @@ type WSTransactionalCountEvent implements CBServerEvent {
     projectId: String!
     connectionId: String!
     transactionalCount: Int!
+}
+
+type WSWebSessionAuthEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    userTokens: [UserAuthToken!]
 }
 
 extend type Query {
