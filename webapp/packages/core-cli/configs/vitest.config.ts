@@ -22,6 +22,7 @@ export default defineConfig({
       'lib\\**\\*.{spec,test}.{js,jsx}',
     ],
     exclude: ['node_modules/**', '\\.pnp\\.[^\\/]+$'],
+    setupFiles: [path.resolve(__dirname, './vitest.setup.ts')],
     alias: [
       {
         find: /.*.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)%/,

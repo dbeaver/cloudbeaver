@@ -18,11 +18,9 @@ if (process.env.VITEST == null) {
 
 const { filter, options } = parseCLI(['vitest', ...process.argv.slice(2)]);
 const configFile = fileURLToPath(new URL('../configs/vitest.config.ts', import.meta.url));
-const setupFile = fileURLToPath(new URL('../configs/vitest.setup.ts', import.meta.url));
 
 const vitest = await startVitest(process.env.VITEST, filter, {
   config: configFile,
-  setupFiles: [setupFile],
   ...options,
 });
 
