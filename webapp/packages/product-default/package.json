@@ -11,14 +11,14 @@
   "description": "CloudBeaver Community",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./lib/index.js",
+    ".": "./dist/index.js",
     "./*": "./*"
   },
   "browserslist": [
     "extends @cloudbeaver/browserslist-config"
   ],
   "scripts": {
-    "build": "rimraf --glob lib && yarn workspaces foreach -Ap --include '@cloudbeaver/core-sdk' run gql:gen && yarn tsc -b",
+    "build": "rimraf --glob dist && yarn workspaces foreach -Ap --include '@cloudbeaver/core-sdk' run gql:gen && yarn tsc -b",
     "bundle": "yarn build && vite build --mode production",
     "dev": "yarn build && concurrently -P -k \"yarn workspaces foreach -Ap --include '@cloudbeaver/core-sdk' run gql:gen:dev\" \"vite {@}\"",
     "lint": "eslint ./src/ --ext .ts,.tsx",
