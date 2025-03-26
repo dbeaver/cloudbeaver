@@ -53,6 +53,7 @@ import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.SecurityUtils;
 
+import javax.sql.DataSource;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -63,7 +64,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.sql.DataSource;
 
 /**
  * Database management
@@ -154,7 +154,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         // config file must be valid
         readInitialDataConfigurationFile();
 
-        this.dataSource = initConnectionPool(driver.getDriverInstance(monitor), driver.getFullName());
+        this.dataSource = initConnectionPool(driver.getDefaultDriverLoader().getDriverInstance(monitor), driver.getFullName());
         this.dialect = driver.getScriptDialect().createInstance();
 
         try (Connection connection = dataSource.getConnection()) {

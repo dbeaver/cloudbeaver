@@ -55,6 +55,7 @@ import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
+import org.jkiss.dbeaver.model.websocket.event.session.WSAuthEvent;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
@@ -1521,7 +1522,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     smTokens.getSmRefreshToken(),
                     new SMAuthPermissions(null, smSessionId, permissions),
                     Map.of(),
-                    null
+                    null,
+                    appSessionId
                 );
             }
         } catch (SQLException e) {
@@ -1614,7 +1616,15 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                         providerConfig.getParameters());
                     Map<SMAuthConfigurationReference, Object> authData = Map.of(new SMAuthConfigurationReference(authProviderId,
                         authProviderConfigurationId), filteredUserCreds);
-                    return SMAuthInfo.inProgress(authAttemptId, signInLink, signOutLink, authData, isMainSession, forceSessionsLogout);
+                    return SMAuthInfo.inProgress(
+                        authAttemptId,
+                        signInLink,
+                        signOutLink,
+                        authData,
+                        isMainSession,
+                        forceSessionsLogout,
+                        appSessionId
+                    );
                 }
                 txn.commit();
                 return finishAuthentication(
@@ -1622,10 +1632,13 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                         authAttemptId,
                         null,
                         null,
-                        Map.of(new SMAuthConfigurationReference(authProviderId, authProviderConfigurationId),
-                            securedUserIdentifyingCredentials),
+                        Map.of(
+                            new SMAuthConfigurationReference(authProviderId, authProviderConfigurationId),
+                            securedUserIdentifyingCredentials
+                        ),
                         isMainSession,
-                        forceSessionsLogout
+                        forceSessionsLogout,
+                        appSessionId
                     ),
                     true,
                     forceSessionsLogout
@@ -1781,6 +1794,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
         var authSessionInfo = readAuthAttemptSessionInfo(authId);
         updateAuthStatus(authId, authStatus, authInfo, error, authSessionInfo.getSmSessionId(), errorCode);
+        if (authStatus == SMAuthStatus.ERROR) {
+            SMAuthInfo errorInfo = getAuthStatus(authId, false);
+            application.getEventController().addEvent(
+                new WSAuthEvent(errorInfo)
+            );
+        }
     }
 
     private void updateAuthStatus(
@@ -1863,12 +1882,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             String errorCode;
             boolean forceSessionsLogout;
             boolean isMainAuth;
+            String appSessionId;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames(
-                    "SELECT AUTH_STATUS,AUTH_ERROR,SESSION_ID,IS_MAIN_AUTH,ERROR_CODE,FORCE_SESSION_LOGOUT" +
-                            " FROM {table_prefix}CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
+                    "SELECT AUTH_STATUS,AUTH_ERROR,SESSION_ID,IS_MAIN_AUTH,ERROR_CODE,FORCE_SESSION_LOGOUT,APP_SESSION_ID" +
+                        " FROM {table_prefix}CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
                 )
-            )) {
+            )
+            ) {
                 dbStat.setString(1, authId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (!dbResult.next()) {
@@ -1880,6 +1901,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     isMainAuth = CHAR_BOOL_TRUE.equals(dbResult.getString(4));
                     errorCode = dbResult.getString(5);
                     forceSessionsLogout = CHAR_BOOL_TRUE.equals(dbResult.getString(6));
+                    appSessionId = dbResult.getString(7);
                 }
             }
             Map<SMAuthConfigurationReference, Object> authData = new LinkedHashMap<>();
@@ -1921,9 +1943,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             if (smAuthStatus != SMAuthStatus.SUCCESS) {
                 return switch (smAuthStatus) {
                     case IN_PROGRESS ->
-                        SMAuthInfo.inProgress(authId, signInLink, signOutLink, authData, isMainAuth, forceSessionsLogout);
-                    case ERROR -> SMAuthInfo.error(authId, authError, isMainAuth, errorCode);
-                    case EXPIRED -> SMAuthInfo.expired(authId, readExpiredData ? authData : Map.of(), isMainAuth);
+                        SMAuthInfo.inProgress(authId, signInLink, signOutLink, authData, isMainAuth, forceSessionsLogout, appSessionId);
+                    case ERROR -> SMAuthInfo.error(authId, authError, isMainAuth, errorCode, appSessionId);
+                    case EXPIRED -> SMAuthInfo.expired(authId, readExpiredData ? authData : Map.of(), isMainAuth, appSessionId);
                     default -> throw new SMException("Unknown auth status:" + smAuthStatus);
                 };
             }
@@ -1939,11 +1961,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     smTokens.getSmRefreshToken(),
                     authPermissions,
                     authData,
-                    authRole
+                    authRole,
+                    appSessionId
                 );
             } else {
                 //TODO remove permissions from child session
-                return SMAuthInfo.successChildSession(authId, authPermissions, authData);
+                return SMAuthInfo.successChildSession(authId, authPermissions, authData, appSessionId);
             }
         } catch (SQLException e) {
             throw new DBException("Error while read auth info", e);
@@ -1970,7 +1993,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             latestActiveSmTokens.getRefreshToken(),
             getTokenPermissions(latestActiveSmTokens.getAccessToken()),
             mergedData,
-            readTokenAuthRole(latestActiveSmTokens.getAccessToken())
+            readTokenAuthRole(latestActiveSmTokens.getAccessToken()),
+            appSessionId
         );
     }
 
@@ -2136,7 +2160,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     @Override
     public SMAuthInfo finishAuthentication(@NotNull String authId) throws DBException {
         SMAuthInfo authInfo = getAuthStatus(authId);
-        return finishAuthentication(authInfo, false, authInfo.isForceSessionsLogout());
+        SMAuthInfo finalAuthInfo = finishAuthentication(authInfo, false, authInfo.isForceSessionsLogout());
+        application.getEventController().addEvent(new WSAuthEvent(finalAuthInfo));
+        return finalAuthInfo;
     }
 
     protected SMAuthInfo finishAuthentication(
@@ -2220,7 +2246,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 if (userIdFromCreds == null) {
                     var error = "Invalid user credentials";
                     updateAuthStatus(authId, SMAuthStatus.ERROR, dbStoredUserData, error, null);
-                    return SMAuthInfo.error(authId, error, isMainAuthSession, null);
+                    return SMAuthInfo.error(authId, error, isMainAuthSession, null, authInfo.getAppSessionId());
                 }
 
                 if (autoAssign != null && !CommonUtils.isEmpty(autoAssign.getExternalTeamIds())) {
@@ -2295,13 +2321,15 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 smTokens.getSmRefreshToken(),
                 permissions,
                 sentToUserAuthData,
-                tokenAuthRole
+                tokenAuthRole,
+                authInfo.getAppSessionId()
             );
         } else {
             return SMAuthInfo.successChildSession(
                 authId,
                 permissions,
-                sentToUserAuthData
+                sentToUserAuthData,
+                authInfo.getAppSessionId()
             );
         }
     }
