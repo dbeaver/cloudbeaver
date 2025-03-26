@@ -44,7 +44,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
       authModelId: computed,
     });
 
-    this.formState.loadedTask.addHandler(this.formAuthState.bind(this));
+    this.formState.formStateTask.addHandler(this.formAuthState.bind(this));
   }
 
   private get optionsPart() {
@@ -94,7 +94,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     return this.optionsPart.state.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null;
   }
 
-  private async formAuthState(data: IFormState<IConnectionFormState>, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
+  private async formAuthState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const stateContext = contexts.getContext(formStateContext);
 
     const info = this.optionsPart.connectionKey ? this.connectionInfoResource.get(this.optionsPart.connectionKey) : null;
