@@ -17,6 +17,7 @@
   "dependencies": {
     "@cloudbeaver/core-di": "workspace:*",
     "@testing-library/dom": "^10",
+    "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
     "mobx": "^6",
     "react": "^19",

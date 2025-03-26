@@ -8,7 +8,6 @@
     "public/**/*"
   ],
   "devDependencies": {
-    "@dbeaver/tsconfig": "workspace:*",
-    "@testing-library/jest-dom": "^6"
+    "@dbeaver/tsconfig": "workspace:*"
   }
 }

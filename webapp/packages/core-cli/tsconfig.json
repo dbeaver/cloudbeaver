@@ -6,6 +6,10 @@
     "tsBuildInfoFile": "lib/tsconfig.tsbuildinfo",
     "composite": true
   },
+  "types": [
+    "vitest/globals",
+    "@testing-library/jest-dom"
+  ],
   "include": [
     "__custom_mocks__/**/*",
     "src/**/*",

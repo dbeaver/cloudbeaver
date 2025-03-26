@@ -76,10 +76,6 @@ export function validateDependencies(currentPackageRoot: string) {
       devDependencies.add('typescript-plugin-css-modules');
     }
 
-    if (isTestFile) {
-      devDependencies.add('vitest');
-    }
-
     if (isTSXFileRegex) {
       if (isTestFile) {
         devDependencies.add('react');

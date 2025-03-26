@@ -4314,6 +4314,7 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@testing-library/dom": "npm:^10"
+    "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
@@ -4330,7 +4331,6 @@ __metadata:
   resolution: "@cloudbeaver/tsconfig@workspace:packages/tsconfig"
   dependencies:
     "@dbeaver/tsconfig": "workspace:*"
-    "@testing-library/jest-dom": "npm:^6"
   languageName: unknown
   linkType: soft
 
