@@ -517,7 +517,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
     @NotNull
     protected Map<String, Object> collectServerConfigProperties(
-        @NotNull CBServerConfig serverConfig,
+        @NotNull CBServerConfig<?> serverConfig,
         Map<String, Object> originServerConfig
     ) {
         var serverConfigProperties = new LinkedHashMap<String, Object>();
@@ -541,8 +541,9 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         var productConfigProperties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Map<String, Object> oldProductRuntimeConfig = JSONUtils.getObject(originServerConfig,
             CBConstants.PARAM_PRODUCT_SETTINGS);
-        if (!CommonUtils.isEmpty(getServerConfiguration().getProductSettings())) {
-            for (Map.Entry<String, Object> mp : getServerConfiguration().getProductSettings().entrySet()) {
+        Map<String, Object> productSettings = getServerConfiguration().getProductSettings();
+        if (!CommonUtils.isEmpty(productSettings)) {
+            for (Map.Entry<String, Object> mp : productSettings.entrySet()) {
                 copyConfigValue(oldProductRuntimeConfig, productConfigProperties, mp.getKey(), mp.getValue());
             }
             serverConfigProperties.put(CBConstants.PARAM_PRODUCT_SETTINGS, productConfigProperties);

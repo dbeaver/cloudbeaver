@@ -196,7 +196,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 if (isSubjectExists(possibleUserId)) {
                     log.info("User already exist : " + possibleUserId);
                     setUserAuthRole(connection, possibleUserId, authRole);
-                    enableUser(connection, possibleUserId, true);
+                    enableUser(connection, possibleUserId, true, null, null);
                     continue outer;
                 }
             }
@@ -451,9 +451,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             SMUser user;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames(
-                    "SELECT U.USER_ID,U.IS_ACTIVE,U.DEFAULT_AUTH_ROLE,S.IS_SECRET_STORAGE FROM " +
-                        "{table_prefix}CB_USER U, {table_prefix}CB_AUTH_SUBJECT S " +
-                        "WHERE U.USER_ID=? AND U.USER_ID=S.SUBJECT_ID")
+                    """
+                        SELECT U.USER_ID,U.IS_ACTIVE,U.DEFAULT_AUTH_ROLE,S.IS_SECRET_STORAGE,U.CHANGE_DATE,U.DISABLED_BY,U.DISABLE_REASON
+                        FROM {table_prefix}CB_USER U, {table_prefix}CB_AUTH_SUBJECT S
+                        WHERE U.USER_ID=? AND U.USER_ID=S.SUBJECT_ID""")
             )) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -762,19 +763,33 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
-    public void enableUser(String userId, boolean enabled) throws DBException {
+    public void enableUser(
+        @NotNull String userId,
+        boolean enabled,
+        @Nullable String disabledBy,
+        @Nullable String disableReason
+    ) throws DBException {
         try (Connection dbCon = database.openConnection()) {
-            enableUser(dbCon, userId, enabled);
+            enableUser(dbCon, userId, enabled, disabledBy, disableReason);
         } catch (SQLException e) {
             throw new DBCException("Error while updating user configuration", e);
         }
     }
 
-    public void enableUser(Connection dbCon, String userId, boolean enabled) throws SQLException {
+    protected void enableUser(
+        @NotNull Connection dbCon,
+        @NotNull String userId,
+        boolean enabled,
+        @Nullable String disabledBy,
+        @Nullable String disableReason
+    ) throws SQLException {
         try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
-            "UPDATE {table_prefix}CB_USER SET IS_ACTIVE=? WHERE USER_ID=?"))) {
+            "UPDATE {table_prefix}CB_USER SET IS_ACTIVE=?, CHANGE_DATE=?, DISABLED_BY=?, DISABLE_REASON=? WHERE USER_ID=?"))) {
             dbStat.setString(1, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
-            dbStat.setString(2, userId);
+            dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+            JDBCUtils.setStringOrNull(dbStat, 3, enabled ? null : disabledBy);
+            JDBCUtils.setStringOrNull(dbStat, 4, enabled ? null : disableReason);
+            dbStat.setString(5, userId);
             dbStat.executeUpdate();
         }
     }
@@ -1212,11 +1227,16 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @NotNull
     private SMUser fetchUser(ResultSet dbResult) throws SQLException {
+        Timestamp timestamp = dbResult.getTimestamp("CHANGE_DATE");
+        Instant disableDate = timestamp != null ? timestamp.toInstant() : null;
         return new SMUser(
             dbResult.getString("USER_ID"),
             stringToBoolean(dbResult.getString("IS_ACTIVE")),
             dbResult.getString("DEFAULT_AUTH_ROLE"),
-            stringToBoolean(dbResult.getString("IS_SECRET_STORAGE"))
+            stringToBoolean(dbResult.getString("IS_SECRET_STORAGE")),
+            disableDate,
+            dbResult.getString("DISABLED_BY"),
+            dbResult.getString("DISABLE_REASON")
         );
     }
 
@@ -3152,24 +3172,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
         } catch (SQLException e) {
             throw new DBCException("Error reading granted object permissions ", e);
-        }
-    }
-
-    @Override
-    public void blockUserByBruteForceProtection(@NotNull String userId) throws DBException {
-        try (Connection dbCon = database.openConnection()) {
-            var currentPermissions = getUserPermissions(userId);
-            if (currentPermissions.contains(DBWConstants.PERMISSION_ADMIN)) {
-                return;
-            }
-            enableUser(
-                dbCon,
-                userId,
-                false
-            );
-            killAllExistsUserSessions(userId);
-        } catch (SQLException e) {
-            throw new DBCException("Error while blocking user", e);
         }
     }
 

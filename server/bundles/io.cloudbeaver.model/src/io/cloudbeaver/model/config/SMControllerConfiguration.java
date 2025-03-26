@@ -37,7 +37,6 @@ public class SMControllerConfiguration {
     private int minimumLoginTimeout = DEFAULT_MINIMUM_LOGIN_TIMEOUT;
     private int blockLoginPeriod = DEFAULT_BLOCK_LOGIN_PERIOD;
     private final PasswordPolicyConfiguration passwordPolicy = new PasswordPolicyConfiguration();
-    private final ConnectionBruteForceConfiguration connectionBruteForce = new ConnectionBruteForceConfiguration();
 
     public int getAccessTokenTtl() {
         return accessTokenTtl;
@@ -97,9 +96,5 @@ public class SMControllerConfiguration {
 
     public PasswordPolicyConfiguration getPasswordPolicyConfiguration() {
         return passwordPolicy;
-    }
-
-    public ConnectionBruteForceConfiguration getConnectionBruteForceConfiguration() {
-        return connectionBruteForce;
     }
 }
