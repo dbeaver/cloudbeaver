@@ -212,7 +212,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
     public void loadExtraConfig(IConfigurationElement ext) {
         //todo read other props if it needs
-        String typesAttr = cfg.getAttribute(WebRegistryConstant.ATTR_CATEGORIES);
+        String typesAttr = ext.getAttribute(WebRegistryConstant.ATTR_CATEGORIES);
         this.types = CommonUtils.isEmpty(typesAttr) ? new String[0] : typesAttr.split(",");
         this.implType = new ObjectType(ext, WebRegistryConstant.ATTR_CLASS);
         for (IConfigurationElement cfgElement : ext.getChildren(WebRegistryConstant.TAG_CONFIGURATION)) {
