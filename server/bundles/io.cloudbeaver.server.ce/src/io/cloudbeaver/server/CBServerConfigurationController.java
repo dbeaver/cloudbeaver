@@ -17,6 +17,7 @@
 package io.cloudbeaver.server;
 
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.model.app.BaseServerConfigurationController;
 import io.cloudbeaver.model.app.BaseServletApplication;
 import io.cloudbeaver.model.config.CBAppConfig;
@@ -141,7 +142,10 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         serverConfig = ServletAppUtils.mergeConfigurations(currentConfigurationAsMap, serverConfig);
         gson.fromJson(
             gson.toJson(serverConfig),
-            getServerConfiguration().getClass()
+            TypeToken.getParameterized(
+                getServerConfiguration().getClass(),
+                getServerConfiguration().getSecurityManagerConfiguration().getClass()
+            )
         );
 
         parseServerConfiguration();
@@ -149,7 +153,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         //SM config
         gson.fromJson(
             gson.toJson(JSONUtils.getObject(serverConfig, CBConstants.PARAM_SM_CONFIGURATION)),
-            SMControllerConfiguration.class
+            getServerConfiguration().getSecurityManagerConfiguration().getClass()
         );
         // App config
         Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
@@ -329,7 +333,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
         InstanceCreator<DataSourceNavigatorSettings> navSettingsCreator = type -> (DataSourceNavigatorSettings) appConfiguration.getDefaultNavigatorSettings();
         var securityManagerConfiguration = getServerConfiguration().getSecurityManagerConfiguration();
-        InstanceCreator<SMControllerConfiguration> smConfigCreator = type -> securityManagerConfiguration;
+        InstanceCreator<? extends SMControllerConfiguration> smConfigCreator = type -> securityManagerConfiguration;
         InstanceCreator<T> serverConfigCreator = type -> serverConfiguration;
         InstanceCreator<PasswordPolicyConfiguration> smPasswordPoliceConfigCreator =
             type -> securityManagerConfiguration.getPasswordPolicyConfiguration();
@@ -339,7 +343,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             .registerTypeAdapter(getServerConfiguration().getClass(), serverConfigCreator)
             .registerTypeAdapter(CBAppConfig.class, appConfigCreator)
             .registerTypeAdapter(DataSourceNavigatorSettings.class, navSettingsCreator)
-            .registerTypeAdapter(SMControllerConfiguration.class, smConfigCreator)
+            .registerTypeAdapter(securityManagerConfiguration.getClass(), smConfigCreator)
             .registerTypeAdapter(PasswordPolicyConfiguration.class, smPasswordPoliceConfigCreator);
     }
 
