@@ -123,6 +123,8 @@ type SQLResultSet {
     hasChildrenCollection: Boolean!
     hasDynamicTrace: Boolean! @since(version: "24.1.2")
     isSupportsDataFilter: Boolean!
+    readOnly: Boolean! @since(version: "25.0.1")
+    readOnlyStatus: String @since(version: "25.0.1")
 }
 
 type SQLQueryResults {

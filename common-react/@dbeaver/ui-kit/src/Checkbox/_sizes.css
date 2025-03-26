@@ -2,22 +2,22 @@
   :root {
     /* Small checkbox */
     --dbv-kit-checkbox-small-font-size: calc(var(--dbv-kit-checkbox-font-size) * 0.875);
-    --dbv-kit-checkbox-small-height: calc(var(--dbv-kit-control-height-small) * 0.875);
+    --dbv-kit-checkbox-small-height: var(--dbv-kit-control-height-small);
     --dbv-kit-checkbox-small-gap: calc(var(--dbv-kit-checkbox-gap) * 0.5);
 
     /* Medium checkbox */
     --dbv-kit-checkbox-medium-font-size: var(--dbv-kit-checkbox-font-size);
-    --dbv-kit-checkbox-medium-height: calc(var(--dbv-kit-control-height-medium) * 0.75);
+    --dbv-kit-checkbox-medium-height: var(--dbv-kit-control-height-medium);
     --dbv-kit-checkbox-medium-gap: var(--dbv-kit-checkbox-gap);
 
     /* Large checkbox */
     --dbv-kit-checkbox-large-font-size: calc(var(--dbv-kit-checkbox-font-size) * 1.125);
-    --dbv-kit-checkbox-large-height: calc(var(--dbv-kit-control-height-large) * 0.75);
+    --dbv-kit-checkbox-large-height: var(--dbv-kit-control-height-large);
     --dbv-kit-checkbox-large-gap: calc(var(--dbv-kit-checkbox-gap) * 1.25);
 
     /* Extra large checkbox */
     --dbv-kit-checkbox-xlarge-font-size: calc(var(--dbv-kit-checkbox-font-size) * 1.25);
-    --dbv-kit-checkbox-xlarge-height: calc(var(--dbv-kit-control-height-xlarge) * 0.75);
+    --dbv-kit-checkbox-xlarge-height: var(--dbv-kit-control-height-xlarge);
     --dbv-kit-checkbox-xlarge-gap: calc(var(--dbv-kit-checkbox-gap) * 1.5);
   }
 }

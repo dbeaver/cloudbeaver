@@ -9,7 +9,7 @@
     --dbv-kit-btn-background: var(--dbv-kit-color-primary-600);
     --dbv-kit-btn-background-hover: var(--dbv-kit-color-primary-700);
     --dbv-kit-btn-background-active: var(--dbv-kit-color-primary-800);
-    --dbv-kit-btn-outline-color: var(--dbv-kit-color-outline);
+    --dbv-kit-btn-outline-color: var(--dbv-kit-control-outline-color);
 
     --dbv-kit-btn-border-width: var(--dbv-kit-control-border-width);
     --dbv-kit-btn-border-color: transparent;

@@ -534,7 +534,7 @@ public class ConnectionControllerCE implements ConnectionController {
 
 
     private void validateDriverLibrariesPresence(@NotNull DBPDataSourceContainer container) throws DBWebException {
-        if (!DBWorkbench.isDistributed() && container.getDriver().needsExternalDependencies()) {
+        if (!DBWorkbench.isDistributed() && container.getDriver().getDriverLoader(container).needsExternalDependencies()) {
             throwDriverNotFoundException(container);
         }
     }
