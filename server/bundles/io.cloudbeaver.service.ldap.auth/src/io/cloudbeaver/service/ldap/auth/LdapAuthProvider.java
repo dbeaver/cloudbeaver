@@ -188,7 +188,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     }
 
     @NotNull
-    protected static Hashtable<String, String> creteAuthEnvironment(LdapSettings ldapSettings) {
+    public Hashtable<String, String> creteAuthEnvironment(LdapSettings ldapSettings) {
         Hashtable<String, String> environment = new Hashtable<>();
         environment.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 
@@ -219,7 +219,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return null;
     }
 
-    protected NamingEnumeration<SearchResult> findByFilter(
+    public NamingEnumeration<SearchResult> findByFilter(
         @NotNull DirContext serviceContext,
         @NotNull LdapSettings ldapSettings,
         @NotNull String searchFilter,
