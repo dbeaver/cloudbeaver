@@ -131,58 +131,6 @@ public class WebServiceCore implements DBWServiceCore {
             .toList();
     }
 
-    @Deprecated
-    @Override
-    public List<WebDataSourceConfig> getTemplateDataSources() throws DBWebException {
-
-        List<WebDataSourceConfig> result = new ArrayList<>();
-        DBPDataSourceRegistry dsRegistry = WebServiceUtils.getGlobalDataSourceRegistry();
-
-        for (DBPDataSourceContainer ds : dsRegistry.getDataSources()) {
-            if (ds.isTemplate()) {
-                if (WebAppUtils.getWebApplication().getDriverRegistry().getApplicableDrivers().contains(ds.getDriver())) {
-                    result.add(new WebDataSourceConfig(ds));
-                } else {
-                    log.debug("Template datasource '" + ds.getName() + "' ignored - driver is not applicable");
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<WebConnectionInfo> getTemplateConnections(
-        @NotNull WebSession webSession, @Nullable String projectId
-    ) throws DBWebException {
-        if (webSession.getApplication().isDistributed()) {
-            return List.of();
-        }
-        List<WebConnectionInfo> result = new ArrayList<>();
-        if (projectId == null) {
-            for (WebSessionProjectImpl project : webSession.getAccessibleProjects()) {
-                getTemplateConnectionsFromProject(webSession, project, result);
-            }
-        } else {
-            WebSessionProjectImpl project = getProjectById(webSession, projectId);
-            getTemplateConnectionsFromProject(webSession, project, result);
-        }
-        return result;
-    }
-
-    private void getTemplateConnectionsFromProject(
-        @NotNull WebSession webSession,
-        @NotNull WebSessionProjectImpl project,
-        List<WebConnectionInfo> result
-    ) {
-        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-        for (DBPDataSourceContainer ds : registry.getDataSources()) {
-            if (ds.isTemplate() && WebAppUtils.getWebApplication().getDriverRegistry().getApplicableDrivers().contains(ds.getDriver())) {
-                result.add(new WebConnectionInfo(webSession, ds));
-            }
-        }
-    }
-
     @Override
     public List<WebConnectionFolderInfo> getConnectionFolders(
         @NotNull WebSession webSession, @Nullable String projectId, @Nullable String id

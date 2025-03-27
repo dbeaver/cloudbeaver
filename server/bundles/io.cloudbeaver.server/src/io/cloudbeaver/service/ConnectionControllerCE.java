@@ -72,10 +72,6 @@ public class ConnectionControllerCE implements ConnectionController {
         webSession.addInfoMessage("Create new connection");
         DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
 
-        // we don't need to save credentials for templates
-        if (connectionConfig.isTemplate()) {
-            connectionConfig.setSaveCredentials(false);
-        }
         DBPDataSourceContainer newDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig,
             sessionRegistry);
         if (CommonUtils.isEmpty(newDataSource.getName())) {

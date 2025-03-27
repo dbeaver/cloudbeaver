@@ -357,7 +357,6 @@ type ConnectionInfo {
 
     properties: Object
 
-    template: Boolean! @deprecated
     connected: Boolean!
     provided: Boolean!
     readOnly: Boolean!
@@ -589,9 +588,6 @@ extend type Query {
 
     # Return list of user connections
     userConnections( projectId: ID, id: ID, projectIds: [ID!] ): [ ConnectionInfo! ]!
-
-    # Return list of template connections by project ID
-    templateConnections( projectId: ID ): [ ConnectionInfo! ]! @deprecated
 
     # List of connection folders
     connectionFolders( projectId: ID, path: ID ): [ ConnectionFolderInfo! ]!

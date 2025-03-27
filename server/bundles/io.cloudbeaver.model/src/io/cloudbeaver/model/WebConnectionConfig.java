@@ -35,7 +35,6 @@ public class WebConnectionConfig {
     private String templateId;
     private String driverId;
 
-    private boolean template;
     private boolean readOnly;
 
     private String host;
@@ -77,7 +76,6 @@ public class WebConnectionConfig {
             }
             driverId = JSONUtils.getString(params, "driverId");
 
-            template = JSONUtils.getBoolean(params, "template");
             readOnly = JSONUtils.getBoolean(params, "readOnly");
 
             host = JSONUtils.getString(params, "host");
@@ -129,11 +127,6 @@ public class WebConnectionConfig {
     @Property
     public String getDriverId() {
         return driverId;
-    }
-
-    @Property
-    public boolean isTemplate() {
-        return template;
     }
 
     @Property
