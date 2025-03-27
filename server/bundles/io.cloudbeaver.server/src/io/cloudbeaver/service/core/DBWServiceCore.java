@@ -21,6 +21,7 @@ import io.cloudbeaver.WebAction;
 import io.cloudbeaver.WebObjectId;
 import io.cloudbeaver.WebProjectAction;
 import io.cloudbeaver.model.*;
+import io.cloudbeaver.model.dto.WebServerConfigDto;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +40,7 @@ import java.util.Map;
 public interface DBWServiceCore extends DBWService {
 
     @WebAction(authRequired = false, initializationRequired = false)
-    WebServerConfig getServerConfig() throws DBWebException;
+    WebServerConfigDto getServerConfig(WebSession webSession) throws DBWebException;
 
     /**
      * Returns information of system.

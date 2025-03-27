@@ -136,7 +136,7 @@ type ServerConfig {
     adminCredentialsSaveEnabled: Boolean!
 
     licenseRequired: Boolean!
-    licenseValid: Boolean!
+    licenseValid: Boolean
     licenseStatus: String @since(version: "24.1.5")
 
     configurationMode: Boolean!
@@ -150,9 +150,9 @@ type ServerConfig {
     supportedLanguages: [ ServerLanguage! ]!
     services: [ WebServiceConfig ]
     productConfiguration: Object!
-    productInfo: ProductInfo!
+    productInfo: ProductInfo
     defaultNavigatorSettings: NavigatorSettings!
-    disabledDrivers: [ID!]!
+    disabledDrivers: [ID!]
     resourceQuotas: Object!
 }
 
