@@ -17,19 +17,12 @@ import {
   useResource,
   useUserData,
 } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
-import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import {
-  CachedMapAllKey,
-  CachedResourceOffsetPageKey,
-  CachedResourceOffsetPageTargetKey,
-  getNextPageOffset,
-  ResourceKeyUtils,
-} from '@cloudbeaver/core-resource';
+import { type NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { ProjectsService } from '@cloudbeaver/core-projects';
+import { CachedResourceOffsetPageKey, CachedResourceOffsetPageTargetKey, getNextPageOffset, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import type { IDNDData } from '@cloudbeaver/core-ui';
 import { type ILoadableState, MetadataMap, throttle } from '@cloudbeaver/core-utils';
 
@@ -147,11 +140,9 @@ export interface IElementsTree extends ILoadableState {
 
 export function useElementsTree(options: IOptions): IElementsTree {
   const projectsService = useService(ProjectsService);
-  const projectInfoResource = useService(ProjectInfoResource);
   const notificationService = useService(NotificationService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
-  const connectionInfoResource = useService(ConnectionInfoResource);
   const elementsTreeService = useService(ElementsTreeService);
 
   const [localTreeNodesState] = useState(
@@ -189,8 +180,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
   const functionsRef = useObjectRef({
     async loadTree(...nodes: string[]) {
       await Promise.all(loadingNodes.values());
-      await projectInfoResource.load();
-      await connectionInfoResource.load(ConnectionInfoActiveProjectKey);
       const preloadedRoot = await elementsTree.loadPath(options.folderExplorer.state.fullPath);
 
       if (preloadedRoot !== options.folderExplorer.state.folder) {
@@ -218,11 +207,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
     },
 
     async loadNode(nodeId: string) {
-      await projectInfoResource.waitLoad();
-      await connectionInfoResource.waitLoad();
-      await navTreeResource.waitLoad();
-      await navNodeInfoResource.waitLoad();
-
       const expanded = elementsTree.isNodeExpanded(nodeId, true);
       if (!expanded && nodeId !== options.root) {
         if (navNodeInfoResource.isOutdated(nodeId)) {
@@ -757,12 +741,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
     onData: () => loadTreeThreshold(),
   });
 
-  useResource(useElementsTree, ProjectInfoResource, CachedMapAllKey, {
-    onData: () => {
-      loadTreeThreshold();
-    },
-  });
-
   useExecutor({
     executor: navNodeInfoResource.onDataOutdated,
     postHandlers: [loadTreeThreshold],
@@ -794,11 +772,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
         });
       },
     ],
-  });
-
-  useExecutor({
-    executor: projectInfoResource.onDataOutdated,
-    handlers: [() => navTreeResource.markOutdated(ROOT_NODE_PATH)],
   });
 
   useExecutor({

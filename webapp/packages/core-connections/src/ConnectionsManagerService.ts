@@ -32,7 +32,9 @@ export interface IConnectionExecutorData {
 @injectable()
 export class ConnectionsManagerService {
   get projectConnections(): Connection[] {
-    return this.connectionInfo.values.filter(connection => this.projectsService.activeProjects.some(project => project.id === connection.projectId));
+    return this.connectionInfoResource.values.filter(connection =>
+      this.projectsService.activeProjects.some(project => project.id === connection.projectId),
+    );
   }
   get createConnectionProjects(): ProjectInfo[] {
     return this.projectsService.activeProjects.filter(project => project.canEditDataSources).sort(projectInfoSortByName);
@@ -44,7 +46,7 @@ export class ConnectionsManagerService {
   private disconnecting: boolean;
 
   constructor(
-    readonly connectionInfo: ConnectionInfoResource,
+    readonly connectionInfoResource: ConnectionInfoResource,
     readonly containerContainers: ContainerResource,
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
@@ -56,9 +58,9 @@ export class ConnectionsManagerService {
     this.onDisconnect = new Executor();
     this.onDelete = new Executor();
 
-    this.connectionExecutor.addHandler(data => connectionInfo.load(data.key));
+    this.connectionExecutor.addHandler(data => connectionInfoResource.load(data.key));
     this.onDelete.before(this.onDisconnect);
-    this.connectionInfo.onConnectionClose.next(this.onDisconnect, key => ({
+    this.connectionInfoResource.onConnectionClose.next(this.onDisconnect, key => ({
       connections: [key],
       state: 'after' as const,
     }));
@@ -78,10 +80,6 @@ export class ConnectionsManagerService {
     const connection = context.getContext(this.connectionContext);
 
     return connection.connection;
-  }
-
-  addOpenedConnection(connection: Connection): void {
-    this.connectionInfo.add(connection);
   }
 
   getObjectContainerById(connectionKey: IConnectionInfoParams, objectCatalogId?: string, objectSchemaId?: string): ObjectContainer | undefined {
@@ -107,7 +105,7 @@ export class ConnectionsManagerService {
   }
 
   async deleteConnection(key: IConnectionInfoParams): Promise<void> {
-    const connection = await this.connectionInfo.load(key);
+    const connection = await this.connectionInfoResource.load(key);
 
     if (!connection.canDelete) {
       return;
@@ -131,7 +129,7 @@ export class ConnectionsManagerService {
       return;
     }
 
-    await this.connectionInfo.deleteConnection(key);
+    await this.connectionInfoResource.deleteConnection(key);
 
     this.onDelete.execute({
       connections: [key],
@@ -157,7 +155,7 @@ export class ConnectionsManagerService {
       return;
     }
 
-    await this.connectionInfo.close(createConnectionParam(connection));
+    await this.connectionInfoResource.close(createConnectionParam(connection));
   }
 
   async closeAllConnections(): Promise<void> {
@@ -192,7 +190,7 @@ export class ConnectionsManagerService {
   }
 
   async closeConnectionAsync(key: IConnectionInfoParams): Promise<void> {
-    const connection = this.connectionInfo.get(key);
+    const connection = this.connectionInfoResource.get(key);
     if (!connection || !connection.connected) {
       return;
     }

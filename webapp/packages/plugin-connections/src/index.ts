@@ -27,6 +27,7 @@ export * from './ConnectionForm/ConnectionAuthModelCredentials/ConnectionAuthMod
 export * from './ContextMenu/MENU_CONNECTION_VIEW.js';
 export * from './ContextMenu/MENU_CONNECTIONS.js';
 export * from './PublicConnectionForm/PublicConnectionFormService.js';
+export * from './NavNodes/ConnectionNavNodeService.js';
 export * from './ConnectionAuthService.js';
 export * from './PluginConnectionsSettingsService.js';
 export * from './ConnectionShieldLazy.js';

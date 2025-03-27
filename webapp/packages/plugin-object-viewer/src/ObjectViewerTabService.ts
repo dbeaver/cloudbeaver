@@ -12,7 +12,6 @@ import {
   ConnectionExecutionContextResource,
   ConnectionInfoActiveProjectKey,
   ConnectionInfoResource,
-  ConnectionNavNodeService,
   connectionProvider,
   createConnectionParam,
   executionContextProvider,
@@ -35,6 +34,7 @@ import {
 import { projectProvider } from '@cloudbeaver/core-projects';
 import { type ResourceKey, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { type ITab, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
+import { ConnectionNavNodeService } from '@cloudbeaver/plugin-connections';
 
 import type { IObjectViewerTabContext } from './IObjectViewerTabContext.js';
 import type { IObjectViewerTabState } from './IObjectViewerTabState.js';
