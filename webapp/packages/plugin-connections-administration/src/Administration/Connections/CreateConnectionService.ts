@@ -116,6 +116,7 @@ export class CreateConnectionService {
       submitType: null,
       type: 'admin',
       requiredNetworkHandlersIds: [],
+      driverId: config.driverId ?? '',
     });
 
     runInAction(() => {

@@ -22,9 +22,10 @@ import {
   DBDriverResource,
   isJDBCConnection,
   type DatabaseConnection,
+  type DBDriver,
 } from '@cloudbeaver/core-connections';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { action, computed, makeObservable, observable, toJS } from 'mobx';
+import { action, computed, makeObservable, observable, reaction, toJS } from 'mobx';
 import { getUniqueName, isNotNullDefined } from '@cloudbeaver/core-utils';
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import { getConnectionName } from './getConnectionName.js';
@@ -68,10 +69,22 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     this.formState.validationTask.addPostHandler(this.askCredentials.bind(this));
 
+    reaction(() => this.state.host, this.handleHostChange.bind(this));
+
     makeObservable(this, {
       setAuthModel: action.bound,
+      setDriver: action.bound,
+      updateNameTemplate: action.bound,
       connectionKey: computed,
     });
+  }
+
+  private handleHostChange(host: string | undefined, prevHost: string | undefined) {
+    const driver = this.state.driverId ? this.dbDriverResource.get(this.state.driverId) : undefined;
+
+    if (host !== prevHost && this.isNameAutoFill()) {
+      this.updateNameTemplate(driver);
+    }
   }
 
   private async askCredentials(data: IFormState<IConnectionFormState>, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
@@ -128,12 +141,12 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
   protected override async loader(): Promise<void> {
     if (this.formState.mode === 'create') {
-      const defaults = await this.getDefaults();
+      this.setInitialState(defaultStateGetter());
 
-      this.setInitialState({
-        ...defaults,
-        ...this.state,
-      });
+      if (this.formState.state.driverId && !this.isChanged) {
+        await this.setDriver(this.formState.state.driverId);
+      }
+
       return;
     }
 
@@ -199,9 +212,81 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   }
 
   isNameAutoFill() {
-    const isAutoFill = this.state.name === this.initialState.name || this.initialState.name === null;
+    if (this.formState.mode === 'edit') {
+      return false;
+    }
 
-    return isAutoFill && this.formState.mode === 'create';
+    return this.state.name === this.initialState.name || !isNotNullDefined(this.initialState.name);
+  }
+
+  updateNameTemplate(driver: DBDriver | undefined) {
+    const info = this.connectionKey ? this.connectionInfoResource.get(this.connectionKey) : undefined;
+
+    if (isJDBCConnection(driver, info)) {
+      this.state.name = this.state.url || '';
+      this.initialState.name = this.state.name;
+      return;
+    }
+
+    if (!driver) {
+      this.state.name = 'New connection';
+      this.initialState.name = this.state.name;
+      return;
+    }
+
+    this.state.name = getConnectionName(driver.name || '', this.state.host, this.state.port, driver.defaultPort);
+    this.initialState.name = this.state.name;
+  }
+
+  async setDriver(driverId: string) {
+    if (this.formState.mode === 'edit') {
+      return;
+    }
+
+    let prevDriver: DBDriver | undefined;
+    let driver: DBDriver | undefined = this.dbDriverResource.get(driverId);
+    let prevDriverId = this.initialState.driverId;
+
+    this.state.driverId = driverId;
+    this.initialState.driverId = driverId;
+
+    if (!driver) {
+      driver = await this.dbDriverResource.load(driverId, ['includeProviderProperties']);
+    }
+
+    if (prevDriverId) {
+      prevDriver = await this.dbDriverResource.load(prevDriverId, ['includeProviderProperties']);
+    }
+
+    if (!this.state.configurationType || !driver?.configurationTypes.includes(this.state.configurationType)) {
+      this.state.configurationType = getDefaultConfigurationType(driver);
+    }
+
+    if ((!prevDriver && this.state.host === undefined) || this.state.host === prevDriver?.defaultServer) {
+      this.state.host = driver?.defaultServer || 'localhost';
+    }
+
+    if ((!prevDriver && this.state.port === undefined) || this.state.port === prevDriver?.defaultPort) {
+      this.state.port = driver?.defaultPort;
+    }
+
+    if ((!prevDriver && this.state.databaseName === undefined) || this.state.databaseName === prevDriver?.defaultDatabase) {
+      this.state.databaseName = driver?.defaultDatabase;
+    }
+
+    if ((!prevDriver && this.state.url === undefined) || this.state.url === prevDriver?.sampleURL) {
+      this.state.url = driver?.sampleURL;
+    }
+
+    if (this.isNameAutoFill()) {
+      this.updateNameTemplate(driver);
+    }
+
+    if (driver?.id !== prevDriver?.id) {
+      this.state.credentials = {};
+      this.state.providerProperties = {};
+      this.state.authModelId = driver?.defaultAuthModel;
+    }
   }
 
   setAuthModel(model: DatabaseAuthModel) {
@@ -212,31 +297,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     this.state.authModelId = model.id;
-  }
-
-  private async getDefaults() {
-    const config = defaultStateGetter();
-    if (!this.state.driverId) {
-      config.name = 'New connection';
-      return config;
-    }
-
-    const driver = await this.dbDriverResource.load(this.state.driverId, ['includeProviderProperties']);
-
-    config.authModelId = driver?.defaultAuthModel;
-    config.configurationType = getDefaultConfigurationType(driver);
-    config.host = this.state.host || driver?.defaultServer || 'localhost';
-    config.port = this.state.port || driver?.defaultPort;
-    config.databaseName = driver?.defaultDatabase;
-    config.url = driver?.sampleURL;
-
-    if (isJDBCConnection(driver)) {
-      config.name = config.url;
-    } else {
-      config.name = getConnectionName(driver.name || '', config.host, config.port, driver.defaultPort);
-    }
-
-    return config;
   }
 
   protected override async format(

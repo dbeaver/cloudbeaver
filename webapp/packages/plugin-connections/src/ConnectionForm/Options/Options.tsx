@@ -61,7 +61,6 @@ import { ParametersForm } from './ParametersForm.js';
 import { ProviderPropertiesForm } from './ProviderPropertiesForm.js';
 import { getConnectionFormOptionsPart } from './getConnectionFormOptionsPart.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
-import { runInAction } from 'mobx';
 
 const PROFILE_AUTH_MODEL_ID = 'profile';
 
@@ -196,12 +195,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
       return;
     }
 
-    runInAction(() => {
-      optionsPart.state = {
-        driverId,
-      };
-    });
-
+    formState.state.driverId = driverId;
     await formState.reload();
   }
 

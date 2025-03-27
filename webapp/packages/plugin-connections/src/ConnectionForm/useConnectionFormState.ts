@@ -19,6 +19,7 @@ const EMPTY_CONNECTION_INFO_PARAMS: IConnectionFormState = {
   submitType: 'submit',
   availableDrivers: [],
   type: 'admin',
+  driverId: '',
   requiredNetworkHandlersIds: [],
 };
 

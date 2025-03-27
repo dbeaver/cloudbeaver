@@ -159,6 +159,7 @@ export class ConnectionSearchService {
       availableDrivers: database.possibleDrivers,
       type: 'public',
       requiredNetworkHandlersIds: [],
+      driverId: database.defaultDriver,
     });
 
     runInAction(() => {

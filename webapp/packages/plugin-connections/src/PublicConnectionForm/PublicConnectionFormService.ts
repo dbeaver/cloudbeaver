@@ -78,6 +78,7 @@ export class PublicConnectionFormService {
       submitType: 'submit',
       type: 'public',
       requiredNetworkHandlersIds: [],
+      driverId: config.driverId ?? '',
     });
 
     runInAction(() => {
