@@ -13,7 +13,7 @@ export default defineConfig({
     environment: 'jsdom',
     root: path.resolve('.'),
     include: ['**/lib/**/*.test.js'],
-    exclude: ['node_modules/**', '\\.pnp\\.[^\\/]+$'],
+    exclude: ['node_modules/**'],
     setupFiles: [path.resolve(__dirname, './vitest.setup.ts')],
     alias: [
       {
