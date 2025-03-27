@@ -68,16 +68,16 @@ public class CBSchemaVersionManager implements SQLSchemaVersionManager {
         @NotNull String schemaName,
         int version
     ) throws DBException, SQLException {
-        var updateCount = JDBCUtils.executeUpdate(
+        var selectCount = CommonUtils.toInt(JDBCUtils.executeQuery(
             connection,
             CommonUtils.normalizeTableNames(
-                "UPDATE {table_prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP WHERE MODULE_ID = ?",
+                "SELECT count(1) FROM {table_prefix}CB_SCHEMA_INFO",
                 schemaName
-            ),
-            version,
-            getSchemaId()
-        );
-        if (updateCount <= 0) {
+            )
+        ));
+        if (selectCount <= 0) {
+            log.debug("Didn't find any records in " +
+                CommonUtils.normalizeTableNames("{table_prefix}CB_SCHEMA_INFO", schemaName));
             JDBCUtils.executeSQL(
                 connection,
                 CommonUtils.normalizeTableNames(
@@ -87,7 +87,31 @@ public class CBSchemaVersionManager implements SQLSchemaVersionManager {
                 getSchemaId(),
                 version
             );
+            return;
         }
+        if (selectCount == 1) {
+            log.debug("Found only one record in " +
+                CommonUtils.normalizeTableNames("{table_prefix}CB_SCHEMA_INFO", schemaName));
+            JDBCUtils.executeUpdate(
+                connection,
+                CommonUtils.normalizeTableNames(
+                    "UPDATE {table_prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP",
+                    schemaName
+                ),
+                version
+            );
+            return;
+        }
+        JDBCUtils.executeUpdate(
+            connection,
+            CommonUtils.normalizeTableNames(
+                "UPDATE {table_prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP WHERE MODULE_ID = ?",
+                schemaName
+            ),
+            version,
+            getSchemaId()
+        );
+
     }
 
     protected Integer tryGetVersion(Connection connection, String sql, Object... params) {
