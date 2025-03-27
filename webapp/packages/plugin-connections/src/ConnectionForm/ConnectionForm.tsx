@@ -18,7 +18,7 @@ import style from './ConnectionForm.module.css';
 import type { ConnectionFormState } from './ConnectionFormState.js';
 import { getFirstException } from '@cloudbeaver/core-utils';
 import { ConnectionFormService } from './ConnectionFormService.js';
-import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { getConnectionFormOptionsPart } from './Options/getConnectionFormOptionsPart.js';
 
 export interface ConnectionFormProps {
@@ -34,14 +34,9 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   const styles = useS(style);
   const notificationService = useService(NotificationService);
   const optionsPart = getConnectionFormOptionsPart(formState);
-  const connectionInfoResource = useResource(
-    ConnectionForm,
-    ConnectionInfoResource,
-    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
-    {
-      active: !!formState.state.projectId && !!optionsPart.state.connectionId,
-    },
-  );
+  const connectionInfoResource = useResource(ConnectionForm, ConnectionInfoResource, optionsPart.connectionKey, {
+    active: !!optionsPart.connectionKey,
+  });
   const exception = getFirstException(formState.exception);
 
   const form = useForm({

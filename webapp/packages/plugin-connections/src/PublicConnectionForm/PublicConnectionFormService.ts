@@ -81,10 +81,7 @@ export class PublicConnectionFormService {
     });
 
     runInAction(() => {
-      this.optionsPart!.state = {
-        ...this.optionsPart!.state,
-        ...config,
-      };
+      Object.assign(this.optionsPart!.state, config);
     });
 
     this.formState.disposeTask.addHandler(this.close.bind(this, true));

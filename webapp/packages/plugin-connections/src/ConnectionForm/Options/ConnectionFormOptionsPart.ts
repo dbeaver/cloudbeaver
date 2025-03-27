@@ -24,7 +24,7 @@ import {
   type DatabaseConnection,
 } from '@cloudbeaver/core-connections';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { action, makeObservable, observable, toJS } from 'mobx';
+import { action, computed, makeObservable, observable, toJS } from 'mobx';
 import { getUniqueName, isNotNullDefined } from '@cloudbeaver/core-utils';
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import { getConnectionName } from './getConnectionName.js';
@@ -70,6 +70,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     makeObservable(this, {
       setAuthModel: action.bound,
+      connectionKey: computed,
     });
   }
 
@@ -118,13 +119,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       return false;
     }
 
-    const isProjectOutdated = this.projectInfoResource.isOutdated(this.formState.state.projectId);
-
-    if (!this.connectionKey) {
-      return isProjectOutdated;
+    if (this.projectInfoResource.isOutdated(this.formState.state.projectId)) {
+      return true;
     }
 
-    return this.connectionInfoResource.isOutdated(this.connectionKey) || isProjectOutdated;
+    return !!this.connectionKey && this.connectionInfoResource.isOutdated(this.connectionKey);
   }
 
   protected override async loader(): Promise<void> {
@@ -138,12 +137,12 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       return;
     }
 
-    if (!this.state.connectionId || !this.formState.state.projectId) {
-      console.error('Connection id and project id should be defined');
+    if (!this.connectionKey) {
+      console.error('Connection connection key should be defined');
       return;
     }
 
-    const info = await this.connectionInfoResource.load(createConnectionParam(this.formState.state.projectId, this.state.connectionId), [
+    const info = await this.connectionInfoResource.load(this.connectionKey, [
       'includeAuthProperties',
       'includeCredentialsSaved',
       'customIncludeOptions',
@@ -196,7 +195,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     this.formState.state.availableDrivers = [info.driverId];
 
-    this.setInitialState({ ...config });
+    this.setInitialState(config);
   }
 
   isNameAutoFill() {
@@ -206,21 +205,10 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   }
 
   setAuthModel(model: DatabaseAuthModel) {
-    this.state.credentials = {};
-
-    const info =
-      this.formState.state.projectId && this.state.connectionId
-        ? this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.state.connectionId!))
-        : null;
-
-    if (model.id === info?.authModel) {
-      if (info.authProperties) {
-        for (const property of info.authProperties) {
-          if (!property.features.includes('password')) {
-            this.state.credentials[property.id!] = property.value;
-          }
-        }
-      }
+    if (model.id !== this.initialState.authModelId) {
+      this.state.credentials = {};
+    } else {
+      this.state.credentials = { ...this.initialState.credentials };
     }
 
     this.state.authModelId = model.id;
@@ -260,10 +248,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     const driver = await this.dbDriverResource.load(this.state.driverId, ['includeProviderProperties', 'includeMainProperties']);
-
-    if (this.formState.mode === 'edit') {
-      this.state.connectionId = this.state.connectionId;
-    }
 
     this.formState.state.requiredNetworkHandlersIds = observable([]);
     this.state.networkHandlersConfig = observable([]);
@@ -306,10 +290,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if ((this.state.authModelId || driver.defaultAuthModel) && !driver.anonymousAccess) {
       this.state.authModelId = this.state.authModelId || driver.defaultAuthModel;
       this.state.saveCredentials = this.state.saveCredentials || this.state.sharedCredentials;
-      const info =
-        this.state.connectionId && this.formState.state.projectId
-          ? this.connectionInfoResource.get(createConnectionParam(this.formState.state.projectId, this.state.connectionId))
-          : undefined;
+      const info = this.connectionKey ? this.connectionInfoResource.get(this.connectionKey) : undefined;
 
       const properties = await this.getConnectionAuthModelProperties(this.state.authModelId, info);
       const passwordProperty = properties.find(property => property.features.includes('password'));
@@ -419,7 +400,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     if (this.formState.state.submitType === 'submit') {
       if (this.formState.mode === 'edit') {
-        await this.connectionInfoResource.update(createConnectionParam(this.formState.state.projectId, this.state.connectionId!), this.state);
+        await this.connectionInfoResource.update(this.connectionKey!, this.state);
       } else {
         const connection = await this.connectionInfoResource.create(this.formState.state.projectId, this.state);
         this.state.connectionId = connection.id;
