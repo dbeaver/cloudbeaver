@@ -6,13 +6,22 @@
  * you may not use this file except in compliance with the License.
  */
 
+const CONNECTION_NODE_ID_PREFIX = 'database://';
+
 export const NodeManagerUtils = {
-  connectionIdToConnectionNodeId(connectionId: string): string {
-    return `database://${connectionId}`;
+  getConnectionId(nodeId: string) {
+    const indexOfConnectionPart = nodeId.indexOf('/', CONNECTION_NODE_ID_PREFIX.length);
+    const connectionId = nodeId.slice(CONNECTION_NODE_ID_PREFIX.length, indexOfConnectionPart > -1 ? indexOfConnectionPart : nodeId.length);
+
+    return connectionId;
   },
 
-  isDatabaseObject(objectId: string): boolean {
-    return objectId.startsWith('database://');
+  connectionIdToConnectionNodeId(connectionId: string): string {
+    return `${CONNECTION_NODE_ID_PREFIX}${connectionId}`;
+  },
+
+  isDatabaseObject(nodeId: string): boolean {
+    return nodeId.startsWith(CONNECTION_NODE_ID_PREFIX);
   },
 
   concatSchemaAndCatalog(catalogId?: string, schemaId?: string): string {

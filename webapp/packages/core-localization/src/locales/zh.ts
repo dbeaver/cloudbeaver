@@ -82,6 +82,7 @@ export default [
   ['ui_create_processing', '创建中...'],
   ['ui_folder', '文件夹'],
   ['ui_folder_new', '新建文件夹'],
+  ['ui_folder_new_default_name', '新建文件夹'],
   ['ui_rename', '重命名'],
   ['ui_rename_processing', '重命名中...'],
   ['ui_name', '名称'],
