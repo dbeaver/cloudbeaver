@@ -145,7 +145,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             TypeToken.getParameterized(
                 getServerConfiguration().getClass(),
                 getServerConfiguration().getSecurityManagerConfiguration().getClass()
-            )
+            ).getType()
         );
 
         parseServerConfiguration();

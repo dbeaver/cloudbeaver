@@ -392,7 +392,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         webSession.addInfoMessage("Enable user - " + userID);
         try {
-            webSession.getAdminSecurityController().enableUser(userID, enabled, grantor.getUserId(), "Manually");
+            webSession.getAdminSecurityController().enableUser(userID, enabled, grantor.getUserId(), "Disabled manually");
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error activating user", e);
