@@ -141,6 +141,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         } else {
           key = { column: viewAction.columnKeys[0], row: viewAction.rowKeys[0] };
         }
+        selectionAction.focus(key as IResultSetElementKey);
       }
 
       if (!key?.column || !key?.row) {
@@ -257,8 +258,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   useEffect(() => {
     const gridDiv = dataGridDivRef.current;
-
-    handleFocusChange(focusedCell.current ?? { colIdx: 1, rowIdx: 0 });
 
     if (
       gridDiv &&
