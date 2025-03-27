@@ -15,6 +15,7 @@ export const CONNECTION_FORM_STATE_SCHEMA = schema
     submitType: schema.enum(['submit', 'test']).nullable(),
     availableDrivers: schema.array(schema.string()),
     requiredNetworkHandlersIds: schema.array(schema.string()),
+    connectionId: schema.string().or(schema.undefined()),
     type: schema.enum(['admin', 'public']),
   })
   .required()

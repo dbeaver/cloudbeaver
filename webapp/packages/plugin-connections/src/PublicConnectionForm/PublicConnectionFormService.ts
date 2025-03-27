@@ -78,15 +78,16 @@ export class PublicConnectionFormService {
       submitType: 'submit',
       type: 'public',
       requiredNetworkHandlersIds: [],
+      connectionId: config.connectionId,
     }).setMode(config.connectionId ? FormMode.Edit : FormMode.Create);
-
-    Object.assign(this.optionsPart!.state, config);
 
     await this.optionsPart?.load();
 
     if (config.driverId) {
       await this.optionsPart?.setDriverId(config.driverId);
     }
+
+    Object.assign(this.optionsPart!.state, config);
 
     this.formState.disposeTask.addHandler(this.close.bind(this, true));
   }

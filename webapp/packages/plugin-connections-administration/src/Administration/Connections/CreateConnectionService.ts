@@ -116,12 +116,13 @@ export class CreateConnectionService {
       submitType: null,
       type: 'admin',
       requiredNetworkHandlersIds: [],
+      connectionId: config.connectionId,
     });
-
-    Object.assign(this.optionsPart!.state, config);
 
     await this.optionsPart?.load();
     await this.optionsPart?.setDriverId(config.driverId);
+
+    Object.assign(this.optionsPart!.state, config);
 
     this.data.disposeTask.addHandler(this.cancelCreate.bind(this));
   }

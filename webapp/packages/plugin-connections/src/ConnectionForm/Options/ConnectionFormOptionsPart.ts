@@ -155,6 +155,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       return;
     }
 
+    this.state.connectionId = this.formState.state.connectionId ?? undefined;
+
     if (!this.connectionKey) {
       console.error('Connection connection key should be defined');
       return;
