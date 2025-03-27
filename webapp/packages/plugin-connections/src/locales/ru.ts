@@ -44,6 +44,6 @@ export default [
     'plugin_connections_connection_auth_secret_description',
     'У вас есть несколько учетных записей для авторизации.\nВыберите учетную запись из списка.',
   ],
-  ['plugin_connections_connection_create_menu_title', 'Подключение'],
+  ['plugin_connections_connection_create_menu_title', 'Новое Подключение'],
   ['plugin_connections_connection_driver_not_installed_message', 'Драйвер не установлен. Вы можете установить его в "Администрированой" части.'],
 ];

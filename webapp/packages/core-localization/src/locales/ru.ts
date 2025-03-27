@@ -82,6 +82,7 @@ export default [
   ['ui_create_processing', 'Создание...'],
   ['ui_folder', 'Папка'],
   ['ui_folder_new', 'Новая папка'],
+  ['ui_folder_new_default_name', 'Новая папка'],
   ['ui_rename_processing', 'Переименование...'],
   ['ui_name', 'Название'],
   ['ui_value', 'Значение'],

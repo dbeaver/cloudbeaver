@@ -24,6 +24,7 @@ import {
   useSelectContext,
   useSelectStore,
 } from '@ariakit/react';
+import clsx from 'clsx';
 
 import './Select.css';
 
@@ -32,12 +33,12 @@ export function SelectProvider({ children, ...props }: SelectProviderProps) {
 }
 
 export function Select({ className, ...props }: SelectProps) {
-  return <AriaSelect className={`dbv-kit-select ${className || ''}`} {...props} />;
+  return <AriaSelect className={clsx('dbv-kit-select', className)} {...props} />;
 }
 
 export function SelectPopover({ children, className, ...props }: SelectPopoverProps) {
   return (
-    <AriaSelectPopover className={`dbv-kit-select__popover ${className || ''}`} sameWidth={props.sameWidth ?? true} {...props}>
+    <AriaSelectPopover className={clsx('dbv-kit-select__popover', className)} sameWidth={props.sameWidth ?? true} {...props}>
       {children}
     </AriaSelectPopover>
   );
@@ -45,7 +46,7 @@ export function SelectPopover({ children, className, ...props }: SelectPopoverPr
 
 export function SelectItem({ children, className, ...props }: SelectItemProps) {
   return (
-    <AriaSelectItem className={`dbv-kit-select__item ${className || ''}`} {...props}>
+    <AriaSelectItem className={clsx('dbv-kit-select__item', className)} {...props}>
       {children}
     </AriaSelectItem>
   );
@@ -53,7 +54,7 @@ export function SelectItem({ children, className, ...props }: SelectItemProps) {
 
 export function SelectLabel({ children, className, ...props }: SelectLabelProps) {
   return (
-    <AriaSelectLabel className={`dbv-kit-select__label ${className || ''}`} {...props}>
+    <AriaSelectLabel className={clsx('dbv-kit-select__label', className)} {...props}>
       {children}
     </AriaSelectLabel>
   );
