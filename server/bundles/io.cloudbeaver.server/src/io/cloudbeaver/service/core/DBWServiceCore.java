@@ -70,13 +70,6 @@ public interface DBWServiceCore extends DBWService {
     List<WebConnectionFolderInfo> getConnectionFolders(
         @NotNull WebSession webSession, @Nullable String projectId, @Nullable String id) throws DBWebException;
 
-    @Deprecated
-    @WebAction
-    List<WebDataSourceConfig> getTemplateDataSources() throws DBWebException;
-
-    @WebAction
-    List<WebConnectionInfo> getTemplateConnections(@NotNull WebSession webSession, @Nullable String projectId) throws DBWebException;
-
     @WebAction(authRequired = false)
     String[] getSessionPermissions(@NotNull WebSession webSession) throws DBWebException;
 

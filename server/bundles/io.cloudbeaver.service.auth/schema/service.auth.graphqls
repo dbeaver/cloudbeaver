@@ -84,7 +84,8 @@ type AuthProviderInfo {
 type AuthInfo {
     redirectLink: String
 
-    authId: String
+
+    authId: String @deprecated
 
     authStatus: AuthStatus!
 

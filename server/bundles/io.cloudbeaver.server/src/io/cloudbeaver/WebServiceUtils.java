@@ -138,7 +138,6 @@ public class WebServiceUtils extends WebCommonUtils {
         if (config.getFolder() != null) {
             newDataSource.setFolder(registry.getFolder(config.getFolder()));
         }
-        ((DataSourceDescriptor)newDataSource).setTemplate(config.isTemplate());
 
         ServletApplication app = ServletAppUtils.getServletApplication();
         if (app instanceof WebApplication webApplication) {

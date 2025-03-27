@@ -3,12 +3,16 @@
     --dbv-kit-input-radius: var(--dbv-kit-control-border-radius);
     --dbv-kit-input-font-size: calc(var(--dbv-kit-font-size-base) * 0.875);
     --dbv-kit-input-background: var(--dbv-kit-color-background);
-    --dbv-kit-input-border-color: var(--tw-color-gray-300);
+    --dbv-kit-input-border-color: var(--dbv-kit-color-control-inactive);
     --dbv-kit-input-border-width: var(--dbv-kit-control-border-width);
     --dbv-kit-input-border-style: solid;
     --dbv-kit-input-foreground: var(--dbv-kit-color-foreground);
+
+    --dbv-kit-input-label-foreground: var(--dbv-kit-color-control-label);
+    --dbv-kit-input-label-padding: var(--tw-spacing);
+
     --dbv-kit-input-height: var(--dbv-kit-control-height-medium);
-    --dbv-kit-input-padding: calc(var(--tw-spacing) * 1.1);
+    --dbv-kit-input-padding: calc(var(--tw-spacing) * 2.5);
     --dbv-kit-input-placeholder-foreground: var(--tw-color-gray-500);
     --dbv-kit-input-option-active-background: var(--dbv-kit-color-primary-200);
     --dbv-kit-input-option-active-border: var(--dbv-kit-color-primary-500);

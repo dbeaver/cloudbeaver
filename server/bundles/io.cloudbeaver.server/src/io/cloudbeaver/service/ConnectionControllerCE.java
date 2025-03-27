@@ -72,10 +72,6 @@ public class ConnectionControllerCE implements ConnectionController {
         webSession.addInfoMessage("Create new connection");
         DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
 
-        // we don't need to save credentials for templates
-        if (connectionConfig.isTemplate()) {
-            connectionConfig.setSaveCredentials(false);
-        }
         DBPDataSourceContainer newDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig,
             sessionRegistry);
         if (CommonUtils.isEmpty(newDataSource.getName())) {
@@ -534,7 +530,7 @@ public class ConnectionControllerCE implements ConnectionController {
 
 
     private void validateDriverLibrariesPresence(@NotNull DBPDataSourceContainer container) throws DBWebException {
-        if (!DBWorkbench.isDistributed() && container.getDriver().needsExternalDependencies()) {
+        if (!DBWorkbench.isDistributed() && container.getDriver().getDriverLoader(container).needsExternalDependencies()) {
             throwDriverNotFoundException(container);
         }
     }

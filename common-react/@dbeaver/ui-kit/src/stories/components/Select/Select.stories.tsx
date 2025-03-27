@@ -1,3 +1,11 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
 import { Select } from '../../../Select/Select.js';
 
 export const Docs = () => {
@@ -69,7 +77,7 @@ export const Docs = () => {
         <code>--dbv-kit-control-outline-width</code> - Defines the width of the focus outline.
       </p>
       <p>
-        <code>--dbv-kit-color-outline</code> - Sets the color of the focus outline.
+        <code>--dbv-kit-control-outline-color</code> - Sets the color of the focus outline.
       </p>
 
       <h3>Label Variables</h3>

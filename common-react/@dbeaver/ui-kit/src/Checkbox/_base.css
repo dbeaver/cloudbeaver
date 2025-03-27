@@ -3,22 +3,21 @@
     /* Checkbox sizes */
     --dbv-kit-checkbox-height: var(--dbv-kit-control-height-medium);
     --dbv-kit-checkbox-gap: calc(var(--tw-spacing) * 1.25);
-    --dbv-kit-checkbox-check-size: 0.75;
+    --dbv-kit-checkbox-check-size: 0.5625;
 
     /* Checkbox colors */
     --dbv-kit-checkbox-foreground: var(--tw-color-black);
     --dbv-kit-checkbox-background: transparent;
     --dbv-kit-checkbox-background-checked: var(--dbv-kit-color-primary-600);
-    --dbv-kit-checkbox-background-active: var(--dbv-kit-color-primary-800);
 
-    --dbv-kit-checkbox-hover-shadow-color: var(--dbv-kit-color-primary-100);
+    --dbv-kit-checkbox-hover-shadow-color: var(--dbv-kit-color-primary-200);
     --dbv-kit-checkbox-icon-color: var(--tw-color-white);
 
     /* Checkbox border */
-    --dbv-kit-checkbox-border-width: var(--dbv-kit-control-border-width);
+    --dbv-kit-checkbox-border-width: calc(var(--dbv-kit-control-border-width) * 2);
     --dbv-kit-checkbox-border-radius: var(--dbv-kit-control-border-radius);
     --dbv-kit-checkbox-border-style: solid;
-    --dbv-kit-checkbox-border-color: var(--tw-color-gray-300);
+    --dbv-kit-checkbox-border-color: var(--dbv-kit-color-control-inactive);
     --dbv-kit-checkbox-border-color-checked: var(--dbv-kit-color-primary-600);
 
     /* Checkbox label font */
