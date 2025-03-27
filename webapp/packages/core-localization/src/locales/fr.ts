@@ -80,6 +80,7 @@ export default [
   ['ui_create_processing', 'Création...'],
   ['ui_folder', 'Dossier'],
   ['ui_folder_new', 'Nouveau dossier'],
+  ['ui_folder_new_default_name', 'Nouveau dossier'],
   ['ui_rename_processing', 'Renommage...'],
   ['ui_interval', 'Intervalle'],
   ['ui_name', 'Nom'],
