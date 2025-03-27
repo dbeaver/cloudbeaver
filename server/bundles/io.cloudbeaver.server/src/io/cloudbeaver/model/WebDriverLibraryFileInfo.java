@@ -21,14 +21,14 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBIcon;
 import org.jkiss.dbeaver.model.connection.DBPDriverLibrary;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
+import org.jkiss.dbeaver.registry.driver.DriverFileInfo;
 
 public class WebDriverLibraryFileInfo {
 
     @NotNull
-    private final DriverDescriptor.DriverFileInfo fileInfo;
+    private final DriverFileInfo fileInfo;
 
-    public WebDriverLibraryFileInfo(@NotNull DriverDescriptor.DriverFileInfo fileInfo) {
+    public WebDriverLibraryFileInfo(@NotNull DriverFileInfo fileInfo) {
         this.fileInfo = fileInfo;
     }
 
