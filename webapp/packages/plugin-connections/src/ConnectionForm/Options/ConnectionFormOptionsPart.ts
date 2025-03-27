@@ -55,6 +55,7 @@ const defaultStateGetter = () =>
   }) as IConnectionFormOptionsState;
 
 export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsState, IConnectionFormState> {
+  private disposeReaction: () => void;
   constructor(
     formState: IFormState<IConnectionFormState>,
     private readonly dbDriverResource: DBDriverResource,
@@ -69,22 +70,20 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     this.formState.validationTask.addPostHandler(this.askCredentials.bind(this));
 
-    reaction(() => this.state.host, this.handleHostChange.bind(this));
+    this.disposeReaction = reaction(() => this.getNameTemplate(), (value, prev)=> {
+      if (this.formState.mode === 'edit') {
+        return;
+      }
+      if(!this.state.name||prev === this.state.name) {
+        this.state.name = value;
+      }
+    });
 
     makeObservable(this, {
       setAuthModel: action.bound,
-      setDriver: action.bound,
-      updateNameTemplate: action.bound,
+      setDriverId: action.bound,
       connectionKey: computed,
     });
-  }
-
-  private handleHostChange(host: string | undefined, prevHost: string | undefined) {
-    const driver = this.state.driverId ? this.dbDriverResource.get(this.state.driverId) : undefined;
-
-    if (host !== prevHost && this.isNameAutoFill()) {
-      this.updateNameTemplate(driver);
-    }
   }
 
   private async askCredentials(data: IFormState<IConnectionFormState>, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
@@ -143,9 +142,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (this.formState.mode === 'create') {
       this.setInitialState(defaultStateGetter());
 
-      if (this.formState.state.driverId && !this.isChanged) {
-        await this.setDriver(this.formState.state.driverId);
-      }
+      await this.setDriverId(this.state.driverId);
 
       return;
     }
@@ -211,51 +208,38 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     this.setInitialState(config);
   }
 
-  isNameAutoFill() {
-    if (this.formState.mode === 'edit') {
-      return false;
-    }
-
-    return this.state.name === this.initialState.name || !isNotNullDefined(this.initialState.name);
-  }
-
-  updateNameTemplate(driver: DBDriver | undefined) {
+  private getNameTemplate() {
+    const driver = this.state.driverId ? this.dbDriverResource.get(this.state.driverId) : undefined;
     const info = this.connectionKey ? this.connectionInfoResource.get(this.connectionKey) : undefined;
 
     if (isJDBCConnection(driver, info)) {
-      this.state.name = this.state.url || '';
-      this.initialState.name = this.state.name;
-      return;
+      return this.state.url || '';
     }
 
-    if (!driver) {
-      this.state.name = 'New connection';
-      this.initialState.name = this.state.name;
-      return;
-    }
-
-    this.state.name = getConnectionName(driver.name || '', this.state.host, this.state.port, driver.defaultPort);
-    this.initialState.name = this.state.name;
+    return getConnectionName(driver?.name || 'New connection', this.state.host, this.state.port, driver?.defaultPort);
   }
 
-  async setDriver(driverId: string) {
+  async setDriverId(driverId: string | undefined) {
+    let prevDriverId = this.state.driverId;
+    this.state.driverId = driverId;
+
     if (this.formState.mode === 'edit') {
       return;
     }
 
     let prevDriver: DBDriver | undefined;
-    let driver: DBDriver | undefined = this.dbDriverResource.get(driverId);
-    let prevDriverId = this.initialState.driverId;
+    let driver: DBDriver | undefined;
 
-    this.state.driverId = driverId;
-    this.initialState.driverId = driverId;
+    if(prevDriverId) {
+      prevDriver = await this.dbDriverResource.load(prevDriverId, ['includeProviderProperties']);
+    }
 
-    if (!driver) {
+    if (driverId) {
       driver = await this.dbDriverResource.load(driverId, ['includeProviderProperties']);
     }
 
-    if (prevDriverId) {
-      prevDriver = await this.dbDriverResource.load(prevDriverId, ['includeProviderProperties']);
+    if(!driver) {
+      return;
     }
 
     if (!this.state.configurationType || !driver?.configurationTypes.includes(this.state.configurationType)) {
@@ -276,10 +260,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     if ((!prevDriver && this.state.url === undefined) || this.state.url === prevDriver?.sampleURL) {
       this.state.url = driver?.sampleURL;
-    }
-
-    if (this.isNameAutoFill()) {
-      this.updateNameTemplate(driver);
     }
 
     if (driver?.id !== prevDriver?.id) {
@@ -481,6 +461,10 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
         ExecutorInterrupter.interrupt(contexts);
       }
     }
+  }
+
+  override dispose(): void {
+      this.disposeReaction();
   }
 }
 

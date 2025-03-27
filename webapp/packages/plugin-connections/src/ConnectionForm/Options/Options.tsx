@@ -190,13 +190,12 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     tabsState?.open(CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID);
   }
 
-  async function reloadForm(driverId: string | undefined) {
+  async function setDriverIdHandler(driverId: string | undefined) {
     if (!driverId) {
       return;
     }
 
-    formState.state.driverId = driverId;
-    await formState.reload();
+    optionsPart.setDriverId(driverId);
   }
 
   useAutoLoad(Options, optionsPart, selected);
@@ -216,9 +215,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               <Container wrap gap>
                 <Combobox
                   name="driverId"
-                  state={optionsPart.state}
+                  value={optionsPart.state.driverId}
                   items={drivers}
-                  onSelect={reloadForm}
+                  onSelect={setDriverIdHandler}
                   keySelector={driver => driver.id}
                   valueSelector={driver => driver.name ?? ''}
                   titleSelector={driver => driver.description}

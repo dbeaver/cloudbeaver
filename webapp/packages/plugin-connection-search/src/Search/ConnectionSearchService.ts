@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, makeObservable, observable, runInAction } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
@@ -159,14 +159,11 @@ export class ConnectionSearchService {
       availableDrivers: database.possibleDrivers,
       type: 'public',
       requiredNetworkHandlersIds: [],
-      driverId: database.defaultDriver,
     });
 
-    runInAction(() => {
       this.optionsPart!.state.host = database.host;
       this.optionsPart!.state.port = String(database.port);
       this.optionsPart!.state.driverId = database.defaultDriver;
-    });
 
     this.formState.disposeTask.addHandler(this.goBack.bind(this));
   }

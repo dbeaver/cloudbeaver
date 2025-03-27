@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { action, makeObservable, observable, runInAction } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
@@ -71,23 +71,21 @@ export class PublicConnectionFormService {
     });
   }
 
-  change(projectId: string, config: ConnectionConfig, availableDrivers?: string[]): void {
+  async change(projectId: string, config: ConnectionConfig, availableDrivers?: string[]): Promise<void> {
     this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
       projectId,
       availableDrivers: availableDrivers ?? [],
       submitType: 'submit',
       type: 'public',
       requiredNetworkHandlersIds: [],
-      driverId: config.driverId ?? '',
-    });
+    }).setMode(config.connectionId ? FormMode.Edit : FormMode.Create);
 
-    runInAction(() => {
+    await this.optionsPart?.load();
+
+    await this.optionsPart?.setDriverId(config.driverId);
       Object.assign(this.optionsPart!.state, config);
-    });
 
     this.formState.disposeTask.addHandler(this.close.bind(this, true));
-
-    this.formState.setMode(config.connectionId ? FormMode.Edit : FormMode.Create);
   }
 
   async open(projectId: string, config: ConnectionConfig, availableDrivers?: string[]): Promise<boolean> {

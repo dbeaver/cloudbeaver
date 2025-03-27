@@ -29,7 +29,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     initialState: TPartState,
   ) {
     this.initialState = initialState;
-    this.state = toJS(this.initialState);
+    this.state = {...toJS(this.initialState)};
     this.isSaving = false;
 
     this.exception = null;

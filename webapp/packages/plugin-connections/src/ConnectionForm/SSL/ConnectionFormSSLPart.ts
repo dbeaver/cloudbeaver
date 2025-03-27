@@ -14,7 +14,7 @@ import { isNotNullDefined } from '@cloudbeaver/core-utils';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { type ConnectionInfoResource, type DBDriverResource, type NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { toJS } from 'mobx';
+import { makeObservable, observable, toJS } from 'mobx';
 import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED.js';
 import { SSL_CODE_NAME } from './SSL_CODE_NAME.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
@@ -30,6 +30,7 @@ const getDefaultState = () =>
   }) as INetworkHandlerConfig;
 
 export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConnectionFormState> {
+  private activeDriverId: string | undefined;
   constructor(
     formState: IFormState<IConnectionFormState>,
     private readonly dbDriverResource: DBDriverResource,
@@ -37,10 +38,20 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     super(formState, getDefaultState());
+
+    this.activeDriverId = undefined;
+
+    makeObservable<this, 'activeDriverId'>(this, {
+      activeDriverId: observable,
+    });
   }
 
   private get optionsPart() {
     return getConnectionFormOptionsPart(this.formState);
+  }
+
+  override isLoaded(): boolean {
+      return super.isLoaded() && this.activeDriverId === this.optionsPart.state.driverId;
   }
 
   override isOutdated(): boolean {
@@ -50,6 +61,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   protected override async loader(): Promise<void> {
+    this.activeDriverId = this.optionsPart.state.driverId;
     if (!this.optionsPart.state.driverId) {
       this.setInitialState(getDefaultState());
       return;
