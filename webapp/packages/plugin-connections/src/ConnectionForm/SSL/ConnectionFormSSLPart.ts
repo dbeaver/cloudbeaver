@@ -51,7 +51,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   override isLoaded(): boolean {
-      return super.isLoaded() && this.activeDriverId === this.optionsPart.state.driverId;
+    return super.isLoaded() && this.activeDriverId === this.optionsPart.state.driverId;
   }
 
   override isOutdated(): boolean {

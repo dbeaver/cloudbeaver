@@ -80,10 +80,13 @@ export class PublicConnectionFormService {
       requiredNetworkHandlersIds: [],
     }).setMode(config.connectionId ? FormMode.Edit : FormMode.Create);
 
+    Object.assign(this.optionsPart!.state, config);
+
     await this.optionsPart?.load();
 
-    await this.optionsPart?.setDriverId(config.driverId);
-      Object.assign(this.optionsPart!.state, config);
+    if (config.driverId) {
+      await this.optionsPart?.setDriverId(config.driverId);
+    }
 
     this.formState.disposeTask.addHandler(this.close.bind(this, true));
   }

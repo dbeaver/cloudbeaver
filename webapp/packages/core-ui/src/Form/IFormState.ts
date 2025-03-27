@@ -46,7 +46,6 @@ export interface IFormState<TState> {
   isCancelled: boolean;
   isChanged: boolean;
 
-  reload(): Promise<void>;
   save(): Promise<boolean>;
   reset(): void;
   cancel(): void;

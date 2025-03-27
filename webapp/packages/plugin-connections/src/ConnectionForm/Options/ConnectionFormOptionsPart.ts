@@ -56,6 +56,7 @@ const defaultStateGetter = () =>
 
 export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsState, IConnectionFormState> {
   private disposeReaction: () => void;
+
   constructor(
     formState: IFormState<IConnectionFormState>,
     private readonly dbDriverResource: DBDriverResource,
@@ -70,14 +71,17 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     this.formState.validationTask.addPostHandler(this.askCredentials.bind(this));
 
-    this.disposeReaction = reaction(() => this.getNameTemplate(), (value, prev)=> {
-      if (this.formState.mode === 'edit') {
-        return;
-      }
-      if(!this.state.name||prev === this.state.name) {
-        this.state.name = value;
-      }
-    });
+    this.disposeReaction = reaction(
+      () => this.getNameTemplate(),
+      (value, prev) => {
+        if (this.formState.mode === 'edit') {
+          return;
+        }
+        if (!this.state.name || prev === this.state.name) {
+          this.state.name = value;
+        }
+      },
+    );
 
     makeObservable(this, {
       setAuthModel: action.bound,
@@ -132,6 +136,10 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     if (this.projectInfoResource.isOutdated(this.formState.state.projectId)) {
+      return true;
+    }
+
+    if (this.dbDriverResource.isOutdated(this.state.driverId)) {
       return true;
     }
 
@@ -220,26 +228,25 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   }
 
   async setDriverId(driverId: string | undefined) {
-    let prevDriverId = this.state.driverId;
-    this.state.driverId = driverId;
-
     if (this.formState.mode === 'edit') {
       return;
     }
 
-    let prevDriver: DBDriver | undefined;
     let driver: DBDriver | undefined;
-
-    if(prevDriverId) {
-      prevDriver = await this.dbDriverResource.load(prevDriverId, ['includeProviderProperties']);
-    }
+    let prevDriver: DBDriver | undefined;
+    let prevDriverId = this.state.driverId;
+    this.state.driverId = driverId;
 
     if (driverId) {
       driver = await this.dbDriverResource.load(driverId, ['includeProviderProperties']);
     }
 
-    if(!driver) {
+    if (!driver) {
       return;
+    }
+
+    if (prevDriverId) {
+      prevDriver = await this.dbDriverResource.load(prevDriverId, ['includeProviderProperties']);
     }
 
     if (!this.state.configurationType || !driver?.configurationTypes.includes(this.state.configurationType)) {
@@ -464,7 +471,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   }
 
   override dispose(): void {
-      this.disposeReaction();
+    this.disposeReaction();
   }
 }
 

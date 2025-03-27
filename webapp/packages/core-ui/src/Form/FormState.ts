@@ -95,7 +95,6 @@ export class FormState<TState> implements IFormState<TState> {
       isDisabled: computed,
       setMode: action,
       setPartsState: action,
-      reload: action,
       setState: action,
       updateFormState: action,
       isChanged: computed,
@@ -149,12 +148,6 @@ export class FormState<TState> implements IFormState<TState> {
       if (loader.isCancelled?.() !== true) {
         loader.cancel?.();
       }
-    }
-  }
-
-  async reload() {
-    for (const part of this.parts.values()) {
-      await part.reload();
     }
   }
 

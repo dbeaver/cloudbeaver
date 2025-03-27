@@ -108,7 +108,7 @@ export class CreateConnectionService {
     return this.data ? getConnectionFormOptionsPart(this.data) : null;
   }
 
-  setConnectionTemplate(projectId: string, config: ConnectionConfig, availableDrivers: string[]) {
+  async setConnectionTemplate(projectId: string, config: ConnectionConfig, availableDrivers: string[]) {
     this.clearConnectionTemplate();
     this.data = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
       projectId,
@@ -118,7 +118,11 @@ export class CreateConnectionService {
       requiredNetworkHandlersIds: [],
     });
 
-      Object.assign(this.optionsPart!.state, config);
+    Object.assign(this.optionsPart!.state, config);
+
+    await this.optionsPart?.load();
+    await this.optionsPart?.setDriverId(config.driverId);
+
     this.data.disposeTask.addHandler(this.cancelCreate.bind(this));
   }
 

@@ -144,7 +144,7 @@ export class ConnectionSearchService {
     this.clearFormState();
   }
 
-  select(database: AdminConnectionSearchInfo): void {
+  async select(database: AdminConnectionSearchInfo): Promise<void> {
     const projects = this.connectionsManagerService.createConnectionProjects;
 
     if (projects.length === 0) {
@@ -161,9 +161,12 @@ export class ConnectionSearchService {
       requiredNetworkHandlersIds: [],
     });
 
-      this.optionsPart!.state.host = database.host;
-      this.optionsPart!.state.port = String(database.port);
-      this.optionsPart!.state.driverId = database.defaultDriver;
+    await this.optionsPart?.load();
+    await this.optionsPart?.setDriverId(database.defaultDriver);
+
+    this.optionsPart!.state.host = database.host;
+    this.optionsPart!.state.port = String(database.port);
+    this.optionsPart!.state.driverId = database.defaultDriver;
 
     this.formState.disposeTask.addHandler(this.goBack.bind(this));
   }

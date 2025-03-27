@@ -191,11 +191,12 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   }
 
   async function setDriverIdHandler(driverId: string | undefined) {
-    if (!driverId) {
+    if (!driverId || driverId === optionsPart.state.driverId) {
       return;
     }
 
-    optionsPart.setDriverId(driverId);
+    formState.reset();
+    await optionsPart.setDriverId(driverId);
   }
 
   useAutoLoad(Options, optionsPart, selected);

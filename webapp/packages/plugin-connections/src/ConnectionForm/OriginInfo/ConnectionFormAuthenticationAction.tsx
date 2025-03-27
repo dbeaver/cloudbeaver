@@ -31,7 +31,13 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
 
   const authentication = useAuthenticationAction({
     providerId: authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
-    onAuthenticate: () => formState.reload(),
+    onAuthenticate: () => {
+      if (!optionsPart.connectionKey) {
+        return;
+      }
+
+      connectionInfoService.resource.markOutdated(optionsPart.connectionKey);
+    },
   });
 
   if (authentication.authorized) {
