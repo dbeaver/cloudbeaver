@@ -86,6 +86,7 @@ export default [
   ['ui_create_processing', 'Creating...'],
   ['ui_folder', 'Folder'],
   ['ui_folder_new', 'New folder'],
+  ['ui_folder_new_default_name', 'New folder'],
   ['ui_rename_processing', 'Renaming...'],
   ['ui_interval', 'Interval'],
   ['ui_name', 'Name'],

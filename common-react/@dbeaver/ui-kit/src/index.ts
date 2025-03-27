@@ -7,6 +7,17 @@
  */
 import './index.css';
 
+/* AriaKit Utility Components */
+export {
+  VisuallyHidden,
+  FocusTrap,
+  type FocusTrapOptions,
+  type FocusTrapProps,
+  FocusTrapRegion,
+  type FocusTrapRegionOptions,
+  type FocusTrapRegionProps,
+} from '@ariakit/react';
+
 export { Button, type ButtonProps } from './Button/Button.js';
 export { Checkbox, type CheckboxProps } from './Checkbox/Checkbox.js';
 export { Input, type InputProps } from './Input/Input.js';
@@ -22,3 +33,4 @@ export {
 } from './Select/Select.js';
 export { SelectField, type SelectFieldProps, type SelectItem } from './Select/SelectField.js';
 export { Radio, RadioGroup, useRadioContext, useRadioStore, type RadioProviderProps, type RadioProps, type RadioGroupProps } from './Radio/index.js';
+export * from './utils/clsx.js';

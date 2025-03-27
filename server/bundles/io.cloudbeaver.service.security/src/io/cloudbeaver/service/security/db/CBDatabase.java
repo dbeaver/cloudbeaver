@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,7 @@ import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.SecurityUtils;
 
+import javax.sql.DataSource;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -64,7 +65,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
-import javax.sql.DataSource;
 
 /**
  * Database management
@@ -73,7 +73,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     private static final Log log = Log.getLog(CBDatabase.class);
 
     private static final int LEGACY_SCHEMA_VERSION = 1;
-    private static final int CURRENT_SCHEMA_VERSION = 22;
+    private static final int CURRENT_SCHEMA_VERSION = 23;
 
     private static final SQLSchemaConfig SCHEMA_CREATE_CONFIG = new SQLSchemaConfig(
         "CB",
@@ -137,7 +137,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         // config file must be valid
         readInitialDataConfigurationFile();
 
-        this.dataSource = initConnectionPool(driver.getDriverInstance(monitor), driver.getFullName());
+        this.dataSource = initConnectionPool(driver.getDefaultDriverLoader().getDriverInstance(monitor), driver.getFullName());
         this.dialect = driver.getScriptDialect().createInstance();
 
         try (Connection connection = dataSource.getConnection()) {

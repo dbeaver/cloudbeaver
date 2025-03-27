@@ -29,16 +29,16 @@ export interface TreeNodeMenuProps {
 
 export const TreeNodeMenu = observer<TreeNodeMenuProps>(function TreeNodeMenu({ node, actions, selected, contextMenuPosition, onClose }) {
   const styles = useS(style);
-  const connectionsInfoResource = useService(ConnectionInfoResource);
+  const connectionInfoResource = useService(ConnectionInfoResource);
   const menu = useMenu({ menu: MENU_NAV_TREE });
-  const connection = getComputed(() => connectionsInfoResource.getConnectionForNode(node.id));
+  const connectionKey = getComputed(() => connectionInfoResource.getConnectionIdForNodeId(node.projectId!, node.id));
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_NAV_NODE, node, id);
     context.set(DATA_CONTEXT_NAV_NODE_ACTIONS, actions, id);
 
-    if (connection) {
-      context.set(DATA_CONTEXT_CONNECTION, connection, id);
+    if (connectionKey) {
+      context.set(DATA_CONTEXT_CONNECTION, connectionKey, id);
     }
   });
 

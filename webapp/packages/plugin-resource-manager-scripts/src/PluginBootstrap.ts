@@ -8,7 +8,7 @@
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { SideBarPanelService } from '@cloudbeaver/core-ui';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_TOOLS } from '@cloudbeaver/plugin-tools-panel';
@@ -21,11 +21,11 @@ const ResourceManagerScripts = importLazyComponent(() => import('./ResourceManag
 @injectable()
 export class PluginBootstrap extends Bootstrap {
   constructor(
+    private readonly userInfoResource: UserInfoResource,
     private readonly sideBarPanelService: SideBarPanelService,
     private readonly resourceManagerScriptsService: ResourceManagerScriptsService,
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
-    private readonly serverConfigResource: ServerConfigResource,
   ) {
     super();
   }
@@ -37,6 +37,7 @@ export class PluginBootstrap extends Bootstrap {
       order: 0,
       name: 'plugin_resource_manager_scripts_title',
       isHidden: () => !this.resourceManagerScriptsService.active,
+      getLoader: () => [getCachedDataResourceLoaderState(this.userInfoResource, () => undefined)],
       onClose: this.resourceManagerScriptsService.togglePanel,
       panel: () => ResourceManagerScripts,
     });
@@ -57,12 +58,7 @@ export class PluginBootstrap extends Bootstrap {
       actions: [ACTION_RESOURCE_MANAGER_SCRIPTS],
       isHidden: () => !this.resourceManagerScriptsService.enabled,
       isChecked: () => this.resourceManagerScriptsService.active,
-      getLoader: () =>
-        getCachedDataResourceLoaderState(
-          this.serverConfigResource,
-          () => undefined,
-          () => undefined,
-        ),
+      getLoader: () => [getCachedDataResourceLoaderState(this.userInfoResource, () => undefined)],
       handler: (context, action) => {
         switch (action) {
           case ACTION_RESOURCE_MANAGER_SCRIPTS: {

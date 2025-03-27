@@ -52,7 +52,7 @@ public class WebDriverLibraryInfo {
     @Property
     @Nullable
     public List<WebDriverLibraryFileInfo> getLibraryFiles() {
-        var libraryFiles = ((DriverDescriptor) driver).getLibraryFiles(driverLibrary);
+        var libraryFiles = ((DriverDescriptor) driver).getDefaultDriverLoader().getLibraryFiles(driverLibrary);
         if (libraryFiles == null) {
             return null;
         }

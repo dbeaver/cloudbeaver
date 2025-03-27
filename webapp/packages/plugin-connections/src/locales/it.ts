@@ -46,7 +46,7 @@ export default [
     'plugin_connections_connection_auth_secret_description',
     'There are multiple credentials available for authentication.\nPlease choose credentials you want to use.',
   ],
-  ['plugin_connections_connection_create_menu_title', 'Connection'],
+  ['plugin_connections_connection_create_menu_title', 'New Connection'],
   ['plugin_connections_connection_driver_not_installed_message', 'Driver is not installed. You can install it in the "Administration" part.'],
   ['plugin_connections_connection_established', 'Connection established'],
   ['plugin_connections_connection_client_version', 'Client version: {arg:version} \n'],
