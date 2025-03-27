@@ -434,7 +434,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return <TextPlaceholder>{translate('data_grid_table_empty_placeholder')}</TextPlaceholder>;
   }
 
-  const handleCellKeyDown: DataGridProps['onCellKeyDown'] = ({ rowIdx, column }, event) => {
+  const handleCellKeyDown: DataGridProps['onCellKeyDown'] = ({ rowIdx, colIdx }, event) => {
     gridSelectedCellCopy.onKeydownHandler(event);
     const cell = selectionAction.getFocusedElement();
     // we can't edit table cells if table doesn't have row identifier, but we can edit new created rows before insert (CB-6063)
@@ -469,8 +469,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       }
       case 'Delete': {
         event.preventGridDefault();
-
-        const colIdx = column.idx;
 
         const filteredRows = activeRows.filter(cell => tableData.editor.getElementState(cell) !== DatabaseEditChangeType.delete);
 
