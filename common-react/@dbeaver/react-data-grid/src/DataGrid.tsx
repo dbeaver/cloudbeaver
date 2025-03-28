@@ -18,6 +18,11 @@ export interface ICellPosition {
   colIdx: number;
 }
 
+export interface DataGridCellKeyboardEvent extends React.KeyboardEvent<HTMLDivElement> {
+  preventGridDefault: () => void;
+  isGridDefaultPrevented: () => boolean;
+}
+
 export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext, IDataGridHeaderCellContext, React.PropsWithChildren {
   getRowHeight?: (rowIdx: number) => number;
   getRowId?: (rowIdx: number) => React.Key;
@@ -26,6 +31,7 @@ export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext
   onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;
   onFocus?: (position: ICellPosition) => void;
   onEditorOpen?: (position: ICellPosition) => void;
+  onCellKeyDown?: (position: ICellPosition, event: DataGridCellKeyboardEvent) => void;
   className?: string;
 }
 
@@ -59,6 +65,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     onCellChange,
     children,
     className,
+    onCellKeyDown,
   },
   ref,
 ) {
@@ -135,6 +142,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
             rowHeight={getRowHeight ? row => getRowHeight(row.idx) : undefined}
             rowKeyGetter={getRowId ? row => getRowId(row.idx) : undefined}
             onSelectedCellChange={handleCellFocus}
+            onCellKeyDown={onCellKeyDown ? (args, event) => onCellKeyDown({ rowIdx: args.rowIdx, colIdx: args.column.idx }, event) : undefined}
             renderers={{
               renderRow: rowRenderer,
               renderCell: cellRenderer,
