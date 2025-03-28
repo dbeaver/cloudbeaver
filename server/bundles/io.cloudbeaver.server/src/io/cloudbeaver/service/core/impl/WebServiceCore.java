@@ -72,11 +72,12 @@ public class WebServiceCore implements DBWServiceCore {
     public WebServerConfigDto getServerConfig(WebSession webSession) {
         WebServerConfig webServerConfig = WebAppUtils.getWebApplication().getWebServerConfig();
         WebServerConfigDto dto = new WebServerConfigDto(webServerConfig);
-        if (webSession.getUser() == null) {
-            dto.setDisabledDrivers(null);
-            dto.setLicenseStatus(null);
-            dto.setProductInfo(null);
+        if (webSession.getUser() != null || webServerConfig.isConfigurationMode()) {
+            return dto;
         }
+        dto.setDisabledDrivers(null);
+        dto.setLicenseStatus(null);
+        dto.setProductInfo(null);
         return dto;
     }
 
