@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@timohausmann/quadtree-ts": "^2",
-    "clsx": "^2",
     "fast-deep-equal": "^3",
     "i18next": "^24",
     "md5": "^2",

@@ -11,7 +11,7 @@ import { NavNodeInfoResource, NavNodeManagerService } from '@cloudbeaver/core-na
 import { projectProvider } from '@cloudbeaver/core-projects';
 
 import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA.js';
-import { ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource.js';
+import { ConnectionInfoResource } from '../ConnectionInfoResource.js';
 import { connectionProvider } from '../extensions/IConnectionProvider.js';
 import { objectCatalogProvider } from '../extensions/IObjectCatalogProvider.js';
 import { objectSchemaProvider } from '../extensions/IObjectSchemaProvider.js';
@@ -40,13 +40,17 @@ export class NavNodeExtensionsService {
   }
 
   getConnection(navNodeId: string): IConnectionInfoParams | undefined {
-    const connection = this.connectionInfoResource.getConnectionForNode(navNodeId);
+    const node = this.navNodeInfoResource.get(navNodeId);
+    if (!node?.projectId) {
+      return;
+    }
+    const connectionKey = this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, navNodeId);
 
-    if (!connection) {
+    if (!connectionKey) {
       return;
     }
 
-    return createConnectionParam(connection);
+    return connectionKey;
   }
 
   getDBObjectCatalog(navNodeId: string) {

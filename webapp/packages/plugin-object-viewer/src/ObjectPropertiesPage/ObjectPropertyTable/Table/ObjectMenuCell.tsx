@@ -37,12 +37,13 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
   const [menuOpened, switchState] = useState(false);
   const connection = connectionsInfoResource.getConnectionForNode(node.id);
   const contextMenuPosition = useContextMenuPosition();
+  const connectionKey = connectionsInfoResource.getConnectionIdForNodeId(node.projectId!, node.id);
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_NAV_NODE, node, id);
 
     if (connection) {
-      context.set(DATA_CONTEXT_CONNECTION, connection, id);
+      context.set(DATA_CONTEXT_CONNECTION, connectionKey, id);
     }
   });
 
