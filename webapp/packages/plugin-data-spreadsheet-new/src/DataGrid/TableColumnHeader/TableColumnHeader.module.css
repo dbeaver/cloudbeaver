@@ -17,9 +17,15 @@
 .icon {
   display: flex;
   position: relative;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  justify-content: center;
+  align-items: center;
 }
 .staticImage {
   height: 16px;
+  display: block;
 }
 .name {
   font-weight: 400;

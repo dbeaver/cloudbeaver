@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
-import DataGridBase, { type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle } from 'react-data-grid';
+import { DataGrid as DataGridBase, type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle } from 'react-data-grid';
 import { rowRenderer } from './renderers/rowRenderer.js';
 import { cellRenderer } from './renderers/cellRenderer.js';
 import { DataGridCellHeaderContext, type IDataGridHeaderCellContext } from './DataGridHeaderCellContext.js';
@@ -77,9 +77,8 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
         name: '',
         resizable: getHeaderResizable?.(i) ?? true,
         width,
-        minWidth: 24,
+        minWidth: 26,
         editable: row => getCellEditable?.(row.idx, i) ?? false,
-        maxWidth: 900, // TODO: there is a bug with auto-resize if this value is too high or not set
         frozen: getHeaderPinned?.(i),
         renderHeaderCell: mapRenderHeaderCell,
         renderCell: mapCellContentRenderer,
@@ -141,6 +140,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
               renderCell: cellRenderer,
               noRowsFallback: children,
             }}
+            minimumRowsToRender={100}
           />
         </DataGridCellHeaderContext>
       </DataGridCellContext>

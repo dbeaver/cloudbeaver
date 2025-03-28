@@ -3,7 +3,7 @@ import type { IGridReactiveValue } from './IGridReactiveValue.js';
 
 export function useGridReactiveValue<P extends IGridReactiveValue<any, any[]> | undefined>(
   value: P,
-  ...args: P extends IGridReactiveValue<any, infer T> ? T : unknown[]
+  ...args: P extends IGridReactiveValue<any, infer T> ? T : never[]
 ): P extends IGridReactiveValue<infer T, any[]> ? T : undefined {
   const mappedValue = useMemo(
     () => ({
