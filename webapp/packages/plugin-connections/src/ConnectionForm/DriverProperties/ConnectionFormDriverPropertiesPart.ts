@@ -10,8 +10,8 @@ import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { IConnectionProperties } from '../Options/IConnectionConfig.js';
-import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 import { runInAction } from 'mobx';
+import type { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
 
 function getDefaultState(): IConnectionProperties {
   return {};
@@ -21,12 +21,9 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
   constructor(
     formState: IFormState<IConnectionFormState>,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly optionsPart: ConnectionFormOptionsPart,
   ) {
     super(formState, getDefaultState());
-  }
-
-  private get optionsPart() {
-    return getConnectionFormOptionsPart(this.formState);
   }
 
   override isOutdated(): boolean {
@@ -58,17 +55,15 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): void | Promise<void> {
-    for (const key of Object.keys(this.state!)) {
-      if (typeof this.state[key] === 'string') {
-        this.state[key] = this.state[key].trim();
-      }
-    }
-
-    const optionsPart = getConnectionFormOptionsPart(this.formState);
-
     runInAction(() => {
-      optionsPart.state.properties = {
-        ...optionsPart.state.properties,
+      for (const key of Object.keys(this.state!)) {
+        if (typeof this.state[key] === 'string') {
+          this.state[key] = this.state[key].trim();
+        }
+      }
+
+      this.optionsPart.state.properties = {
+        ...this.optionsPart.state.properties,
         ...this.state,
       };
     });

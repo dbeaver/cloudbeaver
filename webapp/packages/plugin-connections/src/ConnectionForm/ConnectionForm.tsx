@@ -7,11 +7,11 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Form, Loader, Placeholder, s, StatusMessage, useExecutor, useForm, useObjectRef, useResource, useS } from '@cloudbeaver/core-blocks';
+import { Form, Loader, Placeholder, s, StatusMessage, useForm, useObjectRef, useResource, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import { formStatusContext, formValidationContext, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
+import { formSubmitContext, TabList, TabPanelList, TabsState, type IFormState } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormActionsContext, type IConnectionFormActionsContext } from './ConnectFormActionsContext.js';
 import style from './ConnectionForm.module.css';
@@ -20,6 +20,8 @@ import { getFirstException } from '@cloudbeaver/core-utils';
 import { ConnectionFormService } from './ConnectionFormService.js';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { getConnectionFormOptionsPart } from './Options/getConnectionFormOptionsPart.js';
+import { ExecutionContext } from '@cloudbeaver/core-executor';
+import type { IConnectionFormState } from './IConnectionFormState.js';
 
 export interface ConnectionFormProps {
   formState: ConnectionFormState;
@@ -29,7 +31,6 @@ export interface ConnectionFormProps {
 }
 
 export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionForm({ formState, onCancel, onSave = () => {}, className }) {
-  const props = useObjectRef({ onSave });
   const service = useService(ConnectionFormService);
   const styles = useS(style);
   const notificationService = useService(NotificationService);
@@ -41,13 +42,19 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
 
   const form = useForm({
     onSubmit: async event => {
-      formState.state.submitType = event?.type === 'test' ? 'test' : 'submit';
+      const submitType = event?.type === 'test' ? 'test' : 'submit';
+      const context = new ExecutionContext<IFormState<IConnectionFormState>>(formState);
 
+      const submitInfo = context.getContext(formSubmitContext);
+      submitInfo.setType(submitType);
+      if (submitType === 'test') {
+        submitInfo.setSubmitOnNoChanges(true);
+      }
       const initialMode = formState.mode;
-      const saved = await formState.save();
+      const saved = await formState.save(context);
 
       if (saved) {
-        if (formState.state.submitType === 'submit') {
+        if (submitType === 'submit') {
           notificationService.notify(
             {
               title: initialMode === 'create' ? 'core_connections_connection_create_success' : 'core_connections_connection_update_success',
@@ -55,11 +62,13 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
             },
             ENotificationType.Success,
           );
+
+          onSave(optionsPart.state);
         }
       } else {
         const error = getFirstException(formState.exception);
 
-        if (formState.state.submitType === 'submit') {
+        if (submitType === 'submit') {
           notificationService.logException(error, 'connections_connection_create_fail');
         }
       }
@@ -71,20 +80,6 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
     test: () => form.submit(new SubmitEvent('test')),
     onCancel,
   }));
-
-  useExecutor({
-    executor: formState.submitTask,
-    postHandlers: [
-      function save(data, contexts) {
-        const validation = contexts.getContext(formValidationContext);
-        const state = contexts.getContext(formStatusContext);
-
-        if (validation.valid && state.saved && data.state.submitType === 'submit') {
-          props.onSave(optionsPart.state);
-        }
-      },
-    ],
-  });
 
   return (
     <Form context={form} contents>

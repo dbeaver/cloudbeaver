@@ -10,7 +10,7 @@ import { action, computed, makeObservable, observable } from 'mobx';
 import { DataContext, dataContextAddDIProvider, type DataContextGetter, type IDataContext } from '@cloudbeaver/core-data-context';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ENotificationType } from '@cloudbeaver/core-events';
-import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, type IExecutionContext, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import { isArraysEqual, isNotNullDefined, MetadataMap, uuid } from '@cloudbeaver/core-utils';
 import { DATA_CONTEXT_LOADABLE_STATE, loadableStateContext } from '@cloudbeaver/core-view';
 
@@ -172,9 +172,9 @@ export class FormState<TState> implements IFormState<TState> {
     return this;
   }
 
-  async save(): Promise<boolean> {
+  async save(providedContext?: IExecutionContext<IFormState<TState>>): Promise<boolean> {
     try {
-      this.savingPromise = this.submitTask.execute(this);
+      this.savingPromise = this.submitTask.execute(this, providedContext);
       const context = await this.savingPromise;
 
       if (ExecutorInterrupter.isInterrupted(context)) {

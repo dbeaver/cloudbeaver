@@ -132,25 +132,14 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     DatabaseAuthModelsResource,
     getComputed(() => optionsPart.state.authModelId || connectionInfoResource.data?.authModel || driver?.defaultAuthModel || null),
     {
-      onData: optionsPart.setAuthModel.bind(optionsPart),
       active: selected,
     },
   );
 
   const authModel = authModelLoader.data;
 
-  async function handleAuthModelSelect(id: string | undefined) {
-    if (!id) {
-      return;
-    }
-
-    const model = await authModelLoader.resource.load(id);
-
-    if (!model) {
-      return;
-    }
-
-    optionsPart.setAuthModel(model);
+  function handleAuthModelSelect(authModelId: string | undefined) {
+    optionsPart.setAuthModelId(authModelId);
   }
 
   const authentication = useAuthenticationAction({
@@ -191,11 +180,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   }
 
   async function setDriverIdHandler(driverId: string | undefined) {
-    if (!driverId || driverId === optionsPart.state.driverId) {
-      return;
-    }
-
-    formState.reset();
     await optionsPart.setDriverId(driverId);
   }
 
@@ -218,7 +202,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   name="driverId"
                   value={optionsPart.state.driverId}
                   items={drivers}
-                  onSelect={setDriverIdHandler}
                   keySelector={driver => driver.id}
                   valueSelector={driver => driver.name ?? ''}
                   titleSelector={driver => driver.description}
@@ -229,6 +212,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   loading={driverMap.isLoading()}
                   tiny
                   fill
+                  onSelect={setDriverIdHandler}
                 >
                   {translate('connections_connection_driver')}
                 </Combobox>

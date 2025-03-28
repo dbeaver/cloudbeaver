@@ -10,9 +10,10 @@ import React from 'react';
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { EAdminPermission, PermissionsService } from '@cloudbeaver/core-root';
+import { EAdminPermission, PermissionsService, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { ConnectionFormService, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 import { getConnectionFormAccessPart } from './getConnectionFormAccessPart.js';
+import { getCachedDataResourceLoaderState, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
 const ConnectionAccess = React.lazy(async () => {
   const { ConnectionAccess } = await import('./ConnectionAccess.js');
@@ -26,6 +27,7 @@ export class ConnectionAccessTabService extends Bootstrap {
   constructor(
     private readonly ConnectionFormService: ConnectionFormService,
     private readonly administrationScreenService: AdministrationScreenService,
+    private readonly sessionPermissionsResource: SessionPermissionsResource,
     private readonly permissionsResource: PermissionsService,
     private readonly projectInfoResource: ProjectInfoResource,
   ) {
@@ -40,6 +42,10 @@ export class ConnectionAccessTabService extends Bootstrap {
       title: 'connections_connection_edit_access',
       order: 4,
       stateGetter: context => () => getConnectionFormAccessPart(context.formState),
+      getLoader: (_, context) => [
+        getCachedMapResourceLoaderState(this.projectInfoResource, () => context?.formState.state.projectId ?? null),
+        getCachedDataResourceLoaderState(this.sessionPermissionsResource, () => undefined),
+      ],
       isHidden: (_, context) => !context || !this.isAccessTabActive(context.formState.state.projectId),
       isDisabled: (tabId, props) => {
         const optionsPart = props?.formState ? getConnectionFormOptionsPart(props.formState) : null;

@@ -14,11 +14,11 @@ import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { ConnectionFormService } from '../ConnectionFormService.js';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
-export const SSLTab = React.lazy(async () => {
+const SSLTab = React.lazy(async () => {
   const { SSLTab } = await import('./SSLTab.js');
   return { default: SSLTab };
 });
-export const SSLPanel = React.lazy(async () => {
+const SSLPanel = React.lazy(async () => {
   const { SSLPanel } = await import('./SSLPanel.js');
   return { default: SSLPanel };
 });

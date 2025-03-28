@@ -154,7 +154,6 @@ export class ConnectionSearchService {
 
     this.formState?.dispose();
     this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
-      submitType: null,
       projectId: projects[0]!.id,
       availableDrivers: database.possibleDrivers,
       type: 'public',

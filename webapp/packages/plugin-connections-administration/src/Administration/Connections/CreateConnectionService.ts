@@ -108,12 +108,11 @@ export class CreateConnectionService {
     return this.data ? getConnectionFormOptionsPart(this.data) : null;
   }
 
-  async setConnectionTemplate(projectId: string, config: ConnectionConfig, availableDrivers: string[]) {
+  async setConnectionTemplate(projectId: string, config: ConnectionConfig, availableDrivers: string[]): Promise<void> {
     this.clearConnectionTemplate();
     this.data = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
       projectId,
       availableDrivers,
-      submitType: null,
       type: 'admin',
       requiredNetworkHandlersIds: [],
       connectionId: config.connectionId,

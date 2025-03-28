@@ -2909,6 +2909,7 @@ __metadata:
     "@cloudbeaver/plugin-projects": "workspace:*"
     "@cloudbeaver/plugin-top-app-bar": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/jdbc-uri-parser": "workspace:^"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -4662,6 +4663,16 @@ __metadata:
   checksum: 10c0/39b85e3ac266cb30a28c98a9ecf1cde34cdd160c243fe54a673b744990d72bb7758c1f557b7df25153c84e03ed9e989d7392a00e776533a731cb79fb0dca894e
   languageName: node
   linkType: hard
+
+"@dbeaver/jdbc-uri-parser@workspace:../common-typescript/@dbeaver/jdbc-uri-parser, @dbeaver/jdbc-uri-parser@workspace:^":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/jdbc-uri-parser@workspace:../common-typescript/@dbeaver/jdbc-uri-parser"
+  dependencies:
+    "@dbeaver/tsconfig": "workspace:^"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
 
 "@dbeaver/prettier-config@workspace:*, @dbeaver/prettier-config@workspace:../common-typescript/@dbeaver/prettier-config, @dbeaver/prettier-config@workspace:^":
   version: 0.0.0-use.local

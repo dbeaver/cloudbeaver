@@ -12,7 +12,6 @@ import type { IFormProps } from '@cloudbeaver/core-ui';
 export const CONNECTION_FORM_STATE_SCHEMA = schema
   .object({
     projectId: schema.string(),
-    submitType: schema.enum(['submit', 'test']).nullable(),
     availableDrivers: schema.array(schema.string()),
     requiredNetworkHandlersIds: schema.array(schema.string()),
     connectionId: schema.string().or(schema.undefined()),

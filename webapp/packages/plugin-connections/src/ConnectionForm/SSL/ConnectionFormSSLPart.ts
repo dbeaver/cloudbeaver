@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
+import { FormPart, formSubmitContext, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
@@ -140,7 +140,8 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
         }
       }
 
-      if (this.formState.state.submitType === 'submit') {
+      const submitInfo = contexts.getContext(formSubmitContext);
+      if (submitInfo.type === 'submit') {
         if (Object.keys(handlerConfig.secureProperties).length === 0) {
           delete handlerConfig.secureProperties;
         }

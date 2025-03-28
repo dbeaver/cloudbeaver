@@ -12,6 +12,7 @@ import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import type { IFormPart } from './IFormPart.js';
 import type { IFormState } from './IFormState.js';
+import { formSubmitContext } from './formSubmitContext.js';
 
 export abstract class FormPart<TPartState, TFormState = any> implements IFormPart<TPartState> {
   state: TPartState;
@@ -38,8 +39,10 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     this.loaded = false;
     this.loading = false;
 
+    this.reset = this.reset.bind(this);
+
     this.formState.submitTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.save.bind(this)));
-    this.formState.formatTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.format.bind(this)));
+    this.formState.formatTask.addHandler(executorHandlerFilter(() => this.isLoaded() && this.isChanged, this.format.bind(this)));
     this.formState.validationTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.handleValidation.bind(this)));
 
     makeObservable<this, 'loaded' | 'loading' | 'setInitialState'>(this, {
@@ -93,8 +96,9 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
 
     try {
       await this.loader();
+      const formSubmit = contexts.getContext(formSubmitContext);
 
-      if (!this.isChanged) {
+      if (!this.isChanged && !formSubmit.submitOnNoChanges) {
         return;
       }
 

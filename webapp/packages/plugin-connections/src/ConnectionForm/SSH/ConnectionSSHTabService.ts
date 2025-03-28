@@ -13,12 +13,13 @@ import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 
 import { ConnectionFormService } from '../ConnectionFormService.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
-export const SSHTab = React.lazy(async () => {
+const SSHTab = React.lazy(async () => {
   const { SSHTab } = await import('./SSHTab.js');
   return { default: SSHTab };
 });
-export const SSHPanel = React.lazy(async () => {
+const SSHPanel = React.lazy(async () => {
   const { SSHPanel } = await import('./SSHPanel.js');
   return { default: SSHPanel };
 });
@@ -39,6 +40,10 @@ export class ConnectionSSHTabService extends Bootstrap {
       order: 3,
       tab: () => SSHTab,
       panel: () => SSHPanel,
+      getLoader: (_, props) => {
+        const optionsPart = props?.formState ? getConnectionFormOptionsPart(props.formState) : null;
+        return [getCachedMapResourceLoaderState(this.dbDriverResource, () => optionsPart?.state.driverId ?? null)];
+      },
       isHidden: (tabId, props) => {
         const optionsPart = props?.formState ? getConnectionFormOptionsPart(props.formState) : null;
 

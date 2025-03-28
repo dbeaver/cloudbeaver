@@ -7,7 +7,7 @@
  */
 import type { DataContextGetter, IDataContext } from '@cloudbeaver/core-data-context';
 import type { ENotificationType } from '@cloudbeaver/core-events';
-import type { IExecutor } from '@cloudbeaver/core-executor';
+import type { IExecutionContext, IExecutor } from '@cloudbeaver/core-executor';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { FormBaseService } from './FormBaseService.js';
@@ -46,7 +46,7 @@ export interface IFormState<TState> {
   isCancelled: boolean;
   isChanged: boolean;
 
-  save(): Promise<boolean>;
+  save(providedContext?: IExecutionContext<IFormState<TState>>): Promise<boolean>;
   reset(): void;
   cancel(): void;
   dispose(): void | Promise<void>;

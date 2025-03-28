@@ -75,7 +75,6 @@ export class PublicConnectionFormService {
     this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
       projectId,
       availableDrivers: availableDrivers ?? [],
-      submitType: 'submit',
       type: 'public',
       requiredNetworkHandlersIds: [],
       connectionId: config.connectionId,

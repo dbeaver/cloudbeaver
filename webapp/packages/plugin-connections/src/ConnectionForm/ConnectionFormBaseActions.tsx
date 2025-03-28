@@ -57,7 +57,7 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
           {translate('connections_connection_test')}
         </Button>
       )}
-      <Button type="button" disabled={formState.isDisabled} mod={['unelevated']} loader onClick={actions['save']}>
+      <Button type="button" disabled={formState.isDisabled || !formState.isChanged} mod={['unelevated']} loader onClick={actions['save']}>
         {translate(formState.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_create')}
       </Button>
     </>

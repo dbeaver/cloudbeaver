@@ -16,7 +16,6 @@ import { runInAction } from 'mobx';
 
 const EMPTY_CONNECTION_INFO_PARAMS: IConnectionFormState = {
   projectId: '',
-  submitType: 'submit',
   availableDrivers: [],
   type: 'admin',
   requiredNetworkHandlersIds: [],

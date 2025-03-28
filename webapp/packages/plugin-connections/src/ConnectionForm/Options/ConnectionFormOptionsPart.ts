@@ -5,22 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { FormMode, FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
-import {
-  DriverConfigurationType,
-  type ConnectionConfig,
-  type DatabaseAuthModel,
-  type ObjectPropertyInfo,
-  type TestConnectionMutation,
-} from '@cloudbeaver/core-sdk';
-import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { FormMode, FormPart, formSubmitContext, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
+import { DriverConfigurationType, type ConnectionConfig, type ObjectPropertyInfo, type TestConnectionMutation } from '@cloudbeaver/core-sdk';
+import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import {
   ConnectionInfoProjectKey,
   ConnectionInfoResource,
   createConnectionParam,
   DatabaseAuthModelsResource,
   DBDriverResource,
-  isJDBCConnection,
   type DatabaseConnection,
   type DBDriver,
 } from '@cloudbeaver/core-connections';
@@ -35,14 +28,16 @@ import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
 import type { NotificationService } from '@cloudbeaver/core-events';
+import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
 const MAIN_PROPERTY_PORT_KEY = 'port';
 const MAIN_PROPERTY_SERVER_KEY = 'server';
 
-const defaultStateGetter = () =>
+const defaultStateGetter = (connectionId?: string) =>
   ({
+    connectionId,
     configurationType: DriverConfigurationType.Manual,
     keepAliveInterval: 0,
     credentials: {},
@@ -57,6 +52,8 @@ const defaultStateGetter = () =>
 export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsState, IConnectionFormState> {
   private disposeReaction: () => void;
 
+  readonly onDriverIdChange: IExecutor<string | undefined>;
+
   constructor(
     formState: IFormState<IConnectionFormState>,
     private readonly dbDriverResource: DBDriverResource,
@@ -67,9 +64,9 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
   ) {
-    super(formState, defaultStateGetter());
+    super(formState, defaultStateGetter(formState.state.connectionId));
 
-    this.formState.validationTask.addPostHandler(this.askCredentials.bind(this));
+    this.onDriverIdChange = new Executor();
 
     this.disposeReaction = reaction(
       () => this.getNameTemplate(),
@@ -84,48 +81,45 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     );
 
     makeObservable(this, {
-      setAuthModel: action.bound,
+      setAuthModelId: action.bound,
       setDriverId: action.bound,
       connectionKey: computed,
     });
   }
 
-  private async askCredentials(data: IFormState<IConnectionFormState>, contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>) {
-    const shouldNotAskCredentials = this.state.saveCredentials && !this.formState.state.requiredNetworkHandlersIds.length;
-
-    if (this.formState.state.submitType !== 'test' || shouldNotAskCredentials) {
-      return;
+  private async askCredentials(state: IConnectionFormOptionsState) {
+    if (state.saveCredentials && !this.formState.state.requiredNetworkHandlersIds.length) {
+      return true;
     }
 
-    const config = { ...this.state };
-
-    if (this.state.saveCredentials) {
-      delete config.authModelId;
-      delete config.credentials;
+    if (state.saveCredentials) {
+      delete state.authModelId;
+      delete state.credentials;
     }
 
     if (!this.formState.state.requiredNetworkHandlersIds.length) {
-      delete config.networkHandlersConfig;
+      delete state.networkHandlersConfig;
     }
 
     const result = await this.commonDialogService.open(ConnectionAuthenticationDialogLoader, {
-      config,
-      authModelId: config.authModelId ?? null,
+      config: state,
+      authModelId: state.authModelId ?? null,
       networkHandlers: this.formState.state.requiredNetworkHandlersIds,
-      projectId: data.state.projectId,
+      projectId: this.formState.state.projectId,
     });
 
     if (result === DialogueStateResult.Rejected) {
-      ExecutorInterrupter.interrupt(contexts);
+      return false;
     }
+    return true;
   }
 
   get connectionKey() {
-    if (!this.state.connectionId || !this.formState.state.projectId) {
+    if (!this.initialState.connectionId || !this.formState.state.projectId) {
       return null;
     }
 
-    return createConnectionParam(this.formState.state.projectId, this.state.connectionId);
+    return createConnectionParam(this.formState.state.projectId, this.initialState.connectionId);
   }
 
   // do not check outdated of userInfoResource cause it synced with projectInfoResource which is handled in optionsPart outdated method
@@ -148,20 +142,19 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
   protected override async loader(): Promise<void> {
     if (this.formState.mode === 'create') {
-      this.setInitialState(defaultStateGetter());
+      this.setInitialState(defaultStateGetter(this.initialState.connectionId ?? this.formState.state.connectionId));
 
       await this.setDriverId(this.state.driverId);
 
       return;
     }
 
-    this.state.connectionId = this.formState.state.connectionId ?? undefined;
-
     if (!this.connectionKey) {
       console.error('Connection connection key should be defined');
       return;
     }
 
+    // TODO: we should split connection info resource to multiple resources and load this data separately in different parts where needed
     const info = await this.connectionInfoResource.load(this.connectionKey, [
       'includeAuthProperties',
       'includeCredentialsSaved',
@@ -206,11 +199,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     if (info.providerProperties) {
-      config.providerProperties = { ...info.providerProperties };
+      config.providerProperties = { ...toJS(info.providerProperties) };
     }
 
     if (info.mainPropertyValues) {
-      config.mainPropertyValues = { ...info.mainPropertyValues };
+      config.mainPropertyValues = { ...toJS(info.mainPropertyValues) };
     }
 
     this.formState.state.availableDrivers = [info.driverId];
@@ -220,23 +213,35 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
   private getNameTemplate() {
     const driver = this.state.driverId ? this.dbDriverResource.get(this.state.driverId) : undefined;
-    const info = this.connectionKey ? this.connectionInfoResource.get(this.connectionKey) : undefined;
 
-    if (isJDBCConnection(driver, info)) {
-      return this.state.url || '';
+    if (this.state.configurationType === DriverConfigurationType.Url) {
+      const parsedJdbcUri = parseJdbcUri(this.state.url ?? '');
+      return getConnectionName({
+        driverName: driver?.name || 'New connection',
+        host: parsedJdbcUri.host,
+        port: parsedJdbcUri.port,
+        defaultPort: driver?.defaultPort,
+        database: parsedJdbcUri.database,
+      });
     }
 
-    return getConnectionName(driver?.name || 'New connection', this.state.host, this.state.port, driver?.defaultPort);
+    return getConnectionName({
+      driverName: driver?.name || 'New connection',
+      host: this.state.host,
+      port: this.state.port,
+      defaultPort: driver?.defaultPort,
+      database: this.state.databaseName,
+    });
   }
 
-  async setDriverId(driverId: string | undefined) {
+  async setDriverId(driverId: string | undefined): Promise<void> {
     if (this.formState.mode === 'edit') {
       return;
     }
 
     let driver: DBDriver | undefined;
     let prevDriver: DBDriver | undefined;
-    let prevDriverId = this.state.driverId;
+    const prevDriverId = this.state.driverId;
     this.state.driverId = driverId;
 
     if (driverId) {
@@ -274,18 +279,20 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (driver?.id !== prevDriver?.id) {
       this.state.credentials = {};
       this.state.providerProperties = {};
-      this.state.authModelId = driver?.defaultAuthModel;
+      this.setAuthModelId(driver?.defaultAuthModel);
     }
+
+    await this.onDriverIdChange.execute(this.state.driverId);
   }
 
-  setAuthModel(model: DatabaseAuthModel) {
-    if (model.id !== this.initialState.authModelId) {
-      this.state.credentials = {};
-    } else {
+  setAuthModelId(modelId: string | undefined): void {
+    if (modelId === this.initialState.authModelId) {
       this.state.credentials = { ...this.initialState.credentials };
+    } else if (modelId !== this.state.authModelId) {
+      this.state.credentials = {};
     }
 
-    this.state.authModelId = model.id;
+    this.state.authModelId = modelId;
   }
 
   protected override async format(
@@ -302,14 +309,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     this.state.networkHandlersConfig = observable([]);
 
     this.state.name = this.state.name?.trim();
-
-    if (this.state.name && this.formState.mode === 'create') {
-      const connections = this.connectionInfoResource.get(ConnectionInfoProjectKey(this.formState.state.projectId)).filter(isNotNullDefined);
-      const connectionNames = connections.map(connection => connection.name);
-
-      this.state.name = getUniqueName(this.state.name, connectionNames);
-    }
-
     this.state.description = this.state.description?.trim();
 
     if (this.state.template || !this.state.folder) {
@@ -447,17 +446,28 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       return;
     }
 
-    if (this.formState.state.submitType === 'submit') {
+    const submitType = contexts.getContext(formSubmitContext);
+    if (submitType.type === 'submit') {
       if (this.formState.mode === 'edit') {
         await this.connectionInfoResource.update(this.connectionKey!, this.state);
       } else {
-        const connection = await this.connectionInfoResource.create(this.formState.state.projectId, this.state);
+        const connections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(this.formState.state.projectId));
+        const connectionNames = connections.map(connection => connection.name);
+
+        const uniqueName = getUniqueName(this.state.name || '', connectionNames);
+        const connection = await this.connectionInfoResource.create(this.formState.state.projectId, { ...this.state, name: uniqueName });
         this.state.connectionId = connection.id;
+        this.initialState.connectionId = connection.id;
         this.formState.setMode(FormMode.Edit);
       }
     } else {
       try {
-        const info = await this.connectionInfoResource.test(this.formState.state.projectId, this.state);
+        const stateCopy = toJS(this.state);
+        const isFilled = await this.askCredentials(stateCopy);
+        if (!isFilled) {
+          return;
+        }
+        const info = await this.connectionInfoResource.test(this.formState.state.projectId, stateCopy);
 
         this.notificationService.logSuccess({
           title: 'connections_connection_test_success',

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
+import { FormPart, formSubmitContext, type IFormState } from '@cloudbeaver/core-ui';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { type ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { action, makeObservable } from 'mobx';
@@ -52,7 +52,8 @@ export class ConnectionFormAccessPart extends FormPart<string[], IConnectionForm
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
-    if (this.formState.state.submitType === 'test' || !this.optionsPart.connectionKey) {
+    const submitInfo = contexts.getContext(formSubmitContext);
+    if (submitInfo.type === 'test' || !this.optionsPart.connectionKey) {
       return;
     }
 

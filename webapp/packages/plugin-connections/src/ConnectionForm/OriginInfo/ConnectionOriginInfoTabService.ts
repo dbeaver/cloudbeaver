@@ -17,8 +17,8 @@ export const ConnectionFormAuthenticationAction = importLazyComponent(() =>
   import('./ConnectionFormAuthenticationAction.js').then(m => m.ConnectionFormAuthenticationAction),
 );
 
-export const OriginInfo = importLazyComponent(() => import('./OriginInfo.js').then(m => m.OriginInfo));
-export const OriginInfoTab = importLazyComponent(() => import('./OriginInfoTab.js').then(m => m.OriginInfoTab));
+const OriginInfo = importLazyComponent(() => import('./OriginInfo.js').then(m => m.OriginInfo));
+const OriginInfoTab = importLazyComponent(() => import('./OriginInfoTab.js').then(m => m.OriginInfoTab));
 
 @injectable()
 export class ConnectionOriginInfoTabService extends Bootstrap {
