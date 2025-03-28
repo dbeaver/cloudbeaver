@@ -459,7 +459,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
-                        user = fetchUser(dbResult);
+                        user = fetchUser(dbResult, true);
                     } else {
                         return null;
                     }
@@ -526,16 +526,15 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             Map<String, SMUser> result = new LinkedHashMap<>();
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER"
+                database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE,CHANGE_DATE,DISABLED_BY,"
+                    + "DISABLE_REASON FROM {table_prefix}CB_USER"
                     + buildUsersFilter(filter) + "\nORDER BY USER_ID " + getOffsetLimitPart(filter)))) {
                 setUsersFilterValues(dbStat, filter, 1);
 
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
-                        String userId = dbResult.getString(1);
-                        String active = dbResult.getString(2);
-                        String authRole = dbResult.getString(3);
-                        result.put(userId, new SMUser(userId, CHAR_BOOL_TRUE.equals(active), authRole));
+                        SMUser user = fetchUser(dbResult, false);
+                        result.put(user.getUserId(), user);
                     }
                 }
             }
@@ -1226,14 +1225,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     @NotNull
-    private SMUser fetchUser(ResultSet dbResult) throws SQLException {
+    private SMUser fetchUser(ResultSet dbResult, boolean checkSecretStorage) throws SQLException {
         Timestamp timestamp = dbResult.getTimestamp("CHANGE_DATE");
         Instant disableDate = timestamp != null ? timestamp.toInstant() : null;
         return new SMUser(
             dbResult.getString("USER_ID"),
             stringToBoolean(dbResult.getString("IS_ACTIVE")),
             dbResult.getString("DEFAULT_AUTH_ROLE"),
-            stringToBoolean(dbResult.getString("IS_SECRET_STORAGE")),
+            !checkSecretStorage || stringToBoolean(dbResult.getString("IS_SECRET_STORAGE")),
             disableDate,
             dbResult.getString("DISABLED_BY"),
             dbResult.getString("DISABLE_REASON")
@@ -2622,7 +2621,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             .map(SMActiveSession::sessionId)
             .collect(Collectors.toList());
         deleteSessionsTokens(smSessionsId);
-        application.getEventController().addEvent(new WSUserCloseSessionsEvent(smSessionsId, getSmSessionId(), getUserId()));
+        application.getEventController().addEvent(new WSUserCloseSessionsEvent(smSessionsId, getSmSessionId(), userId));
     }
 
     /**
