@@ -27,7 +27,8 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
   const tabState = useTabState<UserFormInfoPart>();
   const userFormInfoPartService = useService(UserFormInfoPartService);
   const administrationUsersManagementService = useService(AdministrationUsersManagementService);
-  const user = useResource(UserFormInfo, UsersResource, formState.state.userId, {
+  const userId = tabState.state.userId ?? formState.state.userId;
+  const user = useResource(UserFormInfo, UsersResource, userId, {
     active: formState.mode === 'edit',
   });
 
