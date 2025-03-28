@@ -44,7 +44,7 @@ public class CBServerConfigurationControllerEmbedded<T extends CBServerConfig> e
     @NotNull
     @Override
     protected Map<String, Object> collectServerConfigProperties(
-        @NotNull CBServerConfig<?> serverConfig,
+        @NotNull CBServerConfig serverConfig,
         @NotNull Map<String, Object> originServerConfig
     ) {
         Map<String, Object> serverConfigProperties = super.collectServerConfigProperties(serverConfig, originServerConfig);

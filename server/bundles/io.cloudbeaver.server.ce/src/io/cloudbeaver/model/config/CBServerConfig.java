@@ -26,7 +26,7 @@ import org.jkiss.dbeaver.Log;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CBServerConfig<T extends SMControllerConfiguration> implements WebServerConfiguration {
+public class CBServerConfig implements WebServerConfiguration {
 
     private static final Log log = Log.getLog(CBServerConfig.class);
 
@@ -47,7 +47,7 @@ public class CBServerConfig<T extends SMControllerConfiguration> implements WebS
     private final Map<String, Object> productSettings = new HashMap<>();
 
     @SerializedName("sm")
-    protected T securityManagerConfiguration;
+    protected SMControllerConfiguration securityManagerConfiguration;
     @SerializedName("database")
     private WebDatabaseConfig databaseConfiguration = new WebDatabaseConfig();
     private String staticContent = "";
@@ -174,11 +174,11 @@ public class CBServerConfig<T extends SMControllerConfiguration> implements WebS
         return productSettings;
     }
 
-    public T getSecurityManagerConfiguration() {
-        return securityManagerConfiguration;
+    public <T extends SMControllerConfiguration> T getSecurityManagerConfiguration() {
+        return (T) securityManagerConfiguration;
     }
 
-    protected T createSecurityManagerConfiguration() {
-        return (T) new SMControllerConfiguration();
+    protected SMControllerConfiguration createSecurityManagerConfiguration() {
+        return new SMControllerConfiguration();
     }
 }

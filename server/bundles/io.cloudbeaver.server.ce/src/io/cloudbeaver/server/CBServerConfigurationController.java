@@ -142,10 +142,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         serverConfig = ServletAppUtils.mergeConfigurations(currentConfigurationAsMap, serverConfig);
         gson.fromJson(
             gson.toJson(serverConfig),
-            TypeToken.getParameterized(
-                getServerConfiguration().getClass(),
-                getServerConfiguration().getSecurityManagerConfiguration().getClass()
-            ).getType()
+            TypeToken.get(getServerConfiguration().getClass()).getType()
         );
 
         parseServerConfiguration();
@@ -333,7 +330,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
         InstanceCreator<DataSourceNavigatorSettings> navSettingsCreator = type -> (DataSourceNavigatorSettings) appConfiguration.getDefaultNavigatorSettings();
         var securityManagerConfiguration = getServerConfiguration().getSecurityManagerConfiguration();
-        InstanceCreator<? extends SMControllerConfiguration> smConfigCreator = type -> securityManagerConfiguration;
+        InstanceCreator<SMControllerConfiguration> smConfigCreator = type -> securityManagerConfiguration;
         InstanceCreator<T> serverConfigCreator = type -> serverConfiguration;
         InstanceCreator<PasswordPolicyConfiguration> smPasswordPoliceConfigCreator =
             type -> securityManagerConfiguration.getPasswordPolicyConfiguration();
@@ -343,7 +340,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             .registerTypeAdapter(getServerConfiguration().getClass(), serverConfigCreator)
             .registerTypeAdapter(CBAppConfig.class, appConfigCreator)
             .registerTypeAdapter(DataSourceNavigatorSettings.class, navSettingsCreator)
-            .registerTypeAdapter(securityManagerConfiguration.getClass(), smConfigCreator)
+            .registerTypeAdapter(SMControllerConfiguration.class, smConfigCreator)
             .registerTypeAdapter(PasswordPolicyConfiguration.class, smPasswordPoliceConfigCreator);
     }
 
@@ -521,7 +518,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
     @NotNull
     protected Map<String, Object> collectServerConfigProperties(
-        @NotNull CBServerConfig<?> serverConfig,
+        @NotNull CBServerConfig serverConfig,
         Map<String, Object> originServerConfig
     ) {
         var serverConfigProperties = new LinkedHashMap<String, Object>();
