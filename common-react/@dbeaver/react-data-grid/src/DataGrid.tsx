@@ -77,7 +77,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
         name: '',
         resizable: getHeaderResizable?.(i) ?? true,
         width,
-        minWidth: 24,
+        minWidth: 26,
         editable: row => getCellEditable?.(row.idx, i) ?? false,
         frozen: getHeaderPinned?.(i),
         renderHeaderCell: mapRenderHeaderCell,
