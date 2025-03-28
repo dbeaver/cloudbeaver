@@ -78,6 +78,8 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly projectsNavNodeService: ProjectsNavNodeService,
+    // TODO: https://dbeaver.atlassian.net/browse/CB-6272
+    // private readonly navigationTreeService: NavigationTreeService,
     private readonly treeSelectionService: TreeSelectionService,
   ) {
     super();
@@ -159,17 +161,11 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
+      // TODO: https://dbeaver.atlassian.net/browse/CB-6272
+      // root: true,
       menus: [MENU_NAVIGATION_TREE_CREATE],
       contexts: [DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_ELEMENTS_TREE],
-      getItems: (context, items) => [...items, ACTION_TREE_CREATE_FOLDER],
-    });
-
-    this.actionService.addHandler({
-      id: 'nav-tree-create-create-folders-handler',
-      menus: [MENU_NAVIGATION_TREE_CREATE],
-      contexts: [DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_ELEMENTS_TREE],
-      actions: [ACTION_TREE_CREATE_FOLDER],
-      isActionApplicable: (context, action) => {
+      isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
         const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
         const targetNode = this.treeSelectionService.getFirstSelectedNode(
@@ -181,8 +177,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         );
 
         if (
-          action !== ACTION_TREE_CREATE_FOLDER ||
-          ![isConnectionNode, isConnectionFolder, isProjectNode].some(check => check(node)) ||
+          ![isConnectionFolder, isProjectNode].some(check => check(node)) ||
           !this.userInfoResource.isAuthenticated() ||
           tree.baseRoot !== ROOT_NODE_PATH ||
           targetNode === undefined
@@ -192,6 +187,14 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
         return true;
       },
+      getItems: (context, items) => [...items, ACTION_TREE_CREATE_FOLDER],
+    });
+
+    this.actionService.addHandler({
+      id: 'nav-tree-create-create-folders-handler',
+      // menus: [MENU_NAVIGATION_TREE_CREATE],
+      contexts: [DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_ELEMENTS_TREE],
+      actions: [ACTION_TREE_CREATE_FOLDER],
       getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       handler: this.elementsTreeActionHandler.bind(this),
     });
@@ -301,7 +304,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         }
 
         const result = await this.commonDialogService.open(FolderDialog, {
-          value: this.localizationService.translate('ui_folder_new'),
+          value: this.localizationService.translate('ui_folder_new_default_name'),
           projectId: targetNode.projectId,
           folder: parentFolderParam?.folderId,
           title: 'core_view_action_new_folder',
@@ -335,6 +338,11 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
                 ? getConnectionFolderId(createConnectionFolderParam(result.projectId, result.folder))
                 : getProjectNodeId(result.projectId),
             );
+
+            // TODO: https://dbeaver.atlassian.net/browse/CB-6272
+            // const newFolderId = getConnectionFolderId(createConnectionFolderParam(result.projectId, createPath(result.folder, result.name)));
+            // await this.navNodeInfoResource.loadNodeParents(newFolderId);
+            // await this.navigationTreeService.showNode(newFolderId, this.navNodeInfoResource.getParents(newFolderId));
           } catch (exception: any) {
             this.notificationService.logException(exception, "Can't create folder");
           }

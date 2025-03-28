@@ -1513,7 +1513,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 var smSessionId = createSmSession(appSessionId, null, sessionParameters, sessionType, dbCon);
-                var smTokens = generateNewSessionToken(smSessionId, null, null, dbCon);
+                var smTokens = generateNewSessionToken(smSessionId, null, null, dbCon, false);
                 var permissions = getAnonymousUserPermissions();
                 txn.commit();
                 return SMAuthInfo.successMainSession(
@@ -1586,7 +1586,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                             sessionType,
                             sessionParameters,
                             isMainSession,
-                            null,
                             forceSessionsLogout
                         );
                         throw e;
@@ -1603,7 +1602,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     sessionType,
                     sessionParameters,
                     isMainSession,
-                    null,
                     forceSessionsLogout
                 );
 
@@ -1674,13 +1672,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         SMSessionType sessionType,
         Map<String, Object> sessionParameters,
         boolean isMainSession,
-        @Nullable String errorCode,
         boolean forceSessionsLogout
     ) throws DBException {
         String authAttemptId = UUID.randomUUID().toString();
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                if (smConfig.isCheckBruteforce() && this.getAuthProvider(authProviderId).getInstance() instanceof SMBruteForceProtected bruteforceProtected) {
+                WebAuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
+                if (smConfig.isCheckBruteforce()
+                    && authProviderDescriptor.getInstance() instanceof SMBruteForceProtected bruteforceProtected) {
                     Object inputUsername = bruteforceProtected.getInputUsername(authData);
                     if (inputUsername != null) {
                         BruteForceUtils.checkBruteforce(smConfig,
@@ -1690,8 +1689,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     database.normalizeTableNames(
                         "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT" +
-                            "(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE," +
-                            "SESSION_ID,IS_MAIN_AUTH,AUTH_USERNAME,ERROR_CODE,FORCE_SESSION_LOGOUT) " +
+                            "(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,"
+                            + "SESSION_ID,IS_MAIN_AUTH,AUTH_USERNAME,FORCE_SESSION_LOGOUT,IS_SERVICE_AUTH) "
+                            +
                             "VALUES(?,?,?,?,?,?,?,?,?,?)"
                     )
                 )) {
@@ -1716,8 +1716,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     } else {
                         dbStat.setString(8, null);
                     }
-                    dbStat.setString(9, errorCode);
-                    dbStat.setString(10, forceSessionsLogout ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
+                    dbStat.setString(9, booleanToString(forceSessionsLogout));
+                    boolean isServiceAuth = isMainSession && authProviderDescriptor.isServiceProvider();
+                    dbStat.setString(10, booleanToString(isServiceAuth));
                     dbStat.execute();
                 }
 
@@ -2027,7 +2028,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         var currentUserCreds = getCurrentUserCreds();
         var currentUserAccessToken = currentUserCreds.getSmAccessToken();
 
-        var smTokenInfo = readAccessTokenInfo(currentUserAccessToken);
+        SMTokenInfo smTokenInfo = readAccessTokenInfo(currentUserAccessToken);
 
         if (!smTokenInfo.getRefreshToken().equals(refreshToken)) {
             throw new SMException("Invalid refresh token");
@@ -2038,8 +2039,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             return generateNewSessionToken(
                 smTokenInfo.getSessionId(),
                 smTokenInfo.getUserId(),
-                updateUserAuthRoleIfNeeded(smTokenInfo.getUserId(), null),
-                dbCon);
+                updateUserAuthRoleIfNeeded(smTokenInfo.getUserId(), null), dbCon, smTokenInfo.isServiceToken()
+            );
         } catch (SQLException e) {
             throw new DBException("Error refreshing sm session", e);
         }
@@ -2128,9 +2129,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     private SMTokenInfo readAccessTokenInfo(String smAccessToken) throws DBException {
         try (Connection dbCon = database.openConnection();
-             PreparedStatement dbStat = dbCon.prepareStatement(
-                 database.normalizeTableNames("SELECT REFRESH_TOKEN_ID,SESSION_ID,USER_ID,REFRESH_TOKEN_EXPIRATION_TIME,AUTH_ROLE FROM " +
-                     "{table_prefix}CB_AUTH_TOKEN WHERE TOKEN_ID=?")
+            PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
+                "SELECT REFRESH_TOKEN_ID,SESSION_ID,USER_ID,REFRESH_TOKEN_EXPIRATION_TIME,AUTH_ROLE,IS_SERVICE"
+                    + " FROM {table_prefix}CB_AUTH_TOKEN WHERE TOKEN_ID=?")
              )
         ) {
             dbStat.setString(1, smAccessToken);
@@ -2146,7 +2147,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 if (isTokenExpired(expiredDate)) {
                     throw new SMRefreshTokenExpiredException("Refresh token expired");
                 }
-                return new SMTokenInfo(smAccessToken, refreshToken, sessionId, userId, authRole);
+                boolean isService = stringToBoolean(dbResult.getString(6));
+                return new SMTokenInfo(smAccessToken, refreshToken, sessionId, userId, authRole, isService);
             }
         } catch (SQLException e) {
             throw new DBCException("Error reading token info in database", e);
@@ -2297,7 +2299,13 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     if (forceSessionsLogout && CommonUtils.isNotEmpty(activeUserId) && isMainAuthSession) {
                         killAllExistsUserSessions(activeUserId);
                     }
-                    smTokens = generateNewSessionToken(smSessionId, activeUserId, tokenAuthRole, dbCon);
+                    smTokens = generateNewSessionToken(
+                        smSessionId,
+                        activeUserId,
+                        tokenAuthRole,
+                        dbCon,
+                        authAttemptSessionInfo.isServiceAuth()
+                    );
 
                     permissions = new SMAuthPermissions(
                         activeUserId, smSessionId, getUserPermissions(activeUserId, tokenAuthRole)
@@ -2451,7 +2459,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames(
-                    "SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID,IS_MAIN_AUTH " +
+                    "SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID,IS_MAIN_AUTH,IS_SERVICE_AUTH " +
                         "FROM {table_prefix}CB_AUTH_ATTEMPT WHERE AUTH_ID=?")
             )) {
                 dbStat.setString(1, authId);
@@ -2465,14 +2473,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                         dbResult.getString(3), MAP_STRING_OBJECT_TYPE
                     );
                     String smSessionId = dbResult.getString(4);
-                    boolean isMainAuth = CHAR_BOOL_TRUE.equals(dbResult.getString(5));
+                    boolean isMainAuth = stringToBoolean(dbResult.getString(5));
+                    boolean isServiceAuth = stringToBoolean(dbResult.getString(6));
 
                     return new AuthAttemptSessionInfo(
                         appSessionId,
                         smSessionId,
                         sessionType,
-                        sessionParams,
-                        isMainAuth
+                        sessionParams, isMainAuth, isServiceAuth
                     );
                 }
             }
@@ -2555,19 +2563,44 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull String smSessionId,
         @Nullable String userId,
         @Nullable String authRole,
-        @NotNull Connection dbCon
+        @NotNull Connection dbCon,
+        boolean isServiceToken
     ) throws SQLException, DBException {
         JDBCUtils.executeStatement(
             dbCon, database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE SESSION_ID=?"), smSessionId);
-        return generateNewSessionTokens(smSessionId, userId, authRole, dbCon);
+        try (
+            PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames("INSERT INTO {table_prefix}CB_AUTH_TOKEN"
+                + "(TOKEN_ID,SESSION_ID,USER_ID,AUTH_ROLE,EXPIRATION_TIME,REFRESH_TOKEN_ID,REFRESH_TOKEN_EXPIRATION_TIME,IS_SERVICE) "
+                + "VALUES(?,?,?,?,?,?,?,?)"))
+        ) {
+
+            String smAccessToken = SecurityUtils.generatePassword(32);
+            dbStat.setString(1, smAccessToken);
+            dbStat.setString(2, smSessionId);
+            JDBCUtils.setStringOrNull(dbStat, 3, userId);
+            JDBCUtils.setStringOrNull(dbStat, 4, authRole);
+            var accessTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusMinutes(smConfig.getAccessTokenTtl()));
+            dbStat.setTimestamp(5, accessTokenExpirationTime);
+
+            String smRefreshToken = SecurityUtils.generatePassword(32);
+            dbStat.setString(6, smRefreshToken);
+            var refreshTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusMinutes(smConfig.getRefreshTokenTtl()));
+            dbStat.setTimestamp(7, refreshTokenExpirationTime);
+            dbStat.setString(8, booleanToString(isServiceToken));
+
+            dbStat.execute();
+            return new SMTokens(smAccessToken, smRefreshToken);
+        }
     }
 
     protected void killAllExistsUserSessions(
-            @NotNull String userId
+        @NotNull String userId
     ) throws SQLException, DBException {
         LocalDateTime currentTime = LocalDateTime.now();
-        List<String> smSessionsId = findActiveUserSessions(userId, currentTime)
-                .stream().map(SMActiveSession::sessionId).collect(Collectors.toList());
+        List<String> smSessionsId = findActiveUserSessions(userId, currentTime, true)
+            .stream()
+            .map(SMActiveSession::sessionId)
+            .collect(Collectors.toList());
         deleteSessionsTokens(smSessionsId);
         application.getEventController().addEvent(new WSUserCloseSessionsEvent(smSessionsId, getSmSessionId(), getUserId()));
     }
@@ -2578,22 +2611,25 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     @NotNull
     public List<SMActiveSession> findActiveUserSessions(
             @NotNull String userId,
-            @NotNull LocalDateTime currentTime
+            @NotNull LocalDateTime currentTime,
+            boolean isService
     ) throws DBException {
         var activeSessions = new ArrayList<SMActiveSession>();
         try (var dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
+            try (
+                PreparedStatement dbStat = dbCon.prepareStatement(
                     database.normalizeTableNames("SELECT DISTINCT CAT.SESSION_ID, CAT.EXPIRATION_TIME " +
-                            "FROM {table_prefix}CB_AUTH_TOKEN CAT " +
-                            "JOIN {table_prefix}CB_AUTH_ATTEMPT CAA ON CAA.SESSION_ID = CAT.SESSION_ID WHERE " +
-                            "CAT.USER_ID=? AND CAA.AUTH_STATUS=? AND CAT.EXPIRATION_TIME>? " +
-                            "ORDER BY CAT.EXPIRATION_TIME"
+                        "FROM {table_prefix}CB_AUTH_TOKEN CAT " +
+                        "JOIN {table_prefix}CB_AUTH_ATTEMPT CAA ON CAA.SESSION_ID = CAT.SESSION_ID WHERE " +
+                        "CAT.USER_ID=? AND CAA.AUTH_STATUS=? AND CAT.EXPIRATION_TIME>? AND CAT.IS_SERVICE=? " +
+                        "ORDER BY CAT.EXPIRATION_TIME"
                     ))
             ) {
                 dbStat.setString(1, userId);
                 //count only tokens actually used by users
                 dbStat.setString(2, SMAuthStatus.EXPIRED.name());
                 dbStat.setTimestamp(3, Timestamp.valueOf(currentTime));
+                dbStat.setString(4, booleanToString(isService));
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         var sessionId = dbResult.getString(1);
@@ -2620,36 +2656,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
         } catch (SQLException e) {
             throw new DBException("Error delete active user's session", e);
-        }
-    }
-
-
-    private SMTokens generateNewSessionTokens(
-        @NotNull String smSessionId,
-        @Nullable String userId,
-        @Nullable String authRole,
-        @NotNull Connection dbCon
-    ) throws SQLException {
-        try (PreparedStatement dbStat = dbCon.prepareStatement(
-            database.normalizeTableNames("INSERT INTO {table_prefix}CB_AUTH_TOKEN" +
-                "(TOKEN_ID,SESSION_ID,USER_ID,AUTH_ROLE,EXPIRATION_TIME,REFRESH_TOKEN_ID,REFRESH_TOKEN_EXPIRATION_TIME) " +
-                "VALUES(?,?,?,?,?,?,?)"))) {
-
-            String smAccessToken = SecurityUtils.generatePassword(32);
-            dbStat.setString(1, smAccessToken);
-            dbStat.setString(2, smSessionId);
-            JDBCUtils.setStringOrNull(dbStat, 3, userId);
-            JDBCUtils.setStringOrNull(dbStat, 4, authRole);
-            var accessTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusMinutes(smConfig.getAccessTokenTtl()));
-            dbStat.setTimestamp(5, accessTokenExpirationTime);
-
-            String smRefreshToken = SecurityUtils.generatePassword(32);
-            dbStat.setString(6, smRefreshToken);
-            var refreshTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusMinutes(smConfig.getRefreshTokenTtl()));
-            dbStat.setTimestamp(7, refreshTokenExpirationTime);
-
-            dbStat.execute();
-            return new SMTokens(smAccessToken, smRefreshToken);
         }
     }
 
