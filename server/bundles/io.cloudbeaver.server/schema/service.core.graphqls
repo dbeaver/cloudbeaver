@@ -136,7 +136,7 @@ type ServerConfig {
     adminCredentialsSaveEnabled: Boolean!
 
     licenseRequired: Boolean!
-    licenseValid: Boolean
+    licenseValid: Boolean!
     licenseStatus: String @since(version: "24.1.5")
 
     configurationMode: Boolean!

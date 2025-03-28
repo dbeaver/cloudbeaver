@@ -21,7 +21,7 @@ public class WebServerConfigDto {
     private final boolean publicCredentialsSaveEnabled;
     private final boolean adminCredentialsSaveEnabled;
     private final boolean licenseRequired;
-    private Boolean licenseValid;
+    private final Boolean licenseValid;
     private String licenseStatus;
     private final boolean configurationMode;
     private final boolean developmentMode;
@@ -204,11 +204,7 @@ public class WebServerConfigDto {
         this.licenseStatus = licenseStatus;
     }
 
-    public void setLicenseValid(Boolean licenseValid) {
-        this.licenseValid = licenseValid;
-    }
-
-    public void setProductInfo(WebProductInfo productInfo){
+    public void setProductInfo(WebProductInfo productInfo) {
         this.productInfo = productInfo;
     }
 

@@ -75,7 +75,6 @@ public class WebServiceCore implements DBWServiceCore {
         if (webSession.getUser() == null) {
             dto.setDisabledDrivers(null);
             dto.setLicenseStatus(null);
-            dto.setLicenseValid(null);
             dto.setProductInfo(null);
         }
         return dto;
