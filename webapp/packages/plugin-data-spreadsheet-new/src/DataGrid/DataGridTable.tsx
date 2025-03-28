@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
 import { reaction } from 'mobx';
 
 import { s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
@@ -53,11 +53,6 @@ import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
 
-interface IInnerState {
-  lastCount: number;
-  lastScrollTop: number;
-}
-
 const rowHeight = 24;
 const headerHeight = 32;
 
@@ -79,13 +74,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const focusedCell = useRef<ICellPosition | null>(null);
   const focusSyncRef = useRef<ICellPosition | null>(null);
   const dataGridRef = useRef<DataGridRef>(null);
-  const innerState = useObjectRef<IInnerState>(
-    () => ({
-      lastCount: 0,
-      lastScrollTop: 0,
-    }),
-    false,
-  );
 
   const selectionAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetSelectAction);
   const viewAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetViewAction);
@@ -193,21 +181,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       const rowIdx = tableData.getRowIndexFromKey(key.row);
 
       if (selectionAction.isFocused(key)) {
-        const rowTop = rowIdx * rowHeight;
-        const gridDiv = dataGridDivRef.current;
         dataGridRef.current?.scrollToCell({ colIdx });
-
-        if (gridDiv) {
-          if (rowTop < gridDiv.scrollTop - rowHeight + headerHeight) {
-            gridDiv.scrollTo({
-              top: rowTop,
-            });
-          } else if (rowTop > gridDiv.scrollTop + gridDiv.clientHeight - headerHeight - rowHeight) {
-            gridDiv.scrollTo({
-              top: rowTop - gridDiv.clientHeight + headerHeight + rowHeight,
-            });
-          }
-        }
         return;
       }
 
@@ -255,22 +229,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       selectionAction.focus(null);
     }
   };
-
-  useEffect(() => {
-    const gridDiv = dataGridDivRef.current;
-
-    if (
-      gridDiv &&
-      innerState.lastCount > model.source.count &&
-      model.source.count * rowHeight < gridDiv.scrollTop + gridDiv.clientHeight - headerHeight
-    ) {
-      gridDiv.scrollTo({
-        top: model.source.count * rowHeight - gridDiv.clientHeight + headerHeight - 1,
-      });
-    }
-
-    innerState.lastCount = model.source.count;
-  }, [model.source.count]);
 
   const handleScrollToBottom = useCallback(async () => {
     const result = model.source.getResult(resultIndex);
