@@ -8,7 +8,6 @@
 
 import path from 'path';
 import fs from 'fs';
-import pnpapi from 'pnpapi';
 
 export default {
   meta: {
@@ -20,8 +19,9 @@ export default {
     function checkFileExtension(node) {
       try {
         const importerExtension = path.extname(context.filename).substring(1);
+        const isIndexFile = context.filename.endsWith('index.ts');
 
-        if (node.importKind === 'type' || node.exportKind === 'type' || importerExtension !== 'ts') {
+        if (node.importKind === 'type' || node.exportKind === 'type' || importerExtension !== 'ts' || isIndexFile) {
           return;
         }
 
