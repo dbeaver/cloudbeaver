@@ -136,11 +136,11 @@ export class ConnectionSearchService {
     this.hosts = hosts;
   }
 
-  saveConnection() {
+  saveConnection(): void {
     this.goBack();
   }
 
-  goBack() {
+  goBack(): void {
     this.clearFormState();
   }
 

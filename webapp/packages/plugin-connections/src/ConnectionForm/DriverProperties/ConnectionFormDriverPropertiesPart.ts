@@ -40,20 +40,21 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     return this.optionsPart.isOutdated();
   }
 
-  protected override async loader(): Promise<void> {
+  protected override loader(): Promise<void> {
     if (!this.optionsPart.connectionKey) {
       this.setInitialState(getDefaultState());
-      return;
+      return Promise.resolve();
     }
 
     const connection = this.connectionInfoResource.get(this.optionsPart.connectionKey);
 
     if (connection?.properties) {
       this.setInitialState({ ...connection.properties });
-      return;
+      return Promise.resolve();
     }
 
     this.setInitialState(getDefaultState());
+    return Promise.resolve();
   }
 
   protected override async saveChanges(

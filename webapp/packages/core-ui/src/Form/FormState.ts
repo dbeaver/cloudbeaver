@@ -106,7 +106,7 @@ export class FormState<TState> implements IFormState<TState> {
     });
   }
 
-  get partsValues() {
+  get partsValues(): IFormPart<any>[] {
     return Array.from(this.parts.values());
   }
 

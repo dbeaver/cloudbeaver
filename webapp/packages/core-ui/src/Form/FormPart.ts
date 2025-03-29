@@ -87,7 +87,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     return !isObjectsEqual(this.initialState, this.state);
   }
 
-  async save(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<any> {
+  async save(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<void> {
     if (this.loading) {
       return;
     }
@@ -146,7 +146,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     await this.load();
   }
 
-  reset() {
+  reset(): void {
     this.setState(toJS(this.initialState));
   }
 
@@ -159,7 +159,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     }
   }
 
-  protected setInitialState(initialState: TPartState) {
+  protected setInitialState(initialState: TPartState): void {
     this.initialState = initialState;
 
     if (this.isChanged) {
@@ -169,7 +169,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     this.setState(toJS(this.initialState));
   }
 
-  protected setState(state: TPartState) {
+  protected setState(state: TPartState): void {
     this.state = state;
   }
 

@@ -50,15 +50,16 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     return this.optionsPart.isOutdated();
   }
 
-  protected override async loader(): Promise<void> {
+  protected override loader(): Promise<void> {
     if (!this.optionsPart.connectionKey) {
       this.setInitialState(getDefaultState());
-      return;
+      return Promise.resolve();
     }
 
     const connection = this.connectionInfoResource.get(this.optionsPart.connectionKey);
 
     this.setInitialState(connection?.networkHandlersConfig?.find(h => h.id === SSH_TUNNEL_ID) ?? getDefaultState());
+    return Promise.resolve();
   }
 
   protected override async saveChanges(
