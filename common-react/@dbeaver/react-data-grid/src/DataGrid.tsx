@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
-import DataGridBase, { type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle } from 'react-data-grid';
+import { DataGrid as DataGridBase, type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle } from 'react-data-grid';
 import { rowRenderer } from './renderers/rowRenderer.js';
 import { cellRenderer } from './renderers/cellRenderer.js';
 import { DataGridCellHeaderContext, type IDataGridHeaderCellContext } from './DataGridHeaderCellContext.js';
@@ -18,6 +18,11 @@ export interface ICellPosition {
   colIdx: number;
 }
 
+export interface DataGridCellKeyboardEvent extends React.KeyboardEvent<HTMLDivElement> {
+  preventGridDefault: () => void;
+  isGridDefaultPrevented: () => boolean;
+}
+
 export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext, IDataGridHeaderCellContext, React.PropsWithChildren {
   getRowHeight?: (rowIdx: number) => number;
   getRowId?: (rowIdx: number) => React.Key;
@@ -26,6 +31,7 @@ export interface DataGridProps extends IDataGridCellContext, IDataGridRowContext
   onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;
   onFocus?: (position: ICellPosition) => void;
   onEditorOpen?: (position: ICellPosition) => void;
+  onCellKeyDown?: (position: ICellPosition, event: DataGridCellKeyboardEvent) => void;
   className?: string;
 }
 
@@ -59,6 +65,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     onCellChange,
     children,
     className,
+    onCellKeyDown,
   },
   ref,
 ) {
@@ -77,9 +84,8 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
         name: '',
         resizable: getHeaderResizable?.(i) ?? true,
         width,
-        minWidth: 24,
+        minWidth: 26,
         editable: row => getCellEditable?.(row.idx, i) ?? false,
-        maxWidth: 900, // TODO: there is a bug with auto-resize if this value is too high or not set
         frozen: getHeaderPinned?.(i),
         renderHeaderCell: mapRenderHeaderCell,
         renderCell: mapCellContentRenderer,
@@ -136,11 +142,13 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
             rowHeight={getRowHeight ? row => getRowHeight(row.idx) : undefined}
             rowKeyGetter={getRowId ? row => getRowId(row.idx) : undefined}
             onSelectedCellChange={handleCellFocus}
+            onCellKeyDown={onCellKeyDown ? (args, event) => onCellKeyDown({ rowIdx: args.rowIdx, colIdx: args.column.idx }, event) : undefined}
             renderers={{
               renderRow: rowRenderer,
               renderCell: cellRenderer,
               noRowsFallback: children,
             }}
+            minimumRowsToRender={100}
           />
         </DataGridCellHeaderContext>
       </DataGridCellContext>
