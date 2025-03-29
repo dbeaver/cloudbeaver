@@ -92,15 +92,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       return true;
     }
 
-    if (state.saveCredentials) {
-      delete state.authModelId;
-      delete state.credentials;
-    }
-
-    if (!this.formState.state.requiredNetworkHandlersIds.length) {
-      delete state.networkHandlersConfig;
-    }
-
     const result = await this.commonDialogService.open(ConnectionAuthenticationDialogLoader, {
       config: state,
       authModelId: state.authModelId ?? null,
@@ -462,12 +453,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       }
     } else {
       try {
-        const stateCopy = toJS(this.state);
-        const isFilled = await this.askCredentials(stateCopy);
+        const isFilled = await this.askCredentials(this.state);
         if (!isFilled) {
           return;
         }
-        const info = await this.connectionInfoResource.test(this.formState.state.projectId, stateCopy);
+        const info = await this.connectionInfoResource.test(this.formState.state.projectId, this.state);
 
         this.notificationService.logSuccess({
           title: 'connections_connection_test_success',
