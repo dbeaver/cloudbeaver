@@ -24,6 +24,16 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     private readonly optionsPart: ConnectionFormOptionsPart,
   ) {
     super(formState, getDefaultState());
+
+    this.optionsPart.onDriverIdChange.addHandler(this.onDriverIdChangeHandler.bind(this));
+  }
+
+  private onDriverIdChangeHandler(driverId: string | undefined) {
+    if (!driverId) {
+      return;
+    }
+
+    this.reset();
   }
 
   override isOutdated(): boolean {
