@@ -80,16 +80,36 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       },
     );
 
-    makeObservable(this, {
+    makeObservable<this, 'askCredentials'>(this, {
       setAuthModelId: action.bound,
       setDriverId: action.bound,
       connectionKey: computed,
+      askCredentials: action.bound,
     });
   }
 
   private async askCredentials(state: IConnectionFormOptionsState) {
     if (state.saveCredentials && !this.formState.state.requiredNetworkHandlersIds.length) {
       return true;
+    }
+
+    const propertiesToRestore: Partial<IConnectionFormOptionsState> = {};
+
+    if (state.saveCredentials) {
+      if (state.authModelId) {
+        propertiesToRestore.authModelId = state.authModelId;
+        delete state.authModelId;
+      }
+
+      if (state.credentials) {
+        propertiesToRestore.credentials = toJS(state.credentials);
+        delete state.credentials;
+      }
+    }
+
+    if (!this.formState.state.requiredNetworkHandlersIds.length) {
+      propertiesToRestore.networkHandlersConfig = toJS(state.networkHandlersConfig);
+      delete state.networkHandlersConfig;
     }
 
     const result = await this.commonDialogService.open(ConnectionAuthenticationDialogLoader, {
@@ -99,9 +119,16 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       projectId: this.formState.state.projectId,
     });
 
+    for (const key of Object.keys(propertiesToRestore)) {
+      state[key as keyof IConnectionFormOptionsState] = propertiesToRestore[key as keyof IConnectionFormOptionsState] as any;
+    }
+
+    this.state = observable(state);
+
     if (result === DialogueStateResult.Rejected) {
       return false;
     }
+
     return true;
   }
 
@@ -452,12 +479,13 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
         this.formState.setMode(FormMode.Edit);
       }
     } else {
+      const stateCopy = observable(toJS(this.state));
       try {
-        const isFilled = await this.askCredentials(this.state);
+        const isFilled = await this.askCredentials(stateCopy);
         if (!isFilled) {
           return;
         }
-        const info = await this.connectionInfoResource.test(this.formState.state.projectId, this.state);
+        const info = await this.connectionInfoResource.test(this.formState.state.projectId, stateCopy);
 
         this.notificationService.logSuccess({
           title: 'connections_connection_test_success',
