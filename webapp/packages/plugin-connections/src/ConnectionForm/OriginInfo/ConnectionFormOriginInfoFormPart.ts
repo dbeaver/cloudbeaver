@@ -18,9 +18,9 @@ import {
 } from '@cloudbeaver/core-connections';
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, type UserInfoResource } from '@cloudbeaver/core-authentication';
 import { computed, makeObservable } from 'mobx';
-import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { LocalizationService } from '@cloudbeaver/core-localization';
+import type { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
 
 const defaultStateGetter = () => ({}) as IConnectionFormOriginInfoState;
 
@@ -35,6 +35,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     private readonly dbDriverResource: DBDriverResource,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly localizationService: LocalizationService,
+    private readonly optionsPart: ConnectionFormOptionsPart,
   ) {
     super(formState, defaultStateGetter());
 
@@ -45,10 +46,6 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     });
 
     this.formState.formStateTask.addHandler(this.formAuthState.bind(this));
-  }
-
-  private get optionsPart() {
-    return getConnectionFormOptionsPart(this.formState);
   }
 
   // do not include connectionInfoOriginDetailsResource cause it is already synced with connectionInfoResource

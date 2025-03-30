@@ -19,7 +19,7 @@ import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED.js';
 import { SSL_CODE_NAME } from './SSL_CODE_NAME.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
 import { getSSLDefaultConfig } from './getSSLDefaultConfig.js';
-import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
 
 const getDefaultState = () =>
   ({
@@ -36,6 +36,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     private readonly dbDriverResource: DBDriverResource,
     private readonly networkHandlerResource: NetworkHandlerResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly optionsPart: ConnectionFormOptionsPart,
   ) {
     super(formState, getDefaultState());
 
@@ -44,10 +45,6 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     makeObservable<this, 'activeDriverId'>(this, {
       activeDriverId: observable,
     });
-  }
-
-  private get optionsPart() {
-    return getConnectionFormOptionsPart(this.formState);
   }
 
   override isLoaded(): boolean {
@@ -99,9 +96,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
-    const optionsPart = getConnectionFormOptionsPart(this.formState);
-
-    if (!optionsPart.state.driverId) {
+    if (!this.optionsPart.state.driverId) {
       return;
     }
 
@@ -109,7 +104,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     const descriptor = handlers.find(h => h.id === this.state?.id);
 
     const handlerConfig: NetworkHandlerConfigInput = toJS(this.state);
-    handlerConfig.savePassword = this.state.savePassword || optionsPart.state.sharedCredentials;
+    handlerConfig.savePassword = this.state.savePassword || this.optionsPart.state.sharedCredentials;
 
     if (this.isChanged && descriptor) {
       for (const descriptorProperty of descriptor.properties) {
@@ -161,7 +156,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     if (handlerConfig) {
       trimSSLConfig(handlerConfig);
 
-      optionsPart.state.networkHandlersConfig!.push(handlerConfig);
+      this.optionsPart.state.networkHandlersConfig!.push(handlerConfig);
     }
   }
 

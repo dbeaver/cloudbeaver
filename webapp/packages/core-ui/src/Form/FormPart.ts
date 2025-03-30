@@ -30,7 +30,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     initialState: TPartState,
   ) {
     this.initialState = initialState;
-    this.state = { ...toJS(this.initialState) };
+    this.state = toJS(this.initialState);
     this.isSaving = false;
 
     this.exception = null;
@@ -38,8 +38,6 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
 
     this.loaded = false;
     this.loading = false;
-
-    this.reset = this.reset.bind(this);
 
     this.formState.submitTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.save.bind(this)));
     this.formState.formatTask.addHandler(executorHandlerFilter(() => this.isLoaded() && this.isChanged, this.format.bind(this)));

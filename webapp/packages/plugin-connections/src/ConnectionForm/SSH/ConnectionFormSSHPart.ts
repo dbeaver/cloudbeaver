@@ -13,7 +13,7 @@ import { ConnectionInfoResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connect
 import { toJS } from 'mobx';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
-import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
 
 const getDefaultState = () =>
   ({
@@ -38,12 +38,9 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   constructor(
     formState: IFormState<IConnectionFormState>,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly optionsPart: ConnectionFormOptionsPart,
   ) {
     super(formState, getDefaultState());
-  }
-
-  private get optionsPart() {
-    return getConnectionFormOptionsPart(this.formState);
   }
 
   override isOutdated(): boolean {
@@ -71,8 +68,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): void | Promise<void> {
-    const optionsPart = getConnectionFormOptionsPart(this.formState);
-    const urlType = optionsPart.state.configurationType === DriverConfigurationType.Url;
+    const urlType = this.optionsPart.state.configurationType === DriverConfigurationType.Url;
 
     if (urlType) {
       return;
@@ -83,7 +79,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
 
     let handlerConfig: NetworkHandlerConfigInput = {
       ...this.state,
-      savePassword: this.state.savePassword || optionsPart.state.sharedCredentials,
+      savePassword: this.state.savePassword || this.optionsPart.state.sharedCredentials,
       key: this.state.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? this.state.key : undefined,
       password: passwordChanged ? this.state.password : undefined,
     };
@@ -98,7 +94,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
 
     if (handlerConfig) {
       handlerConfig = getTrimmedSSHConfig(handlerConfig);
-      optionsPart.state.networkHandlersConfig!.push(handlerConfig);
+      this.optionsPart.state.networkHandlersConfig!.push(handlerConfig);
     }
   }
 

@@ -9,7 +9,7 @@ import { FormPart, formSubmitContext, type IFormState } from '@cloudbeaver/core-
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { type ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { action, makeObservable } from 'mobx';
-import { getConnectionFormOptionsPart, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { type IConnectionFormState, ConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 import { getSubjectDifferences } from '@cloudbeaver/core-utils';
 
 function getDefaultState(): string[] {
@@ -20,6 +20,7 @@ export class ConnectionFormAccessPart extends FormPart<string[], IConnectionForm
   constructor(
     formState: IFormState<IConnectionFormState>,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly optionsPart: ConnectionFormOptionsPart,
   ) {
     super(formState, getDefaultState());
 
@@ -27,10 +28,6 @@ export class ConnectionFormAccessPart extends FormPart<string[], IConnectionForm
       revoke: action.bound,
       grant: action.bound,
     });
-  }
-
-  private get optionsPart() {
-    return getConnectionFormOptionsPart(this.formState);
   }
 
   override isOutdated(): boolean {
