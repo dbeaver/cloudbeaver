@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
 import { reaction } from 'mobx';
 
 import { s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
@@ -20,6 +20,7 @@ import {
   type DataGridRef,
   type ICellPosition,
   type IDataGridCellRenderer,
+  type DataGridProps,
 } from '@cloudbeaver/plugin-data-grid';
 import {
   DATA_CONTEXT_DV_PRESENTATION,
@@ -52,11 +53,6 @@ import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
 
-interface IInnerState {
-  lastCount: number;
-  lastScrollTop: number;
-}
-
 const rowHeight = 24;
 const headerHeight = 32;
 
@@ -78,13 +74,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const focusedCell = useRef<ICellPosition | null>(null);
   const focusSyncRef = useRef<ICellPosition | null>(null);
   const dataGridRef = useRef<DataGridRef>(null);
-  const innerState = useObjectRef<IInnerState>(
-    () => ({
-      lastCount: 0,
-      lastScrollTop: 0,
-    }),
-    false,
-  );
 
   const selectionAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetSelectAction);
   const viewAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetViewAction);
@@ -140,6 +129,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         } else {
           key = { column: viewAction.columnKeys[0], row: viewAction.rowKeys[0] };
         }
+        selectionAction.focus(key as IResultSetElementKey);
       }
 
       if (!key?.column || !key?.row) {
@@ -178,92 +168,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     context.set(DATA_CONTEXT_DV_PRESENTATION, { type: DataViewerPresentationType.Data }, id);
   });
 
-  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
-    gridSelectedCellCopy.onKeydownHandler(event);
-    const cell = selectionAction.getFocusedElement();
-    // we can't edit table cells if table doesn't have row identifier, but we can edit new created rows before insert (CB-6063)
-    const canEdit = model.hasElementIdentifier(resultIndex) || !!(cell && tableData.editor.getElementState(cell) === DatabaseEditChangeType.add);
-
-    if (EventContext.has(event, EventStopPropagationFlag) || !canEdit || model.isReadonly(resultIndex)) {
-      return;
-    }
-
-    const activeElements = selectionAction.getActiveElements();
-    const activeRows = selectionAction.getActiveRows();
-
-    if (!cell) {
-      return;
-    }
-
-    switch (event.nativeEvent.code) {
-      case 'Escape': {
-        tableData.editor.revert(...activeElements);
-        return;
-      }
-      case 'KeyR': {
-        if (event.altKey) {
-          if (event.shiftKey) {
-            tableData.editor.duplicate(...activeRows);
-          } else {
-            tableData.editor.add(cell);
-          }
-          return;
-        }
-      }
-    }
-
-    // const colIdx = tableData.getColumnIndexFromColumnKey(cell.column);
-    // const rowIdx = tableData.getRowIndexFromKey(cell.row);
-    // const editingState = tableData.editor.getElementState(cell);
-
-    // switch (event.nativeEvent.code) {
-    //   case 'Delete': {
-    //     const filteredRows = activeRows.filter(cell => tableData.editor.getElementState(cell) !== DatabaseEditChangeType.delete);
-
-    //     if (filteredRows.length > 0) {
-    //       const editor = tableData.editor;
-    //       const firstRow = filteredRows[0]!;
-    //       const editingState = tableData.editor.getElementState(firstRow);
-
-    //       editor.delete(...filteredRows);
-
-    //       if (editingState === DatabaseEditChangeType.add) {
-    //         if (rowIdx - 1 > 0) {
-    //           handlers.selectCell({ colIdx, rowIdx: rowIdx - 1 });
-    //         }
-    //       } else {
-    //         if (rowIdx + 1 < tableData.rows.length) {
-    //           handlers.selectCell({ colIdx, rowIdx: rowIdx + 1 });
-    //         }
-    //       }
-    //     }
-
-    //     return;
-    //   }
-    //   case 'KeyV': {
-    //     if (editingState === DatabaseEditChangeType.delete) {
-    //       return;
-    //     }
-
-    //     if (event.ctrlKey || event.metaKey) {
-    //       if (!clipboardService.clipboardAvailable || clipboardService.state === 'denied' || tableData.isCellReadonly(cell)) {
-    //         return;
-    //       }
-
-    //       clipboardService
-    //         .read()
-    //         .then(value => tableData.editor.set(cell, value))
-    //         .catch();
-    //       return;
-    //     }
-    //   }
-    // }
-
-    // if (editingState === DatabaseEditChangeType.delete) {
-    //   return;
-    // }
-  }
-
   useLayoutEffect(() => {
     function syncEditor(data: IResultSetEditActionData) {
       const editor = tableData.editor;
@@ -277,21 +181,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       const rowIdx = tableData.getRowIndexFromKey(key.row);
 
       if (selectionAction.isFocused(key)) {
-        const rowTop = rowIdx * rowHeight;
-        const gridDiv = dataGridDivRef.current;
         dataGridRef.current?.scrollToCell({ colIdx });
-
-        if (gridDiv) {
-          if (rowTop < gridDiv.scrollTop - rowHeight + headerHeight) {
-            gridDiv.scrollTo({
-              top: rowTop,
-            });
-          } else if (rowTop > gridDiv.scrollTop + gridDiv.clientHeight - headerHeight - rowHeight) {
-            gridDiv.scrollTo({
-              top: rowTop - gridDiv.clientHeight + headerHeight + rowHeight,
-            });
-          }
-        }
         return;
       }
 
@@ -316,22 +206,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       tableData.editor.action.removeHandler(syncEditor);
     };
   }, [tableData.editor, selectionAction]);
-
-  useEffect(() => {
-    const gridDiv = dataGridDivRef.current;
-
-    if (
-      gridDiv &&
-      innerState.lastCount > model.source.count &&
-      model.source.count * rowHeight < gridDiv.scrollTop + gridDiv.clientHeight - headerHeight
-    ) {
-      gridDiv.scrollTo({
-        top: model.source.count * rowHeight - gridDiv.clientHeight + headerHeight - 1,
-      });
-    }
-
-    innerState.lastCount = model.source.count;
-  }, [model.source.count]);
 
   const handleFocusChange = (position: ICellPosition) => {
     focusedCell.current = position;
@@ -517,6 +391,65 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return <TextPlaceholder>{translate('data_grid_table_empty_placeholder')}</TextPlaceholder>;
   }
 
+  const handleCellKeyDown: DataGridProps['onCellKeyDown'] = ({ rowIdx, colIdx }, event) => {
+    gridSelectedCellCopy.onKeydownHandler(event);
+    const cell = selectionAction.getFocusedElement();
+    // we can't edit table cells if table doesn't have row identifier, but we can edit new created rows before insert (CB-6063)
+    const canEdit = model.hasElementIdentifier(resultIndex) || !!(cell && tableData.editor.getElementState(cell) === DatabaseEditChangeType.add);
+
+    if (EventContext.has(event, EventStopPropagationFlag) || !canEdit || model.isReadonly(resultIndex)) {
+      return;
+    }
+
+    const activeElements = selectionAction.getActiveElements();
+    const activeRows = selectionAction.getActiveRows();
+
+    if (!cell) {
+      return;
+    }
+
+    switch (event.code) {
+      case 'Escape': {
+        tableData.editor.revert(...activeElements);
+        return;
+      }
+      case 'KeyR': {
+        if (event.altKey) {
+          if (event.shiftKey) {
+            tableData.editor.duplicate(...activeRows);
+          } else {
+            tableData.editor.add(cell);
+          }
+          return;
+        }
+        return;
+      }
+      case 'Delete': {
+        event.preventGridDefault();
+
+        const filteredRows = activeRows.filter(cell => tableData.editor.getElementState(cell) !== DatabaseEditChangeType.delete);
+
+        if (filteredRows.length > 0) {
+          const editor = tableData.editor;
+          const firstRow = filteredRows[0]!;
+          const editingState = tableData.editor.getElementState(firstRow);
+
+          editor.delete(...filteredRows);
+
+          if (editingState === DatabaseEditChangeType.add) {
+            if (rowIdx - 1 > 0) {
+              handlers.selectCell({ colIdx, rowIdx: rowIdx - 1 });
+            }
+          } else {
+            if (rowIdx + 1 < tableData.rows.length) {
+              handlers.selectCell({ colIdx, rowIdx: rowIdx + 1 });
+            }
+          }
+        }
+      }
+    }
+  };
+
   return (
     <DataGridContext.Provider value={gridContext}>
       <DataGridSelectionContext.Provider value={gridSelectionContext}>
@@ -526,7 +459,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
             tabIndex={-1}
             {...rest}
             className={s(styles, { container: true }, className)}
-            onKeyDown={handleKeyDown}
             onMouseDown={onMouseDownHandler}
             onMouseMove={onMouseMoveHandler}
           >
@@ -544,6 +476,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               getHeaderResizable={getHeaderResizable}
               getRowHeight={() => rowHeight}
               getColumnKey={getColumnKey}
+              onCellKeyDown={handleCellKeyDown}
               columnCount={columnsCount}
               rowCount={rowsCount}
               getRowId={rowIdx => (tableData.rows[rowIdx] ? ResultSetDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
