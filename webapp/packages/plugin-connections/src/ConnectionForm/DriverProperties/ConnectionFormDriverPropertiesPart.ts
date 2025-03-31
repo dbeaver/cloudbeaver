@@ -29,10 +29,6 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
   }
 
   private onDriverIdChangeHandler(driverId: string | undefined) {
-    if (!driverId) {
-      return;
-    }
-
     this.reset();
   }
 
@@ -40,21 +36,20 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     return this.optionsPart.isOutdated();
   }
 
-  protected override loader(): Promise<void> {
+  protected override async loader(): Promise<void> {
     if (!this.optionsPart.connectionKey) {
       this.setInitialState(getDefaultState());
-      return Promise.resolve();
+      return;
     }
 
     const connection = this.connectionInfoResource.get(this.optionsPart.connectionKey);
 
     if (connection?.properties) {
       this.setInitialState({ ...connection.properties });
-      return Promise.resolve();
+      return;
     }
 
     this.setInitialState(getDefaultState());
-    return Promise.resolve();
   }
 
   protected override async saveChanges(

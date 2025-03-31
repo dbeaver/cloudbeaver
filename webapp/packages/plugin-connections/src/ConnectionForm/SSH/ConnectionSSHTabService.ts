@@ -39,6 +39,12 @@ export class ConnectionSSHTabService extends Bootstrap {
       order: 3,
       tab: () => SSHTab,
       panel: () => SSHPanel,
+      // TODO fix authentication app freeze
+      // https://github.com/dbeaver/pro/issues/5373
+      // getLoader: (_, props) => {
+      //   const optionsPart = props?.formState ? getConnectionFormOptionsPart(props.formState) : null;
+      //   return [getCachedMapResourceLoaderState(this.dbDriverResource, () => optionsPart?.state.driverId ?? null)];
+      // },
       isHidden: (tabId, props) => {
         const optionsPart = props?.formState ? getConnectionFormOptionsPart(props.formState) : null;
 
