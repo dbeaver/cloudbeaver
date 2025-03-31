@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,6 +9,7 @@ import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   compareConnectionsInfo,
+  ConnectionInfoActiveProjectKey,
   ConnectionInfoResource,
   ConnectionsManagerService,
   ConnectionsSettingsService,
@@ -85,7 +86,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
       iconComponent: () => ConnectionIcon,
       hideIfEmpty: () => false,
       getExtraProps: () => ({ connectionKey: this.connectionSchemaManagerService.currentConnectionKey, small: true }),
-      getLoader: (context, menu) => {
+      getLoader: () => {
         if (this.isHidden()) {
           return [];
         }
@@ -93,12 +94,13 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
         const activeConnectionKey = this.connectionSchemaManagerService.activeConnectionKey;
 
         if (!activeConnectionKey) {
-          return this.appAuthService.loaders;
+          return [...this.appAuthService.loaders, getCachedMapResourceLoaderState(this.connectionInfoResource, () => ConnectionInfoActiveProjectKey)];
         }
 
         return [
           ...this.appAuthService.loaders,
           ...this.connectionSchemaManagerService.currentObjectLoaders,
+          getCachedMapResourceLoaderState(this.connectionInfoResource, () => ConnectionInfoActiveProjectKey),
           getCachedMapResourceLoaderState(this.containerResource, () => ({
             ...activeConnectionKey,
             catalogId: this.connectionSchemaManagerService.activeObjectCatalogId,

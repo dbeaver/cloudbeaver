@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -159,11 +159,11 @@ export class SqlEditorBootstrap extends Bootstrap {
             break;
           }
           case ACTION_SQL_EDITOR_OPEN: {
-            const connection = context.get(DATA_CONTEXT_CONNECTION)!;
+            const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
 
             this.sqlEditorNavigatorService.openNewEditor({
               dataSourceKey: LocalStorageSqlDataSource.key,
-              connectionKey: createConnectionParam(connection),
+              connectionKey,
             });
             break;
           }

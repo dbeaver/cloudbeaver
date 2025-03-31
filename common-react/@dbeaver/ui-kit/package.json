@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@ariakit/react": "^0",
+    "clsx": "^2",
     "react": "^19",
     "react-dom": "^19"
   }

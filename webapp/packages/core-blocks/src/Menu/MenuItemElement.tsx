@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
   const translate = useTranslate();
 
   const title = translate(label);
-  loading = useStateDelay(loading, 100);
+  loading = useStateDelay(loading, 300);
 
   return (
     <div className={s(styles, { menuPanelItem: true })} title={tooltip ? translate(tooltip) : title}>

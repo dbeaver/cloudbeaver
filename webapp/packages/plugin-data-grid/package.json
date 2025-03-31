@@ -24,7 +24,7 @@
     "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
     "@dbeaver/react-data-grid": "workspace:*",
-    "clsx": "^2",
+    "@dbeaver/ui-kit": "workspace:^",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",

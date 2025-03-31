@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -81,10 +81,6 @@ export class ConnectionsAdministrationService extends Bootstrap {
     });
     this.connectionDetailsPlaceholder.add(Origin, 0);
     this.connectionDetailsPlaceholder.add(SSH, 2);
-  }
-
-  override async load(): Promise<void> {
-    await this.connectionInfoResource.load();
   }
 
   private async refreshUserConnections(configuration: boolean, outside: boolean, outsideAdminPage: boolean): Promise<void> {

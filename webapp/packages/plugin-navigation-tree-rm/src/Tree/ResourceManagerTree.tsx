@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import {
   validateElementsTreeSettings,
 } from '@cloudbeaver/plugin-navigation-tree';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
 
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter.js';
 import { navigationTreeProjectSearchCompare } from './ProjectsRenderer/navigationTreeProjectSearchCompare.js';
@@ -52,6 +53,7 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
   const navTreeService = useService(NavigationTreeService);
   const resourceManagerService = useService(ResourceManagerService);
   const navTreeResource = useService(NavTreeResource);
+  const userInfoResource = useService(UserInfoResource);
 
   const key = getComputed<string[]>(() => projectsService.activeProjects.map(project => getRmResourcePath(project.id)), isArraysEqual);
   useResource(ResourceManagerTree, ResourceManagerResource, resourceKeyList(key));
@@ -100,13 +102,22 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
 
   const settingsElements = useMemo(() => [ProjectsSettingsPlaceholderElement], []);
 
+  async function loadChildren(nodeId: string, manual: boolean) {
+    await userInfoResource.load();
+    if (!resourceManagerService.enabled) {
+      return false;
+    }
+
+    return navTreeService.loadNestedNodes(nodeId, manual);
+  }
+
   return (
     <CaptureView view={navTreeService} className={s(styles, { captureView: true })}>
       <ResourceManagerTreeCaptureViewContext resourceTypeId={resourceTypeId} />
       <ElementsTreeLoader
         root={root}
         getChildren={navTreeService.getChildren}
-        loadChildren={navTreeService.loadNestedNodes}
+        loadChildren={loadChildren}
         settings={settings}
         nodeInfoTransformers={[transformResourceNode]}
         filters={[resourceTypeFilter, projectFilter]}

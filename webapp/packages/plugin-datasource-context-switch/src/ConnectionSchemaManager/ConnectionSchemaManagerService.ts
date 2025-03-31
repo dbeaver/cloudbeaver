@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -161,7 +161,7 @@ export class ConnectionSchemaManagerService {
       return;
     }
 
-    return this.connectionInfo.get(this.currentConnectionKey);
+    return this.connectionInfoResource.get(this.currentConnectionKey);
   }
 
   get currentObjectCatalog(): ObjectContainer | undefined {
@@ -250,7 +250,7 @@ export class ConnectionSchemaManagerService {
 
   constructor(
     private readonly navigationTabsService: NavigationTabsService,
-    private readonly connectionInfo: ConnectionInfoResource,
+    private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly dbDriverResource: DBDriverResource,
     private readonly notificationService: NotificationService,
@@ -422,7 +422,7 @@ export class ConnectionSchemaManagerService {
       return;
     }
 
-    const connection = this.connectionInfo.get(key);
+    const connection = this.connectionInfoResource.get(key);
 
     if (!connection) {
       console.warn(`Connection Schema Manager: connection (${serializeConnectionParam(key)}) not exists`);

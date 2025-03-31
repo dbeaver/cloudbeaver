@@ -38,6 +38,7 @@
     "@cloudbeaver/core-view": "workspace:*",
     "@cloudbeaver/plugin-administration": "workspace:*",
     "@cloudbeaver/plugin-authentication": "workspace:*",
+    "@dbeaver/ui-kit": "workspace:^",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -132,6 +132,7 @@ export function useResource<
 ): IMapResourceResult<TResource, TIncludes> | IMapResourceListResult<TResource, TIncludes> | IDataResourceResult<TResource, TIncludes> {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const resource = ctor instanceof Resource ? ctor : useService(ctor);
+  const unmountedRef = useObjectRef({ unmounted: false });
   const errorContext = useContext(ErrorContext);
   let key: ResourceKey<TKeyArg> | null = keyObj as ResourceKey<TKeyArg>;
   let includes: TIncludes = [] as unknown as TIncludes;
@@ -234,7 +235,7 @@ export function useResource<
         }
       },
       async load(refresh?: boolean): Promise<void> {
-        if (propertiesRef.key === null) {
+        if (propertiesRef.key === null || unmountedRef.unmounted) {
           return;
         }
 
@@ -473,6 +474,13 @@ export function useResource<
       result.load();
     }
   }, [canLoad, loadKey]);
+
+  useEffect(
+    () => () => {
+      unmountedRef.unmounted = true;
+    },
+    [],
+  );
 
   if (actions?.forceSuspense) {
     result.data;

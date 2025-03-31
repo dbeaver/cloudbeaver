@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,9 +8,9 @@
 import { action, makeObservable } from 'mobx';
 
 import {
+  type Connection,
   ConnectionInfoResource,
   ConnectionsManagerService,
-  createConnectionParam,
   type IConnectionInfoParams,
   NavNodeExtensionsService,
 } from '@cloudbeaver/core-connections';
@@ -88,10 +88,16 @@ export class NavigationTreeService extends View<string> {
 
   async loadNestedNodes(id = ROOT_NODE_PATH, tryConnect?: boolean): Promise<boolean> {
     if (this.isConnectionNode(id)) {
-      let connection = this.connectionInfoResource.getConnectionForNode(id);
+      const node = this.navNodeInfoResource.get(id);
 
-      if (connection) {
-        connection = await this.connectionInfoResource.load(createConnectionParam(connection));
+      if (!node?.projectId) {
+        return false;
+      }
+
+      const connectionParam = this.connectionInfoResource.getConnectionIdForNodeId(node.projectId, id);
+      let connection: Connection | undefined;
+      if (connectionParam) {
+        connection = await this.connectionInfoResource.load(connectionParam);
       } else {
         return false;
       }
@@ -101,22 +107,20 @@ export class NavigationTreeService extends View<string> {
           return false;
         }
 
-        const connected = await this.tryInitConnection(createConnectionParam(connection));
+        const connected = await this.tryInitConnection(connectionParam);
         if (!connected) {
           return false;
         }
       }
     }
 
-    await this.navTreeResource.waitLoad();
-
     if (tryConnect && this.navTreeResource.getException(id)) {
       this.navTreeResource.markOutdated(id);
     }
 
-    const parents = this.navNodeInfoResource.getParents(id);
+    const preloaded = await this.navTreeResource.preloadParents(id);
 
-    if (parents.length > 0 && !this.navNodeInfoResource.has(id)) {
+    if (!preloaded) {
       return false;
     }
 
