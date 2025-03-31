@@ -11,8 +11,6 @@ import { ConnectionFormState } from './ConnectionFormState.js';
 import { ConnectionFormService } from './ConnectionFormService.js';
 import type { IConnectionFormState } from './IConnectionFormState.js';
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
-import { getConnectionFormOptionsPart } from './Options/getConnectionFormOptionsPart.js';
-import { runInAction } from 'mobx';
 
 const EMPTY_CONNECTION_INFO_PARAMS: IConnectionFormState = {
   projectId: '',
@@ -26,19 +24,13 @@ export function useConnectionFormState(params: IConnectionInfoParams, configure?
   const serviceProvider = useService(IServiceProvider);
   const service = useService(ConnectionFormService);
   const ref = useRef<ConnectionFormState>(null);
-  const optionsPart = ref.current ? getConnectionFormOptionsPart(ref.current) : null;
 
-  if (optionsPart?.state.connectionId !== params.connectionId || ref.current?.state.projectId !== params.projectId) {
+  if (ref.current?.state.connectionId !== params.connectionId || ref.current?.state.projectId !== params.projectId) {
     ref.current?.dispose();
     ref.current = new ConnectionFormState(serviceProvider, service, {
       ...EMPTY_CONNECTION_INFO_PARAMS,
       projectId: params.projectId,
-    });
-
-    runInAction(() => {
-      if (optionsPart) {
-        optionsPart.state.connectionId = params.connectionId;
-      }
+      connectionId: params.connectionId,
     });
 
     configure?.(ref.current);
