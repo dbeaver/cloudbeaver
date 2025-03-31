@@ -45,6 +45,7 @@
     "@cloudbeaver/tsconfig": "workspace:*",
     "@swc/core": "^1",
     "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^14",
     "@types/js-yaml": "^4",
     "@types/node": "^20",
     "enquirer": "^2",

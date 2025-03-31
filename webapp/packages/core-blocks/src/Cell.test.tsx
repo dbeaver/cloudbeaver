@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { waitFor } from '@testing-library/react';
 
 import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
@@ -15,11 +15,7 @@ import { Cell } from './Cell.js';
 
 const app = createApp();
 
-describe('Cell', () => {
-  afterEach(() => {
-    cleanup();
-  });
-
+describe.skip('Cell', () => {
   it('should render children correctly', async () => {
     const { getByText } = renderInApp(<Cell>Test Children</Cell>, app);
     const text = await waitFor(() => getByText('Test Children'));

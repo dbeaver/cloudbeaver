@@ -21,7 +21,6 @@ export default defineConfig({
         replacement: path.resolve(__dirname, './__mocks__/styleMock.js'),
       },
     ],
-    globals: true,
     watch: false,
     environmentOptions: {
       // This will force JSDOM to use the default export condition when importing msw/node, resulting in correct imports.
