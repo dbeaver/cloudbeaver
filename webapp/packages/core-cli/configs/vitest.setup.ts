@@ -5,8 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, expect } from 'vitest';
-import * as matchers from 'jest-extended';
+import { afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
@@ -16,5 +15,3 @@ process.env.TZ = 'UTC';
 afterEach(() => {
   cleanup();
 });
-
-expect.extend(matchers);
