@@ -47,7 +47,7 @@ export const UserFormConnectionTableItem = observer<Props>(function UserFormConn
         <TableItemSelect disabled={disabled} checked={selected} />
       </TableColumnValue>
       <TableColumnValue centerContent>
-        <StaticImage className={style['staticImage']} icon={driver?.icon} width={24} block />
+        <StaticImage className={style['staticImage']} icon={driver?.icon} block />
       </TableColumnValue>
       <TableColumnValue title={connection.name} ellipsis>
         {connection.name}
