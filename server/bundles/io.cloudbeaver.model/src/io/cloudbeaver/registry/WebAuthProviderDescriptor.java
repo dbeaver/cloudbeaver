@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private final boolean isPrivate;
     private final boolean isAuthHidden;
     private final boolean isCaseInsensitive;
+    private final boolean serviceProvider;
     private final String[] requiredFeatures;
     private final boolean isRequired;
     private String[] types;
@@ -71,6 +72,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         this.isRequired = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_REQUIRED));
         this.isAuthHidden = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_AUTH_HIDDEN));
         this.isCaseInsensitive = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_CASE_INSENSITIVE));
+        this.serviceProvider = CommonUtils.toBoolean(cfg.getAttribute("serviceProvider"));
 
         for (IConfigurationElement cfgElement : cfg.getChildren(WebRegistryConstant.TAG_CONFIGURATION)) {
             List<WebAuthProviderProperty> properties = WebAuthProviderRegistry.readProperties(cfgElement, getId());
@@ -222,5 +224,9 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
             }
         }
         replaceContributor(ext.getContributor());
+    }
+
+    public boolean isServiceProvider() {
+        return serviceProvider;
     }
 }

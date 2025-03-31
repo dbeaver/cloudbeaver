@@ -18,7 +18,6 @@ export * from './extensions/IObjectSchemaProvider.js';
 export * from './extensions/IObjectSchemaSetter.js';
 export * from './extensions/IObjectLoaderProvider.js';
 export * from './extensions/IExecutionContextProvider.js';
-export * from './NavTree/ConnectionNavNodeService.js';
 export * from './NavTree/NavNodeExtensionsService.js';
 export * from './NavTree/getConnectionFolderIdFromNodeId.js';
 export * from './NavTree/getConnectionFolderId.js';
@@ -31,6 +30,7 @@ export * from './NavTree/isConnectionNode.js';
 
 export * from './extensions/IConnectionProvider.js';
 export * from './extensions/IConnectionSetter.js';
+export * from './ConnectionFolderEventHandler.js';
 export * from './ConnectionsManagerService.js';
 export * from './ConnectionFolderResource.js';
 export * from './ConnectionDialectResource.js';

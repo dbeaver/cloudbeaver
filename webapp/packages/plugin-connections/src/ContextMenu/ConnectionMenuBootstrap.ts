@@ -63,24 +63,15 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       root: true,
+      contexts: [DATA_CONTEXT_CONNECTION, DATA_CONTEXT_NAV_NODE],
       isApplicable: context => {
         if (this.pluginConnectionsSettingsService.hideConnectionViewForUsers && !this.permissionsService.has(EAdminPermission.admin)) {
           return false;
         }
 
-        const connection = context.get(DATA_CONTEXT_CONNECTION);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
-        if (!connection?.connected) {
-          return false;
-        }
-
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
-
-        if (node && !node.objectFeatures.includes(EObjectFeature.dataSource)) {
-          return false;
-        }
-
-        return context.has(DATA_CONTEXT_CONNECTION);
+        return node.objectFeatures.includes(EObjectFeature.dataSource) && node.objectFeatures.includes(EObjectFeature.dataSourceConnected);
       },
       getItems: (context, items) => [...items, MENU_CONNECTION_VIEW],
     });
@@ -101,7 +92,12 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       actions: [ACTION_CONNECTION_VIEW_SIMPLE, ACTION_CONNECTION_VIEW_ADVANCED, ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS],
       contexts: [DATA_CONTEXT_CONNECTION],
       isChecked: (context, action) => {
-        const connection = context.get(DATA_CONTEXT_CONNECTION)!;
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+        const connection = this.connectionInfoResource.get(connectionKey);
+
+        if (!connection) {
+          return false;
+        }
 
         switch (action) {
           case ACTION_CONNECTION_VIEW_SIMPLE: {
@@ -118,7 +114,8 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         return false;
       },
       handler: async (context, action) => {
-        const connection = context.get(DATA_CONTEXT_CONNECTION)!;
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+        const connection = await this.connectionInfoResource.load(connectionKey);
 
         switch (action) {
           case ACTION_CONNECTION_VIEW_SIMPLE: {
@@ -140,6 +137,10 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           }
         }
       },
+      getLoader: context => {
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+        return getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKey, undefined, true);
+      },
     });
 
     this.menuService.addCreator({
@@ -156,57 +157,65 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'connection-management',
-      contexts: [DATA_CONTEXT_CONNECTION],
-      isActionApplicable: (context, action) => {
-        const connection = context.get(DATA_CONTEXT_CONNECTION);
+      actions: [
+        ACTION_DELETE,
+        ACTION_CONNECTION_CHANGE_CREDENTIALS,
+        ACTION_CONNECTION_EDIT,
+        ACTION_CONNECTION_DISCONNECT,
+        ACTION_CONNECTION_DISCONNECT_ALL,
+      ],
+      contexts: [DATA_CONTEXT_CONNECTION, DATA_CONTEXT_NAV_NODE],
+      isActionApplicable: context => {
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
+
+        return node.objectFeatures.includes(EObjectFeature.dataSource);
+      },
+      isHidden: (context, action) => {
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+        const connection = this.connectionInfoResource.get(connectionKey);
 
         if (!connection) {
-          return false;
-        }
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
-
-        if (node && !node.objectFeatures.includes(EObjectFeature.dataSource)) {
-          return false;
+          return true;
         }
 
         if (action === ACTION_CONNECTION_DISCONNECT) {
-          return connection.connected;
+          return !connection.connected;
         }
 
         if (action === ACTION_CONNECTION_DISCONNECT_ALL) {
-          return this.connectionsManagerService.hasAnyConnection(true);
+          return !this.connectionsManagerService.hasAnyConnection(true);
         }
 
         if (action === ACTION_DELETE) {
-          return connection.canDelete;
+          return !connection.canDelete;
         }
 
         if (action === ACTION_CONNECTION_EDIT) {
-          return connection.canEdit || connection.canViewSettings;
+          return !(connection.canEdit || connection.canViewSettings);
         }
 
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
-          return this.serverConfigResource.distributed && !connection.sharedCredentials;
+          return !this.serverConfigResource.distributed || connection.sharedCredentials;
         }
 
-        return false;
+        return true;
       },
       getLoader: (context, action) => {
-        const connection = context.get(DATA_CONTEXT_CONNECTION)!;
-
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
           return getCachedMapResourceLoaderState(
             this.connectionInfoResource,
-            () => createConnectionParam(connection),
+            () => connectionKey,
             () => ['includeCredentialsSaved' as const],
             true,
           );
         }
 
-        return [];
+        return getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKey, undefined, true);
       },
       handler: async (context, action) => {
-        const connection = context.get(DATA_CONTEXT_CONNECTION)!;
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+        const connection = await this.connectionInfoResource.load(connectionKey);
 
         switch (action) {
           case ACTION_CONNECTION_DISCONNECT: {

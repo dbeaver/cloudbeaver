@@ -1,1 +1,7 @@
 @import url('react-data-grid/lib/styles.css') layer(components);
+
+@layer components.rdg.MeasuringCell {
+  [data-measuring-cell] {
+    max-width: var(--rdg-max-auto-size, 350px);
+  }
+}
