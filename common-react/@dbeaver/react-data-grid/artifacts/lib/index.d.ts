@@ -1,11 +1,10 @@
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { Context } from 'react';
+import { JSX } from 'react/jsx-runtime';
 import type { Key } from 'react';
-import { Provider } from 'react';
 import type { ReactElement } from 'react';
 import { ReactNode } from 'react';
-import { RefAttributes } from 'react';
 
-declare interface BaseRenderRowProps<TRow, TSummaryRow = unknown> extends Omit_2<React.HTMLAttributes<HTMLDivElement>, 'style' | 'children'>, Pick<DataGridProps<TRow, TSummaryRow>, 'onCellClick' | 'onCellDoubleClick' | 'onCellContextMenu'> {
+declare interface BaseRenderRowProps<TRow, TSummaryRow = unknown> extends Omit_2<React.ComponentProps<'div'>, 'style' | 'children'>, Pick<DataGridProps<TRow, TSummaryRow>, 'onCellClick' | 'onCellDoubleClick' | 'onCellContextMenu'> {
     viewportColumns: readonly CalculatedColumn<TRow, TSummaryRow>[];
     rowIdx: number;
     selectedCellIdx: number | undefined;
@@ -27,6 +26,7 @@ export declare interface CalculatedColumn<TRow, TSummaryRow = unknown> extends C
     readonly draggable: boolean;
     readonly frozen: boolean;
     readonly renderCell: (props: RenderCellProps<TRow, TSummaryRow>) => ReactNode;
+    readonly renderHeaderCell: (props: RenderHeaderCellProps<TRow, TSummaryRow>) => ReactNode;
 }
 
 export declare type CalculatedColumnOrColumnGroup<R, SR> = CalculatedColumnParent<R, SR> | CalculatedColumn<R, SR>;
@@ -40,7 +40,7 @@ export declare interface CalculatedColumnParent<R, SR> {
     readonly headerCellClass?: Maybe<string>;
 }
 
-export declare const Cell: <R, SR>(props: CellRendererProps<R, SR> & RefAttributes<HTMLDivElement>) => React.JSX.Element;
+export declare const Cell: <R, SR>(props: CellRendererProps<R, SR>) => React.JSX.Element;
 
 export declare interface CellClickArgs<TRow, TSummaryRow = unknown> {
     rowIdx: number;
@@ -60,7 +60,7 @@ export declare type CellKeyDownArgs<TRow, TSummaryRow = unknown> = SelectCellKey
 
 export declare type CellMouseEvent = CellEvent<React.MouseEvent<HTMLDivElement>>;
 
-export declare interface CellRendererProps<TRow, TSummaryRow> extends Pick<RenderRowProps<TRow, TSummaryRow>, 'row' | 'rowIdx' | 'selectCell'>, Omit_2<React.HTMLAttributes<HTMLDivElement>, 'children' | 'onClick' | 'onDoubleClick' | 'onContextMenu'> {
+export declare interface CellRendererProps<TRow, TSummaryRow> extends Pick<RenderRowProps<TRow, TSummaryRow>, 'row' | 'rowIdx' | 'selectCell'>, Omit_2<React.ComponentProps<'div'>, 'children' | 'onClick' | 'onDoubleClick' | 'onContextMenu'> {
     column: CalculatedColumn<TRow, TSummaryRow>;
     colSpan: number | undefined;
     isCopied: boolean;
@@ -158,7 +158,16 @@ export declare interface CopyEvent<TRow> {
     sourceRow: TRow;
 }
 
-export declare const DataGridDefaultRenderersProvider: Provider<Maybe<Renderers<any, any>>>;
+/**
+ * Main API Component to render a data grid of rows and columns
+ *
+ * @example
+ *
+ * <DataGrid columns={columns} rows={rows} />
+ */
+export declare function DataGrid<R, SR = unknown, K extends Key = Key>(props: DataGridProps<R, SR, K>): JSX.Element;
+
+export declare const DataGridDefaultRenderersContext: Context<Maybe<Renderers<any, any>>>;
 
 export declare interface DataGridHandle {
     element: HTMLDivElement | null;
@@ -167,6 +176,7 @@ export declare interface DataGridHandle {
 }
 
 export declare interface DataGridProps<R, SR = unknown, K extends Key = Key> extends SharedDivProps {
+    ref?: Maybe<React.Ref<DataGridHandle>>;
     /**
      * Grid and data Props
      */
@@ -243,6 +253,10 @@ export declare interface DataGridProps<R, SR = unknown, K extends Key = Key> ext
     /** @default true */
     enableVirtualization?: Maybe<boolean>;
     /**
+     * The minimum number of rows to render when virtualization is enabled
+     */
+    minimumRowsToRender?: Maybe<number>;
+    /**
      * Miscellaneous
      */
     renderers?: Maybe<Renderers<NoInfer<R>, NoInfer<SR>>>;
@@ -253,10 +267,7 @@ export declare interface DataGridProps<R, SR = unknown, K extends Key = Key> ext
     'data-cy'?: Maybe<string>;
 }
 
-declare const _default: <R, SR = unknown, K extends Key = Key>(props: DataGridProps<R, SR, K> & RefAttributes<DataGridHandle>) => React.JSX.Element;
-export default _default;
-
-export declare type DefaultColumnOptions<R, SR> = Pick<Column<R, SR>, 'renderCell' | 'width' | 'minWidth' | 'maxWidth' | 'resizable' | 'sortable' | 'draggable'>;
+export declare type DefaultColumnOptions<R, SR> = Pick<Column<R, SR>, 'renderCell' | 'renderHeaderCell' | 'width' | 'minWidth' | 'maxWidth' | 'resizable' | 'sortable' | 'draggable'>;
 
 declare type Direction = 'ltr' | 'rtl';
 
@@ -317,9 +328,9 @@ export declare interface RenderCellProps<TRow, TSummaryRow = unknown> {
     onRowChange: (row: TRow) => void;
 }
 
-export declare function renderCheckbox({ onChange, indeterminate, ...props }: RenderCheckboxProps): JSX_2.Element;
+export declare function renderCheckbox({ onChange, indeterminate, ...props }: RenderCheckboxProps): JSX.Element;
 
-export declare interface RenderCheckboxProps extends Pick<React.InputHTMLAttributes<HTMLInputElement>, 'aria-label' | 'aria-labelledby' | 'checked' | 'tabIndex' | 'disabled'> {
+export declare interface RenderCheckboxProps extends Pick<React.ComponentProps<'input'>, 'aria-label' | 'aria-labelledby' | 'checked' | 'tabIndex' | 'disabled'> {
     indeterminate?: boolean | undefined;
     onChange: (checked: boolean, shift: boolean) => void;
 }
@@ -350,7 +361,7 @@ export declare interface RenderGroupCellProps<TRow, TSummaryRow = unknown> {
     toggleGroup: () => void;
 }
 
-export declare function renderHeaderCell<R, SR>({ column, sortDirection, priority }: RenderHeaderCellProps<R, SR>): string | JSX_2.Element;
+export declare function renderHeaderCell<R, SR>({ column, sortDirection, priority }: RenderHeaderCellProps<R, SR>): string | JSX.Element;
 
 export declare interface RenderHeaderCellProps<TRow, TSummaryRow = unknown> {
     column: CalculatedColumn<TRow, TSummaryRow>;
@@ -370,7 +381,7 @@ export declare interface RenderRowProps<TRow, TSummaryRow = unknown> extends Bas
     setDraggedOverRowIdx: ((overRowIdx: number) => void) | undefined;
 }
 
-export declare function renderSortIcon({ sortDirection }: RenderSortIconProps): JSX_2.Element | null;
+export declare function renderSortIcon({ sortDirection }: RenderSortIconProps): JSX.Element | null;
 
 export declare interface RenderSortIconProps {
     sortDirection: SortDirection | undefined;
@@ -391,11 +402,11 @@ export declare interface RenderSummaryCellProps<TSummaryRow, TRow = unknown> {
     tabIndex: number;
 }
 
-export declare function renderToggleGroup<R, SR>(props: RenderGroupCellProps<R, SR>): JSX_2.Element;
+export declare function renderToggleGroup<R, SR>(props: RenderGroupCellProps<R, SR>): JSX.Element;
 
 export declare function renderValue<R, SR>(props: RenderCellProps<R, SR>): ReactNode;
 
-export declare const Row: <R, SR>(props: RenderRowProps<R, SR> & RefAttributes<HTMLDivElement>) => React.JSX.Element;
+export declare const Row: <R, SR>(props: RenderRowProps<R, SR>) => React.JSX.Element;
 
 export declare type RowHeightArgs<TRow> = {
     type: 'ROW';
@@ -438,7 +449,7 @@ export declare interface SelectRowEvent<TRow> {
     isShiftClick: boolean;
 }
 
-declare type SharedDivProps = Pick<React.HTMLAttributes<HTMLDivElement>, 'role' | 'aria-label' | 'aria-labelledby' | 'aria-description' | 'aria-describedby' | 'aria-rowcount' | 'className' | 'style'>;
+declare type SharedDivProps = Pick<React.ComponentProps<'div'>, 'role' | 'aria-label' | 'aria-labelledby' | 'aria-description' | 'aria-describedby' | 'aria-rowcount' | 'className' | 'style'>;
 
 declare type SharedInputProps = Pick<RenderCheckboxProps, 'disabled' | 'tabIndex' | 'aria-label' | 'aria-labelledby' | 'indeterminate' | 'onChange'>;
 
@@ -449,11 +460,11 @@ export declare interface SortColumn {
 
 export declare type SortDirection = 'ASC' | 'DESC';
 
-export declare function textEditor<TRow, TSummaryRow>({ row, column, onRowChange, onClose }: RenderEditCellProps<TRow, TSummaryRow>): JSX_2.Element;
+export declare function textEditor<TRow, TSummaryRow>({ row, column, onRowChange, onClose }: RenderEditCellProps<TRow, TSummaryRow>): JSX.Element;
 
-export declare function ToggleGroup<R, SR>({ groupKey, isExpanded, tabIndex, toggleGroup }: RenderGroupCellProps<R, SR>): JSX_2.Element;
+export declare function ToggleGroup<R, SR>({ groupKey, isExpanded, tabIndex, toggleGroup }: RenderGroupCellProps<R, SR>): JSX.Element;
 
-export declare const TreeDataGrid: <R, SR = unknown, K extends Key = Key>(props: TreeDataGridProps<R, SR, K> & RefAttributes<DataGridHandle>) => React.JSX.Element;
+export declare function TreeDataGrid<R, SR = unknown, K extends Key = Key>({ columns: rawColumns, rows: rawRows, rowHeight: rawRowHeight, rowKeyGetter: rawRowKeyGetter, onCellKeyDown: rawOnCellKeyDown, onRowsChange, selectedRows: rawSelectedRows, onSelectedRowsChange: rawOnSelectedRowsChange, renderers, groupBy: rawGroupBy, rowGrouper, expandedGroupIds, onExpandedGroupIdsChange, ...props }: TreeDataGridProps<R, SR, K>): JSX.Element;
 
 export declare interface TreeDataGridProps<R, SR = unknown, K extends Key = Key> extends Omit_2<DataGridProps<R, SR, K>, 'columns' | 'role' | 'aria-rowcount' | 'rowHeight' | 'onFill' | 'isRowSelectionDisabled'> {
     columns: readonly Column<NoInfer<R>, NoInfer<SR>>[];

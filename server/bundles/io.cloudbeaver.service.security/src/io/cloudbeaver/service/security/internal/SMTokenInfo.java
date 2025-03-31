@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,19 +35,22 @@ public class SMTokenInfo {
 
     @Nullable
     private final String authRole;
+    private final boolean serviceToken;
 
     public SMTokenInfo(
         @NotNull String accessToken,
         @NotNull String refreshToken,
         @NotNull String sessionId,
         @NotNull String userId,
-        @Nullable String authRole
+        @Nullable String authRole,
+        boolean serviceToken
     ) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.sessionId = sessionId;
         this.userId = userId;
         this.authRole = authRole;
+        this.serviceToken = serviceToken;
     }
 
     @NotNull
@@ -73,5 +76,9 @@ public class SMTokenInfo {
     @Nullable
     public String getAuthRole() {
         return authRole;
+    }
+
+    public boolean isServiceToken() {
+        return serviceToken;
     }
 }

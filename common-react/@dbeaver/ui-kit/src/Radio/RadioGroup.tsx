@@ -7,6 +7,7 @@
  */
 
 import { useId } from 'react';
+import clsx from 'clsx';
 import './RadioGroup.css';
 import { _RadioGroup, _RadioProvider, type RadioProviderProps } from './index.js';
 
@@ -42,14 +43,14 @@ export function RadioGroup({ className, children, labelledBy, label, ['aria-labe
     <_RadioProvider {...props}>
       <div className="dbv-kit-radio-group__container">
         {label && (
-          <div id={labelId} className={`dbv-kit-radio-group__label ${props.required ? 'dbv-kit-radio-group__label--required' : ''}`}>
+          <div id={labelId} className={clsx('dbv-kit-radio-group__label', props.required && 'dbv-kit-radio-group__label--required')}>
             {label}
           </div>
         )}
         <_RadioGroup
           aria-labelledby={labelledById}
           aria-label={ariaLabel}
-          className={`dbv-kit-radio-group ${className ?? ''} ${props.vertical ? 'dbv-kit-radio-group--vertical' : ''}`}
+          className={clsx('dbv-kit-radio-group', className, props.vertical && 'dbv-kit-radio-group--vertical')}
         >
           {children}
         </_RadioGroup>

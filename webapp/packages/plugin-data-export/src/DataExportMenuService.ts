@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
-import { createConnectionParam, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
@@ -35,6 +35,7 @@ export class DataExportMenuService {
     private readonly menuService: MenuService,
     private readonly localizationService: LocalizationService,
     private readonly dataViewerService: DataViewerService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
   ) {}
 
   register(): void {
@@ -130,11 +131,12 @@ export class DataExportMenuService {
       contexts: [DATA_CONTEXT_CONNECTION, DATA_CONTEXT_NAV_NODE],
       handler: async context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
-        const connection = context.get(DATA_CONTEXT_CONNECTION)!;
+        const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
+        const connection = await this.connectionInfoResource.load(connectionKey);
         const fileName = withTimestamp(`${connection.name}${node.name ? ` - ${node.name}` : ''}`);
 
         this.commonDialogService.open(DataExportDialog, {
-          connectionKey: createConnectionParam(connection),
+          connectionKey,
           name: node.name,
           fileName,
           containerNodePath: node.id,

@@ -89,7 +89,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
       )}
       {icon && (
         <div className={s(styles, { icon: true })}>
-          {icon && <StaticImage icon={icon} className={s(styles, { staticImage: true })} />}
+          <StaticImage icon={icon} className={s(styles, { staticImage: true })} />
           {columnReadOnly && hasElementIdentifier && !dataReadonly && (
             <div className={s(styles, { readonlyStatus: true }, 'rdg-table-header__readonly-status')} />
           )}
