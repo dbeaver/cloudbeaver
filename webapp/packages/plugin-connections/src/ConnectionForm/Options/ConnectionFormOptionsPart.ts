@@ -29,7 +29,6 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
 import type { NotificationService } from '@cloudbeaver/core-events';
 import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
-import type { ConnectionAuthenticationDialogPayload } from '../../ConnectionAuthentication/ConnectionAuthenticationDialog.js';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
@@ -94,37 +93,43 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       return state;
     }
 
+    const stateToRestore: IConnectionFormOptionsState = {};
+
     // does not show credentials in dialog if they are already saved
     if (state.saveCredentials) {
       if (state.authModelId) {
+        stateToRestore.authModelId = state.authModelId;
         delete state.authModelId;
       }
 
       if (state.credentials) {
+        stateToRestore.credentials = toJS(state.credentials);
         delete state.credentials;
       }
     }
 
     // does not show network handlers in dialog if they are not required
-    if (!this.formState.state.requiredNetworkHandlersIds.length) {
+    if (!this.formState.state.requiredNetworkHandlersIds.length && state.networkHandlersConfig) {
+      stateToRestore.networkHandlersConfig = toJS(state.networkHandlersConfig);
       delete state.networkHandlersConfig;
     }
 
-    const result = await this.commonDialogService.open<ConnectionAuthenticationDialogPayload, ConnectionConfig>(
-      ConnectionAuthenticationDialogLoader,
-      {
-        config: state,
-        authModelId: state.authModelId ?? null,
-        networkHandlers: this.formState.state.requiredNetworkHandlersIds,
-        projectId: this.formState.state.projectId,
-      },
-    );
+    const result = await this.commonDialogService.open(ConnectionAuthenticationDialogLoader, {
+      config: state,
+      authModelId: state.authModelId ?? null,
+      networkHandlers: this.formState.state.requiredNetworkHandlersIds,
+      projectId: this.formState.state.projectId,
+    });
 
     if (result === DialogueStateResult.Rejected) {
       return null;
     }
 
-    return result as ConnectionConfig;
+    for (const key of Object.keys(stateToRestore)) {
+      state[key as keyof IConnectionFormOptionsState] = observable(stateToRestore[key as keyof IConnectionFormOptionsState] as any);
+    }
+
+    return state;
   }
 
   get connectionKey() {
@@ -474,17 +479,14 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
         this.formState.setMode(FormMode.Edit);
       }
     } else {
-      const stateCopy = observable(toJS(this.state));
       try {
-        const updatedState = await this.askCredentials(stateCopy);
+        const stateCopy = await this.askCredentials(observable(toJS(this.state)));
 
-        if (!updatedState) {
+        if (!stateCopy) {
           return;
         }
 
-        Object.assign(this.state, updatedState);
-
-        const info = await this.connectionInfoResource.test(this.formState.state.projectId, this.state);
+        const info = await this.connectionInfoResource.test(this.formState.state.projectId, stateCopy);
 
         this.notificationService.logSuccess({
           title: 'connections_connection_test_success',

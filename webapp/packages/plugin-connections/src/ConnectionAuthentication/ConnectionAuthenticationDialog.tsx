@@ -20,7 +20,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useDBDriver } from '@cloudbeaver/core-connections';
-import { type DialogComponent } from '@cloudbeaver/core-dialogs';
+import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 import style from './ConnectionAuthenticationDialog.module.css';
@@ -33,7 +33,7 @@ export interface ConnectionAuthenticationDialogPayload {
   projectId: string | null;
 }
 
-export const ConnectionAuthenticationDialog: DialogComponent<ConnectionAuthenticationDialogPayload, ConnectionConfig> = observer(
+export const ConnectionAuthenticationDialog: DialogComponent<ConnectionAuthenticationDialogPayload> = observer(
   function ConnectionAuthenticationDialog({ payload, rejectDialog, resolveDialog }) {
     const translate = useTranslate();
     const styles = useS(style);
@@ -49,7 +49,7 @@ export const ConnectionAuthenticationDialog: DialogComponent<ConnectionAuthentic
           onReject={rejectDialog}
         />
         <CommonDialogBody>
-          <Form ref={focusedRef} className={s(styles, { submittingForm: true })} onSubmit={() => resolveDialog(payload.config)}>
+          <Form ref={focusedRef} className={s(styles, { submittingForm: true })} onSubmit={() => resolveDialog()}>
             <ConnectionAuthenticationFormLoader
               config={payload.config}
               projectId={payload.projectId ?? null}
@@ -62,7 +62,7 @@ export const ConnectionAuthenticationDialog: DialogComponent<ConnectionAuthentic
           </Form>
         </CommonDialogBody>
         <CommonDialogFooter>
-          <Button mod={['unelevated']} className={s(styles, { button: true })} onClick={() => resolveDialog(payload.config)}>
+          <Button mod={['unelevated']} className={s(styles, { button: true })} onClick={() => resolveDialog()}>
             {translate('ui_apply')}
           </Button>
         </CommonDialogFooter>
