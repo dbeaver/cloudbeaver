@@ -152,7 +152,7 @@ type ServerConfig {
     productConfiguration: Object!
     productInfo: ProductInfo
     defaultNavigatorSettings: NavigatorSettings!
-    disabledDrivers: [ID!]
+    disabledDrivers: [ID!]!
     resourceQuotas: Object!
 }
 

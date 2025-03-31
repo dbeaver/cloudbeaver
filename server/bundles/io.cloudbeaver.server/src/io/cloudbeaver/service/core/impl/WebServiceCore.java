@@ -20,7 +20,6 @@ package io.cloudbeaver.service.core.impl;
 import io.cloudbeaver.*;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.app.ServletApplication;
-import io.cloudbeaver.model.dto.WebServerConfigDto;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
@@ -69,16 +68,10 @@ public class WebServiceCore implements DBWServiceCore {
     private static final Log log = Log.getLog(WebServiceCore.class);
 
     @Override
-    public WebServerConfigDto getServerConfig(WebSession webSession) {
+    public WebServerConfig getServerConfig(WebSession webSession) {
         WebServerConfig webServerConfig = WebAppUtils.getWebApplication().getWebServerConfig();
-        WebServerConfigDto dto = new WebServerConfigDto(webServerConfig);
-        if (webSession.getUser() != null || webServerConfig.isConfigurationMode()) {
-            return dto;
-        }
-        dto.setDisabledDrivers(null);
-        dto.setLicenseStatus(null);
-        dto.setProductInfo(null);
-        return dto;
+        webServerConfig.setProvideSensitiveInformation(webSession.getUser() != null || webServerConfig.isConfigurationMode());
+        return webServerConfig;
     }
 
     @Override

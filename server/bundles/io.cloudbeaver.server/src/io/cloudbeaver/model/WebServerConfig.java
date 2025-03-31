@@ -40,6 +40,7 @@ import java.util.Map;
 public class WebServerConfig {
 
     private final WebApplication application;
+    private boolean provideSensitiveInformation = true;
 
     public WebServerConfig(@NotNull WebApplication application) {
         this.application = application;
@@ -92,7 +93,7 @@ public class WebServerConfig {
 
     @Property
     public String getLicenseStatus() {
-        return application.getLicenseStatus();
+            return provideSensitiveInformation ? application.getLicenseStatus() : "";
     }
 
     @Property
@@ -168,16 +169,24 @@ public class WebServerConfig {
 
     @Property
     public WebProductInfo getProductInfo() {
-        return new WebProductInfo();
+        return provideSensitiveInformation ? new WebProductInfo() : null;
     }
 
     @Property
     public String[] getDisabledDrivers() {
-        return application.getAppConfiguration().getDisabledDrivers();
+        return provideSensitiveInformation ? application.getAppConfiguration().getDisabledDrivers() : new String[]{};
     }
 
     @Property
     public Boolean isDistributed() {
         return application.isDistributed();
+    }
+
+    public boolean isProvideSensitiveInformation() {
+        return provideSensitiveInformation;
+    }
+
+    public void setProvideSensitiveInformation(boolean provideSensitiveInformation) {
+        this.provideSensitiveInformation = provideSensitiveInformation;
     }
 }
