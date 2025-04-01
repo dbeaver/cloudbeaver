@@ -65,7 +65,7 @@ export default [
   ['connections_connection_port', 'Porta'],
   ['connections_connection_template', 'Template'],
   ['core_connections_connection_create_success', 'Connection was created'],
-  ['core_connections_connection_update_success', 'Connection is updated'],
+  ['core_connections_connection_update_success', 'Connection was updated'],
   ['connections_connection_test', 'Prova la connessione'],
   ['connections_connection_test_tooltip', 'Test connection'],
   ['connections_connection_test_fail', 'Prova di connessione fallita'],
