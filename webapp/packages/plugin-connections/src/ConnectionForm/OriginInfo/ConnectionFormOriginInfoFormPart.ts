@@ -51,11 +51,11 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
   // do not include connectionInfoOriginDetailsResource cause it is already synced with connectionInfoResource
   // this will lead to the infinite loop of loading
   override isOutdated(): boolean {
-    return (
-      this.dbDriverResource.isOutdated(this.optionsPart.state.driverId) ||
-      !!(this.authModelId && this.databaseAuthModelsResource.isOutdated(this.authModelId)) ||
-      this.userInfoResource.isOutdated()
-    );
+    const isDriverOutdated = Boolean(this.optionsPart.state.driverId && this.dbDriverResource.isOutdated(this.optionsPart.state.driverId));
+    const isAuthModelOutdated = Boolean(this.authModelId && this.databaseAuthModelsResource.isOutdated(this.authModelId));
+    const isUserInfoOutdated = this.userInfoResource.isOutdated();
+
+    return isDriverOutdated || isAuthModelOutdated || isUserInfoOutdated;
   }
 
   get providerId(): string | null {

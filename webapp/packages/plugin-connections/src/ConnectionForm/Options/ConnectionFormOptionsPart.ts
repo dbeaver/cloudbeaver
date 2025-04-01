@@ -14,6 +14,8 @@ import {
   createConnectionParam,
   DatabaseAuthModelsResource,
   DBDriverResource,
+  type Connection,
+  type ConnectionInfoIncludes,
   type DatabaseConnection,
   type DBDriver,
 } from '@cloudbeaver/core-connections';
@@ -29,11 +31,20 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
 import type { NotificationService } from '@cloudbeaver/core-events';
 import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
+import type { CachedResourceIncludeArgs } from '@cloudbeaver/core-resource';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
 const MAIN_PROPERTY_PORT_KEY = 'port';
 const MAIN_PROPERTY_SERVER_KEY = 'server';
+const CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS: CachedResourceIncludeArgs<Connection, ConnectionInfoIncludes> = [
+  'includeAuthProperties',
+  'includeCredentialsSaved',
+  'customIncludeOptions',
+  'includeProperties',
+  'includeProviderProperties',
+  'includeNetworkHandlersConfig',
+];
 
 const defaultStateGetter = (connectionId?: string) =>
   ({
@@ -147,15 +158,13 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       return false;
     }
 
-    if (this.projectInfoResource.isOutdated(this.formState.state.projectId)) {
-      return true;
+    if (this.formState.mode === 'create') {
+      if (this.state.driverId && this.dbDriverResource.isOutdated(this.state.driverId)) {
+        return true;
+      }
     }
 
-    if (this.dbDriverResource.isOutdated(this.state.driverId)) {
-      return true;
-    }
-
-    return !!this.connectionKey && this.connectionInfoResource.isOutdated(this.connectionKey);
+    return !!this.connectionKey && this.connectionInfoResource.isOutdated(this.connectionKey, CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS);
   }
 
   protected override async loader(): Promise<void> {
@@ -173,14 +182,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     // TODO: we should split connection info resource to multiple resources and load this data separately in different parts where needed
-    const info = await this.connectionInfoResource.load(this.connectionKey, [
-      'includeAuthProperties',
-      'includeCredentialsSaved',
-      'customIncludeOptions',
-      'includeProperties',
-      'includeProviderProperties',
-      'includeNetworkHandlersConfig',
-    ]);
+    const info = await this.connectionInfoResource.load(this.connectionKey, CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS);
 
     const config: ConnectionConfig = defaultStateGetter();
 
