@@ -11,6 +11,9 @@
       "path": "../../../common-react/@dbeaver/react-data-grid"
     },
     {
+      "path": "../../../common-react/@dbeaver/ui-kit"
+    },
+    {
       "path": "../core-blocks"
     },
     {

@@ -32,28 +32,37 @@ import java.util.Date;
  */
 public class WebProductInfo {
 
+    private final boolean provideSensitiveInformation;
+
+    public WebProductInfo(boolean provideSensitiveInformation) {
+        this.provideSensitiveInformation = provideSensitiveInformation;
+    }
+
     @Property
     public String getId() {
-        return CommonUtils.notEmpty(Platform.getProduct().getId());
+        return provideSensitiveInformation ? CommonUtils.notEmpty(Platform.getProduct().getId()) : "";
     }
 
     @Property
     public String getVersion() {
-        return GeneralUtils.getProductVersion().toString();
+        return provideSensitiveInformation ? GeneralUtils.getProductVersion().toString() : "";
     }
 
     @Property
     public String getName() {
-        return CommonUtils.notEmpty(Platform.getProduct().getName());
+        return provideSensitiveInformation ? CommonUtils.notEmpty(Platform.getProduct().getName()) : "";
     }
 
     @Property
     public String getDescription() {
-        return CommonUtils.notEmpty(Platform.getProduct().getDescription());
+        return provideSensitiveInformation ? CommonUtils.notEmpty(Platform.getProduct().getDescription()) : "";
     }
 
     @Property
     public String getBuildTime() {
+        if (!provideSensitiveInformation) {
+            return "";
+        }
         Date buildTime = GeneralUtils.getProductBuildTime();
         if (buildTime == null) {
             buildTime = new Date();
@@ -63,24 +72,35 @@ public class WebProductInfo {
 
     @Property
     public String getReleaseTime() {
-        return DateFormat.getDateInstance(DateFormat.LONG).format(GeneralUtils.getProductReleaseDate());
+        return provideSensitiveInformation
+            ? DateFormat.getDateInstance(DateFormat.LONG).format(GeneralUtils.getProductReleaseDate())
+            : "";
     }
 
     @Property
     public String getLicenseInfo() {
-        return ServletAppUtils.getServletApplication().getInfoDetails(new VoidProgressMonitor());
+        return provideSensitiveInformation
+            ? ServletAppUtils.getServletApplication().getInfoDetails(new VoidProgressMonitor())
+            : "";
     }
 
     @Property
     public String getLatestVersionInfo() {
+        if (!provideSensitiveInformation) {
+            return "";
+        }
         IProduct product = Platform.getProduct();
         return CommonUtils.notEmpty(product.getProperty("versionUpdateURL"));
     }
 
     @Property
     public String getProductPurchaseURL() {
+        if (!provideSensitiveInformation) {
+            return "";
+        }
         IProduct product = Platform.getProduct();
         return CommonUtils.notEmpty(product.getProperty("productPurchaseURL"));
     }
+
 
 }

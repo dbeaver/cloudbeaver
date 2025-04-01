@@ -93,7 +93,7 @@ public class WebServerConfig {
 
     @Property
     public String getLicenseStatus() {
-            return provideSensitiveInformation ? application.getLicenseStatus() : "";
+        return provideSensitiveInformation ? application.getLicenseStatus() : "";
     }
 
     @Property
@@ -169,7 +169,7 @@ public class WebServerConfig {
 
     @Property
     public WebProductInfo getProductInfo() {
-        return provideSensitiveInformation ? new WebProductInfo() : null;
+        return new WebProductInfo(provideSensitiveInformation);
     }
 
     @Property

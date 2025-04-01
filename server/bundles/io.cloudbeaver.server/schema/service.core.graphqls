@@ -150,7 +150,7 @@ type ServerConfig {
     supportedLanguages: [ ServerLanguage! ]!
     services: [ WebServiceConfig ]
     productConfiguration: Object!
-    productInfo: ProductInfo
+    productInfo: ProductInfo!
     defaultNavigatorSettings: NavigatorSettings!
     disabledDrivers: [ID!]!
     resourceQuotas: Object!

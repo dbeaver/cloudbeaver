@@ -7,6 +7,7 @@
  */
 
 import { useState } from 'react';
+import clsx from 'clsx';
 import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel } from './Select.js';
 import './SelectField.css';
 
@@ -116,12 +117,10 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
 
   const displayValue = selectedItem ? (selectedRender ? selectedRender(currentValue, selectedItem) : renderItem(selectedItem)) : '';
 
-  const labelClassName = required ? ' dbv-kit-select__label--required ' : undefined;
-
   return (
-    <div className={`dbv-kit-select-field ${className || ''}`}>
+    <div className={clsx('dbv-kit-select-field', className)}>
       <SelectProvider value={currentValue as any} setValue={val => handleChange(val as T)}>
-        {label && <SelectLabel className={labelClassName}>{label}</SelectLabel>}
+        {label && <SelectLabel className={clsx(required && 'dbv-kit-select__label--required')}>{label}</SelectLabel>}
 
         <Select name={name} disabled={disabled}>
           {displayValue}

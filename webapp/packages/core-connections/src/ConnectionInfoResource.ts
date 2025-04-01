@@ -10,6 +10,7 @@ import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import {
   CachedMapAllKey,
@@ -292,8 +293,17 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   }
 
   // TODO: we need here node path ie ['', 'project://', 'database://...', '...']
+  getConnectionIdForNodeId(projectId: string, nodeId: string): IConnectionInfoParams | undefined {
+    if (!NodeManagerUtils.isDatabaseObject(nodeId)) {
+      return;
+    }
+
+    return createConnectionParam(projectId, NodeManagerUtils.getConnectionId(nodeId));
+  }
+
+  // TODO: we need here node path ie ['', 'project://', 'database://...', '...']
   getConnectionForNode(nodeId: string): Connection | undefined {
-    if (!nodeId.startsWith('database://')) {
+    if (!NodeManagerUtils.isDatabaseObject(nodeId)) {
       return;
     }
 

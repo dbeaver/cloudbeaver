@@ -8,6 +8,7 @@
 
 import { type ComponentPropsWithRef } from 'react';
 import './Input.css';
+import clsx from 'clsx';
 
 export interface InputProps extends Omit<ComponentPropsWithRef<'input'>, 'size'> {
   size?: 'small' | 'medium' | 'large' | 'xlarge';
@@ -15,10 +16,10 @@ export interface InputProps extends Omit<ComponentPropsWithRef<'input'>, 'size'>
 }
 
 export const Input: React.FC<InputProps> = function Input({ size, className, ...props }) {
-  const classNameToApply = `dbv-kit-input dbv-kit-input--${size ?? 'medium'} ${className ?? ''}`.trim();
+  const classNameToApply = clsx(`dbv-kit-input`, `dbv-kit-input--${size ?? 'medium'}`, className);
   return (
     <label className="dbv-kit-input-wrapper">
-      {props.label && <div className={`dbv-kit-input__title ${props.required ? 'dbv-kit-input__title--required' : ''}`}>{props.label}</div>}
+      {props.label && <div className={clsx('dbv-kit-input__title', props.required && 'dbv-kit-input__title--required')}>{props.label}</div>}
       <input className={classNameToApply} {...props} />
     </label>
   );

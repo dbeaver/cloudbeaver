@@ -26,5 +26,6 @@ export const connectionPlugin: PluginManifest = {
     () => import('./NavNodes/ConnectionFoldersBootstrap.js').then(m => m.ConnectionFoldersBootstrap),
     () => import('./ConnectionForm/SSL/ConnectionSSLTabService.js').then(m => m.ConnectionSSLTabService),
     () => import('./PluginConnectionsSettingsService.js').then(m => m.PluginConnectionsSettingsService),
+    () => import('./NavNodes/ConnectionNavNodeService.js').then(m => m.ConnectionNavNodeService),
   ],
 };
