@@ -115,7 +115,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     DBDriverResource,
     {
       key: optionsPart.state.driverId || null,
-      includes: ['includeProviderProperties', 'includeMainProperties'] as const,
+      includes: ['includeProviderProperties', 'includeMainProperties', 'includeDriverProperties'] as const,
     },
     {
       active: selected,
