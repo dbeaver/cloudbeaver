@@ -43,8 +43,8 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
 
             return word === '*' ||
               (display !== wordLowerCase && display.startsWith(wordLowerCase)) ||
-              (replacement !== wordLowerCase && replacement.startsWith(wordLowerCase))
-          },
+              (replacement !== wordLowerCase && replacement.startsWith(wordLowerCase));
+          }
         )
         .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
