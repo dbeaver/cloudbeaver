@@ -14,7 +14,7 @@ import { isNotNullDefined } from '@cloudbeaver/core-utils';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { type ConnectionInfoResource, type DBDriverResource, type NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { makeObservable, observable, override, toJS } from 'mobx';
+import { makeObservable, observable, toJS } from 'mobx';
 import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED.js';
 import { SSL_CODE_NAME } from './SSL_CODE_NAME.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
