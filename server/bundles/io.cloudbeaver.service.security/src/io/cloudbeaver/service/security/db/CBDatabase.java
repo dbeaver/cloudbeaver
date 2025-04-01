@@ -24,7 +24,7 @@ import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.config.WebDatabaseConfig;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
-import io.cloudbeaver.service.security.internal.InternalProxyConnection;
+import org.jkiss.dbeaver.model.sql.db.InternalProxyConnection;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.apache.commons.dbcp2.*;
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -114,7 +114,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         if (exclusiveConnection != null) {
             return exclusiveConnection;
         }
-        return new InternalProxyConnection(dataSource.getConnection(), this);
+        return new InternalProxyConnection(dataSource.getConnection(), databaseConfig);
     }
 
     public void initialize() throws DBException {
@@ -382,7 +382,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
                 public void close() throws SQLException {
                     // do nothing
                 }
-            }, CBDatabase.this);
+            }, databaseConfig);
 
             try {
                 // Fill initial data
