@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.app;
 
+import io.cloudbeaver.model.cli.CloudBeaverInstanceServer;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -27,6 +28,7 @@ import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
+import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
@@ -57,7 +59,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     private static final Log log = Log.getLog(BaseServletApplication.class);
 
     private String instanceId;
-
+    private CloudBeaverInstanceServer instanceServer;
     @Override
     public RMController createResourceController(
         @NotNull SMCredentialsProvider credentialsProvider,
@@ -200,6 +202,11 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     public Object start(IApplicationContext context) {
         initializeApplicationServices();
         try {
+            try {
+                this.instanceServer = new CloudBeaverInstanceServer();
+            } catch (Exception e) {
+                log.error("Error initializing instance server", e);
+            }
             startServer();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -265,5 +272,11 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
         } catch (Exception e) {
             log.error("Failed close " + name, e);
         }
+    }
+
+    @Nullable
+    @Override
+    public ApplicationInstanceController getInstanceServer() {
+        return instanceServer;
     }
 }
