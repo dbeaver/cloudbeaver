@@ -12,10 +12,9 @@ interface IConnectionNameOptions {
   host?: string;
   port?: string;
   defaultPort?: string;
-  database?: string;
 }
 
-export function getConnectionName({ driverName, host, port, defaultPort, database }: IConnectionNameOptions): string {
+export function getConnectionName({ driverName, host, port, defaultPort }: IConnectionNameOptions): string {
   let name = driverName;
 
   if (host) {
@@ -23,10 +22,6 @@ export function getConnectionName({ driverName, host, port, defaultPort, databas
     if (port && port !== defaultPort) {
       name += ':' + port;
     }
-  }
-
-  if (database) {
-    name += ` (${database})`;
   }
 
   return name;

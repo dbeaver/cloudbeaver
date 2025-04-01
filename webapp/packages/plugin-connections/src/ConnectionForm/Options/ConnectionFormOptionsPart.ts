@@ -239,7 +239,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
         host: parsedJdbcUri.host,
         port: parsedJdbcUri.port,
         defaultPort: driver?.defaultPort,
-        database: parsedJdbcUri.database,
       });
     }
 
@@ -248,7 +247,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       host: this.state.host,
       port: this.state.port,
       defaultPort: driver?.defaultPort,
-      database: this.state.databaseName,
     });
   }
 
@@ -489,7 +487,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
         const info = await this.connectionInfoResource.test(this.formState.state.projectId, stateCopy);
 
         this.notificationService.logSuccess({
-          title: 'connections_connection_test_success',
+          title: 'plugin_connections_connection_established',
           message: this.getTestMessageInfo(info),
         });
       } catch (error) {
