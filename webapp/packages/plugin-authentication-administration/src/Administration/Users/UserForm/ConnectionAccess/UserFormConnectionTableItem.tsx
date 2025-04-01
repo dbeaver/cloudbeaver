@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@ import { AdminSubjectType } from '@cloudbeaver/core-sdk';
 import { useTabState } from '@cloudbeaver/core-ui';
 
 import type { UserFormConnectionAccessPart } from './UserFormConnectionAccessPart.js';
+
+import style from './UserFormConnectionTableItem.module.css';
 
 interface Props {
   connection: Connection;
@@ -45,7 +47,7 @@ export const UserFormConnectionTableItem = observer<Props>(function UserFormConn
         <TableItemSelect disabled={disabled} checked={selected} />
       </TableColumnValue>
       <TableColumnValue centerContent>
-        <StaticImage icon={driver?.icon} width={24} block />
+        <StaticImage className={style['staticImage']} icon={driver?.icon} block />
       </TableColumnValue>
       <TableColumnValue title={connection.name} ellipsis>
         {connection.name}
