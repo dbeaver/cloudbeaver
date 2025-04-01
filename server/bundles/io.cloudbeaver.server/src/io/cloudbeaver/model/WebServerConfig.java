@@ -169,7 +169,7 @@ public class WebServerConfig {
 
     @Property
     public WebProductInfo getProductInfo() {
-        return provideSensitiveInformation ? new WebProductInfo() : null;
+        return new WebProductInfo(provideSensitiveInformation);
     }
 
     @Property
