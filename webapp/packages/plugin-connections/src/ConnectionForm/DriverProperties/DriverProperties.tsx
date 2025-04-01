@@ -90,7 +90,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
           className={s(style, { propertiesTable: true })}
           properties={joinedProperties.get()}
           propertiesState={driverPropertiesPart.state}
-          readOnly={formState.isDisabled}
+          readOnly={formState.isDisabled || formState.isReadOnly}
           filterable
           onAdd={state.add}
           onRemove={state.remove}

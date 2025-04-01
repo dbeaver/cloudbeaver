@@ -28,6 +28,7 @@ export class FormState<TState> implements IFormState<TState> {
 
   statusMessage: string | string[] | null;
   statusType: ENotificationType | null;
+  isReadOnly: boolean;
 
   savingPromise: Promise<any> | null;
 
@@ -61,7 +62,7 @@ export class FormState<TState> implements IFormState<TState> {
 
     this.statusMessage = null;
     this.statusType = null;
-
+    this.isReadOnly = false;
     this.savingPromise = null;
 
     this.formStateTask = new Executor<TState>(state, () => true);
@@ -199,6 +200,7 @@ export class FormState<TState> implements IFormState<TState> {
 
     this.statusMessage = context.statusMessage;
     this.statusType = context.statusType;
+    this.isReadOnly = context.readonly;
   }
 
   async dispose(): Promise<void> {

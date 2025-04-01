@@ -53,7 +53,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
     active: selected,
   });
 
-  const disabled = formState.isDisabled;
+  const disabled = formState.isDisabled || formState.isReadOnly;
   const enabled = handlerState.enabled || false;
   const optionsPart = getConnectionFormOptionsPart(formState);
   const connectionInfoService = useResource(SSL, ConnectionInfoResource, optionsPart.connectionKey, {

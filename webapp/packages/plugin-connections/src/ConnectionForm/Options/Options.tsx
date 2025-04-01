@@ -105,7 +105,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   });
 
   //@TODO it's here until the profile implementation in the CloudBeaver
-  const readonly = formState.isDisabled || connectionInfoResource.data?.authModel === PROFILE_AUTH_MODEL_ID;
+  const readonly = formState.isDisabled || formState.isReadOnly || connectionInfoResource.data?.authModel === PROFILE_AUTH_MODEL_ID;
 
   useFormValidator(formState.validationTask, formRef.current);
   const { credentialsSavingEnabled } = useAdministrationSettings();
