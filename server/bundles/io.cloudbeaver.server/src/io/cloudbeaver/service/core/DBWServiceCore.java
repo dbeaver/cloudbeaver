@@ -144,14 +144,6 @@ public interface DBWServiceCore extends DBWService {
         @Nullable @WebObjectId String projectId,
         @NotNull String connectionId) throws DBWebException;
 
-    @WebAction
-    @Deprecated
-    WebConnectionInfo createConnectionFromTemplate(
-        @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @NotNull String templateId,
-        @Nullable String connectionName) throws DBWebException;
-
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebConnectionInfo copyConnectionFromNode(
         @NotNull WebSession webSession,

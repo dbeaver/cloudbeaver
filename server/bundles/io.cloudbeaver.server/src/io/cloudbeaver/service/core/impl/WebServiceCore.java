@@ -349,44 +349,6 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    @Deprecated
-    public WebConnectionInfo createConnectionFromTemplate(
-        @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @NotNull String templateId,
-        @Nullable String connectionName
-    ) throws DBWebException {
-        WebSessionProjectImpl project = getProjectById(webSession, projectId);
-        DBPDataSourceRegistry templateRegistry = project.getDataSourceRegistry();
-        DBPDataSourceContainer dataSourceTemplate = templateRegistry.getDataSource(templateId);
-        if (dataSourceTemplate == null) {
-            throw new DBWebException("Template data source '" + templateId + "' not found");
-        }
-
-        DBPDataSourceRegistry projectRegistry = webSession.getSingletonProject().getDataSourceRegistry();
-        DBPDataSourceContainer newDataSource = projectRegistry.createDataSource(dataSourceTemplate);
-
-        ServletApplication app = ServletAppUtils.getServletApplication();
-        if (app instanceof WebApplication webApplication) {
-            ((DataSourceDescriptor) newDataSource).setNavigatorSettings(
-                webApplication.getAppConfiguration().getDefaultNavigatorSettings());
-        }
-
-        if (!CommonUtils.isEmpty(connectionName)) {
-            newDataSource.setName(connectionName);
-        }
-        try {
-            projectRegistry.addDataSource(newDataSource);
-
-            projectRegistry.checkForErrors();
-        } catch (DBException e) {
-            throw new DBWebException(e.getMessage(), e);
-        }
-
-        return project.addConnection(newDataSource);
-    }
-
-    @Override
     public WebConnectionInfo copyConnectionFromNode(
         @NotNull WebSession webSession,
         @Nullable String projectId,

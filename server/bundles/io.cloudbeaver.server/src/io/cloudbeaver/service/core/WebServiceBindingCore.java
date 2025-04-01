@@ -110,11 +110,6 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                 getWebSession(env), getProjectReference(env), getConnectionConfig(env)))
             .dataFetcher("deleteConnection", env -> getService(env).deleteConnection(
                 getWebSession(env), getProjectReference(env), env.getArgument("id")))
-            .dataFetcher("createConnectionFromTemplate", env -> getService(env).createConnectionFromTemplate(
-                getWebSession(env),
-                getProjectReference(env),
-                env.getArgument("templateId"),
-                env.getArgument("connectionName")))
             .dataFetcher("copyConnectionFromNode", env -> getService(env).copyConnectionFromNode(
                 getWebSession(env),
                 getProjectReference(env),
