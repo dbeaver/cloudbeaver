@@ -52,9 +52,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   override isOutdated(): boolean {
-    return (
-      this.optionsPart.isOutdated() || this.dbDriverResource.isOutdated(this.optionsPart.state.driverId) || this.networkHandlerResource.isOutdated()
-    );
+    return this.dbDriverResource.isOutdated(this.optionsPart.state.driverId) || this.networkHandlerResource.isOutdated();
   }
 
   protected override async loader(): Promise<void> {

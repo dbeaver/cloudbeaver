@@ -32,10 +32,6 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     this.reset();
   }
 
-  override isOutdated(): boolean {
-    return this.optionsPart.isOutdated();
-  }
-
   protected override async loader(): Promise<void> {
     if (!this.optionsPart.connectionKey) {
       this.setInitialState(getDefaultState());

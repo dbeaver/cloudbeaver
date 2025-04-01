@@ -52,7 +52,6 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
   // this will lead to the infinite loop of loading
   override isOutdated(): boolean {
     return (
-      this.optionsPart.isOutdated() ||
       this.dbDriverResource.isOutdated(this.optionsPart.state.driverId) ||
       !!(this.authModelId && this.databaseAuthModelsResource.isOutdated(this.authModelId)) ||
       this.userInfoResource.isOutdated()
