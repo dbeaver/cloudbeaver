@@ -19,14 +19,19 @@ import {
 import { getProjectNodeId } from '@cloudbeaver/core-projects';
 import { isResourceAlias, type ResourceKey, resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { ServerEventId } from '@cloudbeaver/core-root';
-
-import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA.js';
-import { ConnectionFolderEventHandler, type IConnectionFolderEvent } from '../ConnectionFolderEventHandler.js';
-import { type Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource.js';
-import { ConnectionsManagerService } from '../ConnectionsManagerService.js';
-import { ContainerResource } from '../ContainerResource.js';
-import { getConnectionParentId } from './getConnectionParentId.js';
-import { getFolderNodeParents } from './getFolderNodeParents.js';
+import {
+  ConnectionInfoResource,
+  ContainerResource,
+  ConnectionsManagerService,
+  getFolderNodeParents,
+  type Connection,
+  ConnectionInfoActiveProjectKey,
+  type IConnectionInfoParams,
+  getConnectionParentId,
+  createConnectionParam,
+  ConnectionFolderEventHandler,
+  type IConnectionFolderEvent,
+} from '@cloudbeaver/core-connections';
 
 @injectable()
 export class ConnectionNavNodeService extends Dependency {
@@ -36,6 +41,8 @@ export class ConnectionNavNodeService extends Dependency {
     private readonly containerResource: ContainerResource,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navNodeManagerService: NavNodeManagerService,
+    // TODO: https://dbeaver.atlassian.net/browse/CB-6272
+    // private readonly navigationTreeService: NavigationTreeService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly connectionFolderEventHandler: ConnectionFolderEventHandler,
   ) {
@@ -196,51 +203,57 @@ export class ConnectionNavNodeService extends Dependency {
       return;
     }
 
-    const parentId = getConnectionParentId(connection.projectId, connection.folder);
+    try {
+      const parentId = getConnectionParentId(connection.projectId, connection.folder);
 
-    await this.navTreeResource.waitLoad();
+      await this.navTreeResource.waitLoad();
 
-    if (!this.navTreeResource.has(parentId)) {
-      await this.navNodeInfoResource.loadNodeParents(parentId);
-      const parents = this.navNodeInfoResource.getParents(parentId);
+      if (!this.navTreeResource.has(parentId)) {
+        await this.navNodeInfoResource.loadNodeParents(parentId);
+        const parents = this.navNodeInfoResource.getParents(parentId);
 
-      this.navTreeResource.markOutdated(parents[parents.length - 1]);
-      const preloaded = await this.navTreeResource.preloadNodeParents(parents, parentId);
+        this.navTreeResource.markOutdated(parents[parents.length - 1]);
+        const preloaded = await this.navTreeResource.preloadNodeParents(parents, parentId);
 
-      if (!preloaded) {
+        if (!preloaded) {
+          return;
+        }
+      }
+
+      let children = this.navTreeResource.get(parentId);
+
+      if (!children || children.includes(connection.nodePath)) {
         return;
       }
-    }
 
-    let children = this.navTreeResource.get(parentId);
+      const connectionNode = await this.navNodeInfoResource.load(connection.nodePath);
+      await this.navTreeResource.waitLoad();
 
-    if (!children || children.includes(connection.nodePath)) {
-      return;
-    }
+      this.navNodeInfoResource.setParent(connection.nodePath, parentId);
 
-    const connectionNode = await this.navNodeInfoResource.load(connection.nodePath);
-    await this.navTreeResource.waitLoad();
+      children = this.navTreeResource.get(parentId);
 
-    this.navNodeInfoResource.setParent(connection.nodePath, parentId);
-
-    children = this.navTreeResource.get(parentId);
-
-    if (!children || children.includes(connection.nodePath)) {
-      return; // double check
-    }
-
-    let insertIndex = 0;
-
-    const nodes = this.navNodeInfoResource.get(resourceKeyList(children));
-
-    for (const node of nodes) {
-      if (!node?.folder && node?.name?.localeCompare(connectionNode.name!) === 1) {
-        break;
+      if (!children || children.includes(connection.nodePath)) {
+        return; // double check
       }
-      insertIndex++;
-    }
 
-    this.navTreeResource.insertToNode(parentId, insertIndex, connection.nodePath);
+      let insertIndex = 0;
+
+      const nodes = this.navNodeInfoResource.get(resourceKeyList(children));
+
+      for (const node of nodes) {
+        if (!node?.folder && node?.name?.localeCompare(connectionNode.name!) === 1) {
+          break;
+        }
+        insertIndex++;
+      }
+
+      this.navTreeResource.insertToNode(parentId, insertIndex, connection.nodePath);
+    } finally {
+      // TODO: https://dbeaver.atlassian.net/browse/CB-6272
+      // await this.navNodeInfoResource.loadNodeParents(connection.nodePath);
+      // await this.navigationTreeService.showNode(connection.nodePath, this.navNodeInfoResource.getParents(connection.nodePath));
+    }
   }
 
   private async navigateHandler({ nodeId }: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>): Promise<void> {

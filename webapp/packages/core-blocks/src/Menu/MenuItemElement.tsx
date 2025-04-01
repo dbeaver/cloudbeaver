@@ -42,7 +42,7 @@ export const MenuItemElement = observer<IMenuItemElementProps>(function MenuItem
   const translate = useTranslate();
 
   const title = translate(label);
-  loading = useStateDelay(loading, 100);
+  loading = useStateDelay(loading, 300);
 
   return (
     <div className={s(styles, { menuPanelItem: true })} title={tooltip ? translate(tooltip) : title}>

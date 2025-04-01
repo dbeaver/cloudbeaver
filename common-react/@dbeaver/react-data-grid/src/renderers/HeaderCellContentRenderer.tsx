@@ -7,7 +7,7 @@ interface Props {
 }
 export function HeaderCellContentRenderer({ colIdx }: Props) {
   const cellHeaderContext = use(DataGridCellHeaderContext);
-  const headerElement = useGridReactiveValue(cellHeaderContext?.headerElement, [colIdx]);
-  const getHeaderText = useGridReactiveValue(headerElement ? undefined : cellHeaderContext?.headerText, [colIdx]);
+  const headerElement = useGridReactiveValue(cellHeaderContext?.headerElement, colIdx);
+  const getHeaderText = useGridReactiveValue(headerElement ? undefined : cellHeaderContext?.headerText, colIdx);
   return headerElement ?? getHeaderText ?? '';
 }

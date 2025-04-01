@@ -60,7 +60,6 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     });
 
     this.beforeLoad.addHandler(async (originalKey, context) => {
-      await this.navTreeResource.waitLoad();
       const parentKey = this.aliases.isAlias(originalKey, DBObjectParentKey);
       const pageKey =
         this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
@@ -80,6 +79,15 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
       }
 
       const key = ResourceKeyUtils.toList(this.aliases.transformToKey(originalKey));
+
+      for (const nodeId of key) {
+        const preloaded = await this.navTreeResource.preloadParents(nodeId);
+
+        if (!preloaded) {
+          throw new DetailsError('Not found: ' + nodeId);
+        }
+      }
+
       const parents = [
         ...new Set(
           key.map(nodeId => this.navNodeInfoResource.get(nodeId)?.parentId).filter<string>((nodeId): nodeId is string => nodeId !== undefined),
