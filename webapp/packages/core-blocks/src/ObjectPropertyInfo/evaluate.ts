@@ -19,7 +19,7 @@ interface IContext {
   object: Record<string, any>;
 }
 
-export function evaluate(expression: string, object: Record<string, any>) {
+export function evaluate(expression: string, object: Record<string, any>): boolean {
   const fn = subscript(expression);
   const context: IContext = {
     object,

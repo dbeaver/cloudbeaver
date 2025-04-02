@@ -74,11 +74,11 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   className,
   canShowPassword,
   onFocus,
-  ...rest
+  readOnly
 }) {
   const translate = useTranslate();
 
-  let readonly = rest.readOnly;
+  let readonly = readOnly;
 
   const controlType = getObjectPropertyType(property);
   const type = getObjectPropertyValueType(property);
