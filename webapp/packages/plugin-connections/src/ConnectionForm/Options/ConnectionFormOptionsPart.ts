@@ -100,7 +100,10 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
   }
 
   private async askCredentials(state: IConnectionFormOptionsState): Promise<IConnectionFormOptionsState | null> {
-    if (state.saveCredentials && !this.formState.state.requiredNetworkHandlersIds.length) {
+    const driver = this.state.driverId ? this.dbDriverResource.get(this.state.driverId) : undefined;
+    const isCredentialsRequired = !state.saveCredentials || this.formState.state.requiredNetworkHandlersIds.length;
+
+    if (!isCredentialsRequired || driver?.anonymousAccess) {
       return state;
     }
 
