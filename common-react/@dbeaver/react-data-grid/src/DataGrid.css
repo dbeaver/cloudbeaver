@@ -1,3 +1,4 @@
+@import url('@dbeaver/ui-kit/index.css');
 @import url('react-data-grid/lib/styles.css') layer(components);
 
 @layer components.rdg.MeasuringCell {

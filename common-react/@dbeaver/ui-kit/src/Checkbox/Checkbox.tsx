@@ -11,6 +11,7 @@ import { useState } from 'react';
 import clsx from 'clsx';
 import './Checkbox.css';
 import type { ControlSize } from '../types/controls.js';
+import { componentProviderWrapper } from '../componentProviderWrapper.js';
 
 export interface CheckboxProps extends Omit<AriaKitCheckboxProps, 'render' | 'size'> {
   size?: ControlSize;
@@ -19,7 +20,7 @@ export interface CheckboxProps extends Omit<AriaKitCheckboxProps, 'render' | 'si
   indeterminateIcon?: React.ReactNode;
 }
 
-export function Checkbox({ children, className, icon, indeterminate, indeterminateIcon, size = 'medium', ...props }: CheckboxProps) {
+export function CheckboxBase({ children, className, icon, indeterminate, indeterminateIcon, size = 'medium', ...props }: CheckboxProps) {
   const [innerChecked, setInnerChecked] = useState(props.defaultChecked ?? false);
   const checked = props.checked ?? innerChecked;
 
@@ -70,3 +71,5 @@ export function Checkbox({ children, className, icon, indeterminate, indetermina
     </label>
   );
 }
+
+export const Checkbox = componentProviderWrapper('Checkbox', CheckboxBase);
