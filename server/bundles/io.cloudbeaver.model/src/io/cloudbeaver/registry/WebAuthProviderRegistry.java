@@ -60,7 +60,7 @@ public class WebAuthProviderRegistry {
                 // Load webServices
                 if (TAG_AUTH_PROVIDER.equals(ext.getName())) {
                     WebAuthProviderDescriptor providerDescriptor;
-                    WebAuthProviderDescriptor webAuthProviderDescriptor = authProviders.get(ext.getAttribute("id"));
+                    WebAuthProviderDescriptor webAuthProviderDescriptor = authProviders.get(ext.getAttribute(WebRegistryConstant.ATTR_ID));
                     if (webAuthProviderDescriptor != null) {
                         webAuthProviderDescriptor.loadExtraConfig(ext);
                     } else {

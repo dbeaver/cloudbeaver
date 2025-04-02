@@ -22,8 +22,6 @@ import io.cloudbeaver.auth.SMAuthProviderExternal;
 import io.cloudbeaver.auth.SMAutoAssign;
 import io.cloudbeaver.auth.SMBruteForceProtected;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
-import io.cloudbeaver.auth.provisioning.SMProvisioner;
-import io.cloudbeaver.auth.provisioning.SMProvisioningFilter;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.code.NotNull;
@@ -36,17 +34,18 @@ import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.user.SMUserProvisioning;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.UUID;
 
-public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected, SMAuthProviderAssigner, SMProvisioner {
+public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected, SMAuthProviderAssigner {
     private static final Log log = Log.getLog(LdapAuthProvider.class);
     public static final String LDAP_AUTH_PROVIDER_ID = "ldap";
     public static final String LDAP_ATTRIBUTE_OBJECT_GUID = "objectGUID";
@@ -91,31 +90,6 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return userData;
     }
 
-    //todo out to utils
-    public static String getAttributeValueSafe(Attributes attributes, String attrName) {
-        try {
-            Attribute attr = attributes.get(attrName);
-            return attr != null ? (String) attr.get() : "";
-        } catch (NamingException e) {
-            //fixme log
-            return "";
-        }
-    }
-
-    @NotNull
-    @Override
-    public List<SMUserProvisioning> listExternalUsers(
-        @NotNull WebSession webSession,
-        @NotNull SMAuthProviderCustomConfiguration customConfiguration,
-        @NotNull SMProvisioningFilter filter
-    ) throws DBException {
-        return List.of();
-    }
-
-    @Override
-    public boolean isSupportProvisioning() {
-        return !DBWorkbench.getPlatform().getApplication().isCommunity();
-    }
     /**
      * Find user and validate in ldap by uniq parameter from identityProviders
      *
@@ -233,14 +207,14 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         }
     }
 
-    protected String getBaseDN(DirContext serviceContext, LdapSettings ldapSettings) throws DBException {
+    private String getBaseDN(DirContext serviceContext, LdapSettings ldapSettings) throws DBException {
         if (CommonUtils.isEmpty(ldapSettings.getBaseDN())) {
             return getRootDN(serviceContext);
         }
         return ldapSettings.getBaseDN();
     }
 
-    protected String buildSearchFilter(LdapSettings ldapSettings, String userIdentifier) {
+    private String buildSearchFilter(LdapSettings ldapSettings, String userIdentifier) {
         String userFilter = String.format("(%s=%s)", ldapSettings.getLoginAttribute(), userIdentifier);
         if (CommonUtils.isNotEmpty(ldapSettings.getFilter())) {
             return String.format("(&%s%s)", userFilter, ldapSettings.getFilter());

@@ -36,7 +36,7 @@ public interface SMProvisioner {
         return false;
     }
 
-    default boolean isSupportProvisioning(){
+    default boolean isSupportProvisioning() {
         return true;
     }
 }
