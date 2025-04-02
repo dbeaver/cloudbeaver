@@ -74,7 +74,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   className,
   canShowPassword,
   onFocus,
-  readOnly
+  readOnly,
 }) {
   const translate = useTranslate();
 
