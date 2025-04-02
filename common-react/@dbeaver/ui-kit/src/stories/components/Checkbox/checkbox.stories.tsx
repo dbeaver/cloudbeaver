@@ -76,7 +76,7 @@ export const States = () => {
 };
 
 export const Sizes = () => (
-  <div className="tw:flex tw:flex-col tw:space-y-4">
+  <div className="tw:flex tw:flex-col">
     <Checkbox size="small"> Small </Checkbox>
     <Checkbox size="medium"> Medium </Checkbox>
     <Checkbox size="large"> Large </Checkbox>
@@ -135,10 +135,6 @@ export const Tokens = () => {
         <div>
           <code>--dbv-kit-checkbox-background-hover:</code> var(--dbv-kit-color-primary-100);{' '}
           <span className="comment"> Checkbox background color on hover</span>
-        </div>
-        <div>
-          <code>--dbv-kit-checkbox-background-active:</code> var(--dbv-kit-color-primary-800);{' '}
-          <span className="comment"> Checkbox background color when active</span>
         </div>
         <h3>Borders</h3>
         <div>

@@ -6,18 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 
-import type { ComponentPropsWithRef } from 'react';
+import { type ComponentPropsWithRef } from 'react';
 import './Input.css';
+import clsx from 'clsx';
 
 export interface InputProps extends Omit<ComponentPropsWithRef<'input'>, 'size'> {
   size?: 'small' | 'medium' | 'large' | 'xlarge';
+  label?: React.ReactNode;
 }
 
 export const Input: React.FC<InputProps> = function Input({ size, className, ...props }) {
-  const classNameToApply = `dbv-kit-input dbv-kit-input--${size ?? 'medium'} ${className}`.trim();
+  const classNameToApply = clsx(`dbv-kit-input`, `dbv-kit-input--${size ?? 'medium'}`, className);
   return (
-    <div className="dbv-kit-input-wrapper">
+    <label className="dbv-kit-input-wrapper">
+      {props.label && <div className={clsx('dbv-kit-input__title', props.required && 'dbv-kit-input__title--required')}>{props.label}</div>}
       <input className={classNameToApply} {...props} />
-    </div>
+    </label>
   );
 };
