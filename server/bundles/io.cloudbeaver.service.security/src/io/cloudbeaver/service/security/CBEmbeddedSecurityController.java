@@ -659,12 +659,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private void saveSubjectMetas(Connection dbCon, String subjectId, Map<String, String> metaParameters) throws SQLException {
         if (!CommonUtils.isEmpty(metaParameters)) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("INSERT INTO {table_prefix}CB_SUBJECT_META(SUBJECT_ID,META_ID,META_VALUE) VALUES(?,?,?)"))
+                database.normalizeTableNames(
+                    "INSERT INTO {table_prefix}CB_SUBJECT_META(SUBJECT_ID,META_ID,META_VALUE,UPDATE_TIME) VALUES(?,?,?,?)"))
             ) {
                 dbStat.setString(1, subjectId);
                 for (Map.Entry<String, String> mp : metaParameters.entrySet()) {
                     dbStat.setString(2, mp.getKey());
                     dbStat.setString(3, mp.getValue());
+                    dbStat.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
                     dbStat.execute();
                 }
             }
@@ -887,7 +889,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 if (!CommonUtils.isEmpty(credentials)) {
                     try (PreparedStatement dbStat = dbCon.prepareStatement(
                         database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_CREDENTIALS" +
-                            "(USER_ID,PROVIDER_ID,CRED_ID,CRED_VALUE) VALUES(?,?,?,?)")
+                            "(USER_ID,PROVIDER_ID,CRED_ID,CRED_VALUE,UPDATE_TIME) VALUES(?,?,?,?,?)")
                     )) {
                         for (String[] cred : transformedCredentials) {
                             if (cred == null) {
@@ -897,6 +899,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                             dbStat.setString(2, authProvider.getId());
                             dbStat.setString(3, cred[0]);
                             dbStat.setString(4, cred[1]);
+                            dbStat.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
                             dbStat.execute();
                         }
                     }
@@ -1690,9 +1693,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     database.normalizeTableNames(
                         "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT" +
                             "(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,"
-                            + "SESSION_ID,IS_MAIN_AUTH,AUTH_USERNAME,FORCE_SESSION_LOGOUT,IS_SERVICE_AUTH) "
+                            + "SESSION_ID,IS_MAIN_AUTH,AUTH_USERNAME,FORCE_SESSION_LOGOUT,IS_SERVICE_AUTH,CREATE_TIME) "
                             +
-                            "VALUES(?,?,?,?,?,?,?,?,?,?)"
+                            "VALUES(?,?,?,?,?,?,?,?,?,?,?)"
                     )
                 )) {
                     dbStat.setString(1, authAttemptId);
@@ -1719,20 +1722,22 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     dbStat.setString(9, booleanToString(forceSessionsLogout));
                     boolean isServiceAuth = isMainSession && authProviderDescriptor.isServiceProvider();
                     dbStat.setString(10, booleanToString(isServiceAuth));
+                    dbStat.setTimestamp(11, new Timestamp(System.currentTimeMillis()));
                     dbStat.execute();
                 }
 
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     database.normalizeTableNames(
                         "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT_INFO" +
-                            "(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) " +
-                            "VALUES(?,?,?,?)"
+                            "(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE,CREATE_TIME) " +
+                            "VALUES(?,?,?,?,?)"
                     )
                 )) {
                     dbStat.setString(1, authAttemptId);
                     dbStat.setString(2, authProviderId);
                     dbStat.setString(3, authProviderConfigurationId);
                     dbStat.setString(4, gson.toJson(authData));
+                    dbStat.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
                     dbStat.execute();
                 }
                 txn.commit();
@@ -1842,13 +1847,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     if (dbStat.executeUpdate() <= 0) {
                         try (PreparedStatement dbStatIns = dbCon.prepareStatement(
                             database.normalizeTableNames("INSERT INTO {table_prefix}CB_AUTH_ATTEMPT_INFO " +
-                                "(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) "
-                                + "VALUES(?,?,?,?)")
+                                "(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE,CREATE_TIME) "
+                                + "VALUES(?,?,?,?,?)")
                         )) {
                             dbStatIns.setString(1, authId);
                             dbStatIns.setString(2, providerId.getAuthProviderId());
                             dbStatIns.setString(3, providerId.getAuthProviderConfigurationId());
                             dbStatIns.setString(4, authJson);
+                            dbStatIns.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
                             dbStatIns.execute();
                         }
                     }
@@ -2570,8 +2576,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             dbCon, database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE SESSION_ID=?"), smSessionId);
         try (
             PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames("INSERT INTO {table_prefix}CB_AUTH_TOKEN"
-                + "(TOKEN_ID,SESSION_ID,USER_ID,AUTH_ROLE,EXPIRATION_TIME,REFRESH_TOKEN_ID,REFRESH_TOKEN_EXPIRATION_TIME,IS_SERVICE) "
-                + "VALUES(?,?,?,?,?,?,?,?)"))
+                + "(TOKEN_ID,SESSION_ID,USER_ID,AUTH_ROLE,EXPIRATION_TIME,"
+                + "REFRESH_TOKEN_ID,REFRESH_TOKEN_EXPIRATION_TIME,CREATE_TIME,IS_SERVICE) "
+                + "VALUES(?,?,?,?,?,?,?,?,?)"))
         ) {
 
             String smAccessToken = SecurityUtils.generatePassword(32);
@@ -2586,7 +2593,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             dbStat.setString(6, smRefreshToken);
             var refreshTokenExpirationTime = Timestamp.valueOf(LocalDateTime.now().plusMinutes(smConfig.getRefreshTokenTtl()));
             dbStat.setTimestamp(7, refreshTokenExpirationTime);
-            dbStat.setString(8, booleanToString(isServiceToken));
+            dbStat.setTimestamp(8, new Timestamp(System.currentTimeMillis()));
+            dbStat.setString(9, booleanToString(isServiceToken));
 
             dbStat.execute();
             return new SMTokens(smAccessToken, smRefreshToken);
