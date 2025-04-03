@@ -37,6 +37,7 @@ import {
   useAutoLoad,
 } from '@cloudbeaver/core-blocks';
 import {
+  ConnectionInfoAuthPropertiesResource,
   ConnectionInfoOriginResource,
   ConnectionInfoResource,
   DatabaseAuthModelsResource,
@@ -103,6 +104,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const connectionInfoOriginResource = useResource(Options, ConnectionInfoOriginResource, optionsPart.connectionKey, {
     active: selected && !!optionsPart.connectionKey,
   });
+  const connectionInfoAuthPropertiesResource = useResource(Options, ConnectionInfoAuthPropertiesResource, optionsPart.connectionKey, {
+    active: selected && !!optionsPart.connectionKey,
+  });
 
   //@TODO it's here until the profile implementation in the CloudBeaver
   const readonly = formState.isDisabled || formState.isReadOnly || connectionInfoResource.data?.authModel === PROFILE_AUTH_MODEL_ID;
@@ -165,11 +169,11 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   let properties = authModel?.properties;
 
   if (
-    connectionInfoResource.data?.authProperties &&
-    connectionInfoResource.data.authProperties.length > 0 &&
-    optionsPart.state.authModelId === connectionInfoResource.data.authModel
+    connectionInfoAuthPropertiesResource.data?.authProperties &&
+    connectionInfoAuthPropertiesResource.data.authProperties.length > 0 &&
+    optionsPart.state.authModelId === connectionInfoResource.data?.authModel
   ) {
-    properties = connectionInfoResource.data.authProperties;
+    properties = connectionInfoAuthPropertiesResource.data.authProperties;
   }
 
   const sharedCredentials = optionsPart.state.sharedCredentials && serverConfigResource.data?.distributed;

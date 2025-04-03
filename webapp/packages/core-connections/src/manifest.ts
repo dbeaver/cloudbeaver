@@ -21,6 +21,7 @@ export const manifest: PluginManifest = {
     () => import('./ConnectionInfoOriginResource.js').then(m => m.ConnectionInfoOriginResource),
     () => import('./ConnectionInfoOriginDetailsResource.js').then(m => m.ConnectionInfoOriginDetailsResource),
     () => import('./ConnectionInfoCredentialsSavedResource.js').then(m => m.ConnectionInfoCredentialsSavedResource),
+    () => import('./ConnectionInfoAuthPropertiesResource.js').then(m => m.ConnectionInfoAuthPropertiesResource),
     () => import('./ConnectionToolsResource.js').then(m => m.ConnectionToolsResource),
     () => import('./ContainerResource.js').then(m => m.ContainerResource),
     () => import('./ConnectionsLocaleService.js').then(m => m.ConnectionsLocaleService),

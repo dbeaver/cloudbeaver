@@ -9,6 +9,7 @@ import { FormMode, FormPart, formSubmitContext, formValidationContext, type IFor
 import { DriverConfigurationType, type ConnectionConfig, type ObjectPropertyInfo, type TestConnectionMutation } from '@cloudbeaver/core-sdk';
 import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import {
+  ConnectionInfoAuthPropertiesResource,
   ConnectionInfoCredentialsSavedResource,
   ConnectionInfoProjectKey,
   ConnectionInfoResource,
@@ -16,8 +17,8 @@ import {
   DatabaseAuthModelsResource,
   DBDriverResource,
   type Connection,
+  type ConnectionInfoAuthProperties,
   type ConnectionInfoIncludes,
-  type DatabaseConnection,
   type DBDriver,
 } from '@cloudbeaver/core-connections';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
@@ -39,7 +40,6 @@ const MAIN_PROPERTY_HOST_KEY = 'host';
 const MAIN_PROPERTY_PORT_KEY = 'port';
 const MAIN_PROPERTY_SERVER_KEY = 'server';
 const CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS: CachedResourceIncludeArgs<Connection, ConnectionInfoIncludes> = [
-  'includeAuthProperties',
   'customIncludeOptions',
   'includeProperties',
   'includeProviderProperties',
@@ -72,6 +72,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionInfoCredentialsSavedResource: ConnectionInfoCredentialsSavedResource,
+    private readonly connectionInfoAuthPropertiesResource: ConnectionInfoAuthPropertiesResource,
     private readonly localizationService: LocalizationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
@@ -171,8 +172,9 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     const isConnectionInfoOutdated =
       !!this.connectionKey && this.connectionInfoResource.isOutdated(this.connectionKey, CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS);
     const isCredentialsSavedOutdated = !!this.connectionKey && this.connectionInfoCredentialsSavedResource.isOutdated(this.connectionKey);
+    const isAuthPropertiesOutdated = !!this.connectionKey && this.connectionInfoAuthPropertiesResource.isOutdated(this.connectionKey);
 
-    return isConnectionInfoOutdated || isCredentialsSavedOutdated;
+    return isConnectionInfoOutdated || isCredentialsSavedOutdated || isAuthPropertiesOutdated;
   }
 
   protected override async loader(): Promise<void> {
@@ -190,9 +192,10 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     // TODO: we should split connection info resource to multiple resources and load this data separately in different parts where needed
-    const [info, credentialsSavedInfo] = await Promise.all([
+    const [info, credentialsSavedInfo, authPropertiesInfo] = await Promise.all([
       this.connectionInfoResource.load(this.connectionKey, CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS),
       this.connectionInfoCredentialsSavedResource.load(this.connectionKey),
+      this.connectionInfoAuthPropertiesResource.load(this.connectionKey),
     ]);
 
     const config: ConnectionConfig = defaultStateGetter();
@@ -221,8 +224,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     config.autocommit = info.autocommit;
     config.readOnly = info.readOnly;
 
-    if (info.authProperties) {
-      for (const property of info.authProperties) {
+    if (authPropertiesInfo.authProperties) {
+      for (const property of authPropertiesInfo.authProperties) {
         if (!property.features.includes('password')) {
           config.credentials[property.id!] = property.value;
         }
@@ -367,9 +370,9 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if ((this.state.authModelId || driver.defaultAuthModel) && !driver.anonymousAccess) {
       this.state.authModelId = this.state.authModelId || driver.defaultAuthModel;
       this.state.saveCredentials = this.state.saveCredentials || this.state.sharedCredentials;
-      const info = this.connectionKey ? this.connectionInfoResource.get(this.connectionKey) : undefined;
+      const authPropertiesInfo = this.connectionKey ? await this.connectionInfoAuthPropertiesResource.load(this.connectionKey) : undefined;
 
-      const properties = await this.getConnectionAuthModelProperties(this.state.authModelId, info);
+      const properties = await this.getConnectionAuthModelProperties(this.state.authModelId, authPropertiesInfo);
       const passwordProperty = properties.find(property => property.features.includes('password'));
       const isPasswordEmpty =
         passwordProperty &&
@@ -397,7 +400,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
   }
 
-  private async getConnectionAuthModelProperties(authModelId: string, connectionInfo?: DatabaseConnection): Promise<ObjectPropertyInfo[]> {
+  private async getConnectionAuthModelProperties(authModelId: string, connectionInfo?: ConnectionInfoAuthProperties): Promise<ObjectPropertyInfo[]> {
     const authModel = await this.databaseAuthModelsResource.load(authModelId);
 
     let properties = authModel.properties;

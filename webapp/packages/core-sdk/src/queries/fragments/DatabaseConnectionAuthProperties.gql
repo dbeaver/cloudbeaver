@@ -1,0 +1,7 @@
+fragment DatabaseConnectionAuthProperties on ConnectionInfo {
+  id
+  projectId
+  authProperties {
+    ...UserConnectionAuthProperties
+  }
+}
