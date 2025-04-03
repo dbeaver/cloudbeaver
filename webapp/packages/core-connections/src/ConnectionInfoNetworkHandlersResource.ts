@@ -10,7 +10,7 @@ import { runInAction, toJS } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { type DatabaseConnectionProviderPropertiesFragment, GraphQLService } from '@cloudbeaver/core-sdk';
+import { type DatabaseConnectionNetworkHandlersFragment, GraphQLService } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 
 import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA.js';
@@ -23,11 +23,11 @@ import {
 } from './ConnectionInfoResource.js';
 import { parseConnectionKey } from './parseConnectionKey.js';
 
-export type ConnectionInfoProviderProperties = DatabaseConnectionProviderPropertiesFragment;
+export type ConnectionInfoNetworkHandlers = DatabaseConnectionNetworkHandlersFragment;
 
-// TODO reuse it everywhere where include "includeProviderProperties" is used
+// TODO reuse it everywhere where include "includeNetworkHandlers" is used
 @injectable()
-export class ConnectionInfoProviderPropertiesResource extends CachedMapResource<IConnectionInfoParams, ConnectionInfoProviderProperties> {
+export class ConnectionInfoNetworkHandlersResource extends CachedMapResource<IConnectionInfoParams, ConnectionInfoNetworkHandlers> {
   constructor(
     private readonly projectsService: ProjectsService,
     private readonly graphQLService: GraphQLService,
@@ -49,8 +49,8 @@ export class ConnectionInfoProviderPropertiesResource extends CachedMapResource<
     originalKey: ResourceKey<IConnectionInfoParams>,
     _: any,
     refresh?: boolean,
-  ): Promise<Map<IConnectionInfoParams, ConnectionInfoProviderProperties>> {
-    const connectionsList: ConnectionInfoProviderProperties[] = [];
+  ): Promise<Map<IConnectionInfoParams, ConnectionInfoNetworkHandlers>> {
+    const connectionsList: ConnectionInfoNetworkHandlers[] = [];
     let removedConnections: IConnectionInfoParams[] = [];
     const parsed = parseConnectionKey({
       originalKey,
@@ -70,7 +70,7 @@ export class ConnectionInfoProviderPropertiesResource extends CachedMapResource<
         connectionId = connectionKey.connectionId;
       }
 
-      const { connections } = await this.graphQLService.sdk.getUserConnectionsProviderProperties({
+      const { connections } = await this.graphQLService.sdk.getUserConnectionsNetworkHandlers({
         projectId,
         connectionId,
         projectIds,

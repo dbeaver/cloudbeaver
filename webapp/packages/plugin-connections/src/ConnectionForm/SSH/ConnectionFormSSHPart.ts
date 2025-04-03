@@ -9,7 +9,7 @@ import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/c
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { DriverConfigurationType, NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
-import { ConnectionInfoResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
+import { ConnectionInfoNetworkHandlersResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { toJS } from 'mobx';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
@@ -37,10 +37,18 @@ const getDefaultState = () =>
 export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConnectionFormState> {
   constructor(
     formState: IFormState<IConnectionFormState>,
-    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionInfoNetworkHandlersResource: ConnectionInfoNetworkHandlersResource,
     private readonly optionsPart: ConnectionFormOptionsPart,
   ) {
     super(formState, getDefaultState());
+  }
+
+  override isOutdated(): boolean {
+    if (!this.optionsPart.connectionKey) {
+      return false;
+    }
+
+    return this.connectionInfoNetworkHandlersResource.isOutdated(this.optionsPart.connectionKey);
   }
 
   protected override async loader(): Promise<void> {
@@ -49,9 +57,10 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    const connection = this.connectionInfoResource.get(this.optionsPart.connectionKey);
+    const connection = await this.connectionInfoNetworkHandlersResource.load(this.optionsPart.connectionKey);
+    const sshHandler = connection?.networkHandlersConfig?.find(h => h.id === SSH_TUNNEL_ID);
 
-    this.setInitialState(connection?.networkHandlersConfig?.find(h => h.id === SSH_TUNNEL_ID) ?? getDefaultState());
+    this.setInitialState(sshHandler ?? getDefaultState());
   }
 
   protected override async saveChanges(

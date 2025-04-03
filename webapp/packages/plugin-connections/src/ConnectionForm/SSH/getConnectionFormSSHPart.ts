@@ -8,7 +8,7 @@
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
 import type { IFormState } from '@cloudbeaver/core-ui';
 import { ConnectionFormSSHPart } from './ConnectionFormSSHPart.js';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
@@ -17,9 +17,9 @@ const DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART = createDataContext<ConnectionFo
 export function getConnectionFormSSHPart(formState: IFormState<IConnectionFormState>): ConnectionFormSSHPart {
   return formState.getPart(DATA_CONTEXT_CONNECTION_FORM_OPTIONS_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
-    const connectionInfoResource = di.getService(ConnectionInfoResource);
+    const connectionInfoNetworkHandlersResource = di.getService(ConnectionInfoNetworkHandlersResource);
     const optionsPart = getConnectionFormOptionsPart(formState);
 
-    return new ConnectionFormSSHPart(formState, connectionInfoResource, optionsPart);
+    return new ConnectionFormSSHPart(formState, connectionInfoNetworkHandlersResource, optionsPart);
   });
 }

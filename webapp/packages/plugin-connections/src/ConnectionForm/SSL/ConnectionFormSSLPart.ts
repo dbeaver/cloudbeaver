@@ -12,7 +12,7 @@ import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
-import { type ConnectionInfoResource, type DBDriverResource, type NetworkHandlerResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoNetworkHandlersResource, type DBDriverResource, type NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { makeObservable, observable, toJS } from 'mobx';
 import { PROPERTY_FEATURE_SECURED } from './PROPERTY_FEATURE_SECURED.js';
@@ -35,7 +35,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     formState: IFormState<IConnectionFormState>,
     private readonly dbDriverResource: DBDriverResource,
     private readonly networkHandlerResource: NetworkHandlerResource,
-    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionInfoNetworkHandlersResource: ConnectionInfoNetworkHandlersResource,
     private readonly optionsPart: ConnectionFormOptionsPart,
   ) {
     super(formState, getDefaultState());
@@ -54,12 +54,16 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
   override isOutdated(): boolean {
     const isDriverOutdated = Boolean(this.optionsPart.state.driverId && this.dbDriverResource.isOutdated(this.optionsPart.state.driverId));
     const isNetworkHandlerOutdated = this.networkHandlerResource.isOutdated(CachedMapAllKey);
+    const isConnectionInfoNetworkHandlersOutdated = this.optionsPart.connectionKey
+      ? this.connectionInfoNetworkHandlersResource.isOutdated(this.optionsPart.connectionKey)
+      : false;
 
-    return isDriverOutdated || isNetworkHandlerOutdated;
+    return isDriverOutdated || isNetworkHandlerOutdated || isConnectionInfoNetworkHandlersOutdated;
   }
 
   protected override async loader(): Promise<void> {
     this.activeDriverId = this.optionsPart.state.driverId;
+
     if (!this.optionsPart.state.driverId) {
       this.setInitialState(getDefaultState());
       return;
@@ -76,7 +80,7 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
       return;
     }
 
-    const info = this.optionsPart.connectionKey ? this.connectionInfoResource.get(this.optionsPart.connectionKey) : null;
+    const info = this.optionsPart.connectionKey ? await this.connectionInfoNetworkHandlersResource.load(this.optionsPart.connectionKey) : null;
     const initialConfig = info?.networkHandlersConfig?.find(h => h.id === handler.id);
 
     if (!this.optionsPart.state.networkHandlersConfig?.some(state => state.id === handler.id)) {

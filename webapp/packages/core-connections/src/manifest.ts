@@ -25,6 +25,7 @@ export const manifest: PluginManifest = {
     () => import('./ConnectionInfoCustomOptionsResource.js').then(m => m.ConnectionInfoCustomOptionsResource),
     () => import('./ConnectionInfoPropertiesResource.js').then(m => m.ConnectionInfoPropertiesResource),
     () => import('./ConnectionInfoProviderPropertiesResource.js').then(m => m.ConnectionInfoProviderPropertiesResource),
+    () => import('./ConnectionInfoNetworkHandlersResource.js').then(m => m.ConnectionInfoNetworkHandlersResource),
     () => import('./ConnectionToolsResource.js').then(m => m.ConnectionToolsResource),
     () => import('./ContainerResource.js').then(m => m.ContainerResource),
     () => import('./ConnectionsLocaleService.js').then(m => m.ConnectionsLocaleService),

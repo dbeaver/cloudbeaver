@@ -18,9 +18,7 @@ import {
   createConnectionParam,
   DatabaseAuthModelsResource,
   DBDriverResource,
-  type Connection,
   type ConnectionInfoAuthProperties,
-  type ConnectionInfoIncludes,
   type DBDriver,
 } from '@cloudbeaver/core-connections';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
@@ -35,13 +33,11 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
 import type { NotificationService } from '@cloudbeaver/core-events';
 import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
-import type { CachedResourceIncludeArgs } from '@cloudbeaver/core-resource';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
 const MAIN_PROPERTY_PORT_KEY = 'port';
 const MAIN_PROPERTY_SERVER_KEY = 'server';
-const CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS: CachedResourceIncludeArgs<Connection, ConnectionInfoIncludes> = ['includeNetworkHandlersConfig'];
 
 const defaultStateGetter = (connectionId?: string) =>
   ({
@@ -168,8 +164,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       }
     }
 
-    const isConnectionInfoOutdated =
-      !!this.connectionKey && this.connectionInfoResource.isOutdated(this.connectionKey, CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS);
+    const isConnectionInfoOutdated = !!this.connectionKey && this.connectionInfoResource.isOutdated(this.connectionKey);
     const isCredentialsSavedOutdated = !!this.connectionKey && this.connectionInfoCredentialsSavedResource.isOutdated(this.connectionKey);
     const isAuthPropertiesOutdated = !!this.connectionKey && this.connectionInfoAuthPropertiesResource.isOutdated(this.connectionKey);
     const isCustomOptionsOutdated = !!this.connectionKey && this.connectionInfoCustomOptionsResource.isOutdated(this.connectionKey);
@@ -194,9 +189,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       return;
     }
 
-    // TODO: we should split connection info resource to multiple resources and load this data separately in different parts where needed
     const [info, credentialsSavedInfo, authPropertiesInfo, customOptionsInfo, providerPropertiesInfo] = await Promise.all([
-      this.connectionInfoResource.load(this.connectionKey, CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS),
+      this.connectionInfoResource.load(this.connectionKey),
       this.connectionInfoCredentialsSavedResource.load(this.connectionKey),
       this.connectionInfoAuthPropertiesResource.load(this.connectionKey),
       this.connectionInfoCustomOptionsResource.load(this.connectionKey),

@@ -35,7 +35,7 @@ import { isSafari } from '@cloudbeaver/core-utils';
 import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR.js';
 import styles from './SSL.module.css';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connections';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
 interface Props extends IConnectionFormProps {
@@ -56,11 +56,11 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
   const disabled = formState.isDisabled || formState.isReadOnly;
   const enabled = handlerState.enabled || false;
   const optionsPart = getConnectionFormOptionsPart(formState);
-  const connectionInfoService = useResource(SSL, ConnectionInfoResource, optionsPart.connectionKey, {
+  const connectionInfoNetworkHandlersService = useResource(SSL, ConnectionInfoNetworkHandlersResource, optionsPart.connectionKey, {
     active: selected && !!optionsPart.connectionKey,
   });
-  const info = connectionInfoService.data;
-  const initialHandler = info?.networkHandlersConfig?.find(h => h.id === handler.id);
+  const handlersInfo = connectionInfoNetworkHandlersService.data;
+  const initialHandler = handlersInfo?.networkHandlersConfig?.find(h => h.id === handler.id);
   const autofillToken = isSafari ? 'section-connection-authentication-ssl section-ssl' : 'new-password';
   const projectInfoResource = useService(ProjectInfoResource);
   const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
