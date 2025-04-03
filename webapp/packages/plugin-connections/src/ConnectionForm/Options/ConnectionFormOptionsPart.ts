@@ -11,6 +11,7 @@ import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IEx
 import {
   ConnectionInfoAuthPropertiesResource,
   ConnectionInfoCredentialsSavedResource,
+  ConnectionInfoCustomOptionsResource,
   ConnectionInfoProjectKey,
   ConnectionInfoResource,
   createConnectionParam,
@@ -40,7 +41,6 @@ const MAIN_PROPERTY_HOST_KEY = 'host';
 const MAIN_PROPERTY_PORT_KEY = 'port';
 const MAIN_PROPERTY_SERVER_KEY = 'server';
 const CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS: CachedResourceIncludeArgs<Connection, ConnectionInfoIncludes> = [
-  'customIncludeOptions',
   'includeProperties',
   'includeProviderProperties',
   'includeNetworkHandlersConfig',
@@ -73,6 +73,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionInfoCredentialsSavedResource: ConnectionInfoCredentialsSavedResource,
     private readonly connectionInfoAuthPropertiesResource: ConnectionInfoAuthPropertiesResource,
+    private readonly connectionInfoCustomOptionsResource: ConnectionInfoCustomOptionsResource,
     private readonly localizationService: LocalizationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
@@ -173,8 +174,9 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       !!this.connectionKey && this.connectionInfoResource.isOutdated(this.connectionKey, CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS);
     const isCredentialsSavedOutdated = !!this.connectionKey && this.connectionInfoCredentialsSavedResource.isOutdated(this.connectionKey);
     const isAuthPropertiesOutdated = !!this.connectionKey && this.connectionInfoAuthPropertiesResource.isOutdated(this.connectionKey);
+    const isCustomOptionsOutdated = !!this.connectionKey && this.connectionInfoCustomOptionsResource.isOutdated(this.connectionKey);
 
-    return isConnectionInfoOutdated || isCredentialsSavedOutdated || isAuthPropertiesOutdated;
+    return isConnectionInfoOutdated || isCredentialsSavedOutdated || isAuthPropertiesOutdated || isCustomOptionsOutdated;
   }
 
   protected override async loader(): Promise<void> {
@@ -192,16 +194,17 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     // TODO: we should split connection info resource to multiple resources and load this data separately in different parts where needed
-    const [info, credentialsSavedInfo, authPropertiesInfo] = await Promise.all([
+    const [info, credentialsSavedInfo, authPropertiesInfo, customOptionsInfo] = await Promise.all([
       this.connectionInfoResource.load(this.connectionKey, CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS),
       this.connectionInfoCredentialsSavedResource.load(this.connectionKey),
       this.connectionInfoAuthPropertiesResource.load(this.connectionKey),
+      this.connectionInfoCustomOptionsResource.load(this.connectionKey),
     ]);
 
     const config: ConnectionConfig = defaultStateGetter();
 
     config.connectionId = info.id;
-    config.configurationType = info.configurationType;
+    config.configurationType = customOptionsInfo.configurationType;
 
     config.name = info.name;
     config.description = info.description;
@@ -213,7 +216,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     config.serverName = info.mainPropertyValues[MAIN_PROPERTY_SERVER_KEY];
     config.databaseName = info.mainPropertyValues[MAIN_PROPERTY_DATABASE_KEY];
 
-    config.url = info.url;
+    config.url = customOptionsInfo.url;
     config.folder = info.folder;
 
     config.authModelId = info.authModel;

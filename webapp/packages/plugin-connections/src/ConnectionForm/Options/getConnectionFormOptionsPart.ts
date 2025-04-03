@@ -11,6 +11,7 @@ import { ConnectionFormOptionsPart } from './ConnectionFormOptionsPart.js';
 import {
   ConnectionInfoAuthPropertiesResource,
   ConnectionInfoCredentialsSavedResource,
+  ConnectionInfoCustomOptionsResource,
   ConnectionInfoResource,
   DatabaseAuthModelsResource,
   DBDriverResource,
@@ -35,6 +36,7 @@ export function getConnectionFormOptionsPart(formState: IFormState<IConnectionFo
     const notificationService = di.getService(NotificationService);
     const connectionInfoCredentialsSavedResource = di.getService(ConnectionInfoCredentialsSavedResource);
     const connectionInfoAuthPropertiesResource = di.getService(ConnectionInfoAuthPropertiesResource);
+    const connectionInfoCustomOptionsResource = di.getService(ConnectionInfoCustomOptionsResource);
 
     return new ConnectionFormOptionsPart(
       formState,
@@ -44,6 +46,7 @@ export function getConnectionFormOptionsPart(formState: IFormState<IConnectionFo
       connectionInfoResource,
       connectionInfoCredentialsSavedResource,
       connectionInfoAuthPropertiesResource,
+      connectionInfoCustomOptionsResource,
       localizationService,
       commonDialogService,
       notificationService,
