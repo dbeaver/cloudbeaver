@@ -42,6 +42,7 @@ export * from './ConnectionInfoCredentialsSavedResource.js';
 export * from './ConnectionInfoAuthPropertiesResource.js';
 export * from './ConnectionInfoCustomOptionsResource.js';
 export * from './ConnectionInfoPropertiesResource.js';
+export * from './ConnectionInfoProviderPropertiesResource.js';
 export * from './CONNECTIONS_SETTINGS_GROUP.js';
 export * from './EConnectionFeature.js';
 export * from './ConnectionsSettingsService.js';

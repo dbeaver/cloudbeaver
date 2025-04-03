@@ -13,6 +13,7 @@ import {
   ConnectionInfoCredentialsSavedResource,
   ConnectionInfoCustomOptionsResource,
   ConnectionInfoProjectKey,
+  ConnectionInfoProviderPropertiesResource,
   ConnectionInfoResource,
   createConnectionParam,
   DatabaseAuthModelsResource,
@@ -40,10 +41,7 @@ const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
 const MAIN_PROPERTY_PORT_KEY = 'port';
 const MAIN_PROPERTY_SERVER_KEY = 'server';
-const CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS: CachedResourceIncludeArgs<Connection, ConnectionInfoIncludes> = [
-  'includeProviderProperties',
-  'includeNetworkHandlersConfig',
-];
+const CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS: CachedResourceIncludeArgs<Connection, ConnectionInfoIncludes> = ['includeNetworkHandlersConfig'];
 
 const defaultStateGetter = (connectionId?: string) =>
   ({
@@ -73,6 +71,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     private readonly connectionInfoCredentialsSavedResource: ConnectionInfoCredentialsSavedResource,
     private readonly connectionInfoAuthPropertiesResource: ConnectionInfoAuthPropertiesResource,
     private readonly connectionInfoCustomOptionsResource: ConnectionInfoCustomOptionsResource,
+    private readonly connectionInfoProviderPropertiesResource: ConnectionInfoProviderPropertiesResource,
     private readonly localizationService: LocalizationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
@@ -174,8 +173,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     const isCredentialsSavedOutdated = !!this.connectionKey && this.connectionInfoCredentialsSavedResource.isOutdated(this.connectionKey);
     const isAuthPropertiesOutdated = !!this.connectionKey && this.connectionInfoAuthPropertiesResource.isOutdated(this.connectionKey);
     const isCustomOptionsOutdated = !!this.connectionKey && this.connectionInfoCustomOptionsResource.isOutdated(this.connectionKey);
+    const isProviderPropertiesOutdated = !!this.connectionKey && this.connectionInfoProviderPropertiesResource.isOutdated(this.connectionKey);
 
-    return isConnectionInfoOutdated || isCredentialsSavedOutdated || isAuthPropertiesOutdated || isCustomOptionsOutdated;
+    return (
+      isConnectionInfoOutdated || isCredentialsSavedOutdated || isAuthPropertiesOutdated || isCustomOptionsOutdated || isProviderPropertiesOutdated
+    );
   }
 
   protected override async loader(): Promise<void> {
@@ -193,11 +195,12 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     // TODO: we should split connection info resource to multiple resources and load this data separately in different parts where needed
-    const [info, credentialsSavedInfo, authPropertiesInfo, customOptionsInfo] = await Promise.all([
+    const [info, credentialsSavedInfo, authPropertiesInfo, customOptionsInfo, providerPropertiesInfo] = await Promise.all([
       this.connectionInfoResource.load(this.connectionKey, CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS),
       this.connectionInfoCredentialsSavedResource.load(this.connectionKey),
       this.connectionInfoAuthPropertiesResource.load(this.connectionKey),
       this.connectionInfoCustomOptionsResource.load(this.connectionKey),
+      this.connectionInfoProviderPropertiesResource.load(this.connectionKey),
     ]);
 
     const config: ConnectionConfig = defaultStateGetter();
@@ -234,8 +237,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       }
     }
 
-    if (info.providerProperties) {
-      config.providerProperties = { ...toJS(info.providerProperties) };
+    if (providerPropertiesInfo.providerProperties) {
+      config.providerProperties = { ...toJS(providerPropertiesInfo.providerProperties) };
     }
 
     if (info.mainPropertyValues) {
