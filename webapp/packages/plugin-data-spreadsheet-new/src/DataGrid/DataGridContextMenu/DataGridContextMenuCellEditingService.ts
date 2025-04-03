@@ -102,13 +102,7 @@ export class DataGridContextMenuCellEditingService {
         }
 
         if (action === ACTION_DATA_GRID_EDITING_SET_TO_NULL) {
-          return (
-            cellValue !== undefined &&
-            !(format.isReadOnly(key) && !canEdit) &&
-            !view.getColumn(key.column)?.required &&
-            !format.isNull(key) &&
-            canEdit
-          );
+          return cellValue !== undefined && !(format.isReadOnly(key) && !canEdit) && !view.getColumn(key.column)?.required && !format.isNull(key);
         }
 
         if (action === ACTION_DATA_GRID_EDITING_ADD_ROW || action === ACTION_DATA_GRID_EDITING_DUPLICATE_ROW) {
