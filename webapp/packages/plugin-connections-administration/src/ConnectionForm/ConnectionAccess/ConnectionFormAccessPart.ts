@@ -30,10 +30,6 @@ export class ConnectionFormAccessPart extends FormPart<string[], IConnectionForm
     });
   }
 
-  override isOutdated(): boolean {
-    return Boolean(this.optionsPart.connectionKey && this.connectionInfoResource.isOutdated(this.optionsPart.connectionKey));
-  }
-
   protected override async loader(): Promise<void> {
     if (!this.optionsPart.connectionKey) {
       this.setInitialState(getDefaultState());

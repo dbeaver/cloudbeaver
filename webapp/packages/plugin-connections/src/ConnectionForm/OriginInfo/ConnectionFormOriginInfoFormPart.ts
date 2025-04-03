@@ -48,14 +48,28 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     this.formState.formStateTask.addHandler(this.formAuthState.bind(this));
   }
 
-  // do not include connectionInfoOriginDetailsResource cause it is already synced with connectionInfoResource
-  // this will lead to the infinite loop of loading
   override isOutdated(): boolean {
-    const isDriverOutdated = Boolean(this.optionsPart.state.driverId && this.dbDriverResource.isOutdated(this.optionsPart.state.driverId));
-    const isAuthModelOutdated = Boolean(this.authModelId && this.databaseAuthModelsResource.isOutdated(this.authModelId));
-    const isUserInfoOutdated = this.userInfoResource.isOutdated();
+    if (!this.optionsPart.connectionKey || !this.optionsPart.state.driverId) {
+      return false;
+    }
 
-    return isDriverOutdated || isAuthModelOutdated || isUserInfoOutdated;
+    if (this.dbDriverResource.isOutdated(this.optionsPart.state.driverId)) {
+      return true;
+    }
+
+    if (!this.authModelId) {
+      return false;
+    }
+
+    if (this.databaseAuthModelsResource.isOutdated(this.authModelId) || this.userInfoResource.isOutdated()) {
+      return true;
+    }
+
+    if (this.isAuthenticated && this.connectionInfoOriginDetailsResource.isOutdated(this.optionsPart.connectionKey)) {
+      return true;
+    }
+
+    return false;
   }
 
   get providerId(): string | null {
