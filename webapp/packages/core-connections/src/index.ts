@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ export * from './ConnectionInfoEventHandler.js';
 export * from './ConnectionInfoResource.js';
 export * from './ConnectionInfoOriginResource.js';
 export * from './ConnectionInfoOriginDetailsResource.js';
+export * from './ConnectionInfoCredentialsSavedResource.js';
 export * from './CONNECTIONS_SETTINGS_GROUP.js';
 export * from './EConnectionFeature.js';
 export * from './ConnectionsSettingsService.js';

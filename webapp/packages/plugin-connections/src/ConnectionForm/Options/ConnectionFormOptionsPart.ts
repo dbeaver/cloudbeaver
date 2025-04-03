@@ -9,6 +9,7 @@ import { FormMode, FormPart, formSubmitContext, formValidationContext, type IFor
 import { DriverConfigurationType, type ConnectionConfig, type ObjectPropertyInfo, type TestConnectionMutation } from '@cloudbeaver/core-sdk';
 import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import {
+  ConnectionInfoCredentialsSavedResource,
   ConnectionInfoProjectKey,
   ConnectionInfoResource,
   createConnectionParam,
@@ -39,7 +40,6 @@ const MAIN_PROPERTY_PORT_KEY = 'port';
 const MAIN_PROPERTY_SERVER_KEY = 'server';
 const CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS: CachedResourceIncludeArgs<Connection, ConnectionInfoIncludes> = [
   'includeAuthProperties',
-  'includeCredentialsSaved',
   'customIncludeOptions',
   'includeProperties',
   'includeProviderProperties',
@@ -71,6 +71,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionInfoCredentialsSavedResource: ConnectionInfoCredentialsSavedResource,
     private readonly localizationService: LocalizationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
@@ -167,7 +168,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       }
     }
 
-    return !!this.connectionKey && this.connectionInfoResource.isOutdated(this.connectionKey, CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS);
+    const isConnectionInfoOutdated =
+      !!this.connectionKey && this.connectionInfoResource.isOutdated(this.connectionKey, CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS);
+    const isCredentialsSavedOutdated = !!this.connectionKey && this.connectionInfoCredentialsSavedResource.isOutdated(this.connectionKey);
+
+    return isConnectionInfoOutdated || isCredentialsSavedOutdated;
   }
 
   protected override async loader(): Promise<void> {
@@ -185,7 +190,10 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     // TODO: we should split connection info resource to multiple resources and load this data separately in different parts where needed
-    const info = await this.connectionInfoResource.load(this.connectionKey, CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS);
+    const [info, credentialsSavedInfo] = await Promise.all([
+      this.connectionInfoResource.load(this.connectionKey, CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS),
+      this.connectionInfoCredentialsSavedResource.load(this.connectionKey),
+    ]);
 
     const config: ConnectionConfig = defaultStateGetter();
 
@@ -206,7 +214,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     config.folder = info.folder;
 
     config.authModelId = info.authModel;
-    config.saveCredentials = info.credentialsSaved;
+    config.saveCredentials = credentialsSavedInfo.credentialsSaved;
     config.sharedCredentials = info.sharedCredentials;
 
     config.keepAliveInterval = info.keepAliveInterval;
