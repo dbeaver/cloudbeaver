@@ -41,7 +41,6 @@ const MAIN_PROPERTY_HOST_KEY = 'host';
 const MAIN_PROPERTY_PORT_KEY = 'port';
 const MAIN_PROPERTY_SERVER_KEY = 'server';
 const CONNECTION_INFO_RESOURCE_INCLUDE_OPTIONS: CachedResourceIncludeArgs<Connection, ConnectionInfoIncludes> = [
-  'includeProperties',
   'includeProviderProperties',
   'includeNetworkHandlersConfig',
 ];

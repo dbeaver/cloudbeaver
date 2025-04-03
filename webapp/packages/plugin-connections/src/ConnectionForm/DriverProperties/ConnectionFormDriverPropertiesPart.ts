@@ -7,10 +7,10 @@
  */
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoPropertiesResource } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { IConnectionProperties } from '../Options/IConnectionConfig.js';
-import { runInAction } from 'mobx';
+import { observable, runInAction } from 'mobx';
 import type { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
 
 function getDefaultState(): IConnectionProperties {
@@ -20,7 +20,7 @@ function getDefaultState(): IConnectionProperties {
 export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProperties, IConnectionFormState> {
   constructor(
     formState: IFormState<IConnectionFormState>,
-    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionInfoPropertiesResource: ConnectionInfoPropertiesResource,
     private readonly optionsPart: ConnectionFormOptionsPart,
   ) {
     super(formState, getDefaultState());
@@ -32,20 +32,23 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     this.reset();
   }
 
+  override isOutdated(): boolean {
+    if (!this.optionsPart.connectionKey) {
+      return false;
+    }
+
+    return this.connectionInfoPropertiesResource.isOutdated(this.optionsPart.connectionKey);
+  }
+
   protected override async loader(): Promise<void> {
     if (!this.optionsPart.connectionKey) {
       this.setInitialState(getDefaultState());
       return;
     }
 
-    const connection = this.connectionInfoResource.get(this.optionsPart.connectionKey);
+    const connection = await this.connectionInfoPropertiesResource.load(this.optionsPart.connectionKey);
 
-    if (connection?.properties) {
-      this.setInitialState({ ...connection.properties });
-      return;
-    }
-
-    this.setInitialState(getDefaultState());
+    this.setInitialState({ ...connection.properties });
   }
 
   protected override async saveChanges(
@@ -64,10 +67,11 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
         }
       }
 
-      this.optionsPart.state.properties = {
-        ...this.optionsPart.state.properties,
-        ...this.state,
-      };
+      if (!this.optionsPart.state.properties) {
+        this.optionsPart.state.properties = observable({});
+      }
+
+      Object.assign(this.optionsPart.state.properties, this.state);
     });
   }
 }
