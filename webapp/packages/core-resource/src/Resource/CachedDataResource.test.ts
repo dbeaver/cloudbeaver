@@ -27,11 +27,7 @@ const DATA_MOCK_GETTER: () => IEntityData[] = () => [
 ];
 
 async function fetchMock(): Promise<IEntityData[]> {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(DATA_MOCK_GETTER());
-    }, 1);
-  });
+  return Promise.resolve(DATA_MOCK_GETTER());
 }
 
 class TestDataResource extends CachedDataResource<IEntityData[]> {

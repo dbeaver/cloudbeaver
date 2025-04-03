@@ -5,13 +5,30 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach } from 'vitest';
+import { afterEach, beforeEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
 // different machine has its own timezones and some tests can fail because of it
 process.env.TZ = 'UTC';
 
-afterEach(() => {
+function resetMocks() {
+  vi.clearAllMocks();
+  vi.clearAllTimers();
+  vi.useRealTimers();
+}
+
+function resetDocument() {
+  document.body.innerHTML = '';
+  document.body.className = '';
   cleanup();
+}
+
+beforeEach(() => {
+  resetMocks();
+});
+
+afterEach(() => {
+  resetMocks();
+  resetDocument();
 });

@@ -5,17 +5,34 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { expect, test } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
-
-import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
+import { expect, describe, it, vi } from 'vitest';
 
 import { ErrorMessage } from './ErrorMessage.js';
+import { render } from '@testing-library/react';
 
-const app = createApp(coreLocalizationManifest);
+vi.mock('./s', () => ({
+  s: (...args: any[]) => args.join(' '),
+}));
 
-test('icons.svg#name', async () => {
-  renderInApp(<ErrorMessage text="error" />, app);
-  await waitFor(() => expect(screen.getByText('error')).not.toBeNull());
+vi.mock('./useS', () => ({
+  useS: vi.fn(),
+}));
+
+vi.mock('./localization/useTranslate', () => ({
+  useTranslate: () => (key: string) => key,
+}));
+
+vi.mock('./Button', () => ({
+  Button: (props: any) => <button {...props} />,
+}));
+
+vi.mock('./IconOrImage', () => ({
+  IconOrImage: (props: any) => <svg {...props} />,
+}));
+
+describe('ErrorMessage', async () => {
+  it('should render error message', async () => {
+    const { getByText } = render(<ErrorMessage text="error" />);
+    await vi.waitFor(() => expect(getByText('error')).toBeInTheDocument());
+  });
 });

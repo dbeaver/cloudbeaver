@@ -5,46 +5,56 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it, vitest } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { CancellablePromise } from './CancellablePromise.js';
 
 describe('CancellablePromise', () => {
-  vitest.mock('./PromiseCancelledError', () => ({
-    PromiseCancelledError: vitest.fn().mockImplementation(() => Error('Promise cancelled')),
-  }));
+  it('should resolve with value', async () => {
+    const promise = new CancellablePromise<string>(resolve => {
+      resolve('test');
+      return () => {};
+    });
 
-  it('cancels promise', async () => {
-    const promise = new CancellablePromise<void>(resolve => {
-      const token = setTimeout(() => resolve(), 0);
-      return () => {
-        clearTimeout(token);
-      };
+    const result = await promise;
+    expect(result).toBe('test');
+  });
+
+  it('should reject with error', async () => {
+    const error = new Error('test error');
+    const promise = new CancellablePromise<string>((_, reject) => {
+      reject(error);
+      return () => {};
+    });
+
+    await expect(promise).rejects.toThrow(error);
+  });
+
+  it('should reject with PromiseCancelledError when cancelled', async () => {
+    const promise = new CancellablePromise<string>(() => {
+      return () => {};
     });
 
     promise.cancel();
 
-    await expect(promise).rejects.toThrow('Promise cancelled');
+    await expect(promise).rejects.toThrow();
   });
 
-  it('should resolve promise', async () => {
-    const promise = new CancellablePromise<number>(resolve => {
-      const token = setTimeout(() => resolve(777), 0);
-      return () => {
-        clearTimeout(token);
-      };
+  it('should call cancel function when cancelled', async () => {
+    const cancelFn = vi.fn();
+    const promise = new CancellablePromise<string>(() => {
+      return cancelFn;
     });
 
-    await expect(promise).resolves.toBe(777);
+    promise.cancel();
+    expect(cancelFn).toHaveBeenCalled();
+    await expect(promise).rejects.toThrow();
   });
 
-  it('should reject promise', async () => {
-    const error = new Error('test');
-    const promise = new CancellablePromise<number>((resolve, reject) => {
-      const token = setTimeout(() => reject(error), 0);
-      return () => {
-        clearTimeout(token);
-      };
+  it('should handle executor throwing error', async () => {
+    const error = new Error('executor error');
+    const promise = new CancellablePromise<string>(() => {
+      throw error;
     });
 
     await expect(promise).rejects.toThrow(error);

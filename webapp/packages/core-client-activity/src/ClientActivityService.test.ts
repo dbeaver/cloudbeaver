@@ -9,12 +9,24 @@ import { afterEach, beforeEach, describe, expect, it, vitest } from 'vitest';
 
 import { ClientActivityService, INACTIVE_PERIOD_TIME } from './ClientActivityService.js';
 
-vitest.useFakeTimers();
+vitest.mock('@cloudbeaver/core-executor', () => ({
+  Executor: vitest.fn(() => ({
+    execute: vitest.fn(),
+    addHandler: vitest.fn(),
+    removeHandler: vitest.fn(),
+    addPostHandler: vitest.fn(),
+    removePostHandler: vitest.fn(),
+    before: vitest.fn(),
+    removeBefore: vitest.fn(),
+    next: vitest.fn(),
+  })),
+}));
 
 describe('ClientActivityService', () => {
   let clientActivityService: ClientActivityService;
 
   beforeEach(() => {
+    vitest.useFakeTimers();
     clientActivityService = new ClientActivityService();
 
     vitest.spyOn(globalThis, 'setTimeout');
@@ -22,8 +34,7 @@ describe('ClientActivityService', () => {
   });
 
   afterEach(() => {
-    vitest.clearAllTimers();
-    vitest.restoreAllMocks();
+    vitest.useRealTimers();
   });
 
   it('should initialize with isActive set to false', () => {

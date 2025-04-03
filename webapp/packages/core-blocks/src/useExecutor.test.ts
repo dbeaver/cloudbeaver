@@ -13,6 +13,7 @@ import type { IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver
 import { useExecutor } from './useExecutor.js';
 import { useObjectRef } from './useObjectRef.js';
 
+vitest.mock('@cloudbeaver/core-executor', () => ({}));
 vitest.mock('./useObjectRef', () => ({
   useObjectRef: vitest.fn(obj => obj),
 }));

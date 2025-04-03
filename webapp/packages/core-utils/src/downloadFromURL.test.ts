@@ -5,74 +5,53 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, vitest, type Mock } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { downloadFromURL } from './downloadFromURL.js';
 
-type MockXHR = {
-  open: Mock;
-  send: Mock;
-  setRequestHeader: Mock;
-  responseType: string;
-  onload: Mock;
-  onerror: Mock;
-  response: Blob | null;
-};
-
 describe('downloadFromURL', () => {
-  let mockXHR: MockXHR;
+  let mockXHR: {
+    open: ReturnType<typeof vi.fn>;
+    send: ReturnType<typeof vi.fn>;
+    responseType: string;
+    response: Blob;
+    onload: () => void;
+    onerror: (e: Error) => void;
+  };
 
   beforeEach(() => {
     mockXHR = {
-      open: vitest.fn(),
-      send: vitest.fn(),
-      setRequestHeader: vitest.fn(),
+      open: vi.fn(),
+      send: vi.fn(),
       responseType: '',
-      onload: vitest.fn(),
-      onerror: vitest.fn(),
-      response: null,
+      response: new Blob(['test data']),
+      onload: () => {},
+      onerror: () => {},
     };
 
-    (globalThis as any).XMLHttpRequest = vitest.fn(() => mockXHR);
+    (window as any).XMLHttpRequest = vi.fn().mockImplementation(() => mockXHR);
   });
 
-  afterEach(() => {
-    vitest.restoreAllMocks();
-  });
-
-  it('should open and send request to the specified URL', async () => {
-    const url = 'http://example.com/test';
-    downloadFromURL(url);
+  it('should download data successfully', async () => {
+    const url = 'https://example.com/file';
+    const promise = downloadFromURL(url);
 
     expect(mockXHR.open).toHaveBeenCalledWith('GET', url, true);
+    expect(mockXHR.responseType).toBe('blob');
     expect(mockXHR.send).toHaveBeenCalled();
+
+    mockXHR.onload();
+    const result = await promise;
+
+    expect(result).toBe(mockXHR.response);
   });
 
-  it('should resolve with a Blob when the request is successful', async () => {
-    const mockBlob = new Blob(['test'], { type: 'text/plain' });
-    mockXHR.response = mockBlob;
+  it('should reject on error', async () => {
+    const url = 'https://example.com/file';
+    const error = new Error('Network error');
+    const promise = downloadFromURL(url);
 
-    setTimeout(() => {
-      mockXHR.onload?.();
-    }, 0);
-
-    const url = 'http://example.com/test';
-    const result = await downloadFromURL(url);
-
-    expect(mockXHR.responseType).toBe('blob');
-    expect(result).toBe(mockBlob);
-  });
-
-  it('should reject with an error when the request fails', async () => {
-    const mockError = new Error('Network error');
-
-    setTimeout(() => {
-      mockXHR.onerror?.(mockError);
-    }, 0);
-
-    const url = 'http://example.com/test';
-
-    await expect(downloadFromURL(url)).rejects.toThrow('Network error');
-    expect(mockXHR.responseType).toBe('blob');
+    mockXHR.onerror(error);
+    await expect(promise).rejects.toThrow('Network error');
   });
 });

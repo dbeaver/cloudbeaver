@@ -41,20 +41,18 @@ async function fetchMock(key: ResourceKey<string> | undefined): Promise<IEntityD
   const data = DATA_MOCK_GETTER();
 
   return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (key) {
-        if (key === ERROR_ITEM_ID) {
-          reject(new Error(TEST_ERROR_MESSAGE));
-        }
-
-        const item = data.find(d => d.id === key);
-        if (item) {
-          resolve([item]);
-        }
-      } else {
-        resolve(data);
+    if (key) {
+      if (key === ERROR_ITEM_ID) {
+        reject(new Error(TEST_ERROR_MESSAGE));
       }
-    }, 1);
+
+      const item = data.find(d => d.id === key);
+      if (item) {
+        resolve([item]);
+      }
+    } else {
+      resolve(data);
+    }
   });
 }
 

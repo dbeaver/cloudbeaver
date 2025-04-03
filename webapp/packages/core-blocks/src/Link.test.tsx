@@ -5,58 +5,65 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it, vitest } from 'vitest';
-import { fireEvent, queryByAttribute, waitFor } from '@testing-library/react';
-
-import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
+import { describe, expect, it, vi } from 'vitest';
+import { fireEvent, render } from '@testing-library/react';
 
 import { Link } from './Link.js';
 
-const app = createApp();
+vi.mock('./IconOrImage', () => ({
+  IconOrImage: (props: any) => <svg {...props}>{props.children}</svg>,
+}));
 
-describe.skip('Link', () => {
+vi.mock('./s', () => ({
+  s: (...args: any[]) => args.join(' '),
+}));
+
+vi.mock('./useS', () => ({
+  useS: vi.fn(),
+}));
+
+describe('Link', () => {
   it('should render link and children correctly', async () => {
-    const { getByText } = renderInApp(<Link href="#">Test Link</Link>, app);
-    const linkElement = await waitFor(() => getByText('Test Link'));
+    const { getByText } = render(<Link href="#">Test Link</Link>);
+    const linkElement = await vi.waitFor(() => getByText('Test Link'));
 
     expect(linkElement.tagName).toBe('A');
     expect(linkElement).toBeInTheDocument();
   });
 
   it('should display the indicator icon when indicator is true', async () => {
-    const { container } = renderInApp(
+    const { container } = render(
       <Link href="#" indicator>
         Test Link
       </Link>,
-      app,
     );
 
-    const icon = await waitFor(() => queryByAttribute('href', container, /external-link/i));
-    expect(icon).toBeInTheDocument();
+    const link = container.querySelector('a');
+    const icon = link?.querySelector('svg');
+
+    expect(icon).toHaveAttribute('icon', 'external-link');
   });
 
   it('should apply the className correctly', async () => {
-    const { getByText } = renderInApp(
+    const { getByText } = render(
       <Link href="#" className="custom-class">
         Test Link
       </Link>,
-      app,
     );
 
-    const linkContainer = await waitFor(() => getByText('Test Link').closest('div'));
+    const linkContainer = await vi.waitFor(() => getByText('Test Link').closest('div'));
     expect(linkContainer).toHaveClass('custom-class');
   });
 
   it('should handle onClick event', async () => {
-    const handleClick = vitest.fn();
-    const { getByText } = renderInApp(
+    const handleClick = vi.fn();
+    const { getByText } = render(
       <Link href="#" onClick={handleClick}>
         Test Link
       </Link>,
-      app,
     );
 
-    const linkElement = await waitFor(() => getByText('Test Link'));
+    const linkElement = await vi.waitFor(() => getByText('Test Link'));
     fireEvent.click(linkElement);
 
     expect(handleClick).toHaveBeenCalled();

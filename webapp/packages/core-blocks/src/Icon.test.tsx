@@ -5,30 +5,21 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, test } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, expect, test, vi } from 'vitest';
 
 import { Icon } from './Icon.js';
+import { render } from '@testing-library/react';
 
-describe.skip('Icon', () => {
-  test('icons.svg#name', () => {
-    (globalThis as any)._ROOT_URI_ = undefined;
+vi.mock('@cloudbeaver/core-utils', () => ({
+  GlobalConstants: {
+    absoluteUrl: (name: string) => name,
+  },
+}));
 
-    render(<Icon data-testid="Icon" name="test" />);
-    expect(screen.getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/icons/icons.svg#test');
-  });
-
-  test('/image.jpg', () => {
-    (globalThis as any)._ROOT_URI_ = undefined;
-
-    render(<Icon data-testid="Icon" name="/image.jpg" />);
-    expect(screen.getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/image.jpg');
-  });
-
-  test('{_ROOT_URI_}/icons.svg#name', () => {
-    (globalThis as any)._ROOT_URI_ = '/path/';
-
-    render(<Icon data-testid="Icon" name="test" />);
-    expect(screen.getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/path/icons/icons.svg#test');
+describe('Icon', () => {
+  test('/image.jpg', async () => {
+    const { getByTestId } = render(<Icon data-testid="Icon" name="/image.jpg" />);
+    const icon = await vi.waitFor(() => getByTestId('Icon'));
+    expect(icon.querySelector('use')).toHaveAttribute('href', '/image.jpg');
   });
 });

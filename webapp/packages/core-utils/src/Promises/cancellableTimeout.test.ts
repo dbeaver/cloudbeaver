@@ -10,9 +10,10 @@ import { afterEach, beforeEach, describe, expect, it, vitest } from 'vitest';
 import { cancellableTimeout } from './cancellableTimeout.js';
 
 vitest.mock('./CancellablePromise', () => ({
-  CancellablePromise: vitest.fn().mockImplementation(() => ({
-    cancel: vitest.fn(),
-  })),
+  CancellablePromise: vitest.fn().mockImplementation(executor => {
+    executor(() => {});
+    return { cancel: vitest.fn(), then: vitest.fn(), catch: vitest.fn() };
+  }),
 }));
 
 describe('cancellableTimeout', () => {
@@ -24,15 +25,15 @@ describe('cancellableTimeout', () => {
     vitest.useRealTimers();
   });
 
-  it('resolves after the specified timeout', async () => {
-    const timeout = 0;
+  it('should resolve after specified timeout', async () => {
+    const timeout = 1000;
     const start = Date.now();
 
     const promise = cancellableTimeout(timeout);
 
-    await promise;
+    await vitest.runAllTimersAsync();
 
-    vitest.advanceTimersByTime(timeout);
+    await expect(promise).resolves.toBeUndefined();
 
     expect(Date.now() - start).toBe(timeout);
   });
