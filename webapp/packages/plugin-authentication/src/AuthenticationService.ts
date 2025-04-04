@@ -205,8 +205,8 @@ export class AuthenticationService extends Bootstrap {
     this.administrationScreenService.ensurePermissions.addHandler(async () => {
       await this.waitAuth();
 
-      const userInfo = await this.userInfoResource.load();
-      if (userInfo && !userInfo.isAnonymous) {
+      await this.userInfoResource.load();
+      if (this.userInfoResource.isAuthenticated()) {
         return;
       }
 
