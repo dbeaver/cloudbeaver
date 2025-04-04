@@ -7,11 +7,11 @@
  */
 
 import { describe, expect, it, vi } from 'vitest';
-
-import '@testing-library/jest-dom/vitest';
-import { render } from '@testing-library/react';
-
 import { Cell } from './Cell.js';
+import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
+import { coreBlocksManifest } from './manifest.js';
+import { coreDIManifest } from '@cloudbeaver/core-di';
+import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 
 vi.mock('./s', () => ({
   s: (...args: any[]) => args.join(' '),
@@ -26,32 +26,35 @@ vi.mock('./Containers/Container', () => ({
 }));
 
 describe('Cell', () => {
+  const app = createApp(coreDIManifest, coreBlocksManifest, coreLocalizationManifest);
+
   it('should render children correctly', async () => {
-    const { getByText } = render(<Cell>Test Children</Cell>);
+    const { getByText } = renderInApp(<Cell>Test Children</Cell>, app);
     const text = await vi.waitFor(() => getByText('Test Children'));
 
     expect(text).toBeInTheDocument();
   });
 
   it('should render before element correctly', async () => {
-    const { getByText } = render(<Cell before={<span>Before Element</span>}>Test Children</Cell>);
+    const { getByText } = renderInApp(<Cell before={<span>Before Element</span>}>Test Children</Cell>, app);
 
     const beforeText = await vi.waitFor(() => getByText('Before Element'));
     expect(beforeText).toBeInTheDocument();
   });
 
   it('should render after element correctly', async () => {
-    const { getByText } = render(<Cell after={<span>After Element</span>}>Test Children</Cell>);
+    const { getByText } = renderInApp(<Cell after={<span>After Element</span>}>Test Children</Cell>, app);
 
     const afterText = await vi.waitFor(() => getByText('After Element'));
     expect(afterText).toBeInTheDocument();
   });
 
   it('should render after and before elements correctly', async () => {
-    const { getByText } = render(
+    const { getByText } = renderInApp(
       <Cell before={<span>Before Element</span>} after={<span>After Element</span>}>
         Test Children
       </Cell>,
+      app,
     );
 
     const afterText = await vi.waitFor(() => getByText('After Element'));
@@ -62,7 +65,7 @@ describe('Cell', () => {
   });
 
   it('should render description element correctly', async () => {
-    const { getByText } = render(<Cell description={<span>Description Element</span>}>Test Children</Cell>);
+    const { getByText } = renderInApp(<Cell description={<span>Description Element</span>}>Test Children</Cell>, app);
 
     const description = await vi.waitFor(() => getByText('Description Element'));
     expect(description).toBeInTheDocument();

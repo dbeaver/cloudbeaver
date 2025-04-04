@@ -6,11 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, queryByAttribute, render } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
 
 import { ENotificationType } from '@cloudbeaver/core-events';
 
 import { StatusMessage } from './StatusMessage.js';
+import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
+import { coreDIManifest } from '@cloudbeaver/core-di';
+import { coreBlocksManifest } from './manifest.js';
+import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
+import { coreDialogsManifest } from '@cloudbeaver/core-dialogs';
+import * as ErrorDetailsModule from './useErrorDetails.js';
 
 vi.mock('./localization/useTranslate', () => ({
   useTranslate: () => (key: string) => key,
@@ -32,20 +38,21 @@ vi.mock('./useS', () => ({
   useS: vi.fn(),
 }));
 
-// TODO add correct mocks here
 vi.mock('./useErrorDetails', () => ({
-  useErrorDetails: () => ({
-    message: 'test_error',
-    hasDetails: true,
+  useErrorDetails: (exception: Error | null) => ({
+    message: exception?.message || '',
+    hasDetails: false,
   }),
 }));
 
-describe.skip('StatusMessage', () => {
+describe('StatusMessage', () => {
+  const app = createApp(coreDIManifest, coreBlocksManifest, coreLocalizationManifest, coreDialogsManifest);
+
   it('should display an error icon and message when type is error', async () => {
     const message = 'test_error';
-    const { container, getByTitle } = render(<StatusMessage message={message} type={ENotificationType.Error} />);
+    const { container, getByTitle } = renderInApp(<StatusMessage message={message} type={ENotificationType.Error} />, app);
     const title = await vi.waitFor(() => getByTitle(message));
-    const icon = await vi.waitFor(() => queryByAttribute('src', container, /error/i));
+    const icon = container.querySelector('svg');
 
     expect(title).toBeInTheDocument();
     expect(icon).toBeInTheDocument();
@@ -53,25 +60,35 @@ describe.skip('StatusMessage', () => {
 
   it('should display a success icon and message when type is success', async () => {
     const message = 'test_success';
-    const { container, getByTitle } = render(<StatusMessage message={message} type={ENotificationType.Success} />);
+    const { container, getByTitle } = renderInApp(<StatusMessage message={message} type={ENotificationType.Success} />, app);
     const title = await vi.waitFor(() => getByTitle(message));
-    const icon = await vi.waitFor(() => queryByAttribute('src', container, /success/i));
+    const icon = container.querySelector('svg');
 
     expect(title).toBeInTheDocument();
     expect(icon).toBeInTheDocument();
   });
 
   it('should display an error message when no message is provided', async () => {
-    const { getByText } = render(<StatusMessage exception={new Error('Test error')} />);
-    const message = await vi.waitFor(() => getByText('Test error'));
+    const message = 'test_error';
+    const error = new Error(message);
+    vi.spyOn(ErrorDetailsModule, 'useErrorDetails').mockReturnValueOnce({
+      hasDetails: true,
+      error,
+      message: error.message,
+      isOpen: true,
+      open: vi.fn(),
+    });
 
-    expect(message).toBeInTheDocument();
+    const { getByText } = renderInApp(<StatusMessage exception={error} />, app);
+    const statusMessage = await vi.waitFor(() => getByText(message));
+
+    expect(statusMessage).toBeInTheDocument();
   });
 
   it('should call onShowDetails when link is clicked', async () => {
     const onShowDetails = vi.fn();
     const message = 'test_message_with_details';
-    const { getByText } = render(<StatusMessage message={message} onShowDetails={onShowDetails} />);
+    const { getByText } = renderInApp(<StatusMessage message={message} onShowDetails={onShowDetails} />, app);
     const link = await vi.waitFor(() => getByText(message));
 
     fireEvent.click(link);
@@ -80,7 +97,7 @@ describe.skip('StatusMessage', () => {
 
   it('should display multiple messages joined by comma', async () => {
     const messages = ['message_one', 'message_two'];
-    const { getByText } = render(<StatusMessage message={messages} />);
+    const { getByText } = renderInApp(<StatusMessage message={messages} />, app);
     const message = await vi.waitFor(() => getByText('message_one, message_two'));
 
     expect(message).toBeInTheDocument();

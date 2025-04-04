@@ -6,9 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
 
 import { Link } from './Link.js';
+import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
+import { coreBlocksManifest } from './index.js';
+import { coreDIManifest } from '@cloudbeaver/core-di';
+import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 
 vi.mock('./IconOrImage', () => ({
   IconOrImage: (props: any) => <svg {...props}>{props.children}</svg>,
@@ -23,8 +27,10 @@ vi.mock('./useS', () => ({
 }));
 
 describe('Link', () => {
+  const app = createApp(coreDIManifest, coreBlocksManifest, coreLocalizationManifest);
+
   it('should render link and children correctly', async () => {
-    const { getByText } = render(<Link href="#">Test Link</Link>);
+    const { getByText } = renderInApp(<Link href="#">Test Link</Link>, app);
     const linkElement = await vi.waitFor(() => getByText('Test Link'));
 
     expect(linkElement.tagName).toBe('A');
@@ -32,10 +38,11 @@ describe('Link', () => {
   });
 
   it('should display the indicator icon when indicator is true', async () => {
-    const { container } = render(
+    const { container } = renderInApp(
       <Link href="#" indicator>
         Test Link
       </Link>,
+      app,
     );
 
     const link = container.querySelector('a');
@@ -45,10 +52,11 @@ describe('Link', () => {
   });
 
   it('should apply the className correctly', async () => {
-    const { getByText } = render(
+    const { getByText } = renderInApp(
       <Link href="#" className="custom-class">
         Test Link
       </Link>,
+      app,
     );
 
     const linkContainer = await vi.waitFor(() => getByText('Test Link').closest('div'));
@@ -57,10 +65,11 @@ describe('Link', () => {
 
   it('should handle onClick event', async () => {
     const handleClick = vi.fn();
-    const { getByText } = render(
+    const { getByText } = renderInApp(
       <Link href="#" onClick={handleClick}>
         Test Link
       </Link>,
+      app,
     );
 
     const linkElement = await vi.waitFor(() => getByText('Test Link'));

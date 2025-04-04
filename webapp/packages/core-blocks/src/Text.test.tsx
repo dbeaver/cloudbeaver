@@ -6,9 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import { describe, expect, it, vi } from 'vitest';
-import { render } from '@testing-library/react';
 
 import { Text } from './Text.js';
+import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
+import { coreBlocksManifest } from './manifest.js';
+import { coreDIManifest } from '@cloudbeaver/core-di';
+import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 
 vi.mock('./s', () => ({
   s: (...args: any[]) => args.join(' '),
@@ -19,22 +22,25 @@ vi.mock('./useS', () => ({
 }));
 
 describe('Text Component', () => {
+  const app = createApp(coreDIManifest, coreBlocksManifest, coreLocalizationManifest);
+
   it('renders children correctly', async () => {
-    const { getByText } = render(<Text>Hello World</Text>);
+    const { getByText } = renderInApp(<Text>Hello World</Text>, app);
     const text = await vi.waitFor(() => getByText('Hello World'));
     expect(text).toBeInTheDocument();
   });
 
   it('applies custom className', () => {
-    const { container } = render(<Text className="custom-class">Hello World</Text>);
+    const { container } = renderInApp(<Text className="custom-class">Hello World</Text>, app);
     expect(container.getElementsByClassName('custom-class')).toHaveLength(1);
   });
 
   it('passes HTML attributes correctly', () => {
-    const { container } = render(
+    const { container } = renderInApp(
       <Text id="custom-id" data-testid="custom-testid">
         Hello World
       </Text>,
+      app,
     );
 
     const div = container.firstChild;

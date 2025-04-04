@@ -8,7 +8,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { TimerIcon } from './TimerIcon.js';
-import { render } from '@testing-library/react';
+import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
+import { coreBlocksManifest } from './manifest.js';
+import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
+import { coreDIManifest } from '@cloudbeaver/core-di';
 
 vi.mock('./Icon', () => ({
   Icon: (props: any) => <svg {...props}>Icon</svg>,
@@ -23,8 +26,10 @@ vi.mock('./useS', () => ({
 }));
 
 describe('TimerIcon', () => {
+  const app = createApp(coreDIManifest, coreBlocksManifest, coreLocalizationManifest);
+
   it('renders correctly with state "play" and interval 30', async () => {
-    const { getByText, getByTestId } = render(<TimerIcon state="play" data-testid="timer-icon" interval={30} />);
+    const { getByText, getByTestId } = renderInApp(<TimerIcon state="play" data-testid="timer-icon" interval={30} />, app);
     const text = await vi.waitFor(() => getByText('30'));
 
     const timerIcon = await vi.waitFor(() => getByTestId('timer-icon'));
@@ -36,7 +41,7 @@ describe('TimerIcon', () => {
   });
 
   it('renders correctly with state "stop" and interval 60', async () => {
-    const { getByText, getByTestId } = render(<TimerIcon state="stop" data-testid="timer-icon" interval={60} />);
+    const { getByText, getByTestId } = renderInApp(<TimerIcon state="stop" data-testid="timer-icon" interval={60} />, app);
     const text = await vi.waitFor(() => getByText('60'));
 
     const timerIcon = await vi.waitFor(() => getByTestId('timer-icon'));
@@ -48,7 +53,7 @@ describe('TimerIcon', () => {
   });
 
   it('passes HTML attributes correctly', () => {
-    const { container } = render(<TimerIcon state="play" interval={30} id="custom-id" data-testid="custom-testid" />);
+    const { container } = renderInApp(<TimerIcon state="play" interval={30} id="custom-id" data-testid="custom-testid" />, app);
 
     const div = container.firstChild;
     expect(div).toHaveAttribute('id', 'custom-id');

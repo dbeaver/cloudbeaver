@@ -8,7 +8,10 @@
 import { describe, expect, test, vi } from 'vitest';
 
 import { Icon } from './Icon.js';
-import { render } from '@testing-library/react';
+import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
+import { coreDIManifest } from '@cloudbeaver/core-di';
+import { coreBlocksManifest } from './manifest.js';
+import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 
 vi.mock('@cloudbeaver/core-utils', () => ({
   GlobalConstants: {
@@ -17,8 +20,10 @@ vi.mock('@cloudbeaver/core-utils', () => ({
 }));
 
 describe('Icon', () => {
+  const app = createApp(coreDIManifest, coreBlocksManifest, coreLocalizationManifest);
+
   test('/image.jpg', async () => {
-    const { getByTestId } = render(<Icon data-testid="Icon" name="/image.jpg" />);
+    const { getByTestId } = renderInApp(<Icon data-testid="Icon" name="/image.jpg" />, app);
     const icon = await vi.waitFor(() => getByTestId('Icon'));
     expect(icon.querySelector('use')).toHaveAttribute('href', '/image.jpg');
   });
