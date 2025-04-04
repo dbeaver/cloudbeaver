@@ -12,16 +12,16 @@ import { timestampToDate } from './timestampToDate.js';
 describe('timestampToDate', () => {
   it('should convert timestamp to date', () => {
     const date = timestampToDate(1591862400000);
-    expect(date).toBe('6/11/2020, 8:00:00 AM');
+    expect(date).toBe('06/11/2020, 08:00:00');
   });
 
   it('should convert negative timestamp to date', () => {
     const date = timestampToDate(-1591862400000);
-    expect(date).toBe('7/23/1919, 4:00:00 PM');
+    expect(date).toBe('07/23/1919, 16:00:00');
   });
 
   it('should convert zero timestamp to date', () => {
     const date = timestampToDate(0);
-    expect(date).toBe('1/1/1970, 12:00:00 AM');
+    expect(date).toBe('01/01/1970, 00:00:00');
   });
 });
