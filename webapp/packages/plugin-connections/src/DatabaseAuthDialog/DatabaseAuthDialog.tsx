@@ -8,12 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { CommonDialogHeader, CommonDialogWrapper, useResource } from '@cloudbeaver/core-blocks';
-import {
-  ConnectionInfoCustomOptionsResource,
-  ConnectionPublicSecretsResource,
-  DBDriverResource,
-  type IConnectionInfoParams,
-} from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionPublicSecretsResource, DBDriverResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
 import { DatabaseCredentialsAuthDialog } from './DatabaseCredentialsAuthDialog/DatabaseCredentialsAuthDialog.js';
@@ -26,15 +21,15 @@ interface Payload {
 }
 
 export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function DatabaseAuthDialog({ payload, options, rejectDialog, resolveDialog }) {
-  const connectionInfoCustomOptionsResource = useResource(DatabaseAuthDialog, ConnectionInfoCustomOptionsResource, {
+  const connectionInfoLoader = useResource(DatabaseAuthDialog, ConnectionInfoResource, {
     key: payload.connection,
     includes: ['includeAuthNeeded', 'includeNetworkHandlersConfig', 'includeCredentialsSaved'],
   });
-  const driverLoader = useResource(DatabaseAuthDialog, DBDriverResource, connectionInfoCustomOptionsResource.data?.driverId || null);
+  const driverLoader = useResource(DatabaseAuthDialog, DBDriverResource, connectionInfoLoader.data?.driverId || null);
   const connectionPublicSecretsLoader = useResource(DatabaseSecretAuthDialog, ConnectionPublicSecretsResource, payload.connection);
   const useSharedCredentials = (connectionPublicSecretsLoader.data?.length || 0) > 1;
 
-  const subtitle = connectionInfoCustomOptionsResource.data?.name;
+  const subtitle = connectionInfoLoader.data?.name;
 
   return (
     <CommonDialogWrapper size="large" fixedSize={useSharedCredentials}>

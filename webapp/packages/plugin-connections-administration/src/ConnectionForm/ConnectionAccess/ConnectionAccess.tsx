@@ -25,7 +25,7 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoOriginResource, createConnectionParam, isCloudConnection } from '@cloudbeaver/core-connections';
+import { ConnectionInfoOriginResource, ConnectionInfoResource, createConnectionParam, isCloudConnection } from '@cloudbeaver/core-connections';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { FormMode, type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
@@ -74,6 +74,14 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
   );
 
   const optionsPart = getConnectionFormOptionsPart(formState);
+  const connectionInfoResource = useResource(
+    ConnectionAccess,
+    ConnectionInfoResource,
+    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
+    {
+      active: selected && !!formState.state.projectId && !!optionsPart.state.connectionId,
+    },
+  );
   const originInfoResource = useResource(
     ConnectionAccess,
     ConnectionInfoOriginResource,
@@ -82,9 +90,10 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
       active: selected && !!formState.state.projectId && !!optionsPart.state.connectionId,
     },
   );
+  const connectionInfo = connectionInfoResource.data;
   const originInfo = originInfoResource.data;
   const loading = users.isLoading() || teams.isLoading() || accessPart.isLoading();
-  const cloud = originInfo && originInfo?.origin ? isCloudConnection(originInfo.origin) : false;
+  const cloud = connectionInfo && originInfo?.origin ? isCloudConnection(originInfo.origin) : false;
   const disabled = loading || !accessPart.isLoaded() || formState.isDisabled || cloud;
   let info: TLocalizationToken | null = null;
 

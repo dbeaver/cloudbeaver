@@ -18,7 +18,7 @@ import style from './ConnectionForm.module.css';
 import type { ConnectionFormState } from './ConnectionFormState.js';
 import { getFirstException } from '@cloudbeaver/core-utils';
 import { ConnectionFormService } from './ConnectionFormService.js';
-import { ConnectionInfoCustomOptionsResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { getConnectionFormOptionsPart } from './Options/getConnectionFormOptionsPart.js';
 import { ExecutionContext } from '@cloudbeaver/core-executor';
 import type { IConnectionFormState } from './IConnectionFormState.js';
@@ -35,7 +35,7 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   const styles = useS(style);
   const notificationService = useService(NotificationService);
   const optionsPart = getConnectionFormOptionsPart(formState);
-  const connectionInfoCustomOptionsResource = useResource(ConnectionForm, ConnectionInfoCustomOptionsResource, optionsPart.connectionKey, {
+  const connectionInfoResource = useResource(ConnectionForm, ConnectionInfoResource, optionsPart.connectionKey, {
     active: !!optionsPart.connectionKey,
   });
   const exception = getFirstException(formState.exception);
@@ -58,7 +58,7 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
           notificationService.notify(
             {
               title: initialMode === 'create' ? 'core_connections_connection_create_success' : 'core_connections_connection_update_success',
-              message: connectionInfoCustomOptionsResource.data?.name,
+              message: connectionInfoResource.data?.name,
             },
             ENotificationType.Success,
           );

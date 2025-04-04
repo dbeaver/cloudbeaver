@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { Button, getComputed, type PlaceholderComponent, useResource, useTranslate, useAuthenticationAction } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoAuthPropertiesResource, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
@@ -18,30 +18,25 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
   const translate = useTranslate();
   const optionsPart = getConnectionFormOptionsPart(formState);
   const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, optionsPart.state.driverId || null);
-  const connectionInfoAuthPropertiesResource = useResource(
-    ConnectionFormAuthenticationAction,
-    ConnectionInfoAuthPropertiesResource,
-    optionsPart.connectionKey,
-    {
-      active: !!optionsPart.connectionKey,
-    },
-  );
-  const authInfo = connectionInfoAuthPropertiesResource.data;
+  const connectionInfoService = useResource(ConnectionFormAuthenticationAction, ConnectionInfoResource, optionsPart.connectionKey, {
+    active: !!optionsPart.connectionKey,
+  });
+  const info = connectionInfoService.data;
   const driver = driverMap.data;
   const { data: authModel } = useResource(
     ConnectionFormAuthenticationAction,
     DatabaseAuthModelsResource,
-    getComputed(() => optionsPart.state.authModelId || authInfo?.authModel || driver?.defaultAuthModel || null),
+    getComputed(() => optionsPart.state.authModelId || info?.authModel || driver?.defaultAuthModel || null),
   );
 
   const authentication = useAuthenticationAction({
-    providerId: authModel?.requiredAuth ?? authInfo?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
+    providerId: authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
     onAuthenticate: () => {
       if (!optionsPart.connectionKey) {
         return;
       }
 
-      connectionInfoAuthPropertiesResource.resource.markOutdated(optionsPart.connectionKey);
+      connectionInfoService.resource.markOutdated(optionsPart.connectionKey);
     },
   });
 
@@ -61,22 +56,17 @@ export const ConnectionFormAuthenticationAction: PlaceholderComponent<IConnectio
 }) {
   const optionsPart = getConnectionFormOptionsPart(formState);
   const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, optionsPart.state.driverId || null);
-  const connectionInfoAuthPropertiesResource = useResource(
-    ConnectionFormAuthenticationAction,
-    ConnectionInfoAuthPropertiesResource,
-    optionsPart.connectionKey,
-    {
-      active: !!optionsPart.connectionKey,
-    },
-  );
+  const connectionInfoService = useResource(ConnectionFormAuthenticationAction, ConnectionInfoResource, optionsPart.connectionKey, {
+    active: !!optionsPart.connectionKey,
+  });
   const driver = driverMap.data;
   const { data: authModel } = useResource(
     ConnectionFormAuthenticationAction,
     DatabaseAuthModelsResource,
-    getComputed(() => optionsPart.state.authModelId || connectionInfoAuthPropertiesResource.data?.authModel || driver?.defaultAuthModel || null),
+    getComputed(() => optionsPart.state.authModelId || connectionInfoService.data?.authModel || driver?.defaultAuthModel || null),
   );
 
-  if (!authModel?.requiredAuth && !connectionInfoAuthPropertiesResource.data?.requiredAuth) {
+  if (!authModel?.requiredAuth && !connectionInfoService.data?.requiredAuth) {
     return null;
   }
 
