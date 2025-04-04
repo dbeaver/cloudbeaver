@@ -168,6 +168,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             var securityController = webSession.getAdminSecurityController();
             securityController.createUser(userId, Map.of(), enabled, authRole);
             var smUser = securityController.getUserById(userId);
+            log.info(String.format("New user created: [userId=%s]", userId));
             return new AdminUserInfo(webSession, new WebUser(smUser));
         } catch (Exception e) {
             throw new DBWebException("Error creating new user", e);
@@ -196,6 +197,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 secretController.deleteSubjectSecrets(userName);
             }
             webSession.getAdminSecurityController().deleteUser(userName);
+            log.info(String.format("User deleted: [userId=%s]", userName));
         } catch (Exception e) {
             throw new DBWebException("Error deleting user", e);
         }
@@ -290,6 +292,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         try {
             var adminSecurityController = webSession.getAdminSecurityController();
             adminSecurityController.addUserTeams(user, new String[]{team}, grantor.getUserId());
+            log.info(String.format("User added to team: [userId=%s,team=%s, grantorUserId=%s]", user, team, grantor.getUserId()));
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error granting team", e);
@@ -313,6 +316,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             List<String> teamIds = Arrays.stream(userTeams).map(SMTeam::getTeamId).collect(Collectors.toList());
             if (teamIds.contains(team)) {
                 adminSecurityController.deleteUserTeams(user, new String[]{team});
+                log.info(String.format("User deleted from team: [userId=%s,team=%s, grantorUserId=%s]", user, team, grantor.getUserId()));
             } else {
                 throw new DBWebException("User '" + user + "' doesn't have team '" + team + "'");
             }
@@ -361,6 +365,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             webSession.getAdminSecurityController().setUserCredentials(userID, authProvider.getId(), credentials);
+            log.info(String.format("Set credentials for user: [userId=%s,providerId=%s]", userID, providerId));
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error setting user credentials", e);
@@ -375,6 +380,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     ) throws DBWebException {
         try {
             webSession.getAdminSecurityController().deleteUserCredentials(userId, providerId);
+            log.info(String.format("User credentials deleted: [userId=%s, providerId=%s]", userId, providerId));
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error setting user credentials", e);
@@ -393,6 +399,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         webSession.addInfoMessage("Enable user - " + userID);
         try {
             webSession.getAdminSecurityController().enableUser(userID, enabled);
+            log.info(String.format("User enabled: [userId=%s]", userID));
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error activating user", e);
@@ -403,6 +410,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public Boolean setUserAuthRole(WebSession webSession, String userId, String authRole) throws DBWebException {
         try {
             webSession.getAdminSecurityController().setUserAuthRole(userId, authRole);
+            log.info(String.format("User set auth role: [userId=%s,role=%s, grantorUserId=%s]", userId, authRole, webSession.getUserId()));
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error updating user auth role", e);
@@ -418,6 +426,13 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     ) throws DBWebException {
         try {
             webSession.getAdminSecurityController().setUserTeamRole(userId, teamId, teamRole);
+            log.info(String.format(
+                "User set team role: [userId=%s,teamId=%s, role=%s, grantorUserId=%s]",
+                userId,
+                teamId,
+                teamRole,
+                webSession.getUserId()
+            ));
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error updating user auth role", e);
