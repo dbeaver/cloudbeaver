@@ -12,14 +12,6 @@ import * as isValidUrlModule from './isValidUrl.js';
 
 type WindowSpyType = MockInstance;
 
-vitest.mock('./isValidUrl', () => ({
-  isValidUrl: vitest.fn().mockReturnValue(false),
-}));
-
-vitest.mock('./pathJoin', () => ({
-  pathJoin: vitest.fn((...args: string[]) => args.reduce((acc, arg) => acc + arg, '')),
-}));
-
 describe('GlobalConstants', () => {
   let windowSpy: WindowSpyType;
 
@@ -88,7 +80,7 @@ describe('GlobalConstants', () => {
     expect(GlobalConstants.rootURI).toBe('/');
 
     (globalThis as any)._ROOT_URI_ = '/dbeaver';
-    expect(GlobalConstants.rootURI).toBe('/dbeaver/');
+    expect(GlobalConstants.rootURI).toBe('/dbeaver');
   });
 
   it('should return correct serviceURI value', () => {
@@ -130,6 +122,6 @@ describe('GlobalConstants', () => {
 
   it('should generate absolute url', () => {
     expect(GlobalConstants.absoluteUrl('test/', 'test2')).toBe('/test/test2');
-    expect(GlobalConstants.absoluteUrl('platform:test/', 'test2')).toBe('/apiimagesplatform:test/test2');
+    expect(GlobalConstants.absoluteUrl('platform:test/', 'test2')).toBe('/api/images/platform:test/test2');
   });
 });
