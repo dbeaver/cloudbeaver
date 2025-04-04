@@ -11,11 +11,7 @@ import { fireEvent } from '@testing-library/react';
 import { ENotificationType } from '@cloudbeaver/core-events';
 
 import { StatusMessage } from './StatusMessage.js';
-import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
-import { coreDIManifest } from '@cloudbeaver/core-di';
-import { coreBlocksManifest } from './manifest.js';
-import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { coreDialogsManifest } from '@cloudbeaver/core-dialogs';
+import { renderInApp } from '@cloudbeaver/tests-runner';
 import * as ErrorDetailsModule from './useErrorDetails.js';
 
 vi.mock('./localization/useTranslate', () => ({
@@ -46,11 +42,9 @@ vi.mock('./useErrorDetails', () => ({
 }));
 
 describe('StatusMessage', () => {
-  const app = createApp(coreDIManifest, coreBlocksManifest, coreLocalizationManifest, coreDialogsManifest);
-
   it('should display an error icon and message when type is error', async () => {
     const message = 'test_error';
-    const { container, getByTitle } = renderInApp(<StatusMessage message={message} type={ENotificationType.Error} />, app);
+    const { container, getByTitle } = renderInApp(<StatusMessage message={message} type={ENotificationType.Error} />);
     const title = await vi.waitFor(() => getByTitle(message));
     const icon = container.querySelector('svg');
 
@@ -60,7 +54,7 @@ describe('StatusMessage', () => {
 
   it('should display a success icon and message when type is success', async () => {
     const message = 'test_success';
-    const { container, getByTitle } = renderInApp(<StatusMessage message={message} type={ENotificationType.Success} />, app);
+    const { container, getByTitle } = renderInApp(<StatusMessage message={message} type={ENotificationType.Success} />);
     const title = await vi.waitFor(() => getByTitle(message));
     const icon = container.querySelector('svg');
 
@@ -79,7 +73,7 @@ describe('StatusMessage', () => {
       open: vi.fn(),
     });
 
-    const { getByText } = renderInApp(<StatusMessage exception={error} />, app);
+    const { getByText } = renderInApp(<StatusMessage exception={error} />);
     const statusMessage = await vi.waitFor(() => getByText(message));
 
     expect(statusMessage).toBeInTheDocument();
@@ -88,7 +82,7 @@ describe('StatusMessage', () => {
   it('should call onShowDetails when link is clicked', async () => {
     const onShowDetails = vi.fn();
     const message = 'test_message_with_details';
-    const { getByText } = renderInApp(<StatusMessage message={message} onShowDetails={onShowDetails} />, app);
+    const { getByText } = renderInApp(<StatusMessage message={message} onShowDetails={onShowDetails} />);
     const link = await vi.waitFor(() => getByText(message));
 
     fireEvent.click(link);
@@ -97,7 +91,7 @@ describe('StatusMessage', () => {
 
   it('should display multiple messages joined by comma', async () => {
     const messages = ['message_one', 'message_two'];
-    const { getByText } = renderInApp(<StatusMessage message={messages} />, app);
+    const { getByText } = renderInApp(<StatusMessage message={messages} />);
     const message = await vi.waitFor(() => getByText('message_one, message_two'));
 
     expect(message).toBeInTheDocument();

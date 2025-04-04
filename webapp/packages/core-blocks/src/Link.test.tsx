@@ -9,10 +9,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { fireEvent } from '@testing-library/react';
 
 import { Link } from './Link.js';
-import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
-import { coreBlocksManifest } from './index.js';
-import { coreDIManifest } from '@cloudbeaver/core-di';
-import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
+import { renderInApp } from '@cloudbeaver/tests-runner';
 
 vi.mock('./IconOrImage', () => ({
   IconOrImage: (props: any) => <svg {...props}>{props.children}</svg>,
@@ -27,10 +24,8 @@ vi.mock('./useS', () => ({
 }));
 
 describe('Link', () => {
-  const app = createApp(coreDIManifest, coreBlocksManifest, coreLocalizationManifest);
-
   it('should render link and children correctly', async () => {
-    const { getByText } = renderInApp(<Link href="#">Test Link</Link>, app);
+    const { getByText } = renderInApp(<Link href="#">Test Link</Link>);
     const linkElement = await vi.waitFor(() => getByText('Test Link'));
 
     expect(linkElement.tagName).toBe('A');
@@ -42,7 +37,6 @@ describe('Link', () => {
       <Link href="#" indicator>
         Test Link
       </Link>,
-      app,
     );
 
     const link = container.querySelector('a');
@@ -56,7 +50,6 @@ describe('Link', () => {
       <Link href="#" className="custom-class">
         Test Link
       </Link>,
-      app,
     );
 
     const linkContainer = await vi.waitFor(() => getByText('Test Link').closest('div'));
@@ -69,7 +62,6 @@ describe('Link', () => {
       <Link href="#" onClick={handleClick}>
         Test Link
       </Link>,
-      app,
     );
 
     const linkElement = await vi.waitFor(() => getByText('Test Link'));

@@ -8,10 +8,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { Text } from './Text.js';
-import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
-import { coreBlocksManifest } from './manifest.js';
-import { coreDIManifest } from '@cloudbeaver/core-di';
-import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
+import { renderInApp } from '@cloudbeaver/tests-runner';
 
 vi.mock('./s', () => ({
   s: (...args: any[]) => args.join(' '),
@@ -22,16 +19,14 @@ vi.mock('./useS', () => ({
 }));
 
 describe('Text Component', () => {
-  const app = createApp(coreDIManifest, coreBlocksManifest, coreLocalizationManifest);
-
   it('renders children correctly', async () => {
-    const { getByText } = renderInApp(<Text>Hello World</Text>, app);
+    const { getByText } = renderInApp(<Text>Hello World</Text>);
     const text = await vi.waitFor(() => getByText('Hello World'));
     expect(text).toBeInTheDocument();
   });
 
   it('applies custom className', () => {
-    const { container } = renderInApp(<Text className="custom-class">Hello World</Text>, app);
+    const { container } = renderInApp(<Text className="custom-class">Hello World</Text>);
     expect(container.getElementsByClassName('custom-class')).toHaveLength(1);
   });
 
@@ -40,7 +35,6 @@ describe('Text Component', () => {
       <Text id="custom-id" data-testid="custom-testid">
         Hello World
       </Text>,
-      app,
     );
 
     const div = container.firstChild;

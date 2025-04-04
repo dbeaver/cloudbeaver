@@ -13,7 +13,7 @@ import '@testing-library/jest-dom/vitest';
 process.env.TZ = 'UTC';
 
 function resetMocks() {
-  vi.resetAllMocks();
+  vi.restoreAllMocks();
   vi.clearAllTimers();
   vi.useRealTimers();
 }

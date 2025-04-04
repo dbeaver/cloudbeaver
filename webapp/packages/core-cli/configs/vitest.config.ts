@@ -26,6 +26,12 @@ export default defineConfig({
       },
     ],
     isolate: false,
+    poolOptions: {
+      forks: {
+        isolate: false,
+      },
+    },
+    fileParallelism: false,
     css: false,
     watch: false,
     environmentOptions: {

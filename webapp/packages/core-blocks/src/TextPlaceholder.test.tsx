@@ -8,10 +8,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { TextPlaceholder } from './TextPlaceholder.js';
-import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
-import { coreDIManifest } from '@cloudbeaver/core-di';
-import { coreBlocksManifest } from './manifest.js';
-import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
+import { renderInApp } from '@cloudbeaver/tests-runner';
 
 vi.mock('./s', () => ({
   s: (...args: any[]) => args.join(' '),
@@ -22,16 +19,14 @@ vi.mock('./useS', () => ({
 }));
 
 describe('TextPlaceholder Component', () => {
-  const app = createApp(coreDIManifest, coreBlocksManifest, coreLocalizationManifest);
-
   it('renders children correctly', async () => {
-    const { getByText } = renderInApp(<TextPlaceholder>Hello World</TextPlaceholder>, app);
+    const { getByText } = renderInApp(<TextPlaceholder>Hello World</TextPlaceholder>);
     const text = await vi.waitFor(() => getByText('Hello World'));
     expect(text).toBeInTheDocument();
   });
 
   it('applies custom className', () => {
-    const { container } = renderInApp(<TextPlaceholder className="custom-class">Hello World</TextPlaceholder>, app);
+    const { container } = renderInApp(<TextPlaceholder className="custom-class">Hello World</TextPlaceholder>);
     expect(container.getElementsByClassName('custom-class')).toHaveLength(1);
   });
 });

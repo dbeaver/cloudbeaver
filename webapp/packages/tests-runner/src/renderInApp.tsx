@@ -13,15 +13,12 @@ import { type IServiceProvider, ServiceProviderContext } from '@cloudbeaver/core
 
 import type { IApplication } from './createApp.js';
 
-function ApplicationWrapper(serviceInjector: IServiceProvider, withSuspense: boolean): React.FC<React.PropsWithChildren> {
-  return ({ children }) =>
-    withSuspense ? (
-      <Suspense fallback={null}>
-        <ServiceProviderContext serviceProvider={serviceInjector}>{children}</ServiceProviderContext>
-      </Suspense>
-    ) : (
+function ApplicationWrapper(serviceInjector: IServiceProvider): React.FC<React.PropsWithChildren> {
+  return ({ children }) => (
+    <Suspense fallback={null}>
       <ServiceProviderContext serviceProvider={serviceInjector}>{children}</ServiceProviderContext>
-    );
+    </Suspense>
+  );
 }
 export function renderInApp<
   Q extends Queries = typeof queries,
@@ -29,9 +26,12 @@ export function renderInApp<
   BaseElement extends Element | DocumentFragment = Container,
 >(
   ui: React.ReactElement,
-  app: IApplication,
-  withSuspense = false,
-  options?: Omit<RenderOptions<Q, Container, BaseElement>, 'queries' | 'wrapper'>,
+  options: Omit<RenderOptions<Q, Container, BaseElement>, 'queries' | 'wrapper'> = {},
+  app?: IApplication,
 ): RenderResult<Q, Container, BaseElement> {
-  return render(ui, { wrapper: ApplicationWrapper(app.serviceProvider, withSuspense), ...options });
+  if (!app) {
+    return render(ui, options);
+  }
+
+  return render(ui, { wrapper: ApplicationWrapper(app.serviceProvider), ...options });
 }

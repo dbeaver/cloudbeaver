@@ -8,10 +8,7 @@
 import { expect, describe, it, vi } from 'vitest';
 
 import { ErrorMessage } from './ErrorMessage.js';
-import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
-import { coreDIManifest } from '@cloudbeaver/core-di';
-import { coreBlocksManifest } from './manifest.js';
-import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
+import { renderInApp } from '@cloudbeaver/tests-runner';
 
 vi.mock('./s', () => ({
   s: (...args: any[]) => args.join(' '),
@@ -33,11 +30,9 @@ vi.mock('./IconOrImage', () => ({
   IconOrImage: (props: any) => <svg {...props} />,
 }));
 
-describe('ErrorMessage', async () => {
-  const app = createApp(coreDIManifest, coreBlocksManifest, coreLocalizationManifest);
-
+describe('ErrorMessage', () => {
   it('should render error message', async () => {
-    const { getByText } = renderInApp(<ErrorMessage text="error" />, app);
+    const { getByText } = renderInApp(<ErrorMessage text="error" />);
     await vi.waitFor(() => expect(getByText('error')).toBeInTheDocument());
   });
 });
