@@ -38,7 +38,6 @@ export * from './ConnectionInfoEventHandler.js';
 export * from './ConnectionInfoResource.js';
 export * from './ConnectionInfoOriginResource.js';
 export * from './ConnectionInfoOriginDetailsResource.js';
-export * from './ConnectionInfoCredentialsSavedResource.js';
 export * from './ConnectionInfoAuthPropertiesResource.js';
 export * from './ConnectionInfoCustomOptionsResource.js';
 export * from './ConnectionInfoPropertiesResource.js';

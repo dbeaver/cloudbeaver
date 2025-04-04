@@ -11,7 +11,7 @@ import { FormPart, formStateContext, type IFormState } from '@cloudbeaver/core-u
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { IConnectionFormOriginInfoState } from './IConnectionFormOriginInfoState.js';
 import {
-  ConnectionInfoResource,
+  ConnectionInfoAuthPropertiesResource,
   DatabaseAuthModelsResource,
   DBDriverResource,
   type ConnectionInfoOriginDetailsResource,
@@ -31,7 +31,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
     private readonly connectionInfoOriginDetailsResource: ConnectionInfoOriginDetailsResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
-    private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionInfoAuthPropertiesResource: ConnectionInfoAuthPropertiesResource,
     private readonly dbDriverResource: DBDriverResource,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly localizationService: LocalizationService,
@@ -53,7 +53,10 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
       return false;
     }
 
-    if (this.dbDriverResource.isOutdated(this.optionsPart.state.driverId)) {
+    if (
+      this.dbDriverResource.isOutdated(this.optionsPart.state.driverId) ||
+      this.connectionInfoAuthPropertiesResource.isOutdated(this.optionsPart.connectionKey)
+    ) {
       return true;
     }
 
@@ -83,7 +86,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
       return null;
     }
 
-    const info = this.optionsPart.connectionKey ? this.connectionInfoResource.get(this.optionsPart.connectionKey) : null;
+    const info = this.optionsPart.connectionKey ? this.connectionInfoAuthPropertiesResource.get(this.optionsPart.connectionKey) : null;
     const authModel = this.databaseAuthModelsResource.get(this.optionsPart.state.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null);
 
     return authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
@@ -99,7 +102,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
 
   get authModelId(): string | null {
     const driver = this.dbDriverResource.get(this.optionsPart.state.driverId!)!;
-    const info = this.optionsPart.connectionKey ? this.connectionInfoResource.get(this.optionsPart.connectionKey) : null;
+    const info = this.optionsPart.connectionKey ? this.connectionInfoAuthPropertiesResource.get(this.optionsPart.connectionKey) : null;
 
     return this.optionsPart.state.authModelId ?? info?.authModel ?? driver?.defaultAuthModel ?? null;
   }
@@ -107,7 +110,7 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
   private async formAuthState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const stateContext = contexts.getContext(formStateContext);
 
-    const info = this.optionsPart.connectionKey ? this.connectionInfoResource.get(this.optionsPart.connectionKey) : null;
+    const info = this.optionsPart.connectionKey ? this.connectionInfoAuthPropertiesResource.get(this.optionsPart.connectionKey) : null;
     const driver = await this.dbDriverResource.load(this.optionsPart.state.driverId!, ['includeProviderProperties', 'includeMainProperties']);
     const [authModel] = await Promise.all([this.databaseAuthModelsResource.load(driver.defaultAuthModel), this.userInfoResource.load()]);
     const providerId = authModel.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
@@ -130,7 +133,10 @@ export class ConnectionFormOriginInfoFormPart extends FormPart<IConnectionFormOr
       return;
     }
 
-    await this.dbDriverResource.load(this.optionsPart.state.driverId);
+    await Promise.all([
+      this.dbDriverResource.load(this.optionsPart.state.driverId),
+      this.connectionInfoAuthPropertiesResource.load(this.optionsPart.connectionKey),
+    ]);
 
     if (!this.authModelId) {
       throw new Error('Auth model is not defined');

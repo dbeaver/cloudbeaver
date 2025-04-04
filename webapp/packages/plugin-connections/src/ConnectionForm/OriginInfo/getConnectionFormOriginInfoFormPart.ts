@@ -8,8 +8,8 @@
 import { type IFormState } from '@cloudbeaver/core-ui';
 
 import {
+  ConnectionInfoAuthPropertiesResource,
   ConnectionInfoOriginDetailsResource,
-  ConnectionInfoResource,
   DatabaseAuthModelsResource,
   DBDriverResource,
 } from '@cloudbeaver/core-connections';
@@ -30,7 +30,7 @@ export function getConnectionFormOriginInfoFormPart(formState: IFormState<IConne
     const connectionInfoOriginDetailsResource = di.getService(ConnectionInfoOriginDetailsResource);
     const userInfoResource = di.getService(UserInfoResource);
     const databaseAuthModelsResource = di.getService(DatabaseAuthModelsResource);
-    const connectionInfoResource = di.getService(ConnectionInfoResource);
+    const connectionInfoAuthPropertiesResource = di.getService(ConnectionInfoAuthPropertiesResource);
     const dbDriverResource = di.getService(DBDriverResource);
     const authProvidersResource = di.getService(AuthProvidersResource);
     const localizationService = di.getService(LocalizationService);
@@ -41,7 +41,7 @@ export function getConnectionFormOriginInfoFormPart(formState: IFormState<IConne
       connectionInfoOriginDetailsResource,
       userInfoResource,
       databaseAuthModelsResource,
-      connectionInfoResource,
+      connectionInfoAuthPropertiesResource,
       dbDriverResource,
       authProvidersResource,
       localizationService,

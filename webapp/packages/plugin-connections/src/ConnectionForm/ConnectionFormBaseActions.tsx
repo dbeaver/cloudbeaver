@@ -11,7 +11,7 @@ import { useContext } from 'react';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { Button, getComputed, type PlaceholderComponent, useResource, useTranslate, useAuthenticationAction } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoAuthPropertiesResource, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { ConnectionFormActionsContext } from './ConnectFormActionsContext.js';
@@ -28,18 +28,23 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
   const optionsPart = getConnectionFormOptionsPart(formState);
   const driverMap = useResource(ConnectionFormBaseActions, DBDriverResource, optionsPart.state.driverId || null);
   const driver = driverMap.data;
-  const connectionInfoResource = useResource(ConnectionFormBaseActions, ConnectionInfoResource, optionsPart.connectionKey, {
-    active: !!optionsPart.connectionKey,
-  });
+  const connectionInfoAuthPropertiesResource = useResource(
+    ConnectionFormBaseActions,
+    ConnectionInfoAuthPropertiesResource,
+    optionsPart.connectionKey,
+    {
+      active: !!optionsPart.connectionKey,
+    },
+  );
 
   const serverConfigResource = useResource(ConnectionFormBaseActions, ServerConfigResource, undefined);
   const { data: authModel } = useResource(
     ConnectionFormBaseActions,
     DatabaseAuthModelsResource,
-    getComputed(() => optionsPart.state.authModelId || connectionInfoResource.data?.authModel || driver?.defaultAuthModel || null),
+    getComputed(() => optionsPart.state.authModelId || connectionInfoAuthPropertiesResource.data?.authModel || driver?.defaultAuthModel || null),
   );
   const authentication = useAuthenticationAction({
-    providerId: authModel?.requiredAuth ?? connectionInfoResource.data?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
+    providerId: authModel?.requiredAuth ?? connectionInfoAuthPropertiesResource.data?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
   });
 
   const authorized = authentication.providerId === AUTH_PROVIDER_LOCAL_ID || authentication.authorized;

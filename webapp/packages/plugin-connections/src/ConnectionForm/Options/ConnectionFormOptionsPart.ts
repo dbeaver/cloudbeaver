@@ -10,7 +10,6 @@ import { DriverConfigurationType, type ConnectionConfig, type ObjectPropertyInfo
 import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import {
   ConnectionInfoAuthPropertiesResource,
-  ConnectionInfoCredentialsSavedResource,
   ConnectionInfoCustomOptionsResource,
   ConnectionInfoProjectKey,
   ConnectionInfoProviderPropertiesResource,
@@ -64,7 +63,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly databaseAuthModelsResource: DatabaseAuthModelsResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly connectionInfoCredentialsSavedResource: ConnectionInfoCredentialsSavedResource,
     private readonly connectionInfoAuthPropertiesResource: ConnectionInfoAuthPropertiesResource,
     private readonly connectionInfoCustomOptionsResource: ConnectionInfoCustomOptionsResource,
     private readonly connectionInfoProviderPropertiesResource: ConnectionInfoProviderPropertiesResource,
@@ -164,15 +162,15 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       }
     }
 
-    const isConnectionInfoOutdated = !!this.connectionKey && this.connectionInfoResource.isOutdated(this.connectionKey);
-    const isCredentialsSavedOutdated = !!this.connectionKey && this.connectionInfoCredentialsSavedResource.isOutdated(this.connectionKey);
-    const isAuthPropertiesOutdated = !!this.connectionKey && this.connectionInfoAuthPropertiesResource.isOutdated(this.connectionKey);
-    const isCustomOptionsOutdated = !!this.connectionKey && this.connectionInfoCustomOptionsResource.isOutdated(this.connectionKey);
-    const isProviderPropertiesOutdated = !!this.connectionKey && this.connectionInfoProviderPropertiesResource.isOutdated(this.connectionKey);
+    if (!this.connectionKey) {
+      return false;
+    }
 
-    return (
-      isConnectionInfoOutdated || isCredentialsSavedOutdated || isAuthPropertiesOutdated || isCustomOptionsOutdated || isProviderPropertiesOutdated
-    );
+    const isAuthPropertiesOutdated = this.connectionInfoAuthPropertiesResource.isOutdated(this.connectionKey);
+    const isCustomOptionsOutdated = this.connectionInfoCustomOptionsResource.isOutdated(this.connectionKey);
+    const isProviderPropertiesOutdated = this.connectionInfoProviderPropertiesResource.isOutdated(this.connectionKey);
+
+    return isAuthPropertiesOutdated || isCustomOptionsOutdated || isProviderPropertiesOutdated;
   }
 
   protected override async loader(): Promise<void> {
@@ -189,9 +187,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       return;
     }
 
-    const [info, credentialsSavedInfo, authPropertiesInfo, customOptionsInfo, providerPropertiesInfo] = await Promise.all([
-      this.connectionInfoResource.load(this.connectionKey),
-      this.connectionInfoCredentialsSavedResource.load(this.connectionKey),
+    const [authPropertiesInfo, customOptionsInfo, providerPropertiesInfo] = await Promise.all([
       this.connectionInfoAuthPropertiesResource.load(this.connectionKey),
       this.connectionInfoCustomOptionsResource.load(this.connectionKey),
       this.connectionInfoProviderPropertiesResource.load(this.connectionKey),
@@ -199,29 +195,29 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     const config: ConnectionConfig = defaultStateGetter();
 
-    config.connectionId = info.id;
+    config.connectionId = customOptionsInfo.id;
     config.configurationType = customOptionsInfo.configurationType;
 
-    config.name = info.name;
-    config.description = info.description;
-    config.template = info.template;
-    config.driverId = info.driverId;
+    config.name = customOptionsInfo.name;
+    config.description = customOptionsInfo.description;
+    config.template = customOptionsInfo.template;
+    config.driverId = customOptionsInfo.driverId;
 
-    config.host = info.mainPropertyValues[MAIN_PROPERTY_HOST_KEY];
-    config.port = info.mainPropertyValues[MAIN_PROPERTY_PORT_KEY];
-    config.serverName = info.mainPropertyValues[MAIN_PROPERTY_SERVER_KEY];
-    config.databaseName = info.mainPropertyValues[MAIN_PROPERTY_DATABASE_KEY];
+    config.host = customOptionsInfo.host || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_HOST_KEY];
+    config.port = customOptionsInfo.port || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_PORT_KEY];
+    config.serverName = customOptionsInfo.serverName || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_SERVER_KEY];
+    config.databaseName = customOptionsInfo.databaseName || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_DATABASE_KEY];
 
     config.url = customOptionsInfo.url;
-    config.folder = info.folder;
+    config.folder = customOptionsInfo.folder;
 
-    config.authModelId = info.authModel;
-    config.saveCredentials = credentialsSavedInfo.credentialsSaved;
-    config.sharedCredentials = info.sharedCredentials;
+    config.authModelId = authPropertiesInfo.authModel;
+    config.saveCredentials = authPropertiesInfo.credentialsSaved;
+    config.sharedCredentials = authPropertiesInfo.sharedCredentials;
 
-    config.keepAliveInterval = info.keepAliveInterval;
-    config.autocommit = info.autocommit;
-    config.readOnly = info.readOnly;
+    config.keepAliveInterval = customOptionsInfo.keepAliveInterval;
+    config.autocommit = customOptionsInfo.autocommit;
+    config.readOnly = customOptionsInfo.readOnly;
 
     if (authPropertiesInfo.authProperties) {
       for (const property of authPropertiesInfo.authProperties) {
@@ -235,11 +231,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       config.providerProperties = { ...toJS(providerPropertiesInfo.providerProperties) };
     }
 
-    if (info.mainPropertyValues) {
-      config.mainPropertyValues = { ...toJS(info.mainPropertyValues) };
+    if (customOptionsInfo.mainPropertyValues) {
+      config.mainPropertyValues = { ...toJS(customOptionsInfo.mainPropertyValues) };
     }
 
-    this.formState.state.availableDrivers = [info.driverId];
+    this.formState.state.availableDrivers = [customOptionsInfo.driverId];
 
     this.setInitialState(config);
   }
@@ -338,6 +334,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     this.formState.state.requiredNetworkHandlersIds = observable([]);
     this.state.networkHandlersConfig = observable([]);
+    this.state.keepAliveInterval = this.state.keepAliveInterval ? Number(this.state.keepAliveInterval) : undefined;
 
     this.state.name = this.state.name?.trim();
     this.state.description = this.state.description?.trim();
@@ -353,6 +350,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       delete this.state.url;
     }
 
+    // databaseName, host, port, serverName only saves on backend like this
     if (this.state.configurationType === DriverConfigurationType.Manual && !driver.useCustomPage) {
       this.state.mainPropertyValues![MAIN_PROPERTY_DATABASE_KEY] = this.state.databaseName?.trim();
 

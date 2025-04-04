@@ -8,4 +8,13 @@ fragment DatabaseConnectionCustomOptions on ConnectionInfo {
   serverName
   databaseName
   url
+  name
+  description
+  folder
+  template
+  driverId
+  keepAliveInterval
+  autocommit
+  readOnly
+  mainPropertyValues
 }

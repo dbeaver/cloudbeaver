@@ -30,12 +30,17 @@ export class ConnectionFormAccessPart extends FormPart<string[], IConnectionForm
     });
   }
 
+  override isOutdated(): boolean {
+    return Boolean(this.optionsPart.connectionKey && this.connectionInfoResource.isOutdated(this.optionsPart.connectionKey));
+  }
+
   protected override async loader(): Promise<void> {
     if (!this.optionsPart.connectionKey) {
       this.setInitialState(getDefaultState());
       return;
     }
 
+    await this.connectionInfoResource.load(this.optionsPart.connectionKey);
     const subjects = await this.connectionInfoResource.loadAccessSubjects(this.optionsPart.connectionKey);
 
     this.setInitialState(subjects.map(subject => subject.subjectId));
