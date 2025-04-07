@@ -26,7 +26,7 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 ## Changelog
 
 ### 25.0.2 2025-04-07
-- Data Editor: Improved table rendering to scale column width depending on the content.
+- Data Editor: improved table rendering to scale column width depending on the content.
 - Improved Navigation tree performance: lost connection does not lead to the application freezing anymore.
 - Different bug fixes and enhancements have been made.
 
