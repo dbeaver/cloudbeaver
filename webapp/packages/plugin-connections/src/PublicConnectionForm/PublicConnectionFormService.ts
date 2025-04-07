@@ -89,7 +89,7 @@ export class PublicConnectionFormService {
 
     Object.assign(this.optionsPart!.state, config);
 
-    this.formState.disposeTask.addHandler(this.close.bind(this));
+    this.formState.disposeTask.addHandler(this.close.bind(this, true));
   }
 
   async open(projectId: string, config: ConnectionConfig, availableDrivers?: string[]): Promise<boolean> {
@@ -102,18 +102,28 @@ export class PublicConnectionFormService {
     return state;
   }
 
-  async close(): Promise<void> {
-    if (!this.formState || !this.optionsPanelService.isOpen(formGetter)) {
-      return;
+  async close(saved?: boolean): Promise<boolean> {
+    if (!this.formState) {
+      return true;
     }
 
-    this.optionsPanelService.close();
+    if (saved) {
+      this.clearFormState();
+    }
+
+    const state = await this.optionsPanelService.close();
+
+    if (state) {
+      this.clearFormState();
+    }
+
+    return state;
   }
 
   async save(): Promise<void> {
     const key = this.optionsPart?.connectionKey;
 
-    await this.close();
+    await this.close(true);
 
     if (key && this.connectionInfoResource.isConnected(key)) {
       this.tryReconnect(key);
@@ -130,7 +140,7 @@ export class PublicConnectionFormService {
     }
 
     if (!this.connectionInfoResource.has(this.optionsPart.connectionKey)) {
-      this.close();
+      this.close(true);
     }
   };
 
@@ -140,7 +150,7 @@ export class PublicConnectionFormService {
     }
 
     if (this.connectionInfoResource.isIntersect(data, this.optionsPart.connectionKey)) {
-      this.close();
+      this.close(true);
     }
   };
 
@@ -152,7 +162,7 @@ export class PublicConnectionFormService {
       return;
     }
 
-    this.clearFormState();
+    await this.close(true);
   };
 
   private async showUnsavedChangesDialog(): Promise<boolean> {
