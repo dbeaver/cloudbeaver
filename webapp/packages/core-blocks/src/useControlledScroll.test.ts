@@ -16,12 +16,9 @@ describe('useControlledScroll', () => {
 
   afterEach(() => {
     element.remove();
-    vitest.useRealTimers();
   });
 
   beforeEach(() => {
-    vitest.resetAllMocks();
-    vitest.useFakeTimers();
     element = document.createElement('div');
     scrollState = { scrollTop: 100, scrollLeft: 100 };
   });

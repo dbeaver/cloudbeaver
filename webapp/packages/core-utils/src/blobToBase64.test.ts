@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { blobToBase64 } from './blobToBase64.js';
 
@@ -29,12 +29,10 @@ describe('blobToBase64', () => {
 
   beforeEach(() => {
     originalFileReader = globalThis.FileReader;
-    vi.useFakeTimers();
   });
 
   afterEach(() => {
     globalThis.FileReader = originalFileReader;
-    vi.useRealTimers();
   });
 
   it('should convert blob to base64', async () => {

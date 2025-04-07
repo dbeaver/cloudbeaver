@@ -5,19 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, vitest } from 'vitest';
+import { describe, expect, it, vitest } from 'vitest';
 
 import { throttle } from './throttle.js';
 
 describe('throttle', () => {
-  beforeEach(() => {
-    vitest.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vitest.useRealTimers();
-  });
-
   it('should throttle', () => {
     const callback = vitest.fn();
     const throttled = throttle(callback, 100, false);
@@ -46,7 +38,6 @@ describe('throttle', () => {
   });
 
   it('should has tail execution', () => {
-    vitest.useFakeTimers();
     const callback = vitest.fn();
     const throttled = throttle(callback, 100, true);
 
