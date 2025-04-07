@@ -19,7 +19,7 @@ export const PublicConnectionForm: React.FC = observer(function PublicConnection
   const service = useService(PublicConnectionFormService);
   const style = useS(styles);
 
-  const close = useCallback(() => service.close(true), []);
+  const close = useCallback(() => service.close(), []);
   const save = useCallback(() => service.save(), []);
 
   return (
