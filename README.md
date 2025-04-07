@@ -25,6 +25,11 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 25.0.2 2025-04-07
+- Data Editor: improved table rendering to scale column width depending on the content.
+- Improved Navigation tree performance: lost connection does not lead to the application freezing anymore.
+- Different bug fixes and enhancements have been made.
+
 ### 25.0.1 2025-03-24
 - Improved performance of the export/import functionality by optimizing disk memory consumption;
 - Enhanced initial configuration on stage security: if the initial setup time exceeds 1 hour, the server must be restarted.
