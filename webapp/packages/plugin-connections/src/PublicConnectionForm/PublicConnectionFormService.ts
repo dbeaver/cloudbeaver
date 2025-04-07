@@ -158,7 +158,10 @@ export class PublicConnectionFormService {
 
     if (!confirmed) {
       ExecutorInterrupter.interrupt(contexts);
+      return;
     }
+
+    await this.close(true);
   };
 
   private async showUnsavedChangesDialog(): Promise<boolean> {
