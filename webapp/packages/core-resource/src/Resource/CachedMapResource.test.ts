@@ -37,7 +37,7 @@ const DATA_MOCK_GETTER: () => IEntityData[] = () => [
 const TEST_ERROR_MESSAGE = 'Test error';
 const DEFAULT_STATE_GETTER = () => new Map();
 
-async function fetchMock(key: ResourceKey<string> | undefined): Promise<IEntityData[]> {
+function fetchMock(key: ResourceKey<string> | undefined): Promise<IEntityData[]> {
   const data = DATA_MOCK_GETTER();
 
   return new Promise((resolve, reject) => {

@@ -353,7 +353,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     }
   }
 
-  private async syncWithNavTree(key: ResourceKeySimple<string>) {
+  private syncWithNavTree(key: ResourceKeySimple<string>) {
     const isFolder = ResourceKeyUtils.some(key, nodeId => this.connectionFolderResource.fromNodeId(nodeId) !== undefined);
 
     if (isFolder) {
