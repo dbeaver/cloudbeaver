@@ -72,6 +72,7 @@ export class PublicConnectionFormService {
   }
 
   async change(projectId: string, config: ConnectionConfig, availableDrivers?: string[]): Promise<void> {
+    this.formState?.dispose();
     this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
       projectId,
       availableDrivers: availableDrivers ?? [],
