@@ -2,6 +2,8 @@ export const DatabaseDataType = {
   Binary: 'binary',
   Boolean: 'boolean',
   Date: 'date',
+  DateTime: 'datetime',
+  Time: 'time',
   Number: 'number',
   String: 'string',
   Null: 'null',

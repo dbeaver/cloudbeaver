@@ -1,6 +1,15 @@
 import styles from './NullFormatter.module.css';
 import { clsx } from '@dbeaver/ui-kit';
 
-export function NullFormatter() {
-  return <span className={clsx(styles['nullValue'])}>[NULL]</span>;
+interface Props {
+  className?: string;
+  onClick?: React.MouseEventHandler<HTMLElement>;
+}
+
+export function NullFormatter({ className, onClick }: Props) {
+  return (
+    <span className={clsx(styles['nullValue'], className)} onClick={onClick}>
+      [NULL]
+    </span>
+  );
 }

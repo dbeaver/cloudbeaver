@@ -4,6 +4,7 @@
   "sideEffects": [],
   "exports": {
     ".": "./lib/index.js",
+    "./*.css": "./src/*.css",
     "./*": "./lib/*.js"
   },
   "scripts": {

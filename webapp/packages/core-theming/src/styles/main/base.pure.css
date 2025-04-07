@@ -1,9 +1,9 @@
-[type="checkbox"] {
+[type='checkbox'] {
   height: 16px;
   width: 16px;
 }
 
-label {
+label:not([class^='dbv-kit']) {
   display: block;
   line-height: 15px;
   box-sizing: border-box;
