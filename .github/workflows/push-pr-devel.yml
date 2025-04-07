@@ -25,7 +25,7 @@ jobs:
       timeout-minutes: 5
 
   # build-server:
-  #   name: Server
+  #   name: Serverа
   #   uses: ./.github/workflows/backend-build.yml
   #   secrets: inherit
 
