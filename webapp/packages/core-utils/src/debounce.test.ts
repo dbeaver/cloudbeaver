@@ -40,7 +40,7 @@ describe('DebounceAsync', () => {
     vitest.useRealTimers();
   });
 
-  test('function should be executed just once', async () => {
+  test('function should be executed just once', () => {
     const func = vitest.fn(() => Promise.resolve(true));
     const debouncedFunction = debounceAsync(func, 1000);
 

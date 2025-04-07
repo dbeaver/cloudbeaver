@@ -83,7 +83,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
     this.connectionDetailsPlaceholder.add(SSH, 2);
   }
 
-  private async refreshUserConnections(configuration: boolean, outside: boolean, outsideAdminPage: boolean): Promise<void> {
+  private refreshUserConnections(configuration: boolean, outside: boolean, outsideAdminPage: boolean): void {
     // TODO: we have to track users' leaving the page
     if (outside) {
       this.connectionInfoResource.cleanNewFlags();
@@ -95,14 +95,14 @@ export class ConnectionsAdministrationService extends Bootstrap {
     }
   }
 
-  private async activateCreateMethod(param: string | null) {
+  private activateCreateMethod(param: string | null) {
     if (!param) {
       this.createConnectionService.setCreateMethod();
     }
     this.createConnectionService.setCreateMethod(param);
   }
 
-  private async deactivateCreateMethod(param: string | null, configuration: boolean, outside: boolean) {
+  private deactivateCreateMethod(param: string | null, configuration: boolean, outside: boolean) {
     if (outside) {
       this.createConnectionService.close();
     }

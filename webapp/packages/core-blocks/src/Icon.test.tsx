@@ -16,7 +16,7 @@ vi.mock('@cloudbeaver/core-utils', () => ({
   },
 }));
 
-describe('Icon', async () => {
+describe('Icon', () => {
   test('icons.svg#name', () => {
     (globalThis as any)._ROOT_URI_ = undefined;
 

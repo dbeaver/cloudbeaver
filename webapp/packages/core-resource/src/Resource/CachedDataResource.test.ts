@@ -26,7 +26,7 @@ const DATA_MOCK_GETTER: () => IEntityData[] = () => [
   },
 ];
 
-async function fetchMock(): Promise<IEntityData[]> {
+function fetchMock(): Promise<IEntityData[]> {
   return Promise.resolve(DATA_MOCK_GETTER());
 }
 

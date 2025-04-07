@@ -31,9 +31,7 @@ describe('CancellablePromise', () => {
   });
 
   it('should reject with PromiseCancelledError when cancelled', async () => {
-    const promise = new CancellablePromise<string>(() => {
-      return () => {};
-    });
+    const promise = new CancellablePromise<string>(() => () => {});
 
     promise.cancel();
 
@@ -42,9 +40,7 @@ describe('CancellablePromise', () => {
 
   it('should call cancel function when cancelled', async () => {
     const cancelFn = vi.fn();
-    const promise = new CancellablePromise<string>(() => {
-      return cancelFn;
-    });
+    const promise = new CancellablePromise<string>(() => cancelFn);
 
     promise.cancel();
     expect(cancelFn).toHaveBeenCalled();

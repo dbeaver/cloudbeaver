@@ -50,7 +50,7 @@ describe('useClipboard', () => {
     vitest.clearAllMocks();
   });
 
-  it('should copy without notification', async () => {
+  it('should copy without notification', () => {
     const { notificationServiceMock, copyToClipboardMock } = getMocks();
 
     const { result } = renderHook(() => useClipboard());
@@ -67,7 +67,7 @@ describe('useClipboard', () => {
     expect(notificationServiceMock.logException).not.toHaveBeenCalled();
   });
 
-  it('should copy with notification', async () => {
+  it('should copy with notification', () => {
     const { notificationServiceMock, copyToClipboardMock } = getMocks();
 
     const { result } = renderHook(() => useClipboard());
@@ -79,7 +79,7 @@ describe('useClipboard', () => {
     expect(notificationServiceMock.logException).not.toHaveBeenCalled();
   });
 
-  it('should handle exception while trying to copy', async () => {
+  it('should handle exception while trying to copy', () => {
     const { notificationServiceMock, copyToClipboardMock } = getMocks();
 
     const { result } = renderHook(() => useClipboard());

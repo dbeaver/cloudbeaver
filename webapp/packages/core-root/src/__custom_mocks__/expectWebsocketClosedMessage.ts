@@ -11,7 +11,7 @@ import { addKnownInfo, consoleSpy } from '@cloudbeaver/tests-runner';
 
 const WEBSOCKET_CLOSED_MESSAGE_REGEX = /Websocket closed.*/;
 
-beforeAll(async () => {
+beforeAll(() => {
   addKnownInfo(WEBSOCKET_CLOSED_MESSAGE_REGEX);
 });
 

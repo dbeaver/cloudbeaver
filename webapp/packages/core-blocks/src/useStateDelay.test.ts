@@ -27,7 +27,7 @@ describe('useStateDelay', () => {
     vitest.useFakeTimers();
   });
 
-  test("should return initial state during whole hook's lifecycle", async () => {
+  test("should return initial state during whole hook's lifecycle", () => {
     const { result, unmount } = renderHook(() => useStateDelay(true, 100));
     expect(result.current).toBe(true);
     act(() => {
@@ -41,7 +41,7 @@ describe('useStateDelay', () => {
     unmount();
   });
 
-  test('should return updated state after delay if it was updated', async () => {
+  test('should return updated state after delay if it was updated', () => {
     const { result, rerender, unmount } = renderHook(({ value, delay }: IHookProps) => useStateDelayWrapper({ value, delay }), {
       initialProps: {
         value: false,
@@ -64,7 +64,7 @@ describe('useStateDelay', () => {
     unmount();
   });
 
-  test('should execute callback on state change', async () => {
+  test('should execute callback on state change', () => {
     const callback = vitest.fn();
     const { rerender, unmount } = renderHook(({ value, delay }: IHookProps) => useStateDelayWrapper({ value, delay, callback }), {
       initialProps: {
@@ -90,7 +90,7 @@ describe('useStateDelay', () => {
     unmount();
   });
 
-  test('should not call callback', async () => {
+  test('should not call callback', () => {
     const callback = vitest.fn();
     const { result, rerender, unmount } = renderHook(({ value, delay }: IHookProps) => useStateDelayWrapper({ value, delay, callback }), {
       initialProps: {
@@ -117,7 +117,7 @@ describe('useStateDelay', () => {
     unmount();
   });
 
-  test("should prolong delay if was updated as hook's argument", async () => {
+  test("should prolong delay if was updated as hook's argument", () => {
     const { result, rerender, unmount } = renderHook(({ value, delay }: IHookProps) => useStateDelayWrapper({ value, delay }), {
       initialProps: {
         value: false,

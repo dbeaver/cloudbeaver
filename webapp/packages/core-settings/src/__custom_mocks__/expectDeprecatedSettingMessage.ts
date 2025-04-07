@@ -11,7 +11,7 @@ import { addKnownWarn, consoleSpy } from '@cloudbeaver/tests-runner';
 
 const DEPRECATED_SETTING_MESSAGE_REGEX = /You have deprecated settings:*/;
 
-beforeAll(async () => {
+beforeAll(() => {
   addKnownWarn(DEPRECATED_SETTING_MESSAGE_REGEX);
 });
 

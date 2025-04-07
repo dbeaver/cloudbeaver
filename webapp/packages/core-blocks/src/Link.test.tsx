@@ -32,7 +32,7 @@ describe('Link', () => {
     expect(linkElement).toBeInTheDocument();
   });
 
-  it('should display the indicator icon when indicator is true', async () => {
+  it('should display the indicator icon when indicator is true', () => {
     const { container } = renderInApp(
       <Link href="#" indicator>
         Test Link
