@@ -102,22 +102,16 @@ export class PublicConnectionFormService {
     return state;
   }
 
-  async close(saved?: boolean): Promise<boolean> {
+  async close(saved?: boolean): Promise<void> {
     if (!this.formState) {
-      return true;
+      return;
     }
 
     if (saved) {
       this.clearFormState();
     }
 
-    const state = await this.optionsPanelService.close();
-
-    if (state) {
-      this.clearFormState();
-    }
-
-    return state;
+    await this.optionsPanelService.close();
   }
 
   async save(): Promise<void> {
@@ -162,7 +156,7 @@ export class PublicConnectionFormService {
       return;
     }
 
-    await this.close(true);
+    this.clearFormState();
   };
 
   private async showUnsavedChangesDialog(): Promise<boolean> {

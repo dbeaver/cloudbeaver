@@ -47,7 +47,6 @@ const defaultStateGetter = (connectionId?: string) =>
     template: false,
     mainPropertyValues: {},
     networkHandlersConfig: [],
-    saveCredentials: false,
     properties: {},
     providerProperties: {},
   }) as IConnectionFormOptionsState;
