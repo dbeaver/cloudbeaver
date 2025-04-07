@@ -17,9 +17,24 @@ vi.mock('@cloudbeaver/core-utils', () => ({
 }));
 
 describe('Icon', async () => {
-  test('/image.jpg', async () => {
+  test('icons.svg#name', () => {
+    (globalThis as any)._ROOT_URI_ = undefined;
+
+    const { getByTestId } = renderInApp(<Icon data-testid="Icon" name="test" />);
+    expect(getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/icons/icons.svg#test');
+  });
+
+  test('/image.jpg', () => {
+    (globalThis as any)._ROOT_URI_ = undefined;
+
     const { getByTestId } = renderInApp(<Icon data-testid="Icon" name="/image.jpg" />);
-    const icon = await vi.waitFor(() => getByTestId('Icon'));
-    expect(icon.querySelector('use')).toHaveAttribute('href', '/image.jpg');
+    expect(getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/image.jpg');
+  });
+
+  test('{_ROOT_URI_}/icons.svg#name', () => {
+    (globalThis as any)._ROOT_URI_ = '/path/';
+
+    const { getByTestId } = renderInApp(<Icon data-testid="Icon" name="test" />);
+    expect(getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/icons/icons.svg#test');
   });
 });

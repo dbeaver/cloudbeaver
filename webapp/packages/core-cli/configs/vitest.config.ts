@@ -17,10 +17,6 @@ export default defineConfig({
     setupFiles: [path.resolve(__dirname, './vitest.setup.ts')],
     alias: [
       {
-        find: /.*.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$/,
-        replacement: path.resolve(__dirname, './__mocks__/fileMock.js'),
-      },
-      {
         find: /.*.(css|scss|less)$/,
         replacement: path.resolve(__dirname, './__mocks__/styleMock.js'),
       },
