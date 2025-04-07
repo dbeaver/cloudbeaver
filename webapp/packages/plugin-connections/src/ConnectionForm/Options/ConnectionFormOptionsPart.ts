@@ -45,6 +45,7 @@ const defaultStateGetter = (connectionId?: string) =>
     keepAliveInterval: 0,
     credentials: {},
     template: false,
+    sharedCredentials: false,
     mainPropertyValues: {},
     networkHandlersConfig: [],
     saveCredentials: false,
