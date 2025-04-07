@@ -102,7 +102,7 @@ public class WebAuthProviderInfo {
     }
 
     public boolean isSupportProvisioning() {
-        return descriptor.getInstance() instanceof SMProvisioner smProvisioner && smProvisioner.isSupportProvisioning();
+        return descriptor.getInstance() instanceof SMProvisioner;
     }
 
     public List<WebAuthProviderConfiguration> getConfigurations() {

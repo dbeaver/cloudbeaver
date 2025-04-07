@@ -35,8 +35,4 @@ public interface SMProvisioner {
     default boolean isAuthRoleProvided(SMAuthProviderCustomConfiguration configuration) {
         return false;
     }
-
-    default boolean isSupportProvisioning() {
-        return true;
-    }
 }

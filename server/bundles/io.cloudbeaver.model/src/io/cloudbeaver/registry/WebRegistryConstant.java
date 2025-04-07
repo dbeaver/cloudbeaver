@@ -2,6 +2,7 @@ package io.cloudbeaver.registry;
 
 public class WebRegistryConstant {
     public static final String ATTR_ID = "id";
+    public static final String ATTR_EXTENDED = "extended";
     public static final String ATTR_LABEL = "label";
     public static final String ATTR_DESCRIPTION = "description";
     public static final String ATTR_CLASS = "class";
