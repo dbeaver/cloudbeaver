@@ -25,9 +25,9 @@ interface IOptions {
   externalState?: TreeState;
   getNode(id: string): INode;
   getChildren: (node: string) => string[];
-  getParent: (node: string) => string | null;
   load(nodeId: string, manual: boolean): Promise<void>;
 
+  getParent?: (node: string) => string | null;
   childrenTransformers?: TreeDataTransformer<string[]>[];
   nodeTransformers?: TreeDataTransformer<INode>[];
   parentTransformers?: TreeDataTransformer<string | null>[];
@@ -74,7 +74,7 @@ export function useTreeData(options: IOptions): ITreeData {
   const [parentCache] = useState(
     () =>
       new MetadataMap<string, IComputedValue<string | null>>(id =>
-        computed(() => applyTransforms(treeData, id, options.getParent(id), options.parentTransformers)),
+        computed(() => applyTransforms(treeData, id, options.getParent?.(id) ?? null, options.parentTransformers)),
       ),
   );
   const [stateCache] = useState(

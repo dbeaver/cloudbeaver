@@ -61,9 +61,6 @@ export const Settings = observer<ISettingsProps>(function Settings({ source, acc
         .sort((a, b) => a.order - b.order)
         .map(group => group.id);
     },
-    getParent(id) {
-      return id;
-    },
     load() {
       return Promise.resolve();
     },
