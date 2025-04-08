@@ -173,6 +173,8 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         @Nullable WebSQLResultsInfo resultsInfo
     ) {
         sqlProcessor.getWebSession().addInfoMessage("Export data");
+        log.info(String.format("Data export started: [userId=%s]", sqlProcessor.getWebSession().getUserId()));
+
         DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(parameters.getProcessorId());
         String uniqueFileName = makeUniqueFileName(sqlProcessor, processor, parameters.getProcessorProperties());
         var outputSettings = parameters.getOutputSettings();

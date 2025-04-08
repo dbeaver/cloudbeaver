@@ -536,6 +536,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         } catch (DBException e) {
             throw new DBWebException("Error saving server configuration", e);
         }
+        log.info(String.format(
+            "Auth provider configuration created: [id=%s, provider=%s, userId=%s]",
+            providerConfig.getId(),
+            providerConfig.getProvider(),
+            webSession.getUserId()
+        ));
         return new WebAuthProviderConfiguration(authProvider, providerConfig);
     }
 
@@ -549,6 +555,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             } catch (DBException e) {
                 throw new DBWebException("Error saving server configuration", e);
             }
+            log.info(String.format("Auth provider configuration deleted: [id=%s, userId=%s]", id, webSession.getUserId()));
             return true;
         }
         return false;
