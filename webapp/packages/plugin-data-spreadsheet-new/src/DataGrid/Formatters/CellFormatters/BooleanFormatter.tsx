@@ -54,7 +54,7 @@ export const BooleanFormatter = observer<ICellFormatterProps>(function BooleanFo
   }
 
   if (value === null) {
-    return <GridNullFormatter />;
+    return <GridNullFormatter onClick={toggleValue} />;
   }
 
   return (
