@@ -156,9 +156,11 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
   }
 
   protected setInitialState(initialState: TPartState) {
+    const isChanged = this.isChanged;
+
     this.initialState = initialState;
 
-    if (this.isChanged) {
+    if (isChanged) {
       return;
     }
 
