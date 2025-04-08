@@ -38,6 +38,7 @@ export function useTreeData(options: IOptions): ITreeData {
   options = useObservableRef(
     {
       ...options,
+      getParent: options.getParent ?? (() => null),
       childrenTransformers: [...(options.childrenTransformers || [])],
       nodeTransformers: [...(options.nodeTransformers || [])],
       stateTransformers: [...(options.stateTransformers || [])],
