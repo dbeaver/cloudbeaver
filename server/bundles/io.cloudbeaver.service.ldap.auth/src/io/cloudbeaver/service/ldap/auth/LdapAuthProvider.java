@@ -373,26 +373,20 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         DirContext userContext = null;
         try {
             userContext = new InitialDirContext(environment);
-            if (CommonUtils.isNotEmpty(login)) {
-                userData.put(LdapConstants.CRED_USERNAME, login);
-                userData.put(LdapConstants.CRED_USER_DN, userDN);
-                userData.put(LdapConstants.CRED_DISPLAY_NAME, findUserNameFromDN(userDN, ldapSettings));
-            } else {
-                SearchControls searchControls = createSearchControls();
-                String userId = "";
-                var searchResult = userContext.search(userDN, "objectClass=*", searchControls);
-                if (searchResult.hasMore()) {
-                    SearchResult result = searchResult.next();
-                    Attributes attributes = result.getAttributes();
-                    userId = getAttributeValue(attributes, "objectGUID");
-                    if (userId == null) {
-                        userId = getAttributeValue(attributes, "entryUUID");
-                    }
+            SearchControls searchControls = createSearchControls();
+            String userId = "";
+            var searchResult = userContext.search(userDN, "objectClass=*", searchControls);
+            if (searchResult.hasMore()) {
+                SearchResult result = searchResult.next();
+                Attributes attributes = result.getAttributes();
+                userId = getAttributeValue(attributes, "objectGUID");
+                if (userId == null) {
+                    userId = getAttributeValue(attributes, "entryUUID");
                 }
-                userData.putIfAbsent(LdapConstants.CRED_USERNAME, CommonUtils.isNotEmpty(userId) ? userId : login);
-                userData.put(LdapConstants.CRED_USER_DN, userDN);
-                userData.put(LdapConstants.CRED_DISPLAY_NAME, findUserNameFromDN(userDN, ldapSettings));
             }
+            userData.putIfAbsent(LdapConstants.CRED_USERNAME, CommonUtils.isNotEmpty(userId) ? userId : login);
+            userData.put(LdapConstants.CRED_USER_DN, userDN);
+            userData.put(LdapConstants.CRED_DISPLAY_NAME, findUserNameFromDN(userDN, ldapSettings));
             userData.put(LdapConstants.CRED_SESSION_ID, UUID.randomUUID());
             return userData;
         } catch (Exception e) {
