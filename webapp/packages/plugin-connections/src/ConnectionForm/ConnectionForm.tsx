@@ -92,7 +92,6 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
                   type={exception ? ENotificationType.Error : ENotificationType.Info}
                   message={formState.statusMessage}
                   exception={exception}
-                  multipleRows
                 />
               </div>
               <TabList className={s(styles, { tabList: true })} disabled={formState.isDisabled} underline big />
