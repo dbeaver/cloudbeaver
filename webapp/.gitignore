@@ -18,6 +18,7 @@ src/**/*.js.map
 typings
 dist
 lib
+!.yarn/sdks/**/lib
 coverage
 ts-out
 npm-debug.log
