@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -199,8 +199,12 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
           }
         }
 
-        if (cursor && isCursorInDoc) {
-          transaction.selection = cursor;
+        if (cursor) {
+          const changed = view.state.selection.main.anchor !== cursor.anchor || view.state.selection.main.head !== cursor.head;
+
+          if (changed && isCursorInDoc) {
+            transaction.selection = cursor;
+          }
         }
 
         if (hasInsertProperty(transaction.changes) && !transaction.selection) {
