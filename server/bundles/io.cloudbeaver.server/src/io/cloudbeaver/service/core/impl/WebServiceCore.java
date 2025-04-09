@@ -46,6 +46,7 @@ import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWNetworkHandler;
 import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHSession;
+import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
@@ -606,6 +607,7 @@ public class WebServiceCore implements DBWServiceCore {
             ServletAppUtils.getServletApplication().getAppConfiguration().isSupportsCustomConnections()
                 || SMUtils.isRMAdmin(session);
         return session.getAccessibleProjects().stream()
+            .filter(pr -> customConnectionsEnabled || !RMProjectType.USER.equals(pr.getRMProject().getType()))
             .map(pr -> new WebProjectInfo(session, pr, customConnectionsEnabled))
             .collect(Collectors.toList());
     }

@@ -341,6 +341,7 @@ __metadata:
   resolution: "@dbeaver/react-data-grid@workspace:@dbeaver/react-data-grid"
   dependencies:
     "@dbeaver/tsconfig": "workspace:^"
+    "@dbeaver/ui-kit": "workspace:^"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     react: "npm:^19"
@@ -361,7 +362,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/ui-kit@workspace:@dbeaver/ui-kit":
+"@dbeaver/ui-kit@workspace:@dbeaver/ui-kit, @dbeaver/ui-kit@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/ui-kit@workspace:@dbeaver/ui-kit"
   dependencies:
