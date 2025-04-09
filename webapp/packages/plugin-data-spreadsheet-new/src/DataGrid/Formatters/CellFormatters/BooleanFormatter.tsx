@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { NullFormatter as GridNullFormatter } from '@cloudbeaver/plugin-data-grid';
+import { BooleanFormatter as GridBooleanFormatter, NullFormatter as GridNullFormatter } from '@cloudbeaver/plugin-data-grid';
 import { getComputed, s, useS } from '@cloudbeaver/core-blocks';
 import { DatabaseEditChangeType } from '@cloudbeaver/plugin-data-viewer';
 
@@ -34,8 +34,6 @@ export const BooleanFormatter = observer<ICellFormatterProps>(function BooleanFo
   const value = getComputed(() => formatter.get(cell));
   const textValue = getComputed(() => formatter.getText(cell));
   const booleanValue = getComputed(() => textValue.toLowerCase() === 'true');
-  const stringifiedValue = getComputed(() => formatter.getDisplayString(cell));
-  const valueRepresentation = value === null ? stringifiedValue : `[${booleanValue ? 'v' : ' '}]`;
   const disabled = formatter.isReadOnly(cell) && cellContext.editionState !== DatabaseEditChangeType.add;
 
   function toggleValue() {
@@ -57,9 +55,5 @@ export const BooleanFormatter = observer<ICellFormatterProps>(function BooleanFo
     return <GridNullFormatter onClick={toggleValue} />;
   }
 
-  return (
-    <span className={s(styles, { booleanFormatter: true, nullValue: value === null, disabled })} title={stringifiedValue} onClick={toggleValue}>
-      {valueRepresentation}
-    </span>
-  );
+  return <GridBooleanFormatter value={booleanValue} className={s(styles, { booleanFormatter: true })} onClick={toggleValue} />;
 });

@@ -7,16 +7,5 @@
  */
 
 .booleanFormatter {
-  cursor: pointer;
-}
-
-.disabled {
-  cursor: auto;
-}
-
-.booleanFormatter {
-  font-family: monospace;
-  white-space: pre;
-  line-height: 1;
-  vertical-align: text-top;
+  padding-inline: 2px;
 }
