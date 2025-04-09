@@ -11,3 +11,9 @@
 
 #!.yarn/cache
 .pnp.*
+
+# artifacts
+lib
+out
+dist
+node_modules

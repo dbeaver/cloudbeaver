@@ -4662,6 +4662,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@dbeaver/database-commons@workspace:../common-typescript/@dbeaver/database-commons, @dbeaver/database-commons@workspace:^":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/database-commons@workspace:../common-typescript/@dbeaver/database-commons"
+  dependencies:
+    "@dbeaver/tsconfig": "workspace:^"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@dbeaver/prettier-config@workspace:*, @dbeaver/prettier-config@workspace:../common-typescript/@dbeaver/prettier-config, @dbeaver/prettier-config@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/prettier-config@workspace:../common-typescript/@dbeaver/prettier-config"
@@ -4678,11 +4688,23 @@ __metadata:
   resolution: "@dbeaver/react-data-grid@workspace:../common-react/@dbeaver/react-data-grid"
   dependencies:
     "@dbeaver/tsconfig": "workspace:^"
+    "@dbeaver/ui-kit": "workspace:^"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     react: "npm:^19"
     react-data-grid: "file:./artifacts"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api"
+  dependencies:
+    "@dbeaver/database-commons": "workspace:^"
+    "@dbeaver/tsconfig": "workspace:^"
     rimraf: "npm:^6"
     typescript: "npm:^5"
   languageName: unknown
