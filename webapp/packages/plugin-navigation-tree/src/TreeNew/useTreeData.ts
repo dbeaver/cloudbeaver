@@ -34,11 +34,13 @@ interface IOptions {
   stateTransformers?: TreeDataTransformer<INodeState>[];
 }
 
+const DEFAULT_PARENT_GETTER = () => null;
+
 export function useTreeData(options: IOptions): ITreeData {
   options = useObservableRef(
     {
       ...options,
-      getParent: options.getParent ?? (() => null),
+      getParent: options.getParent ?? DEFAULT_PARENT_GETTER,
       childrenTransformers: [...(options.childrenTransformers || [])],
       nodeTransformers: [...(options.nodeTransformers || [])],
       stateTransformers: [...(options.stateTransformers || [])],
