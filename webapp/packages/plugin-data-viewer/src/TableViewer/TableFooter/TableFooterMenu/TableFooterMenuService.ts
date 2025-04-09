@@ -191,15 +191,7 @@ export class TableFooterMenuService {
             break;
           }
           case ACTION_SAVE:
-            model
-              .save()
-              .then(() => {
-                //TODO: Remove this when we have virtual keys. We need to refresh the data in tables without a primary key to avoid UI glitch #5140.
-                if (!model.hasElementIdentifier(resultIndex)) {
-                  model.source.refreshData();
-                }
-              })
-              .catch(() => {});
+            model.save().catch(() => {});
             break;
           case ACTION_CANCEL: {
             editor.clear();
