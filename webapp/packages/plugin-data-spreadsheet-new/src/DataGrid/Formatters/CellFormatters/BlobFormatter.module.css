@@ -9,9 +9,7 @@
 .blobFormatter {
   display: flex;
   align-items: center;
-  &:not(.nullValue) {
-    color: var(--theme-primary);
-  }
+  color: var(--theme-primary);
 }
 
 .blobFormatterValue {
@@ -19,8 +17,4 @@
   overflow: hidden;
   white-space: pre;
   text-overflow: ellipsis;
-}
-
-.nullValue {
-  composes: nullValue from './CellNullValue.module.css';
 }
