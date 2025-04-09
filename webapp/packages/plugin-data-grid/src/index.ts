@@ -18,6 +18,7 @@ export {
   DateFormatter,
   NullFormatter,
   NumberFormatter,
+  BlobFormatter,
   type IGridReactiveValue,
   type DataGridRef,
   type ICellPosition,

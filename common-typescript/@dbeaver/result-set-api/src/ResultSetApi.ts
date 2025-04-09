@@ -9,6 +9,14 @@ export class ResultSetApi {
     return new Date(stringValue);
   }
 
+  static getBlobValue(value: any): string | null {
+    if (value === null) {
+      return null;
+    }
+
+    return 'blob';
+  }
+
   static getNumberValue(value: any): number | null {
     if (value === null) {
       return null;
