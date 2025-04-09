@@ -2453,7 +2453,6 @@ __metadata:
     "@types/underscore": "npm:^1"
     "@types/uuid": "npm:^10"
     "@types/whatwg-mimetype": "npm:^3"
-    clsx: "npm:^2"
     fast-deep-equal: "npm:^3"
     i18next: "npm:^24"
     md5: "npm:^2"
@@ -2655,6 +2654,7 @@ __metadata:
     "@cloudbeaver/plugin-administration": "workspace:*"
     "@cloudbeaver/plugin-authentication": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:^"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -2735,6 +2735,7 @@ __metadata:
     "@codemirror/search": "npm:^6"
     "@codemirror/state": "npm:^6"
     "@codemirror/view": "npm:^6"
+    "@dbeaver/ui-kit": "workspace:^"
     "@lezer/common": "npm:^1"
     "@lezer/highlight": "npm:^1"
     "@types/react": "npm:^19"
@@ -2975,8 +2976,8 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/react-data-grid": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:^"
     "@types/react": "npm:^19"
-    clsx: "npm:^2"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
@@ -3037,6 +3038,7 @@ __metadata:
     "@cloudbeaver/plugin-data-grid": "workspace:*"
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:^"
     "@popperjs/core": "npm:^2"
     "@types/jest": "npm:^29"
     "@types/react": "npm:^19"
@@ -4660,6 +4662,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@dbeaver/database-commons@workspace:../common-typescript/@dbeaver/database-commons, @dbeaver/database-commons@workspace:^":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/database-commons@workspace:../common-typescript/@dbeaver/database-commons"
+  dependencies:
+    "@dbeaver/tsconfig": "workspace:^"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@dbeaver/prettier-config@workspace:*, @dbeaver/prettier-config@workspace:../common-typescript/@dbeaver/prettier-config, @dbeaver/prettier-config@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/prettier-config@workspace:../common-typescript/@dbeaver/prettier-config"
@@ -4676,11 +4688,23 @@ __metadata:
   resolution: "@dbeaver/react-data-grid@workspace:../common-react/@dbeaver/react-data-grid"
   dependencies:
     "@dbeaver/tsconfig": "workspace:^"
+    "@dbeaver/ui-kit": "workspace:^"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     react: "npm:^19"
     react-data-grid: "file:./artifacts"
     react-dom: "npm:^19"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api"
+  dependencies:
+    "@dbeaver/database-commons": "workspace:^"
+    "@dbeaver/tsconfig": "workspace:^"
     rimraf: "npm:^6"
     typescript: "npm:^5"
   languageName: unknown
@@ -4708,6 +4732,7 @@ __metadata:
     "@types/react-dom": "npm:^19"
     "@wroud/vite-plugin-asset-resolver": "npm:^0"
     "@wroud/vite-plugin-tsc": "npm:^0.11.6"
+    clsx: "npm:^2"
     react: "npm:^19"
     react-dom: "npm:^19"
     rimraf: "npm:^6"
@@ -17291,14 +17316,14 @@ __metadata:
   linkType: hard
 
 "react-data-grid@file:./artifacts::locator=%40dbeaver%2Freact-data-grid%40workspace%3A..%2Fcommon-react%2F%40dbeaver%2Freact-data-grid":
-  version: 7.0.0-beta.47
-  resolution: "react-data-grid@file:./artifacts#./artifacts::hash=ebde6a&locator=%40dbeaver%2Freact-data-grid%40workspace%3A..%2Fcommon-react%2F%40dbeaver%2Freact-data-grid"
+  version: 7.0.0-beta.50
+  resolution: "react-data-grid@file:./artifacts#./artifacts::hash=f67a36&locator=%40dbeaver%2Freact-data-grid%40workspace%3A..%2Fcommon-react%2F%40dbeaver%2Freact-data-grid"
   dependencies:
     clsx: "npm:^2.0.0"
   peerDependencies:
-    react: ^18.0 || ^19.0
-    react-dom: ^18.0 || ^19.0
-  checksum: 10c0/6a1ee314f8cdd603ffa72c778e4aee72f3cd5922a56df1d3f7b095d541a8056946598dde34bddff4de442bef9c732174fb1e8853d6ab3a901001973ba109de7d
+    react: ^19.0
+    react-dom: ^19.0
+  checksum: 10c0/5591a564d6c3f4772dd87b8bfda111b0aafb8f748f1337f492db7ab5fc3f5dd5da3088aa4856ce581d943202ca8ed508e2828fc3e1453441b3061fa56a62ae95
   languageName: node
   linkType: hard
 

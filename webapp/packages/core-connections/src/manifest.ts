@@ -27,7 +27,6 @@ export const manifest: PluginManifest = {
     () => import('./DBDriverResource.js').then(m => m.DBDriverResource),
     () => import('./NetworkHandlerResource.js').then(m => m.NetworkHandlerResource),
     () => import('./ConnectionDialectResource.js').then(m => m.ConnectionDialectResource),
-    () => import('./NavTree/ConnectionNavNodeService.js').then(m => m.ConnectionNavNodeService),
     () => import('./NavTree/NavNodeExtensionsService.js').then(m => m.NavNodeExtensionsService),
     () => import('./ConnectionInfoEventHandler.js').then(m => m.ConnectionInfoEventHandler),
     () => import('./ConnectionFolderEventHandler.js').then(m => m.ConnectionFolderEventHandler),

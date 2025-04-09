@@ -1,17 +1,6 @@
-[type="checkbox"] {
+[type='checkbox'] {
   height: 16px;
   width: 16px;
-}
-
-label {
-  display: block;
-  line-height: 15px;
-  box-sizing: border-box;
-  padding: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  width: 100%;
 }
 
 label[title] {

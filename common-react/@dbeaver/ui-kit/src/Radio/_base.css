@@ -1,0 +1,22 @@
+@layer base {
+  :root {
+    --dbv-kit-radio-inactive-hover-background: transparent;
+    --dbv-kit-radio-inactive-hover-border: var(--tw-color-gray-400);
+    --dbv-kit-radio-inactive-background: transparent;
+    --dbv-kit-radio-inactive-foreground: var(--dbv-kit-color-control-inactive);
+    --dbv-kit-radio-inactive-border: var(--dbv-kit-color-control-inactive);
+    --dbv-kit-radio-active-background: transparent;
+    --dbv-kit-radio-active-border: var(--dbv-kit-color-primary-500);
+    --dbv-kit-radio-active-foreground: var(--dbv-kit-color-primary-500);
+    --dbv-kit-radio-hover-shadow-color: var(--dbv-kit-color-primary-200);
+
+    --dbv-kit-radio-height: var(--dbv-kit-control-height-medium);
+    --dbv-kit-radio-ring-size: 0.5625;
+    --dbv-kit-radio-dot-size: 0.25;
+    --dbv-kit-radio-font-size: calc(var(--dbv-kit-font-size-base) * 0.875);
+    --dbv-kit-radio-gap: var(--tw-spacing);
+
+    --dbv-kit-select-label-foreground: var(--dbv-kit-color-control-label);
+    --dbv-kit-select-label-padding-inline: var(--tw-spacing);
+  }
+}

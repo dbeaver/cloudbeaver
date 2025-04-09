@@ -21,7 +21,11 @@
     font-size: var(--dbv-kit-select-font-size);
     outline-width: var(--dbv-kit-control-outline-width);
     outline-offset: var(--dbv-kit-control-outline-offset);
-    outline-color: var(--dbv-kit-color-outline);
+    outline-color: var(--dbv-kit-control-outline-color);
+
+    &:hover {
+      border-color: var(--dbv-kit-color-control-hover);
+    }
 
     &[aria-disabled='true'] {
       opacity: var(--dbv-kit-control-disabled-opacity);
@@ -29,11 +33,6 @@
     &[data-focus-visible],
     &:focus-visible {
       outline-style: solid;
-    }
-
-    &:active,
-    &[data-active] {
-      padding-top: 0.125rem;
     }
   }
 

@@ -159,11 +159,11 @@ export class SqlEditorBootstrap extends Bootstrap {
             break;
           }
           case ACTION_SQL_EDITOR_OPEN: {
-            const connection = context.get(DATA_CONTEXT_CONNECTION)!;
+            const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
 
             this.sqlEditorNavigatorService.openNewEditor({
               dataSourceKey: LocalStorageSqlDataSource.key,
-              connectionKey: createConnectionParam(connection),
+              connectionKey,
             });
             break;
           }
