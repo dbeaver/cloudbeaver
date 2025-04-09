@@ -9,13 +9,14 @@
 import { type ComponentPropsWithRef } from 'react';
 import './Input.css';
 import clsx from 'clsx';
+import { componentProviderWrapper } from '../componentProviderWrapper.js';
 
 export interface InputProps extends Omit<ComponentPropsWithRef<'input'>, 'size'> {
   size?: 'small' | 'medium' | 'large' | 'xlarge';
   label?: React.ReactNode;
 }
 
-export const Input: React.FC<InputProps> = function Input({ size, className, ...props }) {
+export const InputBase: React.FC<InputProps> = function Input({ size, className, ...props }) {
   const classNameToApply = clsx(`dbv-kit-input`, `dbv-kit-input--${size ?? 'medium'}`, className);
   return (
     <label className="dbv-kit-input-wrapper">
@@ -24,3 +25,5 @@ export const Input: React.FC<InputProps> = function Input({ size, className, ...
     </label>
   );
 };
+
+export const Input = componentProviderWrapper('Input', InputBase);
