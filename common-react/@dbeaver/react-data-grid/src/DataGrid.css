@@ -1,7 +1,29 @@
+@import url('@dbeaver/ui-kit/index.css');
 @import url('react-data-grid/lib/styles.css') layer(components);
 
 @layer components.rdg.MeasuringCell {
   [data-measuring-cell] {
     max-width: var(--rdg-max-auto-size, 350px);
+  }
+}
+
+@layer components.rdg.Cell {
+  @media (prefers-color-scheme: dark) {
+    .rdg-cell-frozen {
+      &:nth-last-child(1 of &) {
+        box-shadow: none;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: -1;
+          background-color: rgba(255, 255, 255, 0.02);
+        }
+      }
+    }
   }
 }

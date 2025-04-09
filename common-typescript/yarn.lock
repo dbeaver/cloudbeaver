@@ -97,6 +97,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@dbeaver/database-commons@workspace:@dbeaver/database-commons, @dbeaver/database-commons@workspace:^":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/database-commons@workspace:@dbeaver/database-commons"
+  dependencies:
+    "@dbeaver/tsconfig": "workspace:^"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@dbeaver/jdbc-uri-parser@workspace:@dbeaver/jdbc-uri-parser":
   version: 0.0.0-use.local
   resolution: "@dbeaver/jdbc-uri-parser@workspace:@dbeaver/jdbc-uri-parser"
@@ -115,6 +125,17 @@ __metadata:
     prettier: "npm:^3"
   peerDependencies:
     prettier: ">=3.0.0"
+  languageName: unknown
+  linkType: soft
+
+"@dbeaver/result-set-api@workspace:@dbeaver/result-set-api":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/result-set-api@workspace:@dbeaver/result-set-api"
+  dependencies:
+    "@dbeaver/database-commons": "workspace:^"
+    "@dbeaver/tsconfig": "workspace:^"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
   languageName: unknown
   linkType: soft
 
