@@ -70,10 +70,9 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebServerConfig getServerConfig(@Nullable WebSession webSession) {
-
         WebServerConfig webServerConfig = WebAppUtils.getWebApplication().getWebServerConfig();
-        webServerConfig.setProvideSensitiveInformation(webSession != null
-            && (webSession.getUser() != null || webServerConfig.isConfigurationMode()));
+        webServerConfig.setProvideSensitiveInformation(webServerConfig.isConfigurationMode() ||
+            (webSession != null && webSession.getUser() != null));
         return webServerConfig;
     }
 
