@@ -421,6 +421,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
       isLoaded(): boolean {
         return navNodeInfoResource.isLoaded(this.root);
       },
+      isOutdated(): boolean {
+        return navNodeInfoResource.isOutdated(this.root);
+      },
       getNodeState(nodeId: string) {
         return this.state.get(nodeId);
       },

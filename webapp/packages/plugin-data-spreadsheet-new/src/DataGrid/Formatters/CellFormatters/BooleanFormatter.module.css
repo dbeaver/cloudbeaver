@@ -14,11 +14,7 @@
   cursor: auto;
 }
 
-.nullValue {
-  composes: nullValue from './CellNullValue.module.css';
-}
-
-.booleanFormatter:not(.nullValue) {
+.booleanFormatter {
   font-family: monospace;
   white-space: pre;
   line-height: 1;

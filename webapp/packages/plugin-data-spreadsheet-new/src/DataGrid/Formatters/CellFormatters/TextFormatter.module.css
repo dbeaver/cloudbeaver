@@ -34,7 +34,3 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-.nullValue {
-  composes: nullValue from './CellNullValue.module.css';
-}
