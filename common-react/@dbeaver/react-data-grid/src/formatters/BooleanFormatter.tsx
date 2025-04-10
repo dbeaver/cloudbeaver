@@ -15,7 +15,11 @@ export function BooleanFormatter({ value, className, onClick }: Props) {
     }
   };
   return (
-    <Focusable className={clsx('tw:flex tw:items-center tw:w-full tw:outline-none', className)} onKeyDown={handleKeyDown} onClick={onClick}>
+    <Focusable
+      className={clsx('tw:flex tw:items-center tw:w-full tw:outline-none tw:hover:cursor-pointer', className)}
+      onKeyDown={handleKeyDown}
+      onClick={onClick}
+    >
       {value === null ? <NullFormatter /> : <Checkbox className="tw:data-disabled:opacity-100" disabled size="small" checked={value} />}
     </Focusable>
   );
