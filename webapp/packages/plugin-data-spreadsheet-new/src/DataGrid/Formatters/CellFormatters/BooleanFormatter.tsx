@@ -49,5 +49,5 @@ export const BooleanFormatter = observer<ICellFormatterProps>(function BooleanFo
     tableDataContext.editor.set(cell, nextValue);
   }
 
-  return <GridBooleanFormatter value={value as boolean | null} className="tw:px-2" onClick={toggleValue} />;
+  return <GridBooleanFormatter value={value as boolean | null} onClick={toggleValue} />;
 });
