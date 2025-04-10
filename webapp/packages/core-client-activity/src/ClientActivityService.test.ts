@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { beforeEach, describe, expect, it, vitest } from 'vitest';
+import { beforeEach, describe, expect, it, vitest, afterEach } from 'vitest';
 
 import { ClientActivityService, INACTIVE_PERIOD_TIME } from './ClientActivityService.js';
 
@@ -26,10 +26,15 @@ describe('ClientActivityService', () => {
   let clientActivityService: ClientActivityService;
 
   beforeEach(() => {
+    vitest.useFakeTimers();
     clientActivityService = new ClientActivityService();
 
     vitest.spyOn(globalThis, 'setTimeout');
     vitest.spyOn(globalThis, 'clearTimeout');
+  });
+
+  afterEach(() => {
+    vitest.useRealTimers();
   });
 
   it('should initialize with isActive set to false', () => {

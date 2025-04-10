@@ -12,12 +12,6 @@ import '@testing-library/jest-dom/vitest';
 // different machine has its own timezones and some tests can fail because of it
 process.env.TZ = 'UTC';
 
-function resetMocks() {
-  vi.clearAllTimers();
-  vi.useFakeTimers();
-  vi.restoreAllMocks();
-}
-
 function resetDocument() {
   document.body.innerHTML = '';
   document.body.className = '';
@@ -25,6 +19,6 @@ function resetDocument() {
 }
 
 beforeEach(() => {
-  resetMocks();
+  vi.restoreAllMocks();
   resetDocument();
 });

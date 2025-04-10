@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 
 import { CancellablePromise } from './CancellablePromise.js';
 
@@ -14,6 +14,14 @@ vi.mock('./PromiseCancelledError', () => ({
 }));
 
 describe('CancellablePromise', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('cancels promise', async () => {
     const promise = new CancellablePromise<void>(resolve => {
       const token = setTimeout(() => resolve(), 0);

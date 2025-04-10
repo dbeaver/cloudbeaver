@@ -14,7 +14,12 @@ describe('useControlledScroll', () => {
   let element: HTMLDivElement;
   let scrollState: IScrollState;
 
+  beforeEach(() => {
+    vitest.useFakeTimers();
+  });
+
   afterEach(() => {
+    vitest.useRealTimers();
     element.remove();
   });
 

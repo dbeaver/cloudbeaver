@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { beforeEach, describe, expect, it, type Mock, vi, afterEach } from 'vitest';
 
 import { downloadFromURL } from './downloadFromURL.js';
 
@@ -23,6 +23,7 @@ describe('downloadFromURL', () => {
   let mockXHR: MockXHR;
 
   beforeEach(() => {
+    vi.useFakeTimers();
     mockXHR = {
       open: vi.fn(),
       send: vi.fn(),
@@ -34,6 +35,10 @@ describe('downloadFromURL', () => {
     };
 
     (globalThis as any).XMLHttpRequest = vi.fn(() => mockXHR);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('should open and send request to the specified URL', () => {

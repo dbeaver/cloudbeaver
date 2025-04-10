@@ -5,11 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, vitest, test } from 'vitest';
+import { describe, expect, vitest, test, beforeEach, afterEach } from 'vitest';
 
 import { debounce, debounceAsync } from './debounce.js';
 
 describe('Debounce', () => {
+  beforeEach(() => {
+    vitest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vitest.useRealTimers();
+  });
+
   test('function should be executed just once', () => {
     const func = vitest.fn();
     const debouncedFunction = debounce(func, 1000);
@@ -26,6 +34,14 @@ describe('Debounce', () => {
 });
 
 describe('DebounceAsync', () => {
+  beforeEach(() => {
+    vitest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vitest.useRealTimers();
+  });
+
   test('function should be executed just once', () => {
     const func = vitest.fn(() => Promise.resolve(true));
     const debouncedFunction = debounceAsync(func, 1000);

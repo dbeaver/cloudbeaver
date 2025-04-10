@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, test, vitest } from 'vitest';
+import { describe, expect, test, vitest, beforeEach, afterEach } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 
 import { useStateDelay } from './useStateDelay.js';
@@ -19,6 +19,14 @@ interface IHookProps {
 const useStateDelayWrapper = ({ value, delay, callback }: IHookProps) => useStateDelay(value, delay, callback);
 
 describe('useStateDelay', () => {
+  beforeEach(() => {
+    vitest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vitest.useRealTimers();
+  });
+
   test("should return initial state during whole hook's lifecycle", () => {
     const { result, unmount } = renderHook(() => useStateDelay(true, 100));
     expect(result.current).toBe(true);
