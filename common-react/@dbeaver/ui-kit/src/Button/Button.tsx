@@ -9,6 +9,7 @@ import { Button as AriaButton, type ButtonProps as AriaKitButtonProps } from '@a
 import clsx from 'clsx';
 import './Button.css';
 import type { ControlSize } from '../types/controls.js';
+import { componentProviderWrapper } from '../componentProviderWrapper.js';
 
 export interface ButtonProps extends Omit<AriaKitButtonProps, 'clickOnEnter' | 'clickOnSpace'> {
   variant?: 'primary' | 'secondary' | 'danger';
@@ -17,7 +18,7 @@ export interface ButtonProps extends Omit<AriaKitButtonProps, 'clickOnEnter' | '
   loader?: React.ReactNode;
 }
 
-export function Button({ className, variant = 'primary', size = 'medium', loading, loader, children, onClick, ...props }: ButtonProps) {
+export function ButtonBase({ className, variant = 'primary', size = 'medium', loading, loader, children, onClick, ...props }: ButtonProps) {
   const classToApply = clsx('dbv-kit-button', `dbv-kit-button--${variant}`, `dbv-kit-button--${size}`, className);
 
   if (loading) {
@@ -41,7 +42,9 @@ export interface ButtonIconProps extends React.HTMLAttributes<HTMLSpanElement> {
  *
  * @param props.placement This property is needed to adjust icon placement inside a button. The icon with placement="start" will cut the inline-start padding. placement="end" will affect the padding-inline-end accordingly. This property supports RTL and LTR, so you don't need to think about it.
  */
-Button.Icon = function ButtonIcon({ className, children, placement }: ButtonIconProps) {
+ButtonBase.Icon = function ButtonBaseIcon({ className, children, placement }: ButtonIconProps) {
   const classToApply = clsx('dbv-kit-button__icon', placement && `dbv-kit-button__icon--${placement}`, className);
   return <span className={classToApply}>{children}</span>;
 };
+
+export const Button = componentProviderWrapper('Button', ButtonBase);

@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
+import { NullFormatter as GridNullFormatter } from '@cloudbeaver/plugin-data-grid';
 import { getComputed, s, useS } from '@cloudbeaver/core-blocks';
 import { DatabaseEditChangeType } from '@cloudbeaver/plugin-data-viewer';
 
@@ -50,6 +51,10 @@ export const BooleanFormatter = observer<ICellFormatterProps>(function BooleanFo
     const nextValue = !resultColumn.required && value === false ? null : !booleanValue;
 
     tableDataContext.editor.set(cell, nextValue);
+  }
+
+  if (value === null) {
+    return <GridNullFormatter onClick={toggleValue} />;
   }
 
   return (
