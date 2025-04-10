@@ -53,7 +53,7 @@ public class WebServerConfig {
 
     @Property
     public String getVersion() {
-        return GeneralUtils.getProductVersion().toString();
+        return provideSensitiveInformation ? GeneralUtils.getProductVersion().toString() : "";
     }
 
     @Property
@@ -180,10 +180,6 @@ public class WebServerConfig {
     @Property
     public Boolean isDistributed() {
         return application.isDistributed();
-    }
-
-    public boolean isProvideSensitiveInformation() {
-        return provideSensitiveInformation;
     }
 
     public void setProvideSensitiveInformation(boolean provideSensitiveInformation) {
