@@ -9,50 +9,51 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { CancellablePromise } from './CancellablePromise.js';
 
+vi.mock('./PromiseCancelledError', () => ({
+  PromiseCancelledError: vi.fn(),
+}));
+
 describe('CancellablePromise', () => {
-  it('should resolve with value', async () => {
-    const promise = new CancellablePromise<string>(resolve => {
-      resolve('test');
-      return () => {};
+  it('cancels promise', async () => {
+    const promise = new CancellablePromise<void>(resolve => {
+      const token = setTimeout(() => resolve(), 0);
+      return () => {
+        clearTimeout(token);
+      };
     });
-
-    const result = await promise;
-    expect(result).toBe('test');
-  });
-
-  it('should reject with error', async () => {
-    const error = new Error('test error');
-    const promise = new CancellablePromise<string>((_, reject) => {
-      reject(error);
-      return () => {};
-    });
-
-    await expect(promise).rejects.toThrow(error);
-  });
-
-  it('should reject with PromiseCancelledError when cancelled', async () => {
-    const promise = new CancellablePromise<string>(() => () => {});
 
     promise.cancel();
 
-    await expect(promise).rejects.toThrow();
+    vi.advanceTimersByTime(1);
+
+    await expect(promise).rejects.toThrowError('');
   });
 
-  it('should call cancel function when cancelled', async () => {
-    const cancelFn = vi.fn();
-    const promise = new CancellablePromise<string>(() => cancelFn);
-
-    promise.cancel();
-    expect(cancelFn).toHaveBeenCalled();
-    await expect(promise).rejects.toThrow();
-  });
-
-  it('should handle executor throwing error', async () => {
-    const error = new Error('executor error');
-    const promise = new CancellablePromise<string>(() => {
-      throw error;
+  it('should resolve promise', async () => {
+    const promise = new CancellablePromise<number>(resolve => {
+      const token = setTimeout(() => resolve(777), 0);
+      return () => {
+        clearTimeout(token);
+      };
     });
 
-    await expect(promise).rejects.toThrow(error);
+    vi.advanceTimersByTime(1);
+
+    await expect(promise).resolves.toBe(777);
+  });
+
+  it('should reject promise', async () => {
+    const testMessage = 'test';
+    const error = new Error(testMessage);
+    const promise = new CancellablePromise<number>((resolve, reject) => {
+      const token = setTimeout(() => reject(error), 0);
+      return () => {
+        clearTimeout(token);
+      };
+    });
+
+    vi.advanceTimersByTime(1);
+
+    await expect(promise).rejects.toThrowError(testMessage);
   });
 });

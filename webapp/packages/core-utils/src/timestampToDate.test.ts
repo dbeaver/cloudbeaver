@@ -7,9 +7,12 @@
  */
 import { describe, expect, it } from 'vitest';
 
+import { mockToLocaleString } from './__mocks__/mockToLocaleString.js';
 import { timestampToDate } from './timestampToDate.js';
 
 describe('timestampToDate', () => {
+  mockToLocaleString();
+
   it('should convert timestamp to date', () => {
     const date = timestampToDate(1591862400000);
     expect(date).toBe('06/11/2020, 08:00:00');
