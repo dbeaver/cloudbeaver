@@ -95,11 +95,13 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
           doc: value,
         });
 
+        const validatedCursor = cursor ? validateCursorBoundaries(cursor, tempState.doc.length) : undefined;
+
         if (incomingValue !== undefined) {
           merge = new MergeView({
             a: {
               doc: value,
-              selection: cursor && validateCursorBoundaries(cursor, tempState.doc.length),
+              selection: validatedCursor,
               extensions: [updateListener, ...effects],
             },
             b: {
@@ -114,16 +116,20 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
           editorView = new EditorView({
             state: EditorState.create({
               doc: value,
-              selection: cursor && validateCursorBoundaries(cursor, tempState.doc.length),
+              selection: validatedCursor,
               extensions: [updateListener, ...effects],
             }),
             parent: container,
           });
         }
 
-        editorView.dispatch({
-          scrollIntoView: true,
-        });
+        if (validatedCursor) {
+          if (validatedCursor.anchor > 0 || validatedCursor.head !== validatedCursor.anchor) {
+            editorView.dispatch({
+              scrollIntoView: true,
+            });
+          }
+        }
 
         if (incomingView) {
           setIncomingView(incomingView);
