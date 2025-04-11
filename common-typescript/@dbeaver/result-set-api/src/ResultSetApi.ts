@@ -58,7 +58,7 @@ export class ResultSetApi {
     return value;
   }
 
-static getStringFallbackForComplexValue(value: unknown): string | unknown {
+static getStringFallbackForComplexValue(value: unknown): string  {
   if (isResultSetContentValue(value) && value.text !== undefined) {
       return this.truncateText(String(value.text), DISPLAY_STRING_LENGTH);
   }
@@ -71,7 +71,7 @@ static getStringFallbackForComplexValue(value: unknown): string | unknown {
     return String(value.value);
   }
   
-  return value
+  return String(value)
 }
 
   static getValueDataType(value: unknown, columnDataType?: DatabaseDataType): DatabaseDataType {
