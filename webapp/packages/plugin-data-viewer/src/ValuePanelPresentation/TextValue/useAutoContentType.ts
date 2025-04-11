@@ -7,7 +7,7 @@
  */
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { isResultSetContentValue } from '@dbeaver/result-set-api'
+import { isResultSetContentValue } from '@dbeaver/result-set-api';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
