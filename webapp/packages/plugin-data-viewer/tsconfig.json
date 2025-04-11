@@ -8,6 +8,9 @@
   },
   "references": [
     {
+      "path": "../../../common-typescript/@dbeaver/result-set-api"
+    },
+    {
       "path": "../core-blocks"
     },
     {

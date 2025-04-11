@@ -3038,6 +3038,7 @@ __metadata:
     "@cloudbeaver/plugin-data-grid": "workspace:*"
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/result-set-api": "workspace:^"
     "@dbeaver/ui-kit": "workspace:^"
     "@popperjs/core": "npm:^2"
     "@types/jest": "npm:^29"
@@ -3135,6 +3136,7 @@ __metadata:
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
     "@cloudbeaver/plugin-object-viewer": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/result-set-api": "workspace:^"
     "@types/jest": "npm:^29"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
@@ -4699,7 +4701,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api":
+"@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api, @dbeaver/result-set-api@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api"
   dependencies:

@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { getComputed, useS } from '@cloudbeaver/core-blocks';
-import { isResultSetContentValue } from '@cloudbeaver/plugin-data-viewer';
+import { isResultSetContentValue } from '@dbeaver/result-set-api';
 
 import { CellContext } from '../../CellRenderer/CellContext.js';
 import { DataGridContext } from '../../DataGridContext.js';
@@ -38,5 +38,5 @@ export const BlobFormatter = observer<ICellFormatterProps>(function BlobFormatte
     return <GridNullFormatter />;
   }
 
-  return <GridBlobFormatter value={rawValue} className={styles['blobFormatter']} />;
+  return <GridBlobFormatter className={styles['blobFormatter']} />;
 });
