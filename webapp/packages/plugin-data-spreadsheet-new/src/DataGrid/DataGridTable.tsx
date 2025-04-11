@@ -394,22 +394,21 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const handleCellKeyDown: DataGridProps['onCellKeyDown'] = ({ rowIdx, colIdx }, event) => {
     gridSelectedCellCopy.onKeydownHandler(event);
     const cell = selectionAction.getFocusedElement();
-    // we can't edit table cells if table doesn't have row identifier, but we can edit new created rows before insert (CB-6063)
-    const canEdit = model.hasElementIdentifier(resultIndex) || !!(cell && tableData.editor.getElementState(cell) === DatabaseEditChangeType.add);
 
-    if (EventContext.has(event, EventStopPropagationFlag) || !canEdit || model.isReadonly(resultIndex)) {
+    if (EventContext.has(event, EventStopPropagationFlag) || model.isReadonly(resultIndex) || !cell) {
       return;
     }
 
+    // we can't edit table cells if table doesn't have row identifier, but we can edit just added/duplicated rows before insert (CB-6063)
+    const canEdit = model.hasElementIdentifier(resultIndex) || tableData.editor.getElementState(cell) === DatabaseEditChangeType.add;
     const activeElements = selectionAction.getActiveElements();
     const activeRows = selectionAction.getActiveRows();
 
-    if (!cell) {
-      return;
-    }
-
     switch (event.code) {
       case 'Escape': {
+        if (!canEdit) {
+          return;
+        }
         tableData.editor.revert(...activeElements);
         return;
       }
@@ -425,6 +424,9 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         return;
       }
       case 'Delete': {
+        if (!canEdit) {
+          return;
+        }
         event.preventGridDefault();
 
         const filteredRows = activeRows.filter(cell => tableData.editor.getElementState(cell) !== DatabaseEditChangeType.delete);
