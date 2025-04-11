@@ -50,7 +50,7 @@ export class ResultSetApi {
     return false;
   }
 
-  static getNullableValue(value: unknown): unknown {
+  static getNullableValue(value: unknown): unknown | null {
     if (String(value).toLowerCase() === 'null') {
       return null;
     }
@@ -58,28 +58,20 @@ export class ResultSetApi {
     return value;
   }
 
-static getStringFallbackForComplexValue(value: unknown): string {
-  if (isResultSetContentValue(value)) {
-    if (value.text !== undefined) {
+static getStringFallbackForComplexValue(value: unknown): string | unknown {
+  if (isResultSetContentValue(value) && value.text !== undefined) {
       return this.truncateText(String(value.text), DISPLAY_STRING_LENGTH);
-    }
-
-    return '[null]';
   }
 
-  if (isResultSetComplexValue(value)) {
-    if (value.value !== undefined) {
-      if (typeof value.value === 'object' && value.value !== null) {
-        return JSON.stringify(value.value);
-      }
-
-      return String(value.value);
+  if (isResultSetComplexValue(value) && value.value !== undefined) {
+    if (typeof value.value === 'object' && value.value !== null) {
+      return JSON.stringify(value.value);
     }
 
-    return '[null]';
+    return String(value.value);
   }
-
-  return ''
+  
+  return value
 }
 
   static getValueDataType(value: unknown, columnDataType?: DatabaseDataType): DatabaseDataType {
