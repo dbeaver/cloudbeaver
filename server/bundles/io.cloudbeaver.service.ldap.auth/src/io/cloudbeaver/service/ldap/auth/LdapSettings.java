@@ -91,4 +91,9 @@ public class LdapSettings {
     public String getLoginAttribute() {
         return loginAttribute;
     }
+
+    @NotNull
+    public SMAuthProviderCustomConfiguration getProviderConfiguration() {
+        return providerConfiguration;
+    }
 }

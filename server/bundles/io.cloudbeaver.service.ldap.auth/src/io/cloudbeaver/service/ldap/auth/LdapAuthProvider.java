@@ -17,9 +17,7 @@
 package io.cloudbeaver.service.ldap.auth;
 
 import io.cloudbeaver.DBWUserIdentity;
-import io.cloudbeaver.auth.SMAuthProviderAssigner;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
-import io.cloudbeaver.auth.SMAutoAssign;
 import io.cloudbeaver.auth.SMBruteForceProtected;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
 import io.cloudbeaver.model.session.WebSession;
@@ -45,7 +43,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
 
-public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected, SMAuthProviderAssigner {
+public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected {
     private static final Log log = Log.getLog(LdapAuthProvider.class);
     public static final String LDAP_AUTH_PROVIDER_ID = "ldap";
     public static final String LDAP_ATTRIBUTE_OBJECT_GUID = "objectGUID";
@@ -156,9 +154,20 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         }
     }
 
-    private String getAttributeValue(Attributes attributes, String attributeName) throws NamingException {
+    protected String getAttributeValue(Attributes attributes, String attributeName) throws NamingException {
         Attribute attribute = attributes.get(attributeName);
         return attribute != null ? attribute.get().toString() : null;
+    }
+
+    @NotNull
+    protected String getAttributeValueSafe(@NotNull Attributes attributes, @NotNull String attrName) {
+        try {
+            Attribute attr = attributes.get(attrName.toLowerCase());
+            return attr != null ? (String) attr.get() : "";
+        } catch (Exception e) {
+            log.debug("Can't extract '" + attrName + "' from ldap attributes");
+            return "";
+        }
     }
 
     @NotNull
@@ -171,7 +180,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         return environment;
     }
 
-    private String findUserDN(DirContext serviceContext, LdapSettings ldapSettings, String userIdentifier) throws DBException {
+    protected String findUserDN(DirContext serviceContext, LdapSettings ldapSettings, String userIdentifier) throws DBException {
 
         SearchControls searchControls = new SearchControls();
         searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
@@ -356,7 +365,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         SearchControls searchControls = new SearchControls();
         searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         searchControls.setTimeLimit(30_000);
-        searchControls.setReturningAttributes(new String[]{LDAP_ATTRIBUTE_OBJECT_GUID, LDAP_ATTRIBUTE_ENTRY_UUID});
+        searchControls.setReturningAttributes(new String[]{"*", "+"});
         return searchControls;
     }
 
@@ -383,11 +392,14 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                 if (userId == null) {
                     userId = getAttributeValue(attributes, "entryUUID");
                 }
+
+                doCustomModifyUserDataAfterAuthentication(ldapSettings, attributes, userData);
             }
             userData.putIfAbsent(LdapConstants.CRED_USERNAME, CommonUtils.isNotEmpty(userId) ? userId : login);
             userData.put(LdapConstants.CRED_USER_DN, userDN);
             userData.put(LdapConstants.CRED_DISPLAY_NAME, findUserNameFromDN(userDN, ldapSettings));
             userData.put(LdapConstants.CRED_SESSION_ID, UUID.randomUUID());
+
             return userData;
         } catch (Exception e) {
             throw new DBException("LDAP authentication failed: " + e.getMessage(), e);
@@ -402,72 +414,6 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         }
     }
 
-    @NotNull
-    @Override
-    public SMAutoAssign detectAutoAssignments(
-        @NotNull DBRProgressMonitor monitor,
-        @NotNull SMAuthProviderCustomConfiguration providerConfig,
-        @NotNull Map<String, Object> authParameters
-    ) throws DBException {
-        String userName = JSONUtils.getString(authParameters, LdapConstants.CRED_USERNAME);
-        if (CommonUtils.isEmpty(userName)) {
-            throw new DBException("LDAP user name is empty");
-        }
-
-        LdapSettings ldapSettings = new LdapSettings(providerConfig);
-        String fullDN = JSONUtils.getString(authParameters, LdapConstants.CRED_USER_DN);
-        String userDN;
-        if (!CommonUtils.isEmpty(fullDN)) {
-            userDN = fullDN;
-        } else {
-            userDN = getUserDN(ldapSettings, JSONUtils.getString(authParameters, LdapConstants.CRED_DISPLAY_NAME));
-        }
-        if (userDN == null) {
-            return new SMAutoAssign();
-        }
-
-        SMAutoAssign smAutoAssign = new SMAutoAssign();
-        smAutoAssign.addExternalTeamId(userDN);
-
-        String groupDN = getGroupForMember(userDN, ldapSettings);
-        if (groupDN != null) {
-            smAutoAssign.addExternalTeamId(groupDN);
-        }
-
-        return smAutoAssign;
-    }
-
-    private String getUserDN(LdapSettings ldapSettings, String displayName) {
-        DirContext context;
-        try {
-            context = new InitialDirContext(creteAuthEnvironment(ldapSettings));
-            return findUserDN(context, ldapSettings, displayName);
-        } catch (Exception e) {
-            log.error("User not found", e);
-            return null;
-        }
-    }
-
-    private String getGroupForMember(String fullDN, LdapSettings ldapSettings) {
-        DirContext context;
-        try {
-            context = new InitialDirContext(creteAuthEnvironment(ldapSettings));
-            String searchFilter = "(member=" + fullDN + ")";
-            SearchControls searchControls = new SearchControls();
-            searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-
-            NamingEnumeration<SearchResult> results = context.search(ldapSettings.getBaseDN(), searchFilter, searchControls);
-            if (results.hasMore()) {
-                return results.next().getName();
-            }
-        } catch (Exception e) {
-            log.error("Group not found", e);
-        }
-        return null;
-    }
-
-    @Override
-    public String getExternalTeamIdMetadataFieldName() {
-        return LdapConstants.LDAP_META_GROUP_NAME;
+    protected void doCustomModifyUserDataAfterAuthentication(LdapSettings ldapSettings, Attributes attributes, Map<String, Object> userData) {
     }
 }

@@ -2527,7 +2527,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     createUser(
                         dbCon,
                         userId,
-                        Map.of(),
+                        (Map<String, String>) userCredentials.get(SMStandardMeta.KEY_META_PARAMS),
                         true,
                         resolveUserAuthRole(null, authRole)
                     );
