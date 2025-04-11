@@ -40,29 +40,26 @@ public class WebProductInfo {
 
     @Property
     public String getId() {
-        return provideSensitiveInformation ? CommonUtils.notEmpty(Platform.getProduct().getId()) : "";
+        return CommonUtils.notEmpty(Platform.getProduct().getId());
     }
 
     @Property
     public String getVersion() {
-        return provideSensitiveInformation ? GeneralUtils.getProductVersion().toString() : "";
+        return GeneralUtils.getProductVersion().toString();
     }
 
     @Property
     public String getName() {
-        return provideSensitiveInformation ? CommonUtils.notEmpty(Platform.getProduct().getName()) : "";
+        return CommonUtils.notEmpty(Platform.getProduct().getName());
     }
 
     @Property
     public String getDescription() {
-        return provideSensitiveInformation ? CommonUtils.notEmpty(Platform.getProduct().getDescription()) : "";
+        return CommonUtils.notEmpty(Platform.getProduct().getDescription());
     }
 
     @Property
     public String getBuildTime() {
-        if (!provideSensitiveInformation) {
-            return "";
-        }
         Date buildTime = GeneralUtils.getProductBuildTime();
         if (buildTime == null) {
             buildTime = new Date();
@@ -72,9 +69,7 @@ public class WebProductInfo {
 
     @Property
     public String getReleaseTime() {
-        return provideSensitiveInformation
-            ? DateFormat.getDateInstance(DateFormat.LONG).format(GeneralUtils.getProductReleaseDate())
-            : "";
+        return DateFormat.getDateInstance(DateFormat.LONG).format(GeneralUtils.getProductReleaseDate());
     }
 
     @Property
@@ -86,18 +81,12 @@ public class WebProductInfo {
 
     @Property
     public String getLatestVersionInfo() {
-        if (!provideSensitiveInformation) {
-            return "";
-        }
         IProduct product = Platform.getProduct();
         return CommonUtils.notEmpty(product.getProperty("versionUpdateURL"));
     }
 
     @Property
     public String getProductPurchaseURL() {
-        if (!provideSensitiveInformation) {
-            return "";
-        }
         IProduct product = Platform.getProduct();
         return CommonUtils.notEmpty(product.getProperty("productPurchaseURL"));
     }

@@ -53,7 +53,7 @@ public class WebServerConfig {
 
     @Property
     public String getVersion() {
-        return provideSensitiveInformation ? GeneralUtils.getProductVersion().toString() : "";
+        return GeneralUtils.getProductVersion().toString();
     }
 
     @Property
@@ -174,7 +174,7 @@ public class WebServerConfig {
 
     @Property
     public String[] getDisabledDrivers() {
-        return provideSensitiveInformation ? application.getAppConfiguration().getDisabledDrivers() : new String[]{};
+        return application.getAppConfiguration().getDisabledDrivers();
     }
 
     @Property
