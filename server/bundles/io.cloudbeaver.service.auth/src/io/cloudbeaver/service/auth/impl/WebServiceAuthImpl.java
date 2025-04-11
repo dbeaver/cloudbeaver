@@ -34,6 +34,7 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.auth.*;
 import io.cloudbeaver.service.auth.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.service.security.SMUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -286,7 +287,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     @Override
-    public WebAuthProviderInfo[] getAuthProviders() {
+    public WebAuthProviderInfo[] getAuthProviders(@NotNull HttpServletRequest request) {
         return WebAuthProviderRegistry.getInstance().getAuthProviders()
             .stream().map(WebAuthProviderInfo::new)
             .toArray(WebAuthProviderInfo[]::new);

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ public class CBConstants {
     public static final String PARAM_SERVER_PORT = "serverPort";
     public static final String PARAM_SERVER_HOST = "serverHost";
     public static final String PARAM_SERVER_NAME = "serverName";
+    public static final String PARAM_SECURE_COOKIES = "secureCookies";
     public static final String PARAM_SSL_CONFIGURATION_PATH = "sslConfigurationPath";
     public static final String PARAM_CONTENT_ROOT = "contentRoot";
     public static final String PARAM_SERVER_URL = "serverURL";

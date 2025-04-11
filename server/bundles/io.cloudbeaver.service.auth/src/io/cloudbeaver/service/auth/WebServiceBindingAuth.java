@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.auth;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.auth.impl.WebServiceAuthImpl;
@@ -65,7 +66,7 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 CommonUtils.toBoolean(env.getArgument("linkUser"))
             ))
             .dataFetcher("activeUser", env -> getService(env).activeUser(getWebSession(env, false)))
-            .dataFetcher("authProviders", env -> getService(env).getAuthProviders())
+            .dataFetcher("authProviders", env -> getService(env).getAuthProviders(GraphQLEndpoint.getServletRequest(env)))
             .dataFetcher("authChangeLocalPassword", env -> getService(env).changeLocalPassword(
                 getWebSession(env),
                 env.getArgument("oldPassword"),
