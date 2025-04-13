@@ -25,8 +25,4 @@
         </eventHandler>
     </extension>
 
-    <extension point="org.jkiss.dbeaver.ws.event">
-        <event topicId="cb_session" id="cb_web_session_auth"
-               class="io.cloudbeaver.service.auth.handler.WebSessionAuthEvent"/>
-    </extension>
 </plugin>
