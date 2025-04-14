@@ -126,12 +126,12 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
       this.promise = this.loader();
 
       await this.promise;
-      this.loaded = true;
       this.exception = null;
       await this.formState.loadedTask.execute(this.formState);
     } catch (exception: any) {
       this.exception = exception;
     } finally {
+      this.loaded = true;
       this.promise = null;
       this.loading = false;
     }
@@ -156,9 +156,11 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
   }
 
   protected setInitialState(initialState: TPartState) {
+    const isChanged = this.isChanged;
+
     this.initialState = initialState;
 
-    if (this.isChanged) {
+    if (isChanged) {
       return;
     }
 

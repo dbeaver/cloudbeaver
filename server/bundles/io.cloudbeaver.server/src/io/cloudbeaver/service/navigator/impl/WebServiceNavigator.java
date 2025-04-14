@@ -30,6 +30,7 @@ import io.cloudbeaver.service.navigator.WebCatalog;
 import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
 import io.cloudbeaver.service.navigator.WebStructContainers;
 import io.cloudbeaver.service.security.SMUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
@@ -128,6 +129,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                                 nodeId,
                                 parentPath)
                         );
+                        continue;
+                    }
+                    var customConnectionsEnabled =
+                        ServletAppUtils.getServletApplication().getAppConfiguration().isSupportsCustomConnections()
+                            || SMUtils.isRMAdmin(session);
+                    if (node instanceof DBNProject project && !customConnectionsEnabled && project.getProject().isPrivateProject()) {
                         continue;
                     }
                     nodeIds.add(node.getNodeUri());

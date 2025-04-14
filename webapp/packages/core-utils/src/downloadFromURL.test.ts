@@ -1,21 +1,21 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, type Mock, vi, afterEach } from 'vitest';
 
 import { downloadFromURL } from './downloadFromURL.js';
 
 type MockXHR = {
-  open: jest.Mock;
-  send: jest.Mock;
-  setRequestHeader: jest.Mock;
+  open: Mock;
+  send: Mock;
+  setRequestHeader: Mock;
   responseType: string;
-  onload: jest.Mock;
-  onerror: jest.Mock;
+  onload: Mock;
+  onerror: Mock;
   response: Blob | null;
 };
 
@@ -23,24 +23,25 @@ describe('downloadFromURL', () => {
   let mockXHR: MockXHR;
 
   beforeEach(() => {
+    vi.useFakeTimers();
     mockXHR = {
-      open: jest.fn(),
-      send: jest.fn(),
-      setRequestHeader: jest.fn(),
+      open: vi.fn(),
+      send: vi.fn(),
+      setRequestHeader: vi.fn(),
       responseType: '',
-      onload: jest.fn(),
-      onerror: jest.fn(),
+      onload: vi.fn(),
+      onerror: vi.fn(),
       response: null,
     };
 
-    (global as any).XMLHttpRequest = jest.fn(() => mockXHR);
+    (globalThis as any).XMLHttpRequest = vi.fn(() => mockXHR);
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.useRealTimers();
   });
 
-  it('should open and send request to the specified URL', async () => {
+  it('should open and send request to the specified URL', () => {
     const url = 'http://example.com/test';
     downloadFromURL(url);
 
@@ -57,7 +58,9 @@ describe('downloadFromURL', () => {
     }, 0);
 
     const url = 'http://example.com/test';
-    const result = await downloadFromURL(url);
+    const resultPromise = downloadFromURL(url);
+    vi.advanceTimersByTime(1);
+    const result = await resultPromise;
 
     expect(mockXHR.responseType).toBe('blob');
     expect(result).toBe(mockBlob);
@@ -71,8 +74,11 @@ describe('downloadFromURL', () => {
     }, 0);
 
     const url = 'http://example.com/test';
+    const promise = downloadFromURL(url);
 
-    await expect(downloadFromURL(url)).rejects.toThrow('Network error');
+    vi.advanceTimersByTime(1);
+
+    await expect(promise).rejects.toThrow('Network error');
     expect(mockXHR.responseType).toBe('blob');
   });
 });

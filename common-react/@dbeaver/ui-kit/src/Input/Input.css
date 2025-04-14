@@ -2,74 +2,76 @@
 @import './_sizes.css';
 @import './_variants.css';
 
-.dbv-kit-input-wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-.dbv-kit-input {
-  background: var(--dbv-kit-input-background);
-  border-radius: var(--dbv-kit-input-radius);
-  border-color: var(--dbv-kit-input-border-color);
-  border-width: var(--dbv-kit-input-border-width);
-  border-style: var(--dbv-kit-input-border-style);
-  color: var(--dbv-kit-input-foreground);
-  padding-inline: var(--dbv-kit-input-padding);
-  font-size: var(--dbv-kit-input-font-size);
-  height: var(--dbv-kit-input-height);
-
-  &:not(:disabled):hover {
-    border-color: var(--dbv-kit-color-control-hover);
+@layer base {
+  .dbv-kit-input-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
   }
 
-  &:disabled {
-    cursor: not-allowed;
-    opacity: var(--dbv-kit-control-disabled-opacity);
+  .dbv-kit-input {
+    background: var(--dbv-kit-input-background);
+    border-radius: var(--dbv-kit-input-radius);
+    border-color: var(--dbv-kit-input-border-color);
+    border-width: var(--dbv-kit-input-border-width);
+    border-style: var(--dbv-kit-input-border-style);
+    color: var(--dbv-kit-input-foreground);
+    padding-inline: var(--dbv-kit-input-padding);
+    font-size: var(--dbv-kit-input-font-size);
+    height: var(--dbv-kit-input-height);
+
+    &:not(:disabled):hover {
+      border-color: var(--dbv-kit-color-control-hover);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: var(--dbv-kit-control-disabled-opacity);
+    }
+
+    &::placeholder {
+      color: var(--dbv-kit-input-placeholder-foreground);
+    }
+
+    &:focus-visible,
+    &[data-focus-visible] {
+      outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-control-outline-color);
+      outline-offset: var(--dbv-kit-control-outline-offset);
+    }
   }
 
-  &::placeholder {
-    color: var(--dbv-kit-input-placeholder-foreground);
+  .dbv-kit-input__title {
+    color: var(--dbv-kit-input-label-foreground);
+    padding-inline-start: var(--dbv-kit-input-label-padding);
+    margin-block-end: var(--tw-spacing);
   }
 
-  &:focus-visible,
-  &[data-focus-visible] {
-    outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-control-outline-color);
-    outline-offset: var(--dbv-kit-control-outline-offset);
+  .dbv-kit-input__title--required {
+    &:after {
+      content: '*';
+      color: var(--dbv-kit-color-control-required);
+      margin-inline-start: 0.125rem;
+    }
   }
-}
 
-.dbv-kit-input__title {
-  color: var(--dbv-kit-input-label-foreground);
-  padding-inline-start: var(--dbv-kit-input-label-padding);
-  margin-block-end: var(--tw-spacing);
-}
+  /* ---------------------------- */
+  /* Sizes */
 
-.dbv-kit-input__title--required {
-  &:after {
-    content: '*';
-    color: var(--dbv-kit-color-control-required);
-    margin-inline-start: 0.125rem;
+  .dbv-kit-input--small {
+    --dbv-kit-input-height: var(--dbv-kit-input-small-height);
+    --dbv-kit-input-padding: var(--dbv-kit-input-small-padding);
+    --dbv-kit-input-font-size: var(--dbv-kit-input-small-font-size);
   }
-}
 
-/* ---------------------------- */
-/* Sizes */
+  .dbv-kit-input--large {
+    --dbv-kit-input-height: var(--dbv-kit-input-large-height);
+    --dbv-kit-input-padding: var(--dbv-kit-input-large-padding);
+    --dbv-kit-input-font-size: var(--dbv-kit-input-large-font-size);
+  }
 
-.dbv-kit-input--small {
-  --dbv-kit-input-height: var(--dbv-kit-input-small-height);
-  --dbv-kit-input-padding: var(--dbv-kit-input-small-padding);
-  --dbv-kit-input-font-size: var(--dbv-kit-input-small-font-size);
-}
-
-.dbv-kit-input--large {
-  --dbv-kit-input-height: var(--dbv-kit-input-large-height);
-  --dbv-kit-input-padding: var(--dbv-kit-input-large-padding);
-  --dbv-kit-input-font-size: var(--dbv-kit-input-large-font-size);
-}
-
-.dbv-kit-input--xlarge {
-  --dbv-kit-input-height: var(--dbv-kit-input-xlarge-height);
-  --dbv-kit-input-padding: var(--dbv-kit-input-xlarge-padding);
-  --dbv-kit-input-font-size: var(--dbv-kit-input-xlarge-font-size);
+  .dbv-kit-input--xlarge {
+    --dbv-kit-input-height: var(--dbv-kit-input-xlarge-height);
+    --dbv-kit-input-padding: var(--dbv-kit-input-xlarge-padding);
+    --dbv-kit-input-font-size: var(--dbv-kit-input-xlarge-font-size);
+  }
 }

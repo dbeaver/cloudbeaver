@@ -6,8 +6,8 @@ to: <%= name %>/tsconfig.json
   "extends": "<%= isEE ? '../../../../cloudbeaver/webapp/tsconfig.base.json' : '../../tsconfig.base.json' %>",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "outDir": "lib",
+    "tsBuildInfoFile": "lib/tsconfig.tsbuildinfo",
     "composite": true,
   },
   "references": [
@@ -24,7 +24,6 @@ to: <%= name %>/tsconfig.json
   ],
   "exclude": [
     "**/node_modules",
-    "lib/**/*",
-    "dist/**/*"
+    "lib/**/*"
   ]
 }

@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.security;
 
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
+import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.app.ServletAuthApplication;
 import io.cloudbeaver.model.config.SMControllerConfiguration;
 import io.cloudbeaver.model.config.WebDatabaseConfig;
@@ -73,7 +74,7 @@ public class EmbeddedSecurityControllerFactory<T extends ServletAuthApplication>
         @NotNull WebDatabaseConfig databaseConfig,
         @NotNull SMControllerConfiguration smConfig
     ) throws DBException {
-        var database = new CBDatabase(application, databaseConfig);
+        var database = makeDatabase(application, databaseConfig);
         var securityController = createEmbeddedSecurityController(
             application, database, new NoAuthCredentialsProvider(), smConfig
         );
@@ -96,5 +97,9 @@ public class EmbeddedSecurityControllerFactory<T extends ServletAuthApplication>
         SMControllerConfiguration smConfig
     ) {
         return new CBEmbeddedSecurityController<T>(application, database, credentialsProvider, smConfig);
+    }
+
+    protected CBDatabase makeDatabase(ServletApplication application, WebDatabaseConfig databaseConfig) {
+        return new CBDatabase(application, databaseConfig);
     }
 }

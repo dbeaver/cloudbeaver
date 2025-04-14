@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterAll, beforeAll, beforeEach, expect, jest } from '@jest/globals';
+import { afterAll, beforeAll, beforeEach, expect, vitest, type MockInstance } from 'vitest';
 
 let knownLogPatterns: any[][] = [];
 let knownWarnPatterns: any[][] = [];
@@ -13,28 +13,28 @@ let knownErrorPatterns: any[][] = [];
 let knownInfoPatterns: any[][] = [];
 let knownDebugPatterns: any[][] = [];
 
-let logSpy: jest.Spied<typeof console.log>;
-let warnSpy: jest.Spied<typeof console.warn>;
-let errorSpy: jest.Spied<typeof console.error>;
-let infoSpy: jest.Spied<typeof console.info>;
-let debugSpy: jest.Spied<typeof console.debug>;
+let logSpy: MockInstance;
+let warnSpy: MockInstance;
+let errorSpy: MockInstance;
+let infoSpy: MockInstance;
+let debugSpy: MockInstance;
 
 beforeAll(() => {
-  logSpy = jest.spyOn(console, 'log').mockImplementation((...args) => {
+  logSpy = vitest.spyOn(console, 'log').mockImplementation((...args) => {
     if (filterPatterns(knownLogPatterns, args)) {
       return;
     }
     expect(logSpy).not.toHaveBeenCalledWith(...args);
   });
-  warnSpy = jest.spyOn(console, 'warn').mockImplementation((...args) => {
+  warnSpy = vitest.spyOn(console, 'warn').mockImplementation((...args) => {
     if (filterPatterns(knownWarnPatterns, args)) {
       return;
     }
     expect(warnSpy).not.toHaveBeenCalledWith(...args);
   });
-  errorSpy = jest.spyOn(console, 'error').mockImplementation((...args) => {
+  errorSpy = vitest.spyOn(console, 'error').mockImplementation((...args) => {
     if (args[0] && String(args[0]).includes('Expected:')) {
-      // skip exceptions from jest expect
+      // skip exceptions from vitest expect
       return;
     }
     if (args[0] && String(args[0]).includes('Error: Uncaught')) {
@@ -46,13 +46,13 @@ beforeAll(() => {
     }
     expect(errorSpy).not.toHaveBeenCalledWith(...args);
   });
-  infoSpy = jest.spyOn(console, 'info').mockImplementation((...args) => {
+  infoSpy = vitest.spyOn(console, 'info').mockImplementation((...args) => {
     if (filterPatterns(knownInfoPatterns, args)) {
       return;
     }
     expect(infoSpy).not.toHaveBeenCalledWith(...args);
   });
-  debugSpy = jest.spyOn(console, 'debug').mockImplementation((...args) => {
+  debugSpy = vitest.spyOn(console, 'debug').mockImplementation((...args) => {
     if (filterPatterns(knownDebugPatterns, args)) {
       return;
     }

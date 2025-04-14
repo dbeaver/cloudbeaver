@@ -6,4 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export default 'test-file-stub';
+ .nullValue {
+  text-transform: uppercase;
+  opacity: 0.65;
+}
