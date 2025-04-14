@@ -103,7 +103,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private boolean isSubjectExists(String subjectId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT 1 FROM {table_prefix}CB_AUTH_SUBJECT WHERE SUBJECT_ID=?"))
+                "SELECT 1 FROM {table_prefix}CB_AUTH_SUBJECT WHERE SUBJECT_ID=?")
             ) {
                 dbStat.setString(1, subjectId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -158,8 +158,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     ) throws DBException, SQLException {
         createAuthSubject(dbCon, userId, SMSubjectType.user, true);
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER" +
-                "(USER_ID,IS_ACTIVE,CREATE_TIME,DEFAULT_AUTH_ROLE) VALUES(?,?,?,?)"))
+            "INSERT INTO {table_prefix}CB_USER" +
+                "(USER_ID,IS_ACTIVE,CREATE_TIME,DEFAULT_AUTH_ROLE) VALUES(?,?,?,?)")
         ) {
             dbStat.setString(1, userId);
             dbStat.setString(2, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
@@ -212,7 +212,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 deleteAuthSubject(dbCon, userId);
                 JDBCUtils.executeStatement(
                     dbCon,
-                    database.normalizeTableNames("DELETE FROM {table_prefix}CB_USER WHERE USER_ID=?"),
+                    "DELETE FROM {table_prefix}CB_USER WHERE USER_ID=?",
                     userId
                 );
                 txn.commit();
@@ -276,8 +276,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (
             var dbCon = database.openConnection();
             PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("UPDATE {table_prefix}CB_USER_TEAM " +
-                    "SET TEAM_ROLE=? WHERE USER_ID=? AND TEAM_ID=?"))
+                "UPDATE {table_prefix}CB_USER_TEAM " +
+                    "SET TEAM_ROLE=? WHERE USER_ID=? AND TEAM_ID=?")
         ) {
             JDBCUtils.setStringOrNull(dbStat, 1, teamRole);
             dbStat.setString(2, userId);
@@ -298,7 +298,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             deleteUserTeamsSql =
                 deleteUserTeamsSql + " AND TEAM_ID NOT IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
         }
-        try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(deleteUserTeamsSql))) {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(deleteUserTeamsSql)) {
             int index = 1;
             dbStat.setString(index++, userId);
             for (String teamId : teamIds) {
@@ -315,8 +315,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             Set<String> currentUserTeams = getCurrentUserTeams(dbCon, userId);
 
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM" +
-                    "(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)"))
+                "INSERT INTO {table_prefix}CB_USER_TEAM" +
+                    "(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")
             ) {
                 for (String teamId : teamIds) {
                     if (currentUserTeams.contains(teamId)) {
@@ -336,7 +336,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private Set<String> getCurrentUserTeams(@NotNull Connection dbCon, String userId) throws SQLException {
         return new HashSet<>(JDBCUtils.queryStrings(
             dbCon,
-            database.normalizeTableNames("SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"),
+            "SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?",
             userId
         ));
     }
@@ -359,8 +359,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         Set<String> currentUserTeams = getCurrentUserTeams(dbCon, userId);
 
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM" +
-                "(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)"))
+            "INSERT INTO {table_prefix}CB_USER_TEAM" +
+                "(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")
         ) {
             for (String teamId : teamIds) {
                 if (currentUserTeams.contains(teamId)) {
@@ -383,7 +383,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         String deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? " +
                 "AND TEAM_ID IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
 
-        try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(deleteUserTeamsSql))) {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(deleteUserTeamsSql)) {
             int index = 1;
             dbStat.setString(index, userId);
             for (String teamId : teamIds) {
@@ -400,11 +400,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         Map<String, SMUserTeam> teams = new LinkedHashMap<>();
         try (Connection dbCon = database.openConnection()) {
             String defaultUserTeam = getDefaultUserTeam();
-            try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT R.*,S.IS_SECRET_STORAGE,UR.TEAM_ROLE FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R, " +
                     "{table_prefix}CB_AUTH_SUBJECT S " +
                         "WHERE UR.USER_ID=? AND UR.TEAM_ID = R.TEAM_ID " +
-                        "AND S.SUBJECT_ID IN (R.TEAM_ID,?)"))
+                        "AND S.SUBJECT_ID IN (R.TEAM_ID,?)")
             ) {
                 dbStat.setString(1, userId);
                 dbStat.setString(2, defaultUserTeam);
@@ -427,7 +427,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         Set<String> allSubjects = new HashSet<>();
         allSubjects.add(subjectId);
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            database.normalizeTableNames("SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM UR WHERE USER_ID=?"))
+            "SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM UR WHERE USER_ID=?")
         ) {
             dbStat.setString(1, subjectId);
             try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -450,11 +450,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             SMUser user;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames(
+                
                     "SELECT U.USER_ID,U.IS_ACTIVE,U.DEFAULT_AUTH_ROLE,S.IS_SECRET_STORAGE FROM " +
                         "{table_prefix}CB_USER U, {table_prefix}CB_AUTH_SUBJECT S " +
                         "WHERE U.USER_ID=? AND U.USER_ID=S.SUBJECT_ID")
-            )) {
+            ) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
@@ -466,8 +466,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
             readSubjectMetas(dbCon, user);
             // Teams
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"))
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?")
             ) {
                 String defaultUserTeam = getDefaultUserTeam();
                 dbStat.setString(1, userId);
@@ -495,8 +494,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     @Override
     public int countUsers(@NotNull SMUserFilter filter) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
-                "SELECT COUNT(*) FROM {table_prefix}CB_USER" + buildUsersFilter(filter)))) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                "SELECT COUNT(*) FROM {table_prefix}CB_USER" + buildUsersFilter(filter))) {
                 setUsersFilterValues(dbStat, filter, 1);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
@@ -525,8 +524,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             Map<String, SMUser> result = new LinkedHashMap<>();
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER"
-                    + buildUsersFilter(filter) + "\nORDER BY USER_ID " + getOffsetLimitPart(filter)))) {
+                "SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER"
+                    + buildUsersFilter(filter) + "\nORDER BY USER_ID " + getOffsetLimitPart(filter))) {
                 setUsersFilterValues(dbStat, filter, 1);
 
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -547,7 +546,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 "SELECT USER_ID,TEAM_ID FROM {table_prefix}CB_USER_TEAM\n" +
                 "WHERE USER_ID IN (" + SQLUtils.generateParamList(result.size()) + ")";
             // Read teams
-            try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(teamsSql))) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(teamsSql)) {
                 int parameterIndex = 1;
                 for (String userId : result.keySet()) {
                     dbStat.setString(parameterIndex++, userId);
@@ -604,7 +603,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private void cleanupSubjectMeta(Connection dbCon, String subjectId) throws SQLException {
         // Delete old metas
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            database.normalizeTableNames("DELETE FROM {table_prefix}CB_SUBJECT_META WHERE SUBJECT_ID=?"))
+            "DELETE FROM {table_prefix}CB_SUBJECT_META WHERE SUBJECT_ID=?")
         ) {
             dbStat.setString(1, subjectId);
             dbStat.execute();
@@ -614,7 +613,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private void readSubjectMetas(Connection dbCon, SMSubject subject) throws SQLException {
         // Metas
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            database.normalizeTableNames("SELECT META_ID,META_VALUE FROM {table_prefix}CB_SUBJECT_META WHERE SUBJECT_ID=?"))
+            "SELECT META_ID,META_VALUE FROM {table_prefix}CB_SUBJECT_META WHERE SUBJECT_ID=?")
         ) {
             dbStat.setString(1, subject.getSubjectId());
             try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -632,10 +631,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                                    Map<String, ? extends SMSubject> result) throws SQLException {
         // Read metas
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            database.normalizeTableNames("SELECT m.SUBJECT_ID,m.META_ID,m.META_VALUE FROM {table_prefix}CB_AUTH_SUBJECT s, " +
+            "SELECT m.SUBJECT_ID,m.META_ID,m.META_VALUE FROM {table_prefix}CB_AUTH_SUBJECT s, " +
                 "{table_prefix}CB_SUBJECT_META m\n" +
                 "WHERE s.SUBJECT_TYPE=? AND s.SUBJECT_ID=m.SUBJECT_ID" +
-                (CommonUtils.isEmpty(userIdMask) ? "" : " AND s.SUBJECT_ID LIKE ?")))
+                (CommonUtils.isEmpty(userIdMask) ? "" : " AND s.SUBJECT_ID LIKE ?"))
         ) {
             dbStat.setString(1, subjectType.getCode());
             if (!CommonUtils.isEmpty(userIdMask)) {
@@ -659,7 +658,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private void saveSubjectMetas(Connection dbCon, String subjectId, Map<String, String> metaParameters) throws SQLException {
         if (!CommonUtils.isEmpty(metaParameters)) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("INSERT INTO {table_prefix}CB_SUBJECT_META(SUBJECT_ID,META_ID,META_VALUE) VALUES(?,?,?)"))
+                "INSERT INTO {table_prefix}CB_SUBJECT_META(SUBJECT_ID,META_ID,META_VALUE) VALUES(?,?,?)")
             ) {
                 dbStat.setString(1, subjectId);
                 for (Map.Entry<String, String> mp : metaParameters.entrySet()) {
@@ -678,7 +677,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             Map<String, Object> result = new LinkedHashMap<>();
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT * FROM {table_prefix}CB_USER_PREFERENCES WHERE USER_ID=?"))
+                "SELECT * FROM {table_prefix}CB_USER_PREFERENCES WHERE USER_ID=?")
             ) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -714,8 +713,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         if (value == null) {
             // Delete old metas
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames(
-                    "DELETE FROM {table_prefix}CB_USER_PREFERENCES WHERE USER_ID=? AND PREFERENCE_ID=?"))
+                "DELETE FROM {table_prefix}CB_USER_PREFERENCES WHERE USER_ID=? AND PREFERENCE_ID=?")
             ) {
                 dbStat.setString(1, userId);
                 dbStat.setString(2, name);
@@ -725,8 +723,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             // Update/Insert parameter
             boolean updated;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("UPDATE {table_prefix}CB_USER_PREFERENCES " +
-                    "SET PREFERENCE_VALUE=? WHERE USER_ID=? AND PREFERENCE_ID=?"))
+                "UPDATE {table_prefix}CB_USER_PREFERENCES SET PREFERENCE_VALUE=? WHERE USER_ID=? AND PREFERENCE_ID=?")
             ) {
                 dbStat.setString(1, CommonUtils.toString(value));
                 dbStat.setString(2, userId);
@@ -735,8 +732,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
             if (!updated) {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_PREFERENCES " +
-                        "(USER_ID,PREFERENCE_ID,PREFERENCE_VALUE) VALUES(?,?,?)"))
+                    "INSERT INTO {table_prefix}CB_USER_PREFERENCES (USER_ID,PREFERENCE_ID,PREFERENCE_VALUE) VALUES(?,?,?)")
                 ) {
                     dbStat.setString(1, userId);
                     dbStat.setString(2, name);
@@ -771,8 +767,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     public void enableUser(Connection dbCon, String userId, boolean enabled) throws SQLException {
-        try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
-            "UPDATE {table_prefix}CB_USER SET IS_ACTIVE=? WHERE USER_ID=?"))) {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            "UPDATE {table_prefix}CB_USER SET IS_ACTIVE=? WHERE USER_ID=?")) {
             dbStat.setString(1, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
             dbStat.setString(2, userId);
             dbStat.executeUpdate();
@@ -797,7 +793,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     public void setUserAuthRole(@NotNull Connection dbCon, @NotNull String userId, @Nullable String authRole)
         throws DBException, SQLException {
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            database.normalizeTableNames("UPDATE {table_prefix}CB_USER SET DEFAULT_AUTH_ROLE=? WHERE USER_ID=?"))) {
+            "UPDATE {table_prefix}CB_USER SET DEFAULT_AUTH_ROLE=? WHERE USER_ID=?")) {
             if (authRole == null) {
                 dbStat.setNull(1, Types.VARCHAR);
             } else {
@@ -880,15 +876,15 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 JDBCUtils.executeStatement(
                     dbCon,
-                    database.normalizeTableNames("DELETE FROM {table_prefix}CB_USER_CREDENTIALS WHERE USER_ID=? AND PROVIDER_ID=?"),
+                    "DELETE FROM {table_prefix}CB_USER_CREDENTIALS WHERE USER_ID=? AND PROVIDER_ID=?",
                     userId,
                     authProvider.getId()
                 );
                 if (!CommonUtils.isEmpty(credentials)) {
                     try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_CREDENTIALS" +
+                        "INSERT INTO {table_prefix}CB_USER_CREDENTIALS" +
                             "(USER_ID,PROVIDER_ID,CRED_ID,CRED_VALUE) VALUES(?,?,?,?)")
-                    )) {
+                    ) {
                         for (String[] cred : transformedCredentials) {
                             if (cred == null) {
                                 continue;
@@ -913,7 +909,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(
                 dbCon,
-                database.normalizeTableNames("DELETE FROM {table_prefix}CB_USER_CREDENTIALS WHERE USER_ID=? AND PROVIDER_ID=?"),
+                "DELETE FROM {table_prefix}CB_USER_CREDENTIALS WHERE USER_ID=? AND PROVIDER_ID=?",
                 userId,
                 authProviderId
             );
@@ -979,7 +975,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 .append(joinAlias).append("CRED_VALUE=?");
         }
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(sql.toString()))) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(sql.toString())) {
                 dbStat.setString(1, authProvider.getId());
                 int param = 2;
                 for (Map.Entry<String, String> credEntry : identCredentials.entrySet()) {
@@ -1026,8 +1022,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private Map<String, Object> getUserCredentials(WebAuthProviderDescriptor authProvider, String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT CRED_ID,CRED_VALUE FROM {table_prefix}CB_USER_CREDENTIALS\n" +
-                    "WHERE USER_ID=? AND PROVIDER_ID=?"))) {
+                "SELECT CRED_ID,CRED_VALUE FROM {table_prefix}CB_USER_CREDENTIALS\n" +
+                    "WHERE USER_ID=? AND PROVIDER_ID=?")) {
                 dbStat.setString(1, userId);
 
                 dbStat.setString(2, authProvider.getId());
@@ -1061,7 +1057,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     public String[] getUserLinkedProviders(@NotNull String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT DISTINCT PROVIDER_ID FROM {table_prefix}CB_USER_CREDENTIALS\n WHERE USER_ID=?"))) {
+                "SELECT DISTINCT PROVIDER_ID FROM {table_prefix}CB_USER_CREDENTIALS\n WHERE USER_ID=?")) {
                 dbStat.setString(1, userId);
 
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -1112,11 +1108,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             String defaultUserTeam = getDefaultUserTeam();
             Map<String, SMTeam> teams = new LinkedHashMap<>();
-            String query = database.normalizeTableNames(
+            String query = 
                 """
                     SELECT T.*, S.IS_SECRET_STORAGE FROM {table_prefix}CB_TEAM T, \
                     {table_prefix}CB_AUTH_SUBJECT S \
-                    WHERE T.TEAM_ID IN (S.SUBJECT_ID, ?) ORDER BY TEAM_ID""");
+                    WHERE T.TEAM_ID IN (S.SUBJECT_ID, ?) ORDER BY TEAM_ID""";
             try (PreparedStatement dbPreparedStatement = dbCon.prepareStatement(query)) {
                 dbPreparedStatement.setString(1, defaultUserTeam);
                 try (ResultSet dbResult = dbPreparedStatement.executeQuery()) {
@@ -1126,11 +1122,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     }
                 }
             }
-            query = database.normalizeTableNames("""
+            query = """
                 SELECT SUBJECT_ID,PERMISSION_ID
                 FROM {table_prefix}CB_AUTH_PERMISSIONS AP, {table_prefix}CB_TEAM R
                 WHERE AP.SUBJECT_ID IN (R.TEAM_ID,?)
-                """);
+                """;
             try (PreparedStatement dbPreparedStatement = dbCon.prepareStatement(query)) {
                 dbPreparedStatement.setString(1, defaultUserTeam);
                 try (ResultSet dbResult = dbPreparedStatement.executeQuery()) {
@@ -1168,9 +1164,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             Map<String, String> usersRoles = new LinkedHashMap<>();
             if (getDefaultUserTeam().equals(teamId)) {
-                try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("SELECT USER_ID FROM {table_prefix}CB_USER"))
-                ) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT USER_ID FROM {table_prefix}CB_USER")) {
                     try (ResultSet dbResult = dbStat.executeQuery()) {
                         while (dbResult.next()) {
                             usersRoles.put(dbResult.getString(1), null);
@@ -1179,8 +1173,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 }
             }
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames(
-                    "SELECT USER_ID,TEAM_ROLE FROM {table_prefix}CB_USER_TEAM WHERE TEAM_ID=?"))
+                "SELECT USER_ID,TEAM_ROLE FROM {table_prefix}CB_USER_TEAM WHERE TEAM_ID=?")
             ) {
                 dbStat.setString(1, teamId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -1238,8 +1231,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 createAuthSubject(dbCon, teamId, SMSubjectType.team, true);
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("INSERT INTO {table_prefix}CB_TEAM" +
-                        "(TEAM_ID,TEAM_NAME,TEAM_DESCRIPTION,CREATE_TIME) VALUES(?,?,?,?)"))) {
+                    "INSERT INTO {table_prefix}CB_TEAM" +
+                        "(TEAM_ID,TEAM_NAME,TEAM_DESCRIPTION,CREATE_TIME) VALUES(?,?,?,?)")) {
                     dbStat.setString(1, teamId);
                     dbStat.setString(2, CommonUtils.notEmpty(name));
                     dbStat.setString(3, CommonUtils.notEmpty(description));
@@ -1277,7 +1270,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("UPDATE {table_prefix}CB_TEAM SET TEAM_NAME=?,TEAM_DESCRIPTION=? WHERE TEAM_ID=?"))) {
+                    "UPDATE {table_prefix}CB_TEAM SET TEAM_NAME=?,TEAM_DESCRIPTION=? WHERE TEAM_ID=?")) {
                     dbStat.setString(1, CommonUtils.notEmpty(name));
                     dbStat.setString(2, CommonUtils.notEmpty(description));
                     dbStat.setString(3, teamId);
@@ -1301,8 +1294,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             if (!force) {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("SELECT COUNT(*) FROM {table_prefix}CB_USER_TEAM WHERE TEAM_ID=?")
-                )) {
+                    "SELECT COUNT(*) FROM {table_prefix}CB_USER_TEAM WHERE TEAM_ID=?")
+                ) {
                     dbStat.setString(1, teamId);
                     try (ResultSet dbResult = dbStat.executeQuery()) {
                         if (dbResult.next()) {
@@ -1319,13 +1312,13 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 if (force) {
                     JDBCUtils.executeStatement(
                         dbCon,
-                        database.normalizeTableNames("DELETE FROM {table_prefix}CB_USER_TEAM WHERE TEAM_ID=?"),
+                        "DELETE FROM {table_prefix}CB_USER_TEAM WHERE TEAM_ID=?",
                         teamId
                     );
                 }
                 deleteAuthSubject(dbCon, teamId);
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("DELETE FROM {table_prefix}CB_TEAM WHERE TEAM_ID=?"))) {
+                    "DELETE FROM {table_prefix}CB_TEAM WHERE TEAM_ID=?")) {
                     dbStat.setString(1, teamId);
                     dbStat.execute();
                 }
@@ -1363,7 +1356,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 JDBCUtils.executeStatement(dbCon,
-                    database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?"),
+                    "DELETE FROM {table_prefix}CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?",
                     subjectId);
                 insertPermissions(dbCon, subjectId, permissionIds.toArray(String[]::new), grantorId);
                 txn.commit();
@@ -1377,8 +1370,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private void insertPermissions(Connection dbCon, String subjectId, String[] permissionIds, String grantorId) throws SQLException {
         if (!ArrayUtils.isEmpty(permissionIds)) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("INSERT INTO {table_prefix}CB_AUTH_PERMISSIONS" +
-                    "(SUBJECT_ID,PERMISSION_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)"))
+                "INSERT INTO {table_prefix}CB_AUTH_PERMISSIONS" +
+                    "(SUBJECT_ID,PERMISSION_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")
             ) {
                 for (String permission : permissionIds) {
                     dbStat.setString(1, subjectId);
@@ -1397,7 +1390,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT PERMISSION_ID FROM {table_prefix}CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?"))) {
+                "SELECT PERMISSION_ID FROM {table_prefix}CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?")) {
                 dbStat.setString(1, subjectId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
@@ -1417,10 +1410,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames(
-                    "SELECT DISTINCT AP.PERMISSION_ID FROM {table_prefix}CB_AUTH_PERMISSIONS AP, {table_prefix}CB_USER_TEAM UR\n" +
-                        "WHERE UR.TEAM_ID = AP.SUBJECT_ID AND UR.USER_ID=?"
-                )
+                "SELECT DISTINCT AP.PERMISSION_ID FROM {table_prefix}CB_AUTH_PERMISSIONS AP, {table_prefix}CB_USER_TEAM UR\n" +
+                    "WHERE UR.TEAM_ID = AP.SUBJECT_ID AND UR.USER_ID=?"
             )) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -1430,7 +1421,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 }
             }
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT PERMISSION_ID FROM {table_prefix}CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?"))
+                "SELECT PERMISSION_ID FROM {table_prefix}CB_AUTH_PERMISSIONS WHERE SUBJECT_ID=?")
             ) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -1456,9 +1447,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     @Override
     public boolean isSessionPersisted(String id) throws DBException {
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT 1 FROM {table_prefix}CB_SESSION WHERE SESSION_ID=?"))
-            ) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement("SELECT 1 FROM {table_prefix}CB_SESSION WHERE SESSION_ID=?")) {
                 dbStat.setString(1, id);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
@@ -1481,11 +1470,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     ) throws SQLException {
         var sessionId = UUID.randomUUID().toString();
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            database.normalizeTableNames(
-                "INSERT INTO {table_prefix}CB_SESSION(SESSION_ID, APP_SESSION_ID, USER_ID,CREATE_TIME,LAST_ACCESS_TIME," +
-                    "LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT,LAST_ACCESS_INSTANCE_ID, SESSION_TYPE) " +
-                    "VALUES(?,?,?,?,?,?,?,?,?)"
-            )
+            "INSERT INTO {table_prefix}CB_SESSION(SESSION_ID, APP_SESSION_ID, USER_ID,CREATE_TIME,LAST_ACCESS_TIME," +
+                "LAST_ACCESS_REMOTE_ADDRESS,LAST_ACCESS_USER_AGENT,LAST_ACCESS_INSTANCE_ID, SESSION_TYPE) " +
+                "VALUES(?,?,?,?,?,?,?,?,?)"
         )) {
             dbStat.setString(1, sessionId);
             dbStat.setString(2, appSessionId);
@@ -1687,13 +1674,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     }
                 }
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames(
-                        "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT" +
-                            "(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,"
-                            + "SESSION_ID,IS_MAIN_AUTH,AUTH_USERNAME,FORCE_SESSION_LOGOUT,IS_SERVICE_AUTH) "
-                            +
-                            "VALUES(?,?,?,?,?,?,?,?,?,?)"
-                    )
+                    "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT" +
+                        "(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,"
+                        + "SESSION_ID,IS_MAIN_AUTH,AUTH_USERNAME,FORCE_SESSION_LOGOUT,IS_SERVICE_AUTH) "
+                        +
+                        "VALUES(?,?,?,?,?,?,?,?,?,?)"
                 )) {
                     dbStat.setString(1, authAttemptId);
                     dbStat.setString(2, status.toString());
@@ -1723,11 +1708,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 }
 
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames(
-                        "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT_INFO" +
-                            "(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) " +
-                            "VALUES(?,?,?,?)"
-                    )
+                    "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT_INFO" +
+                        "(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) " +
+                        "VALUES(?,?,?,?)"
                 )) {
                     dbStat.setString(1, authAttemptId);
                     dbStat.setString(2, authProviderId);
@@ -1746,18 +1729,16 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private List<UserLoginRecord> getLatestUserLogins(Connection dbCon, String authProviderId, String inputLogin) throws SQLException {
         List<UserLoginRecord> userLoginRecords = new ArrayList<>();
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            database.normalizeTableNames(
-                "SELECT" +
-                    "    attempt.AUTH_STATUS," +
-                    "    attempt.CREATE_TIME" +
-                    " FROM" +
-                    "    {table_prefix}CB_AUTH_ATTEMPT attempt" +
-                    "        JOIN" +
-                    "    {table_prefix}CB_AUTH_ATTEMPT_INFO info ON attempt.AUTH_ID = info.AUTH_ID" +
-                    " WHERE AUTH_PROVIDER_ID = ? AND AUTH_USERNAME = ? AND attempt.CREATE_TIME > ?" +
-                    " ORDER BY attempt.CREATE_TIME DESC " +
-                    database.getDialect().getOffsetLimitQueryPart(0, smConfig.getMaxFailedLogin())
-            )
+            "SELECT" +
+                "    attempt.AUTH_STATUS," +
+                "    attempt.CREATE_TIME" +
+                " FROM" +
+                "    {table_prefix}CB_AUTH_ATTEMPT attempt" +
+                "        JOIN" +
+                "    {table_prefix}CB_AUTH_ATTEMPT_INFO info ON attempt.AUTH_ID = info.AUTH_ID" +
+                " WHERE AUTH_PROVIDER_ID = ? AND AUTH_USERNAME = ? AND attempt.CREATE_TIME > ?" +
+                " ORDER BY attempt.CREATE_TIME DESC " +
+                database.getDialect().getOffsetLimitQueryPart(0, smConfig.getMaxFailedLogin())
         )) {
             dbStat.setString(1, authProviderId);
             dbStat.setString(2, inputLogin);
@@ -1812,9 +1793,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @Nullable String errorCode
     ) throws DBException {
         try (Connection dbCon = database.openConnection(); JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "UPDATE {table_prefix}CB_AUTH_ATTEMPT SET AUTH_STATUS=?,AUTH_ERROR=?,SESSION_ID=?,ERROR_CODE=? WHERE AUTH_ID=?"
-            ))) {
+            )) {
                 dbStat.setString(1, authStatus.toString());
                 JDBCUtils.setStringOrNull(dbStat, 2, error);
                 JDBCUtils.setStringOrNull(dbStat, 3, smSessionId);
@@ -1832,7 +1813,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 String sqlBuilder = "UPDATE {table_prefix}CB_AUTH_ATTEMPT_INFO SET AUTH_STATE=? " +
                                     "WHERE AUTH_ID=? AND AUTH_PROVIDER_ID=? AND " +
                                     (configIdExist ? "AUTH_PROVIDER_CONFIGURATION_ID=?" : "AUTH_PROVIDER_CONFIGURATION_ID IS NULL");
-                try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder))) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder)) {
                     dbStat.setString(1, authJson);
                     dbStat.setString(2, authId);
                     dbStat.setString(3, providerId.getAuthProviderId());
@@ -1841,10 +1822,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     }
                     if (dbStat.executeUpdate() <= 0) {
                         try (PreparedStatement dbStatIns = dbCon.prepareStatement(
-                            database.normalizeTableNames("INSERT INTO {table_prefix}CB_AUTH_ATTEMPT_INFO " +
-                                "(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) "
-                                + "VALUES(?,?,?,?)")
-                        )) {
+                        "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT_INFO " +
+                            "(AUTH_ID,AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE) "
+                            + "VALUES(?,?,?,?)")
+                        ) {
                             dbStatIns.setString(1, authId);
                             dbStatIns.setString(2, providerId.getAuthProviderId());
                             dbStatIns.setString(3, providerId.getAuthProviderConfigurationId());
@@ -1885,12 +1866,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             boolean isMainAuth;
             String appSessionId;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames(
-                    "SELECT AUTH_STATUS,AUTH_ERROR,SESSION_ID,IS_MAIN_AUTH,ERROR_CODE,FORCE_SESSION_LOGOUT,APP_SESSION_ID" +
-                        " FROM {table_prefix}CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
-                )
-            )
-            ) {
+                "SELECT AUTH_STATUS,AUTH_ERROR,SESSION_ID,IS_MAIN_AUTH,ERROR_CODE,FORCE_SESSION_LOGOUT,APP_SESSION_ID" +
+                    " FROM {table_prefix}CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
+            )) {
                 dbStat.setString(1, authId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (!dbResult.next()) {
@@ -1910,11 +1888,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             String signOutLink = null;
 
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames(
-                    "SELECT AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE " +
-                        "FROM {table_prefix}CB_AUTH_ATTEMPT_INFO "
-                        + "WHERE AUTH_ID=? ORDER BY CREATE_TIME"
-                )
+                """
+                    SELECT AUTH_PROVIDER_ID,AUTH_PROVIDER_CONFIGURATION_ID,AUTH_STATE \
+                    FROM {table_prefix}CB_AUTH_ATTEMPT_INFO \
+                    WHERE AUTH_ID=? ORDER BY CREATE_TIME"""
             )) {
                 dbStat.setString(1, authId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -2003,8 +1980,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
         try (var dbCon = database.openConnection()) {
             List<String> authAttemptIds = JDBCUtils.queryStrings(dbCon,
-                database.normalizeTableNames("SELECT AUTH_ID FROM {table_prefix}CB_AUTH_ATTEMPT " +
-                    "WHERE SESSION_ID=? AND AUTH_STATUS IN (?,?) ORDER BY CREATE_TIME"),
+                "SELECT AUTH_ID FROM {table_prefix}CB_AUTH_ATTEMPT " +
+                    "WHERE SESSION_ID=? AND AUTH_STATUS IN (?,?) ORDER BY CREATE_TIME",
                 smSessionId, SMAuthStatus.SUCCESS.name(), SMAuthStatus.EXPIRED.name()
             );
             List<SMAuthInfo> result = new ArrayList<>();
@@ -2049,7 +2026,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private void invalidateUserTokens(String smToken) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(
-                dbCon, database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE TOKEN_ID=?"), smToken);
+                dbCon, "DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE TOKEN_ID=?", smToken);
         } catch (SQLException e) {
             throw new DBCException("Session invalidation failed", e);
         }
@@ -2059,7 +2036,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     public void invalidateAllTokens() throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(
-                dbCon, database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_TOKEN"));
+                dbCon, "DELETE FROM {table_prefix}CB_AUTH_TOKEN");
         } catch (SQLException e) {
             throw new DBCException("Session invalidation failed", e);
         }
@@ -2069,7 +2046,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private void invalidateAllUserTokens(@NotNull String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(
-                dbCon, database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE USER_ID=?"), userId);
+                dbCon, "DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE USER_ID=?", userId);
         } catch (SQLException e) {
             throw new DBCException("Session invalidation failed", e);
         }
@@ -2087,7 +2064,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private SMTokens findTokenBySmSession(String smSessionId) throws DBException {
         try (Connection dbCon = database.openConnection();
              PreparedStatement dbStat = dbCon.prepareStatement(
-                 database.normalizeTableNames("SELECT TOKEN_ID, REFRESH_TOKEN_ID FROM {table_prefix}CB_AUTH_TOKEN WHERE SESSION_ID=?"))
+                 "SELECT TOKEN_ID, REFRESH_TOKEN_ID FROM {table_prefix}CB_AUTH_TOKEN WHERE SESSION_ID=?")
         ) {
             dbStat.setString(1, smSessionId);
             try (var dbResult = dbStat.executeQuery()) {
@@ -2105,13 +2082,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private SMTokenInfo findTokenByAppSession(@NotNull String appSessionId) throws DBException {
         try (var dbCon = database.openConnection();
              var dbStat = dbCon.prepareStatement(
-                 database.normalizeTableNames(
-                     "SELECT CAT.TOKEN_ID FROM {table_prefix}CB_AUTH_TOKEN CAT " +
-                         "  JOIN {table_prefix}CB_SESSION CS ON CAT.SESSION_ID = CS.SESSION_ID " +
-                         "  WHERE CS.APP_SESSION_ID = ? AND CAT.USER_ID IS NOT NULL " +
-                         "  AND CAT.EXPIRATION_TIME > CURRENT_TIMESTAMP" +
-                         "  ORDER BY CAT.EXPIRATION_TIME DESC"
-                 )
+                 """
+                     SELECT CAT.TOKEN_ID FROM {table_prefix}CB_AUTH_TOKEN CAT \
+                       JOIN {table_prefix}CB_SESSION CS ON CAT.SESSION_ID = CS.SESSION_ID \
+                       WHERE CS.APP_SESSION_ID = ? AND CAT.USER_ID IS NOT NULL \
+                       AND CAT.EXPIRATION_TIME > CURRENT_TIMESTAMP\
+                       ORDER BY CAT.EXPIRATION_TIME DESC"""
              )
         ) {
             dbStat.setString(1, appSessionId);
@@ -2129,10 +2105,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     private SMTokenInfo readAccessTokenInfo(String smAccessToken) throws DBException {
         try (Connection dbCon = database.openConnection();
-            PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
-                "SELECT REFRESH_TOKEN_ID,SESSION_ID,USER_ID,REFRESH_TOKEN_EXPIRATION_TIME,AUTH_ROLE,IS_SERVICE"
-                    + " FROM {table_prefix}CB_AUTH_TOKEN WHERE TOKEN_ID=?")
-             )
+            PreparedStatement dbStat = dbCon.prepareStatement(
+                """
+                    SELECT REFRESH_TOKEN_ID,SESSION_ID,USER_ID,REFRESH_TOKEN_EXPIRATION_TIME,AUTH_ROLE,IS_SERVICE\
+                     FROM {table_prefix}CB_AUTH_TOKEN WHERE TOKEN_ID=?"""
+            )
         ) {
             dbStat.setString(1, smAccessToken);
             try (var dbResult = dbStat.executeQuery()) {
@@ -2403,9 +2380,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private String readProviderConfigId(String authAttemptId, String authProviderId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT AUTH_PROVIDER_CONFIGURATION_ID " +
-                    "FROM {table_prefix}CB_AUTH_ATTEMPT_INFO "
-                    + "WHERE AUTH_ID=? AND AUTH_PROVIDER_ID=?")
+                "SELECT AUTH_PROVIDER_CONFIGURATION_ID FROM {table_prefix}CB_AUTH_ATTEMPT_INFO WHERE AUTH_ID=? AND AUTH_PROVIDER_ID=?"
             )) {
                 dbStat.setString(1, authAttemptId);
                 dbStat.setString(2, authProviderId);
@@ -2427,7 +2402,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     protected String readUserAuthRole(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER WHERE USER_ID=?")
+                "SELECT DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER WHERE USER_ID=?"
             )) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -2458,9 +2433,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private AuthAttemptSessionInfo readAuthAttemptSessionInfo(@NotNull String authId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames(
-                    "SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID,IS_MAIN_AUTH,IS_SERVICE_AUTH " +
-                        "FROM {table_prefix}CB_AUTH_ATTEMPT WHERE AUTH_ID=?")
+                """
+                    SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID,IS_MAIN_AUTH,IS_SERVICE_AUTH \
+                    FROM {table_prefix}CB_AUTH_ATTEMPT WHERE AUTH_ID=?"""
             )) {
                 dbStat.setString(1, authId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -2567,11 +2542,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         boolean isServiceToken
     ) throws SQLException, DBException {
         JDBCUtils.executeStatement(
-            dbCon, database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE SESSION_ID=?"), smSessionId);
+            dbCon, "DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE SESSION_ID=?", smSessionId);
         try (
-            PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames("INSERT INTO {table_prefix}CB_AUTH_TOKEN"
+            PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO {table_prefix}CB_AUTH_TOKEN"
                 + "(TOKEN_ID,SESSION_ID,USER_ID,AUTH_ROLE,EXPIRATION_TIME,REFRESH_TOKEN_ID,REFRESH_TOKEN_EXPIRATION_TIME,IS_SERVICE) "
-                + "VALUES(?,?,?,?,?,?,?,?)"))
+                + "VALUES(?,?,?,?,?,?,?,?)")
         ) {
 
             String smAccessToken = SecurityUtils.generatePassword(32);
@@ -2618,12 +2593,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (var dbCon = database.openConnection()) {
             try (
                 PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("SELECT DISTINCT CAT.SESSION_ID, CAT.EXPIRATION_TIME " +
+                    "SELECT DISTINCT CAT.SESSION_ID, CAT.EXPIRATION_TIME " +
                         "FROM {table_prefix}CB_AUTH_TOKEN CAT " +
                         "JOIN {table_prefix}CB_AUTH_ATTEMPT CAA ON CAA.SESSION_ID = CAT.SESSION_ID WHERE " +
                         "CAT.USER_ID=? AND CAA.AUTH_STATUS=? AND CAT.EXPIRATION_TIME>? AND CAT.IS_SERVICE=? " +
                         "ORDER BY CAT.EXPIRATION_TIME"
-                    ))
+                    )
             ) {
                 dbStat.setString(1, userId);
                 //count only tokens actually used by users
@@ -2647,7 +2622,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private void deleteSessionsTokens(@NotNull List<String> sessionsId) throws DBException {
         try (var dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE SESSION_ID = ?"))
+                    "DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE SESSION_ID = ?")
             ) {
                 for (String sessionId : sessionsId) {
                     dbStat.setString(1, sessionId);
@@ -2675,9 +2650,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         String authRole;
         try (Connection dbCon = database.openConnection();
              PreparedStatement dbStat = dbCon.prepareStatement(
-                 database.normalizeTableNames("""
+                 """
                      SELECT USER_ID, EXPIRATION_TIME, SESSION_ID, AUTH_ROLE FROM {table_prefix}CB_AUTH_TOKEN \
-                     WHERE TOKEN_ID=?"""))
+                     WHERE TOKEN_ID=?""")
         ) {
             dbStat.setString(1, token);
             try (var dbResult = dbStat.executeQuery()) {
@@ -2740,9 +2715,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         String userId = getUserIdOrNull();
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("UPDATE {table_prefix}CB_SESSION " +
-                    "SET USER_ID=?,LAST_ACCESS_TIME=?,LAST_ACCESS_REMOTE_ADDRESS=?,LAST_ACCESS_USER_AGENT=?,LAST_ACCESS_INSTANCE_ID=? " +
-                    "WHERE SESSION_ID=?"))) {
+                """
+                    UPDATE {table_prefix}CB_SESSION \
+                    SET USER_ID=?,LAST_ACCESS_TIME=?,LAST_ACCESS_REMOTE_ADDRESS=?,LAST_ACCESS_USER_AGENT=?,LAST_ACCESS_INSTANCE_ID=? \
+                    WHERE SESSION_ID=?""")) {
                 JDBCUtils.setStringOrNull(dbStat, 1, userId);
                 dbStat.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
                 JDBCUtils.setStringOrNull(dbStat, 3, CommonUtils.truncateString(CommonUtils.toString(
@@ -2788,13 +2764,13 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     .append("AND OBJECT_ID IN (");
                 appendStringParameters(sqlBuilder, objectIds);
                 sqlBuilder.append(")");
-                JDBCUtils.executeStatement(dbCon, database.normalizeTableNames(sqlBuilder.toString()), objectType.name());
+                JDBCUtils.executeStatement(dbCon, sqlBuilder.toString(), objectType.name());
                 if (!CommonUtils.isEmpty(permissions)) {
                     try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        database.normalizeTableNames(
-                            "INSERT INTO {table_prefix}CB_OBJECT_PERMISSIONS" +
-                                "(OBJECT_ID,OBJECT_TYPE,GRANT_TIME,GRANTED_BY,SUBJECT_ID,PERMISSION) "
-                                + "VALUES(?,?,?,?,?,?)"))) {
+                        """
+                            INSERT INTO {table_prefix}CB_OBJECT_PERMISSIONS\
+                            (OBJECT_ID,OBJECT_TYPE,GRANT_TIME,GRANTED_BY,SUBJECT_ID,PERMISSION) \
+                            VALUES(?,?,?,?,?,?)""")) {
                         for (String objectId : objectIds) {
                             dbStat.setString(1, objectId);
                             dbStat.setString(2, objectType.name());
@@ -2837,10 +2813,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         Set<String> filteredSubjects = getFilteredSubjects(subjectIds);
         try (Connection dbCon = database.openConnection();
              JDBCTransaction txn = new JDBCTransaction(dbCon);
-             PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
-                 "INSERT INTO {table_prefix}CB_OBJECT_PERMISSIONS" +
-                     "(OBJECT_ID,OBJECT_TYPE,GRANT_TIME,GRANTED_BY,SUBJECT_ID,PERMISSION) "
-                     + "VALUES(?,?,?,?,?,?)"))
+             PreparedStatement dbStat = dbCon.prepareStatement(
+                 """
+                     INSERT INTO {table_prefix}CB_OBJECT_PERMISSIONS\
+                     (OBJECT_ID,OBJECT_TYPE,GRANT_TIME,GRANTED_BY,SUBJECT_ID,PERMISSION) \
+                     VALUES(?,?,?,?,?,?)""")
         ) {
             for (String objectId : objectIds) {
                 dbStat.setString(1, objectId);
@@ -2887,7 +2864,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
         try (
             Connection dbCon = database.openConnection();
-            PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(sql))
+            PreparedStatement dbStat = dbCon.prepareStatement(sql)
         ) {
             int index = 1;
             dbStat.setString(index++, objectType.name());
@@ -2953,7 +2930,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     public void deleteAllObjectPermissions(@NotNull String objectId, @NotNull SMObjectType objectType) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(dbCon,
-                database.normalizeTableNames("DELETE FROM {table_prefix}CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND OBJECT_ID=?"),
+                "DELETE FROM {table_prefix}CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND OBJECT_ID=?",
                 objectType.name(),
                 objectId
             );
@@ -2978,7 +2955,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             "WHERE TEAM_ID IN (SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID = ? and TEAM_ROLE = ?) " +
             "AND UT.USER_ID IN(" + SQLUtils.generateParamList(userIds.size()) + ")";
         try (var dbCon = database.openConnection();
-             var dbStat = dbCon.prepareStatement(database.normalizeTableNames(sql))
+             var dbStat = dbCon.prepareStatement(sql)
         ) {
             dbStat.setString(1, currentUserId);
             dbStat.setString(2, teamRole);
@@ -3003,7 +2980,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     public void deleteAllSubjectObjectPermissions(@NotNull String subjectId, @NotNull SMObjectType objectType) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(dbCon,
-                database.normalizeTableNames("DELETE FROM {table_prefix}CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND SUBJECT_ID=?"),
+                "DELETE FROM {table_prefix}CB_OBJECT_PERMISSIONS WHERE OBJECT_TYPE=? AND SUBJECT_ID=?",
                 objectType.name(),
                 subjectId
             );
@@ -3036,7 +3013,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 sqlBuilder.append("WHERE SUBJECT_ID IN (");
                 appendStringParameters(sqlBuilder, allSubjects);
                 sqlBuilder.append(") AND OBJECT_TYPE=?");
-                try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder.toString()))) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
                     dbStat.setString(1, objectType.name());
 
                     var permissionsByObjectId = new LinkedHashMap<String, Set<String>>();
@@ -3072,7 +3049,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 appendStringParameters(sqlBuilder, allSubjects);
                 sqlBuilder.append(") AND OBJECT_TYPE=? AND OBJECT_ID=?");
 
-                try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder.toString()))) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
                     dbStat.setString(1, objectType.name());
                     dbStat.setString(2, objectId);
 
@@ -3098,11 +3075,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     ) throws DBException {
         var grantedPermissionsBySubjectId = new HashMap<String, SMObjectPermissionsGrant.Builder>();
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
                 """
                     SELECT OP.SUBJECT_ID,S.SUBJECT_TYPE, OP.PERMISSION
                     FROM {table_prefix}CB_OBJECT_PERMISSIONS OP, {table_prefix}CB_AUTH_SUBJECT S
-                    WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.OBJECT_TYPE=? AND OP.OBJECT_ID=?"""))) {
+                    WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.OBJECT_TYPE=? AND OP.OBJECT_ID=?""")) {
                 dbStat.setString(1, smObjectType.name());
                 dbStat.setString(2, objectId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -3137,7 +3114,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     .append("WHERE S.SUBJECT_ID = OP.SUBJECT_ID AND OP.SUBJECT_ID IN (");
             appendStringParameters(sqlBuilder, allLinkedSubjects);
             sqlBuilder.append(") AND OP.OBJECT_TYPE=?");
-            try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder.toString()))) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(sqlBuilder.toString())) {
                 dbStat.setString(1, smObjectType.name());
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
@@ -3187,8 +3164,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     protected String readTokenAuthRole(String smAccessToken) throws DBException {
         try (Connection dbCon = database.openConnection();
-             PreparedStatement dbStat = dbCon.prepareStatement(
-                 database.normalizeTableNames("SELECT AUTH_ROLE FROM {table_prefix}CB_AUTH_TOKEN WHERE TOKEN_ID=?"))
+             PreparedStatement dbStat = dbCon.prepareStatement("SELECT AUTH_ROLE FROM {table_prefix}CB_AUTH_TOKEN WHERE TOKEN_ID=?")
         ) {
             dbStat.setString(1, smAccessToken);
             try (var dbResult = dbStat.executeQuery()) {
@@ -3209,9 +3185,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         boolean secretStorage
     ) throws SQLException {
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            database.normalizeTableNames(
-                "INSERT INTO {table_prefix}CB_AUTH_SUBJECT(SUBJECT_ID,SUBJECT_TYPE,IS_SECRET_STORAGE) " +
-                    "VALUES (?,?,?)"))) {
+            "INSERT INTO {table_prefix}CB_AUTH_SUBJECT(SUBJECT_ID,SUBJECT_TYPE,IS_SECRET_STORAGE) " +
+                "VALUES (?,?,?)")) {
             dbStat.setString(1, subjectId);
             dbStat.setString(2, subjectType.getCode());
             dbStat.setString(3, booleanToString(secretStorage));
@@ -3229,7 +3204,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     private void deleteAuthSubject(Connection dbCon, String subjectId) throws SQLException {
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_SUBJECT WHERE SUBJECT_ID=?"))) {
+            "DELETE FROM {table_prefix}CB_AUTH_SUBJECT WHERE SUBJECT_ID=?")
+        ) {
             dbStat.setString(1, subjectId);
             dbStat.execute();
         }
@@ -3283,14 +3259,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     public void clearOldAuthAttemptInfo() throws DBException {
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(dbCon,
-                database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_ATTEMPT_INFO " +
+                "DELETE FROM {table_prefix}CB_AUTH_ATTEMPT_INFO " +
                     "WHERE EXISTS " +
                     "(SELECT 1 FROM {table_prefix}CB_AUTH_ATTEMPT AA " +
                     "LEFT JOIN {table_prefix}CB_AUTH_TOKEN CAT ON AA.SESSION_ID = CAT.SESSION_ID " +
                     "WHERE (CAT.REFRESH_TOKEN_EXPIRATION_TIME < ? OR CAT.EXPIRATION_TIME IS NULL) " +
                     "AND AA.AUTH_ID={table_prefix}CB_AUTH_ATTEMPT_INFO.AUTH_ID " +
                     "AND AUTH_STATUS='" + SMAuthStatus.EXPIRED + "') " +
-                    "AND CREATE_TIME<?"),
+                    "AND CREATE_TIME<?",
                 Timestamp.valueOf(LocalDateTime.now()),
                 Timestamp.valueOf(LocalDateTime.now().minusMinutes(smConfig.getExpiredAuthAttemptInfoTtl()))
             );
@@ -3305,7 +3281,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             String sqlBuilder =
                 "SELECT SUBJECT_ID FROM {table_prefix}CB_AUTH_SUBJECT U " +
                 "WHERE SUBJECT_ID IN (" + SQLUtils.generateParamList(allSubjects.size()) + ")";
-            try (var dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder))) {
+            try (var dbStat = dbCon.prepareStatement(sqlBuilder)) {
                 int parameterIndex = 1;
                 for (String subjectId : allSubjects) {
                     dbStat.setString(parameterIndex++, subjectId);
@@ -3326,7 +3302,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     private SMSubjectType getSubjectType(@NotNull String subjectId) {
         try (Connection dbCon = database.openConnection()) {
             String sqlBuilder = "SELECT SUBJECT_TYPE FROM {table_prefix}CB_AUTH_SUBJECT U WHERE SUBJECT_ID = ?";
-            try (var dbStat = dbCon.prepareStatement(database.normalizeTableNames(sqlBuilder))) {
+            try (var dbStat = dbCon.prepareStatement(sqlBuilder)) {
                 dbStat.setString(1, subjectId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {

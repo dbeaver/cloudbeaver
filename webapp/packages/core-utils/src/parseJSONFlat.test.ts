@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it, vitest } from 'vitest';
 
 import { parseJSONFlat } from './parseJSONFlat.js';
 
@@ -14,7 +14,7 @@ describe('parseJSONFlat', () => {
     const object = {
       key: null,
     };
-    const setValue = jest.fn();
+    const setValue = vitest.fn();
 
     parseJSONFlat(object, setValue);
 
@@ -23,7 +23,7 @@ describe('parseJSONFlat', () => {
 
   it('should parse empty object', () => {
     const object = {};
-    const setValue = jest.fn();
+    const setValue = vitest.fn();
 
     parseJSONFlat(object, setValue);
 
@@ -34,7 +34,7 @@ describe('parseJSONFlat', () => {
     const object = {
       test: 'test',
     };
-    const setValue = jest.fn();
+    const setValue = vitest.fn();
 
     parseJSONFlat(object, setValue);
 
@@ -49,7 +49,7 @@ describe('parseJSONFlat', () => {
         test3: 'test3',
       },
     };
-    const setValue = jest.fn();
+    const setValue = vitest.fn();
 
     parseJSONFlat(object, setValue);
 
@@ -62,7 +62,7 @@ describe('parseJSONFlat', () => {
     const object = {
       test: 'test',
     };
-    const setValue = jest.fn();
+    const setValue = vitest.fn();
 
     parseJSONFlat(object, setValue, 'scope');
 
@@ -72,7 +72,7 @@ describe('parseJSONFlat', () => {
 
   it('should set array value in scope', () => {
     const object = ['test'];
-    const setValue = jest.fn();
+    const setValue = vitest.fn();
 
     parseJSONFlat(object, setValue, 'scope');
 

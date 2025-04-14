@@ -32,7 +32,7 @@ public class CBSchemaVersionManager implements SQLSchemaVersionManager {
 
         Integer version = tryGetVersion(
             connection,
-            CommonUtils.normalizeTableNames("SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO WHERE MODULE_ID = ?", schemaName),
+            "SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO WHERE MODULE_ID = ?",
             getSchemaId()
         );
         if (version != null) {
@@ -40,14 +40,14 @@ public class CBSchemaVersionManager implements SQLSchemaVersionManager {
         }
         version = tryGetVersion(
             connection,
-            CommonUtils.normalizeTableNames("SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO", schemaName)
+            "SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO"
         );
         if (version != null) {
             return version;
         }
         version = tryGetVersion(
             connection,
-            CommonUtils.normalizeTableNames("SELECT SCHEMA_VERSION FROM {table_prefix}CB_SERVER", schemaName)
+            "SELECT SCHEMA_VERSION FROM {table_prefix}CB_SERVER"
         );
         if (version != null) {
             return LEGACY_SCHEMA_VERSION;
@@ -70,20 +70,14 @@ public class CBSchemaVersionManager implements SQLSchemaVersionManager {
     ) throws DBException, SQLException {
         var selectCount = CommonUtils.toInt(JDBCUtils.executeQuery(
             connection,
-            CommonUtils.normalizeTableNames(
-                "SELECT count(1) FROM {table_prefix}CB_SCHEMA_INFO",
-                schemaName
-            )
+            "SELECT count(1) FROM {table_prefix}CB_SCHEMA_INFO"
         ));
         if (selectCount <= 0) {
             log.debug("Didn't find any records in " +
                 CommonUtils.normalizeTableNames("{table_prefix}CB_SCHEMA_INFO", schemaName));
             JDBCUtils.executeSQL(
                 connection,
-                CommonUtils.normalizeTableNames(
-                    "INSERT INTO {table_prefix}CB_SCHEMA_INFO (MODULE_ID, VERSION,UPDATE_TIME) VALUES(?, ?, CURRENT_TIMESTAMP)",
-                    schemaName
-                ),
+                "INSERT INTO {table_prefix}CB_SCHEMA_INFO (MODULE_ID, VERSION,UPDATE_TIME) VALUES(?, ?, CURRENT_TIMESTAMP)",
                 getSchemaId(),
                 version
             );
@@ -94,20 +88,14 @@ public class CBSchemaVersionManager implements SQLSchemaVersionManager {
                 CommonUtils.normalizeTableNames("{table_prefix}CB_SCHEMA_INFO", schemaName));
             JDBCUtils.executeUpdate(
                 connection,
-                CommonUtils.normalizeTableNames(
-                    "UPDATE {table_prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP",
-                    schemaName
-                ),
+                "UPDATE {table_prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP",
                 version
             );
             return;
         }
         JDBCUtils.executeUpdate(
             connection,
-            CommonUtils.normalizeTableNames(
-                "UPDATE {table_prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP WHERE MODULE_ID = ?",
-                schemaName
-            ),
+            "UPDATE {table_prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP WHERE MODULE_ID = ?",
             version,
             getSchemaId()
         );

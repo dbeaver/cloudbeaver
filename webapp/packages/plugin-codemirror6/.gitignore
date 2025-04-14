@@ -5,8 +5,8 @@
 /coverage
 
 # production
-!lib/
-!lib/lib
+dist
+lib
 
 # misc
 .DS_Store

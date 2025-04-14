@@ -51,6 +51,8 @@ export default [
   ['connections_connection_configuration', 'Configuration'],
   ['connections_connection_host', 'Host'],
   ['connections_connection_port', 'Port'],
+  ['core_connections_connection_create_success', 'Connection was created'],
+  ['core_connections_connection_update_success', 'Connection was updated'],
   ['connections_connection_test', 'Test'],
   ['connections_connection_test_tooltip', 'Test connection'],
   ['connections_connection_test_fail', 'Connection test failed'],

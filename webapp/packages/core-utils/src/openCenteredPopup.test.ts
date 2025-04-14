@@ -1,18 +1,16 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, it, vitest, type MockInstance } from 'vitest';
 
 import { openCenteredPopup } from './openCenteredPopup.js';
 
-type WindowSpyType = jest.SpiedGetter<Window>;
-
 describe('openCenteredPopup', () => {
-  let windowSpy: WindowSpyType;
+  let windowSpy: MockInstance;
   const params = {
     url: 'http://localhost:3000',
     target: 'target',
@@ -22,7 +20,7 @@ describe('openCenteredPopup', () => {
   };
 
   beforeEach(() => {
-    windowSpy = jest.spyOn(window, 'window', 'get');
+    windowSpy = vitest.spyOn(window, 'window', 'get');
   });
 
   afterEach(() => {
@@ -40,7 +38,7 @@ describe('openCenteredPopup', () => {
       screen: {
         availWidth: 1000,
       },
-      open: jest.fn(),
+      open: vitest.fn(),
     } as unknown as Window;
 
     windowSpy.mockImplementation(() => windowMock);

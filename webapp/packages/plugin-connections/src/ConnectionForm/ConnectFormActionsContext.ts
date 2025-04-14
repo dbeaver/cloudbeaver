@@ -1,17 +1,16 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { createContext } from 'react';
 
-import type { IConnectionFormState } from './IConnectionFormProps.js';
-
 export interface IConnectionFormActionsContext {
-  save: IConnectionFormState['save'];
-  test: IConnectionFormState['test'];
+  save: () => Promise<void>;
+  test: () => Promise<void>;
+  onCancel?: () => void;
 }
 
 export const ConnectionFormActionsContext = createContext<IConnectionFormActionsContext | null>(null);

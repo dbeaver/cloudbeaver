@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, it, vitest, type Mocked } from 'vitest';
 
 import { TextTools } from './TextTools.js';
 
@@ -17,23 +17,23 @@ function getLength(value: string): number {
 }
 
 describe('TextTools', () => {
-  let mockContext: jest.Mocked<CanvasRenderingContext2D>;
+  let mockContext: Mocked<CanvasRenderingContext2D>;
 
   beforeEach(() => {
     mockContext = {
-      measureText: jest.fn().mockReturnValue({ width: TEXT_WIDTH }),
+      measureText: vitest.fn().mockReturnValue({ width: TEXT_WIDTH }),
       font: '',
-    } as unknown as jest.Mocked<CanvasRenderingContext2D>;
+    } as unknown as Mocked<CanvasRenderingContext2D>;
 
     const mockCanvas = {
-      getContext: jest.fn().mockReturnValue(mockContext),
+      getContext: vitest.fn().mockReturnValue(mockContext),
     };
 
-    jest.spyOn(document, 'createElement').mockImplementation(() => mockCanvas as unknown as HTMLCanvasElement);
+    vitest.spyOn(document, 'createElement').mockImplementation(() => mockCanvas as unknown as HTMLCanvasElement);
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vitest.restoreAllMocks();
   });
 
   describe('getWidth', () => {
@@ -53,10 +53,10 @@ describe('TextTools', () => {
     it('should use container styles when provided', () => {
       const mockContainer = document.createElement('div');
       const mockStyles = {
-        getPropertyValue: jest.fn().mockReturnValueOnce('bold').mockReturnValueOnce('16px').mockReturnValueOnce('Arial, sans'),
+        getPropertyValue: vitest.fn().mockReturnValueOnce('bold').mockReturnValueOnce('16px').mockReturnValueOnce('Arial, sans'),
       };
 
-      jest.spyOn(window, 'getComputedStyle').mockReturnValue(mockStyles as unknown as CSSStyleDeclaration);
+      vitest.spyOn(window, 'getComputedStyle').mockReturnValue(mockStyles as unknown as CSSStyleDeclaration);
 
       const options = {
         font: 'default',
@@ -73,10 +73,10 @@ describe('TextTools', () => {
     it('should use provided font when container styles are incomplete', () => {
       const mockContainer = document.createElement('div');
       const mockStyles = {
-        getPropertyValue: jest.fn().mockReturnValue(''),
+        getPropertyValue: vitest.fn().mockReturnValue(''),
       };
 
-      jest.spyOn(window, 'getComputedStyle').mockReturnValue(mockStyles as unknown as CSSStyleDeclaration);
+      vitest.spyOn(window, 'getComputedStyle').mockReturnValue(mockStyles as unknown as CSSStyleDeclaration);
 
       const options = {
         font: 'italic 14px Times',

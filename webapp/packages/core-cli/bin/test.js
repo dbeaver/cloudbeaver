@@ -6,16 +6,22 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-/* eslint-disable @typescript-eslint/no-var-requires */
 
-// import jest from 'jest';
-// import { fileURLToPath } from 'node:url';
+import { fileURLToPath } from 'node:url';
+import { startVitest, parseCLI } from 'vitest/node';
+
 process.title = 'core-test';
 
-// if (process.env.NODE_ENV == null) {
-//   process.env.NODE_ENV = 'test';
-// }
+if (process.env.VITEST == null) {
+  process.env.VITEST = 'test';
+}
 
-// const argv = [...process.argv.slice(2, process.argv.length), '--config', fileURLToPath(import.meta.resolve('../configs/jest.config.js'))];
+const { filter, options } = parseCLI(['vitest', ...process.argv.slice(2)]);
+const configFile = fileURLToPath(new URL('../configs/vitest.config.ts', import.meta.url));
 
-// jest.run(argv);
+const vitest = await startVitest(process.env.VITEST, filter, {
+  config: configFile,
+  ...options,
+});
+
+await vitest.close();

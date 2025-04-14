@@ -57,6 +57,8 @@ export default [
   ['connections_connection_host', 'Hôte'],
   ['connections_connection_port', 'Port'],
   ['connections_connection_read_only', 'Read-only connection'],
+  ['core_connections_connection_create_success', 'Connection was created'],
+  ['core_connections_connection_update_success', 'Connection was updated'],
   ['connections_connection_test', 'Tester'],
   ['connections_connection_test_tooltip', 'Tester la connexion'],
   ['connections_connection_test_fail', 'Échec du test de connexion'],

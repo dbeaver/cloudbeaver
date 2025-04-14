@@ -60,6 +60,8 @@ export default [
   ['connections_connection_configuration', 'Конфигурация'],
   ['connections_connection_host', 'Хост'],
   ['connections_connection_port', 'Порт'],
+  ['core_connections_connection_create_success', 'Подключение создано'],
+  ['core_connections_connection_update_success', 'Подключение обновлено'],
   ['connections_connection_test', 'Тест'],
   ['connections_connection_test_tooltip', 'Тестовое соединение'],
   ['connections_connection_test_fail', 'Не удалось выполнить подключение'],

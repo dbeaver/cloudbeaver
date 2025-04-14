@@ -88,3 +88,4 @@ export * from './types/UndefinedToNull.js';
 export * from './bindFunctions.js';
 export * from './getDomainFromUrl.js';
 export * from './isNumber.js';
+export * from './getSubjectDifferences.js';

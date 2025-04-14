@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
@@ -168,7 +169,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
     connectionStateEventHandler.onEvent<IWsDataSourceDisconnectEvent>(
       ServerEventId.CbDatasourceDisconnected,
-      async data => {
+      data => {
         const key: IConnectionInfoParams = {
           projectId: data.projectId,
           connectionId: data.connectionId,
@@ -184,7 +185,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
     connectionStateEventHandler.onEvent<IWsDataSourceConnectEvent>(
       ServerEventId.CbDatasourceConnected,
-      async data => {
+      data => {
         const key: IConnectionInfoParams = {
           projectId: data.projectId,
           connectionId: data.connectionId,
@@ -267,12 +268,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
    * */
   isSessionUpdate(): boolean {
     return this.sessionUpdate;
-  }
-
-  getEmptyConfig(): ConnectionConfig {
-    return {
-      saveCredentials: false,
-    };
   }
 
   isConnecting(key: IConnectionInfoParams): boolean;
@@ -471,6 +466,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     await this.performUpdate(key, [], async () => {
       const { connection } = await this.graphQLService.sdk.updateConnection({
         projectId: key.projectId,
+        connectionId: key.connectionId,
         config,
         ...this.getDefaultIncludes(),
         ...this.getIncludesMap(key),

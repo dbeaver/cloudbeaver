@@ -1,65 +1,67 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-// // @ts-nocheck
-// import { afterEach, describe, expect, it } from '@jest/globals';
-// import { cleanup, waitFor } from '@testing-library/react';
 
-// import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
+import { describe, expect, it, vi } from 'vitest';
+import { Cell } from './Cell.js';
+import { renderInApp } from '@cloudbeaver/tests-runner';
 
-// import { Cell } from './Cell.js';
+vi.mock('./s', () => ({
+  s: (...args: any[]) => args.join(' '),
+}));
 
-// const app = createApp();
+vi.mock('./useS', () => ({
+  useS: vi.fn(),
+}));
 
-// describe('Cell', () => {
-//   afterEach(() => {
-//     cleanup();
-//   });
+vi.mock('./Containers/Container', () => ({
+  Container: (props: any) => <div {...props}>{props.children}</div>,
+}));
 
-//   it('should render children correctly', async () => {
-//     const { getByText } = renderInApp(<Cell>Test Children</Cell>, app);
-//     const text = await waitFor(() => getByText('Test Children'));
+describe('Cell', () => {
+  it('should render children correctly', async () => {
+    const { getByText } = renderInApp(<Cell>Test Children</Cell>);
+    const text = await vi.waitFor(() => getByText('Test Children'));
 
-//     expect(text).toBeInTheDocument();
-//   });
+    expect(text).toBeInTheDocument();
+  });
 
-//   it('should render before element correctly', async () => {
-//     const { getByText } = renderInApp(<Cell before={<span>Before Element</span>}>Test Children</Cell>, app);
+  it('should render before element correctly', async () => {
+    const { getByText } = renderInApp(<Cell before={<span>Before Element</span>}>Test Children</Cell>);
 
-//     const beforeText = await waitFor(() => getByText('Before Element'));
-//     expect(beforeText).toBeInTheDocument();
-//   });
+    const beforeText = await vi.waitFor(() => getByText('Before Element'));
+    expect(beforeText).toBeInTheDocument();
+  });
 
-//   it('should render after element correctly', async () => {
-//     const { getByText } = renderInApp(<Cell after={<span>After Element</span>}>Test Children</Cell>, app);
+  it('should render after element correctly', async () => {
+    const { getByText } = renderInApp(<Cell after={<span>After Element</span>}>Test Children</Cell>);
 
-//     const afterText = await waitFor(() => getByText('After Element'));
-//     expect(afterText).toBeInTheDocument();
-//   });
+    const afterText = await vi.waitFor(() => getByText('After Element'));
+    expect(afterText).toBeInTheDocument();
+  });
 
-//   it('should render after and before elements correctly', async () => {
-//     const { getByText } = renderInApp(
-//       <Cell before={<span>Before Element</span>} after={<span>After Element</span>}>
-//         Test Children
-//       </Cell>,
-//       app,
-//     );
+  it('should render after and before elements correctly', async () => {
+    const { getByText } = renderInApp(
+      <Cell before={<span>Before Element</span>} after={<span>After Element</span>}>
+        Test Children
+      </Cell>,
+    );
 
-//     const afterText = await waitFor(() => getByText('After Element'));
-//     const beforeText = await waitFor(() => getByText('Before Element'));
+    const afterText = await vi.waitFor(() => getByText('After Element'));
+    const beforeText = await vi.waitFor(() => getByText('Before Element'));
 
-//     expect(beforeText).toBeInTheDocument();
-//     expect(afterText).toBeInTheDocument();
-//   });
+    expect(beforeText).toBeInTheDocument();
+    expect(afterText).toBeInTheDocument();
+  });
 
-//   it('should render description element correctly', async () => {
-//     const { getByText } = renderInApp(<Cell description={<span>Description Element</span>}>Test Children</Cell>, app);
+  it('should render description element correctly', async () => {
+    const { getByText } = renderInApp(<Cell description={<span>Description Element</span>}>Test Children</Cell>);
 
-//     const description = await waitFor(() => getByText('Description Element'));
-//     expect(description).toBeInTheDocument();
-//   });
-// });
+    const description = await vi.waitFor(() => getByText('Description Element'));
+    expect(description).toBeInTheDocument();
+  });
+});
