@@ -1,0 +1,7 @@
+query getAuthTaskResult($taskId: String!) {
+  result: asyncAuthTaskResult(taskId: $taskId) {
+    userTokens {
+      ...AuthToken
+    }
+  }
+}

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@ import { uuid } from '@cloudbeaver/core-utils';
 
 import { type AuthProviderConfiguration, AuthProvidersResource } from './AuthProvidersResource.js';
 import { type ILoginOptions, UserInfoResource } from './UserInfoResource.js';
+import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 
 export interface IUserAuthConfiguration {
   providerId: string;
@@ -29,12 +30,61 @@ export class AuthInfoService {
     private readonly userInfoResource: UserInfoResource,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly windowsService: WindowsService,
-  ) {}
+    private readonly asyncTaskInfoService: AsyncTaskInfoService,
+  ) { }
 
   login(providerId: string, options: ILoginOptions): ITask<UserInfo | null> {
     return new AutoRunningTask(async () => await this.userInfoResource.login(providerId, options)).then(authInfo =>
       this.federatedAuthentication(providerId, options, authInfo),
     );
+  }
+
+  asyncLogin(providerId: string, options: ILoginOptions): ITask<UserInfo | null> {
+    return new AutoRunningTask(async () => {
+      const task = this.asyncTaskInfoService.create(async () => {
+        const result = await this.userInfoResource.asyncAuthLogin(providerId, options);
+
+        let window: Window | null = null;
+        let id = providerId;
+
+        if (options.configurationId) {
+          const configuration = this.authProvidersResource.getConfiguration(providerId, options.configurationId);
+
+          if (configuration) {
+            id = configuration.id;
+          }
+        }
+
+        if (result.redirectLink) {
+          id = uuid();
+          window = this.windowsService.open(id, {
+            url: result.redirectLink,
+            target: id,
+            width: 600,
+            height: 700,
+          });
+
+          if (window) {
+            window.focus();
+          }
+        }
+        
+
+        return result.taskInfo;
+      });
+
+
+      const info = await this.asyncTaskInfoService.run(task);
+      await this.userInfoResource.getAuthTaskResult(info.id);
+
+      if (window) {
+        this.windowsService.close(window);
+      }
+
+      return this.userInfoResource.data;
+
+    });
+
   }
 
   private federatedAuthentication(
