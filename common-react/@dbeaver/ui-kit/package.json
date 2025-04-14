@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc -b",
     "docs": "ladle serve",
-    "clean": "rimraf --glob dist"
+    "clean": "rimraf --glob lib"
   },
   "packageManager": "yarn@4.6.0",
   "devDependencies": {

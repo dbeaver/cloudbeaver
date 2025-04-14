@@ -2,10 +2,14 @@
   "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "outDir": "lib",
+    "tsBuildInfoFile": "lib/tsconfig.tsbuildinfo",
     "composite": true
   },
+  "types": [
+    "vitest/globals",
+    "@testing-library/jest-dom"
+  ],
   "include": [
     "__custom_mocks__/**/*",
     "src/**/*",
@@ -15,7 +19,6 @@
   ],
   "exclude": [
     "**/node_modules",
-    "lib/**/*",
-    "dist/**/*"
+    "lib/**/*"
   ]
 }

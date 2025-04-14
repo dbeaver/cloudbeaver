@@ -24,11 +24,11 @@
   "bin": {
     "core-cli-add-plugin": "./bin/add-plugin.js",
     "core-cli-analyzer": "./bin/analyzer.js",
-    "core-cli-check-license": "./dist/cli/license-check.js",
+    "core-cli-check-license": "./lib/cli/license-check.js",
     "core-cli-dependency-graph": "./bin/dependency-graph.js",
     "core-cli-set-version": "./bin/set-version.mjs",
     "core-cli-test": "./bin/test.js",
-    "core-cli-validate-dependencies": "./dist/cli/validate-dependencies.js"
+    "core-cli-validate-dependencies": "./lib/cli/validate-dependencies.js"
   },
   "scripts": {
     "build": "tsc -b",
@@ -44,19 +44,18 @@
   "devDependencies": {
     "@cloudbeaver/tsconfig": "workspace:*",
     "@swc/core": "^1",
-    "@swc/jest": "^0",
     "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^14",
     "@types/js-yaml": "^4",
     "@types/node": "^20",
     "enquirer": "^2",
     "execa": "^9",
     "fake-indexeddb": "^6",
     "glob": "^11",
+    "happy-dom": "^17",
     "hygen": "^6",
-    "jest": "^29",
-    "jest-environment-jsdom": "^29",
     "js-yaml": "^4",
     "typescript": "^5",
-    "upath": "^2"
+    "vitest": "^3"
   }
 }

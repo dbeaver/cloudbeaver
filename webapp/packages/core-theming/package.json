@@ -10,12 +10,12 @@
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./dist/index.js",
+    ".": "./lib/index.js",
     "./*": "./*"
   },
   "scripts": {
     "build": "tsc -b",
-    "clean": "rimraf --glob dist",
+    "clean": "rimraf --glob lib",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies"
@@ -43,8 +43,8 @@
     "@material/switch": "^4",
     "@material/theme": "^4",
     "@material/typography": "^4",
-    "@types/jest": "^29",
     "typescript": "^5",
-    "typescript-plugin-css-modules": "^5"
+    "typescript-plugin-css-modules": "^5",
+    "vitest": "^3"
   }
 }

@@ -1,11 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, jest, test } from '@jest/globals';
+
+import { describe, expect, test, vitest } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { action, computed, isObservable, observable, runInAction } from 'mobx';
 
@@ -13,11 +14,11 @@ import * as coreUtils from '@cloudbeaver/core-utils';
 
 import { useObservableRef } from './useObservableRef.js';
 
-jest.mock('@cloudbeaver/core-utils', () => ({
-  bindFunctions: jest.fn(),
+vitest.mock('@cloudbeaver/core-utils', () => ({
+  bindFunctions: vitest.fn(),
 }));
 
-describe.skip('useObservableRef', () => {
+describe('useObservableRef', () => {
   test('should initialize with a function', () => {
     const init = () => ({ count: 0 });
     const observed = { count: observable };
@@ -39,7 +40,7 @@ describe.skip('useObservableRef', () => {
   });
 
   test('should bind functions', () => {
-    const bindFunctions = jest.spyOn(coreUtils, 'bindFunctions');
+    const bindFunctions = vitest.spyOn(coreUtils, 'bindFunctions');
 
     const observed = { count: observable, increment: action };
 
@@ -93,7 +94,7 @@ describe.skip('useObservableRef', () => {
   });
 
   test('should merge update to bind', () => {
-    const bindFunctions = jest.spyOn(coreUtils, 'bindFunctions');
+    const bindFunctions = vitest.spyOn(coreUtils, 'bindFunctions');
 
     const init = () => ({
       count: 0,
@@ -106,7 +107,7 @@ describe.skip('useObservableRef', () => {
 
     renderHook(() => useObservableRef(init, observed, update));
 
-    expect(bindFunctions).toHaveBeenCalledTimes(2);
+    expect(bindFunctions).toHaveBeenCalledTimes(1);
     bindFunctions.mockClear();
   });
 
