@@ -16,15 +16,23 @@
  */
 package io.cloudbeaver.service.auth;
 
+import io.cloudbeaver.model.session.WebAuthInfo;
 import org.eclipse.core.runtime.IStatus;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+
+import java.util.List;
 
 public class WebAsyncAuthJob extends AbstractJob {
     @NotNull
     private final String authId;
     private final boolean linkWithUser;
+    //result from task do used, because it cannot be serialized into 'object' gql type and separate request is used
+    //to get auth result
+    @Nullable
+    private List<WebAuthInfo> authResult;
 
     public WebAsyncAuthJob(@NotNull String name, @NotNull String authId, boolean linkWithUser) {
         super(name);
@@ -45,5 +53,14 @@ public class WebAsyncAuthJob extends AbstractJob {
 
     public boolean isLinkWithUser() {
         return linkWithUser;
+    }
+
+    @Nullable
+    public List<WebAuthInfo> getAuthResult() {
+        return authResult;
+    }
+
+    public void setAuthResult(@Nullable List<WebAuthInfo> authResult) {
+        this.authResult = authResult;
     }
 }

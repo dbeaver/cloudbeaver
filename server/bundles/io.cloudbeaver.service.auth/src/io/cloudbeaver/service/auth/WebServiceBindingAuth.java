@@ -48,7 +48,6 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 getWebSession(env, false),
                 env.getArgument("provider"),
                 env.getArgument("configuration"),
-                env.getArgument("credentials"),
                 CommonUtils.toBoolean(env.getArgument("linkUser")),
                 CommonUtils.toBoolean(env.getArgument("forceSessionsLogout"))
             ))

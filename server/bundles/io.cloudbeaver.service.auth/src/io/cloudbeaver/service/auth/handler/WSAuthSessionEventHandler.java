@@ -19,7 +19,10 @@ package io.cloudbeaver.service.auth.handler;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
-import io.cloudbeaver.model.session.*;
+import io.cloudbeaver.model.session.BaseWebSession;
+import io.cloudbeaver.model.session.WebAuthInfo;
+import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.session.WebSessionAuthProcessor;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
@@ -56,7 +59,7 @@ public class WSAuthSessionEventHandler implements WSEventHandler<WSAuthEvent> {
         WebAsyncTaskInfo relatedTask = allAuthJobs.stream().filter(
                 task -> {
                     WebAsyncAuthJob job = (WebAsyncAuthJob) task.getJob();
-                    return job.getAuthId().equals(authInfo.getAppSessionId());
+                    return job.getAuthId().equals(authInfo.getAuthAttemptId());
                 })
             .findFirst().orElse(null);
         if (relatedTask == null) {
@@ -66,6 +69,7 @@ public class WSAuthSessionEventHandler implements WSEventHandler<WSAuthEvent> {
             webSession.addWarningMessage(message);
             return;
         }
+        WebAsyncAuthJob relatedJob = (WebAsyncAuthJob) relatedTask.getJob();
         switch (authInfo.getAuthStatus()) {
             case SUCCESS:
                 boolean linkCredentialsWithActiveUser = !webApplication.isConfigurationMode()
@@ -76,7 +80,7 @@ public class WSAuthSessionEventHandler implements WSEventHandler<WSAuthEvent> {
                         authInfo,
                         linkCredentialsWithActiveUser
                     ).authenticateSession();
-                    relatedTask.setResult(newInfos);
+                    relatedJob.setAuthResult(newInfos);
                 } catch (DBException e) {
                     webSession.addSessionError(e);
                     relatedTask.setJobError(e);

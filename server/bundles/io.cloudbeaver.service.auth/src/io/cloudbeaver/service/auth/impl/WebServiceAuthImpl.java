@@ -95,7 +95,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
-        @Nullable Map<String, Object> authParameters,
         boolean linkWithActiveUser,
         boolean forceSessionsLogout
     ) throws DBWebException {
@@ -107,7 +106,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             throw new DBWebException("Provider '" + providerId + "' is not federated");
         }
         try {
-            var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, authParameters, forceSessionsLogout);
+            var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, Map.of(), forceSessionsLogout);
             if (smAuthInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
                 throw new DBWebException("Unexpected auth status: " + smAuthInfo.getAuthStatus());
             }
@@ -134,7 +133,11 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         if (taskInfo.getJob() == null || !WebAsyncAuthJob.class.isAssignableFrom(taskInfo.getJob().getClass())) {
             throw new DBWebException("Task '" + taskId + "' is not async auth task");
         }
-        List<WebAuthInfo> userTokens = (List<WebAuthInfo>) taskInfo.getTaskResult();
+        WebAsyncAuthJob job = (WebAsyncAuthJob) taskInfo.getJob();
+        List<WebAuthInfo> userTokens = job.getAuthResult();
+        if (CommonUtils.isEmpty(userTokens)) {
+            throw new DBWebException("No new user authentications found");
+        }
         return new WebAsyncAuthTaskResult(userTokens);
     }
 
