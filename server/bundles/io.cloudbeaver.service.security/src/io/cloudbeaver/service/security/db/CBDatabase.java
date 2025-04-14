@@ -24,6 +24,7 @@ import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.config.WebDatabaseConfig;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
+import org.jkiss.dbeaver.model.sql.db.InternalProxyConnection;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.apache.commons.dbcp2.*;
 import org.apache.commons.pool2.impl.GenericObjectPool;
@@ -130,7 +131,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         if (exclusiveConnection != null) {
             return exclusiveConnection;
         }
-        return dataSource.getConnection();
+        return new InternalProxyConnection(dataSource.getConnection(), databaseConfig);
     }
 
     public void initialize() throws DBException {
@@ -157,7 +158,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         this.dataSource = initConnectionPool(driver.getDefaultDriverLoader().getDriverInstance(monitor), driver.getFullName());
         this.dialect = driver.getScriptDialect().createInstance();
 
-        try (Connection connection = dataSource.getConnection()) {
+        try (Connection connection = openConnection()) {
             initSchema(monitor, connection);
         } catch (Exception e) {
             throw new DBException("Error updating management database schema", e);
@@ -433,14 +434,14 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         String versionName = CommonUtils.truncateString(GeneralUtils.getProductVersion().toString(), 32);
 
         boolean hasInstanceRecord = JDBCUtils.queryString(connection,
-            normalizeTableNames("SELECT HOST_NAME FROM {table_prefix}CB_INSTANCE WHERE INSTANCE_ID=?"),
+            "SELECT HOST_NAME FROM {table_prefix}CB_INSTANCE WHERE INSTANCE_ID=?",
             instanceId) != null;
         if (!hasInstanceRecord) {
             JDBCUtils.executeSQL(
                 connection,
-                normalizeTableNames("INSERT INTO {table_prefix}CB_INSTANCE " +
+                "INSERT INTO {table_prefix}CB_INSTANCE " +
                     "(INSTANCE_ID,MAC_ADDRESS,HOST_NAME,PRODUCT_NAME,PRODUCT_VERSION,UPDATE_TIME)" +
-                    " VALUES(?,?,?,?,?,CURRENT_TIMESTAMP)"),
+                    " VALUES(?,?,?,?,?,CURRENT_TIMESTAMP)",
                 instanceId,
                 macAddress,
                 hostName,
@@ -449,9 +450,9 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         } else {
             JDBCUtils.executeSQL(
                 connection,
-                normalizeTableNames("UPDATE {table_prefix}CB_INSTANCE " +
+                "UPDATE {table_prefix}CB_INSTANCE " +
                     "SET HOST_NAME=?,PRODUCT_NAME=?,PRODUCT_VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP " +
-                    "WHERE INSTANCE_ID=?"),
+                    "WHERE INSTANCE_ID=?",
                 hostName,
                 productName,
                 versionName,
@@ -459,7 +460,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         }
         JDBCUtils.executeSQL(
             connection,
-            normalizeTableNames("DELETE FROM {table_prefix}CB_INSTANCE_DETAILS WHERE INSTANCE_ID=?"),
+            "DELETE FROM {table_prefix}CB_INSTANCE_DETAILS WHERE INSTANCE_ID=?",
             instanceId);
 
         Map<String, String> instanceDetails = new LinkedHashMap<>();
@@ -470,8 +471,7 @@ public class CBDatabase extends InternalDB<WebDatabaseConfig> {
         }
 
         try (PreparedStatement dbStat = connection.prepareStatement(
-            normalizeTableNames(
-                "INSERT INTO {table_prefix}CB_INSTANCE_DETAILS(INSTANCE_ID,FIELD_NAME,FIELD_VALUE) VALUES(?,?,?)"))
+            "INSERT INTO {table_prefix}CB_INSTANCE_DETAILS(INSTANCE_ID,FIELD_NAME,FIELD_VALUE) VALUES(?,?,?)")
         ) {
             dbStat.setString(1, instanceId);
             for (Map.Entry<String, String> ide : instanceDetails.entrySet()) {

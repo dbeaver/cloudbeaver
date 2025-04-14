@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, it, vitest } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
 import { type IScrollState, useControlledScroll } from './useControlledScroll.js';
@@ -14,14 +14,16 @@ describe('useControlledScroll', () => {
   let element: HTMLDivElement;
   let scrollState: IScrollState;
 
+  beforeEach(() => {
+    vitest.useFakeTimers();
+  });
+
   afterEach(() => {
+    vitest.useRealTimers();
     element.remove();
-    jest.useRealTimers();
   });
 
   beforeEach(() => {
-    jest.resetAllMocks();
-    jest.useFakeTimers();
     element = document.createElement('div');
     scrollState = { scrollTop: 100, scrollLeft: 100 };
   });
@@ -30,7 +32,7 @@ describe('useControlledScroll', () => {
     scrollState = { scrollTop: 50, scrollLeft: 30 };
     renderHook(() => useControlledScroll(element, scrollState));
 
-    jest.runAllTimers();
+    vitest.runAllTimers();
 
     expect(element.scrollTop).toBe(50);
     expect(element.scrollLeft).toBe(30);
@@ -63,14 +65,14 @@ describe('useControlledScroll', () => {
     const newState = { scrollTop: 75, scrollLeft: 25 };
     rerender({ el: element, state: newState });
 
-    jest.runAllTimers();
+    vitest.runAllTimers();
 
     expect(element.scrollTop).toBe(75);
     expect(element.scrollLeft).toBe(25);
   });
 
   it('should clean up event listener on unmount', () => {
-    const removeEventListenerSpy = jest.spyOn(element, 'removeEventListener');
+    const removeEventListenerSpy = vitest.spyOn(element, 'removeEventListener');
     const { unmount } = renderHook(() => useControlledScroll(element, scrollState));
 
     unmount();
@@ -82,7 +84,7 @@ describe('useControlledScroll', () => {
   it('should not set scroll position if element is null', () => {
     renderHook(() => useControlledScroll(null, scrollState));
 
-    jest.runAllTimers();
+    vitest.runAllTimers();
 
     // No errors should be thrown
     expect(true).toBe(true);
@@ -100,7 +102,7 @@ describe('useControlledScroll', () => {
 
     rerender({ el: newElement, state: scrollState });
 
-    jest.runAllTimers();
+    vitest.runAllTimers();
 
     expect(newElement.scrollTop).toBe(100);
     expect(newElement.scrollLeft).toBe(100);
@@ -119,7 +121,7 @@ describe('useControlledScroll', () => {
 
     rerender({ el: newElement, state: newState });
 
-    jest.runAllTimers();
+    vitest.runAllTimers();
 
     expect(newElement.scrollTop).toBe(75);
     expect(newElement.scrollLeft).toBe(25);
@@ -130,7 +132,7 @@ describe('useControlledScroll', () => {
       initialProps: { el: element as HTMLDivElement | null, state: scrollState },
     });
 
-    const removeEventListenerSpy = jest.spyOn(element, 'removeEventListener');
+    const removeEventListenerSpy = vitest.spyOn(element, 'removeEventListener');
 
     rerender({ el: null, state: scrollState });
 

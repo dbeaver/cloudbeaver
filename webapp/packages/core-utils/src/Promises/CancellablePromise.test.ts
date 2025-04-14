@@ -1,22 +1,28 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 
 import { CancellablePromise } from './CancellablePromise.js';
-import { PromiseCancelledError } from './PromiseCancelledError.js';
+
+vi.mock('./PromiseCancelledError', () => ({
+  PromiseCancelledError: vi.fn(),
+}));
 
 describe('CancellablePromise', () => {
-  jest.mock('./PromiseCancelledError', () => ({
-    PromiseCancelledError: jest.fn(),
-  }));
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
   it('cancels promise', async () => {
-    const PromiseCancelledErrorMockInstance = new PromiseCancelledError();
     const promise = new CancellablePromise<void>(resolve => {
       const token = setTimeout(() => resolve(), 0);
       return () => {
@@ -26,7 +32,9 @@ describe('CancellablePromise', () => {
 
     promise.cancel();
 
-    await expect(promise).rejects.toThrow(PromiseCancelledErrorMockInstance);
+    vi.advanceTimersByTime(1);
+
+    await expect(promise).rejects.toThrowError('');
   });
 
   it('should resolve promise', async () => {
@@ -37,11 +45,14 @@ describe('CancellablePromise', () => {
       };
     });
 
+    vi.advanceTimersByTime(1);
+
     await expect(promise).resolves.toBe(777);
   });
 
   it('should reject promise', async () => {
-    const error = new Error('test');
+    const testMessage = 'test';
+    const error = new Error(testMessage);
     const promise = new CancellablePromise<number>((resolve, reject) => {
       const token = setTimeout(() => reject(error), 0);
       return () => {
@@ -49,6 +60,8 @@ describe('CancellablePromise', () => {
       };
     });
 
-    await expect(promise).rejects.toThrow(error);
+    vi.advanceTimersByTime(1);
+
+    await expect(promise).rejects.toThrowError(testMessage);
   });
 });

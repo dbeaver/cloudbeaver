@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, it, vitest } from 'vitest';
 
 import { getTextFileReadingProcess } from './getTextFileReadingProcess.js';
 
@@ -17,17 +17,17 @@ describe('getTextFileReadingProcess', () => {
     file = new File(['file content'], 'test.txt', { type: 'text/plain' });
 
     mockFileReader = {
-      readAsText: jest.fn(),
+      readAsText: vitest.fn(),
       onload: null,
       onerror: null,
       onabort: null,
     };
 
-    jest.spyOn(window, 'FileReader').mockImplementation(() => mockFileReader as FileReader);
+    vitest.spyOn(window, 'FileReader').mockImplementation(() => mockFileReader as FileReader);
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vitest.restoreAllMocks();
   });
 
   it('should return correct instances', () => {
@@ -66,11 +66,16 @@ describe('getTextFileReadingProcess', () => {
     const { promise } = getTextFileReadingProcess(file);
     const error = new Error('Read error');
 
+    // so we don't see the error in the console
+    const consoleErrorSpy = vitest.spyOn(console, 'error').mockImplementation(() => {});
+
     (mockFileReader.onerror as any)({
       target: { error: error },
     });
 
     await expect(promise).rejects.toThrow(`Error occurred reading file: "${file.name}"`);
+
+    consoleErrorSpy.mockRestore();
   });
 
   it('should reject if the read is aborted', async () => {
