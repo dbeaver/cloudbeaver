@@ -13,11 +13,11 @@ to: <%= name %>/package.json
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./lib/index.js"
   },
   "scripts": {
     "build": "tsc -b",
-    "clean": "rimraf --glob dist",
+    "clean": "rimraf --glob lib",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies"

@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, vitest } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
 import * as coreDi from '@cloudbeaver/core-di';
@@ -13,29 +13,29 @@ import * as coreUtils from '@cloudbeaver/core-utils';
 
 import { useClipboard } from './useClipboard.js';
 
-jest.mock('@cloudbeaver/core-utils', () => ({
-  copyToClipboard: jest.fn(),
+vitest.mock('@cloudbeaver/core-utils', () => ({
+  copyToClipboard: vitest.fn(),
 }));
 
-jest.mock('@cloudbeaver/core-di', () => ({
-  useService: jest.fn(),
+vitest.mock('@cloudbeaver/core-di', () => ({
+  useService: vitest.fn(),
 }));
 
-jest.mock('@cloudbeaver/core-events', () => ({
+vitest.mock('@cloudbeaver/core-events', () => ({
   NotificationService: {},
 }));
 
 class NotificationService {
-  logSuccess = jest.fn();
-  logException = jest.fn();
+  logSuccess = vitest.fn();
+  logException = vitest.fn();
 }
 
 const getMocks = () => {
-  const copyToClipboardMock = jest.fn();
+  const copyToClipboardMock = vitest.fn();
   const notificationServiceMock = new NotificationService();
 
-  jest.spyOn(coreUtils, 'copyToClipboard').mockImplementation(copyToClipboardMock);
-  jest.spyOn(coreDi, 'useService').mockImplementation(() => notificationServiceMock);
+  vitest.spyOn(coreUtils, 'copyToClipboard').mockImplementation(copyToClipboardMock);
+  vitest.spyOn(coreDi, 'useService').mockImplementation(() => notificationServiceMock);
 
   return {
     copyToClipboardMock,
@@ -43,14 +43,14 @@ const getMocks = () => {
   };
 };
 
-describe.skip('useClipboard', () => {
+describe('useClipboard', () => {
   const VALUE_TO_COPY = 'test';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vitest.clearAllMocks();
   });
 
-  it('should copy without notification', async () => {
+  it('should copy without notification', () => {
     const { notificationServiceMock, copyToClipboardMock } = getMocks();
 
     const { result } = renderHook(() => useClipboard());
@@ -67,7 +67,7 @@ describe.skip('useClipboard', () => {
     expect(notificationServiceMock.logException).not.toHaveBeenCalled();
   });
 
-  it('should copy with notification', async () => {
+  it('should copy with notification', () => {
     const { notificationServiceMock, copyToClipboardMock } = getMocks();
 
     const { result } = renderHook(() => useClipboard());
@@ -79,7 +79,7 @@ describe.skip('useClipboard', () => {
     expect(notificationServiceMock.logException).not.toHaveBeenCalled();
   });
 
-  it('should handle exception while trying to copy', async () => {
+  it('should handle exception while trying to copy', () => {
     const { notificationServiceMock, copyToClipboardMock } = getMocks();
 
     const { result } = renderHook(() => useClipboard());
