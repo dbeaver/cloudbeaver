@@ -59,6 +59,8 @@ export default [
   ['connections_connection_host', '主机'],
   ['connections_connection_port', '端口'],
   ['connections_connection_template', '模板'],
+  ['core_connections_connection_create_success', 'Connection was created'],
+  ['core_connections_connection_update_success', 'Connection was updated'],
   ['connections_connection_test', '测试连接'],
   ['connections_connection_test_tooltip', '测试链接'],
   ['connections_connection_test_fail', '连接测试失败'],

@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { beforeEach, describe, expect, vitest, test } from 'vitest';
 
 import { CachedDataResource } from './CachedDataResource.js';
 
@@ -26,12 +26,8 @@ const DATA_MOCK_GETTER: () => IEntityData[] = () => [
   },
 ];
 
-async function fetchMock(): Promise<IEntityData[]> {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(DATA_MOCK_GETTER());
-    }, 1);
-  });
+function fetchMock(): Promise<IEntityData[]> {
+  return Promise.resolve(DATA_MOCK_GETTER());
 }
 
 class TestDataResource extends CachedDataResource<IEntityData[]> {
@@ -71,7 +67,7 @@ describe('CachedDataResource', () => {
   });
 
   test('should run onDataOutdated handlers on data outdate', () => {
-    const handler = jest.fn();
+    const handler = vitest.fn();
 
     dataResource.onDataOutdated.addHandler(handler);
     dataResource.markOutdated();
@@ -80,7 +76,7 @@ describe('CachedDataResource', () => {
   });
 
   test('should run onDataUpdate handlers on data update', () => {
-    const handler = jest.fn();
+    const handler = vitest.fn();
 
     dataResource.onDataUpdate.addHandler(handler);
     dataResource.dataUpdate();
