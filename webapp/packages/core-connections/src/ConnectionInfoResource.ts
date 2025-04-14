@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
@@ -270,13 +271,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     return this.sessionUpdate;
   }
 
-  getEmptyConfig(): ConnectionConfig {
-    return {
-      template: false,
-      saveCredentials: false,
-    };
-  }
-
   isConnecting(key: IConnectionInfoParams): boolean;
   isConnecting(key: ResourceKeyList<IConnectionInfoParams>): boolean;
   isConnecting(key: ResourceKey<IConnectionInfoParams>): boolean;
@@ -484,6 +478,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     await this.performUpdate(key, [], async () => {
       const { connection } = await this.graphQLService.sdk.updateConnection({
         projectId: key.projectId,
+        connectionId: key.connectionId,
         config,
         ...this.getDefaultIncludes(),
         ...this.getIncludesMap(key),
