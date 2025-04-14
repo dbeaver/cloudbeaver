@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -33,14 +33,18 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
       const wordLowerCase = word.toLocaleLowerCase();
       const hasSameName = proposals.some(
         ({ replacementString, displayString }) =>
-          displayString.toLocaleLowerCase() === wordLowerCase || replacementString.toLocaleLowerCase() === wordLowerCase,
+          sanitizeProposal(displayString) === wordLowerCase || replacementString.toLocaleLowerCase() === wordLowerCase,
       );
       const filteredProposals = proposals
         .filter(
-          ({ replacementString, displayString }) =>
-            word === '*' ||
-            (displayString.toLocaleLowerCase() !== wordLowerCase && displayString.toLocaleLowerCase().startsWith(wordLowerCase)) ||
-            (replacementString.toLocaleLowerCase() !== wordLowerCase && replacementString.toLocaleLowerCase().startsWith(wordLowerCase)),
+          ({ replacementString, displayString }) => {
+            const display = sanitizeProposal(displayString);
+            const replacement = replacementString.toLocaleLowerCase();
+
+            return word === '*' ||
+              (display !== wordLowerCase && display.startsWith(wordLowerCase)) ||
+              (replacement !== wordLowerCase && replacement.startsWith(wordLowerCase));
+          }
         )
         .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
@@ -148,4 +152,8 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
   });
 
   return useEditorAutocompletion(config);
+}
+
+function sanitizeProposal(value: string): string {
+  return value.replace(/^"|"$/g, '').toLocaleLowerCase();
 }

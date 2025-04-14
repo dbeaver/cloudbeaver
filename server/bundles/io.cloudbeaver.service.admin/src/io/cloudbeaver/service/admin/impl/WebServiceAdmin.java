@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -464,11 +465,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             .filter(p -> {
                 boolean allFeaturesEnabled = true;
                 for (String feature : p.getRequiredFeatures()) {
-                    if (feature.equals("distributed")) {
-                        allFeaturesEnabled = CBApplication.getInstance().isDistributed();
-                    } else {
-                        allFeaturesEnabled = application.getAppConfiguration().isFeatureEnabled(feature);
-                    }
+                    allFeaturesEnabled = application.getAppConfiguration().isFeatureEnabled(feature);
                     if (!allFeaturesEnabled) {
                         break;
                     }
