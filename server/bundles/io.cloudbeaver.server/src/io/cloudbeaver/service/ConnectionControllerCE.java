@@ -453,7 +453,6 @@ public class ConnectionControllerCE implements ConnectionController {
                 );
             }
         } catch (Exception e) {
-            handleConnectException(webSession, dataSourceContainer, e);
             if (e instanceof DBCConnectException) {
                 Throwable rootCause = CommonUtils.getRootCause(e);
                 if (rootCause instanceof ClassNotFoundException) {
@@ -523,20 +522,6 @@ public class ConnectionControllerCE implements ConnectionController {
         }
 
         return connectionInfo;
-    }
-
-    protected void handleConnectException(
-        @NotNull WebSession webSession,
-        @NotNull DBPDataSourceContainer dataSourceContainer,
-        @NotNull Exception e
-    ) throws DBWebException {
-        if (e instanceof DBCConnectException) {
-            Throwable rootCause = CommonUtils.getRootCause(e);
-            if (rootCause instanceof ClassNotFoundException) {
-                throwDriverNotFoundException(dataSourceContainer);
-            }
-        }
-        throw new DBWebException("Error connecting to database", e);
     }
 
     @Override

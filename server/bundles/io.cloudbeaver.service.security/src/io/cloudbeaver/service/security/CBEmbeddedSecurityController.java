@@ -2616,7 +2616,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull String userId
     ) throws SQLException, DBException {
         LocalDateTime currentTime = LocalDateTime.now();
-        List<String> smSessionsId = findActiveUserSessions(userId, currentTime, true)
+        List<String> smSessionsId = findActiveUserSessions(userId, currentTime, false)
             .stream()
             .map(SMActiveSession::sessionId)
             .collect(Collectors.toList());
