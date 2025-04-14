@@ -39,6 +39,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPConnectionInformation;
 import org.jkiss.dbeaver.model.DBPPage;
 import org.jkiss.dbeaver.model.auth.*;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
@@ -1633,7 +1634,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                         throw e;
                     }
                 }
-
+                boolean isFederatedAuth = SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass());
+                if (isFederatedAuth) {
+                    String userOrigin = JSONUtils.getString(userCredentials, SMConstants.USER_ORIGIN);
+                    if (CommonUtils.isEmpty(userOrigin)) {
+                        throw new SMException("User origin not found in authentication data");
+                    }
+                    filteredUserCreds.put(SMConstants.USER_ORIGIN, userOrigin);
+                }
                 authAttemptId = createNewAuthAttempt(
                     SMAuthStatus.IN_PROGRESS,
                     authProviderId,
@@ -1647,17 +1655,20 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     forceSessionsLogout
                 );
 
-                if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
+                if (isFederatedAuth) {
+                    String userOrigin = JSONUtils.getString(userCredentials, SMConstants.USER_ORIGIN);
                     //async auth
                     var authProviderFederated = (SMAuthProviderFederated) authProviderInstance;
                     String signInLink = buildRedirectLink(
-                        authProviderFederated.getSignInLink(authProviderConfigurationId, origin),
+                        authProviderFederated.getSignInLink(authProviderConfigurationId, userOrigin),
                         authAttemptId);
                     String signOutLink = authProviderFederated.getCommonSignOutLink(authProviderConfigurationId,
-                        providerConfig.getParameters(), origin
+                        providerConfig.getParameters(), userOrigin
                     );
-                    Map<SMAuthConfigurationReference, Object> authData = Map.of(new SMAuthConfigurationReference(authProviderId,
-                        authProviderConfigurationId), filteredUserCreds);
+                    Map<SMAuthConfigurationReference, Object> authData = Map.of(
+                        new SMAuthConfigurationReference(authProviderId, authProviderConfigurationId),
+                        filteredUserCreds
+                    );
                     return SMAuthInfo.inProgress(
                         authAttemptId,
                         signInLink,
@@ -1960,15 +1971,18 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                             WebAuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
                             var authProviderInstance = authProviderDescriptor.getInstance();
                             if (authProviderInstance instanceof SMAuthProviderFederated providerFederated) {
-                                signInLink = buildRedirectLink(providerFederated.getRedirectLink(
-                                    authProviderConfiguration,
-                                    Map.of(), origin
-                                ), authId);
-                                signOutLink = providerFederated.getUserSignOutLink(
-                                    application.getAuthConfiguration()
-                                        .getAuthProviderConfiguration(authProviderConfiguration),
-                                    authProviderData, origin
-                                );
+                                String userOrigin = JSONUtils.getString(authProviderData, SMConstants.USER_ORIGIN);
+                                if(CommonUtils.isNotEmpty(userOrigin)){
+                                    signInLink = buildRedirectLink(
+                                        providerFederated.getRedirectLink(authProviderConfiguration, Map.of(), userOrigin),
+                                        authId
+                                    );
+                                    signOutLink = providerFederated.getUserSignOutLink(
+                                        application.getAuthConfiguration()
+                                            .getAuthProviderConfiguration(authProviderConfiguration),
+                                        authProviderData, userOrigin
+                                    );
+                                }
                             }
 
                         }

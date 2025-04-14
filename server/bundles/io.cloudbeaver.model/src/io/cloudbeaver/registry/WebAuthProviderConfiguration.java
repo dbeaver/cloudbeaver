@@ -85,12 +85,12 @@ public class WebAuthProviderConfiguration {
     public String getSignInLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof SMAuthProviderFederated smAuthProviderFederated ?
-            buildRedirectUrl(smAuthProviderFederated.getSignInLink(getId(), origin))
+            buildRedirectUrl(smAuthProviderFederated.getSignInLink(getId(), origin), origin)
             : null;
     }
 
-    private String buildRedirectUrl(String baseUrl) {
-        return baseUrl + "?" + CBAuthConstants.CB_REDIRECT_URL_REQUEST_PARAM + "=" + ServletAppUtils.getFullServerUrl();
+    private String buildRedirectUrl(@NotNull String baseUrl, @NotNull String origin) {
+        return baseUrl + "?" + CBAuthConstants.CB_REDIRECT_URL_REQUEST_PARAM + "=" + origin;
     }
 
     @Property

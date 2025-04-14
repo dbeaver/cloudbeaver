@@ -36,6 +36,8 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -178,8 +180,8 @@ public class ServletAppUtils {
         @NotNull String serviceId,
         @NotNull String origin
     ) throws DBException {
-        String serviceUriSegment = removeSideSlashes(webAuthApplication.getAuthServiceUriSegment());
         StringBuilder apiPrefix = new StringBuilder(removeSideSlashes(origin));
+        String serviceUriSegment = removeSideSlashes(webAuthApplication.getAuthServiceUriSegment());
         if (CommonUtils.isNotEmpty(serviceUriSegment)) {
             apiPrefix.append("/").append(serviceUriSegment);
         }
@@ -293,14 +295,25 @@ public class ServletAppUtils {
         if (CommonUtils.isEmpty(origin)) {
             origin = request.getHeader("Referer");
         }
-        if (CommonUtils.isEmpty(origin)) {
-            throw new DBWebException("Origin/referer headers is empty");
-        }
         var app = ServletAppUtils.getServletApplication();
+
+        if (CommonUtils.isEmpty(origin)) {
+            URI requestUrl = URI.create(request.getRequestURL().toString());
+            var originBuilder = new StringBuilder()
+                .append(requestUrl.getScheme())
+                .append("://")
+                .append(requestUrl.getHost());
+            if (requestUrl.getPort() > 0) {
+                originBuilder.append(":").append(requestUrl.getPort());
+            }
+            originBuilder.append("/");
+            origin = originBuilder.toString();
+        }
+
         origin = removeSideSlashes(origin);
         if (!origin.endsWith(app.getRootURI())) {
-            origin = origin + "/" + app.getRootURI();
+            origin = origin + "/" + removeSideSlashes(app.getRootURI()) + "/";
         }
-        return origin;
+        return removeSideSlashes(origin);
     }
 }

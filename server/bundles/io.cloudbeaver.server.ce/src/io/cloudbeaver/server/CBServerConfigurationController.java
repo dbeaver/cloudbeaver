@@ -74,12 +74,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     }
 
     public String getAuthServiceURL() {
-        return Stream.of(serverConfiguration.getServerURL(),
-                serverConfiguration.getRootURI(),
-                serverConfiguration.getServicesURI())
-            .map(ServletAppUtils::removeSideSlashes)
-            .filter(CommonUtils::isNotEmpty)
-            .collect(Collectors.joining("/"));
+        return serverConfiguration.getServicesURI();
     }
 
     @Override

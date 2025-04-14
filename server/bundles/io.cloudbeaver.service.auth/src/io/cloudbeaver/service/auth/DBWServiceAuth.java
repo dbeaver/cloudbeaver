@@ -35,6 +35,7 @@ public interface DBWServiceAuth extends DBWService {
 
     @WebAction(authRequired = false)
     WebAuthStatus authLogin(
+        @NotNull HttpServletRequest httpRequest,
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
@@ -63,6 +64,7 @@ public interface DBWServiceAuth extends DBWService {
 
     @WebAction(authRequired = false)
     WebLogoutInfo authLogout(
+        @NotNull HttpServletRequest httpRequest,
         @NotNull WebSession webSession,
         @Nullable String providerId,
         @Nullable String configurationId
