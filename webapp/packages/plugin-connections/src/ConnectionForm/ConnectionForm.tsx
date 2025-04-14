@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Form, Loader, Placeholder, s, StatusMessage, useForm, useObjectRef, useResource, useS } from '@cloudbeaver/core-blocks';
+import { Container, Form, Loader, Placeholder, s, StatusMessage, useForm, useObjectRef, useResource, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
@@ -86,16 +86,16 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
       <TabsState container={service.parts} localState={formState.parts} formState={formState}>
         <div className={s(styles, { box: true }, className)}>
           <div className={s(styles, { connectionTopBar: true })}>
-            <div className={s(styles, { connectionTopBarTabs: true })}>
-              <div className={s(styles, { connectionStatusMessage: true })}>
+            <Container className={s(styles, { connectionTopBarTabs: true })} overflow>
+              <Container className={s(styles, { connectionStatusMessage: true })} overflow>
                 <StatusMessage
                   type={exception ? ENotificationType.Error : ENotificationType.Info}
                   message={formState.statusMessage}
                   exception={exception}
                 />
-              </div>
+              </Container>
               <TabList className={s(styles, { tabList: true })} disabled={formState.isDisabled} underline big />
-            </div>
+            </Container>
             <div className={s(styles, { connectionTopBarActions: true })}>
               <Loader suspense inline hideMessage hideException>
                 <ConnectionFormActionsContext.Provider value={actionsContext}>
