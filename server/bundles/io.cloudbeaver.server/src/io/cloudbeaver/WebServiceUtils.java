@@ -296,7 +296,15 @@ public class WebServiceUtils extends WebCommonUtils {
                 configuration.setAuthProperties(currentAuthProps);
             }
             if (!authProperties.isEmpty()) {
-                WebDataSourceUtils.updateCredentialsFromProperties(credentials, authProperties);
+
+                // Make new Gson parser with type adapters to deserialize into existing credentials
+                InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
+                Gson credGson = new GsonBuilder()
+                    .setStrictness(Strictness.LENIENT)
+                    .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
+                    .create();
+
+                credGson.fromJson(credGson.toJsonTree(authProperties), credentials.getClass());
             }
 
             configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
