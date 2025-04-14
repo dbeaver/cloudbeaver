@@ -28,6 +28,7 @@ import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
@@ -37,8 +38,6 @@ import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
@@ -51,7 +50,7 @@ import java.util.Set;
  */
 public class WebServiceRM implements DBWServiceRM {
 
-    private static final Logger log = LoggerFactory.getLogger(WebServiceRM.class);
+    private static final Log log = Log.getLog(WebServiceRM.class);
 
     @Override
     public RMProject[] listProjects(@NotNull WebSession webSession) throws DBWebException {
