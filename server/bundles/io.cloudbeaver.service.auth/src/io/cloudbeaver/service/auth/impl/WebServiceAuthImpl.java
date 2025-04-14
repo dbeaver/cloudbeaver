@@ -136,7 +136,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         WebAsyncAuthJob job = (WebAsyncAuthJob) taskInfo.getJob();
         List<WebAuthInfo> userTokens = job.getAuthResult();
         if (CommonUtils.isEmpty(userTokens)) {
-            throw new DBWebException("No new user authentications found");
+            userTokens = List.of();
         }
         return new WebAsyncAuthTaskResult(userTokens);
     }

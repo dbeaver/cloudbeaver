@@ -51,6 +51,10 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 CommonUtils.toBoolean(env.getArgument("linkUser")),
                 CommonUtils.toBoolean(env.getArgument("forceSessionsLogout"))
             ))
+            .dataFetcher("asyncAuthTaskResult", env -> getService(env).asyncAuthTaskResult(
+                getWebSession(env, false),
+                env.getArgument("taskId")
+            ))
             .dataFetcher("authLogoutExtended", env -> getService(env).authLogout(
                 getWebSession(env, false),
                 env.getArgument("provider"),
