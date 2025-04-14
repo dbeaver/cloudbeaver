@@ -23,6 +23,7 @@ import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMControllerProvider;
 import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.Pair;
 
@@ -143,5 +144,10 @@ public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMCo
 
     public Path getMetadataFilePath() {
         return getMetadataPath().resolve(METADATA_STORAGE_FILE);
+    }
+
+    @Override
+    public boolean isPrivateProject() {
+        return RMProjectType.USER.equals(getRMProject().getType());
     }
 }
