@@ -39,7 +39,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -400,7 +399,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         webSession.addInfoMessage("Enable user - " + userID);
         try {
             webSession.getAdminSecurityController().enableUser(userID, enabled);
-            log.info(String.format("User enabled: [userId=%s]", userID));
+            log.info(String.format("User updated: [userId=%s, isActive=%s]", userID, enabled));
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error activating user", e);
