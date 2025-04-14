@@ -103,7 +103,7 @@
     {
       "label": "Clean CE",
       "type": "shell",
-      "command": "yarn clean",
+      "command": "yarn clear",
       "options": {
         "cwd": "${workspaceFolder}/webapp"
       }

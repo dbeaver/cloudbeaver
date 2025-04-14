@@ -10,12 +10,12 @@
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./dist/index.js",
-    "./*": "./dist/*"
+    ".": "./lib/index.js",
+    "./*": "./lib/*"
   },
   "scripts": {
     "build": "tsc -b",
-    "clean": "rimraf --glob dist",
+    "clean": "rimraf --glob lib",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies"
@@ -39,8 +39,8 @@
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
-    "@types/jest": "^29",
     "msw": "^2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3"
   }
 }

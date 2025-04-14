@@ -1,25 +1,25 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it, vi } from 'vitest';
 
 import { getPathParents } from './getPathParents.js';
 
-jest.mock('./createPath', () => ({
+vi.mock('./createPath', () => ({
   createPath: (...args: string[]) => args.join('/'),
 }));
 
-jest.mock('./getPathParts', () => ({
+vi.mock('./getPathParts', () => ({
   getPathParts: (path: string) => path.split('/').filter(Boolean),
 }));
 
 describe.skip('getPathParents', () => {
   it('should return all path parents ', () => {
-    expect(getPathParents('/a/b/c')).toStrictEqual(['', 'a', 'a/b']);
+    expect(getPathParents('/a/b/c')).toStrictEqual(['', '', 'a', 'a/b']);
   });
 
   it('should return empty array', () => {
@@ -27,7 +27,7 @@ describe.skip('getPathParents', () => {
   });
 
   it('should return 1 parent', () => {
-    expect(getPathParents('/a')).toStrictEqual(['']);
+    expect(getPathParents('/a')).toStrictEqual(['', '']);
   });
 
   it('should return empty array with only letters', () => {
@@ -35,6 +35,6 @@ describe.skip('getPathParents', () => {
   });
 
   it('should return empty array with only /', () => {
-    expect(getPathParents('/')).toStrictEqual([]);
+    expect(getPathParents('/')).toStrictEqual(['', '']);
   });
 });

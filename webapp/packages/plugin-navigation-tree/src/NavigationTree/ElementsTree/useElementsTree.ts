@@ -532,7 +532,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
         await options.onFilter?.(value);
       },
-      async collapse(nodeId?: string) {
+      collapse(nodeId?: string) {
         if (nodeId !== undefined) {
           if (!this.isNodeExpandable(nodeId)) {
             return;

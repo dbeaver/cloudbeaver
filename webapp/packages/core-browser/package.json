@@ -2,7 +2,7 @@
   "name": "@cloudbeaver/core-browser",
   "type": "module",
   "sideEffects": [
-    "dist/service-worker.js",
+    "lib/service-worker.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"
@@ -11,12 +11,12 @@
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./dist/index.js",
-    "./*": "./dist/*.js"
+    ".": "./lib/index.js",
+    "./*": "./lib/*.js"
   },
   "scripts": {
     "build": "tsc -b",
-    "clean": "rimraf --glob dist",
+    "clean": "rimraf --glob lib",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies"

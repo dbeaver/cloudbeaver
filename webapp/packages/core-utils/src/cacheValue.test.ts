@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it, vitest } from 'vitest';
 
 import { cacheValue } from './cacheValue.js';
 
@@ -25,7 +25,7 @@ describe('cacheValue', () => {
   });
 
   it('should calculate new value if invalidated', () => {
-    const fn = jest.fn(() => 1);
+    const fn = vitest.fn(() => 1);
     const cache = cacheValue();
     cache.value(fn);
     cache.invalidate();
@@ -37,7 +37,7 @@ describe('cacheValue', () => {
   });
 
   it('should not calculate new value if not invalidated', () => {
-    const fn = jest.fn(() => 1);
+    const fn = vitest.fn(() => 1);
     const cache = cacheValue();
     cache.value(fn);
     const value = cache.value(fn);
