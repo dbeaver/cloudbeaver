@@ -2234,6 +2234,7 @@ __metadata:
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:^"
     "@fontsource/roboto": "npm:^5"
     "@material/button": "npm:^4"
     "@material/checkbox": "npm:^4"
