@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { beforeEach, describe, expect, vitest, test } from 'vitest';
 
 import type { ResourceKey } from '../ResourceKey.js';
 import { resourceKeyList } from '../ResourceKeyList.js';
@@ -72,7 +72,7 @@ describe('CachedMapResource', () => {
   });
 
   test('should run onDataOutdated handlers on data outdate', () => {
-    const handler = jest.fn();
+    const handler = vitest.fn();
     treeResource.set('root', { name: 'root' });
     treeResource.set('root/level2', { name: 'level2' });
 
@@ -88,7 +88,7 @@ describe('CachedMapResource', () => {
   });
 
   test('CachedTreeChildrenKey alias should return key children of the node', () => {
-    const handler = jest.fn();
+    const handler = vitest.fn();
 
     treeResource.set('root', { name: 'root' });
     treeResource.set('root/level2', { name: 'level2' });
@@ -123,7 +123,7 @@ describe('CachedMapResource', () => {
   });
 
   test('should run onItemDelete handlers on data delete', () => {
-    const handler = jest.fn();
+    const handler = vitest.fn();
 
     treeResource.set('root', { name: 'root' });
     treeResource.set('root/level2', { name: 'level2' });
