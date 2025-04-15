@@ -112,7 +112,7 @@ export function useTableData(
           return true;
         }
 
-        return this.format.isReadOnly(key) && this.editor.getElementState(key) !== DatabaseEditChangeType.add;
+        return model.isReadonly(resultIndex) || (this.format.isReadOnly(key) && this.editor.getElementState(key) !== DatabaseEditChangeType.add);
       },
     }),
     {

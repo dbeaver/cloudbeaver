@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -421,6 +421,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
       isLoaded(): boolean {
         return navNodeInfoResource.isLoaded(this.root);
       },
+      isOutdated(): boolean {
+        return navNodeInfoResource.isOutdated(this.root);
+      },
       getNodeState(nodeId: string) {
         return this.state.get(nodeId);
       },
@@ -529,7 +532,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
         await options.onFilter?.(value);
       },
-      async collapse(nodeId?: string) {
+      collapse(nodeId?: string) {
         if (nodeId !== undefined) {
           if (!this.isNodeExpandable(nodeId)) {
             return;

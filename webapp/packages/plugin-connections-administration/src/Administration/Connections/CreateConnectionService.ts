@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,12 +8,10 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { ConnectionInfoOriginResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
-import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { TabsContainer } from '@cloudbeaver/core-ui';
-import { ConnectionFormService, ConnectionFormState, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormService, ConnectionFormState, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionsAdministrationNavService } from './ConnectionsAdministrationNavService.js';
 
@@ -27,18 +25,15 @@ export interface ICreateMethodOptions {
 @injectable()
 export class CreateConnectionService {
   disabled = false;
-  data: IConnectionFormState | null;
+  data: ConnectionFormState | null;
 
   readonly tabsContainer: TabsContainer<void, ICreateMethodOptions>;
 
   constructor(
     private readonly connectionsAdministrationNavService: ConnectionsAdministrationNavService,
     private readonly administrationScreenService: AdministrationScreenService,
+    private readonly serviceProvider: IServiceProvider,
     private readonly connectionFormService: ConnectionFormService,
-    private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly projectsService: ProjectsService,
-    private readonly projectInfoResource: ProjectInfoResource,
-    private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
   ) {
     this.data = null;
     this.tabsContainer = new TabsContainer('Connection Creation mode');
@@ -109,23 +104,26 @@ export class CreateConnectionService {
     this.activateMethod(defaultId);
   }
 
-  setConnectionTemplate(projectId: string, config: ConnectionConfig, availableDrivers: string[]): void {
-    this.data = new ConnectionFormState(
-      this.projectsService,
-      this.projectInfoResource,
-      this.connectionFormService,
-      this.connectionInfoResource,
-      this.connectionInfoOriginResource,
-    );
+  private get optionsPart() {
+    return this.data ? getConnectionFormOptionsPart(this.data) : null;
+  }
 
-    this.data.closeTask.addHandler(this.cancelCreate.bind(this));
+  async setConnectionTemplate(projectId: string, config: ConnectionConfig, availableDrivers: string[]): Promise<void> {
+    this.clearConnectionTemplate();
+    this.data = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
+      projectId,
+      availableDrivers,
+      type: 'admin',
+      requiredNetworkHandlersIds: [],
+      connectionId: config.connectionId,
+    });
 
-    this.data
-      .setOptions('create', 'admin')
-      .setConfig(projectId, config)
-      .setAvailableDrivers(availableDrivers || []);
+    await this.optionsPart?.load();
+    await this.optionsPart?.setDriverId(config.driverId);
 
-    this.data.load();
+    Object.assign(this.optionsPart!.state, config);
+
+    this.data.disposeTask.addHandler(this.cancelCreate.bind(this));
   }
 
   clearConnectionTemplate(): void {

@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, test, vitest } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
 import type { IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
@@ -13,33 +13,34 @@ import type { IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver
 import { useExecutor } from './useExecutor.js';
 import { useObjectRef } from './useObjectRef.js';
 
-jest.mock('./useObjectRef', () => ({
-  useObjectRef: jest.fn(obj => obj),
+vitest.mock('@cloudbeaver/core-executor', () => ({}));
+vitest.mock('./useObjectRef', () => ({
+  useObjectRef: vitest.fn(obj => obj),
 }));
 
-describe.skip('useExecutor', () => {
+describe('useExecutor', () => {
   let mockExecutor: IExecutorHandlersCollection<any>;
 
   beforeEach(() => {
     mockExecutor = {
-      addHandler: jest.fn(),
-      removeHandler: jest.fn(),
-      addPostHandler: jest.fn(),
-      removePostHandler: jest.fn(),
-      before: jest.fn(),
-      removeBefore: jest.fn(),
-      next: jest.fn(),
-      removeNext: jest.fn(),
+      addHandler: vitest.fn(),
+      removeHandler: vitest.fn(),
+      addPostHandler: vitest.fn(),
+      removePostHandler: vitest.fn(),
+      before: vitest.fn(),
+      removeBefore: vitest.fn(),
+      next: vitest.fn(),
+      removeNext: vitest.fn(),
     } as unknown as IExecutorHandlersCollection<any>;
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vitest.clearAllMocks();
   });
 
   test('should add and remove handlers', () => {
-    const handler1: IExecutorHandler<any> = jest.fn();
-    const handler2: IExecutorHandler<any> = jest.fn();
+    const handler1: IExecutorHandler<any> = vitest.fn();
+    const handler2: IExecutorHandler<any> = vitest.fn();
 
     const { unmount } = renderHook(() =>
       useExecutor({
@@ -56,8 +57,8 @@ describe.skip('useExecutor', () => {
   });
 
   test('should add and remove post handlers', () => {
-    const postHandler1: IExecutorHandler<any> = jest.fn();
-    const postHandler2: IExecutorHandler<any> = jest.fn();
+    const postHandler1: IExecutorHandler<any> = vitest.fn();
+    const postHandler2: IExecutorHandler<any> = vitest.fn();
 
     const { unmount } = renderHook(() =>
       useExecutor({
@@ -110,8 +111,8 @@ describe.skip('useExecutor', () => {
   test('should do nothing if executor is not provided', () => {
     renderHook(() =>
       useExecutor({
-        handlers: [jest.fn()],
-        postHandlers: [jest.fn()],
+        handlers: [vitest.fn()],
+        postHandlers: [vitest.fn()],
       }),
     );
 
@@ -122,7 +123,7 @@ describe.skip('useExecutor', () => {
   test('should use useObjectRef', () => {
     const options = {
       executor: mockExecutor,
-      handlers: [jest.fn()],
+      handlers: [vitest.fn()],
     };
 
     renderHook(() => useExecutor(options));

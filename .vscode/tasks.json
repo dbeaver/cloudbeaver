@@ -93,17 +93,9 @@
       }
     },
     {
-      "label": "Update TS references CE",
-      "type": "shell",
-      "command": "yarn run update-ts-references",
-      "options": {
-        "cwd": "${workspaceFolder}/webapp"
-      }
-    },
-    {
       "label": "Clean CE",
       "type": "shell",
-      "command": "yarn clean",
+      "command": "yarn clear",
       "options": {
         "cwd": "${workspaceFolder}/webapp"
       }

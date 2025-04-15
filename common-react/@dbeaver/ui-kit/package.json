@@ -5,12 +5,14 @@
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./*.css": "./src/*.css",
+    "./*": "./lib/*.js"
   },
   "scripts": {
     "build": "tsc -b",
     "docs": "ladle serve",
-    "clean": "rimraf --glob dist"
+    "clean": "rimraf --glob lib"
   },
   "packageManager": "yarn@4.6.0",
   "devDependencies": {

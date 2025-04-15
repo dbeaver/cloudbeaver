@@ -1,17 +1,17 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { beforeAll, describe, expect, it, jest } from '@jest/globals';
+import { beforeAll, describe, expect, it, vitest } from 'vitest';
 
 import { copyToClipboard } from './copyToClipboard.js';
 
 describe('copyToClipboard', () => {
   beforeAll(() => {
-    document.execCommand = jest.fn() as any;
+    document.execCommand = vitest.fn() as any;
   });
 
   it('should copy data to clipboard', () => {
@@ -21,7 +21,7 @@ describe('copyToClipboard', () => {
   });
 
   it('should focus on active element after copy', () => {
-    document.body.focus = jest.fn();
+    document.body.focus = vitest.fn();
 
     copyToClipboard('test');
 

@@ -1,0 +1,1 @@
+# @dbeaver/jdbc-uri-parser
