@@ -8,6 +8,9 @@
   },
   "references": [
     {
+      "path": "../../../common-typescript/@dbeaver/jdbc-uri-parser"
+    },
+    {
       "path": "../core-authentication"
     },
     {

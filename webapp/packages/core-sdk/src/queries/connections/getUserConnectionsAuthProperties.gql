@@ -1,0 +1,5 @@
+query getUserConnectionsAuthProperties($projectId: ID, $connectionId: ID, $projectIds: [ID!]) {
+  connections: userConnections(projectId: $projectId, id: $connectionId, projectIds: $projectIds) {
+    ...DatabaseConnectionAuthProperties
+  }
+}

@@ -12,6 +12,7 @@ import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import type { IFormPart } from './IFormPart.js';
 import type { IFormState } from './IFormState.js';
+import { formSubmitContext } from './formSubmitContext.js';
 
 export abstract class FormPart<TPartState, TFormState = any> implements IFormPart<TPartState> {
   state: TPartState;
@@ -39,7 +40,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     this.loading = false;
 
     this.formState.submitTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.save.bind(this)));
-    this.formState.formatTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.format.bind(this)));
+    this.formState.formatTask.addHandler(executorHandlerFilter(() => this.isLoaded() && this.isChanged, this.format.bind(this)));
     this.formState.validationTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.handleValidation.bind(this)));
 
     makeObservable<this, 'loaded' | 'loading' | 'setInitialState'>(this, {
@@ -84,7 +85,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     return !isObjectsEqual(this.initialState, this.state);
   }
 
-  async save(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<any> {
+  async save(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<void> {
     if (this.loading) {
       return;
     }
@@ -93,8 +94,9 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
 
     try {
       await this.loader();
+      const formSubmit = contexts.getContext(formSubmitContext);
 
-      if (!this.isChanged) {
+      if (!this.isChanged && !formSubmit.submitOnNoChanges) {
         return;
       }
 
@@ -142,7 +144,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     await this.load();
   }
 
-  reset() {
+  reset(): void {
     this.setState(toJS(this.initialState));
   }
 
@@ -155,7 +157,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     }
   }
 
-  protected setInitialState(initialState: TPartState) {
+  protected setInitialState(initialState: TPartState): void {
     const isChanged = this.isChanged;
 
     this.initialState = initialState;
@@ -167,7 +169,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     this.setState(toJS(this.initialState));
   }
 
-  protected setState(state: TPartState) {
+  protected setState(state: TPartState): void {
     this.state = state;
   }
 
