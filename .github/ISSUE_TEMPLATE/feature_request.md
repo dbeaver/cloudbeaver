@@ -1,9 +1,9 @@
 ---
-name: Feature request
+name: Feature Request
 about: Provide a description of your feature request for CloudBeaver. Include the problem you are trying to solve, why it is important, and any specific functionality you believe would improve the platform.
 title: ''
 labels: wait for review
-#type: Feature
+type: Feature
 assignees: ''
 
 ---
