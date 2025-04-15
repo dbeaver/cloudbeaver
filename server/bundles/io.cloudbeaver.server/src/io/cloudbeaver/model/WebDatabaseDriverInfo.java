@@ -202,7 +202,7 @@ public class WebDatabaseDriverInfo {
             return Arrays.stream(properties)
                 .map(p -> new WebPropertyInfo(webSession, p, propertySource)).toArray(WebPropertyInfo[]::new);
         } catch (DBException e) {
-            log.error("Error reading driver properties", e);
+            log.error("Error reading driver properties:\n" + e.getMessage());
             return new WebPropertyInfo[0];
         }
     }

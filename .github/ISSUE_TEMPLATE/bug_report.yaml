@@ -1,0 +1,61 @@
+name: 🐛 Bug Report
+description: Create a report to help us improve our product
+labels: [wait for review]
+type: Bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug in CloudBeaver!
+        To ensure we can address the issue as quickly and efficiently as possible, please provide as much detail as you can in the fields below.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: |
+        A clear and concise description of the issue being addressed.
+         - Describe the actual problematic behavior.
+         - Ensure private information is redacted.
+         - Include console output or log files if relevant.
+         - If applicable, add screenshots or screen recordings to help explain your problem.
+      placeholder: |
+        Please enter a description of the issue. Here you can also attach log files, screenshots or a video
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Describe the steps to reproduce the bug
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected/Desired Behavior
+      description: |
+        A clear and concise description of what happens in the software **after** a fix is created and merged.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: CloudBeaver Version
+      description: What version of CloudBeaver are you running?
+      placeholder: ex. CloudBeaver Community 25.0.0
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Any additional context about the environment
+      placeholder: |
+        Example:
+        1. OS: [e.g. iOS, Ubuntu, Windows 11]
+        2. Browser: [e.g. Chrome, Safari]
+    validations:
+      required: false
