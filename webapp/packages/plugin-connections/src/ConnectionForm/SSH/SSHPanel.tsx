@@ -1,24 +1,27 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
 
-import { SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps.js';
 import { SSH } from './SSH.js';
+import { useAutoLoad } from '@cloudbeaver/core-blocks';
+import { getConnectionFormSSHPart } from './getConnectionFormSSHPart.js';
+import type { IConnectionFormProps } from '../IConnectionFormState.js';
 
 export const SSHPanel: TabContainerPanelComponent<IConnectionFormProps> = observer(function SSHPanel(props) {
-  const state = props.state.config.networkHandlersConfig?.find(state => state.id === SSH_TUNNEL_ID);
+  const sshPart = getConnectionFormSSHPart(props.formState);
 
-  if (!state) {
+  useAutoLoad(SSHPanel, sshPart);
+
+  if (!sshPart.state) {
     return null;
   }
 
-  return <SSH {...props} handlerState={state} />;
+  return <SSH {...props} handlerState={sshPart.state} />;
 });

@@ -7,11 +7,10 @@
  */
 import { createContext } from 'react';
 
-import type { IConnectionFormState } from './IConnectionFormProps.js';
-
 export interface IConnectionFormActionsContext {
-  save: IConnectionFormState['save'];
-  test: IConnectionFormState['test'];
+  save: () => Promise<void>;
+  test: () => Promise<void>;
+  onCancel?: () => void;
 }
 
 export const ConnectionFormActionsContext = createContext<IConnectionFormActionsContext | null>(null);
