@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it, vitest } from 'vitest';
 
 import { LoadingError } from './LoadingError.js';
 
@@ -17,7 +17,7 @@ describe('LoadingError', () => {
   });
 
   it('should trigger onRefresh', () => {
-    const onRefresh = jest.fn();
+    const onRefresh = vitest.fn();
     const error = new LoadingError(onRefresh, 'test');
 
     error.refresh();
@@ -26,13 +26,13 @@ describe('LoadingError', () => {
   });
 
   it('should refresh cause of the cause', () => {
-    const onRefresh = jest.fn();
+    const onRefresh = vitest.fn();
     const cause = new LoadingError(onRefresh, 'test');
     const causeCause = new LoadingError(onRefresh, 'test', { cause });
     const error = new LoadingError(onRefresh, 'test', { cause: causeCause });
 
-    jest.spyOn(causeCause, 'refresh');
-    jest.spyOn(cause, 'refresh');
+    vitest.spyOn(causeCause, 'refresh');
+    vitest.spyOn(cause, 'refresh');
 
     error.refresh();
 
@@ -44,12 +44,12 @@ describe('LoadingError', () => {
   });
 
   it('should pass cause through the regular error', () => {
-    const onRefresh = jest.fn();
+    const onRefresh = vitest.fn();
     const cause = new LoadingError(onRefresh, 'test', { cause: 'unit test' });
     const regularError = new Error('test', { cause });
     const error = new LoadingError(onRefresh, 'test', { cause: regularError });
 
-    jest.spyOn(cause, 'refresh');
+    vitest.spyOn(cause, 'refresh');
 
     error.refresh();
 

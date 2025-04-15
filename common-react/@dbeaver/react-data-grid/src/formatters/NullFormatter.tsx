@@ -1,4 +1,3 @@
-import styles from './NullFormatter.module.css';
 import { clsx } from '@dbeaver/ui-kit';
 
 interface Props {
@@ -8,7 +7,7 @@ interface Props {
 
 export function NullFormatter({ className, onClick }: Props) {
   return (
-    <span className={clsx(styles['nullValue'], className)} onClick={onClick}>
+    <span className={clsx('tw:uppercase', 'tw:opacity-65', className)} onClick={onClick}>
       [NULL]
     </span>
   );

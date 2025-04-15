@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
     this.connectionDetailsPlaceholder.add(SSH, 2);
   }
 
-  private async refreshUserConnections(configuration: boolean, outside: boolean, outsideAdminPage: boolean): Promise<void> {
+  private refreshUserConnections(configuration: boolean, outside: boolean, outsideAdminPage: boolean): void {
     // TODO: we have to track users' leaving the page
     if (outside) {
       this.connectionInfoResource.cleanNewFlags();
@@ -95,14 +95,14 @@ export class ConnectionsAdministrationService extends Bootstrap {
     }
   }
 
-  private async activateCreateMethod(param: string | null) {
+  private activateCreateMethod(param: string | null) {
     if (!param) {
       this.createConnectionService.setCreateMethod();
     }
     this.createConnectionService.setCreateMethod(param);
   }
 
-  private async deactivateCreateMethod(param: string | null, configuration: boolean, outside: boolean) {
+  private deactivateCreateMethod(param: string | null, configuration: boolean, outside: boolean) {
     if (outside) {
       this.createConnectionService.close();
     }

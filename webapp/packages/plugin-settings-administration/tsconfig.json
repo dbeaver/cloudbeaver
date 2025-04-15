@@ -2,8 +2,8 @@
   "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "outDir": "lib",
+    "tsBuildInfoFile": "lib/tsconfig.tsbuildinfo",
     "composite": true
   },
   "references": [
@@ -44,7 +44,6 @@
   ],
   "exclude": [
     "**/node_modules",
-    "lib/**/*",
-    "dist/**/*"
+    "lib/**/*"
   ]
 }
