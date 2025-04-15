@@ -1,34 +1,28 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { action, makeObservable, observable } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
-import {
-  ConnectionInfoOriginResource,
-  ConnectionInfoResource,
-  ConnectionsManagerService,
-  createConnectionParam,
-  type IConnectionInfoParams,
-} from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { ConnectionInfoResource, ConnectionsManagerService, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { executorHandlerFilter, ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
-import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { ResourceKey, ResourceKeySimple } from '@cloudbeaver/core-resource';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import { OptionsPanelService } from '@cloudbeaver/core-ui';
+import { FormMode, OptionsPanelService } from '@cloudbeaver/core-ui';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
-import { ConnectionFormService } from '../ConnectionForm/ConnectionFormService.js';
 import { ConnectionFormState } from '../ConnectionForm/ConnectionFormState.js';
-import type { IConnectionFormState } from '../ConnectionForm/IConnectionFormProps.js';
+import { ConnectionFormService } from '../ConnectionForm/ConnectionFormService.js';
+import { getConnectionFormOptionsPart } from '../ConnectionForm/Options/getConnectionFormOptionsPart.js';
 
 const PublicConnectionForm = importLazyComponent(() => import('./PublicConnectionForm.js').then(m => m.PublicConnectionForm));
 
@@ -36,20 +30,18 @@ const formGetter = () => PublicConnectionForm;
 
 @injectable()
 export class PublicConnectionFormService {
-  formState: IConnectionFormState | null;
+  formState: ConnectionFormState | null;
 
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
     private readonly optionsPanelService: OptionsPanelService,
+    private readonly serviceProvider: IServiceProvider,
     private readonly connectionFormService: ConnectionFormService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly userInfoResource: UserInfoResource,
     private readonly authenticationService: AuthenticationService,
-    private readonly projectsService: ProjectsService,
-    private readonly projectInfoResource: ProjectInfoResource,
-    private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
   ) {
     this.formState = null;
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
@@ -79,29 +71,25 @@ export class PublicConnectionFormService {
     });
   }
 
-  change(projectId: string, config: ConnectionConfig, availableDrivers?: string[]): void {
-    // if (this.formState) {
-    //   this.formState.dispose();
-    // }
+  async change(projectId: string, config: ConnectionConfig, availableDrivers?: string[]): Promise<void> {
+    this.formState?.dispose();
+    this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
+      projectId,
+      availableDrivers: availableDrivers ?? [],
+      type: 'public',
+      requiredNetworkHandlersIds: [],
+      connectionId: config.connectionId,
+    }).setMode(config.connectionId ? FormMode.Edit : FormMode.Create);
 
-    if (!this.formState) {
-      this.formState = new ConnectionFormState(
-        this.projectsService,
-        this.projectInfoResource,
-        this.connectionFormService,
-        this.connectionInfoResource,
-        this.connectionInfoOriginResource,
-      );
+    await this.optionsPart?.load();
 
-      this.formState.closeTask.addHandler(this.close.bind(this, true));
+    if (config.driverId) {
+      await this.optionsPart?.setDriverId(config.driverId);
     }
 
-    this.formState
-      .setOptions(config.connectionId ? 'edit' : 'create', 'public')
-      .setConfig(projectId, config)
-      .setAvailableDrivers(availableDrivers || []);
+    Object.assign(this.optionsPart!.state, config);
 
-    this.formState.load();
+    this.formState.disposeTask.addHandler(this.close.bind(this, true));
   }
 
   async open(projectId: string, config: ConnectionConfig, availableDrivers?: string[]): Promise<boolean> {
@@ -114,29 +102,20 @@ export class PublicConnectionFormService {
     return state;
   }
 
-  async close(saved?: boolean): Promise<boolean> {
+  async close(saved?: boolean): Promise<void> {
     if (!this.formState) {
-      return true;
+      return;
     }
 
     if (saved) {
       this.clearFormState();
     }
 
-    const state = await this.optionsPanelService.close();
-
-    if (state) {
-      this.clearFormState();
-    }
-
-    return state;
+    await this.optionsPanelService.close();
   }
 
   async save(): Promise<void> {
-    const key =
-      this.formState && this.formState.config.connectionId && this.formState.projectId !== null
-        ? createConnectionParam(this.formState.projectId, this.formState.config.connectionId)
-        : null;
+    const key = this.optionsPart?.connectionKey;
 
     await this.close(true);
 
@@ -145,22 +124,26 @@ export class PublicConnectionFormService {
     }
   }
 
+  private get optionsPart() {
+    return this.formState ? getConnectionFormOptionsPart(this.formState) : null;
+  }
+
   private readonly closeRemoved: IExecutorHandler<ResourceKey<IConnectionInfoParams>> = (data, contexts) => {
-    if (!this.formState || !this.formState.config.connectionId || this.formState.projectId === null) {
+    if (!this.formState || !this.optionsPart?.connectionKey) {
       return;
     }
 
-    if (!this.connectionInfoResource.has(createConnectionParam(this.formState.projectId, this.formState.config.connectionId))) {
+    if (!this.connectionInfoResource.has(this.optionsPart.connectionKey)) {
       this.close(true);
     }
   };
 
   private readonly closeDeleted: IExecutorHandler<ResourceKeySimple<IConnectionInfoParams>> = (data, contexts) => {
-    if (!this.formState || !this.formState.config.connectionId || this.formState.projectId === null) {
+    if (!this.formState || !this.optionsPart?.connectionKey) {
       return;
     }
 
-    if (this.connectionInfoResource.isIntersect(data, createConnectionParam(this.formState.projectId, this.formState.config.connectionId))) {
+    if (this.connectionInfoResource.isIntersect(data, this.optionsPart.connectionKey)) {
       this.close(true);
     }
   };
@@ -170,23 +153,22 @@ export class PublicConnectionFormService {
 
     if (!confirmed) {
       ExecutorInterrupter.interrupt(contexts);
+      return;
     }
+
+    this.clearFormState();
   };
 
   private async showUnsavedChangesDialog(): Promise<boolean> {
     if (
       !this.formState ||
       !this.optionsPanelService.isOpen(formGetter) ||
-      (this.formState.config.connectionId &&
-        this.formState.projectId !== null &&
-        !this.connectionInfoResource.has(createConnectionParam(this.formState.projectId, this.formState.config.connectionId)))
+      (this.optionsPart?.connectionKey && !this.connectionInfoResource.has(this.optionsPart.connectionKey))
     ) {
       return true;
     }
 
-    const state = await this.formState.checkFormState();
-
-    if (!state?.edited) {
+    if (!this.formState.isChanged) {
       return true;
     }
 
