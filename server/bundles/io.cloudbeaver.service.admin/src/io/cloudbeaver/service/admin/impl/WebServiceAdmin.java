@@ -39,7 +39,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -291,6 +290,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         try {
             var adminSecurityController = webSession.getAdminSecurityController();
             adminSecurityController.addUserTeams(user, new String[]{team}, grantor.getUserId());
+
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error granting team", e);
@@ -403,6 +403,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     @Override
     public Boolean setUserAuthRole(WebSession webSession, String userId, String authRole) throws DBWebException {
         try {
+            log.info(String.format("User set auth role: [grantorUserId=%s]", webSession.getUserId()));
             webSession.getAdminSecurityController().setUserAuthRole(userId, authRole);
             return true;
         } catch (Exception e) {
@@ -518,6 +519,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         } catch (DBException e) {
             throw new DBWebException("Error saving server configuration", e);
         }
+        log.info(String.format(
+            "Auth provider configuration created: [id=%s, provider=%s, userId=%s]",
+            providerConfig.getId(),
+            providerConfig.getProvider(),
+            webSession.getUserId()
+        ));
         return new WebAuthProviderConfiguration(authProvider, providerConfig);
     }
 
@@ -531,6 +538,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             } catch (DBException e) {
                 throw new DBWebException("Error saving server configuration", e);
             }
+            log.info(String.format("Auth provider configuration deleted: [id=%s, userId=%s]", id, webSession.getUserId()));
             return true;
         }
         return false;
