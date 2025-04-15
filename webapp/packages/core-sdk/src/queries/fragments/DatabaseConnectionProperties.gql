@@ -1,0 +1,5 @@
+fragment DatabaseConnectionProperties on ConnectionInfo {
+  id
+  projectId
+  properties
+}

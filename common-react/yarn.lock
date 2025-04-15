@@ -335,6 +335,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@dbeaver/jdbc-uri-parser@workspace:../common-typescript/@dbeaver/jdbc-uri-parser":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/jdbc-uri-parser@workspace:../common-typescript/@dbeaver/jdbc-uri-parser"
+  dependencies:
+    "@dbeaver/tsconfig": "workspace:^"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@dbeaver/prettier-config@workspace:../common-typescript/@dbeaver/prettier-config, @dbeaver/prettier-config@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/prettier-config@workspace:../common-typescript/@dbeaver/prettier-config"
