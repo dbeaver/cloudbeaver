@@ -53,6 +53,9 @@
       "path": "../plugin-connections"
     },
     {
+      "path": "../plugin-connections-administration"
+    },
+    {
       "path": "../plugin-data-export"
     },
     {

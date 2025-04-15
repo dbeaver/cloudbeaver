@@ -19,6 +19,7 @@ import connectionCustom from '@cloudbeaver/plugin-connection-custom';
 import connectionSearch from '@cloudbeaver/plugin-connection-search';
 import { objectViewerNavTreeLinkPlugin } from '@cloudbeaver/plugin-object-viewer-nav-tree-link';
 import connectionPlugin from '@cloudbeaver/plugin-connections';
+import connectionAdministration from '@cloudbeaver/plugin-connections-administration';
 import { dataExportManifest } from '@cloudbeaver/plugin-data-export';
 import { dataGridPlugin } from '@cloudbeaver/plugin-data-grid';
 import { dataImportPluginManifest } from '@cloudbeaver/plugin-data-import';
@@ -104,6 +105,7 @@ const PLUGINS: PluginManifest[] = [
   userProfileAdministration,
   objectViewerNavTreeLinkPlugin,
   connectionPlugin,
+  connectionAdministration,
   versionUpdate,
   productPlugin,
   settingsMenu,

@@ -1,0 +1,35 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.table {
+  composes: theme-background-surface theme-text-on-surface from global;
+}
+
+.group {
+  position: relative;
+}
+
+.group,
+.container,
+.tableContainer {
+  height: 100%;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.connectionAccessTableHeader {
+  flex: 0 0 auto;
+}
+
+.tableContainer {
+  overflow: auto;
+}
