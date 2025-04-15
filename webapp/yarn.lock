@@ -2698,6 +2698,7 @@ __metadata:
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-connections": "workspace:*"
+    "@cloudbeaver/core-data-context": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-dialogs": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
@@ -2750,6 +2751,7 @@ __metadata:
     "@cloudbeaver/plugin-projects": "workspace:*"
     "@cloudbeaver/plugin-top-app-bar": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/jdbc-uri-parser": "workspace:^"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -4506,6 +4508,16 @@ __metadata:
 "@dbeaver/database-commons@workspace:../common-typescript/@dbeaver/database-commons, @dbeaver/database-commons@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/database-commons@workspace:../common-typescript/@dbeaver/database-commons"
+  dependencies:
+    "@dbeaver/tsconfig": "workspace:^"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@dbeaver/jdbc-uri-parser@workspace:../common-typescript/@dbeaver/jdbc-uri-parser, @dbeaver/jdbc-uri-parser@workspace:^":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/jdbc-uri-parser@workspace:../common-typescript/@dbeaver/jdbc-uri-parser"
   dependencies:
     "@dbeaver/tsconfig": "workspace:^"
     rimraf: "npm:^6"
