@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,9 @@ package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.DBWFeatureSet;
 import io.cloudbeaver.registry.WebFeatureRegistry;
+import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.utils.ArrayUtils;
 
 import java.util.Collections;
@@ -94,6 +96,9 @@ public abstract class BaseWebAppConfiguration implements ServletAppConfiguration
 
     @Override
     public boolean isFeatureEnabled(String id) {
+        if (DBConstants.PRODUCT_FEATURE_DISTRIBUTED.equals(id)) {
+            return ServletAppUtils.getServletApplication().isDistributed();
+        }
         return ArrayUtils.contains(getEnabledFeatures(), id);
     }
 

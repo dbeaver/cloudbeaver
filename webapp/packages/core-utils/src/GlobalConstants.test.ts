@@ -1,29 +1,22 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, it, vitest, type MockInstance } from 'vitest';
 
 import { GlobalConstants } from './GlobalConstants.js';
+import * as isValidUrlModule from './isValidUrl.js';
 
-type WindowSpyType = jest.SpiedGetter<Window>;
+type WindowSpyType = MockInstance;
 
-jest.mock('./isValidUrl', () => ({
-  isValidUrl: jest.fn().mockReturnValue(false),
-}));
-
-jest.mock('./pathJoin', () => ({
-  pathJoin: jest.fn((...args: string[]) => args.reduce((acc, arg) => acc + arg, '')),
-}));
-
-describe.skip('GlobalConstants', () => {
+describe('GlobalConstants', () => {
   let windowSpy: WindowSpyType;
 
   beforeEach(() => {
-    windowSpy = jest.spyOn(window, 'window', 'get');
+    windowSpy = vitest.spyOn(window, 'window', 'get');
   });
 
   afterEach(() => {
@@ -31,9 +24,9 @@ describe.skip('GlobalConstants', () => {
   });
 
   beforeEach(() => {
-    (global as any)._DEV_ = true;
-    (global as any)._VERSION_ = '1.0.0';
-    (global as any)._ROOT_URI_ = '{ROOT_URI}';
+    (globalThis as any)._DEV_ = true;
+    (globalThis as any)._VERSION_ = '1.0.0';
+    (globalThis as any)._ROOT_URI_ = '{ROOT_URI}';
 
     windowSpy.mockImplementation(
       () =>
@@ -80,13 +73,14 @@ describe.skip('GlobalConstants', () => {
   it('should return correct rootURI value', () => {
     expect(GlobalConstants.rootURI).toBe('/');
 
-    (global as any)._ROOT_URI_ = 'http://localhost:8080';
-    (require('./isValidUrl').isValidUrl as jest.Mock).mockReturnValueOnce(true);
+    (globalThis as any)._ROOT_URI_ = 'http://localhost:8080';
+
+    vitest.spyOn(isValidUrlModule, 'isValidUrl').mockReturnValueOnce(true);
 
     expect(GlobalConstants.rootURI).toBe('/');
 
-    (global as any)._ROOT_URI_ = '/dbeaver';
-    expect(GlobalConstants.rootURI).toBe('/dbeaver/');
+    (globalThis as any)._ROOT_URI_ = '/dbeaver';
+    expect(GlobalConstants.rootURI).toBe('/dbeaver');
   });
 
   it('should return correct serviceURI value', () => {
@@ -128,6 +122,6 @@ describe.skip('GlobalConstants', () => {
 
   it('should generate absolute url', () => {
     expect(GlobalConstants.absoluteUrl('test/', 'test2')).toBe('/test/test2');
-    expect(GlobalConstants.absoluteUrl('platform:test/', 'test2')).toBe('/apiimagesplatform:test/test2');
+    expect(GlobalConstants.absoluteUrl('platform:test/', 'test2')).toBe('/api/images/platform:test/test2');
   });
 });

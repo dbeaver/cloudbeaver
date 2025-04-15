@@ -1,24 +1,25 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { describe, expect, vitest, test, beforeEach, afterEach } from 'vitest';
 
 import { debounce, debounceAsync } from './debounce.js';
 
 describe('Debounce', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vitest.useFakeTimers();
   });
+
   afterEach(() => {
-    jest.useRealTimers();
+    vitest.useRealTimers();
   });
 
   test('function should be executed just once', () => {
-    const func = jest.fn();
+    const func = vitest.fn();
     const debouncedFunction = debounce(func, 1000);
 
     debouncedFunction();
@@ -26,7 +27,7 @@ describe('Debounce', () => {
     debouncedFunction();
 
     // Fast-forward time
-    jest.runAllTimers();
+    vitest.runAllTimers();
 
     expect(func).toHaveBeenCalledTimes(1);
   });
@@ -34,14 +35,15 @@ describe('Debounce', () => {
 
 describe('DebounceAsync', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
-  });
-  afterEach(() => {
-    jest.useRealTimers();
+    vitest.useFakeTimers();
   });
 
-  test('function should be executed just once', async () => {
-    const func = jest.fn(() => Promise.resolve(true));
+  afterEach(() => {
+    vitest.useRealTimers();
+  });
+
+  test('function should be executed just once', () => {
+    const func = vitest.fn(() => Promise.resolve(true));
     const debouncedFunction = debounceAsync(func, 1000);
 
     debouncedFunction();
@@ -49,7 +51,7 @@ describe('DebounceAsync', () => {
     debouncedFunction();
 
     // Fast-forward time
-    jest.runAllTimers();
+    vitest.runAllTimers();
 
     expect(func).toHaveBeenCalledTimes(1);
   });

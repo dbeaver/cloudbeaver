@@ -8,7 +8,6 @@
 
 import path from 'path';
 import fs from 'fs';
-import pnpapi from 'pnpapi';
 
 export default {
   meta: {

@@ -1,10 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { observer } from 'mobx-react-lite';
 
 import {
@@ -25,7 +26,7 @@ import {
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { TabListStyles, TabPanelList, TabPanelStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
-import { ConnectionFormLoader } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormLoader, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 
 import { CreateConnectionService } from '../CreateConnectionService.js';
 import styles from './shared/CreateConnection.module.css';
@@ -48,7 +49,8 @@ export const CreateConnection = observer<Props>(function CreateConnection({ meth
   const style = useS(styles);
   const createConnectionService = useService(CreateConnectionService);
   const translate = useTranslate();
-  const driver = useResource(CreateConnection, DBDriverResource, createConnectionService.data?.config.driverId || null);
+  const optionsPart = createConnectionService.data ? getConnectionFormOptionsPart(createConnectionService.data) : null;
+  const driver = useResource(CreateConnection, DBDriverResource, optionsPart?.state.driverId || null);
 
   if (createConnectionService.data) {
     return (
@@ -75,7 +77,7 @@ export const CreateConnection = observer<Props>(function CreateConnection({ meth
         <Container overflow>
           <Loader className={s(style, { loader: true })} suspense>
             <ConnectionFormLoader
-              state={createConnectionService.data}
+              formState={createConnectionService.data}
               onCancel={createConnectionService.clearConnectionTemplate}
               onSave={createConnectionService.clearConnectionTemplate}
             />

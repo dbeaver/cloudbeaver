@@ -1,13 +1,14 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed } from 'mobx';
+
+import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 import { TeamsResource, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
 import {
@@ -19,29 +20,43 @@ import {
   s,
   TextPlaceholder,
   useAutoLoad,
+  useObservableRef,
   useResource,
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { isCloudConnection } from '@cloudbeaver/core-connections';
+import { ConnectionInfoOriginResource, ConnectionInfoResource, createConnectionParam, isCloudConnection } from '@cloudbeaver/core-connections';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
-import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
-import type { IConnectionFormProps } from '@cloudbeaver/plugin-connections';
-
+import { FormMode, type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
+import { getConnectionFormOptionsPart, type IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 import styles from './ConnectionAccess.module.css';
 import { ConnectionAccessGrantedList } from './ConnectionAccessGrantedList.js';
 import { ConnectionAccessList } from './ConnectionAccessList.js';
-import { useConnectionAccessState } from './useConnectionAccessState.js';
+import { getConnectionFormAccessPart } from './getConnectionFormAccessPart.js';
 
-export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAccess({ tabId, state: formState }) {
-  const state = useConnectionAccessState(formState.info);
+export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAccess({ tabId, formState }) {
   const translate = useTranslate();
   const style = useS(styles);
+  const state = useObservableRef(
+    () => ({
+      editing: false,
+      toggleEdit() {
+        this.editing = !this.editing;
+      },
+    }),
+    {
+      editing: observable.ref,
+      toggleEdit: action.bound,
+    },
+    false,
+  );
 
   const { selected } = useTab(tabId);
+  const accessPart = getConnectionFormAccessPart(formState);
+  const [initialFormMode] = useState<FormMode>(formState.mode);
 
-  useAutoLoad(ConnectionAccess, state, selected);
+  useAutoLoad(ConnectionAccess, accessPart, selected);
 
   const users = useResource(ConnectionAccess, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setParent(UsersResourceFilterKey()), {
     active: selected,
@@ -49,32 +64,51 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
   const teams = useResource(ConnectionAccess, TeamsResource, CachedMapAllKey, { active: selected });
 
   const grantedUsers = useMemo(
-    () => computed(() => users.resource.values.filter(user => state.state.grantedSubjects.includes(user.userId))),
-    [state.state.grantedSubjects, users.resource],
+    () => computed(() => users.resource.values.filter(user => accessPart.state.includes(user.userId))),
+    [accessPart.state, users.resource],
   );
 
   const grantedTeams = useMemo(
-    () => computed(() => teams.resource.values.filter(team => state.state.grantedSubjects.includes(team.teamId))),
-    [state.state.grantedSubjects, teams.resource],
+    () => computed(() => teams.resource.values.filter(team => accessPart.state.includes(team.teamId))),
+    [accessPart.state, teams.resource],
   );
 
-  if (!selected) {
-    return null;
-  }
-
-  const loading = users.isLoading() || teams.isLoading() || state.state.loading;
-  const cloud = formState.info && formState.originInfo?.origin ? isCloudConnection(formState.originInfo.origin) : false;
-  const disabled = loading || !state.state.loaded || formState.disabled || cloud;
+  const optionsPart = getConnectionFormOptionsPart(formState);
+  const connectionInfoResource = useResource(
+    ConnectionAccess,
+    ConnectionInfoResource,
+    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
+    {
+      active: selected && !!formState.state.projectId && !!optionsPart.state.connectionId,
+    },
+  );
+  const originInfoResource = useResource(
+    ConnectionAccess,
+    ConnectionInfoOriginResource,
+    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
+    {
+      active: selected && !!formState.state.projectId && !!optionsPart.state.connectionId,
+    },
+  );
+  const connectionInfo = connectionInfoResource.data;
+  const originInfo = originInfoResource.data;
+  const loading = users.isLoading() || teams.isLoading() || accessPart.isLoading();
+  const cloud = connectionInfo && originInfo?.origin ? isCloudConnection(originInfo.origin) : false;
+  const disabled = loading || !accessPart.isLoaded() || formState.isDisabled || cloud;
   let info: TLocalizationToken | null = null;
 
-  if (formState.mode === 'edit' && state.changed) {
+  if (initialFormMode === FormMode.Edit && accessPart.isChanged) {
     info = 'ui_save_reminder';
   } else if (cloud) {
     info = 'cloud_connections_access_placeholder';
   }
 
+  if (!selected) {
+    return null;
+  }
+
   return (
-    <Loader className={s(style, { loader: true })} state={[users, teams, state.state]}>
+    <Loader className={s(style, { loader: true })} state={[users, teams, accessPart]}>
       {() => (
         <ColoredContainer className={s(style, { coloredContainer: true })} parent gap vertical>
           {!users.resource.values.length && !teams.resource.values.length ? (
@@ -89,16 +123,16 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
                   grantedUsers={grantedUsers.get()}
                   grantedTeams={grantedTeams.get()}
                   disabled={disabled}
-                  onEdit={state.edit}
-                  onRevoke={state.revoke}
+                  onEdit={state.toggleEdit}
+                  onRevoke={accessPart.revoke}
                 />
-                {state.state.editing && (
+                {state.editing && (
                   <ConnectionAccessList
                     userList={users.resource.values}
                     teamList={teams.resource.values}
-                    grantedSubjects={state.state.grantedSubjects}
+                    grantedSubjects={accessPart.state}
                     disabled={disabled}
-                    onGrant={state.grant}
+                    onGrant={accessPart.grant}
                   />
                 )}
               </Container>

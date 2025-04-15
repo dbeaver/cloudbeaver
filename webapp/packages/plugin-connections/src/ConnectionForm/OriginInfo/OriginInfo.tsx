@@ -1,80 +1,54 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import {
   ColoredContainer,
   ExceptionMessage,
+  getComputed,
   Group,
   Loader,
   ObjectPropertyInfoForm,
   s,
   TextPlaceholder,
+  useAutoLoad,
   useResource,
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import {
-  ConnectionInfoOriginDetailsResource,
-  createConnectionParam,
-  DatabaseAuthModelsResource,
-  DBDriverResource,
-} from '@cloudbeaver/core-connections';
-import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
+import { ConnectionInfoOriginDetailsResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps.js';
 import styles from './OriginInfo.module.css';
+import type { IConnectionFormProps } from '../IConnectionFormState.js';
 
-export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = observer(function OriginInfo({
-  tabId,
-  state: { info, resource, config },
-}) {
+import { getConnectionFormOriginInfoFormPart } from './getConnectionFormOriginInfoFormPart.js';
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+
+export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = observer(function OriginInfo({ tabId, formState }) {
   const tab = useTab(tabId);
   const translate = useTranslate();
-  const userInfoLoader = useResource(OriginInfo, UserInfoResource, undefined);
-  const state = useTabState<Record<string, any>>();
+  const originInfoPart = getConnectionFormOriginInfoFormPart(formState);
   const style = useS(styles);
-  const driverLoader = useResource(OriginInfo, DBDriverResource, config.driverId ?? null);
-  const authModeLoader = useResource(
-    OriginInfo,
-    DatabaseAuthModelsResource,
-    config.authModelId ?? info?.authModel ?? driverLoader.data?.defaultAuthModel ?? null,
-  );
-
-  const providerId = authModeLoader.data?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
-  const isAuthenticated = userInfoLoader.resource.hasToken(providerId);
-  const providerLoader = useResource(OriginInfo, AuthProvidersResource, providerId);
-  const connectionId = tab.selected && info ? createConnectionParam(info.projectId, info.id) : null;
-
-  const connectionOriginDetailsResource = useResource(OriginInfo, ConnectionInfoOriginDetailsResource, connectionId, {
-    active: isAuthenticated,
+  const optionsPart = getConnectionFormOptionsPart(formState);
+  const providerLoader = useResource(OriginInfo, AuthProvidersResource, originInfoPart.providerId, {
+    active: tab.selected,
   });
-  const connection = useResource(OriginInfo, resource, connectionId, {
-    active: isAuthenticated,
-    onData: connection => {
-      runInAction(() => {
-        if (!connectionOriginDetailsResource.data?.origin.details) {
-          return;
-        }
-
-        for (const property of Object.keys(state)) {
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-          delete state[property];
-        }
-
-        for (const property of connectionOriginDetailsResource.data.origin.details) {
-          state[property.id!] = property.value;
-        }
-      });
-    },
+  const isAuthenticated = getComputed(() => originInfoPart.isAuthenticated);
+  const connectionOriginDetailsResource = useResource(OriginInfo, ConnectionInfoOriginDetailsResource, optionsPart.connectionKey, {
+    active: tab.selected && isAuthenticated,
   });
+  const connection = useResource(OriginInfo, ConnectionInfoResource, optionsPart.connectionKey, {
+    active: tab.selected && isAuthenticated,
+  });
+
+  useAutoLoad(OriginInfo, originInfoPart);
 
   if (connection.isLoading()) {
     return (
@@ -115,7 +89,13 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   return (
     <ColoredContainer className={s(style, { coloredContainer: true })} parent>
       <Group large gap>
-        <ObjectPropertyInfoForm properties={connectionOriginDetailsResource.data?.origin.details} state={state} readOnly small autoHide />
+        <ObjectPropertyInfoForm
+          properties={connectionOriginDetailsResource.data?.origin.details}
+          state={originInfoPart.state}
+          readOnly
+          small
+          autoHide
+        />
       </Group>
       <Loader key="overlay" className={s(style, { loader: true })} loading={connection.isLoading()} overlay />
     </ColoredContainer>

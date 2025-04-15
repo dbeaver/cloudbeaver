@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,27 +27,35 @@ interface IOptions {
   getChildren: (node: string) => string[];
   load(nodeId: string, manual: boolean): Promise<void>;
 
+  getParent?: (node: string) => string | null;
   childrenTransformers?: TreeDataTransformer<string[]>[];
   nodeTransformers?: TreeDataTransformer<INode>[];
+  parentTransformers?: TreeDataTransformer<string | null>[];
   stateTransformers?: TreeDataTransformer<INodeState>[];
 }
+
+const DEFAULT_PARENT_GETTER = () => null;
 
 export function useTreeData(options: IOptions): ITreeData {
   options = useObservableRef(
     {
       ...options,
+      getParent: options.getParent ?? DEFAULT_PARENT_GETTER,
       childrenTransformers: [...(options.childrenTransformers || [])],
       nodeTransformers: [...(options.nodeTransformers || [])],
       stateTransformers: [...(options.stateTransformers || [])],
+      parentTransformers: [...(options.parentTransformers || [])],
     },
     {
       rootId: observable.ref,
       getNode: observable.ref,
       getChildren: observable.ref,
+      getParent: observable.ref,
       load: observable.ref,
 
       childrenTransformers: observable.ref,
       nodeTransformers: observable.ref,
+      parentTransformers: observable.ref,
       stateTransformers: observable.ref,
     },
   );
@@ -66,6 +74,12 @@ export function useTreeData(options: IOptions): ITreeData {
         computed(() => applyTransforms(treeData, id, options.getChildren(id), options.childrenTransformers)),
       ),
   );
+  const [parentCache] = useState(
+    () =>
+      new MetadataMap<string, IComputedValue<string | null>>(id =>
+        computed(() => applyTransforms(treeData, id, options.getParent?.(id) ?? null, options.parentTransformers)),
+      ),
+  );
   const [stateCache] = useState(
     () =>
       new MetadataMap<string, IComputedValue<INodeState>>(id =>
@@ -82,6 +96,9 @@ export function useTreeData(options: IOptions): ITreeData {
       },
       getChildren(nodeId: string): string[] {
         return childrenCache.get(nodeId).get();
+      },
+      getParent(id: string): string | null {
+        return parentCache.get(id).get();
       },
       getState(id: string): Readonly<INodeState> {
         return stateCache.get(id).get();

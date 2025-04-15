@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -95,11 +95,13 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
           doc: value,
         });
 
+        const validatedCursor = cursor ? validateCursorBoundaries(cursor, tempState.doc.length) : undefined;
+
         if (incomingValue !== undefined) {
           merge = new MergeView({
             a: {
               doc: value,
-              selection: cursor && validateCursorBoundaries(cursor, tempState.doc.length),
+              selection: validatedCursor,
               extensions: [updateListener, ...effects],
             },
             b: {
@@ -114,16 +116,20 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
           editorView = new EditorView({
             state: EditorState.create({
               doc: value,
-              selection: cursor && validateCursorBoundaries(cursor, tempState.doc.length),
+              selection: validatedCursor,
               extensions: [updateListener, ...effects],
             }),
             parent: container,
           });
         }
 
-        editorView.dispatch({
-          scrollIntoView: true,
-        });
+        if (validatedCursor) {
+          if (validatedCursor.anchor > 0 || validatedCursor.head !== validatedCursor.anchor) {
+            editorView.dispatch({
+              scrollIntoView: true,
+            });
+          }
+        }
 
         if (incomingView) {
           setIncomingView(incomingView);
@@ -199,8 +205,12 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
           }
         }
 
-        if (cursor && isCursorInDoc) {
-          transaction.selection = cursor;
+        if (cursor) {
+          const changed = view.state.selection.main.anchor !== cursor.anchor || view.state.selection.main.head !== cursor.head;
+
+          if (changed && isCursorInDoc) {
+            transaction.selection = cursor;
+          }
         }
 
         if (hasInsertProperty(transaction.changes) && !transaction.selection) {
