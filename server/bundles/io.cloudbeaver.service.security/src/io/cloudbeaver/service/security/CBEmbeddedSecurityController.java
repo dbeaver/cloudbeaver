@@ -2594,8 +2594,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             .stream()
             .map(SMActiveSession::sessionId)
             .collect(Collectors.toList());
-        deleteSessionsTokens(smSessionsId);
-        application.getEventController().addEvent(new WSUserCloseSessionsEvent(smSessionsId, getSmSessionId(), userId));
+        if (!smSessionsId.isEmpty()) {
+            deleteSessionsTokens(smSessionsId);
+            application.getEventController().addEvent(new WSUserCloseSessionsEvent(smSessionsId, getSmSessionId(), userId));
+        }
     }
 
     /**
