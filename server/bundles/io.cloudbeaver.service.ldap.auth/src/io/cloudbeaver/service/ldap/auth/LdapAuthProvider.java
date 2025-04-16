@@ -464,10 +464,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
         List<String> result = new ArrayList<>();
         result.add(userDN);
-
-        List<String> groupDNs = getGroupForMember(userDN, ldapSettings, authParameters);
-        groupDNs.forEach(smAutoAssign::addExternalTeamId);
-
+        result.addAll(getGroupForMember(userDN, ldapSettings, authParameters));
         return result;
     }
 
