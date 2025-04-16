@@ -319,9 +319,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     if (modelId) {
-      const authPropertiesInfo = this.connectionKey ? await this.connectionInfoAuthPropertiesResource.load(this.connectionKey) : undefined;
-      const properties = await this.getConnectionAuthModelProperties(modelId, authPropertiesInfo);
-
+      const properties = await this.getConnectionAuthModelProperties(modelId);
       this.state.credentials = prepareDynamicProperties(properties, this.state.credentials ?? {});
     }
 
