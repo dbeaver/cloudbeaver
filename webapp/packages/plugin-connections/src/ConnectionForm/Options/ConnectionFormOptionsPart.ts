@@ -6,7 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { FormMode, FormPart, formSubmitContext, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
-import { DriverConfigurationType, type ConnectionConfig, type ObjectPropertyInfo, type TestConnectionMutation } from '@cloudbeaver/core-sdk';
+import {
+  DriverConfigurationType,
+  getObjectPropertyValue,
+  type ConnectionConfig,
+  type ObjectPropertyInfo,
+  type TestConnectionMutation,
+} from '@cloudbeaver/core-sdk';
 import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import {
   ConnectionInfoAuthPropertiesResource,
@@ -23,14 +29,15 @@ import {
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { action, computed, makeObservable, observable, reaction, toJS } from 'mobx';
 import { getUniqueName, isNotNullDefined } from '@cloudbeaver/core-utils';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import type { LocalizationService } from '@cloudbeaver/core-localization';
+import type { NotificationService } from '@cloudbeaver/core-events';
+
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import { getConnectionName } from './getConnectionName.js';
-import type { LocalizationService } from '@cloudbeaver/core-localization';
 import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
-import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
-import type { NotificationService } from '@cloudbeaver/core-events';
 import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
@@ -221,7 +228,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (authPropertiesInfo.authProperties) {
       for (const property of authPropertiesInfo.authProperties) {
         if (!property.features.includes('password')) {
-          config.credentials[property.id!] = property.value ?? property.defaultValue;
+          config.credentials[property.id!] = getObjectPropertyValue(property) ?? property.defaultValue;
         }
       }
     }
@@ -562,7 +569,7 @@ function isCredentialsChanged(authProperties: ObjectPropertyInfo[], credentials:
       if (value !== undefined) {
         return property.features.includes('file') ? true : !!value;
       }
-    } else if (value !== property.value) {
+    } else if (value !== getObjectPropertyValue(property)) {
       return true;
     }
   }
