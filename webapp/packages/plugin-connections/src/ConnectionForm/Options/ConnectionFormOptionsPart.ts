@@ -221,7 +221,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (authPropertiesInfo.authProperties) {
       for (const property of authPropertiesInfo.authProperties) {
         if (!property.features.includes('password')) {
-          config.credentials[property.id!] = property.value;
+          config.credentials[property.id!] = property.value ?? property.defaultValue;
         }
       }
     }
@@ -305,17 +305,24 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (driver?.id !== prevDriver?.id) {
       this.state.credentials = {};
       this.state.providerProperties = {};
-      this.setAuthModelId(driver?.defaultAuthModel);
+      await this.setAuthModelId(driver?.defaultAuthModel);
     }
 
     await this.onDriverIdChange.execute(this.state.driverId);
   }
 
-  setAuthModelId(modelId: string | undefined): void {
+  async setAuthModelId(modelId: string | undefined): Promise<void> {
     if (modelId === this.initialState.authModelId) {
       this.state.credentials = { ...this.initialState.credentials };
     } else if (modelId !== this.state.authModelId) {
       this.state.credentials = {};
+    }
+
+    if (modelId) {
+      const authPropertiesInfo = this.connectionKey ? await this.connectionInfoAuthPropertiesResource.load(this.connectionKey) : undefined;
+      const properties = await this.getConnectionAuthModelProperties(modelId, authPropertiesInfo);
+
+      this.state.credentials = prepareDynamicProperties(properties, this.state.credentials ?? {});
     }
 
     this.state.authModelId = modelId;
