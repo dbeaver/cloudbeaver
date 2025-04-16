@@ -1,10 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
@@ -18,6 +19,7 @@ import {
   s,
   Switch,
   useAdministrationSettings,
+  useAutoLoad,
   useObjectPropertyCategories,
   useResource,
   useS,
@@ -27,47 +29,49 @@ import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { NetworkHandlerConfigInput, NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { isSafari } from '@cloudbeaver/core-utils';
 
-import type { IConnectionFormProps } from '../IConnectionFormProps.js';
 import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR.js';
 import styles from './SSL.module.css';
+import type { IConnectionFormProps } from '../IConnectionFormState.js';
+import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connections';
+import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 
 interface Props extends IConnectionFormProps {
   handler: NetworkHandlerDescriptor;
   handlerState: NetworkHandlerConfigInput;
 }
 
-export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ state: formState, handler, handlerState }) {
-  const { info, readonly, disabled: formDisabled, loading } = formState;
-
+export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ formState, handler, handlerState, tabId }) {
   const translate = useTranslate();
-
+  const { selected } = useTab(tabId);
   const style = useS(styles);
   const { credentialsSavingEnabled } = useAdministrationSettings();
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(handler.properties);
-  const serverConfigResource = useResource(SSL, ServerConfigResource, undefined);
+  const serverConfigResource = useResource(SSL, ServerConfigResource, undefined, {
+    active: selected,
+  });
 
-  const disabled = formDisabled || loading;
+  const disabled = formState.isDisabled || formState.isReadOnly;
   const enabled = handlerState.enabled || false;
-  const initialHandler = info?.networkHandlersConfig?.find(h => h.id === handler.id);
+  const optionsPart = getConnectionFormOptionsPart(formState);
+  const connectionInfoNetworkHandlersService = useResource(SSL, ConnectionInfoNetworkHandlersResource, optionsPart.connectionKey, {
+    active: selected && !!optionsPart.connectionKey,
+  });
+  const handlersInfo = connectionInfoNetworkHandlersService.data;
+  const initialHandler = handlersInfo?.networkHandlersConfig?.find(h => h.id === handler.id);
   const autofillToken = isSafari ? 'section-connection-authentication-ssl section-ssl' : 'new-password';
   const projectInfoResource = useService(ProjectInfoResource);
-  const isSharedProject = projectInfoResource.isProjectShared(formState.projectId);
+  const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
+
+  useAutoLoad(SSL, optionsPart, enabled);
 
   return (
     <Form className={s(style, { form: true })}>
       <ColoredContainer parent>
         <Group gap form large vertical>
-          <Switch
-            id="ssl-enable-switch"
-            name="enabled"
-            state={handlerState}
-            description={handler.description}
-            mod={['primary']}
-            disabled={disabled || readonly}
-          >
+          <Switch id="ssl-enable-switch" name="enabled" state={handlerState} description={handler.description} mod={['primary']} disabled={disabled}>
             {translate('plugin_connections_connection_ssl_enable')}
           </Switch>
           {isUncategorizedExists && (
@@ -75,7 +79,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
               state={handlerState.properties}
               properties={handler.properties}
               category={null}
-              disabled={disabled || readonly || !enabled}
+              disabled={disabled || !enabled}
               isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
               autofillToken={autofillToken}
               hideEmptyPlaceholder
@@ -91,7 +95,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
                 state={handlerState.properties}
                 properties={handler.properties}
                 category={category}
-                disabled={disabled || readonly || !enabled}
+                disabled={disabled || !enabled}
                 isSaved={p => !!p.id && initialHandler?.secureProperties[p.id] === SAVED_VALUE_INDICATOR}
                 autofillToken={autofillToken}
                 hideEmptyPlaceholder
@@ -101,12 +105,12 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
             </React.Fragment>
           ))}
 
-          {credentialsSavingEnabled && !formState.config.template && !formState.config.sharedCredentials && (
+          {credentialsSavingEnabled && !optionsPart.state.template && !optionsPart.state.sharedCredentials && (
             <FieldCheckbox
               id={handler.id + '_savePassword'}
               name="savePassword"
               state={handlerState}
-              disabled={disabled || !enabled || readonly || formState.config.sharedCredentials}
+              disabled={disabled || !enabled || optionsPart.state.sharedCredentials}
               title={translate(
                 !isSharedProject || serverConfigResource.data?.distributed
                   ? 'connections_connection_authentication_save_credentials_for_user_tooltip'

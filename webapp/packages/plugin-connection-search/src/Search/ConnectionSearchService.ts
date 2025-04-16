@@ -1,29 +1,24 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { makeObservable, observable } from 'mobx';
 
-import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
-import {
-  ConnectionInfoOriginResource,
-  ConnectionInfoResource,
-  ConnectionsManagerService,
-  createConnectionParam,
-} from '@cloudbeaver/core-connections';
-import { injectable } from '@cloudbeaver/core-di';
+import { action, makeObservable, observable } from 'mobx';
+
+import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
+import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
-import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
-import { ConnectionFormService, ConnectionFormState, type IConnectionFormState } from '@cloudbeaver/plugin-connections';
+import { ConnectionFormService, ConnectionFormState, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 
-import { SearchDatabase } from './SearchDatabase.js';
+const SearchDatabase = importLazyComponent(() => import('./SearchDatabase.js').then(module => module.SearchDatabase));
 
 const formGetter = () => SearchDatabase;
 
@@ -34,18 +29,16 @@ export class ConnectionSearchService {
 
   disabled = false;
 
-  formState: IConnectionFormState | null = null;
+  formState: ConnectionFormState | null = null;
 
   constructor(
     private readonly notificationService: NotificationService,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly connectionFormService: ConnectionFormService,
+    private readonly serviceProvider: IServiceProvider,
     private readonly optionsPanelService: OptionsPanelService,
+    private readonly connectionFormService: ConnectionFormService,
     private readonly commonDialogService: CommonDialogService,
-    private readonly projectsService: ProjectsService,
-    private readonly projectInfoResource: ProjectInfoResource,
     private readonly connectionsManagerService: ConnectionsManagerService,
-    private readonly connectionInfoOriginResource: ConnectionInfoOriginResource,
   ) {
     this.optionsPanelService.closeTask.addHandler(this.closeHandler);
 
@@ -59,6 +52,7 @@ export class ConnectionSearchService {
       databases: observable,
       disabled: observable,
       formState: observable.shallow,
+      select: action,
     });
   }
 
@@ -110,20 +104,22 @@ export class ConnectionSearchService {
     this.close();
   };
 
+  private get optionsPart() {
+    return this.formState ? getConnectionFormOptionsPart(this.formState) : null;
+  }
+
   private async showUnsavedChangesDialog(): Promise<boolean> {
     if (
       !this.formState ||
       !this.optionsPanelService.isOpen(formGetter) ||
-      (this.formState.config.connectionId &&
-        this.formState.projectId !== null &&
-        !this.connectionInfoResource.has(createConnectionParam(this.formState.projectId, this.formState.config.connectionId)))
+      (this.optionsPart?.state.connectionId &&
+        this.formState.state.projectId !== null &&
+        !this.connectionInfoResource.has(createConnectionParam(this.formState.state.projectId, this.optionsPart.state.connectionId)))
     ) {
       return true;
     }
 
-    const state = await this.formState.checkFormState();
-
-    if (!state?.edited) {
+    if (!this.formState.isChanged) {
       return true;
     }
 
@@ -140,15 +136,15 @@ export class ConnectionSearchService {
     this.hosts = hosts;
   }
 
-  saveConnection() {
+  saveConnection(): void {
     this.goBack();
   }
 
-  goBack() {
+  goBack(): void {
     this.clearFormState();
   }
 
-  select(database: AdminConnectionSearchInfo): void {
+  async select(database: AdminConnectionSearchInfo): Promise<void> {
     const projects = this.connectionsManagerService.createConnectionProjects;
 
     if (projects.length === 0) {
@@ -156,29 +152,23 @@ export class ConnectionSearchService {
       return;
     }
 
-    if (!this.formState) {
-      this.formState = new ConnectionFormState(
-        this.projectsService,
-        this.projectInfoResource,
-        this.connectionFormService,
-        this.connectionInfoResource,
-        this.connectionInfoOriginResource,
-      );
+    this.formState?.dispose();
+    this.formState = new ConnectionFormState(this.serviceProvider, this.connectionFormService, {
+      projectId: projects[0]!.id,
+      availableDrivers: database.possibleDrivers,
+      type: 'public',
+      requiredNetworkHandlersIds: [],
+      connectionId: undefined,
+    });
 
-      this.formState.closeTask.addHandler(this.goBack.bind(this));
-    }
+    await this.optionsPart?.load();
+    await this.optionsPart?.setDriverId(database.defaultDriver);
 
-    this.formState
-      .setOptions('create', 'public')
-      .setConfig(projects[0]!.id, {
-        ...this.connectionInfoResource.getEmptyConfig(),
-        driverId: database.defaultDriver,
-        host: database.host,
-        port: `${database.port}`,
-      })
-      .setAvailableDrivers(database.possibleDrivers);
+    this.optionsPart!.state.host = database.host;
+    this.optionsPart!.state.port = String(database.port);
+    this.optionsPart!.state.driverId = database.defaultDriver;
 
-    this.formState.load();
+    this.formState.disposeTask.addHandler(this.goBack.bind(this));
   }
 
   private clearFormState() {

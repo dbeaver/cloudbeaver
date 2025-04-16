@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,8 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { isGlobalProject, isSharedProject, ProjectInfoResource, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
-import { isArraysEqual, isDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
+import { isArraysEqual, isObjectsEqual } from '@cloudbeaver/core-utils';
+import { isDefined } from '@dbeaver/js-helpers';
 
 export interface IConnectionsTableState {
   readonly connections: Connection[];

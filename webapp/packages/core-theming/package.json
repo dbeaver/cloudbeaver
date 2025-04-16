@@ -27,6 +27,7 @@
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-settings": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
+    "@dbeaver/ui-kit": "workspace:^",
     "mobx": "^6",
     "tslib": "^2"
   },

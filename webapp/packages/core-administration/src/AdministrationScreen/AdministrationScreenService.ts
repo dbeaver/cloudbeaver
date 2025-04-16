@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,8 @@ import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { EAdminPermission, PermissionsService, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { type RouterState, ScreenService } from '@cloudbeaver/core-routing';
 import { StorageService } from '@cloudbeaver/core-storage';
-import { type DefaultValueGetter, GlobalConstants, isNotNullDefined, MetadataMap, schema } from '@cloudbeaver/core-utils';
+import { type DefaultValueGetter, GlobalConstants, MetadataMap, schema } from '@cloudbeaver/core-utils';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService.js';
 import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute.js';

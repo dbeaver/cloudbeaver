@@ -1,38 +1,47 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useEffect, useState } from 'react';
-
-import { ConnectionInfoOriginResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
-import { useService } from '@cloudbeaver/core-di';
-import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-
-import { ConnectionFormService } from './ConnectionFormService.js';
+import { useEffect, useRef } from 'react';
+import { IServiceProvider, useService } from '@cloudbeaver/core-di';
 import { ConnectionFormState } from './ConnectionFormState.js';
-import type { IConnectionFormState } from './IConnectionFormProps.js';
+import { ConnectionFormService } from './ConnectionFormService.js';
+import type { IConnectionFormState } from './IConnectionFormState.js';
+import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
 
-export function useConnectionFormState(
-  resource: ConnectionInfoResource,
-  originResource: ConnectionInfoOriginResource,
-  configure?: (state: IConnectionFormState) => any,
-): IConnectionFormState {
-  const projectsService = useService(ProjectsService);
-  const projectInfoResource = useService(ProjectInfoResource);
+const EMPTY_CONNECTION_INFO_PARAMS: IConnectionFormState = {
+  projectId: '',
+  availableDrivers: [],
+  type: 'admin',
+  requiredNetworkHandlersIds: [],
+  connectionId: undefined,
+};
 
+export function useConnectionFormState(params: IConnectionInfoParams, configure?: (state: ConnectionFormState) => any): ConnectionFormState {
+  const serviceProvider = useService(IServiceProvider);
   const service = useService(ConnectionFormService);
-  const [state] = useState<IConnectionFormState>(() => {
-    const state = new ConnectionFormState(projectsService, projectInfoResource, service, resource, originResource);
-    configure?.(state);
+  const ref = useRef<ConnectionFormState>(null);
 
-    state.load();
-    return state;
-  });
+  if (ref.current?.state.connectionId !== params.connectionId || ref.current?.state.projectId !== params.projectId) {
+    ref.current?.dispose();
+    ref.current = new ConnectionFormState(serviceProvider, service, {
+      ...EMPTY_CONNECTION_INFO_PARAMS,
+      projectId: params.projectId,
+      connectionId: params.connectionId,
+    });
 
-  useEffect(() => () => state.dispose(), []);
+    configure?.(ref.current);
+  }
 
-  return state;
+  useEffect(
+    () => () => {
+      ref.current?.dispose();
+    },
+    [],
+  );
+
+  return ref.current;
 }

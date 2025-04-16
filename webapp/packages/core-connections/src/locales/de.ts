@@ -62,4 +62,6 @@ export default [
   ['connections_templates_deprecated_message', 'Template connections are deprecated and will be removed in future releases'],
   ['core_connections_connection_driver_not_installed', 'Driver is not installed'],
   ['core_connections_connection_temporary', 'Temporary connection'],
+  ['core_connections_connection_create_success', 'Connection was created'],
+  ['core_connections_connection_update_success', 'Connection was updated'],
 ];
