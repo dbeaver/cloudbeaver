@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,7 +9,8 @@ import type { NavNode, NavNodeInfoResource, NavTreeResource, ProjectsNavNodeServ
 import type { ProjectsService } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { isRMProjectNode, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
-import { createPath, isDefined } from '@cloudbeaver/core-utils';
+import { createPath } from '@cloudbeaver/core-utils';
+import { isDefined } from '@dbeaver/js-helpers';
 import type { IElementsTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 import type { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
