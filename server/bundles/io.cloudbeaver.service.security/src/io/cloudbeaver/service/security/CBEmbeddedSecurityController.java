@@ -1650,10 +1650,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
                     //async auth
                     var authProviderFederated = (SMAuthProviderFederated) authProviderInstance;
-                    String signInLink = buildRedirectLink(authProviderFederated.getSignInLink(authProviderConfigurationId),
+                    String signInLink = buildRedirectLink(
+                        authProviderFederated.getSignInLink(authProviderConfigurationId, origin),
                         authAttemptId);
                     String signOutLink = authProviderFederated.getCommonSignOutLink(authProviderConfigurationId,
-                        providerConfig.getParameters());
+                        providerConfig.getParameters(), origin
+                    );
                     Map<SMAuthConfigurationReference, Object> authData = Map.of(new SMAuthConfigurationReference(authProviderId,
                         authProviderConfigurationId), filteredUserCreds);
                     return SMAuthInfo.inProgress(
@@ -1960,11 +1962,13 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                             if (authProviderInstance instanceof SMAuthProviderFederated providerFederated) {
                                 signInLink = buildRedirectLink(providerFederated.getRedirectLink(
                                     authProviderConfiguration,
-                                    Map.of()), authId);
+                                    Map.of(), origin
+                                ), authId);
                                 signOutLink = providerFederated.getUserSignOutLink(
                                     application.getAuthConfiguration()
                                         .getAuthProviderConfiguration(authProviderConfiguration),
-                                    authProviderData);
+                                    authProviderData, origin
+                                );
                             }
 
                         }

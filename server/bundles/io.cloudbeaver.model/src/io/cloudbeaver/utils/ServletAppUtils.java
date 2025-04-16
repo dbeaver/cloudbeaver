@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -168,14 +168,21 @@ public class ServletAppUtils {
     }
 
     @NotNull
-    public static StringBuilder getAuthApiPrefix(String serviceId) throws DBException {
-        return getAuthApiPrefix(getAuthApplication(), serviceId);
+    public static StringBuilder getAuthApiPrefix(@NotNull String serviceId, @NotNull String origin) throws DBException {
+        return getAuthApiPrefix(getAuthApplication(), serviceId, origin);
     }
 
     @NotNull
-    public static StringBuilder getAuthApiPrefix(ServletAuthApplication webAuthApplication, String serviceId) {
-        String authUrl = removeSideSlashes(webAuthApplication.getAuthServiceURL());
-        StringBuilder apiPrefix = new StringBuilder(authUrl);
+    public static StringBuilder getAuthApiPrefix(
+        @NotNull ServletAuthApplication webAuthApplication,
+        @NotNull String serviceId,
+        @NotNull String origin
+    ) throws DBException {
+        String serviceUriSegment = removeSideSlashes(webAuthApplication.getAuthServiceUriSegment());
+        StringBuilder apiPrefix = new StringBuilder(removeSideSlashes(origin));
+        if (CommonUtils.isNotEmpty(serviceUriSegment)) {
+            apiPrefix.append("/").append(serviceUriSegment);
+        }
         apiPrefix.append("/").append(serviceId).append("/");
         return apiPrefix;
     }
@@ -280,4 +287,20 @@ public class ServletAppUtils {
             .collect(Collectors.joining("/"));
     }
 
+    @NotNull
+    public static String getOriginFromRequestOrThrow(HttpServletRequest request) throws DBWebException {
+        String origin = request.getHeader("Origin");
+        if (CommonUtils.isEmpty(origin)) {
+            origin = request.getHeader("Referer");
+        }
+        if (CommonUtils.isEmpty(origin)) {
+            throw new DBWebException("Origin/referer headers is empty");
+        }
+        var app = ServletAppUtils.getServletApplication();
+        origin = removeSideSlashes(origin);
+        if (!origin.endsWith(app.getRootURI())) {
+            origin = origin + "/" + app.getRootURI();
+        }
+        return origin;
+    }
 }

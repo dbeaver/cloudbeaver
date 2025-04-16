@@ -35,6 +35,7 @@ import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -476,7 +477,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public List<WebAuthProviderConfiguration> listAuthProviderConfigurations(@NotNull WebSession webSession, @Nullable String providerId) throws DBWebException {
+    public List<WebAuthProviderConfiguration> listAuthProviderConfigurations(
+        @NotNull HttpServletRequest request,
+        @NotNull WebSession webSession,
+        @Nullable String providerId
+    ) throws DBWebException {
+        String origin = ServletAppUtils.getOriginFromRequestOrThrow(request);
         List<WebAuthProviderConfiguration> result = new ArrayList<>();
         for (SMAuthProviderCustomConfiguration cfg : CBApplication.getInstance().getAppConfiguration().getAuthCustomConfigurations()) {
             if (providerId != null && !providerId.equals(cfg.getProvider())) {
@@ -484,7 +490,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             }
             WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(cfg.getProvider());
             if (authProvider != null) {
-                result.add(new WebAuthProviderConfiguration(authProvider, cfg));
+                result.add(new WebAuthProviderConfiguration(authProvider, cfg, origin));
             }
         }
         return result;
@@ -492,6 +498,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     @Override
     public WebAuthProviderConfiguration saveAuthProviderConfiguration(
+        @NotNull HttpServletRequest request,
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @NotNull String id,
@@ -525,7 +532,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             providerConfig.getProvider(),
             webSession.getUserId()
         ));
-        return new WebAuthProviderConfiguration(authProvider, providerConfig);
+        return new WebAuthProviderConfiguration(authProvider, providerConfig, ServletAppUtils.getOriginFromRequestOrThrow(request));
     }
 
     @Override

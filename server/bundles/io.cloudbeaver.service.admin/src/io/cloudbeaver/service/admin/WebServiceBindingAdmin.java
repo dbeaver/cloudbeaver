@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package io.cloudbeaver.service.admin;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServletContext;
@@ -152,17 +153,20 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
         .dataFetcher("listAuthProviderConfigurationParameters",
             env -> getService(env).listAuthProviderConfigurationParameters(getWebSession(env), env.getArgument("providerId")))
         .dataFetcher("listAuthProviderConfigurations",
-            env -> getService(env).listAuthProviderConfigurations(getWebSession(env), env.getArgument("providerId")))
+            env -> getService(env).listAuthProviderConfigurations(GraphQLEndpoint.getServletRequest(env),
+                getWebSession(env), env.getArgument("providerId"))
+        )
         .dataFetcher("saveAuthProviderConfiguration",
             env -> getService(env).saveAuthProviderConfiguration(
+                GraphQLEndpoint.getServletRequest(env),
                 getWebSession(env),
                 env.getArgument("providerId"),
                 env.getArgument("id"),
                 env.getArgument("displayName"),
                 CommonUtils.toBoolean((Boolean)env.getArgument("disabled")),
                 env.getArgument("iconURL"),
-                env.getArgument("description"),
-                env.getArgument("parameters")))
+                env.getArgument("description"), env.getArgument("parameters")
+            ))
         .dataFetcher("deleteAuthProviderConfiguration",
             env -> getService(env).deleteAuthProviderConfiguration(getWebSession(env), env.getArgument("id")))
 

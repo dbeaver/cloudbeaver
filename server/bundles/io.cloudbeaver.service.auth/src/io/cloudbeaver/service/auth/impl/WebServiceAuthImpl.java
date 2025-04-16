@@ -34,6 +34,7 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.auth.*;
 import io.cloudbeaver.service.auth.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.service.security.SMUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -236,10 +237,12 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     String logoutUrl;
                     if (removedInfo.getAuthSession() instanceof SMSessionExternal externalSession) {
                         logoutUrl = provider.getUserSignOutLink(providerConfig,
-                            externalSession.getAuthParameters());
+                            externalSession.getAuthParameters(), origin
+                        );
                     } else {
                         logoutUrl = provider.getUserSignOutLink(providerConfig,
-                            Map.of());
+                            Map.of(), origin
+                        );
                     }
                     if (CommonUtils.isNotEmpty(logoutUrl)) {
                         logoutUrls.add(logoutUrl);
@@ -287,9 +290,11 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     @Override
-    public WebAuthProviderInfo[] getAuthProviders(@NotNull HttpServletRequest request) {
+    public WebAuthProviderInfo[] getAuthProviders(@NotNull HttpServletRequest request) throws DBWebException {
+        String origin = ServletAppUtils.getOriginFromRequestOrThrow(request);
         return WebAuthProviderRegistry.getInstance().getAuthProviders()
-            .stream().map(WebAuthProviderInfo::new)
+            .stream()
+            .map(descriptor -> new WebAuthProviderInfo(descriptor, origin))
             .toArray(WebAuthProviderInfo[]::new);
     }
 
