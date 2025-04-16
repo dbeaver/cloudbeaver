@@ -62,6 +62,7 @@ import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
 
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -1640,7 +1641,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     if (CommonUtils.isEmpty(userOrigin)) {
                         throw new SMException("User origin not found in authentication data");
                     }
-                    filteredUserCreds.put(SMConstants.USER_ORIGIN, userOrigin);
+                    filteredUserCreds.put(SMConstants.USER_ORIGIN, modifyOrigin(userOrigin));
                 }
                 authAttemptId = createNewAuthAttempt(
                     SMAuthStatus.IN_PROGRESS,
@@ -1656,12 +1657,13 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 );
 
                 if (isFederatedAuth) {
-                    String userOrigin = JSONUtils.getString(userCredentials, SMConstants.USER_ORIGIN);
+                    String userOrigin = JSONUtils.getString(filteredUserCreds, SMConstants.USER_ORIGIN);
                     //async auth
                     var authProviderFederated = (SMAuthProviderFederated) authProviderInstance;
                     String signInLink = buildRedirectLink(
                         authProviderFederated.getSignInLink(authProviderConfigurationId, userOrigin),
-                        authAttemptId);
+                        authAttemptId
+                    );
                     String signOutLink = authProviderFederated.getCommonSignOutLink(authProviderConfigurationId,
                         providerConfig.getParameters(), userOrigin
                     );
@@ -1700,6 +1702,23 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
         }
+    }
+
+    @NotNull
+    protected String modifyOrigin(@NotNull String origin) {
+        StringBuilder finalOrigin = new StringBuilder();
+        URI uri = URI.create(origin);
+        finalOrigin.append(uri.getScheme())
+            .append("://")
+            .append(uri.getHost());
+        if (uri.getPort() > 0 && application.getServerPort() != uri.getPort()) {
+            finalOrigin.append(":").append(application.getServerPort());
+        } else {
+            return origin;
+        }
+        finalOrigin.append(uri.getPath());
+
+        return finalOrigin.toString();
     }
 
     private Map<String, Object> filterSecuredUserData(
@@ -3306,7 +3325,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         return authProvider;
     }
 
-    private String buildRedirectLink(String originalLink, String authId) {
+    private String buildRedirectLink(@NotNull String originalLink, @NotNull String authId) {
         return originalLink + "?authId=" + authId;
     }
 

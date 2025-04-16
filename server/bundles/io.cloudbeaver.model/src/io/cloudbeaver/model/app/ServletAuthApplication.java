@@ -18,6 +18,7 @@
 package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.auth.CBAuthConstants;
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 
@@ -34,4 +35,8 @@ public interface ServletAuthApplication extends ServletApplication {
     void flushConfiguration() throws DBException;
 
     String getDefaultAuthRole();
+
+    default String modifyOrigin(@NotNull String origin) {
+        return origin;
+    }
 }
