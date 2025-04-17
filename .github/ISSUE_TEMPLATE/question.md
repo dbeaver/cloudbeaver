@@ -1,8 +1,9 @@
 ---
 name: Question
-about: Is there something unclear?
+about: Is there something unclear? Ask your question.
 title: ''
-labels: question, wait for review
+labels: wait for review
+type: Question
 assignees: ''
 
 ---
