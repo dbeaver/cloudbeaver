@@ -18,6 +18,7 @@ package io.cloudbeaver.model.rm.lock;
 
 import io.cloudbeaver.app.CEAppStarter;
 import org.jkiss.dbeaver.Log;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -35,7 +36,12 @@ public class RMLockTest {
     private static final Log log = Log.getLog(RMLockTest.class);
     private final String project1 = "s_fakeProject1";
     private final String project2 = "s_fakeProject2";
-    private final ExecutorService executor = Executors.newFixedThreadPool(2);
+    private static final ExecutorService executor = Executors.newFixedThreadPool(2);
+
+    @AfterClass
+    public static void shutdown() {
+        executor.shutdown();
+    }
 
     @Test
     public void testProjectAccessUsingSeveralControllers() throws Throwable {

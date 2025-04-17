@@ -42,6 +42,7 @@
     "@cloudbeaver/plugin-projects": "workspace:*",
     "@cloudbeaver/plugin-top-app-bar": "workspace:*",
     "@dbeaver/jdbc-uri-parser": "workspace:^",
+    "@dbeaver/js-helpers": "workspace:^",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",
