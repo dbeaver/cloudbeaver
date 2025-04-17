@@ -11,7 +11,8 @@ import { DataContext, dataContextAddDIProvider, type DataContextGetter, type IDa
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ENotificationType } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, type IExecutionContext, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
-import { isArraysEqual, isNotNullDefined, MetadataMap, uuid } from '@cloudbeaver/core-utils';
+import { isArraysEqual, MetadataMap, uuid } from '@cloudbeaver/core-utils';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { DATA_CONTEXT_LOADABLE_STATE, loadableStateContext } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_FORM_STATE } from './DATA_CONTEXT_FORM_STATE.js';

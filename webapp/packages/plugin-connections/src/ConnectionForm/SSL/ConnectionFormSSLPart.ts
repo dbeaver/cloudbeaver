@@ -10,7 +10,7 @@ import { FormPart, formSubmitContext, type IFormState } from '@cloudbeaver/core-
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
-import { isNotNullDefined } from '@cloudbeaver/core-utils';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { getSSLDriverHandler } from './getSSLDriverHandler.js';
 import { ConnectionInfoNetworkHandlersResource, type DBDriverResource, type NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';

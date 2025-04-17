@@ -37,6 +37,7 @@
     "@cloudbeaver/plugin-data-grid": "workspace:*",
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*",
     "@cloudbeaver/plugin-navigation-tree": "workspace:*",
+    "@dbeaver/js-helpers": "workspace:^",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",

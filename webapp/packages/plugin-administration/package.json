@@ -38,6 +38,7 @@
     "@cloudbeaver/core-view": "workspace:*",
     "@cloudbeaver/plugin-settings-menu": "workspace:*",
     "@cloudbeaver/plugin-top-app-bar": "workspace:*",
+    "@dbeaver/js-helpers": "workspace:^",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",

@@ -193,7 +193,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         outer:
         for (SMUserProvisioning user : userImportList.getUsers()) {
             String authRole = user.getAuthRole() == null ? userImportList.getAuthRole() : user.getAuthRole();
-            for (String possibleUserId : List.of(user.getUserId(), user.getUserId().toLowerCase())) {
+            String userId = user.getUserId();
+            for (String possibleUserId : List.of(userId, userId.toLowerCase())) {
                 if (isSubjectExists(possibleUserId)) {
                     log.info("User already exist : " + possibleUserId);
                     setUserAuthRole(connection, possibleUserId, authRole);
@@ -201,7 +202,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     continue outer;
                 }
             }
-            createUser(connection, user.getUserId().toLowerCase(), user.getMetaParameters(), true, authRole);
+            createUser(connection, userId.toLowerCase(), user.getMetaParameters(), true, authRole);
         }
     }
 
@@ -2540,7 +2541,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     createUser(
                         dbCon,
                         userId,
-                        Map.of(),
+                        (Map<String, String>) userCredentials.get(SMStandardMeta.KEY_META_PARAMS),
                         true,
                         resolveUserAuthRole(null, authRole)
                     );
