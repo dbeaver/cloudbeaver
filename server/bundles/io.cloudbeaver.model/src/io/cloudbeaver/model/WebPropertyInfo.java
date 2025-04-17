@@ -247,6 +247,10 @@ public class WebPropertyInfo {
             }
             return result;
         }
+        Class<?> dataType = property.getDataType();
+        if (dataType == Boolean.class || dataType == Boolean.TYPE) {
+            return Boolean.valueOf(value.toString());
+        }
         return CommonUtils.toString(value);
     }
 
