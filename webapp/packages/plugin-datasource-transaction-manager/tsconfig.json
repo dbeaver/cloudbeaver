@@ -2,11 +2,14 @@
   "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "outDir": "lib",
+    "tsBuildInfoFile": "lib/tsconfig.tsbuildinfo",
     "composite": true
   },
   "references": [
+    {
+      "path": "../../../common-typescript/@dbeaver/js-helpers"
+    },
     {
       "path": "../core-blocks"
     },
@@ -77,7 +80,6 @@
   ],
   "exclude": [
     "**/node_modules",
-    "lib/**/*",
-    "dist/**/*"
+    "lib/**/*"
   ]
 }

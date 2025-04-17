@@ -1,39 +1,36 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 
 import { cancellableTimeout } from './cancellableTimeout.js';
 
-jest.mock('./CancellablePromise', () => ({
-  CancellablePromise: jest.fn().mockImplementation(() => ({
-    cancel: jest.fn(),
-  })),
-}));
-
 describe('cancellableTimeout', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
-  it.skip('resolves after the specified timeout', async () => {
+  it('resolves after the specified timeout', async () => {
     const timeout = 0;
     const start = Date.now();
+    let isResolved = false;
 
-    const promise = cancellableTimeout(timeout);
+    const promise = cancellableTimeout(timeout).then(() => {
+      isResolved = true;
+    });
 
+    vi.advanceTimersByTime(timeout);
     await promise;
 
-    jest.advanceTimersByTime(timeout);
-
     expect(Date.now() - start).toBe(timeout);
+    expect(isResolved).toBe(true);
   });
 });

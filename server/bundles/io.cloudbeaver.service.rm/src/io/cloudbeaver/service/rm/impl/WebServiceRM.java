@@ -28,6 +28,7 @@ import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
@@ -48,6 +49,8 @@ import java.util.Set;
  * Web service implementation
  */
 public class WebServiceRM implements DBWServiceRM {
+
+    private static final Log log = Log.getLog(WebServiceRM.class);
 
     @Override
     public RMProject[] listProjects(@NotNull WebSession webSession) throws DBWebException {
@@ -374,6 +377,13 @@ public class WebServiceRM implements DBWServiceRM {
                 new HashSet<>(subjectIds),
                 new HashSet<>(permissions)
             );
+            log.info("Project permissions deleted: [projectIds=%s, subjectIds=%s, permissions=%s, madeBy=%s]"
+                .formatted(
+                    String.join(",", projectIds),
+                    String.join(",", subjectIds),
+                    String.join(",", permissions),
+                    webSession.getUserId()
+                ));
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error deleting project permissions", e);
@@ -396,6 +406,13 @@ public class WebServiceRM implements DBWServiceRM {
                 new HashSet<>(permissions),
                 webSession.getUserId()
             );
+            log.info("Project permissions added: [projectIds=%s, subjectIds=%s, permissions=%s, madeBy=%s]"
+                .formatted(
+                    String.join(",", projectIds),
+                    String.join(",", subjectIds),
+                    String.join(",", permissions),
+                    webSession.getUserId()
+                ));
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error adding project permissions", e);

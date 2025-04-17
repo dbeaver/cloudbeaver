@@ -1,0 +1,14 @@
+fragment DatabaseConnectionNetworkHandlers on ConnectionInfo {
+  id
+  projectId
+  networkHandlersConfig {
+    ...NetworkHandlerBasics
+    authType
+    userName
+    password
+    key
+    savePassword
+    properties
+    secureProperties
+  }
+}

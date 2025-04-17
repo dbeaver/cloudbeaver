@@ -46,4 +46,8 @@ export default [
   ],
   ['plugin_connections_connection_create_menu_title', 'Новое Подключение'],
   ['plugin_connections_connection_driver_not_installed_message', 'Драйвер не установлен. Вы можете установить его в "Администрированой" части.'],
+  ['plugin_connections_connection_established', 'Подключение установлено'],
+  ['plugin_connections_connection_client_version', 'Версия клиента: {arg:version} \n'],
+  ['plugin_connections_connection_server_version', 'Версия сервера: {arg:version} \n'],
+  ['plugin_connections_connection_connection_time', 'Время подключения: {arg:time} \n'],
 ];

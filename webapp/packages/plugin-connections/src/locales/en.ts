@@ -46,4 +46,8 @@ export default [
   ],
   ['plugin_connections_connection_create_menu_title', 'New Connection'],
   ['plugin_connections_connection_driver_not_installed_message', 'Driver is not installed. You can install it in the "Administration" part.'],
+  ['plugin_connections_connection_established', 'Connection is established'],
+  ['plugin_connections_connection_client_version', 'Client version: {arg:version} \n'],
+  ['plugin_connections_connection_server_version', 'Server version: {arg:version} \n'],
+  ['plugin_connections_connection_connection_time', 'Connection time: {arg:time} \n'],
 ];

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
 
   private readonly deleted: Map<TKey, boolean>;
   private readonly temp: Map<TKey, TValue>;
-  private flushTask: NodeJS.Timeout | null;
+  private flushTask: ReturnType<typeof setTimeout> | null;
   private readonly keysTemp: ICachedValueObject<TKey[]>;
   private readonly valuesTemp: ICachedValueObject<TValue[]>;
   private readonly entriesTemp: ICachedValueObject<[TKey, TValue][]>;
