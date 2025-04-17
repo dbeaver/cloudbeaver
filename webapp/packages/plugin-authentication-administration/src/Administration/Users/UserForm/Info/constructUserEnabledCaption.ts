@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
-import { isNotNullDefined } from '@cloudbeaver/core-utils';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 export function constructUserEnabledCaption(user: AdminUserInfoFragment | undefined): string {
   if (!isNotNullDefined(user) || user.enabled) {
