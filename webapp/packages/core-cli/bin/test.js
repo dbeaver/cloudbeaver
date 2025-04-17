@@ -7,21 +7,7 @@
  * you may not use this file except in compliance with the License.
  */
 
+import { runTests } from '@dbeaver/tests-runner';
 import { fileURLToPath } from 'node:url';
-import { startVitest, parseCLI } from 'vitest/node';
 
-process.title = 'core-test';
-
-if (process.env.VITEST == null) {
-  process.env.VITEST = 'test';
-}
-
-const { filter, options } = parseCLI(['vitest', ...process.argv.slice(2)]);
-const configFile = fileURLToPath(new URL('../configs/vitest.config.ts', import.meta.url));
-
-const vitest = await startVitest(process.env.VITEST, filter, {
-  config: configFile,
-  ...options,
-});
-
-await vitest.close();
+runTests('core-cli', fileURLToPath(new URL('../configs/vitest.config.ts', import.meta.url)));

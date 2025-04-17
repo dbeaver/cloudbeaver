@@ -150,6 +150,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@dbeaver/tests-runner@workspace:@dbeaver/tests-runner":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/tests-runner@workspace:@dbeaver/tests-runner"
+  dependencies:
+    "@dbeaver/tsconfig": "workspace:^"
+    "@types/node": "npm:^20"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+    vitest: "npm:^3"
+  languageName: unknown
+  linkType: soft
+
 "@dbeaver/tsconfig@workspace:@dbeaver/tsconfig, @dbeaver/tsconfig@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/tsconfig@workspace:@dbeaver/tsconfig"
@@ -1072,6 +1084,15 @@ __metadata:
   version: 1.0.7
   resolution: "@types/estree@npm:1.0.7"
   checksum: 10c0/be815254316882f7c40847336cd484c3bc1c3e34f710d197160d455dc9d6d050ffbf4c3bc76585dba86f737f020ab20bdb137ebe0e9116b0c86c7c0342221b8c
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^20":
+  version: 20.17.30
+  resolution: "@types/node@npm:20.17.30"
+  dependencies:
+    undici-types: "npm:~6.19.2"
+  checksum: 10c0/649782c7822367d751472d70c948bcc50cded1a4744610f706f81cd54e1fc015523567d7e3e17f6b19e3e2797f6f23b653e898bdb4a2f21f8759ceba49976310
   languageName: node
   linkType: hard
 
@@ -3279,6 +3300,13 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 10c0/6fd7e0ed3bf23a81246878c613423730c40e8bdbfec4c6e4d7bf1b847cbb39076e56ad5f50aa9d7ebd89877999abaee216002d3f2818885e41c907caaa192cc4
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~6.19.2":
+  version: 6.19.8
+  resolution: "undici-types@npm:6.19.8"
+  checksum: 10c0/078afa5990fba110f6824823ace86073b4638f1d5112ee26e790155f481f2a868cc3e0615505b6f4282bdf74a3d8caad715fd809e870c2bb0704e3ea6082f344
   languageName: node
   linkType: hard
 

@@ -5,15 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { defineConfig } from 'vitest/config';
+import { mergeConfig } from 'vitest/config';
+import { BaseVitestConfig } from '@dbeaver/tests-runner';
 import path from 'path';
 
-export default defineConfig({
+export default mergeConfig(BaseVitestConfig, {
   test: {
     environment: 'happy-dom',
-    root: path.resolve('.'),
-    include: ['**/lib/**/*.test.js'],
-    exclude: ['node_modules/**'],
     setupFiles: [path.resolve(__dirname, './vitest.setup.ts')],
     alias: [
       {
@@ -21,20 +19,6 @@ export default defineConfig({
         replacement: path.resolve(__dirname, './__mocks__/styleMock.js'),
       },
     ],
-    isolate: false,
-    poolOptions: {
-      forks: {
-        isolate: false,
-      },
-    },
-    fileParallelism: false,
     css: false,
-    watch: false,
-    environmentOptions: {
-      // This will force JSDOM to use the default export condition when importing msw/node, resulting in correct imports.
-      // https://mswjs.io/docs/migrations/1.x-to-2.x#cannot-find-module-mswnode-jsdom
-      customExportConditions: [''],
-    },
   },
-  esbuild: false,
 });

@@ -20,5 +20,10 @@
   "exclude": [
     "**/node_modules",
     "lib/**/*"
+  ],
+  "references": [
+    {
+      "path": "../../../common-typescript/@dbeaver/tests-runner"
+    }
   ]
 }

@@ -38,6 +38,7 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "@dbeaver/tests-runner": "workspace:^",
     "glob": "^11",
     "tslib": "^2"
   },
