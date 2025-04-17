@@ -1,10 +1,3 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
 export default [
   ['plugin_data_viewer_data_viewer_settings_group', 'Affichage des données'],
   ['table_header_sql_expression', 'Entrez une expression SQL pour filtrer les résultats, par exemple column_name=10'],
