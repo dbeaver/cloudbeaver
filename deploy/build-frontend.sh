@@ -7,9 +7,9 @@ mkdir -p ./cloudbeaver/web
 
 cd ../../cloudbeaver/common-typescript
 
-yarn
+yarn install --immutable
 cd ../webapp
-yarn
+yarn install --immutable
 cd ./packages/product-default
 yarn run bundle
 
