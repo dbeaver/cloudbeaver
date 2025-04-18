@@ -1,10 +1,13 @@
 {
-  "name": "@dbeaver/js-helpers",
+  "name": "@dbeaver/cli",
   "type": "module",
   "sideEffects": [],
   "exports": {
     ".": "./lib/index.js",
     "./*": "./lib/*.js"
+  },
+  "bin": {
+    "dbeaver-test": "./lib/test.js"
   },
   "scripts": {
     "clear": "rimraf lib"
@@ -25,8 +28,8 @@
   ],
   "packageManager": "yarn@4.6.0",
   "devDependencies": {
-    "@dbeaver/cli": "workspace:^",
     "@dbeaver/tsconfig": "workspace:^",
+    "@types/node": "^22",
     "rimraf": "^6",
     "typescript": "^5",
     "vitest": "^3"

@@ -6,21 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { defineConfig } from 'vitest/config';
-import path from 'path';
 
 export default defineConfig({
   test: {
-    environment: 'happy-dom',
-    root: path.resolve('.'),
     include: ['**/lib/**/*.test.js'],
     exclude: ['node_modules/**'],
-    setupFiles: [path.resolve(__dirname, './vitest.setup.ts')],
-    alias: [
-      {
-        find: /.*.(css|scss|less)$/,
-        replacement: path.resolve(__dirname, './__mocks__/styleMock.js'),
-      },
-    ],
     isolate: false,
     poolOptions: {
       forks: {
@@ -28,7 +18,6 @@ export default defineConfig({
       },
     },
     fileParallelism: false,
-    css: false,
     watch: false,
     environmentOptions: {
       // This will force JSDOM to use the default export condition when importing msw/node, resulting in correct imports.

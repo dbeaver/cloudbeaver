@@ -3,10 +3,12 @@ set -Eeuo pipefail
 
 echo "Build static content"
 
-mkdir ./cloudbeaver/web
+mkdir -p ./cloudbeaver/web
 
-cd ../../cloudbeaver/webapp
+cd ../../cloudbeaver/common-typescript
 
+yarn
+cd ../webapp
 yarn
 cd ./packages/product-default
 yarn run bundle
@@ -15,7 +17,9 @@ if [[ "$?" -ne 0 ]] ; then
   echo 'Application build failed'; exit $rc
 fi
 
-cd ../../
+cd ../../../common-typescript
+yarn test
+cd ../webapp
 yarn test
 
 if [[ "$?" -ne 0 ]] ; then
