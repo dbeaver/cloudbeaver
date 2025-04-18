@@ -6,7 +6,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-/// <reference types="node" />
 
 // import nodeFs from 'node:fs';
 // import nodePath from 'node:path';
