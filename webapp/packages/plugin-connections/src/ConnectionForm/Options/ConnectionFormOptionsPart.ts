@@ -22,7 +22,8 @@ import {
 } from '@cloudbeaver/core-connections';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { action, computed, makeObservable, observable, reaction, toJS } from 'mobx';
-import { getUniqueName, isNotNullDefined } from '@cloudbeaver/core-utils';
+import { getUniqueName } from '@cloudbeaver/core-utils';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import { getConnectionName } from './getConnectionName.js';
 import type { LocalizationService } from '@cloudbeaver/core-localization';

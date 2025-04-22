@@ -1,10 +1,3 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
 export default [
   ['core_connections_connections_settings_group', '连接'],
   ['core_connections_search_database_tip', '在此处输入您的主机，例如“localhost host1.myhost.com 192.168.0.1”然后按 Enter'],

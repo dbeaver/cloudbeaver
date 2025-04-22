@@ -42,6 +42,7 @@
     "@cloudbeaver/plugin-resource-manager-scripts": "workspace:*",
     "@cloudbeaver/plugin-sql-editor": "workspace:*",
     "@cloudbeaver/plugin-sql-editor-navigation-tab": "workspace:*",
+    "@dbeaver/js-helpers": "workspace:^",
     "mobx": "^6",
     "tslib": "^2"
   },
