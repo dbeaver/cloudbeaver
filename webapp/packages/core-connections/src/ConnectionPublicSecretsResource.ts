@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,7 +10,8 @@ import { toJS } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { GraphQLService, type SecretInfo } from '@cloudbeaver/core-sdk';
-import { isDefined, schemaValidationError } from '@cloudbeaver/core-utils';
+import { schemaValidationError } from '@cloudbeaver/core-utils';
+import { isDefined } from '@dbeaver/js-helpers';
 
 import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA.js';
 import {

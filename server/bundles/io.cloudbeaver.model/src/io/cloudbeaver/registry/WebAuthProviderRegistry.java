@@ -59,8 +59,14 @@ public class WebAuthProviderRegistry {
             for (IConfigurationElement ext : extConfigs) {
                 // Load webServices
                 if (TAG_AUTH_PROVIDER.equals(ext.getName())) {
-                    WebAuthProviderDescriptor providerDescriptor = new WebAuthProviderDescriptor(ext);
-                    this.authProviders.put(providerDescriptor.getId(), providerDescriptor);
+                    WebAuthProviderDescriptor providerDescriptor;
+                    WebAuthProviderDescriptor webAuthProviderDescriptor = authProviders.get(ext.getAttribute(WebRegistryConstant.ATTR_EXTENDED));
+                    if (webAuthProviderDescriptor != null) {
+                        webAuthProviderDescriptor.loadExtraConfig(ext);
+                    } else {
+                        providerDescriptor = new WebAuthProviderDescriptor(ext);
+                        this.authProviders.put(providerDescriptor.getId(), providerDescriptor);
+                    }
                 } else if (TAG_COMMON_PROVIDER_PROPERTIES.equals(ext.getName())) {
                     var commonProperties = new WebCommonAuthProviderPropertyDescriptor(ext);
                     this.commonProperties.add(commonProperties);

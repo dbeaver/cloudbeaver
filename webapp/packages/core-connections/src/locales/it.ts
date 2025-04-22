@@ -1,10 +1,3 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
 export default [
   ['core_connections_connections_settings_group', 'Connections'],
   ['connections_administration_item', 'Connection Templates'],
@@ -64,6 +57,8 @@ export default [
   ['connections_connection_host', 'Host'],
   ['connections_connection_port', 'Porta'],
   ['connections_connection_template', 'Template'],
+  ['core_connections_connection_create_success', 'Connection was created'],
+  ['core_connections_connection_update_success', 'Connection was updated'],
   ['connections_connection_test', 'Prova la connessione'],
   ['connections_connection_test_tooltip', 'Test connection'],
   ['connections_connection_test_fail', 'Prova di connessione fallita'],

@@ -10,8 +10,9 @@ import { action, computed, makeObservable, observable } from 'mobx';
 import { DataContext, dataContextAddDIProvider, type DataContextGetter, type IDataContext } from '@cloudbeaver/core-data-context';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ENotificationType } from '@cloudbeaver/core-events';
-import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
-import { isArraysEqual, isNotNullDefined, MetadataMap, uuid } from '@cloudbeaver/core-utils';
+import { Executor, ExecutorInterrupter, type IExecutionContext, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
+import { isArraysEqual, MetadataMap, uuid } from '@cloudbeaver/core-utils';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { DATA_CONTEXT_LOADABLE_STATE, loadableStateContext } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_FORM_STATE } from './DATA_CONTEXT_FORM_STATE.js';
@@ -28,6 +29,7 @@ export class FormState<TState> implements IFormState<TState> {
 
   statusMessage: string | string[] | null;
   statusType: ENotificationType | null;
+  isReadOnly: boolean;
 
   savingPromise: Promise<any> | null;
 
@@ -61,14 +63,14 @@ export class FormState<TState> implements IFormState<TState> {
 
     this.statusMessage = null;
     this.statusType = null;
-
+    this.isReadOnly = false;
     this.savingPromise = null;
 
     this.formStateTask = new Executor<TState>(state, () => true);
     this.formStateTask.addCollection(service.onState).addPostHandler(this.updateFormState.bind(this));
 
     this.loadedTask = new Executor(this as IFormState<TState>, () => true);
-    this.loadedTask.addCollection(service.onLoaded).next(this.formStateTask).addPostHandler(this.onLoadedHandler.bind(this));
+    this.loadedTask.addCollection(service.onLoaded).next(this.formStateTask);
 
     this.formatTask = new Executor(this as IFormState<TState>, () => true);
     this.formatTask.addCollection(service.onFormat);
@@ -106,7 +108,7 @@ export class FormState<TState> implements IFormState<TState> {
     });
   }
 
-  get partsValues() {
+  get partsValues(): IFormPart<any>[] {
     return Array.from(this.parts.values());
   }
 
@@ -172,9 +174,9 @@ export class FormState<TState> implements IFormState<TState> {
     return this;
   }
 
-  async save(): Promise<boolean> {
+  async save(providedContext?: IExecutionContext<IFormState<TState>>): Promise<boolean> {
     try {
-      this.savingPromise = this.submitTask.execute(this);
+      this.savingPromise = this.submitTask.execute(this, providedContext);
       const context = await this.savingPromise;
 
       if (ExecutorInterrupter.isInterrupted(context)) {
@@ -190,15 +192,6 @@ export class FormState<TState> implements IFormState<TState> {
     return false;
   }
 
-  private onLoadedHandler(data: IFormState<TState>, contexts: IExecutionContextProvider<IFormState<TState>>): void {
-    for (const part of this.parts.values()) {
-      if (!part.isLoaded()) {
-        ExecutorInterrupter.interrupt(contexts);
-        return;
-      }
-    }
-  }
-
   private updateFormState(data: TState, contexts: IExecutionContextProvider<TState>): void {
     const context = contexts.getContext(formStateContext);
 
@@ -208,6 +201,7 @@ export class FormState<TState> implements IFormState<TState> {
 
     this.statusMessage = context.statusMessage;
     this.statusType = context.statusType;
+    this.isReadOnly = context.readonly;
   }
 
   async dispose(): Promise<void> {
