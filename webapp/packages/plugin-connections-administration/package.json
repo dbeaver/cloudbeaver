@@ -36,6 +36,7 @@
     "@cloudbeaver/core-ui": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
     "@cloudbeaver/plugin-connections": "workspace:*",
+    "@dbeaver/js-helpers": "workspace:^",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",

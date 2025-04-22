@@ -7,7 +7,7 @@
  */
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { isNotNullDefined } from '@cloudbeaver/core-utils';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 export function getObjectPropertyDefaults(properties: ReadonlyArray<ObjectPropertyInfo>): Record<string, any> {
   const result: Record<string, any> = {};

@@ -1,10 +1,3 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
 export default [
   ['plugin_sql_editor_navigation_tab_resource_save_title', 'Enregistrer comme script (Shift + Ctrl + S)'],
   ['plugin_sql_editor_navigation_tab_script_state_renaming', 'Renommer le script...'],

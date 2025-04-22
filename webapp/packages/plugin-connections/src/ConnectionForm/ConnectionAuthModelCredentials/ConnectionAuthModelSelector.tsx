@@ -11,7 +11,7 @@ import { Combobox, usePermission, useResource } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
 import { CachedResourceListEmptyKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import { EAdminPermission } from '@cloudbeaver/core-root';
-import { isNotNullDefined } from '@cloudbeaver/core-utils';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 interface Props {
   authModelCredentialsState: { authModelId?: string };

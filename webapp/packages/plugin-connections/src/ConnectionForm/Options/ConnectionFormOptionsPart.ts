@@ -21,19 +21,20 @@ import {
   type DBDriver,
 } from '@cloudbeaver/core-connections';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { action, computed, makeObservable, observable, reaction, toJS } from 'mobx';
-import { getUniqueName, isNotNullDefined } from '@cloudbeaver/core-utils';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import type { LocalizationService } from '@cloudbeaver/core-localization';
-import type { NotificationService } from '@cloudbeaver/core-events';
+import { LocalizationService } from '@cloudbeaver/core-localization';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { action, computed, makeObservable, observable, reaction, toJS } from 'mobx';
+import { getUniqueName } from '@cloudbeaver/core-utils';
 import { getObjectPropertyDefaults } from '@cloudbeaver/core-blocks';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
+import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
 
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import { getConnectionName } from './getConnectionName.js';
 import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
-import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
@@ -321,8 +322,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (modelId === this.initialState.authModelId) {
       this.state.credentials = { ...this.initialState.credentials };
     } else if (modelId !== this.state.authModelId) {
-      const properties = modelId ? await this.getConnectionAuthModelProperties(modelId) : null;
-      this.state.credentials = properties ? getObjectPropertyDefaults(properties) : {};
+      const properties = modelId ? await this.getConnectionAuthModelProperties(modelId) : [];
+      this.state.credentials = getObjectPropertyDefaults(properties);
     }
 
     this.state.authModelId = modelId;
