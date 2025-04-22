@@ -19,6 +19,8 @@ package io.cloudbeaver.server.websockets;
 import io.cloudbeaver.model.session.WebHeadlessSession;
 import io.cloudbeaver.model.session.WebHttpRequestInfo;
 import io.cloudbeaver.server.WebAppSessionManager;
+import io.cloudbeaver.utils.ServletAppUtils;
+import jakarta.servlet.Servlet;
 import jakarta.servlet.http.HttpSession;
 import jakarta.websocket.HandshakeResponse;
 import jakarta.websocket.server.HandshakeRequest;
@@ -31,6 +33,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.WSClientUtils;
 
 import java.util.List;
 
@@ -99,7 +102,7 @@ public class CBWebSocketServerConfigurator extends ServerEndpointConfig.Configur
         if (request.getHeaders() == null) {
             return null;
         }
-        List<String> tokenHeaders = request.getHeaders().get(WSConstants.WS_AUTH_HEADER);
+        List<String> tokenHeaders = WSClientUtils.getHeaders(request.getHeaders(), WSConstants.WS_AUTH_HEADER);
         if (CommonUtils.isEmpty(tokenHeaders)) {
             return null;
         }
