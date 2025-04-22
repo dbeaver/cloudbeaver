@@ -26,6 +26,7 @@
     "@cloudbeaver/core-settings": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
     "@cloudbeaver/plugin-navigation-tree": "workspace:*",
+    "@dbeaver/js-helpers": "workspace:^",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",

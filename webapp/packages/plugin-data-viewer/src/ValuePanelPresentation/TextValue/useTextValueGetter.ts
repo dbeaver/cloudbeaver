@@ -9,8 +9,9 @@ import { observable } from 'mobx';
 
 import { useObservableRef, useSuspense } from '@cloudbeaver/core-blocks';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { blobToBase64, isNotNullDefined, removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 import { isResultSetContentValue } from '@dbeaver/result-set-api';
+import { blobToBase64, removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';

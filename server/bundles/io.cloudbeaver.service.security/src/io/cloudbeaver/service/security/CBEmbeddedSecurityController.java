@@ -170,6 +170,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 dbStat.setString(4, defaultAuthRole);
             }
             dbStat.execute();
+            log.info(String.format("New user created: [userId=%s]", userId));
         }
         saveSubjectMetas(dbCon, userId, metaParameters);
         String defaultTeamName = getDefaultUserTeam();
@@ -192,7 +193,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         outer:
         for (SMUserProvisioning user : userImportList.getUsers()) {
             String authRole = user.getAuthRole() == null ? userImportList.getAuthRole() : user.getAuthRole();
-            for (String possibleUserId : List.of(user.getUserId(), user.getUserId().toLowerCase())) {
+            String userId = user.getUserId();
+            for (String possibleUserId : List.of(userId, userId.toLowerCase())) {
                 if (isSubjectExists(possibleUserId)) {
                     log.info("User already exist : " + possibleUserId);
                     setUserAuthRole(connection, possibleUserId, authRole);
@@ -200,7 +202,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     continue outer;
                 }
             }
-            createUser(connection, user.getUserId().toLowerCase(), user.getMetaParameters(), true, authRole);
+            createUser(connection, userId.toLowerCase(), user.getMetaParameters(), true, authRole);
         }
     }
 
@@ -222,6 +224,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
         var event = new WSUserDeletedEvent(userId);
         application.getEventController().addEvent(event);
+        log.info(String.format("User deleted: [userId=%s]", userId));
     }
 
     public void setUserTeams(String userId, String[] teamIds, String grantorId) throws DBCException {
@@ -286,6 +289,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        log.info(String.format(
+            "User set team role: [userId=%s,teamId=%s, role=%s]",
+            userId,
+            teamId,
+            teamRole
+        ));
     }
 
     //TODO implement add/delete user teams api
@@ -358,6 +367,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
         Set<String> currentUserTeams = getCurrentUserTeams(dbCon, userId);
 
+        List<String> resultTeamIds = new ArrayList<>();
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             "INSERT INTO {table_prefix}CB_USER_TEAM" +
                 "(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")
@@ -366,6 +376,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 if (currentUserTeams.contains(teamId)) {
                     continue;
                 }
+                resultTeamIds.add(teamId);
                 dbStat.setString(1, userId);
                 dbStat.setString(2, teamId);
                 dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
@@ -373,6 +384,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 dbStat.execute();
             }
         }
+        log.info(String.format(
+            "User added to team: [userId=%s,team=%s, grantorUserId=%s]",
+            userId,
+            String.join(",", resultTeamIds),
+            grantorId
+        ));
     }
 
     protected void deleteUserTeams(
@@ -392,6 +409,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
             dbStat.execute();
         }
+        log.info(String.format("User deleted from team: [userId=%s,teamIds=%s]", userId, String.join(",", teamIds)));
     }
 
     @NotNull
@@ -773,6 +791,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             dbStat.setString(2, userId);
             dbStat.executeUpdate();
         }
+        log.info(String.format("User updated: [userId=%s, isActive=%s]", userId, enabled));
     }
 
     @Override
@@ -803,6 +822,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             if (dbStat.executeUpdate() <= 0) {
                 throw new SMException("User not found");
             }
+            log.info(String.format("User set auth role: [userId=%s,role=%s]", userId, authRole));
         }
     }
 
@@ -902,6 +922,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error saving user credentials in database", e);
         }
+        log.info(String.format("Set credentials for user: [userId=%s,providerId=%s]", userId, authProviderId));
     }
 
     @Override
@@ -916,6 +937,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error deleting user credentials", e);
         }
+        log.info(String.format("User credentials deleted: [userId=%s, providerId=%s]", userId, authProviderId));
     }
 
     @Nullable
@@ -2501,7 +2523,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     createUser(
                         dbCon,
                         userId,
-                        Map.of(),
+                        (Map<String, String>) userCredentials.get(SMStandardMeta.KEY_META_PARAMS),
                         true,
                         resolveUserAuthRole(null, authRole)
                     );

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@ import { Combobox, ConfirmationDialog, Group, GroupTitle, type ITag, s, Tag, Tag
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
-import { isDefined } from '@cloudbeaver/core-utils';
+import { isDefined } from '@dbeaver/js-helpers';
 
 import style from './ServerConfigurationDriversForm.module.css';
 import { useService } from '@cloudbeaver/core-di';

@@ -38,6 +38,7 @@
     "@cloudbeaver/plugin-navigation-tree": "workspace:*",
     "@cloudbeaver/plugin-projects": "workspace:*",
     "@cloudbeaver/plugin-resource-manager": "workspace:*",
+    "@dbeaver/js-helpers": "workspace:^",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",

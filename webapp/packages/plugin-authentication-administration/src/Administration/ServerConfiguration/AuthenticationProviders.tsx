@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import {
 import { FormContext, Group, GroupTitle, type PlaceholderComponent, Switch, useExecutor, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { isDefined } from '@cloudbeaver/core-utils';
+import { isDefined } from '@dbeaver/js-helpers';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
 
 import { ServerConfigurationAdminForm } from './ServerConfigurationAdminForm.js';

@@ -9,8 +9,9 @@ import { makeObservable, observable } from 'mobx';
 
 import { QuotasService, ServerResourceQuotasResource } from '@cloudbeaver/core-root';
 import { GraphQLService, ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { bytesToSize, download, downloadFromURL, GlobalConstants, isNotNullDefined } from '@cloudbeaver/core-utils';
 import { isResultSetContentValue } from '@dbeaver/result-set-api';
+import { bytesToSize, download, downloadFromURL, GlobalConstants } from '@cloudbeaver/core-utils';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
