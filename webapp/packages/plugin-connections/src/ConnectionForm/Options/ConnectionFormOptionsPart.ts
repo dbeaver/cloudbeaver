@@ -6,13 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { FormMode, FormPart, formSubmitContext, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
-import {
-  DriverConfigurationType,
-  getObjectPropertyValue,
-  type ConnectionConfig,
-  type ObjectPropertyInfo,
-  type TestConnectionMutation,
-} from '@cloudbeaver/core-sdk';
+import { DriverConfigurationType, type ConnectionConfig, type ObjectPropertyInfo, type TestConnectionMutation } from '@cloudbeaver/core-sdk';
 import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import {
   ConnectionInfoAuthPropertiesResource,
@@ -32,6 +26,7 @@ import { getUniqueName, isNotNullDefined } from '@cloudbeaver/core-utils';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { LocalizationService } from '@cloudbeaver/core-localization';
 import type { NotificationService } from '@cloudbeaver/core-events';
+import { getObjectPropertyDefaults } from '@cloudbeaver/core-blocks';
 
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import { getConnectionName } from './getConnectionName.js';
@@ -45,12 +40,12 @@ const MAIN_PROPERTY_HOST_KEY = 'host';
 const MAIN_PROPERTY_PORT_KEY = 'port';
 const MAIN_PROPERTY_SERVER_KEY = 'server';
 
-const defaultStateGetter = (connectionId?: string) =>
+const defaultStateGetter = (connectionId?: string, credentials?: Record<string, any>) =>
   ({
     connectionId,
     configurationType: DriverConfigurationType.Manual,
     keepAliveInterval: 0,
-    credentials: {},
+    credentials: credentials ?? {},
     template: false,
     mainPropertyValues: {},
     networkHandlersConfig: [],
@@ -181,7 +176,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
   protected override async loader(): Promise<void> {
     if (this.formState.mode === 'create') {
-      this.setInitialState(defaultStateGetter(this.initialState.connectionId ?? this.formState.state.connectionId));
+      const credentials = this.state.authModelId
+        ? getObjectPropertyDefaults(await this.getConnectionAuthModelProperties(this.state.authModelId))
+        : undefined;
+
+      this.setInitialState(defaultStateGetter(this.initialState.connectionId ?? this.formState.state.connectionId, credentials));
 
       await this.setDriverId(this.state.driverId);
 
@@ -228,7 +227,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (authPropertiesInfo.authProperties) {
       for (const property of authPropertiesInfo.authProperties) {
         if (!property.features.includes('password')) {
-          config.credentials[property.id!] = getObjectPropertyValue(property) ?? property.defaultValue;
+          config.credentials[property.id!] = property.value;
         }
       }
     }
@@ -322,12 +321,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (modelId === this.initialState.authModelId) {
       this.state.credentials = { ...this.initialState.credentials };
     } else if (modelId !== this.state.authModelId) {
-      this.state.credentials = {};
-    }
-
-    if (modelId) {
-      const properties = await this.getConnectionAuthModelProperties(modelId);
-      this.state.credentials = prepareDynamicProperties(properties, this.state.credentials ?? {});
+      const properties = modelId ? await this.getConnectionAuthModelProperties(modelId) : null;
+      this.state.credentials = properties ? getObjectPropertyDefaults(properties) : {};
     }
 
     this.state.authModelId = modelId;
@@ -569,7 +564,7 @@ function isCredentialsChanged(authProperties: ObjectPropertyInfo[], credentials:
       if (value !== undefined) {
         return property.features.includes('file') ? true : !!value;
       }
-    } else if (value !== getObjectPropertyValue(property)) {
+    } else if (value !== property.value) {
       return true;
     }
   }

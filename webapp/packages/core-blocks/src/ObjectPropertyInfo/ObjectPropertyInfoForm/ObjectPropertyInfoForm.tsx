@@ -18,6 +18,7 @@ import { s } from '../../s.js';
 import { TextPlaceholder } from '../../TextPlaceholder.js';
 import { useS } from '../../useS.js';
 import { RenderField } from './RenderField.js';
+import { getObjectPropertyDefaults } from '../getObjectPropertyDefaults.js';
 
 export interface ObjectPropertyFormProps extends ILayoutSizeProps {
   properties: ReadonlyArray<ObjectPropertyInfo>;
@@ -80,6 +81,8 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
     return <TextPlaceholder>{translate(emptyPlaceholder)}</TextPlaceholder>;
   }
 
+  const defaults = { ...getObjectPropertyDefaults(properties), ...defaultState };
+
   return (
     <>
       {properties.map(property => {
@@ -93,7 +96,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
             property={property}
             state={state}
             context={context}
-            defaultState={defaultState}
+            defaultState={defaults}
             editable={editable}
             autofillToken={property.features.includes('password') && disableAutoCompleteForPasswords ? 'new-password' : autofillToken}
             disabled={disabled}

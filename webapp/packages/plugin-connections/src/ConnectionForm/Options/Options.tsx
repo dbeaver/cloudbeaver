@@ -142,8 +142,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
 
   const authModel = authModelLoader.data;
 
-  function handleAuthModelSelect(authModelId: string | undefined) {
-    optionsPart.setAuthModelId(authModelId);
+  async function handleAuthModelSelect(authModelId: string | undefined) {
+    await optionsPart.setAuthModelId(authModelId);
   }
 
   const authentication = useAuthenticationAction({

@@ -63,8 +63,8 @@ function getValue(value: any, controlType: ObjectPropertyType) {
 export const RenderField = observer<RenderFieldProps>(function RenderField({
   property,
   state,
-  context = state,
   defaultState,
+  context,
   editable = true,
   autofillToken = '',
   disabled,
@@ -83,18 +83,17 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   const controlType = getObjectPropertyType(property);
   const type = getObjectPropertyValueType(property);
   const isPassword = type === 'password';
+  const evaluateContext = context ?? { ...defaultState, ...state };
 
-  if (context) {
-    for (const condition of property.conditions ?? EMPTY_ARRAY) {
-      const result = evaluate(condition.expression, context);
+  for (const condition of property.conditions ?? EMPTY_ARRAY) {
+    const result = evaluate(condition.expression, evaluateContext);
 
-      if (condition.conditionType === ConditionType.Hide && result === true) {
-        return null;
-      }
+    if (condition.conditionType === ConditionType.Hide && result === true) {
+      return null;
+    }
 
-      if (condition.conditionType === ConditionType.ReadOnly && result === true) {
-        readonly = true;
-      }
+    if (condition.conditionType === ConditionType.ReadOnly && result === true) {
+      readonly = true;
     }
   }
 
