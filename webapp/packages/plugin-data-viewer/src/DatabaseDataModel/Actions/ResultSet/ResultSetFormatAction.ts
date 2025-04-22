@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { isResultSetContentValue, isResultSetComplexValue } from '@dbeaver/result-set-api';
+import { isResultSetContentValue, isResultSetComplexValue, type IResultSetComplexValue } from '@dbeaver/result-set-api';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
@@ -14,7 +14,6 @@ import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
 import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
 import { DatabaseEditChangeType } from '../IDatabaseDataEditAction.js';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction.js';
-import type { IResultSetComplexValue } from '@dbeaver/result-set-api';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey.js';
 import { isResultSetFileValue } from './isResultSetFileValue.js';
 import { isResultSetGeometryValue } from './isResultSetGeometryValue.js';
