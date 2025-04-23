@@ -5,25 +5,22 @@
   "description": "",
   "license": "Apache-2.0",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./*": "./lib/*.js"
   },
   "scripts": {
     "build": "tsc -b",
     "clean": "rimraf --glob lib",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "test": "core-cli-test",
+    "test": "dbeaver-test",
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
     "@cloudbeaver/core-di": "workspace:*",
-    "@testing-library/dom": "^10",
-    "@testing-library/jest-dom": "^6",
-    "@testing-library/react": "^16",
     "mobx": "^6",
     "react": "^19",
     "react-dom": "^19",
-    "tslib": "^2",
-    "vitest": "^3"
+    "tslib": "^2"
   },
   "sideEffects": [
     "src/**/*.css",
@@ -33,7 +30,15 @@
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
+    "@dbeaver/cli": "workspace:^",
+    "@testing-library/dom": "^10",
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^14",
+    "@types/node": "^22",
     "@types/react": "^19",
-    "typescript": "^5"
+    "fake-indexeddb": "^6",
+    "happy-dom": "^17",
+    "typescript": "^5",
+    "vitest": "^3"
   }
 }

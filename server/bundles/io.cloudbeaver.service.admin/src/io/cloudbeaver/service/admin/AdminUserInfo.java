@@ -22,6 +22,8 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.model.user.WebUserOriginInfo;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
+import io.cloudbeaver.utils.CBModelConstants;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -125,4 +127,19 @@ public class AdminUserInfo {
         return userLinkedProviders;
     }
 
+    @Nullable
+    public String getDisableDate() {
+        return user.getDisableDate() == null ? null : CBModelConstants.ISO_DATE_FORMAT.format(user.getDisableDate());
+    }
+
+
+    @Nullable
+    public String getDisabledBy() {
+        return user.getDisabledBy();
+    }
+
+    @Nullable
+    public String getDisableReason() {
+        return user.getDisableReason();
+    }
 }

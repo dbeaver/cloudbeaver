@@ -279,29 +279,25 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               <InputField type="text" name="name" minLength={1} state={optionsPart.state} readOnly={readonly || formState.isDisabled} required fill>
                 {translate('connections_connection_name')}
               </InputField>
-              {!optionsPart.state.template && (
-                <ProjectSelect
-                  value={formState.state.projectId}
-                  readOnly={readonly || edit}
-                  disabled={formState.isDisabled}
-                  autoHide
-                  onChange={setProject}
-                />
-              )}
-              {!optionsPart.state.template && (
-                <InputField
-                  type="text"
-                  name="folder"
-                  state={optionsPart.state}
-                  autoComplete={`section-${optionsPart.state.driverId || 'driver'} section-folder`}
-                  autoHide
-                  readOnly
-                  tiny
-                  fill
-                >
-                  {translate('plugin_connections_connection_form_part_main_folder')}
-                </InputField>
-              )}
+              <ProjectSelect
+                value={formState.state.projectId}
+                readOnly={readonly || edit}
+                disabled={formState.isDisabled}
+                autoHide
+                onChange={setProject}
+              />
+              <InputField
+                type="text"
+                name="folder"
+                state={optionsPart.state}
+                autoComplete={`section-${optionsPart.state.driverId || 'driver'} section-folder`}
+                autoHide
+                readOnly
+                tiny
+                fill
+              >
+                {translate('plugin_connections_connection_form_part_main_folder')}
+              </InputField>
             </Container>
             <Textarea name="description" rows={3} state={optionsPart.state} readOnly={readonly || formState.isDisabled}>
               {translate('connections_connection_description')}
@@ -351,7 +347,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   </Link>
                 </FormFieldDescription>
               )}
-              {!sharedCredentials && authModel && credentialsSavingEnabled && !optionsPart.state.template && (
+              {!sharedCredentials && authModel && credentialsSavingEnabled && (
                 <FieldCheckbox
                   id={optionsPart.state.connectionId + 'authNeeded'}
                   name="saveCredentials"

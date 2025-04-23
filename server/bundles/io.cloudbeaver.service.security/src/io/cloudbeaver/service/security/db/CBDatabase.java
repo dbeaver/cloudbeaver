@@ -72,7 +72,7 @@ import javax.sql.DataSource;
 public class CBDatabase extends InternalDB<WebDatabaseConfig> {
     private static final Log log = Log.getLog(CBDatabase.class);
 
-    private static final int CURRENT_SCHEMA_VERSION = 24;
+    private static final int CURRENT_SCHEMA_VERSION = 25;
     private static final String SCHEMA_ID = "CB_CE";
 
     private static final SQLSchemaConfig SCHEMA_CREATE_CONFIG = new SQLSchemaConfig(
