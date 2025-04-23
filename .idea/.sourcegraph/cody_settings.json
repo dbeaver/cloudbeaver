@@ -1,0 +1,45 @@
+{
+    "cody" : {
+        "advanced" : {
+            "agent" : {
+                "capabilities" : {
+                    "storage" : true
+                },
+                "extension" : {
+                    "version" : "7.86.0"
+                },
+                "ide" : {
+                    "name" : "JetBrains",
+                    "productCode" : 2,
+                    "version" : "IC-243.25659.59"
+                },
+                "running" : true
+            },
+            "hasNativeWebview" : true
+        },
+        "autocomplete" : {
+            "advanced" : {
+                "model" : null,
+                "provider" : null
+            },
+            "enabled" : true
+        },
+        "codebase" : null,
+        "customHeaders" : {},
+        "debug" : {
+            "verbose" : false
+        },
+        "experimental" : {
+            "foldingRanges" : "indentation-based",
+            "tracing" : false
+        },
+        "serverEndpoint" : null,
+        "suggestions" : {
+            "mode" : "autocomplete"
+        },
+        "telemetry" : {
+            "clientName" : null,
+            "level" : "agent"
+        }
+    }
+}
