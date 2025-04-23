@@ -20,6 +20,7 @@ import io.cloudbeaver.model.app.ServletApplication;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.fs.lock.FileLockController;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 
 import java.nio.file.Path;
 
@@ -29,7 +30,7 @@ public class TestLockController extends FileLockController {
     }
 
     public TestLockController(ServletApplication application, int maxTimeout) throws DBException {
-        super(application.getApplicationInstanceId(), maxTimeout);
+        super(application.getApplicationInstanceId(), maxTimeout, GeneralUtils.getMetadataFolder());
     }
 
     //avoid mockito access method error

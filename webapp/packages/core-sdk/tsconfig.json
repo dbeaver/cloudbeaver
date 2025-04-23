@@ -12,6 +12,9 @@
   },
   "references": [
     {
+      "path": "../../../common-typescript/@dbeaver/cli"
+    },
+    {
       "path": "../core-cli"
     },
     {

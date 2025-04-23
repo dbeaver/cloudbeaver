@@ -11,7 +11,6 @@ fragment DatabaseConnectionCustomOptions on ConnectionInfo {
   name
   description
   folder
-  template
   driverId
   keepAliveInterval
   autocommit
