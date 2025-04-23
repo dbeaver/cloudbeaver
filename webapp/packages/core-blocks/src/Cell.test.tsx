@@ -19,7 +19,7 @@ vi.mock('./useS', () => ({
 }));
 
 vi.mock('./Containers/Container', () => ({
-  Container: (props: any) => <div {...props}>{props.children}</div>,
+  Container: (props: any) => <div>{props.children}</div>,
 }));
 
 describe('Cell', () => {

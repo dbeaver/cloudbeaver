@@ -172,11 +172,6 @@ public class WebConnectionInfo {
     }
 
     @Property
-    public boolean isTemplate() {
-        return dataSourceContainer.isTemplate();
-    }
-
-    @Property
     public boolean isProvided() {
         return dataSourceContainer.isProvided();
     }

@@ -255,7 +255,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
     makeObservable<this, 'nodeIdMap'>(this, {
       nodeIdMap: observable,
-      createFromTemplate: action,
       create: action,
       createFromNode: action,
       add: action,
@@ -354,17 +353,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       ...this.getIncludesMap(),
     });
 
-    return this.add(connection);
-  }
-
-  async createFromTemplate(projectId: string, templateId: string, connectionName: string): Promise<Connection> {
-    const { connection } = await this.graphQLService.sdk.createConnectionFromTemplate({
-      projectId,
-      templateId,
-      connectionName,
-      ...this.getDefaultIncludes(),
-      ...this.getIncludesMap(),
-    });
     return this.add(connection);
   }
 
