@@ -69,6 +69,12 @@ public class WSAuthSessionEventHandler implements WSEventHandler<WSAuthEvent> {
             webSession.addWarningMessage(message);
             return;
         }
+        if (relatedTask.isCancelled()) {
+            String message = "Related authentication task was canceled";
+            log.warn(message);
+            webSession.addWarningMessage(message);
+            return;
+        }
         WebAsyncAuthJob relatedJob = (WebAsyncAuthJob) relatedTask.getJob();
         switch (authInfo.getAuthStatus()) {
             case SUCCESS:

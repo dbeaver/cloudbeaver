@@ -547,10 +547,7 @@ public class WebSession extends BaseWebSession
                 throw new DBWebException("Task '" + taskId + "' not found");
             }
         }
-        AbstractJob job = taskInfo.getJob();
-        if (job != null) {
-            job.cancel();
-        }
+        taskInfo.cancel();
         return true;
     }
 
