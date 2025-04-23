@@ -19,7 +19,7 @@ to: <%= name %>/package.json
     "build": "tsc -b",
     "clean": "rimraf --glob lib",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "test": "core-cli-test",
+    "test": "dbeaver-test",
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
@@ -27,6 +27,7 @@ to: <%= name %>/package.json
   },
   "peerDependencies": {},
   "devDependencies": {
+    "@dbeaver/cli": "workspace:*",
     "rimraf": "^6",
     "@cloudbeaver/core-cli": "^0",
     "typescript": "^5"

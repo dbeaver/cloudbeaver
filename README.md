@@ -25,6 +25,13 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 25.0.3 2025-04-21
+- Administration: log records now capture create, update, and delete actions for users, teams, and connections for improved tracking and transparency;
+- SQL Editor: auto-completion has been improved for aliases and camelCase entities;
+- Users DDL in Oracle is displayed in metadata editor on corresponding tab for users with Oracle administration permissions;
+- Different bug fixes and enhancements have been made.
+
+
 ### 25.0.2 2025-04-07
 - Data Editor: improved table rendering to scale column width depending on the content.
 - Improved Navigation tree performance: lost connection does not lead to the application freezing anymore.
