@@ -1,11 +1,8 @@
 export default [
   ['core_connections_connections_settings_group', 'Verbindungen'],
-  ['connections_administration_new_connection', 'Neue Verbindung'],
-  ['connections_administration_connection_access_empty', 'Keine verfügbaren Benutzer und Teams'],
-  ['connections_administration_configuration_wizard_step_title', 'Datenbankverbindungen'],
-  ['connections_administration_configuration_wizard_step_description', 'Datenbankverbindungen hinzufügen'],
-  ['connections_administration_configuration_wizard_title', 'Datenbankverbindungen hinzufügen'],
-  ['connections_administration_connection_no_information', 'Keine Information verfügbar'],
+  ['core_connections_new_connection', 'Neue Verbindung'],
+  ['core_connections_connection_access_empty', 'Keine verfügbaren Benutzer und Teams'],
+  ['core_connections_connection_no_information', 'Keine Information verfügbar'],
   ['connections_administration_delete_confirmation', 'Sie werden diese Verbindungen löschen: '],
   ['connections_administration_tools_delete_tooltip', 'Löschen Sie ausgewählte Verbindungen'],
   ['connections_administration_tools_refresh_success', 'Die Verbindungsliste wurde aktualisiert'],
@@ -52,7 +49,6 @@ export default [
 
   ['core_connections_settings_disable', 'Disable'],
   ['core_connections_settings_disable_description', 'Disable the ability to create new connections'],
-  ['connections_templates_deprecated_message', 'Template connections are deprecated and will be removed in future releases'],
   ['core_connections_connection_driver_not_installed', 'Driver is not installed'],
   ['core_connections_connection_temporary', 'Temporary connection'],
   ['core_connections_connection_create_success', 'Connection was created'],

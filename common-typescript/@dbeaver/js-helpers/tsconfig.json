@@ -12,5 +12,10 @@
   },
   "include": [
     "src"
+  ],
+  "references": [
+    {
+      "path": "../cli"
+    }
   ]
 }

@@ -132,58 +132,6 @@ public class WebServiceCore implements DBWServiceCore {
             .toList();
     }
 
-    @Deprecated
-    @Override
-    public List<WebDataSourceConfig> getTemplateDataSources() throws DBWebException {
-
-        List<WebDataSourceConfig> result = new ArrayList<>();
-        DBPDataSourceRegistry dsRegistry = WebServiceUtils.getGlobalDataSourceRegistry();
-
-        for (DBPDataSourceContainer ds : dsRegistry.getDataSources()) {
-            if (ds.isTemplate()) {
-                if (WebAppUtils.getWebApplication().getDriverRegistry().getApplicableDrivers().contains(ds.getDriver())) {
-                    result.add(new WebDataSourceConfig(ds));
-                } else {
-                    log.debug("Template datasource '" + ds.getName() + "' ignored - driver is not applicable");
-                }
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<WebConnectionInfo> getTemplateConnections(
-        @NotNull WebSession webSession, @Nullable String projectId
-    ) throws DBWebException {
-        if (webSession.getApplication().isDistributed()) {
-            return List.of();
-        }
-        List<WebConnectionInfo> result = new ArrayList<>();
-        if (projectId == null) {
-            for (WebSessionProjectImpl project : webSession.getAccessibleProjects()) {
-                getTemplateConnectionsFromProject(webSession, project, result);
-            }
-        } else {
-            WebSessionProjectImpl project = getProjectById(webSession, projectId);
-            getTemplateConnectionsFromProject(webSession, project, result);
-        }
-        return result;
-    }
-
-    private void getTemplateConnectionsFromProject(
-        @NotNull WebSession webSession,
-        @NotNull WebSessionProjectImpl project,
-        List<WebConnectionInfo> result
-    ) {
-        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-        for (DBPDataSourceContainer ds : registry.getDataSources()) {
-            if (ds.isTemplate() && WebAppUtils.getWebApplication().getDriverRegistry().getApplicableDrivers().contains(ds.getDriver())) {
-                result.add(new WebConnectionInfo(webSession, ds));
-            }
-        }
-    }
-
     @Override
     public List<WebConnectionFolderInfo> getConnectionFolders(
         @NotNull WebSession webSession, @Nullable String projectId, @Nullable String id
@@ -399,44 +347,6 @@ public class WebServiceCore implements DBWServiceCore {
     ) throws DBWebException {
         return WebAppUtils.getWebApplication().getConnectionController().deleteConnection(webSession, projectId, connectionId);
 
-    }
-
-    @Override
-    @Deprecated
-    public WebConnectionInfo createConnectionFromTemplate(
-        @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @NotNull String templateId,
-        @Nullable String connectionName
-    ) throws DBWebException {
-        WebSessionProjectImpl project = getProjectById(webSession, projectId);
-        DBPDataSourceRegistry templateRegistry = project.getDataSourceRegistry();
-        DBPDataSourceContainer dataSourceTemplate = templateRegistry.getDataSource(templateId);
-        if (dataSourceTemplate == null) {
-            throw new DBWebException("Template data source '" + templateId + "' not found");
-        }
-
-        DBPDataSourceRegistry projectRegistry = webSession.getSingletonProject().getDataSourceRegistry();
-        DBPDataSourceContainer newDataSource = projectRegistry.createDataSource(dataSourceTemplate);
-
-        ServletApplication app = ServletAppUtils.getServletApplication();
-        if (app instanceof WebApplication webApplication) {
-            ((DataSourceDescriptor) newDataSource).setNavigatorSettings(
-                webApplication.getAppConfiguration().getDefaultNavigatorSettings());
-        }
-
-        if (!CommonUtils.isEmpty(connectionName)) {
-            newDataSource.setName(connectionName);
-        }
-        try {
-            projectRegistry.addDataSource(newDataSource);
-
-            projectRegistry.checkForErrors();
-        } catch (DBException e) {
-            throw new DBWebException(e.getMessage(), e);
-        }
-
-        return project.addConnection(newDataSource);
     }
 
     @Override

@@ -81,7 +81,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   if (!connectionOriginDetailsResource.data?.origin.details || connectionOriginDetailsResource.data?.origin.details.length === 0) {
     return (
       <ColoredContainer className={s(style, { coloredContainer: true })} parent>
-        <TextPlaceholder>{translate('connections_administration_connection_no_information')}</TextPlaceholder>
+        <TextPlaceholder>{translate('core_connections_connection_no_information')}</TextPlaceholder>
       </ColoredContainer>
     );
   }
