@@ -40,7 +40,7 @@ interface IData {
   tabIds: string[];
 
   login: (linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) => Promise<void>;
-  loginFederated: (provider: AuthProvider, configuration: AuthProviderConfiguration, onClose?: () => void) => Promise<void>;
+  loginFederated: (provider: AuthProvider, configuration: AuthProviderConfiguration) => Promise<void>;
 }
 
 interface IState {
@@ -223,12 +223,10 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         try {
           this.state.setActiveProvider(provider, configuration ?? null);
 
-          let loginTask: ITask<UserInfo | null> | null = null;
-
-          if (provider && configuration) {
-            loginTask = authInfoService.asyncLogin(provider.id, {configurationId: configuration.id});
+          if (provider.federated && configuration) {
+            await this.loginFederated(provider, configuration);
           } else {
-            loginTask = authInfoService.login(provider.id, {
+            await authInfoService.login(provider.id, {
               configurationId: configuration?.id,
               credentials: {
                 ...state.credentials,
@@ -242,11 +240,6 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
               linkUser,
             });
           }
-
-         
-          this.authTask = loginTask;
-
-          await loginTask;
         } catch (exception: any) {
           const gqlError = errorOf(exception, GQLError);
 
@@ -272,6 +265,18 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         }
 
         return;
+      },
+      async loginFederated(provider: AuthProvider, configuration: AuthProviderConfiguration): Promise<void> {
+        let task: ITask<UserInfo | null> | null = null;
+
+        task = authInfoService.asyncLogin(provider.id, {
+          configurationId: configuration.id,
+          forceSessionsLogout: state.forceSessionsLogout,
+          linkUser: false,
+        });
+
+        this.authTask = task;
+        await task;
       },
     }),
     {

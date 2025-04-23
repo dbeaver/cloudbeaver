@@ -16,6 +16,7 @@ import {
   type AuthInfo,
   type AuthLogoutQuery,
   AuthStatus,
+  type AuthTokenFragment,
   type GetActiveUserQueryVariables,
   GraphQLService,
   type UserInfo,
@@ -36,6 +37,8 @@ export interface ILoginOptions {
   linkUser?: boolean;
   forceSessionsLogout?: boolean;
 }
+
+export type IAsyncLoginOptions = Omit<ILoginOptions, 'credentials'>;
 
 export const ANONYMOUS_USER_ID = 'anonymous';
 
@@ -135,16 +138,18 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     return authInfo as AuthInfo;
   }
 
-  async asyncAuthLogin(provider: string, { configurationId }: ILoginOptions): Promise<AsyncAuthInfo> {
-    const { task } = await this.graphQLService.sdk.asyncAuthLogin({
+  async asyncAuthLogin(provider: string, { configurationId, linkUser, forceSessionsLogout }: IAsyncLoginOptions): Promise<AsyncAuthInfo> {
+    const { result } = await this.graphQLService.sdk.asyncAuthLogin({
       provider,
       configuration: configurationId,
+      linkUser,
+      forceSessionsLogout,
     });
 
-    return task;
+    return result;
   }
 
-  async getAuthTaskResult(taskId: string): Promise<void> {
+  async getAuthTaskResult(taskId: string): Promise<AuthTokenFragment[]> {
     const { result } = await this.graphQLService.sdk.getAuthTaskResult({ taskId });
 
     if (result.userTokens) {
@@ -152,6 +157,8 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
       this.setData(await this.loader());
       this.sessionResource.markOutdated();
     }
+
+    return result.userTokens;
   }
 
   finishFederatedAuthentication(authId: string, linkUser?: boolean): ITask<UserInfo | null> {

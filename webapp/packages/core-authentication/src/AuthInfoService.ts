@@ -8,11 +8,11 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { AutoRunningTask, type ITask } from '@cloudbeaver/core-executor';
 import { WindowsService } from '@cloudbeaver/core-routing';
-import { type AuthInfo, AuthStatus, type UserInfo } from '@cloudbeaver/core-sdk';
+import { type UserInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { type AuthProviderConfiguration, AuthProvidersResource } from './AuthProvidersResource.js';
-import { type ILoginOptions, UserInfoResource } from './UserInfoResource.js';
+import { type IAsyncLoginOptions, type ILoginOptions, UserInfoResource } from './UserInfoResource.js';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 
 export interface IUserAuthConfiguration {
@@ -31,105 +31,57 @@ export class AuthInfoService {
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly windowsService: WindowsService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
-  ) { }
+  ) {}
 
-  login(providerId: string, options: ILoginOptions): ITask<UserInfo | null> {
-    return new AutoRunningTask(async () => await this.userInfoResource.login(providerId, options)).then(authInfo =>
-      this.federatedAuthentication(providerId, options, authInfo),
-    );
+  async login(providerId: string, options: ILoginOptions): Promise<UserInfo | null> {
+    await this.userInfoResource.login(providerId, options);
+    return this.userInfoResource.data;
   }
 
-  asyncLogin(providerId: string, options: ILoginOptions): ITask<UserInfo | null> {
-    return new AutoRunningTask(async () => {
-      const task = this.asyncTaskInfoService.create(async () => {
-        const result = await this.userInfoResource.asyncAuthLogin(providerId, options);
+  asyncLogin(providerId: string, options: IAsyncLoginOptions): ITask<UserInfo | null> {
+    const task = this.asyncTaskInfoService.create(async () => {
+      const result = await this.userInfoResource.asyncAuthLogin(providerId, options);
 
-        let window: Window | null = null;
-        let id = providerId;
+      let window: Window | null = null;
+      let id = providerId;
 
-        if (options.configurationId) {
-          const configuration = this.authProvidersResource.getConfiguration(providerId, options.configurationId);
+      if (options.configurationId) {
+        const configuration = this.authProvidersResource.getConfiguration(providerId, options.configurationId);
 
-          if (configuration) {
-            id = configuration.id;
-          }
+        if (configuration) {
+          id = configuration.id;
         }
-
-        if (result.redirectLink) {
-          id = uuid();
-          window = this.windowsService.open(id, {
-            url: result.redirectLink,
-            target: id,
-            width: 600,
-            height: 700,
-          });
-
-          if (window) {
-            window.focus();
-          }
-        }
-        
-
-        return result.taskInfo;
-      });
-
-
-      const info = await this.asyncTaskInfoService.run(task);
-      await this.userInfoResource.getAuthTaskResult(info.id);
-
-      if (window) {
-        this.windowsService.close(window);
       }
 
-      return this.userInfoResource.data;
+      if (result.redirectLink) {
+        id = uuid();
+        window = this.windowsService.open(id, {
+          url: result.redirectLink,
+          target: id,
+          width: 600,
+          height: 700,
+        });
 
+        if (window) {
+          window.focus();
+        }
+      }
+
+      return result.taskInfo;
     });
 
-  }
-
-  private federatedAuthentication(
-    providerId: string,
-    options: ILoginOptions,
-    { redirectLink, authId, authStatus }: AuthInfo,
-  ): ITask<UserInfo | null> {
-    let window: Window | null = null;
-    let id = providerId;
-
-    if (options.configurationId) {
-      const configuration = this.authProvidersResource.getConfiguration(providerId, options.configurationId);
-
-      if (configuration) {
-        id = configuration.id;
-      }
-    }
-
-    if (redirectLink) {
-      id = uuid();
-      window = this.windowsService.open(id, {
-        url: redirectLink,
-        target: id,
-        width: 600,
-        height: 700,
-      });
-
-      if (window) {
-        window.focus();
-      }
-    }
-
     return new AutoRunningTask(
-      () => {
-        if (authId && authStatus === AuthStatus.InProgress) {
-          return this.userInfoResource.finishFederatedAuthentication(authId, options.linkUser);
-        }
+      async () => {
+        const info = await this.asyncTaskInfoService.run(task);
+        await this.userInfoResource.getAuthTaskResult(info.id);
 
-        return AutoRunningTask.resolve(this.userInfoResource.data);
-      },
-      () => {
         if (window) {
           this.windowsService.close(window);
         }
+
+        return this.userInfoResource.data;
       },
+      () => this.asyncTaskInfoService.cancel(task.id),
     );
   }
 }
