@@ -21,6 +21,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import com.google.gson.Strictness;
 import io.cloudbeaver.*;
+import io.cloudbeaver.model.CustomCancelableJob;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -547,7 +548,13 @@ public class WebSession extends BaseWebSession
                 throw new DBWebException("Task '" + taskId + "' not found");
             }
         }
-        taskInfo.cancel();
+        AbstractJob job = taskInfo.getJob();
+        if (job instanceof CustomCancelableJob cancelableJob) {
+            cancelableJob.cancelJob(this, taskInfo);
+        }
+        if (job != null) {
+            job.cancel();
+        }
         return true;
     }
 

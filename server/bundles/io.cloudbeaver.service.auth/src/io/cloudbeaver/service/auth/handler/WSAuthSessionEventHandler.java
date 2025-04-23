@@ -69,7 +69,7 @@ public class WSAuthSessionEventHandler implements WSEventHandler<WSAuthEvent> {
             webSession.addWarningMessage(message);
             return;
         }
-        if (relatedTask.isCancelled()) {
+        if (!relatedTask.isRunning()) {
             String message = "Related authentication task was canceled";
             log.warn(message);
             webSession.addWarningMessage(message);

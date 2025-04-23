@@ -108,16 +108,4 @@ public class WebAsyncTaskInfo {
     public void setJob(AbstractJob job) {
         this.job = job;
     }
-
-    public void cancel() {
-        AbstractJob job = getJob();
-        if (job != null) {
-            job.cancel();
-        }
-        cancelled = true;
-    }
-
-    public boolean isCancelled() {
-        return cancelled;
-    }
 }
