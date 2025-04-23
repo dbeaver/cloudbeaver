@@ -84,6 +84,6 @@ public class CBWebServerConfig extends WebServerConfig {
 
     @Property
     public PasswordPolicyConfiguration getPasswordPolicyConfiguration() {
-        return cbApp.getSecurityManagerConfiguration().getPasswordPolicyConfiguration();
+        return cbApp.getServerConfiguration().getSecurityManagerConfiguration().getPasswordPolicyConfiguration();
     }
 }

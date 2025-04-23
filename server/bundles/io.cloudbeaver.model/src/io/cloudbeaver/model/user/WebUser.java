@@ -17,8 +17,10 @@
 package io.cloudbeaver.model.user;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 
@@ -92,5 +94,20 @@ public class WebUser {
 
     public String getAuthRole() {
         return user.getAuthRole();
+    }
+
+    @Nullable
+    public Instant getDisableDate() {
+        return user.getDisableDate();
+    }
+
+    @Nullable
+    public String getDisabledBy() {
+        return user.getDisabledBy();
+    }
+
+    @Nullable
+    public String getDisableReason() {
+        return user.getDisableReason();
     }
 }

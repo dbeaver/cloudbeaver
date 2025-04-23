@@ -1,14 +1,21 @@
 {
   "name": "common-typescript",
+  "type": "module",
   "packageManager": "yarn@4.6.0",
   "private": true,
   "workspaces": [
     "@dbeaver/*"
   ],
+  "scripts": {
+    "clear": "rimraf -g './*/*/{dist,lib}'",
+    "test": "dbeaver-test"
+  },
   "devDependencies": {
+    "@dbeaver/cli": "workspace:^",
     "@dbeaver/prettier-config": "workspace:^",
     "@wroud/ts-template": "^0",
     "prettier": "^3.5.1",
+    "rimraf": "^6",
     "typescript": "^5.7.3"
   }
 }
