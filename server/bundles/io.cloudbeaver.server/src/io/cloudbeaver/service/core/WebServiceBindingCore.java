@@ -59,11 +59,8 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("driverList", env -> getService(env).getDriverList(getWebSession(env), env.getArgument("id")))
             .dataFetcher("authModels", env -> getService(env).getAuthModels(getWebSession(env)))
             .dataFetcher("networkHandlers", env -> getService(env).getNetworkHandlers(getWebSession(env)))
-            .dataFetcher("templateDataSources", env -> getService(env).getTemplateDataSources())
             .dataFetcher("userConnections", env -> getService(env).getUserConnections(
                 getWebSession(env), getProjectReference(env), env.getArgument("id"), env.getArgument("projectIds")))
-            .dataFetcher("templateConnections", env -> getService(env).getTemplateConnections(
-                getWebSession(env), getProjectReference(env)))
 
             .dataFetcher("connectionFolders", env -> getService(env).getConnectionFolders(
                 getWebSession(env), getProjectReference(env), env.getArgument("path")))
@@ -113,11 +110,6 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                 getWebSession(env), getProjectReference(env), getConnectionConfig(env)))
             .dataFetcher("deleteConnection", env -> getService(env).deleteConnection(
                 getWebSession(env), getProjectReference(env), env.getArgument("id")))
-            .dataFetcher("createConnectionFromTemplate", env -> getService(env).createConnectionFromTemplate(
-                getWebSession(env),
-                getProjectReference(env),
-                env.getArgument("templateId"),
-                env.getArgument("connectionName")))
             .dataFetcher("copyConnectionFromNode", env -> getService(env).copyConnectionFromNode(
                 getWebSession(env),
                 getProjectReference(env),
