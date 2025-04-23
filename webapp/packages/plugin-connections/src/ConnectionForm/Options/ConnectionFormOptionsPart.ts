@@ -45,7 +45,6 @@ const defaultStateGetter = (connectionId?: string) =>
     configurationType: DriverConfigurationType.Manual,
     keepAliveInterval: 0,
     credentials: {},
-    template: false,
     mainPropertyValues: {},
     networkHandlersConfig: [],
     properties: {},
@@ -200,7 +199,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     config.name = customOptionsInfo.name;
     config.description = customOptionsInfo.description;
-    config.template = customOptionsInfo.template;
     config.driverId = customOptionsInfo.driverId;
 
     config.host = customOptionsInfo.host || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_HOST_KEY];
@@ -339,7 +337,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     this.state.name = this.state.name?.trim();
     this.state.description = this.state.description?.trim();
 
-    if (this.state.template || !this.state.folder) {
+    if (!this.state.folder) {
       delete this.state.folder;
     }
 

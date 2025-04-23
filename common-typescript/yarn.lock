@@ -97,6 +97,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@dbeaver/cli@workspace:@dbeaver/cli, @dbeaver/cli@workspace:^":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/cli@workspace:@dbeaver/cli"
+  dependencies:
+    "@dbeaver/tsconfig": "workspace:^"
+    "@types/node": "npm:^22"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+    vitest: "npm:^3"
+  bin:
+    dbeaver-test: ./lib/test.js
+  languageName: unknown
+  linkType: soft
+
 "@dbeaver/database-commons@workspace:@dbeaver/database-commons, @dbeaver/database-commons@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/database-commons@workspace:@dbeaver/database-commons"
@@ -121,6 +135,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dbeaver/js-helpers@workspace:@dbeaver/js-helpers"
   dependencies:
+    "@dbeaver/cli": "workspace:^"
     "@dbeaver/tsconfig": "workspace:^"
     rimraf: "npm:^6"
     typescript: "npm:^5"
@@ -1075,6 +1090,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^22":
+  version: 22.14.1
+  resolution: "@types/node@npm:22.14.1"
+  dependencies:
+    undici-types: "npm:~6.21.0"
+  checksum: 10c0/d49c4d00403b1c2348cf0701b505fd636d80aabe18102105998dc62fdd36dcaf911e73c7a868c48c21c1022b825c67b475b65b1222d84b704d8244d152bb7f86
+  languageName: node
+  linkType: hard
+
 "@types/postcss-modules-local-by-default@npm:^4.0.2":
   version: 4.0.2
   resolution: "@types/postcss-modules-local-by-default@npm:4.0.2"
@@ -1369,9 +1393,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "common-typescript@workspace:."
   dependencies:
+    "@dbeaver/cli": "workspace:^"
     "@dbeaver/prettier-config": "workspace:^"
     "@wroud/ts-template": "npm:^0"
     prettier: "npm:^3.5.1"
+    rimraf: "npm:^6"
     typescript: "npm:^5.7.3"
   languageName: unknown
   linkType: soft
@@ -3279,6 +3305,13 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 10c0/6fd7e0ed3bf23a81246878c613423730c40e8bdbfec4c6e4d7bf1b847cbb39076e56ad5f50aa9d7ebd89877999abaee216002d3f2818885e41c907caaa192cc4
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~6.21.0":
+  version: 6.21.0
+  resolution: "undici-types@npm:6.21.0"
+  checksum: 10c0/c01ed51829b10aa72fc3ce64b747f8e74ae9b60eafa19a7b46ef624403508a54c526ffab06a14a26b3120d055e1104d7abe7c9017e83ced038ea5cf52f8d5e04
   languageName: node
   linkType: hard
 

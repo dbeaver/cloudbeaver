@@ -130,7 +130,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
               return false;
             }
 
-            return !connection.template;
+            return true;
           })
           .sort((a, b) => {
             if (a.connected === b.connected) {
