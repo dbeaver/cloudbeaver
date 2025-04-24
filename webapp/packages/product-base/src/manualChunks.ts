@@ -13,56 +13,54 @@ const vendorChunks = new Map([
   ['codemirror', 'vendor/codemirror'],
 ]);
 
-export const manualChunks = (): PluginOption => {
-  return [
-    {
-      name: 'manual-chunks',
-      enforce: 'pre',
-      config(config) {
-        return {
-          ...config,
-          build: {
-            ...config.build,
-            rollupOptions: {
-              ...config.build?.rollupOptions,
-              output: {
-                ...config.build?.rollupOptions?.output,
-                manualChunks(id) {
-                  if (id.includes('node_modules')) {
-                    for (const [pattern, chunk] of vendorChunks.entries()) {
-                      if (id.includes(pattern)) {
-                        return chunk;
-                      }
+export const manualChunks = (): PluginOption => [
+  {
+    name: 'manual-chunks',
+    enforce: 'pre',
+    config(config) {
+      return {
+        ...config,
+        build: {
+          ...config.build,
+          rollupOptions: {
+            ...config.build?.rollupOptions,
+            output: {
+              ...config.build?.rollupOptions?.output,
+              manualChunks(id) {
+                if (id.includes('node_modules')) {
+                  for (const [pattern, chunk] of vendorChunks.entries()) {
+                    if (id.includes(pattern)) {
+                      return chunk;
                     }
-
-                    return 'vendor/others';
                   }
 
-                  if (id.includes('common-')) {
-                    return 'common';
-                  }
+                  return 'vendor/others';
+                }
 
-                  if (id.includes('plugin-')) {
-                    return 'plugins';
-                  }
+                if (id.includes('common-')) {
+                  return 'common';
+                }
 
-                  if (id.includes('LocaleService')) {
-                    return 'locale';
-                  }
+                if (id.includes('plugin-')) {
+                  return 'plugins';
+                }
 
-                  const langMatch = /[\\/]locales[\\/](\w+)\.js/.exec(id);
-                  if (langMatch) {
-                    const language = langMatch[1]; // e.g. "en"
-                    return `locales/${language}`;
-                  }
+                if (id.includes('LocaleService')) {
+                  return 'locale';
+                }
 
-                  return null;
-                },
+                const langMatch = /[\\/]locales[\\/](\w+)\.js/.exec(id);
+                if (langMatch) {
+                  const language = langMatch[1]; // e.g. "en"
+                  return `locales/${language}`;
+                }
+
+                return null;
               },
             },
           },
-        };
-      },
+        },
+      };
     },
-  ];
-};
+  },
+];
