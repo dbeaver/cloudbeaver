@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import {
   Link,
   s,
   TextPlaceholder,
+  useResource,
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
@@ -34,12 +35,12 @@ import ProductInfoDialogStyles from './ProductInfoDialog.module.css';
 
 export const ProductInfoDialog = observer<DialogComponentProps<null>>(function ProductInfoDialog(props) {
   const translate = useTranslate();
-  const serverConfigResource = useService(ProductInfoResource);
+  const productInfoResource = useResource(ProductInfoDialog, ProductInfoResource, undefined);
   const themeService = useService(ThemeService);
 
   const version = useAppVersion();
 
-  const productInfo = serverConfigResource.data;
+  const productInfo = productInfoResource.data;
   const logoIcon = themeService.themeId === 'light' ? '/icons/product-logo_light.svg' : '/icons/product-logo_dark.svg';
 
   const styles = useS(ProductInfoDialogStyles);
