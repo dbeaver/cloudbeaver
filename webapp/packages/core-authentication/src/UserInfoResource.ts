@@ -130,9 +130,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     });
 
     if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
-      this.resetIncludes();
-      this.setData(await this.loader());
-      this.sessionResource.markOutdated();
+      await this.syncData();
     }
 
     return authInfo as AuthInfo;
@@ -153,15 +151,13 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     const { result } = await this.graphQLService.sdk.getAuthTaskResult({ taskId });
 
     if (result.userTokens) {
-      this.resetIncludes();
-      this.setData(await this.loader());
-      this.sessionResource.markOutdated();
+      await this.syncData();
     }
 
     return result.userTokens;
   }
 
-  finishFederatedAuthentication(authId: string, linkUser?: boolean): ITask<UserInfo | null> {
+  autoLogin(authId: string, linkUser?: boolean): ITask<UserInfo | null> {
     let activeTask: ITask<AuthInfo> | undefined;
 
     return new AutoRunningTask<UserInfo | null>(
@@ -191,9 +187,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
         const authInfo = await activeTask;
 
         if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
-          this.resetIncludes();
-          this.setData(await this.loader());
-          this.sessionResource.markOutdated();
+          await this.syncData();
         }
 
         return this.data;
@@ -330,5 +324,11 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     return {
       includeConfigurationParameters: false,
     };
+  }
+
+  private async syncData() {
+    this.resetIncludes();
+    this.setData(await this.loader());
+    this.sessionResource.markOutdated();
   }
 }
