@@ -197,7 +197,8 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
-          return !this.serverConfigResource.distributed || connection.sharedCredentials;
+          const auth = this.connectionInfoAuthPropertiesResource.get(connectionKey);
+          return !this.serverConfigResource.distributed || !!auth?.sharedCredentials;
         }
 
         return true;
