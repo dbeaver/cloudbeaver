@@ -7,7 +7,12 @@
  */
 import { type PluginOption } from 'vite';
 
-// eslint-disable-next-line arrow-body-style
+const vendorChunks = new Map([
+  ['d3-', 'vendor/d3'],
+  ['lodash', 'vendor/lodash'],
+  ['codemirror', 'vendor/codemirror'],
+]);
+
 export const manualChunks = (): PluginOption => {
   return [
     {
@@ -22,66 +27,33 @@ export const manualChunks = (): PluginOption => {
               ...config.build?.rollupOptions,
               output: {
                 ...config.build?.rollupOptions?.output,
-                manualChunks(id, { getModuleInfo }) {
-                  function isModuleSync(moduleId: string) {
-                    const info = getModuleInfo(moduleId);
-                    if (!info) {
-                      return true;
-                    } // fallback if no info available
-                    if (info.isEntry) {
-                      return true;
+                manualChunks(id) {
+                  if (id.includes('node_modules')) {
+                    for (const [pattern, chunk] of vendorChunks.entries()) {
+                      if (id.includes(pattern)) {
+                        return chunk;
+                      }
                     }
-                    // info.importers is the list of modules that import this module.
-                    // info.dynamicImporters is the subset of those that import it dynamically.
-                    // If there’s any importer that did a static import, we consider this module sync.
-                    return info.importers && info.importers.some(importer => !info.dynamicImporters.includes(importer));
+
+                    return 'vendor/others';
                   }
 
-                  const nodeModulesMatch = /[\\/]node_modules[\\/](.*?)[\\/]/.exec(id);
+                  if (id.includes('common-')) {
+                    return 'common';
+                  }
 
-                  if (nodeModulesMatch) {
-                    if (isModuleSync(id)) {
-                      return 'vendor';
-                    }
+                  if (id.includes('plugin-')) {
+                    return 'plugins';
+                  }
 
-                    return 'vendor-async';
+                  if (id.includes('LocaleService')) {
+                    return 'locale';
                   }
 
                   const langMatch = /[\\/]locales[\\/](\w+)\.js/.exec(id);
                   if (langMatch) {
                     const language = langMatch[1]; // e.g. "en"
                     return `locales/${language}`;
-                  }
-
-                  const packageMatch = /[\\/]packages[\\/]((plugin|core)-.*?)[\\/](src|dist|lib)[\\/]/.exec(id);
-                  if (packageMatch) {
-                    const packageName = packageMatch[1]; // e.g. "plugin-data-export"
-
-                    const moduleInfo = getModuleInfo(id);
-                    if (!moduleInfo) {
-                      return null;
-                    }
-
-                    // Ensure we correctly group synchronous and dynamic imports
-                    const isDynamic = moduleInfo.dynamicImporters.length > 0;
-                    const isEntry = moduleInfo.isEntry;
-
-                    // If it's an entry point or dynamically imported, create a unique chunk
-                    if (isEntry || isDynamic) {
-                      return `shared.${packageName}`;
-                    }
-
-                    // Ensure that statically imported modules remain in the same chunk
-                    if (moduleInfo.importers.length > 0) {
-                      // Find the top-most importer that is an entry point
-                      const topLevelEntry = moduleInfo.importers.find(importer => getModuleInfo(importer)?.isEntry);
-                      if (topLevelEntry) {
-                        return `entry.${packageName}`;
-                      }
-                    }
-
-                    // Default to a shared chunk for the package
-                    return `shared.${packageName}`;
                   }
 
                   return null;
