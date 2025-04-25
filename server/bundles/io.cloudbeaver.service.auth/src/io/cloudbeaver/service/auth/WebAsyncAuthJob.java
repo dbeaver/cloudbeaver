@@ -24,6 +24,7 @@ import io.cloudbeaver.utils.WebEventUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
@@ -71,6 +72,7 @@ public class WebAsyncAuthJob extends AbstractJob  implements CustomCancelableJob
     @Override
     public void cancelJob(@NotNull WebSession webSession,@NotNull WebAsyncTaskInfo taskInfo) {
         taskInfo.setRunning(false);
+        taskInfo.setJobError(new DBException("Canceled by the user"));
         WebEventUtils.sendAsyncTaskEvent(webSession, taskInfo);
     }
 }
