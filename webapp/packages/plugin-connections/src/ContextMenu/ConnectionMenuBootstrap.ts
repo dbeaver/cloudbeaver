@@ -7,6 +7,7 @@
  */
 import {
   type Connection,
+  ConnectionInfoAuthPropertiesResource,
   ConnectionInfoResource,
   ConnectionsManagerService,
   ConnectionsSettingsService,
@@ -45,6 +46,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
   constructor(
     private readonly notificationService: NotificationService,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionInfoAuthPropertiesResource: ConnectionInfoAuthPropertiesResource,
     private readonly navNodeManagerService: NavNodeManagerService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly actionService: ActionService,
@@ -195,7 +197,8 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
-          return !this.serverConfigResource.distributed || connection.sharedCredentials;
+          const auth = this.connectionInfoAuthPropertiesResource.get(connectionKey);
+          return !this.serverConfigResource.distributed || !!auth?.sharedCredentials;
         }
 
         return true;
@@ -203,12 +206,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
       getLoader: (context, action) => {
         const connectionKey = context.get(DATA_CONTEXT_CONNECTION)!;
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
-          return getCachedMapResourceLoaderState(
-            this.connectionInfoResource,
-            () => connectionKey,
-            () => ['includeCredentialsSaved' as const],
-            true,
-          );
+          return getCachedMapResourceLoaderState(this.connectionInfoAuthPropertiesResource, () => connectionKey, undefined, true);
         }
 
         return getCachedMapResourceLoaderState(this.connectionInfoResource, () => connectionKey, undefined, true);
