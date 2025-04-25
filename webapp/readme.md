@@ -4,10 +4,17 @@ Welcome! Follow these steps to install and run the frontend dev server.
 
 **Prerequisites:**
 
-- Ensure you have Yarn installed.
+- **Ensure you have right Node.js version**
+
+  We recommend using the last LTE version. Check it on https://nodejs.org/
+  The minimum supported version is v20.19.1
+
+- **Ensure you have Yarn installed**
+
   If not, see instruction on official website: https://yarnpkg.com/getting-started/install
 
-- Enable corepack
+- **Enable corepack**
+
   To ensure that you have corepack is enabled run the following command
 
   ```bash
@@ -18,41 +25,46 @@ Welcome! Follow these steps to install and run the frontend dev server.
 
 **Installation Steps:**
 
-1.  **Build the Backend Server:**
-    Navigate to the `deploy` directory and execute the build script. This script will handle cloning necessary repositories and building the backend. It also installs all frontend dependencies and builds it as well.
+1. **Build the Backend Server**
 
-    ```bash
-    cd deploy
-    ./build.sh
-    ```
+   Navigate to the `deploy` directory and execute the build script. This script will handle cloning necessary repositories and building the backend. It also installs all frontend dependencies and builds it as well.
 
-2.  **Navigate to the Directory with Build Artifacts:**
-    Change your current directory to the `cloudbeaver` folder within the `deploy` directory.
+   ```bash
+   cd deploy
+   ./build.sh
+   ```
 
-    ```bash
-    cd cloudbeaver
-    ```
+2. **Navigate to the Directory with Build Artifacts**
 
-3.  **Run the Backend Server:**
-    Start the backend server by running the execution script.
+   Change your current directory to the `cloudbeaver` folder within the `deploy` directory.
 
-    ```bash
-    ./run-server.sh
-    ```
+   ```bash
+   cd cloudbeaver
+   ```
 
-4.  **Navigate to the Webapp Directory:**
-    Open a new terminal window or tab, and change your directory to the web application's product folder.
+3. **Run the Backend Server**
 
-    ```bash.
-    cd webapp/packages/product-default
-    ```
+   Start the backend server by running the execution script.
 
-5.  **Run the Web Application:**
-    Start the web application development server, specifying the backend server's URL. The default URL is `http://localhost:8978/`.
+   ```bash
+   ./run-server.sh
+   ```
 
-    ```bash
-    server=http://localhost:8978/ yarn dev
-    ```
+4. **Navigate to the Webapp Directory**
+
+   Open a new terminal window or tab, and change your directory to the web application's product folder.
+
+   ```bash.
+   cd webapp/packages/product-default
+   ```
+
+5. **Run the Web Application**
+
+   Start the web application development server, specifying the backend server's URL. The default URL is `http://localhost:8978/`.
+
+   ```bash
+   server=http://localhost:8978/ yarn dev
+   ```
 
 You should see a message with URL of your running dev server like below
 
