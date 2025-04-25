@@ -69,8 +69,11 @@ public class WebServiceCore implements DBWServiceCore {
     private static final Log log = Log.getLog(WebServiceCore.class);
 
     @Override
-    public WebServerConfig getServerConfig() {
-        return WebAppUtils.getWebApplication().getWebServerConfig();
+    public WebServerConfig getServerConfig(@Nullable WebSession webSession) {
+        WebServerConfig webServerConfig = WebAppUtils.getWebApplication().getWebServerConfig();
+        webServerConfig.setProvideSensitiveInformation(webServerConfig.isConfigurationMode() ||
+            (webSession != null && webSession.getUser() != null));
+        return webServerConfig;
     }
 
     @Override

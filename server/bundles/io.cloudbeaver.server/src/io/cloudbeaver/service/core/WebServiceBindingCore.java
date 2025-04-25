@@ -52,7 +52,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
     public void bindWiring(DBWBindingContext model) throws DBWebException {
         WebAppSessionManager sessionManager = WebAppUtils.getWebApplication().getSessionManager();
         model.getQueryType()
-            .dataFetcher("serverConfig", env -> getService(env).getServerConfig())
+            .dataFetcher("serverConfig", env -> getService(env).getServerConfig(findWebSession(env)))
             .dataFetcher("systemInfo", env -> getService(env).getSystemInformationProperties(getWebSession(env)))
             .dataFetcher("productSettings", env -> getService(env).getProductSettings(getWebSession(env)))
 
