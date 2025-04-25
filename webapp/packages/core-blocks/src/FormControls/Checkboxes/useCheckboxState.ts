@@ -58,7 +58,7 @@ export function useCheckboxState<TKey extends string>(options: CheckboxStateOpti
         checked = !!currentState;
       }
     } else {
-      checked = false;
+      checked = checked ?? false;
     }
   }
 
