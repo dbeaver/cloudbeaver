@@ -1,0 +1,37 @@
+{
+  "name": "@dbeaver/cli",
+  "type": "module",
+  "sideEffects": [],
+  "exports": {
+    ".": "./lib/index.js",
+    "./*": "./lib/*.js"
+  },
+  "bin": {
+    "dbeaver-test": "./lib/test.js"
+  },
+  "scripts": {
+    "clear": "rimraf lib"
+  },
+  "files": [
+    "package.json",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md",
+    "lib",
+    "!lib/**/*.d.ts.map",
+    "!lib/**/*.test.js",
+    "!lib/**/*.test.d.ts",
+    "!lib/**/*.test.d.ts.map",
+    "!lib/**/*.test.js.map",
+    "!lib/tests",
+    "!.tsbuildinfo"
+  ],
+  "packageManager": "yarn@4.6.0",
+  "devDependencies": {
+    "@dbeaver/tsconfig": "workspace:^",
+    "@types/node": "^22",
+    "rimraf": "^6",
+    "typescript": "^5",
+    "vitest": "^3"
+  }
+}

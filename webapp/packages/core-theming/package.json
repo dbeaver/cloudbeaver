@@ -17,7 +17,7 @@
     "build": "tsc -b",
     "clean": "rimraf --glob lib",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "test": "core-cli-test",
+    "test": "dbeaver-test",
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
@@ -27,12 +27,14 @@
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-settings": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
+    "@dbeaver/ui-kit": "workspace:^",
     "mobx": "^6",
     "tslib": "^2"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
+    "@dbeaver/cli": "workspace:*",
     "@fontsource/roboto": "^5",
     "@material/button": "^4",
     "@material/checkbox": "^4",

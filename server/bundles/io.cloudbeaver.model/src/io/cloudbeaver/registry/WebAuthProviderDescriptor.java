@@ -22,8 +22,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPImage;
-import org.jkiss.dbeaver.model.DBPNamedObjectLocalized;
-import org.jkiss.dbeaver.model.DBPObjectWithDescriptionLocalized;
 import org.jkiss.dbeaver.model.auth.AuthPropertyDescriptor;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.impl.AbstractDescriptor;
@@ -47,7 +45,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
     private final IConfigurationElement cfg;
 
-    private final ObjectType implType;
+    private ObjectType implType;
     private final Map<SMSubjectType, List<DBPPropertyDescriptor>> metaParameters = new HashMap<>();
     private SMAuthProvider<?> instance;
     private final DBPImage icon;
@@ -61,31 +59,31 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private final boolean serviceProvider;
     private final String[] requiredFeatures;
     private final boolean isRequired;
-    private final String[] types;
+    private String[] types;
 
     public WebAuthProviderDescriptor(IConfigurationElement cfg) {
         super(cfg);
         this.cfg = cfg;
-        this.implType = new ObjectType(cfg, "class");
-        this.icon = iconToImage(cfg.getAttribute("icon"));
-        this.configurable = CommonUtils.toBoolean(cfg.getAttribute("configurable"));
-        this.trusted = CommonUtils.toBoolean(cfg.getAttribute("trusted"));
-        this.isPrivate = CommonUtils.toBoolean(cfg.getAttribute("private"));
-        this.isRequired = CommonUtils.toBoolean(cfg.getAttribute("required"));
-        this.isAuthHidden = CommonUtils.toBoolean(cfg.getAttribute("authHidden"));
-        this.isCaseInsensitive = CommonUtils.toBoolean(cfg.getAttribute("caseInsensitive"));
-        this.serviceProvider = CommonUtils.toBoolean(cfg.getAttribute("serviceProvider"));
+        this.implType = new ObjectType(cfg, WebRegistryConstant.ATTR_CLASS);
+        this.icon = iconToImage(cfg.getAttribute(WebRegistryConstant.ATTR_ICON));
+        this.configurable = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_CONFIGURABLE));
+        this.trusted = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_TRUSTED));
+        this.isPrivate = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_PRIVATE));
+        this.isRequired = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_REQUIRED));
+        this.isAuthHidden = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_AUTH_HIDDEN));
+        this.isCaseInsensitive = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_CASE_INSENSITIVE));
+        this.serviceProvider = CommonUtils.toBoolean(cfg.getAttribute(WebRegistryConstant.ATTR_SERVICE_PROVIDER));
 
-        for (IConfigurationElement cfgElement : cfg.getChildren("configuration")) {
+        for (IConfigurationElement cfgElement : cfg.getChildren(WebRegistryConstant.TAG_CONFIGURATION)) {
             List<WebAuthProviderProperty> properties = WebAuthProviderRegistry.readProperties(cfgElement, getId());
             for (WebAuthProviderProperty property : properties) {
                 configurationParameters.put(CommonUtils.toString(property.getId()), property);
             }
         }
-        for (IConfigurationElement credElement : cfg.getChildren("credentials")) {
+        for (IConfigurationElement credElement : cfg.getChildren(WebRegistryConstant.TAG_CREDENTIALS)) {
             credentialProfiles.add(new SMAuthCredentialsProfile(credElement));
         }
-        for (IConfigurationElement mpElement : cfg.getChildren("metaParameters")) {
+        for (IConfigurationElement mpElement : cfg.getChildren(WebRegistryConstant.TAG_META_PARAMETERS)) {
             SMSubjectType subjectType = CommonUtils.valueOf(SMSubjectType.class, mpElement.getAttribute("type"), SMSubjectType.user);
             List<DBPPropertyDescriptor> metaProps = new ArrayList<>();
             for (IConfigurationElement propGroup : ArrayUtils.safeArray(mpElement.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
@@ -94,24 +92,24 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
             metaParameters.put(subjectType, metaProps);
         }
 
-        String rfList = cfg.getAttribute("requiredFeatures");
+        String rfList = cfg.getAttribute(WebRegistryConstant.ATTR_REQUIRED_FEATURES);
         requiredFeatures = CommonUtils.isEmpty(rfList) ? null : rfList.split(",");
 
-        String typesAttr = cfg.getAttribute("categories");
+        String typesAttr = cfg.getAttribute(WebRegistryConstant.ATTR_CATEGORIES);
         this.types = CommonUtils.isEmpty(typesAttr) ? new String[0] : typesAttr.split(",");
     }
 
     @NotNull
     public String getId() {
-        return cfg.getAttribute("id");
+        return cfg.getAttribute(WebRegistryConstant.ATTR_ID);
     }
 
     public String getLabel() {
-        return cfg.getAttribute("label");
+        return cfg.getAttribute(WebRegistryConstant.ATTR_LABEL);
     }
 
     public String getDescription() {
-        return cfg.getAttribute("description");
+        return cfg.getAttribute(WebRegistryConstant.ATTR_DESCRIPTION);
     }
 
     public DBPImage getIcon() {
@@ -212,6 +210,20 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
     public String[] getTypes() {
         return types;
+    }
+
+    public void loadExtraConfig(IConfigurationElement ext) {
+        //todo read other props if it needs
+        String typesAttr = ext.getAttribute(WebRegistryConstant.ATTR_CATEGORIES);
+        this.types = CommonUtils.isEmpty(typesAttr) ? new String[0] : typesAttr.split(",");
+        this.implType = new ObjectType(ext, WebRegistryConstant.ATTR_CLASS);
+        for (IConfigurationElement cfgElement : ext.getChildren(WebRegistryConstant.TAG_CONFIGURATION)) {
+            List<WebAuthProviderProperty> properties = WebAuthProviderRegistry.readProperties(cfgElement, getId());
+            for (WebAuthProviderProperty property : properties) {
+                configurationParameters.put(CommonUtils.toString(property.getId()), property);
+            }
+        }
+        replaceContributor(ext.getContributor());
     }
 
     public boolean isServiceProvider() {

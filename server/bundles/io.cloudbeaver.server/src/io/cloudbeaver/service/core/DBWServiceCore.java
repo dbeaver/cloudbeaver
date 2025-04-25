@@ -39,7 +39,7 @@ import java.util.Map;
 public interface DBWServiceCore extends DBWService {
 
     @WebAction(authRequired = false, initializationRequired = false)
-    WebServerConfig getServerConfig() throws DBWebException;
+    WebServerConfig getServerConfig(@Nullable WebSession webSession) throws DBWebException;
 
     /**
      * Returns information of system.
@@ -69,13 +69,6 @@ public interface DBWServiceCore extends DBWService {
     @WebAction(authRequired = false)
     List<WebConnectionFolderInfo> getConnectionFolders(
         @NotNull WebSession webSession, @Nullable String projectId, @Nullable String id) throws DBWebException;
-
-    @Deprecated
-    @WebAction
-    List<WebDataSourceConfig> getTemplateDataSources() throws DBWebException;
-
-    @WebAction
-    List<WebConnectionInfo> getTemplateConnections(@NotNull WebSession webSession, @Nullable String projectId) throws DBWebException;
 
     @WebAction(authRequired = false)
     String[] getSessionPermissions(@NotNull WebSession webSession) throws DBWebException;
@@ -150,14 +143,6 @@ public interface DBWServiceCore extends DBWService {
         @NotNull WebSession webSession,
         @Nullable @WebObjectId String projectId,
         @NotNull String connectionId) throws DBWebException;
-
-    @WebAction
-    @Deprecated
-    WebConnectionInfo createConnectionFromTemplate(
-        @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @NotNull String templateId,
-        @Nullable String connectionName) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})
     WebConnectionInfo copyConnectionFromNode(

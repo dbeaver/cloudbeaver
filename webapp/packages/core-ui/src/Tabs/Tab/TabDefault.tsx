@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useContext, useMemo } from 'react';
+import { Suspense, useContext, useMemo } from 'react';
 
 import { Translate } from '@cloudbeaver/core-blocks';
 
@@ -47,15 +47,18 @@ export function TabDefault<T = Record<string, any>>({
     const TabComponent = component;
     return (
       <TabContext.Provider value={tabContext}>
-        <TabComponent
-          tabId={tabId}
-          className={className}
-          {...(rest as unknown as T)}
-          selected={selected}
-          disabled={disabled}
-          onOpen={onOpen}
-          onClose={onClose}
-        />
+        <Suspense fallback={null}>
+          {/* TODO: do we want to fallback to default tab with provided name and icon? */}
+          <TabComponent
+            tabId={tabId}
+            className={className}
+            {...(rest as unknown as T)}
+            selected={selected}
+            disabled={disabled}
+            onOpen={onOpen}
+            onClose={onClose}
+          />
+        </Suspense>
       </TabContext.Provider>
     );
   }

@@ -1,10 +1,3 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
 export default [
   ['plugin_connections_connection_form_part_main', 'Главное'],
   ['plugin_connections_connection_form_part_properties', 'Параметры драйвера'],
@@ -46,4 +39,8 @@ export default [
   ],
   ['plugin_connections_connection_create_menu_title', 'Новое Подключение'],
   ['plugin_connections_connection_driver_not_installed_message', 'Драйвер не установлен. Вы можете установить его в "Администрированой" части.'],
+  ['plugin_connections_connection_established', 'Подключение установлено'],
+  ['plugin_connections_connection_client_version', 'Версия клиента: {arg:version} \n'],
+  ['plugin_connections_connection_server_version', 'Версия сервера: {arg:version} \n'],
+  ['plugin_connections_connection_connection_time', 'Время подключения: {arg:time} \n'],
 ];

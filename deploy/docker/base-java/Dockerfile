@@ -9,7 +9,6 @@ RUN set -eux; \
     apt-get install -y --no-install-recommends \
         # curl required for historical reasons, see https://github.com/adoptium/containers/issues/255
         curl \
-        wget \
         # java.lang.UnsatisfiedLinkError: libfontmanager.so: libfreetype.so.6: cannot open shared object file: No such file or directory
         # java.lang.NoClassDefFoundError: Could not initialize class sun.awt.X11FontManager
         # https://github.com/docker-library/openjdk/pull/235#issuecomment-424466077

@@ -77,7 +77,7 @@ public abstract class BaseServletApplication extends BaseApplicationImpl impleme
     @Nullable
     @Override
     public Path getDefaultWorkingFolder() {
-        return null;
+        return getServerConfigurationController().getWorkspacePath();
     }
 
     @Override

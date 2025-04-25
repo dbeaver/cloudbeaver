@@ -326,6 +326,10 @@ public class WebSession extends BaseWebSession
         if (!project.isShared() || application.isConfigurationMode()) {
             getWorkspace().setActiveProject(sessionProject);
         }
+        log.info(String.format(
+            "Project created: [ID=%s, Name=%s, Type=%s, Creator=%s]",
+            project.getId(), project.getName(), project.getType(), project.getCreator()
+        ));
         return sessionProject;
     }
 
@@ -933,6 +937,11 @@ public class WebSession extends BaseWebSession
      */
     public void deleteSessionProject(@Nullable WebSessionProjectImpl project) {
         if (project != null) {
+            RMProject rmProject = project.getRMProject();
+            log.info(String.format(
+                "Project deleted: [ID=%s, Name=%s, Type=%s, Creator=%s]",
+                rmProject.getId(), rmProject.getName(), rmProject.getType(), rmProject.getCreator()
+            ));
             project.dispose();
         }
         getWorkspace().removeProject(project);

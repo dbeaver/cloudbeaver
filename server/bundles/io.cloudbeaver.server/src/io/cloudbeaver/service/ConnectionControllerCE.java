@@ -72,10 +72,6 @@ public class ConnectionControllerCE implements ConnectionController {
         webSession.addInfoMessage("Create new connection");
         DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
 
-        // we don't need to save credentials for templates
-        if (connectionConfig.isTemplate()) {
-            connectionConfig.setSaveCredentials(false);
-        }
         DBPDataSourceContainer newDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig,
             sessionRegistry);
         if (CommonUtils.isEmpty(newDataSource.getName())) {
@@ -112,6 +108,11 @@ public class ConnectionControllerCE implements ConnectionController {
             WSConstants.EventAction.CREATE,
             WSDataSourceProperty.CONFIGURATION
         );
+        log.info(String.format(
+            "New connection was created: [info=%s, user=%s]",
+            WebServiceUtils.getConnectionContainerInfo(newDataSource),
+            webSession.getUserId()
+        ));
         return connectionInfo;
     }
 
@@ -219,6 +220,11 @@ public class ConnectionControllerCE implements ConnectionController {
                 property
             );
         }
+        log.info(String.format(
+            "Connection updated: [info=%s, userId=%s]",
+            WebServiceUtils.getConnectionContainerInfo(dataSource),
+            webSession.getUser()
+        ));
         return connectionInfo;
     }
 
@@ -240,6 +246,12 @@ public class ConnectionControllerCE implements ConnectionController {
             WSConstants.EventAction.DELETE,
             WSDataSourceProperty.CONFIGURATION
         );
+
+        log.info(String.format(
+            "Connection deleted: [info=%s, userId=%s]",
+            WebServiceUtils.getConnectionContainerInfo(connectionInfo.getDataSourceContainer()),
+            webSession.getUserId()
+        ));
         return true;
     }
 

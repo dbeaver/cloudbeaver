@@ -1,10 +1,3 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
 export default [
   ['plugin_connections_connection_form_part_main', '主要'],
   ['plugin_connections_connection_form_part_properties', '驱动属性'],
@@ -42,4 +35,8 @@ export default [
   ['plugin_connections_connection_auth_secret_description', '有多个凭证可用于身份验证.\n请选择您要使用的凭证。'],
   ['plugin_connections_connection_create_menu_title', 'New Connection'],
   ['plugin_connections_connection_driver_not_installed_message', 'Driver is not installed. You can install it in the "Administration" part.'],
+  ['plugin_connections_connection_established', 'Connection is established'],
+  ['plugin_connections_connection_client_version', 'Client version: {arg:version} \n'],
+  ['plugin_connections_connection_server_version', 'Server version: {arg:version} \n'],
+  ['plugin_connections_connection_connection_time', 'Connection time: {arg:time} \n'],
 ];
