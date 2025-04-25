@@ -512,8 +512,14 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             if (!CommonUtils.isEmpty(appConfig.getAuthCustomConfigurations())) {
                 appConfigProperties.put("authConfigurations", appConfig.getAuthCustomConfigurations());
             }
+
+            saveRolePreferences(appConfig, appConfigProperties);
         }
         return rootConfig;
+    }
+
+    protected void saveRolePreferences(CBAppConfig appConfig, Map<String, Object> appConfigProperties) {
+
     }
 
     @NotNull

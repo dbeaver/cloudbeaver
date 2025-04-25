@@ -106,6 +106,16 @@ type WebFeatureSet {
     enabled: Boolean!
 }
 
+type SMRolePreference {
+    role: String!
+    preferences: Object!
+}
+
+input SMRolePreferenceInput {
+    role: String!
+    preferences: Object!
+}
+
 input ServerConfigInput {
     serverName: String
     serverURL: String
@@ -220,10 +230,12 @@ extend type Query {
 
     # Changes default navigator settings
     setDefaultNavigatorSettings( settings: NavigatorSettingsInput!): Boolean!
+    getRolePreferences: [SMRolePreference!]!
 
 }
 
 extend type Mutation {
     # Updates product configuration
     adminUpdateProductConfiguration(configuration: Object!): Boolean! @since(version: "23.3.4")
+    saveRolePreferences(rolePreferences: [SMRolePreferenceInput!]!): Boolean!
 }

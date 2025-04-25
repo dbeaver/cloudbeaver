@@ -49,6 +49,7 @@ import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
+import org.jkiss.dbeaver.model.security.role.SMRolePreference;
 import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
@@ -1226,6 +1227,16 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error while reading team members", e);
         }
+    }
+
+    @Override
+    public void saveRolePreferences(@NotNull List<SMRolePreference> rolePreferences) throws DBException {
+
+    }
+
+    @Override
+    public List<SMRolePreference> getRolePreferences() {
+        return List.of();
     }
 
     @NotNull
