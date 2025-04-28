@@ -30,7 +30,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 import java.util.List;
 
-public class WebAsyncAuthJob extends AbstractJob  implements CustomCancelableJob {
+public class WebAsyncAuthJob extends AbstractJob implements CustomCancelableJob {
     @NotNull
     private final String authId;
     private final boolean linkWithUser;
@@ -70,7 +70,7 @@ public class WebAsyncAuthJob extends AbstractJob  implements CustomCancelableJob
     }
 
     @Override
-    public void cancelJob(@NotNull WebSession webSession,@NotNull WebAsyncTaskInfo taskInfo) {
+    public void cancelJob(@NotNull WebSession webSession, @NotNull WebAsyncTaskInfo taskInfo) {
         taskInfo.setRunning(false);
         taskInfo.setJobError(new DBException("Canceled by the user"));
         WebEventUtils.sendAsyncTaskEvent(webSession, taskInfo);

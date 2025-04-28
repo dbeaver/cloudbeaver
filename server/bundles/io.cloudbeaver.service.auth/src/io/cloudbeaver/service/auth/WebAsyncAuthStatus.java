@@ -17,12 +17,8 @@
 package io.cloudbeaver.service.auth;
 
 import io.cloudbeaver.model.WebAsyncTaskInfo;
-import io.cloudbeaver.model.session.WebAuthInfo;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.meta.Property;
-
-import java.util.List;
 
 public class WebAsyncAuthStatus {
     @NotNull

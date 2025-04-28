@@ -17,11 +17,8 @@
 package io.cloudbeaver.service.auth;
 
 import io.cloudbeaver.model.session.WebAuthInfo;
-import org.eclipse.core.runtime.IStatus;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.runtime.AbstractJob;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 import java.util.List;
 
