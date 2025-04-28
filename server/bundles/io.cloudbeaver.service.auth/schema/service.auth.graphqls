@@ -167,8 +167,6 @@ extend type Query {
     authLogin(provider: ID!, configuration: ID, credentials: Object, linkUser: Boolean, forceSessionsLogout: Boolean): AuthInfo!
 
     @since(version: "25.0.3")
-    asyncAuthLogin(provider: ID!, configuration: ID, linkUser: Boolean, forceSessionsLogout: Boolean): AsyncAuthInfo!
-    @since(version: "25.0.3")
     asyncAuthTaskResult(taskId: String!): AsyncAuthResult!
 
     @deprecated
@@ -201,4 +199,6 @@ extend type Mutation {
     # Updates user preferences
     setUserPreferences(preferences: Object!): UserInfo! @since(version: "24.0.1")
 
+    @since(version: "25.0.3")
+    asyncAuthLogin(provider: ID!, configuration: ID, linkUser: Boolean, forceSessionsLogout: Boolean): AsyncAuthInfo!
 }
