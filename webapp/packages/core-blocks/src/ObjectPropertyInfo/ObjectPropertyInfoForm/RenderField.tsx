@@ -53,6 +53,10 @@ function getValue(value: any, controlType: ObjectPropertyType) {
     return checkbox ? false : '';
   }
 
+  if (typeof value === 'boolean') {
+    return checkbox ? value : String(value);
+  }
+
   if (typeof value === 'string') {
     return checkbox ? value.toLowerCase() === 'true' : value;
   }
