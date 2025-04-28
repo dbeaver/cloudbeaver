@@ -12,7 +12,7 @@ import { AutoRunningTask, type ISyncExecutor, type ITask, SyncExecutor, whileTas
 import { CachedDataResource, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { SessionResource } from '@cloudbeaver/core-root';
 import {
-  type AsyncAuthInfo,
+  type FederatedAuthInfo,
   type AuthInfo,
   type AuthLogoutQuery,
   AuthStatus,
@@ -135,8 +135,11 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     return authInfo as AuthInfo;
   }
 
-  async requestFederatedLogin(provider: string, { configurationId, linkUser, forceSessionsLogout }: IFederatedLoginOptions): Promise<AsyncAuthInfo> {
-    const { result } = await this.graphQLService.sdk.asyncAuthLogin({
+  async requestFederatedLogin(
+    provider: string,
+    { configurationId, linkUser, forceSessionsLogout }: IFederatedLoginOptions,
+  ): Promise<FederatedAuthInfo> {
+    const { result } = await this.graphQLService.sdk.federatedLogin({
       provider,
       configuration: configurationId,
       linkUser,

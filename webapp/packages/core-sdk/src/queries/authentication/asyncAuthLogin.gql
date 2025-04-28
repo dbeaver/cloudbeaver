@@ -1,8 +1,0 @@
-query asyncAuthLogin($provider: ID!, $configuration: ID, $linkUser: Boolean, $forceSessionsLogout: Boolean) {
-  result: asyncAuthLogin(provider: $provider, configuration: $configuration, linkUser: $linkUser, forceSessionsLogout: $forceSessionsLogout) {
-    redirectLink
-    taskInfo {
-      ...AsyncTaskInfo
-    }
-  }
-}
