@@ -4,21 +4,21 @@ Welcome! Follow these steps to install and run the frontend dev server.
 
 **Prerequisites:**
 
-- **Ensure you have right Node.js version**
+- **Ensure you have the correct Node.js version**
 
-  We recommend using the last LTE version. Check it on https://nodejs.org/
+  We recommend using the latest LTS (Long-Term Support) version. Check the official Node.js website: https://nodejs.org/
   The minimum supported version is v20.19.1
 
 - **Ensure you have Yarn installed**
 
-  If not, see instruction on official website: https://yarnpkg.com/getting-started/install
+  If not, see the instructions on the official website: https://yarnpkg.com/getting-started/install
 
-- **Enable corepack**
+- **Enable Corepack**
 
-  To ensure that you have corepack is enabled run the following command
+  To ensure that Corepack is enabled, run the following command:
 
   ```bash
-    corepack enable
+  corepack enable
   ```
 
   More about corepack you can find here: https://yarnpkg.com/corepack
@@ -69,3 +69,17 @@ Welcome! Follow these steps to install and run the frontend dev server.
 You should see a message with URL of your running dev server like below
 
 > ➜ Local: http://localhost:8080/
+
+# Developing in VSCode
+
+VSCode offers dedicated tasks to streamline development with our project, making it the recommended environment for working on the CloudBeaver Frontend.
+
+To access these tasks, press `F1` (or `Cmd/Ctrl + Shift + P`) in VSCode, select "Tasks: Run Task" from the command palette, and then choose the desired task from the list.
+
+To start the local development server, follow these steps:
+
+1.  Execute the **Build CE** task. This task builds both the backend and frontend.
+2.  Run the **Run Backend CE** task to start the backend server.
+3.  Run the **Run DevServer CE** task.
+
+These steps will launch the frontend in development mode and proxy API requests to your locally running backend, accessible at `http://localhost:8080/`.
