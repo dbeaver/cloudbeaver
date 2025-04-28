@@ -110,6 +110,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             if (smAuthInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
                 throw new DBWebException("Unexpected auth status: " + smAuthInfo.getAuthStatus());
             }
+            if (CommonUtils.isEmpty(smAuthInfo.getRedirectUrl())) {
+                throw new DBWebException("Missing redirect URL");
+            }
             WebAsyncTaskInfo authTask = webSession.createAsyncTask(providerId + " authentication");
             authTask.setRunning(true);
             authTask.setJob(
