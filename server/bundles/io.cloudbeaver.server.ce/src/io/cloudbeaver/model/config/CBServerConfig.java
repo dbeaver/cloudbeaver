@@ -47,10 +47,14 @@ public class CBServerConfig implements WebServerConfiguration {
     private final Map<String, Object> productSettings = new HashMap<>();
 
     @SerializedName("sm")
-    protected final SMControllerConfiguration securityManagerConfiguration = new SMControllerConfiguration();
+    protected SMControllerConfiguration securityManagerConfiguration;
     @SerializedName("database")
     private WebDatabaseConfig databaseConfiguration = new WebDatabaseConfig();
     private String staticContent = "";
+
+    public CBServerConfig() {
+        this.securityManagerConfiguration = createSecurityManagerConfiguration();
+    }
 
     public String getServerURL() {
         return serverURL;
@@ -170,7 +174,11 @@ public class CBServerConfig implements WebServerConfiguration {
         return productSettings;
     }
 
-    public SMControllerConfiguration getSecurityManagerConfiguration() {
-        return securityManagerConfiguration;
+    public <T extends SMControllerConfiguration> T getSecurityManagerConfiguration() {
+        return (T) securityManagerConfiguration;
+    }
+
+    protected SMControllerConfiguration createSecurityManagerConfiguration() {
+        return new SMControllerConfiguration();
     }
 }

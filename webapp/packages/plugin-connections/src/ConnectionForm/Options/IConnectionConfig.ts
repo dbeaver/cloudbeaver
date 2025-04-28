@@ -35,8 +35,6 @@ export const CONNECTION_CONFIG_SCHEMA = schema.object({
   selectedSecretId: schema.string().optional(),
   serverName: schema.string().optional(),
   sharedCredentials: schema.boolean().optional(),
-  template: schema.boolean().optional(),
-  templateId: schema.string().optional(),
   url: schema.string().optional(),
   userName: schema.string().optional(),
   userPassword: schema.string().optional(),

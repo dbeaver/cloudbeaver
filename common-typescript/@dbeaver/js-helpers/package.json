@@ -25,6 +25,7 @@
   ],
   "packageManager": "yarn@4.6.0",
   "devDependencies": {
+    "@dbeaver/cli": "workspace:^",
     "@dbeaver/tsconfig": "workspace:^",
     "rimraf": "^6",
     "typescript": "^5",

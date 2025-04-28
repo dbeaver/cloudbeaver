@@ -357,7 +357,6 @@ type ConnectionInfo {
 
     properties: Object
 
-    template: Boolean! @deprecated
     connected: Boolean!
     provided: Boolean!
     readOnly: Boolean!
@@ -502,8 +501,6 @@ input ConnectionConfig {
     name: String
     description: String
 
-    # ID of template connection
-    templateId: ID @deprecated
     # ID of database driver
     driverId: ID
 
@@ -529,8 +526,6 @@ input ConnectionConfig {
     # Return auto-commit connection state
     autocommit: Boolean
 
-    # Return template connection state
-    template: Boolean @deprecated
     # Return read-only connection state
     readOnly: Boolean
 
@@ -590,9 +585,6 @@ extend type Query {
     # Return list of user connections
     userConnections( projectId: ID, id: ID, projectIds: [ID!] ): [ ConnectionInfo! ]!
 
-    # Return list of template connections by project ID
-    templateConnections( projectId: ID ): [ ConnectionInfo! ]! @deprecated
-
     # List of connection folders
     connectionFolders( projectId: ID, path: ID ): [ ConnectionFolderInfo! ]!
 
@@ -631,9 +623,6 @@ extend type Mutation {
 
     # Delete specified connection
     deleteConnection( id: ID!, projectId: ID ): Boolean!
-
-    # Create new custom connection from template
-    createConnectionFromTemplate( templateId: ID!, projectId: ID!, connectionName: String ): ConnectionInfo! @deprecated
 
     # Create new folder for connections
     createConnectionFolder(parentFolderPath: ID, folderName: String!, projectId: ID ): ConnectionFolderInfo!

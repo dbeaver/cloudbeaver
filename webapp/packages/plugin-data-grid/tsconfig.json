@@ -14,6 +14,9 @@
       "path": "../../../common-react/@dbeaver/ui-kit"
     },
     {
+      "path": "../../../common-typescript/@dbeaver/cli"
+    },
+    {
       "path": "../core-blocks"
     },
     {

@@ -18,7 +18,7 @@
     "gql:gen": "yarn run clean && graphql-codegen",
     "gql:gen:dev": "yarn run clean && graphql-codegen --watch",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "test": "core-cli-test",
+    "test": "dbeaver-test",
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
@@ -33,6 +33,7 @@
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
+    "@dbeaver/cli": "workspace:*",
     "@graphql-codegen/add": "^5",
     "@graphql-codegen/cli": "^5",
     "@graphql-codegen/near-operation-file-preset": "^3",

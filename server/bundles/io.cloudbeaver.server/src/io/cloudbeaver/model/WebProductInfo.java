@@ -32,6 +32,12 @@ import java.util.Date;
  */
 public class WebProductInfo {
 
+    private final boolean provideSensitiveInformation;
+
+    public WebProductInfo(boolean provideSensitiveInformation) {
+        this.provideSensitiveInformation = provideSensitiveInformation;
+    }
+
     @Property
     public String getId() {
         return CommonUtils.notEmpty(Platform.getProduct().getId());
@@ -68,7 +74,9 @@ public class WebProductInfo {
 
     @Property
     public String getLicenseInfo() {
-        return ServletAppUtils.getServletApplication().getInfoDetails(new VoidProgressMonitor());
+        return provideSensitiveInformation
+            ? ServletAppUtils.getServletApplication().getInfoDetails(new VoidProgressMonitor())
+            : "";
     }
 
     @Property
@@ -82,5 +90,6 @@ public class WebProductInfo {
         IProduct product = Platform.getProduct();
         return CommonUtils.notEmpty(product.getProperty("productPurchaseURL"));
     }
+
 
 }
