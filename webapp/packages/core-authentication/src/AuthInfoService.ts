@@ -10,10 +10,10 @@ import { AutoRunningTask, type ITask } from '@cloudbeaver/core-executor';
 import { WindowsService } from '@cloudbeaver/core-routing';
 import { type UserInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
+import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 
 import { type AuthProviderConfiguration } from './AuthProvidersResource.js';
 import { type IFederatedLoginOptions, type ILoginOptions, UserInfoResource } from './UserInfoResource.js';
-import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 
 export interface IUserAuthConfiguration {
   providerId: string;
