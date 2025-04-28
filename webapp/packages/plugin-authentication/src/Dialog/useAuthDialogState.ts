@@ -40,7 +40,7 @@ interface IData {
   tabIds: string[];
 
   login: (linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) => Promise<void>;
-  loginFederated: (provider: AuthProvider, configuration: AuthProviderConfiguration) => Promise<void>;
+  federatedLogin: (provider: AuthProvider, configuration: AuthProviderConfiguration) => Promise<void>;
 }
 
 interface IState {
@@ -224,7 +224,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
           this.state.setActiveProvider(provider, configuration ?? null);
 
           if (provider.federated && configuration) {
-            await this.loginFederated(provider, configuration);
+            await this.federatedLogin(provider, configuration);
           } else {
             await authInfoService.login(provider.id, {
               configurationId: configuration?.id,
@@ -266,17 +266,14 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
 
         return;
       },
-      async loginFederated(provider: AuthProvider, configuration: AuthProviderConfiguration): Promise<void> {
-        let task: ITask<UserInfo | null> | null = null;
-
-        task = authInfoService.asyncLogin(provider.id, {
+      async federatedLogin(provider: AuthProvider, configuration: AuthProviderConfiguration): Promise<void> {
+        this.authTask = authInfoService.federatedLogin(provider.id, {
           configurationId: configuration.id,
           forceSessionsLogout: state.forceSessionsLogout,
           linkUser: false,
         });
 
-        this.authTask = task;
-        await task;
+        await this.authTask;
       },
     }),
     {

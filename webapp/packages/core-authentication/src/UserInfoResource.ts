@@ -16,7 +16,6 @@ import {
   type AuthInfo,
   type AuthLogoutQuery,
   AuthStatus,
-  type AuthTokenFragment,
   type GetActiveUserQueryVariables,
   GraphQLService,
   type UserInfo,
@@ -38,7 +37,7 @@ export interface ILoginOptions {
   forceSessionsLogout?: boolean;
 }
 
-export type IAsyncLoginOptions = Omit<ILoginOptions, 'credentials'>;
+export type IFederatedLoginOptions = Omit<ILoginOptions, 'credentials'>;
 
 export const ANONYMOUS_USER_ID = 'anonymous';
 
@@ -136,7 +135,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     return authInfo as AuthInfo;
   }
 
-  async asyncAuthLogin(provider: string, { configurationId, linkUser, forceSessionsLogout }: IAsyncLoginOptions): Promise<AsyncAuthInfo> {
+  async requestFederatedLogin(provider: string, { configurationId, linkUser, forceSessionsLogout }: IFederatedLoginOptions): Promise<AsyncAuthInfo> {
     const { result } = await this.graphQLService.sdk.asyncAuthLogin({
       provider,
       configuration: configurationId,
@@ -145,16 +144,6 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     });
 
     return result;
-  }
-
-  async getAuthTaskResult(taskId: string): Promise<AuthTokenFragment[]> {
-    const { result } = await this.graphQLService.sdk.getAuthTaskResult({ taskId });
-
-    if (result.userTokens) {
-      await this.syncData();
-    }
-
-    return result.userTokens;
   }
 
   autoLogin(authId: string, linkUser?: boolean): ITask<UserInfo | null> {
@@ -293,6 +282,12 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     return this.data?.configurationParameters[key];
   }
 
+  async syncData(): Promise<void> {
+    this.resetIncludes();
+    this.setData(await this.loader());
+    this.sessionResource.markOutdated();
+  }
+
   protected async loader(key: void, includes?: ReadonlyArray<string>): Promise<UserInfo | null> {
     try {
       const { user } = await this.graphQLService.sdk.getActiveUser({
@@ -324,11 +319,5 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     return {
       includeConfigurationParameters: false,
     };
-  }
-
-  private async syncData() {
-    this.resetIncludes();
-    this.setData(await this.loader());
-    this.sessionResource.markOutdated();
   }
 }

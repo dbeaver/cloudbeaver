@@ -11,8 +11,8 @@ import { WindowsService } from '@cloudbeaver/core-routing';
 import { type UserInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
-import { type AuthProviderConfiguration, AuthProvidersResource } from './AuthProvidersResource.js';
-import { type IAsyncLoginOptions, type ILoginOptions, UserInfoResource } from './UserInfoResource.js';
+import { type AuthProviderConfiguration } from './AuthProvidersResource.js';
+import { type IFederatedLoginOptions, type ILoginOptions, UserInfoResource } from './UserInfoResource.js';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 
 export interface IUserAuthConfiguration {
@@ -28,7 +28,6 @@ export class AuthInfoService {
 
   constructor(
     private readonly userInfoResource: UserInfoResource,
-    private readonly authProvidersResource: AuthProvidersResource,
     private readonly windowsService: WindowsService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
   ) {}
@@ -38,32 +37,23 @@ export class AuthInfoService {
     return this.userInfoResource.data;
   }
 
-  asyncLogin(providerId: string, options: IAsyncLoginOptions): ITask<UserInfo | null> {
+  federatedLogin(providerId: string, options: IFederatedLoginOptions): ITask<UserInfo | null> {
+    let redirectWindow: Window | null = null;
+
     const task = this.asyncTaskInfoService.create(async () => {
-      const result = await this.userInfoResource.asyncAuthLogin(providerId, options);
-
-      let window: Window | null = null;
-      let id = providerId;
-
-      if (options.configurationId) {
-        const configuration = this.authProvidersResource.getConfiguration(providerId, options.configurationId);
-
-        if (configuration) {
-          id = configuration.id;
-        }
-      }
+      const result = await this.userInfoResource.requestFederatedLogin(providerId, options);
 
       if (result.redirectLink) {
-        id = uuid();
-        window = this.windowsService.open(id, {
+        const id = uuid();
+        redirectWindow = this.windowsService.open(id, {
           url: result.redirectLink,
           target: id,
           width: 600,
           height: 700,
         });
 
-        if (window) {
-          window.focus();
+        if (redirectWindow) {
+          redirectWindow.focus();
         }
       }
 
@@ -72,11 +62,11 @@ export class AuthInfoService {
 
     return new AutoRunningTask(
       async () => {
-        const info = await this.asyncTaskInfoService.run(task);
-        await this.userInfoResource.getAuthTaskResult(info.id);
+        await this.asyncTaskInfoService.run(task);
+        await this.userInfoResource.syncData();
 
-        if (window) {
-          this.windowsService.close(window);
+        if (redirectWindow) {
+          this.windowsService.close(redirectWindow);
         }
 
         return this.userInfoResource.data;
