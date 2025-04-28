@@ -43,7 +43,7 @@ public interface DBWServiceAuth extends DBWService {
     ) throws DBWebException;
 
     @WebAction(authRequired = false)
-    WebAsyncAuthStatus asyncAuthLogin(
+    WebAsyncAuthStatus federatedLogin(
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
@@ -52,7 +52,7 @@ public interface DBWServiceAuth extends DBWService {
     ) throws DBWebException;
 
     @WebAction(authRequired = false)
-    WebAsyncAuthTaskResult asyncAuthTaskResult(
+    WebAsyncAuthTaskResult federatedAuthTaskResult(
         @NotNull WebSession webSession,
         @NotNull String taskId
     ) throws DBWebException;

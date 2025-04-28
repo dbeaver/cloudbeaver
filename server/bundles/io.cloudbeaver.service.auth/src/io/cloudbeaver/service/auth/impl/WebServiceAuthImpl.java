@@ -91,7 +91,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     @Override
-    public WebAsyncAuthStatus asyncAuthLogin(
+    public WebAsyncAuthStatus federatedLogin(
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
@@ -124,7 +124,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     @Override
-    public WebAsyncAuthTaskResult asyncAuthTaskResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException {
+    public WebAsyncAuthTaskResult federatedAuthTaskResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException {
         WebAsyncTaskInfo taskInfo = webSession.asyncTaskStatus(taskId, true);
         if (taskInfo == null) {
             throw new DBWebException("Task '" + taskId + "' not found");
