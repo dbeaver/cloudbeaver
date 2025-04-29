@@ -42,6 +42,7 @@
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*",
     "@cloudbeaver/plugin-object-viewer": "workspace:*",
     "@dbeaver/js-helpers": "workspace:^",
+    "@dbeaver/result-set-api": "workspace:^",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",

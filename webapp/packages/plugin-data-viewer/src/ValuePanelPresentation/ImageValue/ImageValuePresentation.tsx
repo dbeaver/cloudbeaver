@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@ import { useMemo } from 'react';
 import { ActionIconButton, Button, Container, Fill, Loader, s, useS, useSuspense, useTranslate } from '@cloudbeaver/core-blocks';
 import { type TabContainerPanelComponent, useTabLocalState } from '@cloudbeaver/core-ui';
 import { blobToBase64, bytesToSize, throttle } from '@cloudbeaver/core-utils';
+import { isResultSetContentValue } from '@dbeaver/result-set-api';
 
-import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue.js';
 import { isResultSetDataModel } from '../../ResultSet/isResultSetDataModel.js';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService.js';
 import { QuotaPlaceholder } from '../QuotaPlaceholder.js';
