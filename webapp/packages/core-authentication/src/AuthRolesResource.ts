@@ -38,35 +38,9 @@ export class AuthRolesResource extends CachedMapResource<ELMRole, AuthRoleInfo> 
   }
 
   protected async loader(): Promise<Map<ELMRole, AuthRoleInfo>> {
-    try {
-      const { roles } = await this.graphQLService.sdk.getAuthRoles();
+    const { roles } = await this.graphQLService.sdk.getAuthRoles();
 
-      this.replace(resourceKeyList(roles.map(role => role.id as ELMRole)), roles);
-    } catch (e: any) {
-      console.error(e);
-      this.replace(resourceKeyList([ELMRole.ADMINISTRATOR, ELMRole.DATA_MANAGER, ELMRole.EDITOR, ELMRole.VIEWER, ELMRole.DEVELOPER]), [
-        {
-          id: ELMRole.ADMINISTRATOR,
-          settings: {},
-        },
-        {
-          id: ELMRole.DATA_MANAGER,
-          settings: {},
-        },
-        {
-          id: ELMRole.EDITOR,
-          settings: {},
-        },
-        {
-          id: ELMRole.VIEWER,
-          settings: {},
-        },
-        {
-          id: ELMRole.DEVELOPER,
-          settings: {},
-        },
-      ]);
-    }
+    this.replace(resourceKeyList(roles.map(role => role.id as ELMRole)), roles);
     return this.data;
   }
 
