@@ -11,10 +11,3 @@
   align-items: center;
   color: var(--theme-primary);
 }
-
-.blobFormatterValue {
-  text-transform: uppercase;
-  overflow: hidden;
-  white-space: pre;
-  text-overflow: ellipsis;
-}

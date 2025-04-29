@@ -7,90 +7,125 @@
  */
 import { type PluginOption } from 'vite';
 
-// eslint-disable-next-line arrow-body-style
-export const manualChunks = (): PluginOption => {
-  return [
-    {
-      name: 'manual-chunks',
-      enforce: 'pre',
-      config(config) {
-        return {
-          ...config,
-          build: {
-            ...config.build,
-            rollupOptions: {
-              ...config.build?.rollupOptions,
-              output: {
-                ...config.build?.rollupOptions?.output,
-                manualChunks(id, { getModuleInfo }) {
-                  function isModuleSync(moduleId: string) {
-                    const info = getModuleInfo(moduleId);
+export const manualChunks = (): PluginOption => [
+  {
+    name: 'manual-chunks',
+    enforce: 'pre',
+    config(config) {
+      return {
+        ...config,
+        build: {
+          ...config.build,
+          rollupOptions: {
+            ...config.build?.rollupOptions,
+            output: {
+              ...config.build?.rollupOptions?.output,
+              manualChunks(id, { getModuleInfo }) {
+                function isModuleSync(moduleId: string) {
+                  // Use a non-recursive approach to detect circular dependencies
+                  const visited = new Set<string>();
+                  const queue = [moduleId];
+                  
+                  // Track which modules we've already determined to be sync
+                  const syncModules = new Set<string>();
+                  
+                  while (queue.length > 0) {
+                    const currentId = queue.shift()!;
+                    
+                    // Skip if we've already processed this module in this traversal
+                    if (visited.has(currentId)) {
+                      continue;
+                    }
+                    
+                    visited.add(currentId);
+                    
+                    const info = getModuleInfo(currentId);
+                    
+                    // No module info available, assume it's sync as a fallback
                     if (!info) {
-                      return true;
-                    } // fallback if no info available
+                      syncModules.add(currentId);
+                      continue;
+                    }
+                    
+                    // Entry modules are always sync
                     if (info.isEntry) {
-                      return true;
+                      syncModules.add(currentId);
+                      continue;
                     }
-                    // info.importers is the list of modules that import this module.
-                    // info.dynamicImporters is the subset of those that import it dynamically.
-                    // If there’s any importer that did a static import, we consider this module sync.
-                    return info.importers && info.importers.some(importer => !info.dynamicImporters.includes(importer));
-                  }
-
-                  const nodeModulesMatch = /[\\/]node_modules[\\/](.*?)[\\/]/.exec(id);
-
-                  if (nodeModulesMatch) {
-                    if (isModuleSync(id)) {
-                      return 'vendor';
+                    
+                    // If there are no importers at all, it might be dynamically imported somewhere
+                    if (!info.importers || info.importers.length === 0) {
+                      // Not marking as sync
+                      continue;
                     }
-
-                    return 'vendor-async';
-                  }
-
-                  const langMatch = /[\\/]locales[\\/](\w+)\.js/.exec(id);
-                  if (langMatch) {
-                    const language = langMatch[1]; // e.g. "en"
-                    return `locales/${language}`;
-                  }
-
-                  const packageMatch = /[\\/]packages[\\/]((plugin|core)-.*?)[\\/](src|dist|lib)[\\/]/.exec(id);
-                  if (packageMatch) {
-                    const packageName = packageMatch[1]; // e.g. "plugin-data-export"
-
-                    const moduleInfo = getModuleInfo(id);
-                    if (!moduleInfo) {
-                      return null;
-                    }
-
-                    // Ensure we correctly group synchronous and dynamic imports
-                    const isDynamic = moduleInfo.dynamicImporters.length > 0;
-                    const isEntry = moduleInfo.isEntry;
-
-                    // If it's an entry point or dynamically imported, create a unique chunk
-                    if (isEntry || isDynamic) {
-                      return `shared.${packageName}`;
-                    }
-
-                    // Ensure that statically imported modules remain in the same chunk
-                    if (moduleInfo.importers.length > 0) {
-                      // Find the top-most importer that is an entry point
-                      const topLevelEntry = moduleInfo.importers.find(importer => getModuleInfo(importer)?.isEntry);
-                      if (topLevelEntry) {
-                        return `entry.${packageName}`;
+                    
+                    // If dynamicImporters is undefined or not an array, handle safely
+                    const dynamicImports = Array.isArray(info.dynamicImporters) ? info.dynamicImporters : [];
+                    
+                    // Check if any importer imports this module statically
+                    let hasStaticImporter = false;
+                    for (const importer of info.importers) {
+                      if (!dynamicImports.includes(importer)) {
+                        hasStaticImporter = true;
+                        break;
                       }
                     }
-
-                    // Default to a shared chunk for the package
-                    return `shared.${packageName}`;
+                    
+                    if (hasStaticImporter) {
+                      syncModules.add(currentId);
+                    }
                   }
+                  
+                  return syncModules.has(moduleId);
+                }
 
-                  return null;
-                },
+                const langMatch = /[\\/]locales[\\/](\w+)\.js/.exec(id);
+                if (langMatch) {
+                  const language = langMatch[1]; // e.g. "en"
+                  return `locales/${language}`;
+                }
+
+                if (id.includes('packages/core-')) {
+                  if (!isModuleSync(id)) {
+                    return 'core-async';
+                  }
+                  return 'core';
+                }
+
+                if (id.includes('packages/plugin-')) {
+                  if (!isModuleSync(id)) {
+                    return 'plugins-async';
+                  }
+                  return 'plugins';
+                }
+
+                if (id.includes('packages/product-')) {
+                  if (!isModuleSync(id)) {
+                    return 'products-async';
+                  }
+                  return 'products';
+                }
+
+                if (id.includes('@dbeaver/')) {
+                  if (!isModuleSync(id)) {
+                    return 'dbeaver-async';
+                  }
+                  return 'dbeaver';
+                }
+
+                if (id.includes('node_modules')) {
+                  if (!isModuleSync(id)) {
+                    return 'vendor-async';
+                  }
+                  return 'vendor';
+                }
+
+                return null;
               },
             },
           },
-        };
-      },
+        },
+      };
     },
-  ];
-};
+  },
+];

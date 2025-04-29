@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,6 +8,7 @@
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import { type DataTypeLogicalOperation, ResultDataFormat, type SqlResultColumn } from '@cloudbeaver/core-sdk';
+import { type IResultSetComplexValue, isResultSetContentValue } from '@dbeaver/result-set-api';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import type { IDatabaseDataAction } from '../../IDatabaseDataAction.js';
@@ -15,9 +16,7 @@ import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
 import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
 import { compareResultSetRowKeys } from './compareResultSetRowKeys.js';
-import type { IResultSetComplexValue } from './IResultSetComplexValue.js';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey.js';
-import { isResultSetContentValue } from './isResultSetContentValue.js';
 import { ResultSetDataAction } from './ResultSetDataAction.js';
 import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils.js';
 import { ResultSetEditAction } from './ResultSetEditAction.js';
