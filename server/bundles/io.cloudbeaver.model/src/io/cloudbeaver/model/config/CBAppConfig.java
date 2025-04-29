@@ -19,8 +19,8 @@ package io.cloudbeaver.model.config;
 import com.google.gson.annotations.Expose;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
 import io.cloudbeaver.model.app.BaseWebAppConfiguration;
-import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.app.ServletAuthConfiguration;
+import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import org.jkiss.code.NotNull;
@@ -28,7 +28,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
-import org.jkiss.dbeaver.model.security.role.SMRolePreference;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -69,7 +68,6 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
     private final Map<String, Object> resourceQuotas;
     private String defaultAuthProvider;
     private String[] enabledAuthProviders;
-    private List<SMRolePreference> rolePreferences;
 
     public CBAppConfig() {
         this.defaultAuthProvider = LocalAuthProviderConstants.PROVIDER_ID;
@@ -92,7 +90,6 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
         this.linkExternalCredentialsWithUser = true;
         this.grantConnectionsAccessToAnonymousTeam = false;
         this.systemVariablesResolvingEnabled = false;
-        this.rolePreferences = new ArrayList<>();
     }
 
     public CBAppConfig(CBAppConfig src) {
@@ -117,7 +114,6 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
         this.linkExternalCredentialsWithUser = src.linkExternalCredentialsWithUser;
         this.grantConnectionsAccessToAnonymousTeam = src.grantConnectionsAccessToAnonymousTeam;
         this.systemVariablesResolvingEnabled = src.systemVariablesResolvingEnabled;
-        this.rolePreferences = src.rolePreferences;
     }
 
     @Override
@@ -357,13 +353,5 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
             }
             authConfiguration.clear();
         }
-    }
-
-    public List<SMRolePreference> getRolePreferences() {
-        return rolePreferences;
-    }
-
-    public void setRolePreferences(List<SMRolePreference> rolePreferences) {
-        this.rolePreferences = rolePreferences;
     }
 }

@@ -200,11 +200,12 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
                 )
             )
             .dataFetcher("getRolePreferences", env -> getService(env).getRolePreferences(getWebSession(env)))
+            .dataFetcher("updateAuthRole", env -> getService(env).saveRolePreferences(getWebSession(env), env.getArgument("authRoleId"), env.getArgument("settings")))
         ;
         model.getMutationType()
             .dataFetcher("adminUpdateProductConfiguration",
                 env -> getService(env).updateProductConfiguration(getWebSession(env), env.getArgument("configuration")))
-            .dataFetcher("saveRolePreferences", env -> getService(env).saveRolePreferences(getWebSession(env), env.getArgument("rolePreferences")));
+            ;
     }
 
     @Override

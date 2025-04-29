@@ -896,8 +896,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public Boolean saveRolePreferences(WebSession webSession, @NotNull List<SMRolePreference> rolePreferences) throws DBException {
-        webSession.getAdminSecurityController().saveRolePreferences(rolePreferences);
+    public Boolean saveRolePreferences(WebSession webSession, @NotNull String authRoleId, Map<String, Object> settings) throws DBException {
+        webSession.getAdminSecurityController().updateAuthRolePreference(new SMRolePreference(authRoleId, settings));
         return true;
     }
 

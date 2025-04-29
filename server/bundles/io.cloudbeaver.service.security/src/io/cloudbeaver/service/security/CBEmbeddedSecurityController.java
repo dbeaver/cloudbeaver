@@ -1230,7 +1230,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     @Override
-    public void saveRolePreferences(@NotNull List<SMRolePreference> rolePreferences) throws DBException {
+    public void updateAuthRolePreference(@NotNull SMRolePreference rolePreference) throws DBException {
 
     }
 

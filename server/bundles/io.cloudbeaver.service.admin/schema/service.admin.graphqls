@@ -106,14 +106,9 @@ type WebFeatureSet {
     enabled: Boolean!
 }
 
-type SMRolePreference {
-    role: String!
-    preferences: Object!
-}
-
-input SMRolePreferenceInput {
-    role: String!
-    preferences: Object!
+type AuthRoleInfo {
+    authRoleId: ID!
+    settings: Object!
 }
 
 input ServerConfigInput {
@@ -230,12 +225,11 @@ extend type Query {
 
     # Changes default navigator settings
     setDefaultNavigatorSettings( settings: NavigatorSettingsInput!): Boolean!
-    getRolePreferences: [SMRolePreference!]!
-
+    getRolePreferences(authRoleIds: [ID!]!): [AuthRoleInfo!]!
+    updateAuthRole(authRoleId: ID!, settings: Object!): Boolean!
 }
 
 extend type Mutation {
     # Updates product configuration
     adminUpdateProductConfiguration(configuration: Object!): Boolean! @since(version: "23.3.4")
-    saveRolePreferences(rolePreferences: [SMRolePreferenceInput!]!): Boolean!
 }
