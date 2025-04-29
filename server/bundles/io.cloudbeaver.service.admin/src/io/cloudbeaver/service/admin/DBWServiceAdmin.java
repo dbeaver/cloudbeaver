@@ -219,6 +219,6 @@ public interface DBWServiceAdmin extends DBWService {
 
     //fixme uncomment
     //@WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    List<SMRolePreference> getRolePreferences(WebSession webSession, String[] authRoleIds) throws DBException;
+    List<SMRolePreference> getRolePreferences(WebSession webSession, @Nullable String[] authRoleIds) throws DBException;
 
 }

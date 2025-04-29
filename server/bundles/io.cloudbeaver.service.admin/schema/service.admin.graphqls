@@ -134,7 +134,7 @@ input AdminUserFilterInput {
 }
 
 type AdminAuthRoleInfo {
-    authRoleId: ID!
+    id: ID!
     settings: Object!
 }
 
