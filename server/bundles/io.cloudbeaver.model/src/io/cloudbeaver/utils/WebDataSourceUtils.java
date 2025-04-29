@@ -16,6 +16,10 @@
  */
 package io.cloudbeaver.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
+import com.google.gson.Strictness;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebSessionProjectImpl;
@@ -27,6 +31,8 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
+import org.jkiss.dbeaver.model.access.DBAAuthCredentialsWithComplexProperties;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
@@ -198,5 +204,19 @@ public class WebDataSourceUtils {
             }
         }
         return webSession.getAccessibleProjectById(projectId).getWebConnectionInfo(connectionId);
+    }
+
+
+    public static void updateCredentialsFromProperties(@NotNull DBAAuthCredentials credentials, @NotNull Map<String, ?> properties) {
+        InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
+        Gson credGson = new GsonBuilder()
+            .setStrictness(Strictness.LENIENT)
+            .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
+            .create();
+
+        if (credentials instanceof DBAAuthCredentialsWithComplexProperties complexProperties) {
+            complexProperties.updateCredentialsFromComplexProperties(properties);
+        }
+        credGson.fromJson(credGson.toJsonTree(properties), credentials.getClass());
     }
 }

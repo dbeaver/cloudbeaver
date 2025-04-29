@@ -1,0 +1,4 @@
+fragment Condition on Condition {
+  expression
+  conditionType
+}

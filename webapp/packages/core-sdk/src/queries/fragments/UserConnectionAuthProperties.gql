@@ -11,4 +11,7 @@ fragment UserConnectionAuthProperties on ObjectPropertyInfo {
   features
   required
   order
+  conditions {
+    ...Condition
+  }
 }
