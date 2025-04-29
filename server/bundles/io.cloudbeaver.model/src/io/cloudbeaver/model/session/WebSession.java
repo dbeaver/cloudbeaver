@@ -16,10 +16,6 @@
  */
 package io.cloudbeaver.model.session;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
-import com.google.gson.Strictness;
 import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
@@ -813,14 +809,8 @@ public class WebSession extends BaseWebSession
             // uncommented because we had the problem with non-native auth models
             // (for example, can't connect to DynamoDB if credentials are not saved)
             DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
+            WebDataSourceUtils.updateCredentialsFromProperties(credentials, configuration.getAuthProperties());
 
-            InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
-            Gson credGson = new GsonBuilder()
-                .setStrictness(Strictness.LENIENT)
-                .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
-                .create();
-
-            credGson.fromJson(credGson.toJsonTree(configuration.getAuthProperties()), credentials.getClass());
             configuration.getAuthModel().provideCredentials(dataSourceContainer, configuration, credentials);
         } catch (DBException e) {
             addSessionError(e);

@@ -46,8 +46,7 @@ export const ConnectionAuthModelSelector = observer<Props>(function ConnectionAu
 
   return (
     <Combobox
-      name="authModelId"
-      state={authModelCredentialsState}
+      value={authModelCredentialsState.authModelId}
       items={availableAuthModels}
       keySelector={model => model.id}
       valueSelector={model => model.displayName}

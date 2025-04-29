@@ -12,4 +12,7 @@ fragment ObjectPropertyInfo on ObjectPropertyInfo {
   length
   features
   order
+  conditions {
+    ...Condition
+  }
 }
