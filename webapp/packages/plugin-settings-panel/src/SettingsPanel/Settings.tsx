@@ -5,13 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { useId, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { Container, Filter, Group, s, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import { type ISettingsSource, ROOT_SETTINGS_GROUP, SettingsGroup } from '@cloudbeaver/core-settings';
 import { useTreeData, useTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
+import { SyncExecutor } from '@cloudbeaver/core-executor';
 
-import { getSettingGroupId } from './getSettingGroupId.js';
 import classes from './Settings.module.css';
 import { settingsFilter } from './settingsFilter.js';
 import { SettingsGroups } from './SettingsGroups/SettingsGroups.js';
@@ -25,7 +26,9 @@ export interface ISettingsProps {
 
 export const Settings = observer<ISettingsProps>(function Settings({ source, accessor }) {
   const translate = useTranslate();
+  const settingsId = useId();
   const settings = useSettings(accessor);
+  const [groupSelectExecutor] = useState(() => new SyncExecutor<string>());
 
   function filterExistsGroups(group: SettingsGroup) {
     return settings.groups.has(group);
@@ -71,12 +74,12 @@ export const Settings = observer<ISettingsProps>(function Settings({ source, acc
   }
 
   function handleClick(id: string) {
-    document.querySelector('#' + getSettingGroupId(id))?.scrollIntoView();
+    groupSelectExecutor.execute(id);
   }
 
   return (
     <Container gap overflow noWrap>
-      <Group className={s(classes, { settingsGroups: true })} vertical box keepSize overflow hidden>
+      <Group className={s(classes, { settingsGroups: true })} vertical box keepSize overflow>
         <SettingsGroups treeData={treeData} onClick={handleClick} />
       </Group>
       <Container className={s(classes, { settingsContainer: true })} overflow vertical gap noWrap>
@@ -89,7 +92,14 @@ export const Settings = observer<ISettingsProps>(function Settings({ source, acc
           />
         </Container>
         <Container overflow vertical>
-          <SettingsList treeData={treeData} treeFilter={treeFilter} source={source} settings={settings.settings} />
+          <SettingsList
+            settingsId={settingsId}
+            treeData={treeData}
+            treeFilter={treeFilter}
+            source={source}
+            settings={settings.settings}
+            groupSelectExecutor={groupSelectExecutor}
+          />
         </Container>
       </Container>
     </Container>

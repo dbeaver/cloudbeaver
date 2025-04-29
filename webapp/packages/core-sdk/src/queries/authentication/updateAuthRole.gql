@@ -1,0 +1,5 @@
+mutation updateAuthRole($authRoleId: ID!, $settings: Object) {
+  roles: updateAuthRole(authRoleId: $authRoleId, settings: $settings) {
+    ...AdminAuthRoleInfo
+  }
+}

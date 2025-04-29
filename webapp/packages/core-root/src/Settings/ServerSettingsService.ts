@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -50,17 +50,6 @@ export class ServerSettingsService extends SettingsSource {
     return this.settings.get(key);
   }
 
-  override clear(): void {
-    this.update(() => {
-      super.clear();
-      this.settings.clear();
-    });
-  }
-
-  resetChanges() {
-    super.clear();
-  }
-
   async save() {
     await this.serverConfigResource.updateProductConfiguration(Object.fromEntries(this.changes));
   }
@@ -72,6 +61,7 @@ export class ServerSettingsService extends SettingsSource {
   private refreshConfig() {
     this.update(() => {
       this.clear();
+      this.settings.clear();
 
       if (!this.serverConfigResource.data) {
         this.lastConfig = null;

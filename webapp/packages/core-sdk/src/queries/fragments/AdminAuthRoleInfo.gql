@@ -1,0 +1,4 @@
+fragment AdminAuthRoleInfo on AdminAuthRoleInfo {
+  id
+  settings
+}

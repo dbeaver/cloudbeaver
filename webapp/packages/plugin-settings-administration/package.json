@@ -26,6 +26,7 @@
     "@cloudbeaver/core-events": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
+    "@cloudbeaver/core-settings": "workspace:*",
     "@cloudbeaver/core-ui": "workspace:*",
     "@cloudbeaver/plugin-settings-panel": "workspace:*",
     "mobx": "^6",

@@ -1,3 +1,5 @@
 query getAuthRoles {
-  roles: listAuthRoles
+  roles: listAuthRoleInfos {
+    ...AdminAuthRoleInfo
+  }
 }

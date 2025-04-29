@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ export function useSettings(accessor?: string[]): ISettings {
       get settings() {
         const map = new Map();
         const settings = this.settingsManagerService.activeSettings
-          .filter(setting => accessor?.some(value => setting.access.scope.includes(value)))
+          .filter(setting => this.accessor?.some(value => setting.access.scope.includes(value)))
           .sort((a, b) => a.name.localeCompare(b.name));
 
         for (const setting of settings) {
@@ -54,6 +54,7 @@ export function useSettings(accessor?: string[]): ISettings {
       settings: computed,
       groups: computed,
       settingsManagerService: observable.ref,
+      accessor: observable.ref,
     },
     { settingsManagerService, accessor },
   );

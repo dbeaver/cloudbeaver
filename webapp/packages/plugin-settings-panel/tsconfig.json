@@ -23,6 +23,9 @@
       "path": "../core-di"
     },
     {
+      "path": "../core-executor"
+    },
+    {
       "path": "../core-localization"
     },
     {
