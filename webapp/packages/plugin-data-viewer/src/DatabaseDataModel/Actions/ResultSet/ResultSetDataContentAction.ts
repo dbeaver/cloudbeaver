@@ -9,6 +9,7 @@ import { makeObservable, observable } from 'mobx';
 
 import { QuotasService, ServerResourceQuotasResource } from '@cloudbeaver/core-root';
 import { GraphQLService, ResultDataFormat } from '@cloudbeaver/core-sdk';
+import { isResultSetContentValue } from '@dbeaver/result-set-api';
 import { bytesToSize, download, downloadFromURL, GlobalConstants } from '@cloudbeaver/core-utils';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
@@ -18,7 +19,6 @@ import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
 import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
 import type { IResultSetDataContentAction } from './IResultSetDataContentAction.js';
 import type { IResultSetElementKey } from './IResultSetDataKey.js';
-import { isResultSetContentValue } from './isResultSetContentValue.js';
 import { ResultSetCacheAction } from './ResultSetCacheAction.js';
 import { ResultSetDataAction } from './ResultSetDataAction.js';
 import { type IResultSetValue, ResultSetFormatAction } from './ResultSetFormatAction.js';

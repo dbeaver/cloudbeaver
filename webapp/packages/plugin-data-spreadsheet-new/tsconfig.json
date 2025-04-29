@@ -17,6 +17,9 @@
       "path": "../../../common-typescript/@dbeaver/js-helpers"
     },
     {
+      "path": "../../../common-typescript/@dbeaver/result-set-api"
+    },
+    {
       "path": "../core-blocks"
     },
     {
