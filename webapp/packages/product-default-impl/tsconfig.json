@@ -152,6 +152,9 @@
       "path": "../plugin-settings-administration"
     },
     {
+      "path": "../plugin-settings-default-administration"
+    },
+    {
       "path": "../plugin-settings-menu"
     },
     {

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import { useUsersTableFilters } from './Filters/useUsersTableFilters.js';
 import { UsersAdministrationToolsPanel } from './UsersAdministrationToolsPanel.js';
 import { UsersTable } from './UsersTable.js';
 import { useUsersTable } from './useUsersTable.js';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
 interface Props {
   param?: string | null;
@@ -26,7 +27,7 @@ interface Props {
 
 export const UsersPage = observer<Props>(function UsersPage({ param }) {
   const createUserService = useService(CreateUserService);
-  const authRolesResource = useResource(UsersPage, AuthRolesResource, undefined);
+  const authRolesResource = useResource(UsersPage, AuthRolesResource, CachedMapAllKey);
   const administrationUsersManagementService = useService(AdministrationUsersManagementService);
 
   useAutoLoad(UsersPage, administrationUsersManagementService.loaders);

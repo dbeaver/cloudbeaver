@@ -7,7 +7,14 @@
  */
 import { observable, toJS } from 'mobx';
 
-import type { AdminUser, AuthRolesResource, UserMetaParameter, UsersMetaParametersResource, UsersResource } from '@cloudbeaver/core-authentication';
+import type {
+  AdminUser,
+  AuthRolesResource,
+  ELMRole,
+  UserMetaParameter,
+  UsersMetaParametersResource,
+  UsersResource,
+} from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import type { ServerConfigResource } from '@cloudbeaver/core-root';
 import { FormMode, FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
@@ -142,9 +149,9 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
       }
     }
 
-    if (this.authRolesResource.data.length > 0) {
+    if (this.authRolesResource.data.size > 0) {
       const authRole = getTransformedAuthRole(this.state.authRole);
-      if (!authRole || !this.authRolesResource.data.includes(authRole)) {
+      if (!authRole || !this.authRolesResource.has(authRole as ELMRole)) {
         validation.error('authentication_user_role_not_set');
       }
     }
@@ -162,7 +169,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
   }
 
   private async updateAuthRole() {
-    if (this.state.userId && this.authRolesResource.data.length > 0) {
+    if (this.state.userId && this.authRolesResource.data.size > 0) {
       const authRole = getTransformedAuthRole(this.state.authRole);
       const user = this.usersResource.get(this.state.userId);
 

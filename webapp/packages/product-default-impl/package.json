@@ -67,6 +67,7 @@
     "@cloudbeaver/plugin-root": "workspace:*",
     "@cloudbeaver/plugin-session-expiration": "workspace:*",
     "@cloudbeaver/plugin-settings-administration": "workspace:*",
+    "@cloudbeaver/plugin-settings-default-administration": "workspace:^",
     "@cloudbeaver/plugin-settings-menu": "workspace:*",
     "@cloudbeaver/plugin-settings-menu-administration": "workspace:*",
     "@cloudbeaver/plugin-settings-panel": "workspace:*",

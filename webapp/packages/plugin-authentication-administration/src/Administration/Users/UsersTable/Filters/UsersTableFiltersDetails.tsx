@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@ import { AuthRolesResource } from '@cloudbeaver/core-authentication';
 import { Combobox, Group, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { type IUserFilters, USER_ROLE_ALL, USER_STATUSES } from './useUsersTableFilters.js';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
 interface Props {
   filters: IUserFilters;
@@ -18,7 +19,7 @@ interface Props {
 
 export const UsersTableFiltersDetails = observer<Props>(function UsersTableFiltersDetails({ filters }) {
   const translate = useTranslate();
-  const authRolesResource = useResource(UsersTableFiltersDetails, AuthRolesResource, undefined);
+  const authRolesResource = useResource(UsersTableFiltersDetails, AuthRolesResource, CachedMapAllKey);
 
   return (
     <Group box gap>
@@ -33,7 +34,7 @@ export const UsersTableFiltersDetails = observer<Props>(function UsersTableFilte
         {translate('authentication_user_status')}
       </Combobox>
       {!!authRolesResource.data.length && (
-        <Combobox items={[...authRolesResource.data, USER_ROLE_ALL]} value={filters.role} keepSize onSelect={filters.setRole}>
+        <Combobox items={[...authRolesResource.resource.keys, USER_ROLE_ALL]} value={filters.role} keepSize onSelect={filters.setRole}>
           {translate('authentication_user_role')}
         </Combobox>
       )}

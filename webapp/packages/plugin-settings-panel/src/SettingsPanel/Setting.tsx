@@ -32,7 +32,10 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
   const name = translate(setting.name);
   const description = translate(setting.description);
   const disabled = false;
-  const readOnly = settingsResolverService.isReadOnly(setting.key) ?? false;
+  // TODO: need to figure out how to ignore user scope settings during configuring admin settings
+  //       probably we can use layers to skip some layers when checking settings
+  // const readOnly = settingsResolverService.isReadOnly(setting.key, source) ?? false;
+  const readOnly = false;
 
   let value = source.getEditedValue(setting.key);
   if (readOnly || !isNotNullDefined(value)) {

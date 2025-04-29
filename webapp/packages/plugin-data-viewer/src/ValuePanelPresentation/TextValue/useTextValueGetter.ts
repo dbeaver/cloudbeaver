@@ -9,12 +9,12 @@ import { observable } from 'mobx';
 
 import { useObservableRef, useSuspense } from '@cloudbeaver/core-blocks';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import { isResultSetContentValue } from '@dbeaver/result-set-api';
 import { blobToBase64, removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
-import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue.js';
 import type { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction.js';
 import type { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction.js';
 import type { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';

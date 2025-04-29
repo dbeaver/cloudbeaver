@@ -1,16 +1,16 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import { isResultSetContentValue } from '@dbeaver/result-set-api';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
-import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue.js';
 import type { IResultSetValue, ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction.js';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel.js';
 import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource.js';
