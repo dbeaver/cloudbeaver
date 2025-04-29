@@ -201,7 +201,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         try {
             // Read user from security controller. It will also read meta parameters
             SMUser userWithDetails = webSession.getSecurityController().getCurrentUser();
-            SMRolePreference authRolePreference = webSession.getSecurityController().getAuthRolePreference(userWithDetails.getAuthRole());
+            SMRolePreference authRolePreference = webSession.getSecurityController().getUserAuthRolePreference(userWithDetails.getAuthRole());
             if (userWithDetails != null) {
                 // USer not saved yet. This may happen in easy config mode
                 var webUser = new WebUser(userWithDetails);

@@ -1196,7 +1196,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @Override
     @Nullable
-    public SMRolePreference getAuthRolePreference(String authRoleId) throws DBException {
+    public SMRolePreference getUserAuthRolePreference(String authRoleId) throws DBException {
         return null;
     }
 
@@ -1242,7 +1242,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @NotNull
     @Override
-    public List<SMRolePreference> getRolePreferences(@NotNull List<String> authRoleIds) {
+    public List<SMRolePreference> getAuthRolePreferences(@NotNull List<String> authRoleIds) {
         return List.of();
     }
 
