@@ -2883,6 +2883,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/result-set-api": "workspace:^"
     "@dbeaver/ui-kit": "workspace:^"
     "@popperjs/core": "npm:^2"
     "@types/react": "npm:^19"
@@ -2982,6 +2983,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/result-set-api": "workspace:^"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -4602,7 +4604,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api":
+"@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api, @dbeaver/result-set-api@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api"
   dependencies:

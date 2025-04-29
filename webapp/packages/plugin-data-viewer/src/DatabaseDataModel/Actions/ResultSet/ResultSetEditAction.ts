@@ -10,6 +10,7 @@ import { action, makeObservable, observable } from 'mobx';
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat, type SqlResultRow, type AsyncUpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 import { isNull } from '@cloudbeaver/core-utils';
+import { isResultSetContentValue, isResultSetComplexValue } from '@dbeaver/result-set-api';
 
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
@@ -28,8 +29,6 @@ import { createResultSetFileValue } from './createResultSetFileValue.js';
 import type { IResultSetBlobValue } from './IResultSetBlobValue.js';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey.js';
 import { isResultSetBlobValue } from './isResultSetBlobValue.js';
-import { isResultSetComplexValue } from './isResultSetComplexValue.js';
-import { isResultSetContentValue } from './isResultSetContentValue.js';
 import { isResultSetFileValue } from './isResultSetFileValue.js';
 import { ResultSetDataAction } from './ResultSetDataAction.js';
 import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils.js';

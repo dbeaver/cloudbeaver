@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,9 @@ export * from './DatabaseDataModel/Actions/ResultSet/createResultSetContentValue
 export * from './DatabaseDataModel/Actions/ResultSet/createResultSetFileValue.js';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetDataKey.js';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetBlobValue.js';
-export * from './DatabaseDataModel/Actions/ResultSet/IResultSetComplexValue.js';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetFileValue.js';
-export * from './DatabaseDataModel/Actions/ResultSet/IResultSetContentValue.js';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetGeometryValue.js';
-export * from './DatabaseDataModel/Actions/ResultSet/IResultSetBinaryValue.js';
-export * from './DatabaseDataModel/Actions/ResultSet/isResultSetBinaryValue.js';
 export * from './DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue.js';
-export * from './DatabaseDataModel/Actions/ResultSet/isResultSetComplexValue.js';
-export * from './DatabaseDataModel/Actions/ResultSet/isResultSetContentValue.js';
 export * from './DatabaseDataModel/Actions/ResultSet/isResultSetFileValue.js';
 export * from './DatabaseDataModel/Actions/ResultSet/isResultSetGeometryValue.js';
 export * from './DatabaseDataModel/Actions/DatabaseDataConstraintAction.js';

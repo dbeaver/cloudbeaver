@@ -8,6 +8,6 @@
 import type { IResultSetBinaryValue } from './IResultSetBinaryValue.js';
 import { isResultSetContentValue } from './isResultSetContentValue.js';
 
-export function isResultSetBinaryValue(value: any): value is IResultSetBinaryValue {
+export function isResultSetBinaryValue(value: unknown): value is IResultSetBinaryValue {
   return isResultSetContentValue(value) && 'binary' in value;
 }
