@@ -49,6 +49,7 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.security.*;
+import org.jkiss.dbeaver.model.security.role.SMRolePreference;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.utils.CommonUtils;
@@ -892,6 +893,17 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         } catch (DBException e) {
             throw new DBWebException("Error changing team '" + teamId + "' meta parameters", e);
         }
+    }
+
+    @Override
+    public Boolean saveRolePreferences(WebSession webSession, @NotNull String authRoleId, Map<String, Object> settings) throws DBException {
+        webSession.getAdminSecurityController().updateAuthRolePreference(new SMRolePreference(authRoleId, settings));
+        return true;
+    }
+
+    @Override
+    public List<SMRolePreference> getRolePreferences(WebSession webSession) throws DBException {
+        return webSession.getAdminSecurityController().getRolePreferences();
     }
 
     private DBPDataSourceRegistry getDataSourceRegistry(WebSession session, String projectId) throws DBWebException {

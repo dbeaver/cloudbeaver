@@ -18,16 +18,26 @@ package io.cloudbeaver.model.app;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.Strictness;
+import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.registry.fs.FileSystemProviderRegistry;
+import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 /**
  * Abstract class that contains methods for loading configuration with gson.
@@ -103,5 +113,36 @@ public abstract class BaseServerConfigurationController<T extends ServletServerC
     @Override
     public Path getWorkspacePath() {
         return workspacePath;
+    }
+
+    @NotNull
+    protected Path getDataDirectory(boolean create) {
+        Path dataDir = getWorkspacePath().resolve(CBConstants.RUNTIME_DATA_DIR_NAME);
+        if (create && !Files.exists(dataDir)) {
+            try {
+                Files.createDirectories(dataDir);
+            } catch (Exception e) {
+                log.error("Can't create data directory '" + dataDir.toAbsolutePath() + "'");
+            }
+        }
+        return dataDir;
+    }
+
+    protected synchronized void writeConfig(Path configPath, Map<String, Object> configurationProperties)
+    throws DBException {
+        if (Files.exists(configPath)) {
+            ContentUtils.makeFileBackup(configPath);
+        }
+
+        try (Writer out = new OutputStreamWriter(Files.newOutputStream(configPath), StandardCharsets.UTF_8)) {
+            Gson gson = new GsonBuilder()
+                .setStrictness(Strictness.LENIENT)
+                .setPrettyPrinting()
+                .create();
+            gson.toJson(configurationProperties, out);
+
+        } catch (IOException e) {
+            throw new DBException("Error writing runtime configuration", e);
+        }
     }
 }

@@ -37,7 +37,6 @@ import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
-import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
@@ -361,25 +360,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             throw new DBException("Invalid server configuration, server name cannot be empty");
         }
         Map<String, Object> configurationProperties = collectConfigurationProperties(serverConfig, appConfig);
-        writeRuntimeConfig(getRuntimeAppConfigPath(), configurationProperties);
-    }
-
-    private synchronized void writeRuntimeConfig(Path runtimeConfigPath, Map<String, Object> configurationProperties)
-        throws DBException {
-        if (Files.exists(runtimeConfigPath)) {
-            ContentUtils.makeFileBackup(runtimeConfigPath);
-        }
-
-        try (Writer out = new OutputStreamWriter(Files.newOutputStream(runtimeConfigPath), StandardCharsets.UTF_8)) {
-            Gson gson = new GsonBuilder()
-                .setStrictness(Strictness.LENIENT)
-                .setPrettyPrinting()
-                .create();
-            gson.toJson(configurationProperties, out);
-
-        } catch (IOException e) {
-            throw new DBException("Error writing runtime configuration", e);
-        }
+        writeConfig(getRuntimeAppConfigPath(), configurationProperties);
     }
 
 
@@ -602,19 +583,6 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     @NotNull
     protected Path getRuntimeProductConfigFilePath() {
         return getDataDirectory(false).resolve(CBConstants.RUNTIME_PRODUCT_CONFIG_FILE_NAME);
-    }
-
-    @NotNull
-    public Path getDataDirectory(boolean create) {
-        Path dataDir = getWorkspacePath().resolve(CBConstants.RUNTIME_DATA_DIR_NAME);
-        if (create && !Files.exists(dataDir)) {
-            try {
-                Files.createDirectories(dataDir);
-            } catch (Exception e) {
-                log.error("Can't create data directory '" + dataDir.toAbsolutePath() + "'");
-            }
-        }
-        return dataDir;
     }
 
     public void saveProductConfiguration(Map<String, Object> productConfiguration) throws DBException {
