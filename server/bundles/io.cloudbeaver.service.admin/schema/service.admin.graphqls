@@ -106,11 +106,6 @@ type WebFeatureSet {
     enabled: Boolean!
 }
 
-type AuthRoleInfo {
-    authRoleId: ID!
-    settings: Object!
-}
-
 input ServerConfigInput {
     serverName: String
     serverURL: String
@@ -139,7 +134,7 @@ input AdminUserFilterInput {
 }
 
 type AdminAuthRoleInfo {
-    id: ID!
+    authRoleId: ID!
     settings: Object!
 }
 
@@ -232,8 +227,6 @@ extend type Query {
 
     # Changes default navigator settings
     setDefaultNavigatorSettings( settings: NavigatorSettingsInput!): Boolean!
-    getRolePreferences(authRoleIds: [ID!]!): [AuthRoleInfo!]!
-    updateAuthRole(authRoleId: ID!, settings: Object!): Boolean!
 }
 
 extend type Mutation {

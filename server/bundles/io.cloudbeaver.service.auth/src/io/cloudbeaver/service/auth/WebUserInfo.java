@@ -23,6 +23,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.security.role.SMRolePreference;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,11 +39,19 @@ public class WebUserInfo {
 
     private final WebSession session;
     private final WebUser user;
+    private final SMRolePreference smRolePreference;
     private String[] linkedProviders;
+
+    public WebUserInfo(WebSession session, WebUser user, SMRolePreference smRolePreference) {
+        this.session = session;
+        this.user = user;
+        this.smRolePreference = smRolePreference;
+    }
 
     public WebUserInfo(WebSession session, WebUser user) {
         this.session = session;
         this.user = user;
+        this.smRolePreference = null;
     }
 
     @Property
@@ -58,6 +67,11 @@ public class WebUserInfo {
     @Property
     public String getAuthRole() {
         return user == null ? null : user.getAuthRole();
+    }
+
+    @Property
+    public Map<String, Object> getAuthRoleConfigurationParameters() {
+        return smRolePreference == null ? null : smRolePreference.getSettings();
     }
 
     @Property

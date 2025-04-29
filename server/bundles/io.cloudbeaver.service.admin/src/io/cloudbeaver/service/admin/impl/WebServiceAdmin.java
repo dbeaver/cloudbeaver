@@ -896,14 +896,17 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public Boolean saveRolePreferences(WebSession webSession, @NotNull String authRoleId, Map<String, Object> settings) throws DBException {
-        webSession.getAdminSecurityController().updateAuthRolePreference(new SMRolePreference(authRoleId, settings));
-        return true;
+    public SMRolePreference saveRolePreferences(
+        WebSession webSession,
+        @NotNull String authRoleId,
+        Map<String, Object> settings
+    ) throws DBException {
+        return webSession.getAdminSecurityController().updateAuthRolePreference(new SMRolePreference(authRoleId, settings));
     }
 
     @Override
-    public List<SMRolePreference> getRolePreferences(WebSession webSession) throws DBException {
-        return webSession.getAdminSecurityController().getRolePreferences();
+    public List<SMRolePreference> getRolePreferences(WebSession webSession, String[] authRoleIds) throws DBException {
+        return webSession.getAdminSecurityController().getRolePreferences(List.of(authRoleIds));
     }
 
     private DBPDataSourceRegistry getDataSourceRegistry(WebSession session, String projectId) throws DBWebException {

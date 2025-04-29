@@ -1194,6 +1194,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         return getTeamMembersInfo(teamId).stream().map(SMTeamMemberInfo::userId).toArray(String[]::new);
     }
 
+    @Override
+    @Nullable
+    public SMRolePreference getAuthRolePreference(String authRoleId) throws DBException {
+        return null;
+    }
+
     @NotNull
     @Override
     public List<SMTeamMemberInfo> getTeamMembersInfo(@NotNull String teamId) throws DBException {
@@ -1230,12 +1236,13 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
     @Override
-    public void updateAuthRolePreference(@NotNull SMRolePreference rolePreference) throws DBException {
-
+    public SMRolePreference updateAuthRolePreference(@NotNull SMRolePreference rolePreference) throws DBException {
+        return null;
     }
 
+    @NotNull
     @Override
-    public List<SMRolePreference> getRolePreferences() {
+    public List<SMRolePreference> getRolePreferences(@NotNull List<String> authRoleIds) {
         return List.of();
     }
 
