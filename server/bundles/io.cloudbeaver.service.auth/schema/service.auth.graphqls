@@ -139,6 +139,8 @@ type UserInfo {
     metaParameters: Object!
     # User configuration parameters
     configurationParameters: Object!
+    # User auth role configuration parameters
+    authRoleConfigurationParameters: Object
     # User teams
     teams: [UserTeamInfo!]!
 
