@@ -7,7 +7,7 @@ CloudBeaver is a web server that provides a rich web interface. The server itsel
 It is free to use and open-source (licensed under [Apache 2](https://github.com/dbeaver/cloudbeaver/blob/devel/LICENSE) license).  
 See our [WIKI](https://github.com/dbeaver/cloudbeaver/wiki) for more details. 
 
-<img src="https://github.com/dbeaver/cloudbeaver/wiki/images/connection-creation-demo.png" width="400"/>
+<a><img src="https://github.com/dbeaver/cloudbeaver/wiki/images/connection-creation-demo.png" width="400"/></a>
 <img src="https://github.com/dbeaver/cloudbeaver/wiki/images/gis-demo.png" width="400"/>
 <img src="https://github.com/dbeaver/cloudbeaver/wiki/images/data-transfer-demo.png" width="400"/>
 <img src="https://github.com/dbeaver/cloudbeaver/wiki/images/sql-editor-demo.png" width="400"/>
