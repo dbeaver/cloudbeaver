@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,10 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 CommonUtils.toBoolean(env.getArgument("linkUser")),
                 CommonUtils.toBoolean(env.getArgument("forceSessionsLogout"))
             ))
+            .dataFetcher("federatedAuthTaskResult", env -> getService(env).federatedAuthTaskResult(
+                getWebSession(env, false),
+                env.getArgument("taskId")
+            ))
             .dataFetcher("authLogoutExtended", env -> getService(env).authLogout(
                 getWebSession(env, false),
                 env.getArgument("provider"),
@@ -78,6 +82,13 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
             .dataFetcher("setUserPreferences",
                 env -> getService(env).setUserConfigurationParameters(getWebSession(env),
                     env.getArgument("preferences")))
+            .dataFetcher("federatedLogin", env -> getService(env).federatedLogin(
+                getWebSession(env, false),
+                env.getArgument("provider"),
+                env.getArgument("configuration"),
+                CommonUtils.toBoolean(env.getArgument("linkUser")),
+                CommonUtils.toBoolean(env.getArgument("forceSessionsLogout"))
+            ))
         ;
     }
 }

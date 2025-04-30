@@ -247,6 +247,10 @@ public class WebPropertyInfo {
             }
             return result;
         }
+        Class<?> dataType = property.getDataType();
+        if (dataType == Boolean.class || dataType == Boolean.TYPE) {
+            return Boolean.valueOf(value.toString());
+        }
         return CommonUtils.toString(value);
     }
 
@@ -258,6 +262,28 @@ public class WebPropertyInfo {
         }
         return null;
     }
+
+    /**
+     * Returns expression for a visibility of a property.
+     */
+    @Nullable
+    @Property
+    public List<Condition> getConditions() {
+        if (!(property instanceof DBPConditionalProperty conditionalProperty)) {
+            return null;
+        }
+        List<Condition> conditions = new ArrayList<>();
+        String visibleExpr = conditionalProperty.getHideExpression();
+        if (CommonUtils.isNotEmpty(visibleExpr)) {
+            conditions.add(new Condition(visibleExpr, Condition.Type.HIDE));
+        }
+        String activeExpr = conditionalProperty.getReadOnlyExpression();
+        if (CommonUtils.isNotEmpty(activeExpr)) {
+            conditions.add(new Condition(activeExpr, Condition.Type.READ_ONLY));
+        }
+        return conditions;
+    }
+
 
     //TODO: delete after refactoring on front-end
     public void setDefaultValue(String defaultValue) {
@@ -273,5 +299,10 @@ public class WebPropertyInfo {
         this.supportedConfigurationTypes = supportedConfigurationTypes;
     }
 
-
+    public record Condition(@NotNull String expression, @NotNull Type conditionType) {
+        public enum Type {
+            HIDE,
+            READ_ONLY
+        }
+    }
 }

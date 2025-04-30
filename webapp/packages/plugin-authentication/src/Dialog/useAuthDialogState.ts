@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ interface IData {
   tabIds: string[];
 
   login: (linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) => Promise<void>;
-  loginFederated: (provider: AuthProvider, configuration: AuthProviderConfiguration, onClose?: () => void) => Promise<void>;
+  federatedLogin: (provider: AuthProvider, configuration: AuthProviderConfiguration) => Promise<void>;
 }
 
 interface IState {
@@ -223,22 +223,23 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         try {
           this.state.setActiveProvider(provider, configuration ?? null);
 
-          const loginTask = authInfoService.login(provider.id, {
-            configurationId: configuration?.id,
-            credentials: {
-              ...state.credentials,
+          if (provider.federated && configuration) {
+            await this.federatedLogin(provider, configuration);
+          } else {
+            await authInfoService.login(provider.id, {
+              configurationId: configuration?.id,
               credentials: {
-                ...state.credentials.credentials,
-                user: state.credentials.credentials['user']?.trim(),
-                password: state.credentials.credentials['password']?.trim(),
+                ...state.credentials,
+                credentials: {
+                  ...state.credentials.credentials,
+                  user: state.credentials.credentials['user']?.trim(),
+                  password: state.credentials.credentials['password']?.trim(),
+                },
               },
-            },
-            forceSessionsLogout: state.forceSessionsLogout,
-            linkUser,
-          });
-          this.authTask = loginTask;
-
-          await loginTask;
+              forceSessionsLogout: state.forceSessionsLogout,
+              linkUser,
+            });
+          }
         } catch (exception: any) {
           const gqlError = errorOf(exception, GQLError);
 
@@ -264,6 +265,15 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         }
 
         return;
+      },
+      async federatedLogin(provider: AuthProvider, configuration: AuthProviderConfiguration): Promise<void> {
+        this.authTask = authInfoService.federatedLogin(provider.id, {
+          configurationId: configuration.id,
+          forceSessionsLogout: state.forceSessionsLogout,
+          linkUser: false,
+        });
+
+        await this.authTask;
       },
     }),
     {

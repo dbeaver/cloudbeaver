@@ -40,6 +40,8 @@ type ObjectPropertyInfo {
     required: Boolean! @since(version: "23.3.1")
     # Parameter scopes
     scopes:[String!]
+    # Dynamic conditions for a property (f.e. visibility or read-only expressions)
+    conditions: [Condition!] @since(version: "25.0.1")
 }
 
 enum ObjectPropertyLength {
@@ -53,6 +55,17 @@ enum ObjectPropertyLength {
     LONG,
     # Multi-line long text
     MULTILINE
+}
+
+type Condition @since(version: "25.0.1") {
+    expression: String!
+    conditionType: ConditionType!
+
+}
+
+enum ConditionType @since(version: "25.0.1") {
+    HIDE, # hiding property condition
+    READ_ONLY # restriction for setting a property value
 }
 
 # Async types
