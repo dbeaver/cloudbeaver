@@ -417,9 +417,9 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                 );
                 doCustomModifyUserDataAfterAuthentication(ldapSettings, attributes, userData);
             }
-            userData.putIfAbsent(LdapConstants.CRED_USERNAME, CommonUtils.isNotEmpty(userId) ? userId : login);
+            userData.putIfAbsent(LdapConstants.CRED_USERNAME, CommonUtils.isNotEmpty(login) ? login : userId);
             userData.put(LdapConstants.CRED_USER_DN, userDN);
-            userData.put(LdapConstants.CRED_DISPLAY_NAME, findUserNameFromDN(userDN, ldapSettings));
+            userData.put(LdapConstants.CRED_DISPLAY_NAME, CommonUtils.isNotEmpty(login) ? login :findUserNameFromDN(userDN, ldapSettings));
             userData.put(LdapConstants.CRED_SESSION_ID, UUID.randomUUID());
 
             return userData;
