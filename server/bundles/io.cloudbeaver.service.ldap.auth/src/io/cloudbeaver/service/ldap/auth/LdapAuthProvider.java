@@ -493,6 +493,9 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
                 environment.put(Context.SECURITY_PRINCIPAL, ldapSettings.getBindUserDN());
                 environment.put(Context.SECURITY_CREDENTIALS, ldapSettings.getBindUserPassword());
             }
+            //it's a hack. Otherwise password will be written to database
+            authParameters.remove(LdapConstants.CRED_PASSWORD);
+
             context = new InitialDirContext(environment);
 
             String searchFilter = "(member=" + fullDN + ")";
