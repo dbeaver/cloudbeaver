@@ -34,6 +34,7 @@ import java.util.Map;
 /**
  * WebAuthInfo
  */
+//TODO: create serializable model?
 public class WebAuthInfo implements SMSessionPrincipal, WebUserAuthToken {
 
     private static final Log log = Log.getLog(WebAuthInfo.class);

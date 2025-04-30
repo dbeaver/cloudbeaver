@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,8 @@
  */
 package io.cloudbeaver.model.session;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
-import com.google.gson.Strictness;
 import io.cloudbeaver.*;
+import io.cloudbeaver.model.CustomCancelableJob;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
@@ -548,15 +545,36 @@ public class WebSession extends BaseWebSession
             }
         }
         AbstractJob job = taskInfo.getJob();
+        if (job instanceof CustomCancelableJob cancelableJob) {
+            cancelableJob.cancelJob(this, taskInfo);
+        }
         if (job != null) {
             job.cancel();
         }
         return true;
     }
 
-    public WebAsyncTaskInfo createAndRunAsyncTask(@NotNull String taskName, @NotNull WebAsyncTaskProcessor<?> runnable) {
+
+    public WebAsyncTaskInfo createAsyncTask(@NotNull String taskName) {
         int taskId = TASK_ID.incrementAndGet();
         WebAsyncTaskInfo asyncTask = getAsyncTask(String.valueOf(taskId), taskName, true);
+        return asyncTask;
+    }
+
+    public List<WebAsyncTaskInfo> findTasksByJob(@NotNull Class<? extends AbstractJob> jobClass) {
+        synchronized (asyncTasks) {
+            List<WebAsyncTaskInfo> result = new ArrayList<>();
+            for (WebAsyncTaskInfo task : asyncTasks.values()) {
+                if (task.getJob() != null && jobClass.isAssignableFrom(task.getJob().getClass())) {
+                    result.add(task);
+                }
+            }
+            return result;
+        }
+    }
+
+    public WebAsyncTaskInfo createAndRunAsyncTask(@NotNull String taskName, @NotNull WebAsyncTaskProcessor<?> runnable) {
+        WebAsyncTaskInfo asyncTask = createAsyncTask(taskName);
 
         AbstractJob job = new AbstractJob(taskName) {
             @Override
@@ -575,7 +593,7 @@ public class WebSession extends BaseWebSession
                     runnable.run(taskMonitor);
                     asyncTask.setResult(runnable.getResult());
                     asyncTask.setExtendedResult(runnable.getExtendedResults());
-                    asyncTask.setStatus("Finished");
+                    asyncTask.setStatus(DBWConstants.TASK_STATUS_FINISHED);
                 } catch (InvocationTargetException e) {
                     addSessionError(e.getTargetException());
                     asyncTask.setJobError(e.getTargetException());
@@ -813,14 +831,8 @@ public class WebSession extends BaseWebSession
             // uncommented because we had the problem with non-native auth models
             // (for example, can't connect to DynamoDB if credentials are not saved)
             DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
+            WebDataSourceUtils.updateCredentialsFromProperties(credentials, configuration.getAuthProperties());
 
-            InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
-            Gson credGson = new GsonBuilder()
-                .setStrictness(Strictness.LENIENT)
-                .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
-                .create();
-
-            credGson.fromJson(credGson.toJsonTree(configuration.getAuthProperties()), credentials.getClass());
             configuration.getAuthModel().provideCredentials(dataSourceContainer, configuration, credentials);
         } catch (DBException e) {
             addSessionError(e);

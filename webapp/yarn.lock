@@ -1620,6 +1620,7 @@ __metadata:
     react-minisearch: "npm:^7"
     reakit: "npm:^1"
     reakit-utils: "npm:^0"
+    subscript: "npm:^9"
     tslib: "npm:^2"
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -18439,6 +18440,13 @@ __metadata:
   bin:
     stylus: bin/stylus
   checksum: 10c0/62afe3a6d781f66d7d283e8218dc1a15530d7d89fc2f09457a723975b2073e96e0d32c61d7f0dd1bd2686aae4ab6cc6933dc85e1b72eebab8aa30167bd16962b
+  languageName: node
+  linkType: hard
+
+"subscript@npm:^9":
+  version: 9.1.0
+  resolution: "subscript@npm:9.1.0"
+  checksum: 10c0/1e69ddd3ee297c4e1be42599d8ed44d7fd65761cf0d40d242b7957ae8464f5a8db252f7685b1102ee970558b97c57017c82228be5332f503548f8219767d5daa
   languageName: node
   linkType: hard
 

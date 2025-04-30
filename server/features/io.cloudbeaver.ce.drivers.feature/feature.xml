@@ -2,7 +2,7 @@
 <feature
       id="io.cloudbeaver.ce.drivers.feature"
       label="Cloudbeaver CE 3rd Party Drivers"
-      version="1.0.144.qualifier"
+      version="1.0.145.qualifier"
       provider-name="DBeaver Corp">
 
    <plugin id="io.cloudbeaver.resources.drivers.base" download-size="0" install-size="0" version="0.0.0"/>

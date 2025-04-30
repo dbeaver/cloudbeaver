@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.registry;
 
+import io.cloudbeaver.auth.SMAuthProviderFederated;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -228,5 +229,14 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
     public boolean isServiceProvider() {
         return serviceProvider;
+    }
+
+    public boolean isFederated() {
+        try {
+            implType.checkObjectClass(SMAuthProviderFederated.class);
+            return true;
+        } catch (DBException e) {
+            return false;
+        }
     }
 }

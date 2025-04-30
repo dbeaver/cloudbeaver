@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,11 +8,12 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { AutoRunningTask, type ITask } from '@cloudbeaver/core-executor';
 import { WindowsService } from '@cloudbeaver/core-routing';
-import { type AuthInfo, AuthStatus, type UserInfo } from '@cloudbeaver/core-sdk';
+import { type UserInfo } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
+import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
 
-import { type AuthProviderConfiguration, AuthProvidersResource } from './AuthProvidersResource.js';
-import { type ILoginOptions, UserInfoResource } from './UserInfoResource.js';
+import { type AuthProviderConfiguration } from './AuthProvidersResource.js';
+import { type IFederatedLoginOptions, type ILoginOptions, UserInfoResource } from './UserInfoResource.js';
 
 export interface IUserAuthConfiguration {
   providerId: string;
@@ -27,59 +28,50 @@ export class AuthInfoService {
 
   constructor(
     private readonly userInfoResource: UserInfoResource,
-    private readonly authProvidersResource: AuthProvidersResource,
     private readonly windowsService: WindowsService,
+    private readonly asyncTaskInfoService: AsyncTaskInfoService,
   ) {}
 
-  login(providerId: string, options: ILoginOptions): ITask<UserInfo | null> {
-    return new AutoRunningTask(async () => await this.userInfoResource.login(providerId, options)).then(authInfo =>
-      this.federatedAuthentication(providerId, options, authInfo),
-    );
+  async login(providerId: string, options: ILoginOptions): Promise<UserInfo | null> {
+    await this.userInfoResource.login(providerId, options);
+    return this.userInfoResource.data;
   }
 
-  private federatedAuthentication(
-    providerId: string,
-    options: ILoginOptions,
-    { redirectLink, authId, authStatus }: AuthInfo,
-  ): ITask<UserInfo | null> {
-    let window: Window | null = null;
-    let id = providerId;
+  federatedLogin(providerId: string, options: IFederatedLoginOptions): ITask<UserInfo | null> {
+    let redirectWindow: Window | null = null;
 
-    if (options.configurationId) {
-      const configuration = this.authProvidersResource.getConfiguration(providerId, options.configurationId);
+    const task = this.asyncTaskInfoService.create(async () => {
+      const result = await this.userInfoResource.requestFederatedLogin(providerId, options);
 
-      if (configuration) {
-        id = configuration.id;
+      if (result.redirectLink) {
+        const id = uuid();
+        redirectWindow = this.windowsService.open(id, {
+          url: result.redirectLink,
+          target: id,
+          width: 600,
+          height: 700,
+        });
+
+        if (redirectWindow) {
+          redirectWindow.focus();
+        }
       }
-    }
 
-    if (redirectLink) {
-      id = uuid();
-      window = this.windowsService.open(id, {
-        url: redirectLink,
-        target: id,
-        width: 600,
-        height: 700,
-      });
-
-      if (window) {
-        window.focus();
-      }
-    }
+      return result.taskInfo;
+    });
 
     return new AutoRunningTask(
-      () => {
-        if (authId && authStatus === AuthStatus.InProgress) {
-          return this.userInfoResource.finishFederatedAuthentication(authId, options.linkUser);
+      async () => {
+        await this.asyncTaskInfoService.run(task);
+        await this.userInfoResource.syncData();
+
+        if (redirectWindow) {
+          this.windowsService.close(redirectWindow);
         }
 
-        return AutoRunningTask.resolve(this.userInfoResource.data);
+        return this.userInfoResource.data;
       },
-      () => {
-        if (window) {
-          this.windowsService.close(window);
-        }
-      },
+      () => this.asyncTaskInfoService.cancel(task.id),
     );
   }
 }

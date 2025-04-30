@@ -19,15 +19,10 @@
         <sessionHandler id="LocalSessionHandler" class="io.cloudbeaver.service.auth.local.LocalSessionHandler"/>
     </extension>
 
-    <!--TODO: uncomment after frontend migration-->
-    <!--    <extension point="org.jkiss.dbeaver.ws.event.handler">-->
-<!--        <eventHandler class="io.cloudbeaver.service.auth.handler.WSAuthSessionEventHandler">-->
-<!--            <topic id="cb_session_auth"/>-->
-<!--        </eventHandler>-->
-<!--    </extension>-->
-
-    <extension point="org.jkiss.dbeaver.ws.event">
-        <event topicId="cb_session" id="cb_web_session_auth"
-               class="io.cloudbeaver.service.auth.handler.WebSessionAuthEvent"/>
+    <extension point="org.jkiss.dbeaver.ws.event.handler">
+        <eventHandler class="io.cloudbeaver.service.auth.handler.WSAuthSessionEventHandler">
+            <topic id="cb_session_auth"/>
+        </eventHandler>
     </extension>
+
 </plugin>
