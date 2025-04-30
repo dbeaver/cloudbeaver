@@ -18,7 +18,6 @@ package io.cloudbeaver.service.auth.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.auth.SMSignOutLinkProvider;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
@@ -67,7 +66,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public WebAuthStatus authLogin(
-        @NotNull HttpServletRequest httpRequest,
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
@@ -97,6 +95,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public WebAsyncAuthStatus federatedLogin(
+        @NotNull HttpServletRequest httpRequest,
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
@@ -111,7 +110,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             throw new DBWebException("Provider '" + providerId + "' is not federated");
         }
         try {
-            var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, Map.of(), forceSessionsLogout);
+            Map<String, Object> authParameters = new HashMap<>();
+            authParameters.put(SMConstants.USER_ORIGIN, ServletAppUtils.getOriginFromRequestOrThrow(httpRequest));
+
+            var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, new HashMap<>(), forceSessionsLogout);
             if (smAuthInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
                 throw new DBWebException("Unexpected auth status: " + smAuthInfo.getAuthStatus());
             }
@@ -167,12 +169,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             throw new DBWebException(authProviderDescriptor.getLabel() + " not allowed for authorization via GQL API");
         }
 
-        if (authParameters == null) {
-            authParameters = new HashMap<>();
-        }
-        if (authProviderDescriptor.getInstance() instanceof SMAuthProviderFederated) {
-            authParameters.put(SMConstants.USER_ORIGIN, ServletAppUtils.getOriginFromRequestOrThrow(httpRequest));
-        }
         SMController securityController = webSession.getSecurityController();
         String currentSmSessionId = (webSession.getUser() == null || CBApplication.getInstance().isConfigurationMode())
             ? null

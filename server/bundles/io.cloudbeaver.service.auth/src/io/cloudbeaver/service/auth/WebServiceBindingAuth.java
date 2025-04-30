@@ -38,7 +38,6 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
     public void bindWiring(DBWBindingContext model) throws DBWebException {
         model.getQueryType()
             .dataFetcher("authLogin", env -> getService(env).authLogin(
-                GraphQLEndpoint.getServletRequest(env),
                 getWebSession(env, false),
                 env.getArgument("provider"),
                 env.getArgument("configuration"),
@@ -88,6 +87,7 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 env -> getService(env).setUserConfigurationParameters(getWebSession(env),
                     env.getArgument("preferences")))
             .dataFetcher("federatedLogin", env -> getService(env).federatedLogin(
+                GraphQLEndpoint.getServletRequest(env),
                 getWebSession(env, false),
                 env.getArgument("provider"),
                 env.getArgument("configuration"),
