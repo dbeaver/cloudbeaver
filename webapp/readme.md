@@ -29,9 +29,16 @@ Welcome! Follow these steps to install and run the frontend dev server.
 
    Navigate to the `deploy` directory and execute the build script. This script will handle cloning necessary repositories and building the backend. It also installs all frontend dependencies and builds it as well.
 
+   *For macOS/Linux:*
    ```bash
    cd deploy
    ./build.sh
+   ```
+
+   *For Windows:*
+   ```bash
+   cd deploy
+   ./build.bat
    ```
 
 2. **Navigate to the Directory with Build Artifacts**
@@ -46,8 +53,14 @@ Welcome! Follow these steps to install and run the frontend dev server.
 
    Start the backend server by running the execution script.
 
+   *For macOS/Linux:*
    ```bash
    ./run-server.sh
+   ```
+
+   *For Windows:*
+   ```bash
+   ./run-server.bat
    ```
 
 4. **Navigate to the Webapp Directory**
@@ -62,8 +75,19 @@ Welcome! Follow these steps to install and run the frontend dev server.
 
    Start the web application development server, specifying the backend server's URL. The default URL is `http://localhost:8978/`.
 
+   *For macOS/Linux:*
    ```bash
    server=http://localhost:8978/ yarn dev
+   ```
+
+   *For Windows Command Prompt:*
+   ```cmd
+   set server=http://localhost:8978/ && yarn dev
+   ```
+
+   *For Windows PowerShell:*
+   ```powershell
+   $env:server="http://localhost:8978/"; yarn dev
    ```
 
 You should see a message with URL of your running dev server like below
