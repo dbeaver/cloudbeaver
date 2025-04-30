@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { AutoRunningTask, type ISyncExecutor, type ITask, SyncExecutor, whileTask } from '@cloudbeaver/core-executor';
 import { CachedDataResource, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { SessionResource } from '@cloudbeaver/core-root';
-import { type AuthInfo, type AuthLogoutQuery, AuthStatus, GraphQLService, type UserInfo } from '@cloudbeaver/core-sdk';
+import { type FederatedAuthInfo, type AuthInfo, type AuthLogoutQuery, AuthStatus, GraphQLService, type UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
 import { AuthProviderService } from './AuthProviderService.js';
@@ -26,6 +26,8 @@ export interface ILoginOptions {
   linkUser?: boolean;
   forceSessionsLogout?: boolean;
 }
+
+export type IFederatedLoginOptions = Omit<ILoginOptions, 'credentials'>;
 
 export const ANONYMOUS_USER_ID = 'anonymous';
 
@@ -117,15 +119,27 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
     });
 
     if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
-      this.resetIncludes();
-      this.setData(await this.loader());
-      this.sessionResource.markOutdated();
+      await this.syncData();
     }
 
     return authInfo as AuthInfo;
   }
 
-  finishFederatedAuthentication(authId: string, linkUser?: boolean): ITask<UserInfo | null> {
+  async requestFederatedLogin(
+    provider: string,
+    { configurationId, linkUser, forceSessionsLogout }: IFederatedLoginOptions,
+  ): Promise<FederatedAuthInfo> {
+    const { result } = await this.graphQLService.sdk.federatedLogin({
+      provider,
+      configuration: configurationId,
+      linkUser,
+      forceSessionsLogout,
+    });
+
+    return result;
+  }
+
+  autoLogin(authId: string, linkUser?: boolean): ITask<UserInfo | null> {
     let activeTask: ITask<AuthInfo> | undefined;
 
     return new AutoRunningTask<UserInfo | null>(
@@ -155,9 +169,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
         const authInfo = await activeTask;
 
         if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
-          this.resetIncludes();
-          this.setData(await this.loader());
-          this.sessionResource.markOutdated();
+          await this.syncData();
         }
 
         return this.data;
@@ -259,6 +271,12 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void> 
 
   getConfigurationParameter(key: string): any {
     return this.data?.configurationParameters[key];
+  }
+
+  async syncData(): Promise<void> {
+    this.resetIncludes();
+    this.setData(await this.loader());
+    this.sessionResource.markOutdated();
   }
 
   protected async loader(key: void): Promise<UserInfo | null> {

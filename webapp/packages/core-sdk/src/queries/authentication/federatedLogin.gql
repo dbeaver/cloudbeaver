@@ -1,0 +1,8 @@
+mutation federatedLogin($provider: ID!, $configuration: ID, $linkUser: Boolean, $forceSessionsLogout: Boolean) {
+  result: federatedLogin(provider: $provider, configuration: $configuration, linkUser: $linkUser, forceSessionsLogout: $forceSessionsLogout) {
+    redirectLink
+    taskInfo {
+      ...AsyncTaskInfo
+    }
+  }
+}
