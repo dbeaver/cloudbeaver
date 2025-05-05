@@ -65,6 +65,15 @@ export class ServerSettingsService extends SettingsSource {
     return Object.fromEntries(this.settings);
   }
 
+  restoreDefaults() {
+    this.update(() => {
+      this.clear();
+      for (const key of this.settings.keys()) {
+        this.setValue(key, null);
+      }
+    });
+  }
+
   private refreshConfig() {
     this.update(() => {
       this.clear();

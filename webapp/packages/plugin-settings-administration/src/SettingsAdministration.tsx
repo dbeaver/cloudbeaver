@@ -56,6 +56,8 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
     setTabId(tab.tabId);
   }
 
+  const hideSingleTab = settingsAdministrationService.tabsContainer.getDisplayed().length === 1;
+
   return (
     <TabsState container={settingsAdministrationService.tabsContainer} currentTabId={tabId} onChange={handleTabChange}>
       <Form context={form} contents>
@@ -69,13 +71,19 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
                 {translate('ui_processing_cancel')}
               </ToolsAction>
               {settingsSource?.restoreDefaults && (
-                <ToolsAction icon="/icons/settings_restore_defaults2_m.svg#root" viewBox="0 0 24 24" svg onClick={handleRestoreDefaults}>
+                <ToolsAction
+                  icon="/icons/settings_restore_defaults2_m.svg#root"
+                  viewBox="0 0 24 24"
+                  disabled={!settingsSource.isSet()}
+                  svg
+                  onClick={handleRestoreDefaults}
+                >
                   {translate('plugin_user_profile_settings_restore_defaults')}
                 </ToolsAction>
               )}
             </ToolsPanel>
           </Group>
-          <Group box keepSize hideOverflow>
+          <Group hidden={hideSingleTab} box keepSize hideOverflow>
             <TabList underline />
           </Group>
           {settingsSource ? <Settings source={settingsSource} accessor={accessor} /> : <div>{translate('ui_no_settings')}</div>}

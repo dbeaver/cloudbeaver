@@ -22,7 +22,7 @@ export class SettingsDefaultAdministrationBootstrap extends Bootstrap {
   override register(): void {
     this.settingsAdministrationService.tabsContainer.add({
       key: 'default',
-      name: 'Default',
+      name: 'plugin_settings_default_administration_settings_tab_name',
       order: 0,
       options: {
         source: this.serverSettingsService,

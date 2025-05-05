@@ -91,7 +91,7 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
     </div>
   );
 
-  const restore = isSet && source.restoreDefaults && (
+  const restore = isSet && (
     <Link className="theme-typography--caption" title={translate('plugin_settings_panel_setting_reset_tooltip')} onClick={handleRestore}>
       {translate('plugin_settings_panel_setting_reset')}
     </Link>
