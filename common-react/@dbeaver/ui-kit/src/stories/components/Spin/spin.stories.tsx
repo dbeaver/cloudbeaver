@@ -1,4 +1,5 @@
 import { Spin } from '../../../index.js';
+import './spin.stories.css';
 
 export function Documentation() {
   return (
@@ -124,9 +125,34 @@ export function Tokens() {
           <code>--dbv-kit-spin-stroke-color</code>: Sets the color of the spinner's stroke (default: var(--dbv-kit-color-primary-600))
         </li>
         <li>
-          <code>--dbv-kit-animate-stroke</code>: Defines the animation for the spinner's stroke (default: stroke 2s linear infinite)
+          <code>--dbv-kit-spin-stroke-linecap</code>: Defines the stroke-linecap of the spinner's stroke (default: butt)
+        </li>
+        <code>--dbv-kit-spin-stroke-color-secondary</code>: Sets the color of the spinner's secondary stroke (default:
+        var(--dbv-kit-color-primary-200))
+        <li>
+          <code>--dbv-kit-spin-animation-duration</code>: Controls the duration of the spinner's animation (default: 1.8s)
+        </li>
+        <li>
+          <code>--dbv-kit-animate-stroke</code>: Defines the animation for the spinner's stroke
+        </li>
+        <li>
+          <code>--dbv-kit-animate-spin</code>: Defines the animation for the spinner's rotation
         </li>
       </ul>
+    </div>
+  );
+}
+
+export function SpecialLoader() {
+  return (
+    <div className="tw:flex tw:h-screen tw:items-center tw:justify-center">
+      <div className="tw:flex tw:flex-col tw:gap-1 tw:w-32">
+        <div className="tw:relative tw:flex tw:items-center tw:justify-center tw:w-32 tw:h-32 ">
+          <span className="tw:text-6xl">😜</span>
+          <Spin className="tw:absolute tw:w-full tw:h-full customLoader" />
+        </div>
+        <p className="tw:text-center">Loading...</p>
+      </div>
     </div>
   );
 }

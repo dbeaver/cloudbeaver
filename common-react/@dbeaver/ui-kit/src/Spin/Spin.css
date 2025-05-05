@@ -35,7 +35,9 @@
     stroke-dashoffset: 5px;
     stroke-width: var(--dbv-kit-spin-stroke-width);
     stroke: var(--dbv-kit-spin-stroke-color);
-    stroke-linecap: var(--dbv-kit-spin-stroke-style);
+    stroke-linecap: var(--dbv-kit-spin-stroke-linecap);
+
+    animation: var(--dbv-kit-animate-spin);
   }
 
   .dbv-kit-spin__circle {

@@ -12,7 +12,7 @@ export function Spin({ className, size, enabled = true }: SpinProps) {
   return (
     enabled && (
       <span className={clsx('dbv-kit-spin', size ? `dbv-kit-spin--${size}` : undefined, className)}>
-        <svg className="dbv-kit-spin__svg tw:animate-spin" viewBox="11 11 22 22">
+        <svg className="dbv-kit-spin__svg" viewBox="11 11 22 22">
           <circle className="dbv-kit-spin__circle" cx="22" cy="22" r="9" fill="none"></circle>
         </svg>
       </span>
