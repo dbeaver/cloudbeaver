@@ -905,11 +905,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public List<SMRolePreference> getRolePreferences(WebSession webSession, String[] authRoleIds) throws DBException {
+    public List<SMRolePreference> getRolePreferences(WebSession webSession, List<String> authRoleIds) throws DBException {
         if (authRoleIds == null) {
             return webSession.getAdminSecurityController().getAuthRolePreferences(Collections.emptyList());
         }
-        return webSession.getAdminSecurityController().getAuthRolePreferences(List.of(authRoleIds));
+        return webSession.getAdminSecurityController().getAuthRolePreferences(authRoleIds);
     }
 
     private DBPDataSourceRegistry getDataSourceRegistry(WebSession session, String projectId) throws DBWebException {

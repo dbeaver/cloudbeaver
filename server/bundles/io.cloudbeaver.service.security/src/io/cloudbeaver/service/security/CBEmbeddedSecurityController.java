@@ -1237,7 +1237,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @Override
     public SMRolePreference updateAuthRolePreference(@NotNull SMRolePreference rolePreference) throws DBException {
-        return null;
+        throw new UnsupportedOperationException("Method is unsupported");
     }
 
     @NotNull

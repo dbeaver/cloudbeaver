@@ -213,12 +213,10 @@ public interface DBWServiceAdmin extends DBWService {
         @NotNull String teamId, @Nullable String teamRole
     ) throws DBWebException;
 
-    //fixme uncomment
-    //@WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     SMRolePreference saveRolePreferences(WebSession webSession, @NotNull String authRoleId, Map<String, Object> settings) throws DBException;
 
-    //fixme uncomment
-    //@WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    List<SMRolePreference> getRolePreferences(WebSession webSession, @Nullable String[] authRoleIds) throws DBException;
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    List<SMRolePreference> getRolePreferences(WebSession webSession, @Nullable List<String> authRoleIds) throws DBException;
 
 }
