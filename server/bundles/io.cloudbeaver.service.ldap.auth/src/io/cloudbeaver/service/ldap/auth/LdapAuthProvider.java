@@ -77,10 +77,9 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
         }
         if (CommonUtils.isEmpty(userData)) {
-            userData = new HashMap<>();
             String fullUserDN = buildFullUserDN(userName, ldapSettings);
-            validateUserAccess(fullUserDN, ldapSettings, userData);
-            authenticateLdap(fullUserDN, password, ldapSettings, null, environment, userData);
+            validateUserAccess(fullUserDN, ldapSettings);
+            userData = authenticateLdap(fullUserDN, password, ldapSettings, null, environment);
         }
         return userData;
     }
@@ -130,7 +129,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             if (userDN == null) {
                 return null;
             }
-            return authenticateLdap(userDN, password, ldapSettings, login, creteAuthEnvironment(ldapSettings), new HashMap<>());
+            return authenticateLdap(userDN, password, ldapSettings, login, creteAuthEnvironment(ldapSettings));
         } catch (Exception e) {
             throw new DBException("LDAP authentication failed: " + e.getMessage(), e);
         }
@@ -141,8 +140,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
      */
     private void validateUserAccess(
         @NotNull String fullUserDN,
-        @NotNull LdapSettings ldapSettings,
-        @NotNull Map<String, Object> userData
+        @NotNull LdapSettings ldapSettings
     ) throws DBException {
         if (
             CommonUtils.isEmpty(ldapSettings.getFilter())
@@ -390,9 +388,9 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         String password,
         LdapSettings ldapSettings,
         @Nullable String login,
-        Hashtable<String, String> environment,
-        Map<String, Object> userData
+        Hashtable<String, String> environment
     ) throws DBException {
+        Map<String, Object> userData = new HashMap<>();
         environment.put(Context.SECURITY_PRINCIPAL, userDN);
         environment.put(Context.SECURITY_CREDENTIALS, password);
         DirContext userContext = null;
@@ -419,7 +417,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             }
             userData.putIfAbsent(LdapConstants.CRED_USERNAME, CommonUtils.isNotEmpty(login) ? login : userId);
             userData.put(LdapConstants.CRED_USER_DN, userDN);
-            userData.put(LdapConstants.CRED_DISPLAY_NAME, CommonUtils.isNotEmpty(login) ? login :findUserNameFromDN(userDN, ldapSettings));
+            userData.put(LdapConstants.CRED_DISPLAY_NAME, CommonUtils.isNotEmpty(login) ? login : findUserNameFromDN(userDN, ldapSettings));
             userData.put(LdapConstants.CRED_SESSION_ID, UUID.randomUUID());
 
             return userData;
