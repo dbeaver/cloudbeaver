@@ -16,11 +16,18 @@
  */
 package io.cloudbeaver.service.auth.handler;
 
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
-import io.cloudbeaver.model.session.*;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
+import io.cloudbeaver.model.session.BaseWebSession;
+import io.cloudbeaver.model.session.WebAuthInfo;
+import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.session.WebSessionAuthProcessor;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
+import io.cloudbeaver.service.auth.WebAsyncAuthJob;
+import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -48,6 +55,27 @@ public class WSAuthSessionEventHandler implements WSEventHandler<WSAuthEvent> {
             log.trace("No web session found in current node with id '" + sessionId + "'");
             return;
         }
+        List<WebAsyncTaskInfo> allAuthJobs = webSession.findTasksByJob(WebAsyncAuthJob.class);
+        WebAsyncTaskInfo relatedTask = allAuthJobs.stream().filter(
+                task -> {
+                    WebAsyncAuthJob job = (WebAsyncAuthJob) task.getJob();
+                    return job.getAuthId().equals(authInfo.getAuthAttemptId());
+                })
+            .findFirst().orElse(null);
+        if (relatedTask == null) {
+            String message = "No related authentication task was found in'" + sessionId + "',"
+                + " probably authentication was canceled";
+            log.warn(message);
+            webSession.addWarningMessage(message);
+            return;
+        }
+        if (!relatedTask.isRunning()) {
+            String message = "Related authentication task was canceled";
+            log.warn(message);
+            webSession.addWarningMessage(message);
+            return;
+        }
+        WebAsyncAuthJob relatedJob = (WebAsyncAuthJob) relatedTask.getJob();
         switch (authInfo.getAuthStatus()) {
             case SUCCESS:
                 boolean linkCredentialsWithActiveUser = !webApplication.isConfigurationMode()
@@ -58,23 +86,25 @@ public class WSAuthSessionEventHandler implements WSEventHandler<WSAuthEvent> {
                         authInfo,
                         linkCredentialsWithActiveUser
                     ).authenticateSession();
-                    List<WebUserAuthTokenInfo> tokenInfos = newInfos
-                        .stream()
-                        .map(WebUserAuthTokenInfo::new)
-                        .toList();
-                    webSession.addSessionEvent(new WebSessionAuthEvent(tokenInfos));
+                    relatedJob.setAuthResult(newInfos);
                 } catch (DBException e) {
                     webSession.addSessionError(e);
+                    relatedTask.setJobError(e);
                 }
-
                 break;
             case ERROR:
-                webSession.addSessionEvent(new WebSessionAuthEvent(new DBWebException(authInfo.getError(), authInfo.getErrorCode())));
+                var error = new DBWebException(authInfo.getError(), authInfo.getErrorCode());
+                relatedTask.setJobError(error);
                 break;
-            case IN_PROGRESS, EXPIRED:
-                log.error("Invalid auth status: " + authInfo.getAuthStatus());
             default:
-                log.error("Unknown auth status: " + authInfo.getAuthStatus());
+                String message = "Invalid auth status: " + authInfo.getAuthStatus();
+                log.error(message);
+                var exception = new DBWebException(message);
+                webSession.addSessionError(exception);
+                relatedTask.setJobError(new DBWebException(message));
         }
+        relatedTask.setRunning(false);
+        relatedTask.setStatus(DBWConstants.TASK_STATUS_FINISHED);
+        WebEventUtils.sendAsyncTaskEvent(webSession, relatedTask);
     }
 }

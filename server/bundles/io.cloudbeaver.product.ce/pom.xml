@@ -10,7 +10,7 @@
          <relativePath>../</relativePath>
     </parent>
     <artifactId>io.cloudbeaver.product.ce</artifactId>
-    <version>25.0.4-SNAPSHOT</version>
+    <version>25.0.5-SNAPSHOT</version>
     <packaging>eclipse-plugin</packaging>
 
 </project>
