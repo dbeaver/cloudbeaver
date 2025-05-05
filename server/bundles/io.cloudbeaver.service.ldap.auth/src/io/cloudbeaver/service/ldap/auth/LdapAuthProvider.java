@@ -384,11 +384,11 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
     }
 
     private Map<String, Object> authenticateLdap(
-        String userDN,
-        String password,
-        LdapSettings ldapSettings,
+        @NotNull String userDN,
+        @NotNull String password,
+        @NotNull LdapSettings ldapSettings,
         @Nullable String login,
-        Hashtable<String, String> environment
+        @NotNull Hashtable<String, String> environment
     ) throws DBException {
         Map<String, Object> userData = new HashMap<>();
         environment.put(Context.SECURITY_PRINCIPAL, userDN);
