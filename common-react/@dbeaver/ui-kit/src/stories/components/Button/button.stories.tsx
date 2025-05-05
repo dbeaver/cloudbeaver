@@ -254,11 +254,11 @@ export const Icons = () => (
 );
 
 const CustomLoader = () => (
-  <Button.Icon placement="start">
+  <div>
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="tw:animate-spin tw:p-1">
       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="31.415, 31.415" />
     </svg>
-  </Button.Icon>
+  </div>
 );
 
 export const Loading = () => {
@@ -280,9 +280,7 @@ export const Loading = () => {
           and one of the dark colors for dark theme.
         </span>
       </p>
-      <div>
-        <code>--dbv-kit-btn-loader-animation:</code> var(--animate-spin); <span className="comment"> Button loader animation</span>
-      </div>
+
       <label>
         Enable loaders <input type="checkbox" checked={loading} onChange={toggleLoading} />
       </label>
