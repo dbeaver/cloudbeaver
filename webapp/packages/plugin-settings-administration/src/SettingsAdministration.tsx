@@ -48,6 +48,10 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
     settingsSource?.clear();
   }
 
+  function handleRestoreDefaults() {
+    settingsSource?.restoreDefaults?.();
+  }
+
   function handleTabChange(tab: ITabData<void>) {
     setTabId(tab.tabId);
   }
@@ -64,6 +68,11 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
               <ToolsAction icon="admin-cancel" viewBox="0 0 24 24" disabled={!changed} onClick={handleReset}>
                 {translate('ui_processing_cancel')}
               </ToolsAction>
+              {settingsSource?.restoreDefaults && (
+                <ToolsAction icon="/icons/settings_restore_defaults2_m.svg#root" viewBox="0 0 24 24" svg onClick={handleRestoreDefaults}>
+                  {translate('plugin_user_profile_settings_restore_defaults')}
+                </ToolsAction>
+              )}
             </ToolsPanel>
           </Group>
           <Group box keepSize hideOverflow>

@@ -39,7 +39,7 @@ export class CustomConnectionSettingsService extends Dependency {
           scope: ['role'],
         },
         group: CONNECTIONS_SETTINGS_GROUP,
-        name: 'Disable custom connections',
+        name: 'plugin_connection_custom_settings_disabled_name',
         type: ESettingsValueType.Checkbox,
       },
     ]);

@@ -29,12 +29,13 @@ export class AuthRolesResource extends CachedMapResource<ELMRole, AuthRoleInfo> 
   }
 
   async update(id: ELMRole, options: AuthRoleUpdateOptions): Promise<void> {
-    await this.performUpdate(id, undefined, () =>
-      this.graphQLService.sdk.updateAuthRole({
+    await this.performUpdate(id, undefined, async () => {
+      const { role } = await this.graphQLService.sdk.updateAuthRole({
         authRoleId: id,
         settings: options.settings,
-      }),
-    );
+      });
+      this.set(id, role);
+    });
   }
 
   protected async loader(): Promise<Map<ELMRole, AuthRoleInfo>> {

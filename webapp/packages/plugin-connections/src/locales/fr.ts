@@ -38,8 +38,8 @@ export default [
   ['plugin_connections_menu_connections_label', 'Connexion'],
   ['plugin_connections_action_disconnect_all_label', 'Déconnecter tout'],
   ['plugin_connections_settings', 'Connexions'],
-  ['plugin_connections_settings_hide_connections_view_name', 'Hide connections'],
-  ['plugin_connections_settings_hide_connections_view_description', 'Connections will be hidden for all users except administrators'],
+  ['plugin_connections_settings_hide_connections_view_name', 'Hide connection view management'],
+  ['plugin_connections_settings_hide_connections_view_description', 'Connections view submenu will be hidden for all users except administrators'],
 
   ['plugin_connections_connection_ssl_enable', 'Activer SSL'],
 

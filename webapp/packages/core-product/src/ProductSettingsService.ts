@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,13 @@ export class ProductSettingsService extends SettingsSource {
 
   override has(key: any): boolean {
     return this.settings.has(key) || super.has(key) || false;
+  }
+
+  override isSet(key?: any): boolean {
+    if (key === undefined) {
+      return this.settings.size > 0;
+    }
+    return this.settings.has(key);
   }
 
   isReadOnly(): boolean {

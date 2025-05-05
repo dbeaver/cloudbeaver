@@ -45,7 +45,7 @@ export const SettingsGroup = observer<Props>(function SettingsGroup({ settingsId
   });
 
   return (
-    <Group ref={ref} id={getSettingGroupId(settingsId, group.id)} hidden={groupSettings.length === 0} vertical gap>
+    <Group ref={ref} id={getSettingGroupId(settingsId, group.id)} hidden={groupSettings.length === 0} vertical gap compact>
       <GroupTitle sticky>
         <SettingsGroupTitle group={group} />
       </GroupTitle>
