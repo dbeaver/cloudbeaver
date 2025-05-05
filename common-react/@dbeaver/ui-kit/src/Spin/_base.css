@@ -1,0 +1,25 @@
+@keyframes stroke {
+  0% {
+    stroke-dasharray: 1px, 100px;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 45px, 100px;
+    stroke-dashoffset: -10px;
+  }
+  100% {
+    stroke-dasharray: 17px, 100px;
+    stroke-dashoffset: -58px;
+  }
+}
+
+@layer base {
+  :root {
+    --dbv-kit-spin-height: var(--dbv-kit-control-height-medium);
+
+    --dbv-kit-spin-stroke-width: 2.5px;
+    --dbv-kit-spin-stroke-color: var(--dbv-kit-color-primary-600);
+
+    --dbv-kit-animate-stroke: stroke 2s linear infinite;
+  }
+}
