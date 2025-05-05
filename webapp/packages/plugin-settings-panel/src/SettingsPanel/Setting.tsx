@@ -37,7 +37,7 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
   //       probably we can use layers to skip some layers when checking settings
   // const readOnly = settingsResolverService.isReadOnly(setting.key, source) ?? false;
   const readOnly = false;
-  const isSet = source.isSet(setting.key);
+  const isOverride = source.has(setting.key);
 
   let value = source.getEditedValue(setting.key);
   if (readOnly || !isNotNullDefined(value)) {
@@ -82,16 +82,16 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
 
   const borderTooltip = (
     <div className="tw:w-1 tw:h-full">
-      {isSet && (
+      {isOverride && (
         <div
-          className={clsx('tw:h-full tw:w-full', isSet ? 'tw:bg-[var(--theme-primary)]' : 'tw:bg-transparent')}
+          className={clsx('tw:h-full tw:w-full', isOverride ? 'tw:bg-[var(--theme-primary)]' : 'tw:bg-transparent')}
           title={translate('plugin_settings_panel_setting_set_in_scope')}
         />
       )}
     </div>
   );
 
-  const restore = isSet && (
+  const restore = isOverride && (
     <Link className="theme-typography--caption" title={translate('plugin_settings_panel_setting_reset_tooltip')} onClick={handleRestore}>
       {translate('plugin_settings_panel_setting_reset')}
     </Link>

@@ -49,11 +49,8 @@ export class UserSettingsService extends SettingsSource {
     return this.getSource().has(key) || super.has(key);
   }
 
-  override isSet(key?: any): boolean {
-    if (key === undefined) {
-      return this.getSource().size > 0;
-    }
-    return this.getSource().has(key);
+  isOverrideDefaults(): boolean {
+    return this.getSource().size > 0;
   }
 
   isReadOnly(key: any): boolean {

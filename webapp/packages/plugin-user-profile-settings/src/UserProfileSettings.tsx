@@ -62,7 +62,7 @@ export const UserProfileSettings = observer(function UserProfileSettings() {
             <ToolsAction
               icon="/icons/settings_restore_defaults2_m.svg#root"
               viewBox="0 0 24 24"
-              disabled={!userSettingsService.isSet()}
+              disabled={!userSettingsService.isOverrideDefaults()}
               svg
               onClick={handleRestoreDefaults}
             >

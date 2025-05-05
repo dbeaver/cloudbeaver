@@ -29,13 +29,6 @@ export class ProductSettingsService extends SettingsSource {
     return this.settings.has(key) || super.has(key) || false;
   }
 
-  override isSet(key?: any): boolean {
-    if (key === undefined) {
-      return this.settings.size > 0;
-    }
-    return this.settings.has(key);
-  }
-
   isReadOnly(): boolean {
     return true;
   }

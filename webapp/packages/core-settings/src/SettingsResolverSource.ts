@@ -84,11 +84,8 @@ export class SettingsResolverSource implements ISettingsResolverSource {
     this.layers = [];
   }
 
-  isSet(key?: any): boolean {
-    if (key === undefined) {
-      return this.sources.some(r => r.isSet());
-    }
-    return this.sources.some(r => r.has(key) && r.isSet(key));
+  isOverrideDefaults(): boolean {
+    return this.sources.some(r => r.isOverrideDefaults?.());
   }
 
   isEdited(key?: any): boolean {

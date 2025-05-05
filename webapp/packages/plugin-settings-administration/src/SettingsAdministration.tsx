@@ -74,7 +74,7 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
                 <ToolsAction
                   icon="/icons/settings_restore_defaults2_m.svg#root"
                   viewBox="0 0 24 24"
-                  disabled={!settingsSource.isSet()}
+                  disabled={settingsSource.isOverrideDefaults?.() === false}
                   svg
                   onClick={handleRestoreDefaults}
                 >

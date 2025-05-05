@@ -24,10 +24,6 @@ export class SettingsProvider<TSchema extends schema.SomeZodObject = any> implem
     );
   }
 
-  isSet(key?: any): boolean {
-    return this.source.isSet(key);
-  }
-
   isReadOnly<TKey extends keyof schema.infer<TSchema>>(key: TKey): boolean {
     return this.source.isReadOnly(key) || false;
   }
