@@ -6,6 +6,9 @@
     --dbv-kit-btn-outline-offset: var(--dbv-kit-control-outline-offset);
 
     --dbv-kit-btn-foreground: var(--tw-color-white);
+    --dbv-kit-btn-foreground-hover: var(--tw-color-white);
+    --dbv-kit-btn-foreground-active: var(--tw-color-white);
+
     --dbv-kit-btn-background: var(--dbv-kit-color-primary-600);
     --dbv-kit-btn-background-hover: var(--dbv-kit-color-primary-700);
     --dbv-kit-btn-background-active: var(--dbv-kit-color-primary-800);

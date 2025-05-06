@@ -37,12 +37,14 @@
 
     &:hover {
       @media (hover: hover) {
+        color: var(--dbv-kit-btn-foreground-hover);
         background-color: var(--dbv-kit-btn-background-hover);
       }
     }
 
     &:active,
     &[data-active] {
+      color: var(--dbv-kit-btn-foreground-active);
       background-color: var(--dbv-kit-btn-background-active);
     }
 
@@ -94,8 +96,11 @@
   /* Variants */
 
   .dbv-kit-button--primary {
-    --dbv-kit-btn-background: var(--dbv-kit-btn-primary-background);
     --dbv-kit-btn-foreground: var(--dbv-kit-btn-primary-foreground);
+    --dbv-kit-btn-foreground-hover: var(--dbv-kit-btn-primary-foreground-hover);
+    --dbv-kit-btn-foreground-active: var(--dbv-kit-btn-primary-foreground-active);
+
+    --dbv-kit-btn-background: var(--dbv-kit-btn-primary-background);
     --dbv-kit-btn-background-hover: var(--dbv-kit-btn-primary-background-hover);
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-primary-background-active);
 
@@ -103,8 +108,11 @@
   }
 
   .dbv-kit-button--secondary {
-    --dbv-kit-btn-background: var(--dbv-kit-btn-secondary-background);
     --dbv-kit-btn-foreground: var(--dbv-kit-btn-secondary-foreground);
+    --dbv-kit-btn-foreground-hover: var(--dbv-kit-btn-secondary-foreground-hover);
+    --dbv-kit-btn-foreground-active: var(--dbv-kit-btn-secondary-foreground-active);
+
+    --dbv-kit-btn-background: var(--dbv-kit-btn-secondary-background);
     --dbv-kit-btn-background-hover: var(--dbv-kit-btn-secondary-background-hover);
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-secondary-background-active);
     --dbv-kit-btn-border-color: var(--dbv-kit-btn-secondary-border-color);
@@ -113,8 +121,11 @@
   }
 
   .dbv-kit-button--danger {
-    --dbv-kit-btn-background: var(--dbv-kit-btn-danger-background);
     --dbv-kit-btn-foreground: var(--dbv-kit-btn-danger-foreground);
+    --dbv-kit-btn-foreground-hover: var(--dbv-kit-btn-danger-foreground);
+    --dbv-kit-btn-foreground-active: var(--dbv-kit-btn-danger-foreground-active);
+
+    --dbv-kit-btn-background: var(--dbv-kit-btn-danger-background);
     --dbv-kit-btn-background-hover: var(--dbv-kit-btn-danger-background-hover);
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-danger-background-active);
 

@@ -1,5 +1,5 @@
 import type { Story } from '@ladle/react';
-import { Button, type ButtonProps } from '../../../index.js';
+import { Button, type ButtonProps, IconButton } from '../../../index.js';
 import { useState } from 'react';
 
 export { Tokens } from './button-tokens.js';
@@ -369,4 +369,129 @@ Interactive.argTypes = {
     },
     defaultValue: false,
   },
+};
+
+export const IconButtons = () => {
+  return (
+    <div className="tw:flex tw:flex-col tw:gap-4 tw:my-4 tw:items-center">
+      <div>
+        <h2>Primary</h2>
+        <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
+          <IconButton variant="primary" size="small" aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+          <IconButton variant="primary" size="medium" aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+          <IconButton variant="primary" size="large" aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+          <IconButton variant="primary" size="xlarge" aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+        </div>
+      </div>
+      <div>
+        <h2>Secondary</h2>
+        <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
+          <IconButton variant="secondary" size="small" aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+          <IconButton variant="secondary" size="medium" aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+          <IconButton variant="secondary" size="large" aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+          <IconButton variant="secondary" size="xlarge" aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+        </div>
+      </div>
+      <div>
+        <h2>Danger</h2>
+        <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
+          <IconButton variant="danger" size="small" aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+          <IconButton variant="danger" size="medium" aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+          <IconButton variant="danger" size="large" aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+          <IconButton variant="danger" size="xlarge" aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+        </div>
+      </div>
+      <div>
+        <h2>Disabled</h2>
+        <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
+          <IconButton variant="primary" size="small" disabled aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+          <IconButton variant="secondary" size="medium" disabled aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+          <IconButton variant="danger" size="large" disabled aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+        </div>
+        <h2>Loading</h2>
+        <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
+          <IconButton variant="primary" size="small" loading aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+          <IconButton variant="secondary" size="medium" loading aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+          <IconButton variant="danger" size="large" loading aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+          <IconButton variant="danger" size="xlarge" loading aria-label="Add item">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            </svg>
+          </IconButton>
+        </div>
+      </div>
+    </div>
+  );
 };

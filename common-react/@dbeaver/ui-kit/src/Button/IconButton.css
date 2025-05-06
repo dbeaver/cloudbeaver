@@ -1,0 +1,62 @@
+@import './_base.css';
+@import './_sizes.css';
+@import './_variants.css';
+
+@layer base {
+  .dbv-kit-icon-button {
+    padding: 0;
+    min-width: var(--dbv-kit-btn-height);
+    width: var(--dbv-kit-btn-height);
+    height: var(--dbv-kit-btn-height);
+
+    --dbv-kit-btn-primary-foreground: var(--dbv-kit-color-primary-600);
+    --dbv-kit-btn-primary-foreground-hover: var(--dbv-kit-color-primary-600);
+    --dbv-kit-btn-primary-foreground-active: var(--dbv-kit-color-primary-500);
+    --dbv-kit-btn-primary-background: transparent;
+    --dbv-kit-btn-primary-background-hover: var(--tw-color-gray-100);
+    --dbv-kit-btn-primary-background-active: var(--tw-color-gray-100);
+
+    --dbv-kit-btn-secondary-foreground: var(--tw-color-gray-300);
+    --dbv-kit-btn-secondary-foreground-hover: var(--dbv-kit-color-primary-600);
+    --dbv-kit-btn-secondary-foreground-active: var(--dbv-kit-color-primary-500);
+    --dbv-kit-btn-secondary-background: transparent;
+    --dbv-kit-btn-secondary-background-hover: transparent;
+    --dbv-kit-btn-secondary-background-active: transparent;
+    --dbv-kit-btn-secondary-border-color: transparent;
+
+    --dbv-kit-btn-danger-foreground: var(--tw-color-red-600);
+    --dbv-kit-btn-danger-foreground-hover: var(--tw-color-red-600);
+    --dbv-kit-btn-danger-foreground-active: var(--tw-color-red-500);
+    --dbv-kit-btn-danger-background: transparent;
+    --dbv-kit-btn-danger-background-hover: var(--tw-color-red-100);
+    --dbv-kit-btn-danger-background-active: var(--tw-color-red-100);
+
+    &:hover {
+      @media (hover: hover) {
+        .dbv-kit-icon-button__icon {
+          color: var(--dbv-kit-btn-foreground-hover);
+        }
+      }
+    }
+
+    &:active,
+    &[data-active] {
+      .dbv-kit-icon-button__icon {
+        color: var(--dbv-kit-btn-foreground-active);
+      }
+    }
+
+    &:disabled {
+      opacity: var(--dbv-kit-control-disabled-opacity);
+    }
+  }
+
+  .dbv-kit-icon-button__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dbv-kit-btn-icon-foreground);
+    width: 100%;
+    height: 100%;
+  }
+}
