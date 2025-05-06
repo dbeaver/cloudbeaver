@@ -419,6 +419,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             }
             userData.putIfAbsent(LdapConstants.CRED_USERNAME, CommonUtils.isNotEmpty(userId) ? userId : login);
             userData.put(LdapConstants.CRED_USER_DN, userDN);
+            userData.put(LdapConstants.CRED_PASSWORD, password);
             userData.put(LdapConstants.CRED_DISPLAY_NAME, findUserNameFromDN(userDN, ldapSettings));
             userData.put(LdapConstants.CRED_SESSION_ID, UUID.randomUUID());
 
@@ -463,12 +464,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
         List<String> result = new ArrayList<>();
         result.add(userDN);
-
-        String groupDN = getGroupForMember(userDN, ldapSettings);
-        if (groupDN != null) {
-            result.add(groupDN);
-        }
-
+        result.addAll(getGroupForMember(userDN, ldapSettings, authParameters));
         return result;
     }
 
@@ -483,21 +479,47 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         }
     }
 
-    private String getGroupForMember(String fullDN, LdapSettings ldapSettings) {
-        DirContext context;
+    @NotNull
+    private List<String> getGroupForMember(String fullDN, LdapSettings ldapSettings, Map<String, Object> authParameters) {
+        DirContext context = null;
+        NamingEnumeration<SearchResult> searchResults = null;
+        List<String> result = new ArrayList<>();
         try {
-            context = new InitialDirContext(creteAuthEnvironment(ldapSettings));
+            Hashtable<String, String> environment = creteAuthEnvironment(ldapSettings);
+            if (CommonUtils.isEmpty(ldapSettings.getBindUserDN())) {
+                environment.put(Context.SECURITY_PRINCIPAL, String.valueOf(authParameters.get(LdapConstants.CRED_USER_DN)));
+                environment.put(Context.SECURITY_CREDENTIALS, String.valueOf(authParameters.get(LdapConstants.CRED_PASSWORD)));
+            } else {
+                environment.put(Context.SECURITY_PRINCIPAL, ldapSettings.getBindUserDN());
+                environment.put(Context.SECURITY_CREDENTIALS, ldapSettings.getBindUserPassword());
+            }
+            //it's a hack. Otherwise password will be written to database
+            authParameters.remove(LdapConstants.CRED_PASSWORD);
+
+            context = new InitialDirContext(environment);
+
             String searchFilter = "(member=" + fullDN + ")";
             SearchControls searchControls = new SearchControls();
             searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-            NamingEnumeration<SearchResult> results = context.search(ldapSettings.getBaseDN(), searchFilter, searchControls);
-            if (results.hasMore()) {
-                return results.next().getName();
+            searchResults = context.search(ldapSettings.getBaseDN(), searchFilter, searchControls);
+            while (searchResults.hasMore()) {
+                result.add(searchResults.next().getName());
             }
         } catch (Exception e) {
             log.error("Group not found", e);
+        } finally {
+            try {
+                if (context != null) {
+                    context.close();
+                }
+                if (searchResults != null) {
+                    searchResults.close();
+                }
+            } catch (Exception e) {
+                log.error("Close resource of ldap group search failed", e);
+            }
         }
-        return null;
+        return result;
     }
 }
