@@ -14,8 +14,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { DataGrid, useCreateGridReactiveValue } from '@cloudbeaver/plugin-data-grid';
+import { getObjectPropertyDisplayValue } from '@cloudbeaver/core-sdk';
 
-import { getValue } from '../../helpers.js';
 import { ObjectPropertyTableFooter } from '../ObjectPropertyTableFooter.js';
 import classes from './Table.module.css';
 import { ObjectMenuCell } from './ObjectMenuCell.js';
@@ -75,9 +75,8 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
       return <ObjectMenuCell object={objects[rowIdx]!} />;
     }
 
-    const value = objects[rowIdx]?.object?.properties?.[colIdx]?.value;
-
-    return value !== undefined ? getValue(value) : '';
+    const property = objects[rowIdx]?.object?.properties?.[colIdx];
+    return property ? getObjectPropertyDisplayValue(property) : '';
   }
   const cell = useCreateGridReactiveValue(getCell, (onValueChange, rowIdx, colIdx) => reaction(() => getCell(rowIdx, colIdx), onValueChange), [
     objects,
@@ -86,9 +85,8 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
 
   function getCellTooltip(rowIdx: number, colIdx: number) {
     colIdx--;
-    const value = objects[rowIdx]?.object?.properties?.[colIdx]?.value;
-
-    return value !== undefined ? getValue(value) : '';
+    const property = objects[rowIdx]?.object?.properties?.[colIdx];
+    return property ? getObjectPropertyDisplayValue(property) : '';
   }
 
   const cellTooltip = useCreateGridReactiveValue(

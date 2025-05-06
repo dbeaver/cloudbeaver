@@ -1,9 +1,19 @@
+node_modules
+dist
+lib
+coverage
+npm-debug.log
+debug.log
+yarn-error.log
+
+# Yarn
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+!.yarn/sdks/**
 
 # Swap the comments on the following lines if you wish to use zero-installs
 # In that case, don't forget to run `yarn config set enableGlobalCache false`!
@@ -11,15 +21,3 @@
 
 #!.yarn/cache
 .pnp.*
-
-node_modules
-src/**/*.js
-src/**/*.js.map
-typings
-dist
-lib
-!.yarn/sdks/**/lib
-coverage
-ts-out
-npm-debug.log
-debug.log

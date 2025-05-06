@@ -1,6 +1,8 @@
-include: 
-  - '*.ts'
-  - '*.tsx'
+glob:
+  - '**/*.ts'
+  - '**/*.tsx'
+exclude:
+  - '**/locales/*'
 text: |
   /*
    * CloudBeaver - Cloud Database Manager
