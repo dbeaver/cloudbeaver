@@ -16,7 +16,7 @@
     "build": "tsc -b",
     "clean": "rimraf --glob lib",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "test": "core-cli-test",
+    "test": "dbeaver-test",
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
@@ -31,6 +31,7 @@
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/core-theming": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
+    "@dbeaver/js-helpers": "workspace:^",
     "@dbeaver/ui-kit": "workspace:^",
     "go-split": "^3",
     "minisearch": "^7",
@@ -42,6 +43,7 @@
     "react-minisearch": "^7",
     "reakit": "^1",
     "reakit-utils": "^0",
+    "subscript": "^9",
     "tslib": "^2"
   },
   "devDependencies": {
@@ -51,6 +53,7 @@
     "@cloudbeaver/core-utils": "workspace:*",
     "@cloudbeaver/tests-runner": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
+    "@dbeaver/cli": "workspace:*",
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
     "@types/react": "^19",

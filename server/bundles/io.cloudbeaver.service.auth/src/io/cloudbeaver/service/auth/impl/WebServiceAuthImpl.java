@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.SMSignOutLinkProvider;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.app.ServletAppConfiguration;
 import io.cloudbeaver.model.session.WebAuthInfo;
@@ -30,10 +31,7 @@ import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebMetaParametersRegistry;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.service.auth.DBWServiceAuth;
-import io.cloudbeaver.service.auth.WebAuthStatus;
-import io.cloudbeaver.service.auth.WebLogoutInfo;
-import io.cloudbeaver.service.auth.WebUserInfo;
+import io.cloudbeaver.service.auth.*;
 import io.cloudbeaver.service.auth.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.code.NotNull;
@@ -72,6 +70,89 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         boolean linkWithActiveUser,
         boolean forceSessionsLogout
     ) throws DBWebException {
+        try {
+            var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, authParameters, forceSessionsLogout);
+            //TODO deprecated, use asyncAuthLogin for federated auth, exits for backward compatibility
+            linkWithActiveUser = linkWithActiveUser && CBApplication.getInstance().getAppConfiguration()
+                .isLinkExternalCredentialsWithUser();
+            if (smAuthInfo.getAuthStatus() == SMAuthStatus.IN_PROGRESS) {
+                //run async auth process
+                return new WebAuthStatus(smAuthInfo.getAuthAttemptId(), smAuthInfo.getRedirectUrl(), smAuthInfo.getAuthStatus());
+            } else {
+                //run it sync
+                var authProcessor = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser);
+                return new WebAuthStatus(smAuthInfo.getAuthStatus(), authProcessor.authenticateSession());
+            }
+        } catch (SMTooManySessionsException e) {
+            throw new DBWebException("User authentication failed", e.getErrorType(), e);
+        } catch (Exception e) {
+            throw new DBWebException("User authentication failed", e);
+        }
+    }
+
+    @Override
+    public WebAsyncAuthStatus federatedLogin(
+        @NotNull WebSession webSession,
+        @NotNull String providerId,
+        @Nullable String providerConfigurationId,
+        boolean linkWithActiveUser,
+        boolean forceSessionsLogout
+    ) throws DBWebException {
+        WebAuthProviderDescriptor providerDescriptor = WebAuthProviderRegistry.getInstance().getAuthProvider(providerId);
+        if (providerDescriptor == null) {
+            throw new DBWebException("Provider '" + providerId + "' not found");
+        }
+        if (!providerDescriptor.isFederated()) {
+            throw new DBWebException("Provider '" + providerId + "' is not federated");
+        }
+        try {
+            var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, Map.of(), forceSessionsLogout);
+            if (smAuthInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
+                throw new DBWebException("Unexpected auth status: " + smAuthInfo.getAuthStatus());
+            }
+            if (CommonUtils.isEmpty(smAuthInfo.getRedirectUrl())) {
+                throw new DBWebException("Missing redirect URL");
+            }
+            WebAsyncTaskInfo authTask = webSession.createAsyncTask(providerId + " authentication");
+            authTask.setRunning(true);
+            authTask.setJob(
+                new WebAsyncAuthJob(providerId + " authentication job", smAuthInfo.getAuthAttemptId(), linkWithActiveUser)
+            );
+            return new WebAsyncAuthStatus(smAuthInfo.getRedirectUrl(), authTask);
+        } catch (SMTooManySessionsException e) {
+            throw new DBWebException("User authentication failed", e.getErrorType(), e);
+        } catch (Exception e) {
+            throw new DBWebException("User authentication failed", e);
+        }
+    }
+
+    @Override
+    public WebAsyncAuthTaskResult federatedAuthTaskResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException {
+        WebAsyncTaskInfo taskInfo = webSession.asyncTaskStatus(taskId, true);
+        if (taskInfo == null) {
+            throw new DBWebException("Task '" + taskId + "' not found");
+        }
+        if (taskInfo.isRunning()) {
+            throw new DBWebException("Task '" + taskId + "' is running");
+        }
+        if (taskInfo.getJob() == null || !WebAsyncAuthJob.class.isAssignableFrom(taskInfo.getJob().getClass())) {
+            throw new DBWebException("Task '" + taskId + "' is not async auth task");
+        }
+        WebAsyncAuthJob job = (WebAsyncAuthJob) taskInfo.getJob();
+        List<WebAuthInfo> userTokens = job.getAuthResult();
+        if (CommonUtils.isEmpty(userTokens)) {
+            userTokens = List.of();
+        }
+        return new WebAsyncAuthTaskResult(userTokens);
+    }
+
+    private static SMAuthInfo initiateAuthentication(
+        @NotNull WebSession webSession,
+        @NotNull String providerId,
+        @Nullable String providerConfigurationId,
+        @Nullable Map<String, Object> authParameters,
+        boolean forceSessionsLogout
+    ) throws DBException {
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
         }
@@ -87,34 +168,17 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         String currentSmSessionId = (webSession.getUser() == null || CBApplication.getInstance().isConfigurationMode())
             ? null
             : webSession.getUserContext().getSmSessionId();
-
-        try {
-            var smAuthInfo = securityController.authenticate(
-                webSession.getSessionId(),
-                currentSmSessionId,
-                webSession.getSessionParameters(),
-                WebSession.CB_SESSION_TYPE,
-                providerId,
-                providerConfigurationId,
-                authParameters,
-                forceSessionsLogout
-            );
-
-            linkWithActiveUser = linkWithActiveUser && CBApplication.getInstance().getAppConfiguration().isLinkExternalCredentialsWithUser();
-            if (smAuthInfo.getAuthStatus() == SMAuthStatus.IN_PROGRESS) {
-                //run async auth process
-                return new WebAuthStatus(smAuthInfo.getAuthAttemptId(), smAuthInfo.getRedirectUrl(), smAuthInfo.getAuthStatus());
-            } else {
-                //run it sync
-                var authProcessor = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser);
-                return new WebAuthStatus(smAuthInfo.getAuthStatus(), authProcessor.authenticateSession());
-            }
-        } catch (SMTooManySessionsException e) {
-            throw new DBWebException("User authentication failed", e.getErrorType(), e);
-        } catch (Exception e) {
-            throw new DBWebException("User authentication failed", e);
-        }
-
+        var smAuthInfo = securityController.authenticate(
+            webSession.getSessionId(),
+            currentSmSessionId,
+            webSession.getSessionParameters(),
+            WebSession.CB_SESSION_TYPE,
+            providerId,
+            providerConfigurationId,
+            authParameters,
+            forceSessionsLogout
+        );
+        return smAuthInfo;
     }
 
     @Override

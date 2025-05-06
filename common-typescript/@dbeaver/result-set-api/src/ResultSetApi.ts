@@ -1,7 +1,20 @@
 import { DatabaseDataType } from '@dbeaver/database-commons';
+import { isResultSetBinaryValue } from './isResultSetBinaryValue.js';
+import { isResultSetContentValue } from './isResultSetContentValue.js';
+import { isResultSetComplexValue } from './isResultSetComplexValue.js';
+
+const DISPLAY_STRING_LENGTH = 200;
 
 export class ResultSetApi {
-  static getDateValue(value: any): Date | null {
+  static truncateText(text: string, length: number): string {
+    return text
+      .slice(0, length)
+      .split('')
+      .map(v => (v.charCodeAt(0) < 32 ? ' ' : v))
+      .join('');
+  }
+
+  static getDateValue(value: unknown): Date | null {
     if (value === null) {
       return null;
     }
@@ -9,7 +22,7 @@ export class ResultSetApi {
     return new Date(stringValue);
   }
 
-  static getNumberValue(value: any): number | null {
+  static getNumberValue(value: unknown): number | null {
     if (value === null) {
       return null;
     }
@@ -20,7 +33,7 @@ export class ResultSetApi {
     return isNaN(parsedValue) ? 0 : parsedValue;
   }
 
-  static getBooleanValue(value: any): boolean | null {
+  static getBooleanValue(value: unknown): boolean | null {
     if (value === null) {
       return null;
     }
@@ -28,26 +41,40 @@ export class ResultSetApi {
     const stringValue = String(value);
     const stringLower = stringValue.toLowerCase();
 
-    if (stringValue === 'true' || stringLower === '1') {
+    if (stringLower === 'true' || stringLower === '1') {
       return true;
     }
-    if (stringValue === 'false' || stringLower === '0') {
+    if (stringLower === 'false' || stringLower === '0') {
       return false;
     }
     return false;
   }
 
-  static getNullableValue(value: any): any {
-    const stringValue = String(value);
-    const stringLower = stringValue.toLowerCase();
-    if (stringLower === 'null') {
+  static getNullableValue(value: unknown): unknown | null {
+    if (String(value).toLowerCase() === 'null') {
       return null;
     }
 
     return value;
   }
 
-  static getValueDataType(value: any, columnDataType?: DatabaseDataType): DatabaseDataType {
+static getStringFallbackForComplexValue(value: unknown): string  {
+  if (isResultSetContentValue(value) && value.text !== undefined) {
+      return this.truncateText(String(value.text), DISPLAY_STRING_LENGTH);
+  }
+
+  if (isResultSetComplexValue(value) && value.value !== undefined) {
+    if (typeof value.value === 'object' && value.value !== null) {
+      return JSON.stringify(value.value);
+    }
+
+    return String(value.value);
+  }
+  
+  return String(value)
+}
+
+  static getValueDataType(value: unknown, columnDataType?: DatabaseDataType): DatabaseDataType {
     const stringValue = String(value);
     const stringLower = stringValue.toLowerCase();
 
@@ -57,6 +84,14 @@ export class ResultSetApi {
 
     if (typeof value === 'boolean' || stringLower === 'true' || stringLower === 'false') {
       return DatabaseDataType.Boolean;
+    }
+
+    if (typeof value === 'number') {
+      return DatabaseDataType.Number;
+    }
+
+    if (isResultSetBinaryValue(value)) {
+      return DatabaseDataType.Binary;
     }
 
     return columnDataType ?? DatabaseDataType.String;

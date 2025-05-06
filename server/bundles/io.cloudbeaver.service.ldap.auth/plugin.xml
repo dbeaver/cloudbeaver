@@ -7,6 +7,7 @@
                       configurable="true"
                       class="io.cloudbeaver.service.ldap.auth.LdapAuthProvider"
                       icon="platform:/plugin/org.jkiss.dbeaver.model/icons/idp/ldap.png"
+                      caseInsensitive="true"
         >
             <configuration>
                 <propertyGroup label="LDAP" description="LDAP authentication">

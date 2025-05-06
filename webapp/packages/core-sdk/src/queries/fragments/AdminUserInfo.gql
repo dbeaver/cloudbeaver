@@ -8,4 +8,7 @@ fragment AdminUserInfo on AdminUserInfo {
   }
   enabled
   authRole
+  disabledBy
+  disableDate
+  disableReason
 }

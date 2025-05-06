@@ -18,6 +18,9 @@ query getAuthModels {
       length
       features
       order
+      conditions {
+        ...Condition
+      }
     }
   }
 }

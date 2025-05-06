@@ -30,7 +30,8 @@ import {
 } from '@cloudbeaver/core-resource';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import { DetailsError, type NavNodeChildrenQuery as fake, GraphQLService } from '@cloudbeaver/core-sdk';
-import { flat, getPathName, getPathParent, isDefined, isUndefined, MetadataMap } from '@cloudbeaver/core-utils';
+import { flat, getPathName, getPathParent, isUndefined, MetadataMap } from '@cloudbeaver/core-utils';
+import { isDefined } from '@dbeaver/js-helpers';
 
 import { NavTreeSettingsService } from '../NavTreeSettingsService.js';
 import type { NavNode } from './EntityTypes.js';

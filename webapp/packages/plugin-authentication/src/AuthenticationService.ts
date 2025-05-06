@@ -219,7 +219,7 @@ export class AuthenticationService extends Bootstrap {
     const action = contexts.getContext(sessionActionContext);
 
     if (isAutoLoginSessionAction(data)) {
-      const user = await this.userInfoResource.finishFederatedAuthentication(data['auth-id'], false);
+      const user = await this.userInfoResource.autoLogin(data['auth-id'], false);
 
       if (user) {
         //we request this method/request bc login form can be opened automatically.

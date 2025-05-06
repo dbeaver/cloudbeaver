@@ -1,11 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import { isResultSetContentValue, isResultSetComplexValue, type IResultSetComplexValue } from '@dbeaver/result-set-api';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction.js';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource.js';
@@ -13,10 +14,7 @@ import type { IDatabaseResultSet } from '../../IDatabaseResultSet.js';
 import { databaseDataAction } from '../DatabaseDataActionDecorator.js';
 import { DatabaseEditChangeType } from '../IDatabaseDataEditAction.js';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction.js';
-import type { IResultSetComplexValue } from './IResultSetComplexValue.js';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey.js';
-import { isResultSetComplexValue } from './isResultSetComplexValue.js';
-import { isResultSetContentValue } from './isResultSetContentValue.js';
 import { isResultSetFileValue } from './isResultSetFileValue.js';
 import { isResultSetGeometryValue } from './isResultSetGeometryValue.js';
 import { ResultSetEditAction } from './ResultSetEditAction.js';
