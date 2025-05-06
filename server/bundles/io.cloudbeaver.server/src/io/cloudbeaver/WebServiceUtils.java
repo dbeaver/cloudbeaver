@@ -18,8 +18,6 @@ package io.cloudbeaver;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
-import com.google.gson.Strictness;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.WebPropertyInfo;
@@ -175,6 +173,8 @@ public class WebServiceUtils extends WebCommonUtils {
         if (config.isDefaultAutoCommit() != null) {
             dsConfig.getBootstrap().setDefaultAutoCommit(config.isDefaultAutoCommit());
         }
+        dsConfig.getBootstrap().setDefaultCatalogName(config.getDefaultCatalogName());
+        dsConfig.getBootstrap().setDefaultSchemaName(config.getDefaultSchemaName());
         // Save provider props
         if (config.getProviderProperties() != null) {
             dsConfig.setProviderProperties(new LinkedHashMap<>());
