@@ -31,7 +31,7 @@ export class ConnectionsLocaleService extends Bootstrap {
       case 'de':
         return (await import('./locales/de.js')).default;
       case 'vi':
-          return (await import('./locales/vi.js')).default;
+        return (await import('./locales/vi.js')).default;
       default:
         return (await import('./locales/en.js')).default;
     }
