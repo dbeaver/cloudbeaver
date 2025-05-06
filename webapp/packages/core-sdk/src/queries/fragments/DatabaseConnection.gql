@@ -7,7 +7,6 @@ fragment DatabaseConnection on ConnectionInfo {
   keepAliveInterval
   autocommit
 
-  template
   connected
   readOnly
 

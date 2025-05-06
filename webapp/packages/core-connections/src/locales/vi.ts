@@ -4,7 +4,6 @@ export default [
   ['connections_administration_connection_create', 'Thêm Mẫu Cơ sở Dữ liệu'],
   ['connections_administration_search_database_tip', "Nhập danh sách máy chủ tại đây, ví dụ: 'localhost host1.myhost.com 192.168.0.1' và nhấn Enter"],
   ['connections_administration_new_connection', 'Tạo kết nối mới'],
-  ['connections_administration_connection_create_error', 'Lỗi tạo kết nối'],
   ['connections_administration_connection_save_error', 'Lỗi lưu kết nối'],
   ['connections_administration_connection_access_empty', 'Không có người dùng hoặc nhóm nào khả dụng'],
   ['connections_administration_configuration_wizard_step_title', 'Các kết nối cơ sở dữ liệu'],

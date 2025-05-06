@@ -109,13 +109,7 @@ public class WebServiceUtils extends WebCommonUtils {
     @NotNull
     public static DBPDataSourceContainer createConnectionFromConfig(WebConnectionConfig config, DBPDataSourceRegistry registry) throws DBWebException {
         DBPDataSourceContainer newDataSource;
-        if (!CommonUtils.isEmpty(config.getTemplateId())) {
-            DBPDataSourceContainer tpl = registry.getDataSource(config.getTemplateId());
-            if (tpl == null) {
-                throw new DBWebException("Template connection '" + config.getTemplateId() + "' not found");
-            }
-            newDataSource = registry.createDataSource(tpl);
-        } else if (!CommonUtils.isEmpty(config.getDriverId())) {
+        if (!CommonUtils.isEmpty(config.getDriverId())) {
             String driverId = config.getDriverId();
             if (CommonUtils.isEmpty(driverId)) {
                 throw new DBWebException("Driver not specified");
@@ -138,7 +132,6 @@ public class WebServiceUtils extends WebCommonUtils {
         if (config.getFolder() != null) {
             newDataSource.setFolder(registry.getFolder(config.getFolder()));
         }
-        ((DataSourceDescriptor)newDataSource).setTemplate(config.isTemplate());
 
         ServletApplication app = ServletAppUtils.getServletApplication();
         if (app instanceof WebApplication webApplication) {
@@ -296,15 +289,7 @@ public class WebServiceUtils extends WebCommonUtils {
                 configuration.setAuthProperties(currentAuthProps);
             }
             if (!authProperties.isEmpty()) {
-
-                // Make new Gson parser with type adapters to deserialize into existing credentials
-                InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
-                Gson credGson = new GsonBuilder()
-                    .setStrictness(Strictness.LENIENT)
-                    .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
-                    .create();
-
-                credGson.fromJson(credGson.toJsonTree(authProperties), credentials.getClass());
+                WebDataSourceUtils.updateCredentialsFromProperties(credentials, authProperties);
             }
 
             configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);

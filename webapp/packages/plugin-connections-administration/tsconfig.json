@@ -32,12 +32,6 @@
       "path": "../core-di"
     },
     {
-      "path": "../core-dialogs"
-    },
-    {
-      "path": "../core-events"
-    },
-    {
       "path": "../core-executor"
     },
     {

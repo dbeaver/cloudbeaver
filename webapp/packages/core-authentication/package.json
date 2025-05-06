@@ -17,7 +17,7 @@
     "build": "tsc -b",
     "clean": "rimraf --glob lib",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "test": "core-cli-test",
+    "test": "dbeaver-test",
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
@@ -40,6 +40,7 @@
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
+    "@dbeaver/cli": "workspace:*",
     "msw": "^2",
     "typescript": "^5",
     "vitest": "^3"

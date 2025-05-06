@@ -8,15 +8,15 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { getComputed, s, useS } from '@cloudbeaver/core-blocks';
-import { isResultSetContentValue } from '@cloudbeaver/plugin-data-viewer';
+import { getComputed, useS } from '@cloudbeaver/core-blocks';
+import { isResultSetContentValue } from '@dbeaver/result-set-api';
 
 import { CellContext } from '../../CellRenderer/CellContext.js';
 import { DataGridContext } from '../../DataGridContext.js';
 import { TableDataContext } from '../../TableDataContext.js';
 import style from './BlobFormatter.module.css';
 import type { ICellFormatterProps } from '../ICellFormatterProps.js';
-import { NullFormatter as GridNullFormatter } from '@cloudbeaver/plugin-data-grid';
+import { NullFormatter as GridNullFormatter, BlobFormatter as GridBlobFormatter } from '@cloudbeaver/plugin-data-grid';
 
 export const BlobFormatter = observer<ICellFormatterProps>(function BlobFormatter() {
   const context = useContext(DataGridContext);
@@ -31,7 +31,6 @@ export const BlobFormatter = observer<ICellFormatterProps>(function BlobFormatte
 
   const formatter = tableDataContext.format;
   const rawValue = getComputed(() => formatter.get(cell));
-  const displayString = getComputed(() => formatter.getDisplayString(cell));
 
   const nullValue = isResultSetContentValue(rawValue) ? rawValue.text === 'null' : rawValue === null;
 
@@ -39,9 +38,5 @@ export const BlobFormatter = observer<ICellFormatterProps>(function BlobFormatte
     return <GridNullFormatter />;
   }
 
-  return (
-    <span className={s(styles, { blobFormatter: true })} title={displayString}>
-      <div className={s(style, { blobFormatterValue: true })}>{displayString}</div>
-    </span>
-  );
+  return <GridBlobFormatter className={styles['blobFormatter']} />;
 });

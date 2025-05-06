@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,23 @@ public interface DBWServiceAuth extends DBWService {
         @Nullable String providerConfigurationId,
         @Nullable Map<String, Object> credentials,
         boolean linkWithActiveUser,
-        boolean forceSessionsLogout) throws DBWebException;
+        boolean forceSessionsLogout
+    ) throws DBWebException;
 
+    @WebAction(authRequired = false)
+    WebAsyncAuthStatus federatedLogin(
+        @NotNull WebSession webSession,
+        @NotNull String providerId,
+        @Nullable String providerConfigurationId,
+        boolean linkWithActiveUser,
+        boolean forceSessionsLogout
+    ) throws DBWebException;
+
+    @WebAction(authRequired = false)
+    WebAsyncAuthTaskResult federatedAuthTaskResult(
+        @NotNull WebSession webSession,
+        @NotNull String taskId
+    ) throws DBWebException;
 
     @WebAction(authRequired = false)
     WebAuthStatus authUpdateStatus(@NotNull WebSession webSession, @NotNull String authId, boolean linkWithActiveUser) throws DBWebException;

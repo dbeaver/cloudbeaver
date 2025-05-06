@@ -21,31 +21,32 @@ import {
   type DBDriver,
 } from '@cloudbeaver/core-connections';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { LocalizationService } from '@cloudbeaver/core-localization';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { action, computed, makeObservable, observable, reaction, toJS } from 'mobx';
 import { getUniqueName } from '@cloudbeaver/core-utils';
+import { getObjectPropertyDefaults } from '@cloudbeaver/core-blocks';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
+import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
+
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import { getConnectionName } from './getConnectionName.js';
-import type { LocalizationService } from '@cloudbeaver/core-localization';
 import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
-import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
-import type { NotificationService } from '@cloudbeaver/core-events';
-import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
 
 const MAIN_PROPERTY_DATABASE_KEY = 'database';
 const MAIN_PROPERTY_HOST_KEY = 'host';
 const MAIN_PROPERTY_PORT_KEY = 'port';
 const MAIN_PROPERTY_SERVER_KEY = 'server';
 
-const defaultStateGetter = (connectionId?: string) =>
+const defaultStateGetter = (connectionId?: string, credentials?: Record<string, any>) =>
   ({
     connectionId,
     configurationType: DriverConfigurationType.Manual,
     keepAliveInterval: 0,
-    credentials: {},
-    template: false,
+    credentials: credentials ?? {},
     mainPropertyValues: {},
     networkHandlersConfig: [],
     properties: {},
@@ -175,7 +176,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
   protected override async loader(): Promise<void> {
     if (this.formState.mode === 'create') {
-      this.setInitialState(defaultStateGetter(this.initialState.connectionId ?? this.formState.state.connectionId));
+      const credentials = this.state.authModelId
+        ? getObjectPropertyDefaults(await this.getConnectionAuthModelProperties(this.state.authModelId))
+        : undefined;
+
+      this.setInitialState(defaultStateGetter(this.initialState.connectionId ?? this.formState.state.connectionId, credentials));
 
       await this.setDriverId(this.state.driverId);
 
@@ -200,7 +205,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     config.name = customOptionsInfo.name;
     config.description = customOptionsInfo.description;
-    config.template = customOptionsInfo.template;
     config.driverId = customOptionsInfo.driverId;
 
     config.host = customOptionsInfo.host || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_HOST_KEY];
@@ -306,17 +310,18 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     if (driver?.id !== prevDriver?.id) {
       this.state.credentials = {};
       this.state.providerProperties = {};
-      this.setAuthModelId(driver?.defaultAuthModel);
+      await this.setAuthModelId(driver?.defaultAuthModel);
     }
 
     await this.onDriverIdChange.execute(this.state.driverId);
   }
 
-  setAuthModelId(modelId: string | undefined): void {
+  async setAuthModelId(modelId: string | undefined): Promise<void> {
     if (modelId === this.initialState.authModelId) {
       this.state.credentials = { ...this.initialState.credentials };
     } else if (modelId !== this.state.authModelId) {
-      this.state.credentials = {};
+      const properties = modelId ? await this.getConnectionAuthModelProperties(modelId) : [];
+      this.state.credentials = getObjectPropertyDefaults(properties);
     }
 
     this.state.authModelId = modelId;
@@ -339,7 +344,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     this.state.name = this.state.name?.trim();
     this.state.description = this.state.description?.trim();
 
-    if (this.state.template || !this.state.folder) {
+    if (!this.state.folder) {
       delete this.state.folder;
     }
 

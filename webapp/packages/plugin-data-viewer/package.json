@@ -16,7 +16,7 @@
     "build": "tsc -b",
     "clean": "rimraf --glob lib",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "test": "core-cli-test",
+    "test": "dbeaver-test",
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
@@ -42,6 +42,7 @@
     "@cloudbeaver/plugin-navigation-tabs": "workspace:*",
     "@cloudbeaver/plugin-object-viewer": "workspace:*",
     "@dbeaver/js-helpers": "workspace:^",
+    "@dbeaver/result-set-api": "workspace:^",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^19",
@@ -52,6 +53,7 @@
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
+    "@dbeaver/cli": "workspace:*",
     "@types/react": "^19",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5",

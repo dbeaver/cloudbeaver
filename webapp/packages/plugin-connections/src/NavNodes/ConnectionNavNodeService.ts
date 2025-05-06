@@ -142,7 +142,7 @@ export class ConnectionNavNodeService extends Dependency {
 
     connectionInfos = Array.isArray(connectionInfos) ? connectionInfos : [connectionInfos];
     for (const connectionInfo of connectionInfos) {
-      if (!connectionInfo?.nodePath || connectionInfo.template) {
+      if (!connectionInfo?.nodePath) {
         return;
       }
 
@@ -183,7 +183,7 @@ export class ConnectionNavNodeService extends Dependency {
     ResourceKeyUtils.forEach(key, key => {
       const connectionInfo = this.connectionInfoResource.get(key);
 
-      if (!connectionInfo || connectionInfo.template) {
+      if (!connectionInfo) {
         return;
       }
 
@@ -199,7 +199,7 @@ export class ConnectionNavNodeService extends Dependency {
   }
 
   private async connectionCreateHandler(connection: Connection) {
-    if (!connection.nodePath || connection.template) {
+    if (!connection.nodePath) {
       return;
     }
 
