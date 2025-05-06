@@ -23,5 +23,5 @@ export default [
   ['data_grid_table_index_column_tooltip', 'Chọn toàn bộ bảng'],
   ['data_grid_table_readonly_tooltip', 'Chỉ đọc'],
   ['plugin_data_spreadsheet_new_settings_disable', 'Tắt chế độ hiển thị dạng bảng'],
-  ['plugin_data_spreadsheet_new_settings_disable_description', 'Tắt chế độ hiển thị dữ liệu dạng bảng cho tất cả người dùng']
+  ['plugin_data_spreadsheet_new_settings_disable_description', 'Tắt chế độ hiển thị dữ liệu dạng bảng cho tất cả người dùng'],
 ];

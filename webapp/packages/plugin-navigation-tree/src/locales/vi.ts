@@ -37,5 +37,5 @@ export default [
   ['plugin_navigation_tree_settings_projects_description', 'Hiển thị các phần tử theo nhóm dự án'],
   ['plugin_navigation_tree_settings_projects_title', 'Nhóm theo Dự án'],
   ['plugin_navigation_tree_settings_disable', 'Tắt'],
-  ['plugin_navigation_tree_settings_disable_description', 'Tắt cây điều hướng cho tất cả người dùng']
+  ['plugin_navigation_tree_settings_disable_description', 'Tắt cây điều hướng cho tất cả người dùng'],
 ];

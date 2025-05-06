@@ -42,35 +42,38 @@ export default [
   ['authentication_administration_users_disable_user_success', 'Người dùng đã được tắt'],
   [
     'authentication_administration_users_delete_user_confirmation_input_description',
-    'Vui lòng nhập tên người dùng của tài khoản để xác nhận việc xóa.'
+    'Vui lòng nhập tên người dùng của tài khoản để xác nhận việc xóa.',
   ],
   ['authentication_administration_users_delete_user_confirmation_input_placeholder', 'Nhập tên người dùng tại đây...'],
   [
     'authentication_administration_users_delete_user_disable_info',
-    'Bạn có chắc chắn muốn xóa "{arg:username}" không? Nếu bạn chỉ muốn tạm thời ngăn chặn truy cập, bạn có thể chọn tắt tài khoản thay vì xóa.'
+    'Bạn có chắc chắn muốn xóa "{arg:username}" không? Nếu bạn chỉ muốn tạm thời ngăn chặn truy cập, bạn có thể chọn tắt tài khoản thay vì xóa.',
   ],
   [
     'authentication_administration_users_delete_user_info',
-    'Xóa tài khoản này sẽ xóa vĩnh viễn tất cả dữ liệu liên quan đến người dùng khỏi hệ thống. Vui lòng xác nhận bạn muốn tiếp tục xóa người dùng "{arg:username}".'
+    'Xóa tài khoản này sẽ xóa vĩnh viễn tất cả dữ liệu liên quan đến người dùng khỏi hệ thống. Vui lòng xác nhận bạn muốn tiếp tục xóa người dùng "{arg:username}".',
   ],
   ['authentication_administration_user_delete_credentials_error', 'Xóa thông tin xác thực của người dùng thất bại'],
   ['authentication_administration_user_delete_credentials_success', 'Thông tin xác thực của người dùng đã được xóa'],
   [
     'authentication_administration_user_delete_credentials_confirmation_message',
-    'Bạn có chắc chắn muốn xóa phương thức xác thực "{arg:originName}" khỏi "{arg:userId}" không?'
+    'Bạn có chắc chắn muốn xóa phương thức xác thực "{arg:originName}" khỏi "{arg:userId}" không?',
   ],
   ['administration_configuration_wizard_configuration_admin', 'Thông tin xác thực Quản trị viên'],
   ['administration_configuration_wizard_configuration_admin_name', 'Đăng nhập'],
   ['administration_configuration_wizard_configuration_admin_password', 'Mật khẩu'],
   ['administration_configuration_wizard_configuration_anonymous_access', 'Cho phép truy cập ẩn danh'],
-  ['administration_configuration_wizard_configuration_anonymous_access_description', 'Cho phép làm việc với CloudBeaver mà không cần xác thực người dùng'],
+  [
+    'administration_configuration_wizard_configuration_anonymous_access_description',
+    'Cho phép làm việc với CloudBeaver mà không cần xác thực người dùng',
+  ],
   ['administration_configuration_wizard_configuration_authentication_group', 'Cài đặt xác thực'],
   ['administration_configuration_wizard_configuration_services_group', 'Dịch vụ'],
   ['administration_configuration_wizard_configuration_services', 'Dịch vụ'],
   ['administration_configuration_wizard_configuration_authentication', 'Bật xác thực người dùng'],
   [
     'administration_configuration_wizard_configuration_authentication_description',
-    'Cho phép người dùng xác thực. Nếu không, chỉ truy cập ẩn danh được bật'
+    'Cho phép người dùng xác thực. Nếu không, chỉ truy cập ẩn danh được bật',
   ],
   ['administration_identity_providers_tab_title', 'Nhà cung cấp Danh tính'],
   ['administration_identity_providers_provider', 'Nhà cung cấp'],
@@ -127,7 +130,10 @@ export default [
   ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Nhóm mặc định. Không thể thu hồi'],
   ['plugin_authentication_administration_team_default_users_tooltip', 'Nhóm mặc định. Chứa tất cả người dùng'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'Giám sát'],
-  ['plugin_authentication_administration_team_user_team_role_supervisor_description', 'Giám sát viên có thể xem các truy vấn đã thực hiện của nhóm mình'],
+  [
+    'plugin_authentication_administration_team_user_team_role_supervisor_description',
+    'Giám sát viên có thể xem các truy vấn đã thực hiện của nhóm mình',
+  ],
   ['plugin_authentication_administration_team_form_edit_label', 'Biểu mẫu chỉnh sửa nhóm'],
-  ['plugin_authentication_administration_user_form_edit_label', 'Biểu mẫu chỉnh sửa người dùng']
+  ['plugin_authentication_administration_user_form_edit_label', 'Biểu mẫu chỉnh sửa người dùng'],
 ];

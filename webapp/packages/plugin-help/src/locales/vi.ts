@@ -29,5 +29,5 @@ export default [
   Cài đặt ứng dụng cục bộ của bạn sẽ bị mất sau khi đóng tab.
   Bạn có thể tải các tab và cài đặt cho tab này`,
   ],
-  ['plugin_help_multi_tab_support_load_settings', 'Tải tab và cài đặt']
+  ['plugin_help_multi_tab_support_load_settings', 'Tải tab và cài đặt'],
 ];

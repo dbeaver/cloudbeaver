@@ -11,7 +11,7 @@ export default [
   ['connections_administration_configuration_wizard_title', 'Thêm kết nối cơ sở dữ liệu'],
   [
     'connections_administration_configuration_wizard_message',
-    'Tại đây, bạn có thể tạo kết nối cơ sở dữ liệu theo cách thủ công hoặc sử dụng tính năng tìm kiếm máy chủ cơ sở dữ liệu.\nBạn có thể bỏ qua bước này và cấu hình kết nối sau.'
+    'Tại đây, bạn có thể tạo kết nối cơ sở dữ liệu theo cách thủ công hoặc sử dụng tính năng tìm kiếm máy chủ cơ sở dữ liệu.\nBạn có thể bỏ qua bước này và cấu hình kết nối sau.',
   ],
   ['connections_administration_connection_no_information', 'Không có thông tin'],
   ['connections_administration_delete_confirmation', 'Bạn sẽ xóa các kết nối sau: '],
@@ -32,7 +32,7 @@ export default [
   ['connections_connection_edit_save_credentials_shared', 'Lưu thông tin xác thực cho tất cả người dùng có quyền truy cập'],
   [
     'connections_connection_edit_save_credentials_shared_tooltip',
-    'Thông tin xác thực này sẽ được sử dụng để kết nối tự động cho tất cả người dùng có quyền truy cập'
+    'Thông tin xác thực này sẽ được sử dụng để kết nối tự động cho tất cả người dùng có quyền truy cập',
   ],
   ['connections_connection_share_credentials', 'Chia sẻ thông tin xác thực với nhóm'],
   ['connections_connection_share_credentials_tooltip', 'Thông tin xác thực này sẽ được sử dụng để kết nối tự động cho tất cả người dùng trong nhóm'],
@@ -91,11 +91,11 @@ export default [
   ['connections_not_found', 'Không tìm thấy kết nối cơ sở dữ liệu'],
   [
     'cloud_connections_access_placeholder',
-    'Kết nối Cloud sẽ hiển thị cho tất cả người dùng. Quản lý quyền truy cập có thể được cấu hình trong "AWS Management Console".'
+    'Kết nối Cloud sẽ hiển thị cho tất cả người dùng. Quản lý quyền truy cập có thể được cấu hình trong "AWS Management Console".',
   ],
   ['core_connections_settings_disable', 'Tắt'],
   ['core_connections_settings_disable_description', 'Tắt khả năng tạo kết nối mới'],
   ['connections_templates_deprecated_message', 'Kết nối mẫu đã bị ngừng hỗ trợ và sẽ bị xóa trong các phiên bản tương lai'],
   ['core_connections_connection_driver_not_installed', 'Trình điều khiển (driver) chưa được cài đặt'],
-  ['core_connections_connection_temporary', 'Kết nối tạm thời']
+  ['core_connections_connection_temporary', 'Kết nối tạm thời'],
 ];

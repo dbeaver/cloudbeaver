@@ -4,10 +4,7 @@ export default [
   ['plugin_sql_editor_navigation_tab_script_state_reading', 'Đang đọc script...'],
   ['plugin_sql_editor_navigation_tab_script_state_saving', 'Đang lưu script...'],
   ['plugin_sql_editor_navigation_tab_script_state_updating', 'Đang cập nhật thông tin script...'],
-  [
-    'plugin_sql_editor_navigation_tab_script_state_different_project',
-    'Dự án kết nối khác với dự án script—thay đổi kết nối không được lưu.',
-  ],
+  ['plugin_sql_editor_navigation_tab_script_state_different_project', 'Dự án kết nối khác với dự án script—thay đổi kết nối không được lưu.'],
   ['plugin_sql_editor_navigation_tab_script_state_readonly', 'Đây là script chỉ đọc. Mọi thay đổi sẽ không được lưu.'],
   ['plugin_sql_editor_navigation_tab_resource_save_script_success', 'Script đã được lưu thành công'],
   ['plugin_sql_editor_navigation_tab_resource_open_script_error', 'Không thể mở script'],
@@ -15,8 +12,5 @@ export default [
   ['plugin_sql_editor_navigation_tab_resource_update_script_error', 'Không thể cập nhật script'],
   ['plugin_sql_editor_navigation_tab_resource_sync_script_error', 'Không thể đồng bộ truy vấn của trình soạn thảo'],
   ['plugin_sql_editor_navigation_tab_resource_save_script_error_confirmation_title', 'Không thể lưu script'],
-  [
-    'plugin_sql_editor_navigation_tab_resource_save_script_error_confirmation_message',
-    'Đã xảy ra lỗi khi cố gắng lưu script. Đóng tab?',
-  ],
+  ['plugin_sql_editor_navigation_tab_resource_save_script_error_confirmation_message', 'Đã xảy ra lỗi khi cố gắng lưu script. Đóng tab?'],
 ];

@@ -6,19 +6,16 @@ export default [
   ['administration_configuration_wizard_welcome_title', 'Chào mừng đến với {alias:product_full_name}, hệ thống quản lý cơ sở dữ liệu đám mây!'],
   [
     'administration_configuration_wizard_welcome_message',
-    'Trình hướng dẫn cấu hình dễ dàng sẽ dẫn bạn qua một số bước đơn giản để thiết lập server. Bạn cần thiết lập thông tin server và thông tin xác thực quản trị viên. Bạn có thể thiết lập thêm các tham số server sau khi hoàn tất cấu hình dễ dàng.'
+    'Trình hướng dẫn cấu hình dễ dàng sẽ dẫn bạn qua một số bước đơn giản để thiết lập server. Bạn cần thiết lập thông tin server và thông tin xác thực quản trị viên. Bạn có thể thiết lập thêm các tham số server sau khi hoàn tất cấu hình dễ dàng.',
   ],
-  [
-    'administration_configuration_wizard_welcome_note',
-    'Lưu ý: bạn sẽ có thể thay đổi các tham số cấu hình này sau trong bảng quản trị.'
-  ],
+  ['administration_configuration_wizard_welcome_note', 'Lưu ý: bạn sẽ có thể thay đổi các tham số cấu hình này sau trong bảng quản trị.'],
   ['administration_configuration_wizard_configuration', 'Cấu hình Server'],
   ['administration_configuration_wizard_configuration_step_description', 'Cấu hình server chính'],
   ['administration_configuration_wizard_configuration_title', 'Bạn có thể cấu hình các tham số server chính tại đây.'],
   ['administration_configuration_wizard_configuration_save_error', 'Không thể lưu cấu hình server'],
   [
     'administration_configuration_wizard_configuration_message',
-    'Bạn sẽ có thể thêm các dịch vụ bổ sung sau khi cấu hình server.\n\rQuản trị viên là siêu người dùng có thể cấu hình server, thiết lập kết nối cơ sở dữ liệu, quản lý người dùng khác và nhiều hơn nữa. Vui lòng ghi nhớ mật khẩu đã nhập. Không thể khôi phục mật khẩu quản trị viên tự động.'
+    'Bạn sẽ có thể thêm các dịch vụ bổ sung sau khi cấu hình server.\n\rQuản trị viên là siêu người dùng có thể cấu hình server, thiết lập kết nối cơ sở dữ liệu, quản lý người dùng khác và nhiều hơn nữa. Vui lòng ghi nhớ mật khẩu đã nhập. Không thể khôi phục mật khẩu quản trị viên tự động.',
   ],
   ['administration_configuration_tools_save_tooltip', 'Lưu cấu hình'],
   ['administration_configuration_tools_cancel_tooltip', 'Đặt lại thay đổi'],
@@ -32,7 +29,7 @@ export default [
   ['administration_configuration_wizard_configuration_server_session_lifetime', 'Thời gian phiên, phút'],
   [
     'administration_configuration_wizard_configuration_server_session_lifetime_description',
-    'Tại đây, bạn có thể chỉ định số phút mà phiên được phép ở trạng thái không hoạt động trước khi hết hạn'
+    'Tại đây, bạn có thể chỉ định số phút mà phiên được phép ở trạng thái không hoạt động trước khi hết hạn',
   ],
   ['administration_configuration_wizard_configuration_plugins', 'Cấu hình'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Bật kết nối riêng tư'],
@@ -40,16 +37,19 @@ export default [
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Chế độ xem đơn giản của Navigator'],
   [
     'administration_configuration_wizard_configuration_navigation_tree_view_description',
-    'Theo mặc định, tất cả kết nối mới của người dùng sẽ chỉ chứa thông tin cơ bản trong cây điều hướng'
+    'Theo mặc định, tất cả kết nối mới của người dùng sẽ chỉ chứa thông tin cơ bản trong cây điều hướng',
   ],
   ['administration_configuration_wizard_configuration_security', 'Bảo mật'],
   ['administration_configuration_wizard_configuration_security_admin_credentials', 'Lưu thông tin xác thực'],
   [
     'administration_configuration_wizard_configuration_security_admin_credentials_description',
-    'Cho phép lưu thông tin xác thực cho các cơ sở dữ liệu được cấu hình sẵn'
+    'Cho phép lưu thông tin xác thực cho các cơ sở dữ liệu được cấu hình sẵn',
   ],
   ['administration_configuration_wizard_configuration_security_public_credentials', 'Lưu thông tin xác thực của người dùng'],
-  ['administration_configuration_wizard_configuration_security_public_credentials_description', 'Cho phép lưu thông tin xác thực cho người dùng không phải quản trị viên'],
+  [
+    'administration_configuration_wizard_configuration_security_public_credentials_description',
+    'Cho phép lưu thông tin xác thực cho người dùng không phải quản trị viên',
+  ],
   ['administration_configuration_wizard_configuration_navigator', 'Navigator'],
   ['administration_configuration_wizard_configuration_navigator_hide_folders', 'Ẩn Thư mục'],
   ['administration_configuration_wizard_configuration_navigator_hide_schemas', 'Ẩn Lược đồ'],
@@ -64,12 +64,12 @@ export default [
   ['administration_configuration_wizard_finish_title', 'Gần hoàn tất.'],
   [
     'administration_configuration_wizard_finish_message',
-    'Nhấn nút Hoàn tất để hoàn tất cấu hình server. Bạn có thể quay lại các trang trước nếu muốn thay đổi hoặc thêm gì đó.\nKhi cấu hình hoàn tất, tất cả cài đặt đã nhập sẽ được áp dụng cho server của bạn. Bạn sẽ được chuyển hướng đến trang chính để bắt đầu làm việc.\nBạn luôn có thể đăng nhập vào hệ thống với tư cách quản trị viên để thay đổi cài đặt server.'
+    'Nhấn nút Hoàn tất để hoàn tất cấu hình server. Bạn có thể quay lại các trang trước nếu muốn thay đổi hoặc thêm gì đó.\nKhi cấu hình hoàn tất, tất cả cài đặt đã nhập sẽ được áp dụng cho server của bạn. Bạn sẽ được chuyển hướng đến trang chính để bắt đầu làm việc.\nBạn luôn có thể đăng nhập vào hệ thống với tư cách quản trị viên để thay đổi cài đặt server.',
   ],
   ['administration_disabled_drivers_title', 'Trình điều khiển (driver) bị tắt'],
   ['administration_disabled_drivers_search_placeholder', 'Tìm kiếm trình điều khiển (driver)...'],
   [
     'administration_disabled_drivers_enable_unsafe_driver_message',
-    'Việc bật trình điều khiển (driver) cơ sở dữ liệu này có thể cho phép truy cập vào các tệp trên server nơi ứng dụng này đang chạy. Điều này có thể làm lộ các tệp hệ thống nhạy cảm hoặc dữ liệu được bảo vệ khác.\n\nChỉ tiếp tục nếu bạn hiểu đầy đủ các rủi ro và tin tưởng vào cấu hình cơ sở dữ liệu. Việc sử dụng trình điều khiển này không được phép hoặc không đúng cách có thể dẫn đến rủi ro bảo mật.\n\nBạn có muốn bật trình điều khiển "{arg:driverName}" không?'
-  ]
-]
+    'Việc bật trình điều khiển (driver) cơ sở dữ liệu này có thể cho phép truy cập vào các tệp trên server nơi ứng dụng này đang chạy. Điều này có thể làm lộ các tệp hệ thống nhạy cảm hoặc dữ liệu được bảo vệ khác.\n\nChỉ tiếp tục nếu bạn hiểu đầy đủ các rủi ro và tin tưởng vào cấu hình cơ sở dữ liệu. Việc sử dụng trình điều khiển này không được phép hoặc không đúng cách có thể dẫn đến rủi ro bảo mật.\n\nBạn có muốn bật trình điều khiển "{arg:driverName}" không?',
+  ],
+];

@@ -18,5 +18,5 @@ export default [
 
   ['data_transfer_output_settings', 'Đầu ra'],
   ['data_transfer_output_settings_compress', 'Nén'],
-  ['plugin_data_export_download_process_info', 'Quá trình tải xuống có thể mất một chút thời gian để bắt đầu']
-]
+  ['plugin_data_export_download_process_info', 'Quá trình tải xuống có thể mất một chút thời gian để bắt đầu'],
+];

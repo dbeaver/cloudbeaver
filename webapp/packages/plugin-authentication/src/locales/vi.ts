@@ -40,5 +40,8 @@ export default [
   ['plugin_authentication_user_loading_error', 'Không thể tải dữ liệu người dùng'],
   ['plugin_authentication_loading_error_dialog_title', 'Lỗi xác thực'],
   ['plugin_authentication_loading_error_dialog_message', 'Đã xảy ra lỗi khi tải dữ liệu người dùng. Bạn có muốn đăng xuất không?'],
-  ['plugin_authentication_authentication_method_disabled', 'Phương thức xác thực đã bị tắt, vui lòng cấu hình các phương thức xác thực trong cài đặt']
+  [
+    'plugin_authentication_authentication_method_disabled',
+    'Phương thức xác thực đã bị tắt, vui lòng cấu hình các phương thức xác thực trong cài đặt',
+  ],
 ];

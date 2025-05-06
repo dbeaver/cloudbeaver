@@ -9,5 +9,5 @@ export default [
   ['version_update_info', 'Thông tin'],
   ['version_update_instruction', 'Để cập nhật phiên bản, vui lòng làm theo'],
   ['version_update_instruction_link', 'hướng dẫn'],
-  ['version_update_instruction_link_not_provided', 'Liên kết hướng dẫn không được cung cấp. Vui lòng liên hệ hỗ trợ.']
+  ['version_update_instruction_link_not_provided', 'Liên kết hướng dẫn không được cung cấp. Vui lòng liên hệ hỗ trợ.'],
 ];

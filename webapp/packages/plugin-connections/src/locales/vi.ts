@@ -35,12 +35,15 @@ export default [
   ['plugin_connections_connection_form_shared_credentials_manage_info_tab_link', 'Tab Thông tin xác thực'],
   [
     'plugin_connections_connection_auth_secret_description',
-    'Có nhiều thông tin xác thực có sẵn để xác thực.\nVui lòng chọn thông tin xác thực bạn muốn sử dụng.'
+    'Có nhiều thông tin xác thực có sẵn để xác thực.\nVui lòng chọn thông tin xác thực bạn muốn sử dụng.',
   ],
   ['plugin_connections_connection_create_menu_title', 'Kết nối mới'],
-  ['plugin_connections_connection_driver_not_installed_message', 'Trình điều khiển (driver) chưa được cài đặt. Bạn có thể cài đặt nó trong phần "Quản trị".'],
+  [
+    'plugin_connections_connection_driver_not_installed_message',
+    'Trình điều khiển (driver) chưa được cài đặt. Bạn có thể cài đặt nó trong phần "Quản trị".',
+  ],
   ['plugin_connections_connection_established', 'Kết nối đã được thiết lập'],
   ['plugin_connections_connection_client_version', 'Phiên bản máy khách: {arg:version} \n'],
   ['plugin_connections_connection_server_version', 'Phiên bản máy chủ: {arg:version} \n'],
-  ['plugin_connections_connection_connection_time', 'Thời gian kết nối: {arg:time} \n']
-]
+  ['plugin_connections_connection_connection_time', 'Thời gian kết nối: {arg:time} \n'],
+];
