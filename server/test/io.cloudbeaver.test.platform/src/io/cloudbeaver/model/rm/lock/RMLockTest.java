@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.rm.lock;
 
+import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.app.CEAppStarter;
 import org.jkiss.dbeaver.Log;
 import org.junit.AfterClass;
@@ -32,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class RMLockTest {
+public class RMLockTest extends CloudbeaverMockTest {
     private static final Log log = Log.getLog(RMLockTest.class);
     private final String project1 = "s_fakeProject1";
     private final String project2 = "s_fakeProject2";
