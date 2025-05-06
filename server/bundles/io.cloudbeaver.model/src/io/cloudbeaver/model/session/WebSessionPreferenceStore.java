@@ -37,7 +37,13 @@ public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
 
     // to avoid redundant sm api call
     public void updatePreferenceValues(@NotNull Map<String, Object> newValues) {
-        userPreferences.putAll(newValues);
+        for (Map.Entry<String, Object> entry : newValues.entrySet()) {
+            if (entry.getValue() == null) {
+                userPreferences.remove(entry.getKey());
+            } else {
+                userPreferences.put(entry.getKey(), entry.getValue());
+            }
+        }
     }
 
     @Override
