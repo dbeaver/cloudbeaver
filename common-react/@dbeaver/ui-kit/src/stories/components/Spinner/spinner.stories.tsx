@@ -1,5 +1,5 @@
-import { Spin } from '../../../index.js';
-import './spin.stories.css';
+import { Spinner } from '../../../index.js';
+import './spinner.stories.css';
 
 export function Documentation() {
   return (
@@ -15,9 +15,9 @@ export function Documentation() {
       </p>
       <pre className="codeblock">
         {`
-        <span class="dbv-kit-spin">
-          <svg class="dbv-kit-spin__svg">
-            <circle class="dbv-kit-spin__circle" />
+        <span class="dbv-kit-spinner">
+          <svg class="dbv-kit-spinner__svg">
+            <circle class="dbv-kit-spinner__circle" />
           </svg>
         </span>
         `}
@@ -27,25 +27,25 @@ export function Documentation() {
         The Spin component uses the following class names:
         <ul>
           <li>
-            <code>dbv-kit-spin</code>: Base class for the spinner.
+            <code>dbv-kit-spinner</code>: Base class for the spinner.
           </li>
           <li>
-            <code>dbv-kit-spin--small</code>: Small size variant.
+            <code>dbv-kit-spinner--small</code>: Small size variant.
           </li>
           <li>
-            <code>dbv-kit-spin--medium</code>: Medium size variant.
+            <code>dbv-kit-spinner--medium</code>: Medium size variant.
           </li>
           <li>
-            <code>dbv-kit-spin--large</code>: Large size variant.
+            <code>dbv-kit-spinner--large</code>: Large size variant.
           </li>
           <li>
-            <code>dbv-kit-spin--xlarge</code>: Extra large size variant.
+            <code>dbv-kit-spinner--xlarge</code>: Extra large size variant.
           </li>
           <li>
-            <code>dbv-kit-spin__svg</code>: SVG element for the spinner.
+            <code>dbv-kit-spinner__svg</code>: SVG element for the spinner.
           </li>
           <li>
-            <code>dbv-kit-spin__circle</code>: Circle element for the spinner.
+            <code>dbv-kit-spinner__circle</code>: Circle element for the spinner.
           </li>
         </ul>
       </p>
@@ -93,16 +93,16 @@ export function Sizes() {
       <h1>Spin Sizes</h1>
       <div className="tw:flex tw:flex-col tw:gap-4">
         <div>
-          <p>small</p> <Spin size="small" />
+          <p>small</p> <Spinner size="small" />
         </div>
         <div>
-          <p>medium</p> <Spin size="medium" />
+          <p>medium</p> <Spinner size="medium" />
         </div>
         <div>
-          <p>large</p> <Spin size="large" />
+          <p>large</p> <Spinner size="large" />
         </div>
         <div>
-          <p>xlarge</p> <Spin size="xlarge" />
+          <p>xlarge</p> <Spinner size="xlarge" />
         </div>
       </div>
     </div>
@@ -116,21 +116,21 @@ export function Tokens() {
       <p>Spin component uses the following CSS custom properties:</p>
       <ul>
         <li>
-          <code>--dbv-kit-spin-height</code>: Controls the height of the spinner (default: var(--dbv-kit-control-height-medium))
+          <code>--dbv-kit-spinner-height</code>: Controls the height of the spinner (default: var(--dbv-kit-control-height-medium))
         </li>
         <li>
-          <code>--dbv-kit-spin-stroke-width</code>: Specifies the width of the spinner's stroke (default: 2.5px)
+          <code>--dbv-kit-spinner-stroke-width</code>: Specifies the width of the spinner's stroke (default: 2.5px)
         </li>
         <li>
-          <code>--dbv-kit-spin-stroke-color</code>: Sets the color of the spinner's stroke (default: var(--dbv-kit-color-primary-600))
+          <code>--dbv-kit-spinner-stroke-color</code>: Sets the color of the spinner's stroke (default: var(--dbv-kit-color-primary-600))
         </li>
         <li>
-          <code>--dbv-kit-spin-stroke-linecap</code>: Defines the stroke-linecap of the spinner's stroke (default: butt)
+          <code>--dbv-kit-spinner-stroke-linecap</code>: Defines the stroke-linecap of the spinner's stroke (default: butt)
         </li>
-        <code>--dbv-kit-spin-stroke-color-secondary</code>: Sets the color of the spinner's secondary stroke (default:
+        <code>--dbv-kit-spinner-stroke-color-secondary</code>: Sets the color of the spinner's secondary stroke (default:
         var(--dbv-kit-color-primary-200))
         <li>
-          <code>--dbv-kit-spin-animation-duration</code>: Controls the duration of the spinner's animation (default: 1.8s)
+          <code>--dbv-kit-spinner-animation-duration</code>: Controls the duration of the spinner's animation (default: 1.8s)
         </li>
         <li>
           <code>--dbv-kit-animate-stroke</code>: Defines the animation for the spinner's stroke
@@ -149,7 +149,7 @@ export function SpecialLoader() {
       <div className="tw:flex tw:flex-col tw:gap-1 tw:w-32">
         <div className="tw:relative tw:flex tw:items-center tw:justify-center tw:w-32 tw:h-32 ">
           <span className="tw:text-6xl">😜</span>
-          <Spin className="tw:absolute tw:w-full tw:h-full customLoader" />
+          <Spinner className="tw:absolute tw:w-full tw:h-full customLoader" />
         </div>
         <p className="tw:text-center">Loading...</p>
       </div>

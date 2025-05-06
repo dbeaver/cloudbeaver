@@ -1,7 +1,0 @@
-.customLoader {
-  --dbv-kit-spin-stroke-color: orange;
-  --dbv-kit-spin-animation-duration: 5s;
-  --dbv-kit-animate-stroke: stroke var(--dbv-kit-spin-animation-duration) linear infinite;
-  --dbv-kit-animate-spin: spinning calc(var(--dbv-kit-spin-animation-duration) * 0.5) cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
-  --dbv-kit-spin-stroke-linecap: round;
-}

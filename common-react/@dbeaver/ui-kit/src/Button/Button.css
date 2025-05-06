@@ -138,9 +138,9 @@
   }
 
   .dbv-kit-button__loader {
-    --dbv-kit-spin-stroke-color: var(--dbv-kit-btn-loader-color);
-    --dbv-kit-spin-height: calc(var(--dbv-kit-btn-height) * 0.6);
-    --dbv-kit-spin-stroke-width: 3px;
+    --dbv-kit-spinner-stroke-color: var(--dbv-kit-btn-loader-color);
+    --dbv-kit-spinner-height: calc(var(--dbv-kit-btn-height) * 0.6);
+    --dbv-kit-spinner-stroke-width: 3px;
 
     position: absolute;
   }
