@@ -19,9 +19,7 @@ package io.cloudbeaver.model.rm.lock;
 import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.app.CEAppStarter;
 import org.jkiss.dbeaver.Log;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -42,6 +40,11 @@ public class RMLockTest extends CloudbeaverMockTest {
     @AfterClass
     public static void shutdown() {
         executor.shutdown();
+    }
+
+    @BeforeClass
+    public static void startServer() throws Exception {
+        CEAppStarter.startServerIfNotStarted();
     }
 
     @Test
