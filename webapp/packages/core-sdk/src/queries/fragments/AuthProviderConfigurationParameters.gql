@@ -11,4 +11,7 @@ fragment AuthProviderConfigurationParameters on ObjectPropertyInfo {
   features
   order
   required
+  conditions {
+    ...Condition
+  }
 }

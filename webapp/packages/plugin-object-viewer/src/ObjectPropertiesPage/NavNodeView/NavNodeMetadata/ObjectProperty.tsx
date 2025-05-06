@@ -8,9 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { FieldCheckbox, type ILayoutSizeProps, InputField } from '@cloudbeaver/core-blocks';
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-
-import { additionalProps, filterProperty, getValue, matchType } from '../../helpers.js';
+import { getObjectPropertyType, getObjectPropertyValue, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 interface Props extends ILayoutSizeProps {
   objectProperty?: ObjectPropertyInfo;
@@ -18,35 +16,24 @@ interface Props extends ILayoutSizeProps {
 }
 
 export const ObjectProperty = observer<Props>(function ObjectProperty({ objectProperty, className }) {
-  if (!objectProperty || !filterProperty(objectProperty)) {
+  if (!objectProperty) {
     return null;
   }
 
+  const type = getObjectPropertyType(objectProperty);
+  const value = getObjectPropertyValue(objectProperty);
+
+  if (type === 'checkbox') {
+    return (
+      <FieldCheckbox className={className} title={objectProperty.description} name={objectProperty.id} checked={value} disabled>
+        {objectProperty.displayName}
+      </FieldCheckbox>
+    );
+  }
+
   return (
-    <>
-      {matchType(objectProperty.dataType) === 'checkbox' ? (
-        <FieldCheckbox
-          className={className}
-          title={objectProperty.description}
-          name={objectProperty.id}
-          value={getValue(objectProperty.value)}
-          disabled
-          {...additionalProps(objectProperty)}
-        >
-          {objectProperty.displayName}
-        </FieldCheckbox>
-      ) : (
-        <InputField
-          className={className}
-          title={objectProperty.description}
-          name={objectProperty.id}
-          value={getValue(objectProperty.value)}
-          readOnly
-          {...additionalProps(objectProperty)}
-        >
-          {objectProperty.displayName}
-        </InputField>
-      )}
-    </>
+    <InputField className={className} title={objectProperty.description} name={objectProperty.id} value={value} readOnly>
+      {objectProperty.displayName}
+    </InputField>
   );
 });

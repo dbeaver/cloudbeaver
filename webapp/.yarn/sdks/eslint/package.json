@@ -1,6 +1,6 @@
 {
   "name": "eslint",
-  "version": "9.20.1-sdk",
+  "version": "9.25.1-sdk",
   "main": "./lib/api.js",
   "type": "commonjs",
   "bin": {
@@ -11,13 +11,17 @@
       "types": "./lib/types/index.d.ts",
       "default": "./lib/api.js"
     },
+    "./config": {
+      "types": "./lib/types/config-api.d.ts",
+      "default": "./lib/config-api.js"
+    },
     "./package.json": "./package.json",
     "./use-at-your-own-risk": {
       "types": "./lib/types/use-at-your-own-risk.d.ts",
       "default": "./lib/unsupported-api.js"
     },
     "./rules": {
-      "types": "./lib/types/rules/index.d.ts"
+      "types": "./lib/types/rules.d.ts"
     },
     "./universal": {
       "types": "./lib/types/universal.d.ts",

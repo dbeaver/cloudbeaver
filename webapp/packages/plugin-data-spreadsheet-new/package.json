@@ -36,6 +36,7 @@
     "@cloudbeaver/plugin-data-grid": "workspace:*",
     "@cloudbeaver/plugin-data-viewer": "workspace:*",
     "@dbeaver/js-helpers": "workspace:^",
+    "@dbeaver/result-set-api": "workspace:^",
     "@dbeaver/ui-kit": "workspace:^",
     "@popperjs/core": "^2",
     "mobx": "^6",

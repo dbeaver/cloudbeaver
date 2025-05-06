@@ -81,17 +81,25 @@ type AuthProviderInfo {
     required: Boolean!
 }
 
-type AuthInfo {
-    redirectLink: String
 
+type AuthInfo {
+    redirectLink: String @deprecated
 
     authId: String @deprecated
 
-    authStatus: AuthStatus!
+    authStatus: AuthStatus! @deprecated
 
     userTokens: [UserAuthToken!]
 }
 
+type FederatedAuthInfo @since(version: "25.0.3") {
+    redirectLink: String!
+    taskInfo: AsyncTaskInfo!
+}
+
+type FederatedAuthResult @since(version: "25.0.3") {
+    userTokens: [UserAuthToken!]! @since(version: "25.0.3")
+}
 
 type LogoutInfo @since(version: "23.3.3") {
     redirectLinks: [String!]!
@@ -158,6 +166,10 @@ extend type Query {
     # If forceSessionsLogout=true then kill another sessions
     authLogin(provider: ID!, configuration: ID, credentials: Object, linkUser: Boolean, forceSessionsLogout: Boolean): AuthInfo!
 
+    @since(version: "25.0.3")
+    federatedAuthTaskResult(taskId: String!): FederatedAuthResult!
+
+    @deprecated
     authUpdateStatus(authId: ID!, linkUser: Boolean): AuthInfo!
 
     # Logouts user. If provider not specified then all authorizations are revoked from session.
@@ -187,4 +199,6 @@ extend type Mutation {
     # Updates user preferences
     setUserPreferences(preferences: Object!): UserInfo! @since(version: "24.0.1")
 
+    @since(version: "25.0.3")
+    federatedLogin(provider: ID!, configuration: ID, linkUser: Boolean, forceSessionsLogout: Boolean): FederatedAuthInfo!
 }
