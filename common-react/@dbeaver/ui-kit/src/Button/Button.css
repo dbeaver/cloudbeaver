@@ -133,7 +133,7 @@
     &:hover,
     &:active,
     &[data-active] {
-      background-color: color-mix(in oklch, var(-dbv-kit-btn-loader-base-color) 85%, var(--dbv-kit-btn-background));
+      background-color: color-mix(in oklch, var(--dbv-kit-btn-loader-base-color) 85%, var(--dbv-kit-btn-background));
     }
   }
 
