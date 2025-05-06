@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import type { AdministrationItemContentProps } from '@cloudbeaver/core-administration';
-import { ColoredContainer, Form, Group, ToolsAction, ToolsPanel, useForm, useTranslate, getComputed } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Form, Group, ToolsAction, ToolsPanel, useForm, useTranslate, getComputed, TextPlaceholder } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Settings } from '@cloudbeaver/plugin-settings-panel';
@@ -86,7 +86,7 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
           <Group hidden={hideSingleTab} box keepSize hideOverflow>
             <TabList underline />
           </Group>
-          {settingsSource ? <Settings source={settingsSource} accessor={accessor} /> : <div>{translate('ui_no_settings')}</div>}
+          {settingsSource ? <Settings source={settingsSource} accessor={accessor} /> : <TextPlaceholder>{translate('plugin_settings_administration_no_settings')}</TextPlaceholder>}
         </ColoredContainer>
       </Form>
     </TabsState>

@@ -26,7 +26,7 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
   }
 
   return (
-    <div className={clsx('tw:flex tw:relative tw:gap-2')}>
+    <div className='tw:flex tw:relative tw:gap-2'>
       <div className="tw:w-1 tw:h-full">
         {isOverride && (
           <div className={clsx('tw:h-full tw:w-full tw:bg-[var(--theme-primary)]')} title={translate('plugin_settings_panel_setting_set_in_scope')} />

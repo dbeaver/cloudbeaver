@@ -11,14 +11,14 @@ import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-
 import { GraphQLService, type GetAuthRolesQuery } from '@cloudbeaver/core-sdk';
 import { ELMRole } from './ELMRole.js';
 
-export type AuthRoleInfo = GetAuthRolesQuery['roles'][number];
+export type IAuthRoleInfo = GetAuthRolesQuery['roles'][number];
 
-interface AuthRoleUpdateOptions {
+interface IAuthRoleUpdateOptions {
   settings: Record<string, string | number | null>;
 }
 
 @injectable()
-export class AuthRolesResource extends CachedMapResource<ELMRole, AuthRoleInfo> {
+export class AuthRolesResource extends CachedMapResource<ELMRole, IAuthRoleInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,
     sessionPermissionsResource: SessionPermissionsResource,
@@ -28,7 +28,7 @@ export class AuthRolesResource extends CachedMapResource<ELMRole, AuthRoleInfo> 
     sessionPermissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
   }
 
-  async update(id: ELMRole, options: AuthRoleUpdateOptions): Promise<void> {
+  async update(id: ELMRole, options: IAuthRoleUpdateOptions): Promise<void> {
     await this.performUpdate(id, undefined, async () => {
       const { role } = await this.graphQLService.sdk.updateAuthRole({
         authRoleId: id,
@@ -38,7 +38,7 @@ export class AuthRolesResource extends CachedMapResource<ELMRole, AuthRoleInfo> 
     });
   }
 
-  protected async loader(): Promise<Map<ELMRole, AuthRoleInfo>> {
+  protected async loader(): Promise<Map<ELMRole, IAuthRoleInfo>> {
     const { roles } = await this.graphQLService.sdk.getAuthRoles();
 
     this.replace(resourceKeyList(roles.map(role => role.id as ELMRole)), roles);
