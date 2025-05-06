@@ -40,7 +40,6 @@ export abstract class SettingsSource implements ISettingsSource {
   }
 
   protected abstract getSnapshot(): Record<string, any>;
-  abstract isSet(key?: any): boolean;
   abstract isReadOnly(key: any): boolean;
   abstract getValue(key: any): any;
   abstract save(): Promise<void>;

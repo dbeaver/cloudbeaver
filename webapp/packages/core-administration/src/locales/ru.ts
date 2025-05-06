@@ -1,5 +1,6 @@
 export default [
   ['administration_menu_enter', 'Администрирование'],
+  ['core_administration_settings_group', 'Администрирование'],
   ['administration_menu_back', 'Вернуться в приложение'],
   ['administration_configuration_wizard_title', 'Начальная настройка сервера'],
   ['administration_configuration_wizard_finish_success_title', 'Сервер настроен'],

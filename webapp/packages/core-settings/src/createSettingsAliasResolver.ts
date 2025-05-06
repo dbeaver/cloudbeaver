@@ -76,12 +76,7 @@ export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject
 
       return has;
     },
-    isSet(key) {
-      if (!(key in mappings)) {
-        return false;
-      }
-      return source.isSet(mapKey(key));
-    },
+    isOverrideDefaults: source.isOverrideDefaults?.bind(source.isOverrideDefaults),
     isEdited(key) {
       if (!(key in mappings)) {
         return false;

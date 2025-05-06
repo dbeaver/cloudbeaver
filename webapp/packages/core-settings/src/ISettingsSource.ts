@@ -17,11 +17,11 @@ export interface ISettingsSource {
   has: (key: any) => boolean;
   isEdited: (key?: any) => boolean;
   isReadOnly: (key: any) => boolean;
-  isSet(key?: any): boolean;
   getValue: (key: any) => any | undefined;
   getEditedValue: (key: any) => any | undefined;
   setValue: (key: any, value: any) => void;
   save: () => Promise<void>;
   clear: () => void;
+  isOverrideDefaults?: () => boolean;
   restoreDefaults?: () => void;
 }

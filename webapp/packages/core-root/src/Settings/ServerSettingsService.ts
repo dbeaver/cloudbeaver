@@ -42,11 +42,8 @@ export class ServerSettingsService extends SettingsSource {
     return this.settings.has(key) || super.has(key);
   }
 
-  override isSet(key?: any): boolean {
-    if (key === undefined) {
-      return this.settings.size > 0;
-    }
-    return this.settings.has(key);
+  isOverrideDefaults(): boolean {
+    return this.settings.size > 0;
   }
 
   isReadOnly(key: any): boolean {
