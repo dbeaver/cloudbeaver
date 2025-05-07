@@ -372,6 +372,15 @@ Interactive.argTypes = {
 };
 
 export const IconButtons = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleClick = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 5000);
+  };
+
   return (
     <div className="tw:flex tw:flex-col tw:gap-4 tw:my-4 tw:items-center">
       <div>
@@ -475,17 +484,17 @@ export const IconButtons = () => {
               <circle cx="12" cy="12" r="6" fill="currentColor" />
             </svg>
           </IconButton>
-          <IconButton variant="secondary" size="medium" loading aria-label="Add item">
+          <IconButton variant="secondary" loading={isLoading} onClick={handleClick} aria-label="Add item">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="6" fill="currentColor" />
             </svg>
           </IconButton>
-          <IconButton variant="danger" size="large" loading aria-label="Add item">
+          <IconButton size="large" loading={isLoading} onClick={handleClick} aria-label="Add item">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="6" fill="currentColor" />
             </svg>
           </IconButton>
-          <IconButton variant="danger" size="xlarge" loading aria-label="Add item">
+          <IconButton variant="danger" size="xlarge" loading={isLoading} onClick={handleClick} aria-label="Add item">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="6" fill="currentColor" />
             </svg>

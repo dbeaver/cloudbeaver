@@ -31,6 +31,8 @@
     --dbv-kit-btn-danger-background-hover: var(--tw-color-red-100);
     --dbv-kit-btn-danger-background-active: var(--tw-color-red-100);
 
+    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-foreground-hover);
+
     &:hover {
       @media (hover: hover) {
         .dbv-kit-icon-button__icon {
