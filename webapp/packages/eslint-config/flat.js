@@ -239,8 +239,5 @@ export default tseslint.config(
   {
     files: ['**/*.cjs'],
     ignores: ['**/lib'],
-    languageOptions: {
-      env: { node: true },
-    },
   },
 );

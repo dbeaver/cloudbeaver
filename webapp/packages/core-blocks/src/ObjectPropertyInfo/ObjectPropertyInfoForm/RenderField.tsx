@@ -9,10 +9,11 @@ import { observer } from 'mobx-react-lite';
 
 import {
   ConditionType,
+  getObjectPropertyDefaultValue,
   getObjectPropertyType,
+  getObjectPropertyValue,
   getObjectPropertyValueType,
   type ObjectPropertyInfo,
-  type ObjectPropertyType,
 } from '@cloudbeaver/core-sdk';
 import { EMPTY_ARRAY, removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 
@@ -44,24 +45,6 @@ interface RenderFieldProps {
   className?: string;
   canShowPassword?: boolean;
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
-}
-
-function getValue(value: any, controlType: ObjectPropertyType) {
-  const checkbox = controlType === 'checkbox';
-
-  if (value === null || value === undefined) {
-    return checkbox ? false : '';
-  }
-
-  if (typeof value === 'boolean') {
-    return checkbox ? value : String(value);
-  }
-
-  if (typeof value === 'string') {
-    return checkbox ? value.toLowerCase() === 'true' : value;
-  }
-
-  return value.displayName || value.value || JSON.stringify(value);
 }
 
 export const RenderField = observer<RenderFieldProps>(function RenderField({
@@ -102,8 +85,8 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   }
 
   const required = property.required && !readonly;
-  const value = getValue(property.value, controlType);
-  const defaultValue = getValue(property.defaultValue, controlType);
+  const value = getObjectPropertyValue(property);
+  const defaultValue = getObjectPropertyDefaultValue(property);
 
   if (controlType === 'link') {
     return (

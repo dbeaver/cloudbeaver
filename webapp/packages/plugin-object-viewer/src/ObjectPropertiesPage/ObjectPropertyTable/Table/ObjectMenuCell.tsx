@@ -16,7 +16,7 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import classes from './ObjectMenuCell.module.css';
 import { useMenu } from '@cloudbeaver/core-view';
-import { getValue } from '../../helpers.js';
+import { getObjectPropertyDisplayValue } from '@cloudbeaver/core-sdk';
 
 interface Props {
   object: DBObject;
@@ -68,7 +68,7 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
   }
 
   const property = object.object?.properties?.[0];
-  const value = property ? getValue(property.value) : '';
+  const value = property ? getObjectPropertyDisplayValue(property) : '';
 
   return (
     <div ref={mouse.reference} className={s(styles, { container: true })} onDoubleClick={openNode} onContextMenu={contextMenuOpenHandler}>
