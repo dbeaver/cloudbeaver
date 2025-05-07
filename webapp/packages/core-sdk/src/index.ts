@@ -23,3 +23,4 @@ export * from './ServerInternalError.js';
 export * from './ServiceError.js';
 export * from './SessionError.js';
 export * from './manifest.js';
+export * from './getObjectPropertyValue.js';

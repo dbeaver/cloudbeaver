@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.rm;
 
+import io.cloudbeaver.CloudbeaverMockTest;
 import io.cloudbeaver.app.CEAppStarter;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBConstants;
@@ -46,7 +47,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class RMNIOTest {
+public class RMNIOTest extends CloudbeaverMockTest {
 
     private static WebSession webSession;
     private static RMProject testProject;
