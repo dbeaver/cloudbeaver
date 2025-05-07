@@ -36,5 +36,6 @@ exec java ${JAVA_OPTS} \
   -jar ${launcherJar} \
   -product io.cloudbeaver.product.ce.product \
   -web-config conf/cloudbeaver.conf \
+  ${CLI_OPTS} \
   -nl en \
   -registryMultiLanguage
