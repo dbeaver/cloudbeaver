@@ -1,0 +1,37 @@
+@keyframes stroke {
+  0% {
+    stroke-dasharray: 1px, 100px;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 45px, 100px;
+    stroke-dashoffset: -10px;
+  }
+  100% {
+    stroke-dasharray: 17px, 100px;
+    stroke-dashoffset: -58px;
+  }
+}
+
+@keyframes spinning {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@layer base {
+  :root {
+    --dbv-kit-spinner-height: var(--dbv-kit-control-height-medium);
+    --dbv-kit-spinner-animation-duration: 1.8s;
+
+    --dbv-kit-spinner-stroke-width: 2.5px;
+    --dbv-kit-spinner-stroke-color: var(--dbv-kit-color-primary-600);
+    --dbv-kit-spinner-stroke-linecap: butt;
+
+    --dbv-kit-animate-stroke: stroke var(--dbv-kit-spinner-animation-duration) linear infinite;
+    --dbv-kit-animate-spin: spinning var(--dbv-kit-spinner-animation-duration) cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+  }
+}
