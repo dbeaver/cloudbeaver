@@ -43,7 +43,7 @@ export default [
   ['plugin_sql_editor_settings_auto_save', 'Автосохранение'],
   ['plugin_sql_editor_settings_auto_save_description', 'Автоматически сохранять содержимое редактора'],
   [
-    'plugin_sql_editor_settings_auto_save_description_te',
+    'plugin_sql_editor_settings_auto_save_description_git_integration',
     'Автоматически сохранять содержимое редактора. Эта настройка доступна только при отключенной интеграции с Git.',
   ],
 ];

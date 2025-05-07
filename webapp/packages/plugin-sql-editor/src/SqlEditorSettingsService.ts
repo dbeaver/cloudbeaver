@@ -151,7 +151,7 @@ export class SqlEditorSettingsService extends Dependency {
           type: ESettingsValueType.Checkbox,
           name: 'plugin_sql_editor_settings_auto_save',
           description: this.serverConfigResource.isFeatureEnabled(FEATURE_GIT_ID, true)
-            ? 'plugin_sql_editor_settings_auto_save_description_te'
+            ? 'plugin_sql_editor_settings_auto_save_description_git_integration'
             : 'plugin_sql_editor_settings_auto_save_description',
         },
       ];
