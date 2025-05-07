@@ -63,6 +63,8 @@ export default [
   ['connections_connection_expert_settings', 'Продвинутые настройки'],
   ['connections_connection_keep_alive', 'Поддерживать соединение (в секундах)'],
   ['connections_connection_autocommit', 'Авто коммит'],
+  ['connections_connection_default_catalog', 'Каталог по умолчанию'],
+  ['connections_connection_default_schema', 'Схема по умолчанию'],
   ['connections_connection_keep_alive_tooltip', 'Не отключать соединение'],
   ['connections_connection_read_only', 'Разрешить только чтение'],
   ['connections_network_handler_test', 'Проверить подключение'],

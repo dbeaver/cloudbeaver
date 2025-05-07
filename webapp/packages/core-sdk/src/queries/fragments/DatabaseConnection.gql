@@ -6,6 +6,8 @@ fragment DatabaseConnection on ConnectionInfo {
   driverId
   keepAliveInterval
   autocommit
+  defaultCatalogName
+  defaultSchemaName
 
   connected
   readOnly
