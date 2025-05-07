@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { ServerConfigResource, ServerSettingsManagerService } from '@cloudbeaver/core-root';
+import { FEATURE_GIT_ID, ServerConfigResource, ServerSettingsManagerService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
@@ -150,7 +150,7 @@ export class SqlEditorSettingsService extends Dependency {
           },
           type: ESettingsValueType.Checkbox,
           name: 'plugin_sql_editor_settings_auto_save',
-          description: this.serverConfigResource.distributed
+          description: this.serverConfigResource.isFeatureEnabled(FEATURE_GIT_ID, true)
             ? 'plugin_sql_editor_settings_auto_save_description_te'
             : 'plugin_sql_editor_settings_auto_save_description',
         },

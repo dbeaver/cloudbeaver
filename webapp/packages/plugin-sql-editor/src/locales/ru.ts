@@ -1,11 +1,3 @@
-/*
- * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
- *
- * Licensed under the Apache License, Version 2.0.
- * you may not use this file except in compliance with the License.
- */
-
 export default [
   ['plugin_sql_editor_sql_editor_settings_group', 'SQL Редактор'],
   ['sql_editor_settings_insert_table_aliases_name', 'Вставлять алиасы таблиц (в FROM условии)'],
@@ -49,9 +41,9 @@ export default [
   ['plugin_sql_editor_settings_import_max_size', 'Лимит импорта (КБ)'],
   ['plugin_sql_editor_settings_import_max_size_description', 'Максимальный размер файла, который можно импортировать в КБ'],
   ['plugin_sql_editor_settings_auto_save', 'Автосохранение'],
-  ['plugin_sql_editor_settings_auto_save_description', 'Включает автосохранение для сессий SQL редактора'],
+  ['plugin_sql_editor_settings_auto_save_description', 'Автоматически сохранять содержимое редактора'],
   [
     'plugin_sql_editor_settings_auto_save_description_te',
-    'Включает автосохранение для сессий SQL редактора. Работает только с отключенной функцией Git',
+    'Автоматически сохранять содержимое редактора. Эта настройка доступна только при отключенной интеграции с Git.',
   ],
 ];
