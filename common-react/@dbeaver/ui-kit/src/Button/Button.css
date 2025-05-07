@@ -128,6 +128,7 @@
     --dbv-kit-btn-background: var(--dbv-kit-btn-danger-background);
     --dbv-kit-btn-background-hover: var(--dbv-kit-btn-danger-background-hover);
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-danger-background-active);
+    --dbv-kit-btn-border-color: var(--dbv-kit-btn-danger-border-color);
 
     --dbv-kit-btn-loader-color: var(--dbv-kit-btn-danger-background);
     --dbv-kit-btn-outline-color: var(--dbv-kit-btn-danger-color-outline);

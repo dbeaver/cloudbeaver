@@ -9,7 +9,7 @@
     width: var(--dbv-kit-btn-height);
     height: var(--dbv-kit-btn-height);
 
-    --dbv-kit-btn-primary-foreground: var(--dbv-kit-color-primary-600);
+    --dbv-kit-btn-primary-foreground: var(--tw-color-gray-300);
     --dbv-kit-btn-primary-foreground-hover: var(--dbv-kit-color-primary-600);
     --dbv-kit-btn-primary-foreground-active: var(--dbv-kit-color-primary-500);
     --dbv-kit-btn-primary-background: transparent;
@@ -51,11 +51,22 @@
     }
   }
 
+  .dbv-kit-button[data-loading='true'].dbv-kit-icon-button {
+    opacity: 0.5;
+    color: var(--dbv-kit-btn-foreground);
+    background-color: transparent;
+
+    &:hover,
+    &:active,
+    &[data-active] {
+      background-color: transparent;
+    }
+  }
+
   .dbv-kit-icon-button__icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--dbv-kit-btn-icon-foreground);
     width: 100%;
     height: 100%;
   }
