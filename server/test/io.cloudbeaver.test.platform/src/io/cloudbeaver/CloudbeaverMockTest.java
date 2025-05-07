@@ -12,7 +12,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.net.CookieManager;
 import java.net.http.HttpClient;
 
-@RunWithProduct("CloudbeaverServerTest.product")
+@RunWithProduct("CloudbeaverServerUnitTest.product")
 @RunnerProxy(MockitoJUnitRunner.class)
 @RunWith(OSGITestRunner.class)
 @RunWithApplication(bundleName = "io.cloudbeaver.server.ce", registryName = "io.cloudbeaver.product.ce.application", args = {"-web-config", "workspace/conf/cloudbeaver.conf"})
