@@ -1244,7 +1244,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     @NotNull
     private SMUser fetchUser(ResultSet dbResult, boolean checkSecretStorage) throws SQLException {
-        Timestamp timestamp = dbResult.getTimestamp("CHANGE_DATE");
+        Timestamp timestamp = getTimestamp(dbResult, "CHANGE_DATE");
         Instant disableDate = timestamp != null ? timestamp.toInstant() : null;
         return new SMUser(
             dbResult.getString("USER_ID"),
@@ -1791,7 +1791,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 while (dbResult.next()) {
                     UserLoginRecord loginDto = new UserLoginRecord(
                         SMAuthStatus.valueOf(dbResult.getString(1)),
-                        dbResult.getTimestamp(2).toLocalDateTime()
+                        getTimestamp(dbResult, 2).toLocalDateTime()
                     );
                     userLoginRecords.add(loginDto);
                 }
@@ -2162,7 +2162,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 var refreshToken = dbResult.getString(1);
                 var sessionId = dbResult.getString(2);
                 var userId = dbResult.getString(3);
-                var expiredDate = dbResult.getTimestamp(4);
+                var expiredDate = getTimestamp(dbResult, 4);
                 var authRole = dbResult.getString(5);
                 if (isTokenExpired(expiredDate)) {
                     throw new SMRefreshTokenExpiredException("Refresh token expired");
@@ -2653,7 +2653,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         var sessionId = dbResult.getString(1);
-                        var expirationTime = dbResult.getTimestamp(2);
+                        var expirationTime = getTimestamp(dbResult, 2);
                         activeSessions.add(new SMActiveSession(sessionId, expirationTime));
                     }
                 }
@@ -2705,7 +2705,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     throw new SMException("Error reading permissions: input token not recognized.");
                 }
                 userId = dbResult.getString(1);
-                var expiredDate = dbResult.getTimestamp(2);
+                var expiredDate = getTimestamp(dbResult, 2);
                 if (application.isMultiNode() && isTokenExpired(expiredDate)) {
                     throw new SMAccessTokenExpiredException("Error reading permissions: token has expired");
                 }
@@ -3387,5 +3387,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     private static void setTimestamp(@NotNull PreparedStatement dbStat, int i, @NotNull Timestamp timestamp) throws SQLException {
         dbStat.setTimestamp(i, timestamp, Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+    }
+
+    private static Timestamp getTimestamp(@NotNull ResultSet dbResult, int i) throws SQLException {
+        return dbResult.getTimestamp(i, Calendar.getInstance(TimeZone.getTimeZone("UTC")));
+    }
+
+    @Nullable
+    protected static Timestamp getTimestamp(@NotNull ResultSet dbResult, @NotNull String columnName) throws SQLException {
+        return dbResult.getTimestamp(columnName, Calendar.getInstance(TimeZone.getTimeZone("UTC")));
     }
 }
