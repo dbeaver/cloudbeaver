@@ -10,6 +10,7 @@ import clsx from 'clsx';
 import './Button.css';
 import type { ControlSize } from '../types/controls.js';
 import { componentProviderWrapper } from '../componentProviderWrapper.js';
+import { Spinner } from '../Spinner/Spinner.js';
 
 export interface ButtonProps extends Omit<AriaKitButtonProps, 'clickOnEnter' | 'clickOnSpace'> {
   variant?: 'primary' | 'secondary' | 'danger';
@@ -28,7 +29,7 @@ export function ButtonBase({ className, variant = 'primary', size = 'medium', lo
 
   return (
     <AriaButton onClick={loading ? () => null : onClick} className={classToApply} {...props}>
-      {loading && (loader ? loader : <span className="dbv-kit-button__loader" />)}
+      {loading && (loader ? loader : <Spinner className="dbv-kit-button__loader" />)}
       {children}
     </AriaButton>
   );
