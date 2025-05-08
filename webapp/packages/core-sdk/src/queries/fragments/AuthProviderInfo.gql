@@ -16,6 +16,7 @@ fragment AuthProviderInfo on AuthProviderInfo {
     metadataLink
     acsLink
     entityIdLink
+    redirectLink
   }
 
   #configurationParameters {

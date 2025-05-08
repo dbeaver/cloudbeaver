@@ -40,6 +40,7 @@ type AuthProviderConfiguration {
     # Otherwise authLogin function must be called.
     signInLink: String
     signOutLink: String
+    redirectLink: String
     metadataLink: String
     acsLink: String
     entityIdLink: String @since(version: "24.2.1")

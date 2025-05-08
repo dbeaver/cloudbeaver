@@ -40,7 +40,6 @@ export function CheckboxBase({ children, className, icon, indeterminate, indeter
           onFocusVisible={() => setFocusVisible(true)}
           onBlur={() => setFocusVisible(false)}
           onChange={event => {
-            setFocusVisible(true);
             setInnerChecked(event.target.checked);
             props.onChange?.(event);
           }}
