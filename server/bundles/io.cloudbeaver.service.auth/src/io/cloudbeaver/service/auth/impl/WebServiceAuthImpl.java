@@ -45,7 +45,6 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
 import org.jkiss.dbeaver.model.security.exception.SMTooManySessionsException;
-import org.jkiss.dbeaver.model.security.role.SMRolePreference;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.utils.CommonUtils;
 
@@ -265,14 +264,13 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         try {
             // Read user from security controller. It will also read meta parameters
             SMUser userWithDetails = webSession.getSecurityController().getCurrentUser();
-            SMRolePreference authRolePreference = webSession.getSecurityController().getUserAuthRolePreference(userWithDetails.getAuthRole());
             if (userWithDetails != null) {
                 // USer not saved yet. This may happen in easy config mode
                 var webUser = new WebUser(userWithDetails);
                 webUser.setDisplayName(webSession.getUser().getDisplayName());
-                return new WebUserInfo(webSession, webUser, authRolePreference);
+                return new WebUserInfo(webSession, webUser);
             } else {
-                return new WebUserInfo(webSession, webSession.getUser(), authRolePreference);
+                return new WebUserInfo(webSession, webSession.getUser());
             }
         } catch (DBException e) {
             if (SMUtils.isRefreshTokenExpiredExceptionWasHandled(e)) {

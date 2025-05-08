@@ -26,10 +26,8 @@ import io.cloudbeaver.registry.WebAuthProviderConfiguration;
 import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
-import org.jkiss.dbeaver.model.security.role.SMRolePreference;
 
 import java.util.List;
 import java.util.Map;
@@ -212,11 +210,5 @@ public interface DBWServiceAdmin extends DBWService {
         @NotNull WebSession webSession, @NotNull String userId,
         @NotNull String teamId, @Nullable String teamRole
     ) throws DBWebException;
-
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    SMRolePreference saveRolePreferences(WebSession webSession, @NotNull String authRoleId, Map<String, Object> settings) throws DBException;
-
-    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    List<SMRolePreference> getRolePreferences(WebSession webSession, @Nullable List<String> authRoleIds) throws DBException;
 
 }

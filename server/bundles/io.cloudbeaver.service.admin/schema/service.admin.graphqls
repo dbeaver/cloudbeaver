@@ -133,11 +133,6 @@ input AdminUserFilterInput {
     enabledState: Boolean
 }
 
-type AdminAuthRoleInfo {
-    id: ID!
-    settings: Object!
-}
-
 extend type Query {
     #### Users and teams
 
@@ -145,7 +140,7 @@ extend type Query {
     listUsers(page: PageInput!, filter: AdminUserFilterInput!): [AdminUserInfo!]!
     listTeams(teamId: ID): [AdminTeamInfo!]!
     listPermissions: [AdminPermissionInfo!]!
-    listAuthRoles: [String!]! @deprecated(reason: "25.0.4") # Use listAuthRoleInfos instead
+    listAuthRoles: [String!]!
     listTeamRoles: [String!]!
     listTeamMetaParameters: [ObjectPropertyInfo!]!
 
@@ -223,14 +218,12 @@ extend type Query {
 
     configureServer(configuration: ServerConfigInput!): Boolean!
 
-    listAuthRoleInfos(authRoleIds: [ID!]): [AdminAuthRoleInfo!]! @since(version: "25.0.4")
-
     # Changes default navigator settings
     setDefaultNavigatorSettings( settings: NavigatorSettingsInput!): Boolean!
+
 }
 
 extend type Mutation {
-    updateAuthRole(authRoleId: ID!, settings: Object): AdminAuthRoleInfo! @since(version: "25.0.4")
     # Updates product configuration
     adminUpdateProductConfiguration(configuration: Object!): Boolean! @since(version: "23.3.4")
 }

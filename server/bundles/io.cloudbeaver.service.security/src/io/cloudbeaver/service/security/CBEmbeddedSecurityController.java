@@ -49,7 +49,6 @@ import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
-import org.jkiss.dbeaver.model.security.role.SMRolePreference;
 import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
@@ -1198,12 +1197,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         return getTeamMembersInfo(teamId).stream().map(SMTeamMemberInfo::userId).toArray(String[]::new);
     }
 
-    @Override
-    @Nullable
-    public SMRolePreference getUserAuthRolePreference(String authRoleId) throws DBException {
-        return null;
-    }
-
     @NotNull
     @Override
     public List<SMTeamMemberInfo> getTeamMembersInfo(@NotNull String teamId) throws DBException {
@@ -1237,17 +1230,6 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error while reading team members", e);
         }
-    }
-
-    @Override
-    public SMRolePreference updateAuthRolePreference(@NotNull SMRolePreference rolePreference) throws DBException {
-        throw new UnsupportedOperationException("Method is unsupported");
-    }
-
-    @NotNull
-    @Override
-    public List<SMRolePreference> getAuthRolePreferences(@NotNull List<String> authRoleIds) {
-        return List.of();
     }
 
     @NotNull

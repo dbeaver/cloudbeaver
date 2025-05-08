@@ -192,25 +192,12 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
 
             .dataFetcher("configureServer",
                 env -> getService(env).configureServer(getWebSession(env), env.getArgument("configuration")))
-            .dataFetcher(
-                "setDefaultNavigatorSettings",
-                env -> getService(env).setDefaultNavigatorSettings(
-                    getWebSession(env),
-                    WebServiceUtils.parseNavigatorSettings(env.getArgument("settings"))
-                )
-            )
-            .dataFetcher("listAuthRoleInfos", env -> getService(env).getRolePreferences(getWebSession(env), env.getArgument("authRoleIds")))
+        .dataFetcher("setDefaultNavigatorSettings",
+            env -> getService(env).setDefaultNavigatorSettings(getWebSession(env), WebServiceUtils.parseNavigatorSettings(env.getArgument("settings"))))
         ;
         model.getMutationType()
-            .dataFetcher(
-                "adminUpdateProductConfiguration",
-                env -> getService(env).updateProductConfiguration(getWebSession(env), env.getArgument("configuration"))
-            )
-            .dataFetcher(
-                "updateAuthRole",
-                env -> getService(env).saveRolePreferences(getWebSession(env), env.getArgument("authRoleId"), env.getArgument("settings"))
-            )
-        ;
+            .dataFetcher("adminUpdateProductConfiguration",
+                env -> getService(env).updateProductConfiguration(getWebSession(env), env.getArgument("configuration")));
     }
 
     @Override
