@@ -39,7 +39,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     this.loaded = false;
     this.loading = false;
 
-    this.formState.submitTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.save.bind(this)));
+    this.formState.submitTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.handleSubmit.bind(this)));
     this.formState.formatTask.addHandler(executorHandlerFilter(() => this.isLoaded() && this.isChanged, this.format.bind(this)));
     this.formState.validationTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.handleValidation.bind(this)));
 
@@ -85,21 +85,40 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     return !isObjectsEqual(this.initialState, this.state);
   }
 
-  async save(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<void> {
+  async handleSubmit(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<void> {
+    const formSubmit = contexts.getContext(formSubmitContext);
+
+    // useAutoloads can trigger loading right before submit so we need to load data first
     if (this.loading) {
-      return;
+      await this.promise;
     }
 
     this.loading = true;
 
     try {
       await this.loader();
-      const formSubmit = contexts.getContext(formSubmitContext);
-
-      if (!this.isChanged && !formSubmit.submitOnNoChanges) {
+    } catch (exception: any) {
+      if (this.isChanged) {
+        await this.save(data, contexts);
         return;
       }
 
+      this.exception = exception;
+      throw exception;
+    } finally {
+      this.isSaving = false;
+      this.loading = false;
+    }
+
+    if (!this.isChanged && !formSubmit.submitOnNoChanges) {
+      return;
+    }
+
+    await this.save(data, contexts);
+  }
+
+  private async save(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<void> {
+    try {
       this.isSaving = true;
 
       await this.saveChanges(data, contexts);
