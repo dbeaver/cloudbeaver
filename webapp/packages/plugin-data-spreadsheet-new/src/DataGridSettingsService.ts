@@ -55,7 +55,7 @@ export class DataGridSettingsService extends Dependency {
         group: DATA_EDITOR_SETTINGS_GROUP,
         key: 'plugin.data-spreadsheet.hidden',
         access: {
-          scope: ['server', 'role'],
+          scope: ['role'],
         },
         type: ESettingsValueType.Checkbox,
         name: 'plugin_data_spreadsheet_new_settings_disable',
