@@ -11,7 +11,6 @@ import { AuthRolesResource } from '@cloudbeaver/core-authentication';
 import { Combobox, Group, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { type IUserFilters, USER_ROLE_ALL, USER_STATUSES } from './useUsersTableFilters.js';
-import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
 interface Props {
   filters: IUserFilters;
@@ -19,7 +18,7 @@ interface Props {
 
 export const UsersTableFiltersDetails = observer<Props>(function UsersTableFiltersDetails({ filters }) {
   const translate = useTranslate();
-  const authRolesResource = useResource(UsersTableFiltersDetails, AuthRolesResource, CachedMapAllKey);
+  const authRolesResource = useResource(UsersTableFiltersDetails, AuthRolesResource, undefined);
 
   return (
     <Group box gap>
@@ -34,7 +33,7 @@ export const UsersTableFiltersDetails = observer<Props>(function UsersTableFilte
         {translate('authentication_user_status')}
       </Combobox>
       {!!authRolesResource.data.length && (
-        <Combobox items={[...authRolesResource.resource.keys, USER_ROLE_ALL]} value={filters.role} keepSize onSelect={filters.setRole}>
+        <Combobox items={[...authRolesResource.data, USER_ROLE_ALL]} value={filters.role} keepSize onSelect={filters.setRole}>
           {translate('authentication_user_role')}
         </Combobox>
       )}
