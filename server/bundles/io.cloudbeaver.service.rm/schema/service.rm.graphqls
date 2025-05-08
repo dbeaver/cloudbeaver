@@ -52,12 +52,12 @@ extend type Query {
         folder: String,
         nameMask: String,
         readProperties: Boolean,
-        readHistory: Boolean): [RMResource!]! @deprecated
+        readHistory: Boolean): [RMResource!]!
 
     # Reads resource contents as string in UTF-8
     rmReadResourceAsString(
         projectId: String!,
-        resourcePath: String!): String! @deprecated
+        resourcePath: String!): String!
 
 }
 
@@ -65,28 +65,28 @@ extend type Mutation {
     rmCreateResource(
         projectId: String!,
         resourcePath: String!,
-        isFolder: Boolean!): String! @deprecated
+        isFolder: Boolean!): String!
 
     rmMoveResource(
         projectId: String!,
         oldResourcePath: String!,
-        newResourcePath: String): String! @deprecated
+        newResourcePath: String): String!
 
     rmDeleteResource(
         projectId: String!,
         resourcePath: String!,
-        recursive: Boolean!): Boolean @deprecated
+        recursive: Boolean!): Boolean
 
     rmWriteResourceStringContent(
         projectId: String!,
         resourcePath: String!,
         data: String!,
-        forceOverwrite: Boolean!): String! @deprecated
+        forceOverwrite: Boolean!): String!
 
     rmCreateProject(
         projectId: ID,
         projectName: String!,
-        description: String): RMProject! @deprecated
+        description: String): RMProject!
 
     rmDeleteProject(projectId: ID!): Boolean!
 

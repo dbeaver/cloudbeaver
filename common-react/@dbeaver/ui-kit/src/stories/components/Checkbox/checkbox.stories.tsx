@@ -61,9 +61,13 @@ export const States = () => {
       </Checkbox>
       <Button onClick={() => setIndeterminate(prev => !prev)}>Set Indeterminate</Button>
       <Checkbox indeterminate={indeterminate}>Indeterminate</Checkbox>
-      <Checkbox indeterminate={indeterminate} indeterminateIcon={<div className="tw:flex tw:relative tw:-top-[1px] tw:font-bold">▫</div>}>
+      <Checkbox
+        indeterminate={indeterminate}
+        indeterminateIcon={<div className="tw:flex tw:relative tw:-top-[2px] tw:-left-[1px] tw:font-bold">▫</div>}
+      >
         Indeterminate Custom
       </Checkbox>
+      Long text example:
       <Checkbox>
         Insert spaces when pressing <code>Tab</code>. This setting is overridden based on the file contents when{' '}
         <a data-href="#" href="#">
