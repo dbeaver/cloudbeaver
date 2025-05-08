@@ -56,12 +56,12 @@
   .dbv-kit-button[data-loading='true'].dbv-kit-icon-button {
     opacity: 0.5;
     color: var(--dbv-kit-btn-foreground);
-    background-color: transparent;
+    background-color: var(--dbv-kit-btn-background);
 
     &:hover,
     &:active,
     &[data-active] {
-      background-color: transparent;
+      background-color: var(--dbv-kit-btn-background);
     }
   }
 
