@@ -1,0 +1,25 @@
+export default [
+  ['plugin_user_profile_account_title', 'Tài Khoản'],
+  ['plugin_user_profile_menu', 'Hồ Sơ'],
+  ['plugin_user_profile_info', 'Thông Tin'],
+  ['plugin_user_profile_info_id', 'Mã Người Dùng'],
+  ['plugin_user_profile_info_displayName', 'Tên Hiển Thị'],
+  ['plugin_user_profile_auth_providers', 'Nhà Cung Cấp Xác Thực'],
+  ['plugin_user_profile_info', 'Thông Tin Người Dùng'],
+  ['plugin_user_profile_auth_tokens', 'Mã Xác Thực'],
+  ['plugin_user_profile_auth_providers_active', 'Xác thực đang hoạt động'],
+
+  ['plugin_user_profile_authentication_change_password', 'Đổi mật khẩu'],
+  ['plugin_user_profile_authentication_change_password_current_password', 'Mật khẩu hiện tại'],
+  ['plugin_user_profile_authentication_change_password_new_password', 'Mật khẩu mới'],
+  ['plugin_user_profile_authentication_change_password_repeat_password', 'Nhập lại mật khẩu'],
+  ['plugin_user_profile_authentication_change_password_success', 'Mật khẩu đã được thay đổi thành công'],
+  ['plugin_user_profile_authentication_change_password_submit_label', 'Đổi'],
+  ['plugin_user_profile_authentication_change_password_passwords_not_match', 'Mật khẩu không khớp'],
+  ['plugin_user_profile_authentication_change_password_password_validation_error', 'Xác thực mật khẩu thất bại'],
+  ['plugin_user_profile_authentication_change_password_cancel_title', 'Hủy đổi mật khẩu'],
+  [
+    'plugin_user_profile_authentication_change_password_cancel_message',
+    'Bạn đang hủy thay đổi mật khẩu. Các thay đổi chưa lưu sẽ bị mất. Bạn có chắc chắn không?',
+  ],
+];
