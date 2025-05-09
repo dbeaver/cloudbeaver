@@ -1,0 +1,21 @@
+export default [
+  ['plugin_datasource_transaction_manager_commit', 'Commit'],
+  ['plugin_datasource_transaction_manager_rollback', 'Hoàn tác'],
+  ['plugin_datasource_transaction_manager_commit_mode_switch_to_auto', 'Chuyển sang commit tự động'],
+  ['plugin_datasource_transaction_manager_commit_mode_switch_to_manual', 'Chuyển sang commit thủ công'],
+  ['plugin_datasource_transaction_manager_commit_fail', 'Không thể commit giao dịch'],
+  ['plugin_datasource_transaction_manager_rollback_fail', 'Không thể hoàn tác giao dịch'],
+  ['plugin_datasource_transaction_manager_commit_mode_fail', 'Không thể thay đổi chế độ commit'],
+  ['plugin_datasource_transaction_manager_commit_confirmation_message', 'Bạn có muốn commit các thay đổi không?'],
+
+  ['plugin_datasource_transaction_manager_logs', 'Nhật ký giao dịch'],
+  ['plugin_datasource_transaction_manager_logs_tooltip', 'Mở nhật ký giao dịch'],
+  ['plugin_datasource_transaction_manager_logs_tooltip_count', 'Tổng số câu lệnh: {arg:count}'],
+  ['plugin_datasource_transaction_manager_logs_counter_none', 'Không có'],
+  ['plugin_datasource_transaction_manager_logs_table_column_time', 'Thời gian'],
+  ['plugin_datasource_transaction_manager_logs_table_column_type', 'Loại'],
+  ['plugin_datasource_transaction_manager_logs_table_column_text', 'Truy vấn'],
+  ['plugin_datasource_transaction_manager_logs_table_column_duration', 'Thời gian thực thi (ms)'],
+  ['plugin_datasource_transaction_manager_logs_table_column_rows', 'Hàng'],
+  ['plugin_datasource_transaction_manager_logs_table_column_result', 'Kết quả'],
+];
