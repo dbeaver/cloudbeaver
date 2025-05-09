@@ -30,7 +30,16 @@ export const VersionInfo = observer<Props>(function VersionInfo({ item }) {
         <GroupTitle>{version ? `Release notes ${version.number} - ${version.date}` : translate('version_update_version_no_info')}</GroupTitle>
         {version && (
           <GroupItem>
-            <ReactMarkdown className={s(style, { reactMarkdown: true })}>{version.releaseNotes}</ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                p: ({ node, ...props }) => <p className="tw:mb-4" {...props} />,
+                ul: ({ node, ...props }) => <ul className="tw:list-disc tw:flex tw:flex-col tw:gap-4" {...props} />,
+                ol: ({ node, ...props }) => <ol className="tw:list-decimal tw:flex tw:flex-col tw:gap-4" {...props} />,
+                li: ({ node, ...props }) => <li className="tw:ml-4" {...props} />,
+              }}
+            >
+              {version.releaseNotes}
+            </ReactMarkdown>
           </GroupItem>
         )}
       </Group>

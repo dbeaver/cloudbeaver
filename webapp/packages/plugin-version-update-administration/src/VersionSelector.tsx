@@ -65,7 +65,9 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
         )}
         <GroupTitle>{translate('plugin_version_update_administration_recommendations_label')}</GroupTitle>
         <GroupItem>
-          <h4 className={s(style, { h4: true })}>{translate('plugin_version_update_administration_recommendations')}</h4>
+          <h4>
+            <b>{translate('plugin_version_update_administration_recommendations')}</b>
+          </h4>
         </GroupItem>
       </Group>
       {version && <VersionInfo item={version.number} />}
