@@ -106,6 +106,7 @@ export default [
   ['ui_close_all_to_the_left', 'Fermer tout à gauche'],
   ['ui_or', 'ou'],
   ['ui_download', 'Télécharger'],
+  ['ui_redownload', 'Redownload'],
   ['ui_download_file', 'Télécharger le fichier'],
   ['ui_upload', 'Importer'],
   ['ui_import', 'Importer'],
