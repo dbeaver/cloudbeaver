@@ -1,0 +1,22 @@
+export default [
+  ['plugin_data_export_data_export_settings_group', 'Xuất dữ liệu'],
+  ['data_transfer_dialog_title', 'Xuất dữ liệu'],
+  ['data_transfer_dialog_export', 'Xuất'],
+  ['data_transfer_dialog_export_tooltip', 'Xuất tập hợp kết quả dưới dạng tệp'],
+  ['data_transfer_dialog_configuration_title', 'Cấu hình xuất'],
+  ['data_transfer_dialog_preparation', 'Chúng tôi đang chuẩn bị tệp của bạn để xuất. Vui lòng đợi...'],
+  ['data_transfer_notification_preparation', 'Chúng tôi đang chuẩn bị tệp của bạn để tải xuống. Vui lòng đợi...'],
+  ['data_transfer_notification_ready', 'Tệp đã sẵn sàng để tải xuống'],
+  ['data_transfer_notification_error', 'Xuất dữ liệu thất bại'],
+  ['data_transfer_notification_cancelled', 'Xuất dữ liệu đã bị hủy'],
+  ['data_transfer_notification_download', 'Tải xuống'],
+  ['data_transfer_notification_delete', 'Xóa'],
+  ['data_transfer_exporting_table', 'Bảng:'],
+  ['data_transfer_exporting_sql', 'SQL:'],
+  ['data_transfer_format_settings', 'Định dạng'],
+  ['data_transfer_dialog_select_processor_fail', 'Không thể chọn bộ xử lý'],
+
+  ['data_transfer_output_settings', 'Đầu ra'],
+  ['data_transfer_output_settings_compress', 'Nén'],
+  ['plugin_data_export_download_process_info', 'Quá trình tải xuống có thể mất một chút thời gian để bắt đầu'],
+];
