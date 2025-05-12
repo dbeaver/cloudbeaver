@@ -40,6 +40,10 @@ export default [
   ['plugin_sql_editor_settings_disable_description', 'Отключить SQL редактор для всех пользователей'],
   ['plugin_sql_editor_settings_import_max_size', 'Лимит импорта (КБ)'],
   ['plugin_sql_editor_settings_import_max_size_description', 'Максимальный размер файла, который можно импортировать в КБ'],
-  ['plugin_sql_editor_settings_auto_save', 'Автосохранение'],
-  ['plugin_sql_editor_settings_auto_save_description', 'Автоматически сохранять содержимое редактора'],
+  ['plugin_sql_editor_settings_auto_save', 'Автосохранение файлов скриптов'],
+  ['plugin_sql_editor_settings_auto_save_description', 'Автоматически сохранять файлы скриптов'],
+  [
+    'plugin_sql_editor_settings_auto_save_description_git_integration',
+    'Автоматически сохранять файлы скриптов. Эта настройка доступна только при отключенной интеграции с Git',
+  ],
 ];

@@ -112,6 +112,7 @@ export default [
   ['ui_close_all_to_the_left', 'Đóng tất cả bên trái'],
   ['ui_or', 'hoặc'],
   ['ui_download', 'Tải xuống'],
+  ['ui_redownload', 'Redownload'],
   ['ui_download_file', 'Tải tệp'],
   ['ui_upload', 'Tải lên'],
   ['ui_import', 'Nhập'],

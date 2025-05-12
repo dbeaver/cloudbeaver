@@ -44,6 +44,10 @@ export default [
   ['plugin_sql_editor_settings_disable_description', 'Disable SQL editor for all users'],
   ['plugin_sql_editor_settings_import_max_size', 'Import limit (KB)'],
   ['plugin_sql_editor_settings_import_max_size_description', 'Maximum file size that can be imported in KB'],
-  ['plugin_sql_editor_settings_auto_save', 'Auto save'],
-  ['plugin_sql_editor_settings_auto_save_description', 'Automatically save the editor content'],
+  ['plugin_sql_editor_settings_auto_save', 'Autosave script files'],
+  ['plugin_sql_editor_settings_auto_save_description', 'Automatically save the script files'],
+  [
+    'plugin_sql_editor_settings_auto_save_description_git_integration',
+    'Automatically save the script files. This feature is only available when Git integration is turned off',
+  ],
 ];

@@ -6,12 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 .group {
-  list-style-position: inside;
   height: 100%;
   max-height: 300px;
-}
-
-.reactMarkdown > * {
-  margin: 0;
-  padding: 0;
 }
