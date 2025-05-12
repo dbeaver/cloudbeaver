@@ -40,7 +40,7 @@ export class ResourceManagerScriptsSettingsService extends Dependency {
         group: RESOURCE_MANAGER_SETTINGS_GROUP,
         key: 'plugin.resource-manager-scripts.disabled',
         access: {
-          scope: ['server', 'role'],
+          scope: ['role'],
         },
         type: ESettingsValueType.Checkbox,
         name: 'plugin_resource_manager_scripts_disable',

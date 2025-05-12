@@ -40,7 +40,7 @@ export class PluginConnectionsSettingsService extends Dependency {
         key: 'plugin.connections.hideConnectionViewForUsers',
         type: ESettingsValueType.Checkbox,
         access: {
-          scope: ['server', 'role'],
+          scope: ['role'],
         },
         name: 'plugin_connections_settings_hide_connections_view_name',
         description: 'plugin_connections_settings_hide_connections_view_description',

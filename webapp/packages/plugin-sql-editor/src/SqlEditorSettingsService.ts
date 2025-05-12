@@ -125,7 +125,7 @@ export class SqlEditorSettingsService extends Dependency {
           group: SQL_EDITOR_SETTINGS_GROUP,
           key: 'plugin.sql-editor.disabled',
           access: {
-            scope: ['server', 'role'],
+            scope: ['role'],
           },
           type: ESettingsValueType.Checkbox,
           name: 'plugin_sql_editor_settings_disable',
