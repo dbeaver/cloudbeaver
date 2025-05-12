@@ -108,6 +108,7 @@ export default [
   ['ui_close_all_to_the_left', 'Закрыть все слева'],
   ['ui_or', 'или'],
   ['ui_download', 'Cкачать'],
+  ['ui_redownload', 'Скачать заново'],
   ['ui_download_file', 'Скачать файл'],
   ['ui_upload', 'Загрузить'],
   ['ui_import', 'Импортировать'],

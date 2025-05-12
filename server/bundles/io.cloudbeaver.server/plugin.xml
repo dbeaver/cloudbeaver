@@ -62,4 +62,8 @@
         </propertyGroup>
     </extension>
 
+    <extension point="org.jkiss.dbeaver.language">
+        <language code="vi" label="Tiếng Việt"/>
+    </extension>
+
 </plugin>

@@ -35,4 +35,5 @@
   position: absolute;
   width: 8px;
   left: calc(100% + 4px);
+  top: 0;
 }

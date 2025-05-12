@@ -1,0 +1,15 @@
+export default [
+  ['core_block_properties_table_name', 'Tên'],
+  ['core_block_properties_table_value', 'Giá trị'],
+  ['core_block_properties_table_filter_name', 'Lọc'],
+  ['core_block_properties_table_add', 'Thêm thuộc tính'],
+  ['core_blocks_confirmation_dialog_title', 'Yêu cầu xác nhận'],
+  ['core_blocks_properties_table_item_reset', 'Đặt về mặc định'],
+  ['core_blocks_object_property_info_form_empty_placeholder', 'Thuộc tính trống'],
+  ['core_blocks_object_property_info_password_saved', 'Giá trị trường đã lưu'],
+  ['core_blocks_properties_table_item_remove', 'Xóa thuộc tính'],
+  ['combobox_no_results_placeholder', 'Không có kết quả'],
+  ['core_blocks_exception_message_error_title', 'Không thể hiển thị nội dung'],
+  ['core_blocks_exception_message_error_message', 'Đã xảy ra lỗi.'],
+  ['core_blocks_custom_input_validation_error', 'Giá trị trường không hợp lệ'],
+];
