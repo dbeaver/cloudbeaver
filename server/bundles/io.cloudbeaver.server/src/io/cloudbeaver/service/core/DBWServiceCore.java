@@ -44,10 +44,10 @@ public interface DBWServiceCore extends DBWService {
     /**
      * Returns information of system.
      */
-    @WebAction(authRequired = false)
+    @WebAction
     WebPropertyInfo[] getSystemInformationProperties(@NotNull WebSession webSession);
 
-    @WebAction(authRequired = false)
+    @WebAction
     WebProductSettings getProductSettings(@NotNull WebSession webSession);
 
     @WebAction
@@ -164,7 +164,7 @@ public interface DBWServiceCore extends DBWService {
     ///////////////////////////////////////////
     // Projects
 
-    @WebAction
+//    @WebAction
     List<WebProjectInfo> getProjects(@NotNull WebSession session);
 
     ///////////////////////////////////////////
