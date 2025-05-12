@@ -104,7 +104,7 @@
     --dbv-kit-btn-background-hover: var(--dbv-kit-btn-primary-background-hover);
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-primary-background-active);
 
-    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-background-hover);
+    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-primary-foreground);
   }
 
   .dbv-kit-button--secondary {
@@ -130,7 +130,7 @@
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-danger-background-active);
     --dbv-kit-btn-border-color: var(--dbv-kit-btn-danger-border-color);
 
-    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-danger-background);
+    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-danger-foreground);
     --dbv-kit-btn-outline-color: var(--dbv-kit-btn-danger-color-outline);
   }
 
@@ -139,13 +139,12 @@
 
   .dbv-kit-button[data-loading='true'] {
     opacity: 0.75;
-    color: color-mix(in oklch, var(--dbv-kit-btn-foreground) 25%, var(--dbv-kit-btn-loader-base-color));
-    background-color: color-mix(in oklch, var(--dbv-kit-btn-loader-base-color) 75%, var(--dbv-kit-btn-background));
+    background-color: var(--dbv-kit-btn-background-hover);
 
     &:hover,
     &:active,
     &[data-active] {
-      background-color: color-mix(in oklch, var(--dbv-kit-btn-loader-base-color) 85%, var(--dbv-kit-btn-background));
+      background-color: var(--dbv-kit-btn-background-active);
     }
   }
 

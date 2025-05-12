@@ -1,51 +1,41 @@
 @import './_base.css';
-@import './_sizes.css';
-@import './_variants.css';
+@import './_icon-base.css';
+@import './_icon-sizes.css';
+@import './_icon-variants.css';
 
 @layer base {
   .dbv-kit-icon-button {
     padding: 0;
-    min-width: var(--dbv-kit-btn-height);
-    width: var(--dbv-kit-btn-height);
-    height: var(--dbv-kit-btn-height);
+    min-width: var(--dbv-kit-icon-btn-size);
+    width: var(--dbv-kit-icon-btn-size);
+    height: var(--dbv-kit-icon-btn-size);
+    border-radius: var(--dbv-kit-icon-btn-border-radius);
+    border: none;
+    cursor: pointer;
 
-    --dbv-kit-btn-primary-foreground: var(--tw-color-gray-300);
-    --dbv-kit-btn-primary-foreground-hover: var(--dbv-kit-color-primary-600);
-    --dbv-kit-btn-primary-foreground-active: var(--dbv-kit-color-primary-500);
-    --dbv-kit-btn-primary-background: transparent;
-    --dbv-kit-btn-primary-background-hover: var(--tw-color-gray-100);
-    --dbv-kit-btn-primary-background-active: var(--tw-color-gray-100);
+    color: var(--dbv-kit-icon-btn-foreground);
+    background-color: var(--dbv-kit-icon-btn-background);
+    border-color: var(--dbv-kit-icon-btn-border-color);
+    border-width: var(--dbv-kit-btn-border-width);
+    border-style: var(--dbv-kit-btn-border-style);
 
-    --dbv-kit-btn-secondary-foreground: var(--tw-color-gray-300);
-    --dbv-kit-btn-secondary-foreground-hover: var(--dbv-kit-color-primary-600);
-    --dbv-kit-btn-secondary-foreground-active: var(--dbv-kit-color-primary-500);
-    --dbv-kit-btn-secondary-background: transparent;
-    --dbv-kit-btn-secondary-background-hover: transparent;
-    --dbv-kit-btn-secondary-background-active: transparent;
-    --dbv-kit-btn-secondary-border-color: transparent;
-
-    --dbv-kit-btn-danger-foreground: var(--tw-color-red-600);
-    --dbv-kit-btn-danger-foreground-hover: var(--tw-color-red-600);
-    --dbv-kit-btn-danger-foreground-active: var(--tw-color-red-500);
-    --dbv-kit-btn-danger-background: transparent;
-    --dbv-kit-btn-danger-background-hover: var(--tw-color-red-100);
-    --dbv-kit-btn-danger-background-active: var(--tw-color-red-100);
-
-    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-foreground-hover);
+    &:focus-visible,
+    &[data-focus-visible] {
+      outline: var(--dbv-kit-icon-btn-outline-width) solid var(--dbv-kit-icon-btn-outline-color);
+      outline-offset: var(--dbv-kit-icon-btn-outline-offset);
+    }
 
     &:hover {
       @media (hover: hover) {
-        .dbv-kit-icon-button__icon {
-          color: var(--dbv-kit-btn-foreground-hover);
-        }
+        color: var(--dbv-kit-icon-btn-foreground-hover);
+        background-color: var(--dbv-kit-icon-btn-background-hover);
       }
     }
 
     &:active,
     &[data-active] {
-      .dbv-kit-icon-button__icon {
-        color: var(--dbv-kit-btn-foreground-active);
-      }
+      color: var(--dbv-kit-icon-btn-foreground-active);
+      background-color: var(--dbv-kit-icon-btn-background-active);
     }
 
     &:disabled {
@@ -53,16 +43,12 @@
     }
   }
 
-  .dbv-kit-button[data-loading='true'].dbv-kit-icon-button {
-    opacity: 0.5;
-    color: var(--dbv-kit-btn-foreground);
-    background-color: var(--dbv-kit-btn-background);
+  .dbv-kit-icon-button .dbv-kit-button__loader {
+    --dbv-kit-spinner-stroke-color: var(--dbv-kit-icon-btn-loader-color);
+    --dbv-kit-spinner-height: calc(var(--dbv-kit-icon-btn-size) * 0.8);
+    --dbv-kit-spinner-stroke-width: 3px;
 
-    &:hover,
-    &:active,
-    &[data-active] {
-      background-color: var(--dbv-kit-btn-background);
-    }
+    position: absolute;
   }
 
   .dbv-kit-icon-button__icon {
@@ -71,5 +57,65 @@
     justify-content: center;
     width: 100%;
     height: 100%;
+  }
+
+  .dbv-kit-icon-button.dbv-kit-icon-button[data-loading='true'] {
+    opacity: 0.75;
+    background-color: var(--dbv-kit-icon-btn-background-hover);
+
+    &:hover,
+    &:active,
+    &[data-active] {
+      background-color: var(--dbv-kit-icon-btn-background-active);
+    }
+  }
+
+  /* Size variants */
+  .dbv-kit-icon-button.dbv-kit-button--small {
+    --dbv-kit-icon-btn-size: var(--dbv-kit-icon-btn-small-size);
+  }
+
+  .dbv-kit-icon-button.dbv-kit-button--medium {
+    --dbv-kit-icon-btn-size: var(--dbv-kit-icon-btn-medium-size);
+  }
+
+  .dbv-kit-icon-button.dbv-kit-button--large {
+    --dbv-kit-icon-btn-size: var(--dbv-kit-icon-btn-large-size);
+  }
+
+  .dbv-kit-icon-button.dbv-kit-button--xlarge {
+    --dbv-kit-icon-btn-size: var(--dbv-kit-icon-btn-xlarge-size);
+  }
+
+  /* Variant styles */
+  .dbv-kit-icon-button.dbv-kit-button--primary {
+    --dbv-kit-icon-btn-foreground: var(--dbv-kit-icon-btn-primary-foreground);
+    --dbv-kit-icon-btn-foreground-hover: var(--dbv-kit-icon-btn-primary-foreground-hover);
+    --dbv-kit-icon-btn-foreground-active: var(--dbv-kit-icon-btn-primary-foreground-active);
+    --dbv-kit-icon-btn-background: var(--dbv-kit-icon-btn-primary-background);
+    --dbv-kit-icon-btn-background-hover: var(--dbv-kit-icon-btn-primary-background-hover);
+    --dbv-kit-icon-btn-background-active: var(--dbv-kit-icon-btn-primary-background-active);
+    --dbv-kit-icon-btn-loader-color: var(--dbv-kit-icon-btn-primary-foreground);
+  }
+
+  .dbv-kit-icon-button.dbv-kit-button--secondary {
+    --dbv-kit-icon-btn-foreground: var(--dbv-kit-icon-btn-secondary-foreground);
+    --dbv-kit-icon-btn-foreground-hover: var(--dbv-kit-icon-btn-secondary-foreground-hover);
+    --dbv-kit-icon-btn-foreground-active: var(--dbv-kit-icon-btn-secondary-foreground-active);
+    --dbv-kit-icon-btn-background: var(--dbv-kit-icon-btn-secondary-background);
+    --dbv-kit-icon-btn-background-hover: var(--dbv-kit-icon-btn-secondary-background-hover);
+    --dbv-kit-icon-btn-background-active: var(--dbv-kit-icon-btn-secondary-background-active);
+    --dbv-kit-icon-btn-border-color: var(--dbv-kit-icon-btn-secondary-border-color);
+    --dbv-kit-icon-btn-loader-color: var(--dbv-kit-icon-btn-secondary-loader-color);
+  }
+
+  .dbv-kit-icon-button.dbv-kit-button--danger {
+    --dbv-kit-icon-btn-foreground: var(--dbv-kit-icon-btn-danger-foreground);
+    --dbv-kit-icon-btn-foreground-hover: var(--dbv-kit-icon-btn-danger-foreground-hover);
+    --dbv-kit-icon-btn-foreground-active: var(--dbv-kit-icon-btn-danger-foreground-active);
+    --dbv-kit-icon-btn-background: var(--dbv-kit-icon-btn-danger-background);
+    --dbv-kit-icon-btn-background-hover: var(--dbv-kit-icon-btn-danger-background-hover);
+    --dbv-kit-icon-btn-background-active: var(--dbv-kit-icon-btn-danger-background-active);
+    --dbv-kit-icon-btn-loader-color: var(--dbv-kit-icon-btn-danger-loader-color);
   }
 }
