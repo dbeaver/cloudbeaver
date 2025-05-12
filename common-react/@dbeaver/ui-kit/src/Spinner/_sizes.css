@@ -1,0 +1,8 @@
+@layer base {
+  :root {
+    --dbv-kit-spinner-small-height: var(--dbv-kit-control-height-small);
+    --dbv-kit-spinner-medium-height: var(--dbv-kit-control-height-medium);
+    --dbv-kit-spinner-large-height: var(--dbv-kit-control-height-large);
+    --dbv-kit-spinner-xlarge-height: var(--dbv-kit-control-height-xlarge);
+  }
+}
