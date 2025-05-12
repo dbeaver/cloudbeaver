@@ -164,7 +164,7 @@ public interface DBWServiceCore extends DBWService {
     ///////////////////////////////////////////
     // Projects
 
-//    @WebAction
+    @WebAction
     List<WebProjectInfo> getProjects(@NotNull WebSession session);
 
     ///////////////////////////////////////////
