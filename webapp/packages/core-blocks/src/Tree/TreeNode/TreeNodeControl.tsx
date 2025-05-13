@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React, { forwardRef, useContext } from 'react';
+import React, { forwardRef, useContext, useLayoutEffect, useRef } from 'react';
 
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
@@ -18,6 +18,7 @@ import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag.js';
 import type { ITreeNodeState } from './ITreeNodeState.js';
 import { TreeNodeContext } from './TreeNodeContext.js';
 import style from './TreeNodeControl.module.css';
+import { useMergeRefs } from '../../useMergeRefs.js';
 
 const KEY = {
   ENTER: 'Enter',
@@ -38,6 +39,8 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
   ) {
     const styles = useS(style);
     const context = useContext(TreeNodeContext);
+    const innerRef = useRef<HTMLDivElement>(null);
+    const mergedRef = useMergeRefs(innerRef, ref);
 
     if (!context) {
       throw new Error('Context not provided');
@@ -109,9 +112,15 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
       }
     }
 
+    useLayoutEffect(() => {
+      if (context.selected) {
+        innerRef.current?.focus();
+      }
+    }, [context.selected]);
+
     return (
       <div
-        ref={ref}
+        ref={mergedRef}
         tabIndex={context.selected ? 0 : -1}
         title={title}
         aria-selected={context.selected}

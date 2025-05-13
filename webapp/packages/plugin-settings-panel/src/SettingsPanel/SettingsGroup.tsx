@@ -32,20 +32,28 @@ export const SettingsGroup = observer<Props>(function SettingsGroup({ settingsId
   const ref = useRef<HTMLDivElement>(null);
   const translate = useTranslate();
   const groupSettings = getComputed(() => settings.get(group)?.filter(settingsFilter(translate, treeFilter.filter)) || [], isArraysEqual);
+  const hidden = groupSettings.length === 0;
 
   useExecutor({
     executor: groupSelectExecutor,
     handlers: [
       id => {
         if (id === group.id) {
-          ref.current?.scrollIntoView();
+          if (hidden) {
+            const next = ref.current?.nextSibling;
+            if (next instanceof HTMLElement) {
+              next?.scrollIntoView();
+            }
+          } else {
+            ref.current?.scrollIntoView();
+          }
         }
       },
     ],
   });
 
   return (
-    <Group ref={ref} id={getSettingGroupId(settingsId, group.id)} hidden={groupSettings.length === 0} vertical gap compact>
+    <Group ref={ref} id={getSettingGroupId(settingsId, group.id)} hidden={hidden} vertical gap compact>
       <GroupTitle sticky>
         <SettingsGroupTitle group={group} />
       </GroupTitle>
