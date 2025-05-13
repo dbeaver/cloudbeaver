@@ -1,23 +1,31 @@
 @import './_base.css';
-@import './_icon-base.css';
-@import './_icon-sizes.css';
-@import './_icon-variants.css';
+@import './_sizes.css';
+@import './_variants.css';
 
 @layer base {
   .dbv-kit-icon-button {
+    display: inline-flex;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
     padding: 0;
+
     min-width: var(--dbv-kit-icon-btn-size);
     width: var(--dbv-kit-icon-btn-size);
     height: var(--dbv-kit-icon-btn-size);
-    border-radius: var(--dbv-kit-icon-btn-border-radius);
-    border: none;
-    cursor: pointer;
 
-    color: var(--dbv-kit-icon-btn-foreground);
-    background-color: var(--dbv-kit-icon-btn-background);
+    border-radius: var(--dbv-kit-icon-btn-border-radius);
     border-color: var(--dbv-kit-icon-btn-border-color);
     border-width: var(--dbv-kit-btn-border-width);
     border-style: var(--dbv-kit-btn-border-style);
+
+    color: var(--dbv-kit-icon-btn-foreground);
+    background-color: var(--dbv-kit-icon-btn-background);
 
     &:focus-visible,
     &[data-focus-visible] {
@@ -43,12 +51,10 @@
     }
   }
 
-  .dbv-kit-icon-button .dbv-kit-button__loader {
+  .dbv-kit-icon-button .dbv-kit-spinner {
     --dbv-kit-spinner-stroke-color: var(--dbv-kit-icon-btn-loader-color);
     --dbv-kit-spinner-height: calc(var(--dbv-kit-icon-btn-size) * 0.8);
     --dbv-kit-spinner-stroke-width: 3px;
-
-    position: absolute;
   }
 
   .dbv-kit-icon-button__icon {
@@ -59,8 +65,8 @@
     height: 100%;
   }
 
-  .dbv-kit-icon-button.dbv-kit-icon-button[data-loading='true'] {
-    opacity: 0.75;
+  .dbv-kit-icon-button[data-loading='true'] {
+    opacity: var(--dbv-kit-control-disabled-opacity);
     background-color: var(--dbv-kit-icon-btn-background-hover);
 
     &:hover,
@@ -71,24 +77,24 @@
   }
 
   /* Size variants */
-  .dbv-kit-icon-button.dbv-kit-button--small {
+  .dbv-kit-icon-button--small {
     --dbv-kit-icon-btn-size: var(--dbv-kit-icon-btn-small-size);
   }
 
-  .dbv-kit-icon-button.dbv-kit-button--medium {
+  .dbv-kit-icon-button--medium {
     --dbv-kit-icon-btn-size: var(--dbv-kit-icon-btn-medium-size);
   }
 
-  .dbv-kit-icon-button.dbv-kit-button--large {
+  .dbv-kit-icon-button--large {
     --dbv-kit-icon-btn-size: var(--dbv-kit-icon-btn-large-size);
   }
 
-  .dbv-kit-icon-button.dbv-kit-button--xlarge {
+  .dbv-kit-icon-button--xlarge {
     --dbv-kit-icon-btn-size: var(--dbv-kit-icon-btn-xlarge-size);
   }
 
   /* Variant styles */
-  .dbv-kit-icon-button.dbv-kit-button--primary {
+  .dbv-kit-icon-button--primary {
     --dbv-kit-icon-btn-foreground: var(--dbv-kit-icon-btn-primary-foreground);
     --dbv-kit-icon-btn-foreground-hover: var(--dbv-kit-icon-btn-primary-foreground-hover);
     --dbv-kit-icon-btn-foreground-active: var(--dbv-kit-icon-btn-primary-foreground-active);
@@ -98,7 +104,7 @@
     --dbv-kit-icon-btn-loader-color: var(--dbv-kit-icon-btn-primary-foreground);
   }
 
-  .dbv-kit-icon-button.dbv-kit-button--secondary {
+  .dbv-kit-icon-button--secondary {
     --dbv-kit-icon-btn-foreground: var(--dbv-kit-icon-btn-secondary-foreground);
     --dbv-kit-icon-btn-foreground-hover: var(--dbv-kit-icon-btn-secondary-foreground-hover);
     --dbv-kit-icon-btn-foreground-active: var(--dbv-kit-icon-btn-secondary-foreground-active);
@@ -109,7 +115,7 @@
     --dbv-kit-icon-btn-loader-color: var(--dbv-kit-icon-btn-secondary-loader-color);
   }
 
-  .dbv-kit-icon-button.dbv-kit-button--danger {
+  .dbv-kit-icon-button--danger {
     --dbv-kit-icon-btn-foreground: var(--dbv-kit-icon-btn-danger-foreground);
     --dbv-kit-icon-btn-foreground-hover: var(--dbv-kit-icon-btn-danger-foreground-hover);
     --dbv-kit-icon-btn-foreground-active: var(--dbv-kit-icon-btn-danger-foreground-active);

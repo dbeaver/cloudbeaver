@@ -6,21 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 import { clsx } from 'clsx';
-import './IconButton.css';
-import { ButtonBase, type ButtonProps } from './Button.js';
-import { componentProviderWrapper } from '../componentProviderWrapper.js';
 
-export interface IconButtonProps extends ButtonProps {
+import { componentProviderWrapper } from '../componentProviderWrapper.js';
+import { ButtonRoot, type ButtonPropsWithLoader } from '../Button/ButtonRoot.js';
+import type { ControlSize } from '../types/controls.js';
+
+import './IconButton.css';
+
+export interface IconButtonProps extends ButtonPropsWithLoader {
   'aria-label': string;
+  variant?: 'primary' | 'secondary' | 'danger';
+  size?: ControlSize;
 }
 
 export function IconButtonBase({ className, variant = 'primary', size = 'medium', children, 'aria-label': ariaLabel, ...props }: IconButtonProps) {
-  const classToApply = clsx('dbv-kit-icon-button', className);
+  const classToApply = clsx('dbv-kit-icon-button', `dbv-kit-icon-button--${variant}`, `dbv-kit-icon-button--${size}`, className);
 
   return (
-    <ButtonBase className={classToApply} variant={variant} size={size} aria-label={ariaLabel} {...props}>
+    <ButtonRoot className={classToApply} aria-label={ariaLabel} {...props}>
       <span className="dbv-kit-icon-button__icon">{children}</span>
-    </ButtonBase>
+    </ButtonRoot>
   );
 }
 

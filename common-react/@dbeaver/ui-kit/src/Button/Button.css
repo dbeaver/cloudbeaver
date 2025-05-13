@@ -138,7 +138,7 @@
   /* Loader */
 
   .dbv-kit-button[data-loading='true'] {
-    opacity: 0.75;
+    opacity: var(--dbv-kit-control-disabled-opacity);
     background-color: var(--dbv-kit-btn-background-hover);
 
     &:hover,
@@ -148,12 +148,10 @@
     }
   }
 
-  .dbv-kit-button__loader {
+  .dbv-kit-button .dbv-kit-spinner {
     --dbv-kit-spinner-stroke-color: var(--dbv-kit-btn-loader-color);
     --dbv-kit-spinner-height: calc(var(--dbv-kit-btn-height) * 0.6);
     --dbv-kit-spinner-stroke-width: 3px;
-
-    position: absolute;
   }
 
   /* ---------------------------- */

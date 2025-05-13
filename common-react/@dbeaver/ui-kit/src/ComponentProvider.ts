@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 import type { ButtonBase } from './Button/Button.js';
-import type { IconButtonBase } from './Button/IconButton.js';
+import type { IconButtonBase } from './IconButton/IconButton.js';
 import type { CheckboxBase } from './Checkbox/Checkbox.js';
 import type { Radio } from './Radio/Radio.js';
 import type { InputBase } from './Input/Input.js';
