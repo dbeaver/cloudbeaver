@@ -8,10 +8,10 @@
 import clsx from 'clsx';
 import type { ControlSize } from '../types/controls.js';
 import { componentProviderWrapper } from '../componentProviderWrapper.js';
-import { ButtonRoot, type ButtonPropsWithLoader } from './ButtonRoot.js';
+import { ButtonRoot, type ButtonRootProps } from './ButtonRoot.js';
 import './Button.css';
 
-export interface ButtonProps extends ButtonPropsWithLoader {
+export interface ButtonProps extends ButtonRootProps {
   variant?: 'primary' | 'secondary' | 'danger';
   size?: ControlSize;
 }
