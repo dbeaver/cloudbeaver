@@ -109,6 +109,7 @@ export default [
   ['ui_close_all_to_the_left', '关闭左侧'],
   ['ui_or', '或'],
   ['ui_download', '下载'],
+  ['ui_redownload', 'Redownload'],
   ['ui_download_file', '下载文件'],
   ['ui_upload', '上传'],
   ['ui_import', '导入'],

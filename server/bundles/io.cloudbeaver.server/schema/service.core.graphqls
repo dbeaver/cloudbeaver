@@ -418,6 +418,8 @@ type ConnectionInfo {
 
     projectId: ID!
     requiredAuth: String
+    defaultCatalogName: String @since(version: "25.0.5")
+    defaultSchemaName: String @since(version: "25.0.5")
 
     tools: [String!]! @since(version: "24.1.3")
 }
@@ -570,6 +572,8 @@ input ConnectionConfig {
 
     # Configuration type
     configurationType: DriverConfigurationType
+    defaultCatalogName: String @since(version: "25.0.5")
+    defaultSchemaName: String @since(version: "25.0.5")
 }
 
 ####################################################

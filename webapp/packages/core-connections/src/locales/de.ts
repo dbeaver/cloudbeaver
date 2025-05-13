@@ -46,6 +46,8 @@ export default [
   ['connections_network_handler_ssh_tunnel_advanced_settings', 'Erweiterte Einstellungen'],
   ['connections_not_found', 'Es wurden keine Datenbankverbindungen gefunden'],
   ['connections_connection_autocommit', 'Auto commit'],
+  ['connections_connection_default_catalog', 'Default catalog'],
+  ['connections_connection_default_schema', 'Default schema'],
 
   ['core_connections_settings_disable', 'Disable'],
   ['core_connections_settings_disable_description', 'Disable the ability to create new connections'],

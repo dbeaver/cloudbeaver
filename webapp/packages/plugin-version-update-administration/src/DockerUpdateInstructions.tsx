@@ -19,8 +19,10 @@ export const DockerUpdateInstructions = observer(function DockerUpdateInstructio
     <Group gap large>
       <GroupTitle>{translate('version_update_how_to_update')}</GroupTitle>
       <GroupItem className={s(style, { groupItem: true })}>
-        <h4 className={s(style, { h4: true })}>The following instructions apply only when you run CloudBeaver in a Docker container.</h4>
-        <ol className={s(style, { ol: true })}>
+        <h4 className="tw:mb-4">
+          <b>The following instructions apply only when you run CloudBeaver in a Docker container.</b>
+        </h4>
+        <ol className="tw:list-decimal tw:list-inside">
           <li>
             Stop the existing container by running the <strong>docker stop</strong> command.
           </li>

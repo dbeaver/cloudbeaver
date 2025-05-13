@@ -4,8 +4,6 @@ fragment DatabaseConnection on ConnectionInfo {
   name
   description
   driverId
-  keepAliveInterval
-  autocommit
 
   connected
   readOnly

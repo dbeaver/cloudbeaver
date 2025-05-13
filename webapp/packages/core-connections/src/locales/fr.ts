@@ -60,6 +60,8 @@ export default [
   ['connections_connection_expert_settings', 'Expert settings'],
   ['connections_connection_keep_alive', 'Garder actif (en secondes)'],
   ['connections_connection_autocommit', 'Auto commit'],
+  ['connections_connection_default_catalog', 'Default catalog'],
+  ['connections_connection_default_schema', 'Default schema'],
   ['connections_connection_keep_alive_tooltip', 'Pas de déconnexion automatique'],
   ['connections_network_handler_test', 'Tester le tunnel'],
   ['connections_network_handler_test_fail', 'Échec du test du tunnel'],

@@ -55,6 +55,8 @@ export default [
   ['connections_connection_keep_alive', 'Keep alive (in seconds)'],
   ['connections_connection_read_only', 'Read-only connection'],
   ['connections_connection_autocommit', 'Auto commit'],
+  ['connections_connection_default_catalog', 'Default catalog'],
+  ['connections_connection_default_schema', 'Default schema'],
   ['connections_connection_keep_alive_tooltip', 'No auto disconnect'],
   ['connections_network_handler_test', 'Test Tunnel'],
   ['connections_network_handler_test_fail', 'Tunnel test failed'],

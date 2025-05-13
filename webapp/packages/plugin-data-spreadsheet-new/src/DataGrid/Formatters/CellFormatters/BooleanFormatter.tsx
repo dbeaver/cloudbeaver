@@ -32,7 +32,8 @@ export const BooleanFormatter = observer<ICellFormatterProps>(function BooleanFo
   const value = getComputed(() => formatter.get(cell));
   const textValue = getComputed(() => formatter.getText(cell));
   const booleanValue = getComputed(() => textValue.toLowerCase() === 'true');
-  const disabled = formatter.isReadOnly(cell) && cellContext.editionState !== DatabaseEditChangeType.add;
+  const disabled =
+    context.model.isReadonly(context.resultIndex) || (formatter.isReadOnly(cell) && cellContext.editionState !== DatabaseEditChangeType.add);
 
   function toggleValue() {
     if (disabled || !tableDataContext || !cell) {
