@@ -46,6 +46,8 @@ export default [
   ['connections_connection_expert_settings', '专业设置'],
   ['connections_connection_keep_alive', '保持连接 (秒)'],
   ['connections_connection_autocommit', '自动提交'],
+  ['connections_connection_default_catalog', 'Default catalog'],
+  ['connections_connection_default_schema', 'Default schema'],
   ['connections_connection_keep_alive_tooltip', '无自动断开连接'],
   ['connections_connection_read_only', 'Read-only connection'],
   ['connections_network_handler_test', '测试隧道'],

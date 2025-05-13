@@ -24,6 +24,8 @@ export const CONNECTION_CONFIG_SCHEMA = schema.object({
   folder: schema.string().optional(),
   host: schema.string().optional(),
   keepAliveInterval: schema.number().optional(),
+  defaultCatalogName: schema.string().optional(),
+  defaultSchemaName: schema.string().optional(),
   mainPropertyValues: schema.record(schema.any()).optional(),
   name: schema.string().optional(),
   networkHandlersConfig: schema.array(CONNECTION_NETWORK_HANDLER_SCHEMA).optional(),

@@ -221,6 +221,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     config.keepAliveInterval = customOptionsInfo.keepAliveInterval;
     config.autocommit = customOptionsInfo.autocommit;
+    config.defaultCatalogName = customOptionsInfo.defaultCatalogName;
+    config.defaultSchemaName = customOptionsInfo.defaultSchemaName;
     config.readOnly = customOptionsInfo.readOnly;
 
     if (authPropertiesInfo.authProperties) {
