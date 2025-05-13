@@ -19,7 +19,8 @@ interface Props {
 
 export const Setting = observer<Props>(function Setting({ source, setting }) {
   const translate = useTranslate();
-  const isOverride = source.has(setting.key);
+  // DODO: hide this logic until we have more than one scope
+  const isOverride = source.has(setting.key) && source.getEditedValue(setting.key) !== null && false;
 
   function handleRestore() {
     source.setValue(setting.key, null);
@@ -27,9 +28,9 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
 
   return (
     <div className='tw:flex tw:relative tw:gap-2'>
-      <div className="tw:w-1 tw:h-full">
+      <div className="tw:w-1 tw:h-full" hidden>
         {isOverride && (
-          <div className={clsx('tw:h-full tw:w-full tw:bg-[var(--theme-primary)]')} title={translate('plugin_settings_panel_setting_set_in_scope')} />
+          <div className={clsx('tw:h-full tw:w-full tw:bg-zinc-100 tw:dark:bg-zinc-700')} title={translate('plugin_settings_panel_setting_set_in_scope')} />
         )}
       </div>
       <div>
