@@ -138,7 +138,6 @@
   /* Loader */
 
   .dbv-kit-button[data-loading='true'] {
-    opacity: var(--dbv-kit-control-disabled-opacity);
     background-color: var(--dbv-kit-btn-background-hover);
 
     &:hover,

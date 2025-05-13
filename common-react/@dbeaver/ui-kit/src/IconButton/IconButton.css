@@ -51,7 +51,6 @@
     }
 
     &[data-loading='true'] {
-      opacity: var(--dbv-kit-control-disabled-opacity);
       background-color: var(--dbv-kit-icon-btn-background);
 
       &:hover,
