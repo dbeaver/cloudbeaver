@@ -61,6 +61,8 @@ public class WebConnectionConfig {
     private DBPDriverConfigurationType configurationType;
     private String selectedSecretId;
     private boolean defaultAutoCommit;
+    private String defaultCatalogName;
+    private String defaultSchemaName;
 
     public WebConnectionConfig() {
     }
@@ -96,6 +98,8 @@ public class WebConnectionConfig {
 
             mainPropertyValues = JSONUtils.getObjectOrNull(params, "mainPropertyValues");
             providerProperties = JSONUtils.getObjectOrNull(params, "providerProperties");
+            defaultCatalogName = JSONUtils.getString(params, "defaultCatalogName");
+            defaultSchemaName = JSONUtils.getString(params, "defaultSchemaName");
 
             String configType = JSONUtils.getString(params, "configurationType");
             configurationType = configType == null ? null : DBPDriverConfigurationType.valueOf(configType);
@@ -233,5 +237,15 @@ public class WebConnectionConfig {
     @Nullable
     public String getSelectedSecretId() {
         return selectedSecretId;
+    }
+
+    @Property
+    public String getDefaultCatalogName() {
+        return defaultCatalogName;
+    }
+
+    @Property
+    public String getDefaultSchemaName() {
+        return defaultSchemaName;
     }
 }

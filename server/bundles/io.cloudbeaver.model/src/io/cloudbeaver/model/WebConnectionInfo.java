@@ -492,6 +492,18 @@ public class WebConnectionInfo {
     }
 
     @Property
+    public String getDefaultCatalogName() {
+        DBPConnectionConfiguration connectionConfiguration = dataSourceContainer.getConnectionConfiguration();
+        return connectionConfiguration.getBootstrap().getDefaultCatalogName();
+    }
+
+    @Property
+    public String getDefaultSchemaName() {
+        DBPConnectionConfiguration connectionConfiguration = dataSourceContainer.getConnectionConfiguration();
+        return connectionConfiguration.getBootstrap().getDefaultSchemaName();
+    }
+
+    @Property
     public List<WebSecretInfo> getSharedSecrets() throws DBException {
         return dataSourceContainer.listSharedCredentials()
             .stream()

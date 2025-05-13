@@ -7,13 +7,15 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, Expandable, FieldCheckbox, Group, InputField, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, Expandable, FieldCheckbox, Flex, Group, InputField, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 const MAX_KEEP_ALIVE_INTERVAL = 32767;
 const DEFAULT_CONFIG: ConnectionConfig = {
   keepAliveInterval: 0,
   autocommit: true,
+  defaultCatalogName: '',
+  defaultSchemaName: '',
   readOnly: false,
 };
 
@@ -65,6 +67,30 @@ export const AdvancedPropertiesForm = observer<Props>(function AdvancedPropertie
           >
             {translate('connections_connection_read_only')}
           </FieldCheckbox>
+
+          <Flex gap="xs">
+            <InputField
+              name="defaultCatalogName"
+              readOnly={readonly || disabled}
+              title={translate('connections_connection_default_catalog')}
+              state={config}
+              defaultState={DEFAULT_CONFIG}
+              fill
+            >
+              {translate('connections_connection_default_catalog')}
+            </InputField>
+
+            <InputField
+              name="defaultSchemaName"
+              readOnly={readonly || disabled}
+              title={translate('connections_connection_default_schema')}
+              state={config}
+              defaultState={DEFAULT_CONFIG}
+              fill
+            >
+              {translate('connections_connection_default_schema')}
+            </InputField>
+          </Flex>
         </Container>
       </Expandable>
     </Group>
