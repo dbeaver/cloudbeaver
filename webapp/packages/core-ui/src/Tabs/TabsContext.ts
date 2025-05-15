@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ export interface ITabsContext<T = Record<string, any>> {
   canClose: (tabId: string) => boolean;
   getTabInfo: (tabId: string) => ITabInfo<T> | undefined;
   getTabState: <T>(tabId: string, valueGetter?: MetadataValueGetter<string, T>, schema?: schema.AnyZodObject) => T;
+  setTabState: <T>(tabId: string, value: T) => T;
   getLocalState: <T>(tabId: string, valueGetter?: MetadataValueGetter<string, T>, schema?: schema.AnyZodObject) => T;
   open: (tabId: string) => Promise<void>;
   close: (tabId: string) => Promise<void>;

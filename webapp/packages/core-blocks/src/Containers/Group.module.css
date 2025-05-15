@@ -41,6 +41,18 @@
     }
   }
 
+  &.compact {
+    &.gap > .groupTitle {
+      padding: 16px 0;
+      margin: -16px 0;
+
+      & > .groupClose {
+        right: 0px;
+        top: 16px;
+      }
+    }
+  }
+
   &.form > * {
     margin-right: 25%;
   }

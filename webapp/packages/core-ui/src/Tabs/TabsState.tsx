@@ -24,8 +24,10 @@ type ExtractContainerProps<T> = T extends void ? Record<string, any> : T;
 
 export type TabsStateProps<T = Record<string, any>> = ExtractContainerProps<T> &
   React.PropsWithChildren<{
+    /** Default selected tab id */
     selectedId?: string;
     orientation?: 'horizontal' | 'vertical';
+    /** Provide a tab Id to control tabs state */
     currentTabId?: string | null;
     container?: ITabsContainer<T, any>;
     localState?: MetadataMap<string, any>;
@@ -167,6 +169,9 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       },
       getTabState(tabId: string, valueGetter?: MetadataValueGetter<string, any>, schema?: schema.AnyZodObject) {
         return dynamic.container?.getTabState(dynamic.tabsState, tabId, dynamic.props, valueGetter, schema);
+      },
+      setTabState(tabId: string, value: any) {
+        return dynamic.container?.setTabState(dynamic.tabsState, tabId, value);
       },
       getLocalState(tabId: string, valueGetter?: MetadataValueGetter<string, any>, schema?: schema.AnyZodObject) {
         return dynamic.tabsState.get(tabId, valueGetter, schema);

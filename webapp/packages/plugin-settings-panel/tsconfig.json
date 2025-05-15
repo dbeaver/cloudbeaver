@@ -8,6 +8,9 @@
   },
   "references": [
     {
+      "path": "../../../common-react/@dbeaver/ui-kit"
+    },
+    {
       "path": "../../../common-typescript/@dbeaver/cli"
     },
     {
@@ -21,6 +24,9 @@
     },
     {
       "path": "../core-di"
+    },
+    {
+      "path": "../core-executor"
     },
     {
       "path": "../core-localization"

@@ -26,8 +26,8 @@ export default [
   ['plugin_connections_menu_connections_label', 'Connection'],
   ['plugin_connections_action_disconnect_all_label', 'Disconnect All'],
   ['plugin_connections_settings', 'Connections'],
-  ['plugin_connections_settings_hide_connections_view_name', 'Hide connections'],
-  ['plugin_connections_settings_hide_connections_view_description', 'Connections will be hidden for all users except administrators'],
+  ['plugin_connections_settings_hide_connections_view_name', 'Hide connection view management'],
+  ['plugin_connections_settings_hide_connections_view_description', 'Connections view submenu will be hidden for all users except administrators'],
 
   ['plugin_connections_connection_ssl_enable', 'Enable SSL'],
 

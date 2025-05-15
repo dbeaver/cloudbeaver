@@ -1,0 +1,2 @@
+/* this file required for tailwindcss vscode extension to work */
+@import './packages/product-default/src/styles.css';

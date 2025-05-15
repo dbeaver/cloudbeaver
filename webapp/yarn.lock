@@ -1517,6 +1517,7 @@ __metadata:
     "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-routing": "workspace:*"
     "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-storage": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
@@ -3671,6 +3672,7 @@ __metadata:
     "@cloudbeaver/core-events": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/plugin-settings-panel": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
@@ -3680,6 +3682,25 @@ __metadata:
     mobx-react-lite: "npm:^4"
     react: "npm:^19"
     react-dom: "npm:^19"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
+"@cloudbeaver/plugin-settings-default-administration@workspace:^, @cloudbeaver/plugin-settings-default-administration@workspace:packages/plugin-settings-default-administration":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-settings-default-administration@workspace:packages/plugin-settings-default-administration"
+  dependencies:
+    "@cloudbeaver/core-authentication": "workspace:*"
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-settings": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-settings-administration": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    mobx: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
   languageName: unknown
@@ -3725,6 +3746,7 @@ __metadata:
     "@cloudbeaver/core-blocks": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
@@ -3732,6 +3754,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/ui-kit": "workspace:^"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -4264,6 +4287,7 @@ __metadata:
     "@cloudbeaver/plugin-root": "workspace:*"
     "@cloudbeaver/plugin-session-expiration": "workspace:*"
     "@cloudbeaver/plugin-settings-administration": "workspace:*"
+    "@cloudbeaver/plugin-settings-default-administration": "workspace:^"
     "@cloudbeaver/plugin-settings-menu": "workspace:*"
     "@cloudbeaver/plugin-settings-menu-administration": "workspace:*"
     "@cloudbeaver/plugin-settings-panel": "workspace:*"

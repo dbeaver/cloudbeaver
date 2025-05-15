@@ -1,5 +1,6 @@
 export default [
   ['administration_menu_enter', 'Administration'],
+  ['core_administration_settings_group', 'Administration'],
   ['administration_menu_back', 'Back to app'],
   ['administration_configuration_wizard_title', 'Initial Server Configuration'],
   ['administration_configuration_wizard_finish_success_title', 'Server configured'],

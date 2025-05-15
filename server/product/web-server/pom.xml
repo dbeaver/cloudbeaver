@@ -9,7 +9,7 @@
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../../</relativePath>
     </parent>
-    <version>25.0.5-SNAPSHOT</version>
+    <version>25.1.0-SNAPSHOT</version>
     <artifactId>web-server</artifactId>
     <packaging>eclipse-repository</packaging>
     <name>Cloudbeaver Server Product</name>
