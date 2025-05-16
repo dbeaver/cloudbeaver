@@ -4,25 +4,14 @@
 
 @layer base {
   .dbv-kit-icon-button {
-    display: inline-flex;
-    text-align: center;
-    text-decoration: none;
-    cursor: pointer;
-    user-select: none;
-    position: relative;
-    justify-content: center;
-    align-items: center;
-    white-space: nowrap;
-    padding: 0;
-
     min-width: var(--dbv-kit-icon-btn-size);
     width: var(--dbv-kit-icon-btn-size);
     height: var(--dbv-kit-icon-btn-size);
 
     border-radius: var(--dbv-kit-icon-btn-border-radius);
     border-color: var(--dbv-kit-icon-btn-border-color);
-    border-width: var(--dbv-kit-btn-border-width);
-    border-style: var(--dbv-kit-btn-border-style);
+    border-width: var(--dbv-kit-icon-btn-border-width);
+    border-style: var(--dbv-kit-icon-btn-border-style);
 
     color: var(--dbv-kit-icon-btn-foreground);
     background-color: var(--dbv-kit-icon-btn-background);

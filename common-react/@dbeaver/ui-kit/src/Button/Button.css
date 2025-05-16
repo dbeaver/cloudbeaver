@@ -4,16 +4,6 @@
 
 @layer base {
   .dbv-kit-button {
-    display: inline-flex;
-    text-align: center;
-    text-decoration: none;
-    cursor: pointer;
-    user-select: none;
-    position: relative;
-    justify-content: center;
-    align-items: center;
-    white-space: nowrap;
-
     height: var(--dbv-kit-btn-height);
     padding-inline: var(--dbv-kit-btn-padding-inline);
     gap: var(--dbv-kit-btn-gap);
