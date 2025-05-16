@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
@@ -29,13 +29,16 @@ export class SettingsResolverSource implements ISettingsResolverSource {
       .reverse();
   }
   protected layers: ISettingsSourcesLayer[];
+  private updating: boolean;
 
   constructor() {
     this.onChange = new SyncExecutor();
     this.layers = [];
-    makeObservable<this, 'layers' | 'sources'>(this, {
+    this.updating = false;
+    makeObservable<this, 'layers' | 'sources' | 'update'>(this, {
       layers: observable.shallow,
       sources: computed,
+      update: action,
     });
   }
 
@@ -81,21 +84,29 @@ export class SettingsResolverSource implements ISettingsResolverSource {
     this.layers = [];
   }
 
+  isOverrideDefaults(): boolean {
+    return this.sources.some(r => r.isOverrideDefaults?.());
+  }
+
   isEdited(key?: any): boolean {
     return this.sources.find(r => r.has(key))?.isEdited(key) || false;
   }
 
-  isReadOnly(key: any): boolean {
+  isReadOnly(key: any, stopAt?: ISettingsSource): boolean {
     for (const source of this.sources) {
-      if (!source.isReadOnly(key)) {
-        return false;
+      if (!source.has(key)) {
+        continue;
       }
 
-      if (source.has(key)) {
+      if (source === stopAt) {
+        break;
+      }
+
+      if (source.isReadOnly(key)) {
         return true;
       }
     }
-    return true;
+    return false;
   }
 
   has(key: any): boolean {
@@ -161,5 +172,37 @@ export class SettingsResolverSource implements ISettingsResolverSource {
     }
 
     return layerSources;
+  }
+
+  protected getSnapshot(): Record<string, any> {
+    return {};
+  }
+
+  protected update(action: () => void) {
+    if (this.updating) {
+      action();
+      return;
+    }
+
+    this.updating = true;
+    try {
+      const snapshot = this.getSnapshot();
+      action();
+      const newSnapshot = this.getSnapshot();
+
+      for (const [key, value] of Object.entries(newSnapshot)) {
+        if (snapshot[key] !== value) {
+          this.onChange.execute({ key, value });
+        }
+      }
+
+      for (const key of Object.keys(snapshot)) {
+        if (!(key in newSnapshot)) {
+          this.onChange.execute({ key, value: undefined });
+        }
+      }
+    } finally {
+      this.updating = false;
+    }
   }
 }

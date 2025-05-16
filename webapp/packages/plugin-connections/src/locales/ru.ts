@@ -26,8 +26,8 @@ export default [
   ['plugin_connections_menu_connections_label', 'Подключение'],
   ['plugin_connections_action_disconnect_all_label', 'Отключить все'],
   ['plugin_connections_settings', 'Подключения'],
-  ['plugin_connections_settings_hide_connections_view_name', 'Скрыть подключения'],
-  ['plugin_connections_settings_hide_connections_view_description', 'Подключения будут скрыты для всех пользователей, кроме администраторов'],
+  ['plugin_connections_settings_hide_connections_view_name', 'Скрыть управление отображением подключений'],
+  ['plugin_connections_settings_hide_connections_view_description', 'Подменю выбора отображения подключения будет скрыто для всех пользователей, кроме администраторов'],
 
   ['plugin_connections_connection_ssl_enable', 'Включить SSL'],
 

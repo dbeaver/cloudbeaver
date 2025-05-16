@@ -11,22 +11,12 @@ import { injectable } from '@cloudbeaver/core-di';
 import { AutoRunningTask, type ISyncExecutor, type ITask, SyncExecutor, whileTask } from '@cloudbeaver/core-executor';
 import { CachedDataResource, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { SessionResource } from '@cloudbeaver/core-root';
-import {
-  type FederatedAuthInfo,
-  type AuthInfo,
-  type AuthLogoutQuery,
-  AuthStatus,
-  type GetActiveUserQueryVariables,
-  GraphQLService,
-  type UserInfo,
-} from '@cloudbeaver/core-sdk';
+import { type FederatedAuthInfo, type AuthInfo, type AuthLogoutQuery, AuthStatus, GraphQLService, type UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID.js';
 import { AuthProviderService } from './AuthProviderService.js';
 import type { ELMRole } from './ELMRole.js';
 import type { IAuthCredentials } from './IAuthCredentials.js';
-
-export type UserInfoIncludes = GetActiveUserQueryVariables;
 
 export type UserLogoutInfo = AuthLogoutQuery['result'];
 
@@ -42,7 +32,7 @@ export type IFederatedLoginOptions = Omit<ILoginOptions, 'credentials'>;
 export const ANONYMOUS_USER_ID = 'anonymous';
 
 @injectable()
-export class UserInfoResource extends CachedDataResource<UserInfo | null, void, UserInfoIncludes> {
+export class UserInfoResource extends CachedDataResource<UserInfo | null, void> {
   readonly onUserChange: ISyncExecutor<string>;
   readonly onException: ISyncExecutor<Error>;
 
@@ -63,7 +53,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     private readonly authProviderService: AuthProviderService,
     private readonly sessionResource: SessionResource,
   ) {
-    super(() => null, undefined, ['includeConfigurationParameters']);
+    super(() => null);
 
     this.onUserChange = new SyncExecutor();
     this.onException = new SyncExecutor();
@@ -210,8 +200,6 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     await this.performUpdate(undefined, [], async () => {
       const { user } = await this.graphQLService.sdk.updateUserPreferences({
         preferences,
-        ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(),
       });
 
       this.setData(user as UserInfo | null);
@@ -291,12 +279,9 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     this.sessionResource.markOutdated();
   }
 
-  protected async loader(key: void, includes?: ReadonlyArray<string>): Promise<UserInfo | null> {
+  protected async loader(key: void): Promise<UserInfo | null> {
     try {
-      const { user } = await this.graphQLService.sdk.getActiveUser({
-        ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(key, includes),
-      });
+      const { user } = await this.graphQLService.sdk.getActiveUser({});
 
       return (user as UserInfo | null) || null;
     } catch (exception: any) {
@@ -316,11 +301,5 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     if (prevUserId !== currentUserId) {
       this.onUserChange.execute(currentUserId);
     }
-  }
-
-  private getDefaultIncludes(): UserInfoIncludes {
-    return {
-      includeConfigurationParameters: false,
-    };
   }
 }

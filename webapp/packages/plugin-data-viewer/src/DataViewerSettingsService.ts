@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ export class DataViewerSettingsService extends Dependency {
         {
           key: 'plugin.data-viewer.disableEdit',
           access: {
-            scope: ['server'],
+            scope: ['server', 'role'],
           },
           type: ESettingsValueType.Checkbox,
           name: 'settings_data_editor_disable_edit_name',
@@ -128,7 +128,7 @@ export class DataViewerSettingsService extends Dependency {
         {
           key: 'plugin.data-viewer.disableCopyData',
           access: {
-            scope: ['server'],
+            scope: ['server', 'role'],
           },
           type: ESettingsValueType.Checkbox,
           name: 'settings_data_editor_disable_data_copy_name',
@@ -138,7 +138,7 @@ export class DataViewerSettingsService extends Dependency {
         {
           key: 'plugin.data-viewer.fetchMax',
           access: {
-            scope: ['server'],
+            scope: ['server', 'role'],
           },
           type: ESettingsValueType.Input,
           name: 'settings_data_editor_fetch_max_name',
@@ -152,7 +152,7 @@ export class DataViewerSettingsService extends Dependency {
           name: 'settings_data_editor_disable_data_export_name',
           description: 'settings_data_editor_disable_data_export_description',
           access: {
-            scope: ['server'],
+            scope: ['server', 'role'],
           },
         },
       ];
@@ -161,7 +161,7 @@ export class DataViewerSettingsService extends Dependency {
         settings.push({
           key: 'resultset.maxrows',
           access: {
-            scope: ['server'],
+            scope: ['server', 'client'],
           },
           type: ESettingsValueType.Input,
           name: 'settings_data_editor_fetch_default_name',

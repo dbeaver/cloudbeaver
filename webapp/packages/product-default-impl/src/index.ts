@@ -72,6 +72,7 @@ import { userProfileSettingsPlugin } from '@cloudbeaver/plugin-user-profile-sett
 import version from '@cloudbeaver/plugin-version';
 import versionUpdate from '@cloudbeaver/plugin-version-update-administration';
 import { pluginSystemInformationAdministrationManifest } from '@cloudbeaver/plugin-system-information-administration';
+import { pluginSettingsDefaultAdministrationManifest } from '@cloudbeaver/plugin-settings-default-administration';
 
 import { defaultProductManifest } from './manifest.js';
 
@@ -139,6 +140,7 @@ const PLUGINS: PluginManifest[] = [
   appLogoPlugin,
   appLogoPluginAdministration,
   pluginSystemInformationAdministrationManifest,
+  pluginSettingsDefaultAdministrationManifest,
   // must be las one to override all
   defaultProductManifest,
 ];

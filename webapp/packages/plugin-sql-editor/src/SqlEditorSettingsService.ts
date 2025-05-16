@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -122,16 +122,16 @@ export class SqlEditorSettingsService extends Dependency {
 
     this.settingsManagerService.registerSettings(this.settings, () => {
       const settings: ISettingDescription<SqlEditorSettings>[] = [
-        // {
-        //   group: SQL_EDITOR_SETTINGS_GROUP,
-        //   key: 'plugin.sql-editor.disabled',
-        //   access: {
-        //     scope: ['server'],
-        //   },
-        //   type: ESettingsValueType.Checkbox,
-        //   name: 'plugin_sql_editor_settings_disable',
-        //   description: 'plugin_sql_editor_settings_disable_description',
-        // },
+        {
+          group: SQL_EDITOR_SETTINGS_GROUP,
+          key: 'plugin.sql-editor.disabled',
+          access: {
+            scope: ['role'],
+          },
+          type: ESettingsValueType.Checkbox,
+          name: 'plugin_sql_editor_settings_disable',
+          description: 'plugin_sql_editor_settings_disable_description',
+        },
         {
           group: SQL_EDITOR_SETTINGS_GROUP,
           key: 'plugin.sql-editor.maxFileSize',

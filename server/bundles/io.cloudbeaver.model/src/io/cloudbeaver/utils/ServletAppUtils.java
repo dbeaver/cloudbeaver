@@ -89,13 +89,13 @@ public class ServletAppUtils {
             var additionalValue = additional.get(rootKey);
 
             if (originValue == null || additionalValue == null) {
-                Object resultValue = null;
                 if (additional.containsKey(rootKey)) {
-                    resultValue = additionalValue;
+                    if (additionalValue != null) {
+                        resultConfig.put(rootKey, additionalValue);
+                    }
                 } else if (originValue != null) {
-                    resultValue = originValue;
+                    resultConfig.put(rootKey, originValue);
                 }
-                resultConfig.put(rootKey, resultValue);
                 continue;
             }
 

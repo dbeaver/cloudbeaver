@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,13 @@ export const UserProfileSettings = observer(function UserProfileSettings() {
             <ToolsAction icon="admin-cancel" viewBox="0 0 24 24" disabled={!changed} onClick={handleReset}>
               {translate('ui_processing_cancel')}
             </ToolsAction>
-            <ToolsAction icon="/icons/settings_restore_defaults2_m.svg#root" viewBox="0 0 24 24" svg onClick={handleRestoreDefaults}>
+            <ToolsAction
+              icon="/icons/settings_restore_defaults2_m.svg#root"
+              viewBox="0 0 24 24"
+              disabled={!userSettingsService.isOverrideDefaults()}
+              svg
+              onClick={handleRestoreDefaults}
+            >
               {translate('plugin_user_profile_settings_restore_defaults')}
             </ToolsAction>
           </ToolsPanel>

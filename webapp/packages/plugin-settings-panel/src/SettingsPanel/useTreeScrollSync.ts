@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,11 @@ import type { ITreeData } from '@cloudbeaver/plugin-navigation-tree';
 import { getSettingGroupIdFromElementId } from './getSettingGroupIdFromElementId.js';
 import { querySettingsGroups } from './querySettingsGroups.js';
 
-export function useTreeScrollSync(treeData: ITreeData, onSettingsOpen?: (groupId: string) => void): React.RefObject<HTMLDivElement | null> {
+export function useTreeScrollSync(
+  settingsId: string,
+  treeData: ITreeData,
+  onSettingsOpen?: (groupId: string) => void,
+): React.RefObject<HTMLDivElement | null> {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -38,7 +42,7 @@ export function useTreeScrollSync(treeData: ITreeData, onSettingsOpen?: (groupId
       }
 
       if (firstVisibleElement) {
-        const groupId = getSettingGroupIdFromElementId(firstVisibleElement.id);
+        const groupId = getSettingGroupIdFromElementId(settingsId, firstVisibleElement.id);
         let group = ROOT_SETTINGS_GROUP.get(groupId)!;
 
         treeData.updateAllState({ selected: false, expanded: false });

@@ -1,11 +1,11 @@
-query getActiveUser($includeConfigurationParameters: Boolean!) {
+query getActiveUser {
   user: activeUser {
     userId
     isAnonymous
     displayName
     authRole
     linkedAuthProviders
-    configurationParameters @include(if: $includeConfigurationParameters)
+    configurationParameters
     teams {
       teamId
       teamName
