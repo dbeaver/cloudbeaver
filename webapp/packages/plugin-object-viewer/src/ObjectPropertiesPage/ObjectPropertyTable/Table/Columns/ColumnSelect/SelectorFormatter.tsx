@@ -20,7 +20,7 @@ interface Props {
 
 export const SelectorFormatter = observer<Props>(function SelectorFormatter({ tableState, object }) {
   const id = object.id;
-  const selected = getComputed(() => tableState?.selected.get(id));
+  const selected = getComputed(() => tableState?.selected.get(id) ?? false);
   const styles = useS(style);
 
   const select = useCallback(() => {
