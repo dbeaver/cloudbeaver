@@ -557,8 +557,9 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
     private void patchConfigurationWithProperties(Map<String, Object> configProps) {
         IVariableResolver varResolver = new SystemVariablesResolver() {
+            @Nullable
             @Override
-            public String get(String name) {
+            public String get(@NotNull String name) {
                 String propValue = externalProperties.get(name);
                 if (propValue != null) {
                     return propValue;
