@@ -11,6 +11,7 @@ import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
   'plugin.datasource-transaction-manager.disabled': schemaExtra.stringedBoolean().default(false),
+  'plugin.datasource-transaction-manager.toggleDisabled': schemaExtra.stringedBoolean().default(false),
 });
 
 @injectable()
@@ -18,6 +19,11 @@ export class TransactionManagerSettingsService extends Dependency {
   get disabled(): boolean {
     return this.settings.getValue('plugin.datasource-transaction-manager.disabled');
   }
+
+  get toggleDisabled(): boolean {
+    return this.settings.getValue('plugin.datasource-transaction-manager.toggleDisabled');
+  }
+
   readonly settings: SettingsProvider<typeof defaultSettings>;
 
   constructor(private readonly settingsProviderService: SettingsProviderService) {
