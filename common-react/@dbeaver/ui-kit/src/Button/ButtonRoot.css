@@ -1,0 +1,25 @@
+@layer base {
+  .dbv-kit-button__loader {
+    position: absolute;
+    display: flex;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dbv-kit-button__content {
+    display: flex;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+    transition: opacity 0.2s ease-in-out;
+  }
+}

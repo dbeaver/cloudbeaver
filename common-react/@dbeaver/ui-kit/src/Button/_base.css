@@ -3,13 +3,17 @@
     --dbv-kit-btn-height: var(--dbv-kit-control-height-medium);
     --dbv-kit-btn-padding-inline: calc(var(--tw-spacing) * 2.5);
     --dbv-kit-btn-gap: calc(var(--dbv-kit-btn-padding-inline) / 4);
+
     --dbv-kit-btn-outline-offset: var(--dbv-kit-control-outline-offset);
+    --dbv-kit-btn-outline-color: var(--dbv-kit-control-outline-color);
 
     --dbv-kit-btn-foreground: var(--tw-color-white);
+    --dbv-kit-btn-foreground-hover: var(--tw-color-white);
+    --dbv-kit-btn-foreground-active: var(--tw-color-white);
+
     --dbv-kit-btn-background: var(--dbv-kit-color-primary-600);
     --dbv-kit-btn-background-hover: var(--dbv-kit-color-primary-700);
     --dbv-kit-btn-background-active: var(--dbv-kit-color-primary-800);
-    --dbv-kit-btn-outline-color: var(--dbv-kit-control-outline-color);
 
     --dbv-kit-btn-border-width: var(--dbv-kit-control-border-width);
     --dbv-kit-btn-border-color: transparent;
