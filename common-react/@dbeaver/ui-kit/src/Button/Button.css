@@ -4,16 +4,6 @@
 
 @layer base {
   .dbv-kit-button {
-    display: inline-flex;
-    text-align: center;
-    text-decoration: none;
-    cursor: pointer;
-    user-select: none;
-    position: relative;
-    justify-content: center;
-    align-items: center;
-    white-space: nowrap;
-
     height: var(--dbv-kit-btn-height);
     padding-inline: var(--dbv-kit-btn-padding-inline);
     gap: var(--dbv-kit-btn-gap);
@@ -37,12 +27,14 @@
 
     &:hover {
       @media (hover: hover) {
+        color: var(--dbv-kit-btn-foreground-hover);
         background-color: var(--dbv-kit-btn-background-hover);
       }
     }
 
     &:active,
     &[data-active] {
+      color: var(--dbv-kit-btn-foreground-active);
       background-color: var(--dbv-kit-btn-background-active);
     }
 
@@ -94,17 +86,23 @@
   /* Variants */
 
   .dbv-kit-button--primary {
-    --dbv-kit-btn-background: var(--dbv-kit-btn-primary-background);
     --dbv-kit-btn-foreground: var(--dbv-kit-btn-primary-foreground);
+    --dbv-kit-btn-foreground-hover: var(--dbv-kit-btn-primary-foreground-hover);
+    --dbv-kit-btn-foreground-active: var(--dbv-kit-btn-primary-foreground-active);
+
+    --dbv-kit-btn-background: var(--dbv-kit-btn-primary-background);
     --dbv-kit-btn-background-hover: var(--dbv-kit-btn-primary-background-hover);
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-primary-background-active);
 
-    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-background-hover);
+    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-primary-foreground);
   }
 
   .dbv-kit-button--secondary {
-    --dbv-kit-btn-background: var(--dbv-kit-btn-secondary-background);
     --dbv-kit-btn-foreground: var(--dbv-kit-btn-secondary-foreground);
+    --dbv-kit-btn-foreground-hover: var(--dbv-kit-btn-secondary-foreground-hover);
+    --dbv-kit-btn-foreground-active: var(--dbv-kit-btn-secondary-foreground-active);
+
+    --dbv-kit-btn-background: var(--dbv-kit-btn-secondary-background);
     --dbv-kit-btn-background-hover: var(--dbv-kit-btn-secondary-background-hover);
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-secondary-background-active);
     --dbv-kit-btn-border-color: var(--dbv-kit-btn-secondary-border-color);
@@ -113,12 +111,16 @@
   }
 
   .dbv-kit-button--danger {
-    --dbv-kit-btn-background: var(--dbv-kit-btn-danger-background);
     --dbv-kit-btn-foreground: var(--dbv-kit-btn-danger-foreground);
+    --dbv-kit-btn-foreground-hover: var(--dbv-kit-btn-danger-foreground);
+    --dbv-kit-btn-foreground-active: var(--dbv-kit-btn-danger-foreground-active);
+
+    --dbv-kit-btn-background: var(--dbv-kit-btn-danger-background);
     --dbv-kit-btn-background-hover: var(--dbv-kit-btn-danger-background-hover);
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-danger-background-active);
+    --dbv-kit-btn-border-color: var(--dbv-kit-btn-danger-border-color);
 
-    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-danger-background);
+    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-danger-foreground);
     --dbv-kit-btn-outline-color: var(--dbv-kit-btn-danger-color-outline);
   }
 
@@ -126,23 +128,19 @@
   /* Loader */
 
   .dbv-kit-button[data-loading='true'] {
-    opacity: 0.75;
-    color: color-mix(in oklch, var(--dbv-kit-btn-foreground) 25%, var(--dbv-kit-btn-loader-base-color));
-    background-color: color-mix(in oklch, var(--dbv-kit-btn-loader-base-color) 75%, var(--dbv-kit-btn-background));
+    background-color: var(--dbv-kit-btn-background-hover);
 
     &:hover,
     &:active,
     &[data-active] {
-      background-color: color-mix(in oklch, var(--dbv-kit-btn-loader-base-color) 85%, var(--dbv-kit-btn-background));
+      background-color: var(--dbv-kit-btn-background-active);
     }
   }
 
-  .dbv-kit-button__loader {
+  .dbv-kit-button .dbv-kit-spinner {
     --dbv-kit-spinner-stroke-color: var(--dbv-kit-btn-loader-color);
     --dbv-kit-spinner-height: calc(var(--dbv-kit-btn-height) * 0.6);
     --dbv-kit-spinner-stroke-width: 3px;
-
-    position: absolute;
   }
 
   /* ---------------------------- */

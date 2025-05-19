@@ -48,17 +48,24 @@ export const Variants = () => (
       <code>&lt;Button variant="primary"/&gt;</code>
     </div>
     <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
+      <Button loading>Loading</Button>
       <Button>Primary</Button>
       <Button disabled>Disabled</Button>
     </div>
 
     <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
+      <Button variant="secondary" loading>
+        Secondary
+      </Button>
       <Button variant="secondary">Secondary</Button>
       <Button variant="secondary" disabled>
         Disabled
       </Button>
     </div>
     <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
+      <Button variant="danger" loading>
+        Danger
+      </Button>
       <Button variant="danger">Danger</Button>
       <Button variant="danger" disabled>
         Disabled
