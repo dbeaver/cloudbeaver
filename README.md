@@ -31,7 +31,6 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 - SQLite: added information about a table Strict mode to the table metadata section (thanks to @eusebe-cda);
 - Vietnamese localization has been added (thanks to @0xhanh).
 
-
 ### 25.0.4 2025-05-05
 - Important:
   -    Connection templates were removed from the application. You can use the Connection Editor to create new connections.
