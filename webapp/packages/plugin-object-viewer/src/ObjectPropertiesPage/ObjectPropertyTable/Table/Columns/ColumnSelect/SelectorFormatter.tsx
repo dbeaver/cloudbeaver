@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ interface Props {
 
 export const SelectorFormatter = observer<Props>(function SelectorFormatter({ tableState, object }) {
   const id = object.id;
-  const selected = getComputed(() => tableState?.selected.get(id));
+  const selected = getComputed(() => tableState?.selected.get(id) ?? false);
   const styles = useS(style);
 
   const select = useCallback(() => {
