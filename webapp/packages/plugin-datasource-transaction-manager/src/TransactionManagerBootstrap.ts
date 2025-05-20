@@ -146,7 +146,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE) {
-          return this.transactionManagerSettingsService.toggleDisabled;
+          return !this.transactionManagerSettingsService.allowCommitModeSwitch;
         }
 
         if (action === ACTION_DATASOURCE_TRANSACTION_COMMIT || action === ACTION_DATASOURCE_TRANSACTION_ROLLBACK) {

@@ -11,7 +11,7 @@ import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
   'plugin.datasource-transaction-manager.disabled': schemaExtra.stringedBoolean().default(false),
-  'plugin.datasource-transaction-manager.toggleDisabled': schemaExtra.stringedBoolean().default(false),
+  'plugin.datasource-transaction-manager.allowCommitModeSwitch': schemaExtra.stringedBoolean().default(true),
 });
 
 @injectable()
@@ -20,8 +20,8 @@ export class TransactionManagerSettingsService extends Dependency {
     return this.settings.getValue('plugin.datasource-transaction-manager.disabled');
   }
 
-  get toggleDisabled(): boolean {
-    return this.settings.getValue('plugin.datasource-transaction-manager.toggleDisabled');
+  get allowCommitModeSwitch(): boolean {
+    return this.settings.getValue('plugin.datasource-transaction-manager.allowCommitModeSwitch');
   }
 
   readonly settings: SettingsProvider<typeof defaultSettings>;
