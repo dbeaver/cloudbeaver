@@ -113,7 +113,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             Map<String, Object> authParameters = new HashMap<>();
             authParameters.put(SMConstants.USER_ORIGIN, ServletAppUtils.getOriginFromRequestOrThrow(httpRequest));
 
-            var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, new HashMap<>(), forceSessionsLogout);
+            var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, authParameters, forceSessionsLogout);
             if (smAuthInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
                 throw new DBWebException("Unexpected auth status: " + smAuthInfo.getAuthStatus());
             }
