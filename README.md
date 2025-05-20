@@ -25,6 +25,12 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 25.0.5 2025-05-19
+- Added the ability to configure the default database or schema in the connection configuration;
+- A new setting to autosave scripts in the SQL editor appeared in global and users' preferences;
+- SQLite: added information about a table Strict mode to the table metadata section (thanks to @eusebe-cda);
+- Vietnamese localization has been added (thanks to @0xhanh).
+
 ### 25.0.4 2025-05-05
 - Important:
   -    Connection templates were removed from the application. You can use the Connection Editor to create new connections.

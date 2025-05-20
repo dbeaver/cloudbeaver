@@ -1,0 +1,8 @@
+@layer base {
+  :root {
+    --dbv-kit-icon-btn-small-size: var(--dbv-kit-control-height-small);
+    --dbv-kit-icon-btn-medium-size: var(--dbv-kit-control-height-medium);
+    --dbv-kit-icon-btn-large-size: var(--dbv-kit-control-height-large);
+    --dbv-kit-icon-btn-xlarge-size: var(--dbv-kit-control-height-xlarge);
+  }
+}

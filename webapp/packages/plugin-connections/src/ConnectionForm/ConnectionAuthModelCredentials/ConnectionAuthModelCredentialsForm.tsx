@@ -1,14 +1,14 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, ObjectPropertyInfoForm } from '@cloudbeaver/core-blocks';
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { Container, ObjectPropertyInfoForm, type ILayoutSizeProps } from '@cloudbeaver/core-blocks';
+import { getObjectPropertyType, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { isSafari } from '@cloudbeaver/core-utils';
 
 interface Props {
@@ -26,6 +26,18 @@ export const ConnectionAuthModelCredentialsForm = observer<Props>(function Conne
   readonly,
   disabled,
 }) {
+  function getLayoutSize(property: ObjectPropertyInfo): ILayoutSizeProps {
+    const type = getObjectPropertyType(property);
+
+    if (type === 'checkbox') {
+      return {};
+    }
+
+    return {
+      tiny: true,
+    };
+  }
+
   return (
     <Container wrap gap hideEmpty>
       <ObjectPropertyInfoForm
@@ -35,9 +47,9 @@ export const ConnectionAuthModelCredentialsForm = observer<Props>(function Conne
         defaultState={defaultCredentials}
         disabled={disabled}
         readOnly={readonly}
+        geLayoutSize={getLayoutSize}
         showRememberTip
         hideEmptyPlaceholder
-        tiny
       />
     </Container>
   );
