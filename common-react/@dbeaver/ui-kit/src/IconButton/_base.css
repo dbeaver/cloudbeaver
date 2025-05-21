@@ -1,0 +1,30 @@
+@layer base {
+  :root {
+    /* Icon Button border variables */
+    --dbv-kit-icon-btn-border-radius: var(--dbv-kit-btn-border-radius);
+    --dbv-kit-icon-btn-border-width: var(--dbv-kit-btn-border-width);
+    --dbv-kit-icon-btn-border-style: var(--dbv-kit-btn-border-style);
+    --dbv-kit-icon-btn-border-color: var(--dbv-kit-btn-border-color);
+
+    /* Icon Button outline variables */
+    --dbv-kit-icon-btn-outline-width: var(--dbv-kit-control-outline-width);
+    --dbv-kit-icon-btn-outline-style: var(--dbv-kit-control-outline-style);
+    --dbv-kit-icon-btn-outline-color: var(--dbv-kit-control-outline-color);
+    --dbv-kit-icon-btn-outline-offset: var(--dbv-kit-control-outline-offset);
+
+    /* Default size */
+    --dbv-kit-icon-btn-size: var(--dbv-kit-control-height-medium);
+
+    /* Default colors */
+    --dbv-kit-icon-btn-foreground: var(--tw-color-gray-600);
+    --dbv-kit-icon-btn-foreground-hover: var(--dbv-kit-color-600);
+    --dbv-kit-icon-btn-foreground-active: var(--dbv-kit-color-700);
+    --dbv-kit-icon-btn-background: transparent;
+    --dbv-kit-icon-btn-background-hover: var(--tw-color-gray-100);
+    --dbv-kit-icon-btn-background-active: var(--tw-color-gray-200);
+
+    /* Loader color */
+    --dbv-kit-btn-loader-color: var(--dbv-kit-btn-foreground-hover);
+    --dbv-kit-btn-loader-base-color: transparent;
+  }
+}

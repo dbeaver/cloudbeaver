@@ -23,11 +23,9 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.dbeaver.registry.RegistryConstants;
 import org.jkiss.utils.ArrayUtils;
+import org.jkiss.utils.CommonUtils;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class WebAuthProviderRegistry {
 
@@ -36,6 +34,7 @@ public class WebAuthProviderRegistry {
     private static final String TAG_AUTH_PROVIDER = "authProvider"; //$NON-NLS-1$
     private static final String TAG_AUTH_PROVIDER_DISABLE = "authProviderDisable"; //$NON-NLS-1$
     private static final String TAG_COMMON_PROVIDER_PROPERTIES = "commonProviderProperties"; //$NON-NLS-1$
+    private static final String ATTRIBUTE_EXTENDED = "extended";
 
     private static WebAuthProviderRegistry instance = null;
 
@@ -54,34 +53,43 @@ public class WebAuthProviderRegistry {
     }
 
     private void loadExtensions(IExtensionRegistry registry) {
-        {
-            IConfigurationElement[] extConfigs = registry.getConfigurationElementsFor(WebAuthProviderDescriptor.EXTENSION_ID);
-            for (IConfigurationElement ext : extConfigs) {
-                // Load webServices
-                if (TAG_AUTH_PROVIDER.equals(ext.getName())) {
-                    WebAuthProviderDescriptor providerDescriptor;
-                    WebAuthProviderDescriptor webAuthProviderDescriptor = authProviders.get(ext.getAttribute(WebRegistryConstant.ATTR_EXTENDED));
-                    if (webAuthProviderDescriptor != null) {
-                        webAuthProviderDescriptor.loadExtraConfig(ext);
-                    } else {
-                        providerDescriptor = new WebAuthProviderDescriptor(ext);
-                        this.authProviders.put(providerDescriptor.getId(), providerDescriptor);
-                    }
-                } else if (TAG_COMMON_PROVIDER_PROPERTIES.equals(ext.getName())) {
-                    var commonProperties = new WebCommonAuthProviderPropertyDescriptor(ext);
-                    this.commonProperties.add(commonProperties);
-                }
-            }
+        IConfigurationElement[] extConfigs = registry.getConfigurationElementsFor(WebAuthProviderDescriptor.EXTENSION_ID);
+        // Sort - parse providers with parent in the end
+        Arrays.sort(extConfigs, (o1, o2) -> {
+            String p1 = o1.getAttribute(ATTRIBUTE_EXTENDED);
+            String p2 = o2.getAttribute(ATTRIBUTE_EXTENDED);
+            if (CommonUtils.equalObjects(p1, p2)) return 0;
+            if (p1 == null) return -1;
+            if (p2 == null) return 1;
+            return 0;
+        });
 
-            for (IConfigurationElement ext : extConfigs) {
-                // Disable auth providers
-                if (TAG_AUTH_PROVIDER_DISABLE.equals(ext.getName())) {
-                    String providerId = ext.getAttribute(RegistryConstants.ATTR_ID);
-                    if (!this.authProviders.containsKey(providerId)) {
-                        log.warn("Can't disable auth provider '" + providerId + "' - no such provider found");
-                    } else {
-                        this.authProviders.remove(providerId);
-                    }
+        for (IConfigurationElement ext : extConfigs) {
+            // Load webServices
+            if (TAG_AUTH_PROVIDER.equals(ext.getName())) {
+                WebAuthProviderDescriptor providerDescriptor;
+                WebAuthProviderDescriptor webAuthProviderDescriptor
+                    = authProviders.get(ext.getAttribute(WebRegistryConstant.ATTR_EXTENDED));
+                if (webAuthProviderDescriptor != null) {
+                    webAuthProviderDescriptor.loadExtraConfig(ext);
+                } else {
+                    providerDescriptor = new WebAuthProviderDescriptor(ext);
+                    this.authProviders.put(providerDescriptor.getId(), providerDescriptor);
+                }
+            } else if (TAG_COMMON_PROVIDER_PROPERTIES.equals(ext.getName())) {
+                var commonProperties = new WebCommonAuthProviderPropertyDescriptor(ext);
+                this.commonProperties.add(commonProperties);
+            }
+        }
+
+        for (IConfigurationElement ext : extConfigs) {
+            // Disable auth providers
+            if (TAG_AUTH_PROVIDER_DISABLE.equals(ext.getName())) {
+                String providerId = ext.getAttribute(RegistryConstants.ATTR_ID);
+                if (!this.authProviders.containsKey(providerId)) {
+                    log.warn("Can't disable auth provider '" + providerId + "' - no such provider found");
+                } else {
+                    this.authProviders.remove(providerId);
                 }
             }
         }

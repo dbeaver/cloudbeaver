@@ -145,6 +145,10 @@ export class TransactionManagerBootstrap extends Bootstrap {
           return true;
         }
 
+        if (action === ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE) {
+          return !this.transactionManagerSettingsService.allowCommitModeSwitch;
+        }
+
         if (action === ACTION_DATASOURCE_TRANSACTION_COMMIT || action === ACTION_DATASOURCE_TRANSACTION_ROLLBACK) {
           return transaction.autoCommit === true;
         }

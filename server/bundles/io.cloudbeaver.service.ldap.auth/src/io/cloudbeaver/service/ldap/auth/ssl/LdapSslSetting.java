@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server;
+package io.cloudbeaver.service.ldap.auth.ssl;
 
-public interface HttpConstants {
-    String CONTENT_TYPE = "Content-Type";
+import org.jkiss.code.Nullable;
 
-    String TYPE_JSON = "application/json";
-    String HEADER_AUTHORIZATION = "Authorization";
+public class LdapSslSetting {
+    private final boolean isEnable;
+    @Nullable
+    private final String sslCert;
+
+    public LdapSslSetting(Boolean isEnable, @Nullable String sslCert) {
+        this.isEnable = Boolean.TRUE.equals(isEnable);
+        this.sslCert = sslCert;
+    }
+
+    public boolean isEnable() {
+        return isEnable;
+    }
+
+    @Nullable
+    public String getSslCert() {
+        return sslCert;
+    }
 }

@@ -69,4 +69,9 @@ public interface SMAuthProviderExternal<AUTH_SESSION extends SMSession> extends 
         @NotNull WebUser user,
         boolean selfIdentity) throws DBException;
 
+    /**
+     * Make some post authentication actions
+     */
+    default void postAuthentication() {}
+
 }

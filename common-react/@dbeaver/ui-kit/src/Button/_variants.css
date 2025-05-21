@@ -2,22 +2,30 @@
   :root {
     /* Primary Button */
     --dbv-kit-btn-primary-foreground: var(--tw-color-white);
+    --dbv-kit-btn-primary-foreground-hover: var(--tw-color-white);
+    --dbv-kit-btn-primary-foreground-active: var(--tw-color-white);
     --dbv-kit-btn-primary-background: var(--dbv-kit-color-primary-600);
     --dbv-kit-btn-primary-background-hover: var(--dbv-kit-color-primary-700);
     --dbv-kit-btn-primary-background-active: var(--dbv-kit-color-primary-800);
 
     /* Secondary Button */
     --dbv-kit-btn-secondary-foreground: var(--dbv-kit-color-primary-600);
+    --dbv-kit-btn-secondary-foreground-hover: var(--dbv-kit-color-primary-600);
+    --dbv-kit-btn-secondary-foreground-active: var(--dbv-kit-color-primary-600);
     --dbv-kit-btn-secondary-background: transparent;
     --dbv-kit-btn-secondary-background-hover: var(--dbv-kit-color-primary-50);
     --dbv-kit-btn-secondary-background-active: var(--dbv-kit-color-primary-100);
     --dbv-kit-btn-secondary-border-color: var(--dbv-kit-color-primary-600);
+    --dbv-kit-btn-secondary-border-color-hover: var(--dbv-kit-color-primary-600);
 
     /* Danger Button */
     --dbv-kit-btn-danger-foreground: var(--tw-color-white);
+    --dbv-kit-btn-danger-foreground-hover: var(--tw-color-white);
+    --dbv-kit-btn-danger-foreground-active: var(--tw-color-white);
     --dbv-kit-btn-danger-background: var(--tw-color-red-600);
     --dbv-kit-btn-danger-background-hover: var(--tw-color-red-700);
     --dbv-kit-btn-danger-background-active: var(--tw-color-red-800);
+    --dbv-kit-btn-danger-border-color: transparent;
     --dbv-kit-btn-danger-color-outline: var(--tw-color-red-300);
   }
 }

@@ -1,0 +1,115 @@
+@import './_base.css';
+@import './_sizes.css';
+@import './_variants.css';
+
+@layer base {
+  .dbv-kit-icon-button {
+    min-width: var(--dbv-kit-icon-btn-size);
+    width: var(--dbv-kit-icon-btn-size);
+    height: var(--dbv-kit-icon-btn-size);
+
+    border-radius: var(--dbv-kit-icon-btn-border-radius);
+    border-color: var(--dbv-kit-icon-btn-border-color);
+    border-width: var(--dbv-kit-icon-btn-border-width);
+    border-style: var(--dbv-kit-icon-btn-border-style);
+
+    color: var(--dbv-kit-icon-btn-foreground);
+    background-color: var(--dbv-kit-icon-btn-background);
+
+    &:focus-visible,
+    &[data-focus-visible] {
+      outline: var(--dbv-kit-icon-btn-outline-width) solid var(--dbv-kit-icon-btn-outline-color);
+      outline-offset: var(--dbv-kit-icon-btn-outline-offset);
+    }
+
+    &:hover {
+      @media (hover: hover) {
+        color: var(--dbv-kit-icon-btn-foreground-hover);
+        background-color: var(--dbv-kit-icon-btn-background-hover);
+      }
+    }
+
+    &:active,
+    &[data-active] {
+      color: var(--dbv-kit-icon-btn-foreground-active);
+      background-color: var(--dbv-kit-icon-btn-background-active);
+    }
+
+    &:disabled {
+      opacity: var(--dbv-kit-control-disabled-opacity);
+    }
+
+    &[data-loading='true'] {
+      background-color: var(--dbv-kit-icon-btn-background);
+
+      &:hover,
+      &:active,
+      &[data-active] {
+        background-color: var(--dbv-kit-icon-btn-background-active);
+      }
+    }
+
+    .dbv-kit-spinner {
+      --dbv-kit-spinner-stroke-color: var(--dbv-kit-icon-btn-loader-color);
+      --dbv-kit-spinner-height: calc(var(--dbv-kit-icon-btn-size) * 0.8);
+      --dbv-kit-spinner-stroke-width: 3px;
+    }
+  }
+
+  .dbv-kit-icon-button__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Size variants */
+  .dbv-kit-icon-button--small {
+    --dbv-kit-icon-btn-size: var(--dbv-kit-icon-btn-small-size);
+  }
+
+  .dbv-kit-icon-button--medium {
+    --dbv-kit-icon-btn-size: var(--dbv-kit-icon-btn-medium-size);
+  }
+
+  .dbv-kit-icon-button--large {
+    --dbv-kit-icon-btn-size: var(--dbv-kit-icon-btn-large-size);
+  }
+
+  .dbv-kit-icon-button--xlarge {
+    --dbv-kit-icon-btn-size: var(--dbv-kit-icon-btn-xlarge-size);
+  }
+
+  /* Variant styles */
+  .dbv-kit-icon-button--primary {
+    --dbv-kit-icon-btn-foreground: var(--dbv-kit-icon-btn-primary-foreground);
+    --dbv-kit-icon-btn-foreground-hover: var(--dbv-kit-icon-btn-primary-foreground-hover);
+    --dbv-kit-icon-btn-foreground-active: var(--dbv-kit-icon-btn-primary-foreground-active);
+    --dbv-kit-icon-btn-background: var(--dbv-kit-icon-btn-primary-background);
+    --dbv-kit-icon-btn-background-hover: var(--dbv-kit-icon-btn-primary-background-hover);
+    --dbv-kit-icon-btn-background-active: var(--dbv-kit-icon-btn-primary-background-active);
+    --dbv-kit-icon-btn-loader-color: var(--dbv-kit-icon-btn-primary-foreground);
+  }
+
+  .dbv-kit-icon-button--secondary {
+    --dbv-kit-icon-btn-foreground: var(--dbv-kit-icon-btn-secondary-foreground);
+    --dbv-kit-icon-btn-foreground-hover: var(--dbv-kit-icon-btn-secondary-foreground-hover);
+    --dbv-kit-icon-btn-foreground-active: var(--dbv-kit-icon-btn-secondary-foreground-active);
+    --dbv-kit-icon-btn-background: var(--dbv-kit-icon-btn-secondary-background);
+    --dbv-kit-icon-btn-background-hover: var(--dbv-kit-icon-btn-secondary-background-hover);
+    --dbv-kit-icon-btn-background-active: var(--dbv-kit-icon-btn-secondary-background-active);
+    --dbv-kit-icon-btn-border-color: var(--dbv-kit-icon-btn-secondary-border-color);
+    --dbv-kit-icon-btn-loader-color: var(--dbv-kit-icon-btn-secondary-loader-color);
+  }
+
+  .dbv-kit-icon-button--danger {
+    --dbv-kit-icon-btn-foreground: var(--dbv-kit-icon-btn-danger-foreground);
+    --dbv-kit-icon-btn-foreground-hover: var(--dbv-kit-icon-btn-danger-foreground-hover);
+    --dbv-kit-icon-btn-foreground-active: var(--dbv-kit-icon-btn-danger-foreground-active);
+    --dbv-kit-icon-btn-background: var(--dbv-kit-icon-btn-danger-background);
+    --dbv-kit-icon-btn-background-hover: var(--dbv-kit-icon-btn-danger-background-hover);
+    --dbv-kit-icon-btn-background-active: var(--dbv-kit-icon-btn-danger-background-active);
+    --dbv-kit-icon-btn-loader-color: var(--dbv-kit-icon-btn-danger-loader-color);
+  }
+}
