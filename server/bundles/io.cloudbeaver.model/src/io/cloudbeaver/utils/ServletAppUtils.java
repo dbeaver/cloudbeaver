@@ -285,7 +285,7 @@ public class ServletAppUtils {
     public static String getOriginFromRequestOrThrow(HttpServletRequest request) throws DBWebException {
         String origin = request.getHeader(HEADER_ORIGIN);
         if (CommonUtils.isEmpty(origin)) {
-            origin = request.getParameter(HEADER_REFERER);
+            origin = request.getHeader(HEADER_REFERER);
         }
         if (CommonUtils.isEmpty(origin)) {
             URI requestUrl = URI.create(request.getRequestURL().toString());
