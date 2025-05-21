@@ -18,7 +18,6 @@ import {
   Fill,
   InputField,
   Text,
-  useResource,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
