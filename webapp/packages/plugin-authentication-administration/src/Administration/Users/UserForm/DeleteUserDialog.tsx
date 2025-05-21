@@ -35,14 +35,14 @@ export const DeleteUserDialog: DialogComponent<IPayload> = function DeleteUserDi
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const usersTableOptionsPanelService = useService(UsersTableOptionsPanelService);
-  const usersResource = useResource(DeleteUserDialog, UsersResource, null);
+  const usersResource = useService(UsersResource);
 
   const [name, setName] = useState('');
 
   async function deleteUser() {
     try {
       await usersTableOptionsPanelService.close();
-      await usersResource.resource.deleteUsers(props.payload.userId);
+      await usersResource.deleteUsers(props.payload.userId);
       notificationService.logSuccess({ title: 'authentication_administration_users_delete_user_success', message: props.payload.userId });
       props.resolveDialog();
     } catch (exception: any) {
