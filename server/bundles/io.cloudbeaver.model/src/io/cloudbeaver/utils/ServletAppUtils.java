@@ -41,6 +41,9 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class ServletAppUtils {
+    private static final String HEADER_ORIGIN = "Origin";
+    private static final String HEADER_REFERER = "Referer";
+
     private static final Log log = Log.getLog(ServletAppUtils.class);
 
     public static String getRelativePath(String path, String curDir) {
@@ -280,13 +283,19 @@ public class ServletAppUtils {
 
     @NotNull
     public static String getOriginFromRequestOrThrow(HttpServletRequest request) throws DBWebException {
-        URI requestUrl = URI.create(request.getRequestURL().toString());
-        String origin = getRootUrlFromUri(requestUrl) + "/";
-
+        String origin = request.getHeader(HEADER_ORIGIN);
+        if (CommonUtils.isEmpty(origin)) {
+            origin = request.getParameter(HEADER_REFERER);
+        }
+        if (CommonUtils.isEmpty(origin)) {
+            URI requestUrl = URI.create(request.getRequestURL().toString());
+            origin = getRootUrlFromUri(requestUrl) + "/";
+        }
         origin = removeSideSlashes(origin);
         var app = ServletAppUtils.getServletApplication();
-        if (!origin.endsWith(app.getRootURI())) {
-            origin = origin + "/" + removeSideSlashes(app.getRootURI()) + "/";
+        String rootUri = removeSideSlashes(app.getRootURI());
+        if (!origin.endsWith(rootUri)) {
+            origin = origin + "/" + rootUri + "/";
         }
         return removeSideSlashes(origin);
     }
