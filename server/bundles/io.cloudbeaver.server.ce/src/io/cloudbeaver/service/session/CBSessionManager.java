@@ -62,7 +62,7 @@ public class CBSessionManager implements WebAppSessionManager {
     public BaseWebSession closeSession(@NotNull HttpServletRequest request) {
         HttpSession session = request.getSession();
         if (session != null) {
-            return closeSession(session.getId());
+            return closeSession(getSessionId(request));
         }
         return null;
     }
@@ -113,8 +113,7 @@ public class CBSessionManager implements WebAppSessionManager {
         @NotNull HttpServletResponse response,
         boolean errorOnNoFound
     ) throws DBWebException {
-        HttpSession httpSession = request.getSession(true);
-        String sessionId = httpSession.getId();
+        String sessionId = getSessionId(request);
         WebSession webSession;
         synchronized (sessionMap) {
             var baseWebSession = sessionMap.get(sessionId);
@@ -139,6 +138,7 @@ public class CBSessionManager implements WebAppSessionManager {
                     log.error("Failed to restore previous user session", e);
                 }
 
+                HttpSession httpSession = request.getSession(false);
                 if (!restored && errorOnNoFound && !httpSession.isNew()) {
                     throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
                 }
@@ -157,6 +157,12 @@ public class CBSessionManager implements WebAppSessionManager {
         }
 
         return webSession;
+    }
+
+    @NotNull
+    protected String getSessionId(@NotNull HttpServletRequest request) {
+        HttpSession httpSession = request.getSession(true);
+        return httpSession.getId();
     }
 
     /**
@@ -244,7 +250,7 @@ public class CBSessionManager implements WebAppSessionManager {
     @Override
     @Nullable
     public WebSession findWebSession(HttpServletRequest request) {
-        String sessionId = request.getSession().getId();
+        String sessionId = getSessionId(request);
         synchronized (sessionMap) {
             var session = sessionMap.get(sessionId);
             if (session instanceof WebSession) {
@@ -282,8 +288,7 @@ public class CBSessionManager implements WebAppSessionManager {
         }
 
         for (var session : expiredList) {
-            log.debug("> Expire session '" + session.getSessionId() + "'");
-            session.close();
+            closeExpiredSession(session);
         }
     }
 
@@ -428,5 +433,10 @@ public class CBSessionManager implements WebAppSessionManager {
                 return webSessionImpl;
             }
         }
+    }
+
+    protected void closeExpiredSession(@NotNull BaseWebSession session) {
+        log.debug("> Expire session '" + session.getSessionId() + "'");
+        session.close();
     }
 }

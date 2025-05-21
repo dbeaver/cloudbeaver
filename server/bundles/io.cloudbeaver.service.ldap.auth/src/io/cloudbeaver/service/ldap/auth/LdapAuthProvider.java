@@ -36,11 +36,11 @@ import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.*;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.*;
-import java.util.*;
 
 public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected, SMAuthProviderAssigner {
     private static final Log log = Log.getLog(LdapAuthProvider.class);
@@ -355,7 +355,7 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
 
     @Override
     public Object getInputUsername(@NotNull Map<String, Object> cred) {
-        return cred.get(LdapConstants.CRED_USERNAME);
+        return cred.get(LdapConstants.CRED_USER_DN);
     }
 
     private boolean isFullDN(String userName) {

@@ -134,7 +134,7 @@ public class ServletSystemInformationCollector<T extends ServletApplication> imp
     }
 
     @NotNull
-    @PropertyGroup(order = 31, category = "Security manager database", id = "sm")
+    @PropertyGroup(order = 31, category = "Security manager database", groupId = "sm")
     public DBPConnectionInformation getSmDatabaseInfo() {
         return smDatabaseInfo;
     }
