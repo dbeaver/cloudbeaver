@@ -18,6 +18,10 @@
     flex-basis: 100%;
   }
 
+  .cm-scroller {
+    overflow: hidden;
+  }
+
   .editor,
   .ReactCodemirror,
   .cm-mergeView,
