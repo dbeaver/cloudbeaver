@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import { isValuesEqual } from '@cloudbeaver/core-utils';
 
 import type { UserFormProps } from '../AdministrationUserFormService.js';
 import type { UserFormInfoPart } from './UserFormInfoPart.js';
+import { ENTITY_ID_VALIDATION } from '../../shared/ENTITY_ID_VALIDATION.js';
 
 const PASSWORD_PLACEHOLDER = '••••••';
 
@@ -44,6 +45,14 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
     local = !editing || (!!userInfo.data && isLocalUser(userInfo.data));
   }
 
+  const usernameValidationRef = useCustomInputValidation<string>(value => {
+    if (!value.match(ENTITY_ID_VALIDATION)) {
+      return translate('plugin_authentication_administration_user_username_validation_error');
+    }
+
+    return null;
+  });
+
   const passwordRepeatRef = useCustomInputValidation<string>(value => {
     if (!isValuesEqual(value, tabState.state.password, null)) {
       return translate('authentication_user_passwords_not_match');
@@ -55,6 +64,7 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
     <Container gap vertical>
       <GroupTitle keepSize>{translate('authentication_user_credentials')}</GroupTitle>
       <InputField
+        ref={usernameValidationRef}
         description={!editing ? translate('authentication_user_name_description') : undefined}
         type="text"
         name="userId"
