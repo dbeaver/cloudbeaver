@@ -30,7 +30,7 @@ export function OrderButton({ colIdx, sortState, onSort, tabIndex, ref }: OrderB
       title="Sort by column"
       aria-label="Sort by column"
       className={clsx(
-        'tw:opacity-0 tw:group-focus:opacity-100 tw:focus:opacity-100 tw:group-hover:opacity-100 tw:hover:opacity-100',
+        'tw:opacity-0 tw:group-focus:opacity-100 tw:focus:opacity-100 tw:group-hover:opacity-100 tw:hover:opacity-100 tw:outline-offset-0',
         sortState && 'tw:opacity-100',
       )}
     >
