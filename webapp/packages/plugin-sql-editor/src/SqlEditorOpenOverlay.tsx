@@ -42,7 +42,7 @@ export const SqlEditorOpenOverlay = observer<Props>(function SqlEditorOpenOverla
       <OverlayMessage>{translate('plugin_sql_editor_action_overlay_description')}</OverlayMessage>
       <OverlayActions>
         <Fill />
-        <Button type="button"  loading={dataSource?.isLoading()} loader onClick={openHandler}>
+        <Button type="button" loading={dataSource?.isLoading()} loader onClick={openHandler}>
           {translate('ui_open')}
         </Button>
       </OverlayActions>

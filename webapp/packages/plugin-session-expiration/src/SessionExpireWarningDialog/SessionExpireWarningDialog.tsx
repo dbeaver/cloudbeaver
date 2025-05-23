@@ -31,7 +31,7 @@ export const SessionExpireWarningDialog: DialogComponent<null, null> = observer(
         <p className={s(styles, { text: true })}>{translate('app_root_session_expire_warning_message')}</p>
       </CommonDialogBody>
       <CommonDialogFooter className={s(styles, { footer: true })}>
-        <Button type="button"  onClick={rejectDialog}>
+        <Button type="button" onClick={rejectDialog}>
           {translate('app_root_session_expire_warning_button')}
         </Button>
       </CommonDialogFooter>

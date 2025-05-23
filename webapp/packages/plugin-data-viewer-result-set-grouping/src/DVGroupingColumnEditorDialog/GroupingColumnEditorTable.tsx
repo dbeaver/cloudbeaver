@@ -45,9 +45,7 @@ export const GroupingColumnEditorTable = observer<Props>(function GroupingColumn
             value={newColumnName}
             onChange={v => setNewColumnName(String(v))}
           />
-          <Button  onClick={addColumnHandler}>
-            +
-          </Button>
+          <Button onClick={addColumnHandler}>+</Button>
         </Form>
       </Container>
       <Container className={s(style, { tableContainer: true })} overflow>

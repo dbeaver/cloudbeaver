@@ -65,7 +65,7 @@ export const ConnectionList = observer<Props>(function ConnectionList({ connecti
     <Group className={s(style, { group: true })} box border medium overflow vertical>
       <GrantedConnectionsTableHeader filterState={filterState} disabled={disabled}>
         <Container keepSize>
-          <Button disabled={disabled || !selected}  onClick={grant}>
+          <Button disabled={disabled || !selected} onClick={grant}>
             {translate('ui_add')}
           </Button>
         </Container>

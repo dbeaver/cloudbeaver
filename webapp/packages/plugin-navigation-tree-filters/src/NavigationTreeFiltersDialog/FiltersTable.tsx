@@ -47,7 +47,7 @@ export const FiltersTable = observer<Props>(function FiltersTable({ title, filte
                 value={filter}
                 onChange={v => setFilter(String(v))}
               />
-              <Button className={style['button']}  onClick={add}>
+              <Button className={style['button']} onClick={add}>
                 +
               </Button>
             </div>

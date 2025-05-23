@@ -45,7 +45,7 @@ export const ConnectionShield = observer<PropsWithChildren<IConnectionShieldProp
   if (!isConnectionReady) {
     return (
       <TextPlaceholder>
-        <Button type="button"  onClick={handleConnect}>
+        <Button type="button" onClick={handleConnect}>
           {translate('connections_connection_connect')}
         </Button>
       </TextPlaceholder>

@@ -113,7 +113,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
             {providerDisabled ? (
               <TextPlaceholder>{translate('plugin_authentication_authentication_method_disabled')}</TextPlaceholder>
             ) : (
-              <Button type="button"  onClick={() => login(false, activeProvider, activeConfiguration)}>
+              <Button type="button" onClick={() => login(false, activeProvider, activeConfiguration)}>
                 <Translate token="authentication_login" />
               </Button>
             )}

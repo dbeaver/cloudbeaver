@@ -75,7 +75,7 @@ export const UserList = observer<Props>(function UserList({ userList, grantedUse
     <Group className={s(styles, { group: true })} border box medium overflow vertical>
       <GrantedUsersTableHeader className={s(styles, { header: true })} filterState={filterState} disabled={disabled}>
         <Container keepSize>
-          <Button disabled={disabled || !selected}  onClick={grant}>
+          <Button disabled={disabled || !selected} onClick={grant}>
             {translate('ui_add')}
           </Button>
         </Container>

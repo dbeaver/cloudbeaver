@@ -29,14 +29,7 @@ export const DatabaseCredentialsAuthDialogFooter = observer<React.PropsWithChild
   return (
     <div className={s(style, { footerContainer: true }, className)}>
       {children}
-      <Button
-        className={s(style, { button: true })}
-        type="button"
-        
-        disabled={isAuthenticating}
-        loading={isAuthenticating}
-        onClick={onLogin}
-      >
+      <Button className={s(style, { button: true })} type="button" disabled={isAuthenticating} loading={isAuthenticating} onClick={onLogin}>
         {translate('authentication_login')}
       </Button>
     </div>

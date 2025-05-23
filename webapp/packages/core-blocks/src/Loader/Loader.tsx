@@ -289,7 +289,7 @@ export const Loader = observer<Props>(function Loader({
           )}
           {onCancel && (
             <div className={s(style, { actions: true })}>
-              <Button type="button"  disabled={cancelDisabled} onClick={onCancel}>
+              <Button type="button" disabled={cancelDisabled} onClick={onCancel}>
                 <Translate token="ui_processing_cancel" />
               </Button>
             </div>

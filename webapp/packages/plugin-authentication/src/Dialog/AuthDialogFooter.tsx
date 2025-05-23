@@ -25,7 +25,7 @@ export const AuthDialogFooter = observer<Props>(function AuthDialogFooter({ auth
     <div className={s(style, { footerContainer: true })}>
       {children}
       {authAvailable && (
-        <Button className={s(style, { button: true })} type="button"  loading={isAuthenticating} onClick={onLogin}>
+        <Button className={s(style, { button: true })} type="button" loading={isAuthenticating} onClick={onLogin}>
           {translate('authentication_login')}
         </Button>
       )}

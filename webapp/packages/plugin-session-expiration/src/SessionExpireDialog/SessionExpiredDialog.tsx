@@ -37,7 +37,7 @@ export const SessionExpiredDialog: DialogComponent<null, null> = observer(functi
         <p className={s(styles, { text: true })}>{translate('app_root_session_expired_message')}</p>
       </CommonDialogBody>
       <CommonDialogFooter className={s(styles, { footer: true })}>
-        <Button type="button"  onClick={reload}>
+        <Button type="button" onClick={reload}>
           {translate('ui_processing_reload')}
         </Button>
       </CommonDialogFooter>

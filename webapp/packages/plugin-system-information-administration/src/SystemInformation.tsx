@@ -61,9 +61,7 @@ export const SystemInformation: TabContainerPanelComponent<AdministrationItemCon
 
         <Flex>
           <Fill />
-          <Button  onClick={copyToClipboard}>
-            {translate('ui_copy_to_clipboard')}
-          </Button>
+          <Button onClick={copyToClipboard}>{translate('ui_copy_to_clipboard')}</Button>
         </Flex>
       </Group>
     </ColoredContainer>
