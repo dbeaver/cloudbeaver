@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-export { useHotkeys } from 'react-hotkeys-hook';
 
 export * from './AuthenticationProviderLoader.js';
 export * from './useAuthenticationAction.js';
@@ -32,6 +31,7 @@ export * from './ComplexLoader.js';
 export * from './DisplayError.js';
 export * from './ErrorBoundary.js';
 export * from './Icon.js';
+export * from './useHotkeys.js';
 
 export * from './ItemList/ItemList.js';
 export * from './ItemList/ItemListSearch.js';

@@ -7,7 +7,7 @@ Welcome! Follow these steps to install and run the frontend dev server.
 - **Ensure you have the correct Node.js version**
 
   We recommend using the latest LTS (Long-Term Support) version. Check the official Node.js website: https://nodejs.org/
-  The minimum supported version is v20.19.1
+  The minimum supported version is v22.15.0
 
 - **Ensure you have Yarn installed**
 

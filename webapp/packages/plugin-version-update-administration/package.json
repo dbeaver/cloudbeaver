@@ -33,7 +33,7 @@
     "mobx-react-lite": "^4",
     "react": "^19",
     "react-dom": "^19",
-    "react-markdown": "^9",
+    "react-markdown": "^10",
     "tslib": "^2"
   },
   "devDependencies": {

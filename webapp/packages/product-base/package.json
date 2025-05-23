@@ -26,9 +26,9 @@
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
-    "@tailwindcss/vite": "^4",
+    "@tailwindcss/vite": "4.0.7",
     "@types/fs-extra": "^11",
-    "@types/node": "^20",
+    "@types/node": "^22",
     "tslib": "^2",
     "typescript": "^5"
   },
@@ -40,6 +40,6 @@
     "tslib": "^2",
     "vite": "^6",
     "vite-multiple-assets": "^2",
-    "vite-plugin-pwa": "^0"
+    "vite-plugin-pwa": "^1"
   }
 }

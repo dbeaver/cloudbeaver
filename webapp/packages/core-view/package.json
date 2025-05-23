@@ -30,7 +30,6 @@
     "mobx-react-lite": "^4",
     "react": "^19",
     "react-dom": "^19",
-    "react-hotkeys-hook": "^4",
     "tslib": "^2"
   },
   "devDependencies": {
