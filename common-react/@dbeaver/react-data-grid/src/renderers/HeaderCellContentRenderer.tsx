@@ -70,10 +70,11 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
       tabIndex={tabIndex}
       onKeyDown={handleKeyDown}
       className="tw:w-full tw:h-full tw:content-center tw:flex tw:items-center tw:justify-between tw:gap-1 tw:outline-none tw:group"
-      {...drag.props} {...drop.props}
+      {...drag.props}
+      {...drop.props}
     >
       <span className="tw:overflow-hidden tw:text-ellipsis">{headerElement ?? getHeaderText ?? ''}</span>
       {isColumnSortable && onColumnSort && <OrderButton ref={orderButtonRef} colIdx={colIdx} sortState={sortingState} onSort={onColumnSort} />}
     </div>
   );
-}
+});
