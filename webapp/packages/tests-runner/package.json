@@ -33,7 +33,7 @@
     "@dbeaver/cli": "workspace:^",
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^6",
-    "@testing-library/react": "^14",
+    "@testing-library/react": "^16",
     "@types/node": "^22",
     "@types/react": "^19",
     "fake-indexeddb": "^6",

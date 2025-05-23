@@ -2371,7 +2371,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         SMAutoAssign autoAssign,
         String userId,
         SMTeam[] allTeams
-    ) throws DBCException {
+    ) throws DBException {
         if (!(authProvider.getInstance() instanceof SMAuthProviderAssigner authProviderAssigner)) {
             return;
         }
@@ -2387,6 +2387,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 ).stream())
                 .map(SMTeam::getTeamId)
                 .toArray(String[]::new);
+            SMUserTeam[] oldUserTeams = getUserTeams(userId);
+            Set<String> oldUserTeamIdSet = Arrays.stream(oldUserTeams).map(SMTeam::getTeamId).collect(Collectors.toSet());
+            oldUserTeamIdSet.remove(getDefaultUserTeam());
+            Set<String> newUserTeamIdSet = Arrays.stream(newTeamIds).collect(Collectors.toSet());
+            if (oldUserTeamIdSet.equals(newUserTeamIdSet)) {
+                //do not need to update teams and send events
+                return;
+            }
             if (!ArrayUtils.isEmpty(newTeamIds)) {
                 setUserTeams(
                     userId,

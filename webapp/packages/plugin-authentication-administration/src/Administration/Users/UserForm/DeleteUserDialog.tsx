@@ -18,12 +18,13 @@ import {
   Fill,
   InputField,
   Text,
-  useResource,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+
+import { UsersTableOptionsPanelService } from '../UsersTable/UsersTableOptionsPanelService.js';
 
 interface IPayload {
   userId: string;
@@ -32,13 +33,15 @@ interface IPayload {
 export const DeleteUserDialog: DialogComponent<IPayload> = function DeleteUserDialog(props) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
-  const usersResource = useResource(DeleteUserDialog, UsersResource, null);
+  const usersTableOptionsPanelService = useService(UsersTableOptionsPanelService);
+  const usersResource = useService(UsersResource);
 
   const [name, setName] = useState('');
 
   async function deleteUser() {
     try {
-      await usersResource.resource.deleteUsers(props.payload.userId);
+      await usersTableOptionsPanelService.close();
+      await usersResource.deleteUsers(props.payload.userId);
       notificationService.logSuccess({ title: 'authentication_administration_users_delete_user_success', message: props.payload.userId });
       props.resolveDialog();
     } catch (exception: any) {

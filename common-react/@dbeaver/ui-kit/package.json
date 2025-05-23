@@ -18,13 +18,13 @@
   "devDependencies": {
     "@dbeaver/tsconfig": "workspace:^",
     "@ladle/react": "^5",
-    "@tailwindcss/vite": "^4",
+    "@tailwindcss/vite": "4.0.7",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@wroud/vite-plugin-asset-resolver": "^0",
     "@wroud/vite-plugin-tsc": "^0.11.6",
     "rimraf": "^6",
-    "tailwindcss": "^4",
+    "tailwindcss": "4.0.7",
     "typescript": "^5",
     "vite": "^6"
   },

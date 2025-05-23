@@ -63,7 +63,7 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
                 changeOrigin: true,
                 secure: false,
               },
-              '/auth-complex': {
+              '/auth-external': {
                 target: envServer,
                 changeOrigin: true,
                 secure: false,
