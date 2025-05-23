@@ -1380,7 +1380,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     // Subject functions
 
     @Override
-    public void setSubjectMetas(@NotNull String subjectId, @NotNull Map<String, String> metaParameters) throws DBCException {
+    public void setSubjectMetas(@NotNull String subjectId, @NotNull Map<String, String> metaParameters) throws DBException {
+        validateSubjectMetaValues(metaParameters);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 cleanupSubjectMeta(dbCon, subjectId);
@@ -1391,6 +1392,16 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             }
         } catch (SQLException e) {
             throw new DBCException("Error while loading users", e);
+        }
+    }
+
+    private void validateSubjectMetaValues(@NotNull Map<String, String> metaParameters) throws DBException {
+        Optional<String> invalidValues = metaParameters.values()
+            .stream()
+            .filter(metaValue -> metaValue != null && metaValue.length() > 1024) // META_VALUE has max length of 1024
+            .findAny();
+        if (invalidValues.isPresent()) {
+            throw new DBException("One or more meta parameters contain invalid values. Please check the input and try again");
         }
     }
 
