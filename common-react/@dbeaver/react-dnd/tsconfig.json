@@ -12,13 +12,5 @@
   },
   "include": [
     "src"
-  ],
-  "references": [
-    {
-      "path": "../react-dnd"
-    },
-    {
-      "path": "../ui-kit"
-    }
   ]
 }
