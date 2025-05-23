@@ -1,10 +1,9 @@
 {
-  "name": "@dbeaver/react-data-grid",
+  "name": "@dbeaver/react-dnd",
   "type": "module",
   "sideEffects": [],
   "exports": {
     ".": "./lib/index.js",
-    "./*.css": "./src/*.css",
     "./*": "./lib/*.js"
   },
   "scripts": {
@@ -28,15 +27,10 @@
   "devDependencies": {
     "@dbeaver/tsconfig": "workspace:^",
     "@types/react": "^19",
-    "@types/react-dom": "^19",
     "rimraf": "^6",
     "typescript": "^5"
   },
   "dependencies": {
-    "@dbeaver/react-dnd": "workspace:^",
-    "@dbeaver/ui-kit": "workspace:^",
-    "react": "^19",
-    "react-data-grid": "file:./artifacts",
-    "react-dom": "^19"
+    "react": "^19"
   }
 }

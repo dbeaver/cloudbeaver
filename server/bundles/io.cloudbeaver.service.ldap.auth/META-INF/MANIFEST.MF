@@ -12,5 +12,6 @@ Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.dbeaver.registry;visibility:=reexport,
  io.cloudbeaver.model
 Bundle-Localization: OSGI-INF/l10n/bundle
-Export-Package: io.cloudbeaver.service.ldap.auth
+Export-Package: io.cloudbeaver.service.ldap.auth,
+ io.cloudbeaver.service.ldap.auth.ssl
 Automatic-Module-Name: io.cloudbeaver.service.ldap.auth

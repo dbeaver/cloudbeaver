@@ -39,7 +39,7 @@
     "mobx-react-lite": "^4",
     "react": "^19",
     "react-dom": "^19",
-    "react-hotkeys-hook": "^4",
+    "react-hotkeys-hook": "^5",
     "react-minisearch": "^7",
     "reakit": "^1",
     "reakit-utils": "^0",

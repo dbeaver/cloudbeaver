@@ -18,9 +18,8 @@ package io.cloudbeaver.server.websockets;
 
 import io.cloudbeaver.model.session.WebHeadlessSession;
 import io.cloudbeaver.model.session.WebHttpRequestInfo;
+import io.cloudbeaver.server.HttpConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
-import io.cloudbeaver.utils.ServletAppUtils;
-import jakarta.servlet.Servlet;
 import jakarta.servlet.http.HttpSession;
 import jakarta.websocket.HandshakeResponse;
 import jakarta.websocket.server.HandshakeRequest;
@@ -52,7 +51,7 @@ public class CBWebSocketServerConfigurator extends ServerEndpointConfig.Configur
 
     @Override
     public void modifyHandshake(ServerEndpointConfig sec, HandshakeRequest request, HandshakeResponse response) {
-        String sessionId = request.getHttpSession() instanceof HttpSession httpSession ? httpSession.getId() : null;
+        String sessionId = getSessionId(request);
 
         String userAgentHeader = request.getHeaders()
             .get(WebHttpRequestInfo.USER_AGENT)
@@ -93,6 +92,15 @@ public class CBWebSocketServerConfigurator extends ServerEndpointConfig.Configur
         }
     }
 
+    @Nullable
+    private String getSessionId(@NotNull HandshakeRequest request) {
+        // complex auth uses bearer authentication
+        List<String> authHeaders = WSClientUtils.getHeaders(request.getHeaders(), HttpConstants.HEADER_AUTHORIZATION);
+        if (!CommonUtils.isEmpty(authHeaders) && authHeaders.get(0).startsWith("Bearer ")) {
+            return authHeaders.get(0).substring(7);
+        }
+        return request.getHttpSession() instanceof HttpSession httpSession ? httpSession.getId() : null;
+    }
 
     @Nullable
     private WebHeadlessSession createHeadlessSession(

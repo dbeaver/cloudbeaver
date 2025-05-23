@@ -50,7 +50,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -126,32 +125,16 @@ public class GraphQLEndpoint extends HttpServlet {
 
     private void setDevelHeaders(HttpServletRequest request, HttpServletResponse response) {
         if (ServletAppUtils.getServletApplication().getServerConfiguration().isDevelMode()) {
-            // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
-            // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_HEADERS, "*");
-            // response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "*");
 
-            String referrer = request.getHeader("referer");
+            String origin = request.getHeader("origin");
+            if (origin == null) {
+                return;
+            }
 
-            try {
-                URL url = new URL(referrer);
-                String protocol = url.getProtocol();
-                String host = url.getHost();
-                int port = url.getPort();
-
-                String origin;
-
-                // if the port is not explicitly specified in the input, it will be -1.
-                if (port == -1) {
-                    origin = String.format("%s://%s", protocol, host);
-                } else {
-                    origin = String.format("%s://%s:%d", protocol, host, port);
-                }
-
-                // for local machine must be defined explicitly:
-                response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, origin);
-                response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_HEADERS, "Set-Cookie, Content-Type");
-                response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
-            } catch (Throwable t) {}
+            // for local machine must be defined explicitly:
+            response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+            response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_HEADERS, "Set-Cookie, Content-Type, Authorization");
+            response.setHeader(HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
         }
     }
 
@@ -203,7 +186,13 @@ public class GraphQLEndpoint extends HttpServlet {
 
         JsonElement operNameJSON = reqObject.get("operationName");
 
-        executeQuery(request, response, query.getAsString(), variables, operNameJSON == null || operNameJSON instanceof JsonNull ? null : operNameJSON.getAsString());
+        executeQuery(
+            request,
+            response,
+            query.getAsString(),
+            variables,
+            operNameJSON == null || operNameJSON instanceof JsonNull ? null : operNameJSON.getAsString()
+        );
     }
 
     @Override
@@ -230,12 +219,19 @@ public class GraphQLEndpoint extends HttpServlet {
         }
     }
 
-    private void executeQuery(HttpServletRequest request, HttpServletResponse response, String query, Map<String, Object> variables, String operationName) throws IOException {
+    private void executeQuery(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        String query,
+        Map<String, Object> variables,
+        String operationName
+    ) throws IOException {
         Map<String, Object> mapOfContext =
             Map.of(
                 "request", request,
                 "response", response,
-                "bindingContext", bindingContext);
+                "bindingContext", bindingContext
+            );
         ExecutionInput.Builder contextBuilder = ExecutionInput.newExecutionInput()
             .graphQLContext(mapOfContext)
             .query(query);
@@ -247,11 +243,11 @@ public class GraphQLEndpoint extends HttpServlet {
         }
         {
             String apiCall = operationName;
-//            if (!CommonUtils.isEmpty(apiCall)) {
-//                if (variables != null) {
-//                    apiCall += " (" + variables + ")";
-//                }
-//            }
+            //            if (!CommonUtils.isEmpty(apiCall)) {
+            //                if (variables != null) {
+            //                    apiCall += " (" + variables + ")";
+            //                }
+            //            }
             String sessionId = GraphQLLoggerUtil.getSessionId(request);
             String userId = GraphQLLoggerUtil.getUserId(request);
             String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, variables);
@@ -288,7 +284,10 @@ public class GraphQLEndpoint extends HttpServlet {
             if (exception instanceof InvocationTargetException) {
                 exception = ((InvocationTargetException) exception).getTargetException();
             }
-            log.debug("GraphQL call failed at '" + handlerParameters.getPath() + "'" /*+ ", " + handlerParameters.getArgumentValues()*/, exception);
+            log.debug(
+                "GraphQL call failed at '" + handlerParameters.getPath() + "'" /*+ ", " + handlerParameters.getArgumentValues()*/,
+                exception
+            );
 
             // Log in session
             WebSession webSession = WebServiceBindingBase.findWebSession(handlerParameters.getDataFetchingEnvironment());

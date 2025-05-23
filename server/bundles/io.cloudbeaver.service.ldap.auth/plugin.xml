@@ -30,6 +30,9 @@
                               description="%ldap-filter.description"/>
                     <property id="ldap-login" label="%ldap-login" type="string" required="false"
                               description="%ldap-login.description"/>
+                    <property id="ldap-enable-ssl" label="%ldap-enable-ssl" description="%ldap-enable-ssl.description" type="boolean" defaultValue="false"/>
+                    <property id="ldap-ssl-cert" label="%ldap-ssl-cert" description="%ldap-ssl-cert.description" type="file" features="file"/>
+
                 </propertyGroup>
             </configuration>
             <credentials>
