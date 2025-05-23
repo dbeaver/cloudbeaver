@@ -16,17 +16,20 @@ export function HeaderCellContentRenderer({ colIdx, tabIndex }: Props) {
   const sortingState = useGridReactiveValue(cellHeaderContext?.columnSortingState, colIdx);
 
   const orderButtonRef = useRef<HTMLButtonElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Tab' && !e.shiftKey && isColumnSortable && onColumnSort && orderButtonRef.current !== document.activeElement) {
       e.preventDefault();
       e.stopPropagation();
+      containerRef.current?.parentElement?.setAttribute('aria-selected', 'false');
       orderButtonRef.current?.focus();
     }
   };
 
   return (
     <div
+      ref={containerRef}
       tabIndex={tabIndex}
       onKeyDown={handleKeyDown}
       className="tw:w-full tw:flex tw:items-center tw:justify-between tw:gap-1 tw:outline-none tw:group"
