@@ -4,19 +4,24 @@ import { DataGridCellContext, type IDataGridCellRenderer } from './DataGridCellC
 import { createCellMouseEvent } from './eventUtils.js';
 import { DataGridCellInnerContext, type IDataGridCellInnerContext } from './DataGridCellInnerContext.js';
 import { useGridReactiveValue } from './useGridReactiveValue.js';
+import { HeaderDnDContext } from './useHeaderDnD.js';
 
 export const BaseCell = memo(function BaseCell<TRow, TSummaryRow>(props: CellRendererProps<TRow, TSummaryRow>) {
   const cellContext = use(DataGridCellContext);
-  const tooltip = useGridReactiveValue(cellContext?.cellTooltip, props.rowIdx, props.column.idx);
+  const dndContext = use(HeaderDnDContext)!;
+  const virtualColIdx = props.column.idx;
+  const dataColIdx = dndContext.getDataColIdx(props.column.idx);
+  const rowIdx = props.rowIdx;
+  const tooltip = useGridReactiveValue(cellContext?.cellTooltip, rowIdx, dataColIdx);
 
   function handleClick(event: React.MouseEvent<HTMLDivElement>) {
     props.onClick?.(
       {
-        rowIdx: props.rowIdx,
+        rowIdx,
         row: props.row,
         column: props.column,
         selectCell(enableEditor) {
-          props.selectCell({ rowIdx: props.rowIdx, idx: props.column.idx }, enableEditor);
+          props.selectCell({ rowIdx, idx: virtualColIdx }, enableEditor);
         },
       },
       createCellMouseEvent(event),
@@ -26,11 +31,11 @@ export const BaseCell = memo(function BaseCell<TRow, TSummaryRow>(props: CellRen
   function handleDoubleClick(event: React.MouseEvent<HTMLDivElement>) {
     props.onDoubleClick?.(
       {
-        rowIdx: props.rowIdx,
+        rowIdx,
         row: props.row,
         column: props.column,
         selectCell(enableEditor) {
-          props.selectCell({ rowIdx: props.rowIdx, idx: props.column.idx }, enableEditor);
+          props.selectCell({ rowIdx, idx: virtualColIdx }, enableEditor);
         },
       },
       createCellMouseEvent(event),
@@ -40,11 +45,11 @@ export const BaseCell = memo(function BaseCell<TRow, TSummaryRow>(props: CellRen
   function handleContextMenu(event: React.MouseEvent<HTMLDivElement>) {
     props.onContextMenu?.(
       {
-        rowIdx: props.rowIdx,
+        rowIdx,
         row: props.row,
         column: props.column,
         selectCell(enableEditor) {
-          props.selectCell({ rowIdx: props.rowIdx, idx: props.column.idx }, enableEditor);
+          props.selectCell({ rowIdx, idx: virtualColIdx }, enableEditor);
         },
       },
       createCellMouseEvent(event),
@@ -74,7 +79,7 @@ export const BaseCell = memo(function BaseCell<TRow, TSummaryRow>(props: CellRen
     [...Object.values(props), tooltip],
   );
 
-  const cellElement = useGridReactiveValue(cellContext?.cellElement, props.rowIdx, props.column.idx, mappedProps, renderDefaultCell);
+  const cellElement = useGridReactiveValue(cellContext?.cellElement, rowIdx, dataColIdx, mappedProps, renderDefaultCell);
 
   const innerCellContext = useMemo<IDataGridCellInnerContext>(() => ({ isFocused: props.isCellSelected }), [props.isCellSelected]);
   return <DataGridCellInnerContext value={innerCellContext}>{cellElement ?? <Cell title={tooltip} {...props} />}</DataGridCellInnerContext>;
