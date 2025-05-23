@@ -163,6 +163,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Empty user name");
         }
         String userId = userName.toLowerCase();
+        try {
+            GeneralUtils.validateResourceNameUnconditionally(userId);
+        } catch (DBException e) {
+            throw new DBWebException(e.getMessage(), e);
+        }
         webSession.addInfoMessage("Create new user - " + userId);
 
         try {
