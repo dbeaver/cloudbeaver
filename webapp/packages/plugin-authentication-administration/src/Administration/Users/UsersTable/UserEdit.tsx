@@ -36,8 +36,8 @@ export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit
   useExecutor({
     executor: usersTableOptionsPanelService.onClose,
     handlers: [
-      async function closeHandler(data, contexts) {
-        if (state.isChanged && data === 'before') {
+      async function closeHandler(event, contexts) {
+        if (state.isChanged && event === 'before') {
           const result = await commonDialogService.open(ConfirmationDialog, {
             title: 'core_blocks_confirmation_dialog_title',
             message: 'ui_save_reminder',
