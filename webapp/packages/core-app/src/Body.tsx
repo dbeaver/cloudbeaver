@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import { useAppVersion } from '@cloudbeaver/core-version';
 import style from './Body.module.css';
 import { useAppHeight } from './useAppHeight.js';
 import { useClientActivity } from './useClientActivity.js';
+import icons from '@dbeaver/ui-kit/assets/icons/icons.svg?raw';
 
 export const Body = observer(function Body() {
   // const serverConfigLoader = useResource(Body, ServerConfigResource, undefined);
@@ -70,6 +71,7 @@ export const Body = observer(function Body() {
           <Loader suspense overlay>
             <Notifications />
           </Loader>
+          <div style={{ display: 'none' }} dangerouslySetInnerHTML={{ __html: icons }} />
         </div>
       </Loader>
     </DNDProvider>

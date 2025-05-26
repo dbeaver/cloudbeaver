@@ -7,7 +7,8 @@
   "exports": {
     ".": "./lib/index.js",
     "./*.css": "./src/*.css",
-    "./*": "./lib/*.js"
+    "./*": "./lib/*.js",
+    "./assets/icons/*.svg": "./assets/icons/*.svg"
   },
   "scripts": {
     "build": "tsc -b",

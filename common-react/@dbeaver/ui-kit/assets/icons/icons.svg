@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-sort-unknown" viewBox="0 0 24 24" fill="currentColor">
+        <polygon points="3.4 8.29 10.55 8.29 6.98 4 3.4 8.29" />
+        <rect x="6.26" y="5.43" width="1.43" height="15.71" />
+        <polygon points="20.55 16.86 13.4 16.86 16.98 21.14 20.55 16.86" />
+        <rect x="16.26" y="4" width="1.43" height="15.71" />
+    </symbol>
+    <symbol id="icon-sort-desc" viewBox="0 0 24 24"
+        fill="currentColor">
+        <polygon points="9.14 16.71 2 16.71 5.57 21 9.14 16.71" />
+        <rect x="4.86" y="3.86" width="1.43" height="15.71" />
+        <rect x="10.57" y="5.29" width="11.43" height="1.43" />
+        <rect x="10.57" y="11.71" width="8.57" height="1.43" />
+        <rect x="10.57" y="18.14" width="5.71" height="1.43" />
+    </symbol>
+    <symbol id="icon-sort-asc" viewBox="0 0 24 24" fill="currentColor">
+        <polygon points="2 8.14 9.14 8.14 5.57 3.86 2 8.14" />
+        <rect x="4.86" y="5.29" width="1.43" height="15.71" />
+        <rect x="10.57" y="5.29" width="11.43" height="1.43" />
+        <rect x="10.57" y="11.71" width="8.57" height="1.43" />
+        <rect x="10.57" y="18.14" width="5.71" height="1.43" />
+    </symbol>
+    <symbol id="icon-cross" viewBox="0 0 24 24">
+        <path xmlns="http://www.w3.org/2000/svg" fill="currentColor" fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M3.31579 3.31579C2.89474 3.73684 2.89474 4.42105 3.31579 4.84211L10.4737 12L3.31579 19.1579C2.89474 19.5789 2.89474 20.2632 3.31579 20.6842C3.73684 21.1053 4.42105 21.1053 4.84211 20.6842L12 13.5263L19.1579 20.6842C19.5789 21.1053 20.2632 21.1053 20.6842 20.6842C21.1053 20.2632 21.1053 19.5789 20.6842 19.1579L13.5263 12L20.6842 4.84211C21.1053 4.42105 21.1053 3.73684 20.6842 3.31579C20.2632 2.89474 19.5789 2.89474 19.1579 3.31579L12 10.4737L4.84211 3.31579C4.42105 2.89474 3.73684 2.89474 3.31579 3.31579Z" />
+    </symbol>
+</svg>  

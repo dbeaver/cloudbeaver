@@ -9,13 +9,10 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { getComputed, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
-import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
-import { DatabaseDataConstraintAction, isResultSetDataModel, ResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext.js';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext.js';
 import { TableDataContext } from '../TableDataContext.js';
-import { OrderButton } from './OrderButton.js';
 import style from './TableColumnHeader.module.css';
 import { useTableColumnDnD } from './useTableColumnDnD.js';
 
@@ -34,17 +31,10 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
 
   const columnInfo = tableDataContext.getColumn(colIdx)!;
   const dnd = useTableColumnDnD(model, resultIndex, columnInfo.key);
-  let constraintsAction: DatabaseDataConstraintAction | undefined;
-
-  if (isResultSetDataModel(model)) {
-    constraintsAction = (model.source as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
-  }
 
   const dataReadonly = getComputed(() => model.isReadonly(resultIndex));
   const hasElementIdentifier = getComputed(() => model.hasElementIdentifier(resultIndex));
-  const sortingDisabled = getComputed(() => !constraintsAction?.supported || model.isDisabled(resultIndex));
 
-  let resultColumn: SqlResultColumn | undefined;
   let icon: string | undefined;
   let columnName: string | undefined;
   let columnReadOnly = false;
@@ -54,7 +44,6 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
     const column = tableDataContext.data.getColumn(columnInfo.key);
 
     if (column) {
-      resultColumn = column;
       columnName = column.label!;
       icon = column.icon;
       columnReadOnly ||= tableDataContext.format.isReadOnly({ column: columnInfo.key });
@@ -96,9 +85,6 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
         </div>
       )}
       <div className={s(styles, { name: true })}>{columnName}</div>
-      {!sortingDisabled && resultColumn && isResultSetDataModel(model) && (
-        <OrderButton model={model} resultIndex={resultIndex} attributePosition={resultColumn.position} />
-      )}
     </div>
   );
 });

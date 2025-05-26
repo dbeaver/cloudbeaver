@@ -11,6 +11,9 @@ export interface IDataGridHeaderCellContext {
   getHeaderPinned?: (colIdx: number) => boolean;
   getHeaderDnD?: (colIdx: number) => boolean;
   onHeaderReorder?: (from: number, to: number) => void;
+  columnSortingState?: IGridReactiveValue<'asc' | 'desc' | undefined | null, [colIdx: number]>;
+  columnSortable?: IGridReactiveValue<boolean, [colIdx: number]>;
+  onColumnSort?: (colIdx: number, order: 'asc' | 'desc' | null, isMultiple: boolean) => void;
 }
 
 export const DataGridCellHeaderContext = createContext<IDataGridHeaderCellContext | null>(null);
