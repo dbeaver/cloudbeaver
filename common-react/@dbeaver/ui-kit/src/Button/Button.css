@@ -18,6 +18,8 @@
     font-size: var(--dbv-kit-btn-font-size);
     font-weight: var(--dbv-kit-btn-font-weight);
 
+    cursor: pointer;
+
     &:focus-visible,
     &[data-focus-visible] {
       outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-btn-outline-color);
