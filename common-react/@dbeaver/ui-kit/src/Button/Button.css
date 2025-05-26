@@ -6,7 +6,6 @@
   .dbv-kit-button {
     height: var(--dbv-kit-btn-height);
     padding-inline: var(--dbv-kit-btn-padding-inline);
-    gap: var(--dbv-kit-btn-gap);
 
     background-color: var(--dbv-kit-btn-background);
     color: var(--dbv-kit-btn-foreground);
