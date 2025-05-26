@@ -25,6 +25,7 @@ export type ButtonProps = (React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAn
   iconPlacement?: 'start' | 'end';
   iconSize?: number;
   variant?: 'primary' | 'secondary' | 'danger';
+  size?: 'small' | 'medium' | 'large';
   tag?: 'button' | 'a' | 'div';
   href?: string;
   target?: '_blank' | '_self' | '_parent' | '_top';
