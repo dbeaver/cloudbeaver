@@ -7,6 +7,8 @@
     --dbv-kit-control-border-radius: var(--tw-radius-sm);
     --dbv-kit-control-border-width: 1px;
     --dbv-kit-control-disabled-opacity: 0.5;
+    --dbv-kit-control-disabled-foreground: var(--tw-color-gray-400);
+    --dbv-kit-control-disabled-background: var(--tw-color-gray-200);
 
     /* Outline */
     --dbv-kit-control-outline-color: var(--tw-color-blue-500);
