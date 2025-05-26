@@ -1,4 +1,3 @@
-@import url('@dbeaver/ui-kit/index.css');
 @layer components {
   body {
     --dbv-kit-checkbox-background: var(--theme-surface);

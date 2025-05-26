@@ -91,23 +91,23 @@ export const IconButtons = () => {
         <h2>Primary</h2>
         <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
           <IconButton variant="primary" size="small" aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
           <IconButton variant="primary" size="medium" aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
           <IconButton variant="primary" size="large" aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
           <IconButton variant="primary" size="xlarge" aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
         </div>
@@ -116,23 +116,23 @@ export const IconButtons = () => {
         <h2>Secondary</h2>
         <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
           <IconButton variant="secondary" size="small" aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
           <IconButton variant="secondary" size="medium" aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
           <IconButton variant="secondary" size="large" aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
           <IconButton variant="secondary" size="xlarge" aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
         </div>
@@ -141,23 +141,23 @@ export const IconButtons = () => {
         <h2>Danger</h2>
         <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
           <IconButton variant="danger" size="small" aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
           <IconButton variant="danger" size="medium" aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
           <IconButton variant="danger" size="large" aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
           <IconButton variant="danger" size="xlarge" aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
         </div>
@@ -166,41 +166,41 @@ export const IconButtons = () => {
         <h2>Disabled</h2>
         <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
           <IconButton variant="primary" size="small" disabled aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
           <IconButton variant="secondary" size="medium" disabled aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
           <IconButton variant="danger" size="large" disabled aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
         </div>
         <h2>Loading</h2>
         <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
           <IconButton variant="primary" size="small" loading aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
           <IconButton variant="secondary" loading={isLoading} onClick={handleClick} aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
           <IconButton size="large" loading={isLoading} onClick={handleClick} aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
           <IconButton variant="danger" size="xlarge" loading={isLoading} onClick={handleClick} aria-label="Add item">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="6" fill="currentColor" />
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em">
+              <circle cx="12" cy="12" r="12" fill="currentColor" />
             </svg>
           </IconButton>
         </div>

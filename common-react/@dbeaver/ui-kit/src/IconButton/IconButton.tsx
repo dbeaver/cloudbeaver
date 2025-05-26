@@ -24,7 +24,7 @@ export function IconButtonBase({ className, variant = 'primary', size = 'medium'
 
   return (
     <ButtonRoot className={classToApply} {...props}>
-      <span className="dbv-kit-icon-button__icon">{children}</span>
+      {children}
     </ButtonRoot>
   );
 }

@@ -57,8 +57,3 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-.reject {
-  cursor: pointer;
-  flex-shrink: 0;
-}

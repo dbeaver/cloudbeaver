@@ -8,20 +8,22 @@
 
 @import '../theme-light';
 
-@include theme {
-  @include colors;
-  @include color-scheme;
-  @include css-variables;
-  @include ripple-core-styles;
-  @include theme-ripple;
-  @include layout-grid;
-  @include form-controls;
-  @include button-core-styles;
-  @include radio-core-styles;
-  @include switch-core-styles;
-  @include checkbox-core-styles;
-  @include link;
-  @include placeholder;
-  @include delimiter($mdc-theme-secondary);
-  @include branding-overflow;
+@layer base {
+  @include theme {
+    @include colors;
+    @include color-scheme;
+    @include css-variables;
+    @include ripple-core-styles;
+    @include theme-ripple;
+    @include layout-grid;
+    @include form-controls;
+    @include button-core-styles;
+    @include radio-core-styles;
+    @include switch-core-styles;
+    @include checkbox-core-styles;
+    @include link;
+    @include placeholder;
+    @include delimiter($mdc-theme-secondary);
+    @include branding-overflow;
+  }
 }
