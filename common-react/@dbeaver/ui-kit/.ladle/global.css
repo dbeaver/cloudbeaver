@@ -1,4 +1,4 @@
-@import 'tailwindcss' prefix(tw);
+@import 'tailwindcss' layer(base) prefix(tw);
 
 @layer theme {
   main {

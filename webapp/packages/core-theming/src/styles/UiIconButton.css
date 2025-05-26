@@ -1,0 +1,21 @@
+@layer components {
+  .dbv-kit-icon-button {
+    --dbv-kit-color-primary-500: var(--theme-primary);
+    --dbv-kit-icon-btn-outline-color: var(--theme-primary);
+
+    --dbv-kit-icon-btn-primary-foreground: var(--theme-primary);
+    --dbv-kit-icon-btn-primary-foreground-hover: var(--theme-primary);
+    --dbv-kit-icon-btn-primary-foreground-active: var(--theme-primary);
+    --dbv-kit-icon-btn-primary-background: transparent;
+    --dbv-kit-icon-btn-primary-background-hover: var(--theme-secondary);
+    --dbv-kit-icon-btn-primary-background-active: var(--theme-background);
+
+    --dbv-kit-icon-btn-secondary-background: transparent;
+    --dbv-kit-icon-btn-secondary-foreground: var(--theme-on-secondary);
+    --dbv-kit-icon-btn-secondary-foreground-hover: var(--theme-on-secondary);
+    --dbv-kit-icon-btn-secondary-foreground-active: var(--theme-on-secondary);
+    --dbv-kit-icon-btn-secondary-background-hover: var(--theme-secondary, #f2f2f2);
+    --dbv-kit-icon-btn-secondary-background-active: var(--theme-background);
+    --dbv-kit-icon-btn-secondary-border-color: transparent;
+  }
+}
