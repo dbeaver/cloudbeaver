@@ -33,7 +33,7 @@ export class UserProfileOptionsPanelService {
     this.onOpen = new SyncExecutor();
     this.onClose = new Executor();
 
-    this.optionsPanelService.closeTask.next(this.onClose, undefined, () => this.optionsPanelService.isOpen(panelGetter));
+    this.optionsPanelService.closeTask.next(this.onClose, undefined, data => data === 'before' && this.optionsPanelService.isOpen(panelGetter));
     this.userInfoResource.onDataUpdate.addHandler(this.userUpdateHandler.bind(this));
 
     makeObservable(this, {
