@@ -12,8 +12,4 @@
     --dbv-kit-checkbox-check-size: 0.8;
     --dbv-kit-checkbox-small-height: 1.375rem;
   }
-
-  .dbv-kit-checkbox__check > svg {
-    fill: none !important;
-  }
 }
