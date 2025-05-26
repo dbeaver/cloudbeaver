@@ -9,6 +9,8 @@
   .dbv-kit-button {
     --dbv-kit-btn-padding-inline: 16px;
     --dbv-kit-btn-outline-color: var(--theme-primary);
+    --dbv-kit-control-disabled-foreground: #3535355e;
+    --dbv-kit-control-disabled-background: #3535351f;
 
     --dbv-kit-btn-primary-background: var(--theme-primary);
     --dbv-kit-btn-primary-background-hover: color-mix(in srgb, var(--theme-primary), white 10%);
@@ -39,5 +41,11 @@
     letter-spacing: 0.0892857143em;
     text-decoration: none;
     text-transform: uppercase;
+    opacity: 1;
+  }
+
+  .theme-dark .dbv-kit-button {
+    --dbv-kit-control-disabled-foreground: #ffffff5e;
+    --dbv-kit-control-disabled-background: #ffffff1f;
   }
 }
