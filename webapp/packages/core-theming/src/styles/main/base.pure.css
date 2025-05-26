@@ -1,8 +1,10 @@
-[type='checkbox'] {
-  height: 16px;
-  width: 16px;
-}
+@layer base {
+  [type='checkbox'] {
+    height: 16px;
+    width: 16px;
+  }
 
-label[title] {
-  text-decoration: none;
+  label[title] {
+    text-decoration: none;
+  }
 }
