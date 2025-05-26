@@ -33,6 +33,8 @@
     --dbv-kit-btn-danger-background-hover: color-mix(in srgb, var(--theme-negative), white 10%);
     --dbv-kit-btn-danger-background-active: color-mix(in srgb, var(--theme-negative), white 25%);
 
+    min-width: 64px;
+
     font-family: Roboto, sans-serif;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
