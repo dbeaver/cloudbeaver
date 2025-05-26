@@ -182,7 +182,7 @@ export const InputFiles: InputFilesType = observer(
         </FieldLabel>
         <div className={s(styles, { inputContainer: true })}>
           <UploadArea ref={ref} {...rest} name={name} value={value} required={required} onChange={handleChange}>
-            <Button icon="/icons/import.svg" tag="div" loading={loading} variant="secondary">
+            <Button className="tw:flex" icon="/icons/import.svg" tag="div" loading={loading} variant="secondary">
               {text}
             </Button>
           </UploadArea>

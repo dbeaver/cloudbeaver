@@ -58,14 +58,14 @@ export const ExportNotification = observer<Props>(function ExportNotification({ 
         </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
           {isReadyToDownload && (
-            <>
+            <div className="tw:flex tw:gap-4 tw:p-1">
               <Button type="button" variant="secondary" onClick={state.delete}>
                 {translate('ui_processing_cancel')}
               </Button>
-              <Button tag="a" href={state.downloadUrl} download onClick={state.download}>
+              <Button className="tw:flex tw:text-(--theme-on-primary)!" tag="a" href={state.downloadUrl} download onClick={state.download}>
                 {translate('data_transfer_notification_download')}
               </Button>
-            </>
+            </div>
           )}
           {status === ENotificationType.Error && (
             <Button type="button" variant="secondary" disabled={errorDetails.isOpen} onClick={errorDetails.open}>
