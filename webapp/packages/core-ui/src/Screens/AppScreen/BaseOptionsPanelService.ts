@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,11 +9,11 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 
-import type { OptionsPanelService } from './OptionsPanelService.js';
+import type { OptionsPanelCloseEventData, OptionsPanelService } from './OptionsPanelService.js';
 
 export abstract class BaseOptionsPanelService<T> {
   itemId: T | null;
-  readonly onClose: IExecutor;
+  readonly onClose: IExecutor<OptionsPanelCloseEventData>;
 
   constructor(
     protected readonly optionsPanelService: OptionsPanelService,
@@ -25,6 +25,12 @@ export abstract class BaseOptionsPanelService<T> {
     this.optionsPanelService.closeTask.next(this.onClose, undefined, () => this.optionsPanelService.isOpen(panelGetter));
     this.close = this.close.bind(this);
     this.open = this.open.bind(this);
+
+    this.onClose.addHandler(data => {
+      if (data === 'after') {
+        this.itemId = null;
+      }
+    });
 
     makeObservable(this, {
       itemId: observable.ref,
@@ -52,10 +58,6 @@ export abstract class BaseOptionsPanelService<T> {
       return;
     }
 
-    const result = await this.optionsPanelService.close();
-
-    if (result) {
-      this.itemId = null;
-    }
+    await this.optionsPanelService.close();
   }
 }

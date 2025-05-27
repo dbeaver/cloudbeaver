@@ -7,6 +7,7 @@
     min-width: var(--dbv-kit-icon-btn-size);
     width: var(--dbv-kit-icon-btn-size);
     height: var(--dbv-kit-icon-btn-size);
+    font-size: calc(var(--dbv-kit-icon-btn-size) * 0.75);
 
     border-radius: var(--dbv-kit-icon-btn-border-radius);
     border-color: var(--dbv-kit-icon-btn-border-color);
@@ -54,14 +55,6 @@
       --dbv-kit-spinner-height: calc(var(--dbv-kit-icon-btn-size) * 0.8);
       --dbv-kit-spinner-stroke-width: 3px;
     }
-  }
-
-  .dbv-kit-icon-button__icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
   }
 
   /* Size variants */

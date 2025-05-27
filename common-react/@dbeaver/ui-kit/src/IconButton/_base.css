@@ -17,8 +17,8 @@
 
     /* Default colors */
     --dbv-kit-icon-btn-foreground: var(--tw-color-gray-600);
-    --dbv-kit-icon-btn-foreground-hover: var(--dbv-kit-color-600);
-    --dbv-kit-icon-btn-foreground-active: var(--dbv-kit-color-700);
+    --dbv-kit-icon-btn-foreground-hover: var(--tw-color-gray-600);
+    --dbv-kit-icon-btn-foreground-active: var(--tw-color-gray-700);
     --dbv-kit-icon-btn-background: transparent;
     --dbv-kit-icon-btn-background-hover: var(--tw-color-gray-100);
     --dbv-kit-icon-btn-background-active: var(--tw-color-gray-200);
