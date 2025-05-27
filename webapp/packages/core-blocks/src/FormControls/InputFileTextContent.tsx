@@ -139,7 +139,7 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
         {children}
       </FieldLabel>
       <UploadArea title={tooltip} disabled={disabled} accept={accept} reset onChange={handleChange}>
-        <Button icon="/icons/import.svg" tag="div" variant="secondary" disabled={disabled}>
+        <Button className="tw:inline-flex" icon="/icons/import.svg" tag="div" variant="secondary" disabled={disabled}>
           {translate('ui_upload_file')}
         </Button>
       </UploadArea>
