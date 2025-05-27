@@ -3286,6 +3286,7 @@ __metadata:
     "@cloudbeaver/core-data-context": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
+    "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-datasource-context-switch": "workspace:*"
     "@cloudbeaver/plugin-navigation-tree": "workspace:*"
