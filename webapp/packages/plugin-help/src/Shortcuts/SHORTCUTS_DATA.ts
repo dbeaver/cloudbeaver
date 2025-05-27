@@ -147,9 +147,7 @@ function formatKeyToDisplayKey(code: string): string {
         return 'OPTION';
       }
       return 'ALT';
-    case !!FORMAT_SHORTCUT_KEYS_MAP[lowerCaseCode]:
-      return FORMAT_SHORTCUT_KEYS_MAP[lowerCaseCode];
     default:
-      return code;
+      return FORMAT_SHORTCUT_KEYS_MAP[lowerCaseCode] ?? code;
   }
 }
