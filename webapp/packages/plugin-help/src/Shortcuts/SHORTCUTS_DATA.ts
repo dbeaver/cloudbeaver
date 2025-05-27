@@ -113,7 +113,7 @@ function formatKeysSymbols(key: string): string {
   };
 
   for (const [codeKey, codeValue] of Object.entries(KEY_FORMAT_MAP)) {
-    key = key.replace(codeKey, codeValue);
+    key = key.replaceAll(codeKey, codeValue);
   }
 
   return key;
@@ -122,11 +122,11 @@ function formatKeysSymbols(key: string): string {
 function transformModToDisplayKey(key: string): string {
   const OS = getOS();
   if (OS === OperatingSystem.windowsOS || OS === OperatingSystem.linuxOS) {
-    return key.replace('MOD', 'CTRL');
+    return key.replaceAll('MOD', 'CTRL');
   }
 
   if (OS === OperatingSystem.macOS) {
-    return key.replace('MOD', 'CMD').replace('ALT', 'OPTION');
+    return key.replaceAll('MOD', 'CMD').replaceAll('ALT', 'OPTION');
   }
   return key;
 }
