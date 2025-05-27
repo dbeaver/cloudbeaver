@@ -7,4 +7,9 @@
  */
 import { createMenu } from '@cloudbeaver/core-view';
 
-export const MENU_CONNECTION_SELECTOR = createMenu('connection-selector', { label: 'Connection selector' });
+export const MENU_TREE_CREATE_CONNECTION = createMenu('create-tree-connection', {
+  label: 'plugin_connections_connection_create_menu_title',
+  icon: '/icons/plugin_connection_new_sm.svg',
+  tooltip: 'plugin_connections_connection_create_menu_title',
+  group: true,
+});

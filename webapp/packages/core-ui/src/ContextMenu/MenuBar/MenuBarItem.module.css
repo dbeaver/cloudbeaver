@@ -87,6 +87,7 @@
     & .icon {
       width: 14px;
       height: 14px;
+      fill: var(--mdc-theme-on-secondary, #6d6d6d);
     }
   }
 }
