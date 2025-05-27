@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ package io.cloudbeaver.server;
 public class CBConstants {
     public static final int STATIC_CACHE_SECONDS = 60 * 60 * 24 * 3;
 
+    public static final String CONF_DIR_NAME = "conf";
     public static final String RUNTIME_DATA_DIR_NAME = ".data";
     public static final String RUNTIME_APP_CONFIG_FILE_NAME = ".cloudbeaver.runtime.conf";
     public static final String RUNTIME_PRODUCT_CONFIG_FILE_NAME = ".product.runtime.conf";
