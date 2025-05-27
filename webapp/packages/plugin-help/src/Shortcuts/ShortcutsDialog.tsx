@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
         </Container>
       </CommonDialogBody>
       <CommonDialogFooter>
-        <Button className={s(styles, { button: true })} type="button" mod={['outlined']} onClick={rejectDialog}>
+        <Button className={s(styles, { button: true })} type="button" variant="secondary" onClick={rejectDialog}>
           {translate('ui_close')}
         </Button>
       </CommonDialogFooter>

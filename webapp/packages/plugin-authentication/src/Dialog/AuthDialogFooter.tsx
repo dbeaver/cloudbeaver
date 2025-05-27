@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ export const AuthDialogFooter = observer<Props>(function AuthDialogFooter({ auth
     <div className={s(style, { footerContainer: true })}>
       {children}
       {authAvailable && (
-        <Button className={s(style, { button: true })} type="button" mod={['unelevated']} loading={isAuthenticating} onClick={onLogin}>
+        <Button className={s(style, { button: true })} type="button" loading={isAuthenticating} onClick={onLogin}>
           {translate('authentication_login')}
         </Button>
       )}

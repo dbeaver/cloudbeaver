@@ -21,7 +21,7 @@ export {
   type FocusTrapRegionProps,
 } from '@ariakit/react';
 
-export { Button, ButtonBase, type ButtonProps } from './Button/Button.js';
+export { Button, ButtonBase, type ButtonProps, ButtonIcon, type ButtonIconProps } from './Button/Button.js';
 export { IconButton, IconButtonBase, type IconButtonProps } from './IconButton/IconButton.js';
 export { Checkbox, CheckboxBase, type CheckboxProps } from './Checkbox/Checkbox.js';
 export { Input, InputBase, type InputProps } from './Input/Input.js';

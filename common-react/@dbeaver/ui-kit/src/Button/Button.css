@@ -6,7 +6,6 @@
   .dbv-kit-button {
     height: var(--dbv-kit-btn-height);
     padding-inline: var(--dbv-kit-btn-padding-inline);
-    gap: var(--dbv-kit-btn-gap);
 
     background-color: var(--dbv-kit-btn-background);
     color: var(--dbv-kit-btn-foreground);
@@ -18,6 +17,8 @@
 
     font-size: var(--dbv-kit-btn-font-size);
     font-weight: var(--dbv-kit-btn-font-weight);
+
+    cursor: pointer;
 
     &:focus-visible,
     &[data-focus-visible] {
@@ -36,10 +37,6 @@
     &[data-active] {
       color: var(--dbv-kit-btn-foreground-active);
       background-color: var(--dbv-kit-btn-background-active);
-    }
-
-    &:disabled {
-      opacity: var(--dbv-kit-control-disabled-opacity);
     }
   }
 
@@ -95,6 +92,11 @@
     --dbv-kit-btn-background-active: var(--dbv-kit-btn-primary-background-active);
 
     --dbv-kit-btn-loader-color: var(--dbv-kit-btn-primary-foreground);
+
+    &:disabled {
+      background-color: var(--dbv-kit-control-disabled-background);
+      color: var(--dbv-kit-control-disabled-foreground);
+    }
   }
 
   .dbv-kit-button--secondary {
@@ -108,6 +110,11 @@
     --dbv-kit-btn-border-color: var(--dbv-kit-btn-secondary-border-color);
 
     --dbv-kit-btn-loader-color: var(--dbv-kit-btn-secondary-foreground);
+
+    &:disabled {
+      color: var(--dbv-kit-control-disabled-foreground);
+      border-color: var(--dbv-kit-control-disabled-foreground);
+    }
   }
 
   .dbv-kit-button--danger {
@@ -122,6 +129,11 @@
 
     --dbv-kit-btn-loader-color: var(--dbv-kit-btn-danger-foreground);
     --dbv-kit-btn-outline-color: var(--dbv-kit-btn-danger-color-outline);
+
+    &:disabled {
+      background-color: var(--dbv-kit-control-disabled-background);
+      color: var(--dbv-kit-control-disabled-foreground);
+    }
   }
 
   /* ---------------------------- */

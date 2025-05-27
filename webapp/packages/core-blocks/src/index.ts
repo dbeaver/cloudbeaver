@@ -137,7 +137,6 @@ export * from './Tree/TreeNode/TreeNodeNestedMessage.js';
 export * from './Tree/TreeNode/TreeNodeSelect.js';
 export * from './Button.js';
 export * from './Text.js';
-export { default as ButtonStyles } from './Button.module.css';
 export * from './ToolsPanel/ToolsAction.js';
 export * from './ToolsPanel/ToolsPanel.js';
 export { default as ToolsPanelStyles } from './ToolsPanel/ToolsPanel.module.css';

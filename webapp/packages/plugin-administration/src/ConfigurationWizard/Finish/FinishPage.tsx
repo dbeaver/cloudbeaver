@@ -28,7 +28,7 @@ export const FinishPage = observer(function FinishPage() {
           <h3 className="tw:text-xl tw:font-semibold">{translate('administration_configuration_wizard_finish_title')}</h3>
           <p className={s(style, { message: true })}>{translate('administration_configuration_wizard_finish_message')}</p>
 
-          <Button type="button" mod={['unelevated']} onClick={() => service.next()}>
+          <Button type="button" onClick={() => service.next()}>
             {translate('ui_stepper_finish')}
           </Button>
         </div>

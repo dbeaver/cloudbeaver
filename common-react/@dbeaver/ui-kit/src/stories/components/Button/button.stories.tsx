@@ -1,5 +1,5 @@
 import type { Story } from '@ladle/react';
-import { Button, type ButtonProps } from '../../../index.js';
+import { Button, type ButtonProps, ButtonIcon } from '../../../index.js';
 import { useState } from 'react';
 
 export { Tokens } from './button-tokens.js';
@@ -143,10 +143,10 @@ export const Sizes = () => (
 export const Icons = () => (
   <div>
     <h2>Icons</h2>
-    <h3>&lt;Button.Icon&gt;</h3>
+    <h3>&lt;ButtonIcon&gt;</h3>
     <code>.dbv-kit-button__icon</code>
     <p>
-      To properly place an icon inside a button, you have to use Button.Icon component. That component will compensate outer padding to balance the
+      To properly place an icon inside a button, you have to use ButtonIcon component. That component will compensate outer padding to balance the
       button view. You need to specify the placement property to adjust the icon position.
     </p>
     <dl>
@@ -155,7 +155,7 @@ export const Icons = () => (
     </dl>
     <div className="codeblock">
       <code>
-        &lt;Button&gt; <br /> &nbsp;&nbsp;&lt;Button.Icon placement="start"/&gt;
+        &lt;Button&gt; <br /> &nbsp;&nbsp;&lt;ButtonIcon placement="start"/&gt;
         <br />
         &nbsp; Text
         <br /> &lt;Button/&gt;
@@ -166,14 +166,14 @@ export const Icons = () => (
       <h4>Compare buttons:</h4>
       <div className="tw:flex tw:gap-4 tw:items-center tw:my-4">
         <Button variant="secondary">
-          <Button.Icon placement="start">🧤</Button.Icon>
+          <ButtonIcon placement="start">🧤</ButtonIcon>
           Text
         </Button>
         <Button variant="secondary">🧤 Text</Button>
       </div>
       <p>
-        The left button uses Button.Icon component and looks more balanced. If you feel that in your case it's not needed, feel free to not use the
-        <b> Button.Icon </b> component.
+        The left button uses ButtonIcon component and looks more balanced. If you feel that in your case it's not needed, feel free to not use the
+        <b> ButtonIcon </b> component.
       </p>
     </div>
 
@@ -190,12 +190,12 @@ export const Icons = () => (
     <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
       <Button size="small">
         Love
-        <Button.Icon placement="end">❤️</Button.Icon>
+        <ButtonIcon placement="end">❤️</ButtonIcon>
       </Button>
 
       <Button className="tw:text-lime-300">
         Have you seen
-        <Button.Icon className="w-2">
+        <ButtonIcon className="w-2">
           <svg width="16" height="16" fill="none">
             <g strokeWidth="0"></g>
             <g strokeLinecap="round" strokeLinejoin="round"></g>
@@ -208,24 +208,24 @@ export const Icons = () => (
               ></path>
             </g>
           </svg>
-        </Button.Icon>
+        </ButtonIcon>
         UFO?
       </Button>
 
       <Button size="large">
-        <Button.Icon placement="start">🎾</Button.Icon>
+        <ButtonIcon placement="start">🎾</ButtonIcon>
         Tennis
       </Button>
 
       <Button size="xlarge">
-        <Button.Icon placement="start">🎾</Button.Icon>
+        <ButtonIcon placement="start">🎾</ButtonIcon>
         Tennis is Love
-        <Button.Icon placement="end">❤️</Button.Icon>
+        <ButtonIcon placement="end">❤️</ButtonIcon>
       </Button>
     </div>
     <div className="tw:flex tw:gap-4 tw:my-4 tw:items-center">
       <Button loading>
-        <Button.Icon className="tw:w-8 tw:h-4" placement="start">
+        <ButtonIcon className="tw:w-8 tw:h-4" placement="start">
           <svg width="16" height="16" fill="none">
             <g strokeWidth="0"></g>
             <g strokeLinecap="round" strokeLinejoin="round"></g>
@@ -238,23 +238,23 @@ export const Icons = () => (
               ></path>
             </g>
           </svg>
-        </Button.Icon>
+        </ButtonIcon>
         UFO
       </Button>
       <Button variant="secondary" loading>
-        <Button.Icon placement="start">🎾</Button.Icon>
+        <ButtonIcon placement="start">🎾</ButtonIcon>
         Tennis
       </Button>
       <Button disabled>
-        <Button.Icon placement="start">🎾</Button.Icon>
+        <ButtonIcon placement="start">🎾</ButtonIcon>
         Tennis
       </Button>
       <Button variant="danger">
-        <Button.Icon placement="start">🎾</Button.Icon>
+        <ButtonIcon placement="start">🎾</ButtonIcon>
         Tennis
       </Button>
       <Button>
-        <Button.Icon>🎾</Button.Icon>
+        <ButtonIcon>🎾</ButtonIcon>
       </Button>
     </div>
   </div>

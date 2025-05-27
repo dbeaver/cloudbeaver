@@ -54,8 +54,8 @@ export function CheckboxBase({ children, className, icon, indeterminate, indeter
       >
         {checked &&
           (icon ?? (
-            <svg fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 16 16">
-              <polyline points="3,7 7,11 13,4" />
+            <svg stroke="currentColor" strokeWidth="2" viewBox="0 0 16 16">
+              <polyline fill="none" points="3,7 7,11 13,4" />
             </svg>
           ))}
         {indeterminate &&

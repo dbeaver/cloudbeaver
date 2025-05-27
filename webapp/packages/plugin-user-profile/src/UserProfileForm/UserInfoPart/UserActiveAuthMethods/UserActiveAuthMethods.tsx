@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ export const UserActiveAuthMethods = observer<Props>(function UserActiveAuthMeth
                 className={s(style, { cell: true })}
                 before={icon ? <IconOrImage className={s(style, { iconOrImage: true })} icon={icon} /> : undefined}
                 after={
-                  <Button mod={['outlined']} onClick={() => authenticationService.logout(provider.id, configuration?.id)}>
+                  <Button variant="secondary" onClick={() => authenticationService.logout(provider.id, configuration?.id)}>
                     {translate('authentication_logout')}
                   </Button>
                 }
