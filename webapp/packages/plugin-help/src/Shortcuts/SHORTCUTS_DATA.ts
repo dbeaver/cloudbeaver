@@ -124,48 +124,32 @@ export const NAVIGATION_TREE_SHORTCUTS: IShortcut[] = [
 ];
 
 function transformKeys(keyBinding: IKeyBinding): string[] {
-  return getCommonAndOSSpecificKeys(keyBinding).map(formatDividers).map(formatShortcutKeys);
+  return getCommonAndOSSpecificKeys(keyBinding)
+    .map(shortcut => shortcut.replace(SOURCE_DIVIDER_REGEXP, APPLIED_DIVIDER))
+    .map(shortcut => shortcut.split(APPLIED_DIVIDER).map(formatKey).join(APPLIED_DIVIDER).toLocaleUpperCase());
 }
 
-function formatDividers(key: string): string {
-  return key.replace(SOURCE_DIVIDER_REGEXP, APPLIED_DIVIDER);
-}
-
-function formatShortcutKeys(key: string): string {
+function formatKey(code: string): string {
+  const lowerCaseCode = code.toLowerCase();
   const OS = getOS();
-  const codes = key.split(APPLIED_DIVIDER);
-  const result: string[] = [];
 
-  for (const code of codes) {
-    const lowerCaseCode = code.toLowerCase();
-
-    if (lowerCaseCode === 'mod') {
+  switch (true) {
+    case lowerCaseCode === 'mod':
       if (OS === OperatingSystem.windowsOS || OS === OperatingSystem.linuxOS) {
-        result.push('CTRL');
+        return 'CTRL';
       }
-
       if (OS === OperatingSystem.macOS) {
-        result.push('CMD');
+        return 'CMD';
       }
-
-      continue;
-    }
-
-    if (lowerCaseCode === 'alt') {
+      return code;
+    case lowerCaseCode === 'alt':
       if (OS === OperatingSystem.macOS) {
-        result.push('OPTION');
+        return 'OPTION';
       }
-
-      continue;
-    }
-
-    if (FORMAT_SHORTCUT_KEYS_MAP[lowerCaseCode]) {
-      result.push(FORMAT_SHORTCUT_KEYS_MAP[lowerCaseCode]);
-      continue;
-    }
-
-    result.push(lowerCaseCode);
+      return 'ALT';
+    case !!FORMAT_SHORTCUT_KEYS_MAP[lowerCaseCode]:
+      return FORMAT_SHORTCUT_KEYS_MAP[lowerCaseCode];
+    default:
+      return code;
   }
-
-  return result.join(APPLIED_DIVIDER);
 }
