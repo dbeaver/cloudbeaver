@@ -133,8 +133,8 @@ function formatKeyToDisplayKey(code: string): string {
   const lowerCaseCode = code.toLowerCase();
   const OS = getOS();
 
-  switch (true) {
-    case lowerCaseCode === 'mod':
+  switch (lowerCaseCode) {
+    case 'mod':
       if (OS === OperatingSystem.windowsOS || OS === OperatingSystem.linuxOS) {
         return 'CTRL';
       }
@@ -142,7 +142,7 @@ function formatKeyToDisplayKey(code: string): string {
         return 'CMD';
       }
       return code;
-    case lowerCaseCode === 'alt':
+    case 'alt':
       if (OS === OperatingSystem.macOS) {
         return 'OPTION';
       }
