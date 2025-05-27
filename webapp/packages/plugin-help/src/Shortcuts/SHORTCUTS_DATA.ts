@@ -151,6 +151,14 @@ function formatShortcutKeys(key: string): string {
       continue;
     }
 
+    if (lowerCaseCode === 'alt') {
+      if (OS === OperatingSystem.macOS) {
+        result.push('OPTION');
+      }
+
+      continue;
+    }
+
     if (FORMAT_SHORTCUT_KEYS_MAP[lowerCaseCode]) {
       result.push(FORMAT_SHORTCUT_KEYS_MAP[lowerCaseCode]);
       continue;
