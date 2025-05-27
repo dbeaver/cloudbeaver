@@ -15,7 +15,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
-import { OptionsPanelService } from '@cloudbeaver/core-ui';
+import { OptionsPanelService, type OptionsPanelCloseEventData } from '@cloudbeaver/core-ui';
 import { ConnectionFormService, ConnectionFormState, getConnectionFormOptionsPart } from '@cloudbeaver/plugin-connections';
 
 const SearchDatabase = importLazyComponent(() => import('./SearchDatabase.js').then(module => module.SearchDatabase));
@@ -92,16 +92,18 @@ export class ConnectionSearchService {
     }
   }
 
-  private readonly closeHandler: IExecutorHandler<void> = async (data, contexts) => {
-    const isDialogClosed = await this.showUnsavedChangesDialog();
+  private readonly closeHandler: IExecutorHandler<OptionsPanelCloseEventData> = async (data, contexts) => {
+    if (data === 'before') {
+      const isDialogClosed = await this.showUnsavedChangesDialog();
 
-    if (!isDialogClosed) {
-      ExecutorInterrupter.interrupt(contexts);
-      return;
+      if (!isDialogClosed) {
+        ExecutorInterrupter.interrupt(contexts);
+        return;
+      }
+
+      this.clearFormState();
+      this.close();
     }
-
-    this.clearFormState();
-    this.close();
   };
 
   private get optionsPart() {

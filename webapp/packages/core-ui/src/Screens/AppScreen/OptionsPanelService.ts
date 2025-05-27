@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,10 +12,12 @@ import { Executor, ExecutorInterrupter, type IExecutionContext, type IExecutor, 
 
 import { NavigationService } from './NavigationService.js';
 
+export type OptionsPanelCloseEventData = 'before' | 'after';
+
 @injectable()
 export class OptionsPanelService {
   active: boolean;
-  readonly closeTask: IExecutor;
+  readonly closeTask: IExecutor<OptionsPanelCloseEventData>;
 
   panelComponent: (() => React.FC) | null;
   private basePanelComponent: (() => React.FC) | null;
@@ -55,12 +57,12 @@ export class OptionsPanelService {
     return true;
   }
 
-  async close(context?: IExecutionContext<void>): Promise<boolean> {
+  async close(context?: IExecutionContext<any>): Promise<boolean> {
     if (this.panelComponent === null) {
       return true;
     }
 
-    const contexts = await this.closeTask.execute(undefined, context);
+    const contexts = await this.closeTask.execute('before', context);
 
     const interrupted = contexts.getContext(ExecutorInterrupter.interruptContext);
 
@@ -68,9 +70,12 @@ export class OptionsPanelService {
       return false;
     }
 
+    await this.closeTask.execute('after', context);
+
     this.panelComponent = null;
     this.basePanelComponent = null;
     this.active = false;
+
     return true;
   }
 
