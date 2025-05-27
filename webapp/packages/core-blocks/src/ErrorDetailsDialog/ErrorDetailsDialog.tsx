@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -64,11 +64,11 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
       </CommonDialogBody>
       <CommonDialogFooter className={s(styles, { footer: true })}>
         {error.textToCopy && (
-          <Button type="button" mod={['outlined']} onClick={copyHandler}>
+          <Button type="button" variant="secondary" onClick={copyHandler}>
             {translate('ui_copy_to_clipboard')}
           </Button>
         )}
-        <Button type="button" mod={['unelevated']} onClick={props.rejectDialog}>
+        <Button type="button" onClick={props.rejectDialog}>
           {translate('ui_close')}
         </Button>
       </CommonDialogFooter>

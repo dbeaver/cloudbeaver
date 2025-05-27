@@ -45,7 +45,7 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
   }
 
   return (
-    <Button type="button" disabled={formState.isDisabled} mod={['outlined']} onClick={authentication.auth}>
+    <Button type="button" disabled={formState.isDisabled} variant="secondary" onClick={authentication.auth}>
       {translate('authentication_authenticate')}
     </Button>
   );

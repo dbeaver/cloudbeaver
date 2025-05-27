@@ -30,9 +30,10 @@ export interface ButtonIconProps extends React.HTMLAttributes<HTMLSpanElement> {
  *
  * @param props.placement This property is needed to adjust icon placement inside a button. The icon with placement="start" will cut the inline-start padding. placement="end" will affect the padding-inline-end accordingly. This property supports RTL and LTR, so you don't need to think about it.
  */
-ButtonBase.Icon = function ButtonBaseIcon({ className, children, placement }: ButtonIconProps) {
+export function ButtonBaseIcon({ className, children, placement }: ButtonIconProps) {
   const classToApply = clsx('dbv-kit-button__icon', placement && `dbv-kit-button__icon--${placement}`, className);
   return <span className={classToApply}>{children}</span>;
-};
+}
 
 export const Button = componentProviderWrapper('Button', ButtonBase);
+export const ButtonIcon = componentProviderWrapper('ButtonIcon', ButtonBaseIcon);
