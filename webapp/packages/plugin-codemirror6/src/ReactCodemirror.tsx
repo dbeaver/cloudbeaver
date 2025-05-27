@@ -223,8 +223,8 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
           }
         } else if (hasInsertProperty(transaction.changes) && !transaction.selection) {
           transaction.selection = {
-            anchor: transaction.changes.insert?.length ?? 0 + cursorOffset,
-            head: transaction.changes.insert?.length ?? 0 + cursorOffset,
+            anchor: transaction.changes.insert?.length ?? 0,
+            head: transaction.changes.insert?.length ?? 0,
           };
         }
 
