@@ -25,15 +25,6 @@ import { KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT } from '@cloudbeaver/plugin-sql-e
 
 import type { IShortcut } from './IShortcut.js';
 
-const getF1toF19KeysMap = (): Record<string, string> => {
-  const map: Record<string, string> = {};
-  for (let i = 1; i <= 19; i++) {
-    map[`f${i}`] = `F${i}`;
-  }
-
-  return map;
-};
-
 const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
   comma: ',',
   slash: '/',
@@ -54,7 +45,6 @@ const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
   pagedown: 'pagedown',
   del: '⌦',
   delete: '⌦',
-  ...getF1toF19KeysMap(),
 };
 const SOURCE_DIVIDER_REGEXP = /\+/gi;
 const APPLIED_DIVIDER = ' + ';
