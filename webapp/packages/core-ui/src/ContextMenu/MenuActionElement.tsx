@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,10 +8,9 @@
 import { observer } from 'mobx-react-lite';
 
 import { Checkbox, MenuItem, MenuItemCheckbox, MenuItemElement, MenuItemRadio, Radio, useTranslate } from '@cloudbeaver/core-blocks';
-import { type IMenuActionItem } from '@cloudbeaver/core-view';
+import { getBindingLabel, type IMenuActionItem } from '@cloudbeaver/core-view';
 
 import type { IContextMenuItemProps } from './IContextMenuItemProps.js';
-import { getShortcutStringFromBinding } from '@cloudbeaver/core-utils';
 
 interface IMenuActionElementProps extends IContextMenuItemProps {
   item: IMenuActionItem;
@@ -21,9 +20,9 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
   const translate = useTranslate();
   const actionInfo = item.action.actionInfo;
   const loading = item.action.isLoading();
-  let binding: string | undefined;
+  let binding;
   if (item.action.binding !== null) {
-    binding = getShortcutStringFromBinding(item.action.binding.binding);
+    binding = getBindingLabel(item.action.binding.binding);
   }
 
   function handleClick() {

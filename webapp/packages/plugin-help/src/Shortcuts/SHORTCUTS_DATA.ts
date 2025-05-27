@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { transformKeys } from '@cloudbeaver/core-utils';
-import { KEY_BINDING_OPEN_IN_TAB, KEY_BINDING_REDO, KEY_BINDING_UNDO } from '@cloudbeaver/core-view';
+import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
+import { getCommonAndOSSpecificKeys, type IKeyBinding, KEY_BINDING_OPEN_IN_TAB, KEY_BINDING_REDO, KEY_BINDING_UNDO } from '@cloudbeaver/core-view';
 import {
   KEY_BINDING_ADD_NEW_ROW,
   KEY_BINDING_DUPLICATE_ROW,
@@ -24,6 +24,30 @@ import {
 import { KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT } from '@cloudbeaver/plugin-sql-editor-navigation-tab-script';
 
 import type { IShortcut } from './IShortcut.js';
+
+const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
+  comma: ',',
+  slash: '/',
+  backslash: '\\',
+  backspace: '⌫',
+  tab: 'tab',
+  clear: 'clear',
+  enter: '↵',
+  return: '↵',
+  escape: 'escape',
+  esc: 'escape',
+  space: '␣',
+  up: '↑',
+  down: '↓',
+  left: '←',
+  right: '→',
+  pageup: 'pageup',
+  pagedown: 'pagedown',
+  del: '⌦',
+  delete: '⌦',
+};
+const SOURCE_DIVIDER_REGEXP = /\+/gi;
+const APPLIED_DIVIDER = ' + ';
 
 export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
   {
@@ -98,3 +122,32 @@ export const NAVIGATION_TREE_SHORTCUTS: IShortcut[] = [
     code: transformKeys(KEY_BINDING_LINK_OBJECT),
   },
 ];
+
+function transformKeys(keyBinding: IKeyBinding): string[] {
+  return getCommonAndOSSpecificKeys(keyBinding).map(shortcut =>
+    shortcut.split(SOURCE_DIVIDER_REGEXP).map(formatKeyToDisplayKey).join(APPLIED_DIVIDER).toLocaleUpperCase(),
+  );
+}
+
+function formatKeyToDisplayKey(code: string): string {
+  const lowerCaseCode = code.toLowerCase();
+  const OS = getOS();
+
+  switch (lowerCaseCode) {
+    case 'mod':
+      if (OS === OperatingSystem.windowsOS || OS === OperatingSystem.linuxOS) {
+        return 'CTRL';
+      }
+      if (OS === OperatingSystem.macOS) {
+        return 'CMD';
+      }
+      return code;
+    case 'alt':
+      if (OS === OperatingSystem.macOS) {
+        return 'OPTION';
+      }
+      return 'ALT';
+    default:
+      return FORMAT_SHORTCUT_KEYS_MAP[lowerCaseCode] ?? code;
+  }
+}

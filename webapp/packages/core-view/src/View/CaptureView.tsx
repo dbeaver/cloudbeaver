@@ -10,10 +10,11 @@ import { useContext } from 'react';
 
 import { s, useFocus, useHotkeys, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { isObjectsEqual, getCommonAndOSSpecificKeys } from '@cloudbeaver/core-utils';
+import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import { ActionService } from '../Action/ActionService.js';
 import type { IActionItem } from '../Action/IActionItem.js';
+import { getCommonAndOSSpecificKeys } from '../Action/KeyBinding/getCommonAndOSSpecificKeys.js';
 import styles from './CaptureView.module.css';
 import { CaptureViewContext } from './CaptureViewContext.js';
 import type { IView } from './IView.js';
