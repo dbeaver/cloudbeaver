@@ -21,6 +21,7 @@ import './styles/main/normalize.pure.css';
 import './styles/main/typography.pure.scss';
 import './styles/UiCheckbox.css';
 import './styles/UiIconButton.css';
+import './styles/UiSpinner.css';
 import { DEFAULT_THEME_ID, themes } from './themes.js';
 import { ThemeSettingsService } from './ThemeSettingsService.js';
 import type { ClassCollection } from './themeUtils.js';
