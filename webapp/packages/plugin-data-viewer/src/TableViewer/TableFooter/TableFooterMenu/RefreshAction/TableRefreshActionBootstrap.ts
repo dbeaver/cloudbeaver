@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -142,7 +142,7 @@ export class TableRefreshActionBootstrap extends Bootstrap {
           const state = getRefreshState(context);
           return {
             ...action.info,
-            icon: state?.isAutoRefresh ? '/icons/timer_m.svg#root' : '/icons/refresh_m.svg#root',
+            icon: state?.isAutoRefresh ? '/icons/timer_m.svg#root' : '/icons/refresh_sm.svg',
             label: '',
             tooltip: state?.isAutoRefresh ? 'data_viewer_action_auto_refresh_stop_tooltip' : 'data_viewer_action_refresh_tooltip',
           };

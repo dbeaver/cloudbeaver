@@ -1,7 +1,17 @@
-<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="root">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M2 1C1.44772 1 1 1.44772 1 2V12C1 12.5523 1.44772 13 2 13H6.08296C6.0284 12.6748 6 12.3407 6 12C6 8.68629 8.68629 6 12 6C13.0929 6 14.1175 6.29218 15 6.80269V3.4C15 2.84772 14.5523 2.4 14 2.4H8.53518C8.20083 2.4 7.8886 2.2329 7.70313 1.9547L7.36353 1.4453C7.17807 1.1671 6.86584 1 6.53148 1H2Z" fill="#88C7EA"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M13.8 6.27468V3.6H8.53518C7.79961 3.6 7.1127 3.23238 6.70467 2.62034L6.42445 2.2H2.2V11.8H6.00327C6.0011 11.8664 6 11.9331 6 12C6 12.3407 6.0284 12.6748 6.08296 13H2C1.44772 13 1 12.5523 1 12V2C1 1.44772 1.44772 1 2 1H6.53148C6.86584 1 7.17807 1.1671 7.36353 1.4453L7.70313 1.9547C7.8886 2.2329 8.20083 2.4 8.53518 2.4H14C14.5523 2.4 15 2.84772 15 3.4V6.80269C14.6239 6.58513 14.222 6.40722 13.8 6.27468Z" fill="#338ECC"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M12.5999 9H11.3999V11.3999H9V12.5999H11.3999V15H12.5999V12.5999H15V11.3999H12.5999V9Z" fill="#52C41A"/>
-</g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #4fa143;
+      }
+
+      .cls-2 {
+        fill: #3387c5;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" x="12" y="10" width="1" height="5"/>
+  <rect class="cls-1" x="12" y="10" width="1" height="5" transform="translate(0 25) rotate(-90)"/>
+  <path class="cls-2" d="M8.05,13H2V5h12v3.28c.35.13.69.28,1,.48v-4.76h-6.5l-2-2H1v12h7.28c-.11-.32-.19-.65-.23-1Z"/>
 </svg>

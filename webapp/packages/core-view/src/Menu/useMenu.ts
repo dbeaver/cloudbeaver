@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ import type { MenuCreatorItem } from './IMenuItemsCreator.js';
 import type { IMenuItem } from './MenuItem/IMenuItem.js';
 import { MenuService } from './MenuService.js';
 import { useMenuContext } from './useMenuContext.js';
+import type { IMenuActionItem } from './MenuItem/IMenuActionItem.js';
 
 export interface IMenuData {
   menu: IMenu;
@@ -27,11 +28,13 @@ export interface IMenuData {
   loaders: ILoadableState[];
   itemCreators: MenuCreatorItem[];
   items: IMenuItem[];
+  filterAction: IMenuActionItem | undefined;
 }
 
 interface IMenuOptions {
   menu: IMenu;
   context?: IDataContext;
+  filterAction?: IMenuActionItem;
 }
 
 export function useMenu(options: IMenuOptions): IMenuData {
@@ -55,8 +58,8 @@ export function useMenu(options: IMenuOptions): IMenuData {
       get available() {
         return this.handler?.hideIfEmpty?.(this.context) === false || this.itemCreators.length > 0;
       },
-      get items() {
-        return menuService.getMenu(this.context, this.itemCreators);
+      get items(): IMenuItem[] {
+        return menuService.getMenu(this.context, this.itemCreators).filter(item => item !== this.filterAction);
       },
       get handler() {
         return menuService.getHandler(this.context);
@@ -70,10 +73,12 @@ export function useMenu(options: IMenuOptions): IMenuData {
       handler: computed,
       menu: observable.ref,
       context: observable.ref,
+      filterAction: observable.ref,
     },
     {
       menu: options.menu,
       context,
+      filterAction: options.filterAction,
     },
   );
 
