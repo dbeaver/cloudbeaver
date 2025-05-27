@@ -126,10 +126,10 @@ export const NAVIGATION_TREE_SHORTCUTS: IShortcut[] = [
 function transformKeys(keyBinding: IKeyBinding): string[] {
   return getCommonAndOSSpecificKeys(keyBinding)
     .map(shortcut => shortcut.replace(SOURCE_DIVIDER_REGEXP, APPLIED_DIVIDER))
-    .map(shortcut => shortcut.split(APPLIED_DIVIDER).map(formatKey).join(APPLIED_DIVIDER).toLocaleUpperCase());
+    .map(shortcut => shortcut.split(APPLIED_DIVIDER).map(formatKeyToDisplayKey).join(APPLIED_DIVIDER).toLocaleUpperCase());
 }
 
-function formatKey(code: string): string {
+function formatKeyToDisplayKey(code: string): string {
   const lowerCaseCode = code.toLowerCase();
   const OS = getOS();
 
