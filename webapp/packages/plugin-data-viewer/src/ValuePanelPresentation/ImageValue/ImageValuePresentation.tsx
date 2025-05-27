@@ -47,7 +47,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   );
   const data = useValuePanelImageValue({ model, resultIndex });
   const loading = model.isLoading();
-  const valueSize = bytesToSize(isResultSetContentValue(data.cellValue) ? data.cellValue.contentLength ?? 0 : 0);
+  const valueSize = bytesToSize(isResultSetContentValue(data.cellValue) ? (data.cellValue.contentLength ?? 0) : 0);
   const isTruncatedMessageDisplay = !!data.truncated && !data.src;
   const isDownloadable = isTruncatedMessageDisplay && !!data.selectedCell && data.contentAction.isDownloadable(data.selectedCell);
   const isCacheDownloading = isDownloadable && data.contentAction.isLoading(data.selectedCell);
@@ -83,7 +83,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
           {isTruncatedMessageDisplay && (
             <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
               {isDownloadable && (
-                <Button disabled={loading} loading={isCacheDownloading} loader onClick={data.loadFullImage}>
+                <Button variant="secondary" disabled={loading} loading={isCacheDownloading} loader onClick={data.loadFullImage}>
                   {`${translate('ui_view')} (${valueSize})`}
                 </Button>
               )}
