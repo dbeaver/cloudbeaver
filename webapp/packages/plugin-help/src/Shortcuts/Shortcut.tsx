@@ -16,12 +16,6 @@ interface Props {
   shortcut: IShortcut;
 }
 
-const CODE_FORMAT_MAP: Record<string, string> = {
-  comma: ',',
-  slash: '/',
-  backslash: '\\',
-};
-
 export const Shortcut: React.FC<Props> = function Shortcut({ shortcut }) {
   const translate = useTranslate();
   const style = useS(styles);
@@ -30,19 +24,12 @@ export const Shortcut: React.FC<Props> = function Shortcut({ shortcut }) {
     <div className={s(style, { shortcutContainer: true })}>
       <div className={s(style, { shortcutLabel: true })}>{translate(shortcut.label)}</div>
       <div className={s(style, { shortcutContent: true })}>
-        {shortcut.code.map((code, index) => {
-          const formattedCode = code
-            .split(' ')
-            .map(code => CODE_FORMAT_MAP[code.toLowerCase()] ?? code)
-            .join(' ');
-
-          return (
-            <React.Fragment key={code}>
-              {index > 0 && <span className={s(style, { span: true })}>{translate('ui_or')}</span>}
-              <div className={s(style, { shortcutCode: true })}>{formattedCode}</div>
-            </React.Fragment>
-          );
-        })}
+        {shortcut.code.map((code, index) => (
+          <React.Fragment key={code}>
+            {index > 0 && <span className={s(style, { span: true })}>{translate('ui_or')}</span>}
+            <div className={s(style, { shortcutCode: true })}>{code}</div>
+          </React.Fragment>
+        ))}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,21 @@ export const NAVIGATION_TREE_SHORTCUTS: IShortcut[] = [
 function transformKeys(keyBinding: IKeyBinding): string[] {
   const keys = getCommonAndOSSpecificKeys(keyBinding);
 
-  return keys.map(key => transformModToDisplayKey(key.toLocaleUpperCase().replace(/\+/gi, ' + ')));
+  return keys.map(formatKeysSymbols).map(key => transformModToDisplayKey(key.toLocaleUpperCase().replace(/\+/gi, ' + ')));
+}
+
+function formatKeysSymbols(key: string): string {
+  const KEY_FORMAT_MAP: Record<string, string> = {
+    comma: ',',
+    slash: '/',
+    backslash: '\\',
+  };
+
+  for (const [codeKey, codeValue] of Object.entries(KEY_FORMAT_MAP)) {
+    key = key.replace(codeKey, codeValue);
+  }
+
+  return key;
 }
 
 function transformModToDisplayKey(key: string): string {
