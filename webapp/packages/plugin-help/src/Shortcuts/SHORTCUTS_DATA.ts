@@ -25,6 +25,40 @@ import { KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT } from '@cloudbeaver/plugin-sql-e
 
 import type { IShortcut } from './IShortcut.js';
 
+const getF1toF19KeysMap = (): Record<string, string> => {
+  const map: Record<string, string> = {};
+  for (let i = 1; i <= 19; i++) {
+    map[`f${i}`] = `F${i}`;
+  }
+
+  return map;
+};
+
+const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
+  comma: ',',
+  slash: '/',
+  backslash: '\\',
+  backspace: '⌫',
+  tab: 'tab',
+  clear: 'clear',
+  enter: '↵',
+  return: '↵',
+  escape: 'escape',
+  esc: 'escape',
+  space: '␣',
+  up: '↑',
+  down: '↓',
+  left: '←',
+  right: '→',
+  pageup: 'pageup',
+  pagedown: 'pagedown',
+  del: '⌦',
+  delete: '⌦',
+  ...getF1toF19KeysMap(),
+};
+const SOURCE_DIVIDER_REGEXP = /\+/gi;
+const APPLIED_DIVIDER = ' + ';
+
 export const DATA_VIEWER_SHORTCUTS: IShortcut[] = [
   {
     label: 'data_viewer_shortcut_revert_inline_editor_changes',
@@ -100,33 +134,40 @@ export const NAVIGATION_TREE_SHORTCUTS: IShortcut[] = [
 ];
 
 function transformKeys(keyBinding: IKeyBinding): string[] {
-  const keys = getCommonAndOSSpecificKeys(keyBinding);
-
-  return keys.map(formatKeysSymbols).map(key => transformModToDisplayKey(key.toLocaleUpperCase().replace(/\+/gi, ' + ')));
+  return getCommonAndOSSpecificKeys(keyBinding).map(formatDividers).map(formatShortcutKeys);
 }
 
-function formatKeysSymbols(key: string): string {
-  const KEY_FORMAT_MAP: Record<string, string> = {
-    comma: ',',
-    slash: '/',
-    backslash: '\\',
-  };
-
-  for (const [codeKey, codeValue] of Object.entries(KEY_FORMAT_MAP)) {
-    key = key.replaceAll(codeKey, codeValue);
-  }
-
-  return key;
+function formatDividers(key: string): string {
+  return key.replace(SOURCE_DIVIDER_REGEXP, APPLIED_DIVIDER);
 }
 
-function transformModToDisplayKey(key: string): string {
+function formatShortcutKeys(key: string): string {
   const OS = getOS();
-  if (OS === OperatingSystem.windowsOS || OS === OperatingSystem.linuxOS) {
-    return key.replaceAll('MOD', 'CTRL');
+  const codes = key.split(APPLIED_DIVIDER);
+  const result: string[] = [];
+
+  for (const code of codes) {
+    const lowerCaseCode = code.toLowerCase();
+
+    if (lowerCaseCode === 'mod') {
+      if (OS === OperatingSystem.windowsOS || OS === OperatingSystem.linuxOS) {
+        result.push('CTRL');
+      }
+
+      if (OS === OperatingSystem.macOS) {
+        result.push('CMD');
+      }
+
+      continue;
+    }
+
+    if (FORMAT_SHORTCUT_KEYS_MAP[lowerCaseCode]) {
+      result.push(FORMAT_SHORTCUT_KEYS_MAP[lowerCaseCode]);
+      continue;
+    }
+
+    result.push(lowerCaseCode);
   }
 
-  if (OS === OperatingSystem.macOS) {
-    return key.replaceAll('MOD', 'CMD').replaceAll('ALT', 'OPTION');
-  }
-  return key;
+  return result.join(APPLIED_DIVIDER);
 }
