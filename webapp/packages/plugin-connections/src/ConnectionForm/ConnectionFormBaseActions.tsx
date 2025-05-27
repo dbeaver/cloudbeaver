@@ -48,22 +48,16 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
   return (
     <>
       {actions.onCancel && (
-        <Button type="button" disabled={formState.isDisabled} mod={['outlined']} onClick={actions.onCancel}>
+        <Button type="button" disabled={formState.isDisabled} variant="secondary" onClick={actions.onCancel}>
           {translate('ui_processing_cancel')}
         </Button>
       )}
       {!disableTest && (
-        <Button type="button" disabled={formState.isDisabled || !authorized} mod={['outlined']} loader onClick={actions['test']}>
+        <Button type="button" disabled={formState.isDisabled || !authorized} variant="secondary" loader onClick={actions['test']}>
           {translate('connections_connection_test')}
         </Button>
       )}
-      <Button
-        type="button"
-        disabled={formState.isDisabled || formState.isReadOnly || !formState.isChanged}
-        mod={['unelevated']}
-        loader
-        onClick={actions['save']}
-      >
+      <Button type="button" disabled={formState.isDisabled || formState.isReadOnly || !formState.isChanged} loader onClick={actions['save']}>
         {translate(formState.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_create')}
       </Button>
     </>

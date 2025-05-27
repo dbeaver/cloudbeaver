@@ -49,8 +49,10 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     headerText,
     getHeaderOrder,
     getHeaderResizable,
+    columnSortable,
     getHeaderHeight,
     getHeaderPinned,
+    columnSortingState,
     getHeaderDnD,
     cell,
     cellText,
@@ -67,6 +69,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     onScrollToBottom,
     onFocus,
     onCellChange,
+    onColumnSort,
     children,
     className,
     onCellKeyDown,
@@ -141,7 +144,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     <HeaderDnDContext value={dndHeaderContext}>
       <DataGridRowContext value={{ rowCount, onScrollToBottom }}>
         <DataGridCellContext value={{ cell, cellText, cellElement, cellTooltip, onCellChange }}>
-          <DataGridCellHeaderContext value={{ headerElement, headerText, getHeaderDnD }}>
+          <DataGridCellHeaderContext value={{ headerElement, headerText, getHeaderDnD, columnSortable, onColumnSort, columnSortingState }}>
             <DataGridBase
               key={gridKey.current}
               ref={innerGridRef}

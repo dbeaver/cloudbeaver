@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ export const ActionSnackbar: NotificationComponent<ActionSnackbarProps> = observ
       <SnackbarContent>
         <SnackbarBody title={translate(notification.title)}>{notification.message && translate(notification.message)}</SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
-          <Button type="button" mod={['outlined']} onClick={onAction}>
+          <Button type="button" variant="secondary" onClick={onAction}>
             {translate(actionText)}
           </Button>
         </SnackbarFooter>

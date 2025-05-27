@@ -62,7 +62,7 @@ export const ConnectionAuthenticationDialog: DialogComponent<ConnectionAuthentic
           </Form>
         </CommonDialogBody>
         <CommonDialogFooter>
-          <Button mod={['unelevated']} className={s(styles, { button: true })} onClick={() => resolveDialog()}>
+          <Button className={s(styles, { button: true })} onClick={() => resolveDialog()}>
             {translate('ui_apply')}
           </Button>
         </CommonDialogFooter>

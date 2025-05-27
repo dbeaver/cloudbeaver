@@ -137,7 +137,7 @@ export const Textarea: TextareaType = observer(function Textarea({
             }
           }}
         >
-          <Button tag="div" disabled={rest.disabled || rest.readOnly} mod={['outlined']}>
+          <Button className="tw:inline-flex" tag="div" disabled={rest.disabled || rest.readOnly} variant="secondary">
             {translate('ui_file')}
           </Button>
         </UploadArea>

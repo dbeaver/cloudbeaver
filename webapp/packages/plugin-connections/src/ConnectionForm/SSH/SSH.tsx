@@ -198,7 +198,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
             </Expandable>
           </Container>
           <GroupItem>
-            <Button type="button" mod={['unelevated']} disabled={disabled || !enabled || !testAvailable} loader onClick={testConnection}>
+            <Button type="button" disabled={disabled || !enabled || !testAvailable} loader onClick={testConnection}>
               {translate('connections_network_handler_test')}
             </Button>
           </GroupItem>

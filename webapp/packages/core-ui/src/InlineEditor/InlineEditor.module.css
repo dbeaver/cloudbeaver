@@ -6,136 +6,139 @@
  * you may not use this file except in compliance with the License.
  */
 
-.input {
-  composes: theme-text-text-primary-on-light from global;
-  font: inherit;
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-  font-weight: inherit;
-  letter-spacing: inherit;
-  text-decoration: inherit;
-  text-transform: inherit;
-}
+@layer base {
+  .input {
+    composes: theme-text-text-primary-on-light from global;
+    font: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    text-decoration: inherit;
+    text-transform: inherit;
+  }
 
-.editor {
-  composes: theme-border-color-background from global;
-}
-.specific.editor {
-  position: relative;
-  box-sizing: border-box;
-  display: flex;
-  width: 100%;
-  height: 100%;
-  border: solid 1px;
-}
-
-.specific.editor:focus-within,
-.specific.editorActive {
-  border-color: #52c41a !important;
-}
-
-.editorContainer {
-  position: relative;
-  height: 100%;
-  flex: 1;
-  display: flex;
-  box-sizing: border-box;
-
-  & .input,
-  & .input[disabled],
-  & .input[readonly] {
-    border: none;
-    border-radius: unset;
+  .editor {
+    composes: theme-border-color-background from global;
+  }
+  .specific.editor {
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
     width: 100%;
     height: 100%;
-    min-height: unset;
-    padding: 0 8px;
+    border-style: solid;
+    border-width: 1px;
   }
-}
 
-.editorActions {
-  composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
-  position: absolute;
-  top: -1px;
-  left: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  border: solid 1px;
-  box-sizing: border-box;
-
-  &:empty {
-    display: none;
+  .specific.editor:focus-within,
+  .specific.editorActive {
+    border-color: #52c41a !important;
   }
-}
 
-.editor:focus-within,
-.editorActive {
-  & .editorActions {
-    border-top-color: #52c41a !important;
-    border-right-color: #52c41a !important;
-    border-bottom-color: #52c41a !important;
-  }
-}
-
-.editorActions[data-s-position='inside'] {
-  position: relative;
-  flex: 0 0 auto;
-  top: 0;
-  left: auto;
-  border-right: none !important;
-  border-top: none;
-  border-bottom: none;
-}
-
-.editorActions[data-s-position='bottom'] .editorActions[data-s-position='top'] {
-  right: -1px;
-  left: auto;
-}
-
-.editor:focus-within,
-.editorActive {
-  &[data-s-position='bottom'],
-  &[data-s-position='top'] {
-    border-left-color: #52c41a !important;
-  }
-}
-
-.editorActions[data-s-position='bottom'] {
-  top: 100%;
-}
-
-.editorActions[data-s-position='top'] {
-  bottom: 100%;
-  top: auto;
-}
-
-.editorAction {
-  composes: theme-ripple from global;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  width: 24px;
-  padding: 4px;
-  cursor: pointer;
-  background: transparent;
-
-  & .loader {
-    width: 100%;
+  .editorContainer {
+    position: relative;
     height: 100%;
+    flex: 1;
+    display: flex;
+    box-sizing: border-box;
+
+    & .input,
+    & .input[disabled],
+    & .input[readonly] {
+      border: none;
+      border-radius: unset;
+      width: 100%;
+      height: 100%;
+      min-height: unset;
+      padding: 0 8px;
+    }
   }
 
-  & .iconOrImage {
-    display: block;
-    width: 100%;
+  .editorActions {
+    composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
+    position: absolute;
+    top: -1px;
+    left: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    border: solid 1px;
+    box-sizing: border-box;
+
+    &:empty {
+      display: none;
+    }
   }
 
-  & .icon {
-    width: 100%;
+  .editor:focus-within,
+  .editorActive {
+    & .editorActions {
+      border-top-color: #52c41a !important;
+      border-right-color: #52c41a !important;
+      border-bottom-color: #52c41a !important;
+    }
   }
 
-  &[disabled]::before {
-    display: none;
+  .editorActions[data-s-position='inside'] {
+    position: relative;
+    flex: 0 0 auto;
+    top: 0;
+    left: auto;
+    border-right: none !important;
+    border-top: none;
+    border-bottom: none;
+  }
+
+  .editorActions[data-s-position='bottom'] .editorActions[data-s-position='top'] {
+    right: -1px;
+    left: auto;
+  }
+
+  .editor:focus-within,
+  .editorActive {
+    &[data-s-position='bottom'],
+    &[data-s-position='top'] {
+      border-left-color: #52c41a !important;
+    }
+  }
+
+  .editorActions[data-s-position='bottom'] {
+    top: 100%;
+  }
+
+  .editorActions[data-s-position='top'] {
+    bottom: 100%;
+    top: auto;
+  }
+
+  .editorAction {
+    composes: theme-ripple from global;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    width: 24px;
+    padding: 4px;
+    cursor: pointer;
+    background: transparent;
+
+    & .loader {
+      width: 100%;
+      height: 100%;
+    }
+
+    & .iconOrImage {
+      display: block;
+      width: 100%;
+    }
+
+    & .icon {
+      width: 100%;
+    }
+
+    &[disabled]::before {
+      display: none;
+    }
   }
 }

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -65,16 +65,12 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
         </div>
       </CommonDialogBody>
       <CommonDialogFooter className={s(styles, { footer: true })}>
-        <Button mod={['unelevated']} onClick={apply}>
-          {translate('ui_apply')}
-        </Button>
+        <Button onClick={apply}>{translate('ui_apply')}</Button>
         <Fill />
-        <Button mod={['outlined']} onClick={() => copy(payload.script, true)}>
+        <Button variant="secondary" onClick={() => copy(payload.script, true)}>
           {translate('ui_copy_to_clipboard')}
         </Button>
-        <Button mod={['unelevated']} onClick={rejectDialog}>
-          {translate('ui_close')}
-        </Button>
+        <Button onClick={rejectDialog}>{translate('ui_close')}</Button>
       </CommonDialogFooter>
     </CommonDialogWrapper>
   );

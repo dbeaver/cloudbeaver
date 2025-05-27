@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ export const UsersTable = observer<Props>(function UsersTable({
         {hasMore && (
           <TableItem item="load-more">
             <TableColumnValue colSpan={colSpan} centerContent flex>
-              <Button type="button" mod={['outlined']} loading={loading} loader onClick={onLoadMore}>
+              <Button type="button" variant="secondary" loading={loading} loader onClick={onLoadMore}>
                 {translate('ui_load_more')}
               </Button>
             </TableColumnValue>

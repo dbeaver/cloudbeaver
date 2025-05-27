@@ -68,7 +68,7 @@ export const ConnectionFormAccessTableList = observer<Props>(function Connection
     <Group className={s(style, { group: true })} box medium overflow>
       <div className={s(style, { container: true })}>
         <ConnectionFormAccessTableHeader className={s(style, { connectionAccessTableHeader: true })} filterState={filterState} disabled={disabled}>
-          <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>
+          <Button disabled={disabled || !selected} onClick={grant}>
             {translate('ui_add')}
           </Button>
         </ConnectionFormAccessTableHeader>
