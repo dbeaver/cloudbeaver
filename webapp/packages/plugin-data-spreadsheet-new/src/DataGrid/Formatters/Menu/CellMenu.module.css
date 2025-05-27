@@ -25,6 +25,7 @@
   display: flex;
   align-items: center;
   padding: 0 6px;
+  margin-right: -6px;
 }
 
 .icon {
