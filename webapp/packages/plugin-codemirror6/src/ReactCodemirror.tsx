@@ -193,6 +193,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
     useLayoutEffect(() => {
       if (view) {
         const transaction: TransactionSpec = { annotations: [External.of(true)] };
+        let cursorOffset = 0;
 
         let isCursorInDoc = cursor && cursor.anchor > 0 && cursor.anchor < view.state.doc.length;
 
@@ -202,26 +203,37 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
           if (!newText.eq(view.state.doc)) {
             transaction.changes = { from: 0, to: view.state.doc.length, insert: newText };
             isCursorInDoc = cursor && cursor.anchor > 0 && cursor.anchor < newText.length;
+            cursorOffset = newText.length - view.state.doc.length;
           }
         }
 
         if (cursor) {
+          if (cursor.anchor + cursorOffset > 0) {
+            cursor.anchor += cursorOffset;
+          }
+
+          if (cursor.head !== undefined && cursor.head + cursorOffset > 0) {
+            cursor.head += cursorOffset;
+          }
+
           const changed = view.state.selection.main.anchor !== cursor.anchor || view.state.selection.main.head !== cursor.head;
 
           if (changed && isCursorInDoc) {
             transaction.selection = cursor;
           }
-        }
-
-        if (hasInsertProperty(transaction.changes) && !transaction.selection) {
+        } else if (hasInsertProperty(transaction.changes) && !transaction.selection) {
           transaction.selection = {
-            anchor: transaction.changes.insert?.length ?? 0,
-            head: transaction.changes.insert?.length ?? 0,
+            anchor: transaction.changes.insert?.length ?? 0 + cursorOffset,
+            head: transaction.changes.insert?.length ?? 0 + cursorOffset,
           };
         }
 
-        if (transaction.changes || transaction.selection) {
-          view.dispatch(transaction);
+        if (transaction.changes) {
+          view.dispatch({ changes: transaction.changes });
+        }
+
+        if (transaction.selection) {
+          view.dispatch({ selection: transaction.selection });
         }
       }
     });
