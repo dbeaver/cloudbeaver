@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -65,16 +65,12 @@ export const ProcessSnackbar: NotificationComponent<ProcessSnackbarProps> = obse
         <SnackbarBody title={translate(title)}>{message && translate(message)}</SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
           {details.hasDetails && (
-            <Button type="button" mod={['outlined']} disabled={details.isOpen} onClick={details.open}>
+            <Button type="button" variant="secondary" disabled={details.isOpen} onClick={details.open}>
               {translate('ui_errors_details')}
             </Button>
           )}
 
-          {onCancel && status === ENotificationType.Loading && (
-            <Button mod={['unelevated']} onClick={onCancel}>
-              {translate('ui_processing_cancel')}
-            </Button>
-          )}
+          {onCancel && status === ENotificationType.Loading && <Button onClick={onCancel}>{translate('ui_processing_cancel')}</Button>}
         </SnackbarFooter>
       </SnackbarContent>
     </SnackbarWrapper>

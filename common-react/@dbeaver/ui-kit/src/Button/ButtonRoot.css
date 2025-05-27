@@ -14,12 +14,12 @@
     display: flex;
     text-align: center;
     text-decoration: none;
-    cursor: pointer;
     user-select: none;
     position: relative;
     justify-content: center;
     align-items: center;
     white-space: nowrap;
     transition: opacity 0.2s ease-in-out;
+    gap: var(--dbv-kit-btn-gap);
   }
 }

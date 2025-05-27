@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,18 +10,14 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo, useState } from 'react';
 
 import { Button } from '../Button.js';
-import ButtonStyles from '../Button.module.css';
 import { Filter } from '../FormControls/Filter.js';
-import InputFieldStyles from '../FormControls/InputField/InputField.module.css';
 import { useTranslate } from '../localization/useTranslate.js';
 import { s } from '../s.js';
-import { SContext, type StyleRegistry } from '../SContext.js';
 import { useObjectRef } from '../useObjectRef.js';
 import { useS } from '../useS.js';
 import type { IProperty } from './IProperty.js';
 import styles from './PropertiesTable.module.css';
-import PropertiesTableAddButtonStyles from './PropertiesTableAddButtonStyles.module.css';
-import PropertiesTableInputStyles from './PropertiesTableInputStyles.module.css';
+import propertiesTableAddButtonStyles from './PropertiesTableAddButtonStyles.module.css';
 import { PropertyItem } from './PropertyItem.js';
 
 type PropertiesState = Record<string, string | null>;
@@ -37,23 +33,6 @@ interface Props {
   className?: string;
   filterable?: boolean;
 }
-
-const registry: StyleRegistry = [
-  [
-    InputFieldStyles,
-    {
-      mode: 'append',
-      styles: [PropertiesTableInputStyles],
-    },
-  ],
-  [
-    ButtonStyles,
-    {
-      mode: 'append',
-      styles: [PropertiesTableAddButtonStyles],
-    },
-  ],
-];
 
 export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
   const { className, onAdd, readOnly, propertiesState } = props;
@@ -152,13 +131,20 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
       </div>
       <div className={s(style, { propertiesList: true })}>
         {onAdd && !readOnly && (
-          <SContext registry={registry}>
-            <div className={s(style, { propertiesHeaderAdd: true })}>
-              <Button icon="add_sm" viewBox="0 0 18 18" type="button" onClick={() => onAdd()}>
-                {translate('core_block_properties_table_add')}
-              </Button>
-            </div>
-          </SContext>
+          <div className={s(style, { propertiesHeaderAdd: true })}>
+            <Button
+              className={s(propertiesTableAddButtonStyles, { buttonLabel: true })}
+              icon="add_sm"
+              iconPlacement="start"
+              iconSize={18}
+              viewBox="0 0 18 18"
+              variant="secondary"
+              type="button"
+              onClick={() => onAdd()}
+            >
+              {translate('core_block_properties_table_add')}
+            </Button>
+          </div>
         )}
         {sortedProperties.get().map(property => (
           <PropertyItem

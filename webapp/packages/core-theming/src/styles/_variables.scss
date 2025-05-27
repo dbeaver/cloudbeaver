@@ -50,3 +50,9 @@ $app-height: 100vh !default;
   --theme-group-element-radius: #{$theme-group-element-radius};
   --theme-menu-bar-small-action-radius: #{$theme-menu-bar-small-action-radius};
 }
+
+@layer components {
+  body {
+    --dbv-kit-control-outline-color: var(--theme-primary);
+  }
+}

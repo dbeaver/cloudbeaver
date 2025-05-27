@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -60,18 +60,17 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
       </CommonDialogBody>
 
       <CommonDialogFooter>
-        <Button type="button" mod={['outlined']} onClick={rejectDialog}>
+        <Button type="button" variant="secondary" onClick={rejectDialog}>
           {translate('ui_processing_cancel')}
         </Button>
         <Fill />
         {dialog.state.step === EDataImportDialogStep.File && (
           <Container noWrap keepSize gap>
-            <Button type="button" mod={['outlined']} onClick={dialog.stepBack}>
+            <Button type="button" variant="secondary" onClick={dialog.stepBack}>
               {translate('ui_stepper_back')}
             </Button>
             <Button
               type="button"
-              mod={['unelevated']}
               disabled={!dialog.state.file || !dialog.state.selectedProcessor}
               onClick={() => resolveDialog({ file: dialog.state.file!, processorId: dialog.state.selectedProcessor!.id })}
             >

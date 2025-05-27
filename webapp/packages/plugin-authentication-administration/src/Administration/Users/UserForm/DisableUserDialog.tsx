@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -64,17 +64,15 @@ export const DisableUserDialog: DialogComponent<IPayload> = observer(function Di
         <Text>{translate('authentication_administration_users_delete_user_disable_info', undefined, { username: props.payload.userId })}</Text>
       </CommonDialogBody>
       <CommonDialogFooter>
-        <Button mod={['outlined']} onClick={props.rejectDialog}>
+        <Button variant="secondary" onClick={props.rejectDialog}>
           {translate('ui_processing_cancel')}
         </Button>
         <Fill />
         <Container noWrap gap dense keepSize>
-          <Button mod={['outlined']} onClick={deleteHandler}>
+          <Button variant="secondary" onClick={deleteHandler}>
             {translate('ui_delete')}
           </Button>
-          <Button mod={['unelevated']} onClick={disableHandler}>
-            {translate('ui_disable')}
-          </Button>
+          <Button onClick={disableHandler}>{translate('ui_disable')}</Button>
         </Container>
       </CommonDialogFooter>
     </CommonDialogWrapper>

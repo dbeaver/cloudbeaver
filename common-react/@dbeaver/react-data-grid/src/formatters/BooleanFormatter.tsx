@@ -21,7 +21,7 @@ export function BooleanFormatter({ value, className, onClick, onKeyDown }: Props
       onKeyDown={handleKeyDown}
       onClick={onClick}
     >
-      {value === null ? <NullFormatter /> : <Checkbox className="tw:data-disabled:opacity-100" disabled size="small" checked={value} />}
+      {value === null ? <NullFormatter /> : <Checkbox className="tw:data-disabled:opacity-100!" disabled size="small" checked={value} />}
     </Focusable>
   );
 }

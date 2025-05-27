@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -94,15 +94,15 @@ export const TableError = observer<Props>(function TableError({ model, loading, 
         <div className={s(style, { errorMessage: true })}>{error.message}</div>
       </div>
       <div className={s(style, { controls: true })}>
-        <Button className={s(style, { button: true })} type="button" mod={['outlined']} onClick={() => errorInfo.hide()}>
+        <Button className={s(style, { button: true })} type="button" variant="secondary" onClick={() => errorInfo.hide()}>
           {translate('ui_error_close')}
         </Button>
         {error.hasDetails && (
-          <Button className={s(style, { button: true })} type="button" mod={['outlined']} onClick={error.open}>
+          <Button className={s(style, { button: true })} type="button" variant="secondary" onClick={error.open}>
             {translate('ui_errors_details')}
           </Button>
         )}
-        <Button className={s(style, { button: true })} type="button" mod={['unelevated']} onClick={onRetry}>
+        <Button className={s(style, { button: true })} type="button" onClick={onRetry}>
           {translate('ui_processing_retry')}
         </Button>
       </div>
