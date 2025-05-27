@@ -13,13 +13,8 @@
   .cm-mergeViewEditors,
   .cm-scroller,
   .ReactCodemirror {
-    display: flex;
     width: 100%;
-    flex-basis: 100%;
-  }
-
-  .cm-scroller {
-    overflow: hidden;
+    height: 100% !important;
   }
 
   .editor,
