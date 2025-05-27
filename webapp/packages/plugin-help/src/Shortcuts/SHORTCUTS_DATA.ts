@@ -124,9 +124,9 @@ export const NAVIGATION_TREE_SHORTCUTS: IShortcut[] = [
 ];
 
 function transformKeys(keyBinding: IKeyBinding): string[] {
-  return getCommonAndOSSpecificKeys(keyBinding)
-    .map(shortcut => shortcut.replace(SOURCE_DIVIDER_REGEXP, APPLIED_DIVIDER))
-    .map(shortcut => shortcut.split(APPLIED_DIVIDER).map(formatKeyToDisplayKey).join(APPLIED_DIVIDER).toLocaleUpperCase());
+  return getCommonAndOSSpecificKeys(keyBinding).map(shortcut =>
+    shortcut.split(SOURCE_DIVIDER_REGEXP).map(formatKeyToDisplayKey).join(APPLIED_DIVIDER).toLocaleUpperCase(),
+  );
 }
 
 function formatKeyToDisplayKey(code: string): string {
