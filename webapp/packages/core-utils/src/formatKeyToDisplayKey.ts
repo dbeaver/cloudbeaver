@@ -7,7 +7,7 @@
  */
 import { getOS, OperatingSystem } from './getOS.js';
 
-const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
+export const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
   comma: ',',
   slash: '/',
   backslash: '\\',
