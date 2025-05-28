@@ -17,7 +17,6 @@ import { SqlEditorToolsMenu } from './SqlEditorToolsMenu.js';
 import { useTools } from './useTools.js';
 import { getShortcutsString } from '@cloudbeaver/core-utils';
 import { KEY_BINDING_SQL_EDITOR_FORMAT } from '../actions/bindings/KEY_BINDING_SQL_EDITOR_FORMAT.js';
-import { KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT } from '../actions/bindings/KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT.js';
 
 interface Props {
   data: ISQLEditorData;
@@ -70,7 +69,7 @@ export const SqlEditorTools = observer<Props>(function SqlEditorTools({ data, st
           <ActionIconButton
             name="/icons/export.svg"
             disabled={scriptEmpty}
-            title={`${translate('sql_editor_download_script_tooltip')} ${getShortcutsString(KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT)}`}
+            title={translate('sql_editor_download_script_tooltip')}
             hidden={isActiveSegmentMode}
             img
             onClick={downloadScriptHandler}
