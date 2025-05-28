@@ -15,6 +15,9 @@ import type { ISQLEditorData } from './ISQLEditorData.js';
 import style from './SqlEditorTools.module.css';
 import { SqlEditorToolsMenu } from './SqlEditorToolsMenu.js';
 import { useTools } from './useTools.js';
+import { getShortcutsString } from '@cloudbeaver/core-utils';
+import { KEY_BINDING_SQL_EDITOR_FORMAT } from '../actions/bindings/KEY_BINDING_SQL_EDITOR_FORMAT.js';
+import { KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT } from '../actions/bindings/KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT.js';
 
 interface Props {
   data: ISQLEditorData;
@@ -45,7 +48,7 @@ export const SqlEditorTools = observer<Props>(function SqlEditorTools({ data, st
     }
   }
 
-  async function downloadScriptHandler() {
+  function downloadScriptHandler() {
     tools.downloadScript(data.value.trim());
   }
 
@@ -59,7 +62,7 @@ export const SqlEditorTools = observer<Props>(function SqlEditorTools({ data, st
           <ActionIconButton
             name="/icons/sql_format_sm.svg"
             disabled={disabled || data.readonly}
-            title={translate('sql_editor_sql_format_button_tooltip')}
+            title={`${translate('sql_editor_sql_format_button_tooltip')} ${getShortcutsString(KEY_BINDING_SQL_EDITOR_FORMAT)}`}
             hidden={isActiveSegmentMode}
             img
             onClick={data.formatScript}
@@ -67,7 +70,7 @@ export const SqlEditorTools = observer<Props>(function SqlEditorTools({ data, st
           <ActionIconButton
             name="/icons/export.svg"
             disabled={scriptEmpty}
-            title={translate('sql_editor_download_script_tooltip')}
+            title={`${translate('sql_editor_download_script_tooltip')} ${getShortcutsString(KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT)}`}
             hidden={isActiveSegmentMode}
             img
             onClick={downloadScriptHandler}

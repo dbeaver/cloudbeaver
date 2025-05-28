@@ -13,7 +13,7 @@ export default [
   ['sql_editor_output_logs_tab_title', 'Journaux'],
   ['sql_editor_output_logs_hint', 'Aucun message du serveur'],
   ['sql_editor_output_logs_wrap_mode', 'Mode Wrap'],
-  ['sql_editor_execution_plan_button_tooltip', "Afficher le plan d'exécution (Shift + Ctrl + E)"],
+  ['sql_editor_execution_plan_button_tooltip', "Afficher le plan d'exécution"],
   ['sql_editor_execution_plan_button', "Afficher le plan d'exécution"],
   ['sql_editor_execution_script_button_tooltip', 'Exécuter le script SQL (Alt + X)'],
   ['sql_editor_execution_script_button', 'Exécuter le script SQL'],

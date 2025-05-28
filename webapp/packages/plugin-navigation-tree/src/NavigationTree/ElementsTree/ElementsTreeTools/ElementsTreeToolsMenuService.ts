@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,15 +9,7 @@ import { UserDataService } from '@cloudbeaver/core-authentication';
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import {
-  ACTION_COLLAPSE_ALL,
-  ACTION_FILTER,
-  ActionService,
-  getBindingLabel,
-  type IAction,
-  KeyBindingService,
-  MenuService,
-} from '@cloudbeaver/core-view';
+import { ACTION_COLLAPSE_ALL, ACTION_FILTER, ActionService, type IAction, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
 
 import { getNavigationTreeUserSettingsId } from '../../getNavigationTreeUserSettingsId.js';
 import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE.js';
@@ -26,6 +18,7 @@ import { MENU_ELEMENTS_TREE_TOOLS } from './MENU_ELEMENTS_TREE_TOOLS.js';
 import { createElementsTreeSettings, validateElementsTreeSettings } from './NavigationTreeSettings/createElementsTreeSettings.js';
 import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT.js';
 import { KEY_BINDING_ENABLE_FILTER } from './NavigationTreeSettings/KEY_BINDING_ENABLE_FILTER.js';
+import { getShortcutsString } from '@cloudbeaver/core-utils';
 
 @injectable()
 export class ElementsTreeToolsMenuService {
@@ -56,11 +49,9 @@ export class ElementsTreeToolsMenuService {
       getActionInfo: (context, action) => {
         switch (action) {
           case ACTION_COLLAPSE_ALL: {
-            const bindingLabel = getBindingLabel(KEY_BINDING_COLLAPSE_ALL);
-            const tooltip = this.localizationService.translate('app_navigationTree_action_collapse_all') + (bindingLabel ? ` (${bindingLabel})` : '');
             return {
               ...action.info,
-              tooltip,
+              tooltip: `${this.localizationService.translate('app_navigationTree_action_collapse_all')} ${getShortcutsString(KEY_BINDING_COLLAPSE_ALL)}`,
             };
           }
         }
@@ -135,7 +126,7 @@ export class ElementsTreeToolsMenuService {
     state.filter = !state.filter;
   }
 
-  private async elementsTreeActionHandler(contexts: IDataContextProvider, action: IAction) {
+  private elementsTreeActionHandler(contexts: IDataContextProvider, action: IAction) {
     const tree = contexts.get(DATA_CONTEXT_ELEMENTS_TREE);
 
     if (tree === undefined) {

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@ import { type INodeNavigationData, NavNodeInfoResource, NavNodeManagerService } 
 import { isResourceOfType, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, CachedTreeChildrenKey } from '@cloudbeaver/core-resource';
 import { getRmResourcePath, NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
-import { createPath, getPathName } from '@cloudbeaver/core-utils';
+import { createPath, getPathName, getShortcutsString } from '@cloudbeaver/core-utils';
 import { ActionService, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { getResourceKeyFromNodeId } from '@cloudbeaver/plugin-navigation-tree-rm';
@@ -30,14 +30,15 @@ import {
   SQL_EDITOR_TOOLS_MENU,
   SqlDataSourceService,
   SqlEditorSettingsService,
+  KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT,
   SqlEditorView,
 } from '@cloudbeaver/plugin-sql-editor';
 import { isSQLEditorTab, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
 import { ACTION_SAVE_AS_SCRIPT } from './ACTION_SAVE_AS_SCRIPT.js';
-import { KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT } from './KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT.js';
 import { ResourceSqlDataSource } from './ResourceSqlDataSource.js';
 import { SqlEditorTabResourceService } from './SqlEditorTabResourceService.js';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -60,6 +61,7 @@ export class PluginBootstrap extends Bootstrap {
     private readonly resourceManagerScriptsService: ResourceManagerScriptsService,
     private readonly keyBindingService: KeyBindingService,
     private readonly sqlEditorView: SqlEditorView,
+    private readonly localizationService: LocalizationService,
   ) {
     super();
     this.saveAsScriptHandler = this.saveAsScriptHandler.bind(this);
@@ -93,7 +95,7 @@ export class PluginBootstrap extends Bootstrap {
         if (action === ACTION_SAVE_AS_SCRIPT) {
           return {
             ...action.info,
-            label: '',
+            tooltip: `${this.localizationService.translate('plugin_sql_editor_navigation_tab_resource_save_script_title')} ${getShortcutsString(KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT)}`,
           };
         }
 

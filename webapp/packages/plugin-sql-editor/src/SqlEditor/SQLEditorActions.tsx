@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,12 @@ import type { ISQLEditorData } from './ISQLEditorData.js';
 import style from './SQLEditorActions.module.css';
 import { SqlEditorActionsMenu } from './SqlEditorActionsMenu.js';
 import { SqlEditorTools } from './SqlEditorTools.js';
+
+import { getShortcutsString } from '@cloudbeaver/core-utils';
+import { KEY_BINDING_SQL_EDITOR_EXECUTE } from '../actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE.js';
+import { KEY_BINDING_SQL_EDITOR_EXECUTE_NEW } from '../actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_NEW.js';
+import { KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT } from '../actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT.js';
+import { KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN } from '../actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN.js';
 
 interface Props {
   data: ISQLEditorData;
@@ -40,14 +46,14 @@ export const SQLEditorActions = observer<Props>(function SQLEditorActions({ data
                 <ActionIconButton
                   name="/icons/sql_exec.svg"
                   disabled={disabled}
-                  title={translate('sql_editor_sql_execution_button_tooltip')}
+                  title={`${translate('sql_editor_sql_execution_button_tooltip')} ${getShortcutsString(KEY_BINDING_SQL_EDITOR_EXECUTE)}`}
                   img
                   onClick={data.executeQuery}
                 />
                 <ActionIconButton
                   name="/icons/sql_exec_new.svg"
                   disabled={disabled}
-                  title={translate('sql_editor_sql_execution_new_tab_button_tooltip')}
+                  title={`${translate('sql_editor_sql_execution_new_tab_button_tooltip')} ${getShortcutsString(KEY_BINDING_SQL_EDITOR_EXECUTE_NEW)}`}
                   img
                   onClick={data.executeQueryNewTab}
                 />
@@ -57,7 +63,7 @@ export const SQLEditorActions = observer<Props>(function SQLEditorActions({ data
               name="/icons/sql_script_exec.svg"
               disabled={disabled}
               hidden={isActiveSegmentMode}
-              title={translate('sql_editor_sql_execution_script_button_tooltip')}
+              title={`${translate('sql_editor_sql_execution_script_button_tooltip')} ${getShortcutsString(KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT)}`}
               img
               onClick={data.executeScript}
             />
@@ -66,7 +72,7 @@ export const SQLEditorActions = observer<Props>(function SQLEditorActions({ data
                 name="/icons/sql_execution_plan.svg"
                 disabled={disabled}
                 hidden={isActiveSegmentMode}
-                title={translate('sql_editor_execution_plan_button_tooltip')}
+                title={`${translate('sql_editor_execution_plan_button_tooltip')} ${getShortcutsString(KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN)}`}
                 img
                 onClick={data.showExecutionPlan}
               />

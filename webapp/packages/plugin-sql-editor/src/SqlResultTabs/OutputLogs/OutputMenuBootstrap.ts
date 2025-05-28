@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import { OUTPUT_LOGS_FILTER_MENU } from './OUTPUT_LOGS_FILTER_MENU.js';
 import { OUTPUT_LOGS_MENU } from './OUTPUT_LOGS_MENU.js';
 import { OUTPUT_LOGS_SETTINGS_MENU } from './OUTPUT_LOGS_SETTINGS_MENU.js';
 import { OutputLogsService } from './OutputLogsService.js';
+import { getShortcutsString } from '@cloudbeaver/core-utils';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 
 @injectable()
 export class OutputMenuBootstrap extends Bootstrap {
@@ -29,6 +31,7 @@ export class OutputMenuBootstrap extends Bootstrap {
     private readonly outputLogsService: OutputLogsService,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly keyBindingService: KeyBindingService,
+    private readonly localizationService: LocalizationService,
   ) {
     super();
   }
@@ -130,12 +133,22 @@ export class OutputMenuBootstrap extends Bootstrap {
         return !!isQuery && !!isExecutable;
       },
 
-      handler: async (context, action) => {
+      handler: (context, action) => {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         if (action === ACTION_SHOW_OUTPUT_LOGS) {
           this.outputLogsService.showOutputLogs(state);
         }
+      },
+      getActionInfo: (context, action) => {
+        if (action === ACTION_SHOW_OUTPUT_LOGS) {
+          return {
+            ...action.info,
+            tooltip: `${this.localizationService.translate('sql_editor_output_logs_button_tooltip')} ${getShortcutsString(KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT)}`,
+          };
+        }
+
+        return action.info;
       },
     });
 
