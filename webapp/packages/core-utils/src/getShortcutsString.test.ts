@@ -15,6 +15,11 @@ function mockTransformKeys(returnValue: string[]) {
 }
 
 describe('getShortcutsString', () => {
+  it('should return empty string if keys are not defined', () => {
+    mockTransformKeys([]);
+    expect(getShortcutsString({ id: 'test' })).toBe('');
+  });
+
   it('should return shortcuts string', () => {
     mockTransformKeys(['Ctrl+S']);
 
