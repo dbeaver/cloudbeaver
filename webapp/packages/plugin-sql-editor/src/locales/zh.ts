@@ -7,7 +7,7 @@ export default [
   ['sql_editor_alias_loading_error', '加载节点别名时出错'],
   ['sql_editor_restore_message', '是否恢复之前的连接?'],
   ['sql_editor_restore', '恢复'],
-  ['sql_editor_placeholder', '使用Ctrl + Enter执行查询以查看结果'],
+  ['sql_editor_placeholder', '使用{arg:command}执行查询以查看结果'],
   ['sql_editor_hint_empty', '无提示信息...'],
   ['sql_editor_execution_plan_button_tooltip', '解释执行计划'],
   ['sql_editor_output_logs_button_tooltip', '显示服务端输出'],

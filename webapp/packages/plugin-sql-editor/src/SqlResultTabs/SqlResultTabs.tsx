@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import SqlResultTabsTabList from './shared/SqlResultTabsTabList.module.css';
 import { SqlResultPanel } from './SqlResultPanel.js';
 import { SqlResultTab } from './SqlResultTab.js';
 import { SqlResultTabsService } from './SqlResultTabsService.js';
+import { getShortcutsString } from '@cloudbeaver/core-utils';
+import { KEY_BINDING_SQL_EDITOR_EXECUTE } from '../actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE.js';
 
 interface Props {
   state: ISqlEditorTabState;
@@ -81,7 +83,9 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
   if (!state.tabs.length) {
     return (
       <TextPlaceholder className={s(style, { textPlaceholder: true })}>
-        {translate(dataSource?.emptyPlaceholder ?? 'sql_editor_placeholder')}
+        {translate(dataSource?.emptyPlaceholder ?? 'sql_editor_placeholder', undefined, {
+          command: getShortcutsString(KEY_BINDING_SQL_EDITOR_EXECUTE),
+        })}
       </TextPlaceholder>
     );
   }

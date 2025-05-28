@@ -7,7 +7,7 @@ export default [
   ['sql_editor_alias_loading_error', 'Error occurred while loading node alias'],
   ['sql_editor_restore_message', 'Do you want to restore the connection?'],
   ['sql_editor_restore', 'Restore'],
-  ['sql_editor_placeholder', 'Execute query with Ctrl+Enter to see results'],
+  ['sql_editor_placeholder', 'Execute query with {arg:command} to see results'],
   ['sql_editor_hint_empty', 'There is no proposals...'],
   ['sql_editor_execution_plan_button_tooltip', 'Explain execution plan'],
   ['sql_editor_output_logs_button_tooltip', 'Show server output'],

@@ -6,7 +6,7 @@ export default [
   ['sql_editor_alias_loading_error', 'Erreur survenue lors du chargement des alias'],
   ['sql_editor_restore_message', 'Voulez-vous restaurer la connexion ?'],
   ['sql_editor_restore', 'Restaurer'],
-  ['sql_editor_placeholder', 'Exécuter une requête (appuyez sur Ctrl+Entrée pour voir les résultats)'],
+  ['sql_editor_placeholder', 'Exécuter une requête (appuyez sur {arg:command} pour voir les résultats)'],
   ['sql_editor_hint_empty', "Il n'y a aucune proposition..."],
   ['sql_editor_execution_plan_button', "Afficher le plan d'exécution"],
   ['sql_editor_output_logs_button_tooltip', 'Afficher la sortie du serveur'],

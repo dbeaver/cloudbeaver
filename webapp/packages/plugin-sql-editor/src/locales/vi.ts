@@ -7,7 +7,7 @@ export default [
   ['sql_editor_alias_loading_error', 'Đã xảy ra lỗi khi tải bí danh nút'],
   ['sql_editor_restore_message', 'Bạn có muốn khôi phục kết nối không?'],
   ['sql_editor_restore', 'Khôi phục'],
-  ['sql_editor_placeholder', 'Thực thi truy vấn với Ctrl+Enter để xem kết quả'],
+  ['sql_editor_placeholder', 'Thực thi truy vấn với {arg:command} để xem kết quả'],
   ['sql_editor_hint_empty', 'Không có đề xuất nào...'],
   ['sql_editor_execution_plan_button_tooltip', 'Giải thích kế hoạch thực thi'],
   ['sql_editor_output_logs_button_tooltip', 'Hiển thị đầu ra máy chủ'],

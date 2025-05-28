@@ -7,7 +7,7 @@ export default [
   ['sql_editor_alias_loading_error', 'Возникла ошибка при загрузке псевдонима'],
   ['sql_editor_restore_message', 'Вы хотите восстановить подключение?'],
   ['sql_editor_restore', 'Восстановить'],
-  ['sql_editor_placeholder', 'Нажмите Ctrl+Enter, чтобы выполнить запрос и увидеть результат'],
+  ['sql_editor_placeholder', 'Нажмите {arg:command}, чтобы выполнить запрос и увидеть результат'],
   ['sql_editor_hint_empty', 'Нет авто-дополнений...'],
   ['sql_editor_execution_plan_button_tooltip', 'Посмотреть информацию о плане выполнения запроса'],
   ['sql_editor_output_logs_button_tooltip', 'Показать вывод сервера'],
