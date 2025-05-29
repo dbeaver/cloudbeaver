@@ -101,6 +101,7 @@ export default [
   ['ui_continue', '继续'],
   ['ui_authentication', '认证'],
   ['ui_settings', '设置'],
+  ['ui_preferences', '偏好选项'],
   ['ui_advanced_settings', '高级设置'],
   ['ui_expand', '展开'],
   ['ui_close_all', '关闭全部'],

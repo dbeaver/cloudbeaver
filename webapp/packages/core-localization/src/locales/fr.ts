@@ -98,6 +98,7 @@ export default [
   ['ui_continue', 'Continuer'],
   ['ui_authentication', 'Authentification'],
   ['ui_settings', 'Paramètres'],
+  ['ui_preferences', 'Préférences'],
   ['ui_advanced_settings', 'Paramètres avancés'],
   ['ui_expand', 'Développer'],
   ['ui_close_all', 'Tout fermer'],

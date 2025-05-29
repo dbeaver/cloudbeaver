@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
 
     this.userProfileTabsService.tabContainer.add({
       key: SETTINGS_TAB_ID,
-      name: 'plugin_user_profile_settings_tab_label',
+      name: 'ui_preferences',
       order: 3,
       panel: () => UserProfileSettings,
     });
@@ -71,7 +71,7 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
         return {
           ...action,
           icon: undefined,
-          label: 'plugin_user_profile_settings_tab_label',
+          label: 'ui_preferences',
           tooltip: 'plugin_user_profile_settings_action_description',
         };
       },

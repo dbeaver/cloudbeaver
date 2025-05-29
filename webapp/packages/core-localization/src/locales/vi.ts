@@ -104,6 +104,7 @@ export default [
   ['ui_continue', 'Tiếp tục'],
   ['ui_authentication', 'Xác thực'],
   ['ui_settings', 'Cài đặt'],
+  ['ui_preferences', 'Tùy Chọn'],
   ['ui_advanced_settings', 'Cài đặt nâng cao'],
   ['ui_expand', 'Mở rộng'],
   ['ui_close_all', 'Đóng tất cả'],

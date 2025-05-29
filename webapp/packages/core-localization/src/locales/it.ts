@@ -94,6 +94,7 @@ export default [
   ['ui_set', 'Set'],
   ['ui_restore', 'Restore'],
   ['ui_settings', 'Impostazioni'],
+  ['ui_preferences', 'Preferenze'],
   ['ui_advanced_settings', 'Advanced settings'],
   ['ui_expand', 'Expand'],
   ['ui_close_all', 'Close all'],
