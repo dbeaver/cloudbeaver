@@ -1,0 +1,61 @@
+.button {
+  composes: theme-button theme-button_unelevated theme-button_background theme-elevation-z3 from global;
+  opacity: 1;
+  transition-property: opacity, box-shadow !important;
+  transition: opacity 0.3s ease-in-out;
+  padding: 0 !important;
+  &::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 3px 4px 3px 0;
+    border-color: transparent #000 transparent transparent;
+    margin: -3px -2px;
+  }
+}
+
+.ripple {
+  composes: theme-button_ripple from global;
+}
+
+.button.vertical {
+  margin: 8px 0;
+  min-width: 16px;
+
+  &::after {
+    transform: rotate(180deg);
+  }
+}
+
+.button.vertical.maximize,
+.button.vertical.minimize {
+  min-height: 64px;
+}
+
+.button.vertical.primary::after {
+  transform: rotate(0deg);
+}
+
+.button.horizontal {
+  margin: 0 8px;
+  min-width: 28px;
+  height: 16px;
+
+  &::after {
+    transform: rotate(270deg);
+  }
+}
+
+.button.horizontal.maximize,
+.button.horizontal.minimize {
+  min-width: 64px;
+}
+
+.button.horizontal.primary::after {
+  transform: rotate(90deg);
+}
