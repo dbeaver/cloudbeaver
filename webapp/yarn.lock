@@ -4528,6 +4528,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@dbeaver/table-data@workspace:../common-typescript/@dbeaver/table-data":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/table-data@workspace:../common-typescript/@dbeaver/table-data"
+  dependencies:
+    "@dbeaver/tsconfig": "workspace:^"
+    async-mutex: "npm:^0"
+    nanoevents: "npm:^9"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@dbeaver/tsconfig@workspace:*, @dbeaver/tsconfig@workspace:../common-typescript/@dbeaver/tsconfig, @dbeaver/tsconfig@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/tsconfig@workspace:../common-typescript/@dbeaver/tsconfig"
@@ -8398,6 +8410,15 @@ __metadata:
   version: 1.0.0
   resolution: "async-function@npm:1.0.0"
   checksum: 10c0/669a32c2cb7e45091330c680e92eaeb791bc1d4132d827591e499cd1f776ff5a873e77e5f92d0ce795a8d60f10761dec9ddfe7225a5de680f5d357f67b1aac73
+  languageName: node
+  linkType: hard
+
+"async-mutex@npm:^0":
+  version: 0.5.0
+  resolution: "async-mutex@npm:0.5.0"
+  dependencies:
+    tslib: "npm:^2.4.0"
+  checksum: 10c0/9096e6ad6b674c894d8ddd5aa4c512b09bb05931b8746ebd634952b05685608b2b0820ed5c406e6569919ff5fe237ab3c491e6f2887d6da6b6ba906db3ee9c32
   languageName: node
   linkType: hard
 
@@ -14595,6 +14616,13 @@ __metadata:
   version: 2.0.0
   resolution: "mute-stream@npm:2.0.0"
   checksum: 10c0/2cf48a2087175c60c8dcdbc619908b49c07f7adcfc37d29236b0c5c612d6204f789104c98cc44d38acab7b3c96f4a3ec2cfdc4934d0738d876dbefa2a12c69f4
+  languageName: node
+  linkType: hard
+
+"nanoevents@npm:^9":
+  version: 9.1.0
+  resolution: "nanoevents@npm:9.1.0"
+  checksum: 10c0/5fb48e6fc1d3102daddaeffd6eada907c25b1c8554dcc648e9cb0a72979a1ab3ee56ffa2d2b3e566a8e561a9e2992a3783493c61cfaaa096b2986d56dbbc1ca5
   languageName: node
   linkType: hard
 
