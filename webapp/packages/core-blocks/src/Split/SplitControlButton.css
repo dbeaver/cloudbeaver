@@ -1,34 +1,29 @@
 @layer components {
-  .button {
+  .split-button {
     --dbv-kit-btn-primary-background: var(--tw-color-gray-200);
     --dbv-kit-btn-primary-background-hover: color-mix(in srgb, var(--tw-color-gray-200), white 10%);
     --dbv-kit-btn-primary-background-active: color-mix(in srgb, var(--tw-color-gray-200), white 25%);
   }
 
-  /* TODO: Dark theme is not applied */
-  .theme-dark .button {
-    --dbv-kit-btn-primary-background: var(--tw-color-gray-400);
-    --dbv-kit-btn-primary-background-hover: color-mix(in srgb, var(--tw-color-gray-400), white 10%);
-    --dbv-kit-btn-primary-background-active: color-mix(in srgb, var(--tw-color-gray-400), white 25%);
+  .theme-dark .split-button {
+    --dbv-kit-btn-primary-background: var(--tw-color-gray-500);
+    --dbv-kit-btn-primary-background-hover: color-mix(in srgb, var(--tw-color-gray-500), white 10%);
+    --dbv-kit-btn-primary-background-active: color-mix(in srgb, var(--tw-color-gray-500), white 25%);
   }
 
-  .button {
-    opacity: 1;
-    transition-property: opacity, box-shadow;
-    transition: opacity 0.3s ease-in-out;
+  .split-button {
     padding: 0;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
 
-    &.vertical {
+    &.split-button--vertical {
       margin: 8px 0;
       min-width: 16px;
 
-      &.maximize,
-      &.minimize {
+      &.split-button--maximize,
+      &.split-button--minimize {
         min-height: 64px;
       }
 
-      &.primary::after {
+      &.split-button--primary::after {
         transform: rotate(0deg);
       }
 
@@ -37,17 +32,17 @@
       }
     }
 
-    &.horizontal {
+    &.split-button--horizontal {
       margin: 0 8px;
       min-width: 28px;
       height: 16px;
 
-      &.maximize,
-      &.minimize {
+      &.split-button--maximize,
+      &.split-button--minimize {
         min-width: 64px;
       }
 
-      &.primary::after {
+      &.split-button--primary::after {
         transform: rotate(90deg);
       }
 

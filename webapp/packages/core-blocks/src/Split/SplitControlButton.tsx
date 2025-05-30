@@ -6,21 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { s } from '../s.js';
-import styles from './SplitControlButton.module.css';
+import './SplitControlButton.css';
 import { type ButtonProps, Button } from '../Button.js';
+import { clsx } from '@dbeaver/ui-kit';
 
 interface Props extends ButtonProps {
-  isPrimary: boolean;
   mode: 'maximize' | 'minimize' | 'resize';
   split: 'horizontal' | 'vertical';
 }
 
-export function SplitControlButton({ isPrimary, className, ...props }: Props): React.ReactElement {
+export function SplitControlButton({ className, ...props }: Props): React.ReactElement {
   return (
     <Button
       {...props}
-      className={s(styles, { button: true, primary: isPrimary, [props.mode]: true, [props.split]: true }, className)}
+      className={clsx('split-button', `split-button--${props.mode}`, `split-button--${props.split}`, `split-button--${props.variant}`, className)}
       type="button"
     />
   );
