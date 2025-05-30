@@ -35,14 +35,14 @@ export const SplitControls: React.FC = function SplitControls() {
 
   const handlers = useObjectRef(
     () => ({
-      handleCollapse(event: React.SyntheticEvent<HTMLButtonElement>) {
+      handleCollapse() {
         if (this.mode === 'maximize') {
           this.setMode('resize');
         } else {
           this.setMode('minimize');
         }
       },
-      handleExpand(event: React.SyntheticEvent<HTMLButtonElement>) {
+      handleExpand() {
         if (this.mode === 'minimize') {
           this.setMode('resize');
         } else {

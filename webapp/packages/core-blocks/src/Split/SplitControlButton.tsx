@@ -8,23 +8,20 @@
 
 import { s } from '../s.js';
 import styles from './SplitControlButton.module.css';
+import { type ButtonProps, Button } from '../Button.js';
 
-interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface Props extends ButtonProps {
   isPrimary: boolean;
-  onClick: (event: React.SyntheticEvent<HTMLButtonElement>) => void;
   mode: 'maximize' | 'minimize' | 'resize';
   split: 'horizontal' | 'vertical';
 }
 
-export function SplitControlButton({ isPrimary, onClick, className, ...props }: Props): React.ReactElement {
+export function SplitControlButton({ isPrimary, className, ...props }: Props): React.ReactElement {
   return (
-    <button
+    <Button
       {...props}
       className={s(styles, { button: true, primary: isPrimary, [props.mode]: true, [props.split]: true }, className)}
       type="button"
-      onClick={onClick}
-    >
-      <div className={s(styles, { ripple: true })} />
-    </button>
+    />
   );
 }
