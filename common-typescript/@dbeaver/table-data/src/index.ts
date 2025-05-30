@@ -1,3 +1,4 @@
+export * from './editor/TableEditor.js';
 export * from './interfaces/ITableData.js';
 export * from './interfaces/ITableDataset.js';
 export * from './interfaces/ITableDatasetManager.js';
@@ -8,3 +9,4 @@ export * from './interfaces/TableEvents.js';
 export * from './interfaces/TableSourceEvents.js';
 export * from './TableSource.js';
 export * from './TableDatasetManager.js';
+export * from './editor/index.js';

@@ -4532,11 +4532,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dbeaver/table-data@workspace:../common-typescript/@dbeaver/table-data"
   dependencies:
+    "@dbeaver/cli": "workspace:^"
     "@dbeaver/tsconfig": "workspace:^"
     async-mutex: "npm:^0"
     nanoevents: "npm:^9"
     rimraf: "npm:^6"
     typescript: "npm:^5"
+    vitest: "npm:^3"
   languageName: unknown
   linkType: soft
 

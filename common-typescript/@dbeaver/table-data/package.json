@@ -7,7 +7,9 @@
     "./*": "./lib/*.js"
   },
   "scripts": {
-    "clear": "rimraf lib"
+    "clear": "rimraf lib",
+    "build": "tsc -b",
+    "test": "dbeaver-test"
   },
   "files": [
     "package.json",
@@ -25,9 +27,11 @@
   ],
   "packageManager": "yarn@4.6.0",
   "devDependencies": {
+    "@dbeaver/cli": "workspace:^",
     "@dbeaver/tsconfig": "workspace:^",
     "rimraf": "^6",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3"
   },
   "dependencies": {
     "async-mutex": "^0",
