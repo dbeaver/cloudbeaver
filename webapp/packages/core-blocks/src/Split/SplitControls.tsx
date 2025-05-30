@@ -70,7 +70,7 @@ export const SplitControls: React.FC = function SplitControls() {
           className={s(styles, { resizeButton: isResizeMode })}
           mode={inverseMode}
           split={split.state.split}
-          variant={!inverse ? 'primary' : undefined}
+          inverse={!inverse}
           onClick={handlers.handleCollapse}
         />
       )}
@@ -79,7 +79,7 @@ export const SplitControls: React.FC = function SplitControls() {
           className={s(styles, { resizeButton: isResizeMode })}
           mode={inverseMode}
           split={split.state.split}
-          variant={inverse ? 'primary' : undefined}
+          inverse={inverse}
           onClick={handlers.handleExpand}
         />
       )}

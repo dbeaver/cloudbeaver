@@ -13,13 +13,14 @@ import { clsx } from '@dbeaver/ui-kit';
 interface Props extends ButtonProps {
   mode: 'maximize' | 'minimize' | 'resize';
   split: 'horizontal' | 'vertical';
+  inverse?: boolean;
 }
 
-export function SplitControlButton({ className, ...props }: Props): React.ReactElement {
+export function SplitControlButton({ className, inverse = false, ...props }: Props): React.ReactElement {
   return (
     <Button
       {...props}
-      className={clsx('split-button', `split-button--${props.mode}`, `split-button--${props.split}`, `split-button--${props.variant}`, className)}
+      className={clsx('split-button', `split-button--${props.mode}`, `split-button--${props.split}`, inverse && 'split-button--inverse', className)}
       type="button"
     />
   );

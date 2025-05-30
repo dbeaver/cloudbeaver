@@ -1,14 +1,14 @@
 @layer components {
   .split-button {
-    --dbv-kit-btn-primary-background: var(--tw-color-gray-200);
-    --dbv-kit-btn-primary-background-hover: color-mix(in srgb, var(--tw-color-gray-200), white 10%);
-    --dbv-kit-btn-primary-background-active: color-mix(in srgb, var(--tw-color-gray-200), white 25%);
+    --dbv-kit-btn-primary-background: var(--theme-background);
+    --dbv-kit-btn-primary-background-hover: color-mix(in srgb, var(--theme-background), white 10%);
+    --dbv-kit-btn-primary-background-active: color-mix(in srgb, var(--theme-background), white 25%);
   }
 
   .theme-dark .split-button {
-    --dbv-kit-btn-primary-background: var(--tw-color-gray-500);
-    --dbv-kit-btn-primary-background-hover: color-mix(in srgb, var(--tw-color-gray-500), white 10%);
-    --dbv-kit-btn-primary-background-active: color-mix(in srgb, var(--tw-color-gray-500), white 25%);
+    --dbv-kit-btn-primary-background: color-mix(in srgb, var(--theme-background), white 30%);
+    --dbv-kit-btn-primary-background-hover: color-mix(in srgb, var(--theme-background), white 40%);
+    --dbv-kit-btn-primary-background-active: color-mix(in srgb, var(--theme-background), white 50%);
   }
 
   .split-button {
@@ -23,7 +23,7 @@
         min-height: 64px;
       }
 
-      &.split-button--primary::after {
+      &.split-button--inverse::after {
         transform: rotate(0deg);
       }
 
@@ -42,7 +42,7 @@
         min-width: 64px;
       }
 
-      &.split-button--primary::after {
+      &.split-button--inverse::after {
         transform: rotate(90deg);
       }
 
