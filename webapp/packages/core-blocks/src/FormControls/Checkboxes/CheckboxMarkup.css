@@ -1,0 +1,38 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@layer components {
+  .checkboxMarkup {
+    --dbv-kit-checkbox-background-checked: var(--theme-primary);
+    --dbv-kit-checkbox-icon-color: var(--theme-on-primary);
+
+    --dbv-kit-checkbox-check-size: 0.7;
+    --dbv-kit-checkbox-border-width: 2px;
+    --dbv-kit-checkbox-border-radius: 2px;
+
+    --dbv-kit-checkbox-border-color: color-mix(in srgb, var(--theme-on-secondary), white 20%);
+    --dbv-kit-checkbox-border-color-checked: transparent;
+  }
+
+  .dbv-kit-checkbox {
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dbv-kit-checkbox__check {
+    margin: 0 12px;
+  }
+
+  .checkboxMarkup--secondary {
+    --dbv-kit-checkbox-background-checked: var(--theme-on-primary);
+    --dbv-kit-checkbox-icon-color: var(--theme-primary);
+    --dbv-kit-checkbox-border-color: var(--theme-on-primary);
+    --dbv-kit-checkbox-background: transparent;
+    --dbv-kit-checkbox-border-color-checked: var(--theme-on-primary);
+  }
+}
