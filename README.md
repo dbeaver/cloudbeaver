@@ -32,7 +32,7 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 - Administration:
   -    Log records now capture create, update, and delete actions for users, teams, and connections for improved tracking and transparency.
 - LDAP authorization:
-  -    Added support for secure LDAP authentication over SSL;
+  -    Added support for secure [LDAP authentication over SSL](https://github.com/dbeaver/cloudbeaver/wiki/LDAP-Authentication);
   -    Brute force protection is now supported for LDAP authentication. All authentication methods on the application level have this security mechanism.
 - SQL Editor:
   -    A new setting to autosave scripts in the SQL editor appeared in global and users' preferences;
