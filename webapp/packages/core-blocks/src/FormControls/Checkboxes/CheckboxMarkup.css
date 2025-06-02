@@ -8,9 +8,6 @@
 
 @layer components {
   .checkboxMarkup {
-    --dbv-kit-checkbox-content-gap: calc(var(--tw-spacing) * 0.05);
-    --dbv-kit-checkbox-small-content-gap: calc(var(--dbv-kit-checkbox-content-gap) * 0.5);
-
     --dbv-kit-checkbox-background-checked: var(--theme-primary);
     --dbv-kit-checkbox-icon-color: var(--theme-on-primary);
 
@@ -22,7 +19,7 @@
     --dbv-kit-checkbox-border-color-checked: transparent;
 
     & .checkboxCaption {
-      font-size: 12px;
+      font-size: calc(var(--dbv-kit-checkbox-font-size) * 0.875);
       color: var(--theme-on-secondary);
     }
   }
@@ -38,7 +35,6 @@
   .dbv-kit-checkbox__text {
     display: flex;
     flex-direction: column;
-    gap: var(--dbv-kit-checkbox-content-gap);
   }
 
   .dbv-kit-checkbox {
@@ -47,6 +43,6 @@
   }
 
   .dbv-kit-checkbox__check {
-    margin: 0 10px;
+    margin-top: 0;
   }
 }
