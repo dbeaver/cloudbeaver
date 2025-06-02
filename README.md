@@ -51,7 +51,7 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
   -    DuckDB: expanded the list of system objects that can be hidden in the Navigation tree;
   -    LibSQL: added the ability to connect using token authentication;
   -    Oracle: users' DDL in Oracle is displayed in the metadata editor on the corresponding tab for users with Oracle administration permissions;
-  -    SQLite: added information about a table's Strict mode to the table metadata section (thanks to @eusebe-cda).
+  -    SQLite: added information about a table's Strict mode to the table metadata section (thanks to [eusebe-cda](https://github.com/eusebe-cda)).
 
 ## Contribution
 As a community-driven open-source project, we warmly welcome contributions through GitHub pull requests. 
