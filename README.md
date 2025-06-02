@@ -45,7 +45,7 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
   -    Enhanced initial configuration stage security: a server needs to be restarted if the initial setup time exceeds 1 hour;
   -    Improved Navigation tree performance: lost connection does not lead to the application freezing anymore;
   -    Data transfer: Improved export/import functionality performance by optimizing disk memory consumption;
-  -    Vietnamese localization has been added (thanks to @0xhanh).
+  -    Vietnamese localization has been added (thanks to [0xhanh](https://github.com/0xhanh)).
 - Databases and drivers:
   -    Clickhouse: driver has been updated to version 0.8.5;
   -    DuckDB: expanded the list of system objects that can be hidden in the Navigation tree;
