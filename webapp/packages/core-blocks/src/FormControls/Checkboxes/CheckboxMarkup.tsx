@@ -30,6 +30,7 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
   variant = 'primary',
   title,
   readOnly,
+  children,
   ...rest
 }) {
   const checkboxRef = useRef<HTMLInputElement>(null);
@@ -42,8 +43,17 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
 
   return (
     <div className={clsx('checkboxMarkup', `checkboxMarkup--${variant}`, className)} title={title}>
-      <UiKitCheckbox ref={checkboxRef} id={id || rest.name} indeterminate={indeterminate} disabled={rest.disabled || readOnly} size={size} {...rest}>
+      <UiKitCheckbox
+        ref={checkboxRef}
+        className="checkboxContent"
+        id={id || rest.name}
+        indeterminate={indeterminate}
+        disabled={rest.disabled || readOnly}
+        size={size}
+        {...rest}
+      >
         {label}
+        {children}
       </UiKitCheckbox>
     </div>
   );

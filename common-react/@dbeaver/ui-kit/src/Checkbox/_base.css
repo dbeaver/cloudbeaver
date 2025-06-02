@@ -3,7 +3,6 @@
     /* Checkbox sizes */
     --dbv-kit-checkbox-height: var(--dbv-kit-control-height-medium);
     --dbv-kit-checkbox-gap: calc(var(--tw-spacing) * 1.25);
-    --dbv-kit-checkbox-content-gap: calc(var(--tw-spacing) * 0.5);
     --dbv-kit-checkbox-check-size: 0.5625;
 
     /* Checkbox colors */

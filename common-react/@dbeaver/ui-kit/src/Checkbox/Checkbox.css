@@ -21,12 +21,6 @@
       }
     }
 
-    & .dbv-kit-checkbox__content {
-      display: flex;
-      flex-direction: column;
-      gap: var(--dbv-kit-checkbox-content-gap);
-    }
-
     &[data-checked='true'] {
       border-color: var(--dbv-kit-checkbox-border-color-checked);
     }

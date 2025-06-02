@@ -16,12 +16,11 @@ import { componentProviderWrapper } from '../componentProviderWrapper.js';
 export interface CheckboxProps extends Omit<AriaKitCheckboxProps, 'render' | 'size'> {
   size?: ControlSize;
   icon?: React.ReactNode;
-  caption?: string;
   indeterminate?: boolean;
   indeterminateIcon?: React.ReactNode;
 }
 
-export function CheckboxBase({ children, className, icon, caption, indeterminate, indeterminateIcon, size = 'medium', ...props }: CheckboxProps) {
+export function CheckboxBase({ children, className, icon, indeterminate, indeterminateIcon, size = 'medium', ...props }: CheckboxProps) {
   const [innerChecked, setInnerChecked] = useState(props.defaultChecked ?? false);
   const checked = props.checked ?? innerChecked;
 
@@ -68,10 +67,7 @@ export function CheckboxBase({ children, className, icon, caption, indeterminate
           ))}
       </div>
 
-      <div className="dbv-kit-checkbox__content">
-        <span className="dbv-kit-checkbox__text">{children}</span>
-        {caption && <span className="dbv-kit-checkbox__caption">{caption}</span>}
-      </div>
+      <span className="dbv-kit-checkbox__text">{children}</span>
     </label>
   );
 }
