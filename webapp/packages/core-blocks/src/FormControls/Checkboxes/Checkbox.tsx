@@ -55,14 +55,12 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   value,
   defaultValue,
   state,
-  label,
   checked,
   defaultChecked,
   children,
   inverse,
   className,
   autoHide,
-  caption,
   onChange,
   ...rest
 }: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
@@ -81,9 +79,5 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
     return null;
   }
 
-  return (
-    <CheckboxMarkup {...rest} name={name} checked={checkboxState.checked} label={label} className={className} onChange={checkboxState.change}>
-      {caption && <span className="checkboxCaption">{caption}</span>}
-    </CheckboxMarkup>
-  );
+  return <CheckboxMarkup {...rest} name={name} checked={checkboxState.checked} className={className} onChange={checkboxState.change} />;
 });

@@ -26,6 +26,7 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
   label,
   indeterminate,
   className,
+  caption,
   size = 'small',
   variant = 'primary',
   title,
@@ -45,7 +46,7 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
     <div className={clsx('checkboxMarkup', `checkboxMarkup--${variant}`, className)} title={title}>
       <UiKitCheckbox ref={checkboxRef} id={id || rest.name} indeterminate={indeterminate} disabled={rest.disabled || readOnly} size={size} {...rest}>
         {label}
-        {children}
+        {caption && <span className="checkboxCaption">{caption}</span>}
       </UiKitCheckbox>
     </div>
   );
