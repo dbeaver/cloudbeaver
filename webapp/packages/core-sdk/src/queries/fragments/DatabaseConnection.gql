@@ -28,21 +28,6 @@ fragment DatabaseConnection on ConnectionInfo {
   authNeeded @include(if: $includeAuthNeeded)
   authModel
 
-  networkHandlersConfig @skip(if: $includeNetworkHandlersConfig) {
-    ...NetworkHandlerBasics
-  }
-
-  networkHandlersConfig @include(if: $includeNetworkHandlersConfig) {
-    ...NetworkHandlerBasics
-    authType
-    userName
-    password
-    key
-    savePassword
-    properties
-    secureProperties
-  }
-
   navigatorSettings {
     ...AllNavigatorSettings
   }

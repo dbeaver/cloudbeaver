@@ -10,6 +10,7 @@ import { action, computed, observable } from 'mobx';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import {
   ConnectionInfoAuthPropertiesResource,
+  ConnectionInfoNetworkHandlersResource,
   ConnectionInfoResource,
   type ConnectionInitConfig,
   type DatabaseConnection,
@@ -49,6 +50,7 @@ export function useDatabaseCredentialsAuthDialog(
   const connectionInfoResource = useService(ConnectionInfoResource);
   const dbDriverResource = useService(DBDriverResource);
   const connectionInfoAuthPropertiesResource = useService(ConnectionInfoAuthPropertiesResource);
+  const connectionInfoNetworkHandlersLoader = useService(ConnectionInfoNetworkHandlersResource);
 
   const state: IState = useObservableRef(
     () => ({
@@ -81,9 +83,10 @@ export function useDatabaseCredentialsAuthDialog(
           this.exception = null;
           this.loading = true;
 
-          const [connectionWithAuthProperties, connection] = await Promise.all([
+          const [connectionWithAuthProperties, connection, connectionNetworkHandlersConfig] = await Promise.all([
             this.connectionInfoAuthPropertiesResource.load(this.key),
-            this.connectionInfoResource.load(this.key, ['includeNetworkHandlersConfig', 'includeAuthNeeded']),
+            this.connectionInfoResource.load(this.key, ['includeAuthNeeded']),
+            this.connectionInfoNetworkHandlersLoader.load(this.key),
           ]);
 
           const driver = await this.dbDriverResource.load(connection.driverId);
@@ -97,7 +100,7 @@ export function useDatabaseCredentialsAuthDialog(
           }
 
           for (const id of this.networkHandlers) {
-            const handler = connection.networkHandlersConfig.find(handler => handler.id === id);
+            const handler = connectionNetworkHandlersConfig.networkHandlersConfig?.find(handler => handler.id === id);
 
             if (handler && (handler.userName || handler.authType !== NetworkHandlerAuthType.Password)) {
               this.config.networkHandlersConfig.push({
@@ -182,7 +185,16 @@ export function useDatabaseCredentialsAuthDialog(
       load: action.bound,
       login: action.bound,
     },
-    { connectionInfoResource, dbDriverResource, key, networkHandlers, resetCredentials, connectionInfoAuthPropertiesResource, onInit },
+    {
+      connectionInfoResource,
+      dbDriverResource,
+      key,
+      networkHandlers,
+      resetCredentials,
+      connectionInfoAuthPropertiesResource,
+      connectionInfoNetworkHandlersLoader,
+      onInit,
+    },
   );
 
   return state;

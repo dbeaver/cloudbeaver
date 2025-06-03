@@ -52,7 +52,7 @@ export type Connection = DatabaseConnection & {
 };
 export type ConnectionInitConfig = Omit<
   InitConnectionMutationVariables,
-  'includeNetworkHandlersConfig' | 'includeAuthNeeded' | 'includeCredentialsSaved' | 'includeProperties' | 'includeProviderProperties'
+  'includeAuthNeeded' | 'includeCredentialsSaved' | 'includeProperties' | 'includeProviderProperties'
 >;
 export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'>;
 
@@ -589,10 +589,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     super.dataSet(key, {
       ...oldConnection,
       ...value,
-      networkHandlersConfig: value.networkHandlersConfig?.map(handler => ({
-        ...oldConnection?.networkHandlersConfig?.find(oldHandler => oldHandler.id === handler.id),
-        ...handler,
-      })),
     });
 
     if (oldConnection?.connected && !value.connected) {
@@ -615,7 +611,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
   getDefaultIncludes(): ConnectionInfoIncludes {
     return {
-      includeNetworkHandlersConfig: false,
       includeAuthNeeded: false,
       includeCredentialsSaved: false,
       includeProperties: false,

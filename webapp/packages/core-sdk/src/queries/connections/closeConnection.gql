@@ -1,7 +1,6 @@
 mutation closeConnection(
   $projectId: ID!
   $connectionId: ID!
-  $includeNetworkHandlersConfig: Boolean!
   $includeCredentialsSaved: Boolean!
   $includeAuthNeeded: Boolean!
   $includeProperties: Boolean!

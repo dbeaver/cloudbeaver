@@ -2,7 +2,6 @@ query getUserConnections(
   $projectId: ID
   $connectionId: ID
   $projectIds: [ID!]
-  $includeNetworkHandlersConfig: Boolean!
   $includeCredentialsSaved: Boolean!
   $includeAuthNeeded: Boolean!
   $includeProperties: Boolean!

@@ -23,7 +23,7 @@ interface Payload {
 export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function DatabaseAuthDialog({ payload, options, rejectDialog, resolveDialog }) {
   const connectionInfoLoader = useResource(DatabaseAuthDialog, ConnectionInfoResource, {
     key: payload.connection,
-    includes: ['includeAuthNeeded', 'includeNetworkHandlersConfig', 'includeCredentialsSaved'],
+    includes: ['includeAuthNeeded', 'includeCredentialsSaved'],
   });
   const driverLoader = useResource(DatabaseAuthDialog, DBDriverResource, connectionInfoLoader.data?.driverId || null);
   const connectionPublicSecretsLoader = useResource(DatabaseSecretAuthDialog, ConnectionPublicSecretsResource, payload.connection);
