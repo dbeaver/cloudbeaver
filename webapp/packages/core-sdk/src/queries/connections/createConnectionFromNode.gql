@@ -1,11 +1,4 @@
-mutation createConnectionFromNode(
-  $projectId: ID!
-  $nodePath: String!
-  $config: ConnectionConfig
-  $includeCredentialsSaved: Boolean!
-  $includeAuthNeeded: Boolean!
-  $includeProperties: Boolean!
-) {
+mutation createConnectionFromNode($projectId: ID!, $nodePath: String!, $config: ConnectionConfig, $includeProperties: Boolean!) {
   connection: copyConnectionFromNode(projectId: $projectId, nodePath: $nodePath, config: $config) {
     ...DatabaseConnection
   }

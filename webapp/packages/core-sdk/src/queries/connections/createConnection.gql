@@ -1,10 +1,4 @@
-mutation createConnection(
-  $projectId: ID!
-  $config: ConnectionConfig!
-  $includeCredentialsSaved: Boolean!
-  $includeAuthNeeded: Boolean!
-  $includeProperties: Boolean!
-) {
+mutation createConnection($projectId: ID!, $config: ConnectionConfig!, $includeProperties: Boolean!) {
   connection: createConnection(projectId: $projectId, config: $config) {
     ...DatabaseConnection
   }

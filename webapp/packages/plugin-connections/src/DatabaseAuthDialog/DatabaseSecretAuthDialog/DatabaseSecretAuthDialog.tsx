@@ -35,10 +35,7 @@ interface Props {
 export const DatabaseSecretAuthDialog = observer<Props>(function DatabaseSecretAuthDialog({ connectionKey, onLogin }) {
   const styles = useS(style);
   const translate = useTranslate();
-  const connectionInfoLoader = useResource(DatabaseSecretAuthDialog, ConnectionInfoResource, {
-    key: connectionKey,
-    includes: ['includeAuthNeeded', 'includeCredentialsSaved'],
-  });
+  const connectionInfoLoader = useResource(DatabaseSecretAuthDialog, ConnectionInfoResource, connectionKey);
   const state = useObservableRef(
     () => ({
       exception: null as Error | null,

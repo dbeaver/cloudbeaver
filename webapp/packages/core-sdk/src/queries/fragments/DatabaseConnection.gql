@@ -9,7 +9,7 @@ fragment DatabaseConnection on ConnectionInfo {
   readOnly
 
   saveCredentials
-  credentialsSaved @include(if: $includeCredentialsSaved)
+  credentialsSaved
   sharedCredentials
 
   folder
@@ -24,7 +24,7 @@ fragment DatabaseConnection on ConnectionInfo {
   features
   supportedDataFormats
 
-  authNeeded @include(if: $includeAuthNeeded)
+  authNeeded
   authModel
 
   navigatorSettings {

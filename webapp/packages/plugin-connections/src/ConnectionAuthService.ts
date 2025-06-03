@@ -94,7 +94,7 @@ export class ConnectionAuthService extends Dependency {
 
     [connectionNetworkHandlers, connection] = await Promise.all([
       this.connectionInfoNetworkHandlersResource.load(key),
-      this.connectionInfoResource.load(key, ['includeAuthNeeded', 'includeCredentialsSaved']),
+      this.connectionInfoResource.load(key),
     ]);
 
     const networkHandlers = connectionNetworkHandlers

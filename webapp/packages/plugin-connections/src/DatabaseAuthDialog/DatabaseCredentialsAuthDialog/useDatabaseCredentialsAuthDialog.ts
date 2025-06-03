@@ -85,7 +85,7 @@ export function useDatabaseCredentialsAuthDialog(
 
           const [connectionWithAuthProperties, connection, connectionNetworkHandlersConfig] = await Promise.all([
             this.connectionInfoAuthPropertiesResource.load(this.key),
-            this.connectionInfoResource.load(this.key, ['includeAuthNeeded']),
+            this.connectionInfoResource.load(this.key),
             this.connectionInfoNetworkHandlersLoader.load(this.key),
           ]);
 

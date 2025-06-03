@@ -50,7 +50,7 @@ import { parseConnectionKey } from './parseConnectionKey.js';
 export type Connection = DatabaseConnection & {
   authProperties?: UserConnectionAuthPropertiesFragment[];
 };
-export type ConnectionInitConfig = Omit<InitConnectionMutationVariables, 'includeAuthNeeded' | 'includeCredentialsSaved' | 'includeProperties'>;
+export type ConnectionInitConfig = Omit<InitConnectionMutationVariables, 'includeProperties'>;
 export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'>;
 
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
@@ -608,8 +608,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
   getDefaultIncludes(): ConnectionInfoIncludes {
     return {
-      includeAuthNeeded: false,
-      includeCredentialsSaved: false,
       includeProperties: false,
     };
   }
