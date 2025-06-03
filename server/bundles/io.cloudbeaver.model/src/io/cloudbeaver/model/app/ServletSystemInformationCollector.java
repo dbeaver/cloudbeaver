@@ -36,7 +36,7 @@ import java.nio.file.Path;
  */
 public class ServletSystemInformationCollector<T extends ServletApplication> implements DBPObject {
 
-    private enum DeploymentType {
+    protected enum DeploymentType {
         DEFAULT,
         DOCKER,
         KUBERNETES
@@ -61,7 +61,7 @@ public class ServletSystemInformationCollector<T extends ServletApplication> imp
     private final String installPath;
     private DBPConnectionInformation smDatabaseInfo;
     private String workspacePath;
-    private final DeploymentType deploymentType;
+    protected final DeploymentType deploymentType;
 
     public ServletSystemInformationCollector(@NotNull T application) {
         this.application = application;
