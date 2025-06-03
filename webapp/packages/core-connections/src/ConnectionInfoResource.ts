@@ -52,12 +52,7 @@ export type Connection = DatabaseConnection & {
 };
 export type ConnectionInitConfig = Omit<
   InitConnectionMutationVariables,
-  | 'includeNetworkHandlersConfig'
-  | 'includeAuthNeeded'
-  | 'includeCredentialsSaved'
-  | 'includeProperties'
-  | 'includeProviderProperties'
-  | 'customIncludeOptions'
+  'includeNetworkHandlersConfig' | 'includeAuthNeeded' | 'includeCredentialsSaved' | 'includeProperties' | 'includeProviderProperties'
 >;
 export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'>;
 
@@ -625,7 +620,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       includeCredentialsSaved: false,
       includeProperties: false,
       includeProviderProperties: false,
-      customIncludeOptions: false,
     };
   }
 

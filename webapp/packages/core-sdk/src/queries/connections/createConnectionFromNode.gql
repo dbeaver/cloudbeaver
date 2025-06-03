@@ -7,7 +7,6 @@ mutation createConnectionFromNode(
   $includeAuthNeeded: Boolean!
   $includeProperties: Boolean!
   $includeProviderProperties: Boolean!
-  $customIncludeOptions: Boolean!
 ) {
   connection: copyConnectionFromNode(projectId: $projectId, nodePath: $nodePath, config: $config) {
     ...DatabaseConnection

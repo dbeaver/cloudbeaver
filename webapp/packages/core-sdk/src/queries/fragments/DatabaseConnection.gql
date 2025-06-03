@@ -17,14 +17,6 @@ fragment DatabaseConnection on ConnectionInfo {
 
   mainPropertyValues
 
-  configurationType @include(if: $customIncludeOptions)
-  useUrl @include(if: $customIncludeOptions)
-  host @include(if: $customIncludeOptions)
-  port @include(if: $customIncludeOptions)
-  serverName @include(if: $customIncludeOptions)
-  databaseName @include(if: $customIncludeOptions)
-  url @include(if: $customIncludeOptions)
-
   properties @include(if: $includeProperties)
   providerProperties @include(if: $includeProviderProperties)
 

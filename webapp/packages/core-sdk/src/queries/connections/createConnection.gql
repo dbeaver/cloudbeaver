@@ -6,7 +6,6 @@ mutation createConnection(
   $includeAuthNeeded: Boolean!
   $includeProperties: Boolean!
   $includeProviderProperties: Boolean!
-  $customIncludeOptions: Boolean!
 ) {
   connection: createConnection(projectId: $projectId, config: $config) {
     ...DatabaseConnection
