@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -124,12 +124,10 @@ export const GeneratedSqlDialog = observer<DialogComponentProps<Payload>>(functi
             />
           )}
           <div className={s(styles, { buttons: true })}>
-            <Button mod={['outlined']} onClick={() => copy(state.query, true)}>
+            <Button variant="secondary" onClick={() => copy(state.query, true)}>
               {translate('ui_copy_to_clipboard')}
             </Button>
-            <Button mod={['unelevated']} onClick={rejectDialog}>
-              {translate('ui_close')}
-            </Button>
+            <Button onClick={rejectDialog}>{translate('ui_close')}</Button>
           </div>
         </div>
       </CommonDialogFooter>

@@ -1,4 +1,3 @@
-@import url('@dbeaver/ui-kit/index.css');
 @layer components {
   body {
     --dbv-kit-checkbox-background: var(--theme-surface);
@@ -12,9 +11,5 @@
     --dbv-kit-checkbox-border-width: 1px;
     --dbv-kit-checkbox-check-size: 0.8;
     --dbv-kit-checkbox-small-height: 1.375rem;
-  }
-
-  .dbv-kit-checkbox__check > svg {
-    fill: none !important;
   }
 }

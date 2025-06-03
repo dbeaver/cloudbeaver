@@ -134,8 +134,7 @@ export class MenuService {
         if (isMenu(item)) {
           return new MenuSubMenuItem({
             menu: item,
-            action: (isAction(item.action) ? this.createActionItem(context, item.action) : undefined) || undefined,
-          }) as IMenuItem;
+          });
         }
         return item;
       })

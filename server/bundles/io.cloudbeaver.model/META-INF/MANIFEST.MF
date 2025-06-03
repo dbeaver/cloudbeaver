@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Model
 Bundle-SymbolicName: io.cloudbeaver.model;singleton:=true
-Bundle-Version: 1.0.78.qualifier
-Bundle-Release-Date: 20250602
+Bundle-Version: 1.0.79.qualifier
+Bundle-Release-Date: 20250616
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .

@@ -88,7 +88,7 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(function P
         </ColoredContainer>
       </CommonDialogBody>
       <CommonDialogFooter className={s(styles, { commonDialogFooter: true })}>
-        <Button type="button" mod={['outlined']} onClick={props.rejectDialog}>
+        <Button type="button" variant="secondary" onClick={props.rejectDialog}>
           {translate('ui_processing_ok')}
         </Button>
       </CommonDialogFooter>

@@ -810,7 +810,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             dbStat.setString(5, userId);
             dbStat.executeUpdate();
         }
-        log.info(String.format("User updated: [userId=%s, isActive=%s]", userId, enabled));
+        log.info(String.format("User updated: [userId=%s, isActive=%s, reason=%s]", userId, enabled, disableReason));
     }
 
     @Override

@@ -1,0 +1,5 @@
+@layer base {
+  .dbv-kit-spinner {
+    --dbv-kit-spinner-stroke-color: var(--theme-primary);
+  }
+}

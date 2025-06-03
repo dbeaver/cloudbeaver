@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -67,14 +67,14 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
       </CommonDialogBody>
       <CommonDialogFooter className={s(styles, { footer: true })}>
         {clipboardService.clipboardAvailable && clipboardService.state !== 'denied' && (
-          <Button type="button" mod={['outlined']} onClick={getValueFromClipboard}>
+          <Button type="button" variant="secondary" onClick={getValueFromClipboard}>
             {translate('ui_clipboard')}
           </Button>
         )}
-        <Button type="button" mod={['outlined']} onClick={rejectDialog}>
+        <Button type="button" variant="secondary" onClick={rejectDialog}>
           {translate('ui_processing_cancel')}
         </Button>
-        <Button type="button" mod={['unelevated']} onClick={handleApply}>
+        <Button type="button" onClick={handleApply}>
           {translate('ui_processing_ok')}
         </Button>
       </CommonDialogFooter>

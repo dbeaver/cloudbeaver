@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -31,14 +31,14 @@ export const ScriptImportDialog: DialogComponent<null, boolean> = function Scrip
       </CommonDialogBody>
       <CommonDialogFooter className={s(styles, { footer: true })}>
         <div className={s(styles, { container: true })}>
-          <Button type="button" mod={['outlined']} onClick={rejectDialog}>
+          <Button type="button" variant="secondary" onClick={rejectDialog}>
             <Translate token="ui_processing_cancel" />
           </Button>
           <Fill />
-          <Button type="button" mod={['outlined']} onClick={() => resolveDialog(false)}>
+          <Button type="button" variant="secondary" onClick={() => resolveDialog(false)}>
             <Translate token="ui_no" />
           </Button>
-          <Button type="button" mod={['unelevated']} onClick={() => resolveDialog(true)}>
+          <Button type="button" onClick={() => resolveDialog(true)}>
             <Translate token="ui_yes" />
           </Button>
         </div>

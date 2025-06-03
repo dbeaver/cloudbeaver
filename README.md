@@ -25,70 +25,33 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
-### 25.0.5 2025-05-19
-- Added the ability to configure the default database or schema in the connection configuration;
-- A new setting to autosave scripts in the SQL editor appeared in global and users' preferences;
-- SQLite: added information about a table Strict mode to the table metadata section (thanks to @eusebe-cda);
-- Vietnamese localization has been added (thanks to @0xhanh).
-
-### 25.0.4 2025-05-05
+### 25.1.0 2025-06-02
+### Changes since 25.0.0:
 - Important:
   -    Connection templates were removed from the application. You can use the Connection Editor to create new connections.
-- Databases and drivers:
-  -    LibSQL: added the ability to use token authentication for connecting;
-  -    Clickhouse: driver has been updated to version 0.8.5.
-
-### 25.0.3 2025-04-21
-- Administration: log records now capture create, update, and delete actions for users, teams, and connections for improved tracking and transparency;
-- SQL Editor: auto-completion has been improved for aliases and camelCase entities;
-- Users DDL in Oracle is displayed in metadata editor on corresponding tab for users with Oracle administration permissions;
-- Different bug fixes and enhancements have been made.
-
-### 25.0.2 2025-04-07
-- Data Editor: improved table rendering to scale column width depending on the content.
-- Improved Navigation tree performance: lost connection does not lead to the application freezing anymore.
-- Different bug fixes and enhancements have been made.
-
-### 25.0.1 2025-03-24
-- Improved performance of the export/import functionality by optimizing disk memory consumption;
-- Enhanced initial configuration on stage security: if the initial setup time exceeds 1 hour, the server must be restarted.
-
-### 25.0 2025-03-03
-### Changes since 24.3.0:
-- General:
-  -    Added transaction log viewing for connections with manual commit mode. This allows users to see all modifying statements before committing;
-  -    Added an ability for all editors to reconnect if a connection has been lost;
-  -    Tooltips for metadata objects and SQL Editor tabs now include additional details about catalogs, schemas, and connections;
-  -    Added Ctrl + Shift + S (Cmd + Shift + S on Mac) shortcut for the "Save As Script" action;
-  -    Updated list of available shortcuts for macOS.
 - Administration:
-  -    Added system information data to the Product Information tab in the Administration panel. This provides administrators with quick access to essential system details, such as the server deployment type (e.g., Docker, Kubernetes), install path, Java version, and Java parameters;
-  -    The global access server URL has been added to the console log, making it easier to locate server installation information directly within the logs;
-  -    New environment variables were introduced for theme styling, SQL editor, and log viewer settings. You can use them for quick setup during the initial Docker configuration stage.
+  -    Log records now capture create, update, and delete actions for users, teams, and connections for improved tracking and transparency.
 - LDAP authorization:
-  -    Added the ability to match users from LDAP configuration with CloudBeaver users;
-  -    Added an option to specify a user login as an attribute parameter for LDAP providers;
-  -    CloudBeaver now uses EntityID or objectGUID to create new LDAP users in CloudBeaver to ensure uniqueness. This change enhances user identification and prevents conflicts while maintaining backward compatibility for existing users.
-- Deployment:
-  -    CloudBeaver now uses JDK 21 as its base Java image. If you use standard deployment and upgrade scripts, the new Java version will be applied automatically after the product update;
-  -    Changed the permission of the Docker volumes directory to enhance security and prevent any insecure actions by the "root" user. All new deployments will use the "dbeaver" user by default. For existing deployments running as the "root" user, this update will automatically adjust file permissions to ensure they are compatible with the new security model. There will be no manual intervention, and the service will continue to run as expected with the updated permissions.
-- Connections:
-  -    Enabled the possibility of switching a database connection to read-only mode. This mode can be activated in the connection dialog. Administrators can set this mode for any connection, while regular users can set it for their private connections only;
-  -    For Oracle and SQL Server connections, advanced database settings can now be used in the URL connection mode.
+  -    Added support for secure [LDAP authentication over SSL](https://github.com/dbeaver/cloudbeaver/wiki/LDAP-Authentication);
+  -    Brute force protection is now supported for LDAP authentication. All authentication methods on the application level have this security mechanism.
+- SQL Editor:
+  -    A new setting to autosave scripts in the SQL editor appeared in global and users' preferences;
+  -    Auto-completion has been improved for aliases and camelCase entities.
 - Data Editor:
-  -    Auto-suggestions for column names in the Data Editor filter field were introduced to avoid typing mistakes;
-  -    Introduced the ability to insert data in tables without unique keys: you can import data from CSV files or insert entire rows directly via UI;
-  -    The collapse of the grouping panel doesn't lead to the complete panel cleaning anymore.
-- Data transfer:
-  -    Added the ability to use default spreadsheet names (e.g. Sheet0, Sheet1) for exporting to XLSX;
-  -    An option to replace line break characters on any custom value was added when exporting to CSV.
-- Navigator tree: 
-  -    An option to show metadata object comments was added. You can enable it in the database navigator settings panel;
-  -    Introduced the ability to create connections not only on the initial level but in folders and sub-folders directly;
-  -    Fixed the display of objects with long names (more than 32 characters) - now, such names will be displayed entirely and not in a cropped format.
-- Drivers:
-  -    The MariaDB driver has been updated to version 3.5.1;
-  -    The SQLite driver has been updated to version 3.48.0.0.
+  -    Improved table rendering to scale column width depending on the content;
+  -    Accessibility: improved keyboard navigation by sorting buttons in column headers.
+- General:
+  -    Added the ability to configure the default database or schema in the connection configuration;
+  -    Enhanced initial configuration stage security: a server needs to be restarted if the initial setup time exceeds 1 hour;
+  -    Improved Navigation tree performance: lost connection does not lead to the application freezing anymore;
+  -    Data transfer: Improved export/import functionality performance by optimizing disk memory consumption;
+  -    Vietnamese localization has been added (thanks to [0xhanh](https://github.com/0xhanh)).
+- Databases and drivers:
+  -    Clickhouse: driver has been updated to version 0.8.5;
+  -    DuckDB: expanded the list of system objects that can be hidden in the Navigation tree;
+  -    LibSQL: added the ability to connect using token authentication;
+  -    Oracle: users' DDL in Oracle is displayed in the metadata editor on the corresponding tab for users with Oracle administration permissions;
+  -    SQLite: added information about a table's Strict mode to the table metadata section (thanks to [eusebe-cda](https://github.com/eusebe-cda)).
 
 ## Contribution
 As a community-driven open-source project, we warmly welcome contributions through GitHub pull requests. 

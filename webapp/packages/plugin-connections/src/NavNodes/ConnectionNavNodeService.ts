@@ -32,6 +32,7 @@ import {
   ConnectionFolderEventHandler,
   type IConnectionFolderEvent,
 } from '@cloudbeaver/core-connections';
+import { NavigationTreeService } from '@cloudbeaver/plugin-navigation-tree';
 
 @injectable()
 export class ConnectionNavNodeService extends Dependency {
@@ -41,8 +42,7 @@ export class ConnectionNavNodeService extends Dependency {
     private readonly containerResource: ContainerResource,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navNodeManagerService: NavNodeManagerService,
-    // TODO: https://dbeaver.atlassian.net/browse/CB-6272
-    // private readonly navigationTreeService: NavigationTreeService,
+    private readonly navigationTreeService: NavigationTreeService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly connectionFolderEventHandler: ConnectionFolderEventHandler,
   ) {
@@ -250,9 +250,8 @@ export class ConnectionNavNodeService extends Dependency {
 
       this.navTreeResource.insertToNode(parentId, insertIndex, connection.nodePath);
     } finally {
-      // TODO: https://dbeaver.atlassian.net/browse/CB-6272
-      // await this.navNodeInfoResource.loadNodeParents(connection.nodePath);
-      // await this.navigationTreeService.showNode(connection.nodePath, this.navNodeInfoResource.getParents(connection.nodePath));
+      await this.navNodeInfoResource.loadNodeParents(connection.nodePath);
+      await this.navigationTreeService.showNode(connection.nodePath, this.navNodeInfoResource.getParents(connection.nodePath));
     }
   }
 

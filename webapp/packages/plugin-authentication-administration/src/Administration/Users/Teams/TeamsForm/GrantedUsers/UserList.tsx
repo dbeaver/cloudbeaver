@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ export const UserList = observer<Props>(function UserList({ userList, grantedUse
     <Group className={s(styles, { group: true })} border box medium overflow vertical>
       <GrantedUsersTableHeader className={s(styles, { header: true })} filterState={filterState} disabled={disabled}>
         <Container keepSize>
-          <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>
+          <Button disabled={disabled || !selected} onClick={grant}>
             {translate('ui_add')}
           </Button>
         </Container>

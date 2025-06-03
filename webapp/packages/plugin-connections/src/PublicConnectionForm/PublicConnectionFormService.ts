@@ -17,7 +17,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { executorHandlerFilter, ExecutorInterrupter, type IExecutorHandler } from '@cloudbeaver/core-executor';
 import type { ResourceKey, ResourceKeySimple } from '@cloudbeaver/core-resource';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import { FormMode, OptionsPanelService } from '@cloudbeaver/core-ui';
+import { FormMode, OptionsPanelService, type OptionsPanelCloseEventData } from '@cloudbeaver/core-ui';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 import { ConnectionFormState } from '../ConnectionForm/ConnectionFormState.js';
@@ -148,15 +148,17 @@ export class PublicConnectionFormService {
     }
   };
 
-  private readonly closeHandler: IExecutorHandler<any> = async (data, contexts) => {
-    const confirmed = await this.showUnsavedChangesDialog();
+  private readonly closeHandler: IExecutorHandler<OptionsPanelCloseEventData> = async (data, contexts) => {
+    if (data === 'before') {
+      const confirmed = await this.showUnsavedChangesDialog();
 
-    if (!confirmed) {
-      ExecutorInterrupter.interrupt(contexts);
-      return;
+      if (!confirmed) {
+        ExecutorInterrupter.interrupt(contexts);
+        return;
+      }
+
+      this.clearFormState();
     }
-
-    this.clearFormState();
   };
 
   private async showUnsavedChangesDialog(): Promise<boolean> {

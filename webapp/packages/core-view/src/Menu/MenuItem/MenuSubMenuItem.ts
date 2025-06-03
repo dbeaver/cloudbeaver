@@ -1,12 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import type { IMenu } from '../IMenu.js';
-import type { IMenuActionItem } from './IMenuActionItem.js';
 import type { IMenuSubMenuEvents, IMenuSubMenuItem, IMenuSubMenuItemOptions, MenuSubMenuItemIconComponent } from './IMenuSubMenuItem.js';
 import { MenuItem } from './MenuItem.js';
 
@@ -16,10 +15,6 @@ export class MenuSubMenuItem<TExtraProps = unknown> extends MenuItem implements 
   readonly icon?: string;
   readonly tooltip?: string;
 
-  /**
-   * experimental, can be changed
-   */
-  readonly action?: IMenuActionItem;
   override readonly events?: IMenuSubMenuEvents;
   readonly hidden: boolean;
   readonly getExtraProps?: () => TExtraProps;
@@ -31,7 +26,6 @@ export class MenuSubMenuItem<TExtraProps = unknown> extends MenuItem implements 
     this.label = options.label;
     this.icon = options.icon;
     this.tooltip = options.tooltip;
-    this.action = options.action;
     this.getExtraProps = options.getExtraProps;
     this.iconComponent = options.iconComponent;
     this.hidden = false;

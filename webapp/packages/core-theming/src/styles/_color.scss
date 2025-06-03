@@ -10,15 +10,15 @@
   $feat-color: mdc-feature-create-target($query, color);
 
   /*:root {*/
-    @include mdc-feature-targets($feat-color) {
-      @each $style in map-keys($mdc-theme-property-values) {
-        --theme-#{$style}: #{map-get($mdc-theme-property-values, $style)};
-      }
+  @include mdc-feature-targets($feat-color) {
+    @each $style in map-keys($mdc-theme-property-values) {
+      --theme-#{$style}: #{map-get($mdc-theme-property-values, $style)};
     }
+  }
   /*}*/
 
   @each $style in map-keys($mdc-theme-property-values) {
-    @if $style != "background" and $style != "surface" and $style != "on-surface" {
+    @if $style != 'background' and $style != 'surface' and $style != 'on-surface' {
       &.theme-text-#{$style},
       .theme-text-#{$style} {
         @include theme-ripple-color($query, $style);
@@ -84,12 +84,18 @@
   }
 
   // CSS rules for using primary and secondary (plus light/dark variants) as background colors.
-  @each $style in ("primary", "secondary", "positive") {
+  @each $style in ('primary', 'secondary', 'positive') {
     &.theme-background-#{$style},
     .theme-background-#{$style} {
       @include mdc-feature-targets($feat-color) {
         @include mdc-theme-prop(background-color, $style, true);
       }
     }
+  }
+}
+
+@layer components {
+  * {
+    outline-color: var(--theme-primary);
   }
 }

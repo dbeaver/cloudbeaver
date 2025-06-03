@@ -63,7 +63,7 @@ export const TextValueTruncatedMessage = observer<Props>(function TextValueTrunc
     <QuotaPlaceholder model={model} resultIndex={resultIndex} elementKey={elementKey} keepSize>
       {isTextColumn && (
         <Container keepSize>
-          <Button disabled={model.isLoading()} onClick={pasteFullText}>
+          <Button variant="secondary" disabled={model.isLoading()} onClick={pasteFullText}>
             {`${translate('ui_show_more')} (${valueSize})`}
           </Button>
         </Container>

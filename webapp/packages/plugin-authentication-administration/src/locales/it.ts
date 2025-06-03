@@ -85,4 +85,13 @@ export default [
 
   ['plugin_authentication_administration_team_form_edit_label', 'Team editing form'],
   ['plugin_authentication_administration_user_form_edit_label', 'User editing form'],
+
+  [
+    'plugin_authentication_administration_user_username_validation_error',
+    "User's name may not contain the following symbols / : \" \\ ' <> | ? * and can't start with a dot",
+  ],
+  [
+    'plugin_authentication_administration_team_id_validation_error',
+    "Team's ID may not contain the following symbols / : \" \\ ' <> | ? * and can't start with a dot",
+  ],
 ];

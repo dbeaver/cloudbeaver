@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -48,11 +48,11 @@ export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ servic
             </Container>
             <Container keepSize noWrap center gap compact>
               {onClose && (
-                <Button type="button" disabled={state.isDisabled} mod={['outlined']} onClick={onClose}>
+                <Button type="button" disabled={state.isDisabled} variant="secondary" onClick={onClose}>
                   {translate('ui_processing_cancel')}
                 </Button>
               )}
-              <Button type="button" disabled={state.isDisabled || !changed} mod={['unelevated']} onClick={() => form.submit()}>
+              <Button type="button" disabled={state.isDisabled || !changed} onClick={() => form.submit()}>
                 {translate(!editing ? 'ui_processing_create' : 'ui_processing_save')}
               </Button>
             </Container>

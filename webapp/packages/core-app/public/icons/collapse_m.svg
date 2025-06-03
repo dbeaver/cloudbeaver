@@ -1,5 +1,13 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 15L19 21L5 21L12 15Z" fill="#338ECC"/>
-<path d="M12 9L5 3H19L12 9Z" fill="#338ECC"/>
-<rect x="2" y="11" width="20" height="2" fill="#338ECC"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #3387c5;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M12.32,15.31l4.77,5.33H7.57l4.76-5.33M12.32,13.29l-7.77,8.71h15.56l-7.79-8.71h0Z"/>
+  <path class="cls-1" d="M17.1,4.36l-4.76,5.33-4.77-5.33h9.53M20.11,3H4.56l7.79,8.71,7.77-8.71h0Z"/>
+  <rect class="cls-1" x="3" y="11.82" width="18.67" height="1.36"/>
 </svg>

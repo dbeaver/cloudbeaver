@@ -146,4 +146,13 @@ export default [
 
   ['plugin_authentication_administration_team_form_edit_label', 'Форма редактирования команды'],
   ['plugin_authentication_administration_user_form_edit_label', 'Форма редактирования пользователя'],
+
+  [
+    'plugin_authentication_administration_user_username_validation_error',
+    'Имя пользователя не может содержать следующие символы / : " \\ \' <> | ? * и не может начинаться с точки',
+  ],
+  [
+    'plugin_authentication_administration_team_id_validation_error',
+    'ID команды не может содержать следующие символы / : " \\ \' <> | ? * и не может начинаться с точки',
+  ],
 ];

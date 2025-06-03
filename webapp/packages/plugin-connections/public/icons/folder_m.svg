@@ -1,7 +1,17 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="root">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M3 2C1.89543 2 1 2.89543 1 4V19C1 20.1046 1.89543 21 3 21H9.51212C9.18046 20.0617 9 19.0519 9 18C9 13.0294 13.0294 9 18 9C19.8501 9 21.5699 9.55827 23 10.5155V6.2C23 5.09543 22.1046 4.2 21 4.2H13.0704C12.4017 4.2 11.7772 3.8658 11.4063 3.3094L11.1271 2.8906C10.7561 2.3342 10.1317 2 9.46297 2H3Z" fill="#88C7EA"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M9.05493 19H3L3 4L9.46297 4L9.74217 4.4188C10.484 5.5316 11.733 6.2 13.0704 6.2L21 6.2V9.51212C21.7121 9.76379 22.383 10.1025 23 10.5155V6.2C23 5.09543 22.1046 4.2 21 4.2H13.0704C12.4017 4.2 11.7772 3.8658 11.4063 3.3094L11.1271 2.8906C10.7561 2.3342 10.1317 2 9.46297 2H3C1.89543 2 1 2.89543 1 4V19C1 20.1046 1.89543 21 3 21H9.51212C9.28703 20.3632 9.13159 19.6935 9.05493 19Z" fill="#338ECC"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M19 13H17V17H13V19H17V23H19V19H23V17H19V13Z" fill="#52C41A"/>
-</g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #4fa143;
+      }
+
+      .cls-2 {
+        fill: #3387c5;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" x="17" y="14.67" width="1.33" height="6.67"/>
+  <rect class="cls-1" x="17" y="14.67" width="1.33" height="6.67" transform="translate(-.33 35.67) rotate(-90)"/>
+  <path class="cls-2" d="M11.71,18.67H3.67v-10.67h16v4.35c.47.17.92.39,1.33.66v-6.35h-8.67l-2.67-2.67H2.33v16h9.68c-.15-.43-.26-.87-.31-1.33Z"/>
 </svg>
