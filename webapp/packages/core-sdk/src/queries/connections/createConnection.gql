@@ -1,4 +1,4 @@
-mutation createConnection($projectId: ID!, $config: ConnectionConfig!, $includeProperties: Boolean!) {
+mutation createConnection($projectId: ID!, $config: ConnectionConfig!) {
   connection: createConnection(projectId: $projectId, config: $config) {
     ...DatabaseConnection
   }

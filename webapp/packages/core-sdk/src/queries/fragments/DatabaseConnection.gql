@@ -17,8 +17,6 @@ fragment DatabaseConnection on ConnectionInfo {
 
   mainPropertyValues
 
-  properties @include(if: $includeProperties)
-
   requiredAuth
 
   features
