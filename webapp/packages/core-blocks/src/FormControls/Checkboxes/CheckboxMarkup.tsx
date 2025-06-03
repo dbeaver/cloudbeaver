@@ -27,7 +27,7 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
   indeterminate,
   className,
   caption,
-  size = 'small',
+  size = 'medium',
   variant = 'primary',
   title,
   readOnly,
