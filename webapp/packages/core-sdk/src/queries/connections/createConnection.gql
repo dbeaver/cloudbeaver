@@ -1,7 +1,6 @@
 mutation createConnection(
   $projectId: ID!
   $config: ConnectionConfig!
-  $includeAuthProperties: Boolean!
   $includeNetworkHandlersConfig: Boolean!
   $includeCredentialsSaved: Boolean!
   $includeAuthNeeded: Boolean!

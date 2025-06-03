@@ -2,7 +2,6 @@ mutation setConnectionNavigatorSettings(
   $projectId: ID!
   $connectionId: ID!
   $settings: NavigatorSettingsInput!
-  $includeAuthProperties: Boolean!
   $includeNetworkHandlersConfig: Boolean!
   $includeCredentialsSaved: Boolean!
   $includeAuthNeeded: Boolean!

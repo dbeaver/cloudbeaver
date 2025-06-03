@@ -2,7 +2,6 @@ mutation createConnectionFromNode(
   $projectId: ID!
   $nodePath: String!
   $config: ConnectionConfig
-  $includeAuthProperties: Boolean!
   $includeNetworkHandlersConfig: Boolean!
   $includeCredentialsSaved: Boolean!
   $includeAuthNeeded: Boolean!

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,6 +9,7 @@ import { action, computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import {
+  ConnectionInfoAuthPropertiesResource,
   ConnectionInfoResource,
   type ConnectionInitConfig,
   type DatabaseConnection,
@@ -18,7 +19,7 @@ import {
   USER_NAME_PROPERTY_ID,
 } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
+import { NetworkHandlerAuthType, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import type { IConnectionAuthenticationConfig } from '../../ConnectionAuthentication/IConnectionAuthenticationConfig.js';
@@ -27,6 +28,7 @@ interface IState extends ILoadableState {
   readonly authModelId: string | null;
   driver: DBDriver | null;
   connection: DatabaseConnection | null;
+  connectionAuthProperties: ObjectPropertyInfo[];
   config: IConnectionAuthenticationConfig;
   authenticating: boolean;
   loading: boolean;
@@ -46,6 +48,7 @@ export function useDatabaseCredentialsAuthDialog(
 ) {
   const connectionInfoResource = useService(ConnectionInfoResource);
   const dbDriverResource = useService(DBDriverResource);
+  const connectionInfoAuthPropertiesResource = useService(ConnectionInfoAuthPropertiesResource);
 
   const state: IState = useObservableRef(
     () => ({
@@ -56,6 +59,7 @@ export function useDatabaseCredentialsAuthDialog(
 
         return this.connection?.authModel || this.driver?.defaultAuthModel || null;
       },
+      connectionAuthProperties: [] as ObjectPropertyInfo[],
       connection: null as DatabaseConnection | null,
       driver: null as DBDriver | null,
       authenticating: false,
@@ -77,16 +81,15 @@ export function useDatabaseCredentialsAuthDialog(
           this.exception = null;
           this.loading = true;
 
-          const connection = await this.connectionInfoResource.load(this.key, [
-            'includeAuthProperties',
-            'includeNetworkHandlersConfig',
-            'includeAuthNeeded',
+          const [connectionWithAuthProperties, connection] = await Promise.all([
+            this.connectionInfoAuthPropertiesResource.load(this.key),
+            this.connectionInfoResource.load(this.key, ['includeNetworkHandlersConfig', 'includeAuthNeeded']),
           ]);
 
           const driver = await this.dbDriverResource.load(connection.driverId);
 
           if (connection.authNeeded) {
-            const property = connection.authProperties.find(property => property.id === USER_NAME_PROPERTY_ID);
+            const property = connectionWithAuthProperties?.authProperties.find(property => property.id === USER_NAME_PROPERTY_ID);
 
             if (property?.value) {
               this.config.credentials[USER_NAME_PROPERTY_ID] = property.value;
@@ -108,6 +111,7 @@ export function useDatabaseCredentialsAuthDialog(
           }
 
           this.config.saveCredentials = connection.saveCredentials;
+          this.connectionAuthProperties = connectionWithAuthProperties?.authProperties || [];
           this.connection = connection;
           this.driver = driver;
 
@@ -167,6 +171,7 @@ export function useDatabaseCredentialsAuthDialog(
     {
       authModelId: computed,
       config: observable,
+      connectionAuthProperties: observable.ref,
       connection: observable.ref,
       driver: observable.ref,
       authenticating: observable.ref,
@@ -177,7 +182,7 @@ export function useDatabaseCredentialsAuthDialog(
       load: action.bound,
       login: action.bound,
     },
-    { connectionInfoResource, dbDriverResource, key, networkHandlers, resetCredentials, onInit },
+    { connectionInfoResource, dbDriverResource, key, networkHandlers, resetCredentials, connectionInfoAuthPropertiesResource, onInit },
   );
 
   return state;

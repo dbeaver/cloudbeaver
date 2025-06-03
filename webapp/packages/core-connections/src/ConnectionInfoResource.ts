@@ -52,7 +52,6 @@ export type Connection = DatabaseConnection & {
 };
 export type ConnectionInitConfig = Omit<
   InitConnectionMutationVariables,
-  | 'includeAuthProperties'
   | 'includeNetworkHandlersConfig'
   | 'includeAuthNeeded'
   | 'includeCredentialsSaved'
@@ -622,7 +621,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   getDefaultIncludes(): ConnectionInfoIncludes {
     return {
       includeNetworkHandlersConfig: false,
-      includeAuthProperties: false,
       includeAuthNeeded: false,
       includeCredentialsSaved: false,
       includeProperties: false,
