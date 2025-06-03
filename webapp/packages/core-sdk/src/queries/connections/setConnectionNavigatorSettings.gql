@@ -5,7 +5,6 @@ mutation setConnectionNavigatorSettings(
   $includeCredentialsSaved: Boolean!
   $includeAuthNeeded: Boolean!
   $includeProperties: Boolean!
-  $includeProviderProperties: Boolean!
 ) {
   connection: setConnectionNavigatorSettings(projectId: $projectId, id: $connectionId, settings: $settings) {
     ...DatabaseConnection

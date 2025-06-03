@@ -9,7 +9,6 @@ mutation initConnection(
   $includeCredentialsSaved: Boolean!
   $includeAuthNeeded: Boolean!
   $includeProperties: Boolean!
-  $includeProviderProperties: Boolean!
 ) {
   connection: initConnection(
     projectId: $projectId
