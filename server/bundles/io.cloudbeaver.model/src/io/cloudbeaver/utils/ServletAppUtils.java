@@ -44,6 +44,9 @@ public class ServletAppUtils {
     private static final String HEADER_ORIGIN = "Origin";
     private static final String HEADER_REFERER = "Referer";
 
+    private static final String HEADER_FORWARDED_SCHEME = "X-Forwarded-Scheme";
+    private static final String HEADER_FORWARDED_HOST = "X-Forwarded-Host";
+
     private static final Log log = Log.getLog(ServletAppUtils.class);
 
     public static String getRelativePath(String path, String curDir) {
@@ -286,6 +289,11 @@ public class ServletAppUtils {
         String origin = request.getHeader(HEADER_ORIGIN);
         if (CommonUtils.isEmpty(origin)) {
             origin = request.getHeader(HEADER_REFERER);
+        }
+        String forwardedScheme = request.getHeader(HEADER_FORWARDED_SCHEME);
+        String forwardedHost = request.getHeader(HEADER_FORWARDED_HOST);
+        if (CommonUtils.isNotEmpty(forwardedScheme) && CommonUtils.isNotEmpty(forwardedHost)) {
+            origin = forwardedHost + "://" + forwardedScheme;
         }
         if (CommonUtils.isEmpty(origin)) {
             URI requestUrl = URI.create(request.getRequestURL().toString());
