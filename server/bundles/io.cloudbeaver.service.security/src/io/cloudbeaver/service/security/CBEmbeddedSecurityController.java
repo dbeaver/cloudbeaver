@@ -2537,7 +2537,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull DBRProgressMonitor progressMonitor,
         @Nullable String activeUserId,
         boolean createNewUserIfNotExist,
-        String authRole,
+        @Nullable String authRole,
         SMAuthProviderCustomConfiguration providerConfig
     ) throws DBException {
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
@@ -2563,17 +2563,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             userId = authProvider.isCaseInsensitive() ? userIdFromCredentials.toLowerCase() : userIdFromCredentials;
             if (!isSubjectExists(userId)) {
                 log.debug("Create user: " + userId);
-                try (Connection dbCon = database.openConnection()) {
-                    createUser(
-                        dbCon,
-                        userId,
-                        (Map<String, String>) userCredentials.get(SMStandardMeta.KEY_META_PARAMS),
-                        true,
-                        resolveUserAuthRole(null, authRole)
-                    );
-                } catch (SQLException e) {
-                    throw new DBException("Error saving user in database", e);
-                }
+                createUser(
+                    userId,
+                    (Map<String, String>) userCredentials.get(SMStandardMeta.KEY_META_PARAMS),
+                    true,
+                    resolveUserAuthRole(null, authRole)
+                );
             }
             setUserCredentials(userId, authProvider.getId(), userCredentials);
         } else if (userId == null) {
