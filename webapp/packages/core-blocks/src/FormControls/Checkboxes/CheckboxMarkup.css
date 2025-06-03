@@ -11,9 +11,6 @@
     --dbv-kit-checkbox-border-color: color-mix(in srgb, var(--theme-on-secondary), black 20%);
 
     & .dbv-kit-checkbox {
-      display: flex;
-      align-items: center;
-
       &[data-disabled='true'] {
         & .dbv-kit-checkbox__check {
           --dbv-kit-checkbox-background-checked: color-mix(in srgb, var(--theme-on-secondary), black 20%);
