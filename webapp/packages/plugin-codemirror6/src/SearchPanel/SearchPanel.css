@@ -1,0 +1,14 @@
+@layer components {
+  .search-panel {
+    --dbv-kit-control-outline-offset: -2px;
+    --dbv-kit-icon-btn-outline-offset: 0;
+  }
+  .search-panel__input {
+    .dbv-kit-input {
+      padding-right: 88px;
+    }
+    .dbv-kit-icon-button {
+      --dbv-kit-icon-btn-primary-background: var(--theme-secondary);
+    }
+  }
+}

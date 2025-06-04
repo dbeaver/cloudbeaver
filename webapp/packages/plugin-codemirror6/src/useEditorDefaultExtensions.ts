@@ -7,7 +7,7 @@
  */
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { bracketMatching, foldGutter, indentOnInput, syntaxHighlighting } from '@codemirror/language';
-import { highlightSelectionMatches } from '@codemirror/search';
+import { highlightSelectionMatches, search, searchKeymap } from '@codemirror/search';
 import { Compartment, type Extension } from '@codemirror/state';
 import {
   crosshairCursor,
@@ -23,6 +23,7 @@ import {
 } from '@codemirror/view';
 import { classHighlighter } from '@lezer/highlight';
 import { useRef } from 'react';
+import { createSearchPanel } from './SearchPanel/SearchPanel.js';
 
 import { GlobalConstants, isObjectsEqual } from '@cloudbeaver/core-utils';
 import { clsx } from '@dbeaver/ui-kit';
@@ -35,6 +36,7 @@ DEFAULT_KEY_MAP.push({
   key: 'Mod-s',
   run: () => true,
 });
+DEFAULT_KEY_MAP.push(...searchKeymap);
 
 const defaultExtensionsFlags: IDefaultExtensions = {
   lineNumbers: false,
@@ -52,6 +54,7 @@ const defaultExtensionsFlags: IDefaultExtensions = {
   rectangularSelection: true,
   keymap: true,
   lineWrapping: false,
+  search: true,
 };
 
 export interface IDefaultExtensions {
@@ -70,6 +73,10 @@ export interface IDefaultExtensions {
   rectangularSelection?: boolean;
   keymap?: boolean;
   lineWrapping?: boolean;
+  search?: boolean;
+  searchOptions?: {
+    createPanel?: (view: EditorView) => { dom: HTMLElement };
+  };
 }
 
 const extensionMap = {
@@ -106,6 +113,10 @@ const extensionMap = {
   rectangularSelection,
   keymap: () => keymap.of(DEFAULT_KEY_MAP),
   lineWrapping: () => EditorView.lineWrapping,
+  search: () =>
+    search({
+      createPanel: createSearchPanel,
+    }),
 };
 
 const DEFAULT_EXTENSIONS_COMPARTMENT = new Compartment();
