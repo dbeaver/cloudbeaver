@@ -1,0 +1,6 @@
+---
+engines:
+  eslint-8:
+    enabled: false
+  eslint-9:
+    enabled: false
