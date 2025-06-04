@@ -36,7 +36,6 @@ import {
   type InitConnectionMutationVariables,
   type NavigatorSettingsInput,
   type TestConnectionMutation,
-  type UserConnectionAuthPropertiesFragment,
 } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 
@@ -47,9 +46,7 @@ import type { DatabaseConnection } from './DatabaseConnection.js';
 import { DBDriverResource } from './DBDriverResource.js';
 import { parseConnectionKey } from './parseConnectionKey.js';
 
-export type Connection = DatabaseConnection & {
-  authProperties?: UserConnectionAuthPropertiesFragment[];
-};
+export type Connection = DatabaseConnection;
 export type ConnectionInitConfig = InitConnectionMutationVariables;
 export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'>;
 
@@ -463,16 +460,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     });
     this.onDataOutdated.execute(key);
   }
-
-  // async updateSessionConnections(): Promise<boolean> {
-  //   if (!this.changed) {
-  //     return false;
-  //   }
-
-  //   await this.graphQLService.sdk.refreshSessionConnections();
-  //   this.changed = false;
-  //   return true;
-  // }
 
   cleanNewFlags(): void {
     for (const connection of this.data.values()) {

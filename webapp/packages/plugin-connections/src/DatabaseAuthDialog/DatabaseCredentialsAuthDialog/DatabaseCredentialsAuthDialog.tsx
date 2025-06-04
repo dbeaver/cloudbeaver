@@ -59,7 +59,7 @@ export const DatabaseCredentialsAuthDialog = observer<Props>(function DatabaseCr
             <ConnectionAuthenticationFormLoader
               config={dialog.config}
               authModelId={dialog.authModelId}
-              authProperties={dialog.connectionAuthProperties}
+              authProperties={dialog.connectionAuthProperties?.authProperties}
               networkHandlers={networkHandlers}
               formId={`${connection.projectId}:${connection.connectionId}`}
               projectId={connection.projectId}

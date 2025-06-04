@@ -4,31 +4,15 @@ fragment DatabaseConnection on ConnectionInfo {
   name
   description
   driverId
-
   connected
   readOnly
-
-  saveCredentials
-  credentialsSaved
-  sharedCredentials
-
   folder
   nodePath
-
-  mainPropertyValues
-
-  requiredAuth
-
   features
   supportedDataFormats
-
-  authNeeded
-  authModel
-
   navigatorSettings {
     ...AllNavigatorSettings
   }
-
   canViewSettings
   canEdit
   canDelete

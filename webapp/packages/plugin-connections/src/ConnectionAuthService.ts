@@ -9,6 +9,7 @@ import { AuthProviderService, UserInfoResource } from '@cloudbeaver/core-authent
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   type Connection,
+  ConnectionInfoAuthPropertiesResource,
   type ConnectionInfoNetworkHandlers,
   ConnectionInfoNetworkHandlersResource,
   ConnectionInfoResource,
@@ -29,6 +30,7 @@ export class ConnectionAuthService extends Dependency {
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionInfoNetworkHandlersResource: ConnectionInfoNetworkHandlersResource,
+    private readonly connectionInfoAuthPropertiesResource: ConnectionInfoAuthPropertiesResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly authProviderService: AuthProviderService,
     userInfoResource: UserInfoResource,
@@ -84,8 +86,10 @@ export class ConnectionAuthService extends Dependency {
       }
     }
 
-    if (connection.requiredAuth) {
-      const state = await this.authProviderService.requireProvider(connection.requiredAuth);
+    const connectionAuthProperties = await this.connectionInfoAuthPropertiesResource.load(key);
+
+    if (connectionAuthProperties.requiredAuth) {
+      const state = await this.authProviderService.requireProvider(connectionAuthProperties.requiredAuth);
 
       if (!state) {
         return connection;
@@ -101,7 +105,7 @@ export class ConnectionAuthService extends Dependency {
       .networkHandlersConfig!.filter(handler => handler.enabled && (!handler.savePassword || resetCredentials))
       .map(handler => handler.id);
 
-    if (connection.authNeeded || (connection.credentialsSaved && resetCredentials) || networkHandlers.length > 0) {
+    if (connectionAuthProperties.authNeeded || (connectionAuthProperties.credentialsSaved && resetCredentials) || networkHandlers.length > 0) {
       const result = await this.commonDialogService.open(DatabaseAuthDialog, {
         connection: key,
         networkHandlers,

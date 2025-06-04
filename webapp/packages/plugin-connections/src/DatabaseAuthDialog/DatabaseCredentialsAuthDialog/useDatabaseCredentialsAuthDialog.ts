@@ -9,18 +9,18 @@ import { action, computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import {
+  type ConnectionInfoAuthProperties,
   ConnectionInfoAuthPropertiesResource,
   ConnectionInfoNetworkHandlersResource,
   ConnectionInfoResource,
   type ConnectionInitConfig,
-  type DatabaseConnection,
   type DBDriver,
   DBDriverResource,
   type IConnectionInfoParams,
   USER_NAME_PROPERTY_ID,
 } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { NetworkHandlerAuthType, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import type { IConnectionAuthenticationConfig } from '../../ConnectionAuthentication/IConnectionAuthenticationConfig.js';
@@ -28,8 +28,7 @@ import type { IConnectionAuthenticationConfig } from '../../ConnectionAuthentica
 interface IState extends ILoadableState {
   readonly authModelId: string | null;
   driver: DBDriver | null;
-  connection: DatabaseConnection | null;
-  connectionAuthProperties: ObjectPropertyInfo[];
+  connectionAuthProperties: ConnectionInfoAuthProperties | null;
   config: IConnectionAuthenticationConfig;
   authenticating: boolean;
   loading: boolean;
@@ -55,14 +54,13 @@ export function useDatabaseCredentialsAuthDialog(
   const state: IState = useObservableRef(
     () => ({
       get authModelId() {
-        if (!this.connection?.authNeeded && !this.resetCredentials) {
+        if (!this.connectionAuthProperties?.authNeeded && !this.resetCredentials) {
           return null;
         }
 
-        return this.connection?.authModel || this.driver?.defaultAuthModel || null;
+        return this.connectionAuthProperties?.authModel || this.driver?.defaultAuthModel || null;
       },
-      connectionAuthProperties: [] as ObjectPropertyInfo[],
-      connection: null as DatabaseConnection | null,
+      connectionAuthProperties: null as ConnectionInfoAuthProperties | null,
       driver: null as DBDriver | null,
       authenticating: false,
       loading: false,
@@ -83,7 +81,7 @@ export function useDatabaseCredentialsAuthDialog(
           this.exception = null;
           this.loading = true;
 
-          const [connectionWithAuthProperties, connection, connectionNetworkHandlersConfig] = await Promise.all([
+          const [connectionAuthProperties, connection, connectionNetworkHandlersConfig] = await Promise.all([
             this.connectionInfoAuthPropertiesResource.load(this.key),
             this.connectionInfoResource.load(this.key),
             this.connectionInfoNetworkHandlersLoader.load(this.key),
@@ -91,8 +89,8 @@ export function useDatabaseCredentialsAuthDialog(
 
           const driver = await this.dbDriverResource.load(connection.driverId);
 
-          if (connection.authNeeded) {
-            const property = connectionWithAuthProperties?.authProperties.find(property => property.id === USER_NAME_PROPERTY_ID);
+          if (connectionAuthProperties.authNeeded) {
+            const property = connectionAuthProperties?.authProperties.find(property => property.id === USER_NAME_PROPERTY_ID);
 
             if (property?.value) {
               this.config.credentials[USER_NAME_PROPERTY_ID] = property.value;
@@ -113,9 +111,8 @@ export function useDatabaseCredentialsAuthDialog(
             }
           }
 
-          this.config.saveCredentials = connection.saveCredentials;
-          this.connectionAuthProperties = connectionWithAuthProperties?.authProperties || [];
-          this.connection = connection;
+          this.config.saveCredentials = connectionAuthProperties.saveCredentials;
+          this.connectionAuthProperties = connectionAuthProperties;
           this.driver = driver;
 
           this.loaded = true;
@@ -175,7 +172,6 @@ export function useDatabaseCredentialsAuthDialog(
       authModelId: computed,
       config: observable,
       connectionAuthProperties: observable.ref,
-      connection: observable.ref,
       driver: observable.ref,
       authenticating: observable.ref,
       loading: observable.ref,
