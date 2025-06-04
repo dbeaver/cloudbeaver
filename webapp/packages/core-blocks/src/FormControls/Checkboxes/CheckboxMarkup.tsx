@@ -8,7 +8,6 @@
 
 import { Checkbox as UiKitCheckbox, clsx } from '@dbeaver/ui-kit';
 import './CheckboxMarkup.css';
-import { useLayoutEffect, useRef } from 'react';
 import type { ControlSize } from '@dbeaver/ui-kit/types/controls';
 
 export type CheckboxMod = 'primary' | 'surface' | 'small';
@@ -34,17 +33,9 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
   children,
   ...rest
 }) {
-  const checkboxRef = useRef<HTMLInputElement>(null);
-
-  useLayoutEffect(() => {
-    if (checkboxRef.current) {
-      checkboxRef.current.indeterminate = indeterminate || false;
-    }
-  });
-
   return (
     <div className={clsx('checkboxMarkup', `checkboxMarkup--${variant}`, className)} title={title}>
-      <UiKitCheckbox ref={checkboxRef} id={id || rest.name} indeterminate={indeterminate} disabled={rest.disabled || readOnly} size={size} {...rest}>
+      <UiKitCheckbox id={id || rest.name} indeterminate={indeterminate} disabled={rest.disabled || readOnly} size={size} {...rest}>
         {label}
         {caption && <span className="checkboxCaption">{caption}</span>}
       </UiKitCheckbox>
