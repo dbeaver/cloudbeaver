@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { DatabaseConnectionCustomOptionsFragment } from '@cloudbeaver/core-sdk';
 import type { DBDriver } from './DBDriverResource.js';
+import type { ConnectionInfoCustomOptions } from './ConnectionInfoCustomOptionsResource.js';
 
-export function isJDBCConnection(driver?: DBDriver, connection?: DatabaseConnectionCustomOptionsFragment): boolean {
+export function isJDBCConnection(driver?: DBDriver, connection?: ConnectionInfoCustomOptions): boolean {
   return connection?.useUrl || !driver?.sampleURL || false;
 }
