@@ -353,7 +353,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   function getColumnSortingState(colIdx: number) {
     const column = tableData.getColumn(colIdx)?.key;
-    if (!column || !constraintsAction) {
+    if (!column || !constraintsAction?.supported || !isResultSetDataModel(model)) {
       return null;
     }
     const resultColumn = tableData.getColumnInfo(column);
