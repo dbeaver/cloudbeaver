@@ -100,6 +100,8 @@
     flex-wrap: wrap;
     padding: 4px 8px;
     gap: 8px;
+    min-width: 160px;
+    container-type: inline-size;
 
     & label {
       display: flex;
@@ -112,7 +114,7 @@
 
     & input {
       @include mdc-typography('body2');
-      max-width: 100px;
+      max-width: 60px;
       height: 24px;
       padding-inline: 8px;
 
@@ -136,6 +138,10 @@
 
       &:hover {
         background: color-mix(in srgb, transparent, var(--theme-primary) 5%);
+      }
+
+      @container (width < 240px) {
+        display: none;
       }
     }
 

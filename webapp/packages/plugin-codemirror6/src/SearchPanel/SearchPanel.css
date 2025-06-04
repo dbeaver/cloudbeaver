@@ -2,13 +2,57 @@
   .search-panel {
     --dbv-kit-control-outline-offset: -2px;
     --dbv-kit-icon-btn-outline-offset: 0;
+
+    container-type: inline-size;
+    min-width: 180px;
+    padding: var(--tw-spacing);
   }
+
+  .search-panel__row {
+    display: flex;
+    align-items: center;
+    gap: var(--tw-spacing);
+    padding-block: calc(var(--tw-spacing) / 2);
+  }
+
   .search-panel__input {
+    position: relative;
+
     .dbv-kit-input {
       padding-right: 88px;
     }
     .dbv-kit-icon-button {
       --dbv-kit-icon-btn-primary-background: var(--theme-secondary);
+    }
+  }
+
+  .search-panel__input,
+  .search-panel__replace-input {
+    width: 240px;
+
+    @container (width >= 440px) {
+      width: 300px;
+    }
+
+    @container (width >= 680px) {
+      width: 420px;
+    }
+  }
+
+  .search-panel__matches {
+    display: none;
+    font-size: 12px;
+
+    @container (width >= 380px) {
+      display: inline;
+      padding-inline: var(--tw-spacing);
+    }
+  }
+
+  .search-panel__find {
+    display: none;
+    @container (width >= 500px) {
+      display: block;
     }
   }
 }

@@ -14,7 +14,7 @@ import { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { Icon } from '@cloudbeaver/core-blocks';
-import { IconButton, Input } from '@dbeaver/ui-kit';
+import { clsx, IconButton, Input } from '@dbeaver/ui-kit';
 import type { EditorState } from '@codemirror/state';
 import { observer } from 'mobx-react-lite';
 
@@ -138,9 +138,9 @@ export const SearchPanel = observer(function SearchPanel({
   }
 
   return (
-    <div className="search-panel tw:space-y-0.5 tw:p-0.5" onKeyDown={handleKeyDown}>
-      <div className="tw:flex tw:gap-1 tw:items-center tw:@container">
-        <div className="search-panel__input  tw:relative tw:grow tw:min-w-[220px] tw:max-w-xl">
+    <div className="search-panel" onKeyDown={handleKeyDown}>
+      <div className="search-panel__row">
+        <div className="search-panel__input">
           <Input
             type="text"
             value={queryState.search}
@@ -157,6 +157,7 @@ export const SearchPanel = observer(function SearchPanel({
               type="button"
               onClick={handleCaseSensitiveToggle}
               aria-label="Match Case"
+              title="Match Case"
               className="tw:text-sm!"
             >
               Aa
@@ -168,6 +169,7 @@ export const SearchPanel = observer(function SearchPanel({
               type="button"
               onClick={handleWholeWordToggle}
               aria-label="Match Whole Word"
+              title="Match Whole Word"
               className="tw:text-sm!"
             >
               [Ab]
@@ -179,6 +181,7 @@ export const SearchPanel = observer(function SearchPanel({
               type="button"
               onClick={handleLiteralToggle}
               aria-label="Use Regular Expression"
+              title="Use Regular Expression"
               className="tw:text-sm!"
             >
               .*
@@ -192,23 +195,23 @@ export const SearchPanel = observer(function SearchPanel({
           onClick={handleFindPrevious}
           aria-label="Previous (Shift+Enter)"
           title="Previous (Shift+Enter)"
-          className="tw:@max-xs:hidden"
+          className="search-panel__find"
         >
           <Icon width={16} height={16} viewBox="0 0 16 16" name="arrow" />
         </IconButton>
 
-        <IconButton size="small" aria-label="Next (Enter)" type="button" onClick={handleFindNext} title="Next (Enter)" className="tw:@max-xs:hidden">
+        <IconButton size="small" aria-label="Next (Enter)" type="button" onClick={handleFindNext} title="Next (Enter)" className="search-panel__find">
           <Icon className="tw:rotate-180" width={16} height={16} viewBox="0 0 16 16" name="arrow" />
         </IconButton>
 
-        <span className="tw:text-xs tw:px-1">
-          {queryState.search &&
-            searchMatchesCount &&
-            (searchMatchesCount.count > 0 ? `${searchMatchesCount.current} of ${searchMatchesCount.count}` : 'No results')}
-        </span>
+        {queryState.search && searchMatchesCount && (
+          <span className="search-panel__matches">
+            {searchMatchesCount.count > 0 ? `${searchMatchesCount.current} of ${searchMatchesCount.count}` : 'No results'}
+          </span>
+        )}
 
         <IconButton size="small" aria-label="Toggle Replace" type="button" onClick={handleToggleReplace} title="Toggle Replace">
-          <Icon width={16} height={16} viewBox="0 0 16 16" name="arrow" />
+          <Icon className={clsx(showReplace && 'tw:rotate-180')} width={16} height={16} viewBox="0 0 16 16" name="arrow" />
         </IconButton>
 
         <IconButton
@@ -225,23 +228,22 @@ export const SearchPanel = observer(function SearchPanel({
       </div>
 
       {showReplace && (
-        <div className="tw:flex tw:items-center tw:gap-2">
-          <div className="tw:grow tw:max-w-xl">
+        <div className="search-panel__row">
+          <div className="search-panel__replace-input">
             <Input
               type="text"
               value={queryState.replace}
               placeholder="Replace"
               onKeyDown={handleReplaceKeyDown}
               onChange={event => handleReplaceChange(event.target.value)}
-              className="tw:min-w-[220px]"
             />
           </div>
 
-          <IconButton size="small" type="button" onClick={handleReplaceNext} aria-label="Replace Next">
+          <IconButton size="small" type="button" onClick={handleReplaceNext} aria-label="Replace Next" title="Replace Next">
             R
           </IconButton>
 
-          <IconButton size="small" type="button" onClick={handleReplaceAll} aria-label="Replace All">
+          <IconButton size="small" type="button" onClick={handleReplaceAll} aria-label="Replace All" title="Replace All">
             All
           </IconButton>
         </div>
