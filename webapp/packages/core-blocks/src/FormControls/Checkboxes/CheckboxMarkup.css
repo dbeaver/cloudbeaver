@@ -70,7 +70,6 @@
     }
 
     & .dbv-kit-checkbox__check {
-      margin-top: 0;
       margin: calc(var(--dbv-kit-checkbox-font-size) * 0.5);
     }
   }
