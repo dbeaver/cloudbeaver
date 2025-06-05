@@ -7,7 +7,7 @@
  */
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { bracketMatching, foldGutter, indentOnInput, syntaxHighlighting } from '@codemirror/language';
-import { highlightSelectionMatches, search, searchKeymap } from '@codemirror/search';
+import { highlightSelectionMatches, searchKeymap } from '@codemirror/search';
 import { Compartment, type Extension } from '@codemirror/state';
 import {
   crosshairCursor,
@@ -23,7 +23,6 @@ import {
 } from '@codemirror/view';
 import { classHighlighter } from '@lezer/highlight';
 import { useRef } from 'react';
-import { createSearchPanel } from './SearchPanel/SearchPanel.js';
 
 import { GlobalConstants, isObjectsEqual } from '@cloudbeaver/core-utils';
 import { clsx } from '@dbeaver/ui-kit';
@@ -113,10 +112,6 @@ const extensionMap = {
   rectangularSelection,
   keymap: () => keymap.of(DEFAULT_KEY_MAP),
   lineWrapping: () => EditorView.lineWrapping,
-  search: () =>
-    search({
-      createPanel: createSearchPanel,
-    }),
 };
 
 const DEFAULT_EXTENSIONS_COMPARTMENT = new Compartment();

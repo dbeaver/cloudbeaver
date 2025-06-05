@@ -2,10 +2,20 @@
   .search-panel {
     --dbv-kit-control-outline-offset: -2px;
     --dbv-kit-icon-btn-outline-offset: 0;
+    --dbv-kit-input-height: 26px;
+    --dbv-kit-icon-btn-small-size: 20px;
+
+    display: flex;
+    align-items: center;
+    gap: var(--tw-spacing);
 
     container-type: inline-size;
     min-width: 180px;
     padding: var(--tw-spacing);
+
+    .dbv-kit-input {
+      border: 1px solid var(--theme-background);
+    }
   }
 
   .search-panel__row {
@@ -28,7 +38,15 @@
 
   .search-panel__input,
   .search-panel__replace-input {
-    width: 240px;
+    width: 120px;
+
+    @container (width >= 240px) {
+      width: 170px;
+    }
+
+    @container (width >= 340px) {
+      width: 240px;
+    }
 
     @container (width >= 440px) {
       width: 300px;
