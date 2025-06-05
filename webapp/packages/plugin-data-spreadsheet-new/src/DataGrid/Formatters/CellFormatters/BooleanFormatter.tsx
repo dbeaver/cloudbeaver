@@ -16,6 +16,7 @@ import { CellContext } from '../../CellRenderer/CellContext.js';
 import { DataGridContext } from '../../DataGridContext.js';
 import { TableDataContext } from '../../TableDataContext.js';
 import type { ICellFormatterProps } from '../ICellFormatterProps.js';
+import './BooleanFormatter.css';
 
 export const BooleanFormatter = observer<ICellFormatterProps>(function BooleanFormatter() {
   const context = useContext(DataGridContext);
