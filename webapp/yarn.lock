@@ -2172,6 +2172,7 @@ __metadata:
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/js-helpers": "workspace:^"
+    "@dbeaver/ui-kit": "workspace:*"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
@@ -4538,7 +4539,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/ui-kit@workspace:../common-react/@dbeaver/ui-kit, @dbeaver/ui-kit@workspace:^":
+"@dbeaver/ui-kit@workspace:*, @dbeaver/ui-kit@workspace:../common-react/@dbeaver/ui-kit, @dbeaver/ui-kit@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/ui-kit@workspace:../common-react/@dbeaver/ui-kit"
   dependencies:

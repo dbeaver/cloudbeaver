@@ -11,4 +11,5 @@ export const MENU_TOOLS = createMenu('tools', {
   label: 'plugin_tools_panel_menu_title',
   icon: '/icons/plugin_tools_panel_m.svg',
   tooltip: 'plugin_tools_panel_menu_title',
+  className: 'topNavBarMenu',
 });

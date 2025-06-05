@@ -11,6 +11,7 @@ export interface IMenuInfo {
   label: string;
   icon?: string;
   tooltip?: string;
+  className?: string;
   /**
    * experimental, can be changed
    */

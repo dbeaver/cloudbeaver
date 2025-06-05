@@ -7,4 +7,4 @@
  */
 import { createMenu } from '@cloudbeaver/core-view';
 
-export const MENU_DEVTOOLS = createMenu('devtools', { label: 'DevTools' });
+export const MENU_DEVTOOLS = createMenu('devtools', { label: 'DevTools', className: 'topNavBarMenu' });

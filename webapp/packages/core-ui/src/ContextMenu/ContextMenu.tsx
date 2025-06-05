@@ -9,6 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef, useRef, useState } from 'react';
 
 import { getComputed, type IMenuState, Menu, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { clsx } from '@dbeaver/ui-kit';
 import { MenuActionItem } from '@cloudbeaver/core-view';
 
 import type { IContextMenuProps } from './IContextMenuProps.js';
@@ -17,7 +18,7 @@ import { MenuItemRenderer } from './MenuItemRenderer.js';
 // TODO the click doesn't work for React components as children
 export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
   forwardRef(function ContextMenu(
-    { contextMenuPosition, menu: menuData, disclosure, children, placement, visible, onVisibleSwitch, modal, rtl, ...props },
+    { contextMenuPosition, menu: menuData, disclosure, children, placement, visible, onVisibleSwitch, modal, rtl, className, ...props },
     ref,
   ) {
     const translate = useTranslate();
@@ -64,6 +65,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
       <Menu
         {...props}
         ref={ref}
+        className={clsx(menuData.menu.info.className, className)}
         label={translate(menuData.menu.info.label)}
         title={translate(menuData.menu.info.tooltip)}
         items={() =>
@@ -83,6 +85,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
         disabled={disabled}
         disclosure={disclosure}
         getHasBindings={handlers.hasBindings}
+        menuPanelClassName={menuData.menu.info.className}
         onVisibleSwitch={handlers.handleVisibleSwitch}
       >
         {renderingChildren}
