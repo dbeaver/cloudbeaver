@@ -6,7 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 import { Compartment, EditorState, StateEffect } from '@codemirror/state';
-import { getSearchQuery, search, SearchQuery } from '@codemirror/search';
+import {
+  closeSearchPanel,
+  findNext,
+  findPrevious,
+  getSearchQuery,
+  replaceAll,
+  replaceNext,
+  search,
+  SearchQuery,
+  setSearchQuery,
+} from '@codemirror/search';
 import { observer } from 'mobx-react-lite';
 import { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -48,7 +58,65 @@ export const ReactCodemirrorSearchPanel: React.FC<Props> = observer(function Rea
   const view = incomingView ? context?.incomingView : context?.view;
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [searchMatchesCount, setSearchMatchesCount] = useState({ count: 0, current: 1 });
-  const [queryState, setQueryState] = useState<SearchQuery>(view ? getSearchQuery(view?.state) : new SearchQuery({ search: '' }));
+  const [queryState, setQueryState] = useState<SearchQuery>(() => (view ? getSearchQuery(view?.state) : new SearchQuery({ search: '' })));
+
+  function updateQuery(updates: Partial<SearchQuery>) {
+    if (view) {
+      view.dispatch({
+        effects: setSearchQuery.of(new SearchQuery({ ...queryState, ...updates })),
+      });
+    }
+  }
+
+  function handleQueryChange(value: string) {
+    updateQuery({ search: value });
+  }
+
+  function handleCaseSensitiveToggle() {
+    updateQuery({ caseSensitive: !queryState.caseSensitive });
+  }
+
+  function handleLiteralToggle() {
+    updateQuery({ literal: !queryState.literal });
+  }
+
+  function handleWholeWordToggle() {
+    updateQuery({ wholeWord: !queryState.wholeWord });
+  }
+
+  function handleReplaceChange(value: string) {
+    updateQuery({ replace: value });
+  }
+
+  function handleFindNext() {
+    if (view) {
+      findNext(view);
+    }
+  }
+
+  function handleFindPrevious() {
+    if (view) {
+      findPrevious(view);
+    }
+  }
+
+  function handleReplaceNext() {
+    if (view) {
+      replaceNext(view);
+    }
+  }
+
+  function handleReplaceAll() {
+    if (view) {
+      replaceAll(view);
+    }
+  }
+
+  function handleClose() {
+    if (view) {
+      closeSearchPanel(view);
+    }
+  }
 
   useLayoutEffect(() => {
     if (view) {
@@ -83,7 +151,7 @@ export const ReactCodemirrorSearchPanel: React.FC<Props> = observer(function Rea
     }
 
     return undefined;
-  }, [view, top]);
+  }, [view, top, compartment]);
 
   useLayoutEffect(() => {
     if (className) {
@@ -95,14 +163,28 @@ export const ReactCodemirrorSearchPanel: React.FC<Props> = observer(function Rea
       };
     }
     return undefined;
-  }, [className]);
+  }, [className, dom.classList]);
 
   if (!view) {
     return null;
   }
 
   return createPortal(
-    <SearchPanel inputRef={searchInputRef} queryState={queryState} view={view} searchMatchesCount={searchMatchesCount} />,
+    <SearchPanel
+      inputRef={searchInputRef}
+      queryState={queryState}
+      searchMatchesCount={searchMatchesCount}
+      onQueryChange={handleQueryChange}
+      onCaseSensitiveToggle={handleCaseSensitiveToggle}
+      onLiteralToggle={handleLiteralToggle}
+      onWholeWordToggle={handleWholeWordToggle}
+      onReplaceChange={handleReplaceChange}
+      onFindNext={handleFindNext}
+      onFindPrevious={handleFindPrevious}
+      onReplaceAll={handleReplaceAll}
+      onReplaceNext={handleReplaceNext}
+      onClose={handleClose}
+    />,
     dom,
   ) as any;
 });

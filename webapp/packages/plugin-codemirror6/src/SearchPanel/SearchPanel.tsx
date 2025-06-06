@@ -6,9 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { closeSearchPanel, findNext, findPrevious, replaceAll, replaceNext, SearchQuery, setSearchQuery } from '@codemirror/search';
-
-import type { EditorView } from '@codemirror/view';
+import { SearchQuery } from '@codemirror/search';
 import { useState } from 'react';
 
 import { Icon, useTranslate } from '@cloudbeaver/core-blocks';
@@ -16,65 +14,39 @@ import { clsx, IconButton, Input } from '@dbeaver/ui-kit';
 
 import './SearchPanel.css';
 
-export function SearchPanel({
-  view,
-  searchMatchesCount,
-  queryState,
-  inputRef,
-}: {
-  view: EditorView;
+interface SearchPanelProps {
   searchMatchesCount?: { count: number; current: number };
   queryState: SearchQuery;
   inputRef?: React.RefObject<HTMLInputElement | null>;
-}) {
+  onQueryChange: (value: string) => void;
+  onCaseSensitiveToggle: () => void;
+  onLiteralToggle: () => void;
+  onWholeWordToggle: () => void;
+  onReplaceChange: (value: string) => void;
+  onFindNext: () => void;
+  onFindPrevious: () => void;
+  onReplaceAll: () => void;
+  onReplaceNext: () => void;
+  onClose: () => void;
+}
+
+export function SearchPanel({
+  searchMatchesCount,
+  queryState,
+  inputRef,
+  onQueryChange,
+  onCaseSensitiveToggle,
+  onLiteralToggle,
+  onWholeWordToggle,
+  onReplaceChange,
+  onFindNext,
+  onFindPrevious,
+  onReplaceAll,
+  onReplaceNext,
+  onClose,
+}: SearchPanelProps) {
   const [showReplace, setShowReplace] = useState(false);
   const translate = useTranslate();
-
-  function updateQuery(updates: Partial<SearchQuery>) {
-    view.dispatch({
-      effects: setSearchQuery.of(new SearchQuery({ ...queryState, ...updates })),
-    });
-  }
-
-  function handleQueryChange(value: string) {
-    updateQuery({ search: value });
-  }
-
-  function handleCaseSensitiveToggle() {
-    updateQuery({ caseSensitive: !queryState.caseSensitive });
-  }
-
-  function handleLiteralToggle() {
-    updateQuery({ literal: !queryState.literal });
-  }
-
-  function handleWholeWordToggle() {
-    updateQuery({ wholeWord: !queryState.wholeWord });
-  }
-
-  function handleReplaceChange(value: string) {
-    updateQuery({ replace: value });
-  }
-
-  function handleFindNext() {
-    findNext(view);
-  }
-
-  function handleFindPrevious() {
-    findPrevious(view);
-  }
-
-  function handleReplaceNext() {
-    replaceNext(view);
-  }
-
-  function handleReplaceAll() {
-    replaceAll(view);
-  }
-
-  function handleClose() {
-    closeSearchPanel(view);
-  }
 
   function handleToggleReplace() {
     setShowReplace(prev => !prev);
@@ -82,16 +54,16 @@ export function SearchPanel({
 
   function handleKeyDown(event: React.KeyboardEvent) {
     if (event.key === 'Escape') {
-      handleClose();
+      onClose();
     }
   }
 
   function handleInputKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter') {
       if (event.shiftKey) {
-        handleFindPrevious();
+        onFindPrevious();
       } else {
-        handleFindNext();
+        onFindNext();
       }
     }
   }
@@ -99,9 +71,9 @@ export function SearchPanel({
   function handleReplaceKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter') {
       if (event.shiftKey) {
-        handleReplaceAll();
+        onReplaceAll();
       } else {
-        handleReplaceNext();
+        onReplaceNext();
       }
     }
   }
@@ -113,8 +85,8 @@ export function SearchPanel({
         size="small"
         aria-label={translate('plugin_codemirror_search_replace_toggle')}
         type="button"
-        onClick={handleToggleReplace}
         title={translate('plugin_codemirror_search_replace_toggle')}
+        onClick={handleToggleReplace}
       >
         <Icon className={clsx(showReplace && 'tw:rotate-180')} width={16} height={16} viewBox="0 0 16 16" name="arrow" />
       </IconButton>
@@ -127,17 +99,17 @@ export function SearchPanel({
               placeholder={translate('plugin_codemirror_search_input_placeholder')}
               main-field="true"
               onKeyDown={handleInputKeyDown}
-              onChange={event => handleQueryChange(event.target.value)}
+              onChange={event => onQueryChange(event.target.value)}
             />
             <div className="tw:absolute tw:top-1/2 tw:-translate-y-1/2 tw:right-2 tw:flex tw:gap-1">
               <IconButton
                 variant={queryState.caseSensitive ? 'primary' : 'secondary'}
                 size="small"
                 type="button"
-                onClick={handleCaseSensitiveToggle}
                 aria-label={translate('plugin_codemirror_search_case_sensitive')}
                 title={translate('plugin_codemirror_search_case_sensitive')}
                 className="tw:text-sm!"
+                onClick={onCaseSensitiveToggle}
               >
                 Aa
               </IconButton>
@@ -146,10 +118,10 @@ export function SearchPanel({
                 variant={queryState.wholeWord ? 'primary' : 'secondary'}
                 size="small"
                 type="button"
-                onClick={handleWholeWordToggle}
                 aria-label={translate('plugin_codemirror_search_whole_word')}
                 title={translate('plugin_codemirror_search_whole_word')}
                 className="tw:text-sm!"
+                onClick={onWholeWordToggle}
               >
                 [Ab]
               </IconButton>
@@ -158,10 +130,10 @@ export function SearchPanel({
                 variant={queryState.literal ? 'primary' : 'secondary'}
                 size="small"
                 type="button"
-                onClick={handleLiteralToggle}
                 aria-label={translate('plugin_codemirror_search_literal')}
                 title={translate('plugin_codemirror_search_literal')}
                 className="tw:text-sm!"
+                onClick={onLiteralToggle}
               >
                 .*
               </IconButton>
@@ -179,10 +151,10 @@ export function SearchPanel({
           <IconButton
             size="small"
             type="button"
-            onClick={handleFindPrevious}
             aria-label={translate('plugin_codemirror_search_find_previous')}
             title={translate('plugin_codemirror_search_find_previous')}
             className="search-panel__find"
+            onClick={onFindPrevious}
           >
             <Icon width={16} height={16} viewBox="0 0 16 16" name="arrow" />
           </IconButton>
@@ -191,9 +163,9 @@ export function SearchPanel({
             size="small"
             aria-label={translate('plugin_codemirror_search_find_next')}
             type="button"
-            onClick={handleFindNext}
             title={translate('plugin_codemirror_search_find_next')}
             className="search-panel__find"
+            onClick={onFindNext}
           >
             <Icon className="tw:rotate-180" width={16} height={16} viewBox="0 0 16 16" name="arrow" />
           </IconButton>
@@ -203,9 +175,9 @@ export function SearchPanel({
             size="small"
             aria-label={translate('plugin_codemirror_search_close')}
             type="button"
-            onClick={handleClose}
             title={translate('plugin_codemirror_search_close')}
             className="tw:ml-auto!"
+            onClick={onClose}
           >
             <Icon width={16} height={16} viewBox="0 0 16 16" name="cross" />
           </IconButton>
@@ -218,16 +190,16 @@ export function SearchPanel({
                 value={queryState.replace}
                 placeholder={translate('plugin_codemirror_search_replace')}
                 onKeyDown={handleReplaceKeyDown}
-                onChange={event => handleReplaceChange(event.target.value)}
+                onChange={event => onReplaceChange(event.target.value)}
               />
             </div>
 
             <IconButton
               size="small"
               type="button"
-              onClick={handleReplaceNext}
               aria-label={translate('plugin_codemirror_search_replace')}
               title={translate('plugin_codemirror_search_replace')}
+              onClick={onReplaceNext}
             >
               R
             </IconButton>
@@ -235,9 +207,9 @@ export function SearchPanel({
             <IconButton
               size="small"
               type="button"
-              onClick={handleReplaceAll}
               aria-label={translate('plugin_codemirror_search_replace_all')}
               title={translate('plugin_codemirror_search_replace_all')}
+              onClick={onReplaceAll}
             >
               All
             </IconButton>
