@@ -1,9 +1,11 @@
 @layer components {
   .search-panel {
-    --dbv-kit-control-outline-offset: -2px;
+    --dbv-kit-control-outline-offset: -1px;
+    --dbv-kit-control-outline-width: 1px;
     --dbv-kit-icon-btn-outline-offset: 0;
     --dbv-kit-input-height: 26px;
     --dbv-kit-icon-btn-small-size: 20px;
+    --dbv-kit-icon-btn-outline-width: 1px;
 
     display: flex;
     align-items: center;
