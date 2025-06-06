@@ -9,21 +9,20 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { BooleanFormatter as GridBooleanFormatter } from '@cloudbeaver/plugin-data-grid';
-import { getComputed, s, useS } from '@cloudbeaver/core-blocks';
+import { getComputed } from '@cloudbeaver/core-blocks';
 import { DatabaseEditChangeType } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellContext } from '../../CellRenderer/CellContext.js';
 import { DataGridContext } from '../../DataGridContext.js';
 import { TableDataContext } from '../../TableDataContext.js';
 import type { ICellFormatterProps } from '../ICellFormatterProps.js';
-import styles from './BooleanFormatter.module.css';
 import './BooleanFormatter.css';
+import { clsx } from '@dbeaver/ui-kit';
 
 export const BooleanFormatter = observer<ICellFormatterProps>(function BooleanFormatter() {
   const context = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const cellContext = useContext(CellContext);
-  const style = useS(styles);
 
   const cell = cellContext.cell;
 
@@ -55,7 +54,7 @@ export const BooleanFormatter = observer<ICellFormatterProps>(function BooleanFo
 
   return (
     <GridBooleanFormatter
-      className={s(style, { dataGridBooleanFormatter: true }, 'dataGridBooleanFormatter')}
+      className={clsx('data-grid-boolean-formatter__container_small', 'checkbox-markup-theme_tertiary')}
       value={value as boolean | null}
       onClick={toggleValue}
       onKeyDown={toggleValue}

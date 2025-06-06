@@ -1,3 +1,0 @@
-.dataGridBooleanFormatter {
-  composes: checkbox-tertiary from global;
-}

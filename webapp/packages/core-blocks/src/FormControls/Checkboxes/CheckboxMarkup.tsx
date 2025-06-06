@@ -22,7 +22,7 @@ interface ICheckboxMarkupProps extends Omit<React.InputHTMLAttributes<HTMLInputE
   caption?: string;
   indeterminate?: boolean;
   size?: ControlSize;
-  variant?: 'primary' | 'secondary' | 'tertiary';
+  theme?: 'primary' | 'secondary' | 'tertiary';
 }
 
 export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxMarkup({
@@ -32,7 +32,7 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
   className,
   caption,
   size = 'medium',
-  variant = 'primary',
+  theme = 'primary',
   title,
   readOnly,
   children,
@@ -41,10 +41,13 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
   const styles = useS(CheckboxMarkupStyles);
 
   return (
-    <div className={s(styles, { container: true }, 'checkboxMarkup', 'checkbox-dimensions', `checkbox-${variant}`, className)} title={title}>
+    <div
+      className={s(styles, { container: true }, 'checkbox-markup', 'checkbox-markup-dimensions_default', `checkbox-markup-theme_${theme}`, className)}
+      title={title}
+    >
       <UiKitCheckbox id={id || rest.name} indeterminate={indeterminate} disabled={rest.disabled || readOnly} size={size} {...rest}>
-        {label && <span className={s(styles, { label: true }, 'checkboxLabel')}>{label}</span>}
-        {caption && <span className={s(styles, { caption: true }, 'checkboxCaption')}>{caption}</span>}
+        {label && <span className={s(styles, { label: true }, 'checkbox-markup__label')}>{label}</span>}
+        {caption && <span className={s(styles, { caption: true }, 'checkbox-markup__caption')}>{caption}</span>}
       </UiKitCheckbox>
     </div>
   );
