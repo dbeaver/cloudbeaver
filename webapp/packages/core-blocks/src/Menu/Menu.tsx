@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ interface IMenuProps extends React.ButtonHTMLAttributes<any> {
   rtl?: boolean;
   hasBindings?: boolean;
   panelAvailable?: boolean;
-  menuPanelClassName?: string;
   getHasBindings?: () => boolean;
   onVisibleSwitch?: (visible: boolean) => void;
 }
@@ -55,7 +54,6 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
       onVisibleSwitch,
       modal,
       submenu,
-      menuPanelClassName,
       rtl,
       className,
       ...props
@@ -150,7 +148,6 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
               label={label}
               menu={menu}
               rtl={rtl}
-              className={menuPanelClassName}
               submenu={submenu}
               panelAvailable={panelAvailable}
               hasBindings={hasBindings}
@@ -182,7 +179,6 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
           </MenuButton>
           <MenuPanel
             ref={menuPanelRef}
-            className={menuPanelClassName}
             label={label}
             menu={menu}
             rtl={rtl}

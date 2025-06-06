@@ -26,7 +26,6 @@ import { MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 import TopMenuStyles from './shared/TopMenu.module.css';
 import TopMenuBarStyles from './shared/TopMenuBar.module.css';
 import TopMenuBarItemStyles from './shared/TopMenuBarItem.module.css';
-import './shared/TopMenuCheckbox.css';
 import TopMenuItemStyles from './shared/TopMenuItem.module.css';
 import TopMenuItemElementStyles from './shared/TopMenuItemElement.module.css';
 import TopMenuPanelStyles from './shared/TopMenuPanel.module.css';

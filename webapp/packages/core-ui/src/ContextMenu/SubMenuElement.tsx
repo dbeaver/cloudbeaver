@@ -105,7 +105,6 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
         panelAvailable={panelAvailable}
         disabled={disabled}
         getHasBindings={handlers.hasBindings}
-        menuPanelClassName={subMenuData.menu.info.className}
         submenu
         onVisibleSwitch={handlers.handleVisibleSwitch}
       >
