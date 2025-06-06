@@ -6,6 +6,38 @@
  * you may not use this file except in compliance with the License.
  */
 
+.checkbox-dimensions {
+  --dbv-kit-checkbox-border-width: 2px;
+  --dbv-kit-checkbox-border-radius: 2px;
+
+  --dbv-kit-checkbox-small-height: 24px;
+  --dbv-kit-checkbox-medium-height: 28px;
+  --dbv-kit-checkbox-large-height: 32px;
+  --dbv-kit-checkbox-xlarge-height: 36px;
+
+  --dbv-kit-checkbox-small-font-size: 14px;
+  --dbv-kit-checkbox-medium-font-size: 14px;
+  --dbv-kit-checkbox-large-font-size: 16px;
+  --dbv-kit-checkbox-xlarge-font-size: 18px;
+}
+
+.checkbox-primary {
+  --dbv-kit-checkbox-background-checked: var(--theme-primary);
+  --dbv-kit-checkbox-icon-color: var(--theme-on-primary);
+
+  --dbv-kit-checkbox-border-color: color-mix(in srgb, var(--theme-on-secondary), white 20%);
+  --dbv-kit-checkbox-border-color-checked: transparent;
+}
+
+.checkbox-secondary {
+  --dbv-kit-checkbox-background-checked: var(--theme-on-primary);
+  --dbv-kit-checkbox-icon-color: var(--theme-primary);
+  --dbv-kit-checkbox-background: transparent;
+
+  --dbv-kit-checkbox-border-color: var(--theme-on-primary);
+  --dbv-kit-checkbox-border-color-checked: var(--theme-on-primary);
+}
+
 @layer components {
   .theme-dark .checkboxMarkup {
     --dbv-kit-checkbox-border-color: color-mix(in srgb, var(--theme-on-secondary), black 20%);
@@ -20,31 +52,8 @@
   }
 
   .checkboxMarkup {
-    --dbv-kit-checkbox-background-checked: var(--theme-primary);
-    --dbv-kit-checkbox-icon-color: var(--theme-on-primary);
-
-    --dbv-kit-checkbox-border-color: color-mix(in srgb, var(--theme-on-secondary), white 20%);
-    --dbv-kit-checkbox-border-color-checked: transparent;
-    --dbv-kit-checkbox-border-width: 2px;
-    --dbv-kit-checkbox-border-radius: 2px;
-
-    --dbv-kit-checkbox-small-height: 18px;
-    --dbv-kit-checkbox-medium-height: 20px;
-    --dbv-kit-checkbox-large-height: 24px;
-    --dbv-kit-checkbox-xlarge-height: 28px;
-
-    --dbv-kit-checkbox-small-font-size: 14px;
-    --dbv-kit-checkbox-medium-font-size: 14px;
-    --dbv-kit-checkbox-large-font-size: 16px;
-    --dbv-kit-checkbox-xlarge-font-size: 18px;
-
-    &.checkboxMarkup--secondary {
-      --dbv-kit-checkbox-background-checked: var(--theme-on-primary);
-      --dbv-kit-checkbox-icon-color: var(--theme-primary);
-      --dbv-kit-checkbox-background: transparent;
-
-      --dbv-kit-checkbox-border-color: var(--theme-on-primary);
-      --dbv-kit-checkbox-border-color-checked: var(--theme-on-primary);
+    & .checkboxLabel {
+      color: var(--theme-on-surface);
     }
 
     & .checkboxCaption {

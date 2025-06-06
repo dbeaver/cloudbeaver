@@ -6,11 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Checkbox as UiKitCheckbox, clsx } from '@dbeaver/ui-kit';
-import './CheckboxMarkup.css';
+import { Checkbox as UiKitCheckbox } from '@dbeaver/ui-kit';
 import type { ControlSize } from '@dbeaver/ui-kit/types/controls';
+import { useS } from '../../useS.js';
+import './CheckboxMarkup.css';
+import CheckboxMarkupStyles from './CheckboxMarkup.module.css';
+import { s } from '../../s.js';
 
 export type CheckboxMod = 'primary' | 'surface' | 'small';
+
+export { CheckboxMarkupStyles };
 
 interface ICheckboxMarkupProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'style' | 'size'> {
   label?: string;
@@ -33,11 +38,13 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
   children,
   ...rest
 }) {
+  const styles = useS(CheckboxMarkupStyles);
+
   return (
-    <div className={clsx('checkboxMarkup', `checkboxMarkup--${variant}`, className)} title={title}>
+    <div className={s(styles, { container: true }, 'checkboxMarkup', 'checkbox-dimensions', `checkbox-${variant}`, className)} title={title}>
       <UiKitCheckbox id={id || rest.name} indeterminate={indeterminate} disabled={rest.disabled || readOnly} size={size} {...rest}>
-        {label}
-        {caption && <span className="checkboxCaption">{caption}</span>}
+        {label && <span className={s(styles, { label: true }, 'checkboxLabel')}>{label}</span>}
+        {caption && <span className={s(styles, { caption: true }, 'checkboxCaption')}>{caption}</span>}
       </UiKitCheckbox>
     </div>
   );
