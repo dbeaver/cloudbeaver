@@ -10,7 +10,7 @@ import { SearchQuery } from '@codemirror/search';
 import { useState } from 'react';
 
 import { Icon, useTranslate } from '@cloudbeaver/core-blocks';
-import { clsx, IconButton, Input } from '@dbeaver/ui-kit';
+import { clsx, IconButton, Input, Icon as UIKitIcon } from '@dbeaver/ui-kit';
 
 import './SearchPanel.css';
 
@@ -111,7 +111,7 @@ export function SearchPanel({
                 className="tw:text-sm!"
                 onClick={onCaseSensitiveToggle}
               >
-                Aa
+                <UIKitIcon name="case" />
               </IconButton>
 
               <IconButton
@@ -123,7 +123,7 @@ export function SearchPanel({
                 className="tw:text-sm!"
                 onClick={onWholeWordToggle}
               >
-                [Ab]
+                <UIKitIcon name="match-word" />
               </IconButton>
 
               <IconButton
@@ -135,7 +135,7 @@ export function SearchPanel({
                 className="tw:text-sm!"
                 onClick={onLiteralToggle}
               >
-                .*
+                <UIKitIcon name="regex" />
               </IconButton>
             </div>
           </div>
@@ -156,7 +156,7 @@ export function SearchPanel({
             className="search-panel__find"
             onClick={onFindPrevious}
           >
-            <Icon width={16} height={16} viewBox="0 0 16 16" name="arrow" />
+            <UIKitIcon name="arrow-down" />
           </IconButton>
 
           <IconButton
@@ -167,7 +167,7 @@ export function SearchPanel({
             className="search-panel__find"
             onClick={onFindNext}
           >
-            <Icon className="tw:rotate-180" width={16} height={16} viewBox="0 0 16 16" name="arrow" />
+            <UIKitIcon name="arrow-up" />
           </IconButton>
 
           <IconButton
@@ -179,7 +179,7 @@ export function SearchPanel({
             className="tw:ml-auto!"
             onClick={onClose}
           >
-            <Icon width={16} height={16} viewBox="0 0 16 16" name="cross" />
+            <UIKitIcon name="cross" size="medium" className="tw:h-[16px]" />
           </IconButton>
         </div>
 
@@ -201,7 +201,7 @@ export function SearchPanel({
               title={translate('plugin_codemirror_search_replace')}
               onClick={onReplaceNext}
             >
-              R
+              <UIKitIcon name="replace" />
             </IconButton>
 
             <IconButton
@@ -211,7 +211,7 @@ export function SearchPanel({
               title={translate('plugin_codemirror_search_replace_all')}
               onClick={onReplaceAll}
             >
-              All
+              <UIKitIcon name="replace-all" />
             </IconButton>
           </div>
         )}
