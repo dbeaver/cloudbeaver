@@ -5,7 +5,7 @@ Bundle-SymbolicName: io.cloudbeaver.test.platform
 Bundle-Version: 1.0.0.qualifier
 Bundle-Release-Date: 20220606
 Bundle-Vendor: DBeaver Corp
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.core.runtime,
  org.junit,

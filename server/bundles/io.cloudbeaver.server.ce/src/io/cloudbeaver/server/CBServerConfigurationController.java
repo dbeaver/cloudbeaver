@@ -355,7 +355,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     protected synchronized void saveRuntimeConfig(
         @NotNull CBServerConfig serverConfig,
         @NotNull CBAppConfig appConfig,
-        SMCredentialsProvider credentialsProvider
+        @Nullable SMCredentialsProvider credentialsProvider
     ) throws DBException {
         if (serverConfig.getServerName() == null) {
             throw new DBException("Invalid server configuration, server name cannot be empty");
@@ -493,18 +493,12 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
                     navigatorProperties.put("hideVirtualModel", navSettings.isHideVirtualModel());
                 }
             }
-            if (appConfig.getEnabledFeatures() != null) {
-                appConfigProperties.put("enabledFeatures", Arrays.asList(appConfig.getEnabledFeatures()));
-            }
+            appConfigProperties.put("enabledFeatures", Arrays.asList(appConfig.getEnabledFeatures()));
             if (appConfig.getEnabledAuthProviders() != null) {
                 appConfigProperties.put("enabledAuthProviders", Arrays.asList(appConfig.getEnabledAuthProviders()));
             }
-            if (appConfig.getEnabledDrivers() != null) {
-                appConfigProperties.put("enabledDrivers", Arrays.asList(appConfig.getEnabledDrivers()));
-            }
-            if (appConfig.getDisabledDrivers() != null) {
-                appConfigProperties.put("disabledDrivers", Arrays.asList(appConfig.getDisabledDrivers()));
-            }
+            appConfigProperties.put("enabledDrivers", Arrays.asList(appConfig.getEnabledDrivers()));
+            appConfigProperties.put("disabledDrivers", Arrays.asList(appConfig.getDisabledDrivers()));
 
             if (!CommonUtils.isEmpty(appConfig.getPlugins())) {
                 appConfigProperties.put("plugins", appConfig.getPlugins());
@@ -586,7 +580,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             Map<String, Object> subValue = new LinkedHashMap<>();
             Map<String, Object> oldConfigValue = JSONUtils.getObject(oldConfig, key);
             for (Map.Entry<String, Object> entry : oldConfigValue.entrySet()) {
-                copyConfigValue(oldConfigValue, subValue, entry.getKey(), ((Map) defaultValue).get(entry.getKey()));
+                copyConfigValue(oldConfigValue, subValue, entry.getKey(), ((Map<?,?>) defaultValue).get(entry.getKey()));
             }
             newConfig.put(key, subValue);
         } else {
@@ -618,13 +612,14 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         return dataDir;
     }
 
-    public void saveProductConfiguration(Map<String, Object> productConfiguration) throws DBException {
+    public void saveProductConfiguration(Map<String, Object> productConfiguration) {
         Map<String, Object> productSettings = getServerConfiguration().getProductSettings();
         Map<String, Object> mergedConfig = ServletAppUtils.mergeConfigurations(productSettings, productConfiguration);
         productSettings.clear();
         productSettings.putAll(ServletAppUtils.flattenMap(mergedConfig));
     }
 
+    @NotNull
     public T getServerConfiguration() {
         return serverConfiguration;
     }
