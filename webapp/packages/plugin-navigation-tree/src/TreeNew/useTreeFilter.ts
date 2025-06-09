@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,21 @@ export function useTreeFilter(options: ITreeFilterOptions = {}): Readonly<ITreeF
         return isNodeMatched || treeData.getChildren(nodeId).length > 0;
       },
       transformer(treeData: ITreeData, nodeId: string, children: string[]): string[] {
+        const filter = this.filter.trim();
+        if (!filter) {
+          return children;
+        }
+
+        let parentMatches = treeData.getNode(nodeId).name.toLowerCase().includes(filter.toLowerCase());
+
+        if (options?.isNodeMatched) {
+          parentMatches = options.isNodeMatched(nodeId, filter, parentMatches);
+        }
+
+        if (parentMatches) {
+          return children;
+        }
+
         return children.filter(child => this.isNodeMatched(treeData, child));
       },
       setFilter(filter: string): void {
