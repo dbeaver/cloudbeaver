@@ -1,0 +1,3 @@
+.formatter {
+  composes: checkbox-markup-theme--tertiary data-grid__checkbox--small from global;
+}

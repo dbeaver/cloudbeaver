@@ -1,19 +1,4 @@
-.checkbox-markup-dimensions_default {
-  --dbv-kit-checkbox-border-width: 2px;
-  --dbv-kit-checkbox-border-radius: 2px;
-
-  --dbv-kit-checkbox-small-height: 24px;
-  --dbv-kit-checkbox-medium-height: 28px;
-  --dbv-kit-checkbox-large-height: 32px;
-  --dbv-kit-checkbox-xlarge-height: 36px;
-
-  --dbv-kit-checkbox-small-font-size: 14px;
-  --dbv-kit-checkbox-medium-font-size: 14px;
-  --dbv-kit-checkbox-large-font-size: 16px;
-  --dbv-kit-checkbox-xlarge-font-size: 18px;
-}
-
-.checkbox-markup-theme_primary {
+.checkbox-markup-theme--primary {
   --dbv-kit-checkbox-background-checked: var(--theme-primary);
   --dbv-kit-checkbox-icon-color: var(--theme-on-primary);
 
@@ -21,7 +6,7 @@
   --dbv-kit-checkbox-border-color-checked: transparent;
 }
 
-.checkbox-markup-theme_secondary {
+.checkbox-markup-theme--secondary {
   --dbv-kit-checkbox-background-checked: var(--theme-on-primary);
   --dbv-kit-checkbox-icon-color: var(--theme-primary);
   --dbv-kit-checkbox-background: transparent;
@@ -30,7 +15,7 @@
   --dbv-kit-checkbox-border-color-checked: var(--theme-on-primary);
 }
 
-.checkbox-markup-theme_tertiary {
+.checkbox-markup-theme--tertiary {
   --dbv-kit-checkbox-background: var(--theme-surface);
   --dbv-kit-checkbox-background-checked: var(--theme-surface);
   --dbv-kit-checkbox-foreground: var(--theme-on-surface);
@@ -54,6 +39,19 @@
   }
 
   .checkbox-markup {
+    --dbv-kit-checkbox-border-width: 2px;
+    --dbv-kit-checkbox-border-radius: 2px;
+
+    --dbv-kit-checkbox-small-height: 24px;
+    --dbv-kit-checkbox-medium-height: 28px;
+    --dbv-kit-checkbox-large-height: 32px;
+    --dbv-kit-checkbox-xlarge-height: 36px;
+
+    --dbv-kit-checkbox-small-font-size: 14px;
+    --dbv-kit-checkbox-medium-font-size: 14px;
+    --dbv-kit-checkbox-large-font-size: 16px;
+    --dbv-kit-checkbox-xlarge-font-size: 18px;
+
     & .checkbox-markup__label {
       color: var(--theme-on-surface);
     }
