@@ -8,7 +8,6 @@
 import type { IDataPresentationProps } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridTable } from './DataGrid/DataGridTableLoader.js';
-import './DataGrid/shared/CheckboxStylesheet.css';
 
 export const SpreadsheetGrid: React.FC<IDataPresentationProps> = function SpreadsheetGrid(props) {
   return <DataGridTable {...props} />;
