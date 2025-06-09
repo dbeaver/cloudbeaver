@@ -38,41 +38,30 @@
     }
   }
 
-  .search-panel__input,
-  .search-panel__replace-input {
-    width: 120px;
+  .search-panel__inputs {
+    flex-basis: 420px;
+    min-width: 120px;
+  }
 
-    @container (width >= 240px) {
-      width: 170px;
-    }
+  .search-panel__buttons {
+    flex-basis: 80px;
+    flex-shrink: 0;
 
-    @container (width >= 340px) {
-      width: 240px;
-    }
-
-    @container (width >= 440px) {
-      width: 300px;
-    }
-
-    @container (width >= 680px) {
-      width: 420px;
+    @container (width >= 280px) {
+      &:has(.search-panel__matches) {
+        flex-basis: 130px;
+      }
     }
   }
 
   .search-panel__matches {
     display: none;
     font-size: 12px;
+    flex-shrink: 0;
 
-    @container (width >= 380px) {
+    @container (width >= 280px) {
       display: inline;
       padding-inline: var(--tw-spacing);
-    }
-  }
-
-  .search-panel__find {
-    display: none;
-    @container (width >= 500px) {
-      display: block;
     }
   }
 }

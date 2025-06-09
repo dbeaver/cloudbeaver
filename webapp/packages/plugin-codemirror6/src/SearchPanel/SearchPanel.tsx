@@ -90,56 +90,68 @@ export function SearchPanel({
       >
         <Icon className={clsx(showReplace && 'tw:rotate-180')} width={16} height={16} viewBox="0 0 16 16" name="arrow" />
       </IconButton>
-      <div className="tw:grow tw:shrink">
-        <div className="search-panel__row">
-          <div className="search-panel__input">
-            <Input
-              ref={inputRef}
-              value={queryState.search}
-              placeholder={translate('plugin_codemirror_search_input_placeholder')}
-              main-field="true"
-              onKeyDown={handleInputKeyDown}
-              onChange={event => onQueryChange(event.target.value)}
-            />
-            <div className="tw:absolute tw:top-1/2 tw:-translate-y-1/2 tw:right-2 tw:flex tw:gap-1">
-              <IconButton
-                variant={queryState.caseSensitive ? 'primary' : 'secondary'}
-                size="small"
-                type="button"
-                aria-label={translate('plugin_codemirror_search_case_sensitive')}
-                title={translate('plugin_codemirror_search_case_sensitive')}
-                className="tw:text-sm!"
-                onClick={onCaseSensitiveToggle}
-              >
-                <UIKitIcon name="case" />
-              </IconButton>
 
-              <IconButton
-                variant={queryState.wholeWord ? 'primary' : 'secondary'}
-                size="small"
-                type="button"
-                aria-label={translate('plugin_codemirror_search_whole_word')}
-                title={translate('plugin_codemirror_search_whole_word')}
-                className="tw:text-sm!"
-                onClick={onWholeWordToggle}
-              >
-                <UIKitIcon name="match-word" />
-              </IconButton>
+      <div className="search-panel__inputs">
+        <div className="search-panel__input">
+          <Input
+            ref={inputRef}
+            value={queryState.search}
+            placeholder={translate('plugin_codemirror_search_input_placeholder')}
+            main-field="true"
+            onKeyDown={handleInputKeyDown}
+            onChange={event => onQueryChange(event.target.value)}
+          />
+          <div className="tw:absolute tw:top-1/2 tw:-translate-y-1/2 tw:right-2 tw:flex tw:gap-1">
+            <IconButton
+              variant={queryState.caseSensitive ? 'primary' : 'secondary'}
+              size="small"
+              type="button"
+              aria-label={translate('plugin_codemirror_search_case_sensitive')}
+              title={translate('plugin_codemirror_search_case_sensitive')}
+              className="tw:text-sm!"
+              onClick={onCaseSensitiveToggle}
+            >
+              <UIKitIcon name="case" />
+            </IconButton>
 
-              <IconButton
-                variant={queryState.literal ? 'primary' : 'secondary'}
-                size="small"
-                type="button"
-                aria-label={translate('plugin_codemirror_search_literal')}
-                title={translate('plugin_codemirror_search_literal')}
-                className="tw:text-sm!"
-                onClick={onLiteralToggle}
-              >
-                <UIKitIcon name="regex" />
-              </IconButton>
-            </div>
+            <IconButton
+              variant={queryState.wholeWord ? 'primary' : 'secondary'}
+              size="small"
+              type="button"
+              aria-label={translate('plugin_codemirror_search_whole_word')}
+              title={translate('plugin_codemirror_search_whole_word')}
+              className="tw:text-sm!"
+              onClick={onWholeWordToggle}
+            >
+              <UIKitIcon name="match-word" />
+            </IconButton>
+
+            <IconButton
+              variant={queryState.literal ? 'primary' : 'secondary'}
+              size="small"
+              type="button"
+              aria-label={translate('plugin_codemirror_search_literal')}
+              title={translate('plugin_codemirror_search_literal')}
+              className="tw:text-sm!"
+              onClick={onLiteralToggle}
+            >
+              <UIKitIcon name="regex" />
+            </IconButton>
           </div>
-
+        </div>
+        {showReplace && (
+          <div className="search-panel__replace-input">
+            <Input
+              value={queryState.replace}
+              placeholder={translate('plugin_codemirror_search_replace')}
+              onKeyDown={handleReplaceKeyDown}
+              onChange={event => onReplaceChange(event.target.value)}
+            />
+          </div>
+        )}
+      </div>
+      <div className="search-panel__buttons">
+        <div className="search-panel__row">
           {queryState.search && searchMatchesCount && (
             <span className="search-panel__matches">
               {searchMatchesCount.count > 0
@@ -176,7 +188,6 @@ export function SearchPanel({
             aria-label={translate('plugin_codemirror_search_close')}
             type="button"
             title={translate('plugin_codemirror_search_close')}
-            className="tw:ml-auto!"
             onClick={onClose}
           >
             <UIKitIcon name="cross" size="medium" className="tw:h-[16px]" />
@@ -185,15 +196,6 @@ export function SearchPanel({
 
         {showReplace && (
           <div className="search-panel__row">
-            <div className="search-panel__replace-input">
-              <Input
-                value={queryState.replace}
-                placeholder={translate('plugin_codemirror_search_replace')}
-                onKeyDown={handleReplaceKeyDown}
-                onChange={event => onReplaceChange(event.target.value)}
-              />
-            </div>
-
             <IconButton
               size="small"
               type="button"
