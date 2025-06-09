@@ -1,5 +1,5 @@
-import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
-import { DataGrid as DataGridBase, type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle } from 'react-data-grid';
+import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { DataGrid as DataGridBase, type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle, type ColumnWidth, type ColumnWidths } from 'react-data-grid';
 import { rowRenderer } from './renderers/rowRenderer.js';
 import { cellRenderer } from './renderers/cellRenderer.js';
 import { DataGridCellHeaderContext, type IDataGridHeaderCellContext } from './DataGridHeaderCellContext.js';
@@ -76,10 +76,10 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   },
   ref,
 ) {
+  const [columnWidths, setColumnWidths] = useState<ColumnWidths>(() => new Map<string, ColumnWidth>());
   const rowsCount = useGridReactiveValue(rowCount);
   const columnsCount = useGridReactiveValue(columnCount);
 
-  const gridKey = useRef(0);
   const rowsCountRef = useRef(rowsCount);
   const innerGridRef = useRef<DataGridHandle>(null);
   const columns = new Array<ColumnOrColumnGroup<IInnerRow, unknown>>(columnsCount)
@@ -110,7 +110,9 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
       innerGridRef.current?.scrollToCell({ idx: position.colIdx && dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx });
     },
     openEditor: (position: ICellPosition) => {
-      innerGridRef.current?.selectCell({ idx: dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx }, true);
+      innerGridRef.current?.selectCell({ idx: dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx }, {
+        enableEditor: true,
+      });
     },
   }));
 
@@ -119,12 +121,11 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     rowsCountRef.current = rowsCount;
 
     if (previousRowCount === 0) {
-      // we trigger columns size recalculation when rows are added
-      gridKey.current++;
+      setColumnWidths(new Map<string, ColumnWidth>());
     }
   }
 
-  const rows = useMemo(
+  let rows = useMemo(
     () =>
       new Array<IInnerRow>(rowsCount).fill({ idx: 0 }).map((_, i) => ({
         idx: i,
@@ -140,29 +141,36 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     onCellKeyDown?.({ colIdx: dndHeaderContext.getDataColIdx(args.column.idx), rowIdx: args.rowIdx }, event);
   }
 
+  const isMeasurementRender = columnWidths.size === 0 && columnCount.get() > 0;
+
+  if (isMeasurementRender) {
+    rows = rows.slice(0, 100);
+  }
+
   return (
     <HeaderDnDContext value={dndHeaderContext}>
       <DataGridRowContext value={{ rowCount, onScrollToBottom }}>
         <DataGridCellContext value={{ cell, cellText, cellElement, cellTooltip, onCellChange }}>
           <DataGridCellHeaderContext value={{ headerElement, headerText, getHeaderDnD, columnSortable, onColumnSort, columnSortingState }}>
             <DataGridBase
-              key={gridKey.current}
               ref={innerGridRef}
               columns={dndHeaderContext.columns}
+              enableVirtualization={!isMeasurementRender}
               rows={rows}
               className={className}
               headerRowHeight={getHeaderHeight?.()}
-              onScroll={onScroll}
               rowHeight={getRowHeight ? row => getRowHeight(row.idx) : undefined}
               rowKeyGetter={getRowId ? row => getRowId(row.idx) : undefined}
-              onSelectedCellChange={handleCellFocus}
-              onCellKeyDown={handleCellKeyDown}
+              columnWidths={columnWidths}
               renderers={{
                 renderRow: rowRenderer,
                 renderCell: cellRenderer,
                 noRowsFallback: children,
               }}
-              minimumRowsToRender={100}
+              onScroll={onScroll}
+              onSelectedCellChange={handleCellFocus}
+              onCellKeyDown={handleCellKeyDown}
+              onColumnWidthsChange={setColumnWidths}
             />
           </DataGridCellHeaderContext>
         </DataGridCellContext>

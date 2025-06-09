@@ -1,17 +1,17 @@
 {
   "name": "react-data-grid",
-  "version": "7.0.0-beta.50",
+  "version": "7.0.0-beta.55",
   "type": "module",
   "exports": {
     "./lib/styles.css": "./lib/styles.css",
     ".": {
       "types": "./lib/index.d.ts",
-      "default": "./lib/bundle.js"
+      "default": "./lib/index.js"
     }
   },
-  "browser": "./lib/bundle.js",
-  "main": "./lib/bundle.js",
-  "module": "./lib/bundle.js",
+  "browser": "./lib/index.js",
+  "main": "./lib/index.js",
+  "module": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "files": [
     "lib"
