@@ -26,7 +26,6 @@ import io.cloudbeaver.model.app.ServletAuthConfiguration;
 import io.cloudbeaver.model.app.ServletSystemInformationCollector;
 import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.config.CBServerConfig;
-import io.cloudbeaver.model.config.SMControllerConfiguration;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
@@ -76,8 +75,9 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * This class controls all aspects of the application's execution
  */
-public abstract class CBApplication<T extends CBServerConfig> extends
-    BaseServletApplication implements ServletAuthApplication, WebApplication {
+public abstract class CBApplication<T extends CBServerConfig>
+    extends BaseServletApplication
+    implements ServletAuthApplication, WebApplication {
 
     private static final Log log = Log.getLog(CBApplication.class);
 
@@ -93,8 +93,8 @@ public abstract class CBApplication<T extends CBServerConfig> extends
     }
 
 
-    public static CBApplication getInstance() {
-        return (CBApplication) BaseApplicationImpl.getInstance();
+    public static CBApplication<?> getInstance() {
+        return (CBApplication<?>) BaseApplicationImpl.getInstance();
     }
 
     private final File homeDirectory;
@@ -111,7 +111,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends
     private CBSessionManager sessionManager;
 
     private final Map<String, String> initActions = new ConcurrentHashMap<>();
-    private ServletSystemInformationCollector systemInformationCollector;
+    private ServletSystemInformationCollector<?> systemInformationCollector;
 
     private CBJettyServer jettyServer;
 
@@ -188,12 +188,9 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         return getServerConfigurationController().getAuthServiceURL();
     }
 
+    @NotNull
     public Map<String, Object> getProductConfiguration() {
         return getServerConfigurationController().getProductConfiguration();
-    }
-
-    public SMControllerConfiguration getSecurityManagerConfiguration() {
-        return getServerConfiguration().getSecurityManagerConfiguration();
     }
 
     public SMAdminController getSecurityController() {
@@ -230,9 +227,6 @@ public abstract class CBApplication<T extends CBServerConfig> extends
             localHostAddress)) {
             localHostAddress = CBConstants.HOST_LOCALHOST;
         }
-
-        final Runtime runtime = Runtime.getRuntime();
-        initializeAdditionalConfiguration();
 
         Location instanceLoc = Platform.getInstanceLocation();
         try {
@@ -335,23 +329,15 @@ public abstract class CBApplication<T extends CBServerConfig> extends
         runWebServer();
 
         log.debug("Shutdown");
-
-        return;
     }
 
     protected ServletSystemInformationCollector<?> createSystemInformationCollector() {
         return new ServletSystemInformationCollector<>(this);
     }
 
-    protected void initializeAdditionalConfiguration() {
-
-    }
-
     /**
      * Configures server automatically.
      * Called on startup
-     *
-     * @param configPath
      */
     protected void performAutoConfiguration(Path configPath) {
         String autoServerName = System.getenv(CBConstants.VAR_AUTO_CB_SERVER_NAME);
@@ -417,11 +403,6 @@ public abstract class CBApplication<T extends CBServerConfig> extends
 
     private void determineLocalAddresses() {
         try {
-//            InetAddress localHost = InetAddress.getLocalHost();
-//            InetAddress[] allMyIps = InetAddress.getAllByName(localHost.getCanonicalHostName());
-//            for (InetAddress addr : allMyIps) {
-//                System.out.println("Local addr: " + addr);
-//            }
             try {
                 InetAddress dockerAddress = InetAddress.getByName(CBConstants.VAR_HOST_DOCKER_INTERNAL);
                 localInetAddresses.add(dockerAddress);
@@ -522,15 +503,6 @@ public abstract class CBApplication<T extends CBServerConfig> extends
 
     public String getLocalHostAddress() {
         return localHostAddress;
-    }
-
-    public boolean isLocalInetAddress(String hostName) {
-        for (InetAddress addr : localInetAddresses) {
-            if (addr.getHostAddress().equals(hostName)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public List<InetAddress> getLocalInetAddresses() {
