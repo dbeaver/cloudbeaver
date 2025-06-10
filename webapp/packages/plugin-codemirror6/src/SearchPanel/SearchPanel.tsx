@@ -8,17 +8,21 @@
 
 import { SearchQuery } from '@codemirror/search';
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
+import { useImperativeHandle, useRef, useState } from 'react';
 
 import { Icon, useTranslate } from '@cloudbeaver/core-blocks';
 import { clsx, IconButton, Input, Icon as UIKitIcon } from '@dbeaver/ui-kit';
 
 import './SearchPanel.css';
 
+export interface SearchPanelRef {
+  focus: () => void;
+}
+
 interface SearchPanelProps {
   searchMatchesCount?: { count: number; current: number };
   queryState: SearchQuery;
-  inputRef?: React.RefObject<HTMLInputElement | null>;
+  ref: React.RefObject<SearchPanelRef | null>;
   onQueryChange: (value: string) => void;
   onCaseSensitiveToggle: () => void;
   onLiteralToggle: () => void;
@@ -34,7 +38,7 @@ interface SearchPanelProps {
 export const SearchPanel = observer(function SearchPanel({
   searchMatchesCount,
   queryState,
-  inputRef,
+  ref,
   onQueryChange,
   onCaseSensitiveToggle,
   onLiteralToggle,
@@ -48,6 +52,17 @@ export const SearchPanel = observer(function SearchPanel({
 }: SearchPanelProps) {
   const [showReplace, setShowReplace] = useState(false);
   const translate = useTranslate();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      focus: () => {
+        inputRef.current?.focus();
+      },
+    }),
+    [],
+  );
 
   function handleToggleReplace() {
     setShowReplace(prev => !prev);

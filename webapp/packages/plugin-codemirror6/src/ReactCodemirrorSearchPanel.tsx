@@ -22,7 +22,7 @@ import { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { ReactCodemirrorContext } from './ReactCodemirrorContext.js';
-import { SearchPanel } from './SearchPanel/SearchPanel.js';
+import { SearchPanel, type SearchPanelRef } from './SearchPanel/SearchPanel.js';
 
 interface Props extends React.PropsWithChildren {
   className?: string;
@@ -56,7 +56,7 @@ export const ReactCodemirrorSearchPanel: React.FC<Props> = observer(function Rea
   const compartment = useMemo(() => new Compartment(), []);
   const context = useContext(ReactCodemirrorContext);
   const view = incomingView ? context?.incomingView : context?.view;
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchPanelRef = useRef<SearchPanelRef>(null);
   const [searchMatchesCount, setSearchMatchesCount] = useState({ count: 0, current: 1 });
   const [queryState, setQueryState] = useState<SearchQuery>(() => (view ? getSearchQuery(view?.state) : new SearchQuery({ search: '' })));
 
@@ -134,7 +134,7 @@ export const ReactCodemirrorSearchPanel: React.FC<Props> = observer(function Rea
                     setSearchMatchesCount(getSearchMatchesCount(update.state, searchQuery));
                   },
                   mount: () => {
-                    searchInputRef.current?.focus();
+                    searchPanelRef.current?.focus();
                   },
                 }),
               }),
@@ -171,7 +171,7 @@ export const ReactCodemirrorSearchPanel: React.FC<Props> = observer(function Rea
 
   return createPortal(
     <SearchPanel
-      inputRef={searchInputRef}
+      ref={searchPanelRef}
       queryState={queryState}
       searchMatchesCount={searchMatchesCount}
       onQueryChange={handleQueryChange}
