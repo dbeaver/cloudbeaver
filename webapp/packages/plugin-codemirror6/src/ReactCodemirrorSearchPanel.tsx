@@ -16,6 +16,7 @@ import {
   search,
   SearchQuery,
   setSearchQuery,
+  RegExpCursor,
 } from '@codemirror/search';
 import { observer } from 'mobx-react-lite';
 import { useContext, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -33,8 +34,20 @@ interface Props extends React.PropsWithChildren {
 function getSearchMatchesCount(state: EditorState, config?: SearchQuery) {
   const searchQuery = new SearchQuery(config ?? getSearchQuery(state));
 
-  const cursor = searchQuery.getCursor(state);
+  let cursor;
   const counter = { count: 0, current: 1 };
+  const options = { ignoreCase: !config?.caseSensitive };
+
+  if (config?.regexp) {
+    try {
+      new RegExp(config.search);
+      cursor = new RegExpCursor(state.doc, config.search, options);
+    } catch (error) {
+      return counter;
+    }
+  } else {
+    cursor = searchQuery.getCursor(state);
+  }
 
   const { from, to } = state.selection.main;
 
@@ -76,8 +89,8 @@ export const ReactCodemirrorSearchPanel: React.FC<Props> = observer(function Rea
     updateQuery({ caseSensitive: !queryState.caseSensitive });
   }
 
-  function handleLiteralToggle() {
-    updateQuery({ literal: !queryState.literal });
+  function handleRegexToggle() {
+    updateQuery({ regexp: !queryState.regexp });
   }
 
   function handleWholeWordToggle() {
@@ -176,7 +189,7 @@ export const ReactCodemirrorSearchPanel: React.FC<Props> = observer(function Rea
       searchMatchesCount={searchMatchesCount}
       onQueryChange={handleQueryChange}
       onCaseSensitiveToggle={handleCaseSensitiveToggle}
-      onLiteralToggle={handleLiteralToggle}
+      onRegexToggle={handleRegexToggle}
       onWholeWordToggle={handleWholeWordToggle}
       onReplaceChange={handleReplaceChange}
       onFindNext={handleFindNext}
@@ -186,5 +199,5 @@ export const ReactCodemirrorSearchPanel: React.FC<Props> = observer(function Rea
       onClose={handleClose}
     />,
     dom,
-  ) as any;
+  );
 });

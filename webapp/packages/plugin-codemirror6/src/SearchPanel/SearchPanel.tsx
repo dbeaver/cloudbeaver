@@ -25,7 +25,7 @@ interface SearchPanelProps {
   ref: React.RefObject<SearchPanelRef | null>;
   onQueryChange: (value: string) => void;
   onCaseSensitiveToggle: () => void;
-  onLiteralToggle: () => void;
+  onRegexToggle: () => void;
   onWholeWordToggle: () => void;
   onReplaceChange: (value: string) => void;
   onFindNext: () => void;
@@ -41,7 +41,7 @@ export const SearchPanel = observer(function SearchPanel({
   ref,
   onQueryChange,
   onCaseSensitiveToggle,
-  onLiteralToggle,
+  onRegexToggle,
   onWholeWordToggle,
   onReplaceChange,
   onFindNext,
@@ -143,13 +143,13 @@ export const SearchPanel = observer(function SearchPanel({
             </IconButton>
 
             <IconButton
-              variant={queryState.literal ? 'primary' : 'secondary'}
+              variant={queryState.regexp ? 'primary' : 'secondary'}
               size="small"
               type="button"
               aria-label={translate('plugin_codemirror_search_literal')}
               title={translate('plugin_codemirror_search_literal')}
               className="tw:text-sm!"
-              onClick={onLiteralToggle}
+              onClick={onRegexToggle}
             >
               <UIKitIcon name="regex" />
             </IconButton>
