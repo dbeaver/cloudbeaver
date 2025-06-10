@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@ import { CacheFirst } from 'workbox-strategies';
 declare const self: ServiceWorkerGlobalScope;
 const manifest = self.__WB_MANIFEST;
 
+const imagesCacheName = 'images';
+const fontsCacheName = 'fonts';
+
 async function broadcastMessage(message: Record<string, any>) {
   const clients = await self.clients.matchAll({ includeUncontrolled: true });
   clients.forEach(client => {
@@ -25,7 +28,7 @@ async function broadcastMessage(message: Record<string, any>) {
   });
 }
 
-addEventListener('fetch', async event => {
+addEventListener('fetch', event => {
   if (!(event instanceof FetchEvent)) {
     return;
   }
@@ -58,6 +61,25 @@ addEventListener('fetch', async event => {
 
 self.addEventListener('install', () => {
   self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    (async () => {
+      // Clean fonts and images caches when service worker updates
+      const cacheNames = await caches.keys();
+      const cacheNamesToDelete = cacheNames.filter(cacheName => cacheName === fontsCacheName || cacheName === imagesCacheName);
+
+      await Promise.all(cacheNamesToDelete.map(cacheName => caches.delete(cacheName)));
+
+      if (cacheNamesToDelete.length > 0) {
+        await broadcastMessage({
+          type: 'caches-cleared',
+          clearedCaches: cacheNamesToDelete,
+        });
+      }
+    })(),
+  );
 });
 
 function createUpdateProgressPlugin(): WorkboxPlugin {
@@ -103,7 +125,7 @@ precacheAndRoute(manifest);
 registerRoute(
   ({ request }) => request.destination === 'font',
   new CacheFirst({
-    cacheName: 'fonts',
+    cacheName: fontsCacheName,
     plugins: [
       new CacheableResponsePlugin({
         statuses: [0, 200],
@@ -119,7 +141,7 @@ registerRoute(
 registerRoute(
   ({ request, url }) => url.origin === self.location.origin && request.destination === 'image',
   new CacheFirst({
-    cacheName: 'images',
+    cacheName: imagesCacheName,
     plugins: [
       new CacheableResponsePlugin({
         statuses: [0, 200],

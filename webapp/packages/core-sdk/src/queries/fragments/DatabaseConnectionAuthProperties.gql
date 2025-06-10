@@ -1,6 +1,8 @@
 fragment DatabaseConnectionAuthProperties on ConnectionInfo {
   id
   projectId
+  saveCredentials
+  authNeeded
   credentialsSaved
   authModel
   sharedCredentials

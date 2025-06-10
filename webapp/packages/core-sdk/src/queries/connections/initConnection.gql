@@ -6,13 +6,6 @@ mutation initConnection(
   $saveCredentials: Boolean
   $sharedCredentials: Boolean
   $selectedSecretId: String
-  $includeAuthProperties: Boolean!
-  $includeNetworkHandlersConfig: Boolean!
-  $includeCredentialsSaved: Boolean!
-  $includeAuthNeeded: Boolean!
-  $includeProperties: Boolean!
-  $includeProviderProperties: Boolean!
-  $customIncludeOptions: Boolean!
 ) {
   connection: initConnection(
     projectId: $projectId
