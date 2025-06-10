@@ -24,11 +24,16 @@
     display: flex;
     align-items: center;
     gap: var(--tw-spacing);
-    padding-block: calc(var(--tw-spacing) / 2);
+    height: 26px;
+
+    &:first-child {
+      margin-bottom: calc(var(--tw-spacing) / 2);
+    }
   }
 
   .search-panel__input {
     position: relative;
+    margin-bottom: calc(var(--tw-spacing) / 2);
 
     .dbv-kit-input {
       padding-right: 88px;
@@ -56,6 +61,7 @@
 
   .search-panel__matches {
     display: none;
+    user-select: none;
     font-size: 12px;
     flex-shrink: 0;
 
