@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import {
-  type Connection,
+  type ConnectionInfoCustomOptions,
+  ConnectionInfoCustomOptionsResource,
   type ConnectionInfoOrigin,
   ConnectionInfoOriginResource,
   ConnectionInfoProjectKey,
-  ConnectionInfoResource,
   DBDriverResource,
   isCloudConnection,
 } from '@cloudbeaver/core-connections';
@@ -57,10 +57,10 @@ export const GrantedConnections: TabContainerPanelComponent<TeamFormProps> = obs
 
   useResource(GrantedConnections, DBDriverResource, CachedMapAllKey, { active: selected });
 
-  const connectionsLoader = useResource(GrantedConnections, ConnectionInfoResource, globalConnectionsKey, { active: selected });
+  const connectionsLoader = useResource(GrantedConnections, ConnectionInfoCustomOptionsResource, globalConnectionsKey, { active: selected });
   const connectionsOriginLoader = useResource(GrantedConnections, ConnectionInfoOriginResource, globalConnectionsKey, { active: selected });
 
-  const connections = connectionsLoader.data as Connection[];
+  const connections = connectionsLoader.data as ConnectionInfoCustomOptions[];
 
   const grantedConnections = getComputed(() => connections.filter(connection => tabState.state.grantedSubjects.includes(connection.id)));
   const connectionsOrigins = (connectionsOriginLoader.data ?? []) as ConnectionInfoOrigin[];

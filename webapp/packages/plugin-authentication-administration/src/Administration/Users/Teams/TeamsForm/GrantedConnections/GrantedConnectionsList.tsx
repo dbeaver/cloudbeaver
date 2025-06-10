@@ -24,7 +24,7 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { type Connection, type ConnectionInfoOrigin, DBDriverResource } from '@cloudbeaver/core-connections';
+import { type ConnectionInfoCustomOptions, type ConnectionInfoOrigin, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
@@ -35,7 +35,7 @@ import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHea
 import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem.js';
 
 interface Props {
-  grantedConnections: Connection[];
+  grantedConnections: ConnectionInfoCustomOptions[];
   connectionsOrigins: ConnectionInfoOrigin[];
   disabled: boolean;
   onRevoke: (subjectIds: string[]) => void;
