@@ -5,7 +5,7 @@ Bundle-Name: Cloudbeaver Community Product
 Bundle-SymbolicName: io.cloudbeaver.product.ce;singleton:=true
 Bundle-Version: 25.1.1.qualifier
 Bundle-Release-Date: 20250616
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Require-Bundle: io.cloudbeaver.server.ce

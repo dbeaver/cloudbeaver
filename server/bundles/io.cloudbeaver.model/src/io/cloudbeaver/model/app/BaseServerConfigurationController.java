@@ -55,8 +55,8 @@ public abstract class BaseServerConfigurationController<T extends ServletServerC
     @NotNull
     protected abstract GsonBuilder getGsonBuilder();
 
+    @NotNull
     public abstract T getServerConfiguration();
-
 
     @NotNull
     protected synchronized Path initWorkspacePath() {
