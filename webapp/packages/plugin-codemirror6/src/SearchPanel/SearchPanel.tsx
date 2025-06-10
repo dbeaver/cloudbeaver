@@ -7,6 +7,7 @@
  */
 
 import { SearchQuery } from '@codemirror/search';
+import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
 import { Icon, useTranslate } from '@cloudbeaver/core-blocks';
@@ -30,7 +31,7 @@ interface SearchPanelProps {
   onClose: () => void;
 }
 
-export function SearchPanel({
+export const SearchPanel = observer(function SearchPanel({
   searchMatchesCount,
   queryState,
   inputRef,
@@ -220,4 +221,4 @@ export function SearchPanel({
       </div>
     </div>
   );
-}
+});
