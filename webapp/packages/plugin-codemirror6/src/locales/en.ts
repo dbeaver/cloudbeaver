@@ -9,6 +9,6 @@ export default [
   ['plugin_codemirror_search_find_next', 'Find Next (Enter)'],
   ['plugin_codemirror_search_find_previous', 'Find Previous (Shift+Enter)'],
   ['plugin_codemirror_search_matches_of', 'of'],
-  ['plugin_codemirror_search_matches_none', 'No found'],
+  ['plugin_codemirror_search_matches_none', 'Not found'],
   ['plugin_codemirror_search_close', 'Close (Escape)'],
 ];
