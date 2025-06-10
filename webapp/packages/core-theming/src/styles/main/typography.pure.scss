@@ -21,3 +21,24 @@
 }
 
 @include typography-core-styles;
+
+@layer base {
+  .typography-body-1 {
+    @include mdc-typography('body1');
+  }
+  .typography-body-2 {
+    @include mdc-typography('body2');
+  }
+  .typography-caption {
+    @include mdc-typography('caption');
+  }
+  .typography-headline-1 {
+    @include mdc-typography('headline1');
+  }
+  .typography-headline-2 {
+    @include mdc-typography('headline2');
+  }
+  .typography-headline-3 {
+    @include mdc-typography('headline3');
+  }
+}
