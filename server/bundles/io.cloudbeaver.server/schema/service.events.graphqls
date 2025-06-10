@@ -34,6 +34,7 @@ enum CBServerEventId {
     cb_subject_permissions_updated,
 
     cb_database_output_log_updated,
+    cb_ai_chat_message @since(version: "25.1.1")
 
     cb_transaction_count @since(version: "24.3.3")
 
@@ -224,6 +225,15 @@ type WSTransactionalCountEvent implements CBServerEvent {
     projectId: String!
     connectionId: String!
     transactionalCount: Int!
+}
+
+type WSAIChatMessageEvent implements CBServerEvent @since(version: "25.1.1") {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    conversationId: ID!
+    messageId: String!
+    chunk: String
+    completed: Boolean!
 }
 
 extend type Query {
