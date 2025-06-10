@@ -140,6 +140,7 @@ export default [
   ['ui_schema', 'Lược đồ'],
   ['ui_project', 'Dự án'],
   ['ui_type', 'Loại'],
+  ['ui_field_is_required', 'Please fill in this field'],
 
   ['root_permission_denied', 'Bạn không có quyền'],
   ['root_permission_no_permission', 'Bạn không có quyền thực hiện hành động này'],

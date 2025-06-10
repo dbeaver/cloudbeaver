@@ -46,7 +46,13 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
   }
 
   const usernameValidationRef = useCustomInputValidation<string>(value => {
-    if (!value.match(ENTITY_ID_VALIDATION)) {
+    const v = value.trim();
+
+    if (!v) {
+      return translate('ui_field_is_required');
+    }
+
+    if (!v.match(ENTITY_ID_VALIDATION)) {
       return translate('plugin_authentication_administration_user_username_validation_error');
     }
 
