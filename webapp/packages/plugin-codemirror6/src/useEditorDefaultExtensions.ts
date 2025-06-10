@@ -73,9 +73,6 @@ export interface IDefaultExtensions {
   keymap?: boolean;
   lineWrapping?: boolean;
   search?: boolean;
-  searchOptions?: {
-    createPanel?: (view: EditorView) => { dom: HTMLElement };
-  };
 }
 
 const extensionMap = {
