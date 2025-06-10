@@ -40,7 +40,6 @@ function getSearchMatchesCount(state: EditorState, config?: SearchQuery) {
 
   if (config?.regexp) {
     try {
-      new RegExp(config.search);
       cursor = new RegExpCursor(state.doc, config.search, options);
     } catch (error) {
       return counter;
