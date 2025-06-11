@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ export interface ISQLEditorData {
   activeSegmentMode: ISQLEditorMode;
   readonly parser: SQLParser;
   readonly dialect: SqlDialectInfo | undefined;
-  readonly activeSegment: ISQLScriptSegment | undefined;
   readonly cursorSegment: ISQLScriptSegment | undefined;
   readonly readonly: boolean;
   readonly editing: boolean;
@@ -51,12 +50,12 @@ export interface ISQLEditorData {
   executeQueryNewTab(): Promise<void>;
   showExecutionPlan(): Promise<void>;
   executeScript(): Promise<void>;
-  switchEditing(): Promise<void>;
+  switchEditing(): void;
   getHintProposals(position: number, simple: boolean): Promise<SQLProposal[]>;
   getResolvedSegment(): Promise<ISQLScriptSegment | undefined>;
   executeQueryAction<T>(
     segment: ISQLScriptSegment | undefined,
-    action: (query: ISQLScriptSegment) => Promise<T>,
+    action: (query: ISQLScriptSegment) => T | Promise<T>,
     passEmpty?: boolean,
     passDisabled?: boolean,
   ): Promise<T | undefined>;

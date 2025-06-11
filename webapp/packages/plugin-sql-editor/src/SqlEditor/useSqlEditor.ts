@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -52,8 +52,8 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   hintsLimitIsMet: boolean;
   updateParserScripts(): Promise<void>;
   loadDatabaseDataModels(): Promise<void>;
-  getExecutingQuery(script: boolean): ISQLScriptSegment | undefined;
-  getSubQuery(): ISQLScriptSegment | undefined;
+  getExecutingQuery(script: boolean): Promise<ISQLScriptSegment | undefined>;
+  getSubQuery(): Promise<ISQLScriptSegment | undefined>;
 }
 
 const MAX_HINTS_LIMIT = 200;
@@ -84,12 +84,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       activeSegmentMode: {
-        activeSegment: undefined,
         activeSegmentMode: false,
-      },
-
-      get activeSegment(): ISQLScriptSegment | undefined {
-        return this.activeSegmentMode.activeSegment;
       },
 
       get cursorSegment(): ISQLScriptSegment | undefined {
@@ -210,7 +205,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
         await this.updateParserScripts();
         const query = this.value;
-        const script = this.getExecutingQuery(false);
+        const script = await this.getExecutingQuery(false);
 
         if (!script) {
           return;
@@ -237,7 +232,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
 
         await this.updateParserScripts();
-        const query = this.getSubQuery();
+        const query = await this.getSubQuery();
 
         try {
           await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
@@ -247,11 +242,11 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       async loadDatabaseDataModels(): Promise<void> {
-        const query = this.getExecutingQuery(true);
+        const query = await this.getExecutingQuery(true);
 
         await this.executeQueryAction(
           query,
-          async () => {
+          () => {
             if (this.dataSource?.databaseModels.length) {
               this.sqlQueryService.initDatabaseDataModels(this.state);
             }
@@ -270,7 +265,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
 
         await this.updateParserScripts();
-        const query = this.getSubQuery();
+        const query = await this.getSubQuery();
 
         try {
           await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
@@ -288,7 +283,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
 
         await this.updateParserScripts();
-        const query = this.getSubQuery();
+        const query = await this.getSubQuery();
 
         try {
           await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
@@ -297,7 +292,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         } catch {}
       },
 
-      async switchEditing(): Promise<void> {
+      switchEditing(): void {
         this.dataSource?.setEditing(!this.dataSource.isEditing());
       },
 
@@ -423,12 +418,12 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
       },
 
-      getExecutingQuery(script: boolean): ISQLScriptSegment | undefined {
+      async getExecutingQuery(script: boolean): Promise<ISQLScriptSegment | undefined> {
         if (script) {
           return this.parser.getScriptSegment();
         }
 
-        return this.activeSegment;
+        return await this.getResolvedSegment();
       },
 
       async getResolvedSegment(): Promise<ISQLScriptSegment | undefined> {
@@ -441,10 +436,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return this.getSubQuery();
         }
 
-        if (this.activeSegmentMode.activeSegmentMode) {
-          return this.activeSegment;
-        }
-
         const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, this.value, this.cursor.anchor);
 
         if (result.end === 0 && result.start === 0) {
@@ -455,8 +446,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         return segment;
       },
 
-      getSubQuery(): ISQLScriptSegment | undefined {
-        const query = this.getExecutingQuery(false);
+      async getSubQuery(): Promise<ISQLScriptSegment | undefined> {
+        const query = await this.getExecutingQuery(false);
 
         if (!query) {
           return undefined;
