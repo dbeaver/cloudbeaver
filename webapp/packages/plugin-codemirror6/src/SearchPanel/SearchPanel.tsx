@@ -184,7 +184,7 @@ export const SearchPanel = observer(function SearchPanel({
             className="search-panel__find"
             onClick={onFindPrevious}
           >
-            <UIKitIcon name="arrow-down" />
+            <UIKitIcon name="arrow-up" />
           </IconButton>
 
           <IconButton
@@ -195,7 +195,7 @@ export const SearchPanel = observer(function SearchPanel({
             className="search-panel__find"
             onClick={onFindNext}
           >
-            <UIKitIcon name="arrow-up" />
+            <UIKitIcon name="arrow-down" />
           </IconButton>
 
           <IconButton
