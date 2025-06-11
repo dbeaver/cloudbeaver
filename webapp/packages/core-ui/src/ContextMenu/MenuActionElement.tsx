@@ -43,6 +43,8 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
         name={item.id}
         value={label}
         checked={checked}
+        style={{ pointerEvents: 'auto' }}
+        focusable
         onClick={handleClick}
       >
         <MenuItemElement
@@ -66,6 +68,8 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
         name={item.id}
         value={label}
         checked={checked}
+        style={{ pointerEvents: 'auto' }}
+        focusable
         onClick={handleClick}
       >
         <MenuItemElement label={actionInfo.label} icon={<Checkbox checked={checked} size="small" />} tooltip={actionInfo.tooltip} loading={loading} />
@@ -74,7 +78,15 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
   }
 
   return (
-    <MenuItem hidden={item.hidden} id={item.id} aria-label={label} disabled={item.disabled} onClick={handleClick}>
+    <MenuItem
+      hidden={item.hidden}
+      id={item.id}
+      aria-label={label}
+      disabled={item.disabled}
+      style={{ pointerEvents: 'auto' }}
+      focusable
+      onClick={handleClick}
+    >
       <MenuItemElement label={actionInfo.label} icon={actionInfo.icon} binding={binding} tooltip={actionInfo.tooltip} loading={loading} />
     </MenuItem>
   );

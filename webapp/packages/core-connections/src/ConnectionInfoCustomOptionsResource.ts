@@ -25,7 +25,6 @@ import { parseConnectionKey } from './parseConnectionKey.js';
 
 export type ConnectionInfoCustomOptions = DatabaseConnectionCustomOptionsFragment;
 
-// TODO reuse it everywhere where include "customIncludeOptions" is used
 @injectable()
 export class ConnectionInfoCustomOptionsResource extends CachedMapResource<IConnectionInfoParams, ConnectionInfoCustomOptions> {
   constructor(
