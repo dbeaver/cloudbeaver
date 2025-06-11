@@ -16,7 +16,7 @@ Require-Bundle: org.jkiss.dbeaver.data.gis;visibility:=reexport,
  org.jkiss.dbeaver.model.nio;visibility:=reexport,
  org.jkiss.dbeaver.registry;visibility:=reexport,
  org.jkiss.dbeaver.net.ssh,
- org.jkiss.bundle.graphql.java;visibility:=reexport,
+ org.jkiss.bundle.graphql;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp,
  com.google.gson;visibility:=reexport,
  jakarta.servlet-api;bundle-version:="6.0.0";visibility:=reexport

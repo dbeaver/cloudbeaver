@@ -5,9 +5,6 @@ MAINTAINER DBeaver Corp, devops@dbeaver.com
 ENV DBEAVER_GID=8978
 ENV DBEAVER_UID=8978
 
-RUN apt-get update && \
-    apt-get upgrade -y
-
 RUN groupadd -g $DBEAVER_GID dbeaver && \
     useradd -g $DBEAVER_GID -m -u $DBEAVER_UID -s /bin/bash dbeaver
 

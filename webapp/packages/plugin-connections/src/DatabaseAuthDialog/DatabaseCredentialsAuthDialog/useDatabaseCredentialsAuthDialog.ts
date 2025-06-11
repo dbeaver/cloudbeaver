@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,9 +9,11 @@ import { action, computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import {
+  type ConnectionInfoAuthProperties,
+  ConnectionInfoAuthPropertiesResource,
+  ConnectionInfoNetworkHandlersResource,
   ConnectionInfoResource,
   type ConnectionInitConfig,
-  type DatabaseConnection,
   type DBDriver,
   DBDriverResource,
   type IConnectionInfoParams,
@@ -26,7 +28,7 @@ import type { IConnectionAuthenticationConfig } from '../../ConnectionAuthentica
 interface IState extends ILoadableState {
   readonly authModelId: string | null;
   driver: DBDriver | null;
-  connection: DatabaseConnection | null;
+  connectionAuthProperties: ConnectionInfoAuthProperties | null;
   config: IConnectionAuthenticationConfig;
   authenticating: boolean;
   loading: boolean;
@@ -46,17 +48,19 @@ export function useDatabaseCredentialsAuthDialog(
 ) {
   const connectionInfoResource = useService(ConnectionInfoResource);
   const dbDriverResource = useService(DBDriverResource);
+  const connectionInfoAuthPropertiesResource = useService(ConnectionInfoAuthPropertiesResource);
+  const connectionInfoNetworkHandlersLoader = useService(ConnectionInfoNetworkHandlersResource);
 
   const state: IState = useObservableRef(
     () => ({
       get authModelId() {
-        if (!this.connection?.authNeeded && !this.resetCredentials) {
+        if (!this.connectionAuthProperties?.authNeeded && !this.resetCredentials) {
           return null;
         }
 
-        return this.connection?.authModel || this.driver?.defaultAuthModel || null;
+        return this.connectionAuthProperties?.authModel || this.driver?.defaultAuthModel || null;
       },
-      connection: null as DatabaseConnection | null,
+      connectionAuthProperties: null as ConnectionInfoAuthProperties | null,
       driver: null as DBDriver | null,
       authenticating: false,
       loading: false,
@@ -77,16 +81,16 @@ export function useDatabaseCredentialsAuthDialog(
           this.exception = null;
           this.loading = true;
 
-          const connection = await this.connectionInfoResource.load(this.key, [
-            'includeAuthProperties',
-            'includeNetworkHandlersConfig',
-            'includeAuthNeeded',
+          const [connectionAuthProperties, connection, connectionNetworkHandlersConfig] = await Promise.all([
+            this.connectionInfoAuthPropertiesResource.load(this.key),
+            this.connectionInfoResource.load(this.key),
+            this.connectionInfoNetworkHandlersLoader.load(this.key),
           ]);
 
           const driver = await this.dbDriverResource.load(connection.driverId);
 
-          if (connection.authNeeded) {
-            const property = connection.authProperties.find(property => property.id === USER_NAME_PROPERTY_ID);
+          if (connectionAuthProperties.authNeeded) {
+            const property = connectionAuthProperties?.authProperties.find(property => property.id === USER_NAME_PROPERTY_ID);
 
             if (property?.value) {
               this.config.credentials[USER_NAME_PROPERTY_ID] = property.value;
@@ -94,7 +98,7 @@ export function useDatabaseCredentialsAuthDialog(
           }
 
           for (const id of this.networkHandlers) {
-            const handler = connection.networkHandlersConfig.find(handler => handler.id === id);
+            const handler = connectionNetworkHandlersConfig.networkHandlersConfig?.find(handler => handler.id === id);
 
             if (handler && (handler.userName || handler.authType !== NetworkHandlerAuthType.Password)) {
               this.config.networkHandlersConfig.push({
@@ -107,8 +111,8 @@ export function useDatabaseCredentialsAuthDialog(
             }
           }
 
-          this.config.saveCredentials = connection.saveCredentials;
-          this.connection = connection;
+          this.config.saveCredentials = connectionAuthProperties.saveCredentials;
+          this.connectionAuthProperties = connectionAuthProperties;
           this.driver = driver;
 
           this.loaded = true;
@@ -167,7 +171,7 @@ export function useDatabaseCredentialsAuthDialog(
     {
       authModelId: computed,
       config: observable,
-      connection: observable.ref,
+      connectionAuthProperties: observable.ref,
       driver: observable.ref,
       authenticating: observable.ref,
       loading: observable.ref,
@@ -177,7 +181,16 @@ export function useDatabaseCredentialsAuthDialog(
       load: action.bound,
       login: action.bound,
     },
-    { connectionInfoResource, dbDriverResource, key, networkHandlers, resetCredentials, onInit },
+    {
+      connectionInfoResource,
+      dbDriverResource,
+      key,
+      networkHandlers,
+      resetCredentials,
+      connectionInfoAuthPropertiesResource,
+      connectionInfoNetworkHandlersLoader,
+      onInit,
+    },
   );
 
   return state;
