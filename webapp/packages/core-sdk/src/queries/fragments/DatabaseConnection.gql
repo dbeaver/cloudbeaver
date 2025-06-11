@@ -4,61 +4,15 @@ fragment DatabaseConnection on ConnectionInfo {
   name
   description
   driverId
-
   connected
   readOnly
-
-  saveCredentials
-  credentialsSaved @include(if: $includeCredentialsSaved)
-  sharedCredentials
-
   folder
   nodePath
-
-  mainPropertyValues
-
-  configurationType @include(if: $customIncludeOptions)
-  useUrl @include(if: $customIncludeOptions)
-  host @include(if: $customIncludeOptions)
-  port @include(if: $customIncludeOptions)
-  serverName @include(if: $customIncludeOptions)
-  databaseName @include(if: $customIncludeOptions)
-  url @include(if: $customIncludeOptions)
-
-  properties @include(if: $includeProperties)
-  providerProperties @include(if: $includeProviderProperties)
-
-  requiredAuth
-
   features
   supportedDataFormats
-
-  authNeeded @include(if: $includeAuthNeeded)
-  authModel
-
-  authProperties @include(if: $includeAuthProperties) {
-    ...UserConnectionAuthProperties
-  }
-
-  networkHandlersConfig @skip(if: $includeNetworkHandlersConfig) {
-    ...NetworkHandlerBasics
-  }
-
-  networkHandlersConfig @include(if: $includeNetworkHandlersConfig) {
-    ...NetworkHandlerBasics
-    authType
-    userName
-    password
-    key
-    savePassword
-    properties
-    secureProperties
-  }
-
   navigatorSettings {
     ...AllNavigatorSettings
   }
-
   canViewSettings
   canEdit
   canDelete
