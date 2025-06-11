@@ -28,7 +28,7 @@ export interface ITree {
   openNode(id: string): Promise<void>;
   clickNode(id: string): Promise<void>;
   expandNode(id: string, state: boolean): Promise<void>;
-  selectNode(id: string, state: boolean): void;
+  selectNode(id: string, state: boolean): Promise<void>;
 }
 
 export function useTree(options: IOptions): ITree {
@@ -80,8 +80,8 @@ export function useTree(options: IOptions): ITree {
           }
         } catch (exception) {}
       },
-      selectNode(id: string, state: boolean) {
-        selectNode(options.data, id, state);
+      async selectNode(id: string, state: boolean) {
+        await selectNode(options.data, id, state);
       },
     }),
     {},

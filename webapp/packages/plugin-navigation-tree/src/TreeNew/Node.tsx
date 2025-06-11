@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
   const tree = useContext(TreeContext)!;
   const data = useContext(TreeDataContext)!;
 
-  const { expanded, selected } = data.getState(nodeId);
+  const { expanded, selected, loading } = data.getState(nodeId);
 
   const dndData = useNodeDnD(nodeId, () => {
-    if (!selected) {
-      tree.selectNode(nodeId, true);
-    }
+    // if (!selected) {
+    //   tree.selectNode(nodeId, true);
+    // }
   });
 
   function handleOpen() {
@@ -37,7 +37,9 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
   }
 
   function handleSelect() {
-    tree.selectNode(nodeId, !selected);
+    if (!loading) {
+      tree.selectNode(nodeId, !selected).catch(() => {});
+    }
   }
 
   function handleClick() {
@@ -48,7 +50,15 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
   const ChildrenRenderer = childrenRenderer;
 
   return (
-    <TreeNode selected={selected} expanded={expanded} onExpand={handleToggleExpand} onOpen={handleOpen} onSelect={handleSelect} onClick={handleClick}>
+    <TreeNode
+      selected={selected}
+      expanded={expanded}
+      loading={loading}
+      onExpand={handleToggleExpand}
+      onOpen={handleOpen}
+      onSelect={handleSelect}
+      onClick={handleClick}
+    >
       <ControlRenderer ref={dndData.setTargetRef} nodeId={nodeId} />
       {expanded && <ChildrenRenderer nodeId={nodeId} offsetHeight={offsetHeight + tree.getNodeHeight(nodeId)} />}
     </TreeNode>

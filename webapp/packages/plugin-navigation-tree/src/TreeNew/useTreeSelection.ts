@@ -20,8 +20,8 @@ export interface ITreeSelection {
   multipleSelection: boolean;
   selectedNodes: string[];
   isNodeSelected(nodeId: string): boolean;
-  selectNode(treeData: ITreeData, nodeId: string, selected?: boolean): void;
-  selectAll(treeData: ITreeData): void;
+  selectNode(treeData: ITreeData, nodeId: string, selected?: boolean): Promise<void>;
+  selectAll(treeData: ITreeData): Promise<void>;
   clearSelection(treeData: ITreeData): void;
   getSelectedNodes(): string[];
 }
@@ -33,6 +33,43 @@ function getAllNodes(treeData: ITreeData, nodeId: string): string[] {
   children.forEach(childId => {
     nodes.push(...getAllNodes(treeData, childId));
   });
+
+  return nodes;
+}
+
+async function getAllNodesWithLoad(treeData: ITreeData, nodeId: string): Promise<string[]> {
+  const nodes = [nodeId];
+  const nodeState = treeData.getState(nodeId);
+
+  if (!nodeState.expanded) {
+    try {
+      treeData.updateState(nodeId, { expanded: true });
+      await treeData.load(nodeId, true);
+
+      const children = treeData.getChildren(nodeId);
+
+      if (children.length === 0) {
+        treeData.updateState(nodeId, { expanded: false });
+        return nodes;
+      }
+    } catch (error) {
+      treeData.updateState(nodeId, { expanded: false });
+      return nodes;
+    }
+  }
+
+  const children = treeData.getChildren(nodeId);
+
+  if (children.length > 0) {
+    const childPromises = children.map(childId => getAllNodesWithLoad(treeData, childId));
+    const results = await Promise.allSettled(childPromises);
+
+    results.forEach(result => {
+      if (result.status === 'fulfilled') {
+        nodes.push(...result.value);
+      }
+    });
+  }
 
   return nodes;
 }
@@ -52,28 +89,37 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
       isNodeSelected(nodeId: string): boolean {
         return treeData.getState(nodeId).selected;
       },
-      selectNode(treeData: ITreeData, nodeId: string, selected?: boolean): void {
-        const currentlySelected = treeData.getState(nodeId).selected;
+      async selectNode(treeData: ITreeData, nodeId: string, selected?: boolean): Promise<void> {
+        const nodeState = treeData.getState(nodeId);
+        if (nodeState.loading) {
+          return;
+        }
+
+        const currentlySelected = nodeState.selected;
         const shouldSelect = selected !== undefined ? selected : !currentlySelected;
 
         if (!this.multipleSelection && shouldSelect) {
           this.clearSelection(treeData);
         }
 
-        if (treeData.getChildren(nodeId).length > 0) {
-          const allNodes = getAllNodes(treeData, nodeId);
-          allNodes.forEach(childId => {
-            treeData.updateState(childId, { selected: shouldSelect });
-          });
-        }
+        const allNodes = await getAllNodesWithLoad(treeData, nodeId);
+        allNodes.forEach(childId => {
+          treeData.updateState(childId, { selected: shouldSelect });
+        });
 
-        treeData.updateState(nodeId, { selected: shouldSelect });
         options.onSelectionChange?.(this.getSelectedNodes());
       },
-      selectAll(treeData: ITreeData): void {
+      async selectAll(treeData: ITreeData): Promise<void> {
         if (!this.multipleSelection) {
           return;
         }
+
+        const rootState = treeData.getState(treeData.rootId);
+        if (rootState.loading) {
+          return;
+        }
+
+        await getAllNodesWithLoad(treeData, treeData.rootId);
 
         treeData.updateAllState({ selected: true });
 
