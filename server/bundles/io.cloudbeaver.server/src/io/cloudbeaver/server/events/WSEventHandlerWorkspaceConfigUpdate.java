@@ -30,7 +30,7 @@ public class WSEventHandlerWorkspaceConfigUpdate extends WSDefaultEventHandler<W
         String configFileName = event.getConfigFilePath();
         log.info("Config file changed: " + configFileName);
         WorkspaceConfigEventManager.fireConfigChangedEvent(configFileName);
-        if (DriverDescriptorSerializerLegacy.DRIVERS_FILE_NAME.equals(event.getTopicId())) {
+        if (DriverDescriptorSerializerLegacy.DRIVERS_FILE_NAME.equals(event.getConfigFilePath())) {
             super.handleEvent(event);
         }
     }
