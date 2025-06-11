@@ -29,6 +29,8 @@ export interface ITree {
   clickNode(id: string): Promise<void>;
   expandNode(id: string, state: boolean): Promise<void>;
   selectNode(id: string, state: boolean): Promise<void>;
+  isNodeSelected(id: string): boolean;
+  isNodeIndeterminateSelected(id: string): boolean;
 }
 
 export function useTree(options: IOptions): ITree {
@@ -39,7 +41,7 @@ export function useTree(options: IOptions): ITree {
     onNodeDoubleClick: observable.ref,
     getNodeHeight: observable.ref,
   });
-  const { selectNode } = useTreeSelection(options.data);
+  const { selectNode, isNodeSelected, isNodeIndeterminateSelected } = useTreeSelection(options.data);
 
   const data = useObservableRef(
     () => ({
@@ -82,6 +84,12 @@ export function useTree(options: IOptions): ITree {
       },
       async selectNode(id: string, state: boolean) {
         await selectNode(options.data, id, state);
+      },
+      isNodeSelected(id: string): boolean {
+        return isNodeSelected(id);
+      },
+      isNodeIndeterminateSelected(id: string): boolean {
+        return isNodeIndeterminateSelected(id);
       },
     }),
     {},

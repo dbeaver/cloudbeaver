@@ -11,4 +11,5 @@ export interface INodeState {
   expanded: boolean;
   loading?: boolean;
   showInFilter?: boolean;
+  indeterminateSelected?: boolean;
 }

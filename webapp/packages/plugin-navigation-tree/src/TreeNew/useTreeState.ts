@@ -29,6 +29,7 @@ export function useTreeState(externalState?: TreeState): ITreeState {
           selected: false,
           showInFilter: false,
           loading: false,
+          indeterminateSelected: false,
         }),
       ),
   );

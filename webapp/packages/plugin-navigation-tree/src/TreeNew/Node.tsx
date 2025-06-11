@@ -20,7 +20,7 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
   const tree = useContext(TreeContext)!;
   const data = useContext(TreeDataContext)!;
 
-  const { expanded, selected, loading } = data.getState(nodeId);
+  const { expanded, selected, loading, indeterminateSelected } = data.getState(nodeId);
 
   const dndData = useNodeDnD(nodeId, () => {
     // if (!selected) {
@@ -52,6 +52,7 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
   return (
     <TreeNode
       selected={selected}
+      indeterminateSelected={indeterminateSelected}
       expanded={expanded}
       loading={loading}
       onExpand={handleToggleExpand}
