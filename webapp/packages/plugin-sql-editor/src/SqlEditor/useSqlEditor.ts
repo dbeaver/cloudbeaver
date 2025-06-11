@@ -433,7 +433,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         await data.updateParserScripts();
 
         if (!projectId || !connectionId || this.cursor.anchor !== this.cursor.head) {
-          return this.getSubQuery();
+          return await this.getSubQuery();
         }
 
         const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, this.value, this.cursor.anchor);
