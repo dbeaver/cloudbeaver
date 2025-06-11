@@ -36,7 +36,6 @@ import {
   type InitConnectionMutationVariables,
   type NavigatorSettingsInput,
   type TestConnectionMutation,
-  type UserConnectionAuthPropertiesFragment,
 } from '@cloudbeaver/core-sdk';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 
@@ -47,19 +46,8 @@ import type { DatabaseConnection } from './DatabaseConnection.js';
 import { DBDriverResource } from './DBDriverResource.js';
 import { parseConnectionKey } from './parseConnectionKey.js';
 
-export type Connection = DatabaseConnection & {
-  authProperties?: UserConnectionAuthPropertiesFragment[];
-};
-export type ConnectionInitConfig = Omit<
-  InitConnectionMutationVariables,
-  | 'includeAuthProperties'
-  | 'includeNetworkHandlersConfig'
-  | 'includeAuthNeeded'
-  | 'includeCredentialsSaved'
-  | 'includeProperties'
-  | 'includeProviderProperties'
-  | 'customIncludeOptions'
->;
+export type Connection = DatabaseConnection;
+export type ConnectionInitConfig = InitConnectionMutationVariables;
 export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'>;
 
 export const NEW_CONNECTION_SYMBOL = Symbol('new-connection');
@@ -313,17 +301,9 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   }
 
   async create(projectId: string, config: ConnectionConfig): Promise<Connection> {
-    let key: IConnectionInfoParams | undefined;
-
-    if (config.connectionId) {
-      key = createConnectionParam(projectId, config.connectionId);
-    }
-
     const { connection } = await this.graphQLService.sdk.createConnection({
       projectId: projectId,
       config,
-      ...this.getDefaultIncludes(),
-      ...this.getIncludesMap(key),
     });
 
     return this.add(connection, true);
@@ -349,30 +329,10 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       projectId,
       nodePath: nodeId,
       config: { name: nodeName },
-      ...this.getDefaultIncludes(),
-      ...this.getIncludesMap(),
     });
 
     return this.add(connection);
   }
-
-  // addList(connections: Connection[]): Connection[] {
-  //   const newConnections = connections.filter(connection => !this.has({
-  //     projectId: connection.projectId,
-  //     connectionId: connection.id,
-  //   }));
-
-  //   const key = this.updateConnection(...connections);
-
-  //   for (const connection of newConnections) {
-  //     this.onConnectionCreate.execute(this.get({
-  //       projectId: connection.projectId,
-  //       connectionId: connection.id,
-  //     })!);
-  //   }
-
-  //   return this.get(key) as Connection[];
-  // }
 
   async add(connection: Connection, isNew = false): Promise<Connection> {
     const key = createConnectionParam(connection);
@@ -433,8 +393,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       try {
         const { connection } = await this.graphQLService.sdk.initConnection({
           ...config,
-          ...this.getDefaultIncludes(),
-          ...this.getIncludesMap(key),
         });
         this.set(createConnectionParam(connection), connection);
         this.onDataOutdated.execute(key);
@@ -452,8 +410,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       connectionId: key.connectionId,
       projectId: key.projectId,
       settings: { ...connectionNavigatorViewSettings, ...settings },
-      ...this.getDefaultIncludes(),
-      ...this.getIncludesMap(key),
     });
 
     this.set(createConnectionParam(connection), connection);
@@ -466,10 +422,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     await this.performUpdate(key, [], async () => {
       const { connection } = await this.graphQLService.sdk.updateConnection({
         projectId: key.projectId,
-        connectionId: key.connectionId,
         config,
-        ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(key),
       });
 
       this.set(createConnectionParam(connection), connection);
@@ -483,8 +436,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       const { connection } = await this.graphQLService.sdk.closeConnection({
         projectId: key.projectId,
         connectionId: key.connectionId,
-        ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(key),
       });
 
       runInAction(() => {
@@ -509,16 +460,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     });
     this.onDataOutdated.execute(key);
   }
-
-  // async updateSessionConnections(): Promise<boolean> {
-  //   if (!this.changed) {
-  //     return false;
-  //   }
-
-  //   await this.graphQLService.sdk.refreshSessionConnections();
-  //   this.changed = false;
-  //   return true;
-  // }
 
   cleanNewFlags(): void {
     for (const connection of this.data.values()) {
@@ -560,8 +501,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
         projectId,
         connectionId,
         projectIds,
-        ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(connectionKey, includes),
       });
 
       if (connectionId && !connections.some(connection => connection.id === connectionId)) {
@@ -595,10 +534,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     super.dataSet(key, {
       ...oldConnection,
       ...value,
-      networkHandlersConfig: value.networkHandlersConfig?.map(handler => ({
-        ...oldConnection?.networkHandlersConfig?.find(oldHandler => oldHandler.id === handler.id),
-        ...handler,
-      })),
     });
 
     if (oldConnection?.connected && !value.connected) {
@@ -617,18 +552,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   protected override resetDataToDefault(): void {
     super.resetDataToDefault();
     this.nodeIdMap.clear();
-  }
-
-  getDefaultIncludes(): ConnectionInfoIncludes {
-    return {
-      includeNetworkHandlersConfig: false,
-      includeAuthProperties: false,
-      includeAuthNeeded: false,
-      includeCredentialsSaved: false,
-      includeProperties: false,
-      includeProviderProperties: false,
-      customIncludeOptions: false,
-    };
   }
 
   protected validateKey(key: IConnectionInfoParams): boolean {
