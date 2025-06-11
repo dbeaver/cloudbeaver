@@ -183,6 +183,7 @@ export const ReactCodemirrorSearchPanel: React.FC<Props> = observer(function Rea
 
   return createPortal(
     <SearchPanel
+      isReadOnly={view.state.readOnly}
       ref={searchPanelRef}
       queryState={queryState}
       searchMatchesCount={searchMatchesCount}

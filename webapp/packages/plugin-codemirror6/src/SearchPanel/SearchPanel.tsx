@@ -20,6 +20,7 @@ export interface SearchPanelRef {
 }
 
 interface SearchPanelProps {
+  isReadOnly: boolean;
   searchMatchesCount?: { count: number; current: number };
   queryState: SearchQuery;
   ref: React.RefObject<SearchPanelRef | null>;
@@ -36,6 +37,7 @@ interface SearchPanelProps {
 }
 
 export const SearchPanel = observer(function SearchPanel({
+  isReadOnly,
   searchMatchesCount,
   queryState,
   ref,
@@ -96,16 +98,18 @@ export const SearchPanel = observer(function SearchPanel({
 
   return (
     <div className="search-panel" onKeyDown={handleKeyDown}>
-      <IconButton
-        className={clsx(showReplace ? 'tw:h-[56px]!' : 'tw:h-[26px]!')}
-        size="small"
-        aria-label={translate('plugin_codemirror_search_replace_toggle')}
-        type="button"
-        title={translate('plugin_codemirror_search_replace_toggle')}
-        onClick={handleToggleReplace}
-      >
-        <Icon className={clsx(showReplace && 'tw:rotate-180')} width={16} height={16} viewBox="0 0 16 16" name="arrow" />
-      </IconButton>
+      {!isReadOnly && (
+        <IconButton
+          className={clsx(showReplace ? 'tw:h-[56px]!' : 'tw:h-[26px]!')}
+          size="small"
+          aria-label={translate('plugin_codemirror_search_replace_toggle')}
+          type="button"
+          title={translate('plugin_codemirror_search_replace_toggle')}
+          onClick={handleToggleReplace}
+        >
+          <Icon className={clsx(showReplace && 'tw:rotate-180')} width={16} height={16} viewBox="0 0 16 16" name="arrow" />
+        </IconButton>
+      )}
 
       <div className="search-panel__inputs">
         <div className="search-panel__input">
