@@ -54,7 +54,7 @@
 
     @container (width >= 280px) {
       &:has(.search-panel__matches) {
-        flex-basis: 135px;
+        flex-basis: 140px;
       }
     }
   }
