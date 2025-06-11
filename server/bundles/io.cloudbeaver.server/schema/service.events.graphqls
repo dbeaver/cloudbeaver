@@ -34,7 +34,7 @@ enum CBServerEventId {
     cb_subject_permissions_updated,
 
     cb_database_output_log_updated,
-    cb_ai_chat_message @since(version: "25.1.1")
+    cb_ai_chat_message_chunk @since(version: "25.1.1")
 
     cb_transaction_count @since(version: "24.3.3")
 
@@ -68,6 +68,7 @@ enum CBEventTopic {
     cb_delete_temp_folder,
 
     cb_transaction @since(version: "24.3.3")
+    cb_ai @since(version: "25.1.1")
 }
 
 # Base server event interface
