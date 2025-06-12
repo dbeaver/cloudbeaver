@@ -1436,18 +1436,18 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         if (CommonUtils.isEmpty(permissions)) {
             return;
         }
-        SMPermissionsRegistry permissionsRegistry = SMPermissionsRegistry.getInstance();
-        List<SMPermission> forDelete = new ArrayList<>();
+        Map<String, SMPermission> defaultPermissions = getGlobalDefaultPermissions()
+            .stream()
+            .collect(Collectors.toMap(SMPermission::getPermissionId, Function.identity()));
         List<SMPermission> forInsert = new ArrayList<>();
+
         for (SMPermission permission : permissions) {
-            SMPermissionDescriptor descriptor = permissionsRegistry.getPermissionDescriptor(permission.getPermissionId());
-            if (descriptor == null) {
+            SMPermission defaultValue = defaultPermissions.get(permission.getPermissionId());
+            if (defaultValue == null) {
                 throw new SMException("Unknown permission '" + permission.getPermissionId() + "'");
             }
             //delete permission from db if new enabled status is default status
-            if (descriptor.enabledByDefault() == permission.isEnabled()) {
-                forDelete.add(permission);
-            } else {
+            if (defaultValue.isEnabled() != permission.isEnabled()) {
                 forInsert.add(permission);
             }
         }
@@ -1456,17 +1456,15 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             var dbCon = database.openConnection();
             var txn = new JDBCTransaction(dbCon)
         ) {
-            if (!CommonUtils.isEmpty(forDelete)) {
-                String deleteSql = "DELETE FROM {table_prefix}CB_GLOBAL_PERMISSIONS "
-                    + "WHERE SUBJECT_ID=? AND PERMISSION_ID IN (" + SQLUtils.generateParamList(forDelete.size()) + ")";
-                try (PreparedStatement dbStat = dbCon.prepareStatement(deleteSql)) {
-                    int paramIndex = 1;
-                    dbStat.setString(paramIndex++, subjectId);
-                    for (SMPermission permission : forDelete) {
-                        dbStat.setString(paramIndex++, permission.getPermissionId());
-                    }
-                    dbStat.execute();
+            String deleteSql = "DELETE FROM {table_prefix}CB_GLOBAL_PERMISSIONS "
+                + "WHERE SUBJECT_ID=? AND PERMISSION_ID IN (" + SQLUtils.generateParamList(permissions.size()) + ")";
+            try (PreparedStatement dbStat = dbCon.prepareStatement(deleteSql)) {
+                int paramIndex = 1;
+                dbStat.setString(paramIndex++, subjectId);
+                for (SMPermission permission : permissions) {
+                    dbStat.setString(paramIndex++, permission.getPermissionId());
                 }
+                dbStat.execute();
             }
             if (!CommonUtils.isEmpty(forInsert)) {
                 try (
