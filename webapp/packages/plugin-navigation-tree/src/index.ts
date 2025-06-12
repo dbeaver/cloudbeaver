@@ -48,11 +48,13 @@ export * from './TreeNew/TreeLazy.js';
 export * from './TreeNew/NodeLazy.js';
 export * from './TreeNew/contexts/TreeContext.js';
 export * from './TreeNew/contexts/TreeDataContext.js';
+export * from './TreeNew/contexts/TreeSelectionContext.js';
 export * from './TreeNew/NodeControlLazy.js';
 export * from './TreeNew/useTreeData.js';
 export * from './TreeNew/ITreeData.js';
 export * from './TreeNew/useTreeFilter.js';
 export * from './TreeNew/useTreeSelection.js';
+export * from './TreeNew/contexts/useTreeSelectionContext.js';
 export * from './TreeNew/INode.js';
 export * from './TreeNew/NodeEmptyPlaceholderComponent.js';
 

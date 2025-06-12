@@ -13,6 +13,7 @@ import { NodeSizeCacheContext } from './contexts/NodeSizeCacheContext.js';
 import { TreeContext } from './contexts/TreeContext.js';
 import { TreeDataContext } from './contexts/TreeDataContext.js';
 import { TreeDnDContext } from './contexts/TreeDnDContext.js';
+import { TreeSelectionContext } from './contexts/TreeSelectionContext.js';
 import { TreeVirtualizationContext } from './contexts/TreeVirtualizationContext.js';
 import type { INodeRenderer } from './INodeRenderer.js';
 import type { ITreeData } from './ITreeData.js';
@@ -21,6 +22,7 @@ import type { NodeEmptyPlaceholderComponent } from './NodeEmptyPlaceholderCompon
 import { useNodeSizeCache } from './useNodeSizeCache.js';
 import { useTree } from './useTree.js';
 import { useTreeDnD } from './useTreeDnD.js';
+import { useTreeSelection } from './useTreeSelection.js';
 import { useTreeVirtualization } from './useTreeVirtualization.js';
 
 export interface NavigationTreeNewProps {
@@ -32,6 +34,7 @@ export interface NavigationTreeNewProps {
   className?: string;
   onNodeClick?(id: string): void | Promise<void>;
   onNodeDoubleClick?(id: string): void | Promise<void>;
+  onSelectionChange?(selectedNodeIds: string[]): void;
   getNodeDnDContext?(id: string, context: IDataContext): void;
   getNodeHeight(id: string): number;
 }
@@ -45,17 +48,21 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
   expandOnSelect = false,
   onNodeClick,
   onNodeDoubleClick,
+  onSelectionChange,
   getNodeDnDContext,
   getNodeHeight,
 }) {
   const tree = useTree({
     data,
     nodeRenderers,
-    multipleSelection,
-    expandOnSelect,
     onNodeClick,
     onNodeDoubleClick,
     getNodeHeight,
+  });
+  const treeSelection = useTreeSelection(data, {
+    multipleSelection,
+    expandOnSelect,
+    onSelectionChange,
   });
   const mountOptimization = useTreeVirtualization();
   const elementsSizeCache = useNodeSizeCache(tree, data);
@@ -67,13 +74,15 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
     <div ref={mountOptimization.setRootRef} className={className} style={{ overflow: 'auto', position: 'relative' }}>
       <NodeSizeCacheContext.Provider value={elementsSizeCache}>
         <TreeDataContext.Provider value={data}>
-          <TreeVirtualizationContext.Provider value={mountOptimization}>
-            <TreeContext.Provider value={tree}>
-              <TreeDnDContext.Provider value={treeDnD}>
-                <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
-              </TreeDnDContext.Provider>
-            </TreeContext.Provider>
-          </TreeVirtualizationContext.Provider>
+          <TreeSelectionContext.Provider value={treeSelection}>
+            <TreeVirtualizationContext.Provider value={mountOptimization}>
+              <TreeContext.Provider value={tree}>
+                <TreeDnDContext.Provider value={treeDnD}>
+                  <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
+                </TreeDnDContext.Provider>
+              </TreeContext.Provider>
+            </TreeVirtualizationContext.Provider>
+          </TreeSelectionContext.Provider>
         </TreeDataContext.Provider>
       </NodeSizeCacheContext.Provider>
     </div>

@@ -22,9 +22,9 @@ export interface ITreeSelection {
   selectedNodes: string[];
   isNodeSelected(nodeId: string): boolean;
   isNodeIndeterminateSelected(nodeId: string): boolean;
-  selectNode(treeData: ITreeData, nodeId: string, selected?: boolean): Promise<void>;
-  selectAll(treeData: ITreeData): Promise<void>;
-  clearSelection(treeData: ITreeData): void;
+  selectNode(nodeId: string, selected?: boolean): Promise<void>;
+  selectAll(): Promise<void>;
+  clearSelection(): void;
   getSelectedNodes(): string[];
 }
 
@@ -175,7 +175,7 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
       isNodeIndeterminateSelected(nodeId: string): boolean {
         return treeData.getState(nodeId).indeterminateSelected ?? false;
       },
-      async selectNode(treeData: ITreeData, nodeId: string, selected?: boolean): Promise<void> {
+      async selectNode(nodeId: string, selected?: boolean): Promise<void> {
         const nodeState = treeData.getState(nodeId);
         if (nodeState.loading) {
           return;
@@ -185,7 +185,7 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
         const shouldSelect = selected !== undefined ? selected : !currentlySelected;
 
         if (!this.multipleSelection && shouldSelect) {
-          this.clearSelection(treeData);
+          this.clearSelection();
         }
 
         const node = treeData.getNode(nodeId);
@@ -200,7 +200,7 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
 
         options.onSelectionChange?.(this.getSelectedNodes());
       },
-      async selectAll(treeData: ITreeData): Promise<void> {
+      async selectAll(): Promise<void> {
         if (!this.multipleSelection) {
           return;
         }
@@ -214,7 +214,7 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
 
         options.onSelectionChange?.(this.getSelectedNodes());
       },
-      clearSelection(treeData: ITreeData): void {
+      clearSelection(): void {
         const allNodes = getAllNodes(treeData, treeData.rootId);
         allNodes.forEach(nodeId => {
           treeData.updateState(nodeId, {

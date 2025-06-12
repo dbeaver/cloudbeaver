@@ -11,13 +11,10 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 
 import type { INodeRenderer, NodeComponent } from './INodeRenderer.js';
 import type { ITreeData } from './ITreeData.js';
-import { useTreeSelection } from './useTreeSelection.js';
 
 interface IOptions {
   data: ITreeData;
   nodeRenderers?: INodeRenderer[];
-  multipleSelection?: boolean;
-  expandOnSelect?: boolean;
   onNodeClick?(id: string): void | Promise<void>;
   onNodeDoubleClick?(id: string): void | Promise<void>;
   getNodeHeight(id: string): number;
@@ -30,23 +27,15 @@ export interface ITree {
   openNode(id: string): Promise<void>;
   clickNode(id: string): Promise<void>;
   expandNode(id: string, state: boolean): Promise<void>;
-  selectNode(id: string, state: boolean): Promise<void>;
-  isNodeSelected(id: string): boolean;
-  isNodeIndeterminateSelected(id: string): boolean;
 }
 
 export function useTree(options: IOptions): ITree {
   options = useObservableRef(options, {
     data: observable.ref,
-    multipleSelection: observable.ref,
     nodeRenderers: observable.ref,
     onNodeClick: observable.ref,
     onNodeDoubleClick: observable.ref,
     getNodeHeight: observable.ref,
-  });
-  const { selectNode, isNodeSelected, isNodeIndeterminateSelected } = useTreeSelection(options.data, {
-    multipleSelection: options.multipleSelection,
-    expandOnSelect: options.expandOnSelect,
   });
 
   const data = useObservableRef(
@@ -87,15 +76,6 @@ export function useTree(options: IOptions): ITree {
             }
           }
         } catch (exception) {}
-      },
-      async selectNode(id: string, state: boolean) {
-        await selectNode(options.data, id, state);
-      },
-      isNodeSelected(id: string): boolean {
-        return isNodeSelected(id);
-      },
-      isNodeIndeterminateSelected(id: string): boolean {
-        return isNodeIndeterminateSelected(id);
       },
     }),
     {},
