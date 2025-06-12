@@ -1,5 +1,7 @@
 fragment DatabaseConnectionProviderProperties on ConnectionInfo {
   id
   projectId
+  driverId
+  configurationType
   providerProperties
 }

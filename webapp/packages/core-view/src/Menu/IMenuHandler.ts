@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,13 +10,14 @@ import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import type { IMenu } from './IMenu.js';
 import type { MenuSubMenuItemIconComponent } from './MenuItem/IMenuSubMenuItem.js';
+import type { IMenuInfo } from './IMenuInfo.js';
 
 export interface IMenuHandler<TExtraProps = unknown> {
   id: string;
   menus: Set<IMenu>;
   contexts: Set<DataContextGetter<any>>;
 
-  getInfo?: (context: IDataContextProvider, menu: IMenu) => IMenu;
+  getInfo?: (context: IDataContextProvider, menu: IMenu) => IMenuInfo;
   getLoader?: (context: IDataContextProvider, menu: IMenu) => ILoadableState[] | ILoadableState;
   getExtraProps?: () => TExtraProps;
   iconComponent?: () => MenuSubMenuItemIconComponent<TExtraProps>;

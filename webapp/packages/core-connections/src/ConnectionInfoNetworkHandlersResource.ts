@@ -25,7 +25,6 @@ import { parseConnectionKey } from './parseConnectionKey.js';
 
 export type ConnectionInfoNetworkHandlers = DatabaseConnectionNetworkHandlersFragment;
 
-// TODO reuse it everywhere where include "includeNetworkHandlers" is used
 @injectable()
 export class ConnectionInfoNetworkHandlersResource extends CachedMapResource<IConnectionInfoParams, ConnectionInfoNetworkHandlers> {
   constructor(

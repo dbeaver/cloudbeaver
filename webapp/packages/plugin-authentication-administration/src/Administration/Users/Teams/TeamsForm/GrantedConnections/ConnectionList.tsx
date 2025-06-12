@@ -24,7 +24,7 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { type Connection, type ConnectionInfoOrigin, DBDriverResource } from '@cloudbeaver/core-connections';
+import { type ConnectionInfoCustomOptions, type ConnectionInfoOrigin, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 
 import styles from './ConnectionList.module.css';
@@ -34,7 +34,7 @@ import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHea
 import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem.js';
 
 interface Props {
-  connectionList: Connection[];
+  connectionList: ConnectionInfoCustomOptions[];
   connectionsOrigins: ConnectionInfoOrigin[];
   grantedSubjects: string[];
   disabled: boolean;

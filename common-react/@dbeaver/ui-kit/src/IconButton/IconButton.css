@@ -17,6 +17,8 @@
     color: var(--dbv-kit-icon-btn-foreground);
     background-color: var(--dbv-kit-icon-btn-background);
 
+    cursor: pointer;
+
     &:focus-visible,
     &[data-focus-visible] {
       outline: var(--dbv-kit-icon-btn-outline-width) solid var(--dbv-kit-icon-btn-outline-color);

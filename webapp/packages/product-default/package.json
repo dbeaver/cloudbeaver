@@ -7,7 +7,7 @@
     "public/**/*",
     "src/**/*.css"
   ],
-  "version": "25.1.0",
+  "version": "25.1.1",
   "description": "CloudBeaver Community",
   "license": "Apache-2.0",
   "exports": {

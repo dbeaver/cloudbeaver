@@ -31,5 +31,6 @@ export * from './ConnectionAuthService.js';
 export * from './PluginConnectionsSettingsService.js';
 export * from './ConnectionShieldLazy.js';
 export * from './Actions/ACTION_TREE_CREATE_CONNECTION.js';
+export * from './Actions/MENU_TREE_CREATE_CONNECTION.js';
 
 export default connectionPlugin;

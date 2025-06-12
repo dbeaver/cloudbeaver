@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { Button, getComputed, type PlaceholderComponent, useResource, useTranslate, useAuthenticationAction } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoAuthPropertiesResource, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
@@ -18,10 +18,15 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
   const translate = useTranslate();
   const optionsPart = getConnectionFormOptionsPart(formState);
   const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, optionsPart.state.driverId || null);
-  const connectionInfoService = useResource(ConnectionFormAuthenticationAction, ConnectionInfoResource, optionsPart.connectionKey, {
-    active: !!optionsPart.connectionKey,
-  });
-  const info = connectionInfoService.data;
+  const connectionInfoAuthPropertiesService = useResource(
+    ConnectionFormAuthenticationAction,
+    ConnectionInfoAuthPropertiesResource,
+    optionsPart.connectionKey,
+    {
+      active: !!optionsPart.connectionKey,
+    },
+  );
+  const info = connectionInfoAuthPropertiesService.data;
   const driver = driverMap.data;
   const { data: authModel } = useResource(
     ConnectionFormAuthenticationAction,
@@ -36,7 +41,7 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
         return;
       }
 
-      connectionInfoService.resource.markOutdated(optionsPart.connectionKey);
+      connectionInfoAuthPropertiesService.resource.markOutdated(optionsPart.connectionKey);
     },
   });
 
@@ -56,7 +61,7 @@ export const ConnectionFormAuthenticationAction: PlaceholderComponent<IConnectio
 }) {
   const optionsPart = getConnectionFormOptionsPart(formState);
   const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, optionsPart.state.driverId || null);
-  const connectionInfoService = useResource(ConnectionFormAuthenticationAction, ConnectionInfoResource, optionsPart.connectionKey, {
+  const connectionInfoService = useResource(ConnectionFormAuthenticationAction, ConnectionInfoAuthPropertiesResource, optionsPart.connectionKey, {
     active: !!optionsPart.connectionKey,
   });
   const driver = driverMap.data;

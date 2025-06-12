@@ -136,6 +136,7 @@ export default [
   ['ui_schema', 'Схема'],
   ['ui_project', 'Проект'],
   ['ui_type', 'Тип'],
+  ['ui_field_is_required', 'Заполните это поле'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],
