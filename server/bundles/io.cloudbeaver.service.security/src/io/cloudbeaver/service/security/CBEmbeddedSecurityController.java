@@ -40,6 +40,7 @@ import org.jkiss.dbeaver.model.DBPConnectionInformation;
 import org.jkiss.dbeaver.model.DBPPage;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
@@ -49,6 +50,9 @@ import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
+import org.jkiss.dbeaver.model.security.permissions.SMPermission;
+import org.jkiss.dbeaver.model.security.permissions.SMPermissionDescriptor;
+import org.jkiss.dbeaver.model.security.permissions.SMPermissionsRegistry;
 import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
@@ -65,6 +69,7 @@ import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -1422,6 +1427,162 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         addSubjectPermissionsUpdateEvent(subjectId, null);
     }
 
+    @Override
+    public void setGlobalSubjectPermissions(
+        @NotNull String subjectId,
+        @NotNull List<SMPermission> permissions,
+        @NotNull String grantorId
+    ) throws DBException {
+        if (CommonUtils.isEmpty(permissions)) {
+            return;
+        }
+        SMPermissionsRegistry permissionsRegistry = SMPermissionsRegistry.getInstance();
+        List<SMPermission> forDelete = new ArrayList<>();
+        List<SMPermission> forInsert = new ArrayList<>();
+        for (SMPermission permission : permissions) {
+            SMPermissionDescriptor descriptor = permissionsRegistry.getPermissionDescriptor(permission.getPermissionId());
+            if (descriptor == null) {
+                throw new SMException("Unknown permission '" + permission.getPermissionId() + "'");
+            }
+            //delete permission from db if new enabled status is default status
+            if (descriptor.enabledByDefault() == permission.isEnabled()) {
+                forDelete.add(permission);
+            } else {
+                forInsert.add(permission);
+            }
+        }
+
+        try (
+            var dbCon = database.openConnection();
+            var txn = new JDBCTransaction(dbCon)
+        ) {
+            if (!CommonUtils.isEmpty(forDelete)) {
+                String deleteSql = "DELETE FROM {table_prefix}CB_GLOBAL_PERMISSIONS "
+                    + "WHERE SUBJECT_ID=? AND PERMISSION_ID IN (" + SQLUtils.generateParamList(forDelete.size()) + ")";
+                try (PreparedStatement dbStat = dbCon.prepareStatement(deleteSql)) {
+                    int paramIndex = 1;
+                    dbStat.setString(paramIndex++, subjectId);
+                    for (SMPermission permission : forDelete) {
+                        dbStat.setString(paramIndex++, permission.getPermissionId());
+                    }
+                    dbStat.execute();
+                }
+            }
+            if (!CommonUtils.isEmpty(forInsert)) {
+                try (
+                    PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO {table_prefix}CB_GLOBAL_PERMISSIONS" +
+                        "(SUBJECT_ID,PERMISSION_ID,IS_ENABLED,GRANTED_BY) VALUES(?,?,?,?)")
+                ) {
+                    for (SMPermission permission : forInsert) {
+                        dbStat.setString(1, subjectId);
+                        dbStat.setString(2, permission.getPermissionId());
+                        dbStat.setString(3, booleanToString(permission.isEnabled()));
+                        dbStat.setString(4, grantorId);
+                        dbStat.addBatch();
+                    }
+                    dbStat.executeBatch();
+                }
+            }
+            txn.commit();
+        } catch (Exception e) {
+            throw new SMException("Error updating permissions: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void setGlobalDefaultPermissions(@NotNull List<SMPermission> permissions, @NotNull String grantorId) throws DBException {
+
+    }
+
+    public void initialize() throws DBException {
+        List<SMPermission> currentSavedPermissions = getGlobalDefaultPermissions();
+        Map<String, SMPermission> currentSavedPermissionsById = currentSavedPermissions.stream()
+            .collect(Collectors.toMap(SMPermission::getPermissionId, Function.identity()));
+        Map<String, SMPermissionDescriptor> allExistPermissions = SMPermissionsRegistry.getInstance().getPermissionsMap();
+
+        List<SMPermission> forInsert = new ArrayList<>();
+        for (SMPermissionDescriptor permissionDescriptor : allExistPermissions.values()) {
+            if (!currentSavedPermissionsById.containsKey(permissionDescriptor.getId())) {
+                forInsert.add(new SMPermission(permissionDescriptor.getId(), permissionDescriptor.enabledByDefault()));
+            }
+        }
+
+        List<SMPermission> forDelete = new ArrayList<>();
+        for (SMPermission savedPermission : currentSavedPermissions) {
+            if (!allExistPermissions.containsKey(savedPermission.getPermissionId())) {
+                log.warn("Unknown permission: " + savedPermission.getPermissionId());
+                forDelete.add(savedPermission);
+            }
+        }
+        try (
+            var dbCon = database.openConnection();
+            var txn = new JDBCTransaction(dbCon)
+        ) {
+            if (!CommonUtils.isEmpty(forDelete)) {
+                String sql = "UPDATE {table_prefix}CB_GLOBAL_PERMISSIONS_DEFAULTS SET DELETED=? WHERE "
+                    + "PERMISSION_ID IN (" + SQLUtils.generateParamList(forDelete.size()) + ")";
+                try (var dbStat = dbCon.prepareStatement(sql)) {
+                    int paramIndex = 1;
+                    dbStat.setString(paramIndex++, booleanToString(true));
+                    for (SMPermission permission : forDelete) {
+                        dbStat.setString(paramIndex++, permission.getPermissionId());
+                    }
+                }
+            }
+            if (!CommonUtils.isEmpty(forInsert)) {
+                try (var dbStat = dbCon.prepareStatement(
+                        """
+                            INSERT INTO {table_prefix}CB_GLOBAL_PERMISSIONS_DEFAULTS(PERMISSION_ID,ENABED_BY_DEFAULT,GRANTED_BY)
+                            VALUES(?,?,?)
+                            """
+                    )
+                ) {
+                    for (SMPermission permission : forInsert) {
+                        dbStat.setString(1, permission.getPermissionId());
+                        dbStat.setString(2, booleanToString(permission.isEnabled()));
+                        dbStat.setString(
+                            3,
+                            "automatically granted by " + ApplicationRegistry.getInstance().getApplication().getName()
+                        );
+                        dbStat.addBatch();
+                    }
+                    dbStat.executeBatch();
+                }
+            }
+            txn.commit();
+        } catch (SQLException e) {
+            throw new SMException("Error initialize default permissions in database", e);
+        }
+
+
+    }
+
+    @Override
+    public List<SMPermission> getGlobalDefaultPermissions() throws DBException {
+        List<SMPermission> defaultPermissions = new ArrayList<>();
+        try (
+            var dbCon = database.openConnection();
+            var dbStat = dbCon.prepareStatement(
+                """
+                    SELECT PERMISSION_ID,ENABED_BY_DEFAULT FROM {table_prefix}CB_GLOBAL_PERMISSIONS_DEFAULTS 
+                    AND DELETED=?
+                    """
+            )
+        ) {
+            dbStat.setString(1, booleanToString(false));
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                while (dbResult.next()) {
+                    var permissionId = dbResult.getString(1);
+                    boolean enabled = stringToBoolean(dbResult.getString(2));
+                    defaultPermissions.add(new SMPermission(permissionId, enabled));
+                }
+            }
+            return defaultPermissions;
+        } catch (SQLException e) {
+            throw new SMException("Error getting global default permissions: " + e.getMessage(), e);
+        }
+    }
+
     private void insertPermissions(Connection dbCon, String subjectId, String[] permissionIds, String grantorId) throws SQLException {
         if (!ArrayUtils.isEmpty(permissionIds)) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -1485,11 +1646,104 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     }
                 }
             }
+            permissions.addAll(getGlobalUserPermissions(dbCon, userId));
             permissions.addAll(getSubjectPermissions(userId));
             return permissions;
         } catch (SQLException e) {
             throw new DBCException("Error reading user permissions", e);
         }
+    }
+
+    protected Set<String> getGlobalUserPermissions(@NotNull Connection dbCon, @NotNull String userId) throws DBException {
+        Set<SMPermission> permissionsGrantedToUser = new HashSet<>();
+        try (
+            PreparedStatement dbStat = dbCon.prepareStatement(
+                """
+                    SELECT SP.PERMISSION_ID, SP.IS_ENABLED
+                    FROM {table_prefix}CB_GLOBAL_PERMISSIONS GP
+                    WHERE GP.SUBJECT_ID=?
+                    """)
+        ) {
+            dbStat.setString(1, userId);
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                while (dbResult.next()) {
+                    String permissionId = dbResult.getString(1);
+                    boolean isEnabled = stringToBoolean(dbResult.getString(2));
+                    permissionsGrantedToUser.add(new SMPermission(permissionId, isEnabled));
+                }
+
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error reading user's permissions", e);
+        }
+        Map<String, List<SMPermission>> permissionByTeamId = new HashMap<>();
+        try (
+            PreparedStatement dbStat = dbCon.prepareStatement(
+                """
+                    SELECT GP.SUBJECT_ID, GP.PERMISSION_ID, GP.IS_ENABLED
+                    FROM {table_prefix}CB_GLOBAL_PERMISSIONS GP, {table_prefix}CB_USER_TEAM UR
+                    WHERE UR.USER_ID=? AND GP.SUBJECT_ID=UR.TEAM_ID
+                    """
+            )
+        ) {
+            dbStat.setString(1, userId);
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                while (dbResult.next()) {
+                    String teamId = dbResult.getString(1);
+                    String permissionId = dbResult.getString(2);
+                    boolean enabled = stringToBoolean(dbResult.getString(3));
+                    permissionByTeamId.computeIfAbsent(teamId, k -> new ArrayList<>()).add(new SMPermission(permissionId, enabled));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error reading user's teams permissions", e);
+        }
+
+        Set<String> permissions = new HashSet<>();
+        /* permissions priority:
+         * 1. user
+         * 2. team
+         * 3. default
+         */
+        Collection<SMPermission> defaultPermissions = getGlobalDefaultPermissions();
+        for (SMPermission permission : defaultPermissions) {
+            if (permission.isEnabled()) {
+                permissions.add(permission.getPermissionId());
+            }
+        }
+
+        // determinate enabled permission by team or disabled
+        Map<String, SMPermission> finalPermissionStateByTeam = new HashMap<>();
+        permissionByTeamId.values()
+            .stream()
+            .flatMap(Collection::stream)
+            .forEach(permission -> {
+                if (finalPermissionStateByTeam.containsKey(permission.getPermissionId())) {
+                    // if permissions specified in several team - enabled state has priority
+                    if (permission.isEnabled()) {
+                        finalPermissionStateByTeam.put(permission.getPermissionId(), permission);
+                    }
+                } else {
+                    finalPermissionStateByTeam.put(permission.getPermissionId(), permission);
+                }
+            });
+
+        for (SMPermission teamPermission : finalPermissionStateByTeam.values()) {
+            if (teamPermission.isEnabled()) {
+                permissions.add(teamPermission.getPermissionId());
+            } else {
+                permissions.remove(teamPermission.getPermissionId());
+            }
+        }
+
+        for (SMPermission userPermission : permissionsGrantedToUser) {
+            if (userPermission.isEnabled()) {
+                permissions.add(userPermission.getPermissionId());
+            } else {
+                permissions.remove(userPermission.getPermissionId());
+            }
+        }
+        return permissions;
     }
 
     protected Set<String> getUserPermissions(String userId, String authRole) throws DBException {
