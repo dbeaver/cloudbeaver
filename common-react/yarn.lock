@@ -384,6 +384,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@dbeaver/table-data@workspace:../common-typescript/@dbeaver/table-data":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/table-data@workspace:../common-typescript/@dbeaver/table-data"
+  dependencies:
+    "@dbeaver/cli": "workspace:^"
+    "@dbeaver/tsconfig": "workspace:^"
+    async-mutex: "npm:^0"
+    nanoevents: "npm:^9"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+    vitest: "npm:^3"
+  languageName: unknown
+  linkType: soft
+
 "@dbeaver/tsconfig@workspace:../common-typescript/@dbeaver/tsconfig, @dbeaver/tsconfig@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/tsconfig@workspace:../common-typescript/@dbeaver/tsconfig"
@@ -1985,6 +1999,15 @@ __metadata:
   bin:
     astring: bin/astring
   checksum: 10c0/e7519544d9824494e80ef0e722bb3a0c543a31440d59691c13aeaceb75b14502af536b23f08db50aa6c632dafaade54caa25f0788aa7550b6b2d6e2df89e0830
+  languageName: node
+  linkType: hard
+
+"async-mutex@npm:^0":
+  version: 0.5.0
+  resolution: "async-mutex@npm:0.5.0"
+  dependencies:
+    tslib: "npm:^2.4.0"
+  checksum: 10c0/9096e6ad6b674c894d8ddd5aa4c512b09bb05931b8746ebd634952b05685608b2b0820ed5c406e6569919ff5fe237ab3c491e6f2887d6da6b6ba906db3ee9c32
   languageName: node
   linkType: hard
 
@@ -5127,6 +5150,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nanoevents@npm:^9":
+  version: 9.1.0
+  resolution: "nanoevents@npm:9.1.0"
+  checksum: 10c0/5fb48e6fc1d3102daddaeffd6eada907c25b1c8554dcc648e9cb0a72979a1ab3ee56ffa2d2b3e566a8e561a9e2992a3783493c61cfaaa096b2986d56dbbc1ca5
+  languageName: node
+  linkType: hard
+
 "nanoid@npm:^3.3.8":
   version: 3.3.11
   resolution: "nanoid@npm:3.3.11"
@@ -6512,7 +6542,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2, tslib@npm:^2.3.0":
+"tslib@npm:^2, tslib@npm:^2.3.0, tslib@npm:^2.4.0":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
