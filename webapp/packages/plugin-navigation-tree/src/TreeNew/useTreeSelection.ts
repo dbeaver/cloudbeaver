@@ -38,7 +38,35 @@ function getAllNodes(treeData: ITreeData, nodeId: string): string[] {
   return nodes;
 }
 
-function updateIndeterminateState(treeData: ITreeData, nodeId: string): void {
+function updateIndeterminateStates(treeData: ITreeData, nodeId: string): void {
+  updateNodeAndDescendantsIndeterminateState(treeData, nodeId);
+
+  const parent = treeData.getParent(nodeId);
+  if (parent) {
+    updateAncestorsIndeterminateState(treeData, parent);
+  }
+}
+
+function updateNodeAndDescendantsIndeterminateState(treeData: ITreeData, nodeId: string): void {
+  const children = treeData.getChildren(nodeId);
+
+  children.forEach(childId => {
+    updateNodeAndDescendantsIndeterminateState(treeData, childId);
+  });
+
+  updateNodeIndeterminateState(treeData, nodeId);
+}
+
+function updateAncestorsIndeterminateState(treeData: ITreeData, nodeId: string): void {
+  updateNodeIndeterminateState(treeData, nodeId);
+
+  const parent = treeData.getParent(nodeId);
+  if (parent) {
+    updateAncestorsIndeterminateState(treeData, parent);
+  }
+}
+
+function updateNodeIndeterminateState(treeData: ITreeData, nodeId: string): void {
   const node = treeData.getNode(nodeId);
   const children = treeData.getChildren(nodeId);
 
@@ -57,15 +85,6 @@ function updateIndeterminateState(treeData: ITreeData, nodeId: string): void {
     selected: allSelected,
     indeterminateSelected: !allSelected && someSelected,
   });
-}
-
-function updateIndeterminateStateRecursively(treeData: ITreeData, nodeId: string): void {
-  updateIndeterminateState(treeData, nodeId);
-
-  const parent = treeData.getParent(nodeId);
-  if (parent) {
-    updateIndeterminateStateRecursively(treeData, parent);
-  }
 }
 
 async function getAllNodesWithLoad(treeData: ITreeData, nodeId: string): Promise<string[]> {
@@ -171,18 +190,15 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
         const node = treeData.getNode(nodeId);
 
         if (node.leaf) {
-          treeData.updateState(nodeId, { selected: shouldSelect });
+          treeData.updateState(nodeId, { selected: shouldSelect, indeterminateSelected: false });
         } else {
           const allNodes = await getAllNodesWithLoad(treeData, nodeId);
           allNodes.forEach(childId => {
-            treeData.updateState(childId, { selected: shouldSelect });
+            treeData.updateState(childId, { selected: shouldSelect, indeterminateSelected: false });
           });
         }
 
-        const parent = treeData.getParent(nodeId);
-        if (parent) {
-          updateIndeterminateStateRecursively(treeData, parent);
-        }
+        updateIndeterminateStates(treeData, nodeId);
 
         options.onSelectionChange?.(this.getSelectedNodes());
       },
