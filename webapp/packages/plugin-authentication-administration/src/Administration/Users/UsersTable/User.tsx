@@ -63,8 +63,9 @@ export const User = observer<Props>(function User({ user, displayAuthRole, isMan
       <TableColumnValue title={teams} ellipsis>
         {teams}
       </TableColumnValue>
-      <TableColumnValue>
+      <TableColumnValue centerContent>
         <Checkbox
+          className={style['checkbox']}
           checked={user.enabled}
           disabled={usersService.isActiveUser(user.userId) || !isManageable}
           title={enabledCheckboxTitle}

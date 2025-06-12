@@ -27,6 +27,7 @@
 
 @layer components {
   .theme-dark .checkbox-markup {
+    --dbv-kit-checkbox-hover-shadow-color: color-mix(in srgb, var(--theme-on-secondary), black 50%);
     --dbv-kit-checkbox-border-color: color-mix(in srgb, var(--theme-on-secondary), black 20%);
 
     & .dbv-kit-checkbox {
@@ -39,6 +40,8 @@
   }
 
   .checkbox-markup {
+    --dbv-kit-checkbox-hover-shadow-color: color-mix(in srgb, var(--theme-on-secondary), white 80%);
+
     --dbv-kit-checkbox-border-width: 2px;
     --dbv-kit-checkbox-border-radius: 2px;
 
