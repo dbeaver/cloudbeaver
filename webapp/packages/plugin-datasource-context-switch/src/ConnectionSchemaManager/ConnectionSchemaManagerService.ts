@@ -35,6 +35,7 @@ import {
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { SyncExecutor } from '@cloudbeaver/core-executor';
 import { ExtensionUtils, type IExtension } from '@cloudbeaver/core-extensions';
 import { type IDataContextActiveNode, type IObjectNavNodeProvider, isObjectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
 import {
@@ -73,6 +74,8 @@ interface IActiveItem<T> {
 
 @injectable()
 export class ConnectionSchemaManagerService {
+  onConnectionChange: SyncExecutor<IConnectionInfoParams>;
+
   get activeNavNode(): IDataContextActiveNode | null | undefined {
     if (!this.activeItem?.getCurrentNavNode) {
       return null;
@@ -255,6 +258,8 @@ export class ConnectionSchemaManagerService {
     private readonly dbDriverResource: DBDriverResource,
     private readonly notificationService: NotificationService,
   ) {
+    this.onConnectionChange = new SyncExecutor();
+
     this.changingProjectId = false;
     this.changingConnection = false;
     this.changingConnectionContainer = false;
@@ -335,6 +340,8 @@ export class ConnectionSchemaManagerService {
       });
       await this.activeItem.changeConnectionId(connectionKey, this.activeItem.context);
       await this.updateContainer(connectionKey);
+
+      this.onConnectionChange.execute(connectionKey);
     } finally {
       runInAction(() => {
         this.changingProjectId = false;

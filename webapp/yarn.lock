@@ -2887,6 +2887,7 @@ __metadata:
     "@cloudbeaver/core-connections": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-executor": "workspace:*"
     "@cloudbeaver/core-extensions": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-navigation-tree": "workspace:*"
