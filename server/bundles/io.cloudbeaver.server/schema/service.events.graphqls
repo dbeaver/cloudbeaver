@@ -35,6 +35,7 @@ enum CBServerEventId {
 
     cb_database_output_log_updated,
     cb_ai_chat_message_chunk @since(version: "25.1.1")
+    cb_ai_chat_message_error @since(version: "25.1.1")
 
     cb_transaction_count @since(version: "24.3.3")
 
