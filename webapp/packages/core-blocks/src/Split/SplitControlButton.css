@@ -1,0 +1,68 @@
+@layer components {
+  .split-button {
+    --dbv-kit-btn-primary-background: var(--theme-background);
+    --dbv-kit-btn-primary-background-hover: color-mix(in srgb, var(--theme-background), white 10%);
+    --dbv-kit-btn-primary-background-active: color-mix(in srgb, var(--theme-background), white 25%);
+  }
+
+  .theme-dark .split-button {
+    --dbv-kit-btn-primary-background: color-mix(in srgb, var(--theme-background), white 30%);
+    --dbv-kit-btn-primary-background-hover: color-mix(in srgb, var(--theme-background), white 40%);
+    --dbv-kit-btn-primary-background-active: color-mix(in srgb, var(--theme-background), white 50%);
+  }
+
+  .split-button {
+    padding: 0;
+
+    &.split-button--vertical {
+      margin: 8px 0;
+      min-width: 16px;
+
+      &.split-button--maximize,
+      &.split-button--minimize {
+        min-height: 64px;
+      }
+
+      &.split-button--inverse::after {
+        transform: rotate(0deg);
+      }
+
+      &::after {
+        transform: rotate(180deg);
+      }
+    }
+
+    &.split-button--horizontal {
+      margin: 0 8px;
+      min-width: 28px;
+      height: 16px;
+
+      &.split-button--maximize,
+      &.split-button--minimize {
+        min-width: 64px;
+      }
+
+      &.split-button--inverse::after {
+        transform: rotate(90deg);
+      }
+
+      &::after {
+        transform: rotate(270deg);
+      }
+    }
+
+    &::after {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      content: '';
+      display: block;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 3px 4px 3px 0;
+      border-color: transparent #000 transparent transparent;
+      margin: -3px -2px;
+    }
+  }
+}

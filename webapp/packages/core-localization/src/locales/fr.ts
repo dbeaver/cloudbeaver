@@ -134,6 +134,7 @@ export default [
   ['ui_schema', 'Schema'],
   ['ui_project', 'Project'],
   ['ui_type', 'Type'],
+  ['ui_field_is_required', 'Please fill in this field'],
 
   ['root_permission_denied', "Vous n'avez pas les permissions"],
   ['root_permission_no_permission', "Vous n'avez pas la permission pour cette action"],

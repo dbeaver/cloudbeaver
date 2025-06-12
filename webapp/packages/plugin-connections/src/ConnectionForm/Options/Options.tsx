@@ -39,7 +39,6 @@ import {
 import {
   ConnectionInfoAuthPropertiesResource,
   ConnectionInfoOriginResource,
-  ConnectionInfoResource,
   DatabaseAuthModelsResource,
   type DBDriver,
   DBDriverResource,
@@ -98,7 +97,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const tabsState = useContext(TabsContext);
   const isSharedProject = projectInfoResource.isProjectShared(formState.state.projectId);
   const optionsPart = getConnectionFormOptionsPart(formState);
-  const connectionInfoResource = useResource(Options, ConnectionInfoResource, optionsPart.connectionKey, {
+  const connectionInfoAuthResource = useResource(Options, ConnectionInfoAuthPropertiesResource, optionsPart.connectionKey, {
     active: selected && !!optionsPart.connectionKey,
   });
   const connectionInfoOriginResource = useResource(Options, ConnectionInfoOriginResource, optionsPart.connectionKey, {
@@ -109,7 +108,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   });
 
   //@TODO it's here until the profile implementation in the CloudBeaver
-  const readonly = formState.isDisabled || formState.isReadOnly || connectionInfoResource.data?.authModel === PROFILE_AUTH_MODEL_ID;
+  const readonly = formState.isDisabled || formState.isReadOnly || connectionInfoAuthResource.data?.authModel === PROFILE_AUTH_MODEL_ID;
 
   useFormValidator(formState.validationTask, formRef.current);
   const { credentialsSavingEnabled } = useAdministrationSettings();
@@ -134,7 +133,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const authModelLoader = useResource(
     Options,
     DatabaseAuthModelsResource,
-    getComputed(() => optionsPart.state.authModelId || connectionInfoResource.data?.authModel || driver?.defaultAuthModel || null),
+    getComputed(() => optionsPart.state.authModelId || connectionInfoAuthResource.data?.authModel || driver?.defaultAuthModel || null),
     {
       active: selected,
     },
@@ -147,12 +146,12 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   }
 
   const authentication = useAuthenticationAction({
-    providerId: authModel?.requiredAuth ?? connectionInfoResource.data?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
+    providerId: authModel?.requiredAuth ?? connectionInfoAuthResource.data?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
   });
 
   const edit = formState.mode === 'edit';
   const originLocal =
-    !connectionInfoResource.data || (connectionInfoOriginResource.data?.origin && isLocalConnection(connectionInfoOriginResource.data.origin));
+    !connectionInfoAuthResource.data || (connectionInfoOriginResource.data?.origin && isLocalConnection(connectionInfoOriginResource.data.origin));
 
   const drivers = driverMap.resource.enabledDrivers.filter(({ id, driverInstalled }) => {
     if (!edit && !isAdmin && !driverInstalled) {
@@ -171,7 +170,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   if (
     connectionInfoAuthPropertiesResource.data?.authProperties &&
     connectionInfoAuthPropertiesResource.data.authProperties.length > 0 &&
-    optionsPart.state.authModelId === connectionInfoResource.data?.authModel
+    optionsPart.state.authModelId === connectionInfoAuthResource.data?.authModel
   ) {
     properties = connectionInfoAuthPropertiesResource.data.authProperties;
   }

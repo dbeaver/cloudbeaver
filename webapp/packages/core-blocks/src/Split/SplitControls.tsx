@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,6 +8,7 @@
 import { s } from '../s.js';
 import { useObjectRef } from '../useObjectRef.js';
 import { useS } from '../useS.js';
+import { SplitControlButton } from './SplitControlButton.js';
 import SplitControlsStyles from './SplitControls.module.css';
 import { useSplit } from './useSplit.js';
 
@@ -34,14 +35,14 @@ export const SplitControls: React.FC = function SplitControls() {
 
   const handlers = useObjectRef(
     () => ({
-      handleCollapse(event: React.SyntheticEvent<HTMLButtonElement>) {
+      handleCollapse() {
         if (this.mode === 'maximize') {
           this.setMode('resize');
         } else {
           this.setMode('minimize');
         }
       },
-      handleExpand(event: React.SyntheticEvent<HTMLButtonElement>) {
+      handleExpand() {
         if (this.mode === 'minimize') {
           this.setMode('resize');
         } else {
@@ -65,18 +66,22 @@ export const SplitControls: React.FC = function SplitControls() {
       onDoubleClick={split.state.onDoubleClick}
     >
       {split.state.mode !== 'minimize' && (
-        <button
-          className={s(styles, { button: true, primary: !inverse, resizeButton: isResizeMode })}
-          type="button"
+        <SplitControlButton
+          className={s(styles, { resizeButton: isResizeMode })}
+          mode={inverseMode}
+          split={split.state.split}
+          inverse={!inverse}
           onClick={handlers.handleCollapse}
-        >
-          <div className={s(styles, { ripple: true })} />
-        </button>
+        />
       )}
       {split.state.mode !== 'maximize' && (
-        <button className={s(styles, { button: true, primary: inverse, resizeButton: isResizeMode })} type="button" onClick={handlers.handleExpand}>
-          <div className={s(styles, { ripple: true })} />
-        </button>
+        <SplitControlButton
+          className={s(styles, { resizeButton: isResizeMode })}
+          mode={inverseMode}
+          split={split.state.split}
+          inverse={inverse}
+          onClick={handlers.handleExpand}
+        />
       )}
     </div>
   );
