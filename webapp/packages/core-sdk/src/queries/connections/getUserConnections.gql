@@ -1,15 +1,4 @@
-query getUserConnections(
-  $projectId: ID
-  $connectionId: ID
-  $projectIds: [ID!]
-  $includeAuthProperties: Boolean!
-  $includeNetworkHandlersConfig: Boolean!
-  $includeCredentialsSaved: Boolean!
-  $includeAuthNeeded: Boolean!
-  $includeProperties: Boolean!
-  $includeProviderProperties: Boolean!
-  $customIncludeOptions: Boolean!
-) {
+query getUserConnections($projectId: ID, $connectionId: ID, $projectIds: [ID!]) {
   connections: userConnections(projectId: $projectId, id: $connectionId, projectIds: $projectIds) {
     ...DatabaseConnection
   }

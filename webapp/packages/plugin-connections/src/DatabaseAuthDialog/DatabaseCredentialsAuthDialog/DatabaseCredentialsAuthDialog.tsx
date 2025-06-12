@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ export const DatabaseCredentialsAuthDialog = observer<Props>(function DatabaseCr
             <ConnectionAuthenticationFormLoader
               config={dialog.config}
               authModelId={dialog.authModelId}
-              authProperties={dialog.connection?.authProperties}
+              authProperties={dialog.connectionAuthProperties?.authProperties}
               networkHandlers={networkHandlers}
               formId={`${connection.projectId}:${connection.connectionId}`}
               projectId={connection.projectId}
