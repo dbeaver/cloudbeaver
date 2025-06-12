@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -108,10 +108,16 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
       if (source === SOURCE_HISTORY) {
         return;
       }
-      this.history.add(script);
+      this.history.add(script, this.cursor);
     });
 
-    this.history.onNavigate.addHandler(value => this.setScript(value, SOURCE_HISTORY));
+    this.history.onNavigate.addHandler(({ value, cursor }) => {
+      this.setScript(value, SOURCE_HISTORY);
+
+      if (cursor) {
+        this.setCursor(cursor.anchor, cursor.head);
+      }
+    });
 
     makeObservable<this, 'outdated' | 'editing' | 'innerCursorState'>(this, {
       isSaved: computed,
