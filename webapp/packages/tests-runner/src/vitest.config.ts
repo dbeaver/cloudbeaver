@@ -7,13 +7,14 @@
  */
 import { mergeConfig, defineConfig } from 'vitest/config';
 import { DefaultVitestConfig } from '@dbeaver/cli';
+import { resolve } from 'node:path';
 
 export default mergeConfig(
   DefaultVitestConfig,
   defineConfig({
     test: {
       environment: 'happy-dom',
-      setupFiles: [import.meta.resolve('./vitest.setup.js')],
+      setupFiles: [resolve('./vitest.setup.js')],
       alias: [
         {
           find: /.*.(css|scss|less)$/,
@@ -22,5 +23,23 @@ export default mergeConfig(
       ],
       css: false,
     },
+
+    plugins: [
+      {
+        name: 'vitest-setup',
+        resolveId(source) {
+          if (source === resolve('./vitest.setup.js')) {
+            return '\0internal:vitest-setup';
+          }
+          return null;
+        },
+        load(id) {
+          if (id === '\0internal:vitest-setup') {
+            return "import '@cloudbeaver/tests-runner/vitest.setup';";
+          }
+          return null;
+        },
+      },
+    ],
   }),
 );

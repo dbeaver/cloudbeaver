@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@ import {
   delayWhen,
   filter,
   from,
-  interval,
   map,
   merge,
   Observable,
@@ -26,6 +25,7 @@ import {
   Subject,
   switchMap,
   throwError,
+  timer,
 } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
@@ -58,7 +58,8 @@ export interface ITopicSubEvent extends ISessionEvent {
   topicId: SessionEventTopic;
 }
 
-const RETRY_INTERVAL = 30 * 1000;
+const RETRY_INTERVALS = [1000, 5000, 30000, 60000]; // 1s, 5s, 30s, 1m
+const MAX_RETRY_ATTEMPTS = 4;
 
 @injectable()
 export class SessionEventSource implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
@@ -72,7 +73,6 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
   private readonly subject: WebSocketSubject<ISessionEvent>;
   private readonly oldEventsSubject: Subject<ISessionEvent>;
   private readonly emitSubject: Subject<ISessionEvent>;
-  private readonly retryTimer: Observable<number>;
   private readonly disconnectSubject: Subject<boolean>;
   private disconnected: boolean;
 
@@ -89,9 +89,6 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
     this.openSubject = new Subject();
     this.errorSubject = new Subject();
     this.disconnected = false;
-    this.retryTimer = interval(RETRY_INTERVAL).pipe(
-      filter(() => !this.sessionExpireService.expired && networkStateService.state && !this.disconnected),
-    );
     this.subject = webSocket({
       url: environmentService.wsEndpoint,
       closeObserver: this.closeSubject,
@@ -188,12 +185,12 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
     return this;
   }
 
-  connect() {
+  connect(): void {
     this.disconnected = false;
     this.disconnectSubject.next(this.disconnected);
   }
 
-  disconnect() {
+  disconnect(): void {
     this.disconnected = true;
     this.disconnectSubject.next(this.disconnected);
   }
@@ -209,10 +206,31 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
 
   private handleErrors() {
     return (source: Observable<ISessionEvent>): Observable<ISessionEvent> =>
-      source.pipe(share(), catchError(this.errorHandler), retry({ delay: () => this.retryTimer }), repeat({ delay: () => this.retryTimer }));
+      source.pipe(
+        share(),
+        catchError(this.errorHandler.bind(this)),
+        retry({
+          count: MAX_RETRY_ATTEMPTS,
+          delay: (error, retryCount) => {
+            // Stop retrying if session expired or disconnected
+            if (this.sessionExpireService.expired || this.disconnected) {
+              return throwError(() => error);
+            }
+
+            const delayIndex = Math.min(retryCount - 1, RETRY_INTERVALS.length - 1);
+            const delayTime = RETRY_INTERVALS[delayIndex]!;
+            console.warn(`WebSocket retry attempt ${retryCount}/${MAX_RETRY_ATTEMPTS} in ${delayTime}ms`);
+
+            return timer(delayTime);
+          },
+        }),
+        repeat({
+          delay: () => timer(RETRY_INTERVALS[0]!),
+        }),
+      );
   }
 
-  private errorHandler(error: any, caught: Observable<ISessionEvent>): Observable<ISessionEvent> {
+  private errorHandler(error: any): Observable<ISessionEvent> {
     this.errorSubject.next(new ServiceError('WebSocket connection error', { cause: error }));
     return throwError(() => error);
   }

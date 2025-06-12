@@ -3,15 +3,11 @@
   <defs>
     <style>
       .cls-1 {
-        fill: #4fa143;
-      }
-
-      .cls-2 {
         fill: #3387c5;
       }
     </style>
   </defs>
-  <rect class="cls-1" x="12" y="10" width="1" height="5"/>
-  <rect class="cls-1" x="12" y="10" width="1" height="5" transform="translate(0 25) rotate(-90)"/>
-  <path class="cls-2" d="M8.05,13H2V5h12v3.28c.35.13.69.28,1,.48v-4.76h-6.5l-2-2H1v12h7.28c-.11-.32-.19-.65-.23-1Z"/>
+  <rect class="cls-1" x="12" y="9" width="1" height="7"/>
+  <rect class="cls-1" x="12" y="9" width="1" height="7" transform="translate(0 25) rotate(-90)"/>
+  <polygon class="cls-1" points="8 13 2 13 2 5 14 5 14 8 15 8 15 4 8.5 4 6.5 2 1 2 1 14 8 14 8 13"/>
 </svg>
