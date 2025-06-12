@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -84,12 +84,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       activeSegmentMode: {
-        activeSegment: undefined,
         activeSegmentMode: false,
-      },
-
-      get activeSegment(): ISQLScriptSegment | undefined {
-        return this.activeSegmentMode.activeSegment;
       },
 
       get cursorSegment(): ISQLScriptSegment | undefined {
@@ -428,7 +423,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return this.parser.getScriptSegment();
         }
 
-        return this.activeSegment;
+        return this.cursorSegment;
       },
 
       async getResolvedSegment(): Promise<ISQLScriptSegment | undefined> {
@@ -439,10 +434,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
         if (!projectId || !connectionId || this.cursor.anchor !== this.cursor.head) {
           return this.getSubQuery();
-        }
-
-        if (this.activeSegmentMode.activeSegmentMode) {
-          return this.activeSegment;
         }
 
         const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, this.value, this.cursor.anchor);
