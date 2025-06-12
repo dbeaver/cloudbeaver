@@ -14,6 +14,7 @@ import type { ITreeData } from './ITreeData.js';
 export interface ITreeSelectionOptions {
   onSelectionChange?: (selectedNodeIds: string[]) => void;
   multipleSelection?: boolean;
+  expandOnSelect?: boolean;
 }
 
 export interface ITreeSelection {
@@ -28,12 +29,23 @@ export interface ITreeSelection {
 }
 
 function getAllNodes(treeData: ITreeData, nodeId: string): string[] {
-  const nodes = [nodeId];
-  const children = treeData.getChildren(nodeId);
+  const nodes: string[] = [];
+  const stack: string[] = [nodeId];
 
-  children.forEach(childId => {
-    nodes.push(...getAllNodes(treeData, childId));
-  });
+  while (stack.length > 0) {
+    const currentNodeId = stack.pop();
+    if (!currentNodeId) continue;
+
+    nodes.push(currentNodeId);
+
+    const children = treeData.getChildren(currentNodeId);
+    for (let i = children.length - 1; i >= 0; i--) {
+      const childId = children[i];
+      if (childId) {
+        stack.push(childId);
+      }
+    }
+  }
 
   return nodes;
 }
@@ -87,19 +99,28 @@ function updateNodeIndeterminateState(treeData: ITreeData, nodeId: string): void
   });
 }
 
-async function getAllNodesWithLoad(treeData: ITreeData, nodeId: string): Promise<string[]> {
+async function updateAllDescendantNodesWithLoad(
+  treeData: ITreeData,
+  nodeId: string,
+  shouldSelect: boolean,
+  expandOnSelect: boolean = false,
+): Promise<string[]> {
   const nodes = [nodeId];
   const nodeState = treeData.getState(nodeId);
 
+  treeData.updateState(nodeId, { selected: shouldSelect, indeterminateSelected: false });
+
   if (!nodeState.expanded) {
     try {
-      treeData.updateState(nodeId, { expanded: true });
+      if (expandOnSelect) {
+        treeData.updateState(nodeId, { expanded: true });
+      }
       await treeData.load(nodeId, true);
 
       const children = treeData.getChildren(nodeId);
 
       if (children.length === 0) {
-        treeData.updateState(nodeId, { expanded: false });
+        treeData.updateState(nodeId, { expanded: true, selected: shouldSelect, indeterminateSelected: false });
         return nodes;
       }
     } catch (error) {
@@ -111,7 +132,7 @@ async function getAllNodesWithLoad(treeData: ITreeData, nodeId: string): Promise
   const children = treeData.getChildren(nodeId);
 
   if (children.length > 0) {
-    const childPromises = children.map(childId => getAllNodesWithLoad(treeData, childId));
+    const childPromises = children.map(childId => updateAllDescendantNodesWithLoad(treeData, childId, shouldSelect, expandOnSelect));
     const results = await Promise.allSettled(childPromises);
 
     results.forEach(result => {
@@ -133,46 +154,26 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
         return options.multipleSelection ?? false;
       },
       get selectedNodes(): string[] {
-        const allNodes = getAllNodes(treeData, treeData.rootId);
-        return allNodes.filter(nodeId => treeData.getState(nodeId).selected);
+        const selectedNodes: string[] = [];
+
+        const collectSelectedNodes = (nodeId: string): void => {
+          const nodeState = treeData.getState(nodeId);
+          if (nodeState.selected) {
+            selectedNodes.push(nodeId);
+          }
+
+          const children = treeData.getChildren(nodeId);
+          children.forEach(childId => collectSelectedNodes(childId));
+        };
+
+        collectSelectedNodes(treeData.rootId);
+        return selectedNodes;
       },
       isNodeSelected(nodeId: string): boolean {
-        const nodeState = treeData.getState(nodeId);
-
-        if (nodeState.selected) {
-          return true;
-        }
-
-        const node = treeData.getNode(nodeId);
-
-        if (!node.leaf) {
-          const children = treeData.getChildren(nodeId);
-
-          if (children.length > 0) {
-            return children.every(child => this.isNodeSelected(child));
-          }
-        }
-
-        return false;
+        return treeData.getState(nodeId).selected;
       },
       isNodeIndeterminateSelected(nodeId: string): boolean {
-        if (this.isNodeSelected(nodeId)) {
-          return false;
-        }
-
-        const node = treeData.getNode(nodeId);
-
-        if (node.leaf) {
-          return false;
-        }
-
-        const children = treeData.getChildren(nodeId);
-
-        if (children.length > 0) {
-          return children.some(child => this.isNodeSelected(child) || this.isNodeIndeterminateSelected(child));
-        }
-
-        return false;
+        return treeData.getState(nodeId).indeterminateSelected ?? false;
       },
       async selectNode(treeData: ITreeData, nodeId: string, selected?: boolean): Promise<void> {
         const nodeState = treeData.getState(nodeId);
@@ -192,10 +193,7 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
         if (node.leaf) {
           treeData.updateState(nodeId, { selected: shouldSelect, indeterminateSelected: false });
         } else {
-          const allNodes = await getAllNodesWithLoad(treeData, nodeId);
-          allNodes.forEach(childId => {
-            treeData.updateState(childId, { selected: shouldSelect, indeterminateSelected: false });
-          });
+          await updateAllDescendantNodesWithLoad(treeData, nodeId, shouldSelect, options.expandOnSelect);
         }
 
         updateIndeterminateStates(treeData, nodeId);
@@ -212,9 +210,7 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
           return;
         }
 
-        await getAllNodesWithLoad(treeData, treeData.rootId);
-
-        treeData.updateAllState({ selected: true, indeterminateSelected: false });
+        await updateAllDescendantNodesWithLoad(treeData, treeData.rootId, true, options.expandOnSelect);
 
         options.onSelectionChange?.(this.getSelectedNodes());
       },

@@ -17,6 +17,7 @@ interface IOptions {
   data: ITreeData;
   nodeRenderers?: INodeRenderer[];
   multipleSelection?: boolean;
+  expandOnSelect?: boolean;
   onNodeClick?(id: string): void | Promise<void>;
   onNodeDoubleClick?(id: string): void | Promise<void>;
   getNodeHeight(id: string): number;
@@ -45,6 +46,7 @@ export function useTree(options: IOptions): ITree {
   });
   const { selectNode, isNodeSelected, isNodeIndeterminateSelected } = useTreeSelection(options.data, {
     multipleSelection: options.multipleSelection,
+    expandOnSelect: options.expandOnSelect,
   });
 
   const data = useObservableRef(
