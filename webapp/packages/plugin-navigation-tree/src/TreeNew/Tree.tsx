@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ export interface NavigationTreeNewProps {
   data: ITreeData;
   nodeRenderers?: INodeRenderer[];
   emptyPlaceholder?: NodeEmptyPlaceholderComponent;
+  multipleSelection?: boolean;
   className?: string;
   onNodeClick?(id: string): void | Promise<void>;
   onNodeDoubleClick?(id: string): void | Promise<void>;
@@ -39,6 +40,7 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
   nodeRenderers,
   emptyPlaceholder,
   className,
+  multipleSelection = false,
   onNodeClick,
   onNodeDoubleClick,
   getNodeDnDContext,
@@ -47,6 +49,7 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
   const tree = useTree({
     data,
     nodeRenderers,
+    multipleSelection,
     onNodeClick,
     onNodeDoubleClick,
     getNodeHeight,

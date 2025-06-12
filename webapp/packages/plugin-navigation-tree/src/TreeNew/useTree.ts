@@ -16,6 +16,7 @@ import { useTreeSelection } from './useTreeSelection.js';
 interface IOptions {
   data: ITreeData;
   nodeRenderers?: INodeRenderer[];
+  multipleSelection?: boolean;
   onNodeClick?(id: string): void | Promise<void>;
   onNodeDoubleClick?(id: string): void | Promise<void>;
   getNodeHeight(id: string): number;
@@ -36,12 +37,15 @@ export interface ITree {
 export function useTree(options: IOptions): ITree {
   options = useObservableRef(options, {
     data: observable.ref,
+    multipleSelection: observable.ref,
     nodeRenderers: observable.ref,
     onNodeClick: observable.ref,
     onNodeDoubleClick: observable.ref,
     getNodeHeight: observable.ref,
   });
-  const { selectNode, isNodeSelected, isNodeIndeterminateSelected } = useTreeSelection(options.data);
+  const { selectNode, isNodeSelected, isNodeIndeterminateSelected } = useTreeSelection(options.data, {
+    multipleSelection: options.multipleSelection,
+  });
 
   const data = useObservableRef(
     () => ({
