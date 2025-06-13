@@ -69,11 +69,6 @@ export function useTree(options: IOptions): ITree {
           options.data.updateState(id, { expanded: state });
           if (state) {
             await options.data.load(id, true);
-            const children = options.data.getChildren(id);
-
-            if (children.length === 0) {
-              options.data.updateState(id, { expanded: false });
-            }
           }
         } catch (exception) {}
       },
