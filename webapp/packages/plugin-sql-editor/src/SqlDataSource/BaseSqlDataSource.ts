@@ -111,13 +111,15 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
       this.history.add(script, this.cursor);
     });
 
-    this.history.onNavigate.addHandler(({ value, cursor }) => {
-      this.setScript(value, SOURCE_HISTORY);
+    this.history.onNavigate.addHandler(
+      action(({ value, cursor }) => {
+        this.setScript(value, SOURCE_HISTORY);
 
-      if (cursor) {
-        this.setCursor(cursor.anchor, cursor.head);
-      }
-    });
+        if (cursor) {
+          this.setCursor(cursor.anchor, cursor.head);
+        }
+      }),
+    );
 
     makeObservable<this, 'outdated' | 'editing' | 'innerCursorState'>(this, {
       isSaved: computed,
