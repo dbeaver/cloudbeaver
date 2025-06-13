@@ -229,13 +229,20 @@ type WSTransactionalCountEvent implements CBServerEvent {
     transactionalCount: Int!
 }
 
-type WSAIChatMessageEvent implements CBServerEvent @since(version: "25.1.1") {
+type WSAIChatMessageChunkEvent implements CBServerEvent @since(version: "25.1.1") {
     id: CBServerEventId!
     topicId: CBEventTopic
     conversationId: ID!
-    messageId: String!
+    messageId: ID!
     chunk: String
     completed: Boolean!
+}
+
+type WSAIChatMessageErrorEvent implements CBServerEvent @since(version: "25.1.1") {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    conversationId: ID!
+    messageId: ID!
 }
 
 extend type Query {
