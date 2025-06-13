@@ -162,9 +162,14 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       this,
     );
 
-    this.workspaceConfigEventHandler.onEvent(ServerEventId.CbWorkspaceConfigChanged, () => {
-      this.markOutdated(CachedMapAllKey);
-    });
+    this.workspaceConfigEventHandler.onEvent(
+      ServerEventId.CbWorkspaceConfigChanged,
+      () => {
+        this.markOutdated(CachedMapAllKey);
+      },
+      undefined,
+      this,
+    );
 
     connectionStateEventHandler.onEvent<IWsDataSourceDisconnectEvent>(
       ServerEventId.CbDatasourceDisconnected,

@@ -47,9 +47,14 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, DBDriv
       () => CachedMapAllKey,
     );
 
-    this.workspaceConfigEventHandler.onEvent(CbServerEventId.CbWorkspaceConfigChanged, () => {
-      this.markOutdated(CachedMapAllKey);
-    });
+    this.workspaceConfigEventHandler.onEvent(
+      CbServerEventId.CbWorkspaceConfigChanged,
+      () => {
+        this.markOutdated(CachedMapAllKey);
+      },
+      undefined,
+      this,
+    );
 
     makeObservable(this, {
       enabledDrivers: computed<DBDriver[]>({
