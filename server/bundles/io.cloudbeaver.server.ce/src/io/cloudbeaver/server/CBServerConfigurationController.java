@@ -134,6 +134,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         Gson gson = getGson();
         Map<String, Object> currentConfigurationAsMap = gson.fromJson(gson.toJson(getServerConfiguration()),
             JSONUtils.MAP_TYPE_TOKEN);
+        Map<String, Object> originalServerConfig = new HashMap<>(serverConfig);
         serverConfig = ServletAppUtils.mergeConfigurations(currentConfigurationAsMap, serverConfig);
         gson.fromJson(
             gson.toJson(serverConfig),
@@ -150,8 +151,8 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         // App config
         Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
         preValidateAppConfiguration(appConfig);
-        gson.fromJson(gson.toJson(appConfig), CBAppConfig.class);
-        readProductConfiguration(serverConfig, gson);
+        CBAppConfig cbAppConfig = gson.fromJson(gson.toJson(appConfig), CBAppConfig.class);
+        readProductConfiguration(serverConfig, originalServerConfig, cbAppConfig, gson);
     }
 
     public T parseServerConfiguration() {
@@ -220,7 +221,9 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         appConfiguration.setAuthProvidersConfigurations(mergedAuthProviders);
     }
 
-    protected void readProductConfiguration(Map<String, Object> serverConfig, Gson gson)
+    protected void readProductConfiguration(Map<String, Object> serverConfig,
+                                            Map<String, Object> originalServerConfig,
+                                            CBAppConfig cbAppConfig, Gson gson)
         throws DBException {
         // legacy configuration with path to product.conf file
         if (!serverConfig.containsKey(CBConstants.PARAM_PRODUCT_SETTINGS)
@@ -268,6 +271,8 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
                 }
             }
         }
+
+        updateDataEditorMaxBlobSizeProperty(originalServerConfig, cbAppConfig);
     }
 
     protected Map<String, Object> readConnectionsPermissionsConfiguration(Path parentPath) {
@@ -654,4 +659,29 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     public void validateFinalServerConfiguration() throws DBException {
 
     }
+
+
+    private void updateDataEditorMaxBlobSizeProperty(Map<String, Object> originalServerConfig, CBAppConfig cbAppConfig) throws DBException {
+        var productSettings = JSONUtils.getObject(originalServerConfig, CBConstants.PARAM_PRODUCT_SETTINGS);
+
+        var actualValue = productSettings.get(CBConstants.PARAM_DATA_EDITOR_BLOB_MAX_SIZE);
+        if (actualValue != null) {
+            try {
+                long value = Long.parseLong(actualValue.toString());
+                serverConfiguration.getProductSettings()
+                    .put(CBConstants.PARAM_DATA_EDITOR_BLOB_MAX_SIZE, value);
+            } catch (NumberFormatException e) {
+                throw new DBException("Invalid format for max blob size: " + actualValue, e);
+            }
+            return;
+        }
+
+        var quota = cbAppConfig.getResourceQuota(CBConstants.QUOTA_PROP_FILE_LIMIT);
+        if (quota instanceof Number number) {
+            long value = Math.max(1, number.longValue());
+            serverConfiguration.getProductSettings()
+                .put(CBConstants.PARAM_DATA_EDITOR_BLOB_MAX_SIZE, value);
+        }
+    }
+
 }
