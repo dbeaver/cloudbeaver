@@ -6,20 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { type CbConfigEvent as IWorkspaceConfigEvent } from '@cloudbeaver/core-sdk';
-
-import { TopicEventHandler } from './ServerEventEmitter/TopicEventHandler.js';
-import { type ISessionEvent, SessionEventSource, SessionEventTopic } from './SessionEventSource.js';
-
-export { type IWorkspaceConfigEvent };
+import { type ISessionEvent, SessionEventSource, SessionEventTopic, TopicEventHandler } from '@cloudbeaver/core-root';
+import type { CbServerEvent } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class WorkspaceConfigEventHandler extends TopicEventHandler<IWorkspaceConfigEvent, ISessionEvent> {
+export class WorkspaceConfigEventHandler extends TopicEventHandler<CbServerEvent, ISessionEvent> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbWorkspaceConfiguration, sessionEventSource);
   }
 
-  map(event: any): IWorkspaceConfigEvent {
+  map(event: any) {
     return event;
   }
 }
