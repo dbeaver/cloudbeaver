@@ -34,7 +34,9 @@ function getAllNodes(treeData: ITreeData, nodeId: string): string[] {
 
   while (stack.length > 0) {
     const currentNodeId = stack.pop();
-    if (!currentNodeId) continue;
+    if (!currentNodeId) {
+      continue;
+    }
 
     nodes.push(currentNodeId);
 
