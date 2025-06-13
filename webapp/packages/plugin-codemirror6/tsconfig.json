@@ -17,6 +17,12 @@
       "path": "../core-cli"
     },
     {
+      "path": "../core-di"
+    },
+    {
+      "path": "../core-localization"
+    },
+    {
       "path": "../core-theming"
     },
     {
