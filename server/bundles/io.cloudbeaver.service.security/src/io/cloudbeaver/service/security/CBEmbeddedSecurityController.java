@@ -1485,11 +1485,25 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (Exception e) {
             throw new SMException("Error updating permissions: " + e.getMessage(), e);
         }
+        addSubjectPermissionsUpdateEvent(subjectId, null);
     }
 
     @Override
     public void setGlobalDefaultPermissions(@NotNull List<SMPermission> permissions, @NotNull String grantorId) throws DBException {
-
+        try (
+            var dbCon = database.openConnection();
+            PreparedStatement dbStat = dbCon.prepareStatement("UPDATE {table_prefix}CB_GLOBAL_PERMISSIONS "
+                + "SET ENABLED_BY_DEFAULT=? WHERE PERMISSION_ID=?")
+        ) {
+            for (SMPermission permission : permissions) {
+                dbStat.setString(1, booleanToString(permission.isEnabled()));
+                dbStat.setString(2, permission.getPermissionId());
+                dbStat.addBatch();
+            }
+            dbStat.executeBatch();
+        } catch (Exception e) {
+            throw new DBException("Error updating permissions: " + e.getMessage(), e);
+        }
     }
 
     public void initialize() throws DBException {
@@ -1530,7 +1544,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             if (!CommonUtils.isEmpty(forInsert)) {
                 try (var dbStat = dbCon.prepareStatement(
                         """
-                            INSERT INTO {table_prefix}CB_GLOBAL_PERMISSIONS_DEFAULTS(PERMISSION_ID,ENABED_BY_DEFAULT,GRANTED_BY)
+                            INSERT INTO {table_prefix}CB_GLOBAL_PERMISSIONS_DEFAULTS(PERMISSION_ID,ENABLED_BY_DEFAULT,GRANTED_BY)
                             VALUES(?,?,?)
                             """
                     )
@@ -1562,8 +1576,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             var dbCon = database.openConnection();
             var dbStat = dbCon.prepareStatement(
                 """
-                    SELECT PERMISSION_ID,ENABED_BY_DEFAULT FROM {table_prefix}CB_GLOBAL_PERMISSIONS_DEFAULTS 
-                    AND DELETED=?
+                    SELECT PERMISSION_ID,ENABLED_BY_DEFAULT FROM {table_prefix}CB_GLOBAL_PERMISSIONS_DEFAULTS
+                    WHERE DELETED=?
                     """
             )
         ) {
@@ -1657,7 +1671,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         try (
             PreparedStatement dbStat = dbCon.prepareStatement(
                 """
-                    SELECT SP.PERMISSION_ID, SP.IS_ENABLED
+                    SELECT GP.PERMISSION_ID, GP.IS_ENABLED
                     FROM {table_prefix}CB_GLOBAL_PERMISSIONS GP
                     WHERE GP.SUBJECT_ID=?
                     """)
