@@ -7,7 +7,7 @@
  */
 .treeNodeNested {
   box-sizing: border-box;
-  padding-left: 8px;
+  padding-left: var(--tree-node-nested-padding, 8px);
 
   &.root {
     padding: 0;
