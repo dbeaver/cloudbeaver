@@ -26,9 +26,6 @@
       "path": "../core-events"
     },
     {
-      "path": "../core-executor"
-    },
-    {
       "path": "../core-extensions"
     },
     {
