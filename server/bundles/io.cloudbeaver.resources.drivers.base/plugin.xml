@@ -18,6 +18,7 @@
         <resource name="drivers/mssql/new"/>
         <resource name="drivers/trino"/>
         <resource name="drivers/kyuubi"/>
+        <resource name="drivers/databend"/>
     </extension>
 
     <!-- Bundles  -->
@@ -38,6 +39,7 @@
         <bundle id="drivers.mssql.new" label="SQL Server drivers"/>
         <bundle id="drivers.trino" label="Trino drivers"/>
         <bundle id="drivers.kyuubi" label="Apache Kyuubi drivers"/>
+        <bundle id="drivers.databend" label="Databend drivers"/>
     </extension>
 
     <!-- Enabled drivers -->
@@ -59,6 +61,7 @@
         <driver id="generic:trino_jdbc"/>
         <driver id="generic:duckdb_jdbc"/>
         <driver id="generic:kyuubi_hive"/>
+        <driver id="databend:databend"/>
     </extension>
 
 
