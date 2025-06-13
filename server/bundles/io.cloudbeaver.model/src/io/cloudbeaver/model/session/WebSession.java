@@ -48,7 +48,6 @@ import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
-import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
@@ -523,6 +522,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
+    @NotNull
     public WebAsyncTaskInfo asyncTaskStatus(String taskId, boolean removeOnFinish) throws DBWebException {
         synchronized (asyncTasks) {
             WebAsyncTaskInfo taskInfo = asyncTasks.get(taskId);
@@ -989,7 +989,7 @@ public class WebSession extends BaseWebSession
     }
 
     @NotNull
-    public DBPPreferenceStore getUserPreferenceStore() {
+    public WebSessionPreferenceStore getUserPreferenceStore() {
         return getUserContext().getPreferenceStore();
     }
 
