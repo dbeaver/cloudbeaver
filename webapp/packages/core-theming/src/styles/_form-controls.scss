@@ -47,6 +47,7 @@
 
   input,
   textarea {
+    --dbv-kit-input-placeholder-foreground: var(--theme-input-color-placeholder);
     box-sizing: border-box;
     padding: 7px 12px;
     width: 100%;
