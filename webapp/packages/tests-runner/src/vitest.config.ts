@@ -7,14 +7,14 @@
  */
 import { mergeConfig, defineConfig } from 'vitest/config';
 import { DefaultVitestConfig } from '@dbeaver/cli';
-import { resolve } from 'node:path';
+import { posix } from 'node:path';
 
 export default mergeConfig(
   DefaultVitestConfig,
   defineConfig({
     test: {
       environment: 'happy-dom',
-      setupFiles: [resolve('./vitest.setup.js')],
+      setupFiles: [posix.resolve('./vitest.setup.js')],
       alias: [
         {
           find: /.*.(css|scss|less)$/,
@@ -28,7 +28,7 @@ export default mergeConfig(
       {
         name: 'vitest-setup',
         resolveId(source) {
-          if (source === resolve('./vitest.setup.js')) {
+          if (source === posix.resolve('./vitest.setup.js')) {
             return '\0internal:vitest-setup';
           }
           return null;
