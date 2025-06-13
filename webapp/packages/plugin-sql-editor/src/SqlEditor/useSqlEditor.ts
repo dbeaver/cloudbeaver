@@ -430,20 +430,34 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         const projectId = this.dataSource?.executionContext?.projectId;
         const connectionId = this.dataSource?.executionContext?.connectionId;
 
-        await data.updateParserScripts();
+        while (true) {
+          const currentScript = this.parser.actualScript;
+          // TODO: we updating parser scripts
+          //       script may be changed this will lead to temporary wrong segments offsets
 
-        if (!projectId || !connectionId || this.cursor.anchor !== this.cursor.head) {
-          return this.getSubQuery();
+          await data.updateParserScripts();
+
+          if (currentScript !== this.parser.actualScript) {
+            continue;
+          }
+          if (!projectId || !connectionId || this.cursor.anchor !== this.cursor.head) {
+            return this.getSubQuery();
+          }
+
+          const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, currentScript, this.cursor.anchor);
+
+          if (currentScript !== this.parser.actualScript) {
+            continue;
+          }
+
+          if (result.end === 0 && result.start === 0) {
+            return;
+          }
+
+          // TODO: here we use parser that may be outdated and segment will return wrong value
+          const segment = this.parser.getSegment(result.start, result.end);
+          return segment;
         }
-
-        const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, this.value, this.cursor.anchor);
-
-        if (result.end === 0 && result.start === 0) {
-          return;
-        }
-
-        const segment = this.parser.getSegment(result.start, result.end);
-        return segment;
       },
 
       getSubQuery(): ISQLScriptSegment | undefined {
