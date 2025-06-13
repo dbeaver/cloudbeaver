@@ -48,7 +48,6 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, DBDriv
     );
 
     this.workspaceConfigEventHandler.onEvent(CbServerEventId.CbWorkspaceConfigChanged, () => {
-      console.log('DBDriverResource: CbWorkspaceConfigChanged event received');
       this.markOutdated(CachedMapAllKey);
     });
 
