@@ -18,6 +18,7 @@ import type { IReactCodeMirrorProps } from './IReactCodemirrorProps.js';
 import { type IReactCodemirrorContext, ReactCodemirrorContext } from './ReactCodemirrorContext.js';
 import { useCodemirrorExtensions } from './useCodemirrorExtensions.js';
 import { validateCursorBoundaries } from './validateCursorBoundaries.js';
+import { ReactCodemirrorSearchPanel } from './ReactCodemirrorSearchPanel.js';
 
 const External = Annotation.define<boolean>();
 
@@ -260,6 +261,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
     return (
       <ReactCodemirrorContext.Provider value={context}>
         <div ref={setContainer} className="ReactCodemirror">
+          <ReactCodemirrorSearchPanel />
           {children}
         </div>
       </ReactCodemirrorContext.Provider>
