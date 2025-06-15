@@ -8,7 +8,6 @@ Bundle-Release-Date: 20250616
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: io.cloudbeaver.server.CBPlatformActivator
-Bundle-ClassPath: .
 Require-Bundle: io.cloudbeaver.server;visibility:=reexport
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.model,

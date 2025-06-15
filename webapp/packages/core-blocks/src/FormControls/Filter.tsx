@@ -119,6 +119,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
         readOnly={disabled}
         name={name}
         value={value}
+        size={smallSize ? 'small' : 'medium'}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
       />

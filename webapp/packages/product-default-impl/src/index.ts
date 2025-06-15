@@ -73,6 +73,7 @@ import version from '@cloudbeaver/plugin-version';
 import versionUpdate from '@cloudbeaver/plugin-version-update-administration';
 import { pluginSystemInformationAdministrationManifest } from '@cloudbeaver/plugin-system-information-administration';
 import { pluginSettingsDefaultAdministrationManifest } from '@cloudbeaver/plugin-settings-default-administration';
+import { codemirror6Manifest } from '@cloudbeaver/plugin-codemirror6';
 
 import { defaultProductManifest } from './manifest.js';
 
@@ -141,6 +142,7 @@ const PLUGINS: PluginManifest[] = [
   appLogoPluginAdministration,
   pluginSystemInformationAdministrationManifest,
   pluginSettingsDefaultAdministrationManifest,
+  codemirror6Manifest,
   // must be las one to override all
   defaultProductManifest,
 ];

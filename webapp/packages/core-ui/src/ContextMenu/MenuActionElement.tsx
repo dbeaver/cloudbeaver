@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,8 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
         name={item.id}
         value={label}
         checked={checked}
+        style={{ pointerEvents: 'auto' }}
+        focusable
         onClick={handleClick}
       >
         <MenuItemElement
@@ -66,20 +68,25 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
         name={item.id}
         value={label}
         checked={checked}
+        style={{ pointerEvents: 'auto' }}
+        focusable
         onClick={handleClick}
       >
-        <MenuItemElement
-          label={actionInfo.label}
-          icon={<Checkbox checked={checked} mod={['primary', 'small']} ripple={false} />}
-          tooltip={actionInfo.tooltip}
-          loading={loading}
-        />
+        <MenuItemElement label={actionInfo.label} icon={<Checkbox checked={checked} size="small" />} tooltip={actionInfo.tooltip} loading={loading} />
       </MenuItemCheckbox>
     );
   }
 
   return (
-    <MenuItem hidden={item.hidden} id={item.id} aria-label={label} disabled={item.disabled} onClick={handleClick}>
+    <MenuItem
+      hidden={item.hidden}
+      id={item.id}
+      aria-label={label}
+      disabled={item.disabled}
+      style={{ pointerEvents: 'auto' }}
+      focusable
+      onClick={handleClick}
+    >
       <MenuItemElement label={actionInfo.label} icon={actionInfo.icon} binding={binding} tooltip={actionInfo.tooltip} loading={loading} />
     </MenuItem>
   );

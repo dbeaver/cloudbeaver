@@ -1,4 +1,4 @@
-import { clsx, IconButton } from '@dbeaver/ui-kit';
+import { clsx, IconButton, Icon } from '@dbeaver/ui-kit';
 
 interface OrderButtonProps {
   colIdx: number;
@@ -14,9 +14,9 @@ export function OrderButton({ colIdx, sortState, onSort, tabIndex, ref }: OrderB
     onSort(colIdx, nextSortState, e.ctrlKey || e.metaKey);
   }
 
-  const svgSortAsc = '#icon-sort-asc';
-  const svgSortDesc = '#icon-sort-desc';
-  const svgSortUnknown = '#icon-sort-unknown';
+  const svgSortAsc = 'sort-asc';
+  const svgSortDesc = 'sort-desc';
+  const svgSortUnknown = 'sort-unknown';
 
   const iconSrc = sortState === 'asc' ? svgSortAsc : sortState === 'desc' ? svgSortDesc : svgSortUnknown;
 
@@ -34,9 +34,7 @@ export function OrderButton({ colIdx, sortState, onSort, tabIndex, ref }: OrderB
         sortState && 'tw:opacity-100',
       )}
     >
-      <svg width="16" height="16" viewBox="0 0 16 16">
-        <use href={iconSrc} />
-      </svg>
+      <Icon name={iconSrc} />
     </IconButton>
   );
 }
