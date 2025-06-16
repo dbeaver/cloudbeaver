@@ -11,7 +11,6 @@ RUN groupadd -g $DBEAVER_GID dbeaver && \
 COPY cloudbeaver /opt/cloudbeaver
 
 EXPOSE 8978
-RUN mkdir -p "/opt/cloudbeaver/workspace/"
 RUN find /opt/cloudbeaver -type d -exec chmod 775 {} \;
 RUN chown -R dbeaver:dbeaver /opt/cloudbeaver
 WORKDIR /opt/cloudbeaver/
