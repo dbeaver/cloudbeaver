@@ -352,7 +352,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   name="saveCredentials"
                   state={optionsPart.state}
                   disabled={formState.isDisabled || readonly || optionsPart.state.sharedCredentials}
-                  mod={['primary']}
                   title={translate(
                     !isSharedProject || serverConfigResource.data?.distributed
                       ? 'connections_connection_authentication_save_credentials_for_user_tooltip'

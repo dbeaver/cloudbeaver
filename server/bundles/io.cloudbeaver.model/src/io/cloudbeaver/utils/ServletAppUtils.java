@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,12 +36,17 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ServletAppUtils {
+    private static final String HEADER_ORIGIN = "Origin";
+    private static final String HEADER_REFERER = "Referer";
+
+    private static final String HEADER_FORWARDED_SCHEME = "X-Forwarded-Scheme";
+    private static final String HEADER_FORWARDED_HOST = "X-Forwarded-Host";
+
     private static final Log log = Log.getLog(ServletAppUtils.class);
 
     public static String getRelativePath(String path, String curDir) {
@@ -168,16 +173,24 @@ public class ServletAppUtils {
     }
 
     @NotNull
-    public static StringBuilder getAuthApiPrefix(String serviceId) throws DBException {
-        return getAuthApiPrefix(getAuthApplication(), serviceId);
+    public static StringBuilder getAuthApiUri(@NotNull String serviceId, @NotNull String origin) throws DBException {
+        return getAuthApiUri(getAuthApplication(), serviceId, origin);
     }
 
     @NotNull
-    public static StringBuilder getAuthApiPrefix(ServletAuthApplication webAuthApplication, String serviceId) {
-        String authUrl = removeSideSlashes(webAuthApplication.getAuthServiceURL());
-        StringBuilder apiPrefix = new StringBuilder(authUrl);
-        apiPrefix.append("/").append(serviceId).append("/");
-        return apiPrefix;
+    public static StringBuilder getAuthApiUri(
+        @NotNull ServletAuthApplication webAuthApplication,
+        @NotNull String serviceId,
+        @NotNull String origin
+    ) throws DBException {
+        String finalOrigin =  webAuthApplication.modifyOrigin(origin);
+        StringBuilder authUriBuilder = new StringBuilder(removeSideSlashes(finalOrigin));
+        String serviceUriSegment = removeSideSlashes(webAuthApplication.getAuthServiceUriSegment());
+        if (CommonUtils.isNotEmpty(serviceUriSegment)) {
+            authUriBuilder.append("/").append(serviceUriSegment);
+        }
+        authUriBuilder.append("/").append(serviceId).append("/");
+        return authUriBuilder;
     }
 
     public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response, String cookieName, String cookieValue, long maxSessionIdleTime) {
@@ -272,12 +285,46 @@ public class ServletAppUtils {
     }
 
     @NotNull
-    public static String getFullServerUrl() {
-        ServletApplication application = ServletAppUtils.getServletApplication();
-        return Stream.of(application.getServerURL(), application.getRootURI())
-            .map(ServletAppUtils::removeSideSlashes)
-            .filter(CommonUtils::isNotEmpty)
-            .collect(Collectors.joining("/"));
+    public static String getOriginFromRequestOrThrow(HttpServletRequest request) throws DBWebException {
+        String origin = request.getHeader(HEADER_ORIGIN);
+        if (CommonUtils.isEmpty(origin)) {
+            origin = request.getHeader(HEADER_REFERER);
+        }
+        String forwardedScheme = request.getHeader(HEADER_FORWARDED_SCHEME);
+        String forwardedHost = request.getHeader(HEADER_FORWARDED_HOST);
+        if (CommonUtils.isNotEmpty(forwardedScheme) && CommonUtils.isNotEmpty(forwardedHost)) {
+            origin = forwardedHost + "://" + forwardedScheme;
+        }
+        if (CommonUtils.isEmpty(origin)) {
+            URI requestUrl = URI.create(request.getRequestURL().toString());
+            origin = getRootUrlFromUri(requestUrl) + "/";
+        }
+        origin = removeSideSlashes(origin);
+        var app = ServletAppUtils.getServletApplication();
+        String rootUri = removeSideSlashes(app.getRootURI());
+        if (!origin.endsWith(rootUri)) {
+            origin = origin + "/" + rootUri + "/";
+        }
+        return removeSideSlashes(origin);
     }
 
+    public static String getRootUrlFromUri(@NotNull URI uri) {
+        var builder = new StringBuilder()
+            .append(uri.getScheme())
+            .append("://")
+            .append(uri.getHost());
+        if (uri.getPort() > 0) {
+            builder.append(":").append(uri.getPort());
+        }
+        return removeSideSlashes(substringBeforeRootURI(builder.toString()));
+    }
+
+    public static String substringBeforeRootURI(@NotNull String uri) {
+        String rootUri = removeSideSlashes(getServletApplication().getRootURI());
+        if (CommonUtils.isEmpty(rootUri)) {
+            return uri;
+        }
+        String[] split = uri.split(rootUri);
+        return split[0];
+    }
 }

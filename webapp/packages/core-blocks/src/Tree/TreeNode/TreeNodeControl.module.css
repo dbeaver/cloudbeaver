@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 .treeNodeControl {
-  composes: theme-ripple theme-ripple-selectable from global;
   box-sizing: border-box;
   height: 22px;
   display: flex;

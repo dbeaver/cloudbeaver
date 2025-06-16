@@ -74,12 +74,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     }
 
     public String getAuthServiceURL() {
-        return Stream.of(serverConfiguration.getServerURL(),
-                serverConfiguration.getRootURI(),
-                serverConfiguration.getServicesURI())
-            .map(ServletAppUtils::removeSideSlashes)
-            .filter(CommonUtils::isNotEmpty)
-            .collect(Collectors.joining("/"));
+        return serverConfiguration.getServicesURI();
     }
 
     @Override
@@ -533,6 +528,12 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
                 CBConstants.PARAM_SESSION_EXPIRE_PERIOD,
                 serverConfig.getMaxSessionIdleTime());
         }
+        copyConfigValue(
+            originServerConfig,
+            serverConfigProperties,
+            CBConstants.PARAM_SECURE_COOKIES,
+            serverConfig.isSecureCookies()
+        );
         var productConfigProperties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Map<String, Object> oldProductRuntimeConfig = JSONUtils.getObject(originServerConfig,
             CBConstants.PARAM_PRODUCT_SETTINGS);

@@ -11,7 +11,7 @@ export const WEBSITE_LINKS = {
   SQL_EDITOR_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/SQL-Editor/',
   SERVER_CONFIGURATION_RESOURCE_QUOTAS_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Server-configuration/#resource-quotas',
   DATABASE_NAVIGATOR_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Database-Navigator/',
-  AWS_DEPLOY_UPDATE_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Managing-CloudBeaver-server-on-AWS/#version-update-procedure',
+  AWS_DEPLOY_UPDATE_PAGE: 'https://github.com/dbeaver/cloudbeaver-deploy?tab=readme-ov-file#updating-the-cluster',
 
   ENTERPRISE_BUY_PRODUCT_PAGE: 'https://dbeaver.com/products/cloudbeaver-enterprise/',
   TEAM_EDITION_BUY_PRODUCT_PAGE: 'https://dbeaver.com/products/team-edition/',

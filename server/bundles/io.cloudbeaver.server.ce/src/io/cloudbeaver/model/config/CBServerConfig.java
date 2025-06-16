@@ -31,6 +31,7 @@ public class CBServerConfig implements WebServerConfiguration {
     private static final Log log = Log.getLog(CBServerConfig.class);
 
     protected String serverURL;
+    protected boolean secureCookies;
     protected int serverPort = CBConstants.DEFAULT_SERVER_PORT;
     private String serverHost = null;
     private String serverName = null;
@@ -180,5 +181,9 @@ public class CBServerConfig implements WebServerConfiguration {
 
     protected SMControllerConfiguration createSecurityManagerConfiguration() {
         return new SMControllerConfiguration();
+    }
+
+    public boolean isSecureCookies() {
+        return secureCookies;
     }
 }
