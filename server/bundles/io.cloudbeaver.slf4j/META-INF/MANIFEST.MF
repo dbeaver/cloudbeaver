@@ -7,7 +7,6 @@ Bundle-Version: 1.0.39.qualifier
 Bundle-Release-Date: 20250616
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: .
 Fragment-Host: slf4j.api
 Require-Bundle: org.jkiss.bundle.logback
 Automatic-Module-Name: io.cloudbeaver.slf4j
