@@ -19,6 +19,7 @@ import { type IReactCodemirrorContext, ReactCodemirrorContext } from './ReactCod
 import { useCodemirrorExtensions } from './useCodemirrorExtensions.js';
 import { validateCursorBoundaries } from './validateCursorBoundaries.js';
 import { ReactCodemirrorSearchPanel } from './ReactCodemirrorSearchPanel.js';
+import { hasInsertProperty } from './hasInsertProperty.js';
 
 const External = Annotation.define<boolean>();
 
@@ -211,6 +212,13 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
           if (changed && isCursorInDoc) {
             transaction.selection = cursor;
           }
+        }
+
+        if (hasInsertProperty(transaction.changes) && !transaction.selection) {
+          transaction.selection = {
+            anchor: transaction.changes.insert?.length ?? 0,
+            head: transaction.changes.insert?.length ?? 0,
+          };
         }
 
         if (transaction.changes) {
