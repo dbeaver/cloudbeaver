@@ -7,7 +7,6 @@ Bundle-Version: 1.0.123.qualifier
 Bundle-Release-Date: 20250616
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: .
 Require-Bundle: io.cloudbeaver.server.ce,
  org.jkiss.dbeaver.registry
 Automatic-Module-Name: io.cloudbeaver.service.admin

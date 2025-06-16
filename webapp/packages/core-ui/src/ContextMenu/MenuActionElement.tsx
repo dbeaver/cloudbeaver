@@ -72,12 +72,7 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
         focusable
         onClick={handleClick}
       >
-        <MenuItemElement
-          label={actionInfo.label}
-          icon={<Checkbox checked={checked} mod={['primary', 'small']} ripple={false} />}
-          tooltip={actionInfo.tooltip}
-          loading={loading}
-        />
+        <MenuItemElement label={actionInfo.label} icon={<Checkbox checked={checked} size="small" />} tooltip={actionInfo.tooltip} loading={loading} />
       </MenuItemCheckbox>
     );
   }

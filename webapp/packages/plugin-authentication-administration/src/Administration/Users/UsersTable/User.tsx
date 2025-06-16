@@ -63,13 +63,15 @@ export const User = observer<Props>(function User({ user, displayAuthRole, isMan
       <TableColumnValue title={teams} ellipsis>
         {teams}
       </TableColumnValue>
-      <TableColumnValue>
-        <Checkbox
-          checked={user.enabled}
-          disabled={usersService.isActiveUser(user.userId) || !isManageable}
-          title={enabledCheckboxTitle}
-          onChange={handleEnabledCheckboxChange}
-        />
+      <TableColumnValue centerContent>
+        <div className="tw:flex tw:items-center tw:justify-center">
+          <Checkbox
+            checked={user.enabled}
+            disabled={usersService.isActiveUser(user.userId) || !isManageable}
+            title={enabledCheckboxTitle}
+            onChange={handleEnabledCheckboxChange}
+          />
+        </div>
       </TableColumnValue>
       <TableColumnValue className={clsx(style['gap'], style['overflow'])} flex ellipsis>
         <Loader suspense small inline hideMessage>
