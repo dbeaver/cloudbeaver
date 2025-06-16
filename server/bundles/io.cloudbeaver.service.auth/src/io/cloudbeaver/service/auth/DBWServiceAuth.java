@@ -22,6 +22,7 @@ import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
 import io.cloudbeaver.service.auth.model.user.WebAuthProviderInfo;
+import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 
@@ -44,6 +45,7 @@ public interface DBWServiceAuth extends DBWService {
 
     @WebAction(authRequired = false)
     WebAsyncAuthStatus federatedLogin(
+        @NotNull HttpServletRequest httpRequest,
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
@@ -62,6 +64,7 @@ public interface DBWServiceAuth extends DBWService {
 
     @WebAction(authRequired = false)
     WebLogoutInfo authLogout(
+        @NotNull HttpServletRequest httpRequest,
         @NotNull WebSession webSession,
         @Nullable String providerId,
         @Nullable String configurationId
@@ -71,7 +74,7 @@ public interface DBWServiceAuth extends DBWService {
     WebUserInfo activeUser(@NotNull WebSession webSession) throws DBWebException;
 
     @WebAction(authRequired = false)
-    WebAuthProviderInfo[] getAuthProviders();
+    WebAuthProviderInfo[] getAuthProviders(@NotNull HttpServletRequest request) throws DBWebException;
 
     @WebAction()
     boolean changeLocalPassword(@NotNull WebSession webSession, @NotNull String oldPassword, @NotNull String newPassword) throws DBWebException;

@@ -184,7 +184,7 @@ public abstract class CBApplication<T extends CBServerConfig>
     }
 
     @Override
-    public String getAuthServiceURL() {
+    public String getAuthServiceUriSegment() {
         return getServerConfigurationController().getAuthServiceURL();
     }
 
