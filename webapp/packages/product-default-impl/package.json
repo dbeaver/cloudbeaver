@@ -31,6 +31,7 @@
     "@cloudbeaver/plugin-authentication": "workspace:*",
     "@cloudbeaver/plugin-authentication-administration": "workspace:*",
     "@cloudbeaver/plugin-browser": "workspace:*",
+    "@cloudbeaver/plugin-codemirror6": "workspace:*",
     "@cloudbeaver/plugin-connection-custom": "workspace:*",
     "@cloudbeaver/plugin-connection-search": "workspace:*",
     "@cloudbeaver/plugin-connections": "workspace:*",

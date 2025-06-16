@@ -89,11 +89,7 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
         checked={item.checked}
         onClick={() => onClick(false)}
       >
-        <MenuItemElement
-          label={item.label}
-          icon={<Checkbox checked={item.checked} mod={['primary', 'small']} ripple={false} />}
-          tooltip={item.tooltip}
-        />
+        <MenuItemElement label={item.label} icon={<Checkbox checked={item.checked} size="small" />} tooltip={item.tooltip} />
       </MenuItemCheckbox>
     );
   }
@@ -120,7 +116,15 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
     const extraProps = item.getExtraProps?.();
 
     return (
-      <MenuItem id={item.id} aria-label={translate(item.label)} hidden={item.hidden} disabled={item.disabled} onClick={() => onClick()}>
+      <MenuItem
+        id={item.id}
+        aria-label={translate(item.label)}
+        hidden={item.hidden}
+        disabled={item.disabled}
+        style={{ pointerEvents: 'auto' }}
+        focusable
+        onClick={() => onClick()}
+      >
         <MenuItemElement label={item.label} icon={IconComponent ? <IconComponent item={item} {...extraProps} /> : item.icon} tooltip={item.tooltip} />
       </MenuItem>
     );
