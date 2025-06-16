@@ -28,8 +28,6 @@ export function useTreeState(externalState?: TreeState): ITreeState {
           expanded: false,
           selected: false,
           showInFilter: false,
-          loading: false,
-          indeterminateSelected: false,
         }),
       ),
   );

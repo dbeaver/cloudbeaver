@@ -15,14 +15,12 @@ import { TreeDataContext } from './contexts/TreeDataContext.js';
 import type { NodeComponent } from './INodeRenderer.js';
 import { NodeControl } from './NodeControl.js';
 import { useNodeDnD } from './useNodeDnD.js';
-import { useTreeSelectionContext } from './contexts/useTreeSelectionContext.js';
 
 export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight, controlRenderer, childrenRenderer }) {
   const tree = useContext(TreeContext)!;
   const data = useContext(TreeDataContext)!;
-  const selection = useTreeSelectionContext();
 
-  const { expanded, selected, loading, indeterminateSelected } = data.getState(nodeId);
+  const { expanded, selected } = data.getState(nodeId);
 
   const dndData = useNodeDnD(nodeId, () => {
     // if (!selected) {
@@ -39,9 +37,7 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
   }
 
   function handleSelect() {
-    if (!loading) {
-      selection.selectNode(nodeId, !selected);
-    }
+    tree.selectNode(nodeId, !selected);
   }
 
   function handleClick() {
@@ -54,9 +50,7 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
   return (
     <TreeNode
       selected={selected}
-      indeterminateSelected={indeterminateSelected}
       expanded={expanded}
-      loading={loading}
       onExpand={handleToggleExpand}
       onOpen={handleOpen}
       onSelect={handleSelect}

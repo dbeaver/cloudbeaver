@@ -110,12 +110,7 @@ export function useTreeData(options: IOptions): ITreeData {
         this.state.updateAllState(state);
       },
       async load(nodeId: string, manual: boolean) {
-        this.state.updateState(nodeId, { loading: true });
-        try {
-          await options.load(nodeId, manual);
-        } finally {
-          this.state.updateState(nodeId, { loading: false });
-        }
+        await options.load(nodeId, manual);
       },
       async update() {
         const nodes = [this.rootId];

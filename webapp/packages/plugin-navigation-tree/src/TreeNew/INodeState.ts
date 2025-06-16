@@ -9,7 +9,5 @@
 export interface INodeState {
   selected: boolean;
   expanded: boolean;
-  loading?: boolean;
   showInFilter?: boolean;
-  indeterminateSelected?: boolean;
 }
