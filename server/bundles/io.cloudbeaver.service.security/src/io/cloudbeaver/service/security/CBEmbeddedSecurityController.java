@@ -1458,34 +1458,38 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             var dbCon = database.openConnection();
             var txn = new JDBCTransaction(dbCon)
         ) {
-            String deleteSql = "DELETE FROM {table_prefix}CB_GLOBAL_PERMISSIONS "
-                + "WHERE SUBJECT_ID=? AND PERMISSION_ID IN (" + SQLUtils.generateParamList(permissions.size()) + ")";
-            try (PreparedStatement dbStat = dbCon.prepareStatement(deleteSql)) {
-                int paramIndex = 1;
-                dbStat.setString(paramIndex++, subjectId);
-                for (SMPermission permission : permissions) {
-                    dbStat.setString(paramIndex++, permission.getPermissionId());
-                }
-                dbStat.execute();
-            }
-            if (!CommonUtils.isEmpty(forInsert)) {
-                try (
-                    PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO {table_prefix}CB_GLOBAL_PERMISSIONS" +
-                        "(SUBJECT_ID,PERMISSION_ID,IS_ENABLED,GRANTED_BY) VALUES(?,?,?,?)")
-                ) {
-                    for (SMPermission permission : forInsert) {
-                        dbStat.setString(1, subjectId);
-                        dbStat.setString(2, permission.getPermissionId());
-                        dbStat.setString(3, booleanToString(permission.isEnabled()));
-                        dbStat.setString(4, grantorId);
-                        dbStat.addBatch();
+            try {
+                String deleteSql = "DELETE FROM {table_prefix}CB_GLOBAL_PERMISSIONS "
+                    + "WHERE SUBJECT_ID=? AND PERMISSION_ID IN (" + SQLUtils.generateParamList(permissions.size()) + ")";
+                try (PreparedStatement dbStat = dbCon.prepareStatement(deleteSql)) {
+                    int paramIndex = 1;
+                    dbStat.setString(paramIndex++, subjectId);
+                    for (SMPermission permission : permissions) {
+                        dbStat.setString(paramIndex++, permission.getPermissionId());
                     }
-                    dbStat.executeBatch();
+                    dbStat.execute();
                 }
+                if (!CommonUtils.isEmpty(forInsert)) {
+                    try (
+                        PreparedStatement dbStat = dbCon.prepareStatement("INSERT INTO {table_prefix}CB_GLOBAL_PERMISSIONS" +
+                            "(SUBJECT_ID,PERMISSION_ID,IS_ENABLED,GRANTED_BY) VALUES(?,?,?,?)")
+                    ) {
+                        for (SMPermission permission : forInsert) {
+                            dbStat.setString(1, subjectId);
+                            dbStat.setString(2, permission.getPermissionId());
+                            dbStat.setString(3, booleanToString(permission.isEnabled()));
+                            dbStat.setString(4, grantorId);
+                            dbStat.addBatch();
+                        }
+                        dbStat.executeBatch();
+                    }
+                }
+                txn.commit();
+            } catch (SQLException e) {
+                txn.rollback();
             }
-            txn.commit();
         } catch (Exception e) {
-            throw new SMException("Error updating permissions: " + e.getMessage(), e);
+            throw new SMException("Error updating permissions, rollback failed: " + e, e);
         }
         addSubjectPermissionsUpdateEvent(subjectId, null);
     }
@@ -1532,38 +1536,43 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             var dbCon = database.openConnection();
             var txn = new JDBCTransaction(dbCon)
         ) {
-            if (!CommonUtils.isEmpty(forDelete)) {
-                String sql = "UPDATE {table_prefix}CB_GLOBAL_PERMISSIONS_DEFAULTS SET DELETED=? WHERE "
-                    + "PERMISSION_ID IN (" + SQLUtils.generateParamList(forDelete.size()) + ")";
-                try (var dbStat = dbCon.prepareStatement(sql)) {
-                    int paramIndex = 1;
-                    dbStat.setString(paramIndex++, booleanToString(true));
-                    for (SMPermission permission : forDelete) {
-                        dbStat.setString(paramIndex++, permission.getPermissionId());
+            try {
+                if (!CommonUtils.isEmpty(forDelete)) {
+                    String sql = "UPDATE {table_prefix}CB_GLOBAL_PERMISSIONS_DEFAULTS SET DELETED=? WHERE "
+                        + "PERMISSION_ID IN (" + SQLUtils.generateParamList(forDelete.size()) + ")";
+                    try (var dbStat = dbCon.prepareStatement(sql)) {
+                        int paramIndex = 1;
+                        dbStat.setString(paramIndex++, booleanToString(true));
+                        for (SMPermission permission : forDelete) {
+                            dbStat.setString(paramIndex++, permission.getPermissionId());
+                        }
                     }
                 }
-            }
-            if (!CommonUtils.isEmpty(forInsert)) {
-                try (var dbStat = dbCon.prepareStatement(
+                if (!CommonUtils.isEmpty(forInsert)) {
+                    try (var dbStat = dbCon.prepareStatement(
                         """
                             INSERT INTO {table_prefix}CB_GLOBAL_PERMISSIONS_DEFAULTS(PERMISSION_ID,ENABLED_BY_DEFAULT,GRANTED_BY)
                             VALUES(?,?,?)
                             """
                     )
-                ) {
-                    for (SMPermission permission : forInsert) {
-                        dbStat.setString(1, permission.getPermissionId());
-                        dbStat.setString(2, booleanToString(permission.isEnabled()));
-                        dbStat.setString(
-                            3,
-                            "automatically granted by " + ApplicationRegistry.getInstance().getApplication().getName()
-                        );
-                        dbStat.addBatch();
+                    ) {
+                        for (SMPermission permission : forInsert) {
+                            dbStat.setString(1, permission.getPermissionId());
+                            dbStat.setString(2, booleanToString(permission.isEnabled()));
+                            dbStat.setString(
+                                3,
+                                "automatically granted by " + ApplicationRegistry.getInstance().getApplication().getName()
+                            );
+                            dbStat.addBatch();
+                        }
+                        dbStat.executeBatch();
                     }
-                    dbStat.executeBatch();
                 }
+                txn.commit();
+            } catch (SQLException e) {
+                txn.rollback();
+                throw e;
             }
-            txn.commit();
         } catch (SQLException e) {
             throw new SMException("Error initialize default permissions in database", e);
         }
