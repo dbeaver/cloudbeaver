@@ -19,7 +19,6 @@ import './styles/main/fonts.pure.css';
 // TODO: important to keep normalize first
 import './styles/main/normalize.pure.css';
 import './styles/main/typography.pure.scss';
-import './styles/UiCheckbox.css';
 import './styles/UiIconButton.css';
 import './styles/UiSpinner.css';
 import './styles/UiInput.css';
