@@ -9,12 +9,14 @@ RUN groupadd -g $DBEAVER_GID dbeaver && \
     useradd -g $DBEAVER_GID -m -u $DBEAVER_UID -s /bin/bash dbeaver
 
 COPY cloudbeaver /opt/cloudbeaver
-COPY scripts/launch-product.sh /opt/cloudbeaver/launch-product.sh
 
 EXPOSE 8978
 RUN find /opt/cloudbeaver -type d -exec chmod 775 {} \;
+RUN chown -R dbeaver:dbeaver /opt/cloudbeaver
 WORKDIR /opt/cloudbeaver/
 
-RUN chmod +x "run-server.sh" "/opt/cloudbeaver/launch-product.sh"
+RUN chmod +x "run-server.sh"
 
-ENTRYPOINT ["./launch-product.sh"]
+USER dbeaver
+
+ENTRYPOINT ["./run-server.sh"]
