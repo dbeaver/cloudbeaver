@@ -22,33 +22,29 @@ import type { NodeEmptyPlaceholderComponent } from './NodeEmptyPlaceholderCompon
 import { useNodeSizeCache } from './useNodeSizeCache.js';
 import { useTree } from './useTree.js';
 import { useTreeDnD } from './useTreeDnD.js';
-import { useTreeSelection } from './useTreeSelection.js';
+import type { ITreeSelection } from './useTreeSelection.js';
 import { useTreeVirtualization } from './useTreeVirtualization.js';
 
 export interface NavigationTreeNewProps {
   data: ITreeData;
+  selection?: ITreeSelection;
   nodeRenderers?: INodeRenderer[];
   emptyPlaceholder?: NodeEmptyPlaceholderComponent;
-  multipleSelection?: boolean;
-  expandOnSelect?: boolean;
   className?: string;
   onNodeClick?(id: string): void | Promise<void>;
   onNodeDoubleClick?(id: string): void | Promise<void>;
-  onSelectionChange?(selectedNodeIds: string[]): void;
   getNodeDnDContext?(id: string, context: IDataContext): void;
   getNodeHeight(id: string): number;
 }
 
 export const Tree = observer<NavigationTreeNewProps>(function Tree({
   data,
+  selection,
   nodeRenderers,
   emptyPlaceholder,
   className,
-  multipleSelection = false,
-  expandOnSelect = false,
   onNodeClick,
   onNodeDoubleClick,
-  onSelectionChange,
   getNodeDnDContext,
   getNodeHeight,
 }) {
@@ -58,11 +54,6 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
     onNodeClick,
     onNodeDoubleClick,
     getNodeHeight,
-  });
-  const treeSelection = useTreeSelection(data, {
-    multipleSelection,
-    expandOnSelect,
-    onSelectionChange,
   });
   const mountOptimization = useTreeVirtualization();
   const elementsSizeCache = useNodeSizeCache(tree, data);
@@ -74,7 +65,7 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
     <div ref={mountOptimization.setRootRef} className={className} style={{ overflow: 'auto', position: 'relative' }}>
       <NodeSizeCacheContext.Provider value={elementsSizeCache}>
         <TreeDataContext.Provider value={data}>
-          <TreeSelectionContext.Provider value={treeSelection}>
+          <TreeSelectionContext.Provider value={selection}>
             <TreeVirtualizationContext.Provider value={mountOptimization}>
               <TreeContext.Provider value={tree}>
                 <TreeDnDContext.Provider value={treeDnD}>
