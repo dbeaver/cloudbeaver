@@ -34,6 +34,8 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.auth.*;
 import io.cloudbeaver.service.auth.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.service.security.SMUtils;
+import io.cloudbeaver.utils.ServletAppUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -42,6 +44,7 @@ import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.auth.SMSessionExternal;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
+import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
 import org.jkiss.dbeaver.model.security.exception.SMTooManySessionsException;
@@ -92,6 +95,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public WebAsyncAuthStatus federatedLogin(
+        @NotNull HttpServletRequest httpRequest,
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
@@ -106,7 +110,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             throw new DBWebException("Provider '" + providerId + "' is not federated");
         }
         try {
-            var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, Map.of(), forceSessionsLogout);
+            Map<String, Object> authParameters = new HashMap<>();
+            authParameters.put(SMConstants.USER_ORIGIN, ServletAppUtils.getOriginFromRequestOrThrow(httpRequest));
+
+            var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, authParameters, forceSessionsLogout);
             if (smAuthInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
                 throw new DBWebException("Unexpected auth status: " + smAuthInfo.getAuthStatus());
             }
@@ -161,9 +168,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         if (authProviderDescriptor.isTrusted()) {
             throw new DBWebException(authProviderDescriptor.getLabel() + " not allowed for authorization via GQL API");
         }
-        if (authParameters == null) {
-            authParameters = Map.of();
-        }
+
         SMController securityController = webSession.getSecurityController();
         String currentSmSessionId = (webSession.getUser() == null || CBApplication.getInstance().isConfigurationMode())
             ? null
@@ -210,6 +215,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public WebLogoutInfo authLogout(
+        @NotNull HttpServletRequest httpRequest,
         @NotNull WebSession webSession,
         @Nullable String providerId,
         @Nullable String configurationId
@@ -221,6 +227,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             List<WebAuthInfo> removedInfos = webSession.removeAuthInfo(providerId);
             List<String> logoutUrls = new ArrayList<>();
             var cbApp = CBApplication.getInstance();
+            String origin = ServletAppUtils.getOriginFromRequestOrThrow(httpRequest);
             for (WebAuthInfo removedInfo : removedInfos) {
                 if (removedInfo.getAuthProviderDescriptor()
                     .getInstance() instanceof SMSignOutLinkProvider provider
@@ -233,12 +240,15 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                         continue;
                     }
                     String logoutUrl;
+
                     if (removedInfo.getAuthSession() instanceof SMSessionExternal externalSession) {
                         logoutUrl = provider.getUserSignOutLink(providerConfig,
-                            externalSession.getAuthParameters());
+                            externalSession.getAuthParameters(), origin
+                        );
                     } else {
                         logoutUrl = provider.getUserSignOutLink(providerConfig,
-                            Map.of());
+                            Map.of(), origin
+                        );
                     }
                     if (CommonUtils.isNotEmpty(logoutUrl)) {
                         logoutUrls.add(logoutUrl);
@@ -286,9 +296,11 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     @Override
-    public WebAuthProviderInfo[] getAuthProviders() {
+    public WebAuthProviderInfo[] getAuthProviders(@NotNull HttpServletRequest request) throws DBWebException {
+        String origin = ServletAppUtils.getOriginFromRequestOrThrow(request);
         return WebAuthProviderRegistry.getInstance().getAuthProviders()
-            .stream().map(WebAuthProviderInfo::new)
+            .stream()
+            .map(descriptor -> new WebAuthProviderInfo(descriptor, origin))
             .toArray(WebAuthProviderInfo[]::new);
     }
 
