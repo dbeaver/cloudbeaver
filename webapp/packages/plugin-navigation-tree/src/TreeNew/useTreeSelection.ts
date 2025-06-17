@@ -85,38 +85,33 @@ async function setSelectionWithLoad(
   const nodeState = treeData.getState(nodeId);
   const currentSelectedState = selectionMap.get(nodeId);
 
-  selectionMap.set(nodeId, { selected: shouldSelect, indeterminate: false });
-
-  if (!nodeState.expanded && (currentSelectedState.selected !== shouldSelect || currentSelectedState.indeterminate)) {
-    try {
-      if (expandOnSelect) {
-        treeData.updateState(nodeId, { expanded: true });
-      }
-      await treeData.load(nodeId, true);
-
-      const children = treeData.getChildren(nodeId);
-
-      if (children.length === 0) {
-        selectionMap.set(nodeId, { selected: shouldSelect, indeterminate: false });
-        return nodes;
-      }
-    } catch (error) {
-      treeData.updateState(nodeId, { expanded: false });
-      return nodes;
-    }
+  if (currentSelectedState.selected === shouldSelect && !currentSelectedState.indeterminate) {
+    return nodes;
   }
 
-  const children = treeData.getChildren(nodeId);
+  selectionMap.set(nodeId, { selected: shouldSelect, indeterminate: false });
 
-  if (children.length > 0) {
-    const childPromises = children.map(childId => setSelectionWithLoad(treeData, selectionMap, childId, shouldSelect, expandOnSelect));
-    const results = await Promise.allSettled(childPromises);
+  if (!nodeState.expanded && expandOnSelect) {
+    treeData.updateState(nodeId, { expanded: true });
+  }
 
-    results.forEach(result => {
-      if (result.status === 'fulfilled') {
-        nodes.push(...result.value);
-      }
-    });
+  try {
+    await treeData.load(nodeId, true);
+    const children = treeData.getChildren(nodeId);
+
+    if (children.length > 0) {
+      const childPromises = children.map(childId => setSelectionWithLoad(treeData, selectionMap, childId, shouldSelect, expandOnSelect));
+      const results = await Promise.allSettled(childPromises);
+
+      results.forEach(result => {
+        if (result.status === 'fulfilled') {
+          nodes.push(...result.value);
+        }
+      });
+    }
+  } catch (error) {
+    treeData.updateState(nodeId, { expanded: false });
+    return nodes;
   }
 
   return nodes;
