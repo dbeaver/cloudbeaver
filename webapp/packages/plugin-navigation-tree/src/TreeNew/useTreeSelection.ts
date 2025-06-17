@@ -24,6 +24,8 @@ export interface INodeSelection {
   indeterminate: boolean;
 }
 
+type TreeSelectionState = MetadataMap<string, INodeSelection>
+
 export interface ITreeSelection {
   selectedNodes: Record<string, INodeSelection>;
   getNodeSelection(nodeId: string): INodeSelection;
@@ -32,12 +34,12 @@ export interface ITreeSelection {
   clearSelection(): void;
 }
 
-function getSelectionState(selectionMap: MetadataMap<string, INodeSelection>, nodeId: string): INodeSelection {
+function getSelectionState(selectionMap: TreeSelectionState, nodeId: string): INodeSelection {
   return selectionMap.get(nodeId);
 }
 
 function setSelectionState(
-  selectionMap: MetadataMap<string, INodeSelection>,
+  selectionMap: TreeSelectionState,
   nodeId: string,
   state: Partial<INodeSelection>
 ): void {
@@ -45,26 +47,7 @@ function setSelectionState(
   selectionMap.set(nodeId, { ...currentState, ...state });
 }
 
-function updateIndeterminateStates(treeData: ITreeData, selectionMap: MetadataMap<string, INodeSelection>, nodeId: string): void {
-  updateNodeAndDescendantsIndeterminateState(treeData, selectionMap, nodeId);
-
-  const parent = treeData.getParent(nodeId);
-  if (parent) {
-    updateAncestorsIndeterminateState(treeData, selectionMap, parent);
-  }
-}
-
-function updateNodeAndDescendantsIndeterminateState(treeData: ITreeData, selectionMap: MetadataMap<string, INodeSelection>, nodeId: string): void {
-  const children = treeData.getChildren(nodeId);
-
-  children.forEach(childId => {
-    updateNodeAndDescendantsIndeterminateState(treeData, selectionMap, childId);
-  });
-
-  updateNodeIndeterminateState(treeData, selectionMap, nodeId);
-}
-
-function updateAncestorsIndeterminateState(treeData: ITreeData, selectionMap: MetadataMap<string, INodeSelection>, nodeId: string): void {
+function updateIndeterminateStates(treeData: ITreeData, selectionMap: TreeSelectionState, nodeId: string): void {
   updateNodeIndeterminateState(treeData, selectionMap, nodeId);
 
   const parent = treeData.getParent(nodeId);
@@ -73,7 +56,16 @@ function updateAncestorsIndeterminateState(treeData: ITreeData, selectionMap: Me
   }
 }
 
-function updateNodeIndeterminateState(treeData: ITreeData, selectionMap: MetadataMap<string, INodeSelection>, nodeId: string): void {
+function updateAncestorsIndeterminateState(treeData: ITreeData, selectionMap: TreeSelectionState, nodeId: string): void {
+  updateNodeIndeterminateState(treeData, selectionMap, nodeId);
+
+  const parent = treeData.getParent(nodeId);
+  if (parent) {
+    updateAncestorsIndeterminateState(treeData, selectionMap, parent);
+  }
+}
+
+function updateNodeIndeterminateState(treeData: ITreeData, selectionMap: TreeSelectionState, nodeId: string): void {
   const node = treeData.getNode(nodeId);
   const children = treeData.getChildren(nodeId);
 
@@ -96,7 +88,7 @@ function updateNodeIndeterminateState(treeData: ITreeData, selectionMap: Metadat
 
 async function updateAllDescendantNodesWithLoad(
   treeData: ITreeData,
-  selectionMap: MetadataMap<string, INodeSelection>,
+  selectionMap: TreeSelectionState,
   nodeId: string,
   shouldSelect: boolean,
   expandOnSelect: boolean = false,
