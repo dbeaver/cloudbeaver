@@ -1,6 +1,9 @@
 export default [
   ['shortcuts_title', 'Горячие клавиши'],
 
+  ['plugin_help_welcome_docs_label', 'Документация'],
+  ['plugin_help_welcome_docs_description', 'Узнайте, как использовать CloudBeaver'],
+
   ['data_viewer_shortcut_start_inline_editing', 'Начать редактирование ячейки во встроенном редакторе'],
   ['data_viewer_shortcut_add_new_row', 'Добавить новую строку'],
   ['data_viewer_shortcut_duplicate_row', 'Продублировать строку'],
