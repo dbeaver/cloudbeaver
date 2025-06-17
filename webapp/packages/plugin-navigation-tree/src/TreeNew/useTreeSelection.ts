@@ -34,19 +34,6 @@ export interface ITreeSelection {
   clearSelection(): void;
 }
 
-function getSelectionState(selectionMap: TreeSelectionState, nodeId: string): INodeSelection {
-  return selectionMap.get(nodeId);
-}
-
-function setSelectionState(
-  selectionMap: TreeSelectionState,
-  nodeId: string,
-  state: Partial<INodeSelection>
-): void {
-  const currentState = getSelectionState(selectionMap, nodeId);
-  selectionMap.set(nodeId, { ...currentState, ...state });
-}
-
 function updateIndeterminateStates(treeData: ITreeData, selectionMap: TreeSelectionState, nodeId: string): void {
   updateNodeIndeterminateState(treeData, selectionMap, nodeId);
 
@@ -68,25 +55,26 @@ function updateAncestorsIndeterminateState(treeData: ITreeData, selectionMap: Tr
 function updateNodeIndeterminateState(treeData: ITreeData, selectionMap: TreeSelectionState, nodeId: string): void {
   const node = treeData.getNode(nodeId);
   const children = treeData.getChildren(nodeId);
+  const currentState = selectionMap.get(nodeId);
 
   if (node.leaf || children.length === 0) {
-    setSelectionState(selectionMap, nodeId, { indeterminate: false });
+    selectionMap.set(nodeId, { ...currentState, indeterminate: false });
     return;
   }
 
-  const selectedChildren = children.filter(childId => getSelectionState(selectionMap, childId).selected);
-  const indeterminateChildren = children.filter(childId => getSelectionState(selectionMap, childId).indeterminate);
+  const selectedChildren = children.filter(childId => selectionMap.get(childId).selected);
+  const indeterminateChildren = children.filter(childId => selectionMap.get(childId).indeterminate);
 
   const allSelected = selectedChildren.length === children.length;
   const someSelected = selectedChildren.length > 0 || indeterminateChildren.length > 0;
 
-  setSelectionState(selectionMap, nodeId, {
+  selectionMap.set(nodeId, {
     selected: allSelected,
     indeterminate: !allSelected && someSelected,
   });
 }
 
-async function updateAllDescendantNodesWithLoad(
+async function setSelectionWithLoad(
   treeData: ITreeData,
   selectionMap: TreeSelectionState,
   nodeId: string,
@@ -95,9 +83,9 @@ async function updateAllDescendantNodesWithLoad(
 ): Promise<string[]> {
   const nodes = [nodeId];
   const nodeState = treeData.getState(nodeId);
-  const currentSelectedState = getSelectionState(selectionMap, nodeId);
+  const currentSelectedState = selectionMap.get(nodeId);
 
-  setSelectionState(selectionMap, nodeId, { selected: shouldSelect, indeterminate: false });
+  selectionMap.set(nodeId, { selected: shouldSelect, indeterminate: false });
 
   if (!nodeState.expanded && (currentSelectedState.selected !== shouldSelect || currentSelectedState.indeterminate)) {
     try {
@@ -109,8 +97,7 @@ async function updateAllDescendantNodesWithLoad(
       const children = treeData.getChildren(nodeId);
 
       if (children.length === 0) {
-        treeData.updateState(nodeId, { expanded: true });
-        setSelectionState(selectionMap, nodeId, { selected: shouldSelect, indeterminate: false });
+        selectionMap.set(nodeId, { selected: shouldSelect, indeterminate: false });
         return nodes;
       }
     } catch (error) {
@@ -122,7 +109,7 @@ async function updateAllDescendantNodesWithLoad(
   const children = treeData.getChildren(nodeId);
 
   if (children.length > 0) {
-    const childPromises = children.map(childId => updateAllDescendantNodesWithLoad(treeData, selectionMap, childId, shouldSelect, expandOnSelect));
+    const childPromises = children.map(childId => setSelectionWithLoad(treeData, selectionMap, childId, shouldSelect, expandOnSelect));
     const results = await Promise.allSettled(childPromises);
 
     results.forEach(result => {
@@ -179,7 +166,7 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
         if (node.leaf) {
           internalState.set(nodeId, { selected: shouldSelect, indeterminate: false });
         } else {
-          await updateAllDescendantNodesWithLoad(treeData, internalState, nodeId, shouldSelect, options.expandOnSelect);
+          await setSelectionWithLoad(treeData, internalState, nodeId, shouldSelect, options.expandOnSelect);
         }
 
         updateIndeterminateStates(treeData, internalState, nodeId);
@@ -192,7 +179,7 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
           return;
         }
 
-        await updateAllDescendantNodesWithLoad(treeData, internalState, treeData.rootId, true, options.expandOnSelect);
+        await setSelectionWithLoad(treeData, internalState, treeData.rootId, true, options.expandOnSelect);
 
         options.onSelectionChange?.(this.selectedNodes);
       },
