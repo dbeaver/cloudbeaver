@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, type IComputedValue } from 'mobx';
+import { computed } from 'mobx';
 import { useState } from 'react';
 
 import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
@@ -35,20 +35,11 @@ export interface ITreeSelection {
 }
 
 function updateIndeterminateStates(treeData: ITreeData, selectionMap: TreeSelectionState, nodeId: string): void {
-  updateNodeIndeterminateState(treeData, selectionMap, nodeId);
+  let currentNodeId: string | null | undefined = nodeId;
 
-  const parent = treeData.getParent(nodeId);
-  if (parent) {
-    updateAncestorsIndeterminateState(treeData, selectionMap, parent);
-  }
-}
-
-function updateAncestorsIndeterminateState(treeData: ITreeData, selectionMap: TreeSelectionState, nodeId: string): void {
-  updateNodeIndeterminateState(treeData, selectionMap, nodeId);
-
-  const parent = treeData.getParent(nodeId);
-  if (parent) {
-    updateAncestorsIndeterminateState(treeData, selectionMap, parent);
+  while (currentNodeId) {
+    updateNodeIndeterminateState(treeData, selectionMap, currentNodeId);
+    currentNodeId = treeData.getParent(currentNodeId);
   }
 }
 
@@ -58,20 +49,35 @@ function updateNodeIndeterminateState(treeData: ITreeData, selectionMap: TreeSel
   const currentState = selectionMap.get(nodeId);
 
   if (node.leaf || children.length === 0) {
-    selectionMap.set(nodeId, { ...currentState, indeterminate: false });
+    if (currentState.indeterminate) {
+      selectionMap.set(nodeId, { selected: currentState.selected, indeterminate: false });
+    }
     return;
   }
 
-  const selectedChildren = children.filter(childId => selectionMap.get(childId).selected);
-  const indeterminateChildren = children.filter(childId => selectionMap.get(childId).indeterminate);
+  let selectedCount = 0;
+  let indeterminateCount = 0;
 
-  const allSelected = selectedChildren.length === children.length;
-  const someSelected = selectedChildren.length > 0 || indeterminateChildren.length > 0;
+  for (const childId of children) {
+    const childState = selectionMap.get(childId);
+    if (childState.selected) {
+      selectedCount++;
+    }
+    if (childState.indeterminate) {
+      indeterminateCount++;
+    }
+  }
 
-  selectionMap.set(nodeId, {
-    selected: allSelected,
-    indeterminate: !allSelected && someSelected,
-  });
+  const allSelected = selectedCount === children.length;
+  const someSelected = selectedCount > 0 || indeterminateCount > 0;
+  const newIndeterminate = !allSelected && someSelected;
+
+  if (currentState.selected !== allSelected || currentState.indeterminate !== newIndeterminate) {
+    selectionMap.set(nodeId, {
+      selected: allSelected,
+      indeterminate: newIndeterminate,
+    });
+  }
 }
 
 async function setSelectionWithLoad(
@@ -100,14 +106,22 @@ async function setSelectionWithLoad(
     const children = treeData.getChildren(nodeId);
 
     if (children.length > 0) {
-      const childPromises = children.map(childId => setSelectionWithLoad(treeData, selectionMap, childId, shouldSelect, expandOnSelect));
-      const results = await Promise.allSettled(childPromises);
+      const BATCH_SIZE = 10;
 
-      results.forEach(result => {
-        if (result.status === 'fulfilled') {
-          nodes.push(...result.value);
-        }
-      });
+      for (let i = 0; i < children.length; i += BATCH_SIZE) {
+        const batch = children.slice(i, i + BATCH_SIZE);
+
+        const batchPromises = batch.map(childId =>
+          setSelectionWithLoad(treeData, selectionMap, childId, shouldSelect, expandOnSelect)
+            .catch(() => [])
+        );
+
+        const batchResults = await Promise.all(batchPromises);
+
+        batchResults.forEach(childNodes => {
+          nodes.push(...childNodes);
+        });
+      }
     }
   } catch (error) {
     treeData.updateState(nodeId, { expanded: false });
@@ -122,16 +136,6 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
 
   const [internalState] = useState(() => new MetadataMap<string, INodeSelection>(() => ({ selected: false, indeterminate: false })));
 
-  const [selectionCache] = useState(
-    () =>
-      new MetadataMap<string, IComputedValue<INodeSelection>>(id =>
-        computed(() => {
-          const state = internalState.get(id);
-          return { ...state };
-        }),
-      ),
-  );
-
   const treeSelection = useObservableRef(
     () => ({
       get selectedNodes(): Record<string, INodeSelection> {
@@ -139,17 +143,17 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
 
         for (const [nodeId, selection] of internalState) {
           if (selection.selected || selection.indeterminate) {
-            result[nodeId] = { ...selection };
+            result[nodeId] = selection;
           }
         }
 
         return result;
       },
       getNodeSelection(nodeId: string): INodeSelection {
-        return selectionCache.get(nodeId).get();
+        return internalState.get(nodeId);
       },
       async selectNode(nodeId: string): Promise<void> {
-        const currentState = selectionCache.get(nodeId).get();
+        const currentState = this.getNodeSelection(nodeId);
         const shouldSelect = currentState.indeterminate ? false : !currentState.selected;
 
         if (!options.multipleSelection && shouldSelect) {
