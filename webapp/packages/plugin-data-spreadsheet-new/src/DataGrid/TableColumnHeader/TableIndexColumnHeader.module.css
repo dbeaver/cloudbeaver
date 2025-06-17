@@ -7,14 +7,12 @@
  */
 
 .container {
-  width: 100%;
   cursor: pointer;
 }
 .iconOrImage {
   cursor: auto;
   width: 10px;
   position: absolute;
-  right: 8px;
   top: 50%;
   transform: translateY(-50%);
 }

@@ -7,6 +7,7 @@
  */
 export const WEBSITE_LINKS = {
   ROOT_PAGE: 'https://dbeaver.com/',
+  DOCS_PAGE: 'https://dbeaver.com/docs/cloudbeaver/',
   DATA_EDITOR_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Data-editor/',
   SQL_EDITOR_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/SQL-Editor/',
   SERVER_CONFIGURATION_RESOURCE_QUOTAS_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Server-configuration/#resource-quotas',

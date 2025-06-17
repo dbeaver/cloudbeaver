@@ -2615,6 +2615,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-connections": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
     "@cloudbeaver/plugin-navigation-tree": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^19"
@@ -3150,6 +3151,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/core-view": "workspace:*"
     "@cloudbeaver/plugin-data-spreadsheet-new": "workspace:*"
+    "@cloudbeaver/plugin-navigation-tabs": "workspace:*"
     "@cloudbeaver/plugin-navigation-tree": "workspace:*"
     "@cloudbeaver/plugin-object-viewer-nav-tree-link": "workspace:*"
     "@cloudbeaver/plugin-sql-editor": "workspace:*"
@@ -3157,6 +3159,7 @@ __metadata:
     "@cloudbeaver/plugin-top-app-bar": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@types/react": "npm:^19"
+    mobx-react-lite: "npm:^4"
     react: "npm:^19"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -3257,8 +3260,10 @@ __metadata:
     "@cloudbeaver/core-events": "workspace:*"
     "@cloudbeaver/core-executor": "workspace:*"
     "@cloudbeaver/core-extensions": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-projects": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
     "@cloudbeaver/core-storage": "workspace:*"
     "@cloudbeaver/core-ui": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
@@ -15836,14 +15841,14 @@ __metadata:
   linkType: hard
 
 "react-data-grid@file:./artifacts::locator=%40dbeaver%2Freact-data-grid%40workspace%3A..%2Fcommon-react%2F%40dbeaver%2Freact-data-grid":
-  version: 7.0.0-beta.50
-  resolution: "react-data-grid@file:./artifacts#./artifacts::hash=f67a36&locator=%40dbeaver%2Freact-data-grid%40workspace%3A..%2Fcommon-react%2F%40dbeaver%2Freact-data-grid"
+  version: 7.0.0-beta.55
+  resolution: "react-data-grid@file:./artifacts#./artifacts::hash=2f312f&locator=%40dbeaver%2Freact-data-grid%40workspace%3A..%2Fcommon-react%2F%40dbeaver%2Freact-data-grid"
   dependencies:
     clsx: "npm:^2.0.0"
   peerDependencies:
     react: ^19.0
     react-dom: ^19.0
-  checksum: 10c0/5591a564d6c3f4772dd87b8bfda111b0aafb8f748f1337f492db7ab5fc3f5dd5da3088aa4856ce581d943202ca8ed508e2828fc3e1453441b3061fa56a62ae95
+  checksum: 10c0/f0f3685c1ebcd3e0d3f33f189016a541eee963db1beb3f751209ef6eeb39497a08e1a583900a42a596b017e5daf6935d9ab9cd444e3b16ed905399e941eeadbb
   languageName: node
   linkType: hard
 
