@@ -24,7 +24,7 @@ export interface INodeSelection {
   indeterminate: boolean;
 }
 
-type TreeSelectionState = MetadataMap<string, INodeSelection>
+type TreeSelectionState = MetadataMap<string, INodeSelection>;
 
 export interface ITreeSelection {
   selectedNodes: Record<string, INodeSelection>;

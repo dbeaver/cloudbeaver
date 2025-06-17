@@ -8,8 +8,9 @@
 import { useContext } from 'react';
 
 import { TreeSelectionContext } from './TreeSelectionContext.js';
+import type { ITreeSelection } from '../useTreeSelection.js';
 
-export function useTreeSelectionContext() {
+export function useTreeSelectionContext(): ITreeSelection {
   const context = useContext(TreeSelectionContext);
   if (!context) {
     throw new Error('useTreeSelectionContext must be used within a TreeSelectionContext.Provider');
