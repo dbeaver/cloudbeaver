@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ import { resourceKeyList, type ResourceKeySimple, ResourceKeyUtils } from '@clou
 import { StorageService } from '@cloudbeaver/core-storage';
 import { isArraysEqual, MetadataMap, TempMap } from '@cloudbeaver/core-utils';
 import { ACTION_OPEN_IN_TAB, type IActiveView, View } from '@cloudbeaver/core-view';
+import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 
 import type { ITab, ITabMetadata } from './ITab.js';
 import { TabHandler, type TabHandlerEvent, type TabHandlerOptions, type TabSyncHandlerEvent } from './TabHandler.js';
@@ -100,6 +101,7 @@ export class NavigationTabsService extends View<ITab> {
   readonly onTabClose: ISyncExecutor<ITab | undefined>;
   readonly onInit: ISyncExecutor<boolean>;
   readonly onStateUpdate: ISyncExecutor;
+  readonly welcomeContainer: PlaceholderContainer;
 
   private readonly handlers: Map<string, TabHandler>;
   private readonly tabsMap: Map<string, ITab>;
@@ -122,6 +124,7 @@ export class NavigationTabsService extends View<ITab> {
     this.tabsMap = new Map<string, ITab>();
     this.state = new Map<string, TabsState>();
     this.historyState = new Map<string, INavigatorHistory>();
+    this.welcomeContainer = new PlaceholderContainer();
 
     this.onTabSelect = new SyncExecutor();
     this.onTabClose = new SyncExecutor();

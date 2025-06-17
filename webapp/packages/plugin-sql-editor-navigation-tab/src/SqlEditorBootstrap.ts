@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { RenameDialog } from '@cloudbeaver/core-blocks';
+import { importLazyComponent, RenameDialog } from '@cloudbeaver/core-blocks';
 import {
   type Connection,
   ConnectionInfoResource,
@@ -45,6 +45,8 @@ import { SQL_EDITOR_SOURCE_ACTION } from './SQL_EDITOR_SOURCE_ACTION.js';
 import { SqlEditorNavigatorService } from './SqlEditorNavigatorService.js';
 import { SqlEditorTabService } from './SqlEditorTabService.js';
 
+const WelcomeNewSqlEditor = importLazyComponent(() => import('./WelcomeNewSqlEditor.js').then(m => m.WelcomeNewSqlEditor));
+
 interface IActiveConnectionContext {
   connectionKey?: IConnectionInfoParams;
   catalogId?: string;
@@ -72,6 +74,7 @@ export class SqlEditorBootstrap extends Bootstrap {
   }
 
   override register(): void {
+    this.navigationTabsService.welcomeContainer.add(WelcomeNewSqlEditor, undefined, () => this.sqlEditorSettingsService.disabled);
     this.registerTopAppBarItem();
 
     this.menuService.addCreator({
@@ -237,10 +240,10 @@ export class SqlEditorBootstrap extends Bootstrap {
 
         return false;
       },
-      handler: (context, action) => {
+      handler: async (context, action) => {
         switch (action) {
           case ACTION_SQL_EDITOR_NEW: {
-            this.openSQLEditor();
+            await this.openSQLEditor();
             break;
           }
         }
@@ -277,10 +280,10 @@ export class SqlEditorBootstrap extends Bootstrap {
     };
   }
 
-  private openSQLEditor() {
+  async openSQLEditor(): Promise<void> {
     const connectionContext = this.getActiveConnectionContext();
 
-    this.sqlEditorNavigatorService.openNewEditor({
+    await this.sqlEditorNavigatorService.openNewEditor({
       dataSourceKey: LocalStorageSqlDataSource.key,
       connectionKey: connectionContext.connectionKey,
       catalogId: connectionContext.catalogId,
