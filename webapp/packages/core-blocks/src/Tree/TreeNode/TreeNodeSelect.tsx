@@ -20,7 +20,7 @@ import style from './TreeNodeSelect.module.css';
 
 interface Props {
   group?: boolean;
-  onSelect?: () => Promise<void> | boolean | void;
+  onSelect?: () => Promise<void> | boolean | void | undefined;
   selected?: boolean;
   indeterminate?: boolean;
   disabled?: boolean;
