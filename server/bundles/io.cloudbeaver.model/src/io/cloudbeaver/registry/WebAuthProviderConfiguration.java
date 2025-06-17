@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.auth.SMSignOutLinkProvider;
 import io.cloudbeaver.utils.ServletAppUtils;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
@@ -35,12 +36,21 @@ public class WebAuthProviderConfiguration {
 
     private static final Log log = Log.getLog(WebAuthProviderConfiguration.class);
 
+    @NotNull
     private final WebAuthProviderDescriptor providerDescriptor;
+    @NotNull
     private final SMAuthProviderCustomConfiguration config;
+    @NotNull
+    private final String origin;
 
-    public WebAuthProviderConfiguration(WebAuthProviderDescriptor providerDescriptor, SMAuthProviderCustomConfiguration config) {
+    public WebAuthProviderConfiguration(
+        @NotNull WebAuthProviderDescriptor providerDescriptor,
+        @NotNull SMAuthProviderCustomConfiguration config,
+        @NotNull String origin
+    ) {
         this.providerDescriptor = providerDescriptor;
         this.config = config;
+        this.origin = origin;
     }
 
     public String getProviderId() {
@@ -75,19 +85,19 @@ public class WebAuthProviderConfiguration {
     public String getSignInLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof SMAuthProviderFederated smAuthProviderFederated ?
-            buildRedirectUrl(smAuthProviderFederated.getSignInLink(getId()))
+            buildRedirectUrl(smAuthProviderFederated.getSignInLink(getId(), origin), origin)
             : null;
     }
 
-    private String buildRedirectUrl(String baseUrl) {
-        return baseUrl + "?" + CBAuthConstants.CB_REDIRECT_URL_REQUEST_PARAM + "=" + ServletAppUtils.getFullServerUrl();
+    private String buildRedirectUrl(@NotNull String baseUrl, @NotNull String origin) {
+        return baseUrl + "?" + CBAuthConstants.CB_REDIRECT_URL_REQUEST_PARAM + "=" + origin;
     }
 
     @Property
     public String getSignOutLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof SMSignOutLinkProvider smSignOutLinkProvider
-            ? smSignOutLinkProvider.getCommonSignOutLink(getId(), config.getParameters())
+            ? smSignOutLinkProvider.getCommonSignOutLink(getId(), config.getParameters(), origin)
             : null;
     }
 
@@ -95,7 +105,7 @@ public class WebAuthProviderConfiguration {
     public String getRedirectLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof SMAuthProviderFederated smAuthProviderFederated
-            ? smAuthProviderFederated.getRedirectLink(getId(), config.getParameters())
+            ? smAuthProviderFederated.getRedirectLink(getId(), config.getParameters(), origin)
             : null;
     }
 
@@ -103,7 +113,7 @@ public class WebAuthProviderConfiguration {
     public String getMetadataLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof SMAuthProviderFederated smAuthProviderFederated
-            ? smAuthProviderFederated.getMetadataLink(getId(), config.getParameters())
+            ? smAuthProviderFederated.getMetadataLink(getId(), config.getParameters(), origin)
             : null;
     }
 
@@ -111,7 +121,7 @@ public class WebAuthProviderConfiguration {
     public String getAcsLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof SMAuthProviderFederated smAuthProviderFederated
-            ? smAuthProviderFederated.getAcsLink(getId(), config.getParameters())
+            ? smAuthProviderFederated.getAcsLink(getId(), config.getParameters(), origin)
             : null;
     }
 
@@ -119,7 +129,7 @@ public class WebAuthProviderConfiguration {
     public String getEntityIdLink() throws  DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof SMAuthProviderFederated smAuthProviderFederated
-            ? smAuthProviderFederated.getEntityIdLink(getId(), config.getParameters())
+            ? smAuthProviderFederated.getEntityIdLink(getId(), config.getParameters(), origin)
             : null;
     }
 

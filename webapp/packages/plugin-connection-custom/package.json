@@ -34,6 +34,7 @@
     "@cloudbeaver/core-utils": "workspace:*",
     "@cloudbeaver/core-view": "workspace:*",
     "@cloudbeaver/plugin-connections": "workspace:*",
+    "@cloudbeaver/plugin-navigation-tabs": "workspace:*",
     "@cloudbeaver/plugin-navigation-tree": "workspace:*",
     "mobx": "^6",
     "mobx-react-lite": "^4",
