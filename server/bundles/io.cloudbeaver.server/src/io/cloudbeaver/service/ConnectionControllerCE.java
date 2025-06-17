@@ -39,7 +39,6 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
-import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceConnectEvent;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -454,16 +453,6 @@ public class ConnectionControllerCE implements ConnectionController {
         validateDriverLibrariesPresence(dataSourceContainer);
         try {
             boolean connect = dataSourceContainer.connect(monitor, true, false);
-            if (connect) {
-                webSession.addSessionEvent(
-                    new WSDataSourceConnectEvent(
-                        projectId,
-                        connectionId,
-                        webSession.getSessionId(),
-                        webSession.getUserId()
-                    )
-                );
-            }
         } catch (Exception e) {
             if (e instanceof DBCConnectException) {
                 Throwable rootCause = CommonUtils.getRootCause(e);

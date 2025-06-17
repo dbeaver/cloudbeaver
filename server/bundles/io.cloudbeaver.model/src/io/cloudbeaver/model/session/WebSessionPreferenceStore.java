@@ -44,7 +44,9 @@ public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
 
     // to avoid redundant sm api call
     public void updatePreferenceValues(@NotNull Map<String, Object> newValues) throws DBException {
-        userContext.getSecurityController().setCurrentUserParameters(newValues);
+        if (userContext.getUser() != null) {
+            userContext.getSecurityController().setCurrentUserParameters(newValues);
+        }
         for (Map.Entry<String, Object> entry : newValues.entrySet()) {
             if (entry.getValue() == null) {
                 userPreferences.remove(entry.getKey());
