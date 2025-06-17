@@ -15,7 +15,7 @@ import { Button } from './Button.js';
 export type Props = {
   providerId: string;
   className?: string;
-  children?: React.ReactNode;
+  children?: () => React.ReactNode;
   onAuthenticate?: () => void;
   onClose?: () => void;
 };
@@ -25,7 +25,7 @@ export const AuthenticationProvider = observer<Props>(function AuthenticationPro
   const action = useAuthenticationAction(props);
 
   if (action.authorized) {
-    return props.children || null;
+    return props.children?.() || null;
   }
 
   return (
