@@ -45,7 +45,7 @@ function updateIndeterminateStates(treeData: ITreeData, selectionMap: TreeSelect
 
 function updateNodeIndeterminateState(treeData: ITreeData, selectionMap: TreeSelectionState, nodeId: string): void {
   const node = treeData.getNode(nodeId);
-  const children = treeData.getChildren(nodeId);
+  const children = treeData.getUnfilteredChildren(nodeId);
   const currentState = selectionMap.get(nodeId);
 
   if (node.leaf || children.length === 0) {
