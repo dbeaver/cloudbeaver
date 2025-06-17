@@ -29,7 +29,7 @@ type TreeSelectionState = MetadataMap<string, INodeSelection>;
 export interface ITreeSelection {
   selectedNodes: Record<string, INodeSelection>;
   getNodeSelection(nodeId: string): INodeSelection;
-  selectNode(nodeId: string): Promise<boolean>;
+  selectNode(nodeId: string): Promise<void>;
   selectAll(): Promise<void>;
   clearSelection(): void;
 }
@@ -148,7 +148,7 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
       getNodeSelection(nodeId: string): INodeSelection {
         return selectionCache.get(nodeId).get();
       },
-      async selectNode(nodeId: string): Promise<boolean> {
+      async selectNode(nodeId: string): Promise<void> {
         const currentState = selectionCache.get(nodeId).get();
         const shouldSelect = currentState.indeterminate ? false : !currentState.selected;
 
@@ -167,7 +167,6 @@ export function useTreeSelection(treeData: ITreeData, options: ITreeSelectionOpt
         updateIndeterminateStates(treeData, internalState, nodeId);
 
         options.onSelectionChange?.(this.selectedNodes);
-        return shouldSelect;
       },
       async selectAll(): Promise<void> {
         if (!options.multipleSelection) {

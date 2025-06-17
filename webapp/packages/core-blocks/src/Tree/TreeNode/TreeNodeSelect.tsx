@@ -20,7 +20,7 @@ import style from './TreeNodeSelect.module.css';
 
 interface Props {
   group?: boolean;
-  onSelect?: () => Promise<boolean> | boolean | void;
+  onSelect?: () => Promise<void> | boolean | void;
   selected?: boolean;
   indeterminate?: boolean;
   disabled?: boolean;
@@ -44,7 +44,7 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
     throw new Error('Context not provided');
   }
 
-  disabled = disabled || context.disabled;
+  disabled = disabled || context.disabled || context.processing || context.loading;
   group = group ?? context.group;
   const loading = loadIndicator && context.loading;
   selected = selected ?? context.selected;
