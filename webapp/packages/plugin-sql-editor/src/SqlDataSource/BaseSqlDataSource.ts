@@ -108,7 +108,8 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
       if (source === SOURCE_HISTORY) {
         return;
       }
-      this.history.add(script, this.cursor);
+
+      this.history.add(script, { anchor: this.cursor.anchor + 1, head: this.cursor.head + 1 });
     });
 
     this.history.onNavigate.addHandler(
