@@ -15,7 +15,7 @@
     --dbv-kit-spinner-xlarge-height: 80px;
   }
 
-  .spinner__secondary {
+  .spinnerSecondary {
     --dbv-kit-spinner-stroke-color: var(--theme-on-primary);
   }
 

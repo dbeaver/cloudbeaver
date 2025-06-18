@@ -24,8 +24,7 @@ import { FieldDescription } from '../FieldDescription.js';
 import { FieldLabel } from '../FieldLabel.js';
 import { useCapsLockTracker } from '../useCapsLockTracker.js';
 import inputFieldStyle from './InputField.module.css';
-import { IconButton, Input, type InputProps } from '@dbeaver/ui-kit';
-import { Loader } from '../../Loader/Loader.js';
+import { IconButton, Input, Spinner, type InputProps } from '@dbeaver/ui-kit';
 
 export type InputFieldBaseProps = Omit<InputProps, 'onChange'> &
   ILayoutSizeProps & {
@@ -136,7 +135,7 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
           />
           {loading && (
             <div title={translate('ui_processing_loading')} className={s(styles, { loaderContainer: true })}>
-              <Loader small />
+              <Spinner size="small" />
             </div>
           )}
           {passwordType && canShowPassword && (

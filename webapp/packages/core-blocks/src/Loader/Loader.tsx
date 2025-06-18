@@ -270,7 +270,7 @@ export const Loader = observer<Props>(function Loader({
         {overlay && renderWrappedChildren()}
         <div ref={loaderRef} className={s(style, { loader: true, loaderOverlay: overlay, small, fullSize, inline, secondary, overlay }, className)}>
           <Spinner
-            className={s(style, { spinner: true, 'spinner__secondary': secondary || overlay })}
+            className={s(style, { spinner: true, spinnerSecondary: secondary || overlay })}
             size={small ? 'small' : 'medium'}
           />
           {!hideMessage && (
