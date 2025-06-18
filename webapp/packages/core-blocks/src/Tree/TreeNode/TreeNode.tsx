@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { forwardRef } from 'react';
 
@@ -99,6 +99,7 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
         externalExpanded: observable.ref,
         showInFilter: observable.ref,
         leaf: observable.ref,
+        processAction: action.bound,
       },
       {
         group,
