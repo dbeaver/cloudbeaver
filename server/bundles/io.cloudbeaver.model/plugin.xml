@@ -25,10 +25,4 @@
                     label="Default secret controller" description="Default void secret controller"/>
     </extension>
 
-
-    <extension point="org.jkiss.dbeaver.ws.event.handler">
-        <eventHandler class="io.cloudbeaver.model.events.WSEventHandlerWorkspaceConfigUpdate">
-            <topic id="cb_workspace_configuration"/>
-        </eventHandler>
-    </extension>
 </plugin>
