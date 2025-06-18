@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.events;
+package io.cloudbeaver.server.events;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.WorkspaceConfigEventManager;
-import org.jkiss.dbeaver.model.websocket.WSEventHandler;
 import org.jkiss.dbeaver.model.websocket.event.WSWorkspaceConfigurationChangedEvent;
+import org.jkiss.dbeaver.registry.driver.DriverDescriptorSerializerLegacy;
 
-public class WSEventHandlerWorkspaceConfigUpdate implements WSEventHandler<WSWorkspaceConfigurationChangedEvent> {
+public class WSEventHandlerWorkspaceConfigUpdate extends WSDefaultEventHandler<WSWorkspaceConfigurationChangedEvent> {
     private static final Log log = Log.getLog(WSEventHandlerWorkspaceConfigUpdate.class);
 
     @Override
@@ -30,6 +30,8 @@ public class WSEventHandlerWorkspaceConfigUpdate implements WSEventHandler<WSWor
         String configFileName = event.getConfigFilePath();
         log.info("Config file changed: " + configFileName);
         WorkspaceConfigEventManager.fireConfigChangedEvent(configFileName);
+        if (DriverDescriptorSerializerLegacy.DRIVERS_FILE_NAME.equals(event.getConfigFilePath())) {
+            super.handleEvent(event);
+        }
     }
-
 }
