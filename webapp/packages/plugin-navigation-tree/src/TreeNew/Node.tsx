@@ -16,16 +16,13 @@ import type { NodeComponent } from './INodeRenderer.js';
 import { NodeControl } from './NodeControl.js';
 import { useNodeDnD } from './useNodeDnD.js';
 
-export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight, controlRenderer, childrenRenderer }) {
+export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight, controlRenderer, childrenRenderer, disabled }) {
   const tree = useContext(TreeContext)!;
   const data = useContext(TreeDataContext)!;
 
   const { expanded, selected } = data.getState(nodeId);
 
   const dndData = useNodeDnD(nodeId, () => {
-    // if (!selected) {
-    //   tree.selectNode(nodeId, true);
-    // }
   });
 
   function handleOpen() {
@@ -51,6 +48,7 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
     <TreeNode
       selected={selected}
       expanded={expanded}
+      disabled={disabled}
       onExpand={handleToggleExpand}
       onOpen={handleOpen}
       onSelect={handleSelect}
