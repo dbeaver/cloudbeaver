@@ -74,7 +74,7 @@ export const RadioGroup: RadioGroupType = observer(function RadioGroup({
       value,
       onChange: handleChange,
     }),
-    [value, value, handleChange],
+    [value, handleChange],
   );
 
   return (
