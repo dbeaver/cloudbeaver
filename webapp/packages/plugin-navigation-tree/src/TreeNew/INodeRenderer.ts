@@ -22,7 +22,6 @@ export type NodeControlComponent =
 export interface INodeComponentProps extends INodeComponentBaseProps {
   childrenRenderer: React.FC<INodeComponentBaseProps>;
   controlRenderer?: NodeControlComponent;
-  disabled?: boolean;
 }
 
 export type NodeComponent = React.FC<INodeComponentProps>;

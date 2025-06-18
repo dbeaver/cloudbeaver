@@ -8,19 +8,15 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { EventContext } from '@cloudbeaver/core-events';
-
 import { Checkbox } from '../../FormControls/Checkboxes/Checkbox.js';
 import { Loader } from '../../Loader/Loader.js';
 import { s } from '../../s.js';
 import { useS } from '../../useS.js';
-import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag.js';
 import { TreeNodeContext } from './TreeNodeContext.js';
 import style from './TreeNodeSelect.module.css';
 
 interface Props {
-  group?: boolean;
-  onSelect?: () => Promise<void> | boolean | void | undefined;
+  onSelect?: () => Promise<unknown> | undefined;
   selected?: boolean;
   indeterminate?: boolean;
   disabled?: boolean;
@@ -28,15 +24,7 @@ interface Props {
   className?: string;
 }
 
-export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
-  onSelect,
-  group,
-  selected,
-  indeterminate,
-  disabled,
-  loadIndicator,
-  className,
-}) {
+export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({ onSelect, selected, indeterminate, disabled, loadIndicator, className }) {
   const styles = useS(style);
   const context = useContext(TreeNodeContext);
 
@@ -45,7 +33,6 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
   }
 
   disabled = disabled || context.disabled || context.processing || context.loading;
-  group = group ?? context.group;
   const loading = loadIndicator && context.loading;
   selected = selected ?? context.selected;
   indeterminate = indeterminate ?? context.indeterminateSelected;
@@ -54,16 +41,8 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
     await onSelect?.();
   }
 
-  function handleClick(event: React.MouseEvent<HTMLInputElement>) {
-    EventContext.set(event, EventTreeNodeSelectFlag);
-  }
-
-  function handleDbClick(event: React.MouseEvent<HTMLDivElement>) {
-    EventContext.set(event, EventTreeNodeSelectFlag);
-  }
-
   return (
-    <div className={className} onClick={handleClick} onDoubleClick={handleDbClick}>
+    <div className={className}>
       {loading ? (
         <Loader className={s(styles, { loader: true })} small />
       ) : (
