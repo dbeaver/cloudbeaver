@@ -62,14 +62,6 @@
       height: 100%;
     }
   }
-  @keyframes rotation {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(359deg);
-    }
-  }
   
   .loaderOverlay {
     composes: theme-text-on-primary from global;
