@@ -52,6 +52,9 @@
         <eventHandler class="io.cloudbeaver.server.events.WSDeleteTempFileHandler">
             <topic id="cb_delete_temp_folder"/>
         </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSEventHandlerWorkspaceConfigUpdate">
+            <topic id="cb_workspace_configuration"/>
+        </eventHandler>
     </extension>
 
     <extension point="org.jkiss.dbeaver.settings">

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,15 @@
 package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.auth.CBAuthConstants;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 
 public interface ServletAuthApplication extends ServletApplication {
     ServletAuthConfiguration getAuthConfiguration();
 
-    String getAuthServiceURL();
+    @Nullable
+    String getAuthServiceUriSegment();
 
     default long getMaxSessionIdleTime() {
         return CBAuthConstants.MAX_SESSION_IDLE_TIME;
@@ -32,4 +35,8 @@ public interface ServletAuthApplication extends ServletApplication {
     void flushConfiguration() throws DBException;
 
     String getDefaultAuthRole();
+
+    default String modifyOrigin(@NotNull String origin) {
+        return origin;
+    }
 }

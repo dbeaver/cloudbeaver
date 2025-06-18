@@ -39,6 +39,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPConnectionInformation;
 import org.jkiss.dbeaver.model.DBPPage;
 import org.jkiss.dbeaver.model.auth.*;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
@@ -61,6 +62,7 @@ import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
 
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -1633,7 +1635,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                         throw e;
                     }
                 }
-
+                boolean isFederatedAuth = SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass());
+                if (isFederatedAuth) {
+                    String userOrigin = JSONUtils.getString(userCredentials, SMConstants.USER_ORIGIN);
+                    if (CommonUtils.isEmpty(userOrigin)) {
+                        throw new SMException("User origin not found in authentication data");
+                    }
+                    filteredUserCreds.put(SMConstants.USER_ORIGIN, modifyOrigin(userOrigin));
+                }
                 authAttemptId = createNewAuthAttempt(
                     SMAuthStatus.IN_PROGRESS,
                     authProviderId,
@@ -1647,15 +1656,21 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     forceSessionsLogout
                 );
 
-                if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
+                if (isFederatedAuth) {
+                    String userOrigin = JSONUtils.getString(filteredUserCreds, SMConstants.USER_ORIGIN);
                     //async auth
                     var authProviderFederated = (SMAuthProviderFederated) authProviderInstance;
-                    String signInLink = buildRedirectLink(authProviderFederated.getSignInLink(authProviderConfigurationId),
-                        authAttemptId);
+                    String signInLink = buildRedirectLink(
+                        authProviderFederated.getSignInLink(authProviderConfigurationId, userOrigin),
+                        authAttemptId
+                    );
                     String signOutLink = authProviderFederated.getCommonSignOutLink(authProviderConfigurationId,
-                        providerConfig.getParameters());
-                    Map<SMAuthConfigurationReference, Object> authData = Map.of(new SMAuthConfigurationReference(authProviderId,
-                        authProviderConfigurationId), filteredUserCreds);
+                        providerConfig.getParameters(), userOrigin
+                    );
+                    Map<SMAuthConfigurationReference, Object> authData = Map.of(
+                        new SMAuthConfigurationReference(authProviderId, authProviderConfigurationId),
+                        filteredUserCreds
+                    );
                     return SMAuthInfo.inProgress(
                         authAttemptId,
                         signInLink,
@@ -1687,6 +1702,23 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
         }
+    }
+
+    @NotNull
+    protected String modifyOrigin(@NotNull String origin) {
+        StringBuilder finalOrigin = new StringBuilder();
+        URI uri = URI.create(origin);
+        finalOrigin.append(uri.getScheme())
+            .append("://")
+            .append(uri.getHost());
+        if (uri.getPort() > 0 && application.getServerPort() != uri.getPort()) {
+            finalOrigin.append(":").append(application.getServerPort());
+        } else {
+            return origin;
+        }
+        finalOrigin.append(uri.getPath());
+
+        return finalOrigin.toString();
     }
 
     private Map<String, Object> filterSecuredUserData(
@@ -1958,13 +1990,18 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                             WebAuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
                             var authProviderInstance = authProviderDescriptor.getInstance();
                             if (authProviderInstance instanceof SMAuthProviderFederated providerFederated) {
-                                signInLink = buildRedirectLink(providerFederated.getRedirectLink(
-                                    authProviderConfiguration,
-                                    Map.of()), authId);
-                                signOutLink = providerFederated.getUserSignOutLink(
-                                    application.getAuthConfiguration()
-                                        .getAuthProviderConfiguration(authProviderConfiguration),
-                                    authProviderData);
+                                String userOrigin = JSONUtils.getString(authProviderData, SMConstants.USER_ORIGIN);
+                                if(CommonUtils.isNotEmpty(userOrigin)){
+                                    signInLink = buildRedirectLink(
+                                        providerFederated.getRedirectLink(authProviderConfiguration, Map.of(), userOrigin),
+                                        authId
+                                    );
+                                    signOutLink = providerFederated.getUserSignOutLink(
+                                        application.getAuthConfiguration()
+                                            .getAuthProviderConfiguration(authProviderConfiguration),
+                                        authProviderData, userOrigin
+                                    );
+                                }
                             }
 
                         }
@@ -3288,7 +3325,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         return authProvider;
     }
 
-    private String buildRedirectLink(String originalLink, String authId) {
+    private String buildRedirectLink(@NotNull String originalLink, @NotNull String authId) {
         return originalLink + "?authId=" + authId;
     }
 
