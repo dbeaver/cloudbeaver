@@ -105,8 +105,8 @@ export const Radio: RadioType = observer(function Radio({
         name={name}
         value={value?.toString() ?? ''}
         checked={checked}
-        onChange={handleChange}
         disabled={rest.disabled}
+        onChange={handleChange}
         {...rest}
       >
         {children}
