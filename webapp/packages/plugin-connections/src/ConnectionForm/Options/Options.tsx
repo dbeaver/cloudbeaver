@@ -85,8 +85,6 @@ const driverConfiguration: IDriverConfiguration[] = [
   },
 ];
 
-const CONFIGURATION_TYPE_NAME = 'configurationType';
-
 export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({ formState, tabId }) {
   const { selected } = useTab(tabId);
   const isAdmin = usePermission(EAdminPermission.admin);
@@ -225,7 +223,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 {configurationTypes.length > 1 && (
                   <FormFieldDescription label={translate('connections_connection_configuration')} tiny>
                     <Container gap>
-                      <RadioGroup aria-label={CONFIGURATION_TYPE_NAME} name={CONFIGURATION_TYPE_NAME} state={optionsPart.state}>
+                      <RadioGroup aria-label="configurationTypeRadioGroup" name="configurationType" state={optionsPart.state}>
                         {configurationTypes.map(conf => (
                           <Radio
                             key={conf.value}

@@ -79,7 +79,7 @@ export const RadioGroup: RadioGroupType = observer(function RadioGroup({
 
   return (
     <RadioGroupContext.Provider value={context}>
-      <UiKitRadioGroup {...rest}>
+      <UiKitRadioGroup {...rest} label={rest['aria-label'] ?? rest['label'] ?? name }>
         {children}
       </UiKitRadioGroup>
     </RadioGroupContext.Provider>
