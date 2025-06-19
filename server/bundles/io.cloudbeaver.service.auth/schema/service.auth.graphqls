@@ -178,7 +178,7 @@ extend type Query {
     authUpdateStatus(authId: ID!, linkUser: Boolean): AuthInfo! @deprecated
 
     "Same as authLogoutExtended but without additional information"
-    authLogout(provider: ID, configuration: ID): Boolean @deprecated(reason: "Use authLogoutExtended instead")
+    authLogout(provider: ID, configuration: ID): Boolean @deprecated(reason: "use authLogoutExtended instead")
 
     "Logouts user. If provider not specified then all authorizations are revoked from session. Contains additional information"
     authLogoutExtended(provider: ID, configuration: ID): LogoutInfo! @since(version: "23.3.3")

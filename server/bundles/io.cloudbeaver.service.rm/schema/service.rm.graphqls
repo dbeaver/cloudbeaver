@@ -112,7 +112,7 @@ extend type Mutation {
     "Deletes project by projectId. Returns true if project was deleted, false if project not found"
     rmDeleteProject(projectId: ID!): Boolean!
 
-    rmSetProjectPermissions(projectId: String!, permissions: [RMSubjectProjectPermissions!]!): Boolean! @deprecated(reason: "setConnectionSubjectAccess")
+    rmSetProjectPermissions(projectId: String!, permissions: [RMSubjectProjectPermissions!]!): Boolean! @deprecated(reason: "use setConnectionSubjectAccess")
 
     rmSetSubjectProjectPermissions(subjectId: String!, permissions: [RMProjectPermissions!]!): Boolean! @deprecated
 

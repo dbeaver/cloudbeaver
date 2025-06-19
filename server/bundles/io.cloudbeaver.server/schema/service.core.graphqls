@@ -314,9 +314,9 @@ type DriverInfo {
     "Defines if the driver is enabled"
     enabled: Boolean!
     "Defines if the driver page requires server name field"
-    requiresServerName: Boolean @deprecated(reason: "Use mainProperties instead")
+    requiresServerName: Boolean @deprecated(reason: "use mainProperties instead")
     "Defines if the driver page requires database name field"
-    requiresDatabaseName: Boolean @deprecated(reason: "Use mainProperties instead")
+    requiresDatabaseName: Boolean @deprecated(reason: "use mainProperties instead")
     "Defines if host, port, database, server name fields are using a custom page"
     useCustomPage: Boolean! @since(version: "24.1.2")
 
@@ -353,30 +353,44 @@ type DriverInfo {
 
     "False for drivers which do not support authentication."
     anonymousAccess: Boolean
-
+    "Default auth model that is used for this driver (see authModels)"
     defaultAuthModel: ID!
+    "List of auth models that can be used with this driver (see authModels)"
     applicableAuthModels: [ID!]!
-
+    "List of network handlers that can be used with this driver (SSH/SSL)"
     applicableNetworkHandlers: [ID]!
-
+    "Configuration types are used in UI to determine how to display connection settings (show host/port/database fields or use URL field)"
     configurationTypes: [DriverConfigurationType]!
 
+    "Defines if the driver can be downloaded remotely"
     downloadable: Boolean! @since(version: "24.3.3")
+    "Defines if the driver is installed on the server"
     driverInstalled: Boolean!
+    "List of driver libraries that are used for connecting to the database"
     driverLibraries: [DriverLibraryInfo!]!
+    "Defines if embedded driver is safe to use in the server"
     safeEmbeddedDriver: Boolean! @since(version: "25.0.0")
 }
 
+"Driver library information. Used to display driver files in UI"
 type DriverLibraryInfo {
+    "Driver library unique ID"
     id: ID!
+    "Driver library name"
     name: String!
+    "Path to the driver library icon"
     icon: String
+    "List of files that are used by the driver"
     libraryFiles: [DriverFileInfo!]
 }
 
+"Driver file information."
 type DriverFileInfo @since(version: "24.3.2") {
+    "Driver file unique ID"
     id: ID!
+    "Driver file name"
     fileName: String!
+    "Path to the driver file icon"
     icon: String
 }
 
@@ -402,6 +416,7 @@ enum NetworkHandlerType {
     CONFIG
 }
 
+"SSH network handler authentication type"
 enum NetworkHandlerAuthType {
     PASSWORD,
     PUBLIC_KEY,
@@ -453,10 +468,13 @@ type SecretInfo {
 
 "Connection instance"
 type ConnectionInfo {
+    "Connection unique ID"
     id: ID!
+    "ID of the driver that is used for this connection (see DriverInfo)"
     driverId: ID!
-
+    "Connection name"
     name: String!
+    "Connection description"
     description: String
 
     host: String
@@ -465,15 +483,19 @@ type ConnectionInfo {
     databaseName: String
     url: String
 
+    "Main connection properties. Contains host, port, database, server name fields"
     mainPropertyValues: Object @since(version: "24.1.2")
 
+    "Connection keep-alive interval in seconds"
     keepAliveInterval: Int!
+    "Defines if the connection is in auto-commit mode"
     autocommit: Boolean
 
     properties: Object
-
+    "Indicates if the connection is already connected to the database"
     connected: Boolean!
     provided: Boolean!
+    "Indicates if the connection is read-only (no data modification allowed)"
     readOnly: Boolean!
     "Forces connection URL use, host/port/database parameters will be ignored"
     useUrl: Boolean!
@@ -495,16 +517,23 @@ type ConnectionInfo {
     """
     authNeeded: Boolean!
 
+    "ID of the connection folder where this connection is stored"
     folder: ID
+    "Node path of the connection in the navigator"
     nodePath: String
 
+    "Connection time in ISO format"
     connectTime: String
+    "Connection error if any"
     connectionError: ServerError
+    "Server version that is used for this connection"
     serverVersion: String
+    "Client version that is used for this connection"
     clientVersion: String
 
     origin: ObjectOrigin!
 
+    "ID of the auth model that is used for this connection (see authModels)"
     authModel: ID
     authProperties: [ObjectPropertyInfo!]!
 
@@ -527,6 +556,7 @@ type ConnectionInfo {
     defaultCatalogName: String @since(version: "25.0.5")
     defaultSchemaName: String @since(version: "25.0.5")
 
+    "List of tools that can be used with this connection. Returns empty list if no tools are available"
     tools: [String!]! @since(version: "24.1.3")
 }
 
