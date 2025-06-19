@@ -104,12 +104,14 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
     this.onDatabaseModelUpdate.setInitialDataGetter(() => this.databaseModels);
     this.onSetScript.next(this.onUpdate);
-    this.onSetScript.addHandler(({ script, source }) => {
-      if (source === SOURCE_HISTORY) {
-        return;
-      }
-      this.history.add(script, this.cursor);
-    });
+    this.onSetScript.addHandler(
+      action(({ script, source, cursor }) => {
+        if (source === SOURCE_HISTORY) {
+          return;
+        }
+        this.history.add(script, source, cursor);
+      }),
+    );
 
     this.history.onNavigate.addHandler(
       action(({ value, cursor }) => {
@@ -150,8 +152,8 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     });
   }
 
-  setScript(script: string, source?: string): void {
-    this.onSetScript.execute({ script, source });
+  setScript(script: string, source?: string, cursor?: ISqlEditorCursor): void {
+    this.onSetScript.execute({ script, source, cursor });
   }
 
   setIncomingScript(script: string): void {

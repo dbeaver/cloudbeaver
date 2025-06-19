@@ -16,7 +16,7 @@ export interface ISqlDataSourceHistory {
     value: string;
     cursor?: ISqlEditorCursor;
   }>;
-  add(value: string, cursor: ISqlEditorCursor, source?: string): void;
+  add(value: string, source?: string, cursor?: ISqlEditorCursor): void;
   undo(): void;
   redo(): void;
   restore(data: ISqlDataSourceHistoryState): void;

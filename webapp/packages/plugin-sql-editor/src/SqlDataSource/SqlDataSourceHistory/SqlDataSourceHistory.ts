@@ -33,7 +33,7 @@ export class SqlDataSourceHistory implements ISqlDataSourceHistory {
     });
   }
 
-  add(value: string, cursor: ISqlEditorCursor, source?: string): void {
+  add(value: string, source?: string, cursor?: ISqlEditorCursor): void {
     // skip history if value is the same as current
     if (this.state.history[this.state.historyIndex]!.value === value) {
       return;

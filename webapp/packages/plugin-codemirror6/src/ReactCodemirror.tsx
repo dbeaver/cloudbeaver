@@ -67,16 +67,16 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
       if (container) {
         const updateListener = EditorView.updateListener.of((update: ViewUpdate) => {
           const remote = update.transactions.some(tr => tr.annotation(External));
+          const selection = update.state.selection.main;
 
           if (update.docChanged && !remote) {
             const doc = update.state.doc;
             const value = doc.toString();
 
-            callbackRef.onChange?.(value, update);
+            callbackRef.onChange?.(value, selection, update);
           }
 
           if (update.selectionSet && !remote) {
-            const selection = update.state.selection.main;
             callbackRef.onCursorChange?.(selection, update);
           }
 
