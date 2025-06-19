@@ -251,7 +251,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
         await this.executeQueryAction(
           query,
-          async () => {
+          () => {
             if (this.dataSource?.databaseModels.length) {
               this.sqlQueryService.initDatabaseDataModels(this.state);
             }
@@ -297,7 +297,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         } catch {}
       },
 
-      async switchEditing(): Promise<void> {
+      switchEditing(): void {
         this.dataSource?.setEditing(!this.dataSource.isEditing());
       },
 

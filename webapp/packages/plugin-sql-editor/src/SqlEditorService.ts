@@ -174,7 +174,7 @@ export class SqlEditorService {
     }
   }
 
-  async initEditorConnection(state: ISqlEditorTabState): Promise<IConnectionExecutionContext | undefined> {
+  initEditorConnection(state: ISqlEditorTabState): Promise<IConnectionExecutionContext | undefined> {
     return this.sqlDataSourceService.executeAction(
       state.editorId,
       async dataSource => {

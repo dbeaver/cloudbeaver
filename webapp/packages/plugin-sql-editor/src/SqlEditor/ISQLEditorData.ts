@@ -51,12 +51,12 @@ export interface ISQLEditorData {
   executeQueryNewTab(): Promise<void>;
   showExecutionPlan(): Promise<void>;
   executeScript(): Promise<void>;
-  switchEditing(): Promise<void>;
+  switchEditing(): void;
   getHintProposals(position: number, simple: boolean): Promise<SQLProposal[]>;
   getResolvedSegment(): Promise<ISQLScriptSegment | undefined>;
   executeQueryAction<T>(
     segment: ISQLScriptSegment | undefined,
-    action: (query: ISQLScriptSegment) => Promise<T>,
+    action: (query: ISQLScriptSegment) => T | Promise<T>,
     passEmpty?: boolean,
     passDisabled?: boolean,
   ): Promise<T | undefined>;
