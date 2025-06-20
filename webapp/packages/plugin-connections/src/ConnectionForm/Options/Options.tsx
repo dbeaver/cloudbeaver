@@ -224,7 +224,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 {configurationTypes.length > 1 && (
                   <FormFieldDescription label={configurationTypeLabel} tiny>
                     <Container gap>
-                      <RadioGroup labelledBy={configurationTypeLabel} name="configurationType" state={optionsPart.state}>
+                      <RadioGroup aria-label={configurationTypeLabel} name="configurationType" state={optionsPart.state}>
                         {configurationTypes.map(conf => (
                           <Radio
                             key={conf.value}
