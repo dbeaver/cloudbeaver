@@ -5,6 +5,7 @@
 
     &.dbv-kit-radio-group--vertical {
       flex-direction: column;
+      gap: 0;
     }
   }
 
