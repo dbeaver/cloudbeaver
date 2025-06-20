@@ -46,7 +46,6 @@ import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.*;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
-import org.jkiss.dbeaver.model.sql.completion.SQLCompletionProposalBase;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
 import org.jkiss.dbeaver.model.sql.format.SQLFormatUtils;
 import org.jkiss.dbeaver.model.sql.generator.SQLGenerator;
@@ -54,6 +53,14 @@ import org.jkiss.dbeaver.model.sql.parser.SQLParserContext;
 import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorConfigurationRegistry;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
+import org.jkiss.dbeaver.model.sql.semantics.SQLDocumentScriptItemSyntaxContext;
+import org.jkiss.dbeaver.model.sql.semantics.SQLQueryModelRecognizer;
+import org.jkiss.dbeaver.model.sql.semantics.SQLQueryRecognitionContext;
+import org.jkiss.dbeaver.model.sql.semantics.SQLScriptItemAtOffset;
+import org.jkiss.dbeaver.model.sql.semantics.completion.ISqlCompletionProposal;
+import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionAnalyzer;
+import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionContext;
+import org.jkiss.dbeaver.model.sql.semantics.model.SQLQueryModel;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSWrapper;
@@ -142,14 +149,10 @@ public class WebServiceSQL implements DBWServiceSQL {
     {
         try {
             DBPDataSource dataSource = sqlContext.getProcessor().getConnection().getDataSourceContainer().getDataSource();
-
             Document document = new Document();
             document.set(query);
-
             WebSQLCompletionContext completionContext = new WebSQLCompletionContext(sqlContext);
-
             SQLScriptElement activeQuery;
-
             if (position != null) {
                 SQLParserContext parserContext = new SQLParserContext(
                     sqlContext.getProcessor().getConnection().getDataSource(),
@@ -161,7 +164,6 @@ public class WebServiceSQL implements DBWServiceSQL {
                 activeQuery = new SQLQuery(dataSource, query);
             }
 
-
             SQLCompletionRequest request = new SQLCompletionRequest(
                 completionContext,
                 document,
@@ -170,11 +172,49 @@ public class WebServiceSQL implements DBWServiceSQL {
                 CommonUtils.getBoolean(simpleMode, false)
             );
 
-            SQLCompletionAnalyzer analyzer = new SQLCompletionAnalyzer(request);
-            analyzer.setCheckNavigatorNodes(false);
-            analyzer.runAnalyzer(sqlContext.getProcessor().getWebSession().getProgressMonitor());
-            List<SQLCompletionProposalBase> proposals = analyzer.getProposals();
-            if (maxResults == null) maxResults = 200;
+            List<ISqlCompletionProposal> proposals = new ArrayList<>();
+            WebSession webSession = sqlContext.getWebSession();
+            boolean useNewCompletionEngine = webSession.getUserPreferenceStore()
+                .getBoolean(SQLModelPreferences.AUTOCOMPLETION_MODE);
+
+            if (useNewCompletionEngine) {
+                SQLQueryRecognitionContext recognitionContext = new SQLQueryRecognitionContext(
+                    webSession.getProgressMonitor(),
+                    request.getContext().getExecutionContext(),
+                    true,
+                    request.getContext().getSyntaxManager(),
+                    request.getContext().getDataSource().getSQLDialect()
+                );
+                SQLQueryModel queryModel = SQLQueryModelRecognizer.recognizeQuery(recognitionContext, query);
+                SQLDocumentScriptItemSyntaxContext scriptItemContext = new SQLDocumentScriptItemSyntaxContext(
+                    position == null ? 0 : position,
+                    query,
+                    queryModel,
+                    query.length()
+                );
+                scriptItemContext.setHasContextBoundaryAtLength(false);
+
+                final SQLQueryCompletionAnalyzer analyzer = new SQLQueryCompletionAnalyzer(
+                    m -> SQLQueryCompletionContext.prepareCompletionContext(
+                        new SQLScriptItemAtOffset(0, scriptItemContext),
+                        request.getDocumentOffset(),
+                        request.getContext().getExecutionContext(),
+                        request.getContext().getDataSource().getSQLDialect()
+                    ),
+                    request,
+                    request::getDocumentOffset
+                );
+                analyzer.run(webSession.getProgressMonitor());
+                proposals.addAll(analyzer.getResult());
+            } else {
+                SQLCompletionAnalyzer analyzer = new SQLCompletionAnalyzer(request);
+                analyzer.setCheckNavigatorNodes(false);
+                analyzer.runAnalyzer(sqlContext.getProcessor().getWebSession().getProgressMonitor());
+                proposals.addAll(analyzer.getProposals());
+            }
+            if (maxResults == null) {
+                maxResults = 200;
+            }
             if (proposals.size() > maxResults) {
                 proposals = proposals.subList(0, maxResults);
             }
@@ -184,7 +224,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                 result[i] = new WebSQLCompletionProposal(proposals.get(i));
             }
             return result;
-        } catch (DBException e) {
+        } catch (Exception e) {
             throw new DBWebException("Error processing SQL proposals", e);
         }
     }
@@ -253,7 +293,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                     DBSObject object = ((DBSWrapper) node).getObject();
                     if (object != null) {
                         objectList.add(object);
-                    }
+                      }
                 }
             }
             return objectList;
