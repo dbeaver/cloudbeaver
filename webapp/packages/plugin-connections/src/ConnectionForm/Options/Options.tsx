@@ -107,6 +107,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const connectionInfoAuthPropertiesResource = useResource(Options, ConnectionInfoAuthPropertiesResource, optionsPart.connectionKey, {
     active: selected && !!optionsPart.connectionKey,
   });
+  const configurationTypeLabel = translate('connections_connection_configuration');
 
   //@TODO it's here until the profile implementation in the CloudBeaver
   const readonly = formState.isDisabled || formState.isReadOnly || connectionInfoAuthResource.data?.authModel === PROFILE_AUTH_MODEL_ID;
@@ -221,9 +222,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   {translate('connections_connection_driver')}
                 </Combobox>
                 {configurationTypes.length > 1 && (
-                  <FormFieldDescription label={translate('connections_connection_configuration')} tiny>
+                  <FormFieldDescription label={configurationTypeLabel} tiny>
                     <Container gap>
-                      <RadioGroup aria-label="configurationTypeRadioGroup" name="configurationType" state={optionsPart.state}>
+                      <RadioGroup labelledBy={configurationTypeLabel} name="configurationType" state={optionsPart.state}>
                         {configurationTypes.map(conf => (
                           <Radio
                             key={conf.value}
