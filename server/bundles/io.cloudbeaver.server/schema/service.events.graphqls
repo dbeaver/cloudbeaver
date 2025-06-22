@@ -35,9 +35,10 @@ enum CBServerEventId {
 
     cb_database_output_log_updated,
 
-    cb_transaction_count @since(version: "24.3.3")
+    cb_transaction_count @since(version: "24.3.3"),
 
-    cb_session_task_info_updated @since(version: "24.3.1")
+    cb_session_task_info_updated @since(version: "24.3.1"),
+    cb_workspace_config_changed @since(version: "25.1.1")
 }
 
 # Events sent by client
@@ -66,7 +67,8 @@ enum CBEventTopic {
     cb_datasource_connection,
     cb_delete_temp_folder,
 
-    cb_transaction @since(version: "24.3.3")
+    cb_transaction @since(version: "24.3.3"),
+    cb_workspace_configuration @since(version: "25.1.1")
 }
 
 # Base server event interface

@@ -15,7 +15,7 @@
     Root;
 }
 
-.mlln6zg7-0-0-beta-50 {
+.mlln6zg7-0-0-beta-55 {
   @layer rdg.MeasuringCell {
     contain: strict;
     grid-row: 1;
@@ -24,7 +24,7 @@
 }
 
 
-.cj343x07-0-0-beta-50 {
+.cj343x07-0-0-beta-55 {
   @layer rdg.Cell {
     /* max-content does not work with size containment
      * dynamically switching between different containment styles incurs a heavy relayout penalty
@@ -53,7 +53,7 @@
   }
 }
 
-.csofj7r7-0-0-beta-50 {
+.csofj7r7-0-0-beta-55 {
   @layer rdg.Cell {
     position: sticky;
     /* Should have a higher value than 0 to show up above unfrozen cells */
@@ -66,8 +66,33 @@
   }
 }
 
+.ch2wcw87-0-0-beta-55 {
+  @layer rdg.DragHandle {
+    --rdg-drag-handle-size: 8px;
+    z-index: 0;
+    cursor: move;
+    inline-size: var(--rdg-drag-handle-size);
+    block-size: var(--rdg-drag-handle-size);
+    background-color: var(--rdg-selection-color);
+    place-self: end;
 
-.c1bn88vv7-0-0-beta-50 {
+    &:hover {
+      --rdg-drag-handle-size: 16px;
+      border: 2px solid var(--rdg-selection-color);
+      background-color: var(--rdg-background-color);
+    }
+  }
+}
+
+.c1wvphzh7-0-0-beta-55 {
+  @layer rdg.DragHandle {
+    z-index: 1;
+    position: sticky;
+  }
+}
+
+
+.c1bn88vv7-0-0-beta-55 {
   @layer rdg.CheckboxInput {
     display: block;
     margin: auto;
@@ -86,13 +111,13 @@
 }
 
 
-.g1s9ylgp7-0-0-beta-50 {
+.g1s9ylgp7-0-0-beta-55 {
   @layer rdg.GroupCellContent {
     outline: none;
   }
 }
 
-.cz54e4y7-0-0-beta-50 {
+.cz54e4y7-0-0-beta-55 {
   @layer rdg.GroupCellCaret {
     margin-inline-start: 4px;
     stroke: currentColor;
@@ -107,13 +132,13 @@
 }
 
 
-.h44jtk67-0-0-beta-50 {
+.h44jtk67-0-0-beta-55 {
   @layer rdg.SortableHeaderCell {
     display: flex;
   }
 }
 
-.hcgkhxz7-0-0-beta-50 {
+.hcgkhxz7-0-0-beta-55 {
   @layer rdg.SortableHeaderCellName {
     flex-grow: 1;
     overflow: clip;
@@ -122,69 +147,33 @@
 }
 
 
-.c6ra8a37-0-0-beta-50 {
+.c6ra8a37-0-0-beta-55 {
   @layer rdg.Cell {
     background-color: #ccccff;
   }
 }
 
-.cq910m07-0-0-beta-50 {
-  @layer rdg.Cell {
-    background-color: #ccccff;
 
-    &.c6ra8a37-0-0-beta-50 {
-      background-color: #9999ff;
-    }
-  }
-}
-
-
-.c1w9bbhr7-0-0-beta-50 {
-  @layer rdg.DragHandle {
-    --rdg-drag-handle-size: 8px;
-    z-index: 0;
-    cursor: move;
-    inline-size: var(--rdg-drag-handle-size);
-    block-size: var(--rdg-drag-handle-size);
-    background-color: var(--rdg-selection-color);
-    place-self: end;
-
-    &:hover {
-      --rdg-drag-handle-size: 16px;
-      border: 2px solid var(--rdg-selection-color);
-      background-color: var(--rdg-background-color);
-    }
-  }
-}
-
-.c1creorc7-0-0-beta-50 {
-  @layer rdg.DragHandle {
-    z-index: 1;
-    position: sticky;
-  }
-}
-
-
-.cis5rrm7-0-0-beta-50 {
+.cis5rrm7-0-0-beta-55 {
   @layer rdg.EditCell {
     padding: 0;
   }
 }
 
 
-.c6l2wv17-0-0-beta-50 {
+.c6l2wv17-0-0-beta-55 {
   @layer rdg.HeaderCell {
     cursor: pointer;
   }
 }
 
-.c1kqdw7y7-0-0-beta-50 {
+.c1kqdw7y7-0-0-beta-55 {
   @layer rdg.HeaderCell {
     touch-action: none;
   }
 }
 
-.r1y6ywlx7-0-0-beta-50 {
+.r1y6ywlx7-0-0-beta-55 {
   @layer rdg.HeaderCell {
     cursor: col-resize;
     position: absolute;
@@ -195,16 +184,29 @@
   }
 }
 
-.c1bezg5o7-0-0-beta-50 {
-  opacity: 0.5;
+.c1bezg5o7-0-0-beta-55 {
+  @layer rdg.HeaderCell {
+    background-color: var(--rdg-header-draggable-background-color);
+  }
 }
 
-.c1vc96037-0-0-beta-50 {
-  background-color: var(--rdg-header-draggable-background-color);
+.c1vc96037-0-0-beta-55 {
+  @layer rdg.HeaderCell {
+    background-color: var(--rdg-header-draggable-background-color);
+  }
+}
+
+.d8rwc9w7-0-0-beta-55 {
+  @layer rdg.HeaderCell {
+    border-radius: 4px;
+    width: fit-content;
+    outline: 2px solid hsl(207, 100%, 50%);
+    outline-offset: -2px;
+  }
 }
 
 
-.r1upfr807-0-0-beta-50 {
+.r1upfr807-0-0-beta-55 {
   @layer rdg.Row {
     display: contents;
     background-color: var(--rdg-background-color);
@@ -223,14 +225,14 @@
   }
 }
 
-.r190mhd37-0-0-beta-50 {
+.r190mhd37-0-0-beta-55 {
   @layer rdg.FocusSink {
     outline: 2px solid var(--rdg-selection-color);
     outline-offset: -2px;
   }
 }
 
-.r139qu9m7-0-0-beta-50 {
+.r139qu9m7-0-0-beta-55 {
   @layer rdg.FocusSink {
     &::before {
       content: '';
@@ -244,26 +246,26 @@
 }
 
 
-.h10tskcx7-0-0-beta-50 {
+.h10tskcx7-0-0-beta-55 {
   @layer rdg.HeaderRow {
     display: contents;
     background-color: var(--rdg-header-background-color);
     font-weight: bold;
 
-    & > .cj343x07-0-0-beta-50 {
+    & > .cj343x07-0-0-beta-55 {
       /* Should have a higher value than 1 to show up above regular cells and the focus sink */
       z-index: 2;
       position: sticky;
     }
 
-    & > .csofj7r7-0-0-beta-50 {
+    & > .csofj7r7-0-0-beta-55 {
       z-index: 3;
     }
   }
 }
 
 
-.a3ejtar7-0-0-beta-50 {
+.a3ejtar7-0-0-beta-55 {
   @layer rdg.SortIcon {
     fill: currentColor;
 
@@ -274,7 +276,7 @@
 }
 
 
-.rnvodz57-0-0-beta-50 {
+.rnvodz57-0-0-beta-55 {
   @layer rdg.Defaults {
     *,
     *::before,
@@ -285,7 +287,7 @@
 
   @layer rdg.Root {
     --rdg-color: #000;   --rdg-border-color: #ddd;   --rdg-summary-border-color: #aaa;   --rdg-background-color: hsl(0deg 0% 100%);   --rdg-header-background-color: hsl(0deg 0% 97.5%);   --rdg-header-draggable-background-color: hsl(0deg 0% 90.5%);   --rdg-row-hover-background-color: hsl(0deg 0% 96%);   --rdg-row-selected-background-color: hsl(207deg 76% 92%);   --rdg-row-selected-hover-background-color: hsl(207deg 76% 88%);   --rdg-checkbox-focus-color: hsl(207deg 100% 69%);
-    --rdg-selection-color: #66afe9;
+    --rdg-selection-color: hsl(207, 75%, 66%);
     --rdg-font-size: 14px;
     --rdg-cell-frozen-box-shadow: 2px 0 5px -2px rgba(136, 136, 136, 0.3);
 
@@ -334,30 +336,30 @@
     }
 
     > :nth-last-child(1 of .rdg-top-summary-row) {
-      > .cj343x07-0-0-beta-50 {
+      > .cj343x07-0-0-beta-55 {
         border-block-end: 2px solid var(--rdg-summary-border-color);
       }
     }
 
     > :nth-child(1 of .rdg-bottom-summary-row) {
-      > .cj343x07-0-0-beta-50 {
+      > .cj343x07-0-0-beta-55 {
         border-block-start: 2px solid var(--rdg-summary-border-color);
       }
     }
   }
 }
 
-.vlqv91k7-0-0-beta-50 {
+.vlqv91k7-0-0-beta-55 {
   @layer rdg.Root {
     user-select: none;
 
-    & .r1upfr807-0-0-beta-50 {
+    & .r1upfr807-0-0-beta-55 {
       cursor: move;
     }
   }
 }
 
-.f1lsfrzw7-0-0-beta-50 {
+.f1lsfrzw7-0-0-beta-55 {
   @layer rdg.FocusSink {
     grid-column: 1/-1;
     pointer-events: none;
@@ -366,7 +368,7 @@
   }
 }
 
-.f1cte0lg7-0-0-beta-50 {
+.f1cte0lg7-0-0-beta-55 {
   @layer rdg.FocusSink {
     /* Should have a higher value than 3 to show up above header and summary rows */
     z-index: 3;
@@ -374,7 +376,7 @@
 }
 
 
-.s8wc6fl7-0-0-beta-50 {
+.s8wc6fl7-0-0-beta-55 {
   @layer rdg.SummaryCell {
     inset-block-start: var(--rdg-summary-row-top);
     inset-block-end: var(--rdg-summary-row-bottom);
@@ -382,42 +384,42 @@
 }
 
 
-.skuhp557-0-0-beta-50 {
+.skuhp557-0-0-beta-55 {
   @layer rdg.SummaryRow {
-    > .cj343x07-0-0-beta-50 {
+    > .cj343x07-0-0-beta-55 {
       position: sticky;
     }
   }
 }
 
-.tf8l5ub7-0-0-beta-50 {
+.tf8l5ub7-0-0-beta-55 {
   @layer rdg.SummaryRow {
-    > .cj343x07-0-0-beta-50 {
+    > .cj343x07-0-0-beta-55 {
       z-index: 2;
     }
 
-    > .csofj7r7-0-0-beta-50 {
+    > .csofj7r7-0-0-beta-55 {
       z-index: 3;
     }
   }
 }
 
 
-.g1yxluv37-0-0-beta-50 {
+.g1yxluv37-0-0-beta-55 {
   @layer rdg.GroupedRow {
     &:not([aria-selected='true']) {
       background-color: var(--rdg-header-background-color);
     }
 
-    > .cj343x07-0-0-beta-50:not(:last-child, .csofj7r7-0-0-beta-50),
-    > :nth-last-child(n + 2 of .csofj7r7-0-0-beta-50) {
+    > .cj343x07-0-0-beta-55:not(:last-child, .csofj7r7-0-0-beta-55),
+    > :nth-last-child(n + 2 of .csofj7r7-0-0-beta-55) {
       border-inline-end: none;
     }
   }
 }
 
 
-.t7vyx3i7-0-0-beta-50 {
+.t7vyx3i7-0-0-beta-55 {
   @layer rdg.TextEditor {
     appearance: none;
 

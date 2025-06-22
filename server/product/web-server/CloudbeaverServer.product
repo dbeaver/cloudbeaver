@@ -2,7 +2,7 @@
 <?pde version="3.5"?>
 
 <product name="CloudBeaver ce Server" uid="io.cloudbeaver.product" id="io.cloudbeaver.product.ce.product"
-    application="io.cloudbeaver.product.ce.application" version="25.1.1.qualifier" useFeatures="true"
+    application="io.cloudbeaver.product.ce.application" version="25.1.2.qualifier" useFeatures="true"
     includeLaunchers="false">
 
     <configIni use="default">

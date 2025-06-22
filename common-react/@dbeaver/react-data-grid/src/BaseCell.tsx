@@ -15,13 +15,18 @@ export const BaseCell = memo(function BaseCell<TRow, TSummaryRow>(props: CellRen
   const tooltip = useGridReactiveValue(cellContext?.cellTooltip, rowIdx, dataColIdx);
 
   function handleClick(event: React.MouseEvent<HTMLDivElement>) {
-    props.onClick?.(
+    props.onCellClick?.(
       {
         rowIdx,
         row: props.row,
         column: props.column,
         selectCell(enableEditor) {
-          props.selectCell({ rowIdx, idx: virtualColIdx }, enableEditor);
+          props.selectCell(
+            { rowIdx, idx: virtualColIdx },
+            {
+              enableEditor,
+            },
+          );
         },
       },
       createCellMouseEvent(event),
@@ -29,13 +34,13 @@ export const BaseCell = memo(function BaseCell<TRow, TSummaryRow>(props: CellRen
   }
 
   function handleDoubleClick(event: React.MouseEvent<HTMLDivElement>) {
-    props.onDoubleClick?.(
+    props.onCellDoubleClick?.(
       {
         rowIdx,
         row: props.row,
         column: props.column,
         selectCell(enableEditor) {
-          props.selectCell({ rowIdx, idx: virtualColIdx }, enableEditor);
+          props.selectCell({ rowIdx, idx: virtualColIdx }, { enableEditor });
         },
       },
       createCellMouseEvent(event),
@@ -43,13 +48,13 @@ export const BaseCell = memo(function BaseCell<TRow, TSummaryRow>(props: CellRen
   }
 
   function handleContextMenu(event: React.MouseEvent<HTMLDivElement>) {
-    props.onContextMenu?.(
+    props.onCellContextMenu?.(
       {
         rowIdx,
         row: props.row,
         column: props.column,
         selectCell(enableEditor) {
-          props.selectCell({ rowIdx, idx: virtualColIdx }, enableEditor);
+          props.selectCell({ rowIdx, idx: virtualColIdx }, { enableEditor });
         },
       },
       createCellMouseEvent(event),
@@ -57,7 +62,16 @@ export const BaseCell = memo(function BaseCell<TRow, TSummaryRow>(props: CellRen
   }
 
   const mappedProps = useMemo(
-    () => ({ ...props, isFocused: props.isCellSelected, onClick: handleClick, onDoubleClick: handleDoubleClick, onContextMenu: handleContextMenu }),
+    () => ({
+      ...props,
+      onCellClick: undefined,
+      onCellContextMenu: undefined,
+      onCellDoubleClick: undefined,
+      isFocused: props.isCellSelected,
+      onClick: handleClick,
+      onDoubleClick: handleDoubleClick,
+      onContextMenu: handleContextMenu,
+    }),
     Object.values(props),
   );
 
@@ -68,9 +82,9 @@ export const BaseCell = memo(function BaseCell<TRow, TSummaryRow>(props: CellRen
           <Cell
             {...props}
             title={tooltip}
-            onClick={(_, event) => onClick?.(event)}
-            onDoubleClick={(_, event) => onDoubleClick?.(event)}
-            onContextMenu={(_, event) => onContextMenu?.(event)}
+            onCellClick={(_, event) => onClick?.(event)}
+            onCellDoubleClick={(_, event) => onDoubleClick?.(event)}
+            onCellContextMenu={(_, event) => onContextMenu?.(event)}
             {...rest}
             isCellSelected={props.isCellSelected || rest.isFocused || false}
           />
