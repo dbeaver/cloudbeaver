@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ export interface ISqlDataSourceKey {
 
 export interface ISetScriptData {
   script: string;
+  cursor?: ISqlEditorCursor;
   source?: string;
 }
 
@@ -70,7 +71,7 @@ export interface ISqlDataSource extends ILoadableState {
 
   setName(name: string | null): void;
   setProject(projectId: string | null): void;
-  setScript(script: string, source?: string): void;
+  setScript(script: string, source?: string, cursor?: ISqlEditorCursor): void;
   setCursor(anchor: number, head?: number): void;
   setEditing(state: boolean): void;
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void;
