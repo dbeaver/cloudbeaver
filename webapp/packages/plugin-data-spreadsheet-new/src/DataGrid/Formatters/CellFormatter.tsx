@@ -47,7 +47,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
     },
   });
 
-  function handleStateSwitch(visible: boolean): void {
+  function handleCellMenuStateSwitch(visible: boolean): void {
     cellContext.changeMenuVisibility(visible);
   }
 
@@ -65,7 +65,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
             spreadsheetActions={spreadsheetActions}
             resultIndex={context.resultIndex}
             simple={context.simple}
-            onStateSwitch={handleStateSwitch}
+            onStateSwitch={handleCellMenuStateSwitch}
           />
         </div>
       )}
