@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,9 +42,11 @@ public class WebAuthProviderInfo {
 
     @NotNull
     private final WebAuthProviderDescriptor descriptor;
+    private final String origin;
 
-    public WebAuthProviderInfo(@NotNull WebAuthProviderDescriptor descriptor) {
+    public WebAuthProviderInfo(@NotNull WebAuthProviderDescriptor descriptor, String origin) {
         this.descriptor = descriptor;
+        this.origin = origin;
     }
 
     public String getId() {
@@ -109,7 +111,7 @@ public class WebAuthProviderInfo {
         List<WebAuthProviderConfiguration> result = new ArrayList<>();
         for (SMAuthProviderCustomConfiguration cfg : CBApplication.getInstance().getAppConfiguration().getAuthCustomConfigurations()) {
             if (!cfg.isDisabled() && getId().equals(cfg.getProvider())) {
-                result.add(new WebAuthProviderConfiguration(descriptor, cfg));
+                result.add(new WebAuthProviderConfiguration(descriptor, cfg, origin));
             }
         }
         return result;
@@ -125,7 +127,7 @@ public class WebAuthProviderInfo {
     }
 
     public WebAuthProviderConfiguration getTemplateConfiguration() {
-        return new WebAuthProviderConfiguration(descriptor, TEMPLATE_CONFIG);
+        return new WebAuthProviderConfiguration(descriptor, TEMPLATE_CONFIG, "{origin}");
     }
 
     @Override

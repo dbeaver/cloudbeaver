@@ -80,7 +80,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
   const selectionAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetSelectAction);
   const viewAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetViewAction);
-  const constraintsAction = (model.source as unknown as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
 
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
@@ -339,6 +338,10 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   );
 
   function getColumnSortable(colIdx: number) {
+    if (!isResultSetDataModel(model)) {
+      return false;
+    }
+    const constraintsAction = (model.source as unknown as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
     return (
       Boolean(tableData.getColumn(colIdx) && constraintsAction?.supported && isResultSetDataModel(model) && !model.isDisabled(resultIndex)) &&
       colIdx !== 0
@@ -348,12 +351,16 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const columnSortable = useCreateGridReactiveValue(
     getColumnSortable,
     (onValueChange, colIdx) => reaction(() => getColumnSortable(colIdx), onValueChange),
-    [tableData, constraintsAction, model],
+    [tableData, model],
   );
 
   function getColumnSortingState(colIdx: number) {
+    if (!isResultSetDataModel(model)) {
+      return null;
+    }
+    const constraintsAction = (model.source as unknown as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
     const column = tableData.getColumn(colIdx)?.key;
-    if (!column || !constraintsAction) {
+    if (!column || !constraintsAction?.supported) {
       return null;
     }
     const resultColumn = tableData.getColumnInfo(column);
@@ -363,18 +370,19 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const columnSortingState = useCreateGridReactiveValue(
     getColumnSortingState,
     (onValueChange, colIdx) => reaction(() => getColumnSortingState(colIdx), onValueChange),
-    [tableData, constraintsAction, model],
+    [tableData, model],
   );
 
   function handleSort(colIdx: number, order: 'asc' | 'desc' | null, isMultiple: boolean) {
     const column = tableData.getColumn(colIdx)?.key;
-    if (!column || !constraintsAction) {
+    if (!column) {
       return;
     }
     const resultColumn = tableData.getColumnInfo(column);
     if (!resultColumn) {
       return;
     }
+    const constraintsAction = (model.source as unknown as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
     const currentOrder = constraintsAction!.getOrder(resultColumn.position);
     const nextOrder = getNextOrder(currentOrder);
     model.request(() => {

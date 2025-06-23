@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,6 +9,9 @@ import { AuthProviderService, UserInfoResource } from '@cloudbeaver/core-authent
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   type Connection,
+  ConnectionInfoAuthPropertiesResource,
+  type ConnectionInfoNetworkHandlers,
+  ConnectionInfoNetworkHandlersResource,
   ConnectionInfoResource,
   ConnectionsManagerService,
   createConnectionParam,
@@ -26,6 +29,8 @@ const DatabaseAuthDialog = importLazyComponent(() => import('./DatabaseAuthDialo
 export class ConnectionAuthService extends Dependency {
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionInfoNetworkHandlersResource: ConnectionInfoNetworkHandlersResource,
+    private readonly connectionInfoAuthPropertiesResource: ConnectionInfoAuthPropertiesResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly authProviderService: AuthProviderService,
     userInfoResource: UserInfoResource,
@@ -69,6 +74,7 @@ export class ConnectionAuthService extends Dependency {
       return null;
     }
 
+    let connectionNetworkHandlers: ConnectionInfoNetworkHandlers | null = null;
     let connection = await this.connectionInfoResource.load(key);
     const isConnectedInitially = connection?.connected;
 
@@ -80,21 +86,26 @@ export class ConnectionAuthService extends Dependency {
       }
     }
 
-    if (connection.requiredAuth) {
-      const state = await this.authProviderService.requireProvider(connection.requiredAuth);
+    const connectionAuthProperties = await this.connectionInfoAuthPropertiesResource.load(key);
+
+    if (connectionAuthProperties.requiredAuth) {
+      const state = await this.authProviderService.requireProvider(connectionAuthProperties.requiredAuth);
 
       if (!state) {
         return connection;
       }
     }
 
-    connection = await this.connectionInfoResource.load(key, ['includeAuthNeeded', 'includeNetworkHandlersConfig', 'includeCredentialsSaved']);
+    [connectionNetworkHandlers, connection] = await Promise.all([
+      this.connectionInfoNetworkHandlersResource.load(key),
+      this.connectionInfoResource.load(key),
+    ]);
 
-    const networkHandlers = connection
+    const networkHandlers = connectionNetworkHandlers
       .networkHandlersConfig!.filter(handler => handler.enabled && (!handler.savePassword || resetCredentials))
       .map(handler => handler.id);
 
-    if (connection.authNeeded || (connection.credentialsSaved && resetCredentials) || networkHandlers.length > 0) {
+    if (connectionAuthProperties.authNeeded || (connectionAuthProperties.credentialsSaved && resetCredentials) || networkHandlers.length > 0) {
       const result = await this.commonDialogService.open(DatabaseAuthDialog, {
         connection: key,
         networkHandlers,

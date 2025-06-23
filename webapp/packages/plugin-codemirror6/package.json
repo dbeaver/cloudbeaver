@@ -20,6 +20,8 @@
   },
   "dependencies": {
     "@cloudbeaver/core-blocks": "workspace:*",
+    "@cloudbeaver/core-di": "workspace:*",
+    "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-theming": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
     "@codemirror/autocomplete": "^6",

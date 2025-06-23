@@ -28,7 +28,13 @@ export const TeamOptions: TabContainerPanelComponent<TeamFormProps> = observer(f
   useAutoLoad(TeamOptions, tabState, tab.selected && !loaded);
 
   const idValidationRef = useCustomInputValidation<string>(value => {
-    if (!value.match(ENTITY_ID_VALIDATION)) {
+    const v = value.trim();
+
+    if (!v) {
+      return translate('ui_field_is_required');
+    }
+
+    if (!v.match(ENTITY_ID_VALIDATION)) {
       return translate('plugin_authentication_administration_team_id_validation_error');
     }
 

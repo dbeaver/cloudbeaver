@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderConfiguration;
 import io.cloudbeaver.service.DBWService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
@@ -119,10 +120,11 @@ public interface DBWServiceAdmin extends DBWService {
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     List<WebPropertyInfo> listAuthProviderConfigurationParameters(@NotNull WebSession webSession, @NotNull String providerId) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    List<WebAuthProviderConfiguration> listAuthProviderConfigurations(@NotNull WebSession webSession, @Nullable String providerId) throws DBWebException;
+    List<WebAuthProviderConfiguration> listAuthProviderConfigurations(@NotNull HttpServletRequest request, @NotNull WebSession webSession, @Nullable String providerId) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     WebAuthProviderConfiguration saveAuthProviderConfiguration(
+        @NotNull HttpServletRequest request,
         @NotNull WebSession webSession,
         @NotNull String providerId,
         @NotNull String id,

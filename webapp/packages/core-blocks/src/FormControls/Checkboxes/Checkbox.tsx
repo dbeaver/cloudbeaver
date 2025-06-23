@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,20 +8,21 @@
 import { observer } from 'mobx-react-lite';
 
 import { isControlPresented } from '../isControlPresented.js';
-import { CheckboxMarkup, type CheckboxMod } from './CheckboxMarkup.js';
+import { CheckboxMarkup } from './CheckboxMarkup.js';
 import { type CheckboxOnChangeEvent, useCheckboxState } from './useCheckboxState.js';
+import type { ControlSize } from '@dbeaver/ui-kit/types/controls';
 
 export interface CheckboxBaseProps {
   caption?: string;
-  mod?: CheckboxMod[];
-  ripple?: boolean;
   indeterminate?: boolean;
   inverse?: boolean;
+  size?: ControlSize;
+  variant?: 'primary' | 'secondary';
 }
 
 export type CheckboxInputProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
-  'onChange' | 'type' | 'value' | 'defaultValue' | 'checked' | 'defaultChecked' | 'style'
+  'onChange' | 'type' | 'value' | 'defaultValue' | 'checked' | 'defaultChecked' | 'style' | 'size'
 > & {
   value?: string;
   defaultValue?: string;
@@ -54,14 +55,10 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   value,
   defaultValue,
   state,
-  label,
   checked,
   defaultChecked,
   children,
   inverse,
-  mod,
-  ripple,
-  className,
   autoHide,
   onChange,
   ...rest
@@ -81,16 +78,5 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
     return null;
   }
 
-  return (
-    <CheckboxMarkup
-      {...rest}
-      name={name}
-      checked={checkboxState.checked}
-      label={label}
-      className={className}
-      mod={mod}
-      ripple={ripple}
-      onChange={checkboxState.change}
-    />
-  );
+  return <CheckboxMarkup {...rest} name={name} checked={checkboxState.checked} onChange={checkboxState.change} />;
 });

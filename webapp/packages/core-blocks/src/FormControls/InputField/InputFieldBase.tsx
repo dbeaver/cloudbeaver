@@ -13,7 +13,6 @@ import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { filterLayoutFakeProps, getLayoutProps } from '../../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps.js';
 import { Icon } from '../../Icon.js';
-import { Loader } from '../../Loader/Loader.js';
 import { useTranslate } from '../../localization/useTranslate.js';
 import { s } from '../../s.js';
 import { useCombinedHandler } from '../../useCombinedHandler.js';
@@ -25,9 +24,11 @@ import { FieldDescription } from '../FieldDescription.js';
 import { FieldLabel } from '../FieldLabel.js';
 import { useCapsLockTracker } from '../useCapsLockTracker.js';
 import inputFieldStyle from './InputField.module.css';
+import { IconButton, Input, Spinner, type InputProps } from '@dbeaver/ui-kit';
 
-export type InputFieldBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'style' | 'ref'> &
+export type InputFieldBaseProps = Omit<InputProps, 'onChange'> &
   ILayoutSizeProps & {
+    size?: 'small' | 'medium' | 'large';
     value?: string;
     error?: boolean;
     loading?: boolean;
@@ -119,7 +120,7 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
           {children}
         </FieldLabel>
         <div className={s(styles, { inputContainer: true })}>
-          <input
+          <Input
             ref={mergedRef}
             {...rest}
             type={passwordRevealed ? 'text' : rest.type}
@@ -134,18 +135,31 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
           />
           {loading && (
             <div title={translate('ui_processing_loading')} className={s(styles, { loaderContainer: true })}>
-              <Loader small />
+              <Spinner size="small" />
             </div>
           )}
           {passwordType && canShowPassword && (
-            <div title={translate('ui_reveal_password')} className={styles['iconContainer']} onClick={revealPassword}>
-              <Icon name={passwordRevealed ? 'password-hide' : 'password-show'} viewBox="0 0 16 16" className={styles['icon']} />
-            </div>
+            <IconButton
+              variant="secondary"
+              size="small"
+              aria-label={translate('ui_reveal_password')}
+              title={translate('ui_reveal_password')}
+              className={styles['iconContainer']}
+              onClick={revealPassword}
+            >
+              <Icon width={16} height={16} name={passwordRevealed ? 'password-hide' : 'password-show'} viewBox="0 0 16 16" />
+            </IconButton>
           )}
           {onCustomCopy && (
-            <div title={translate('ui_copy_to_clipboard')} className={styles['iconContainer']} onClick={onCustomCopy}>
-              <Icon name="copy" viewBox="0 0 32 32" className={styles['icon']} />
-            </div>
+            <IconButton
+              size="small"
+              aria-label={translate('ui_copy_to_clipboard')}
+              title={translate('ui_copy_to_clipboard')}
+              className={styles['iconContainer']}
+              onClick={onCustomCopy}
+            >
+              <Icon width={16} height={16} name="copy" viewBox="0 0 32 32" />
+            </IconButton>
           )}
           {icon && <div className={s(styles, { customIconContainer: true })}>{icon}</div>}
         </div>

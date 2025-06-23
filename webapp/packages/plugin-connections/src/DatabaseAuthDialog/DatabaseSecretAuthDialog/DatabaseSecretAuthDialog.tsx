@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,7 @@ interface Props {
 export const DatabaseSecretAuthDialog = observer<Props>(function DatabaseSecretAuthDialog({ connectionKey, onLogin }) {
   const styles = useS(style);
   const translate = useTranslate();
-  const connectionInfoLoader = useResource(DatabaseSecretAuthDialog, ConnectionInfoResource, {
-    key: connectionKey,
-    includes: ['includeAuthNeeded', 'includeNetworkHandlersConfig', 'includeCredentialsSaved'],
-  });
+  const connectionInfoLoader = useResource(DatabaseSecretAuthDialog, ConnectionInfoResource, connectionKey);
   const state = useObservableRef(
     () => ({
       exception: null as Error | null,

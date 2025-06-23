@@ -1,0 +1,8 @@
+@layer components {
+  .formatter {
+    composes: checkbox-markup-theme--tertiary from global;
+    --dbv-kit-checkbox-border-width: 1px;
+    --dbv-kit-checkbox-check-size: 0.8;
+    --dbv-kit-checkbox-small-height: 1.375rem;
+  }
+}

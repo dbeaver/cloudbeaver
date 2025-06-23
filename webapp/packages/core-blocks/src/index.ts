@@ -81,6 +81,7 @@ export * from './Overlay/OverlayHeaderTitle.js';
 export * from './Overlay/OverlayMessage.js';
 
 export * from './Placeholder/Placeholder.js';
+export * from './Placeholder/usePlaceholder.js';
 export * from './Placeholder/PlaceholderContainer.js';
 
 export * from './PropertiesTable/PropertiesTable.js';

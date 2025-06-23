@@ -7,7 +7,7 @@
  */
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { bracketMatching, foldGutter, indentOnInput, syntaxHighlighting } from '@codemirror/language';
-import { highlightSelectionMatches } from '@codemirror/search';
+import { highlightSelectionMatches, searchKeymap } from '@codemirror/search';
 import { Compartment, type Extension } from '@codemirror/state';
 import {
   crosshairCursor,
@@ -35,6 +35,7 @@ DEFAULT_KEY_MAP.push({
   key: 'Mod-s',
   run: () => true,
 });
+DEFAULT_KEY_MAP.push(...searchKeymap);
 
 const defaultExtensionsFlags: IDefaultExtensions = {
   lineNumbers: false,
@@ -52,6 +53,7 @@ const defaultExtensionsFlags: IDefaultExtensions = {
   rectangularSelection: true,
   keymap: true,
   lineWrapping: false,
+  search: true,
 };
 
 export interface IDefaultExtensions {
@@ -70,6 +72,7 @@ export interface IDefaultExtensions {
   rectangularSelection?: boolean;
   keymap?: boolean;
   lineWrapping?: boolean;
+  search?: boolean;
 }
 
 const extensionMap = {

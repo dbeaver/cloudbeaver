@@ -1,0 +1,88 @@
+.checkbox-markup-theme--primary {
+  --dbv-kit-checkbox-background-checked: var(--theme-primary);
+  --dbv-kit-checkbox-icon-color: var(--theme-on-primary);
+
+  --dbv-kit-checkbox-border-color: color-mix(in srgb, var(--theme-on-secondary), white 20%);
+  --dbv-kit-checkbox-border-color-checked: transparent;
+}
+
+.checkbox-markup-theme--secondary {
+  --dbv-kit-checkbox-background-checked: var(--theme-on-primary);
+  --dbv-kit-checkbox-icon-color: var(--theme-primary);
+  --dbv-kit-checkbox-background: transparent;
+
+  --dbv-kit-checkbox-border-color: var(--theme-on-primary);
+  --dbv-kit-checkbox-border-color-checked: var(--theme-on-primary);
+}
+
+.checkbox-markup-theme--tertiary {
+  --dbv-kit-checkbox-background: var(--theme-surface);
+  --dbv-kit-checkbox-background-checked: var(--theme-surface);
+  --dbv-kit-checkbox-foreground: var(--theme-on-surface);
+  --dbv-kit-checkbox-border-color: var(--theme-on-secondary);
+  --dbv-kit-checkbox-border-color-checked: var(--theme-on-secondary);
+  --dbv-kit-checkbox-icon-color: var(--theme-on-secondary);
+  --dbv-kit-control-outline-color: var(--theme-primary);
+}
+
+@layer components {
+  .theme-dark .checkbox-markup {
+    --dbv-kit-checkbox-hover-shadow-color: color-mix(in srgb, var(--theme-on-secondary), black 50%);
+    --dbv-kit-checkbox-border-color: color-mix(in srgb, var(--theme-on-secondary), black 20%);
+
+    & .dbv-kit-checkbox {
+      &[data-disabled='true'] {
+        & .dbv-kit-checkbox__check {
+          --dbv-kit-checkbox-background-checked: color-mix(in srgb, var(--theme-on-secondary), black 20%);
+        }
+      }
+    }
+  }
+
+  .checkbox-markup {
+    --dbv-kit-checkbox-hover-shadow-color: color-mix(in srgb, var(--theme-on-secondary), white 80%);
+
+    --dbv-kit-checkbox-border-width: 2px;
+    --dbv-kit-checkbox-border-radius: 2px;
+
+    --dbv-kit-checkbox-small-height: 24px;
+    --dbv-kit-checkbox-medium-height: 28px;
+    --dbv-kit-checkbox-large-height: 32px;
+    --dbv-kit-checkbox-xlarge-height: 36px;
+
+    --dbv-kit-checkbox-small-font-size: 14px;
+    --dbv-kit-checkbox-medium-font-size: 14px;
+    --dbv-kit-checkbox-large-font-size: 16px;
+    --dbv-kit-checkbox-xlarge-font-size: 18px;
+
+    & .checkbox-markup__label {
+      color: var(--theme-on-surface);
+    }
+
+    & .checkbox-markup__caption {
+      font-size: calc(var(--dbv-kit-checkbox-font-size) * 0.875);
+      color: var(--theme-on-secondary);
+    }
+
+    & .dbv-kit-checkbox {
+      display: flex;
+      align-items: center;
+
+      &[data-disabled='true'] {
+        & .dbv-kit-checkbox__check {
+          --dbv-kit-checkbox-background-checked: color-mix(in srgb, var(--theme-on-secondary), white 30%);
+        }
+      }
+    }
+
+    & .dbv-kit-checkbox__text {
+      line-height: calc(var(--dbv-kit-checkbox-font-size) * 1.4);
+      display: flex;
+      flex-direction: column;
+    }
+
+    & .dbv-kit-checkbox__check {
+      margin: calc(var(--dbv-kit-checkbox-font-size) * 0.5);
+    }
+  }
+}
