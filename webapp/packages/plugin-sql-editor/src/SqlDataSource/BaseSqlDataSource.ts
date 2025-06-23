@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -104,14 +104,24 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
     this.onDatabaseModelUpdate.setInitialDataGetter(() => this.databaseModels);
     this.onSetScript.next(this.onUpdate);
-    this.onSetScript.addHandler(({ script, source }) => {
-      if (source === SOURCE_HISTORY) {
-        return;
-      }
-      this.history.add(script);
-    });
+    this.onSetScript.addHandler(
+      action(({ script, source, cursor }) => {
+        if (source === SOURCE_HISTORY) {
+          return;
+        }
+        this.history.add(script, source, cursor);
+      }),
+    );
 
-    this.history.onNavigate.addHandler(value => this.setScript(value, SOURCE_HISTORY));
+    this.history.onNavigate.addHandler(
+      action(({ value, cursor }) => {
+        this.setScript(value, SOURCE_HISTORY);
+
+        if (cursor) {
+          this.setCursor(cursor.anchor, cursor.head);
+        }
+      }),
+    );
 
     makeObservable<this, 'outdated' | 'editing' | 'innerCursorState'>(this, {
       isSaved: computed,
@@ -142,8 +152,8 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     });
   }
 
-  setScript(script: string, source?: string): void {
-    this.onSetScript.execute({ script, source });
+  setScript(script: string, source?: string, cursor?: ISqlEditorCursor): void {
+    this.onSetScript.execute({ script, source, cursor });
   }
 
   setIncomingScript(script: string): void {
