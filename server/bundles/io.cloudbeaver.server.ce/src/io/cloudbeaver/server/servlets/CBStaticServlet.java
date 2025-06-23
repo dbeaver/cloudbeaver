@@ -220,7 +220,7 @@ public class CBStaticServlet extends DefaultServlet {
             pathInContext = pathInContext.substring(1);
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        var filePath = contentRoot.resolve(pathInContext);
+        Path filePath = contentRoot.resolve(pathInContext);
         try (InputStream fis = Files.newInputStream(filePath)) {
             IOUtils.copyStream(fis, baos);
         }
