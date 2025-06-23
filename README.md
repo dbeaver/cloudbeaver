@@ -25,6 +25,12 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 25.1.1 2025-06-23
+### Changes since 25.1.0:
+- Added a search panel for SQL Editor and Value panel: press Ctrl+F to open a panel that allows searching and replacing by keyword or regular expression.
+- Added a new welcome screen for a freshly opened application. This screen contains shortcuts to create a new connection, open SQL editor or documentation.
+- Databend database support has been added.
+
 ### 25.1.0 2025-06-02
 ### Changes since 25.0.0:
 - Important:
