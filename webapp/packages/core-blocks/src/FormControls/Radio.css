@@ -7,7 +7,11 @@
  */
 
 @layer components {
-  .field {
+  .theme-dark .radio-field {
+    --dbv-kit-radio-hover-shadow-color: color-mix(in srgb, var(--theme-on-secondary), black 60%);
+  }
+
+  .radio-field {
     display: flex;
     align-items: center;
   
@@ -16,7 +20,7 @@
   
     --dbv-kit-radio-inactive-border: color-mix(in srgb, var(--theme-on-secondary), white 30%);
     
-    --dbv-kit-radio-hover-shadow-color: color-mix(in srgb, var(--theme-on-secondary), white 90%);
+    --dbv-kit-radio-hover-shadow-color: color-mix(in srgb, var(--theme-on-secondary), white 80%);
     
     --dbv-kit-radio-medium-dot-size: 0.3;
     

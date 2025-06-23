@@ -10,14 +10,12 @@ import { useCallback, useContext } from 'react';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
-import { s } from '../s.js';
-import { useS } from '../useS.js';
 import { Field } from './Field.js';
 import { FormContext } from './FormContext.js';
-import style from './Radio.module.css';
 import { RadioGroupContext } from './RadioGroupContext.js';
-import { Radio as UiKitRadio } from '@dbeaver/ui-kit';
+import { clsx, Radio as UiKitRadio } from '@dbeaver/ui-kit';
 import type { ControlSize } from '@dbeaver/ui-kit/types/controls';
+import './Radio.css';
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value' | 'checked' | 'size'> &
   ILayoutSizeProps & {
@@ -55,8 +53,6 @@ export const Radio: RadioType = observer(function Radio({
   children,
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
-  const styles = useS(style);
-
   const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
   const formContext = useContext(FormContext);
@@ -99,7 +95,7 @@ export const Radio: RadioType = observer(function Radio({
   }
 
   return (
-    <Field {...layoutProps} className={s(styles, { field: true }, className)}>
+    <Field {...layoutProps} className={clsx('radio-field', className)}>
       <UiKitRadio
         id={id}
         name={name}
