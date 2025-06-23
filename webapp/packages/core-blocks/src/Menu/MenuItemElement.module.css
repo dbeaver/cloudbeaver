@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 .menuPanelItem {
-  composes: theme-ripple theme-border-color-background from global;
+  composes: theme-border-color-background from global;
 
   flex: 1;
   display: flex;
@@ -71,7 +71,13 @@
 
 .menuItem:hover,
 .menuItem:global([aria-expanded='true']) {
+  background-color: color-mix(in srgb, var(--theme-on-surface) 4%, transparent 96%);
+
   & .menuItemContent .icon {
     opacity: 1;
   }
+}
+
+.menuItem:active {
+  background-color: color-mix(in srgb, var(--theme-on-surface) 12%, transparent 88%);
 }
