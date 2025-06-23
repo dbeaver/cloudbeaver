@@ -54,7 +54,7 @@ export const BooleanFormatter = observer<ICellFormatterProps>(function BooleanFo
 
   return (
     <GridBooleanFormatter
-      focusable={!cellContext.menuVisible}
+      focusable={!cellContext.isMenuVisible}
       className={s(style, { formatter: true })}
       value={value as boolean | null}
       onClick={toggleValue}

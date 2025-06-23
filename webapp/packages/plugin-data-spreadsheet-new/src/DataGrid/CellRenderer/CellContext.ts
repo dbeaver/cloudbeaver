@@ -20,8 +20,8 @@ export interface ICellContext {
   cell: IResultSetElementKey | undefined;
   position: ICellPosition;
   editionState: DatabaseEditChangeType | null;
-  menuVisible: boolean;
-  changeMenuVisibility(visible: boolean): void;
+  isMenuVisible: boolean;
+  setMenuVisibility(visible: boolean): void;
 }
 
 export const CellContext = createContext<ICellContext>(undefined as any);

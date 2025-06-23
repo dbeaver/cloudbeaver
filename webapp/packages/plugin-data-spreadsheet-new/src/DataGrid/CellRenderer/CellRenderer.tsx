@@ -35,7 +35,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   const cellContext = useObservableRef(
     () => ({
       isHovered: false,
-      menuVisible: false,
+      isMenuVisible: false,
       get position(): ICellPosition {
         return { colIdx: this.colIdx, rowIdx: this.rowIdx };
       },
@@ -71,14 +71,14 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
 
         return this.tableDataContext.getEditionState(this.cell);
       },
-      changeMenuVisibility(visibility: boolean): void {
-        this.menuVisible = visibility;
+      setMenuVisibility(visibility: boolean): void {
+        this.isMenuVisible = visibility;
       },
     }),
     {
       isHovered: observable.ref,
-      menuVisible: observable.ref,
-      changeMenuVisibility: action,
+      isMenuVisible: observable.ref,
+      setMenuVisibility: action,
       colIdx: observable.ref,
       rowIdx: observable.ref,
       row: computed,

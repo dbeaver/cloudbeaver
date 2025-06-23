@@ -32,7 +32,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
 
   const cell = cellContext.cell;
   const showCellMenu = getComputed(
-    () => !!cell && (innerCellContext?.isFocused || cellContext.isFocused || cellContext.isHovered || cellContext.menuVisible),
+    () => !!cell && (innerCellContext?.isFocused || cellContext.isFocused || cellContext.isHovered || cellContext.isMenuVisible),
   );
   const styles = useS(style);
 
@@ -48,7 +48,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   });
 
   function handleCellMenuStateSwitch(visible: boolean): void {
-    cellContext.changeMenuVisibility(visible);
+    cellContext.setMenuVisibility(visible);
   }
 
   return (
