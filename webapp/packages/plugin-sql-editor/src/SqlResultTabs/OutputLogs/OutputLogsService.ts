@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,8 @@ import type { ISqlEditorTabState } from '../../ISqlEditorTabState.js';
 import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService.js';
 import { OUTPUT_LOG_TYPES } from './IOutputLogTypes.js';
 import { OUTPUT_LOGS_TAB_ID } from './OUTPUT_LOGS_TAB_ID.js';
-import type { IOutputLog } from './OutputLogsResource.js';
+import { type IOutputLog, OutputLogsResource } from './OutputLogsResource.js';
+import { action, computed, makeObservable } from 'mobx';
 
 const OUTPUT_LOGS_KEY = 'output_logs';
 
@@ -26,9 +27,24 @@ export class OutputLogsService {
     return this.userDataService.getUserData(OUTPUT_LOGS_KEY, getOutputLogsDefaultSettings);
   }
 
-  constructor(private readonly sqlDataSourceService: SqlDataSourceService, private readonly userDataService: UserDataService) {}
+  constructor(
+    private readonly sqlDataSourceService: SqlDataSourceService,
+    private readonly userDataService: UserDataService,
+    private readonly outputLogsResource: OutputLogsResource,
+  ) {
+    this.clearOutputLogs = this.clearOutputLogs.bind(this);
 
-  async showOutputLogs(editorState: ISqlEditorTabState): Promise<void> {
+    makeObservable(this, {
+      clearOutputLogs: action.bound,
+      settings: computed,
+      getOutputLogs: action.bound,
+      toggleWrapMode: action.bound,
+      showOutputLogs: action.bound,
+      removeOutputLogsTab: action.bound,
+    });
+  }
+
+  showOutputLogs(editorState: ISqlEditorTabState): void {
     this.createOutputLogsTab(editorState);
     editorState.currentTabId = OUTPUT_LOGS_TAB_ID;
   }
@@ -39,7 +55,7 @@ export class OutputLogsService {
     }
   }
 
-  toggleWrapMode() {
+  toggleWrapMode(): void {
     this.settings.wrapMode = !this.settings.wrapMode;
   }
 
@@ -61,10 +77,14 @@ export class OutputLogsService {
     state.tabs.push({ ...tab });
   }
 
-  getOutputLogs(events: IOutputLog[], editorState: ISqlEditorTabState) {
+  getOutputLogs(events: IOutputLog[], editorState: ISqlEditorTabState): IOutputLog[] {
     const dataSource = this.sqlDataSourceService.get(editorState.editorId);
 
     return events.filter(event => event.contextId === dataSource?.executionContext?.id);
+  }
+
+  clearOutputLogs(): void {
+    this.outputLogsResource.reset();
   }
 }
 
