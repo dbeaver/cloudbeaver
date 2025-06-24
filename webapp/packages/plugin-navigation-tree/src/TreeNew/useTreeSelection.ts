@@ -121,6 +121,7 @@ async function setSelectionWithLoad(
     }
   } catch (error) {
     treeData.updateState(nodeId, { expanded: false });
+    selectionMap.set(nodeId, { selected: false, indeterminate: false });
     return nodes;
   }
 
