@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { ITheme } from './ThemeService.js';
+import type { ClassCollection } from './themeUtils.js';
 
 const emptyTheme = {};
 
@@ -19,7 +20,7 @@ export const themes: ITheme[] = [
   {
     name: 'ui_light_theme',
     id: THEME_ID.LIGHT,
-    loader: async () => {
+    loader: async (): Promise<ClassCollection> => {
       const styles = await import('./styles/main/light.theme.scss');
       return styles.default || emptyTheme;
     },
@@ -27,7 +28,7 @@ export const themes: ITheme[] = [
   {
     name: 'ui_dark_theme',
     id: THEME_ID.DARK,
-    loader: async () => {
+    loader: async (): Promise<ClassCollection> => {
       const styles = await import('./styles/main/dark.theme.scss');
       return styles.default || emptyTheme;
     },
@@ -35,7 +36,7 @@ export const themes: ITheme[] = [
   {
     name: 'ui_system_theme',
     id: THEME_ID.SYSTEM,
-    loader: async () => emptyTheme,
+    loader: (): ClassCollection => emptyTheme,
   },
 ];
 

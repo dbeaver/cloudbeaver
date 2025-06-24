@@ -30,7 +30,7 @@ export interface ITheme {
   name: string;
   id: THEME_ID;
   styles?: ClassCollection; // will be populated after execution ITheme.loader()
-  loader: () => Promise<ClassCollection>;
+  loader: () => ClassCollection | Promise<ClassCollection>;
 }
 
 export interface IStyleRegistry {
