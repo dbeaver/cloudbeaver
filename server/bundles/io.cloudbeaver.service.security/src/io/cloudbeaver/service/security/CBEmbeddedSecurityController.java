@@ -1498,7 +1498,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     public void setGlobalDefaultPermissions(@NotNull List<SMPermission> permissions, @NotNull String grantorId) throws DBException {
         try (
             var dbCon = database.openConnection();
-            PreparedStatement dbStat = dbCon.prepareStatement("UPDATE {table_prefix}CB_GLOBAL_PERMISSIONS "
+            PreparedStatement dbStat = dbCon.prepareStatement("UPDATE {table_prefix}CB_GLOBAL_PERMISSIONS_DEFAULTS "
                 + "SET ENABLED_BY_DEFAULT=? WHERE PERMISSION_ID=?")
         ) {
             for (SMPermission permission : permissions) {
