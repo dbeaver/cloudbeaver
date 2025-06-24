@@ -20,11 +20,58 @@ export interface ITreeFilter {
   filter: string;
   isNodeMatched(treeData: ITreeData, nodeId: string): boolean;
   transformer: TreeDataTransformer<string[]>;
-  setFilter(filter: string): void;
+  setFilter(filter: string, treeData?: ITreeData | null): void;
+}
+
+function updateTreeNodes(treeData: ITreeData, updateFn: (nodeId: string) => void) {
+  const visitedNodes = new Set<string>();
+  const nodesToVisit = [treeData.rootId];
+
+  while (nodesToVisit.length > 0) {
+    const nodeId = nodesToVisit.pop()!;
+
+    if (visitedNodes.has(nodeId)) {
+      continue;
+    }
+    visitedNodes.add(nodeId);
+
+    updateFn(nodeId);
+
+    const children = treeData.getChildren(nodeId);
+    nodesToVisit.push(...children);
+  }
 }
 
 export function useTreeFilter(options: ITreeFilterOptions = {}): Readonly<ITreeFilter> {
   options = useObjectRef(options);
+  const expandedStateCache = new Map<string, boolean>();
+  function cacheExpandedState(treeData: ITreeData): void {
+    expandedStateCache.clear();
+
+    updateTreeNodes(treeData, nodeId => {
+      const state = treeData.getState(nodeId);
+      if (state.expanded) {
+        expandedStateCache.set(nodeId, true);
+      }
+    });
+  };
+
+  function restoreExpandedState(treeData: ITreeData): void {
+    updateTreeNodes(treeData, nodeId => {
+      if (nodeId !== treeData.rootId) {
+        treeData.updateState(nodeId, { expanded: false });
+      }
+    });
+
+    for (const [nodeId, expanded] of expandedStateCache) {
+      if (expanded) {
+        treeData.updateState(nodeId, { expanded: true });
+      }
+    }
+
+    expandedStateCache.clear();
+  };
+
   return useObservableRef<ITreeFilter>(
     () => ({
       filter: '',
@@ -34,10 +81,18 @@ export function useTreeFilter(options: ITreeFilterOptions = {}): Readonly<ITreeF
           return true;
         }
 
-        let isNodeMatched = treeData.getNode(nodeId).name.toLowerCase().includes(filter);
+        let isNodeMatched = treeData.getNode(nodeId).name.toLowerCase().includes(filter.toLowerCase());
 
         if (options?.isNodeMatched) {
           isNodeMatched = options.isNodeMatched(nodeId, filter, isNodeMatched);
+        }
+
+        if (isNodeMatched) {
+          let parent = treeData.getParent(nodeId);
+          while (parent) {
+            treeData.updateState(parent, { expanded: true });
+            parent = treeData.getParent(parent);
+          }
         }
 
         return isNodeMatched || treeData.getChildren(nodeId).length > 0;
@@ -60,8 +115,19 @@ export function useTreeFilter(options: ITreeFilterOptions = {}): Readonly<ITreeF
 
         return children.filter(child => this.isNodeMatched(treeData, child));
       },
-      setFilter(filter: string): void {
+      setFilter(filter: string, treeData?: ITreeData | null): void {
+        const newFilter = filter.trim();
+        const oldFilter = this.filter.trim();
+
+        if (!oldFilter && newFilter && treeData) {
+          cacheExpandedState(treeData);
+        }
+
         this.filter = filter;
+
+        if (oldFilter && !newFilter && treeData) {
+          restoreExpandedState(treeData);
+        }
       },
     }),
     {
