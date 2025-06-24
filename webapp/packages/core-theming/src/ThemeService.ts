@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, type IReactionDisposer, makeObservable, observable, reaction } from 'mobx';
+import { action, computed, type IReactionDisposer, makeObservable, observable, reaction } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { UIError } from '@cloudbeaver/core-events';
@@ -22,13 +22,13 @@ import './styles/main/typography.pure.scss';
 import './styles/UiIconButton.css';
 import './styles/UiSpinner.css';
 import './styles/UiInput.css';
-import { DEFAULT_THEME_ID, themes } from './themes.js';
+import { DEFAULT_THEME_ID, UNKNOWN_SYSTEM_THEME_FALLBACK, THEME_ID, themes } from './themes.js';
 import { ThemeSettingsService } from './ThemeSettingsService.js';
 import type { ClassCollection } from './themeUtils.js';
 
 export interface ITheme {
   name: string;
-  id: string;
+  id: THEME_ID;
   styles?: ClassCollection; // will be populated after execution ITheme.loader()
   loader: () => Promise<ClassCollection>;
 }
@@ -38,13 +38,20 @@ export interface IStyleRegistry {
   styles: Style[];
 }
 
+const SYSTEM_THEMES_QUERIES_MAP = new Map<THEME_ID, string>([
+  [THEME_ID.LIGHT, '(prefers-color-scheme: light)'],
+  [THEME_ID.DARK, '(prefers-color-scheme: dark)'],
+]);
+
 @injectable()
 export class ThemeService extends Bootstrap {
+  themeId: THEME_ID;
+
   get themes(): ITheme[] {
     return Array.from(this.themeMap.values());
   }
 
-  get themeId(): string {
+  get settingsThemeId(): THEME_ID {
     return this.themeSettingsService.theme;
   }
 
@@ -69,20 +76,81 @@ export class ThemeService extends Bootstrap {
 
     this.reactionDisposer = null;
     this.onChange = new SyncExecutor();
+    this.themeId = this.getThemeIdFromSettings();
 
-    makeObservable<ThemeService, 'themeMap'>(this, {
+    makeObservable<ThemeService, 'themeMap' | 'handleSystemThemeChange' | 'setThemeId'>(this, {
       themes: computed,
       currentTheme: computed,
-      themeId: computed,
+      themeId: observable.ref,
+      settingsThemeId: computed,
+      setThemeId: action.bound,
+      handleSystemThemeChange: action.bound,
       themeMap: observable.shallow,
+    });
+  }
+
+  private async setThemeId(themeId: THEME_ID): Promise<void> {
+    await this.loadTheme(themeId);
+    this.themeId = themeId;
+    this.onChange.execute(this.currentTheme);
+  }
+
+  private getThemeIdFromSettings(): THEME_ID {
+    if (this.settingsThemeId === THEME_ID.SYSTEM) {
+      const isDark = window.matchMedia(SYSTEM_THEMES_QUERIES_MAP.get(THEME_ID.DARK)!).matches;
+      const isLight = window.matchMedia(SYSTEM_THEMES_QUERIES_MAP.get(THEME_ID.LIGHT)!).matches;
+
+      if (isDark) {
+        return THEME_ID.DARK;
+      }
+
+      if (isLight) {
+        return THEME_ID.LIGHT;
+      }
+
+      console.error(`System theme is not supported yet, applied theme: ${UNKNOWN_SYSTEM_THEME_FALLBACK}`);
+
+      return UNKNOWN_SYSTEM_THEME_FALLBACK;
+    }
+
+    return this.settingsThemeId;
+  }
+
+  private async handleSystemThemeChange(event: MediaQueryListEvent): Promise<void> {
+    if (this.settingsThemeId !== THEME_ID.SYSTEM) {
+      return;
+    }
+
+    const nextThemeId: THEME_ID = Array.from(SYSTEM_THEMES_QUERIES_MAP.entries()).find(([_, query]) => query === event.media && event.matches)?.[0] || this.getThemeIdFromSettings();
+
+    await this.setThemeId(nextThemeId);
+  }
+
+  private subscribeSystemThemeChange(): void {
+    SYSTEM_THEMES_QUERIES_MAP.forEach(async (query, themeId) => {
+      const mediaQuery = window.matchMedia(query);
+
+      mediaQuery.addEventListener('change', this.handleSystemThemeChange);
+    });
+  }
+
+  private disposeSystemThemeChange(): void {
+    SYSTEM_THEMES_QUERIES_MAP.forEach((query, themeId) => {
+      const mediaQuery = window.matchMedia(query);
+      mediaQuery.removeEventListener('change', this.handleSystemThemeChange);
     });
   }
 
   override register(): void {
     this.loadAllThemes();
+    this.subscribeSystemThemeChange();
+
     this.reactionDisposer = reaction(
-      () => this.currentTheme,
-      theme => this.loadTheme(theme.id),
+      () => this.settingsThemeId,
+      async () => {
+        const nextThemeId = this.getThemeIdFromSettings();
+        await this.setThemeId(nextThemeId);
+      },
       {
         fireImmediately: true,
       },
@@ -93,6 +161,8 @@ export class ThemeService extends Bootstrap {
     if (this.reactionDisposer) {
       this.reactionDisposer();
     }
+
+    this.disposeSystemThemeChange();
   }
 
   addStyleRegistry<T extends Record<string, string>>(style: Style<T>, mode: 'replace' | 'append', styles: Style<T>[]): void {
@@ -128,21 +198,6 @@ export class ThemeService extends Bootstrap {
 
   override async load(): Promise<void> {
     await this.loadTheme(this.themeId);
-  }
-
-  async changeTheme(themeId: string): Promise<void> {
-    if (themeId === this.themeId) {
-      return;
-    }
-    await this.setTheme(themeId);
-    this.onChange.execute(this.currentTheme);
-  }
-
-  private async setTheme(themeId: string): Promise<void> {
-    themeId = await this.loadTheme(themeId);
-
-    this.themeSettingsService.settings.setValue('core.theming.theme', themeId);
-    await this.themeSettingsService.settings.save();
   }
 
   private async loadTheme(themeId: string): Promise<string> {

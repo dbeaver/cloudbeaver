@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@ import {
 } from '@cloudbeaver/core-settings';
 import { schema } from '@cloudbeaver/core-utils';
 
-import { DEFAULT_THEME_ID } from './themes.js';
+import { DEFAULT_THEME_ID, THEME_ID } from './themes.js';
 
 const settingsSchema = schema.object({
   'core.theming.theme': schema.string().default(DEFAULT_THEME_ID),
@@ -25,8 +25,8 @@ export type IThemeSettings = schema.infer<typeof settingsSchema>;
 
 @injectable()
 export class ThemeSettingsService {
-  get theme(): string {
-    return this.settings.getValue('core.theming.theme');
+  get theme(): THEME_ID {
+    return this.settings.getValue('core.theming.theme') as THEME_ID;
   }
   readonly settings: SettingsProvider<typeof settingsSchema>;
 
