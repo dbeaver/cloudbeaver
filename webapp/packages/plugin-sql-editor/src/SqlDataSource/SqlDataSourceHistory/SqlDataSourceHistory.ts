@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,13 +12,17 @@ import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { createSqlDataSourceHistoryInitialState } from './createSqlDataSourceHistoryInitialState.js';
 import type { ISqlDataSourceHistory } from './ISqlDataSourceHistory.js';
 import type { ISqlDataSourceHistoryState } from './ISqlDataSourceHistoryState.js';
+import type { ISqlEditorCursor } from '../ISqlDataSource.js';
 
 const HOT_HISTORY_SIZE = 30;
 const COMPRESSED_HISTORY_DELAY = 5000;
 
 export class SqlDataSourceHistory implements ISqlDataSourceHistory {
   state: ISqlDataSourceHistoryState;
-  readonly onNavigate: ISyncExecutor<string>;
+  readonly onNavigate: ISyncExecutor<{
+    value: string;
+    cursor?: ISqlEditorCursor;
+  }>;
 
   constructor() {
     this.state = createSqlDataSourceHistoryInitialState();
@@ -29,7 +33,7 @@ export class SqlDataSourceHistory implements ISqlDataSourceHistory {
     });
   }
 
-  add(value: string, source?: string): void {
+  add(value: string, source?: string, cursor?: ISqlEditorCursor): void {
     // skip history if value is the same as current
     if (this.state.history[this.state.historyIndex]!.value === value) {
       return;
@@ -40,7 +44,7 @@ export class SqlDataSourceHistory implements ISqlDataSourceHistory {
       this.state.history.splice(this.state.historyIndex + 1);
     }
 
-    this.state.historyIndex = this.state.history.push({ value, source, timestamp: Date.now() }) - 1;
+    this.state.historyIndex = this.state.history.push({ value, source, timestamp: Date.now(), cursor }) - 1;
     this.compressHistory();
   }
 
@@ -49,8 +53,8 @@ export class SqlDataSourceHistory implements ISqlDataSourceHistory {
       return;
     }
     this.state.historyIndex--;
-    const value = this.state.history[this.state.historyIndex]!.value;
-    this.onNavigate.execute(value);
+    const prevHistoryItem = this.state.history[this.state.historyIndex]!;
+    this.onNavigate.execute(prevHistoryItem);
   }
 
   redo(): void {
@@ -59,8 +63,8 @@ export class SqlDataSourceHistory implements ISqlDataSourceHistory {
     }
 
     this.state.historyIndex++;
-    const value = this.state.history[this.state.historyIndex]!.value;
-    this.onNavigate.execute(value);
+    const prevHistoryItem = this.state.history[this.state.historyIndex]!;
+    this.onNavigate.execute(prevHistoryItem);
   }
 
   restore(state: ISqlDataSourceHistoryState): void {
