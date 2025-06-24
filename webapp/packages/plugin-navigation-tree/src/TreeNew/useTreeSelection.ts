@@ -118,6 +118,8 @@ async function setSelectionWithLoad(
           nodes.push(...childNodes);
         });
       }
+    } else if (!treeData.getNode(nodeId).leaf) {
+      selectionMap.set(nodeId, { selected: false, indeterminate: false });
     }
   } catch (error) {
     treeData.updateState(nodeId, { expanded: false });
