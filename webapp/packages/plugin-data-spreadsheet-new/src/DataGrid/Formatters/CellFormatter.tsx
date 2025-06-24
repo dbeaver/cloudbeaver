@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { use, useContext, useDeferredValue, useState } from 'react';
+import { use, useContext } from 'react';
 import { DataGridCellInnerContext } from '@cloudbeaver/plugin-data-grid';
 
 import { getComputed, s, useObjectRef, useS } from '@cloudbeaver/core-blocks';
@@ -29,11 +29,11 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
   const tableDataContext = useContext(TableDataContext);
   const innerCellContext = use(DataGridCellInnerContext);
   const cellContext = useContext(CellContext);
-  const [menuVisible, setMenuVisible] = useState(false);
 
   const cell = cellContext.cell;
-  const showCellMenu = getComputed(() => !!cell && (innerCellContext?.isFocused || cellContext.isFocused || cellContext.isHovered || menuVisible));
-  const showCellMenuDeferred = useDeferredValue(showCellMenu, showCellMenu);
+  const showCellMenu = getComputed(
+    () => !!cell && (innerCellContext?.isFocused || cellContext.isFocused || cellContext.isHovered || cellContext.isMenuVisible),
+  );
   const styles = useS(style);
 
   const spreadsheetActions = useObjectRef<IDataPresentationActions<IResultSetElementKey>>({
@@ -47,12 +47,16 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
     },
   });
 
+  function handleCellMenuStateSwitch(visible: boolean): void {
+    cellContext.setMenuVisibility(visible);
+  }
+
   return (
     <div className={s(styles, { wrapper: true })}>
       <div className={s(styles, { container: true })}>
         <CellFormatterFactory rowIdx={rowIdx} colIdx={colIdx} />
       </div>
-      {showCellMenuDeferred && (
+      {showCellMenu && (
         <div className={s(styles, { menuContainer: true })}>
           <CellMenu
             cellKey={cell!}
@@ -61,7 +65,7 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
             spreadsheetActions={spreadsheetActions}
             resultIndex={context.resultIndex}
             simple={context.simple}
-            onStateSwitch={setMenuVisible}
+            onStateSwitch={handleCellMenuStateSwitch}
           />
         </div>
       )}
