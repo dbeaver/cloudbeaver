@@ -121,13 +121,15 @@ export class ThemeService extends Bootstrap {
       return;
     }
 
-    const nextThemeId: THEME_ID = Array.from(SYSTEM_THEMES_QUERIES_MAP.entries()).find(([_, query]) => query === event.media && event.matches)?.[0] || this.getThemeIdFromSettings();
+    const nextThemeId: THEME_ID =
+      Array.from(SYSTEM_THEMES_QUERIES_MAP.entries()).find(([_, query]) => query === event.media && event.matches)?.[0] ||
+      this.getThemeIdFromSettings();
 
     await this.setThemeId(nextThemeId);
   }
 
   private subscribeSystemThemeChange(): void {
-    SYSTEM_THEMES_QUERIES_MAP.forEach(async (query, themeId) => {
+    SYSTEM_THEMES_QUERIES_MAP.forEach(query => {
       const mediaQuery = window.matchMedia(query);
 
       mediaQuery.addEventListener('change', this.handleSystemThemeChange);
@@ -135,7 +137,7 @@ export class ThemeService extends Bootstrap {
   }
 
   private disposeSystemThemeChange(): void {
-    SYSTEM_THEMES_QUERIES_MAP.forEach((query, themeId) => {
+    SYSTEM_THEMES_QUERIES_MAP.forEach(query => {
       const mediaQuery = window.matchMedia(query);
       mediaQuery.removeEventListener('change', this.handleSystemThemeChange);
     });
