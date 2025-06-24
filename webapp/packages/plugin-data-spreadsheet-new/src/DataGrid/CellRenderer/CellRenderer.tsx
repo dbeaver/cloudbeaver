@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, observable } from 'mobx';
+import { computed, observable, action } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, type HTMLAttributes } from 'react';
 
@@ -35,6 +35,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
   const cellContext = useObservableRef(
     () => ({
       isHovered: false,
+      isMenuVisible: false,
       get position(): ICellPosition {
         return { colIdx: this.colIdx, rowIdx: this.rowIdx };
       },
@@ -70,9 +71,14 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
 
         return this.tableDataContext.getEditionState(this.cell);
       },
+      setMenuVisibility(visibility: boolean): void {
+        this.isMenuVisible = visibility;
+      },
     }),
     {
       isHovered: observable.ref,
+      isMenuVisible: observable.ref,
+      setMenuVisibility: action,
       colIdx: observable.ref,
       rowIdx: observable.ref,
       row: computed,
