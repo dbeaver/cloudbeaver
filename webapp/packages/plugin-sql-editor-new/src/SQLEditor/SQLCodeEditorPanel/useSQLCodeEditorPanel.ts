@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,15 +10,17 @@ import { useCallback } from 'react';
 
 import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
 import { throttle } from '@cloudbeaver/core-utils';
-import type { ISQLEditorData } from '@cloudbeaver/plugin-sql-editor';
+import type { ISqlEditorCursor, ISQLEditorData } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IEditor } from '../SQLCodeEditor/useSQLCodeEditor.js';
 
 interface State {
   highlightActiveQuery: () => void;
-  onQueryChange: (query: string) => void;
+  onQueryChange: (query: string, selection: ISqlEditorCursor) => void;
   onCursorChange: (anchor: number, head?: number) => void;
 }
+
+export const ON_QUERY_CHANGE_SOURCE = 'QueryChange';
 
 export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
   const state: State = useObservableRef(
@@ -32,8 +34,9 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
           this.editor.highlightActiveQuery(segment.begin, segment.end);
         }
       },
-      onQueryChange(query: string) {
-        this.data.setScript(query);
+      onQueryChange(query: string, selection: ISqlEditorCursor) {
+        this.data.setScript(query, ON_QUERY_CHANGE_SOURCE, selection);
+        this.onCursorChange(selection.anchor, selection.head);
       },
       onCursorChange(anchor: number, head?: number) {
         this.data.setCursor(anchor, head);
