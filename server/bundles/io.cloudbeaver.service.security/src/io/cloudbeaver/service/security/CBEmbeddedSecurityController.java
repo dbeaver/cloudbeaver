@@ -3410,7 +3410,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
-    private SMSubjectType getSubjectType(@NotNull String subjectId) {
+    protected SMSubjectType getSubjectType(@NotNull String subjectId) {
         try (Connection dbCon = database.openConnection()) {
             String sqlBuilder = "SELECT SUBJECT_TYPE FROM {table_prefix}CB_AUTH_SUBJECT U WHERE SUBJECT_ID = ?";
             try (var dbStat = dbCon.prepareStatement(sqlBuilder)) {
