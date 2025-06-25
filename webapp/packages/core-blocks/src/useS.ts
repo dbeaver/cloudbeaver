@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -46,8 +46,8 @@ export function useS<T extends ComponentStyle[]>(...componentStyles: [...T]): Ex
   const stylesRef = useRef<ComponentStyle[]>([]);
   const [patch, forceUpdate] = useState(0);
   const loadedStyles = useRef<BaseStyles[]>([]);
-  const themeService = useService(ThemeService, true);
-  const [currentThemeId, setCurrentThemeId] = useState(() => themeService?.themeId);
+  const themeService = useService(ThemeService);
+  const [currentThemeId, setCurrentThemeId] = useState(() => themeService.themeId);
   const lastThemeRef = useRef<string | undefined>(currentThemeId);
   const filteredStyles = themeService
     ? // @ts-ignore
@@ -58,9 +58,9 @@ export function useS<T extends ComponentStyle[]>(...componentStyles: [...T]): Ex
   useExecutor({
     executor: themeService?.onChange,
     handlers: [
-      function updateThemeId(theme) {
-        if (currentThemeId !== themeService?.themeId && trackTheme) {
-          setCurrentThemeId(theme.id);
+      function updateThemeId(themeId) {
+        if (currentThemeId !== themeService.themeId && trackTheme) {
+          setCurrentThemeId(themeId);
         }
       },
     ],

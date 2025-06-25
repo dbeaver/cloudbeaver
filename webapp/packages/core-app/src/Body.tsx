@@ -56,7 +56,7 @@ export const Body = observer(function Body() {
           className={s(
             styles,
             { bodyContent: true },
-            `theme-${themeService.currentTheme.id}`,
+            `theme-${themeService.themeId}`,
             'theme-typography--body2',
             'theme-background-surface',
             'theme-text-on-surface',

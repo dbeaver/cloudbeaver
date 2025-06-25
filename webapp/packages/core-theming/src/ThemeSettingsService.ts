@@ -15,7 +15,7 @@ import {
 } from '@cloudbeaver/core-settings';
 import { schema } from '@cloudbeaver/core-utils';
 
-import { DEFAULT_THEME_ID, THEME_ID } from './themes.js';
+import { DEFAULT_THEME_ID, THEME_OPTIONS_ID } from './themes.js';
 
 const settingsSchema = schema.object({
   'core.theming.theme': schema.string().default(DEFAULT_THEME_ID),
@@ -25,8 +25,8 @@ export type IThemeSettings = schema.infer<typeof settingsSchema>;
 
 @injectable()
 export class ThemeSettingsService {
-  get theme(): THEME_ID {
-    return this.settings.getValue('core.theming.theme') as THEME_ID;
+  get theme(): THEME_OPTIONS_ID {
+    return this.settings.getValue('core.theming.theme') as THEME_OPTIONS_ID;
   }
   readonly settings: SettingsProvider<typeof settingsSchema>;
 

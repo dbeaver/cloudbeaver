@@ -5,11 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, type IReactionDisposer, makeObservable, observable, reaction } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { UIError } from '@cloudbeaver/core-events';
-import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { Style } from './ComponentStyle.js';
 import './styles/main/base.pure.css';
@@ -22,136 +20,71 @@ import './styles/main/typography.pure.scss';
 import './styles/UiIconButton.css';
 import './styles/UiSpinner.css';
 import './styles/UiInput.css';
-import { DEFAULT_THEME_ID, UNKNOWN_SYSTEM_THEME_FALLBACK, THEME_ID, themes } from './themes.js';
+import { DEFAULT_THEME_ID, THEME_OPTIONS_ID, type IStyleRegistry, type ITheme, type IThemeService, type THEME_ID } from './themes.js';
 import { ThemeSettingsService } from './ThemeSettingsService.js';
-import type { ClassCollection } from './themeUtils.js';
-
-export interface ITheme {
-  name: string;
-  id: THEME_ID;
-  styles?: ClassCollection; // will be populated after execution ITheme.loader()
-  loader: () => ClassCollection | Promise<ClassCollection>;
-}
-
-export interface IStyleRegistry {
-  mode: 'replace' | 'append';
-  styles: Style[];
-}
-
-const SYSTEM_THEMES_QUERIES_MAP = new Map<THEME_ID, string>([
-  [THEME_ID.LIGHT, '(prefers-color-scheme: light)'],
-  [THEME_ID.DARK, '(prefers-color-scheme: dark)'],
-]);
+import { computed, makeObservable, observable, reaction, type IReactionDisposer } from 'mobx';
+import { SyncExecutor, type ISyncExecutor } from '@cloudbeaver/core-executor';
 
 @injectable()
 export class ThemeService extends Bootstrap {
-  themeId: THEME_ID;
+  private themeServiceMap: Map<THEME_OPTIONS_ID, IThemeService>;
+  private readonly stylesRegistry: Map<Style, IStyleRegistry[]> = new Map();
+  private reactionDisposer: IReactionDisposer | null;
+  readonly onChange: ISyncExecutor<THEME_ID>;
 
   get themes(): ITheme[] {
-    return Array.from(this.themeMap.values());
+    return Array.from(this.themeServiceMap.values().map(themeService => themeService.theme));
   }
 
-  get settingsThemeId(): THEME_ID {
+  get settingsThemeId(): THEME_OPTIONS_ID {
     return this.themeSettingsService.theme;
   }
 
-  get currentTheme(): ITheme {
-    let theme = this.themeMap.get(this.themeId);
+  get currentThemeService(): IThemeService {
+    let themeService = this.themeServiceMap.get(this.settingsThemeId);
 
-    if (!theme) {
-      theme = this.themeMap.get(DEFAULT_THEME_ID)!;
+    if (!themeService) {
+      themeService = this.themeServiceMap.get(DEFAULT_THEME_ID)!;
     }
 
-    return theme;
+    return themeService;
   }
 
-  readonly onChange: ISyncExecutor<ITheme>;
+  get currentTheme(): ITheme {
+    return this.currentThemeService.theme;
+  }
 
-  private readonly stylesRegistry: Map<Style, IStyleRegistry[]> = new Map();
-  private readonly themeMap: Map<string, ITheme> = new Map();
-  private reactionDisposer: IReactionDisposer | null;
+  get themeId(): THEME_ID {
+    return this.currentThemeService.themeId;
+  }
 
   constructor(private readonly themeSettingsService: ThemeSettingsService) {
     super();
-
+    this.themeServiceMap = new Map();
     this.reactionDisposer = null;
     this.onChange = new SyncExecutor();
-    this.themeId = this.getThemeIdFromSettings();
 
-    makeObservable<ThemeService, 'themeMap' | 'handleSystemThemeChange' | 'setThemeId'>(this, {
+    makeObservable<this, 'themeServiceMap'>(this, {
+      themeServiceMap: observable.deep,
+      themeId: computed,
       themes: computed,
-      currentTheme: computed,
-      themeId: observable.ref,
       settingsThemeId: computed,
-      setThemeId: action.bound,
-      handleSystemThemeChange: action.bound,
-      themeMap: observable.shallow,
-    });
-  }
-
-  private async setThemeId(themeId: THEME_ID): Promise<void> {
-    await this.loadTheme(themeId);
-    this.themeId = themeId;
-    this.onChange.execute(this.currentTheme);
-  }
-
-  private getThemeIdFromSettings(): THEME_ID {
-    if (this.settingsThemeId === THEME_ID.SYSTEM) {
-      const isDark = window.matchMedia(SYSTEM_THEMES_QUERIES_MAP.get(THEME_ID.DARK)!).matches;
-      const isLight = window.matchMedia(SYSTEM_THEMES_QUERIES_MAP.get(THEME_ID.LIGHT)!).matches;
-
-      if (isDark) {
-        return THEME_ID.DARK;
-      }
-
-      if (isLight) {
-        return THEME_ID.LIGHT;
-      }
-
-      console.error(`System theme is not supported yet, applied theme: ${UNKNOWN_SYSTEM_THEME_FALLBACK}`);
-
-      return UNKNOWN_SYSTEM_THEME_FALLBACK;
-    }
-
-    return this.settingsThemeId;
-  }
-
-  private async handleSystemThemeChange(event: MediaQueryListEvent): Promise<void> {
-    if (this.settingsThemeId !== THEME_ID.SYSTEM) {
-      return;
-    }
-
-    const nextThemeId: THEME_ID =
-      Array.from(SYSTEM_THEMES_QUERIES_MAP.entries()).find(([_, query]) => query === event.media && event.matches)?.[0] ||
-      this.getThemeIdFromSettings();
-
-    await this.setThemeId(nextThemeId);
-  }
-
-  private subscribeSystemThemeChange(): void {
-    SYSTEM_THEMES_QUERIES_MAP.forEach(query => {
-      const mediaQuery = window.matchMedia(query);
-
-      mediaQuery.addEventListener('change', this.handleSystemThemeChange);
-    });
-  }
-
-  private disposeSystemThemeChange(): void {
-    SYSTEM_THEMES_QUERIES_MAP.forEach(query => {
-      const mediaQuery = window.matchMedia(query);
-      mediaQuery.removeEventListener('change', this.handleSystemThemeChange);
+      currentThemeService: computed,
+      currentTheme: computed,
     });
   }
 
   override register(): void {
-    this.loadAllThemes();
-    this.subscribeSystemThemeChange();
-
     this.reactionDisposer = reaction(
-      () => this.settingsThemeId,
-      async () => {
-        const nextThemeId = this.getThemeIdFromSettings();
-        await this.setThemeId(nextThemeId);
+      () => this.currentTheme,
+      async theme => {
+        if (theme) {
+          await this.loadTheme(theme.id);
+
+          if (this.currentThemeService) {
+            this.onChange.execute(this.currentThemeService.themeId);
+          }
+        }
       },
       {
         fireImmediately: true,
@@ -162,9 +95,16 @@ export class ThemeService extends Bootstrap {
   override dispose(): void {
     if (this.reactionDisposer) {
       this.reactionDisposer();
+      this.reactionDisposer = null;
+    }
+  }
+
+  registerThemeService(themeService: IThemeService): void {
+    if (this.themeServiceMap.has(themeService.theme.id)) {
+      throw new Error(`Theme with id ${themeService.theme.id} is already registered.`);
     }
 
-    this.disposeSystemThemeChange();
+    this.themeServiceMap.set(themeService.theme.id, themeService);
   }
 
   addStyleRegistry<T extends Record<string, string>>(style: Style<T>, mode: 'replace' | 'append', styles: Style<T>[]): void {
@@ -198,11 +138,7 @@ export class ThemeService extends Bootstrap {
       .flat();
   }
 
-  override async load(): Promise<void> {
-    await this.loadTheme(this.themeId);
-  }
-
-  private async loadTheme(themeId: string): Promise<string> {
+  private async loadTheme(themeId: THEME_OPTIONS_ID): Promise<string> {
     try {
       await this.loadThemeStylesAsync(themeId);
       return themeId;
@@ -214,20 +150,23 @@ export class ThemeService extends Bootstrap {
     }
   }
 
-  private loadAllThemes(): void {
-    for (const theme of themes) {
-      this.themeMap.set(theme.id, theme);
-    }
-  }
+  private async loadThemeStylesAsync(id: THEME_OPTIONS_ID): Promise<void> {
+    const themeService = this.themeServiceMap.get(id);
 
-  private async loadThemeStylesAsync(id: string): Promise<void> {
-    const theme = this.themeMap.get(id);
-    if (!theme) {
+    if (!themeService) {
       throw new UIError(`Theme ${id} not found.`);
     }
 
-    if (!theme.styles) {
-      theme.styles = await theme.loader();
+    const themesMap = await themeService.theme.loader();
+
+    for (const themeService of this.themeServiceMap.values()) {
+      const styles = themesMap[themeService.themeId];
+
+      if (!styles) {
+        throw new UIError(`Theme ${themeService.themeId} styles not found in ${id} theme.`);
+      }
+
+      themeService.theme.styles = styles;
     }
   }
 }

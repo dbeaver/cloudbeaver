@@ -5,40 +5,35 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ITheme } from './ThemeService.js';
+import type { Bootstrap } from '@cloudbeaver/core-di';
 import type { ClassCollection } from './themeUtils.js';
+import type { Style } from './ComponentStyle.js';
 
-const emptyTheme = {};
+export const emptyTheme: ClassCollection = {};
 
-export enum THEME_ID {
+export enum THEME_OPTIONS_ID {
   LIGHT = 'light',
   DARK = 'dark',
   SYSTEM = 'system',
 }
 
-export const themes: ITheme[] = [
-  {
-    name: 'ui_light_theme',
-    id: THEME_ID.LIGHT,
-    loader: async (): Promise<ClassCollection> => {
-      const styles = await import('./styles/main/light.theme.scss');
-      return styles.default || emptyTheme;
-    },
-  },
-  {
-    name: 'ui_dark_theme',
-    id: THEME_ID.DARK,
-    loader: async (): Promise<ClassCollection> => {
-      const styles = await import('./styles/main/dark.theme.scss');
-      return styles.default || emptyTheme;
-    },
-  },
-  {
-    name: 'ui_system_theme',
-    id: THEME_ID.SYSTEM,
-    loader: (): ClassCollection => emptyTheme,
-  },
-];
+export interface IThemeService extends Bootstrap {
+  theme: ITheme;
+  themeId: THEME_ID;
+}
 
-export const DEFAULT_THEME_ID = THEME_ID.SYSTEM;
-export const UNKNOWN_SYSTEM_THEME_FALLBACK = THEME_ID.LIGHT;
+export interface ITheme {
+  name: string;
+  id: THEME_OPTIONS_ID;
+  styles?: ClassCollection; // will be populated after execution ITheme.loader()
+  loader: () => Promise<Partial<Record<THEME_ID, ClassCollection>>>;
+}
+
+export interface IStyleRegistry {
+  mode: 'replace' | 'append';
+  styles: Style[];
+}
+
+export type THEME_ID = 'light' | 'dark';
+export const DEFAULT_THEME_ID = THEME_OPTIONS_ID.SYSTEM;
+export const UNKNOWN_SYSTEM_THEME_FALLBACK: THEME_ID = 'light';
