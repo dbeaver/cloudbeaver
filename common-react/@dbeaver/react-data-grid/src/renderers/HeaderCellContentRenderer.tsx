@@ -9,6 +9,10 @@ interface Props {
   colIdx: number;
   tabIndex?: number;
 }
+export interface OrderButtonRef {
+  sort: (event: React.KeyboardEvent<HTMLElement>) => void;
+}
+
 export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer({ colIdx, tabIndex }: Props) {
   const dndHeaderContext = use(HeaderDnDContext);
   const cellHeaderContext = use(DataGridCellHeaderContext);
@@ -18,8 +22,7 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
   const onColumnSort = cellHeaderContext?.onColumnSort;
   const sortingState = useGridReactiveValue(cellHeaderContext?.columnSortingState, colIdx);
 
-  const orderButtonRef = useRef<HTMLButtonElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const orderButtonRef = useRef<OrderButtonRef>(null);
 
   const draggable = dndHeaderContext?.getCanDrag?.(colIdx) ?? false;
   const drag = useDrag({
@@ -55,20 +58,17 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
     },
   });
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Tab' && !e.shiftKey && isColumnSortable && onColumnSort && orderButtonRef.current !== document.activeElement) {
-      e.preventDefault();
-      e.stopPropagation();
-      containerRef.current?.parentElement?.setAttribute('aria-selected', 'false');
-      orderButtonRef.current?.focus();
+  const onKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if ((event.key === 'Enter' || event.key === ' ') && isColumnSortable && onColumnSort) {
+      event.preventDefault();
+      orderButtonRef.current?.sort(event);
     }
-  };
+  }
 
   return (
     <div
-      ref={containerRef}
+      onKeyDown={onKeyDown}
       tabIndex={tabIndex}
-      onKeyDown={handleKeyDown}
       className="tw:w-full tw:h-full tw:content-center tw:flex tw:items-center tw:justify-between tw:gap-1 tw:outline-none tw:group"
       {...drag.props}
       {...drop.props}

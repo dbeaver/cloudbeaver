@@ -1,15 +1,16 @@
 import { clsx, IconButton, Icon } from '@dbeaver/ui-kit';
+import { useImperativeHandle, type Ref } from 'react';
 
 interface OrderButtonProps {
   colIdx: number;
   sortState?: 'asc' | 'desc' | null;
   onSort: (attributePosition: number, order: 'asc' | 'desc' | null, isMultiple: boolean) => void;
   tabIndex?: number;
-  ref: React.Ref<HTMLButtonElement>;
+  ref: Ref<{ sort: (e: React.KeyboardEvent<HTMLButtonElement>) => void }> | null;
 }
 
 export function OrderButton({ colIdx, sortState, onSort, tabIndex, ref }: OrderButtonProps) {
-  function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
+  function handleSort(e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) {
     const nextSortState = sortState === 'asc' ? 'desc' : sortState === 'desc' ? null : 'asc';
     onSort(colIdx, nextSortState, e.ctrlKey || e.metaKey);
   }
@@ -20,13 +21,16 @@ export function OrderButton({ colIdx, sortState, onSort, tabIndex, ref }: OrderB
 
   const iconSrc = sortState === 'asc' ? svgSortAsc : sortState === 'desc' ? svgSortDesc : svgSortUnknown;
 
+  useImperativeHandle(ref, () => ({
+    sort: handleSort,
+  }));
+
   return (
     <IconButton
       variant="secondary"
       size="small"
-      onClick={handleClick}
+      onClick={handleSort}
       tabIndex={tabIndex}
-      ref={ref}
       title="Sort by column"
       aria-label="Sort by column"
       className={clsx(
