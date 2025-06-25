@@ -10,8 +10,6 @@ import { useEffect, useState } from 'react';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { MetadataMap } from '@cloudbeaver/core-utils';
-import { NotificationService } from '@cloudbeaver/core-events';
-import { useService } from '@cloudbeaver/core-di';
 
 import { applyTransforms } from './DataTransformers/applyTransforms.js';
 import { rootNodeStateTransformer, rootNodeTransformer } from './DataTransformers/rootTransformers.js';
@@ -62,7 +60,6 @@ export function useTreeData(options: IOptions): ITreeData {
     },
   );
   const state = useTreeState(options.externalState);
-  const notificationService = useService(NotificationService);
   const [nodeCache] = useState(
     () =>
       new MetadataMap<string, IComputedValue<INode>>(id =>
@@ -116,14 +113,7 @@ export function useTreeData(options: IOptions): ITreeData {
         this.state.updateAllState(state);
       },
       async load(nodeId: string, manual: boolean) {
-        try {
-          return await options.load(nodeId, manual);
-        } catch (exception: any) {
-          if (exception !== null && exception !== undefined) {
-            notificationService.logException(exception);
-          }
-          throw exception;
-        }
+        await options.load(nodeId, manual);
       },
       async update() {
         const nodes = [this.rootId];
