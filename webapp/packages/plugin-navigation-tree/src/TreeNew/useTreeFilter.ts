@@ -11,6 +11,7 @@ import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 
 import type { TreeDataTransformer } from './DataTransformers/TreeDataTransformer.js';
 import type { ITreeData } from './ITreeData.js';
+import type { INodeState } from './INodeState.js';
 
 export interface ITreeFilterOptions {
   isNodeMatched?: (nodeId: string, filter: string, isMatched: boolean) => boolean;
@@ -20,57 +21,37 @@ export interface ITreeFilter {
   filter: string;
   isNodeMatched(treeData: ITreeData, nodeId: string): boolean;
   transformer: TreeDataTransformer<string[]>;
-  setFilter(filter: string, treeData?: ITreeData | null): void;
-}
-
-function updateTreeNodes(treeData: ITreeData, updateFn: (nodeId: string) => void) {
-  const visitedNodes = new Set<string>();
-  const nodesToVisit = [treeData.rootId];
-
-  while (nodesToVisit.length > 0) {
-    const nodeId = nodesToVisit.pop()!;
-
-    if (visitedNodes.has(nodeId)) {
-      continue;
-    }
-    visitedNodes.add(nodeId);
-
-    updateFn(nodeId);
-
-    const children = treeData.getChildren(nodeId);
-    nodesToVisit.push(...children);
-  }
+  stateTransformer: TreeDataTransformer<INodeState>;
+  setFilter(filter: string): void;
 }
 
 export function useTreeFilter(options: ITreeFilterOptions = {}): Readonly<ITreeFilter> {
   options = useObjectRef(options);
-  const expandedStateCache = new Map<string, boolean>();
-  function cacheExpandedState(treeData: ITreeData): void {
-    expandedStateCache.clear();
+  const matchCache = new Map<string, boolean>();
 
-    updateTreeNodes(treeData, nodeId => {
-      const state = treeData.getState(nodeId);
-      if (state.expanded) {
-        expandedStateCache.set(nodeId, true);
-      }
-    });
-  };
+  function hasMatchingDescendant(
+    treeData: ITreeData, nodeId: string, filter: string, matchFn: (treeData: ITreeData, nodeId: string) => boolean): boolean {
+    const cacheKey = `${nodeId}:${filter}`;
+    if (matchCache.has(cacheKey)) {
+      return matchCache.get(cacheKey)!;
+    }
 
-  function restoreExpandedState(treeData: ITreeData): void {
-    updateTreeNodes(treeData, nodeId => {
-      if (nodeId !== treeData.rootId) {
-        treeData.updateState(nodeId, { expanded: false });
-      }
-    });
+    if (matchFn(treeData, nodeId)) {
+      matchCache.set(cacheKey, true);
+      return true;
+    }
 
-    for (const [nodeId, expanded] of expandedStateCache) {
-      if (expanded) {
-        treeData.updateState(nodeId, { expanded: true });
+    const children = treeData.getUnfilteredChildren(nodeId);
+    for (const childId of children) {
+      if (hasMatchingDescendant(treeData, childId, filter, matchFn)) {
+        matchCache.set(cacheKey, true);
+        return true;
       }
     }
 
-    expandedStateCache.clear();
-  };
+    matchCache.set(cacheKey, false);
+    return false;
+  }
 
   return useObservableRef<ITreeFilter>(
     () => ({
@@ -85,14 +66,6 @@ export function useTreeFilter(options: ITreeFilterOptions = {}): Readonly<ITreeF
 
         if (options?.isNodeMatched) {
           isNodeMatched = options.isNodeMatched(nodeId, filter, isNodeMatched);
-        }
-
-        if (isNodeMatched) {
-          let parent = treeData.getParent(nodeId);
-          while (parent) {
-            treeData.updateState(parent, { expanded: true });
-            parent = treeData.getParent(parent);
-          }
         }
 
         return isNodeMatched || treeData.getChildren(nodeId).length > 0;
@@ -115,25 +88,27 @@ export function useTreeFilter(options: ITreeFilterOptions = {}): Readonly<ITreeF
 
         return children.filter(child => this.isNodeMatched(treeData, child));
       },
-      setFilter(filter: string, treeData?: ITreeData | null): void {
-        const newFilter = filter.trim();
-        const oldFilter = this.filter.trim();
-
-        if (!oldFilter && newFilter && treeData) {
-          cacheExpandedState(treeData);
+      stateTransformer(treeData: ITreeData, nodeId: string, state: INodeState): INodeState {
+        const filter = this.filter.trim();
+        if (!filter) {
+          return state;
         }
 
+        if (hasMatchingDescendant(treeData, nodeId, filter, this.isNodeMatched.bind(this))) {
+          return { ...state, expanded: true };
+        }
+
+        return state;
+      },
+      setFilter(filter: string): void {
+        matchCache.clear();
         this.filter = filter;
-
-        if (oldFilter && !newFilter && treeData) {
-          restoreExpandedState(treeData);
-        }
       },
     }),
     {
       filter: observable.ref,
     },
     false,
-    ['setFilter', 'isNodeMatched', 'transformer'],
+    ['setFilter', 'isNodeMatched', 'transformer', 'stateTransformer'],
   );
 }
