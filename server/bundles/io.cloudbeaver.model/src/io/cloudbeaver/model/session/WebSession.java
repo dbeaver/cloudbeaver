@@ -1010,6 +1010,9 @@ public class WebSession extends BaseWebSession
         }
     }
 
+    public boolean hasGlobalPermission(String permissionId) {
+        return true;
+    }
 
     private record PersistentAttribute(Object value) {
     }
