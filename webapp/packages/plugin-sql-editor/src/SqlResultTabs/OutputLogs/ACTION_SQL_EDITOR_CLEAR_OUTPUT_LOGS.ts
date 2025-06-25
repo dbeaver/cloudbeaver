@@ -7,7 +7,7 @@
  */
 import { createAction } from '@cloudbeaver/core-view';
 
-export const ACTION_CLEAR_OUTPUT_LOGS = createAction('action-clear_output_logs', {
+export const ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS = createAction('action_sql_editor_clear_output_logs', {
   label: 'ui_clear',
   icon: 'erase',
   tooltip: 'ui_clear',

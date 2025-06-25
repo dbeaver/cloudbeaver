@@ -22,7 +22,7 @@ interface ISettings {
 
 @injectable()
 export class OutputLogsService {
-  get settings() {
+  get settings(): ISettings {
     return this.userDataService.getUserData(OUTPUT_LOGS_KEY, getOutputLogsDefaultSettings);
   }
 

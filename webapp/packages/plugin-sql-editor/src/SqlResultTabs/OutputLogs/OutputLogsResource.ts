@@ -63,7 +63,7 @@ export class OutputLogsResource extends CachedDataResource<IOutputLog[]> {
     this.useTracker.use(undefined);
   }
 
-  protected async loader(): Promise<IOutputLog[]> {
+  protected loader(): IOutputLog[] {
     return this.data;
   }
 }
