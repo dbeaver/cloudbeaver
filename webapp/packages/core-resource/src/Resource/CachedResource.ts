@@ -784,7 +784,7 @@ export abstract class CachedResource<
             this.markOutdatedSync(key);
           }
         },
-        success: async () => {
+        success: () => {
           if (loaded) {
             this.dataUpdate(key);
           }

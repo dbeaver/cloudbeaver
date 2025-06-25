@@ -23,7 +23,7 @@ export interface SqlOutputLogsPanelState {
   readonly filteredLogs: WsOutputLogInfo[];
 }
 
-export const useOutputLogsPanelState = (outputLogs: IOutputLog[], sqlEditorTabState: ISqlEditorTabState) =>
+export const useOutputLogsPanelState = (outputLogs: IOutputLog[], sqlEditorTabState: ISqlEditorTabState): SqlOutputLogsPanelState =>
   useObservableRef<SqlOutputLogsPanelState>(
     () => ({
       outputLogs,
