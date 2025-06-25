@@ -28,9 +28,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  & .menuItemIcon {
-    pointer-events: none;
-  }
   & .menuItemIcon,
   & .menuItemContent {
     width: 24px;
