@@ -20,6 +20,7 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
   const getHeaderText = useGridReactiveValue(headerElement ? undefined : cellHeaderContext?.headerText, colIdx);
   const isColumnSortable = useGridReactiveValue(cellHeaderContext?.columnSortable, colIdx);
   const onColumnSort = cellHeaderContext?.onColumnSort;
+  const onHeaderKeyDown = cellHeaderContext?.onHeaderKeyDown;
   const sortingState = useGridReactiveValue(cellHeaderContext?.columnSortingState, colIdx);
 
   const orderButtonRef = useRef<OrderButtonRef>(null);
@@ -59,6 +60,8 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
   });
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    onHeaderKeyDown?.(event);
+    
     if ((event.key === 'Enter' || event.key === ' ') && isColumnSortable && onColumnSort) {
       event.preventDefault();
       orderButtonRef.current?.sort(event);

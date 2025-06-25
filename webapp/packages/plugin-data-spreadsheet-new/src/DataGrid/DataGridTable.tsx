@@ -547,6 +547,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               onColumnSort={handleSort}
               onCellChange={handleCellChange}
               onCellKeyDown={handleCellKeyDown}
+              onHeaderKeyDown={gridSelectedCellCopy.onKeydownHandler}
             />
           </div>
         </TableDataContext.Provider>
