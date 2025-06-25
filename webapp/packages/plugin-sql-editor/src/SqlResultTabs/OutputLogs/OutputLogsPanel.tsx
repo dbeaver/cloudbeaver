@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, getComputed, Group, useResource } from '@cloudbeaver/core-blocks';
+import { Container, Group, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EditorLoader } from '@cloudbeaver/plugin-codemirror6';
 
@@ -16,7 +16,6 @@ import { OutputLogsResource } from './OutputLogsResource.js';
 import { OutputLogsService } from './OutputLogsService.js';
 import { OutputLogsToolbar } from './OutputLogsToolbar.js';
 import { useOutputLogsPanelState } from './useOutputLogsPanelState.js';
-import { getOutputLog } from './getOutputLog.js';
 
 interface Props {
   sqlEditorTabState: ISqlEditorTabState;
@@ -26,16 +25,15 @@ export const OutputLogsPanel = observer<Props>(function SqlOutputLogsPanel({ sql
   const outputLogsService = useService(OutputLogsService);
   const { data } = useResource(SqlOutputLogsPanel, OutputLogsResource, undefined);
   const outputLogs = outputLogsService.getOutputLogs(data, sqlEditorTabState);
-  const state = useOutputLogsPanelState();
-  const selectedLogTypes = getComputed(() => sqlEditorTabState.outputLogsTab?.selectedLogTypes);
-  const resultValue = getComputed(() => getOutputLog(outputLogs, selectedLogTypes, state.searchValue ?? ''));
+
+  const state = useOutputLogsPanelState(outputLogs, sqlEditorTabState);
 
   return (
     <Container className="theme-background-secondary" overflow vertical noWrap dense parent gap>
       <OutputLogsToolbar state={state} sqlEditorTabState={sqlEditorTabState} />
       <Group box overflow>
         <EditorLoader
-          value={resultValue}
+          value={state.resultValue}
           foldGutter={false}
           lineWrapping={outputLogsService.settings.wrapMode}
           highlightActiveLine={false}

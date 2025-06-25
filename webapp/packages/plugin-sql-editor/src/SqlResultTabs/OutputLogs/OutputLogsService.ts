@@ -13,7 +13,6 @@ import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService.j
 import { OUTPUT_LOG_TYPES } from './IOutputLogTypes.js';
 import { OUTPUT_LOGS_TAB_ID } from './OUTPUT_LOGS_TAB_ID.js';
 import { type IOutputLog, OutputLogsResource } from './OutputLogsResource.js';
-import { action, computed, makeObservable } from 'mobx';
 
 const OUTPUT_LOGS_KEY = 'output_logs';
 
@@ -31,18 +30,7 @@ export class OutputLogsService {
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly userDataService: UserDataService,
     private readonly outputLogsResource: OutputLogsResource,
-  ) {
-    this.clearOutputLogs = this.clearOutputLogs.bind(this);
-
-    makeObservable(this, {
-      clearOutputLogs: action.bound,
-      settings: computed,
-      getOutputLogs: action.bound,
-      toggleWrapMode: action.bound,
-      showOutputLogs: action.bound,
-      removeOutputLogsTab: action.bound,
-    });
-  }
+  ) {}
 
   showOutputLogs(editorState: ISqlEditorTabState): void {
     this.createOutputLogsTab(editorState);
@@ -84,7 +72,7 @@ export class OutputLogsService {
   }
 
   clearOutputLogs(): void {
-    this.outputLogsResource.reset();
+    this.outputLogsResource.clear();
   }
 }
 

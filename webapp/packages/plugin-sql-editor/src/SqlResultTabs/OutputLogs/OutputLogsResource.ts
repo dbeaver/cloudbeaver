@@ -58,8 +58,9 @@ export class OutputLogsResource extends CachedDataResource<IOutputLog[]> {
     this.setData(updatedData);
   }
 
-  reset(): void {
-    this.setData([]);
+  override clear(): void {
+    super.clear();
+    this.useTracker.use(undefined);
   }
 
   protected async loader(): Promise<IOutputLog[]> {
