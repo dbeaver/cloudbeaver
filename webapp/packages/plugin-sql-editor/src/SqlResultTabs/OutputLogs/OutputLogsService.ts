@@ -71,8 +71,15 @@ export class OutputLogsService {
     return events.filter(event => event.contextId === dataSource?.executionContext?.id);
   }
 
-  clearOutputLogs(): void {
-    this.outputLogsResource.clear();
+  clearOutputLogs(state: ISqlEditorTabState): void {
+    const dataSource = this.sqlDataSourceService.get(state.editorId);
+    const contextId = dataSource?.executionContext?.id;
+
+    if (!contextId) {
+      return;
+    }
+
+    this.outputLogsResource.deleteLogsByContextId(contextId);
   }
 }
 

@@ -139,7 +139,7 @@ export class OutputMenuBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS) {
-          this.outputLogsService.clearOutputLogs();
+          this.outputLogsService.clearOutputLogs(state);
         }
       },
     });

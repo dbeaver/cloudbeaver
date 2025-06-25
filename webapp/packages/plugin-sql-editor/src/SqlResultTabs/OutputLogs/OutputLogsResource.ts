@@ -63,6 +63,10 @@ export class OutputLogsResource extends CachedDataResource<IOutputLog[]> {
     this.useTracker.use(undefined);
   }
 
+  deleteLogsByContextId(contextId: string): void {
+    this.setData(this.data.filter(log => log.contextId !== contextId));
+  }
+
   protected loader(): IOutputLog[] {
     return this.data;
   }
