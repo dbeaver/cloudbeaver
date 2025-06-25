@@ -145,8 +145,8 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         'data-column-index': colIdx,
         onMouseDown: state.mouseDown,
         onMouseUp: state.mouseUp,
-        onMouseEnter: () => (cellContext.isHovered = true),
-        onMouseLeave: () => (cellContext.isHovered = false),
+        onPointerEnter: () => (cellContext.isHovered = true),
+        onPointerLeave: () => (cellContext.isHovered = false),
       })}
     </CellContext.Provider>
   );
