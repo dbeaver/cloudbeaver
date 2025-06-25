@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 .menuItem {
+  composes: theme-ripple from global;
   composes: menuItem from './MenuItemElement.module.css';
 
   display: flex;

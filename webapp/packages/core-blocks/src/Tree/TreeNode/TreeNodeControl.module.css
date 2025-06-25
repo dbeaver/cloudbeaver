@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 .treeNodeControl {
+  composes: theme-ripple theme-ripple-selectable from global;
   box-sizing: border-box;
   height: 22px;
   display: flex;
@@ -17,26 +18,10 @@
   outline: none;
 
   &::before {
-    position: absolute;
-    content: '';
     left: 0 !important;
     top: auto !important;
     height: inherit !important;
     width: 100% !important;
-    pointer-events: none;
-  }
-
-  &:hover {
-    &::before {
-      background-color: color-mix(in srgb, var(--theme-on-surface) 4%, transparent 96%);
-    }
-  }
-
-  &:active,
-  &[aria-selected='true'] {
-    &::before {
-      background-color: color-mix(in srgb, var(--theme-on-surface) 12%, transparent 88%);
-    }
   }
 
   & > * {
