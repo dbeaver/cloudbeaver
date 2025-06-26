@@ -5,8 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { createContext } from 'react';
 
-export interface INodeState {
-  selected: boolean;
-  expanded: boolean;
-}
+import type { ITreeSelection } from '../useTreeSelection.js';
+
+export const TreeSelectionContext = createContext<ITreeSelection | undefined>(undefined);
