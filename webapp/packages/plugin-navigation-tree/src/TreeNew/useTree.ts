@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ export interface ITree {
   openNode(id: string): Promise<void>;
   clickNode(id: string): Promise<void>;
   expandNode(id: string, state: boolean): Promise<void>;
-  selectNode(id: string, state: boolean): void;
+  selectNode(id: string, selected?: boolean): void;
 }
 
 export function useTree(options: IOptions): ITree {
@@ -70,16 +70,13 @@ export function useTree(options: IOptions): ITree {
           options.data.updateState(id, { expanded: state });
           if (state) {
             await options.data.load(id, true);
-            const children = options.data.getChildren(id);
-
-            if (children.length === 0) {
-              options.data.updateState(id, { expanded: false });
-            }
           }
-        } catch (exception) {}
+        } catch (exception) {
+          options.data.updateState(id, { expanded: false });
+        }
       },
-      selectNode(id: string, state: boolean) {
-        options.data.updateState(id, { selected: state });
+      selectNode(id: string, selected = true) {
+        options.data.updateState(id, { selected });
       },
     }),
     {},
