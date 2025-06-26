@@ -1,4 +1,5 @@
-FROM dbeaver/base-java
+ARG BASE_JAVA_TAG="stable"
+FROM dbeaver/base-java:${BASE_JAVA_TAG}
 
 MAINTAINER DBeaver Corp, devops@dbeaver.com
 
