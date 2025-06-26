@@ -268,11 +268,8 @@ export const Loader = observer<Props>(function Loader({
     <LoaderContext.Provider value={contextState}>
       <>
         {overlay && renderWrappedChildren()}
-        <div ref={loaderRef} className={s(style, { loader: true, loaderOverlay: overlay, small, fullSize, inline, secondary, overlay }, className)}>
-          <Spinner
-            className={s(style, { spinner: true, spinnerSecondary: secondary || overlay })}
-            size={small ? 'small' : 'medium'}
-          />
+        <div ref={loaderRef} className={s(style, { loader: true, loaderOverlay: overlay, small, fullSize, inline }, className)}>
+          <Spinner className={s(style, { spinner: true, spinnerSecondary: secondary || overlay })} size={small ? 'small' : 'medium'} />
           {!hideMessage && (
             <div className={s(style, { message: true })}>
               <Translate token={message || 'ui_processing_loading'} />
