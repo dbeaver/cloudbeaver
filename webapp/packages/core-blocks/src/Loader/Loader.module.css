@@ -13,9 +13,6 @@
     --dbv-kit-spinner-medium-height: 40px;
     --dbv-kit-spinner-large-height: 60px;
     --dbv-kit-spinner-xlarge-height: 80px;
-    --dbv-kit-animate-stroke: none;
-    --dbv-kit-spinner-animation-duration: 1s;
-    --dbv-kit-animate-spin: spinning var(--dbv-kit-spinner-animation-duration) linear infinite;
   }
 
   .spinnerSecondary {
@@ -65,7 +62,7 @@
       height: 100%;
     }
   }
-  
+
   .loaderOverlay {
     composes: theme-text-on-primary from global;
     position: absolute;
