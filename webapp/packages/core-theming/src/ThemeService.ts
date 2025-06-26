@@ -45,7 +45,7 @@ export class ThemeService extends Bootstrap {
     return Array.from(this.themeMap.values());
   }
 
-  get themeId(): string {
+  get themeId(): THEME_ID {
     const themeId = this.themeSettingsService.theme;
 
     if (themeId === THEME_ID.SYSTEM) {
