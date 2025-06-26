@@ -59,9 +59,9 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
     },
   });
 
-  const onKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+  function onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
     onHeaderKeyDown?.(event);
-    
+
     if ((event.key === 'Enter' || event.key === ' ') && isColumnSortable && onColumnSort) {
       event.preventDefault();
       orderButtonRef.current?.sort(event);
