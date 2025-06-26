@@ -34,6 +34,8 @@ enum CBServerEventId {
     cb_subject_permissions_updated,
 
     cb_database_output_log_updated,
+    cb_ai_chat_message_chunk @since(version: "25.1.1")
+    cb_ai_chat_message_error @since(version: "25.1.1")
 
     cb_transaction_count @since(version: "24.3.3"),
 
@@ -69,6 +71,7 @@ enum CBEventTopic {
 
     cb_transaction @since(version: "24.3.3"),
     cb_workspace_configuration @since(version: "25.1.1")
+    cb_ai @since(version: "25.1.1")
 }
 
 # Base server event interface
@@ -226,6 +229,23 @@ type WSTransactionalCountEvent implements CBServerEvent {
     projectId: String!
     connectionId: String!
     transactionalCount: Int!
+}
+
+type WSAIChatMessageChunkEvent implements CBServerEvent @since(version: "25.1.1") {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    conversationId: ID!
+    messageId: ID!
+    chunk: String
+    completed: Boolean!
+}
+
+type WSAIChatMessageErrorEvent implements CBServerEvent @since(version: "25.1.1") {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    conversationId: ID!
+    messageId: ID!
+    errorMessage: String
 }
 
 extend type Query {
