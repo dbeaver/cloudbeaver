@@ -40,11 +40,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.ee10.servlet.ServletApiRequest;
-import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.server.Request;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.qm.QMConstants;
+import org.jkiss.dbeaver.model.qm.QMUtils;
+import org.jkiss.dbeaver.model.qm.meta.QMApiCallLogInfo;
+import org.jkiss.dbeaver.model.qm.meta.QMApiCallType;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -53,10 +54,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class GraphQLEndpoint extends HttpServlet {
@@ -144,13 +143,7 @@ public class GraphQLEndpoint extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String contentType = request.getContentType();
-        if (request instanceof ServletApiRequest apiRequest) {
-            ServletContextHandler.ServletRequestInfo info = apiRequest.getServletRequestInfo();
-            if (info instanceof Request.Wrapper wrapper) {
-                System.out.println(wrapper);
-            }
-        }
-        System.out.println(request.toString());
+
         if (CommonUtils.isEmpty(contentType) || !contentType.startsWith(HttpConstants.TYPE_JSON)) {
             String error = "Bad request," + (CommonUtils.isEmpty(contentType)
                 ? " content type is missing"
@@ -251,24 +244,52 @@ public class GraphQLEndpoint extends HttpServlet {
         if (operationName != null) {
             contextBuilder.operationName(operationName);
         }
-        {
-            String apiCall = operationName;
-            //            if (!CommonUtils.isEmpty(apiCall)) {
-            //                if (variables != null) {
-            //                    apiCall += " (" + variables + ")";
-            //                }
-            //            }
-            String sessionId = GraphQLLoggerUtil.getSessionId(request);
-            String userId = GraphQLLoggerUtil.getUserId(request);
-            String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, variables);
-            if (apiCall != null) {
-                log.debug("API > " + apiCall + loggerMessage);
-            } else if (DEBUG) {
-                log.debug("API > " + query + loggerMessage);
-            }
+        String apiCall = operationName;
+        //            if (!CommonUtils.isEmpty(apiCall)) {
+        //                if (variables != null) {
+        //                    apiCall += " (" + variables + ")";
+        //                }
+        //            }
+        String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
+        WebSession webSession = GraphQLLoggerUtil.getWebSession(request);
+        String userId = GraphQLLoggerUtil.getUserId(request);
+        String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, variables);
+        if (apiCall != null) {
+            log.debug("API > " + apiCall + loggerMessage);
+        } else if (DEBUG) {
+            log.debug("API > " + query + loggerMessage);
         }
+        LocalDateTime startTime = LocalDateTime.now();
         ExecutionInput executionInput = contextBuilder.build();
-        ExecutionResult executionResult = graphQL.execute(executionInput);
+        ExecutionResult executionResult = null;
+        Boolean isSuccessful = null;
+        try {
+            executionResult = graphQL.execute(executionInput);
+        } catch (Exception e){
+            isSuccessful = false;
+            throw e;
+        } finally {
+            String qmSessionId = null;
+            if (webSession != null) {
+                qmSessionId = webSession.getAttribute(QMConstants.QM_SESSION_ID_ATTR);
+            }
+            Map<String, Object> params = new HashMap<>();
+            if (variables != null) {
+                params.putAll(variables);
+            }
+            params.put("sessionId", sessionId);
+            QMApiCallLogInfo qmApiCallLogInfo = QMApiCallLogInfo.builder()
+                .qmSessionId(qmSessionId)
+                .userName(userId)
+                .httpMethod(request.getMethod())
+                .isSuccessful(isSuccessful != null ? isSuccessful : executionResult != null && executionResult.getErrors().isEmpty())
+                .requestType(QMApiCallType.GRAPHQL)
+                .endpoint(apiCall)
+                .requestTime(startTime)
+                .parameters(params)
+                .build();
+            QMUtils.getDefaultHandler().handleActivityLog(qmApiCallLogInfo);
+        }
 
         Map<String, Object> resJSON = executionResult.toSpecification();
         String resString = gson.toJson(resJSON);
