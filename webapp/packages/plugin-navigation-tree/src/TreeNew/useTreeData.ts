@@ -97,6 +97,9 @@ export function useTreeData(options: IOptions): ITreeData {
       getChildren(nodeId: string): string[] {
         return childrenCache.get(nodeId).get();
       },
+      getUnfilteredChildren(nodeId: string): string[] {
+        return options.getChildren(nodeId);
+      },
       getParent(id: string): string | null {
         return parentCache.get(id).get();
       },

@@ -25,7 +25,7 @@ export const AuthenticationProvider = observer<Props>(function AuthenticationPro
   const action = useAuthenticationAction(props);
 
   if (action.authorized) {
-    return (props.children?.() as null) || null;
+    return props.children?.() || null;
   }
 
   return (
