@@ -22,11 +22,18 @@ export interface IThemeService extends Bootstrap {
   themeId: THEME_ID;
 }
 
+export type ThemeLoadersMap = Map<
+  THEME_ID,
+  Promise<{
+    default: typeof import('*.scss');
+  }>
+>;
+
 export interface ITheme {
   name: string;
   id: THEME_OPTIONS_ID;
   styles?: ClassCollection; // will be populated after execution ITheme.loader()
-  loader: () => Promise<Partial<Record<THEME_ID, ClassCollection>>>;
+  getLoadersMap: () => ThemeLoadersMap;
 }
 
 export interface IStyleRegistry {

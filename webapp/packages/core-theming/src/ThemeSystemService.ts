@@ -8,23 +8,17 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ThemeService } from './ThemeService.js';
-import { emptyTheme, THEME_OPTIONS_ID, UNKNOWN_SYSTEM_THEME_FALLBACK, type ITheme, type IThemeService, type THEME_ID } from './themes.js';
-import type { ClassCollection } from './themeUtils.js';
+import { THEME_OPTIONS_ID, UNKNOWN_SYSTEM_THEME_FALLBACK, type ITheme, type IThemeService, type THEME_ID, type ThemeLoadersMap } from './themes.js';
 import { action, computed, makeObservable, observable } from 'mobx';
 
 const SYSTEM_THEME: ITheme = {
   name: 'ui_system_theme',
   id: THEME_OPTIONS_ID.SYSTEM,
-  loader: async (): Promise<Partial<Record<THEME_ID, ClassCollection>>> => {
-    const lightImport = import('./styles/main/light.theme.scss');
-    const darkImport = import('./styles/main/dark.theme.scss');
-    const [lightTheme, darkTheme] = await Promise.all([lightImport, darkImport]);
-
-    return Promise.resolve({
-      light: lightTheme.default || emptyTheme,
-      dark: darkTheme.default || emptyTheme,
-    });
-  },
+  getLoadersMap: (): ThemeLoadersMap =>
+    new Map([
+      ['light', import('./styles/main/light.theme.scss')],
+      ['dark', import('./styles/main/dark.theme.scss')],
+    ]),
 };
 
 const SYSTEM_THEMES_QUERIES_MAP = new Map<THEME_OPTIONS_ID, string>([

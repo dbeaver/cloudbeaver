@@ -20,14 +20,15 @@ import './styles/main/typography.pure.scss';
 import './styles/UiIconButton.css';
 import './styles/UiSpinner.css';
 import './styles/UiInput.css';
-import { DEFAULT_THEME_ID, THEME_OPTIONS_ID, type IStyleRegistry, type ITheme, type IThemeService, type THEME_ID } from './themes.js';
+import { DEFAULT_THEME_ID, emptyTheme, THEME_OPTIONS_ID, type IStyleRegistry, type ITheme, type IThemeService, type THEME_ID } from './themes.js';
 import { ThemeSettingsService } from './ThemeSettingsService.js';
 import { computed, makeObservable, observable, reaction, type IReactionDisposer } from 'mobx';
 import { SyncExecutor, type ISyncExecutor } from '@cloudbeaver/core-executor';
 
 @injectable()
 export class ThemeService extends Bootstrap {
-  private themeServiceMap: Map<THEME_OPTIONS_ID, IThemeService>;
+  private readonly loadedThemes: Set<THEME_ID> = new Set();
+  private readonly themeServiceMap: Map<THEME_OPTIONS_ID, IThemeService>;
   private readonly stylesRegistry: Map<Style, IStyleRegistry[]> = new Map();
   private reactionDisposer: IReactionDisposer | null;
   readonly onChange: ISyncExecutor<THEME_ID>;
@@ -40,22 +41,22 @@ export class ThemeService extends Bootstrap {
     return this.themeSettingsService.theme;
   }
 
-  get currentThemeService(): IThemeService {
+  get currentThemeService(): IThemeService | undefined {
     let themeService = this.themeServiceMap.get(this.settingsThemeId);
 
     if (!themeService) {
-      themeService = this.themeServiceMap.get(DEFAULT_THEME_ID)!;
+      themeService = this.themeServiceMap.get(DEFAULT_THEME_ID);
     }
 
     return themeService;
   }
 
-  get currentTheme(): ITheme {
-    return this.currentThemeService.theme;
+  get currentTheme(): ITheme | undefined {
+    return this.currentThemeService?.theme;
   }
 
-  get themeId(): THEME_ID {
-    return this.currentThemeService.themeId;
+  get themeId(): THEME_ID | undefined {
+    return this.currentThemeService?.themeId;
   }
 
   constructor(private readonly themeSettingsService: ThemeSettingsService) {
@@ -157,16 +158,21 @@ export class ThemeService extends Bootstrap {
       throw new UIError(`Theme ${id} not found.`);
     }
 
-    const themesMap = await themeService.theme.loader();
+    const themesLoaderMap = themeService.theme.getLoadersMap();
 
     for (const themeService of this.themeServiceMap.values()) {
-      const styles = themesMap[themeService.themeId];
+      if (this.loadedThemes.has(themeService.themeId)) {
+        continue;
+      }
+
+      const styles = await themesLoaderMap.get(themeService.themeId);
 
       if (!styles) {
         throw new UIError(`Theme ${themeService.themeId} styles not found in ${id} theme.`);
       }
 
-      themeService.theme.styles = styles;
+      themeService.theme.styles = styles.default || emptyTheme;
+      this.loadedThemes.add(themeService.themeId);
     }
   }
 }

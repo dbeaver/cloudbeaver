@@ -8,20 +8,13 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ThemeService } from './ThemeService.js';
-import { THEME_OPTIONS_ID, type ITheme, type IThemeService, type THEME_ID } from './themes.js';
-import type { ClassCollection } from './themeUtils.js';
+import { THEME_OPTIONS_ID, type ITheme, type IThemeService, type THEME_ID, type ThemeLoadersMap } from './themes.js';
 import { computed, makeObservable, observable } from 'mobx';
 
 const DARK_THEME: ITheme = {
   name: 'ui_dark_theme',
   id: THEME_OPTIONS_ID.DARK,
-  loader: async (): Promise<Partial<Record<THEME_ID, ClassCollection>>> => {
-    const styles = await import('./styles/main/dark.theme.scss');
-
-    return {
-      dark: styles.default || {},
-    };
-  },
+  getLoadersMap: (): ThemeLoadersMap => new Map([['dark', import('./styles/main/dark.theme.scss')]]),
 };
 
 @injectable()
