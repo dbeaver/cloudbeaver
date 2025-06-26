@@ -147,7 +147,6 @@ public class GraphQLEndpoint extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String contentType = request.getContentType();
-
         if (CommonUtils.isEmpty(contentType) || !contentType.startsWith(HttpConstants.TYPE_JSON)) {
             String error = "Bad request," + (CommonUtils.isEmpty(contentType)
                 ? " content type is missing"
