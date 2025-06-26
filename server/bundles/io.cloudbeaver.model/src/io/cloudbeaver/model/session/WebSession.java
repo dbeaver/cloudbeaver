@@ -39,6 +39,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPEventListener;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.auth.*;
@@ -48,7 +49,6 @@ import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
-import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
@@ -108,6 +108,7 @@ public class WebSession extends BaseWebSession
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private final Map<String, DBWSessionHandler> sessionHandlers;
+    private final WebDataSourceConnectEventListener connectListener = new WebDataSourceConnectEventListener(this);
 
     public WebSession(
         @NotNull WebHttpRequestInfo requestInfo,
@@ -260,6 +261,11 @@ public class WebSession extends BaseWebSession
         }
         refreshUserData();
         clearSessionContext();
+    }
+
+    @NotNull
+    public DBPEventListener getDataSourceConnectListener() {
+        return connectListener;
     }
 
     private void initNavigatorModel() {
@@ -523,6 +529,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
+    @NotNull
     public WebAsyncTaskInfo asyncTaskStatus(String taskId, boolean removeOnFinish) throws DBWebException {
         synchronized (asyncTasks) {
             WebAsyncTaskInfo taskInfo = asyncTasks.get(taskId);
@@ -989,7 +996,7 @@ public class WebSession extends BaseWebSession
     }
 
     @NotNull
-    public DBPPreferenceStore getUserPreferenceStore() {
+    public WebSessionPreferenceStore getUserPreferenceStore() {
         return getUserContext().getPreferenceStore();
     }
 

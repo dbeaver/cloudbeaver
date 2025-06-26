@@ -48,7 +48,7 @@ export const CommonDialogHeader = observer<Props>(function CommonDialogHeader({
         <h3 className={s(computedStyles, { headerTitle: true })}>{translate(title)}</h3>
         {onReject && (
           <IconButton variant="secondary" size="small" aria-label="Close" onClick={onReject}>
-            <Icon name="cross" width={16} height={16}  />
+            <Icon name="cross" width={16} height={16} />
           </IconButton>
         )}
       </div>

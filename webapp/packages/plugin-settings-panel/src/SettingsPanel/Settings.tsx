@@ -50,6 +50,7 @@ export const Settings = observer<ISettingsProps>(function Settings({ source, acc
   const treeData = useTreeData({
     rootId: ROOT_SETTINGS_GROUP.id,
     childrenTransformers: [treeFilter.transformer],
+    stateTransformers: [treeFilter.stateTransformer],
     getNode(id) {
       const group = ROOT_SETTINGS_GROUP.get(id);
 
