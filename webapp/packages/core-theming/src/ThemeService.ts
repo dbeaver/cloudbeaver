@@ -22,15 +22,16 @@ import './styles/main/typography.pure.scss';
 import './styles/UiIconButton.css';
 import './styles/UiSpinner.css';
 import './styles/UiInput.css';
-import { DEFAULT_THEME_ID, themes } from './themes.js';
+import { DEFAULT_THEME_ID, THEME_ID, themes } from './themes.js';
 import { ThemeSettingsService } from './ThemeSettingsService.js';
 import type { ClassCollection } from './themeUtils.js';
+import { SystemThemeService } from './SystemThemeService.js';
 
 export interface ITheme {
   name: string;
-  id: string;
+  id: THEME_ID;
   styles?: ClassCollection; // will be populated after execution ITheme.loader()
-  loader: () => Promise<ClassCollection>;
+  loader: () => ClassCollection | Promise<ClassCollection>;
 }
 
 export interface IStyleRegistry {
@@ -45,7 +46,13 @@ export class ThemeService extends Bootstrap {
   }
 
   get themeId(): string {
-    return this.themeSettingsService.theme;
+    const themeId = this.themeSettingsService.theme;
+
+    if (themeId === THEME_ID.SYSTEM) {
+      return this.systemThemeService.systemThemeId;
+    }
+
+    return themeId;
   }
 
   get currentTheme(): ITheme {
@@ -64,7 +71,10 @@ export class ThemeService extends Bootstrap {
   private readonly themeMap: Map<string, ITheme> = new Map();
   private reactionDisposer: IReactionDisposer | null;
 
-  constructor(private readonly themeSettingsService: ThemeSettingsService) {
+  constructor(
+    private readonly themeSettingsService: ThemeSettingsService,
+    private readonly systemThemeService: SystemThemeService,
+  ) {
     super();
 
     this.reactionDisposer = null;
