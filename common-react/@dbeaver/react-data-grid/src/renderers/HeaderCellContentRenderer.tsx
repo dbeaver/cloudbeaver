@@ -1,4 +1,4 @@
-import { memo, use, useRef } from 'react';
+import { memo, use } from 'react';
 import { useDrag, useDrop, type DnDStoreProvider } from '@dbeaver/react-dnd';
 import { DataGridCellHeaderContext } from '../DataGridHeaderCellContext.js';
 import { useGridReactiveValue } from '../useGridReactiveValue.js';
@@ -8,9 +8,6 @@ import { OrderButton } from './OrderButton.js';
 interface Props {
   colIdx: number;
   tabIndex?: number;
-}
-export interface OrderButtonRef {
-  sort: (event: React.KeyboardEvent<HTMLElement>) => void;
 }
 
 export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer({ colIdx, tabIndex }: Props) {
@@ -22,8 +19,6 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
   const onColumnSort = cellHeaderContext?.onColumnSort;
   const onHeaderKeyDown = cellHeaderContext?.onHeaderKeyDown;
   const sortingState = useGridReactiveValue(cellHeaderContext?.columnSortingState, colIdx);
-
-  const orderButtonRef = useRef<OrderButtonRef>(null);
 
   const draggable = dndHeaderContext?.getCanDrag?.(colIdx) ?? false;
   const drag = useDrag({
@@ -59,12 +54,19 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
     },
   });
 
+  function handleSort(e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) {
+    if (!onColumnSort) return;
+
+    const nextSortState = sortingState === 'asc' ? 'desc' : sortingState === 'desc' ? null : 'asc';
+    onColumnSort(colIdx, nextSortState, e.ctrlKey || e.metaKey);
+  }
+
   function onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
     onHeaderKeyDown?.(event);
 
     if ((event.key === 'Enter' || event.key === ' ') && isColumnSortable && onColumnSort) {
       event.preventDefault();
-      orderButtonRef.current?.sort(event);
+      handleSort(event);
     }
   }
 
@@ -77,7 +79,7 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
       {...drop.props}
     >
       <span className="tw:overflow-hidden tw:text-ellipsis">{headerElement ?? getHeaderText ?? ''}</span>
-      {isColumnSortable && onColumnSort && <OrderButton ref={orderButtonRef} colIdx={colIdx} sortState={sortingState} onSort={onColumnSort} />}
+      {isColumnSortable && onColumnSort && <OrderButton sortState={sortingState} onClick={handleSort} />}
     </div>
   );
 });
