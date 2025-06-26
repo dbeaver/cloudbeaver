@@ -77,6 +77,10 @@ public class GraphQLEndpoint extends HttpServlet {
         .create();
     private GraphQLBindingContext bindingContext;
 
+    private static final Set<String> SENSITIVE_KEYWORDS = Set.of(
+        "password", "token", "secret", "key", "auth"
+    );
+
     public GraphQLEndpoint(Instrumentation instrumentation) {
         GraphQLSchema schema = buildSchema();
 
@@ -250,45 +254,15 @@ public class GraphQLEndpoint extends HttpServlet {
         //                    apiCall += " (" + variables + ")";
         //                }
         //            }
-        String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
-        WebSession webSession = GraphQLLoggerUtil.getWebSession(request);
-        String userId = GraphQLLoggerUtil.getUserId(request);
-        String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, variables);
-        if (apiCall != null) {
-            log.debug("API > " + apiCall + loggerMessage);
-        } else if (DEBUG) {
-            log.debug("API > " + query + loggerMessage);
-        }
         LocalDateTime startTime = LocalDateTime.now();
         ExecutionInput executionInput = contextBuilder.build();
         ExecutionResult executionResult = null;
-        Boolean isSuccessful = null;
         try {
             executionResult = graphQL.execute(executionInput);
         } catch (Exception e){
-            isSuccessful = false;
             throw e;
         } finally {
-            String qmSessionId = null;
-            if (webSession != null) {
-                qmSessionId = webSession.getAttribute(QMConstants.QM_SESSION_ID_ATTR);
-            }
-            Map<String, Object> params = new HashMap<>();
-            if (variables != null) {
-                params.putAll(variables);
-            }
-            params.put("sessionId", sessionId);
-            QMApiCallLogInfo qmApiCallLogInfo = QMApiCallLogInfo.builder()
-                .qmSessionId(qmSessionId)
-                .userName(userId)
-                .httpMethod(request.getMethod())
-                .isSuccessful(isSuccessful != null ? isSuccessful : executionResult != null && executionResult.getErrors().isEmpty())
-                .requestType(QMApiCallType.GRAPHQL)
-                .endpoint(apiCall)
-                .requestTime(startTime)
-                .parameters(params)
-                .build();
-            QMUtils.getDefaultHandler().handleActivityLog(qmApiCallLogInfo);
+            logApiCall(request, variables, apiCall, startTime, executionResult);
         }
 
         Map<String, Object> resJSON = executionResult.toSpecification();
@@ -296,6 +270,66 @@ public class GraphQLEndpoint extends HttpServlet {
         setDevelHeaders(request, response);
         response.setContentType(GraphQLConstants.CONTENT_TYPE_JSON_UTF8);
         response.getWriter().print(resString);
+    }
+
+    private void logApiCall(
+        HttpServletRequest request,
+        Map<String, Object> variables,
+        String apiCall,
+        LocalDateTime startTime,
+        ExecutionResult executionResult
+    ) {
+        String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
+        WebSession webSession = GraphQLLoggerUtil.getWebSession(request);
+        String userId = GraphQLLoggerUtil.getUserId(request);
+        String qmSessionId = null;
+        if (webSession != null) {
+            qmSessionId = webSession.getAttribute(QMConstants.QM_SESSION_ID_ATTR);
+        }
+        Map<String, Object> params = new HashMap<>();
+        if (variables != null) {
+            Object filteredVariables = filterSensitive(variables);
+            if (filteredVariables instanceof Map filteredVariablesMap) {
+                params.putAll(filteredVariablesMap);
+            }
+        }
+        params.put("sessionId", sessionId);
+        QMApiCallLogInfo qmApiCallLogInfo = QMApiCallLogInfo.builder()
+            .qmSessionId(qmSessionId)
+            .userName(userId)
+            .httpMethod(request.getMethod())
+            .isSuccessful(executionResult != null && executionResult.getErrors().isEmpty())
+            .requestType(QMApiCallType.GRAPHQL)
+            .endpoint(apiCall)
+            .requestTime(startTime)
+            .parameters(params)
+            .build();
+        QMUtils.getDefaultHandler().handleActivityLog(qmApiCallLogInfo);
+    }
+
+    private Object filterSensitive(Object value) {
+        if (value instanceof Map<?, ?> mapValue) {
+            Map<String, Object> filtered = new HashMap<>();
+            for (Map.Entry<?, ?> entry : mapValue.entrySet()) {
+                String key = String.valueOf(entry.getKey());
+                String keyLower = key.toLowerCase();
+                boolean isSensitive = SENSITIVE_KEYWORDS.stream().anyMatch(keyLower::contains);
+                if (isSensitive) {
+                    filtered.put(key, "********");
+                } else {
+                    filtered.put(key, filterSensitive(entry.getValue()));
+                }
+            }
+            return filtered;
+        } else if (value instanceof List<?> listValue) {
+            List<Object> filtered = new ArrayList<>();
+            for (Object item : listValue) {
+                filtered.add(filterSensitive(item));
+            }
+            return filtered;
+        } else {
+            return value;
+        }
     }
 
     private static class WebExecutionStrategy extends AsyncExecutionStrategy {
