@@ -37,10 +37,15 @@ export const TableIndexColumnHeader = observer(function TableIndexColumnHeader()
 
   return (
     <>
-      <div role="button" title={translate('data_grid_table_index_column_tooltip')} className={s(styles, { container: true })} onClick={handleClick} />
       {readonly && (
         <IconOrImage title={translate('data_grid_table_readonly_tooltip')} icon="/icons/lock.png" className={s(styles, { iconOrImage: true })} />
       )}
+      <div
+        role="button"
+        title={translate('data_grid_table_index_column_tooltip')}
+        className={s(styles, { clickAreaOverlay: true })}
+        onClick={handleClick}
+      />
     </>
   );
 });
