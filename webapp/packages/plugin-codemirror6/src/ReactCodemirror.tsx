@@ -13,13 +13,13 @@ import { forwardRef, useImperativeHandle, useLayoutEffect, useMemo, useRef, useS
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 
-import { hasInsertProperty } from './hasInsertProperty.js';
 import type { IEditorRef } from './IEditorRef.js';
 import type { IReactCodeMirrorProps } from './IReactCodemirrorProps.js';
 import { type IReactCodemirrorContext, ReactCodemirrorContext } from './ReactCodemirrorContext.js';
 import { useCodemirrorExtensions } from './useCodemirrorExtensions.js';
 import { validateCursorBoundaries } from './validateCursorBoundaries.js';
 import { ReactCodemirrorSearchPanel } from './ReactCodemirrorSearchPanel.js';
+import { hasInsertProperty } from './hasInsertProperty.js';
 
 const External = Annotation.define<boolean>();
 
@@ -67,16 +67,16 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
       if (container) {
         const updateListener = EditorView.updateListener.of((update: ViewUpdate) => {
           const remote = update.transactions.some(tr => tr.annotation(External));
+          const selection = update.state.selection.main;
 
           if (update.docChanged && !remote) {
             const doc = update.state.doc;
             const value = doc.toString();
 
-            callbackRef.onChange?.(value, update);
+            callbackRef.onChange?.(value, selection, update);
           }
 
           if (update.selectionSet && !remote) {
-            const selection = update.state.selection.main;
             callbackRef.onCursorChange?.(selection, update);
           }
 
@@ -221,8 +221,12 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
           };
         }
 
-        if (transaction.changes || transaction.selection) {
-          view.dispatch(transaction);
+        if (transaction.changes) {
+          view.dispatch({ changes: transaction.changes });
+        }
+
+        if (transaction.selection) {
+          view.dispatch({ selection: transaction.selection });
         }
       }
     });
