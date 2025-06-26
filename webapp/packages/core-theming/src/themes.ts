@@ -32,7 +32,7 @@ export type ThemeLoadersMap = Map<
 export interface ITheme {
   name: string;
   id: THEME_OPTIONS_ID;
-  styles?: ClassCollection; // will be populated after execution ITheme.loader()
+  styles?: ClassCollection; // will be populated after execution ITheme.getLoadersMap()
   getLoadersMap: () => ThemeLoadersMap;
 }
 
@@ -43,4 +43,3 @@ export interface IStyleRegistry {
 
 export type THEME_ID = 'light' | 'dark';
 export const DEFAULT_THEME_ID = THEME_OPTIONS_ID.SYSTEM;
-export const UNKNOWN_SYSTEM_THEME_FALLBACK: THEME_ID = 'light';

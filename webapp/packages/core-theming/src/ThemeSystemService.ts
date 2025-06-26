@@ -8,7 +8,7 @@
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ThemeService } from './ThemeService.js';
-import { THEME_OPTIONS_ID, UNKNOWN_SYSTEM_THEME_FALLBACK, type ITheme, type IThemeService, type THEME_ID, type ThemeLoadersMap } from './themes.js';
+import { THEME_OPTIONS_ID, type ITheme, type IThemeService, type THEME_ID, type ThemeLoadersMap } from './themes.js';
 import { action, computed, makeObservable, observable } from 'mobx';
 
 const SYSTEM_THEME: ITheme = {
@@ -25,6 +25,8 @@ const SYSTEM_THEMES_QUERIES_MAP = new Map<THEME_OPTIONS_ID, string>([
   [THEME_OPTIONS_ID.DARK, '(prefers-color-scheme: dark)'],
   [THEME_OPTIONS_ID.LIGHT, '(prefers-color-scheme: light)'],
 ]);
+
+const UNKNOWN_SYSTEM_THEME_FALLBACK: THEME_ID = 'light';
 
 @injectable()
 export class ThemeSystemService extends Bootstrap implements IThemeService {
