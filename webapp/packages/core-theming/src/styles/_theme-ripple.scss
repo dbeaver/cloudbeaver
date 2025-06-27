@@ -11,14 +11,14 @@
   .theme-ripple {
     @include mdc-states($color, $query: $query);
 
-    &[aria-expanded="true"] {
+    &[aria-expanded='true'] {
       &::before {
         opacity: mdc-states-opacity($color, focus) + mdc-states-opacity($color, hover);
       }
     }
 
     &.theme-ripple-selectable {
-      &[aria-selected=true] {
+      &[aria-selected='true'] {
         &::before {
           opacity: mdc-states-opacity($color, focus) + mdc-states-opacity($color, hover);
         }
@@ -48,7 +48,6 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-        pointer-events: none;
       }
     }
 
@@ -60,8 +59,8 @@
         &:hover {
           @include mdc-theme-prop(color, text-primary-on-light, false);
         }
-        
-        &[aria-selected=true] {
+
+        &[aria-selected='true'] {
           @include mdc-theme-prop(background-color, surface, false);
           @include mdc-theme-prop(color, text-primary-on-light, false);
 
@@ -80,8 +79,8 @@
         &:hover {
           @include mdc-theme-prop(color, text-primary-on-light, false);
         }
-        
-        &[aria-selected=true] {
+
+        &[aria-selected='true'] {
           @include mdc-theme-prop(background-color, surface, false);
           @include mdc-theme-prop(color, text-primary-on-light, false);
 
@@ -100,8 +99,8 @@
         &:hover {
           @include mdc-theme-prop(color, text-primary-on-light, false);
         }
-        
-        &[aria-selected=true] {
+
+        &[aria-selected='true'] {
           @include mdc-theme-prop(background-color, surface, false);
           @include mdc-theme-prop(color, text-primary-on-light, false);
 
