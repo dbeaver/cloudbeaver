@@ -354,10 +354,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     ) throws DBWebException {
         webSession.addInfoMessage("Set user parameter - " + name);
         try {
-            String serializedValue = value == null ? null : value.toString();
-            if (webSession.getUser() != null) {
-                webSession.getSecurityController().setCurrentUserParameter(name, serializedValue);
-            }
             var params = new HashMap<String, Object>();
             params.put(name, value);
             webSession.getUserContext().getPreferenceStore().updatePreferenceValues(params);
@@ -376,9 +372,6 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             throw new DBWebException("Preferences cannot be changed for anonymous user");
         }
         try {
-            if (webSession.getUser() != null) {
-                webSession.getSecurityController().setCurrentUserParameters(parameters);
-            }
             webSession.getUserContext().getPreferenceStore().updatePreferenceValues(parameters);
             return new WebUserInfo(webSession, webSession.getUser());
         } catch (DBException e) {

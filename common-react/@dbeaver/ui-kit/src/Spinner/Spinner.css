@@ -38,10 +38,12 @@
     stroke-linecap: var(--dbv-kit-spinner-stroke-linecap);
 
     animation: var(--dbv-kit-animate-spin);
+    animation-delay: var(--dbv-kit-spinner-animation-delay);
   }
 
   .dbv-kit-spinner__circle {
     animation: var(--dbv-kit-animate-stroke);
+    animation-delay: var(--dbv-kit-spinner-animation-delay);
 
     @media screen and (prefers-reduced-motion: reduce) {
       animation: none;
