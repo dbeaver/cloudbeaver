@@ -7,32 +7,73 @@
  */
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { THEME_ID } from './themes.js';
-import { computed, makeObservable, observable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
+import { ThemeService, type ITheme } from './ThemeService.js';
+import { ROOT_SETTINGS_LAYER, SettingsResolverService } from '@cloudbeaver/core-settings';
+import { SyncExecutor } from '@cloudbeaver/core-executor';
 
 const DARK_QUERY = '(prefers-color-scheme: dark)';
 const LIGHT_QUERY = '(prefers-color-scheme: light)';
 
 @injectable()
 export class SystemThemeService extends Bootstrap {
-  private themeId: THEME_ID;
+  private dynamicTheme: ITheme;
 
-  constructor() {
+  constructor(
+    private readonly themeService: ThemeService,
+    private readonly settingsResolverService: SettingsResolverService,
+  ) {
     super();
-    this.themeId = this.getThemeId();
+    this.dynamicTheme = this.getDynamicTheme();
 
-    makeObservable<this, 'themeId'>(this, {
-      themeId: observable.ref,
-      systemThemeId: computed,
+    makeObservable<this, 'dynamicTheme'>(this, {
+      dynamicTheme: observable.ref,
     });
   }
 
-  get systemThemeId(): THEME_ID {
-    return this.themeId;
-  }
-
   override register(): void | Promise<void> {
+    const systemThemeService = this;
+    this.themeService.addTheme({
+      id: 'system',
+      name: 'System Theme',
+      get class(): string {
+        return systemThemeService.dynamicTheme!.class;
+      },
+      loaded: false,
+      async loader() {
+        await systemThemeService.themeService.loadTheme(systemThemeService.dynamicTheme.id);
+      },
+    });
     this.subscribeSystemThemeChange();
+
+    this.settingsResolverService.addResolver(ROOT_SETTINGS_LAYER, {
+      onChange: new SyncExecutor(),
+      has: function (key: any): boolean {
+        return key === 'core.theming.theme';
+      },
+      isEdited: function (key?: any): boolean {
+        return false;
+      },
+      isReadOnly: function (key: any): boolean {
+        return true;
+      },
+      getValue: function (key: any) {
+        if (key === 'core.theming.theme') {
+          return 'system';
+        }
+        return undefined;
+      },
+      getEditedValue: function (key: any) {
+        if (key === 'core.theming.theme') {
+          return 'system';
+        }
+        return undefined;
+      },
+      setValue: function (key: any, value: any): void {},
+      save: async function (): Promise<void> {},
+      clear: function (): void {},
+    });
+    this.unsubscribeSystemThemeChange();
   }
 
   override dispose(): void {
@@ -50,23 +91,23 @@ export class SystemThemeService extends Bootstrap {
   }
 
   private handleSystemThemeChange(): void {
-    this.themeId = this.getThemeId();
+    this.dynamicTheme = this.getDynamicTheme();
+    this.themeService.loadTheme(this.dynamicTheme.id);
   }
 
-  private getThemeId(): THEME_ID {
+  private getDynamicTheme(): ITheme {
     const isDark = window.matchMedia(DARK_QUERY).matches;
     const isLight = window.matchMedia(LIGHT_QUERY).matches;
 
     switch (true) {
       case isDark:
-        return THEME_ID.DARK;
+        return this.themeService.themes.find(theme => theme.id === 'dark') || this.themeService.themes[0]!;
       case isLight:
-        return THEME_ID.LIGHT;
+        return this.themeService.themes.find(theme => theme.id === 'light') || this.themeService.themes[0]!;
       default:
         break;
     }
 
-    // fallback to light theme if no theme is detected
-    return THEME_ID.LIGHT;
+    return this.themeService.themes[0]!;
   }
 }

@@ -6,37 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 import type { ITheme } from './ThemeService.js';
-import type { ClassCollection } from './themeUtils.js';
-
-const emptyTheme = {};
-export enum THEME_ID {
-  LIGHT = 'light',
-  DARK = 'dark',
-  SYSTEM = 'system',
-}
 
 export const themes: ITheme[] = [
   {
     name: 'ui_light_theme',
-    id: THEME_ID.LIGHT,
-    loader: async (): Promise<ClassCollection> => {
-      const styles = await import('./styles/main/light.theme.scss');
-      return styles.default || emptyTheme;
+    id: 'light',
+    class: 'light',
+    loaded: false,
+    loader: async (): Promise<void> => {
+      await import('./styles/main/light.theme.scss');
     },
   },
   {
     name: 'ui_dark_theme',
-    id: THEME_ID.DARK,
-    loader: async (): Promise<ClassCollection> => {
-      const styles = await import('./styles/main/dark.theme.scss');
-      return styles.default || emptyTheme;
+    id: 'dark',
+    class: 'dark',
+    loaded: false,
+    loader: async (): Promise<void> => {
+      await import('./styles/main/dark.theme.scss');
     },
-  },
-  {
-    name: 'ui_system_theme',
-    id: THEME_ID.SYSTEM,
-    loader: () => emptyTheme,
   },
 ];
 
-export const DEFAULT_THEME_ID = THEME_ID.SYSTEM;
+export const FALLBACK_THEME_ID = themes[0]!.id;
