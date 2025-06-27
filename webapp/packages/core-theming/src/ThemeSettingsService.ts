@@ -22,6 +22,7 @@ const settingsSchema = schema.object({
 });
 
 export type IThemeSettings = schema.infer<typeof settingsSchema>;
+export type IThemeSettingsKey = keyof IThemeSettings;
 
 @injectable()
 export class ThemeSettingsService {

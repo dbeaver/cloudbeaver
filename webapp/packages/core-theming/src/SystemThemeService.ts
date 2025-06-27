@@ -11,6 +11,7 @@ import { makeObservable, observable } from 'mobx';
 import { ThemeService, type ITheme } from './ThemeService.js';
 import { ROOT_SETTINGS_LAYER, SettingsResolverService } from '@cloudbeaver/core-settings';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
+import type { IThemeSettingsKey } from './ThemeSettingsService.js';
 
 const DARK_QUERY = '(prefers-color-scheme: dark)';
 
@@ -51,28 +52,28 @@ export class SystemThemeService extends Bootstrap {
 
     this.settingsResolverService.addResolver(ROOT_SETTINGS_LAYER, {
       onChange: new SyncExecutor(),
-      has: function (key: any): boolean {
+      has: function (key: IThemeSettingsKey): boolean {
         return key === 'core.theming.theme';
       },
-      isEdited: function (key?: any): boolean {
+      isEdited: function (key?: IThemeSettingsKey): boolean {
         return false;
       },
-      isReadOnly: function (key: any): boolean {
+      isReadOnly: function (key: IThemeSettingsKey): boolean {
         return true;
       },
-      getValue: function (key: any) {
+      getValue: function (key: IThemeSettingsKey) {
         if (key === 'core.theming.theme') {
           return 'system';
         }
         return undefined;
       },
-      getEditedValue: function (key: any) {
+      getEditedValue: function (key: IThemeSettingsKey) {
         if (key === 'core.theming.theme') {
           return 'system';
         }
         return undefined;
       },
-      setValue: function (key: any, value: any): void {},
+      setValue: function (key: IThemeSettingsKey, value: any): void {},
       save: async function (): Promise<void> {},
       clear: function (): void {},
     });
