@@ -10,7 +10,8 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { THEME_ID } from './themes.js';
 import { computed, makeObservable, observable } from 'mobx';
 
-const QUERY_SYSTEM_THEME_SET = new Set<string>(['(prefers-color-scheme: dark)', '(prefers-color-scheme: light)']);
+const DARK_QUERY = '(prefers-color-scheme: dark)';
+const LIGHT_QUERY = '(prefers-color-scheme: light)';
 
 @injectable()
 export class SystemThemeService extends Bootstrap {
@@ -39,17 +40,13 @@ export class SystemThemeService extends Bootstrap {
   }
 
   private unsubscribeSystemThemeChange(): void {
-    for (const query of QUERY_SYSTEM_THEME_SET) {
-      const mediaQuery = window.matchMedia(query);
-      mediaQuery.removeEventListener('change', this.handleSystemThemeChange.bind(this));
-    }
+    window.matchMedia(DARK_QUERY).removeEventListener('change', this.handleSystemThemeChange.bind(this));
+    window.matchMedia(LIGHT_QUERY).removeEventListener('change', this.handleSystemThemeChange.bind(this));
   }
 
   private subscribeSystemThemeChange(): void {
-    for (const query of QUERY_SYSTEM_THEME_SET) {
-      const mediaQuery = window.matchMedia(query);
-      mediaQuery.addEventListener('change', this.handleSystemThemeChange.bind(this));
-    }
+    window.matchMedia(DARK_QUERY).addEventListener('change', this.handleSystemThemeChange.bind(this));
+    window.matchMedia(LIGHT_QUERY).addEventListener('change', this.handleSystemThemeChange.bind(this));
   }
 
   private handleSystemThemeChange(): void {
@@ -57,8 +54,8 @@ export class SystemThemeService extends Bootstrap {
   }
 
   private getThemeId(): THEME_ID {
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const isLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+    const isDark = window.matchMedia(DARK_QUERY).matches;
+    const isLight = window.matchMedia(LIGHT_QUERY).matches;
 
     switch (true) {
       case isDark:
