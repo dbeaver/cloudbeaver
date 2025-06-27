@@ -35,29 +35,33 @@ type DataTransferDefaultExportSettings {
 }
 
 input DataTransferParameters {
-    # Processor ID
+    "Processor ID"
     processorId: ID!
-    # General settings:
-    #   - openNewConnection: opens new database connection for data transfer task
+    """
+    General settings:
+    - openNewConnection: opens new database connection for data transfer task
+    """
     settings: Object
-    # Processor properties. See DataTransferProcessorInfo.properties
+    "Processor properties. See DataTransferProcessorInfo.properties"
     processorProperties: Object!
-    # Consumer properties. See StreamConsumerSettings
+    "Consumer properties. See StreamConsumerSettings"
     outputSettings: DataTransferOutputSettingsInput
-    # Data filter settings
+    "Data filter settings"
     filter: SQLDataFilter
 }
 
 extend type Query {
 
-    # Available transfer processors
+    "Returns available transfer processors for data transfer export"
     dataTransferAvailableStreamProcessors: [ DataTransferProcessorInfo! ]!
 
-    # Available transfer processors for import file
+    "Returns available transfer processors for data transfer import"
     dataTransferAvailableImportStreamProcessors: [ DataTransferProcessorInfo! ]!
 
+    "Returns default export settings for data transfer"
     dataTransferDefaultExportSettings: DataTransferDefaultExportSettings!
 
+    "Creates async task for data transfer export from the container node path"
     dataTransferExportDataFromContainer(
         projectId: ID,
         connectionId: ID!,
@@ -65,6 +69,7 @@ extend type Query {
         parameters: DataTransferParameters!
     ): AsyncTaskInfo!
 
+    "Creates async task for data transfer export from results"
     dataTransferExportDataFromResults(
         projectId: ID,
         connectionId: ID!,
@@ -73,6 +78,7 @@ extend type Query {
         parameters: DataTransferParameters!
     ): AsyncTaskInfo!
 
+    "Deletes data transfer file by ID"
     dataTransferRemoveDataFile(dataFileId: String!): Boolean @deprecated(reason: "25.0.1")
 
 }
