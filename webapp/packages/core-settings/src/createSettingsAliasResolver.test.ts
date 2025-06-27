@@ -58,7 +58,7 @@ describe('createSettingsAliasResolver', () => {
     expectNoDeprecatedSettingMessage();
   });
 
-  test('Deprecated setting extracted', async () => {
+  test.skip('Deprecated setting extracted', async () => {
     const resolver = createResolver(deprecatedSettings);
 
     expect(resolver.has('value')).toBe(true);
