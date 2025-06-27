@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { forwardRef } from 'react';
 
@@ -51,39 +51,38 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
     const styles = useS(style);
     const handlersRef = useObjectRef(handlers);
 
-    async function processAction(action: () => Promise<void>) {
-      nodeContext.inProgress++;
-
-      try {
-        await action();
-      } finally {
-        nodeContext.inProgress--;
-      }
-    }
-
     const nodeContext = useObservableRef<IInnerTreeNodeContext>(
       () => ({
         get processing() {
           return this.inProgress > 0;
         },
         inProgress: 0,
+        async processAction(action: () => Promise<void>) {
+          this.inProgress++;
+
+          try {
+            await action();
+          } finally {
+            this.inProgress--;
+          }
+        },
         async click() {
-          await processAction(async () => {
+          await this.processAction(async () => {
             await handlersRef.onClick?.(this.leaf);
           });
         },
         async expand() {
-          await processAction(async () => {
+          await this.processAction(async () => {
             await handlersRef.onExpand?.();
           });
         },
         async select(multiple?: boolean, nested?: boolean) {
-          await processAction(async () => {
+          await this.processAction(async () => {
             await handlersRef.onSelect?.(multiple, nested);
           });
         },
         async open() {
-          await processAction(async () => {
+          await this.processAction(async () => {
             await handlersRef.onOpen?.(this.leaf);
           });
         },
@@ -100,6 +99,7 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
         externalExpanded: observable.ref,
         showInFilter: observable.ref,
         leaf: observable.ref,
+        processAction: action.bound,
       },
       {
         group,
