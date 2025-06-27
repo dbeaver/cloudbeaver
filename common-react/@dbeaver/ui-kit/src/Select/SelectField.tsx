@@ -84,7 +84,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   itemRender,
   itemDisabled,
   label,
-  noItemsPlaceholder,
+  noItemsPlaceholder = 'No items',
   description,
   disabled,
   required,
