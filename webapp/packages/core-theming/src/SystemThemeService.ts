@@ -13,11 +13,11 @@ import { ROOT_SETTINGS_LAYER, SettingsResolverService } from '@cloudbeaver/core-
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 
 const DARK_QUERY = '(prefers-color-scheme: dark)';
-const LIGHT_QUERY = '(prefers-color-scheme: light)';
 
 @injectable()
 export class SystemThemeService extends Bootstrap {
   private dynamicTheme: ITheme;
+  private readonly mediaQueryList: MediaQueryList;
 
   constructor(
     private readonly themeService: ThemeService,
@@ -25,6 +25,8 @@ export class SystemThemeService extends Bootstrap {
   ) {
     super();
     this.dynamicTheme = this.getDynamicTheme();
+    this.handleSystemThemeChange = this.handleSystemThemeChange.bind(this);
+    this.mediaQueryList = window.matchMedia(DARK_QUERY);
 
     makeObservable<this, 'dynamicTheme'>(this, {
       dynamicTheme: observable.ref,
@@ -35,7 +37,7 @@ export class SystemThemeService extends Bootstrap {
     const systemThemeService = this;
     this.themeService.addTheme({
       id: 'system',
-      name: 'System Theme',
+      name: 'ui_system_theme',
       get class(): string {
         return systemThemeService.dynamicTheme!.class;
       },
@@ -44,6 +46,7 @@ export class SystemThemeService extends Bootstrap {
         await systemThemeService.themeService.loadTheme(systemThemeService.dynamicTheme.id);
       },
     });
+
     this.subscribeSystemThemeChange();
 
     this.settingsResolverService.addResolver(ROOT_SETTINGS_LAYER, {
@@ -73,7 +76,6 @@ export class SystemThemeService extends Bootstrap {
       save: async function (): Promise<void> {},
       clear: function (): void {},
     });
-    this.unsubscribeSystemThemeChange();
   }
 
   override dispose(): void {
@@ -81,13 +83,11 @@ export class SystemThemeService extends Bootstrap {
   }
 
   private unsubscribeSystemThemeChange(): void {
-    window.matchMedia(DARK_QUERY).removeEventListener('change', this.handleSystemThemeChange.bind(this));
-    window.matchMedia(LIGHT_QUERY).removeEventListener('change', this.handleSystemThemeChange.bind(this));
+    this.mediaQueryList.removeEventListener('change', this.handleSystemThemeChange);
   }
 
   private subscribeSystemThemeChange(): void {
-    window.matchMedia(DARK_QUERY).addEventListener('change', this.handleSystemThemeChange.bind(this));
-    window.matchMedia(LIGHT_QUERY).addEventListener('change', this.handleSystemThemeChange.bind(this));
+    this.mediaQueryList.addEventListener('change', this.handleSystemThemeChange);
   }
 
   private handleSystemThemeChange(): void {
@@ -97,17 +97,11 @@ export class SystemThemeService extends Bootstrap {
 
   private getDynamicTheme(): ITheme {
     const isDark = window.matchMedia(DARK_QUERY).matches;
-    const isLight = window.matchMedia(LIGHT_QUERY).matches;
 
-    switch (true) {
-      case isDark:
-        return this.themeService.themes.find(theme => theme.id === 'dark') || this.themeService.themes[0]!;
-      case isLight:
-        return this.themeService.themes.find(theme => theme.id === 'light') || this.themeService.themes[0]!;
-      default:
-        break;
+    if (isDark) {
+      return this.themeService.themes.find(theme => theme.id === 'dark') || this.themeService.themes[0]!;
     }
 
-    return this.themeService.themes[0]!;
+    return this.themeService.themes.find(theme => theme.id === 'light') || this.themeService.themes[0]!;
   }
 }
