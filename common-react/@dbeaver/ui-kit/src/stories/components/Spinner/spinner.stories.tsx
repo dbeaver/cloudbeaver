@@ -133,6 +133,10 @@ export function Tokens() {
           <code>--dbv-kit-spinner-animation-duration</code>: Controls the duration of the spinner's animation (default: 1.8s)
         </li>
         <li>
+          <code>--dbv-kit-spinner-animation-delay</code>: Controls the delay of the spinner's animation (default: -0.3s). This is used to start
+          spinner animation not from the small dot but with semi-filled circle, which looks better.
+        </li>
+        <li>
           <code>--dbv-kit-animate-stroke</code>: Defines the animation for the spinner's stroke
         </li>
         <li>

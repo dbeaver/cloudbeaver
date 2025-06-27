@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag.js';
 import { TableContext } from './TableContext.js';
 import { TableItemContext } from './TableItemContext.js';
 import style from './TableItemExpand.module.css';
+import { IconButton } from '@dbeaver/ui-kit';
 
 interface Props {
   onExpand?: (item: any, state: boolean) => void;
@@ -36,7 +37,7 @@ export const TableItemExpand = observer<Props>(function TableItemExpand({ onExpa
     throw new Error('TableContext must be provided');
   }
   const handleClick = useCallback(
-    (event: React.MouseEvent<HTMLInputElement>) => {
+    (event: React.MouseEvent<HTMLButtonElement>) => {
       if (disabled) {
         return;
       }
@@ -55,8 +56,8 @@ export const TableItemExpand = observer<Props>(function TableItemExpand({ onExpa
   );
 
   return (
-    <div className={s(styles, { tableItemExpandBox: true }, className)} title={translate('ui_expand')} onClick={handleClick}>
+    <IconButton size="small" aria-label={translate('ui_expand')} className={className} title={translate('ui_expand')} onClick={handleClick}>
       <Icon name="angle" viewBox="0 0 15 8" className={s(styles, { tableItemExpandBoxIcon: true, expanded: context.isExpanded() })} />
-    </div>
+    </IconButton>
   );
 });

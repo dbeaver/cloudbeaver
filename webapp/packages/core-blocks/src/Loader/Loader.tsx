@@ -16,10 +16,10 @@ import { ErrorBoundary } from '../ErrorBoundary.js';
 import { ExceptionMessage } from '../ExceptionMessage.js';
 import { Translate } from '../localization/Translate.js';
 import { s } from '../s.js';
-import { StaticImage } from '../StaticImage.js';
 import { useS } from '../useS.js';
 import styles from './Loader.module.css';
 import { type ILoaderContext, LoaderContext } from './LoaderContext.js';
+import { Spinner } from '@dbeaver/ui-kit';
 
 type LoaderState =
   | ILoadableState
@@ -54,13 +54,6 @@ interface Props {
   children?: (() => React.ReactNode) | React.ReactNode;
   onCancel?: () => void;
 }
-
-const spinnerType = {
-  primary: '/icons/spinner-primary.svg',
-  secondary: '/icons/spinner.svg',
-  primarySmall: '/icons/spinner-primary-small.svg',
-  secondarySmall: '/icons/spinner-small.svg',
-};
 
 export const Loader = observer<Props>(function Loader({
   cancelDisabled,
@@ -275,13 +268,8 @@ export const Loader = observer<Props>(function Loader({
     <LoaderContext.Provider value={contextState}>
       <>
         {overlay && renderWrappedChildren()}
-        <div ref={loaderRef} className={s(style, { loader: true, loaderOverlay: overlay, small, fullSize, inline, secondary, overlay }, className)}>
-          <div className={s(style, { icon: true })}>
-            <StaticImage icon={spinnerType.primary} className={s(style, { staticImage: true, primaryIcon: true })} />
-            <StaticImage icon={spinnerType.primarySmall} className={s(style, { staticImage: true, primarySmallIcon: true })} />
-            <StaticImage icon={spinnerType.secondary} className={s(style, { staticImage: true, secondaryIcon: true })} />
-            <StaticImage icon={spinnerType.secondarySmall} className={s(style, { staticImage: true, secondarySmallIcon: true })} />
-          </div>
+        <div ref={loaderRef} className={s(style, { loader: true, loaderOverlay: overlay, small, fullSize, inline }, className)}>
+          <Spinner className={s(style, { spinner: true, spinnerSecondary: secondary || overlay })} size={small ? 'small' : 'medium'} />
           {!hideMessage && (
             <div className={s(style, { message: true })}>
               <Translate token={message || 'ui_processing_loading'} />

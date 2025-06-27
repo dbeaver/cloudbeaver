@@ -3,7 +3,9 @@
 extend type Query {
 
     # Get child nodes
+    "Returns node DDL for the specified node ID"
     metadataGetNodeDDL(nodeId: ID!, options: Object): String
+    "Returns extended node DDL for the specified node ID (e.g., Oracle or MySQL package)"
     metadataGetNodeExtendedDDL(nodeId: ID!): String
 
 }
