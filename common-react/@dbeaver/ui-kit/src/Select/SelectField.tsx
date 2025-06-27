@@ -57,6 +57,8 @@ export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
 
   className?: string;
 
+  noItemsPlaceholder?: React.ReactNode;
+
   /**
    * Custom renderer for the selected value, overrides itemRenderer for the selected state
    * Only needed for special formatting of the selected value different from list items
@@ -82,6 +84,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   itemRender,
   itemDisabled,
   label,
+  noItemsPlaceholder,
   description,
   disabled,
   required,
@@ -130,7 +133,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
 
         <SelectPopover gutter={4} unmountOnHide>
           {items.length === 0 ? (
-            <div className="dbv-kit-select__empty">No items</div>
+            <div className="dbv-kit-select__empty">{noItemsPlaceholder}</div>
           ) : (
             items.map(item => (
               <SelectItem

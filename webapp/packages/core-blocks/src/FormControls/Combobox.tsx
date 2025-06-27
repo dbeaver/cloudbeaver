@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Menu, MenuButton, MenuItem, useMenuState } from 'reakit';
+import { useMenuState } from 'reakit';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
@@ -23,6 +23,7 @@ import { Field } from './Field.js';
 import { FieldDescription } from './FieldDescription.js';
 import { FieldLabel } from './FieldLabel.js';
 import { FormContext } from './FormContext.js';
+import { SelectField } from '@dbeaver/ui-kit';
 
 export type ComboboxBaseProps<TKey, TValue> = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -100,6 +101,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const context = useContext(FormContext);
   const menuRef = useRef<HTMLDivElement>(null);
   const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
+  const [, setOpen] = useState(false);
   const styles = useS(comboboxStyles);
 
   const menu = useMenuState({
@@ -113,7 +115,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
     searchable = true;
   }
 
-  const [searchValue, setSearchValue] = useState<string | null>(null);
+  const [searchValue, setSearchValue] = useState<string>('');
 
   const filteredItems = getComputed(() => {
     const result = items.filter(item => !searchValue || valueSelector(item).toUpperCase().includes(searchValue.toUpperCase()));
@@ -175,7 +177,8 @@ export const Combobox: ComboboxType = observer(function Combobox({
       if (context && changed) {
         context.change(id, name);
       }
-      setSearchValue(null);
+      setSearchValue('');
+      setOpen(false); // TODO delete it?
     },
     [value, state, name, menu, context, onSelect],
   );
@@ -187,7 +190,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
       }
 
       if (filteredItems.length === 0) {
-        setSearchValue(null);
+        setSearchValue('');
         return;
       }
 
@@ -202,7 +205,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
         if (input) {
           handleSelect(keySelector(filteredItems[0], filteredItemIndex));
         } else {
-          setSearchValue(null);
+          setSearchValue('');
         }
       }
     },
@@ -254,34 +257,49 @@ export const Combobox: ComboboxType = observer(function Combobox({
     };
   }, [inputRef]);
 
-  const icon = selectedItem && iconSelector?.(selectedItem);
+  // const icon = selectedItem && iconSelector?.(selectedItem);
   const focus = menu.visible;
   const select = !searchable;
 
   if (loading && items.length === 0) {
     inputValue = translate('ui_processing_loading');
   }
+  
+  const renderIcon = (item: any) => {
+    if (iconSelector && iconSelector(item)) {
+      return (
+        <div className={s(styles, { inputIcon: true })}>
+          {loading ? (
+            <Loader small fullSize />
+          ) : typeof iconSelector(item) === 'string' ? (
+            <IconOrImage icon={iconSelector(item) as string} className={s(styles, { iconOrImage: true })} />
+          ) : (
+            iconSelector(item)
+          )}
+        </div>
+      )
+    }
 
-  return (
-    <Field {...layoutProps} className={s(styles, { field: true, inline }, className)}>
-      {children && (
-        <FieldLabel required={rest.required} title={title} className={s(styles, { fieldLabel: true })}>
-          {children}
-        </FieldLabel>
-      )}
-      <div className={s(styles, { inputBox: true })}>
-        <input className={s(styles, { validationInput: true })} value={inputValue} required={rest.required} readOnly />
-        {(icon || loading) && (
-          <div className={s(styles, { inputIcon: true })}>
-            {loading ? (
-              <Loader small fullSize />
-            ) : typeof icon === 'string' ? (
-              <IconOrImage icon={icon} className={s(styles, { iconOrImage: true })} />
-            ) : (
-              icon
-            )}
-          </div>
-        )}
+    return null;
+  }
+  const itemValue = (item: any) => keySelector(item, items.indexOf(item));
+  const itemRender = (item: any) => (
+    <>
+      {renderIcon(item)}
+      <span>{valueSelector(item)}</span>
+    </>
+  );
+
+  const itemDisabled = (item: any) => isDisabled?.(item) ?? false;
+
+  const selectedRender = (val: any, item: any) => {
+    if (!item) {
+      return ''
+    };
+
+    if (searchable) {
+      return <>
+        {renderIcon(item)}
         <input
           ref={setInputRef}
           required={rest.required}
@@ -299,42 +317,41 @@ export const Combobox: ComboboxType = observer(function Combobox({
           onClick={handleClick}
           {...rest}
         />
-        <MenuButton {...menu} disabled={readOnly || disabled || hideMenu} className={styles['menuButton']}>
-          <Icon name="arrow" viewBox="0 0 16 16" className={s(styles, { icon: true, focus })} />
-        </MenuButton>
-        <Menu {...menu} ref={menuRef} aria-label={propertyName} className={s(styles, { menu: true })} modal>
-          {!filteredItems.length ? (
-            <MenuItem id="placeholder" disabled {...menu} className={s(styles, { menuItem: true })}>
-              {translate('combobox_no_results_placeholder')}
-            </MenuItem>
-          ) : (
-            filteredItems.map((item, index) => {
-              const icon = iconSelector?.(item);
-              const title = titleSelector?.(item);
-              const disabled = isDisabled?.(item);
+      </>
+    }
 
-              return (
-                <MenuItem
-                  key={keySelector(item, index)}
-                  id={keySelector(item, index)}
-                  type="button"
-                  title={title}
-                  {...menu}
-                  disabled={disabled}
-                  className={s(styles, { menuItem: true })}
-                  onClick={event => handleSelect(event.currentTarget.id)}
-                >
-                  {iconSelector && (
-                    <div className={s(styles, { itemIcon: true })}>
-                      {icon && typeof icon === 'string' ? <IconOrImage icon={icon} className={s(styles, { iconOrImage: true })} /> : icon}
-                    </div>
-                  )}
-                  <div>{valueSelector(item)}</div>
-                </MenuItem>
-              );
-            })
-          )}
-        </Menu>
+    return <>
+      <input className={s(styles, { validationInput: true })} value={inputValue} required={rest.required} readOnly />    
+      {itemRender(item)}
+    </>
+  };
+  
+
+  return (
+    <Field {...layoutProps} className={s(styles, { field: true, inline }, className)}>
+      {children && (
+        <FieldLabel required={rest.required} title={title} className={s(styles, { fieldLabel: true })}>
+          {children}
+        </FieldLabel>
+      )}
+      <div className={s(styles, { inputBox: true })}>
+        <SelectField
+          items={filteredItems}
+          value={value}
+          onChange={handleSelect}
+          itemValue={itemValue}
+          itemRender={itemRender}
+          itemDisabled={itemDisabled}
+          label={undefined}
+          description={undefined}
+          name={name}
+          disabled={disabled}
+          required={rest.required}
+          className={styles['selectField']}
+          noItemsPlaceholder={translate('combobox_no_results_placeholder')}
+          selectedRender={selectedRender}
+          arrowIcon={<Icon name="arrow" viewBox="0 0 16 16" className={styles['icon']} />}
+        />
       </div>
       {description && <FieldDescription>{description}</FieldDescription>}
     </Field>
