@@ -18,6 +18,8 @@ package io.cloudbeaver.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.cloudbeaver.model.apilog.ApiCallEvent;
+import io.cloudbeaver.model.apilog.ApiCallEventDispatcher;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebAppUtils;
@@ -30,8 +32,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.qm.QMConstants;
-import org.jkiss.dbeaver.model.qm.QMUtils;
-import org.jkiss.dbeaver.model.qm.meta.QMApiCallLogInfo;
 import org.jkiss.dbeaver.model.qm.meta.QMApiCallType;
 
 import java.io.IOException;
@@ -111,7 +111,7 @@ public abstract class WebServiceServletBase extends HttpServlet {
         String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
         String userId = GraphQLLoggerUtil.getUserId(request);
         params.put("sessionId", sessionId);
-        QMApiCallLogInfo qmApiCallLogInfo = QMApiCallLogInfo.builder()
+        ApiCallEvent apiCallEvent = ApiCallEvent.builder()
             .qmSessionId(qmSessionId)
             .userName(userId)
             .httpMethod(request.getMethod())
@@ -122,6 +122,6 @@ public abstract class WebServiceServletBase extends HttpServlet {
             .requestTime(startTime)
             .parameters(params)
             .build();
-        QMUtils.getDefaultHandler().handleActivityLog(qmApiCallLogInfo);
+        ApiCallEventDispatcher.getInstance().dispatchEvent(apiCallEvent);
     }
 }

@@ -29,9 +29,12 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.model.apilog.ApiCallEvent;
+import io.cloudbeaver.model.apilog.ApiCallInterceptor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.HttpConstants;
+import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.service.WebServiceBindingBase;
@@ -43,8 +46,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.qm.QMConstants;
-import org.jkiss.dbeaver.model.qm.QMUtils;
-import org.jkiss.dbeaver.model.qm.meta.QMApiCallLogInfo;
 import org.jkiss.dbeaver.model.qm.meta.QMApiCallType;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
@@ -248,17 +249,12 @@ public class GraphQLEndpoint extends HttpServlet {
             contextBuilder.operationName(operationName);
         }
         String apiCall = operationName;
-        //            if (!CommonUtils.isEmpty(apiCall)) {
-        //                if (variables != null) {
-        //                    apiCall += " (" + variables + ")";
-        //                }
-        //            }
         LocalDateTime startTime = LocalDateTime.now();
         ExecutionInput executionInput = contextBuilder.build();
         ExecutionResult executionResult = null;
         try {
             executionResult = graphQL.execute(executionInput);
-        } catch (Exception e){
+        } catch (Exception e) {
             throw e;
         } finally {
             logApiCall(request, variables, apiCall, startTime, executionResult);
@@ -293,7 +289,7 @@ public class GraphQLEndpoint extends HttpServlet {
             }
         }
         params.put("sessionId", sessionId);
-        QMApiCallLogInfo qmApiCallLogInfo = QMApiCallLogInfo.builder()
+        ApiCallEvent qmApiCallLogInfo = ApiCallEvent.builder()
             .qmSessionId(qmSessionId)
             .userName(userId)
             .httpMethod(request.getMethod())
@@ -303,7 +299,9 @@ public class GraphQLEndpoint extends HttpServlet {
             .requestTime(startTime)
             .parameters(params)
             .build();
-        QMUtils.getDefaultHandler().handleActivityLog(qmApiCallLogInfo);
+        if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
+            apiCallInterceptor.onApiCallEvent(request, variables, apiCall, startTime, executionResult);
+        }
     }
 
     private Object filterSensitive(Object value) {
