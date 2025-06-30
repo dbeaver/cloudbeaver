@@ -18,12 +18,10 @@ package io.cloudbeaver.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.cloudbeaver.model.apilog.ApiCallEvent;
-import io.cloudbeaver.model.apilog.ApiCallEventDispatcher;
+import io.cloudbeaver.model.apilog.ApiCallInterceptor;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebAppUtils;
-import io.cloudbeaver.server.graphql.GraphQLLoggerUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,13 +29,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
-import org.jkiss.dbeaver.model.qm.QMConstants;
-import org.jkiss.dbeaver.model.qm.meta.QMApiCallType;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 public abstract class WebServiceServletBase extends HttpServlet {
@@ -67,13 +62,17 @@ public abstract class WebServiceServletBase extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Web session not found");
             return;
         }
+
+        LocalDateTime startTime = LocalDateTime.now();
         try {
             processServiceRequest(webSession, request, response);
         } catch (Exception e) {
             log.error(e);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error processing request: " + e.getMessage());
         } finally {
-            sendApiCallLog(request, response, getVariables(request), LocalDateTime.now());
+            if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
+                apiCallInterceptor.onApiCallEvent(request, getVariables(request), request.getRequestURI(), startTime, response.getStatus() != HttpServletResponse.SC_BAD_REQUEST);
+            }
         }
     }
 
@@ -89,39 +88,39 @@ public abstract class WebServiceServletBase extends HttpServlet {
                                        LocalDateTime startTime
     ){
 
-        WebSession webSession = GraphQLLoggerUtil.getWebSession(request);
-
-        String qmSessionId = null;
-        if (webSession != null) {
-            qmSessionId = webSession.getAttribute(QMConstants.QM_SESSION_ID_ATTR);
-        }
-        //from body
-        Map<String, Object> params = new HashMap<>();
-        if (variables != null) {
-            params.putAll(variables);
-        }
-        //from query params
-        request.getParameterMap().forEach((key, values) -> {
-            if (values != null && values.length == 1) {
-                params.put(key, values[0]);
-            } else if (values != null) {
-                params.put(key, values);
-            }
-        });
-        String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
-        String userId = GraphQLLoggerUtil.getUserId(request);
-        params.put("sessionId", sessionId);
-        ApiCallEvent apiCallEvent = ApiCallEvent.builder()
-            .qmSessionId(qmSessionId)
-            .userName(userId)
-            .httpMethod(request.getMethod())
-            //todo to think
-            .isSuccessful(response.getStatus() >= 200 && response.getStatus() < 300)
-            .requestType(QMApiCallType.REST)
-            .endpoint(request.getRequestURI())
-            .requestTime(startTime)
-            .parameters(params)
-            .build();
-        ApiCallEventDispatcher.getInstance().dispatchEvent(apiCallEvent);
+//        WebSession webSession = GraphQLLoggerUtil.getWebSession(request);
+//
+//        String qmSessionId = null;
+//        if (webSession != null) {
+//            qmSessionId = webSession.getAttribute(QMConstants.QM_SESSION_ID_ATTR);
+//        }
+//        //from body
+//        Map<String, Object> params = new HashMap<>();
+//        if (variables != null) {
+//            params.putAll(variables);
+//        }
+//        //from query params
+//        request.getParameterMap().forEach((key, values) -> {
+//            if (values != null && values.length == 1) {
+//                params.put(key, values[0]);
+//            } else if (values != null) {
+//                params.put(key, values);
+//            }
+//        });
+//        String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
+//        String userId = GraphQLLoggerUtil.getUserId(request);
+//        params.put("sessionId", sessionId);
+//        ApiCallEvent apiCallEvent = ApiCallEvent.builder()
+//            .qmSessionId(qmSessionId)
+//            .userName(userId)
+//            .httpMethod(request.getMethod())
+//            //todo to think
+//            .isSuccessful(response.getStatus() >= 200 && response.getStatus() < 300)
+//            .requestType(QMApiCallType.REST)
+//            .endpoint(request.getRequestURI())
+//            .requestTime(startTime)
+//            .parameters(params)
+//            .build();
+//        ApiCallEventDispatcher.getInstance().dispatchEvent(apiCallEvent);
     }
 }

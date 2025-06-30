@@ -1,7 +1,8 @@
 package io.cloudbeaver.model.apilog;
 
-import graphql.ExecutionResult;
 import jakarta.servlet.http.HttpServletRequest;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -13,10 +14,10 @@ public interface ApiCallInterceptor {
      *
      */
     void onApiCallEvent(
-        HttpServletRequest request,
-        Map<String, Object> variables,
-        String apiCall,
-        LocalDateTime startTime,
-        ExecutionResult executionResult
+        @NotNull HttpServletRequest request,
+        @Nullable Map<String, Object> variables,
+        @NotNull String apiCall,
+        @NotNull LocalDateTime startTime,
+        boolean isSuccessful
     );
 }

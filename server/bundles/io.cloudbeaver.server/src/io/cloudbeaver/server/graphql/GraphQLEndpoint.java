@@ -29,7 +29,6 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.model.apilog.ApiCallEvent;
 import io.cloudbeaver.model.apilog.ApiCallInterceptor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
@@ -45,8 +44,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
-import org.jkiss.dbeaver.model.qm.QMConstants;
-import org.jkiss.dbeaver.model.qm.meta.QMApiCallType;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -56,7 +53,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class GraphQLEndpoint extends HttpServlet {
@@ -77,10 +77,6 @@ public class GraphQLEndpoint extends HttpServlet {
         .setPrettyPrinting()
         .create();
     private GraphQLBindingContext bindingContext;
-
-    private static final Set<String> SENSITIVE_KEYWORDS = Set.of(
-        "password", "token", "secret", "key", "auth"
-    );
 
     public GraphQLEndpoint(Instrumentation instrumentation) {
         GraphQLSchema schema = buildSchema();
@@ -257,7 +253,10 @@ public class GraphQLEndpoint extends HttpServlet {
         } catch (Exception e) {
             throw e;
         } finally {
-            logApiCall(request, variables, apiCall, startTime, executionResult);
+            if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
+                apiCallInterceptor.onApiCallEvent(request, variables, apiCall, startTime,
+                    executionResult != null && executionResult.getErrors().isEmpty());
+            }
         }
 
         Map<String, Object> resJSON = executionResult.toSpecification();
@@ -267,67 +266,6 @@ public class GraphQLEndpoint extends HttpServlet {
         response.getWriter().print(resString);
     }
 
-    private void logApiCall(
-        HttpServletRequest request,
-        Map<String, Object> variables,
-        String apiCall,
-        LocalDateTime startTime,
-        ExecutionResult executionResult
-    ) {
-        String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
-        WebSession webSession = GraphQLLoggerUtil.getWebSession(request);
-        String userId = GraphQLLoggerUtil.getUserId(request);
-        String qmSessionId = null;
-        if (webSession != null) {
-            qmSessionId = webSession.getAttribute(QMConstants.QM_SESSION_ID_ATTR);
-        }
-        Map<String, Object> params = new HashMap<>();
-        if (variables != null) {
-            Object filteredVariables = filterSensitive(variables);
-            if (filteredVariables instanceof Map filteredVariablesMap) {
-                params.putAll(filteredVariablesMap);
-            }
-        }
-        params.put("sessionId", sessionId);
-        ApiCallEvent qmApiCallLogInfo = ApiCallEvent.builder()
-            .qmSessionId(qmSessionId)
-            .userName(userId)
-            .httpMethod(request.getMethod())
-            .isSuccessful(executionResult != null && executionResult.getErrors().isEmpty())
-            .requestType(QMApiCallType.GRAPHQL)
-            .endpoint(apiCall)
-            .requestTime(startTime)
-            .parameters(params)
-            .build();
-        if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
-            apiCallInterceptor.onApiCallEvent(request, variables, apiCall, startTime, executionResult);
-        }
-    }
-
-    private Object filterSensitive(Object value) {
-        if (value instanceof Map<?, ?> mapValue) {
-            Map<String, Object> filtered = new HashMap<>();
-            for (Map.Entry<?, ?> entry : mapValue.entrySet()) {
-                String key = String.valueOf(entry.getKey());
-                String keyLower = key.toLowerCase();
-                boolean isSensitive = SENSITIVE_KEYWORDS.stream().anyMatch(keyLower::contains);
-                if (isSensitive) {
-                    filtered.put(key, "********");
-                } else {
-                    filtered.put(key, filterSensitive(entry.getValue()));
-                }
-            }
-            return filtered;
-        } else if (value instanceof List<?> listValue) {
-            List<Object> filtered = new ArrayList<>();
-            for (Object item : listValue) {
-                filtered.add(filterSensitive(item));
-            }
-            return filtered;
-        } else {
-            return value;
-        }
-    }
 
     private static class WebExecutionStrategy extends AsyncExecutionStrategy {
 
