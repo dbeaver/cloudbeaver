@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useMenuState } from 'reakit';
 
-import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps.js';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
 import { getComputed } from '../getComputed.js';
 import { Icon } from '../Icon.js';
@@ -22,6 +22,8 @@ import comboboxStyles from './Combobox.module.css';
 import { FieldLabel } from './FieldLabel.js';
 import { FormContext } from './FormContext.js';
 import { SelectField } from '@dbeaver/ui-kit';
+import { FieldDescription } from './FieldDescription.js';
+import { Field } from './Field.js';
 
 export type ComboboxBaseProps<TKey, TValue> = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -93,6 +95,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   onSwitch,
   ...rest
 }: ControlledProps<any, any> | ObjectProps<any, any, any>) {
+  const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
   const translate = useTranslate();
   const context = useContext(FormContext);
@@ -262,7 +265,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   if (loading && items.length === 0) {
     inputValue = translate('ui_processing_loading');
   }
-  
+
   const renderIcon = (item: any) => {
     if (iconSelector && iconSelector(item)) {
       return (
@@ -275,11 +278,11 @@ export const Combobox: ComboboxType = observer(function Combobox({
             iconSelector(item)
           )}
         </div>
-      )
+      );
     }
 
     return null;
-  }
+  };
   const itemValue = (item: any) => keySelector(item, items.indexOf(item));
   const itemRender = (item: any) => (
     <>
@@ -292,61 +295,71 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   const selectedRender = (val: any, item: any) => {
     if (!item) {
-      return ''
-    };
-
-    if (searchable) {
-      return <>
-        {renderIcon(item)}
-        <input
-          ref={setInputRef}
-          required={rest.required}
-          autoComplete="off"
-          name={name}
-          title={title}
-          value={inputValue}
-          disabled={disabled || hideMenu}
-          readOnly={readOnly || select}
-          data-focus={focus}
-          data-select={select}
-          className={s(styles, { input: true, select, focus })}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          onClick={handleClick}
-          {...rest}
-        />
-      </>
+      return '';
     }
 
-    return <>
-      {/* TODO check validation form select field */}
-      {/* <input className={s(styles, { validationInput: true })} value={inputValue} required={rest.required} readOnly /> */}
-      {itemRender(item)}
-    </>
+    if (searchable) {
+      return (
+        <>
+          {renderIcon(item)}
+          <input
+            ref={setInputRef}
+            required={rest.required}
+            autoComplete="off"
+            name={name}
+            title={title}
+            value={inputValue}
+            disabled={disabled || hideMenu}
+            readOnly={readOnly || select}
+            data-focus={focus}
+            data-select={select}
+            className={s(styles, { input: true, select, focus })}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            onClick={handleClick}
+            {...rest}
+          />
+        </>
+      );
+    }
+
+    return (
+      <>
+        {/* TODO check validation form select field */}
+        {/* <input className={s(styles, { validationInput: true })} value={inputValue} required={rest.required} readOnly /> */}
+        {itemRender(item)}
+      </>
+    );
   };
-  
 
   return (
-    <SelectField
-      items={filteredItems}
-      value={value}
-      onChange={handleSelect}
-      itemValue={itemValue}
-      itemRender={itemRender}
-      itemDisabled={itemDisabled}
-      label={children ? (
+    <Field {...layoutProps} className={s(styles, { field: true, inline }, className)}>
+      {children && (
         <FieldLabel required={rest.required} title={title} className={s(styles, { fieldLabel: true })}>
           {children}
         </FieldLabel>
-      ) : undefined}
-      description={description}
-      name={name}
-      disabled={disabled}
-      required={rest.required}
-      className={s(styles, { field: true, inline }, className, styles['selectField'])}
-      noItemsPlaceholder={translate('combobox_no_results_placeholder')}
-      selectedRender={selectedRender}
-      arrowIcon={<Icon name="arrow" viewBox="0 0 16 16" className={styles['icon']} />}
-    />
+      )}
+      <div className={s(styles, { inputBox: true })}>
+        {/* TODO check validation in the form and remove it */}
+        {/* <input className={s(styles, { validationInput: true })} value={inputValue} required={rest.required} readOnly /> */}
+        <SelectField
+          items={filteredItems}
+          value={value}
+          itemValue={itemValue}
+          itemRender={itemRender}
+          itemDisabled={itemDisabled}
+          name={name}
+          disabled={disabled}
+          required={rest.required}
+          className={s(styles, { field: true, inline }, className, styles['selectField'])}
+          noItemsPlaceholder={translate('combobox_no_results_placeholder')}
+          selectedRender={selectedRender}
+          arrowIcon={<Icon name="arrow" viewBox="0 0 16 16" className={styles['icon']} />}
+          onChange={handleSelect}
+          {...rest}
+        />
+      </div>
+      {description && <FieldDescription>{description}</FieldDescription>}
+    </Field>
   );
 });

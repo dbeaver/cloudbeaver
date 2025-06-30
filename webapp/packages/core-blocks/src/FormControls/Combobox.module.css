@@ -6,60 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 @layer components {
-  .field.inline {
-    display: flex;
-    align-items: center;
-
-    & .fieldLabel {
-      padding-right: 8px;
-      padding-bottom: 0;
-      width: max-content;
-    }
-  }
-
-  .fieldLabel {
-    display: block;
-    padding-bottom: 10px;
-    composes: theme-typography--body1 from global;
-    font-weight: 500;
-  }
-
-  .input {
-    font-size: 12px;
-  }
-
-  .icon {
-    height: 16px;
-    display: block;
-  }
-
-  .inputIcon {
-    position: absolute;
-    left: 0;
-    width: 16px;
-    height: 16px;
-    margin-left: 12px;
-
-    & .iconOrImage {
-      width: 100%;
-      height: 100%;
-    }
-
-    &:not(:empty) + .input {
-      padding-left: 34px !important;
-    }
-  }
-
-  /* TODO check validation form select field and remove it */
-  .validationInput {
-    z-index: -1;
-    opacity: 0;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-  }
-
-  .selectField {
+  .field {
     width: 100%;
     --dbv-kit-select-font-size: 12px;
     --dbv-kit-select-border-width: 2px;
@@ -74,5 +21,75 @@
     --dbv-kit-select-item-foreground: var(--theme-secondary);
     --dbv-kit-select-item-hover-background: color-mix(in srgb, var(--theme-on-secondary), black 60%);
     --dbv-kit-select-item-selected-background: var(--theme-secondary);
+  }
+
+  .field.inline {
+    display: flex;
+    align-items: center;
+
+    & .fieldLabel {
+      padding-right: 8px;
+      padding-bottom: 0;
+      width: max-content;
+    }
+  }
+
+  .field .input {
+    margin: 0;
+  }
+
+  .fieldLabel {
+    display: block;
+    padding-bottom: 10px;
+    composes: theme-typography--body1 from global;
+    font-weight: 500;
+  }
+
+  .input {
+    padding-right: 24px !important;
+    font-size: 12px;
+
+    &.select {
+      cursor: pointer;
+      user-select: none;
+    }
+  }
+
+  .icon {
+    height: 16px;
+    display: block;
+  }
+
+  .inputBox {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    & .inputIcon {
+      position: absolute;
+      left: 0;
+      width: 16px;
+      height: 16px;
+      margin-left: 12px;
+
+      & .iconOrImage {
+        width: 100%;
+        height: 100%;
+      }
+
+      &:not(:empty) + .input {
+        padding-left: 34px !important;
+      }
+    }
+  }
+
+  /* TODO: should be removed after migration to new validation system */
+  .validationInput {
+    z-index: -1;
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
   }
 }
