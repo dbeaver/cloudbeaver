@@ -81,46 +81,4 @@ public abstract class WebServiceServletBase extends HttpServlet {
     protected Map<String, Object> getVariables(HttpServletRequest request) {
         return gson.fromJson(request.getParameter(REQUEST_PARAM_VARIABLES), MAP_STRING_OBJECT_TYPE);
     }
-
-    private void sendApiCallLog(HttpServletRequest request,
-                                       HttpServletResponse response,
-                                       Map<String, Object> variables,
-                                       LocalDateTime startTime
-    ){
-
-//        WebSession webSession = GraphQLLoggerUtil.getWebSession(request);
-//
-//        String qmSessionId = null;
-//        if (webSession != null) {
-//            qmSessionId = webSession.getAttribute(QMConstants.QM_SESSION_ID_ATTR);
-//        }
-//        //from body
-//        Map<String, Object> params = new HashMap<>();
-//        if (variables != null) {
-//            params.putAll(variables);
-//        }
-//        //from query params
-//        request.getParameterMap().forEach((key, values) -> {
-//            if (values != null && values.length == 1) {
-//                params.put(key, values[0]);
-//            } else if (values != null) {
-//                params.put(key, values);
-//            }
-//        });
-//        String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
-//        String userId = GraphQLLoggerUtil.getUserId(request);
-//        params.put("sessionId", sessionId);
-//        ApiCallEvent apiCallEvent = ApiCallEvent.builder()
-//            .qmSessionId(qmSessionId)
-//            .userName(userId)
-//            .httpMethod(request.getMethod())
-//            //todo to think
-//            .isSuccessful(response.getStatus() >= 200 && response.getStatus() < 300)
-//            .requestType(QMApiCallType.REST)
-//            .endpoint(request.getRequestURI())
-//            .requestTime(startTime)
-//            .parameters(params)
-//            .build();
-//        ApiCallEventDispatcher.getInstance().dispatchEvent(apiCallEvent);
-    }
 }
