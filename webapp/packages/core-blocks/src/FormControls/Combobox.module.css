@@ -11,16 +11,17 @@
     --dbv-kit-select-font-size: 12px;
     --dbv-kit-select-border-width: 2px;
 
-    --dbv-kit-select-border-color: color-mix(in srgb, var(--theme-on-secondary), black 60%);
-    --dbv-kit-select-foreground: var(--theme-on-secondary);
-    --dbv-kit-select-background: var(--theme-surface);
+    --dbv-kit-select-border-color: var(--theme-input-border);
+    --dbv-kit-select-foreground: var(--theme-input-color);
+    --dbv-kit-select-background: var(--theme-input-background);
 
-    --dbv-kit-select-popover-background: var(--theme-secondary);
-    --dbv-kit-select-popover-foreground: var(--theme-on-secondary);
+    --dbv-kit-select-popover-background: var(--theme-input-background);
+    --dbv-kit-select-popover-foreground: var(--theme-input-color);
 
     --dbv-kit-select-item-foreground: var(--theme-secondary);
-    --dbv-kit-select-item-hover-background: color-mix(in srgb, var(--theme-on-secondary), black 60%);
-    --dbv-kit-select-item-selected-background: var(--theme-secondary);
+    --dbv-kit-select-item-hover-background: var(--theme-background);
+    --dbv-kit-select-item-hover-foreground: var(--theme-input-color);
+    --dbv-kit-select-item-selected-background: var(--theme-input-border);
   }
 
   .field.inline {
