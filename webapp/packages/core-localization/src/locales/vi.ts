@@ -4,6 +4,7 @@ export default [
   ['ui_tag_new', 'Mới'],
   ['ui_light_theme', 'Sáng'],
   ['ui_dark_theme', 'Tối'],
+  ['ui_system_theme', 'Thiết bị'],
   ['ui_stepper_back', 'Quay lại'],
   ['ui_stepper_next', 'Tiếp theo'],
   ['ui_stepper_finish', 'Hoàn tất'],
@@ -141,6 +142,7 @@ export default [
   ['ui_project', 'Dự án'],
   ['ui_type', 'Loại'],
   ['ui_field_is_required', 'Please fill in this field'],
+  ['ui_delete_confirmation_message', 'You are about to delete "{arg:item}". Are you sure?'],
 
   ['root_permission_denied', 'Bạn không có quyền'],
   ['root_permission_no_permission', 'Bạn không có quyền thực hiện hành động này'],

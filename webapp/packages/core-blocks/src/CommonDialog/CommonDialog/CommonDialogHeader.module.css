@@ -11,6 +11,7 @@
   grid-template-columns: max-content 1fr;
   flex-shrink: 0;
   padding: 24px;
+  padding-right: 20px;
 
   &.noPadding {
     padding: 0px;
@@ -23,6 +24,7 @@
   justify-content: space-between;
   position: relative;
   min-height: 24px;
+  padding-right: 4px;
   overflow: hidden;
 }
 

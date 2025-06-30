@@ -13,6 +13,7 @@ export interface ITreeData {
 
   getNode(id: string): INode;
   getChildren: (node: string) => string[];
+  getUnfilteredChildren: (node: string) => string[];
   getParent: (node: string) => string | null;
   getState(id: string): Readonly<INodeState>;
 

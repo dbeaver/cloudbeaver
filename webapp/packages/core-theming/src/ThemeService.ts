@@ -22,15 +22,16 @@ import './styles/main/typography.pure.scss';
 import './styles/UiIconButton.css';
 import './styles/UiSpinner.css';
 import './styles/UiInput.css';
-import { DEFAULT_THEME_ID, themes } from './themes.js';
+import { FALLBACK_THEME_ID, themes } from './themes.js';
 import { ThemeSettingsService } from './ThemeSettingsService.js';
-import type { ClassCollection } from './themeUtils.js';
 
 export interface ITheme {
   name: string;
   id: string;
-  styles?: ClassCollection; // will be populated after execution ITheme.loader()
-  loader: () => Promise<ClassCollection>;
+  class: string;
+  type?: 'light' | 'dark';
+  loaded: boolean;
+  loader: () => Promise<void>;
 }
 
 export interface IStyleRegistry {
@@ -52,7 +53,7 @@ export class ThemeService extends Bootstrap {
     let theme = this.themeMap.get(this.themeId);
 
     if (!theme) {
-      theme = this.themeMap.get(DEFAULT_THEME_ID)!;
+      theme = this.themeMap.get(FALLBACK_THEME_ID)!;
     }
 
     return theme;
@@ -76,6 +77,13 @@ export class ThemeService extends Bootstrap {
       themeId: computed,
       themeMap: observable.shallow,
     });
+  }
+
+  addTheme(theme: ITheme): void {
+    if (this.themeMap.has(theme.id)) {
+      throw new UIError(`Theme with id "${theme.id}" already exists.`);
+    }
+    this.themeMap.set(theme.id, theme);
   }
 
   override register(): void {
@@ -145,13 +153,13 @@ export class ThemeService extends Bootstrap {
     await this.themeSettingsService.settings.save();
   }
 
-  private async loadTheme(themeId: string): Promise<string> {
+  async loadTheme(themeId: string): Promise<string> {
     try {
       await this.loadThemeStylesAsync(themeId);
       return themeId;
     } catch (e: any) {
-      if (themeId !== DEFAULT_THEME_ID) {
-        return this.loadTheme(DEFAULT_THEME_ID); // try to fallback to default theme
+      if (themeId !== FALLBACK_THEME_ID) {
+        return this.loadTheme(FALLBACK_THEME_ID); // try to fallback to default theme
       }
       throw e;
     }
@@ -169,8 +177,9 @@ export class ThemeService extends Bootstrap {
       throw new UIError(`Theme ${id} not found.`);
     }
 
-    if (!theme.styles) {
-      theme.styles = await theme.loader();
+    if (!theme.loaded) {
+      await theme.loader();
+      theme.loaded = true;
     }
   }
 }
