@@ -4,6 +4,7 @@ export default [
   ['ui_tag_new', '新建'],
   ['ui_light_theme', '明亮'],
   ['ui_dark_theme', '黑暗'],
+  ['ui_system_theme', '设备'],
   ['ui_stepper_back', '返回'],
   ['ui_stepper_next', '下一步'],
   ['ui_stepper_finish', '完成'],

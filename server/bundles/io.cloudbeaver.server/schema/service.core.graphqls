@@ -3,169 +3,217 @@
 # General stuff
 ####################################################
 
-# Property
-
+"""
+Information about the object property used to generate its UI
+"""
 type ObjectPropertyInfo {
-    # ID
+    "Unique property identifier"
     id: String
-    # Human readable name
+    "Human-readable name"
     displayName: String
-    # Property description
+    "Property description"
     description: String
-    # Property hint
+    "Usage hint for the property"
     hint: String @since(version: "23.2.3")
-    # Property category (may be used if object has a lot of properties)
+    "Property category (may be used if object has a lot of properties)"
     category: String
-    # Property data type (int, String, etc)
+    "Property data type (e.g., int, String)"
     dataType: String
-
-    # Property value. Note: for some properties value reading may take a lot of time (e.g. RowCount for tables)
+    "Property value (can be resource-intensive for some properties, e.g., RowCount for tables)"
     value: Object
-
-    # List of values this property can take. Makes sense only for enumerable properties
+    "List of allowed values (for enumerable properties)"
     validValues: [ Object ]
-    # Default property value
+    "Default property value"
     defaultValue: Object
-
-    # Property value length
+    "Property value length"
     length: ObjectPropertyLength!
-
-    # Supported features (system, hidden, inherited, foreign, expensive, etc)
+    "List of supported features (e.g., system, hidden, inherited, foreign, expensive)"
     features: [ String! ]!
-    # Order position
+    "Order position"
     order: Int!
-    # Supported configuration types (for driver properties)
+    "Supported configuration types (for driver properties)"
     supportedConfigurationTypes: [ String! ]
-    # Required parameters
+    "Is the property required"
     required: Boolean! @since(version: "23.3.1")
-    # Parameter scopes
-    scopes:[String!]
-    # Dynamic conditions for a property (f.e. visibility or read-only expressions)
+    "List of preference scopes (e.g., global, user)"
+    scopes: [String!]
+    "Dynamic conditions for the property (e.g., visibility or read-only)"
     conditions: [Condition!] @since(version: "25.0.1")
 }
 
 enum ObjectPropertyLength {
-    # 1 character
+    "1 character"
     TINY,
-    # 20 characters
+    "20 characters"
     SHORT,
-    # <= 64 characters
+    "<= 64 characters"
     MEDIUM,
-    # Full line length. The default
+    "Full line length. The default"
     LONG,
-    # Multi-line long text
+    "Multi-line long text"
     MULTILINE
 }
 
+"Represents a dynamic condition for a property, such as visibility or read-only state"
 type Condition @since(version: "25.0.1") {
+    "The logical expression that defines when the condition applies"
     expression: String!
+    "The type of condition (e.g., HIDE or READ_ONLY)"
     conditionType: ConditionType!
-
 }
 
 enum ConditionType @since(version: "25.0.1") {
-    HIDE, # hiding property condition
-    READ_ONLY # restriction for setting a property value
+    "hiding property condition"
+    HIDE,
+    "restriction for setting a property value"
+    READ_ONLY
 }
 
-# Async types
-
+"""
+Async types
+"""
 type AsyncTaskInfo {
+    "Task unique identifier"
     id: String!
+    "Async task name"
     name: String
+    "Indicates if the task is currently running"
     running: Boolean!
 
+    "Current status of the async task"
     status: String
+    "Error information if the task failed"
     error: ServerError
 
-    result: SQLExecuteInfo @deprecated # Deprecated. Use asyncSqlExecuteResults instead
-    # Task result.
-    # Can be some kind of identifier to obtain real result using another API function
+    """
+    Task result.
+    Can be some kind of identifier to obtain real result using another API function
+    """
     taskResult: Object
 }
 
-# Various server errors descriptor
+"Various server errors descriptor"
 
 type ServerError {
+    "Error message text"
     message: String
+    "Retrieves the vendor-specific error code"
     errorCode: String
+    "Type/category of the error"
     errorType: String
+    "Stack trace for debugging"
     stackTrace: String
+    "Nested error that caused this error (recursive)"
     causedBy: ServerError
 }
 
 type ServerMessage {
+    "The time when the server message was created"
     time: String
+    "The content of the message"
     message: String
 }
 
-# Languages supported by server
-
+"Languages supported by server"
 type ServerLanguage {
+    "ISO 639-1 or similar language code (e.g., \"en\", \"ru\")"
     isoCode: String!
+    "Display name of the language in the current locale (e.g., \"English\")"
     displayName: String
+    "Native name of the language (e.g., \"English\", \"Русский\")"
     nativeName: String
 }
 
-type WebServiceConfig {
-    id: String!
-    name: String!
-    description: String!
-    bundleVersion: String!
-}
-
+"Password policy configuration"
 type PasswordPolicyConfig @since(version: "23.3.3") {
+    "Minimum password length"
     minLength: Int!
+    "Minimum number of digits required"
     minNumberCount: Int!
+    "Minimum number of symbols required"
     minSymbolCount: Int!
+    "Require both uppercase and lowercase letters"
     requireMixedCase: Boolean!
 }
 
+"Product information"
 type ProductInfo {
+    "ID of the product"
     id: ID!
+    "The product version"
     version: String!
+    "The product name"
     name: String!
+    "The product description"
     description: String
+    "The build timestamp of the product"
     buildTime: String!
+    "The release timestamp of the product"
     releaseTime: String!
+    "Information about the product license"
     licenseInfo: String
 
+    "Information about the latest available version"
     latestVersionInfo: String
+    "URL for purchasing the product"
     productPurchaseURL: String
 }
 
+"Server configuration"
 type ServerConfig {
+    "Server name"
     name: String!
+    "Version of the server"
     version: String!
+    "ID of the server workspace"
     workspaceId: ID!
 
+    "Defines if the anonymous access is enabled"
     anonymousAccessEnabled: Boolean!
+    "Defines if non-admin users can create connections"
     supportsCustomConnections: Boolean!
+    "Defines if resource manager is enabled"
     resourceManagerEnabled: Boolean!
 
+    "Defines if secret manager is enabled"
     secretManagerEnabled: Boolean!  @since(version: "24.3.2")
 
+    "Defines is it is possible to save user database credentials"
     publicCredentialsSaveEnabled: Boolean!
+    "Defines is it is possible to save global database credentials"
     adminCredentialsSaveEnabled: Boolean!
 
+    "Defines if the server requires a license"
     licenseRequired: Boolean!
+    "Defines if the server license is valid"
     licenseValid: Boolean!
+    "Returns information about the server license status"
     licenseStatus: String @since(version: "24.1.5")
 
+    "Defines if the server is in configuration mode"
     configurationMode: Boolean!
-    #    initializationMode: Boolean! @since(version: "24.1.5")
+    "Defines if the server is in development mode"
     developmentMode: Boolean!
+    "Defines if the server is distributed"
     distributed: Boolean!
 
+    "List of enabled features"
     enabledFeatures: [ID!]!
+    "List of disabled beta features"
     disabledBetaFeatures: [ID!] @since(version: "24.0.5")
+    "List of server features"
     serverFeatures: [ID!] @since(version: "24.3.0")
+    "List of supported languages"
     supportedLanguages: [ ServerLanguage! ]!
-    services: [ WebServiceConfig ]
+    "Product configuration"
     productConfiguration: Object!
+    "Product information"
     productInfo: ProductInfo!
+    "Navigator settings for the server"
     defaultNavigatorSettings: NavigatorSettings!
+    "List of disabled drivers (IDs of DriverInfo)"
     disabledDrivers: [ID!]!
+    "Resource quotas (e.g., max amount of running SQL queries)"
     resourceQuotas: Object!
 }
 
@@ -176,122 +224,173 @@ type ProductSettingsGroup @since(version: "24.0.1") {
 
 type ProductSettings @since(version: "24.0.1") {
     groups: [ProductSettingsGroup!]!
-    settings: [ObjectPropertyInfo!]! # each property is associated with a group by category
+    "each property is associated with a group by category"
+    settings: [ObjectPropertyInfo!]!
 }
 
 type SessionInfo {
+    "The time when the session was created"
     createTime: String!
+    "The last time the session was accessed"
     lastAccessTime: String!
+    "The current locale of the session"
     locale: String!
 
+    "Indicates whether the session cache has expired"
     cacheExpired: Boolean!
 
-    serverMessages: [ ServerMessage ]
+    "List of active connections in the session"
     connections: [ ConnectionInfo! ]!
+    "Action parameters for the session (e.g., opening a connection)"
     actionParameters: Object
 
+    "Indicates if the session is valid"
     valid: Boolean!
+    "Remaining time before the session expires (in seconds)"
     remainingTime: Int!
 }
 
 ####################################################
-# Drivers and connections
+"Drivers and connections"
 ####################################################
 
 type DatabaseAuthModel {
+    "Auth model unique ID"
     id: ID!
+    "Display name of the auth model"
     displayName: String!
+    "Description of the auth model"
     description: String
+    "Path to the auth model icon"
     icon: String
-    # checks if the auth model needs a configuration on a local file system
+    "Checks if the auth model needs a configuration on a local file system"
     requiresLocalConfiguration: Boolean
+    "Returns id of the required auth provider if the auth model requires it"
     requiredAuth: String
 
+    "List of properties for the auth model that can be displayed in the UI"
     properties: [ObjectPropertyInfo!]!
 }
 
 type DriverInfo {
-    # Driver unique full ID. It is `providerId + "." + driverId`.
-    # It is recommended to use providerId and driverId separately.
+    """
+    Driver unique full ID. It is `providerId + "." + driverId`.
+    It is recommended to use providerId and driverId separately.
+    """
     id: ID!
+    "Name of the driver"
     name: String
+    "Description of the driver"
     description: String
+    "Path to the driver icon"
     icon: String
+    "Path to the driver icon for big size"
     iconBig: String
 
-    # Driver ID. It is unique within provider
+    "Driver ID. It is unique within provider"
     driverId: ID!
-    # Driver provider ID. It is globally unique
+    "Driver provider ID. It is globally unique"
     providerId: ID!
-    # Driver Java class name
+    "Driver Java class name"
     driverClassName: String
+    "Default host for the driver"
     defaultHost: String
+    "Default port for the driver"
     defaultPort: String
+    "Default database name for the driver"
     defaultDatabase: String
+    "Default server name for the driver"
     defaultServer: String
+    "Default user name for the driver"
     defaultUser: String
+    "Default connection URL for the driver"
     sampleURL: String
+    "Returns link to the driver documentation page"
     driverInfoURL: String
+    "Returns link to the driver properties page"
     driverPropertiesURL: String
+    "Defines if the database for this driver is embedded"
     embedded: Boolean
+    "Defines if the driver is enabled"
     enabled: Boolean!
-    requiresServerName: Boolean
-    requiresDatabaseName: Boolean
-    useCustomPage: Boolean! @since(version: "24.1.2") # if host, port, database, server name fields are custom
+    "Defines if the driver page requires server name field"
+    requiresServerName: Boolean @deprecated(reason: "use mainProperties instead")
+    "Defines if the driver page requires database name field"
+    requiresDatabaseName: Boolean @deprecated(reason: "use mainProperties instead")
+    "Defines if host, port, database, server name fields are using a custom page"
+    useCustomPage: Boolean! @since(version: "24.1.2")
 
+    "Defines if driver license is required"
     licenseRequired: Boolean
+    "Driver license information"
     license: String
+    "Defines if the driver is a custom driver"
     custom: Boolean
-    # Driver score for ordering, biggest first
+    "Driver score for ordering, biggest first"
     promotedScore: Int
 
-    # Never used?
-    #connectionProperties: Object
-    #defaultConnectionProperties: Object
-
-    # Driver properties.
-    # Note: it is expensive property and it may produce database server roundtrips.
-    # Call it only when you really need it.
-    # These properties are for advanced users in usually shouldn't be specified for new connections.
+    """
+    Driver properties.
+    Note: it is expensive property and it may produce database server roundtrips.
+    Call it only when you really need it.
+    These properties are for advanced users in usually shouldn't be specified for new connections.
+    """
     driverProperties: [ObjectPropertyInfo!]!
-    # Driver parameters (map name->value)
+    "Driver parameters (map name->value)"
     driverParameters: Object!
 
-    # Main driver properties
-    # Contains info about main fields (host, port, database, server name)
+    """
+    Main driver properties.
+    Contains info about main fields (host, port, database, server name) that are used in main connection page
+    """
     mainProperties: [ObjectPropertyInfo!]! @since(version: "24.1.2")
 
-    # Additional driver provider properties
-    # These properties can be configured by user on main connection page
-    # to provide important connection settings
+    """
+    Additional driver provider properties.
+    These properties can be configured by user on main connection page to provide important connection settings
+    """
     providerProperties: [ObjectPropertyInfo!]!
 
-    # False for drivers which do not support authentication
+    "False for drivers which do not support authentication."
     anonymousAccess: Boolean
-
+    "Default auth model that is used for this driver (see authModels)"
     defaultAuthModel: ID!
+    "List of auth models that can be used with this driver (see authModels)"
     applicableAuthModels: [ID!]!
-
+    "List of network handlers that can be used with this driver (SSH/SSL)"
     applicableNetworkHandlers: [ID]!
-
+    "Configuration types are used in UI to determine how to display connection settings (show host/port/database fields or use URL field)"
     configurationTypes: [DriverConfigurationType]!
 
+    "Defines if the driver can be downloaded remotely"
     downloadable: Boolean! @since(version: "24.3.3")
+    "Defines if the driver is installed on the server"
     driverInstalled: Boolean!
+    "List of driver libraries that are used for connecting to the database"
     driverLibraries: [DriverLibraryInfo!]!
+    "Defines if embedded driver is safe to use in the server"
     safeEmbeddedDriver: Boolean! @since(version: "25.0.0")
 }
 
+"Driver library information. Used to display driver files in UI"
 type DriverLibraryInfo {
+    "Driver library unique ID"
     id: ID!
+    "Driver library name"
     name: String!
+    "Path to the driver library icon"
     icon: String
+    "List of files that are used by the driver"
     libraryFiles: [DriverFileInfo!]
 }
 
+"Driver file information."
 type DriverFileInfo @since(version: "24.3.2") {
+    "Driver file unique ID"
     id: ID!
+    "Driver file name"
     fileName: String!
+    "Path to the driver file icon"
     icon: String
 }
 
@@ -303,7 +402,9 @@ enum ResultDataFormat {
 }
 
 enum DriverConfigurationType {
+    "Driver uses host, port, database and server name fields"
     MANUAL,
+    "Driver uses URL field"
     URL
 }
 
@@ -315,12 +416,17 @@ enum NetworkHandlerType {
     CONFIG
 }
 
+"SSH network handler authentication type"
 enum NetworkHandlerAuthType {
     PASSWORD,
     PUBLIC_KEY,
     AGENT
 }
 
+"""
+Network handler descriptor.
+This descriptor is used to describe network handlers (SSH/SSL) that can be used for connections.
+"""
 type NetworkHandlerDescriptor {
     id: ID!
     codeName: String!
@@ -328,19 +434,30 @@ type NetworkHandlerDescriptor {
     description: String
     secured: Boolean!
     type: NetworkHandlerType
+    "Properties that can be displayed in the UI"
     properties: [ObjectPropertyInfo!]!
 }
 
-# SSH network handler config. Name without prefix only for backward compatibility
+"""
+SSH/SSL network handler config. Name without prefix only for backward compatibility
+"""
 type NetworkHandlerConfig {
     id: ID!
+    "Defines if the network handler is enabled"
     enabled: Boolean!
-    authType: NetworkHandlerAuthType! @deprecated # use properties
+    "SSH network handler auth type"
+    authType: NetworkHandlerAuthType! @deprecated(reason: "use properties")
+    "SSH network handler user name"
     userName: String
+    "SSH network handler user password"
     password: String
-    key: String @deprecated # use secured properties
+    "SSH network handler private key"
+    key: String @deprecated(reason: "use secured properties")
+    "A flag that indicates if the password should be saved in the secure storage"
     savePassword: Boolean!
+    "Network handler properties (name/value)"
     properties: Object!
+    "Network handler secure properties (name/value). Used for passwords and keys"
     secureProperties: Object!
 }
 
@@ -349,12 +466,15 @@ type SecretInfo {
     secretId: String!
 }
 
-# Connection instance
+"Connection instance"
 type ConnectionInfo {
+    "Connection unique ID"
     id: ID!
+    "ID of the driver that is used for this connection (see DriverInfo)"
     driverId: ID!
-
+    "Connection name"
     name: String!
+    "Connection description"
     description: String
 
     host: String
@@ -363,49 +483,64 @@ type ConnectionInfo {
     databaseName: String
     url: String
 
+    "Main connection properties. Contains host, port, database, server name fields"
     mainPropertyValues: Object @since(version: "24.1.2")
 
+    "Connection keep-alive interval in seconds"
     keepAliveInterval: Int!
+    "Defines if the connection is in auto-commit mode"
     autocommit: Boolean
 
     properties: Object
-
+    "Indicates if the connection is already connected to the database"
     connected: Boolean!
     provided: Boolean!
+    "Indicates if the connection is read-only (no data modification allowed)"
     readOnly: Boolean!
-    # Forces connection URL use, host/port/database parameters will be ignored
+    "Forces connection URL use, host/port/database parameters will be ignored"
     useUrl: Boolean!
 
-    # Forces credentials save. This flag doesn't work in shared projects.
+    "Forces credentials save. This flag doesn't work in shared projects."
     saveCredentials: Boolean!
-    # Shared credentials - the same for all users, stored in secure storage.
+    "Shared credentials - the same for all users, stored in secure storage."
     sharedCredentials: Boolean!
 
     sharedSecrets: [SecretInfo!]! @since(version: "23.3.5")
-    # Determines that credentials were saved for current user.
-    # This field read is slow, it should be read only when it really needed
+    """
+    Determines that credentials were saved for current user.
+    This field read is slow, it should be read only when it really needed
+    """
     credentialsSaved: Boolean!
-    # Determines that additional credentials are needed to connect
-    # This field read is slow, it should be read only when it really needed
+    """
+    Determines that additional credentials are needed to connect
+    This field read is slow, it should be read only when it really needed
+    """
     authNeeded: Boolean!
 
+    "ID of the connection folder where this connection is stored"
     folder: ID
+    "Node path of the connection in the navigator"
     nodePath: String
 
+    "Connection time in ISO format"
     connectTime: String
+    "Connection error if any"
     connectionError: ServerError
+    "Server version that is used for this connection"
     serverVersion: String
+    "Client version that is used for this connection"
     clientVersion: String
 
     origin: ObjectOrigin!
 
+    "ID of the auth model that is used for this connection (see authModels)"
     authModel: ID
     authProperties: [ObjectPropertyInfo!]!
 
     providerProperties: Object!
     networkHandlersConfig: [NetworkHandlerConfig!]!
 
-    # Supported features (provided etc)
+    "Supported features (provided etc)"
     features: [ String! ]!
     navigatorSettings: NavigatorSettings!
     supportedDataFormats: [ ResultDataFormat! ]!
@@ -421,6 +556,7 @@ type ConnectionInfo {
     defaultCatalogName: String @since(version: "25.0.5")
     defaultSchemaName: String @since(version: "25.0.5")
 
+    "List of tools that can be used with this connection. Returns empty list if no tools are available"
     tools: [String!]! @since(version: "24.1.3")
 }
 
@@ -499,80 +635,94 @@ input NavigatorSettingsInput {
 
 input NetworkHandlerConfigInput {
     id: ID!
+    "Defines if the network handler should be enabled"
     enabled: Boolean
-    authType: NetworkHandlerAuthType @deprecated # use properties
+    "Network handler type (TUNNEL, PROXY, CONFIG)"
+    authType: NetworkHandlerAuthType @deprecated (reason: "use properties")
+    "Sets user name for the network handler (SSH)"
     userName: String
+    "Sets user password for the network handler (SSH)"
     password: String
-    key: String @deprecated # use secured properties
+    "Sets private key for the network handler (SSH)"
+    key: String @deprecated(reason: "use secured properties")
+    "Sets a flag that indicates if the password should be saved in the secure storage"
     savePassword: Boolean
+    "Network handler properties (name/value)"
     properties: Object
+    "Network handler secure properties (name/value). Used for passwords and keys"
     secureProperties: Object
 }
 
-# Configuration of particular connection. Used for new connection create. Includes auth info
+"Configuration of particular connection. Used for new connection create. Includes auth info"
 input ConnectionConfig {
-    # used only for testing created connection
+    "used only for testing created connection"
     connectionId: String
     name: String
     description: String
 
-    # ID of database driver
+    "ID of database driver"
     driverId: ID
 
     # Custom connection parameters (all optional)
-
     host: String
     port: String
     serverName: String
     databaseName: String
 
-    # Host, port, serverName, databaseName are also stored in mainPropertyValues for custom pages
+    "Host, port, serverName, databaseName are also stored in mainPropertyValues for custom pages"
     mainPropertyValues: Object @since(version: "24.1.2")
 
-    # Return connection URL jdbc:{driver}://{host}[:{port}]/[{database}]
+    "Sets connection URL jdbc:{driver}://{host}[:{port}]/[{database}]"
     url: String
 
-    # Return properties list
+    "Set properties list"
     properties: Object
 
-    # Return keep-alive interval
+    "Set keep-alive interval"
     keepAliveInterval: Int
 
-    # Return auto-commit connection state
+    "Sets auto-commit connection state"
     autocommit: Boolean
 
-    # Return read-only connection state
+    "Sets read-only connection state"
     readOnly: Boolean
 
     # User credentials
 
+    "Flag for saving credentials in secure storage"
     saveCredentials: Boolean
+    "Flag for using shared credentials."
     sharedCredentials: Boolean
+    "Auth model ID that will be used for connection"
     authModelId: ID
+    "Secret ID that will be used for connection"
     selectedSecretId: ID @since(version: "23.3.5")
+    "Credentials for the connection (usually user name and password but it may vary for different auth models)"
     credentials: Object
 
-    # Return map of provider properties (name/value)
+    "Returns map of provider properties (name/value)"
     providerProperties: Object
 
-    # Return network handlers configuration. Map of id->property map (name/value).
+    "Returns network handlers configuration. Map of id->property map (name/value)."
     networkHandlersConfig: [NetworkHandlerConfigInput!]
 
     #### deprecated fields
 
-    # ID of predefined datasource
-    dataSourceId: ID #@deprecated
+    "ID of predefined datasource"
+    dataSourceId: ID @deprecated
 
-    # Direct user credentials
-    userName: String #@deprecated
-    userPassword: String #@deprecated
+    "Direct user credentials"
+    userName: String @deprecated(reason: "use credentials")
+    userPassword: String @deprecated(reason: "use credentials")
 
-    # Folder
+    "Defines in which connection folder the connection should be created"
     folder: ID
 
-    # Configuration type
+    "Configuration type (MANUAL, URL)"
     configurationType: DriverConfigurationType
+    "Sets catalog name for the connection"
     defaultCatalogName: String @since(version: "25.0.5")
+    "Sets schema name for the connection"
     defaultSchemaName: String @since(version: "25.0.5")
 }
 
@@ -581,95 +731,108 @@ input ConnectionConfig {
 ####################################################
 
 extend type Query {
-    # Return server config
+    "Returns server config"
     serverConfig: ServerConfig!
+    "Returns server system information properties"
     systemInfo: [ObjectPropertyInfo!]! @since(version: "24.3.5")
 
-    # Return product settings
+    "Returns product settings"
     productSettings: ProductSettings! @since(version: "24.0.1")
 
-    # Return session state ( initialize if not )
+    "Returns session state ( initialize if not )"
     sessionState: SessionInfo!
 
-    # Return session permissions
+    "Returns session permissions"
     sessionPermissions: [ID]!
 
-    # Get driver info
+    "Returns list of available drivers"
     driverList( id: ID ): [ DriverInfo! ]!
+    "Returns list of available database auth models"
     authModels: [DatabaseAuthModel!]!
+    "Returns list of available network handlers"
     networkHandlers: [NetworkHandlerDescriptor!]!
 
-    # Return list of user connections
+    "Returns list of user connections"
     userConnections( projectId: ID, id: ID, projectIds: [ID!] ): [ ConnectionInfo! ]!
 
-    # List of connection folders
+    "Returns list of connection folders"
     connectionFolders( projectId: ID, path: ID ): [ ConnectionFolderInfo! ]!
 
-    # Return connection info
+    "Returns connection info"
     connectionInfo( projectId: ID!, id: ID! ): ConnectionInfo!
 
-    # Return list of accessible user projects
+    "Returns list of accessible user projects"
     listProjects: [ ProjectInfo! ]!
 
+    "Reads session log entries"
     readSessionLog(maxEntries: Int, clearEntries: Boolean): [ LogEntry! ]!
 }
 
 extend type Mutation {
-    # Initialize session
+    "Initialize session"
     openSession(defaultLocale: String): SessionInfo!
 
-    # Destroy session
+    "Destroy session"
     closeSession: Boolean
 
-    # Refreshes session on server and returns its state
-    touchSession: Boolean  @deprecated(reason: "use events to update session")
-    # Refreshes session on server and returns session state
+    "Refreshes session on server and returns its state"
+    touchSession: Boolean @deprecated(reason: "use events to update session")
+    "Refreshes session on server and returns session state"
     updateSession: SessionInfo! @since(version: "24.0.0") @deprecated(reason: "use events to update session")
 
-    # Refresh session connection list
+    "Refresh session connection list"
     refreshSessionConnections: Boolean
 
-    # Change session language to specified
+    "Change session language to specified"
     changeSessionLanguage(locale: String): Boolean
 
-    # Create new custom connection
+    "Create new custom connection"
     createConnection( config: ConnectionConfig!, projectId: ID ): ConnectionInfo!
 
-    # Update specified connection
+    "Update specified connection"
     updateConnection( config: ConnectionConfig!, projectId: ID ): ConnectionInfo!
 
-    # Delete specified connection
+    "Delete specified connection"
     deleteConnection( id: ID!, projectId: ID ): Boolean!
 
-    # Create new folder for connections
+    "Create new folder for connections"
     createConnectionFolder(parentFolderPath: ID, folderName: String!, projectId: ID ): ConnectionFolderInfo!
 
-    # Delete specified connection folder
+    "Delete specified connection folder"
     deleteConnectionFolder( folderPath: ID!, projectId: ID ): Boolean!
 
-    # Copies connection configuration from node
+    "Copies connection configuration from node"
     copyConnectionFromNode( nodePath: String!, config: ConnectionConfig, projectId: ID ): ConnectionInfo!
 
-    # Test connection configuration. Returns remote server version
+    "Test connection configuration. Returns remote server version"
     testConnection( config: ConnectionConfig!, projectId: ID): ConnectionInfo!
 
-    # Test network handler
+    "Test network handler"
     testNetworkHandler( config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!
 
-    # Initiate existing connection
-    initConnection( id: ID!, projectId: ID, credentials: Object, networkCredentials: [NetworkHandlerConfigInput!],
-        saveCredentials:Boolean, sharedCredentials: Boolean, selectedSecretId:String ): ConnectionInfo!
+    "Initiate existing connection"
+    initConnection(
+        id: ID!,
+        projectId: ID,
+        credentials: Object,
+        networkCredentials: [NetworkHandlerConfigInput!],
+        saveCredentials:Boolean,
+        sharedCredentials: Boolean,
+        selectedSecretId:String
+    ): ConnectionInfo!
 
-    # Disconnect from database
+    "Disconnect from database"
     closeConnection( id: ID!, projectId: ID ): ConnectionInfo!
 
-    # Change navigator settings for connection
+    "Change navigator settings for connection"
     setConnectionNavigatorSettings( id: ID!, projectId: ID, settings: NavigatorSettingsInput!): ConnectionInfo!
 
     #### Generic async functions
 
+    "Cancel async task by ID"
     asyncTaskCancel(id: String!): Boolean
 
+    "Get async task info by ID"
     asyncTaskInfo(id: String!, removeOnFinish: Boolean!): AsyncTaskInfo!
 }
 

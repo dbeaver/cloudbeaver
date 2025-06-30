@@ -1,43 +1,62 @@
 type FSFile @since(version: "23.2.2") {
+    "Name of the file or folder"
     name: String!
+    "Length of the file in bytes"
     length: Int!
+    "Flag indicating if the file is a folder"
     folder: Boolean!
+    "Metadata of the file or folder"
     metaData: Object!
+    "Navigator tree node path"
     nodePath: String!
 }
 
 type FSFileSystem @since(version: "23.2.4") {
+    "File system ID"
     id: ID!
+    "Navigator tree node path"
     nodePath: String!
+    "External auth provider ID if file system requires authentication"
     requiredAuth: String
 }
 
 extend type Query @since(version: "23.2.2") {
+    "Returns available file systems for the specified project"
     fsListFileSystems(projectId: ID!): [FSFileSystem!]!
 
+    "Returns file system information for the specified project and node path"
     fsFileSystem(projectId: ID!, nodePath: String!): FSFileSystem! @since(version: "23.2.4")
 
+    "Returns file info for the specified node path"
     fsFile(nodePath: String!):  FSFile!
 
+    "Returns list of files and folders in the specified folder path"
     fsListFiles(folderPath: String!): [FSFile!]!
 
-    # Reads file contents as string in UTF-8
+    "Reads file contents as string in UTF-8"
     fsReadFileContentAsString(nodePath: String!): String!
 }
 
 extend type Mutation @since(version: "23.2.2") {
+    "Creates a new file in the specified parent path"
     fsCreateFile(parentPath : String!, fileName : String!): FSFile!
 
+    "Creates a new folder in the specified parent path"
     fsCreateFolder(parentPath : String!, folderName: String!): FSFile!
 
+    "Deletes file or folder by node path. Returns true if file was deleted, false if file not found"
     fsDelete(nodePath : String!): Boolean!
 
+    "Moves file or folder to the specified parent path. Returns updated file info"
     fsMove(nodePath: String!, toParentNodePath: String!): FSFile!
 
+    "Renames file or folder by node path. Returns updated file info"
     fsRename(nodePath: String!, newName: String!): FSFile!
 
+    "Copies file or folder to the specified parent path. Returns updated file info"
     fsCopy(nodePath: String!, toParentNodePath: String!): FSFile! @since(version: "23.2.5")
 
+    "Writes string content to the file. If forceOverwrite is true then overwrites existing file, otherwise throws an error if file already exists"
     fsWriteFileStringContent(
         nodePath:String!,
         data: String!,
