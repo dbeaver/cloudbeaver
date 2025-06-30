@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -48,10 +48,12 @@ export * from './TreeNew/TreeLazy.js';
 export * from './TreeNew/NodeLazy.js';
 export * from './TreeNew/contexts/TreeContext.js';
 export * from './TreeNew/contexts/TreeDataContext.js';
+export * from './TreeNew/contexts/TreeSelectionContext.js';
 export * from './TreeNew/NodeControlLazy.js';
 export * from './TreeNew/useTreeData.js';
 export * from './TreeNew/ITreeData.js';
 export * from './TreeNew/useTreeFilter.js';
+export * from './TreeNew/useTreeSelection.js';
 export * from './TreeNew/INode.js';
 export * from './TreeNew/NodeEmptyPlaceholderComponent.js';
 

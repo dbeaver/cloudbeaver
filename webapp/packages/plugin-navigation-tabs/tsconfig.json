@@ -35,10 +35,16 @@
       "path": "../core-extensions"
     },
     {
+      "path": "../core-localization"
+    },
+    {
       "path": "../core-projects"
     },
     {
       "path": "../core-resource"
+    },
+    {
+      "path": "../core-root"
     },
     {
       "path": "../core-storage"

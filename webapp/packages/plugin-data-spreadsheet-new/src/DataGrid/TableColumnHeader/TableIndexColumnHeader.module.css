@@ -6,15 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-.container {
-  width: 100%;
+.clickAreaOverlay {
   cursor: pointer;
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }
+
 .iconOrImage {
   cursor: auto;
   width: 10px;
   position: absolute;
-  right: 8px;
   top: 50%;
   transform: translateY(-50%);
 }

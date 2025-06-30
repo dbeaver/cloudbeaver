@@ -6,39 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-
-import { isDefined } from '@dbeaver/js-helpers';
-
-import { useAutoLoad } from '../Loader/useAutoLoad.js';
+import { usePlaceholder } from './usePlaceholder.js';
 import type { PlaceholderContainer, PlaceholderElement } from './PlaceholderContainer.js';
 
 type Props<T extends Record<string, any>> = T & {
   container: PlaceholderContainer<T>;
   elements?: PlaceholderElement<T>[];
+  empty?: React.ReactNode;
 };
 
-export const Placeholder = observer(function Placeholder<T extends Record<string, any>>({ container, elements: extraElements, ...rest }: Props<T>) {
-  let elements = container.get();
+export const Placeholder = observer(function Placeholder<T extends Record<string, any>>({
+  container,
+  elements: extraElements,
+  empty,
+  ...rest
+}: Props<T>) {
+  const elements = usePlaceholder({ container, extraElements, props: rest as any as T });
 
-  if (extraElements) {
-    elements = [...elements, ...extraElements].sort((a, b) => {
-      if (a.order === b.order) {
-        return 0;
-      }
-
-      return (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER);
-    });
+  if (elements.length === 0 && empty) {
+    return <>{empty}</>;
   }
-
-  useAutoLoad(
-    Placeholder,
-    elements
-      .map(element => element.getLoaders?.(rest as unknown as T))
-      .flat()
-      .filter(isDefined),
-  );
-
-  elements = elements.filter(placeholder => !placeholder.isHidden?.(rest as unknown as T));
 
   return (
     <>

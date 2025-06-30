@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,12 @@ import { ENotificationType, type INotification, NotificationService } from '@clo
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_STATE } from '@cloudbeaver/plugin-top-app-bar';
+import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 import { ACTION_APP_HELP } from './actions/ACTION_APP_HELP.js';
 
 const ShortcutsDialog = importLazyComponent(() => import('./Shortcuts/ShortcutsDialog.js').then(m => m.ShortcutsDialog));
+const WelcomeDocs = importLazyComponent(() => import('./WelcomeDocs.js').then(m => m.WelcomeDocs));
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -29,6 +31,7 @@ export class PluginBootstrap extends Bootstrap {
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
     private readonly localStorageSaveService: LocalStorageSaveService,
+    private readonly navigationTabsService: NavigationTabsService,
   ) {
     super();
     this.errorNotification = null;
@@ -37,6 +40,7 @@ export class PluginBootstrap extends Bootstrap {
   override async load(): Promise<void> {}
 
   override register(): void {
+    this.navigationTabsService.welcomeContainer.add(WelcomeDocs, undefined);
     this.addTopAppMenuItems();
     this.addMultiTabSupportNotification();
   }

@@ -1,6 +1,9 @@
 export default [
   ['shortcuts_title', '快捷操作'],
 
+  ['plugin_help_welcome_docs_label', 'Documentation'],
+  ['plugin_help_welcome_docs_description', 'Learn how to use CloudBeaver'],
+
   ['data_viewer_shortcut_start_inline_editing', '为所选单元格打开内联编辑器'],
   ['data_viewer_shortcut_add_new_row', '添加行'],
   ['data_viewer_shortcut_duplicate_row', '复制行'],

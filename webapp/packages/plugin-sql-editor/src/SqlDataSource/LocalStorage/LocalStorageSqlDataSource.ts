@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@ import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connecti
 import { BaseSqlDataSource } from '../BaseSqlDataSource.js';
 import { ESqlDataSourceFeatures } from '../ESqlDataSourceFeatures.js';
 import type { ILocalStorageSqlDataSourceState } from './ILocalStorageSqlDataSourceState.js';
+import type { ISqlEditorCursor } from '../ISqlDataSource.js';
 
 export class LocalStorageSqlDataSource extends BaseSqlDataSource {
   get baseScript(): string {
@@ -75,9 +76,9 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
     return true;
   }
 
-  override setScript(script: string): void {
+  override setScript(script: string, source?: string, cursor?: ISqlEditorCursor): void {
     this.state.script = script;
-    super.setScript(script);
+    super.setScript(script, source, cursor);
   }
 
   override setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {

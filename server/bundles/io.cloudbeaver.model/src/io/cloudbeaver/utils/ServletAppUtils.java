@@ -293,7 +293,7 @@ public class ServletAppUtils {
         String forwardedScheme = request.getHeader(HEADER_FORWARDED_SCHEME);
         String forwardedHost = request.getHeader(HEADER_FORWARDED_HOST);
         if (CommonUtils.isNotEmpty(forwardedScheme) && CommonUtils.isNotEmpty(forwardedHost)) {
-            origin = forwardedHost + "://" + forwardedScheme;
+            origin = forwardedScheme + "://" + forwardedHost;
         }
         if (CommonUtils.isEmpty(origin)) {
             URI requestUrl = URI.create(request.getRequestURL().toString());

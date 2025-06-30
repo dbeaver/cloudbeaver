@@ -1,7 +1,7 @@
 extend type ServerConfig {
     serverURL: String!
     rootURI: String!
-    hostName: String! @deprecated # use container id instead
+    hostName: String! @deprecated(reason: "use container id instead")
     containerId: String!
     defaultAuthRole: String
     defaultUserTeam: String # [23.2.2]
