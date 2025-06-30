@@ -20,7 +20,7 @@ export const NavNodeMetadataTab: NavNodeTransformViewComponent = observer(functi
     return null;
   }
 
-  const icon = 'platform:/plugin/org.jkiss.dbeaver.model/icons/tree/info.png';
+  const icon = 'platform:/plugin/org.jkiss.dbeaver.model/icons/tree/info.svg';
 
   return (
     <Tab tabId={folderId} title={title}>
