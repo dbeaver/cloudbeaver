@@ -4,6 +4,7 @@ export default [
   ['ui_tag_new', 'Новый'],
   ['ui_light_theme', 'Светлая'],
   ['ui_dark_theme', 'Темная'],
+  ['ui_system_theme', 'Устройство'],
   ['ui_stepper_back', 'Назад'],
   ['ui_load_more', 'Загрузить ещё'],
   ['ui_processing_connecting', 'Подключение...'],
