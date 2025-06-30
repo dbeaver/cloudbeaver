@@ -4,6 +4,7 @@ export default [
   ['ui_tag_new', 'Mới'],
   ['ui_light_theme', 'Sáng'],
   ['ui_dark_theme', 'Tối'],
+  ['ui_system_theme', 'Thiết bị'],
   ['ui_stepper_back', 'Quay lại'],
   ['ui_stepper_next', 'Tiếp theo'],
   ['ui_stepper_finish', 'Hoàn tất'],
