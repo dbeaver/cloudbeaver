@@ -4,6 +4,7 @@ export default [
   ['ui_tag_new', 'Nouveau'],
   ['ui_light_theme', 'Clair'],
   ['ui_dark_theme', 'Sombre'],
+  ['ui_system_theme', 'Appareil'],
   ['ui_stepper_back', 'Retour'],
   ['ui_stepper_next', 'Suivant'],
   ['ui_stepper_finish', 'Terminer'],
