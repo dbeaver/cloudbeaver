@@ -41,10 +41,10 @@
   }
 
   .fieldLabel {
+    composes: theme-typography--body1 from global;
     display: block;
     padding-bottom: 10px;
-    composes: theme-typography--body1 from global;
-    font-weight: 500;
+    font-weight: 500 !important;
   }
 
   .item {
@@ -96,7 +96,7 @@
     align-items: center;
 
     & .inputIcon {
-      width: 20px;
+      width: 18px;
     }
   }
 

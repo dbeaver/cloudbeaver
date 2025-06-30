@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { useMenuState } from 'reakit';
+import { useCallback, useContext, useEffect, useLayoutEffect, useState } from 'react';
+import { useSelectStore, SelectField } from '@dbeaver/ui-kit';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
@@ -21,7 +21,6 @@ import { useS } from '../useS.js';
 import comboboxStyles from './Combobox.module.css';
 import { FieldLabel } from './FieldLabel.js';
 import { FormContext } from './FormContext.js';
-import { SelectField } from '@dbeaver/ui-kit';
 import { FieldDescription } from './FieldDescription.js';
 import { Field } from './Field.js';
 
@@ -99,18 +98,10 @@ export const Combobox: ComboboxType = observer(function Combobox({
   rest = filterLayoutFakeProps(rest);
   const translate = useTranslate();
   const context = useContext(FormContext);
-  // TOD remove menu logic
-  const menuRef = useRef<HTMLDivElement>(null);
   const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
-  const [, setOpen] = useState(false);
+  const store = useSelectStore();
+  const isOpened = store.getState().open;
   const styles = useS(comboboxStyles);
-
-  const menu = useMenuState({
-    placement: 'bottom-end',
-    currentId: null,
-    gutter: 4,
-    unstable_fixed: true,
-  });
 
   if (readOnly) {
     searchable = true;
@@ -146,10 +137,10 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   function handleClick() {
     if (!searchable) {
-      if (menu.visible) {
-        menu.hide();
+      if (isOpened) {
+        store.setOpen(false);
       } else {
-        menu.show();
+        store.setOpen(true);
       }
     }
   }
@@ -168,7 +159,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
       id = id ?? value ?? '';
       const changed = id !== value;
 
-      menu.hide();
+      store.setOpen(false);
       if (state && changed) {
         state[name] = id;
       }
@@ -179,9 +170,8 @@ export const Combobox: ComboboxType = observer(function Combobox({
         context.change(id, name);
       }
       setSearchValue('');
-      setOpen(false); // TODO delete it?
     },
-    [value, state, name, menu, context, onSelect],
+    [value, state, name, store, context, onSelect],
   );
 
   const matchItems = useCallback(
@@ -226,40 +216,21 @@ export const Combobox: ComboboxType = observer(function Combobox({
   useEffect(() => {
     if (inputRef === document.activeElement) {
       if (inputValue === searchValue) {
-        menu.show();
+        store.setOpen(true);
       }
     } else {
-      if (!menu.visible) {
+      if (!isOpened) {
         matchItems();
       }
     }
-  }, [inputValue, searchValue, matchItems, menu]);
+  }, [inputValue, searchValue, isOpened, matchItems]);
 
   useLayoutEffect(() => {
-    onSwitch?.(menu.visible);
-  }, [onSwitch, menu.visible]);
-
-  useEffect(() => {
-    if (!inputRef) {
-      return;
-    }
-
-    const resizeObserver = new ResizeObserver(() => {
-      if (menuRef.current) {
-        const size = inputRef.getBoundingClientRect();
-        menuRef.current.style.width = size.width + 'px';
-      }
-    });
-
-    resizeObserver.observe(inputRef);
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [inputRef]);
+    onSwitch?.(isOpened);
+  }, [onSwitch, isOpened]);
 
   // const icon = selectedItem && iconSelector?.(selectedItem);
-  const focus = menu.visible;
+  const focus = isOpened;
   const select = !searchable;
 
   if (loading && items.length === 0) {
@@ -355,6 +326,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           noItemsPlaceholder={translate('combobox_no_results_placeholder')}
           selectedRender={selectedRender}
           arrowIcon={<Icon name="arrow" viewBox="0 0 16 16" className={styles['icon']} />}
+          store={store}
           onChange={handleSelect}
           {...rest}
         />

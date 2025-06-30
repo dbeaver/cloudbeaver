@@ -8,7 +8,7 @@
 
 import { useState } from 'react';
 import clsx from 'clsx';
-import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel } from './Select.js';
+import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel, type SelectProviderProps } from './Select.js';
 import './SelectField.css';
 
 export interface SelectItem<T> {
@@ -69,6 +69,8 @@ export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
    * Custom arrow icon React Node that will be rendered instead default one
    */
   arrowIcon?: React.ReactNode;
+
+  store?: SelectProviderProps['store']
 }
 
 // Utility function to get value by it's key or using getter function
@@ -91,6 +93,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   className,
   selectedRender,
   arrowIcon,
+  store,
   name,
 }: SelectFieldProps<T, ItemType>) {
   const getItemValue = (item: ItemType): T =>
@@ -122,7 +125,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
 
   return (
     <div className={clsx('dbv-kit-select-field', className)}>
-      <SelectProvider value={currentValue as any} setValue={val => handleChange(val as T)}>
+      <SelectProvider value={currentValue as any} setValue={val => handleChange(val as T)} store={store}> 
         {label && <SelectLabel className={clsx(required && 'dbv-kit-select__label--required')}>{label}</SelectLabel>}
 
         <Select name={name} disabled={disabled}>
