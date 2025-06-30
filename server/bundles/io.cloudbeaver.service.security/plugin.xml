@@ -7,7 +7,7 @@
                 caseInsensitive="true"
                 description="Local name/password based authentication"
                 class="io.cloudbeaver.auth.provider.local.LocalAuthProvider"
-                icon="platform:/plugin/org.jkiss.dbeaver.model/icons/tree/key.png">
+                icon="platform:/plugin/org.jkiss.dbeaver.model/icons/tree/key.svg">
             <credentials>
                 <propertyGroup label="General">
                     <property id="user" label="User name" type="string" description="User name" admin="true" user="true" identifying="true" required="true"/>
@@ -21,7 +21,7 @@
                       trusted="true"
                       configurable="true"
                       class="io.cloudbeaver.auth.provider.rp.RPAuthProvider"
-                      icon="platform:/plugin/org.jkiss.dbeaver.model/icons/tree/key.png">
+                      icon="platform:/plugin/org.jkiss.dbeaver.model/icons/tree/key.svg">
             <credentials>
                 <propertyGroup label="General">
                     <property id="user" label="User name" type="string" description="User name" admin="true" user="true" identifying="true"/>
