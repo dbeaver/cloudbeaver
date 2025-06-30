@@ -46,9 +46,20 @@
     font-weight: 500;
   }
 
+  .item {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+  }
+
   .input {
-    padding-right: 24px !important;
     font-size: 12px;
+    border: none;
+
+    &:disabled,
+    &:read-only {
+      background: none;
+    }
 
     &.select {
       cursor: pointer;
@@ -68,20 +79,23 @@
     align-items: center;
 
     & .inputIcon {
-      position: absolute;
-      left: 0;
       width: 16px;
-      height: 16px;
-      margin-left: 12px;
 
       & .iconOrImage {
         width: 100%;
         height: 100%;
       }
+    }
+  }
 
-      &:not(:empty) + .input {
-        padding-left: 34px !important;
-      }
+  .itemSearch {
+    width: 100%;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+
+    & .inputIcon {
+      width: 20px;
     }
   }
 

@@ -285,10 +285,10 @@ export const Combobox: ComboboxType = observer(function Combobox({
   };
   const itemValue = (item: any) => keySelector(item, items.indexOf(item));
   const itemRender = (item: any) => (
-    <>
+    <div className={s(styles, { item: true })} title={titleSelector?.(item)}>
       {renderIcon(item)}
       <span>{valueSelector(item)}</span>
-    </>
+    </div>
   );
 
   const itemDisabled = (item: any) => isDisabled?.(item) ?? false;
@@ -300,9 +300,10 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
     if (searchable) {
       return (
-        <>
+        <div className={s(styles, { itemSearch: true })} title={title}>
           {renderIcon(item)}
           <input
+            {...rest}
             ref={setInputRef}
             required={rest.required}
             autoComplete="off"
@@ -317,9 +318,8 @@ export const Combobox: ComboboxType = observer(function Combobox({
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             onClick={handleClick}
-            {...rest}
           />
-        </>
+        </div>
       );
     }
 
@@ -349,7 +349,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           itemRender={itemRender}
           itemDisabled={itemDisabled}
           name={name}
-          disabled={disabled}
+          disabled={disabled || readOnly}
           required={rest.required}
           className={s(styles, { field: true, inline }, className, styles['selectField'])}
           noItemsPlaceholder={translate('combobox_no_results_placeholder')}
