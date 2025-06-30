@@ -138,7 +138,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   let inputValue = (selectedItem ? valueSelector(selectedItem) : searchValue) ?? '';
 
-  if (searchValue !== null && selectedItem && valueSelector(selectedItem) !== searchValue) {
+  if (searchValue && selectedItem && valueSelector(selectedItem) !== searchValue) {
     inputValue = searchValue;
   }
 
@@ -186,7 +186,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   const matchItems = useCallback(
     (input?: boolean) => {
-      if (searchValue === null) {
+      if (!searchValue) {
         return;
       }
 
