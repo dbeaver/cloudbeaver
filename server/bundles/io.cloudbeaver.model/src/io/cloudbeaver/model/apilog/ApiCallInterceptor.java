@@ -7,6 +7,10 @@ import org.jkiss.code.Nullable;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+/**
+ * Interceptor for API call events.
+ * This interface allows to intercept and log API call events in a web application.
+ */
 public interface ApiCallInterceptor {
 
     /**
