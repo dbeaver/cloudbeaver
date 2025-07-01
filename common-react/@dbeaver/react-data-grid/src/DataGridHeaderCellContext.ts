@@ -14,6 +14,7 @@ export interface IDataGridHeaderCellContext {
   columnSortingState?: IGridReactiveValue<'asc' | 'desc' | undefined | null, [colIdx: number]>;
   columnSortable?: IGridReactiveValue<boolean, [colIdx: number]>;
   onColumnSort?: (colIdx: number, order: 'asc' | 'desc' | null, isMultiple: boolean) => void;
+  onHeaderKeyDown?: (event: React.KeyboardEvent) => void;
 }
 
 export const DataGridCellHeaderContext = createContext<IDataGridHeaderCellContext | null>(null);

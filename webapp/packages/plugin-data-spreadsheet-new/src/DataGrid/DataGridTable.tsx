@@ -84,11 +84,14 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
 
-  function restoreFocus() {
-    const gridDiv = gridContainerRef.current;
-    const focusSink = gridDiv?.querySelector<HTMLDivElement>('[aria-selected="true"]');
-    focusSink?.focus();
-  }
+  const restoreFocus = useCallback(
+    function restoreFocus() {
+      const gridDiv = gridContainerRef.current;
+      const focusSink = gridDiv?.querySelector<HTMLDivElement>('[aria-selected="true"]');
+      focusSink?.focus();
+    },
+    [gridContainerRef],
+  );
 
   function isGridInFocus(): boolean {
     const gridDiv = gridContainerRef.current;
@@ -544,6 +547,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               onColumnSort={handleSort}
               onCellChange={handleCellChange}
               onCellKeyDown={handleCellKeyDown}
+              onHeaderKeyDown={gridSelectedCellCopy.onKeydownHandler}
             />
           </div>
         </TableDataContext.Provider>
