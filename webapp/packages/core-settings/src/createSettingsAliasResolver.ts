@@ -17,6 +17,30 @@ type SettingsMapping<TTarget> = Partial<{
   [key in keyof TTarget]: string;
 }>;
 
+let resolverLock = false;
+
+/**
+ * Executes a function with a lock to prevent concurrent access.
+ * If the lock is already acquired, it passes `true` to the function.
+ * Otherwise, it acquires the lock, executes the function, and then releases the lock.
+ *
+ * We use this function to verify that the source doesn't have original keys
+ *
+ * @param fn The function to execute with the lock status.
+ * @returns The result of the function execution.
+ */
+function withLock<T>(fn: (locked: boolean) => T): T {
+  if (resolverLock) {
+    return fn(true);
+  }
+  try {
+    resolverLock = true;
+    return fn(false);
+  } finally {
+    resolverLock = false;
+  }
+}
+
 export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject>(
   source: ISettingsSource,
   target: SettingsProvider<TTarget>,
@@ -39,20 +63,6 @@ export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject
     data => ({ ...data, key: reverseMapKey(data.key) }),
     data => data.key in reversed,
   );
-
-  let resolverLock = false;
-
-  function withLock<T>(fn: (locked: boolean) => T): T {
-    if (resolverLock) {
-      return fn(true);
-    }
-    try {
-      resolverLock = true;
-      return fn(false);
-    } finally {
-      resolverLock = false;
-    }
-  }
 
   return {
     onChange,
