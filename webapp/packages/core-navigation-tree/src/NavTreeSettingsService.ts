@@ -62,7 +62,7 @@ export class NavTreeSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings<typeof settingsSchema>(() => [
       {
         key: 'core.navigation-tree.childrenLimit',
         access: {

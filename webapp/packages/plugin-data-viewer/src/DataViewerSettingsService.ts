@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { ServerSettingsManagerService } from '@cloudbeaver/core-root';
+import { ServerSettingsManagerService, SettingsTransformationService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
@@ -67,6 +67,7 @@ export class DataViewerSettingsService extends Dependency {
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
     private readonly settingsResolverService: SettingsResolverService,
+    private readonly settingsTransformationService: SettingsTransformationService,
     private readonly serverSettingsManagerService: ServerSettingsManagerService,
   ) {
     super();
@@ -102,7 +103,7 @@ export class DataViewerSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.serverSettingsManagerService.setSettingTransformer(
+    this.settingsTransformationService.setSettingTransformer(
       'resultset.maxrows',
       setting =>
         ({
@@ -113,7 +114,7 @@ export class DataViewerSettingsService extends Dependency {
         }) as ISettingDescription<DataViewerSettings>,
     );
 
-    this.settingsManagerService.registerSettings(this.settings, () => {
+    this.settingsManagerService.registerSettings<typeof defaultSettings>(() => {
       const settings: ISettingDescription<DataViewerSettings>[] = [
         {
           key: 'plugin.data-viewer.disableEdit',

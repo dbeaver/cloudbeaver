@@ -11,7 +11,7 @@ import { useService } from '@cloudbeaver/core-di';
 import {
   ESettingsValueType,
   SettingsProviderService,
-  SettingsResolverService,
+  SettingsResolverSource,
   type ISettingDescription,
   type ISettingsSource,
 } from '@cloudbeaver/core-settings';
@@ -20,12 +20,12 @@ import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { observer } from 'mobx-react-lite';
 
 interface Props {
+  resolver: SettingsResolverSource;
   source: ISettingsSource;
   setting: ISettingDescription;
 }
 
-export const SettingField = observer<Props>(function SettingField({ setting, source }) {
-  const settingsResolverService = useService(SettingsResolverService);
+export const SettingField = observer<Props>(function SettingField({ resolver, setting, source }) {
   const settingsProviderService = useService(SettingsProviderService);
   const translate = useTranslate();
 
@@ -39,7 +39,7 @@ export const SettingField = observer<Props>(function SettingField({ setting, sou
 
   let value = source.getEditedValue(setting.key);
   if (readOnly || !isNotNullDefined(value)) {
-    value = settingsResolverService.getEditedValue(setting.key);
+    value = resolver.getEditedValue(setting.key);
   }
 
   if (setting.key in settingsProviderService.schema.shape) {

@@ -44,7 +44,6 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
         notificationService.logSuccess({ title, message });
 
         onSave?.();
-        onCancel?.();
       } else {
         if (exception) {
           const errorKey = state.mode === 'create' ? 'administration_teams_team_create_error' : 'administration_teams_team_save_error';

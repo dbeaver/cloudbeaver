@@ -63,7 +63,7 @@ export class LogViewerSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings<typeof defaultSettings>(() => [
       // {
       //   group: LOG_VIEWER_SETTINGS_GROUP,
       //   key: 'plugin.log-viewer.maxLogRecords',

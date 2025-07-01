@@ -25,6 +25,7 @@
     "@cloudbeaver/core-events": "workspace:*",
     "@cloudbeaver/core-executor": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
+    "@cloudbeaver/core-settings": "workspace:*",
     "@cloudbeaver/core-settings-user": "workspace:*",
     "@cloudbeaver/core-view": "workspace:*",
     "@cloudbeaver/plugin-settings-menu": "workspace:*",

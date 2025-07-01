@@ -50,7 +50,7 @@ export class DataGridSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings<typeof defaultSettings>(() => [
       {
         group: DATA_EDITOR_SETTINGS_GROUP,
         key: 'plugin.data-spreadsheet.hidden',

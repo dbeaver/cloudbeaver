@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { FEATURE_GIT_ID, ServerConfigResource, ServerSettingsManagerService } from '@cloudbeaver/core-root';
+import { FEATURE_GIT_ID, ServerConfigResource, ServerSettingsManagerService, SettingsTransformationService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
@@ -89,6 +89,7 @@ export class SqlEditorSettingsService extends Dependency {
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
     private readonly settingsResolverService: SettingsResolverService,
+    private readonly settingsTransformationService: SettingsTransformationService,
     private readonly serverSettingsManagerService: ServerSettingsManagerService,
     private readonly serverConfigResource: ServerConfigResource,
   ) {
@@ -107,8 +108,8 @@ export class SqlEditorSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.serverSettingsManagerService.setGroupOverride('editors/sqlEditor', SQL_EDITOR_SETTINGS_GROUP);
-    this.serverSettingsManagerService.setSettingTransformer(
+    this.settingsTransformationService.setGroupOverride('editors/sqlEditor', SQL_EDITOR_SETTINGS_GROUP);
+    this.settingsTransformationService.setSettingTransformer(
       'sql.proposals.insert.table.alias',
       setting =>
         ({
@@ -120,7 +121,7 @@ export class SqlEditorSettingsService extends Dependency {
         }) as ISettingDescription<SqlEditorSettings>,
     );
 
-    this.settingsManagerService.registerSettings(this.settings, () => {
+    this.settingsManagerService.registerSettings<typeof defaultSettings>(() => {
       const settings: ISettingDescription<SqlEditorSettings>[] = [
         {
           group: SQL_EDITOR_SETTINGS_GROUP,

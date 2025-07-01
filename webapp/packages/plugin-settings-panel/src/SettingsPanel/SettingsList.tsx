@@ -8,7 +8,12 @@
 import { observer } from 'mobx-react-lite';
 
 import { Group, s, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
-import { type ISettingDescription, type ISettingsSource, type SettingsGroup as SettingsGroupType } from '@cloudbeaver/core-settings';
+import {
+  SettingsResolverSource,
+  type ISettingDescription,
+  type ISettingsSource,
+  type SettingsGroup as SettingsGroupType,
+} from '@cloudbeaver/core-settings';
 import type { ITreeData, ITreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
 import { getGroupsFromTree } from './getGroupsFromTree.js';
@@ -22,8 +27,10 @@ interface Props {
   treeData: ITreeData;
   treeFilter: ITreeFilter;
   source: ISettingsSource;
+  resolver: SettingsResolverSource;
   settings: Map<SettingsGroupType, ISettingDescription<any>[]>;
   groupSelectExecutor: ISyncExecutor<string>;
+  groupsHidden?: boolean;
   onSettingsOpen?: (groupId: string) => void;
 }
 
@@ -31,8 +38,10 @@ export const SettingsList = observer<Props>(function SettingsList({
   settingsId,
   treeData,
   treeFilter,
+  resolver,
   source,
   settings,
+  groupsHidden,
   groupSelectExecutor,
   onSettingsOpen,
 }) {
@@ -47,9 +56,11 @@ export const SettingsList = observer<Props>(function SettingsList({
           key={group.id}
           settingsId={settingsId}
           group={group}
+          resolver={resolver}
           source={source}
           settings={settings}
           treeFilter={treeFilter}
+          groupsHidden={groupsHidden}
           groupSelectExecutor={groupSelectExecutor}
         />
       ))}
