@@ -99,13 +99,4 @@
       width: 18px;
     }
   }
-
-  /* TODO: should be removed after migration to new validation system */
-  .validationInput {
-    z-index: -1;
-    opacity: 0;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-  }
 }

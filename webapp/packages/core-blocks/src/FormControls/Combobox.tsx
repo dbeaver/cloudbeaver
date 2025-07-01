@@ -29,7 +29,6 @@ export type ComboboxBaseProps<TKey, TValue> = Omit<
   'onChange' | 'onSelect' | 'name' | 'value' | 'defaultValue'
 > &
   ILayoutSizeProps & {
-    propertyName?: string;
     items: TValue[];
     searchable?: boolean;
     defaultValue?: TKey;
@@ -73,7 +72,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
   defaultValue,
   name,
   state,
-  propertyName,
   items,
   loading,
   children,
@@ -204,6 +202,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   );
 
   useEffect(() => {
+    // TODO delete that?
     if (inputRef === document.activeElement) {
       if (inputValue === searchValue) {
         menu.show();
@@ -226,34 +225,46 @@ export const Combobox: ComboboxType = observer(function Combobox({
     inputValue = translate('ui_processing_loading');
   }
 
-  const renderIcon = (item: any) => {
+  function renderIcon(item: any) {
     if (item && iconSelector && iconSelector(item)) {
-      return (
-        <div className={s(styles, { inputIcon: true })}>
-          {loading ? (
-            <Loader small fullSize />
-          ) : typeof iconSelector(item) === 'string' ? (
-            <IconOrImage icon={iconSelector(item) as string} className={s(styles, { iconOrImage: true })} />
-          ) : (
-            iconSelector(item)
-          )}
-        </div>
-      );
+      let element: React.ReactElement | string | undefined;
+
+      switch (true) {
+        case loading:
+          element = <Loader small fullSize />;
+          break;
+        case typeof iconSelector(item) === 'string':
+          element = <IconOrImage icon={iconSelector(item) as string} className={s(styles, { iconOrImage: true })} />;
+          break;
+        default:
+          element = iconSelector(item);
+          break;
+      }
+
+      return <div className={s(styles, { inputIcon: true })}>{element}</div>;
     }
 
     return null;
-  };
-  const itemValue = (item: any) => keySelector(item, items.indexOf(item));
-  const itemRender = (item: any) => (
-    <div className={s(styles, { item: true })} title={titleSelector?.(item)}>
-      {renderIcon(item)}
-      <span>{valueSelector(item)}</span>
-    </div>
-  );
+  }
 
-  const itemDisabled = (item: any) => isDisabled?.(item) ?? false;
+  function itemValue(item: any) {
+    return keySelector(item, items.indexOf(item));
+  }
 
-  const selectedRender = (val: any, item: any) => {
+  function itemRender(item: any) {
+    return (
+      <div className={s(styles, { item: true })} title={titleSelector?.(item)}>
+        {renderIcon(item)}
+        <span>{valueSelector(item)}</span>
+      </div>
+    );
+  }
+
+  function itemDisabled(item: any): boolean {
+    return isDisabled?.(item) ?? false;
+  }
+
+  function selectedRender(val: any, item: any) {
     if (searchable) {
       return (
         <div className={s(styles, { itemSearch: true })} title={title}>
@@ -270,7 +281,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
             readOnly={readOnly || select}
             data-focus={focus}
             data-select={select}
-            className={s(styles, { input: true, select, focus })}
+            className={s(styles, { input: true, select })}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
           />
@@ -282,14 +293,8 @@ export const Combobox: ComboboxType = observer(function Combobox({
       return '';
     }
 
-    return (
-      <>
-        {/* TODO check validation form select field */}
-        {/* <input className={s(styles, { validationInput: true })} value={inputValue} required={rest.required} readOnly /> */}
-        {itemRender(item)}
-      </>
-    );
-  };
+    return itemRender(item);
+  }
 
   return (
     <Field {...layoutProps} className={s(styles, { field: true, inline }, className)}>
@@ -299,8 +304,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
         </FieldLabel>
       )}
       <div className={s(styles, { inputBox: true })}>
-        {/* TODO check validation in the form and remove it */}
-        {/* <input className={s(styles, { validationInput: true })} value={inputValue} required={rest.required} readOnly /> */}
         <SelectField
           items={filteredItems}
           value={value}
