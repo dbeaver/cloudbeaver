@@ -74,6 +74,9 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       setMenuVisibility(visibility: boolean): void {
         this.isMenuVisible = visibility;
       },
+      setHover(hovered: boolean) {
+        this.isHovered = hovered;
+      },
     }),
     {
       isHovered: observable.ref,
@@ -92,6 +95,7 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
       tableDataContext: observable.ref,
       selectionContext: observable.ref,
       props: observable.ref,
+      setHover: action.bound,
     },
     { colIdx, rowIdx, tableDataContext, selectionContext, props },
   );
@@ -151,8 +155,8 @@ export const CellRenderer = observer<Props>(function CellRenderer({ rowIdx, colI
         'data-column-index': colIdx,
         onMouseDown: state.mouseDown,
         onMouseUp: state.mouseUp,
-        onMouseEnter: () => (cellContext.isHovered = true),
-        onMouseLeave: () => (cellContext.isHovered = false),
+        onPointerEnter: () => cellContext.setHover(true),
+        onPointerLeave: () => cellContext.setHover(false),
       })}
     </CellContext.Provider>
   );
