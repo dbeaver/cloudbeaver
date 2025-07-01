@@ -53,8 +53,6 @@ public class CBConstants {
     public static final String PARAM_CONN_GRANT_ANON_ACCESS = "grantConnectionsAccessToAnonymousTeam";
     public static final String PARAM_AUTH_PROVIDERS = "authConfiguration";
     public static final String PARAM_DB_CONFIGURATION = "database";
-    public static final String PARAM_DATA_EDITOR_BLOB_MAX_SIZE = "dataEditor.blob.maxsize";
-
 
     public static final String PARAM_SESSION_EXPIRE_PERIOD = "expireSessionAfterPeriod";
 
@@ -92,7 +90,6 @@ public class CBConstants {
 
     public static final String APPLICATION_JSON = "application/json";
 
-    @Deprecated
     public static final String QUOTA_PROP_FILE_LIMIT = "dataExportFileSizeLimit";
     public static final String ADMIN_AUTO_GRANT = "auto-grant";
     public static final String HOST_LOCALHOST = "localhost";
