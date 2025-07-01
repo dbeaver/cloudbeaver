@@ -221,7 +221,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
     inputValue = translate('ui_processing_loading');
   }
 
-  function renderIcon(item: typeof items[number]): React.ReactNode {
+  function renderIcon(item: (typeof items)[number]): React.ReactNode {
     if (item && iconSelector && iconSelector(item)) {
       let element: React.ReactElement | string | undefined;
 
@@ -243,11 +243,11 @@ export const Combobox: ComboboxType = observer(function Combobox({
     return null;
   }
 
-  function itemValue(item: typeof items[number]): typeof value {
+  function itemValue(item: (typeof items)[number]): typeof value {
     return keySelector(item, items.indexOf(item));
   }
 
-  function itemRender(item: typeof items[number]): React.ReactNode {
+  function itemRender(item: (typeof items)[number]): React.ReactNode {
     return (
       <div className={s(styles, { item: true })} title={titleSelector?.(item)}>
         {renderIcon(item)}
@@ -256,11 +256,11 @@ export const Combobox: ComboboxType = observer(function Combobox({
     );
   }
 
-  function itemDisabled(item: typeof items[number]): boolean {
+  function itemDisabled(item: (typeof items)[number]): boolean {
     return isDisabled?.(item) ?? false;
   }
 
-  function selectedRender(val: typeof value, item: typeof items[number] | undefined): React.ReactNode {
+  function selectedRender(val: typeof value, item: (typeof items)[number] | undefined): React.ReactNode {
     if (searchable) {
       return (
         <div className={s(styles, { itemSearch: true })} title={title}>
@@ -286,7 +286,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
     }
 
     if (!item) {
-      return '';
+      return <div className={s(styles, { item: true })} title={titleSelector?.(item)} />;
     }
 
     return itemRender(item);
