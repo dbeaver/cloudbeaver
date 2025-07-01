@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ export const coreRootManifest: PluginManifest = {
     () => import('./WindowEventsService.js').then(m => m.WindowEventsService),
     () => import('./QuotasService.js').then(m => m.QuotasService),
     () => import('./ServerConfigEventHandler.js').then(m => m.ServerConfigEventHandler),
+    () => import('./WorkspaceConfigEventHandler.js').then(m => m.WorkspaceConfigEventHandler),
     () => import('./SessionEventSource.js').then(m => m.SessionEventSource),
     () => import('./SessionInfoEventHandler.js').then(m => m.SessionInfoEventHandler),
     () => import('./SessionActivityService.js').then(m => m.SessionActivityService),

@@ -21,6 +21,9 @@ export const manualChunks = (): PluginOption => [
             output: {
               ...config.build?.rollupOptions?.output,
               manualChunks(id, { getModuleInfo }) {
+                // Normalize path separators for cross-platform compatibility
+                const normalizedId = id.replace(/\\/g, '/');
+
                 function isModuleSync(moduleId: string) {
                   // Use a non-recursive approach to detect circular dependencies
                   const visited = new Set<string>();
@@ -79,41 +82,41 @@ export const manualChunks = (): PluginOption => [
                   return syncModules.has(moduleId);
                 }
 
-                const langMatch = /[\\/]locales[\\/](\w+)\.js/.exec(id);
+                const langMatch = /[\\/]locales[\\/](\w+)\.js/.exec(normalizedId);
                 if (langMatch) {
                   const language = langMatch[1]; // e.g. "en"
                   return `locales/${language}`;
                 }
 
-                if (id.includes('packages/core-')) {
+                if (normalizedId.includes('packages/core-')) {
                   if (!isModuleSync(id)) {
                     return 'core-async';
                   }
                   return 'core';
                 }
 
-                if (id.includes('packages/plugin-')) {
+                if (normalizedId.includes('packages/plugin-')) {
                   if (!isModuleSync(id)) {
                     return 'plugins-async';
                   }
                   return 'plugins';
                 }
 
-                if (id.includes('packages/product-')) {
+                if (normalizedId.includes('packages/product-')) {
                   if (!isModuleSync(id)) {
                     return 'products-async';
                   }
                   return 'products';
                 }
 
-                if (id.includes('@dbeaver/')) {
+                if (normalizedId.includes('@dbeaver/')) {
                   if (!isModuleSync(id)) {
                     return 'dbeaver-async';
                   }
                   return 'dbeaver';
                 }
 
-                if (id.includes('node_modules')) {
+                if (normalizedId.includes('node_modules')) {
                   if (!isModuleSync(id)) {
                     return 'vendor-async';
                   }

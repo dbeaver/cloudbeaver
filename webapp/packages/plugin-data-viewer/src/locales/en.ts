@@ -42,7 +42,7 @@ export default [
   ['data_viewer_presentation_value_image_fit', 'Fit Window'],
   ['data_viewer_presentation_value_image_original_size', 'Original Size'],
   ['data_viewer_presentation_value_boolean_placeholder', "Can't show current value as boolean"],
-  ['data_viewer_presentation_value_content_truncated_placeholder', 'The value was truncated because of the'],
+  ['data_viewer_presentation_value_content_truncated_placeholder', 'The value was truncated because of the'],
   ['data_viewer_presentation_value_content_download_error', 'Download failed'],
   ['data_viewer_presentation_value_content_paste_error', 'Cannot load full text'],
   ['data_viewer_script_preview', 'Script'],

@@ -26,7 +26,13 @@ import {
   resourceKeyListAliasFactory,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
-import { DataSynchronizationService, type NavigatorViewSettings, ServerEventId, SessionDataResource } from '@cloudbeaver/core-root';
+import {
+  DataSynchronizationService,
+  type NavigatorViewSettings,
+  ServerEventId,
+  SessionDataResource,
+  WorkspaceConfigEventHandler,
+} from '@cloudbeaver/core-root';
 import {
   type AdminConnectionGrantInfo,
   type AdminConnectionSearchInfo,
@@ -84,6 +90,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly dataSynchronizationService: DataSynchronizationService,
+    private readonly workspaceConfigEventHandler: WorkspaceConfigEventHandler,
     dbDriverResource: DBDriverResource,
     sessionDataResource: SessionDataResource,
     appAuthService: AppAuthService,
@@ -152,6 +159,15 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
             connectionId,
           })),
         ),
+      this,
+    );
+
+    this.workspaceConfigEventHandler.onEvent(
+      ServerEventId.CbWorkspaceConfigChanged,
+      () => {
+        this.markOutdated(CachedMapAllKey);
+      },
+      undefined,
       this,
     );
 

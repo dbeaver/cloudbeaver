@@ -21,7 +21,8 @@
   .ReactCodemirror,
   .cm-mergeView,
   .cm-mergeViewEditors,
-  .cm-editor {
+  .cm-editor,
+  .cm-gotoLine {
     @include mdc-typography('body2');
   }
 
@@ -91,6 +92,75 @@
     display: inline-block;
     @include mdc-theme-prop(background, secondary, false);
     */
+  }
+
+  .editor .cm-gotoLine.cm-panel {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    padding: 4px 8px;
+    gap: 8px;
+    min-width: 160px;
+    container-type: inline-size;
+
+    & label {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      text-transform: uppercase;
+      letter-spacing: -0.1px;
+      gap: 4px;
+    }
+
+    & input {
+      @include mdc-typography('body2');
+      max-width: 60px;
+      height: 24px;
+      padding-inline: 8px;
+
+      &:focus {
+        @include mdc-theme-prop(border-color, primary, false);
+      }
+    }
+    & .cm-button {
+      @include mdc-typography('body2');
+      background: transparent;
+      height: 24px;
+      padding-block: 0;
+      margin-right: 24px;
+
+      font-weight: 500;
+      text-transform: uppercase;
+
+      color: var(--theme-primary);
+      border-radius: 4px;
+      border-color: var(--theme-primary);
+
+      &:hover {
+        background: color-mix(in srgb, transparent, var(--theme-primary) 5%);
+      }
+
+      @container (width < 240px) {
+        display: none;
+      }
+    }
+
+    & button[name='close'] {
+      margin-left: auto;
+      padding: 0 8px;
+      top: 4px;
+      height: 24px;
+      width: 24px;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--theme-on-surface);
+      border-color: var(--theme-on-surface);
+      font-size: 16px;
+
+      &:hover {
+        background: color-mix(in srgb, transparent, var(--theme-on-surface) 5%);
+      }
+    }
   }
 
   .editor .cm-content ::selection {

@@ -16,11 +16,13 @@ import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/c
 import { ActionService, DATA_CONTEXT_MENU, type IAction, MenuService } from '@cloudbeaver/core-view';
 import { ACTION_TREE_CREATE_CONNECTION, MENU_CONNECTIONS, MENU_TREE_CREATE_CONNECTION } from '@cloudbeaver/plugin-connections';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS, TreeSelectionService } from '@cloudbeaver/plugin-navigation-tree';
+import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM.js';
 import { CustomConnectionSettingsService } from './CustomConnectionSettingsService.js';
 
 const DriverSelectorDialog = importLazyComponent(() => import('./DriverSelector/DriverSelectorDialog.js').then(m => m.DriverSelectorDialog));
+const WelcomeNewConnection = importLazyComponent(() => import('./WelcomeNewConnection.js').then(m => m.WelcomeNewConnection));
 
 @injectable()
 export class CustomConnectionPluginBootstrap extends Bootstrap {
@@ -32,11 +34,13 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly customConnectionSettingsService: CustomConnectionSettingsService,
     private readonly treeSelectionService: TreeSelectionService,
+    private readonly navigationTabsService: NavigationTabsService,
   ) {
     super();
   }
 
   override register(): void | Promise<void> {
+    this.navigationTabsService.welcomeContainer.add(WelcomeNewConnection, undefined, () => this.isConnectionFeatureDisabled(true));
     this.menuService.addCreator({
       menus: [MENU_CONNECTIONS],
       getItems: (context, items) => [...items, ACTION_CONNECTION_CUSTOM],
@@ -127,7 +131,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     return false;
   }
 
-  private async openConnectionsDialog(projectId?: string, folderPath?: string) {
+  async openConnectionsDialog(projectId?: string, folderPath?: string): Promise<void> {
     await this.commonDialogService.open(DriverSelectorDialog, {
       projectId,
       folderPath,

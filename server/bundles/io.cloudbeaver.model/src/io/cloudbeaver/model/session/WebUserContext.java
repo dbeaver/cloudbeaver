@@ -73,7 +73,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.securityController = application.createSecurityController(this);
         this.rmController = application.createResourceController(this, workspace);
         this.fileController = application.createFileController(this);
-        this.preferenceStore = new WebSessionPreferenceStore(DBWorkbench.getPlatform().getPreferenceStore());
+        this.preferenceStore = new WebSessionPreferenceStore(this, DBWorkbench.getPlatform().getPreferenceStore());
         setUserPermissions(getDefaultPermissions());
     }
 

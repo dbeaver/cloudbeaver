@@ -1,6 +1,9 @@
 export default [
   ['shortcuts_title', 'Shortcuts'],
 
+  ['plugin_help_welcome_docs_label', 'Documentation'],
+  ['plugin_help_welcome_docs_description', 'Learn how to use CloudBeaver'],
+
   ['data_viewer_shortcut_start_inline_editing', 'Mở Trình chỉnh sửa inline cho ô được chọn'],
   ['data_viewer_shortcut_add_new_row', 'Thêm một hàng mới'],
   ['data_viewer_shortcut_duplicate_row', 'Sao chép hàng'],

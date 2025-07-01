@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -148,6 +148,16 @@ export class SqlEditorTabService extends Bootstrap {
 
     dataSource?.setExecutionContext(undefined);
     this.attachToProject(tab, null);
+  }
+
+  getConnectionId(tab: ITab<ISqlEditorTabState>): IConnectionInfoParams | undefined {
+    const context = this.sqlDataSourceService.get(tab.handlerState.editorId)?.executionContext;
+
+    if (!context) {
+      return undefined;
+    }
+
+    return createConnectionParam(context.projectId, context.connectionId);
   }
 
   private async handleConnectionDelete(key: ResourceKeySimple<IConnectionInfoParams>) {
@@ -313,16 +323,6 @@ export class SqlEditorTabService extends Bootstrap {
     const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
 
     return !!dataSource?.hasFeature(ESqlDataSourceFeatures.setProject);
-  }
-
-  private getConnectionId(tab: ITab<ISqlEditorTabState>): IConnectionInfoParams | undefined {
-    const context = this.sqlDataSourceService.get(tab.handlerState.editorId)?.executionContext;
-
-    if (!context) {
-      return undefined;
-    }
-
-    return createConnectionParam(context.projectId, context.connectionId);
   }
 
   private getObjectLoader(tab: ITab<ISqlEditorTabState>) {

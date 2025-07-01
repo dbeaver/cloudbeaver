@@ -1033,7 +1033,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         List<WebSQLQueryResults> resultList = new ArrayList<>();
         int maxResultsCount = resolveMaxResultsCount(dataContainer.getDataSource());
         WebSQLQueryResults stats = new WebSQLQueryResults(webSession, dataFormat);
-        var rowsUpdated = 0;
+        long rowsUpdated = 0;
         for (int i = 0; i < maxResultsCount; i++) {
             if (hasResultSet) {
                 WebSQLQueryResults results = new WebSQLQueryResults(webSession, dataFormat);

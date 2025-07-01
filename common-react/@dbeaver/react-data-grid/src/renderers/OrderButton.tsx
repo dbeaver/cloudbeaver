@@ -1,22 +1,15 @@
-import { clsx, IconButton } from '@dbeaver/ui-kit';
+import { clsx, IconButton, Icon } from '@dbeaver/ui-kit';
 
 interface OrderButtonProps {
-  colIdx: number;
   sortState?: 'asc' | 'desc' | null;
-  onSort: (attributePosition: number, order: 'asc' | 'desc' | null, isMultiple: boolean) => void;
+  onClick: (e: React.MouseEvent<HTMLElement>) => void;
   tabIndex?: number;
-  ref: React.Ref<HTMLButtonElement>;
 }
 
-export function OrderButton({ colIdx, sortState, onSort, tabIndex, ref }: OrderButtonProps) {
-  function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
-    const nextSortState = sortState === 'asc' ? 'desc' : sortState === 'desc' ? null : 'asc';
-    onSort(colIdx, nextSortState, e.ctrlKey || e.metaKey);
-  }
-
-  const svgSortAsc = '#icon-sort-asc';
-  const svgSortDesc = '#icon-sort-desc';
-  const svgSortUnknown = '#icon-sort-unknown';
+export function OrderButton({ sortState, onClick, tabIndex }: OrderButtonProps) {
+  const svgSortAsc = 'sort-asc';
+  const svgSortDesc = 'sort-desc';
+  const svgSortUnknown = 'sort-unknown';
 
   const iconSrc = sortState === 'asc' ? svgSortAsc : sortState === 'desc' ? svgSortDesc : svgSortUnknown;
 
@@ -24,9 +17,8 @@ export function OrderButton({ colIdx, sortState, onSort, tabIndex, ref }: OrderB
     <IconButton
       variant="secondary"
       size="small"
-      onClick={handleClick}
+      onClick={onClick}
       tabIndex={tabIndex}
-      ref={ref}
       title="Sort by column"
       aria-label="Sort by column"
       className={clsx(
@@ -34,9 +26,7 @@ export function OrderButton({ colIdx, sortState, onSort, tabIndex, ref }: OrderB
         sortState && 'tw:opacity-100',
       )}
     >
-      <svg width="16" height="16" viewBox="0 0 16 16">
-        <use href={iconSrc} />
-      </svg>
+      <Icon name={iconSrc} />
     </IconButton>
   );
 }

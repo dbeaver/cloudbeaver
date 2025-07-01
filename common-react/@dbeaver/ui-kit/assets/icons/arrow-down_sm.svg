@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>
+      .cls-1 {
+      fill: currentColor;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" x="7.5" y="1" width="1" height="13" />
+  <rect class="cls-1" x="6.61" y="11.35" width="7.07" height="1.01"
+    transform="translate(-5.41 10.64) rotate(-45)" />
+  <rect class="cls-1" x="5.35" y="8.32" width="1.01" height="7.07"
+    transform="translate(-6.67 7.61) rotate(-45)" />
+</svg>
