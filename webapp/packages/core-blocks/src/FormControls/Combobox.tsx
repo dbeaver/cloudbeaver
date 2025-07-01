@@ -64,9 +64,6 @@ export interface ComboboxType {
   <TValue, TKey extends keyof TState, TState>(props: ObjectProps<TValue, TKey, TState>): React.JSX.Element;
 }
 
-{
-  /* TODO rewrite whole component to select attribute instead of input type text so it has an okay form validation */
-}
 export const Combobox: ComboboxType = observer(function Combobox({
   value: controlledValue,
   defaultValue,
@@ -202,7 +199,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
   );
 
   useEffect(() => {
-    // TODO delete that?
     if (inputRef === document.activeElement) {
       if (inputValue === searchValue) {
         menu.show();
@@ -268,7 +264,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
     if (searchable) {
       return (
         <div className={s(styles, { itemSearch: true })} title={title}>
-          {renderIcon(item)}
+          {renderIcon(selectedItem)}
           <input
             {...rest}
             ref={setInputRef}

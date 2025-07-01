@@ -81,6 +81,9 @@
     cursor: pointer;
     border: none;
     background: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
     &[aria-disabled='true'] {
       opacity: var(--dbv-kit-control-disabled-opacity);
