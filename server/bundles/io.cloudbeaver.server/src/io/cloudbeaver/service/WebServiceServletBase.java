@@ -71,7 +71,8 @@ public abstract class WebServiceServletBase extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error processing request: " + e.getMessage());
         } finally {
             if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
-                apiCallInterceptor.onApiCallEvent(request, getVariables(request), request.getRequestURI(), startTime, response.getStatus() != HttpServletResponse.SC_BAD_REQUEST);
+                apiCallInterceptor.onApiCallEvent(request, getVariables(request), request.getRequestURI(), startTime,
+                    response.getStatus() != HttpServletResponse.SC_BAD_REQUEST, "REST");
             }
         }
     }

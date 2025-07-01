@@ -18,6 +18,7 @@ public interface ApiCallInterceptor {
         @Nullable Map<String, Object> variables,
         @NotNull String apiCall,
         @NotNull LocalDateTime startTime,
-        boolean isSuccessful
+        boolean isSuccessful,
+        @NotNull String apiCallType
     );
 }

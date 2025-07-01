@@ -255,7 +255,7 @@ public class GraphQLEndpoint extends HttpServlet {
         } finally {
             if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
                 apiCallInterceptor.onApiCallEvent(request, variables, apiCall, startTime,
-                    executionResult != null && executionResult.getErrors().isEmpty());
+                    executionResult != null && executionResult.getErrors().isEmpty(), "GRAPHQL");
             }
         }
 
