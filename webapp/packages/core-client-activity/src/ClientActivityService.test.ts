@@ -28,9 +28,6 @@ describe('ClientActivityService', () => {
   beforeEach(() => {
     vitest.useFakeTimers();
     clientActivityService = new ClientActivityService();
-
-    vitest.spyOn(globalThis, 'setTimeout');
-    vitest.spyOn(globalThis, 'clearTimeout');
   });
 
   afterEach(() => {
@@ -57,24 +54,30 @@ describe('ClientActivityService', () => {
 
   it('should clear previous timer if updateActivity is called multiple times', () => {
     clientActivityService.updateActivity();
-    expect(setTimeout).toHaveBeenCalledTimes(1);
+    expect(clientActivityService.isActive).toBe(true);
 
-    vitest.advanceTimersByTime(Math.random() * INACTIVE_PERIOD_TIME - 1);
+    vitest.advanceTimersByTime(INACTIVE_PERIOD_TIME - 10);
 
     clientActivityService.updateActivity();
-    expect(clearTimeout).toHaveBeenCalledTimes(1);
-    expect(setTimeout).toHaveBeenCalledTimes(2);
+    expect(clientActivityService.isActive).toBe(true);
+
+    vitest.advanceTimersByTime(INACTIVE_PERIOD_TIME);
+
+    expect(clientActivityService.isActive).toBe(false);
   });
 
   it('should clear timer and reset activity when resetActivity is called', () => {
     clientActivityService.updateActivity();
 
-    vitest.advanceTimersByTime(Math.random() * INACTIVE_PERIOD_TIME - 1);
+    vitest.advanceTimersByTime(INACTIVE_PERIOD_TIME - 10);
 
     clientActivityService.resetActivity();
 
     expect(clientActivityService.isActive).toBe(false);
-    expect(clearTimeout).toHaveBeenCalled();
+
+    vitest.advanceTimersByTime(INACTIVE_PERIOD_TIME);
+
+    expect(clientActivityService.isActive).toBe(false);
   });
 
   it('should call onActiveStateChange executor with correct value', () => {

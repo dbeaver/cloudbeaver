@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-export { useHotkeys } from 'react-hotkeys-hook';
 
 export * from './AuthenticationProviderLoader.js';
 export * from './useAuthenticationAction.js';
@@ -32,6 +31,7 @@ export * from './ComplexLoader.js';
 export * from './DisplayError.js';
 export * from './ErrorBoundary.js';
 export * from './Icon.js';
+export * from './useHotkeys.js';
 
 export * from './ItemList/ItemList.js';
 export * from './ItemList/ItemListSearch.js';
@@ -81,6 +81,7 @@ export * from './Overlay/OverlayHeaderTitle.js';
 export * from './Overlay/OverlayMessage.js';
 
 export * from './Placeholder/Placeholder.js';
+export * from './Placeholder/usePlaceholder.js';
 export * from './Placeholder/PlaceholderContainer.js';
 
 export * from './PropertiesTable/PropertiesTable.js';
@@ -137,7 +138,6 @@ export * from './Tree/TreeNode/TreeNodeNestedMessage.js';
 export * from './Tree/TreeNode/TreeNodeSelect.js';
 export * from './Button.js';
 export * from './Text.js';
-export { default as ButtonStyles } from './Button.module.css';
 export * from './ToolsPanel/ToolsAction.js';
 export * from './ToolsPanel/ToolsPanel.js';
 export { default as ToolsPanelStyles } from './ToolsPanel/ToolsPanel.module.css';

@@ -6,12 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 import '@testing-library/jest-dom/vitest';
-import { queries, type Queries, render, type RenderOptions, type RenderResult } from '@testing-library/react';
+import { cleanup, queries, type Queries, render, type RenderOptions, type RenderResult } from '@testing-library/react';
 import { Suspense } from 'react';
 
 import { type IServiceProvider, ServiceProviderContext } from '@cloudbeaver/core-di';
 
 import type { IApplication } from './createApp.js';
+
+function resetDocument() {
+  document.body.innerHTML = '';
+  document.body.className = '';
+  cleanup();
+}
 
 function ApplicationWrapper(serviceInjector: IServiceProvider): React.FC<React.PropsWithChildren> {
   return ({ children }) => (
@@ -29,6 +35,7 @@ export function renderInApp<
   options: Omit<RenderOptions<Q, Container, BaseElement>, 'queries' | 'wrapper'> = {},
   app?: IApplication,
 ): RenderResult<Q, Container, BaseElement> {
+  resetDocument();
   if (!app) {
     return render(ui, options);
   }

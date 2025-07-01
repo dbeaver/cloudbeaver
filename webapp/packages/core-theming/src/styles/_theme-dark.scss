@@ -30,6 +30,7 @@ $link-color-focus: #3f96d1;
 
 $input-color: $mdc-theme-on-secondary;
 $input-color-disabled: darken($input-color, 10%);
+$input-color-placeholder: darken($input-color, 35%);
 $input-color-readonly: darken($input-color, 5%);
 $input-border: #585958;
 $input-border-disabled: darken($input-border, 10%);

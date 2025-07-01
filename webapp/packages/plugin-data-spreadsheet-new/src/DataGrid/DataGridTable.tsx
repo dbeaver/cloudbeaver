@@ -38,6 +38,9 @@ import {
   ResultSetDataSource,
   ResultSetSelectAction,
   ResultSetViewAction,
+  DatabaseDataConstraintAction,
+  getNextOrder,
+  isResultSetDataModel,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
@@ -81,11 +84,14 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
 
-  function restoreFocus() {
-    const gridDiv = gridContainerRef.current;
-    const focusSink = gridDiv?.querySelector<HTMLDivElement>('[aria-selected="true"]');
-    focusSink?.focus();
-  }
+  const restoreFocus = useCallback(
+    function restoreFocus() {
+      const gridDiv = gridContainerRef.current;
+      const focusSink = gridDiv?.querySelector<HTMLDivElement>('[aria-selected="true"]');
+      focusSink?.focus();
+    },
+    [gridContainerRef],
+  );
 
   function isGridInFocus(): boolean {
     const gridDiv = gridContainerRef.current;
@@ -205,7 +211,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return () => {
       tableData.editor.action.removeHandler(syncEditor);
     };
-  }, [tableData.editor, selectionAction]);
+  }, [tableData.editor, selectionAction, handlers, tableData]);
 
   const handleFocusChange = (position: ICellPosition) => {
     focusedCell.current = position;
@@ -249,7 +255,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       getDataGridApi: () => dataGridRef.current,
       focus: restoreFocus,
     }),
-    [model, actions, resultIndex, simple, dataGridRef, gridContainerRef, restoreFocus],
+    [model, actions, resultIndex, simple, dataGridRef, restoreFocus],
   );
 
   const columnsCount = useCreateGridReactiveValue(
@@ -333,6 +339,59 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       reaction(() => getCellElement(rowIdx, colIdx, props, renderDefaultCell), onValueChange),
     [],
   );
+
+  function getColumnSortable(colIdx: number) {
+    if (!isResultSetDataModel(model)) {
+      return false;
+    }
+    const constraintsAction = (model.source as unknown as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
+    return (
+      Boolean(tableData.getColumn(colIdx) && constraintsAction?.supported && isResultSetDataModel(model) && !model.isDisabled(resultIndex)) &&
+      colIdx !== 0
+    );
+  }
+
+  const columnSortable = useCreateGridReactiveValue(
+    getColumnSortable,
+    (onValueChange, colIdx) => reaction(() => getColumnSortable(colIdx), onValueChange),
+    [tableData, model],
+  );
+
+  function getColumnSortingState(colIdx: number) {
+    if (!isResultSetDataModel(model)) {
+      return null;
+    }
+    const constraintsAction = (model.source as unknown as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
+    const column = tableData.getColumn(colIdx)?.key;
+    if (!column || !constraintsAction?.supported) {
+      return null;
+    }
+    const resultColumn = tableData.getColumnInfo(column);
+    return resultColumn ? constraintsAction?.getOrder(resultColumn.position) : null;
+  }
+
+  const columnSortingState = useCreateGridReactiveValue(
+    getColumnSortingState,
+    (onValueChange, colIdx) => reaction(() => getColumnSortingState(colIdx), onValueChange),
+    [tableData, model],
+  );
+
+  function handleSort(colIdx: number, order: 'asc' | 'desc' | null, isMultiple: boolean) {
+    const column = tableData.getColumn(colIdx)?.key;
+    if (!column) {
+      return;
+    }
+    const resultColumn = tableData.getColumnInfo(column);
+    if (!resultColumn) {
+      return;
+    }
+    const constraintsAction = (model.source as unknown as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
+    const currentOrder = constraintsAction!.getOrder(resultColumn.position);
+    const nextOrder = getNextOrder(currentOrder);
+    model.request(() => {
+      constraintsAction!.setOrder(resultColumn.position, nextOrder, isMultiple);
+    });
+  }
 
   function handleCellChange(rowIdx: number, colIdx: number, value: string) {
     const row = tableData.rows[rowIdx];
@@ -478,13 +537,17 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               getHeaderResizable={getHeaderResizable}
               getRowHeight={() => rowHeight}
               getColumnKey={getColumnKey}
-              onCellKeyDown={handleCellKeyDown}
               columnCount={columnsCount}
               rowCount={rowsCount}
+              columnSortable={columnSortable}
+              columnSortingState={columnSortingState}
               getRowId={rowIdx => (tableData.rows[rowIdx] ? ResultSetDataKeysUtils.serialize(tableData.rows[rowIdx]) : '')}
               onFocus={handleFocusChange}
               onScrollToBottom={handleScrollToBottom}
+              onColumnSort={handleSort}
               onCellChange={handleCellChange}
+              onCellKeyDown={handleCellKeyDown}
+              onHeaderKeyDown={gridSelectedCellCopy.onKeydownHandler}
             />
           </div>
         </TableDataContext.Provider>

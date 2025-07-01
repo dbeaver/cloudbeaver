@@ -26,7 +26,7 @@
     "@cloudbeaver/core-utils": "workspace:*",
     "axios": "^1",
     "graphql": "^16",
-    "graphql-request": "^6",
+    "graphql-request": "^7",
     "mobx": "^6",
     "tslib": "^2"
   },

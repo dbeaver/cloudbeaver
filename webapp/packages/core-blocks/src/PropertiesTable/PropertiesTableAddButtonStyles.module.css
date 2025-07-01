@@ -9,7 +9,11 @@
   margin-right: 0px !important;
 }
 .buttonLabel {
+  --dbv-kit-btn-padding-inline: 8px;
+
   composes: theme-typography--caption from global;
   text-transform: initial;
+  border-color: transparent;
+  outline-offset: 0;
   font-weight: 600;
 }

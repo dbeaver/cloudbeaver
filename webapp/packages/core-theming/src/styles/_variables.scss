@@ -16,6 +16,7 @@ $mdc-theme-extra-property-values: (
   input-color: $input-color,
   input-color-disabled: $input-color-disabled,
   input-color-readonly: $input-color-readonly,
+  input-color-placeholder: $input-color-placeholder,
   input-border: $input-border,
   input-border-readonly: $input-border-readonly,
   input-border-disabled: $input-border-disabled,
@@ -49,4 +50,10 @@ $app-height: 100vh !default;
   --theme-form-element-radius: #{$theme-form-element-radius};
   --theme-group-element-radius: #{$theme-group-element-radius};
   --theme-menu-bar-small-action-radius: #{$theme-menu-bar-small-action-radius};
+}
+
+@layer components {
+  body {
+    --dbv-kit-control-outline-color: var(--theme-primary);
+  }
 }

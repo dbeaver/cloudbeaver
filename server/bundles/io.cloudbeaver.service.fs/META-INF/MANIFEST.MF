@@ -3,11 +3,10 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Service - File System
 Bundle-SymbolicName: io.cloudbeaver.service.fs;singleton:=true
-Bundle-Version: 1.0.40.qualifier
-Bundle-Release-Date: 20250602
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-Version: 1.0.42.qualifier
+Bundle-Release-Date: 20250707
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: .
 Require-Bundle: io.cloudbeaver.server.ce,
  io.cloudbeaver.service.admin
 Automatic-Module-Name: io.cloudbeaver.service.fs

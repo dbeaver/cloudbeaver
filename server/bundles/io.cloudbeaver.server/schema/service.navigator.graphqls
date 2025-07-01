@@ -24,17 +24,19 @@ type ObjectDetails {
 }
 
 type DatabaseObjectInfo {
-    # Object name
+    " Object name"
     name: String
-    # Description - optional
+    " Description - optional"
     description: String
-    # Object type. Java class name in most cases
+    " Object type. Java class name in most cases"
     type: String
 
-    # Read object properties.
-    # Optional parameter 'ids' filters properties by id. null means all properties.
-    # Note: property value reading may take a lot of time so don't read all property values always
-    # Examine property meta (features in particular) before reading them
+    """
+    Read object properties.
+    Optional parameter 'ids' filters properties by id. null means all properties.
+    Note: property value reading may take a lot of time so don't read all property values always
+    Examine property meta (features in particular) before reading them
+    """
     properties(filter: ObjectPropertyFilter): [ ObjectPropertyInfo ]
 
     # Optional properties
@@ -45,49 +47,51 @@ type DatabaseObjectInfo {
     uniqueName: String
     state: String
 
-    # Features: script, scriptExtended, dataContainer, dataManipulator,
-    # entity, schema, catalog
+    "Features: script, scriptExtended, dataContainer, dataManipulator, entity, schema, catalog"
     features: [ String! ]
 
-    # Supported editors: ddl, permissions, sourceDeclaration, sourceDefinition
+    " Supported editors: ddl, permissions, sourceDeclaration, sourceDefinition"
     editors: [ String! ]
 }
 
 type NavigatorNodeInfo {
-    # Node ID - generally a full path to the node from root of tree
+    "Node ID - generally a full path to the node from root of tree"
     id: ID!
-    # Node URI - a unique path to a node including all parent nodes
+    "Node URI - a unique path to a node including all parent nodes"
     uri: ID! @since(version: "23.3.1")
-    # Node human readable name
+    "Node human readable name"
     name: String
-    #Node full name
-    fullName: String @deprecated # Use name parameter (23.2.0)
-    #Node plain name (23.2.0)
+    "Node full name"
+    fullName: String @deprecated(reason: "use name parameter (23.2.0)")
+    "Node plain name (23.2.0)"
     plainName: String
-    # Node icon path
+    "Node icon path"
     icon: String
-    # Node description
+    "Node description"
     description: String
-    # Node type
+    "Node type"
     nodeType: String
-    # Can this property have child nodes?
+    "Can this property have child nodes?"
     hasChildren: Boolean!
-    # Project id of the node
+    "Project id of the node"
     projectId: String
 
-    # Associated object. Maybe null for non-database objects
+    "Associated object. Maybe null for non-database objects"
     object: DatabaseObjectInfo
 
-    # Associated object. Return value depends on the node type - connectionId for connection node, resource path for resource node, etc.
-    # null - if node currently not support this property
+    """
+    Associated object. Return value depends on the node type - connectionId for connection node, resource path for resource node, etc.
+    null - if node currently not support this property
+    """
     objectId: String @since(version: "23.2.4")
 
-    # Supported features: item, container, leaf
-    # canDelete, canRename
+    "Supported features: item, container, leaf, canDelete, canRename"
     features: [ String! ]
 
-    # Object detailed info.
-    # If is different than properties. It doesn't perform any expensive operation and doesn't require authentication.
+    """
+    Object detailed info.
+    If is different than properties. It doesn't perform any expensive operation and doesn't require authentication.
+    """
     nodeDetails: [ ObjectPropertyInfo! ]
 
     folder: Boolean!
@@ -95,7 +99,7 @@ type NavigatorNodeInfo {
     navigable: Boolean!
     filtered: Boolean!
 
-    # Reads node filter. Expensive invocation, read only when it is really needed
+    "Reads node filter. Expensive invocation, read only when it is really needed"
     filter: NavigatorNodeFilter
 }
 
@@ -123,18 +127,20 @@ type DatabaseStructContainers {
 
 extend type Query {
 
-    # Get child nodes
+    "Returns child nodes based on parent node path"
     navNodeChildren(
         parentPath: ID!,
         offset: Int,
         limit: Int,
         onlyFolders: Boolean): [ NavigatorNodeInfo! ]!
 
-    # Get node's parents
+    "Returns parent nodes for the specified node path"
     navNodeParents( nodePath: ID! ): [ NavigatorNodeInfo! ]!
 
+    "Returns node info for the specified node path"
     navNodeInfo( nodePath: ID! ): NavigatorNodeInfo!
 
+    "Refreshes node based on the node path"
     navRefreshNode( nodePath: ID! ): Boolean @deprecated # Use navReloadNode method from Mutation (24.2.4)
 
     # contextId currently not using
@@ -144,19 +150,22 @@ extend type Query {
 
 extend type Mutation {
 
+    "Reloads node and returns updated node info"
     navReloadNode( nodePath: ID! ): NavigatorNodeInfo!
 
-    # Rename node and returns new node name
+    "Renames node and returns new node name"
     navRenameNode( nodePath: ID!, newName: String! ): String
 
-    # Deletes nodes with specified IDs and returns number of deleted nodes
+    "Deletes nodes with specified IDs and returns number of deleted nodes"
     navDeleteNodes( nodePaths: [ID!]! ): Int
 
-    # Moves nodes with specified IDs to the connection folder
+    "Moves nodes with specified IDs to the connection folder"
     navMoveNodesToFolder( nodePaths: [ID!]!, folderPath: ID!): Boolean!
 
-    # Sets filter for the folder node. If both include and exclude are null then filter is removed.
-    # Node must be refreshed after applying filters. Node children can be changed
+    """
+    Sets filter for the folder node. If both include and exclude are null then filter is removed.
+    Node must be refreshed after applying filters. Node children can be changed
+    """
     navSetFolderFilter( nodePath: ID!, include: [String!], exclude: [String!]): Boolean!
 
 }

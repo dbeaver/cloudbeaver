@@ -1,5 +1,5 @@
-import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
-import { DataGrid as DataGridBase, type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle } from 'react-data-grid';
+import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { DataGrid as DataGridBase, type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle, type ColumnWidth, type ColumnWidths } from 'react-data-grid';
 import { rowRenderer } from './renderers/rowRenderer.js';
 import { cellRenderer } from './renderers/cellRenderer.js';
 import { DataGridCellHeaderContext, type IDataGridHeaderCellContext } from './DataGridHeaderCellContext.js';
@@ -12,6 +12,7 @@ import { mapRenderHeaderCell } from './mapRenderHeaderCell.js';
 import { mapEditCellRenderer } from './mapEditCellRenderer.js';
 import { DataGridRowContext, type IDataGridRowContext } from './DataGridRowContext.js';
 import './DataGrid.css';
+import { HeaderDnDContext, useHeaderDnD } from './useHeaderDnD.js';
 
 export interface ICellPosition {
   rowIdx: number;
@@ -46,9 +47,13 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     headerElement,
     getHeaderWidth,
     headerText,
+    getHeaderOrder,
     getHeaderResizable,
+    columnSortable,
     getHeaderHeight,
     getHeaderPinned,
+    columnSortingState,
+    getHeaderDnD,
     cell,
     cellText,
     cellElement,
@@ -59,20 +64,23 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     rowCount,
     getRowId,
     getRowHeight,
+    onHeaderReorder,
     onScroll,
     onScrollToBottom,
     onFocus,
     onCellChange,
+    onColumnSort,
+    onHeaderKeyDown,
     children,
     className,
     onCellKeyDown,
   },
   ref,
 ) {
+  const [columnWidths, setColumnWidths] = useState<ColumnWidths>(() => new Map<string, ColumnWidth>());
   const rowsCount = useGridReactiveValue(rowCount);
   const columnsCount = useGridReactiveValue(columnCount);
 
-  const gridKey = useRef(0);
   const rowsCountRef = useRef(rowsCount);
   const innerGridRef = useRef<DataGridHandle>(null);
   const columns = new Array<ColumnOrColumnGroup<IInnerRow, unknown>>(columnsCount)
@@ -87,21 +95,25 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
         minWidth: 26,
         editable: row => getCellEditable?.(row.idx, i) ?? false,
         frozen: getHeaderPinned?.(i),
-        renderHeaderCell: mapRenderHeaderCell,
-        renderCell: mapCellContentRenderer,
-        renderEditCell: mapEditCellRenderer,
+        renderHeaderCell: mapRenderHeaderCell(i),
+        renderCell: mapCellContentRenderer(i),
+        renderEditCell: mapEditCellRenderer(i),
       };
     });
 
+  const dndHeaderContext = useHeaderDnD({ columns, onReorder: onHeaderReorder, getCanDrag: getHeaderDnD, getHeaderOrder });
+
   useImperativeHandle(ref, () => ({
     selectCell: (position: ICellPosition) => {
-      innerGridRef.current?.selectCell({ idx: position.colIdx, rowIdx: position.rowIdx });
+      innerGridRef.current?.selectCell({ idx: dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx });
     },
     scrollToCell: (position: Partial<ICellPosition>) => {
-      innerGridRef.current?.scrollToCell({ idx: position.colIdx, rowIdx: position.rowIdx });
+      innerGridRef.current?.scrollToCell({ idx: position.colIdx && dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx });
     },
     openEditor: (position: ICellPosition) => {
-      innerGridRef.current?.selectCell({ idx: position.colIdx, rowIdx: position.rowIdx }, true);
+      innerGridRef.current?.selectCell({ idx: dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx }, {
+        enableEditor: true,
+      });
     },
   }));
 
@@ -110,12 +122,11 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     rowsCountRef.current = rowsCount;
 
     if (previousRowCount === 0) {
-      // we trigger columns size recalculation when rows are added
-      gridKey.current++;
+      setColumnWidths(new Map<string, ColumnWidth>());
     }
   }
 
-  const rows = useMemo(
+  let rows = useMemo(
     () =>
       new Array<IInnerRow>(rowsCount).fill({ idx: 0 }).map((_, i) => ({
         idx: i,
@@ -124,34 +135,47 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
   );
 
   function handleCellFocus(args: CellSelectArgs<IInnerRow, unknown>) {
-    onFocus?.({ colIdx: args.column.idx, rowIdx: args.rowIdx });
+    onFocus?.({ colIdx: dndHeaderContext.getDataColIdx(args.column.idx), rowIdx: args.rowIdx });
+  }
+
+  function handleCellKeyDown(args: CellSelectArgs<IInnerRow, unknown>, event: DataGridCellKeyboardEvent) {
+    onCellKeyDown?.({ colIdx: dndHeaderContext.getDataColIdx(args.column.idx), rowIdx: args.rowIdx }, event);
+  }
+
+  const isMeasurementRender = columnWidths.size === 0 && columnCount.get() > 0;
+
+  if (isMeasurementRender) {
+    rows = rows.slice(0, 100);
   }
 
   return (
-    <DataGridRowContext value={{ rowCount, onScrollToBottom }}>
-      <DataGridCellContext value={{ cell, cellText, cellElement, cellTooltip, onCellChange }}>
-        <DataGridCellHeaderContext value={{ headerElement, headerText }}>
-          <DataGridBase
-            key={gridKey.current}
-            ref={innerGridRef}
-            columns={columns}
-            rows={rows}
-            className={className}
-            headerRowHeight={getHeaderHeight?.()}
-            onScroll={onScroll}
-            rowHeight={getRowHeight ? row => getRowHeight(row.idx) : undefined}
-            rowKeyGetter={getRowId ? row => getRowId(row.idx) : undefined}
-            onSelectedCellChange={handleCellFocus}
-            onCellKeyDown={onCellKeyDown ? (args, event) => onCellKeyDown({ rowIdx: args.rowIdx, colIdx: args.column.idx }, event) : undefined}
-            renderers={{
-              renderRow: rowRenderer,
-              renderCell: cellRenderer,
-              noRowsFallback: children,
-            }}
-            minimumRowsToRender={100}
-          />
-        </DataGridCellHeaderContext>
-      </DataGridCellContext>
-    </DataGridRowContext>
+    <HeaderDnDContext value={dndHeaderContext}>
+      <DataGridRowContext value={{ rowCount, onScrollToBottom }}>
+        <DataGridCellContext value={{ cell, cellText, cellElement, cellTooltip, onCellChange }}>
+          <DataGridCellHeaderContext value={{ headerElement, headerText, getHeaderDnD, columnSortable, onColumnSort, columnSortingState, onHeaderKeyDown }}>
+            <DataGridBase
+              ref={innerGridRef}
+              columns={dndHeaderContext.columns}
+              enableVirtualization={!isMeasurementRender}
+              rows={rows}
+              className={className}
+              headerRowHeight={getHeaderHeight?.()}
+              rowHeight={getRowHeight ? row => getRowHeight(row.idx) : undefined}
+              rowKeyGetter={getRowId ? row => getRowId(row.idx) : undefined}
+              columnWidths={columnWidths}
+              renderers={{
+                renderRow: rowRenderer,
+                renderCell: cellRenderer,
+                noRowsFallback: children,
+              }}
+              onScroll={onScroll}
+              onSelectedCellChange={handleCellFocus}
+              onCellKeyDown={handleCellKeyDown}
+              onColumnWidthsChange={setColumnWidths}
+            />
+          </DataGridCellHeaderContext>
+        </DataGridCellContext>
+      </DataGridRowContext>
+    </HeaderDnDContext>
   );
 });

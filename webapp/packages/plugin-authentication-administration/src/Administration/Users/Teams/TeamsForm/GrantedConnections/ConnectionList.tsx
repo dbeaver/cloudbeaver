@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { type Connection, type ConnectionInfoOrigin, DBDriverResource } from '@cloudbeaver/core-connections';
+import { type ConnectionInfoCustomOptions, type ConnectionInfoOrigin, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 
 import styles from './ConnectionList.module.css';
@@ -34,7 +34,7 @@ import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHea
 import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem.js';
 
 interface Props {
-  connectionList: Connection[];
+  connectionList: ConnectionInfoCustomOptions[];
   connectionsOrigins: ConnectionInfoOrigin[];
   grantedSubjects: string[];
   disabled: boolean;
@@ -65,7 +65,7 @@ export const ConnectionList = observer<Props>(function ConnectionList({ connecti
     <Group className={s(style, { group: true })} box border medium overflow vertical>
       <GrantedConnectionsTableHeader filterState={filterState} disabled={disabled}>
         <Container keepSize>
-          <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>
+          <Button disabled={disabled || !selected} onClick={grant}>
             {translate('ui_add')}
           </Button>
         </Container>

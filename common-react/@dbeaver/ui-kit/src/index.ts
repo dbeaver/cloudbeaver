@@ -21,7 +21,7 @@ export {
   type FocusTrapRegionProps,
 } from '@ariakit/react';
 
-export { Button, ButtonBase, type ButtonProps } from './Button/Button.js';
+export { Button, ButtonBase, type ButtonProps, ButtonIcon, type ButtonIconProps } from './Button/Button.js';
 export { IconButton, IconButtonBase, type IconButtonProps } from './IconButton/IconButton.js';
 export { Checkbox, CheckboxBase, type CheckboxProps } from './Checkbox/Checkbox.js';
 export { Input, InputBase, type InputProps } from './Input/Input.js';
@@ -38,5 +38,6 @@ export {
 export { SelectField, type SelectFieldProps, type SelectItem } from './Select/SelectField.js';
 export { Spinner, type SpinnerProps } from './Spinner/Spinner.js';
 export { Radio, RadioGroup, useRadioContext, useRadioStore, type RadioProviderProps, type RadioProps, type RadioGroupProps } from './Radio/index.js';
+export { Icon, type IconProps } from './Icon/Icon.js';
 export * from './utils/clsx.js';
 export * from './ComponentProvider.js';

@@ -3,11 +3,10 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Resource manager NIO implementation
 Bundle-SymbolicName: io.cloudbeaver.service.rm.nio;singleton:=true
-Bundle-Version: 1.0.40.qualifier
-Bundle-Release-Date: 20250602
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-Version: 1.0.42.qualifier
+Bundle-Release-Date: 20250707
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: .
 Require-Bundle: io.cloudbeaver.model,
  org.jkiss.dbeaver.model,
  org.jkiss.dbeaver.model.nio

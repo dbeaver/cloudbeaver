@@ -78,10 +78,10 @@ export const ConnectionFormAccessTableGrantedList = observer<Props>(function Con
     <Group className={s(style, { group: true })} box medium overflow>
       <div className={s(style, { container: true })}>
         <ConnectionFormAccessTableHeader className={s(style, { connectionAccessTableHeader: true })} filterState={filterState} disabled={disabled}>
-          <Button disabled={disabled || !selected} mod={['outlined']} onClick={revoke}>
+          <Button disabled={disabled || !selected} variant="secondary" onClick={revoke}>
             {translate('ui_delete')}
           </Button>
-          <Button disabled={disabled} mod={['unelevated']} onClick={props.onEdit}>
+          <Button disabled={disabled} onClick={props.onEdit}>
             {translate('ui_edit')}
           </Button>
         </ConnectionFormAccessTableHeader>

@@ -4,6 +4,7 @@ export default [
   ['ui_tag_new', 'Новый'],
   ['ui_light_theme', 'Светлая'],
   ['ui_dark_theme', 'Темная'],
+  ['ui_system_theme', 'Устройство'],
   ['ui_stepper_back', 'Назад'],
   ['ui_load_more', 'Загрузить ещё'],
   ['ui_processing_connecting', 'Подключение...'],
@@ -136,6 +137,8 @@ export default [
   ['ui_schema', 'Схема'],
   ['ui_project', 'Проект'],
   ['ui_type', 'Тип'],
+  ['ui_field_is_required', 'Заполните это поле'],
+  ['ui_delete_confirmation_message', 'Вы собираетесь удалить "{arg:item}". Вы уверены?'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

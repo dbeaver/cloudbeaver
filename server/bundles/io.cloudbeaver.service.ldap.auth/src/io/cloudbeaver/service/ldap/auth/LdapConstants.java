@@ -25,7 +25,8 @@ public interface LdapConstants {
     String PARAM_FILTER = "ldap-filter";
     String PARAM_USER_IDENTIFIER_ATTR = "ldap-identifier-attr";
     String PARAM_LOGIN = "ldap-login";
-
+    String PARAM_SSL_ENABLE = "ldap-enable-ssl";
+    String PARAM_SSL_CERT = "ldap-ssl-cert";
 
     String CRED_USERNAME = "user";
     String CRED_DISPLAY_NAME = "displayName";

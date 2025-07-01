@@ -11,7 +11,7 @@ import { useContext } from 'react';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { Button, getComputed, type PlaceholderComponent, useResource, useTranslate, useAuthenticationAction } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoAuthPropertiesResource, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { ConnectionFormActionsContext } from './ConnectFormActionsContext.js';
@@ -28,7 +28,7 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
   const optionsPart = getConnectionFormOptionsPart(formState);
   const driverMap = useResource(ConnectionFormBaseActions, DBDriverResource, optionsPart.state.driverId || null);
   const driver = driverMap.data;
-  const connectionInfoResource = useResource(ConnectionFormBaseActions, ConnectionInfoResource, optionsPart.connectionKey, {
+  const connectionInfoResource = useResource(ConnectionFormBaseActions, ConnectionInfoAuthPropertiesResource, optionsPart.connectionKey, {
     active: !!optionsPart.connectionKey,
   });
 
@@ -48,22 +48,16 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
   return (
     <>
       {actions.onCancel && (
-        <Button type="button" disabled={formState.isDisabled} mod={['outlined']} onClick={actions.onCancel}>
+        <Button type="button" disabled={formState.isDisabled} variant="secondary" onClick={actions.onCancel}>
           {translate('ui_processing_cancel')}
         </Button>
       )}
       {!disableTest && (
-        <Button type="button" disabled={formState.isDisabled || !authorized} mod={['outlined']} loader onClick={actions['test']}>
+        <Button type="button" disabled={formState.isDisabled || !authorized} variant="secondary" loader onClick={actions['test']}>
           {translate('connections_connection_test')}
         </Button>
       )}
-      <Button
-        type="button"
-        disabled={formState.isDisabled || formState.isReadOnly || !formState.isChanged}
-        mod={['unelevated']}
-        loader
-        onClick={actions['save']}
-      >
+      <Button type="button" disabled={formState.isDisabled || formState.isReadOnly || !formState.isChanged} loader onClick={actions['save']}>
         {translate(formState.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_create')}
       </Button>
     </>

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -78,10 +78,10 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
     const disabled = getComputed(() => handler?.isDisabled?.(subMenuData.context));
     const loaded = getComputed(() => !subMenuData.loaders.some(loader => !loader.isLoaded()));
     const info = handler?.getInfo?.(subMenuData.context, subMenuData.menu);
-    const label = info?.label ?? subMenu.label ?? subMenu.menu.label;
-    const icon = info?.icon ?? subMenu.icon ?? subMenu.menu.icon;
+    const label = info?.label ?? subMenu.label ?? subMenu.menu.info.label;
+    const icon = info?.icon ?? subMenu.icon ?? subMenu.menu.info.icon;
 
-    const tooltip = info?.tooltip ?? subMenu.tooltip ?? subMenu.menu.tooltip;
+    const tooltip = info?.tooltip ?? subMenu.tooltip ?? subMenu.menu.info.tooltip;
     const MenuItemRenderer = itemRenderer;
     const panelAvailable = subMenuData.available || !loaded;
 
@@ -90,7 +90,7 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
         {...rest}
         ref={ref}
         menuRef={menu}
-        label={subMenuData.menu.label}
+        label={subMenuData.menu.info.label}
         items={() =>
           subMenuData.items.map(
             item =>

@@ -1,19 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import axios, { type AxiosProgressEvent, CanceledError, isAxiosError, isCancel } from 'axios';
-import {
-  resolveRequestDocument as analyzeDocument,
-  ClientError,
-  GraphQLClient,
-  type RequestDocument,
-  type RequestOptions,
-  type Variables,
-} from 'graphql-request';
+import { analyzeDocument, ClientError, GraphQLClient, type RequestDocument, type RequestOptions, type Variables } from 'graphql-request';
 
 import { GQLError } from './GQLError.js';
 import type { IResponseInterceptor } from './IResponseInterceptor.js';
@@ -37,7 +30,7 @@ export class CustomGraphQLClient extends GraphQLClient {
   private isRequestsBlocked = false;
   private requestsBlockedReason: Error | string | null = null;
 
-  async uploadFile<T = any, V extends Variables = Variables>(
+  uploadFile<T = any, V extends Variables = Variables>(
     url: string,
     file: Blob,
     query?: string,
@@ -51,7 +44,7 @@ export class CustomGraphQLClient extends GraphQLClient {
     );
   }
 
-  async uploadFiles<T = any, V extends Variables = Variables>(
+  uploadFiles<T = any, V extends Variables = Variables>(
     url: string,
     files: File[],
     query?: string,
@@ -109,7 +102,7 @@ export class CustomGraphQLClient extends GraphQLClient {
     this.blockRequestsReasonHandler();
     try {
       const requestOptions = parseRequestArgs(documentOrOptions, variables, requestHeaders);
-      const { query: expression } = analyzeDocument(requestOptions.document);
+      const { expression } = analyzeDocument(requestOptions.document);
 
       const response = await this.rawRequest<T, V>(expression, variables, requestHeaders);
 

@@ -20,4 +20,5 @@ public interface HttpConstants {
     String CONTENT_TYPE = "Content-Type";
 
     String TYPE_JSON = "application/json";
+    String HEADER_AUTHORIZATION = "Authorization";
 }

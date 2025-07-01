@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -107,10 +107,10 @@ export const SqlEditorOverlay = observer<Props>(function SqlEditorOverlay({ stat
         </OverlayHeader>
         <OverlayMessage>{translate('sql_editor_restore_message')}</OverlayMessage>
         <OverlayActions className={s(styles, { overlayActions: true })}>
-          <Button type="button" mod={['outlined']} loader onClick={cancelConnection}>
+          <Button type="button" variant="secondary" loader onClick={cancelConnection}>
             {translate('ui_processing_cancel')}
           </Button>
-          <Button type="button" mod={['unelevated']} loading={initializingContext} loader onClick={init}>
+          <Button type="button" loading={initializingContext} loader onClick={init}>
             {translate('sql_editor_restore')}
           </Button>
         </OverlayActions>

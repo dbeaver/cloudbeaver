@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { type Connection, type ConnectionInfoOrigin, DBDriverResource } from '@cloudbeaver/core-connections';
+import { type ConnectionInfoCustomOptions, type ConnectionInfoOrigin, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
@@ -35,7 +35,7 @@ import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHea
 import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem.js';
 
 interface Props {
-  grantedConnections: Connection[];
+  grantedConnections: ConnectionInfoCustomOptions[];
   connectionsOrigins: ConnectionInfoOrigin[];
   disabled: boolean;
   onRevoke: (subjectIds: string[]) => void;
@@ -81,12 +81,12 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
     <Group className={s(styles, { group: true })} box border medium overflow vertical>
       <GrantedConnectionsTableHeader className={s(styles, { header: true })} filterState={filterState} disabled={disabled}>
         <Container keepSize>
-          <Button disabled={disabled || !selected} mod={['outlined']} onClick={revoke}>
+          <Button disabled={disabled || !selected} variant="secondary" onClick={revoke}>
             {translate('ui_delete')}
           </Button>
         </Container>
         <Container keepSize>
-          <Button disabled={disabled} mod={['unelevated']} onClick={props.onEdit}>
+          <Button disabled={disabled} onClick={props.onEdit}>
             {translate('ui_edit')}
           </Button>
         </Container>

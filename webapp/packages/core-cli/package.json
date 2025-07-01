@@ -34,7 +34,7 @@
     "postinstall": "yarn build"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "dependencies": {
     "glob": "^11",
@@ -44,7 +44,7 @@
     "@cloudbeaver/tsconfig": "workspace:*",
     "@swc/core": "^1",
     "@types/js-yaml": "^4",
-    "@types/node": "^20",
+    "@types/node": "^22",
     "enquirer": "^2",
     "execa": "^9",
     "glob": "^11",

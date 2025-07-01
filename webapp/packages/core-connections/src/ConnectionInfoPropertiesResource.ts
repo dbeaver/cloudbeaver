@@ -25,7 +25,6 @@ import { parseConnectionKey } from './parseConnectionKey.js';
 
 export type ConnectionInfoProperties = DatabaseConnectionPropertiesFragment;
 
-// TODO reuse it everywhere where include "includeProperties" is used
 @injectable()
 export class ConnectionInfoPropertiesResource extends CachedMapResource<IConnectionInfoParams, ConnectionInfoProperties> {
   constructor(

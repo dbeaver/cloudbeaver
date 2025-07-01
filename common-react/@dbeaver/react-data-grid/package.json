@@ -33,6 +33,7 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@dbeaver/react-dnd": "workspace:^",
     "@dbeaver/ui-kit": "workspace:^",
     "react": "^19",
     "react-data-grid": "file:./artifacts",

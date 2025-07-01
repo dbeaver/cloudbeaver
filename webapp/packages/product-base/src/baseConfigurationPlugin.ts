@@ -54,8 +54,16 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
             host: 'localhost',
             port: 8080,
             origin: 'http://localhost:8080',
+            cors: {
+              origin: /(^https?:\/\/(?:(?:[^:]+\.)?localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$|^vscode-webview:\/\/|^vscode-file:\/\/vscode-app)/,
+            },
             proxy: {
               '/api': {
+                target: envServer,
+                changeOrigin: true,
+                secure: false,
+              },
+              '/auth-external': {
                 target: envServer,
                 changeOrigin: true,
                 secure: false,
@@ -76,6 +84,8 @@ export function baseConfigurationPlugin(mode: string, packageJson: any): PluginO
             modulePreload: false,
             /* We need to disable css splitting because of the issue with loading CSS for some chunks (dbeaver/pro#5599), can be removed when dbeaver/pro#5204 is done */
             cssCodeSplit: false,
+            /* Imported or referenced assets that are smaller than this threshold will be inlined as base64 URLs to avoid extra http requests. Set to 0 to disable inlining altogether. */
+            assetsInlineLimit: 0,
 
             rollupOptions: {
               ...config.build?.rollupOptions,

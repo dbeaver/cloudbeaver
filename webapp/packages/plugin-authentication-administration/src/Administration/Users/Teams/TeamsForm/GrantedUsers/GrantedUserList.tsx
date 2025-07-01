@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -89,12 +89,12 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({ grante
     <Group className={s(styles, { group: true })} box border medium overflow vertical>
       <GrantedUsersTableHeader className={s(styles, { header: true })} filterState={filterState} disabled={disabled}>
         <Container keepSize>
-          <Button disabled={disabled || !selected} mod={['outlined']} onClick={revoke}>
+          <Button disabled={disabled || !selected} variant="secondary" onClick={revoke}>
             {translate('ui_delete')}
           </Button>
         </Container>
         <Container keepSize>
-          <Button disabled={disabled} mod={['unelevated']} onClick={props.onEdit}>
+          <Button disabled={disabled} onClick={props.onEdit}>
             {translate('ui_edit')}
           </Button>
         </Container>

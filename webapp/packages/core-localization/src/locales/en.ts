@@ -4,6 +4,7 @@ export default [
   ['ui_tag_new', 'New'],
   ['ui_light_theme', 'Light'],
   ['ui_dark_theme', 'Dark'],
+  ['ui_system_theme', 'Device'],
   ['ui_stepper_back', 'Back'],
   ['ui_stepper_next', 'Next'],
   ['ui_stepper_finish', 'Finish'],
@@ -140,6 +141,8 @@ export default [
   ['ui_schema', 'Schema'],
   ['ui_project', 'Project'],
   ['ui_type', 'Type'],
+  ['ui_field_is_required', 'Please fill in this field'],
+  ['ui_delete_confirmation_message', 'You are about to delete "{arg:item}". Are you sure?'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],

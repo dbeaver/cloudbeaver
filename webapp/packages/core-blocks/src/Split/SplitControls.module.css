@@ -20,17 +20,6 @@
   }
 }
 
-.button {
-  composes: theme-button theme-button_unelevated theme-button_background theme-elevation-z3 from global;
-  opacity: 1;
-  transition-property: opacity, box-shadow !important;
-  transition: opacity 0.3s ease-in-out;
-}
-
-.ripple {
-  composes: theme-button_ripple from global;
-}
-
 .container:hover .resizeButton {
   opacity: 1;
 }
@@ -53,24 +42,6 @@
   &[data-s-mode='maximize'] {
     left: -2px;
   }
-
-  & .button {
-    margin: 8px 0;
-    min-width: 16px;
-
-    &::after {
-      transform: rotate(180deg);
-    }
-  }
-
-  &[data-s-mode='maximize'] .button,
-  &[data-s-mode='minimize'] .button {
-    min-height: 64px;
-  }
-
-  & .button.primary::after {
-    transform: rotate(0deg);
-  }
 }
 
 .container[data-s-split='vertical'].inverse {
@@ -91,44 +62,8 @@
   &[data-s-mode='maximize'] {
     top: -2px;
   }
-
-  & .button {
-    margin: 0 8px;
-    min-width: 28px;
-    height: 16px;
-
-    &::after {
-      transform: rotate(270deg);
-    }
-  }
-
-  &[data-s-mode='maximize'] .button,
-  &[data-s-mode='minimize'] .button {
-    min-width: 64px;
-  }
-
-  & .button.primary::after {
-    transform: rotate(90deg);
-  }
 }
 
 .container[data-s-split='horizontal'].inverse {
   flex-direction: row-reverse;
-}
-
-.button {
-  padding: 0 !important;
-  &::after {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    content: '';
-    display: block;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 3px 4px 3px 0;
-    border-color: transparent #000 transparent transparent;
-    margin: -3px -2px;
-  }
 }

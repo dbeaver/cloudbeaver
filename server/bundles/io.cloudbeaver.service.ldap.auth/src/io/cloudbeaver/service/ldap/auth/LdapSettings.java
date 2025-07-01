@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.ldap.auth;
 
+import io.cloudbeaver.service.ldap.auth.ssl.LdapSslSetting;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.utils.CommonUtils;
@@ -34,6 +35,7 @@ public class LdapSettings {
     private final String bindUserPassword;
     private final String filter;
     private final String loginAttribute;
+    private final LdapSslSetting ldapSslSetting;
 
 
     public LdapSettings(
@@ -49,7 +51,11 @@ public class LdapSettings {
         this.bindUser = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_BIND_USER, "");
         this.bindUserPassword = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_BIND_USER_PASSWORD, "");
         this.filter = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_FILTER, "");
-        this.loginAttribute = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_LOGIN, "");;
+        this.loginAttribute = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_LOGIN, "");
+        this.ldapSslSetting = new LdapSslSetting(
+            providerConfiguration.getParameter(LdapConstants.PARAM_SSL_ENABLE),
+            providerConfiguration.getParameter(LdapConstants.PARAM_SSL_CERT)
+        );
     }
 
 
@@ -68,6 +74,9 @@ public class LdapSettings {
     }
 
     public String getLdapProviderUrl() {
+        if (ldapSslSetting.isEnable()) {
+            return "ldaps://" + getHost() + ":" + getPort();
+        }
         return "ldap://" + getHost() + ":" + getPort();
     }
 
@@ -90,6 +99,10 @@ public class LdapSettings {
 
     public String getLoginAttribute() {
         return loginAttribute;
+    }
+
+    public LdapSslSetting getLdapSslSetting() {
+        return ldapSslSetting;
     }
 
     @NotNull

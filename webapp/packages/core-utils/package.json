@@ -22,7 +22,7 @@
   "dependencies": {
     "@timohausmann/quadtree-ts": "^2",
     "fast-deep-equal": "^3",
-    "i18next": "^24",
+    "i18next": "^25",
     "md5": "^2",
     "mobx": "^6",
     "tslib": "^2",

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
       <MenuItem
         {...{ as: SubMenuElement }}
         id={item.id}
-        aria-label={translate(item.menu.label)}
+        aria-label={translate(item.menu.info.label)}
         hidden={item.hidden}
         itemRenderer={MenuItemRenderer}
         menuRtl={rtl}
@@ -89,11 +89,7 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
         checked={item.checked}
         onClick={() => onClick(false)}
       >
-        <MenuItemElement
-          label={item.label}
-          icon={<Checkbox checked={item.checked} mod={['primary', 'small']} ripple={false} />}
-          tooltip={item.tooltip}
-        />
+        <MenuItemElement label={item.label} icon={<Checkbox checked={item.checked} size="small" />} tooltip={item.tooltip} />
       </MenuItemCheckbox>
     );
   }
@@ -120,7 +116,15 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
     const extraProps = item.getExtraProps?.();
 
     return (
-      <MenuItem id={item.id} aria-label={translate(item.label)} hidden={item.hidden} disabled={item.disabled} onClick={() => onClick()}>
+      <MenuItem
+        id={item.id}
+        aria-label={translate(item.label)}
+        hidden={item.hidden}
+        disabled={item.disabled}
+        style={{ pointerEvents: 'auto' }}
+        focusable
+        onClick={() => onClick()}
+      >
         <MenuItemElement label={item.label} icon={IconComponent ? <IconComponent item={item} {...extraProps} /> : item.icon} tooltip={item.tooltip} />
       </MenuItem>
     );
