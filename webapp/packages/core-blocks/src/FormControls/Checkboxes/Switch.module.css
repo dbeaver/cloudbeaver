@@ -33,10 +33,6 @@
   composes: theme-switch__thumb from global;
 }
 
-.radioRipple {
-  composes: theme-radio_ripple from global;
-}
-
 .switchBody {
   display: flex;
   align-items: center;
