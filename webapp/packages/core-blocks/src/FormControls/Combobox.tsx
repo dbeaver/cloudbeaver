@@ -107,7 +107,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
     searchable = true;
   }
 
-  const [searchValue, setSearchValue] = useState<string>('');
+  const [searchValue, setSearchValue] = useState<string | null>(null);
 
   const filteredItems = getComputed(() => {
     const result = items.filter(item => !searchValue || valueSelector(item).toUpperCase().includes(searchValue.toUpperCase()));
@@ -129,7 +129,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   let inputValue = (selectedItem ? valueSelector(selectedItem) : searchValue) ?? '';
 
-  if (searchValue && selectedItem && valueSelector(selectedItem) !== searchValue) {
+  if (searchValue !== null && selectedItem && valueSelector(selectedItem) !== searchValue) {
     inputValue = searchValue;
   }
 
@@ -169,19 +169,19 @@ export const Combobox: ComboboxType = observer(function Combobox({
       if (context && changed) {
         context.change(id, name);
       }
-      setSearchValue('');
+      setSearchValue(null);
     },
     [value, state, name, store, context, onSelect],
   );
 
   const matchItems = useCallback(
     (input?: boolean) => {
-      if (!searchValue) {
+      if (searchValue === null) {
         return;
       }
 
       if (filteredItems.length === 0) {
-        setSearchValue('');
+        setSearchValue(null);
         return;
       }
 
@@ -196,7 +196,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
         if (input) {
           handleSelect(keySelector(filteredItems[0], filteredItemIndex));
         } else {
-          setSearchValue('');
+          setSearchValue(null);
         }
       }
     },
