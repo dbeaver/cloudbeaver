@@ -45,6 +45,7 @@ import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.sql.*;
+import org.jkiss.dbeaver.model.sql.completion.CompletionProposalBase;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionAnalyzer;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
 import org.jkiss.dbeaver.model.sql.format.SQLFormatUtils;
@@ -57,7 +58,6 @@ import org.jkiss.dbeaver.model.sql.semantics.SQLDocumentScriptItemSyntaxContext;
 import org.jkiss.dbeaver.model.sql.semantics.SQLQueryModelRecognizer;
 import org.jkiss.dbeaver.model.sql.semantics.SQLQueryRecognitionContext;
 import org.jkiss.dbeaver.model.sql.semantics.SQLScriptItemAtOffset;
-import org.jkiss.dbeaver.model.sql.semantics.completion.ISqlCompletionProposal;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionAnalyzer;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionContext;
 import org.jkiss.dbeaver.model.sql.semantics.model.SQLQueryModel;
@@ -172,7 +172,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                 CommonUtils.getBoolean(simpleMode, false)
             );
 
-            List<ISqlCompletionProposal> proposals = new ArrayList<>();
+            List<CompletionProposalBase> proposals = new ArrayList<>();
             WebSession webSession = sqlContext.getWebSession();
             boolean useNewCompletionEngine = webSession.getUserPreferenceStore()
                 .getBoolean(SQLModelPreferences.AUTOCOMPLETION_MODE);
@@ -192,7 +192,6 @@ public class WebServiceSQL implements DBWServiceSQL {
                     queryModel,
                     query.length()
                 );
-                scriptItemContext.setHasContextBoundaryAtLength(false);
 
                 final SQLQueryCompletionAnalyzer analyzer = new SQLQueryCompletionAnalyzer(
                     m -> SQLQueryCompletionContext.prepareCompletionContext(
@@ -293,7 +292,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                     DBSObject object = ((DBSWrapper) node).getObject();
                     if (object != null) {
                         objectList.add(object);
-                      }
+                    }
                 }
             }
             return objectList;
