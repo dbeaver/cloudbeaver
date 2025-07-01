@@ -12,6 +12,9 @@
     },
     {
       "path": "../core-cli"
+    },
+    {
+      "path": "../tests-runner"
     }
   ],
   "include": [

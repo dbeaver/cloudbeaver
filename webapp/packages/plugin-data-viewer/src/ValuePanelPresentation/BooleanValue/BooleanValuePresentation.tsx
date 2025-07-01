@@ -59,9 +59,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
   return (
     <div className={classes['container']}>
       <Radio
-        className={classes['radio']}
         id="true_value"
-        mod={['primary']}
         checked={value === true}
         disabled={readonly}
         onClick={() => editAction.set(firstSelectedCell, true)}
@@ -69,9 +67,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
         TRUE
       </Radio>
       <Radio
-        className={classes['radio']}
         id="false_value"
-        mod={['primary']}
         checked={value === false}
         disabled={readonly}
         onClick={() => editAction.set(firstSelectedCell, false)}
@@ -80,9 +76,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
       </Radio>
       {nullable && (
         <Radio
-          className={classes['radio']}
           id="null_value"
-          mod={['primary']}
           checked={value === null}
           disabled={readonly}
           onClick={() => editAction.set(firstSelectedCell, null)}

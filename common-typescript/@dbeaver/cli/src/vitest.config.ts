@@ -12,18 +12,7 @@ export default defineConfig({
     include: ['**/lib/**/*.test.js'],
     exclude: ['node_modules/**'],
     isolate: false,
-    poolOptions: {
-      forks: {
-        isolate: false,
-      },
-    },
-    fileParallelism: false,
     watch: false,
-    environmentOptions: {
-      // This will force JSDOM to use the default export condition when importing msw/node, resulting in correct imports.
-      // https://mswjs.io/docs/migrations/1.x-to-2.x#cannot-find-module-mswnode-jsdom
-      customExportConditions: [''],
-    },
   },
   esbuild: false,
 });
