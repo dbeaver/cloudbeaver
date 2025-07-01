@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import { OUTPUT_LOGS_FILTER_MENU } from './OUTPUT_LOGS_FILTER_MENU.js';
 import { OUTPUT_LOGS_MENU } from './OUTPUT_LOGS_MENU.js';
 import { OUTPUT_LOGS_SETTINGS_MENU } from './OUTPUT_LOGS_SETTINGS_MENU.js';
 import { OutputLogsService } from './OutputLogsService.js';
+import { ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS } from './ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS.js';
 
 @injectable()
 export class OutputMenuBootstrap extends Bootstrap {
@@ -37,7 +38,7 @@ export class OutputMenuBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [OUTPUT_LOGS_MENU],
       getItems(context, items) {
-        return [...items, OUTPUT_LOGS_FILTER_MENU, OUTPUT_LOGS_SETTINGS_MENU];
+        return [...items, ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS, OUTPUT_LOGS_FILTER_MENU, OUTPUT_LOGS_SETTINGS_MENU];
       },
     });
 
@@ -118,7 +119,7 @@ export class OutputMenuBootstrap extends Bootstrap {
   private registerOutputLogsAction() {
     this.actionService.addHandler({
       id: 'output-logs-handler',
-      actions: [ACTION_SHOW_OUTPUT_LOGS],
+      actions: [ACTION_SHOW_OUTPUT_LOGS, ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS],
       contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
       isActionApplicable: (context): boolean => {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
@@ -130,11 +131,15 @@ export class OutputMenuBootstrap extends Bootstrap {
         return !!isQuery && !!isExecutable;
       },
 
-      handler: async (context, action) => {
+      handler: (context, action) => {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         if (action === ACTION_SHOW_OUTPUT_LOGS) {
           this.outputLogsService.showOutputLogs(state);
+        }
+
+        if (action === ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS) {
+          this.outputLogsService.clearOutputLogs(state);
         }
       },
     });
