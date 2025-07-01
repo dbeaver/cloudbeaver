@@ -8,7 +8,7 @@
 
 import { useState } from 'react';
 import clsx from 'clsx';
-import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel, type SelectProviderProps } from './Select.js';
+import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel, type SelectProviderProps, type SelectPopoverProps } from './Select.js';
 import './SelectField.css';
 
 export interface SelectItem<T> {
@@ -70,7 +70,9 @@ export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
    */
   arrowIcon?: React.ReactNode;
 
-  store?: SelectProviderProps['store']
+  store?: SelectProviderProps['store'];
+
+  popoverProps?: Omit<SelectPopoverProps, 'gutter' | 'unmountOnHide'>;
 }
 
 // Utility function to get value by it's key or using getter function
@@ -94,6 +96,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   selectedRender,
   arrowIcon,
   store,
+  popoverProps,
   name,
 }: SelectFieldProps<T, ItemType>) {
   const getItemValue = (item: ItemType): T =>
@@ -121,7 +124,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
 
   const selectedItem = items.find(item => getItemValue(item) === currentValue);
 
-  const displayValue = selectedItem ? (selectedRender ? selectedRender(currentValue, selectedItem) : renderItem(selectedItem)) : '';
+  const displayValue = selectedRender ? selectedRender(currentValue, selectedItem) : selectedItem ? renderItem(selectedItem) : '';
 
   return (
     <div className={clsx('dbv-kit-select-field', className)}>
@@ -134,7 +137,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
         </Select>
         {description && <span className="dbv-kit-select__description">{description}</span>}
 
-        <SelectPopover gutter={4} unmountOnHide>
+        <SelectPopover {...popoverProps} gutter={4} unmountOnHide>
           {items.length === 0 ? (
             <div className="dbv-kit-select__empty">{noItemsPlaceholder}</div>
           ) : (

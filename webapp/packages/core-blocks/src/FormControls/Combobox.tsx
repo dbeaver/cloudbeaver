@@ -99,9 +99,9 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const translate = useTranslate();
   const context = useContext(FormContext);
   const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
-  const store = useSelectStore();
-  const isOpened = store.getState().open;
   const styles = useS(comboboxStyles);
+  const menu = useSelectStore();
+  const isOpened = menu.getState().open;
 
   if (readOnly) {
     searchable = true;
@@ -135,16 +135,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   const hideMenu = items.length === 1 && (!!selectedItem || isDisabled?.(items[0]) === true);
 
-  function handleClick() {
-    if (!searchable) {
-      if (isOpened) {
-        store.setOpen(false);
-      } else {
-        store.setOpen(true);
-      }
-    }
-  }
-
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
@@ -159,7 +149,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
       id = id ?? value ?? '';
       const changed = id !== value;
 
-      store.setOpen(false);
+      menu.hide();
       if (state && changed) {
         state[name] = id;
       }
@@ -171,7 +161,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
       }
       setSearchValue(null);
     },
-    [value, state, name, store, context, onSelect],
+    [value, state, name, menu, context, onSelect],
   );
 
   const matchItems = useCallback(
@@ -216,7 +206,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   useEffect(() => {
     if (inputRef === document.activeElement) {
       if (inputValue === searchValue) {
-        store.setOpen(true);
+        menu.show();
       }
     } else {
       if (!isOpened) {
@@ -229,7 +219,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
     onSwitch?.(isOpened);
   }, [onSwitch, isOpened]);
 
-  // const icon = selectedItem && iconSelector?.(selectedItem);
   const focus = isOpened;
   const select = !searchable;
 
@@ -238,7 +227,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   }
 
   const renderIcon = (item: any) => {
-    if (iconSelector && iconSelector(item)) {
+    if (item && iconSelector && iconSelector(item)) {
       return (
         <div className={s(styles, { inputIcon: true })}>
           {loading ? (
@@ -265,10 +254,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const itemDisabled = (item: any) => isDisabled?.(item) ?? false;
 
   const selectedRender = (val: any, item: any) => {
-    if (!item) {
-      return '';
-    }
-
     if (searchable) {
       return (
         <div className={s(styles, { itemSearch: true })} title={title}>
@@ -288,10 +273,13 @@ export const Combobox: ComboboxType = observer(function Combobox({
             className={s(styles, { input: true, select, focus })}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
-            onClick={handleClick}
           />
         </div>
       );
+    }
+
+    if (!item) {
+      return '';
     }
 
     return (
@@ -326,7 +314,10 @@ export const Combobox: ComboboxType = observer(function Combobox({
           noItemsPlaceholder={translate('combobox_no_results_placeholder')}
           selectedRender={selectedRender}
           arrowIcon={<Icon name="arrow" viewBox="0 0 16 16" className={styles['icon']} />}
-          store={store}
+          store={menu}
+          popoverProps={{
+            autoFocusOnShow: !searchable,
+          }}
           onChange={handleSelect}
           {...rest}
         />
