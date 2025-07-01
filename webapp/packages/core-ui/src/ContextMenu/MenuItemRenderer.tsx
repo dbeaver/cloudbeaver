@@ -106,7 +106,7 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
         checked={item.checked}
         onClick={() => onClick()}
       >
-        <MenuItemElement label={item.label} icon={<Radio checked={item.checked} mod={['primary', 'menu']} ripple={false} />} tooltip={item.tooltip} />
+        <MenuItemElement label={item.label} icon={<Radio size="small" checked={item.checked} />} tooltip={item.tooltip} />
       </MenuItemRadio>
     );
   }

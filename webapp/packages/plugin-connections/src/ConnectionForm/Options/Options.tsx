@@ -84,6 +84,7 @@ const driverConfiguration: IDriverConfiguration[] = [
     isVisible: driver => driver.configurationTypes.includes(DriverConfigurationType.Url),
   },
 ];
+
 export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({ formState, tabId }) {
   const { selected } = useTab(tabId);
   const isAdmin = usePermission(EAdminPermission.admin);
@@ -106,6 +107,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const connectionInfoAuthPropertiesResource = useResource(Options, ConnectionInfoAuthPropertiesResource, optionsPart.connectionKey, {
     active: selected && !!optionsPart.connectionKey,
   });
+  const configurationTypeLabel = translate('connections_connection_configuration');
 
   //@TODO it's here until the profile implementation in the CloudBeaver
   const readonly = formState.isDisabled || formState.isReadOnly || connectionInfoAuthResource.data?.authModel === PROFILE_AUTH_MODEL_ID;
@@ -220,17 +222,17 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   {translate('connections_connection_driver')}
                 </Combobox>
                 {configurationTypes.length > 1 && (
-                  <FormFieldDescription label={translate('connections_connection_configuration')} tiny>
+                  <FormFieldDescription label={configurationTypeLabel} tiny>
                     <Container gap>
-                      <RadioGroup name="configurationType" state={optionsPart.state}>
+                      <RadioGroup aria-label={configurationTypeLabel} name="configurationType" state={optionsPart.state}>
                         {configurationTypes.map(conf => (
                           <Radio
                             key={conf.value}
                             id={conf.value}
                             value={conf.value}
-                            mod={['primary', 'small']}
                             readOnly={readonly || configurationTypes.length < 2}
                             disabled={readonly}
+                            small
                             keepSize
                           >
                             {conf.name}

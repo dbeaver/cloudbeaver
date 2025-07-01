@@ -22,6 +22,7 @@ export interface ICellContext {
   editionState: DatabaseEditChangeType | null;
   isMenuVisible: boolean;
   setMenuVisibility(visible: boolean): void;
+  setHover(hovered: boolean): void;
 }
 
 export const CellContext = createContext<ICellContext>(undefined as any);
