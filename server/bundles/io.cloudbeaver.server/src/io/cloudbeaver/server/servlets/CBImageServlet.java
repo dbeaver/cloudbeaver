@@ -68,19 +68,14 @@ public class CBImageServlet extends HttpServlet {
             if (iconURL == null) {
                 iconURL = FileLocator.find(new URL(iconId));
             }
+            if (iconURL == null && "png".equalsIgnoreCase(iconExt)) {
+                //try to fall back to SVG
+                iconURL = FileLocator.find(new URL(iconPath + ".svg"));
+                iconExt = "svg";
+            }
             if (iconURL == null) {
-                if ("png".equalsIgnoreCase(iconExt)) {
-                    //try fallback to svg
-                    iconURL = FileLocator.find(new URL(iconPath + ".svg"));
-                    if (iconURL == null) {
-                        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Image not found");
-                        return;
-                    }
-                    iconExt = "svg";
-                } else {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Image not found");
-                    return;
-                }
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Image not found");
+                return;
             }
 
             String contentType = switch (iconExt.toLowerCase(Locale.ROOT)) {
