@@ -2,48 +2,72 @@
 # Events API
 ####################################################
 
-# Events sent by server
+"Events sent by server"
 enum CBServerEventId {
+    "Configuration changed"
     cb_config_changed,
 
+    "Session log updated"
     cb_session_log_updated,
 
+    "Session websocket connected"
     cb_session_websocket_connected,
+    "Session state info updated"
     cb_session_state,
+    "Session expired"
     cb_session_expired,
 
+    "Datasource created"
     cb_datasource_created,
+    "Datasource updated"
     cb_datasource_updated,
+    "Datasource deleted"
     cb_datasource_deleted,
 
+    "Datasource folder created"
     cb_datasource_folder_created,
+    "Datasource folder updated"
     cb_datasource_folder_updated,
+    "Datasource folder deleted"
     cb_datasource_folder_deleted,
 
+    "Datasource disconnected"
     cb_datasource_disconnected,
+    "Datasource connected"
     cb_datasource_connected,
 
+    "Resource manager resource created"
     cb_rm_resource_created,
+    "Resource manager resource updated"
     cb_rm_resource_updated,
+    "Resource manager resource deleted"
     cb_rm_resource_deleted,
 
+    "Resource manager project added"
     cb_rm_project_added,
+    "Resource manager project removed"
     cb_rm_project_removed,
 
+    "Object permissions updated (e.g., datasource)"
     cb_object_permissions_updated,
+    "Subject permissions updated (e.g., user, team)"
     cb_subject_permissions_updated,
 
+    "Database output log updated (e.g., DBMS in Oracle)"
     cb_database_output_log_updated,
     cb_ai_chat_message_chunk @since(version: "25.1.1")
     cb_ai_chat_message_error @since(version: "25.1.1")
 
+    "Transaction count updated"
     cb_transaction_count @since(version: "24.3.3"),
 
+    "Session async task info updated"
     cb_session_task_info_updated @since(version: "24.3.1"),
+    "Workspace configuration updated"
     cb_workspace_config_changed @since(version: "25.1.1")
 }
 
-# Events sent by client
+"Events sent by client"
 enum CBClientEventId {
     cb_client_topic_subscribe,
     cb_client_topic_unsubscribe,
@@ -51,7 +75,7 @@ enum CBClientEventId {
     cb_client_session_ping
 }
 
-# Client subscribes on topic to receive only related events
+"Client subscribes on topic to receive only related events"
 enum CBEventTopic {
     cb_config,
     cb_session_log,
@@ -74,19 +98,19 @@ enum CBEventTopic {
     cb_ai @since(version: "25.1.1")
 }
 
-# Base server event interface
+"Base server event interface"
 interface CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
 }
 
-# Base client event interface
+"Base client event interface"
 interface CBClientEvent {
     id: CBClientEventId!
     topicId: CBEventTopic
 }
 
-# Datasource folder event
+"Datasource folder event"
 type CBDatasourceFolderEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
@@ -94,7 +118,7 @@ type CBDatasourceFolderEvent implements CBServerEvent {
     projectId: String!
 }
 
-# Datasource event
+"Datasource event"
 type CBDatasourceEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
@@ -102,7 +126,7 @@ type CBDatasourceEvent implements CBServerEvent {
     projectId: String!
 }
 
-# Resource manager event
+"Resource manager event"
 type CBRMEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
@@ -110,26 +134,26 @@ type CBRMEvent implements CBServerEvent {
     projectId: String!
 }
 
-# Server Config event
+"Server Config event"
 type CBConfigEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
 }
 
-# Session log event
+"Session log event"
 type CBSessionLogEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
 }
 
-# WebSocket connected event
+"WebSocket connected event"
 type WSSocketConnectedEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
     applicationRunId: String!
 }
 
-# Session state info event
+"Session state info event"
 type WSSessionStateEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
@@ -141,46 +165,48 @@ type WSSessionStateEvent implements CBServerEvent {
     actionParameters: Object
 }
 
-# Session expired event
+"Session expired event"
 type WSSessionExpiredEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
 }
 
-# RM project update event
+"RM project update event"
 type CBProjectUpdateEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
     projectId: String!
 }
 
-# Subject permission update event
+"Subject permission update event"
 type CBSubjectPermissionUpdateEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
 }
 
-# Topic subscription event
+"Topic subscription event"
 type CBTopicEvent implements CBClientEvent {
     id: CBClientEventId!
-    topicId: CBEventTopic! # topic to subscribe / unsubscribe
+    "topic to subscribe / unsubscribe"
+    topicId: CBEventTopic!
 }
 
-# Project event
+"Project event"
 type CBProjectEvent implements CBClientEvent {
     id: CBClientEventId!
     topicId: CBEventTopic
     projectId: String!
 }
 
-# Active projects event
+"Active projects event"
 type CBProjectsActiveEvent implements CBClientEvent {
     id: CBClientEventId!
     topicId: CBEventTopic
-    projectIds: [String!]! # list of active projects
+    "list of active projects"
+    projectIds: [String!]!
 }
 
-# Database output log event
+"Database output log event"
 type CBDatabaseOutputLogEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
@@ -189,14 +215,14 @@ type CBDatabaseOutputLogEvent implements CBServerEvent {
     eventTimestamp: Int!
 }
 
-# Define the type for WSOutputLogInfo
+"Define the type for WSOutputLogInfo"
 type WSOutputLogInfo {
     severity: String
     message: String
-    # Add more fields as needed
+    # Add more fields if needed
 }
 
-# Async task info status event
+"Async task info status event"
 type WSAsyncTaskInfo @since(version: "24.3.1") {
     id: CBServerEventId!
     taskId: ID!
@@ -204,7 +230,7 @@ type WSAsyncTaskInfo @since(version: "24.3.1") {
     running: Boolean!
 }
 
-# Datasource disconnect event
+"Datasource disconnect event"
 type WSDataSourceDisconnectEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
@@ -212,7 +238,7 @@ type WSDataSourceDisconnectEvent implements CBServerEvent {
     projectId: String!
     timestamp: Int!
 }
-# Datasource connect event
+"Datasource connect event"
 type WSDataSourceConnectEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
@@ -221,7 +247,7 @@ type WSDataSourceConnectEvent implements CBServerEvent {
     timestamp: Int!
 }
 
-# Datasource count event in transactional mode
+"Datasource count event in transactional mode"
 type WSTransactionalCountEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic

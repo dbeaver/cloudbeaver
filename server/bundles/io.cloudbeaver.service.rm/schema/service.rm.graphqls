@@ -34,73 +34,93 @@ input RMProjectPermissions {
 
 extend type Query {
 
-    # List accessible projects
+    "List accessible projects for a current user"
     rmListProjects: [RMProject!]!
 
+    "List shared projects for a current user"
     rmListSharedProjects: [RMProject!]!
 
+    "Returns project information by projectId"
     rmProject(projectId: String!): RMProject!
 
+    "Returns available project permissions. Can be read only by users with admin permissions"
     rmListProjectPermissions: [AdminPermissionInfo!]!
 
+    "Returns project permissions for the specified project. Can be read only by users with admin permissions"
     rmListProjectGrantedPermissions(projectId: String!): [AdminObjectGrantInfo!]!
 
+    "Returns all project grants bysubjectId. Can be read only by users with admin permissions"
     rmListSubjectProjectsPermissionGrants(subjectId: String!): [AdminObjectGrantInfo!]!
 
+    "Returns resources in the specified project and folder. If folder is not specified, returns resources in the root folder"
     rmListResources(
         projectId: String!,
         folder: String,
         nameMask: String,
         readProperties: Boolean,
-        readHistory: Boolean): [RMResource!]!
+        readHistory: Boolean
+    ): [RMResource!]!
 
-    # Reads resource contents as string in UTF-8
+    "Reads resource contents as string in UTF-8"
     rmReadResourceAsString(
         projectId: String!,
-        resourcePath: String!): String!
+        resourcePath: String!
+    ): String!
 
 }
 
 extend type Mutation {
+    "Creates a new resource in the specified project and folder. If isFolder is true then creates a folder, otherwise creates a file"
     rmCreateResource(
         projectId: String!,
         resourcePath: String!,
-        isFolder: Boolean!): String!
+        isFolder: Boolean!
+    ): String!
 
+    "Moves resource to the specified new path in the same project. Can be used to rename a resource"
     rmMoveResource(
         projectId: String!,
         oldResourcePath: String!,
-        newResourcePath: String): String!
+        newResourcePath: String
+    ): String!
 
+    "Deletes resource by path in the specified project. If recursive is true then deletes all sub-resources in the folder"
     rmDeleteResource(
         projectId: String!,
         resourcePath: String!,
-        recursive: Boolean!): Boolean
+        recursive: Boolean!
+    ): Boolean
 
+    """
+    Writes string content to the resource.
+    If forceOverwrite is true then overwrites existing resource, otherwise throws an error if resource already exists
+    """
     rmWriteResourceStringContent(
         projectId: String!,
         resourcePath: String!,
         data: String!,
-        forceOverwrite: Boolean!): String!
+        forceOverwrite: Boolean!
+    ): String!
 
+    "Creates a new project with the specified projectId and projectName."
     rmCreateProject(
         projectId: ID,
         projectName: String!,
-        description: String): RMProject!
+        description: String
+    ): RMProject!
 
+    "Deletes project by projectId. Returns true if project was deleted, false if project not found"
     rmDeleteProject(projectId: ID!): Boolean!
 
-    @deprecated
-    rmSetProjectPermissions(projectId: String!, permissions: [RMSubjectProjectPermissions!]!): Boolean!
+    rmSetProjectPermissions(projectId: String!, permissions: [RMSubjectProjectPermissions!]!): Boolean! @deprecated(reason: "use setConnectionSubjectAccess")
 
-    @deprecated
-    rmSetSubjectProjectPermissions(subjectId: String!, permissions: [RMProjectPermissions!]!): Boolean!
+    rmSetSubjectProjectPermissions(subjectId: String!, permissions: [RMProjectPermissions!]!): Boolean! @deprecated
 
-    @since(version: "23.2.2")
-    rmAddProjectsPermissions(projectIds: [ID!]!, subjectIds: [ID!]!, permissions:[String!]! ): Boolean
-    @since(version: "23.2.2")
-    rmDeleteProjectsPermissions(projectIds: [ID!]!, subjectIds: [ID!]!, permissions:[String!]!): Boolean
+    "Adds project permissions to the specified projects based on subject IDs and permissions. Returns true if permissions were added successfully."
+    rmAddProjectsPermissions(projectIds: [ID!]!, subjectIds: [ID!]!, permissions:[String!]! ): Boolean @since(version: "23.2.2")
+    "Deletes project permissions from the specified projects based on subject IDs and permissions. Returns true if permissions were deleted successfully."
+    rmDeleteProjectsPermissions(projectIds: [ID!]!, subjectIds: [ID!]!, permissions:[String!]!): Boolean @since(version: "23.2.2")
 
-
+    "Sets resource property by name. If value is null then removes the property (e.g., sets relation between resource and connection)."
     rmSetResourceProperty(projectId: String!, resourcePath: String!, name: ID!, value: String): Boolean!
 }

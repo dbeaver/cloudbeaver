@@ -136,64 +136,94 @@ input AdminUserFilterInput {
 extend type Query {
     #### Users and teams
 
+    "Returns information about user by userId"
     adminUserInfo(userId: ID!): AdminUserInfo!
+    "Returns all users with pagination and filter"
     listUsers(page: PageInput!, filter: AdminUserFilterInput!): [AdminUserInfo!]!
+    "Returns information about team by teamId. If teamId is not provided, returns information about all teams"
     listTeams(teamId: ID): [AdminTeamInfo!]!
+    "Returns all permissions"
     listPermissions: [AdminPermissionInfo!]!
+    "Returns all auth roles based on the license"
     listAuthRoles: [String!]!
+    "Returns all team roles"
     listTeamRoles: [String!]!
+    "Returns teams meta parameters for displaying in the UI"
     listTeamMetaParameters: [ObjectPropertyInfo!]!
 
+    "Creates a new user with the specified userId"
     createUser(userId: ID!, enabled: Boolean!, authRole: String): AdminUserInfo!
+    "Deletes user by userId"
     deleteUser(userId: ID!): Boolean
 
+    "Creates a new team with the specified teamId"
     createTeam(teamId: ID!, teamName: String, description: String): AdminTeamInfo!
+    "Updates team information by teamId"
     updateTeam(teamId: ID!, teamName: String, description: String): AdminTeamInfo!
+    "Deletes team by teamId"
     deleteTeam(teamId: ID!, force: Boolean): Boolean
 
+    "Grants user to team with the specified userId and teamId"
     grantUserTeam(userId: ID!, teamId: ID!): Boolean
+    "Revokes user from team with the specified userId and teamId"
     revokeUserTeam(userId: ID!, teamId: ID!): Boolean
 
+    "Sets permissions to the subject (user or team) with the specified subjectId"
     setSubjectPermissions(subjectId: ID!, permissions: [ID!]!): [AdminPermissionInfo!]!
 
+    "Sets user credentials for the specified userId and providerId"
     setUserCredentials(userId: ID!, providerId: ID!, credentials: Object!): Boolean
 
+    "Deletes user credentials for the specified userId and providerId"
     deleteUserCredentials(userId: ID!, providerId: ID!): Boolean
 
+    "Enables or disables user by userId"
     enableUser(userId: ID!, enabled: Boolean!): Boolean
 
+    "Sets user auth role for the specified userId"
     setUserAuthRole(userId: ID!, authRole: String): Boolean
 
+    "Sets user team role for the specified userId and teamId"
     setUserTeamRole(userId: ID!, teamId: ID!, teamRole: String): Boolean @since(version: "24.0.5")
 
     #### Connection management
 
-    # All connection configurations
+    "Finds available connections by host names"
     searchConnections( hostNames: [String!]! ): [AdminConnectionSearchInfo!]!
 
     # Permissions
 
+    "Returns all subjects (users and teams) that have access to the specified connection"
     getConnectionSubjectAccess(projectId: ID!, connectionId: ID): [AdminConnectionGrantInfo!]!
-    @deprecated(reason: "23.2.2")
-    setConnectionSubjectAccess(projectId: ID!, connectionId: ID!, subjects: [ID!]!): Boolean
-    @since(version: "23.2.2")
-    addConnectionsAccess(projectId: ID!, connectionIds: [ID!]!, subjects: [ID!]!): Boolean
-    @since(version: "23.2.2")
-    deleteConnectionsAccess(projectId: ID!, connectionIds: [ID!]!, subjects: [ID!]!): Boolean
 
+    "Sets access to the connection for the specified subjects (users and teams)"
+    setConnectionSubjectAccess(projectId: ID!, connectionId: ID!, subjects: [ID!]!): Boolean @deprecated(reason: "use addConnectionsAccess (23.2.2)")
+
+    "Sets access to the connections for the specified subjects (users and teams)"
+    addConnectionsAccess(projectId: ID!, connectionIds: [ID!]!, subjects: [ID!]!): Boolean @since(version: "23.2.2")
+
+    "Deletes access to the connections for the specified subjects (users and teams)"
+    deleteConnectionsAccess(projectId: ID!, connectionIds: [ID!]!, subjects: [ID!]!): Boolean @since(version: "23.2.2")
+
+    "Returns all connections that the subject (user or team) has access to"
     getSubjectConnectionAccess(subjectId: ID!): [AdminConnectionGrantInfo!]!
-    @deprecated(reason: "23.2.2")
-    setSubjectConnectionAccess(subjectId: ID!, connections: [ID!]!): Boolean
+
+    "Sets access for a subject (user or team) to the specified connections"
+    setSubjectConnectionAccess(subjectId: ID!, connections: [ID!]!): Boolean @deprecated(reason: "23.2.2")
 
     #### Feature sets
 
+    "Returns all available feature sets that can be enabled or disabled"
     listFeatureSets: [WebFeatureSet!]!
 
     #### Auth providers and configurations
 
+    "Returns all properties of the auth provider with the specified providerId"
     listAuthProviderConfigurationParameters(providerId: ID!): [ObjectPropertyInfo!]!
+    "Returns all auth provider configurations for the specified providerId. If providerId is not provided, returns all configurations"
     listAuthProviderConfigurations(providerId: ID): [AdminAuthProviderConfiguration!]!
 
+    "Saves auth provider configuration with the specified parameters"
     saveAuthProviderConfiguration(
         providerId: ID!,
         id: ID!,
@@ -201,29 +231,37 @@ extend type Query {
         disabled: Boolean,
         iconURL: String
         description: String
-        parameters: Object): AdminAuthProviderConfiguration!
+        parameters: Object
+    ): AdminAuthProviderConfiguration!
+
+    "Deletes auth provider configuration by id"
     deleteAuthProviderConfiguration(id: ID!): Boolean!
 
     #### User profile
 
+    "Not implemented yet"
     saveUserMetaParameter(id: ID!, displayName: String!, description: String, required: Boolean!): ObjectPropertyInfo!
 
+    "Not implemented yet"
     deleteUserMetaParameter(id: ID!): Boolean!
 
+    "Sets user meta parameters values for the specified userId"
     setUserMetaParameterValues(userId: ID!, parameters: Object!): Boolean!
 
+    "Sets team meta parameters values for the specified teamId"
     setTeamMetaParameterValues(teamId: ID!, parameters: Object!): Boolean!
 
     #### Global configuration
 
+    "Saves server configuration"
     configureServer(configuration: ServerConfigInput!): Boolean!
 
-    # Changes default navigator settings
+    "Changes default navigator settings"
     setDefaultNavigatorSettings( settings: NavigatorSettingsInput!): Boolean!
 
 }
 
 extend type Mutation {
-    # Updates product configuration
+    "Updates product configuration"
     adminUpdateProductConfiguration(configuration: Object!): Boolean! @since(version: "23.3.4")
 }
