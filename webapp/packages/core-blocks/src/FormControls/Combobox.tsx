@@ -314,9 +314,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           selectedRender={selectedRender}
           arrowIcon={<Icon name="arrow" viewBox="0 0 16 16" className={styles['icon']} />}
           store={menu}
-          popoverProps={{
-            autoFocusOnShow: !searchable,
-          }}
+          autoFocusItemsOnShow={!searchable}
           onChange={handleSelect}
           {...rest}
         />

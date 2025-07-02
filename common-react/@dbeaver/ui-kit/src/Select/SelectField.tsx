@@ -8,7 +8,7 @@
 
 import { useState } from 'react';
 import clsx from 'clsx';
-import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel, type SelectProviderProps, type SelectPopoverProps } from './Select.js';
+import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel, type SelectProviderProps } from './Select.js';
 import './SelectField.css';
 
 export interface SelectItem<T> {
@@ -72,7 +72,7 @@ export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
 
   store?: SelectProviderProps['store'];
 
-  popoverProps?: Omit<SelectPopoverProps, 'gutter' | 'unmountOnHide'>;
+  autoFocusItemsOnShow?: boolean;
 }
 
 // Utility function to get value by it's key or using getter function
@@ -96,7 +96,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   selectedRender,
   arrowIcon,
   store,
-  popoverProps,
+  autoFocusItemsOnShow,
   name,
 }: SelectFieldProps<T, ItemType>) {
   const getItemValue = (item: ItemType): T =>
@@ -137,7 +137,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
         </Select>
         {description && <span className="dbv-kit-select__description">{description}</span>}
 
-        <SelectPopover {...popoverProps} gutter={4} unmountOnHide>
+        <SelectPopover autoFocusOnShow={autoFocusItemsOnShow} gutter={4} unmountOnHide>
           {items.length === 0 ? (
             <div className="dbv-kit-select__empty">{noItemsPlaceholder}</div>
           ) : (
