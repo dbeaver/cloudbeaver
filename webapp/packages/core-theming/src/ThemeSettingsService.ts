@@ -41,11 +41,11 @@ export class ThemeSettingsService {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, { 'core.theming.theme': 'core.user.defaultTheme' }),
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+      createSettingsAliasResolver<IThemeSettingsSchema>(this.settingsResolverService, { 'core.theming.theme': 'core.user.defaultTheme' }),
+      createSettingsAliasResolver<IThemeSettingsSchema>(this.settingsResolverService, {
         'core.theming.theme': 'core.localization.defaultTheme',
       }),
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, { 'core.theming.theme': 'app.defaultTheme' }),
+      createSettingsAliasResolver<IThemeSettingsSchema>(this.settingsResolverService, { 'core.theming.theme': 'app.defaultTheme' }),
     );
   }
 }

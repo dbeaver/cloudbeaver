@@ -10,9 +10,10 @@ import { action, makeObservable, observable } from 'mobx';
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
-import type { ISettingChangeData, ISettingsSource } from './ISettingsSource.js';
+import type { ISettingChangeData } from './ISettingsSource.js';
+import type { IEditableSettingsSource } from './IEditableSettingsSource.js';
 
-export abstract class SettingsSource implements ISettingsSource {
+export abstract class SettingsSource implements IEditableSettingsSource {
   readonly onChange: ISyncExecutor<ISettingChangeData>;
   private updating: boolean;
   protected readonly changes: Map<any, any>;
@@ -24,6 +25,7 @@ export abstract class SettingsSource implements ISettingsSource {
     makeObservable<this, 'update' | 'changes'>(this, {
       changes: observable.shallow,
       update: action,
+      clear: action,
     });
   }
 

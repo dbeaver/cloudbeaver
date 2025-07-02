@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import type { IResultGroup, ISqlEditorTabState } from '../ISqlEditorTabState.js'
 import { QueryDataSource } from '../QueryDataSource.js';
 import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
 import { SqlQueryResultService } from './SqlQueryResultService.js';
+import { SqlEditorSettingsService } from '../SqlEditorSettingsService.js';
 
 interface IQueryExecutionOptions {
   onQueryExecutionStart?: (query: string, index: number) => void;
@@ -58,6 +59,7 @@ export class SqlQueryService {
     private readonly dataViewerService: DataViewerService,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly dataViewerSettingsService: DataViewerSettingsService,
+    private readonly sqlEditorSettingsService: SqlEditorSettingsService,
   ) {
     this.statisticsMap = new Map();
 
@@ -111,6 +113,9 @@ export class SqlQueryService {
   }
 
   async executeEditorQuery(editorState: ISqlEditorTabState, query: string, inNewTab: boolean): Promise<void> {
+    if (!this.sqlEditorSettingsService.scriptExecutionEnabled) {
+      throw new Error('Script execution is not allowed');
+    }
     const dataSource = this.sqlDataSourceService.get(editorState.editorId);
     const contextInfo = dataSource?.executionContext;
     const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);
@@ -179,6 +184,9 @@ export class SqlQueryService {
   }
 
   async executeQueries(editorState: ISqlEditorTabState, queries: string[], options?: IQueryExecutionOptions): Promise<void> {
+    if (!this.sqlEditorSettingsService.scriptExecutionEnabled) {
+      throw new Error('Script execution is not allowed');
+    }
     const dataSource = this.sqlDataSourceService.get(editorState.editorId);
     const contextInfo = dataSource?.executionContext;
     const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);

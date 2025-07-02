@@ -10,7 +10,7 @@ import { SyncExecutor } from '@cloudbeaver/core-executor';
 
 import { expectDeprecatedSettingMessage, expectNoDeprecatedSettingMessage } from './__custom_mocks__/expectDeprecatedSettingMessage.js';
 import { createSettingsAliasResolver } from './createSettingsAliasResolver.js';
-import type { ISettingsSource } from './ISettingsSource.js';
+import type { IEditableSettingsSource } from './IEditableSettingsSource.js';
 
 const deprecatedSettings = {
   deprecated: 'deprecatedValue',
@@ -21,7 +21,7 @@ const newSettings = {
   value: 'value',
 };
 
-function createSource(settings: Record<any, any>): ISettingsSource {
+function createSource(settings: Record<any, any>): IEditableSettingsSource {
   return {
     onChange: new SyncExecutor(),
     has(key: any): boolean {
@@ -46,19 +46,19 @@ function createSource(settings: Record<any, any>): ISettingsSource {
 }
 
 function createResolver(settings: Record<any, any>) {
-  return createSettingsAliasResolver(createSource(settings), null as any, {
+  return createSettingsAliasResolver(createSource(settings), {
     value: 'deprecated',
   });
 }
 describe('createSettingsAliasResolver', () => {
-  test('Deprecated setting ignored', async () => {
+  test('Deprecated setting ignored', () => {
     const resolver = createResolver(newSettings);
 
     expect(resolver.has('value')).toBe(false);
     expectNoDeprecatedSettingMessage();
   });
 
-  test.skip('Deprecated setting extracted', async () => {
+  test.skip('Deprecated setting extracted', () => {
     const resolver = createResolver(deprecatedSettings);
 
     expect(resolver.has('value')).toBe(true);

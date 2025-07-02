@@ -6,9 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { FEATURE_GIT_ID, ServerConfigResource, ServerSettingsManagerService, SettingsTransformationService } from '@cloudbeaver/core-root';
+import {
+  FEATURE_GIT_ID,
+  ServerConfigResource,
+  ServerSettingsManagerService,
+  SettingsTransformationService,
+  USER_SETTINGS_LAYER,
+} from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
+  createSettingsOverrideResolver,
   ESettingsValueType,
   type ISettingDescription,
   ROOT_SETTINGS_LAYER,
@@ -39,6 +46,7 @@ const TABLE_ALIAS_SETTING_OPTIONS = [
 ];
 
 const defaultSettings = schema.object({
+  'plugin.sql-editor.script.executionEnabled': schemaExtra.stringedBoolean().default(true),
   'plugin.sql-editor.maxFileSize': schema.coerce.number().default(10 * 1024), // kilobyte
   'plugin.sql-editor.disabled': schemaExtra.stringedBoolean().default(false),
   'plugin.sql-editor.autoSave': schemaExtra.stringedBoolean().default(true),
@@ -59,10 +67,14 @@ const defaultSettings = schema.object({
   'SQLEditor.ContentAssistant.proposals.long.name': schema.coerce.boolean().default(false),
 });
 
-export type SqlEditorSettings = schema.infer<typeof defaultSettings>;
+type SqlEditorSettingsSchema = typeof defaultSettings;
+export type SqlEditorSettings = schema.infer<SqlEditorSettingsSchema>;
 
 @injectable()
 export class SqlEditorSettingsService extends Dependency {
+  get scriptExecutionEnabled(): boolean {
+    return this.settings.getValue('plugin.sql-editor.script.executionEnabled');
+  }
   get maxFileSize(): number {
     return this.settings.getValue('plugin.sql-editor.maxFileSize');
   }
@@ -98,10 +110,16 @@ export class SqlEditorSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+      createSettingsAliasResolver<SqlEditorSettingsSchema>(this.settingsResolverService, {
         'plugin.sql-editor.autoSave': 'core.app.sqlEditor.autoSave',
         'plugin.sql-editor.maxFileSize': 'core.app.sqlEditor.maxFileSize',
         'plugin.sql-editor.disabled': 'core.app.sqlEditor.disabled',
+      }),
+    );
+    this.settingsResolverService.addResolver(
+      USER_SETTINGS_LAYER,
+      createSettingsOverrideResolver<SqlEditorSettingsSchema>(this.settingsResolverService, {
+        'plugin.sql-editor.script.executionEnabled': 'permission.sql.script.execution',
       }),
     );
     this.registerSettings();

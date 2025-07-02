@@ -9,12 +9,12 @@ import { observer } from 'mobx-react-lite';
 
 import { Link, useTranslate } from '@cloudbeaver/core-blocks';
 import { clsx } from '@dbeaver/ui-kit';
-import { SettingsResolverSource, type ISettingDescription, type ISettingsSource } from '@cloudbeaver/core-settings';
+import { SettingsResolverSource, type ISettingDescription, type IEditableSettingsSource } from '@cloudbeaver/core-settings';
 import { SettingField } from './SettingField.js';
 
 interface Props {
   resolver: SettingsResolverSource;
-  source: ISettingsSource;
+  source: IEditableSettingsSource;
   setting: ISettingDescription;
 }
 

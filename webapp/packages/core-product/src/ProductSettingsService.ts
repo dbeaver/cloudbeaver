@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { createSettingsLayer, ROOT_SETTINGS_LAYER, SettingsSource } from '@cloudbeaver/core-settings';
@@ -20,7 +20,6 @@ export class ProductSettingsService extends SettingsSource {
     super();
     this.settings = new Map();
     makeObservable<this, 'settings'>(this, {
-      clear: action,
       settings: observable.shallow,
     });
   }

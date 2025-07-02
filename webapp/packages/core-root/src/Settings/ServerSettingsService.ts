@@ -34,7 +34,6 @@ export class ServerSettingsService extends SettingsSource {
     makeObservable<this, 'settings' | 'refreshConfig'>(this, {
       refreshConfig: action,
       settings: observable.shallow,
-      clear: action,
     });
   }
 

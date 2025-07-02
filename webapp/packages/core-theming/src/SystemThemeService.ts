@@ -55,27 +55,12 @@ export class SystemThemeService extends Bootstrap {
       has: function (key: IThemeSettingsKey): boolean {
         return key === 'core.theming.theme';
       },
-      isEdited: function (key?: IThemeSettingsKey): boolean {
-        return false;
-      },
-      isReadOnly: function (key: IThemeSettingsKey): boolean {
-        return true;
-      },
       getValue: function (key: IThemeSettingsKey) {
         if (key === 'core.theming.theme') {
           return 'system';
         }
         return undefined;
       },
-      getEditedValue: function (key: IThemeSettingsKey) {
-        if (key === 'core.theming.theme') {
-          return 'system';
-        }
-        return undefined;
-      },
-      setValue: function (key: IThemeSettingsKey, value: any): void {},
-      save: async function (): Promise<void> {},
-      clear: function (): void {},
     });
   }
 

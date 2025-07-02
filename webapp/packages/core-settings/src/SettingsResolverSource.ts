@@ -13,15 +13,18 @@ import { isNotNullDefined } from '@dbeaver/js-helpers';
 import type { ISettingsResolverSource } from './ISettingsResolverSource.js';
 import type { ISettingChangeData, ISettingsSource } from './ISettingsSource.js';
 import type { ISettingsLayer } from './SettingsLayer.js';
+import type { IEditableSettingsSource } from './IEditableSettingsSource.js';
+
+type SettingsSource = ISettingsSource | IEditableSettingsSource;
 
 interface ISettingsSourcesLayer {
   layer: ISettingsLayer;
-  sources: ISettingsSource[];
+  sources: SettingsSource[];
 }
 
 export class SettingsResolverSource implements ISettingsResolverSource {
   readonly onChange: ISyncExecutor<ISettingChangeData>;
-  protected get sources(): ISettingsSource[] {
+  protected get sources(): SettingsSource[] {
     return this.layers
       .slice()
       .sort((a, b) => a.layer.level - b.layer.level)
@@ -42,11 +45,11 @@ export class SettingsResolverSource implements ISettingsResolverSource {
     });
   }
 
-  hasResolver(layer: ISettingsLayer, resolver: ISettingsSource): boolean {
+  hasResolver(layer: ISettingsLayer, resolver: SettingsSource): boolean {
     return this.tryGetLayerSources(layer)?.sources.includes(resolver) || false;
   }
 
-  removeResolver(layer: ISettingsLayer, resolver: ISettingsSource): void {
+  removeResolver(layer: ISettingsLayer, resolver: SettingsSource): void {
     const layerSources = this.getLayerSources(layer);
 
     const index = layerSources.sources.indexOf(resolver);
@@ -57,7 +60,7 @@ export class SettingsResolverSource implements ISettingsResolverSource {
     }
   }
 
-  addResolver(layer: ISettingsLayer, ...resolvers: ISettingsSource[]): void {
+  addResolver(layer: ISettingsLayer, ...resolvers: SettingsSource[]): void {
     if (resolvers.some(this.hasResolver.bind(this, layer))) {
       return;
     }
@@ -85,11 +88,15 @@ export class SettingsResolverSource implements ISettingsResolverSource {
   }
 
   isOverrideDefaults(): boolean {
-    return this.sources.some(r => r.isOverrideDefaults?.());
+    return this.sources.some(r => 'isOverrideDefaults' in r && r.isOverrideDefaults?.());
   }
 
   isEdited(key?: any): boolean {
-    return this.sources.find(r => r.has(key))?.isEdited(key) || false;
+    const source = this.sources.find(r => r.has(key));
+    if (!source || !('isEdited' in source)) {
+      return false;
+    }
+    return source.isEdited(key);
   }
 
   isReadOnly(key: any, stopAt?: ISettingsSource): boolean {
@@ -102,7 +109,7 @@ export class SettingsResolverSource implements ISettingsResolverSource {
         break;
       }
 
-      if (source.isReadOnly(key)) {
+      if (!('isReadOnly' in source) || source.isReadOnly(key)) {
         return true;
       }
     }
@@ -114,7 +121,8 @@ export class SettingsResolverSource implements ISettingsResolverSource {
   }
 
   getEditedValue(key: any): any {
-    return this.sources.find(r => r.has(key) && isNotNullDefined(r.getEditedValue(key)))?.getEditedValue(key);
+    const source = this.sources.find(r => r.has(key) && 'getEditedValue' in r && isNotNullDefined(r.getEditedValue(key)));
+    return source && 'getEditedValue' in source ? source.getEditedValue(key) : undefined;
   }
 
   getValue(key: any): any {
@@ -123,7 +131,7 @@ export class SettingsResolverSource implements ISettingsResolverSource {
 
   setValue(key: any, value: any): void {
     for (const source of this.sources) {
-      const readonly = source.isReadOnly(key);
+      const readonly = !('isReadOnly' in source) || source.isReadOnly(key);
 
       if (source.has(key) && readonly) {
         throw new Error(`Can't set value for key ${key}`);
@@ -138,7 +146,7 @@ export class SettingsResolverSource implements ISettingsResolverSource {
 
   async save(): Promise<void> {
     for (const source of this.sources) {
-      if (source.isEdited()) {
+      if ('isEdited' in source && source.isEdited()) {
         await source.save();
       }
     }
@@ -146,7 +154,9 @@ export class SettingsResolverSource implements ISettingsResolverSource {
 
   clear(): void {
     for (const resolver of this.sources) {
-      resolver.clear();
+      if ('clear' in resolver) {
+        resolver.clear();
+      }
     }
   }
 

@@ -35,7 +35,7 @@ export type SQLProposal = SqlCompletionProposal;
 
 @injectable()
 export class SqlEditorService {
-  get autoSave() {
+  get autoSave(): boolean {
     return this.sqlEditorSettingsService.autoSave && !this.serverConfigResource.isFeatureEnabled(FEATURE_GIT_ID, true);
   }
 

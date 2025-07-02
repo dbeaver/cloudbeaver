@@ -8,12 +8,13 @@
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import type { schema } from '@cloudbeaver/core-utils';
 
-import type { ISettingChangeData, ISettingsSource } from './ISettingsSource.js';
+import type { ISettingChangeData } from './ISettingsSource.js';
+import type { IEditableSettingsSource } from './IEditableSettingsSource.js';
 
-export class SettingsProvider<TSchema extends schema.SomeZodObject = any> implements ISettingsSource {
+export class SettingsProvider<TSchema extends schema.SomeZodObject = any> implements IEditableSettingsSource {
   readonly onChange: ISyncExecutor<ISettingChangeData<keyof schema.infer<TSchema>>>;
   constructor(
-    private readonly source: ISettingsSource,
+    protected readonly source: IEditableSettingsSource,
     readonly schema: TSchema,
   ) {
     this.onChange = new SyncExecutor();

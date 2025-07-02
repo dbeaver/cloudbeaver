@@ -43,11 +43,13 @@ export class SettingsLocalizationService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.settingsResolverService, this.settingsProvider, { 'core.localization.language': 'core.user.defaultLanguage' }),
-      createSettingsAliasResolver(this.settingsResolverService, this.settingsProvider, {
+      createSettingsAliasResolver<ILocalizationSettingsSchema>(this.settingsResolverService, {
+        'core.localization.language': 'core.user.defaultLanguage',
+      }),
+      createSettingsAliasResolver<ILocalizationSettingsSchema>(this.settingsResolverService, {
         'core.localization.language': 'core.localization.defaultLanguage',
       }),
-      createSettingsAliasResolver(this.settingsResolverService, this.settingsProvider, { 'core.localization.language': 'app.defaultLanguage' }),
+      createSettingsAliasResolver<ILocalizationSettingsSchema>(this.settingsResolverService, { 'core.localization.language': 'app.defaultLanguage' }),
     );
 
     makeObservable(this, {

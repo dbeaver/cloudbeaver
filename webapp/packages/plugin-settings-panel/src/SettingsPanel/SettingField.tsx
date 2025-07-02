@@ -13,7 +13,7 @@ import {
   SettingsProviderService,
   SettingsResolverSource,
   type ISettingDescription,
-  type ISettingsSource,
+  type IEditableSettingsSource,
 } from '@cloudbeaver/core-settings';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
@@ -21,7 +21,7 @@ import { observer } from 'mobx-react-lite';
 
 interface Props {
   resolver: SettingsResolverSource;
-  source: ISettingsSource;
+  source: IEditableSettingsSource;
   setting: ISettingDescription;
 }
 

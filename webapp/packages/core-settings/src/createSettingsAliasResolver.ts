@@ -8,8 +8,8 @@
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { invertObject, type schema } from '@cloudbeaver/core-utils';
 
-import type { ISettingChangeData, ISettingsSource } from './ISettingsSource.js';
-import type { SettingsProvider } from './SettingsProvider.js';
+import type { ISettingChangeData } from './ISettingsSource.js';
+import type { IEditableSettingsSource } from './IEditableSettingsSource.js';
 
 const DEPRECATED_SETTINGS = new Set();
 
@@ -42,10 +42,9 @@ function withLock<T>(fn: (locked: boolean) => T): T {
 }
 
 export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject>(
-  source: ISettingsSource,
-  target: SettingsProvider<TTarget>,
+  source: IEditableSettingsSource,
   mappings: SettingsMapping<schema.infer<TTarget>>,
-): ISettingsSource {
+): IEditableSettingsSource {
   type targetSchema = schema.infer<TTarget>;
   const reversed = invertObject(mappings);
 

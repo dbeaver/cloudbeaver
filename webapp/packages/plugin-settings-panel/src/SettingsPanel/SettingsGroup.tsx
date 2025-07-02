@@ -8,7 +8,12 @@
 import { observer } from 'mobx-react-lite';
 
 import { getComputed, Group, GroupTitle, useExecutor, useTranslate } from '@cloudbeaver/core-blocks';
-import type { ISettingDescription, ISettingsSource, SettingsGroup as SettingsGroupType, SettingsResolverSource } from '@cloudbeaver/core-settings';
+import type {
+  IEditableSettingsSource,
+  ISettingDescription,
+  SettingsGroup as SettingsGroupType,
+  SettingsResolverSource,
+} from '@cloudbeaver/core-settings';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 import type { ITreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
@@ -23,7 +28,7 @@ interface Props {
   settingsId: string;
   group: SettingsGroupType;
   resolver: SettingsResolverSource;
-  source: ISettingsSource;
+  source: IEditableSettingsSource;
   settings: Map<SettingsGroupType, ISettingDescription<any>[]>;
   treeFilter: ITreeFilter;
   groupsHidden?: boolean;

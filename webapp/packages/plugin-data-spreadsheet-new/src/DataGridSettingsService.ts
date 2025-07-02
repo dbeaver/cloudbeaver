@@ -22,14 +22,15 @@ const defaultSettings = schema.object({
   'plugin.data-spreadsheet.hidden': schemaExtra.stringedBoolean().default(false),
 });
 
-export type DataGridSettings = schema.infer<typeof defaultSettings>;
+export type DataGridSettingsSchema = typeof defaultSettings;
+export type DataGridSettings = schema.infer<DataGridSettingsSchema>;
 
 @injectable()
 export class DataGridSettingsService extends Dependency {
   get hidden(): boolean {
     return this.settings.getValue('plugin.data-spreadsheet.hidden');
   }
-  readonly settings: SettingsProvider<typeof defaultSettings>;
+  readonly settings: SettingsProvider<DataGridSettingsSchema>;
 
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
@@ -41,7 +42,7 @@ export class DataGridSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+      createSettingsAliasResolver<DataGridSettingsSchema>(this.settingsResolverService, {
         'plugin.data-spreadsheet.hidden': 'plugin_data_spreadsheet_new.hidden',
       }),
     );
