@@ -7,13 +7,15 @@
  */
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { type schema } from '@cloudbeaver/core-utils';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 import type { ISettingChangeData, ISettingsSource } from './ISettingsSource.js';
 import type { IEditableSettingsSource } from './IEditableSettingsSource.js';
 
 interface ISettingsOverride<TTarget, TKey extends keyof TTarget> {
   key: string;
-  map: (value: any) => TTarget[TKey];
+  map?: (value: any) => TTarget[TKey];
+  filter?: (value: any) => boolean;
 }
 
 type SettingsMapping<TTarget> = Partial<{
@@ -34,13 +36,15 @@ export function createSettingsOverrideResolver<TTarget extends schema.SomeZodObj
       reversed[value] = key;
       fullDescriptionOverrides[key] = {
         key: value,
+        filter: (value: any) => isNotNullDefined(value),
         map: (value: any) => value,
       };
     } else if (value && typeof value === 'object' && 'key' in value) {
       reversed[value.key] = key;
       fullDescriptionOverrides[key] = {
         key: value.key,
-        map: value.map,
+        filter: value.filter || ((value: any) => isNotNullDefined(value)),
+        map: value.map || ((value: any) => value),
       };
     }
   }
@@ -49,9 +53,6 @@ export function createSettingsOverrideResolver<TTarget extends schema.SomeZodObj
     return reversed[key] || (key as keyof targetSchema);
   }
 
-  function getOverrideKey(key: keyof targetSchema): string {
-    return fullDescriptionOverrides[key]?.key || (key as any);
-  }
   const onChange: ISyncExecutor<ISettingChangeData<any>> = new SyncExecutor();
 
   source.onChange.next(
@@ -63,24 +64,28 @@ export function createSettingsOverrideResolver<TTarget extends schema.SomeZodObj
   return {
     onChange,
     has(key) {
-      if (!(key in mappings)) {
+      if (!(key in fullDescriptionOverrides)) {
         return false;
       }
 
-      const overrideKey = getOverrideKey(key);
+      const override = fullDescriptionOverrides[key]!;
 
-      return source.has(overrideKey);
+      if (source.has(override.key)) {
+        return override.filter!(source.getValue(override.key));
+      }
+
+      return false;
     },
     getValue(key) {
-      if (!(key in mappings)) {
+      if (!(key in fullDescriptionOverrides)) {
         return undefined;
       }
 
-      const value = source.getValue(getOverrideKey(key));
+      const override = fullDescriptionOverrides[key]!;
+      const value = source.getValue(override.key);
 
-      const override = fullDescriptionOverrides[key];
       if (override) {
-        return override.map(value);
+        return override.map!(value);
       }
 
       return value;

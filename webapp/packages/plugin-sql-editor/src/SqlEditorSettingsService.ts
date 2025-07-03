@@ -119,7 +119,10 @@ export class SqlEditorSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       USER_SETTINGS_LAYER,
       createSettingsOverrideResolver<SqlEditorSettingsSchema>(this.settingsResolverService, {
-        'plugin.sql-editor.script.executionEnabled': 'permission.sql.script.execution',
+        'plugin.sql-editor.script.executionEnabled': {
+          key: 'permission.sql.script.execution',
+          filter: value => !value,
+        },
       }),
     );
     this.registerSettings();
