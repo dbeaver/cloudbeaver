@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,17 +10,16 @@ import { useCallback, useContext } from 'react';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
-import { s } from '../s.js';
-import { useS } from '../useS.js';
 import { Field } from './Field.js';
 import { FormContext } from './FormContext.js';
-import style from './Radio.module.css';
 import { RadioGroupContext } from './RadioGroupContext.js';
+import { clsx, Radio as UiKitRadio } from '@dbeaver/ui-kit';
+import type { ControlSize } from '@dbeaver/ui-kit/types/controls';
+import './Radio.css';
 
-type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value' | 'checked'> &
+type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value' | 'checked' | 'size'> &
   ILayoutSizeProps & {
-    mod?: Array<'primary' | 'small' | 'menu'>;
-    ripple?: boolean;
+    size?: ControlSize;
   };
 
 type ControlledProps = BaseProps & {
@@ -50,14 +49,10 @@ export const Radio: RadioType = observer(function Radio({
   id: controlledId,
   checked: controlledChecked,
   onChange,
-  mod,
-  ripple = true,
   className,
   children,
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
-  const styles = useS(style);
-
   const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
   const formContext = useContext(FormContext);
@@ -100,35 +95,17 @@ export const Radio: RadioType = observer(function Radio({
   }
 
   return (
-    <Field {...layoutProps} className={s(styles, { field: true, menu: mod?.includes('menu') }, className)}>
-      <div
-        className={s(styles, {
-          radio: true,
-          primary: mod?.includes('primary'),
-          small: mod?.includes('small') || mod?.includes('menu'),
-          disabledRadio: rest.disabled,
-          radioNoRipple: !ripple,
-        })}
+    <Field {...layoutProps} className={clsx('radio-field', className)}>
+      <UiKitRadio
+        id={id}
+        name={name}
+        value={value?.toString() ?? ''}
+        checked={checked}
+        onChange={handleChange}
+        {...rest}
       >
-        <input
-          {...rest}
-          className={s(styles, { input: true, disabledInput: rest.disabled })}
-          type="radio"
-          id={id}
-          name={name}
-          value={value ?? ''}
-          checked={checked}
-          onChange={handleChange}
-        />
-        <div className={s(styles, { radioBackground: true })}>
-          <div className={s(styles, { radioOuterCircle: true })} />
-          <div className={s(styles, { radioInnerCircle: true })} />
-        </div>
-        {ripple && <div className={s(styles, { radioRipple: true })} />}
-      </div>
-      <label className={s(styles, { label: true, disabled: rest.disabled })} htmlFor={id}>
         {children}
-      </label>
+      </UiKitRadio>
     </Field>
   );
 });

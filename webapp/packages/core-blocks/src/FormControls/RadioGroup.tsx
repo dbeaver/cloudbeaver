@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,11 +9,12 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useMemo, useState } from 'react';
 
 import { FormContext } from './FormContext.js';
+import { RadioGroup as UiKitRadioGroup } from '@dbeaver/ui-kit';
 import { type IRadioGroupContext, RadioGroupContext } from './RadioGroupContext.js';
 
-type BaseProps = React.PropsWithChildren<{
+type BaseProps = React.PropsWithChildren<React.ComponentProps<typeof UiKitRadioGroup>> & {
   name: string;
-}>;
+};
 
 type ControlledProps<T> = BaseProps & {
   value?: T;
@@ -41,6 +42,7 @@ export const RadioGroup: RadioGroupType = observer(function RadioGroup({
   state,
   onChange,
   children,
+  ...rest
 }: ControlledProps<string | number> | ObjectProps<any, any>) {
   const formContext = useContext(FormContext);
   const [selfValue, setValue] = useState<string | number>();
@@ -72,8 +74,14 @@ export const RadioGroup: RadioGroupType = observer(function RadioGroup({
       value,
       onChange: handleChange,
     }),
-    [value, value, handleChange],
+    [value, handleChange],
   );
 
-  return <RadioGroupContext.Provider value={context}>{children}</RadioGroupContext.Provider>;
+  return (
+    <RadioGroupContext.Provider value={context}>
+      <UiKitRadioGroup {...rest}>
+        {children}
+      </UiKitRadioGroup>
+    </RadioGroupContext.Provider>
+  );
 });

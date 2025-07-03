@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Community Product
 Bundle-SymbolicName: io.cloudbeaver.product.ce;singleton:=true
-Bundle-Version: 25.1.2.qualifier
-Bundle-Release-Date: 20250707
+Bundle-Version: 25.1.3.qualifier
+Bundle-Release-Date: 20250721
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Require-Bundle: io.cloudbeaver.server.ce
