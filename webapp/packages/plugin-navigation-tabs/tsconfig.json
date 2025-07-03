@@ -47,6 +47,9 @@
       "path": "../core-root"
     },
     {
+      "path": "../core-settings"
+    },
+    {
       "path": "../core-storage"
     },
     {

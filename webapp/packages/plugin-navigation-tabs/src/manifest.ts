@@ -13,5 +13,6 @@ export const navigationTabsPlugin: PluginManifest = {
     () => import('./PluginBootstrap.js').then(m => m.PluginBootstrap),
     () => import('./NavigationTabs/NavigationTabsService.js').then(m => m.NavigationTabsService),
     () => import('./LocaleService.js').then(m => m.LocaleService),
+    () => import('./NavigationTabs/NavigationTabsSettingsService.js').then(m => m.NavigationTabsSettingsService),
   ],
 };
