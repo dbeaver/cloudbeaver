@@ -76,7 +76,7 @@ const TabsBoxContainer: React.FC<FlexibleTabsProps> = ({ tabs, multipleRows, cla
   return (
     <div ref={containerRef} className={s(style, { tabContainer: true, multipleRows }, className)}>
       {tabs.map((tabContent, index) => (
-        <div key={tabContent?.toString()} className={s(style, { expand: multipleRows && expandIndices.has(index) })}>
+        <div key={tabContent?.toString()} className={s(style, { expand: multipleRows &&expandIndices.has(index) })}>
           {tabContent}
         </div>
       ))}

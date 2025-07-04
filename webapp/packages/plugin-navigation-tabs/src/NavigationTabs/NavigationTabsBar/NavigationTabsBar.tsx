@@ -93,8 +93,8 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
           tabsClassName={s(style, { tabs: true })}
           tabs={
             navigation.tabIdList.map(tabId => (
-              <SContext key={tabId}registry={tabsRegistry}>
-                <TabHandlerTab tabId={tabId} onSelect={handleSelect} onClose={handleClose} />
+              <SContext registry={tabsRegistry}>
+                <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} />
               </SContext>
             ))
           }

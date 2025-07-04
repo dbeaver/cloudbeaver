@@ -68,15 +68,11 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
         <TabsBox
           currentTabId={tab.handlerState.pageId}
           tabsClassName={s(style, { tabs: true })}
-          tabs={
-            pages.length > 1
-              ? pages.map(page => (
-                  <SContext key={page.key} registry={tabsRegistry}>
-                    <DBObjectPageTab tab={tab} page={page} onSelect={dbObjectPagesService.selectPage} />
-                  </SContext>
-                ))
-              : []
-          }
+          tabs={pages.length > 1 ? pages.map(page => (
+            <SContext key={page.key} registry={tabsRegistry}>
+              <DBObjectPageTab tab={tab} page={page} onSelect={dbObjectPagesService.selectPage} />
+            </SContext>
+          )) : []}
           localState={innerTabState}
         >
           {pages.map(page => (
