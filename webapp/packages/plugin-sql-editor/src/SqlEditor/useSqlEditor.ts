@@ -410,13 +410,14 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
         this.onExecute.execute(true);
 
+        const id = setTimeout(() => this.onSegmentExecute.execute({ segment, type: 'start' }), 250);
         try {
-          const id = setTimeout(() => this.onSegmentExecute.execute({ segment, type: 'start' }), 250);
           const result = await action(segment);
           clearTimeout(id);
           this.onSegmentExecute.execute({ segment, type: 'end' });
           return result;
         } catch (exception: any) {
+          clearTimeout(id);
           this.onSegmentExecute.execute({ segment, type: 'end' });
           this.onSegmentExecute.execute({ segment, type: 'error' });
           throw exception;
