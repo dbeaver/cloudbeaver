@@ -70,6 +70,7 @@ public class GraphQLEndpoint extends HttpServlet {
     private static final String HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials";
 
     private static final String CORE_SCHEMA_FILE_NAME = "schema/schema.graphqls";
+    public static final String API_PROTOCOL = "GraphQL";
     private final GraphQL graphQL;
 
     private static final Gson gson = new GsonBuilder()
@@ -244,18 +245,32 @@ public class GraphQLEndpoint extends HttpServlet {
         if (operationName != null) {
             contextBuilder.operationName(operationName);
         }
-        String apiCall = operationName;
+        String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
+        String userId = GraphQLLoggerUtil.getUserId(request);
+        String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, variables);
+        if (operationName != null) {
+            log.debug("API > " + operationName + loggerMessage);
+        } else if (DEBUG) {
+            log.debug("API > " + query + loggerMessage);
+        }
         LocalDateTime startTime = LocalDateTime.now();
         ExecutionInput executionInput = contextBuilder.build();
         ExecutionResult executionResult = null;
+        Exception executionException = null;
         try {
             executionResult = graphQL.execute(executionInput);
         } catch (Exception e) {
+            executionException = e;
             throw e;
         } finally {
+            String errorMessage = null;
+            if (executionResult != null && executionResult.getErrors() != null && !executionResult.getErrors().isEmpty()) {
+                errorMessage = executionResult.getErrors().getFirst().getMessage();
+            } else if (executionException != null) {
+                errorMessage = executionException.getMessage();
+            }
             if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
-                apiCallInterceptor.onApiCallEvent(request, variables, apiCall, startTime,
-                    executionResult != null && executionResult.getErrors().isEmpty(), "GRAPHQL");
+                apiCallInterceptor.onApiCallEvent(request, variables, operationName, startTime, errorMessage, API_PROTOCOL);
             }
         }
 

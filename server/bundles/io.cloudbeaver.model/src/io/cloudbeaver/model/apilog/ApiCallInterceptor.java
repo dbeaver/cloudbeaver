@@ -22,7 +22,7 @@ public interface ApiCallInterceptor {
         @Nullable Map<String, Object> variables,
         @NotNull String apiCall,
         @NotNull LocalDateTime startTime,
-        boolean isSuccessful,
-        @NotNull String apiCallType
+        @Nullable String errorMessage,
+        @NotNull String apiProtocol
     );
 }

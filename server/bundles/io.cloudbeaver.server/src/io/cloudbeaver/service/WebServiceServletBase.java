@@ -44,6 +44,7 @@ public abstract class WebServiceServletBase extends HttpServlet {
         .serializeNulls()
         .setPrettyPrinting()
         .create();
+    public static final String API_PROTOCOL = "REST";
 
     private final ServletApplication application;
 
@@ -64,15 +65,18 @@ public abstract class WebServiceServletBase extends HttpServlet {
         }
 
         LocalDateTime startTime = LocalDateTime.now();
+        String errorMessage = null;
         try {
             processServiceRequest(webSession, request, response);
         } catch (Exception e) {
             log.error(e);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error processing request: " + e.getMessage());
+            errorMessage = e.getMessage();
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error processing request: " + errorMessage);
         } finally {
             if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
-                apiCallInterceptor.onApiCallEvent(request, getVariables(request), request.getRequestURI(), startTime,
-                    response.getStatus() != HttpServletResponse.SC_BAD_REQUEST, "REST");
+                apiCallInterceptor.onApiCallEvent(
+                    request, getVariables(request), request.getRequestURI(), startTime, errorMessage, API_PROTOCOL
+                );
             }
         }
     }
