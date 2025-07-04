@@ -1581,7 +1581,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
-    private Set<String> getAnonymousUserPermissions() throws DBException {
+    protected Set<String> getAnonymousUserPermissions() throws DBException {
         var anonymousUserTeam = application.getAppConfiguration().getAnonymousUserTeam();
         return getSubjectPermissions(anonymousUserTeam);
     }
