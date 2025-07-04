@@ -1,13 +1,11 @@
 @layer base {
   .dbv-kit-radio-group {
     display: flex;
+    gap: calc(var(--dbv-kit-radio-gap) * 4);
 
     &.dbv-kit-radio-group--vertical {
       flex-direction: column;
-    }
-
-    &:not(.dbv-kit-radio-group--vertical) .dbv-kit-radio {
-      margin-inline-end: calc(var(--dbv-kit-radio-gap) * 4);
+      gap: 0;
     }
   }
 

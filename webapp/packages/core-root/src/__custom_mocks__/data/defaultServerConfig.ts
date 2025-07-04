@@ -105,7 +105,6 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
       hideVirtualModel: false,
     },
     resourceQuotas: {
-      dataExportFileSizeLimit: 1.0e7,
       sqlMaxRunningQueries: 3.0,
       sqlResultSetRowsLimit: 100000.0,
       sqlResultSetMemoryLimit: 2000000.0,
