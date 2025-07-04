@@ -92,11 +92,11 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
           className={s(style, { tabsBox: true })}
           tabsClassName={s(style, { tabs: true })}
           tabs={
-            <SContext registry={tabsRegistry}>
-              {navigation.tabIdList.map(tabId => (
+            navigation.tabIdList.map(tabId => (
+              <SContext registry={tabsRegistry}>
                 <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} />
-              ))}
-            </SContext>
+              </SContext>
+            ))
           }
           tabList={navigation.tabIdList}
           multipleRows={navigationSettings.hasMultipleRows}

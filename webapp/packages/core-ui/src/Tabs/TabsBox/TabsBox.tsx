@@ -16,6 +16,7 @@ import type { ITabData } from '../TabsContainer/ITabsContainer.js';
 import { TabsState } from '../TabsState.js';
 import styles from './shared/TabsBox.module.css';
 import moduleTabPanelStyles from './shared/TabsBoxTabPanel.module.css';
+import TabsBoxContainer from './TabsBoxContainer.js';
 
 const tabsBoxRegistry: StyleRegistry = [
   [
@@ -29,7 +30,7 @@ const tabsBoxRegistry: StyleRegistry = [
 
 type TabsBoxProps = PropsWithChildren<{
   currentTabId: string | null;
-  tabs?: ReactNode;
+  tabs?: ReactNode[];
   tabIndex?: number;
   localState?: MetadataMap<string, any>;
   tabList?: string[];
@@ -61,7 +62,7 @@ export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox
         onChange={onChange}
       >
         <div ref={ref} className={s(style, { tabsBox: true }, className)} tabIndex={tabIndex ?? -1}>
-          {tabs && <div className={s(style, { tabs: true, multipleRows }, tabsClassName)}>{tabs}</div>}
+          {tabs && <TabsBoxContainer tabs={tabs} className={tabsClassName} multipleRows={multipleRows} />}
           <div className={s(style, { tabPanels: true })}>{children}</div>
         </div>
       </TabsState>
