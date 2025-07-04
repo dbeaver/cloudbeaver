@@ -8,10 +8,10 @@
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import {
   FEATURE_GIT_ID,
+  HIGHEST_SETTINGS_LAYER,
   ServerConfigResource,
   ServerSettingsManagerService,
   SettingsTransformationService,
-  USER_SETTINGS_LAYER,
 } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
@@ -117,7 +117,7 @@ export class SqlEditorSettingsService extends Dependency {
       }),
     );
     this.settingsResolverService.addResolver(
-      USER_SETTINGS_LAYER,
+      HIGHEST_SETTINGS_LAYER,
       createSettingsOverrideResolver<SqlEditorSettingsSchema>(this.settingsResolverService, {
         'plugin.sql-editor.script.executionEnabled': {
           key: 'permission.sql.script.execution',
