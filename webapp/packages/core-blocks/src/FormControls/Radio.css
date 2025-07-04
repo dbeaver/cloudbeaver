@@ -1,0 +1,37 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@layer components {
+  .theme-dark .radio-field {
+    --dbv-kit-radio-hover-shadow-color: color-mix(in srgb, var(--theme-on-secondary), black 60%);
+  }
+
+  .radio-field {
+    display: flex;
+    align-items: center;
+
+    --dbv-kit-radio-active-border: var(--theme-primary);
+    --dbv-kit-radio-active-foreground: var(--theme-primary);
+
+    --dbv-kit-radio-inactive-border: color-mix(in srgb, var(--theme-on-secondary), white 30%);
+
+    --dbv-kit-radio-hover-shadow-color: color-mix(in srgb, var(--theme-on-secondary), white 80%);
+
+    --dbv-kit-radio-medium-dot-size: 0.3;
+
+    --dbv-kit-radio-medium-height: 32px;
+    --dbv-kit-radio-small-height: 24px;
+
+    --dbv-kit-radio-small-gap: calc(var(--dbv-kit-radio-gap) * 0.25);
+    --dbv-kit-radio-medium-gap: calc(var(--dbv-kit-radio-gap) * 3);
+
+    & .dbv-kit-radio__title {
+      white-space: nowrap;
+    }
+  }
+}

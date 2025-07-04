@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/tests-runner": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
     "@types/md5": "^2",

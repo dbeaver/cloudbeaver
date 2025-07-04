@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, vitest, type Mocked } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vitest, type Mocked, type MockInstance } from 'vitest';
 
 import { TextTools } from './TextTools.js';
 
@@ -18,6 +18,7 @@ function getLength(value: string): number {
 
 describe('TextTools', () => {
   let mockContext: Mocked<CanvasRenderingContext2D>;
+  let createElementMock: MockInstance<typeof document.createElement>;
 
   beforeEach(() => {
     mockContext = {
@@ -29,11 +30,11 @@ describe('TextTools', () => {
       getContext: vitest.fn().mockReturnValue(mockContext),
     };
 
-    vitest.spyOn(document, 'createElement').mockImplementation(() => mockCanvas as unknown as HTMLCanvasElement);
+    createElementMock = vitest.spyOn(document, 'createElement').mockImplementation(() => mockCanvas as unknown as HTMLCanvasElement);
   });
 
   afterEach(() => {
-    vitest.restoreAllMocks();
+    createElementMock.mockRestore();
   });
 
   describe('getWidth', () => {

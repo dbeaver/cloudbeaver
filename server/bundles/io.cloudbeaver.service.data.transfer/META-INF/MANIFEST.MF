@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Service - Data Transfer
 Bundle-SymbolicName: io.cloudbeaver.service.data.transfer;singleton:=true
-Bundle-Version: 1.0.125.qualifier
-Bundle-Release-Date: 20250707
+Bundle-Version: 1.0.126.qualifier
+Bundle-Release-Date: 20250721
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Require-Bundle: io.cloudbeaver.server.ce,
