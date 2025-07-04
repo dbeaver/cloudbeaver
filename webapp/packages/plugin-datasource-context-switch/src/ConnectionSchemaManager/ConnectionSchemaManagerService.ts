@@ -396,11 +396,11 @@ export class ConnectionSchemaManagerService {
         this.pendingSchemaId = schemaId;
       });
 
-      await this.activeItem.changeSchemaId(schemaId, this.activeItem.context);
-
       if (catalogId) {
         await this.selectCatalog(catalogId, false);
       }
+
+      await this.activeItem.changeSchemaId(schemaId, this.activeItem.context);
     } finally {
       runInAction(() => {
         this.pendingSchemaId = null;
