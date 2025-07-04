@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -68,11 +68,13 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
         <TabsBox
           currentTabId={tab.handlerState.pageId}
           tabsClassName={s(style, { tabs: true })}
-          tabs={pages.map(page => (
-            <SContext key={page.key} registry={tabsRegistry}>
-              <DBObjectPageTab tab={tab} page={page} onSelect={dbObjectPagesService.selectPage} />
+          tabs={
+            <SContext registry={tabsRegistry}>
+              {pages.map(page => (
+                <DBObjectPageTab key={page.key} tab={tab} page={page} onSelect={dbObjectPagesService.selectPage} />
+              ))}
             </SContext>
-          ))}
+          }
           localState={innerTabState}
         >
           {pages.map(page => (
