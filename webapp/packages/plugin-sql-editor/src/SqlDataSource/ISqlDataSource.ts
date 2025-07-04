@@ -46,8 +46,6 @@ export interface ISqlDataSource extends ILoadableState {
   readonly databaseModels: IDatabaseDataModel<QueryDataSource>[];
   readonly executionContext?: IConnectionExecutionContextInfo;
 
-  readonly features: ESqlDataSourceFeatures[];
-
   readonly isAutoSaveEnabled: boolean;
   readonly isIncomingChanges: boolean;
   readonly isSaved: boolean;

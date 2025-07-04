@@ -30,6 +30,7 @@ import { SqlQueryService } from '../SqlResultTabs/SqlQueryService.js';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService.js';
 import type { ISQLEditorData } from './ISQLEditorData.js';
 import { SQLEditorModeContext } from './SQLEditorModeContext.js';
+import { SqlEditorSettingsService } from '../SqlEditorSettingsService.js';
 
 interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly sqlDialectInfoService: SqlDialectInfoService;
@@ -38,6 +39,7 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly sqlEditorService: SqlEditorService;
   readonly notificationService: NotificationService;
   readonly sqlExecutionPlanService: SqlExecutionPlanService;
+  readonly sqlEditorSettingsService: SqlEditorSettingsService;
   readonly commonDialogService: CommonDialogService;
   readonly sqlResultTabsService: SqlResultTabsService;
   readonly dataSource: ISqlDataSource | undefined;
@@ -68,6 +70,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   const sqlResultTabsService = useService(SqlResultTabsService);
   const commonDialogService = useService(CommonDialogService);
   const sqlDataSourceService = useService(SqlDataSourceService);
+  const sqlEditorSettingsService = useService(SqlEditorSettingsService);
 
   const data = useObservableRef<ISQLEditorDataPrivate>(
     () => ({
@@ -132,6 +135,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       get incomingValue(): string | undefined {
         return this.dataSource?.incomingScript;
+      },
+
+      get isExecutionAllowed(): boolean {
+        return this.sqlEditorSettingsService.scriptExecutionEnabled;
       },
 
       onMode: new SyncExecutor(),
@@ -230,7 +237,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       async executeQuery(): Promise<void> {
         const isQuery = this.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
-        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
+        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) && this.isExecutionAllowed;
 
         if (!isQuery || !isExecutable) {
           return;
@@ -263,7 +270,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       async executeQueryNewTab(): Promise<void> {
         const isQuery = this.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
-        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
+        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) && this.isExecutionAllowed;
 
         if (!isQuery || !isExecutable) {
           return;
@@ -281,7 +288,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       async showExecutionPlan(): Promise<void> {
         const isQuery = this.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
-        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
+        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) && this.isExecutionAllowed;
 
         if (!isQuery || !isExecutable || !this.dialect?.supportsExplainExecutionPlan) {
           return;
@@ -302,7 +309,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       async executeScript(): Promise<void> {
-        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
+        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) && this.isExecutionAllowed;
 
         if (!isExecutable || this.isDisabled || this.isScriptEmpty) {
           return;
@@ -489,6 +496,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       hintsLimitIsMet: observable.ref,
       readonlyState: observable,
       executingScript: observable,
+      sqlEditorSettingsService: observable.ref,
     },
     {
       state,
@@ -500,6 +508,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       sqlResultTabsService,
       notificationService,
       commonDialogService,
+      sqlEditorSettingsService,
     },
   );
 
