@@ -9,7 +9,3 @@
 .tab {
   composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
 }
-
-.tabOuter:only-child {
-  display: none;
-}
