@@ -39,6 +39,7 @@
     "concurrently": "^9",
     "eslint": "^9.25.1",
     "happy-dom": "^17",
+    "lefthook": "^1",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "msw": "^2",
