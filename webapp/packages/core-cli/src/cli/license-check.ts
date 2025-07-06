@@ -12,7 +12,7 @@ process.title = 'core-check-license';
 
 import { execSync } from 'child_process';
 import fs from 'fs';
-import path, { join, resolve } from 'path';
+import path, { resolve } from 'path';
 import { createInterface } from 'readline';
 import yaml from 'js-yaml';
 
@@ -32,7 +32,7 @@ const license = template.replace('${currentYear}', String(currentYear)).trim().s
 const invalidFiles: string[] = [];
 
 for (const file of staged) {
-  const stream = fs.createReadStream(join(process.cwd(), file), 'utf8');
+  const stream = fs.createReadStream(path.join(process.cwd(), file), 'utf8');
   const rl = createInterface({ input: stream, crlfDelay: Infinity });
 
   let index = 0;
