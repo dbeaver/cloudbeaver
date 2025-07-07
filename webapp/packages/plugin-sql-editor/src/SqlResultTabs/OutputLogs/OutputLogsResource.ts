@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,16 @@ export class OutputLogsResource extends CachedDataResource<IOutputLog[]> {
     this.setData(updatedData);
   }
 
-  protected async loader(): Promise<IOutputLog[]> {
+  override clear(): void {
+    super.clear();
+    this.useTracker.use(undefined);
+  }
+
+  deleteLogsByContextId(contextId: string): void {
+    this.setData(this.data.filter(log => log.contextId !== contextId));
+  }
+
+  protected loader(): IOutputLog[] {
     return this.data;
   }
 }

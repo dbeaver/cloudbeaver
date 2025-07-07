@@ -10,7 +10,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ServerResourceQuotasResource } from './ServerResourceQuotasResource.js';
 
 interface IQuotas {
-  dataExportFileSizeLimit: number;
   sqlMaxRunningQueries: number;
   sqlResultSetRowsLimit: number;
   sqlResultSetMemoryLimit: number;
@@ -21,7 +20,6 @@ interface IQuotas {
 type QuotaKey = keyof IQuotas;
 
 const DEFAULT_QUOTAS: IQuotas = {
-  dataExportFileSizeLimit: 1.0e7,
   sqlMaxRunningQueries: 100,
   sqlResultSetRowsLimit: 100000,
   sqlResultSetMemoryLimit: 2000000,
@@ -37,7 +35,6 @@ function isNumber(value: any): value is number {
 export class QuotasService {
   get quotas(): IQuotas {
     return {
-      dataExportFileSizeLimit: this.getQuota('dataExportFileSizeLimit'),
       sqlMaxRunningQueries: this.getQuota('sqlMaxRunningQueries'),
       sqlResultSetRowsLimit: this.getQuota('sqlResultSetRowsLimit'),
       sqlResultSetMemoryLimit: this.getQuota('sqlResultSetMemoryLimit'),

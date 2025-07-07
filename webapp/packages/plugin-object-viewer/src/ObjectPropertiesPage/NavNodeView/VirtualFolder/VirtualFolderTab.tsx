@@ -12,7 +12,7 @@ import { VirtualFolderUtils } from './VirtualFolderUtils.js';
 
 export const VirtualFolderTab: NavNodeTransformViewComponent = function VirtualFolderTab({ folderId }) {
   const nodeType = VirtualFolderUtils.getNodeType(folderId);
-  const icon = 'platform:/plugin/org.jkiss.dbeaver.model/icons/tree/folder.png';
+  const icon = 'platform:/plugin/org.jkiss.dbeaver.model/icons/tree/folder.svg';
 
   return (
     <Tab tabId={folderId} title={nodeType}>

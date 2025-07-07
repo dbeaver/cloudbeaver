@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -41,19 +41,25 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
 
   return (
     <Container className={className} keepSize={keepSize} vertical center>
-      <Container center vertical>
+      <div className="tw:mb-2 tw:text-center">
         {translate('data_viewer_presentation_value_content_truncated_placeholder')}
         &nbsp;
         <span className={s(style, { limitWord: true })}>
           {admin ? (
-            <Link title={limitInfo?.limitWithSize} href={WEBSITE_LINKS.SERVER_CONFIGURATION_RESOURCE_QUOTAS_PAGE} target="_blank" indicator>
+            <Link
+              className="tw:inline tw:whitespace-nowrap"
+              title={limitInfo?.limitWithSize}
+              href={WEBSITE_LINKS.SERVER_CONFIGURATION_RESOURCE_QUOTAS_PAGE}
+              target="_blank"
+              indicator
+            >
               {translate('ui_limit')}
             </Link>
           ) : (
             translate('ui_limit')
           )}
         </span>
-      </Container>
+      </div>
       <Container>{children}</Container>
     </Container>
   );

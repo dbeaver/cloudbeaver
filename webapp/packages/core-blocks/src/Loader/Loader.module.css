@@ -6,114 +6,70 @@
  * you may not use this file except in compliance with the License.
  */
 
-.loader {
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
-  &:global(.animate) {
-    opacity: 1;
+@layer components {
+  .spinner {
+    --dbv-kit-spinner-stroke-color: var(--theme-primary);
+    --dbv-kit-spinner-small-height: 16px;
+    --dbv-kit-spinner-medium-height: 40px;
+    --dbv-kit-spinner-large-height: 60px;
+    --dbv-kit-spinner-xlarge-height: 80px;
   }
-  & .staticImage {
-    height: 100%;
-    width: 100%;
-    display: none;
-  }
-  &.secondary,
-  &.overlay,
-  &:global(.secondary),
-  &:global(.overlay) {
-    &:not(.small):not(:global(.small)) {
-      & .staticImage.secondaryIcon {
-        display: block;
-      }
-    }
-    &.small,
-    &:global(.small) {
-      & .staticImage.secondarySmallIcon {
-        display: block;
-      }
-    }
-  }
-  &:not(.secondary):not(.overlay):not(:global(.secondary)):not(:global(.overlay)) {
-    &:not(.small):not(:global(.small)) {
-      & .staticImage.primaryIcon {
-        display: block;
-      }
-    }
-    &.small,
-    &:global(.small) {
-      & .staticImage.primarySmallIcon {
-        display: block;
-      }
-    }
-  }
-}
-.icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  animation: rotation 2s infinite linear;
-}
-.message {
-  padding: 16px;
-}
-.actions {
-  padding-top: 42px;
-}
-.loader.inline {
-  height: 38px;
-  flex-direction: row;
-  margin: 0;
-  justify-content: left;
-  & .icon {
-    width: 24px;
-    height: 24px;
-  }
-  & .message {
-    display: block;
-    padding: 0 16px;
-  }
-  & .actions {
-    padding: 0;
-  }
-}
-.loader.small {
-  & .icon {
-    width: 16px;
-    height: 16px;
-  }
-  & .message {
-    display: none;
-  }
-}
-.loader.fullSize {
-  height: 100%;
-  & .icon {
-    width: 100%;
-    height: 100%;
-  }
-}
-@keyframes rotation {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(359deg);
-  }
-}
 
-.loaderOverlay {
-  composes: theme-text-on-primary from global;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
+  .spinnerSecondary {
+    --dbv-kit-spinner-stroke-color: var(--theme-on-primary);
+  }
+
+  .loader {
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
+    &:global(.animate) {
+      opacity: 1;
+    }
+  }
+  .message {
+    padding: 16px;
+  }
+  .actions {
+    padding-top: 42px;
+  }
+  .loader.inline {
+    flex-direction: row;
+    margin: 0;
+    justify-content: left;
+    & .message {
+      display: block;
+      padding: 0 16px;
+    }
+    & .actions {
+      padding: 0;
+    }
+  }
+  .loader.small {
+    & .message {
+      display: none;
+    }
+  }
+  .loader.fullSize {
+    height: 100%;
+    width: 100%;
+    & .spinner {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .loaderOverlay {
+    composes: theme-text-on-primary from global;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
 }

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React, { forwardRef, useContext, useLayoutEffect, useRef } from 'react';
+import React, { forwardRef, useContext, useRef } from 'react';
 
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
@@ -111,12 +111,6 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
         onMouseDown(event);
       }
     }
-
-    useLayoutEffect(() => {
-      if (context.selected) {
-        innerRef.current?.focus();
-      }
-    }, [context.selected]);
 
     return (
       <div

@@ -53,6 +53,12 @@ export const BooleanFormatter = observer<ICellFormatterProps>(function BooleanFo
   }
 
   return (
-    <GridBooleanFormatter className={s(style, { formatter: true })} value={value as boolean | null} onClick={toggleValue} onKeyDown={toggleValue} />
+    <GridBooleanFormatter
+      focusable={!cellContext.isMenuVisible}
+      className={s(style, { formatter: true })}
+      value={value as boolean | null}
+      onClick={toggleValue}
+      onKeyDown={toggleValue}
+    />
   );
 });

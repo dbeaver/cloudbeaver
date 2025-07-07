@@ -2286,6 +2286,7 @@ __metadata:
   resolution: "@cloudbeaver/core-utils@workspace:packages/core-utils"
   dependencies:
     "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@timohausmann/quadtree-ts": "npm:^2"

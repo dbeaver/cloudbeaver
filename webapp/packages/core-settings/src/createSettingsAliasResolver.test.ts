@@ -5,68 +5,64 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-// import { expect, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
+import { SyncExecutor } from '@cloudbeaver/core-executor';
 
-import { describe } from 'vitest';
+import { expectDeprecatedSettingMessage, expectNoDeprecatedSettingMessage } from './__custom_mocks__/expectDeprecatedSettingMessage.js';
+import { createSettingsAliasResolver } from './createSettingsAliasResolver.js';
+import type { ISettingsSource } from './ISettingsSource.js';
 
-// import { SyncExecutor } from '@cloudbeaver/core-executor';
+const deprecatedSettings = {
+  deprecated: 'deprecatedValue',
+};
 
-// import { expectDeprecatedSettingMessage, expectNoDeprecatedSettingMessage } from './__custom_mocks__/expectDeprecatedSettingMessage.js';
-// import { createSettingsAliasResolver } from './createSettingsAliasResolver.js';
-// import type { ISettingsSource } from './ISettingsSource.js';
+const newSettings = {
+  ...deprecatedSettings,
+  value: 'value',
+};
 
-// const deprecatedSettings = {
-//   deprecated: 'deprecatedValue',
-// };
+function createSource(settings: Record<any, any>): ISettingsSource {
+  return {
+    onChange: new SyncExecutor(),
+    has(key: any): boolean {
+      return key in settings;
+    },
+    isEdited(key?: any): boolean {
+      return false;
+    },
+    isReadOnly(key: any): boolean {
+      return false;
+    },
+    getValue(key: any): any | undefined {
+      return settings[key];
+    },
+    getEditedValue(key: any): any | undefined {
+      return undefined;
+    },
+    setValue(key: any, value: any): void {},
+    async save(): Promise<void> {},
+    clear(): void {},
+  };
+}
 
-// const newSettings = {
-//   ...deprecatedSettings,
-//   value: 'value',
-// };
+function createResolver(settings: Record<any, any>) {
+  return createSettingsAliasResolver(createSource(settings), null as any, {
+    value: 'deprecated',
+  });
+}
+describe('createSettingsAliasResolver', () => {
+  test('Deprecated setting ignored', async () => {
+    const resolver = createResolver(newSettings);
 
-// function createSource(settings: Record<any, any>): ISettingsSource {
-//   return {
-//     onChange: new SyncExecutor(),
-//     has(key: any): boolean {
-//       return key in settings;
-//     },
-//     isEdited(key?: any): boolean {
-//       return false;
-//     },
-//     isReadOnly(key: any): boolean {
-//       return false;
-//     },
-//     getValue(key: any): any | undefined {
-//       return settings[key];
-//     },
-//     getEditedValue(key: any): any | undefined {
-//       return undefined;
-//     },
-//     setValue(key: any, value: any): void {},
-//     async save(): Promise<void> {},
-//     clear(): void {},
-//   };
-// }
+    expect(resolver.has('value')).toBe(false);
+    expectNoDeprecatedSettingMessage();
+  });
 
-// function createResolver(settings: Record<any, any>) {
-//   return createSettingsAliasResolver(createSource(settings), null as any, {
-//     value: 'deprecated',
-//   });
-// }
+  test.skip('Deprecated setting extracted', async () => {
+    const resolver = createResolver(deprecatedSettings);
 
-// test('Deprecated setting ignored', async () => {
-//   const resolver = createResolver(newSettings);
-
-//   expect(resolver.has('value')).toBe(false);
-//   expectNoDeprecatedSettingMessage();
-// });
-
-// test('Deprecated setting extracted', async () => {
-//   const resolver = createResolver(deprecatedSettings);
-
-//   expect(resolver.has('value')).toBe(true);
-//   expect(resolver.getValue('value')).toBe('deprecatedValue');
-//   expectDeprecatedSettingMessage('deprecated', 'value');
-// });
-
-describe.skip('createSettingsAliasResolver', () => {});
+    expect(resolver.has('value')).toBe(true);
+    expect(resolver.getValue('value')).toBe('deprecatedValue');
+    expectDeprecatedSettingMessage('deprecated', 'value');
+  });
+});
