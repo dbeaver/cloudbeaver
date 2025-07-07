@@ -23,9 +23,10 @@ export interface ISettingsProps {
   resolver: SettingsResolverSource;
   source: IEditableSettingsSource;
   accessor?: string[];
+  hideGroupsSettingsLimit?: number;
 }
 
-export const Settings = observer<ISettingsProps>(function Settings({ resolver, source, accessor }) {
+export const Settings = observer<ISettingsProps>(function Settings({ resolver, source, accessor, hideGroupsSettingsLimit = 0 }) {
   const translate = useTranslate();
   const settingsId = useId();
   const settings = useSettings(accessor);
@@ -79,7 +80,7 @@ export const Settings = observer<ISettingsProps>(function Settings({ resolver, s
     groupSelectExecutor.execute(id);
   }
 
-  const isGroupsHidden = getComputed(() => [...settings.settings.values()].flat().length <= 10);
+  const isGroupsHidden = getComputed(() => [...settings.settings.values()].flat().length <= hideGroupsSettingsLimit);
 
   return (
     <Container gap overflow noWrap>
