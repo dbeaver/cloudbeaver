@@ -54,13 +54,7 @@ import org.jkiss.dbeaver.model.sql.parser.SQLParserContext;
 import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorConfigurationRegistry;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
-import org.jkiss.dbeaver.model.sql.semantics.SQLDocumentScriptItemSyntaxContext;
-import org.jkiss.dbeaver.model.sql.semantics.SQLQueryModelRecognizer;
-import org.jkiss.dbeaver.model.sql.semantics.SQLQueryRecognitionContext;
-import org.jkiss.dbeaver.model.sql.semantics.SQLScriptItemAtOffset;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionAnalyzer;
-import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionContext;
-import org.jkiss.dbeaver.model.sql.semantics.model.SQLQueryModel;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSWrapper;
@@ -178,28 +172,9 @@ public class WebServiceSQL implements DBWServiceSQL {
                 .getBoolean(SQLModelPreferences.AUTOCOMPLETION_MODE);
 
             if (useNewCompletionEngine) {
-                SQLQueryRecognitionContext recognitionContext = new SQLQueryRecognitionContext(
-                    webSession.getProgressMonitor(),
-                    request.getContext().getExecutionContext(),
-                    true,
-                    request.getContext().getSyntaxManager(),
-                    request.getContext().getDataSource().getSQLDialect()
-                );
-                SQLQueryModel queryModel = SQLQueryModelRecognizer.recognizeQuery(recognitionContext, query);
-                SQLDocumentScriptItemSyntaxContext scriptItemContext = new SQLDocumentScriptItemSyntaxContext(
-                    position == null ? 0 : position,
-                    query,
-                    queryModel,
-                    query.length()
-                );
-
-                final SQLQueryCompletionAnalyzer analyzer = new SQLQueryCompletionAnalyzer(
-                    m -> SQLQueryCompletionContext.prepareCompletionContext(
-                        new SQLScriptItemAtOffset(0, scriptItemContext),
-                        request.getDocumentOffset(),
-                        request.getContext().getExecutionContext(),
-                        request.getContext().getDataSource().getSQLDialect()
-                    ),
+                SQLQueryCompletionAnalyzer analyzer = new SQLQueryCompletionAnalyzer(
+                    m -> WebSQLCompletionContextScriptParser.obtainCompletionContext(
+                        webSession.getProgressMonitor(), query, position, request),
                     request,
                     request::getDocumentOffset
                 );
