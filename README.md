@@ -25,6 +25,12 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 25.1.2 2025-07-07
+- The CloudBeaver default theme matches the device theme by default now. You can change this behavior in user preferences under the Theme section;
+- Added a button “Clear” to the Output panel;
+- Changed the data transfer mechanism to avoid intermediate file creation. The parameter dataExportFileSizeLimit was removed from the server configuration as deprecated;
+- PostgresSQL: fixed misplaced comment for table DDL generation.
+
 ### 25.1.1 2025-06-23
 ### Changes since 25.1.0:
 - Added a search panel for SQL Editor and Value panel: press Ctrl+F to open a panel that allows searching and replacing by keyword or regular expression.
