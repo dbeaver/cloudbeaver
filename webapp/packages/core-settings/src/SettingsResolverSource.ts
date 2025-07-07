@@ -133,12 +133,26 @@ export class SettingsResolverSource implements ISettingsResolverSource {
     for (const source of this.sources) {
       const readonly = !('isReadOnly' in source) || source.isReadOnly(key);
 
-      if (source.has(key) && readonly) {
+      if (source.has(key) || readonly) {
         throw new Error(`Can't set value for key ${key}`);
       }
 
       if (!readonly) {
         source.setValue(key, value);
+        return;
+      }
+    }
+  }
+
+  resetValue(key: any): void {
+    for (const source of this.sources) {
+      const readonly = !('isReadOnly' in source) || source.isReadOnly(key);
+      if (source.has(key) || readonly) {
+        throw new Error(`Can't set value for key ${key}`);
+      }
+
+      if ('resetValue' in source) {
+        source.resetValue(key);
         return;
       }
     }

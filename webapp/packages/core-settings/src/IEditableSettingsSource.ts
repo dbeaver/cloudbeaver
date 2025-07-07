@@ -14,6 +14,7 @@ export interface IEditableSettingsSource extends ISettingsSource {
   isReadOnly: (key: any) => boolean;
   getEditedValue: (key: any) => any | undefined;
   setValue: (key: any, value: any) => void;
+  resetValue: (key: any) => void;
   save: () => Promise<void>;
   isOverrideDefaults?: () => boolean;
   restoreDefaults?: () => void;

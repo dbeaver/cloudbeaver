@@ -121,6 +121,16 @@ export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject
         }
       });
     },
+    resetValue(key) {
+      if (!(key in mappings)) {
+        return;
+      }
+      withLock(locked => {
+        if (!locked) {
+          source.resetValue(key);
+        }
+      });
+    },
     async save() {},
     clear() {},
   };

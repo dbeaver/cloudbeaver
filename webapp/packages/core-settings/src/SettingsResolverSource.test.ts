@@ -59,7 +59,7 @@ export class MemorySettingsService extends SettingsSource {
     this.update(() => {
       this.clear();
       for (const key of this.settings.keys()) {
-        this.setValue(key, null);
+        this.resetValue(key);
       }
     });
   }

@@ -32,6 +32,7 @@ interface Props {
   settings: Map<SettingsGroupType, ISettingDescription<any>[]>;
   treeFilter: ITreeFilter;
   groupsHidden?: boolean;
+  displayRestore?: boolean;
   groupSelectExecutor: ISyncExecutor<string>;
 }
 
@@ -43,6 +44,7 @@ export const SettingsGroup = observer<Props>(function SettingsGroup({
   settings,
   treeFilter,
   groupsHidden,
+  displayRestore,
   groupSelectExecutor,
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -73,8 +75,8 @@ export const SettingsGroup = observer<Props>(function SettingsGroup({
       <GroupTitle hidden={groupsHidden} sticky>
         <SettingsGroupTitle group={group} />
       </GroupTitle>
-      {groupSettings.map((setting, i) => (
-        <Setting key={i} resolver={resolver} source={source} setting={setting} />
+      {groupSettings.map(setting => (
+        <Setting key={setting.key} resolver={resolver} source={source} setting={setting} displayRestore={displayRestore} />
       ))}
     </Group>
   );

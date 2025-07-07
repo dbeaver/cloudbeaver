@@ -46,6 +46,10 @@ export abstract class SettingsSource implements IEditableSettingsSource {
   abstract getValue(key: any): any;
   abstract save(): Promise<void>;
 
+  resetValue(key: any): void {
+    this.setValue(key, null);
+  }
+
   clear(): void {
     this.changes.clear();
   }

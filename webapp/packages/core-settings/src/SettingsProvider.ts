@@ -70,6 +70,10 @@ export class SettingsProvider<TSchema extends schema.SomeZodObject = any> implem
     this.source.setValue(key, value);
   }
 
+  resetValue<TKey extends keyof schema.infer<TSchema>>(key: TKey): void {
+    this.source.resetValue(key);
+  }
+
   clear(): void {
     this.source.clear();
   }

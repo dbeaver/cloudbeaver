@@ -40,6 +40,7 @@ function createSource(settings: Record<any, any>): IEditableSettingsSource {
       return undefined;
     },
     setValue(key: any, value: any): void {},
+    resetValue(key: any): void {},
     async save(): Promise<void> {},
     clear(): void {},
   };

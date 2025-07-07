@@ -31,6 +31,7 @@ interface Props {
   settings: Map<SettingsGroupType, ISettingDescription<any>[]>;
   groupSelectExecutor: ISyncExecutor<string>;
   groupsHidden?: boolean;
+  displayRestore?: boolean;
   onSettingsOpen?: (groupId: string) => void;
 }
 
@@ -42,6 +43,7 @@ export const SettingsList = observer<Props>(function SettingsList({
   source,
   settings,
   groupsHidden,
+  displayRestore,
   groupSelectExecutor,
   onSettingsOpen,
 }) {
@@ -62,6 +64,7 @@ export const SettingsList = observer<Props>(function SettingsList({
           treeFilter={treeFilter}
           groupsHidden={groupsHidden}
           groupSelectExecutor={groupSelectExecutor}
+          displayRestore={displayRestore}
         />
       ))}
       {groups.length === 0 && <TextPlaceholder>{translate('plugin_settings_panel_no_settings')}</TextPlaceholder>}

@@ -24,9 +24,10 @@ export interface ISettingsProps {
   source: IEditableSettingsSource;
   accessor?: string[];
   hideGroupsSettingsLimit?: number;
+  displayRestore?: boolean;
 }
 
-export const Settings = observer<ISettingsProps>(function Settings({ resolver, source, accessor, hideGroupsSettingsLimit = 0 }) {
+export const Settings = observer<ISettingsProps>(function Settings({ resolver, source, accessor, hideGroupsSettingsLimit = 0, displayRestore }) {
   const translate = useTranslate();
   const settingsId = useId();
   const settings = useSettings(accessor);
@@ -106,6 +107,7 @@ export const Settings = observer<ISettingsProps>(function Settings({ resolver, s
             settings={settings.settings}
             groupsHidden={isGroupsHidden}
             groupSelectExecutor={groupSelectExecutor}
+            displayRestore={displayRestore}
           />
         </Container>
       </Container>
