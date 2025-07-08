@@ -49,7 +49,6 @@ const defaultStateGetter = (connectionId?: string, credentials?: Record<string, 
     credentials: credentials ?? {},
     mainPropertyValues: {},
     networkHandlersConfig: [],
-    properties: {},
     providerProperties: {},
   }) as IConnectionFormOptionsState;
 

@@ -10,7 +10,7 @@ import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ConnectionInfoPropertiesResource } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { IConnectionProperties } from '../Options/IConnectionConfig.js';
-import { observable, runInAction } from 'mobx';
+import { observable, runInAction, toJS } from 'mobx';
 import type { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
 
 function getDefaultState(): IConnectionProperties {
@@ -40,6 +40,11 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     return this.connectionInfoPropertiesResource.isOutdated(this.optionsPart.connectionKey);
   }
 
+  protected override setState(state: Record<string, any>): void {
+    super.setState(state);
+    this.optionsPart.state.properties = this.state;
+  }
+
   protected override async loader(): Promise<void> {
     if (!this.optionsPart.connectionKey) {
       this.setInitialState(getDefaultState());
@@ -47,8 +52,10 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     }
 
     const connection = await this.connectionInfoPropertiesResource.load(this.optionsPart.connectionKey);
+    const properties = toJS(connection.properties);
 
-    this.setInitialState({ ...connection.properties });
+    this.setInitialState(properties);
+    this.optionsPart.initialState.properties = properties;
   }
 
   protected override async saveChanges(
