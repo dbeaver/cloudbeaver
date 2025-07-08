@@ -36,7 +36,8 @@ export const ServerConfigurationAdminForm = observer<Props>(function ServerConfi
       <InputField ref={passwordValidationRef} type="password" name="adminPassword" state={serverConfig} autoComplete="new-password" required tiny>
         {translate('administration_configuration_wizard_configuration_admin_password')}
       </InputField>
-      <InputField ref={passwordRepeatRef} type="password" name="adminPasswordRepeat" autoComplete="new-password" required tiny>
+      {/* @ts-ignore We need adminPasswordRepeat in state to validate it on navigation, but we don't have this field in serverConfig  */}
+      <InputField ref={passwordRepeatRef} state={serverConfig} type="password" name="adminPasswordRepeat" autoComplete="new-password" required tiny>
         {translate('authentication_user_password_repeat')}
       </InputField>
     </Group>
