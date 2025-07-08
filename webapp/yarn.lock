@@ -2016,6 +2016,7 @@ __metadata:
     "@graphql-codegen/typescript-graphql-files-modules": "npm:^3"
     "@graphql-codegen/typescript-graphql-request": "npm:^6"
     "@graphql-codegen/typescript-operations": "npm:^4"
+    "@graphql-typed-document-node/core": "npm:^3"
     "@parcel/watcher": "npm:^2"
     axios: "npm:^1"
     graphql: "npm:^16"
@@ -5683,7 +5684,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphql-typed-document-node/core@npm:3.2.0, @graphql-typed-document-node/core@npm:^3.1.1, @graphql-typed-document-node/core@npm:^3.2.0":
+"@graphql-typed-document-node/core@npm:3.2.0, @graphql-typed-document-node/core@npm:^3, @graphql-typed-document-node/core@npm:^3.1.1, @graphql-typed-document-node/core@npm:^3.2.0":
   version: 3.2.0
   resolution: "@graphql-typed-document-node/core@npm:3.2.0"
   peerDependencies:
