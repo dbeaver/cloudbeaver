@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useEffect, useLayoutEffect, useState } from 'react';
-import { useSelectStore, SelectField } from '@dbeaver/ui-kit';
+import { useSelectStore, SelectField, clsx } from '@dbeaver/ui-kit';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
@@ -16,9 +16,7 @@ import { Icon } from '../Icon.js';
 import { IconOrImage } from '../IconOrImage.js';
 import { Loader } from '../Loader/Loader.js';
 import { useTranslate } from '../localization/useTranslate.js';
-import { s } from '../s.js';
-import { useS } from '../useS.js';
-import comboboxStyles from './Combobox.module.css';
+import './Combobox.css';
 import { FieldLabel } from './FieldLabel.js';
 import { FormContext } from './FormContext.js';
 import { FieldDescription } from './FieldDescription.js';
@@ -94,7 +92,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const translate = useTranslate();
   const context = useContext(FormContext);
   const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
-  const styles = useS(comboboxStyles);
   const menu = useSelectStore();
   const isOpened = menu.getState().open;
 
@@ -230,14 +227,14 @@ export const Combobox: ComboboxType = observer(function Combobox({
           element = <Loader small fullSize />;
           break;
         case typeof iconSelector(item) === 'string':
-          element = <IconOrImage icon={iconSelector(item) as string} className={s(styles, { iconOrImage: true })} />;
+          element = <IconOrImage icon={iconSelector(item) as string} className="combobox__icon" />;
           break;
         default:
           element = iconSelector(item);
           break;
       }
 
-      return <div className={s(styles, { inputIcon: true })}>{element}</div>;
+      return <div className="combobox__input-icon">{element}</div>;
     }
 
     return null;
@@ -249,7 +246,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   function itemRender(item: (typeof items)[number]): React.ReactNode {
     return (
-      <div className={s(styles, { item: true })} title={titleSelector?.(item)}>
+      <div className="combobox__item" title={titleSelector?.(item)}>
         {renderIcon(item)}
         <span>{valueSelector(item)}</span>
       </div>
@@ -263,12 +260,11 @@ export const Combobox: ComboboxType = observer(function Combobox({
   function selectedRender(val: typeof value, item: (typeof items)[number] | undefined): React.ReactNode {
     if (searchable) {
       return (
-        <div className={s(styles, { itemSearch: true })} title={title}>
+        <div className="combobox__search-container" title={title}>
           {renderIcon(selectedItem)}
           <input
             {...rest}
             ref={setInputRef}
-            required={rest.required}
             autoComplete="off"
             name={name}
             title={title}
@@ -277,7 +273,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
             readOnly={readOnly || select}
             data-focus={focus}
             data-select={select}
-            className={s(styles, { input: true, select })}
+            className={clsx('combobox__search-container__input', select && 'combobox__search-container__select')}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
           />
@@ -286,39 +282,35 @@ export const Combobox: ComboboxType = observer(function Combobox({
     }
 
     if (!item) {
-      return <div className={s(styles, { item: true })} title={titleSelector?.(item)} />;
+      return <div className="combobox__item" title={titleSelector?.(item)} />;
     }
 
     return itemRender(item);
   }
 
   return (
-    <Field {...layoutProps} className={s(styles, { field: true, inline }, className)}>
+    <Field {...layoutProps} className={clsx('combobox__field', inline && 'combobox__field--inline', className)}>
       {children && (
-        <FieldLabel required={rest.required} title={title} className={s(styles, { fieldLabel: true })}>
+        <FieldLabel required={rest.required} title={title} className="combobox__field-label">
           {children}
         </FieldLabel>
       )}
-      <div className={s(styles, { inputBox: true })}>
-        <SelectField
-          items={filteredItems}
-          value={value}
-          itemValue={itemValue}
-          itemRender={itemRender}
-          itemDisabled={itemDisabled}
-          name={name}
-          disabled={disabled || readOnly}
-          required={rest.required}
-          className={s(styles, { field: true, inline }, className, styles['selectField'])}
-          noItemsPlaceholder={translate('combobox_no_results_placeholder')}
-          selectedRender={selectedRender}
-          arrowIcon={<Icon name="arrow" viewBox="0 0 16 16" className={styles['icon']} />}
-          store={menu}
-          autoFocusItemsOnShow={!searchable}
-          onChange={handleSelect}
-          {...rest}
-        />
-      </div>
+      <SelectField
+        items={filteredItems}
+        value={value}
+        itemValue={itemValue}
+        itemRender={itemRender}
+        itemDisabled={itemDisabled}
+        name={name}
+        disabled={disabled || readOnly}
+        noItemsPlaceholder={translate('combobox_no_results_placeholder')}
+        selectedRender={selectedRender}
+        arrowIcon={<Icon name="arrow" viewBox="0 0 16 16" className="combobox__icon" />}
+        store={menu}
+        autoFocusItemsOnShow={!searchable}
+        onChange={handleSelect}
+        {...rest}
+      />
       {description && <FieldDescription>{description}</FieldDescription>}
     </Field>
   );
