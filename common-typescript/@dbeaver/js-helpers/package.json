@@ -30,5 +30,8 @@
     "rimraf": "^6",
     "typescript": "^5",
     "vitest": "^3"
+  },
+  "dependencies": {
+    "async-mutex": "^0"
   }
 }

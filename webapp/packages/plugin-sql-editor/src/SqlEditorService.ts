@@ -30,18 +30,29 @@ import type { ISqlEditorTabState } from './ISqlEditorTabState.js';
 import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures.js';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 
 export type SQLProposal = SqlCompletionProposal;
 
+export interface ISqlEditorActiveQueryUpdateData {
+  editorId: string;
+  update: {
+    query: string;
+    type: 'replace' | 'append' | 'prepend';
+  };
+}
+
 @injectable()
 export class SqlEditorService {
-  get autoSave() {
+  get autoSave(): boolean {
     return this.sqlEditorSettingsService.autoSave && !this.serverConfigResource.isFeatureEnabled(FEATURE_GIT_ID, true);
   }
 
   get insertTableAlias() {
     return this.sqlEditorSettingsService.insertTableAlias;
   }
+
+  readonly updateActiveQuery: IExecutor<ISqlEditorActiveQueryUpdateData>;
 
   constructor(
     private readonly graphQLService: GraphQLService,
@@ -53,14 +64,17 @@ export class SqlEditorService {
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
     private readonly serverConfigResource: ServerConfigResource,
-  ) {}
+  ) {
+    this.updateActiveQuery = new Executor();
+  }
 
-  getState(editorId: string, datasourceKey: string, order: number, source?: string): ISqlEditorTabState {
+  getState(editorId: string, datasourceKey: string, order: number, source?: string, metadata?: Record<string, any>): ISqlEditorTabState {
     return observable({
       editorId,
       datasourceKey,
       source,
       order,
+      metadata,
       tabs: observable([]),
       resultGroups: observable([]),
       resultTabs: observable([]),
