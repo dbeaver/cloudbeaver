@@ -3046,7 +3046,7 @@ __metadata:
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@types/leaflet": "npm:^1"
-    "@types/proj4": "npm:^2"
+    "@types/proj4": "npm:^2.19.0"
     "@types/react": "npm:^19"
     "@types/wellknown": "npm:^0"
     leaflet: "npm:^1"
@@ -7887,10 +7887,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/proj4@npm:^2":
-  version: 2.5.6
-  resolution: "@types/proj4@npm:2.5.6"
-  checksum: 10c0/7590dd982cb0e4a0de57f6089ea932b2821ec13198b1255980b950a27208838965f8f3346d3130a9e9668e345f22d77ada3971b493179281d1b168aba2d6d252
+"@types/proj4@npm:^2.19.0":
+  version: 2.19.0
+  resolution: "@types/proj4@npm:2.19.0"
+  dependencies:
+    proj4: "npm:*"
+  checksum: 10c0/3df1d7a3613461f3f1c5e0369668e50b02c0149233e235bf4b82af53a1f6c61acea633c9087b0a57ed211c873397c005af31082e202ac642b001d3c866d66871
   languageName: node
   linkType: hard
 
@@ -15719,7 +15721,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proj4@npm:^2":
+"proj4@npm:*, proj4@npm:^2":
   version: 2.19.5
   resolution: "proj4@npm:2.19.5"
   dependencies:
