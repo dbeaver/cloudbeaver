@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useLayoutEffect, useMemo, useRef, type HTMLAttributes } from 'react';
 import { reaction } from 'mobx';
 
-import { s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 // import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 // import { ClipboardService } from '@cloudbeaver/core-ui';
@@ -56,18 +56,11 @@ import { useTableData } from './useTableData.js';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
 
-const rowHeight = 24;
-const headerHeight = 32;
+const ROW_HEIGHT = 24;
+const HEADER_HEIGHT = 32;
+const HEADER_WITH_DESC_HEIGHT = 48;
 
-export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({
-  model,
-  actions,
-  resultIndex,
-  simple,
-  className,
-  dataFormat,
-  ...rest
-}) {
+export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({ model, actions, resultIndex, simple, className, ...rest }) {
   const translate = useTranslate();
   const styles = useS(classes);
 
@@ -268,6 +261,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     onValueChange => reaction(() => tableData.rows.length, onValueChange),
     [tableData],
   );
+  const headerHeight = getComputed(() => (tableData.hasDescription ? HEADER_WITH_DESC_HEIGHT : HEADER_HEIGHT));
 
   function getCell(rowIdx: number, colIdx: number) {
     return <CellFormatter rowIdx={rowIdx} colIdx={colIdx} />;
@@ -535,7 +529,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
               getHeaderWidth={getHeaderWidth}
               getHeaderPinned={getHeaderPinned}
               getHeaderResizable={getHeaderResizable}
-              getRowHeight={() => rowHeight}
+              getRowHeight={() => ROW_HEIGHT}
               getColumnKey={getColumnKey}
               columnCount={columnsCount}
               rowCount={rowsCount}

@@ -20,6 +20,7 @@ import type {
   ResultSetFormatAction,
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
+import type { DataGridSettingsService } from '../DataGridSettingsService.js';
 
 export interface IColumnInfo {
   key: IResultSetColumnKey | null;
@@ -30,7 +31,9 @@ export interface ITableData {
   dataContent: ResultSetDataContentAction;
   data: ResultSetDataAction;
   editor: ResultSetEditAction;
+  hasDescription: boolean;
   view: ResultSetViewAction;
+  dataGridSettingsService: DataGridSettingsService;
   columns: Array<IColumnInfo>;
   columnKeys: IResultSetColumnKey[];
   rows: IResultSetRowKey[];

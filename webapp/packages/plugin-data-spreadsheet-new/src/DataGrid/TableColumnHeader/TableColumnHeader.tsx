@@ -39,12 +39,14 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
   let columnName: string | undefined;
   let columnReadOnly = false;
   let columnTooltip: string | undefined;
+  let columnDescription: string | undefined;
 
   if (columnInfo.key !== null) {
     const column = tableDataContext.data.getColumn(columnInfo.key);
 
     if (column) {
       columnName = column.label!;
+      columnDescription = column.description;
       icon = column.icon;
       columnReadOnly ||= tableDataContext.format.isReadOnly({ column: columnInfo.key });
 
@@ -70,21 +72,24 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
       ref={dnd.setRef}
       title={columnTooltip}
       data-s-rearrange={dnd.side}
-      className={s(styles, { header: true, dragging: dnd.data.state.isDragging })}
+      className={s(styles, { dragging: dnd.data.state.isDragging })}
       onClick={handleClick}
     >
-      {dataReadonly && colIdx === 0 && (
-        <div className={s(styles, { readonlyStatus: true, independent: true }, 'rdg-table-header__readonly-status')} />
-      )}
-      {icon && (
-        <div className={s(styles, { icon: true })}>
-          <StaticImage icon={icon} className={s(styles, { staticImage: true })} />
-          {columnReadOnly && hasElementIdentifier && !dataReadonly && (
-            <div className={s(styles, { readonlyStatus: true }, 'rdg-table-header__readonly-status')} />
-          )}
-        </div>
-      )}
-      <div className={s(styles, { name: true })}>{columnName}</div>
+      <div className={s(styles, { header: true })}>
+        {dataReadonly && colIdx === 0 && (
+          <div className={s(styles, { readonlyStatus: true, independent: true }, 'rdg-table-header__readonly-status')} />
+        )}
+        {icon && (
+          <div className={s(styles, { icon: true })}>
+            <StaticImage icon={icon} className={s(styles, { staticImage: true })} />
+            {columnReadOnly && hasElementIdentifier && !dataReadonly && (
+              <div className={s(styles, { readonlyStatus: true }, 'rdg-table-header__readonly-status')} />
+            )}
+          </div>
+        )}
+        <div className={s(styles, { name: true })}>{columnName}</div>
+      </div>
+      {tableDataContext.hasDescription && columnDescription && <div className={s(styles, { description: true })}>{columnDescription}</div>}
     </div>
   );
 });

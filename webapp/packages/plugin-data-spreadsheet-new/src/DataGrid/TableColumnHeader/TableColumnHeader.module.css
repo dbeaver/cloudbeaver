@@ -64,3 +64,10 @@
   content: '';
   right: 0;
 }
+.description {
+  composes: theme-typography--caption from global;
+  color: var(--theme-on-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

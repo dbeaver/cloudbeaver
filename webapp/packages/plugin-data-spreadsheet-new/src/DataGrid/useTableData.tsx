@@ -24,6 +24,8 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IColumnInfo, ITableData } from './TableDataContext.js';
+import { useService } from '@cloudbeaver/core-di';
+import { DataGridSettingsService } from '../DataGridSettingsService.js';
 
 export function useTableData(
   model: IDatabaseDataModel<ResultSetDataSource>,
@@ -35,6 +37,7 @@ export function useTableData(
   const editor = model.source.getAction(resultIndex, ResultSetEditAction);
   const view = model.source.getAction(resultIndex, ResultSetViewAction);
   const dataContent = model.source.getAction(resultIndex, ResultSetDataContentAction);
+  const dataGridSettingsService = useService(DataGridSettingsService);
 
   return useObservableRef<ITableData & { gridDIVElement: React.RefObject<HTMLDivElement | null> }>(
     () => ({
@@ -58,6 +61,13 @@ export function useTableData(
         columns.unshift({ key: null });
 
         return columns;
+      },
+      get hasDescription(): boolean {
+        if (!this.dataGridSettingsService.description) {
+          return false;
+        }
+
+        return Boolean(this.data?.columns?.some(column => column.description));
       },
       getRow(rowIndex) {
         return this.rows[rowIndex];
@@ -119,6 +129,7 @@ export function useTableData(
       columns: computed,
       rows: computed,
       columnKeys: computed,
+      hasDescription: computed,
       format: observable.ref,
       dataContent: observable.ref,
       data: observable.ref,
@@ -133,6 +144,7 @@ export function useTableData(
       editor,
       view,
       gridDIVElement,
+      dataGridSettingsService,
     },
   );
 }
