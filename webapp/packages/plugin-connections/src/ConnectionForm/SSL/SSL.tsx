@@ -132,7 +132,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
             target="_blank"
             rel="noreferrer"
           >
-            <IconOrImage width={16} icon="/icons/documentation_link.svg" /> {translate('plugin_connections_connection_ssl_docs')}
+            <IconOrImage width={16} icon="/icons/documentation_link_sm.svg" /> {translate('plugin_connections_connection_ssl_docs')}
           </a>
         </Group>
       </ColoredContainer>
