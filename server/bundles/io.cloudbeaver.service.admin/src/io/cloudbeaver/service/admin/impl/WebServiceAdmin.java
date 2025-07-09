@@ -605,6 +605,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 serverConfig.setServerName(config.getServerName());
                 serverConfig.setServerURL(config.getServerURL());
                 serverConfig.setMaxSessionIdleTime(config.getSessionExpireTime());
+                if (config.getSecureCookies() != null) {
+                    serverConfig.setSecureCookies(config.getSecureCookies());
+                }
+                if (config.getAvailableHosts() != null) {
+                    serverConfig.setAvailableHosts(config.getAvailableHosts());
+                }
             }
 
             if (CommonUtils.isEmpty(adminName)) {

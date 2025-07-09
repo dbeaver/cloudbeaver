@@ -534,6 +534,12 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             CBConstants.PARAM_SECURE_COOKIES,
             serverConfig.isSecureCookies()
         );
+        copyConfigValue(
+            originServerConfig,
+            serverConfigProperties,
+            CBConstants.PARAM_AVAILABLE_HOSTS,
+            serverConfig.getAvailableHosts()
+        );
         var productConfigProperties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Map<String, Object> oldProductRuntimeConfig = JSONUtils.getObject(originServerConfig,
             CBConstants.PARAM_PRODUCT_SETTINGS);

@@ -1,5 +1,5 @@
 extend type ServerConfig {
-    serverURL: String!
+    serverURL: String! @deprecated
     rootURI: String!
     hostName: String! @deprecated(reason: "use container id instead")
     containerId: String!
@@ -12,5 +12,9 @@ extend type ServerConfig {
     redirectOnFederatedAuth: Boolean!
     enabledAuthProviders: [ID!]!
     passwordPolicyConfiguration: PasswordPolicyConfig! @since(version: "23.3.3")
+    "Mark all cookies as secure, recommend for HTTPS deployment configurations"
+    secureCookies: Boolean! @since(version: "25.1.3")
+    "Mark all cookies as secure, recommend for HTTPS deployment configurations"
+    availableHosts: [String!]! @since(version: "25.1.3")
 }
 

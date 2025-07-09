@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@ package io.cloudbeaver.service.admin;
 
 import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Server configuration for admin API
@@ -45,6 +44,10 @@ public class AdminServerConfig {
     private final List<String> enabledAuthProviders;
     private final String[] enabledDrivers;
     private final String[] disabledDrivers;
+    @Nullable
+    private final Boolean secureCookies;
+    @Nullable
+    private final Set<String> availableHosts;
 
     private long sessionExpireTime;
 
@@ -57,8 +60,16 @@ public class AdminServerConfig {
         CBAppConfig appConfig = CBApplication.getInstance().getAppConfiguration();
         this.anonymousAccessEnabled = JSONUtils.getBoolean(params, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
         this.customConnectionsEnabled = JSONUtils.getBoolean(params, "customConnectionsEnabled", appConfig.isSupportsCustomConnections());
-        this.publicCredentialsSaveEnabled = JSONUtils.getBoolean(params, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
-        this.adminCredentialsSaveEnabled = JSONUtils.getBoolean(params, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
+        this.publicCredentialsSaveEnabled = JSONUtils.getBoolean(
+            params,
+            "publicCredentialsSaveEnabled",
+            appConfig.isPublicCredentialsSaveEnabled()
+        );
+        this.adminCredentialsSaveEnabled = JSONUtils.getBoolean(
+            params,
+            "adminCredentialsSaveEnabled",
+            appConfig.isAdminCredentialsSaveEnabled()
+        );
         this.resourceManagerEnabled = JSONUtils.getBoolean(params, "resourceManagerEnabled", appConfig.isResourceManagerEnabled());
         this.secretManagerEnabled = JSONUtils.getBoolean(params, "secretManagerEnabled", appConfig.isSecretManagerEnabled());
 
@@ -86,6 +97,18 @@ public class AdminServerConfig {
             this.disabledDrivers = JSONUtils.getStringList(params, "disabledDrivers").toArray(new String[0]);
         } else {
             this.disabledDrivers = appConfig.getDisabledDrivers();
+        }
+
+        if (params.containsKey("secureCookies")) {
+            this.secureCookies = JSONUtils.getBoolean(params, "secureCookies");
+        } else {
+            this.secureCookies = null;
+        }
+
+        if (params.containsKey("availableHosts")) {
+            this.availableHosts = new HashSet<>(JSONUtils.getStringList(params, "availableHosts"));
+        } else {
+            this.availableHosts = null;
         }
     }
 
@@ -167,5 +190,15 @@ public class AdminServerConfig {
 
     public boolean isSecretManagerEnabled() {
         return secretManagerEnabled;
+    }
+
+    @Nullable
+    public Set<String> getAvailableHosts() {
+        return availableHosts;
+    }
+
+    @Nullable
+    public Boolean getSecureCookies() {
+        return secureCookies;
     }
 }

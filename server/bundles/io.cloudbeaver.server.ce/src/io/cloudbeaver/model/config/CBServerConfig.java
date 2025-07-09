@@ -23,14 +23,15 @@ import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class CBServerConfig implements WebServerConfiguration {
 
     private static final Log log = Log.getLog(CBServerConfig.class);
 
     protected String serverURL;
+    @NotNull
+    protected Set<String> availableHosts = new LinkedHashSet<>();
     protected boolean secureCookies;
     protected int serverPort = CBConstants.DEFAULT_SERVER_PORT;
     private String serverHost = null;
@@ -185,5 +186,19 @@ public class CBServerConfig implements WebServerConfiguration {
 
     public boolean isSecureCookies() {
         return secureCookies;
+    }
+
+    public void setSecureCookies(boolean secureCookies) {
+        this.secureCookies = secureCookies;
+    }
+
+    @NotNull
+    public Set<String> getAvailableHosts() {
+        return availableHosts;
+    }
+
+    public void setAvailableHosts(@NotNull Collection<String> availableHosts) {
+        this.availableHosts.clear();
+        this.availableHosts.addAll(availableHosts);
     }
 }
