@@ -41,6 +41,7 @@
     "@graphql-codegen/typescript-graphql-files-modules": "^3",
     "@graphql-codegen/typescript-graphql-request": "^6",
     "@graphql-codegen/typescript-operations": "^4",
+    "@graphql-typed-document-node/core": "^3",
     "@parcel/watcher": "^2",
     "graphql": "^16",
     "graphql-tag": "^2",
