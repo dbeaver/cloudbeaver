@@ -72,24 +72,34 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
       ref={dnd.setRef}
       title={columnTooltip}
       data-s-rearrange={dnd.side}
-      className={s(styles, { dragging: dnd.data.state.isDragging })}
+      className={s(styles, { dragging: dnd.data.state.isDragging }, 'tw:h-full tw:pt-[6px]')}
       onClick={handleClick}
     >
       <div className={s(styles, { header: true })}>
         {dataReadonly && colIdx === 0 && (
           <div className={s(styles, { readonlyStatus: true, independent: true }, 'rdg-table-header__readonly-status')} />
         )}
-        {icon && (
-          <div className={s(styles, { icon: true })}>
-            <StaticImage icon={icon} className={s(styles, { staticImage: true })} />
-            {columnReadOnly && hasElementIdentifier && !dataReadonly && (
-              <div className={s(styles, { readonlyStatus: true }, 'rdg-table-header__readonly-status')} />
-            )}
-          </div>
-        )}
-        <div className={s(styles, { name: true })}>{columnName}</div>
+        <div className="tw:grid tw:grid-cols-[auto_1fr] tw:grid-rows-[auto_auto] tw:gap-x-1 tw:gap-y-0.5 tw:h-full tw:w-full tw:items-center">
+          {icon && (
+            <div className={s(styles, { icon: true })}>
+              <StaticImage icon={icon} className={s(styles, { staticImage: true })} />
+              {columnReadOnly && hasElementIdentifier && !dataReadonly && (
+                <div className={s(styles, { readonlyStatus: true }, 'rdg-table-header__readonly-status')} />
+              )}
+            </div>
+          )}
+          <div className={s(styles, { name: true })}>{columnName}</div>
+          {tableDataContext.hasDescription && columnDescription && (
+            <>
+              <div className="tw:col-start-2 tw:min-w-0">
+                <div title={columnDescription} className={s(styles, { description: true })}>
+                  {columnDescription}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
-      {tableDataContext.hasDescription && columnDescription && <div className={s(styles, { description: true })}>{columnDescription}</div>}
     </div>
   );
 });

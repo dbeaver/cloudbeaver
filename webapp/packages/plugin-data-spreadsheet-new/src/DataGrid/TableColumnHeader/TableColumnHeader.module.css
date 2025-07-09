@@ -8,7 +8,6 @@
 
 .header {
   display: flex;
-  align-items: center;
   align-content: center;
   width: 100%;
   gap: 4px;
@@ -32,6 +31,7 @@
   flex-grow: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .readonlyStatus {
   position: absolute;
