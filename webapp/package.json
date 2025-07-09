@@ -22,8 +22,7 @@
     "validate-dependencies": "core-cli-validate-dependencies './packages/*/'",
     "add-plugin": "core-cli-add-plugin",
     "check-license": "core-cli-check-license",
-    "version:set": "yarn workspaces foreach -Ap --include '@cloudbeaver/product-*' run version:set",
-    "postinstall": "[ -z $CI ] && yarn lefthook install || true"
+    "version:set": "yarn workspaces foreach -Ap --include '@cloudbeaver/product-*' run version:set"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
