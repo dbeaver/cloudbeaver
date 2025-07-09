@@ -16,14 +16,11 @@
  */
 package io.cloudbeaver.service.sql;
 
-import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppUtils;
-import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
-import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.utils.CommonUtils;
 
@@ -64,15 +61,6 @@ public class WebSQLDataLOBReceiver extends WebSQLCellValueReceiver {
         fileName.append(s);
         exportFileName = CommonUtils.escapeFileName(fileName.toString());
         byte[] binaryValue = getBinaryValue(monitor);
-        Number fileSizeLimit = ServletAppUtils.getServletApplication()
-            .getAppConfiguration()
-            .getResourceQuota(CBConstants.QUOTA_PROP_FILE_LIMIT);
-        if (fileSizeLimit != null && binaryValue.length > fileSizeLimit.longValue()) {
-            throw new DBQuotaException(
-                "Data export quota exceeded \n Please increase the resourceQuotas parameter in configuration",
-                CBConstants.QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), binaryValue.length
-            );
-        }
         Path file = WebSQLDataLOBReceiver.DATA_EXPORT_FOLDER.resolve(exportFileName);
         Files.write(file, binaryValue);
         return exportFileName;
