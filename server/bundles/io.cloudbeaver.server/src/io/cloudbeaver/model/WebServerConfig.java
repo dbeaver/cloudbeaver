@@ -30,7 +30,10 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Web server configuration
@@ -184,16 +187,5 @@ public class WebServerConfig {
 
     public void setProvideSensitiveInformation(boolean provideSensitiveInformation) {
         this.provideSensitiveInformation = provideSensitiveInformation;
-    }
-
-    @Property
-    public boolean isSecureCookies() {
-        return application.getWebServerConfig().isSecureCookies();
-    }
-
-    @NotNull
-    @Property
-    public Set<String> getAvailableHosts() {
-        return application.getWebServerConfig().getAvailableHosts();
     }
 }
