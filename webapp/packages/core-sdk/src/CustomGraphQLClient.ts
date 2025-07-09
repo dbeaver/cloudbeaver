@@ -97,14 +97,14 @@ export class CustomGraphQLClient extends GraphQLClient {
     }
   }
 
-  private overrideRequest<T, V extends Variables = Variables>(
+  private async overrideRequest<T, V extends Variables = Variables>(
     documentOrOptions: RequestDocument | TypedDocumentNode<T, V> | RequestOptions<V>,
     ...variablesAndRequestHeaders: VariablesAndRequestHeadersArgs<V>
   ): Promise<T> {
     this.blockRequestsReasonHandler();
     try {
       // TODO: seems here can be undefined
-      return super.request<T, V>(documentOrOptions as any, ...variablesAndRequestHeaders);
+      return await super.request<T, V>(documentOrOptions as any, ...variablesAndRequestHeaders);
     } catch (error: any) {
       if (isClientError(error)) {
         if (isObjectError(error)) {
