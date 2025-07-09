@@ -44,7 +44,7 @@ export default [
   ['plugin_connections_connection_ssl_enable', 'Activer SSL'],
   ['plugin_connections_connection_ssl_optional', 'All SSL parameters are optional.'],
   ['plugin_connections_connection_ssl_description', 'You must specify SSL certificates if they are required by your server configuration. Settings on this page override Driver properties'],
-  ['plugin_connections_connection_ssl_note', '{arg: productName} does not verify SSL configuration and relies on the driver implementation. Please refer to the driver documentation for more information.'],
+  ['plugin_connections_connection_ssl_note', '{arg:productName} does not verify SSL configuration and relies on the driver implementation. Please refer to the driver documentation for more information.'],
   ['plugin_connections_connection_ssl_docs', 'SSL configuration documentation'],
 
   ['plugin_connections_connection_form_shared_credentials_manage_info', "Vous pouvez gérer les identifiants dans l'onglet "],
