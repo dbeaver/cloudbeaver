@@ -1,4 +1,5 @@
 export default [
+  ['authentication_administration_pages_label', 'Pages'],
   ['authentication_administration_user_connections_user_add', "Création d'utilisateur"],
   ['authentication_administration_user_connections_user_new', 'Nouvel utilisateur'],
   ['authentication_administration_user_connections_access_load_fail', "Échec du chargement des connexions accordées à l'utilisateur"],

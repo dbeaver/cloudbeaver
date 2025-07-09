@@ -28,7 +28,7 @@ export const SQLEditorActions = observer<Props>(function SQLEditorActions({ data
   const isActiveSegmentMode = getComputed(() => data.activeSegmentMode.activeSegmentMode);
   const disabled = getComputed(() => data.isScriptEmpty || data.isDisabled);
   const isQuery = data.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
-  const isExecutable = data.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) && data.isExecutionAllowed;
+  const isExecutable = data.isExecutionAllowed;
 
   return (
     <div className={s(styles, { container: true })}>

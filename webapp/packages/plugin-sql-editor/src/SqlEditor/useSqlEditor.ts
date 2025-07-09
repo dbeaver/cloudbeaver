@@ -138,7 +138,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       get isExecutionAllowed(): boolean {
-        return this.sqlEditorSettingsService.scriptExecutionEnabled;
+        return !!this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) && this.sqlEditorSettingsService.scriptExecutionEnabled;
       },
 
       onMode: new SyncExecutor(),
@@ -237,9 +237,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       async executeQuery(): Promise<void> {
         const isQuery = this.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
-        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) && this.isExecutionAllowed;
 
-        if (!isQuery || !isExecutable) {
+        if (!isQuery || !this.isExecutionAllowed) {
           return;
         }
 
@@ -270,9 +269,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       async executeQueryNewTab(): Promise<void> {
         const isQuery = this.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
-        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) && this.isExecutionAllowed;
 
-        if (!isQuery || !isExecutable) {
+        if (!isQuery || !this.isExecutionAllowed) {
           return;
         }
 
@@ -288,9 +286,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       async showExecutionPlan(): Promise<void> {
         const isQuery = this.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
-        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) && this.isExecutionAllowed;
 
-        if (!isQuery || !isExecutable || !this.dialect?.supportsExplainExecutionPlan) {
+        if (!isQuery || !this.isExecutionAllowed || !this.dialect?.supportsExplainExecutionPlan) {
           return;
         }
 
@@ -309,9 +306,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       async executeScript(): Promise<void> {
-        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) && this.isExecutionAllowed;
-
-        if (!isExecutable || this.isDisabled || this.isScriptEmpty) {
+        if (!this.isExecutionAllowed || this.isDisabled || this.isScriptEmpty) {
           return;
         }
 

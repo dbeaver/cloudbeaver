@@ -128,7 +128,7 @@ export class OutputMenuBootstrap extends Bootstrap {
 
         const sqlDataSource = this.sqlDataSourceService.get(state.editorId);
         const isQuery = sqlDataSource?.hasFeature(ESqlDataSourceFeatures.query);
-        const isExecutable = sqlDataSource?.hasFeature(ESqlDataSourceFeatures.executable) && sqlEditorData?.isExecutionAllowed;
+        const isExecutable = sqlEditorData?.isExecutionAllowed;
 
         return !!isQuery && !!isExecutable;
       },

@@ -28,6 +28,7 @@ import { QueryDataSource } from '../QueryDataSource.js';
 import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
 import { SqlQueryResultService } from './SqlQueryResultService.js';
 import { SqlEditorSettingsService } from '../SqlEditorSettingsService.js';
+import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures.js';
 
 interface IQueryExecutionOptions {
   onQueryExecutionStart?: (query: string, index: number) => void;
@@ -118,10 +119,10 @@ export class SqlQueryService {
     let isNewTabCreated = false;
 
     try {
-      if (!this.sqlEditorSettingsService.scriptExecutionEnabled) {
+      const dataSource = this.sqlDataSourceService.get(editorState.editorId);
+      if (!this.sqlEditorSettingsService.scriptExecutionEnabled || !dataSource?.hasFeature(ESqlDataSourceFeatures.executable)) {
         throw new Error('Script execution is not allowed');
       }
-      const dataSource = this.sqlDataSourceService.get(editorState.editorId);
       const contextInfo = dataSource?.executionContext;
       const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);
 
@@ -189,10 +190,10 @@ export class SqlQueryService {
 
   async executeQueries(editorState: ISqlEditorTabState, queries: string[], options?: IQueryExecutionOptions): Promise<void> {
     try {
-      if (!this.sqlEditorSettingsService.scriptExecutionEnabled) {
+      const dataSource = this.sqlDataSourceService.get(editorState.editorId);
+      if (!this.sqlEditorSettingsService.scriptExecutionEnabled || !dataSource?.hasFeature(ESqlDataSourceFeatures.executable)) {
         throw new Error('Script execution is not allowed');
       }
-      const dataSource = this.sqlDataSourceService.get(editorState.editorId);
       const contextInfo = dataSource?.executionContext;
       const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);
 

@@ -13,7 +13,7 @@ import { isNotNullDefined } from '@dbeaver/js-helpers';
 import type { ISettingsResolverSource } from './ISettingsResolverSource.js';
 import type { ISettingChangeData, ISettingsSource } from './ISettingsSource.js';
 import type { ISettingsLayer } from './SettingsLayer.js';
-import type { IEditableSettingsSource } from './IEditableSettingsSource.js';
+import { isEditableSettingsSource, type IEditableSettingsSource } from './IEditableSettingsSource.js';
 
 type SettingsSource = ISettingsSource | IEditableSettingsSource;
 
@@ -88,12 +88,12 @@ export class SettingsResolverSource implements ISettingsResolverSource {
   }
 
   isOverrideDefaults(): boolean {
-    return this.sources.some(r => 'isOverrideDefaults' in r && r.isOverrideDefaults?.());
+    return this.sources.some(r => isEditableSettingsSource(r) && r.isOverrideDefaults?.());
   }
 
   isEdited(key?: any): boolean {
     const source = this.sources.find(r => r.has(key));
-    if (!source || !('isEdited' in source)) {
+    if (!source || !isEditableSettingsSource(source)) {
       return false;
     }
     return source.isEdited(key);
@@ -109,7 +109,7 @@ export class SettingsResolverSource implements ISettingsResolverSource {
         break;
       }
 
-      if (!('isReadOnly' in source) || source.isReadOnly(key)) {
+      if (!isEditableSettingsSource(source) || source.isReadOnly(key)) {
         return true;
       }
     }
@@ -121,8 +121,8 @@ export class SettingsResolverSource implements ISettingsResolverSource {
   }
 
   getEditedValue(key: any): any {
-    const source = this.sources.find(r => r.has(key) && 'getEditedValue' in r && isNotNullDefined(r.getEditedValue(key)));
-    return source && 'getEditedValue' in source ? source.getEditedValue(key) : undefined;
+    const source = this.sources.filter(isEditableSettingsSource).find(r => r.has(key) && isNotNullDefined(r.getEditedValue(key)));
+    return source ? source.getEditedValue(key) : undefined;
   }
 
   getValue(key: any): any {
@@ -131,7 +131,7 @@ export class SettingsResolverSource implements ISettingsResolverSource {
 
   setValue(key: any, value: any): void {
     for (const source of this.sources) {
-      const readonly = !('isReadOnly' in source) || source.isReadOnly(key);
+      const readonly = !isEditableSettingsSource(source) || source.isReadOnly(key);
 
       if (source.has(key) || readonly) {
         throw new Error(`Can't set value for key ${key}`);
@@ -146,21 +146,19 @@ export class SettingsResolverSource implements ISettingsResolverSource {
 
   resetValue(key: any): void {
     for (const source of this.sources) {
-      const readonly = !('isReadOnly' in source) || source.isReadOnly(key);
+      const readonly = !isEditableSettingsSource(source) || source.isReadOnly(key);
       if (source.has(key) || readonly) {
         throw new Error(`Can't set value for key ${key}`);
       }
 
-      if ('resetValue' in source) {
-        source.resetValue(key);
-        return;
-      }
+      source.resetValue(key);
+      return;
     }
   }
 
   async save(): Promise<void> {
     for (const source of this.sources) {
-      if ('isEdited' in source && source.isEdited()) {
+      if (isEditableSettingsSource(source) && source.isEdited()) {
         await source.save();
       }
     }
@@ -168,7 +166,7 @@ export class SettingsResolverSource implements ISettingsResolverSource {
 
   clear(): void {
     for (const resolver of this.sources) {
-      if ('clear' in resolver) {
+      if (isEditableSettingsSource(resolver)) {
         resolver.clear();
       }
     }

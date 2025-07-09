@@ -1,4 +1,5 @@
 export default [
+  ['authentication_administration_pages_label', 'Pagine'],
   ['authentication_administration_user_connections_user_add', 'Creazione di Utente'],
   ['authentication_administration_user_connections_user_new', 'Nuovo utente'],
   ['authentication_administration_user_connections_access_load_fail', "Errore in fase di caricamento delle connessioni autorizzate all'utente"],

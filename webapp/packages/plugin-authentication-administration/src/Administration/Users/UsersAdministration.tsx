@@ -60,7 +60,12 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
     <TabsState selectedId={subName} autoSelect={false} container={usersAdministrationService.tabsContainer} lazy onChange={openSub}>
       <ToolsPanel bottomBorder>
         <SContext registry={mainTabsRegistry}>
-          <TabList className={s(styles, { tabList: true, administrationTabs: true })} aria-label="User Administration pages" childrenFirst underline>
+          <TabList
+            className={s(styles, { tabList: true, administrationTabs: true })}
+            aria-label={translate('authentication_administration_pages_label')}
+            childrenFirst
+            underline
+          >
             <Tab tabId={EUsersAdministrationSub.Users}>
               <TabTitle>{translate('authentication_administration_item_users')}</TabTitle>
             </Tab>

@@ -159,8 +159,7 @@ export class MenuBootstrap extends Bootstrap {
         }
 
         if (
-          !sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) &&
-          sqlEditorData.isExecutionAllowed &&
+          !sqlEditorData.isExecutionAllowed &&
           [
             ACTION_SQL_EDITOR_EXECUTE,
             ACTION_SQL_EDITOR_EXECUTE_NEW,
@@ -208,11 +207,7 @@ export class MenuBootstrap extends Bootstrap {
       contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       isBindingApplicable: (contexts, action) => {
         const sqlEditorData = contexts.get(DATA_CONTEXT_SQL_EDITOR_DATA);
-        return (
-          action === ACTION_SQL_EDITOR_EXECUTE_SCRIPT &&
-          sqlEditorData?.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) === true &&
-          sqlEditorData.isExecutionAllowed
-        );
+        return action === ACTION_SQL_EDITOR_EXECUTE_SCRIPT && sqlEditorData?.isExecutionAllowed === true;
       },
       handler: this.sqlEditorActionHandler.bind(this),
     });

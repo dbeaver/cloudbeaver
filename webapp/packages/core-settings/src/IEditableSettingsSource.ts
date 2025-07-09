@@ -19,3 +19,7 @@ export interface IEditableSettingsSource extends ISettingsSource {
   isOverrideDefaults?: () => boolean;
   restoreDefaults?: () => void;
 }
+
+export function isEditableSettingsSource(source: ISettingsSource): source is IEditableSettingsSource {
+  return 'isEdited' in source;
+}
