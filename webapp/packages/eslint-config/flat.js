@@ -111,7 +111,7 @@ export default tseslint.config(
       ],
       '@stylistic/comma-spacing': ['error'],
       '@typescript-eslint/default-param-last': ['error'],
-      '@stylistic/func-call-spacing': ['error'],
+      '@stylistic/@/func-call-spacing': ['error'],
       '@stylistic/keyword-spacing': ['error'],
       '@stylistic/object-curly-spacing': ['error', 'always'],
       '@stylistic/quotes': [
