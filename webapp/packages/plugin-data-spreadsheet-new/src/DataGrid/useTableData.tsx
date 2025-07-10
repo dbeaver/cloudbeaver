@@ -27,6 +27,11 @@ import type { IColumnInfo, ITableData } from './TableDataContext.js';
 import { useService } from '@cloudbeaver/core-di';
 import { DataGridSettingsService } from '../DataGridSettingsService.js';
 
+interface ITableDataPrivate extends ITableData {
+  dataGridSettingsService: DataGridSettingsService;
+  gridDIVElement: React.RefObject<HTMLDivElement | null>;
+}
+
 export function useTableData(
   model: IDatabaseDataModel<ResultSetDataSource>,
   resultIndex: number,
@@ -39,7 +44,7 @@ export function useTableData(
   const dataContent = model.source.getAction(resultIndex, ResultSetDataContentAction);
   const dataGridSettingsService = useService(DataGridSettingsService);
 
-  return useObservableRef<ITableData & { gridDIVElement: React.RefObject<HTMLDivElement | null> }>(
+  return useObservableRef<ITableDataPrivate>(
     () => ({
       get gridDiv(): HTMLDivElement | null {
         return this.gridDIVElement.current;

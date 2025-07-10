@@ -57,14 +57,20 @@ import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader.js';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader.js';
 
 const ROW_HEIGHT = 24;
-const HEADER_HEIGHT = 32;
-const HEADER_WITH_DESC_HEIGHT = 48;
+export const HEADER_HEIGHT = 32;
+export const HEADER_WITH_DESC_HEIGHT = 59;
 
-export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({ model, actions, resultIndex, simple, className, ...rest }) {
+export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({
+  model,
+  actions,
+  resultIndex,
+  simple,
+  className,
+  dataFormat,
+  ...rest
+}) {
   const translate = useTranslate();
   const styles = useS(classes);
-
-  // const clipboardService = useService(ClipboardService);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const dataGridDivRef = useRef<HTMLDivElement | null>(null);
   const focusedCell = useRef<ICellPosition | null>(null);
