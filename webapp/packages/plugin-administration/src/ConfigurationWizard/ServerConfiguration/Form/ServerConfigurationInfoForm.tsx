@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Group, GroupTitle, InputField, Switch, Textarea, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Group, GroupTitle, IconOrImage, InputField, Switch, Textarea, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { MIN_SESSION_EXPIRE_TIME } from './MIN_SESSION_EXPIRE_TIME.js';
@@ -36,7 +36,12 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         mod={['primary']}
         small
       >
-        {translate('administration_configuration_wizard_configuration_secure_cookies')}
+        <div className="tw:flex tw:items-center tw:gap-1.5">
+          {translate('administration_configuration_wizard_configuration_secure_cookies')}
+          {!state.serverConfig.secureCookies && (
+            <IconOrImage title={translate('administration_configuration_wizard_configuration_secure_cookies_warning')} icon="/icons/warning_icon.svg" width={24} />
+          )}
+        </div>
       </Switch>
       <InputField type="text" name="serverName" state={state.serverConfig} required medium>
         {translate('administration_configuration_wizard_configuration_server_name')}
@@ -44,11 +49,11 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
       <Textarea
         title={translate('administration_configuration_wizard_configuration_server_url_description')}
         name="availableHosts"
+        rows={3}
         state={availableHostsState}
         readOnly={serverConfigLoader.resource.distributed}
         description={translate('administration_configuration_wizard_configuration_available_hosts_description')}
-        placeholder="https://host1.com, https://host2.com, etc."
-        medium
+        placeholder={`https://example.com,\nhttps://localhost:5000,\nhttp://127.0.0.1`}
         onChange={availableHostsState.onAvailableHostsChange}
       >
         {translate('administration_configuration_wizard_configuration_available_hosts')}
