@@ -88,7 +88,7 @@ export default tseslint.config(
       '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-empty-function': 'off',
-      '@/semi': ['error', 'always'],
+      '@stylistic/semi': ['error', 'always'],
       '@typescript-eslint/consistent-type-assertions': [
         'error',
         {
@@ -96,7 +96,7 @@ export default tseslint.config(
           objectLiteralTypeAssertions: 'allow',
         },
       ],
-      '@/member-delimiter-style': [
+      '@stylistic/member-delimiter-style': [
         'warn',
         {
           multiline: {
@@ -109,19 +109,19 @@ export default tseslint.config(
           },
         },
       ],
-      '@/comma-spacing': ['error'],
+      '@stylistic/comma-spacing': ['error'],
       '@typescript-eslint/default-param-last': ['error'],
-      '@/func-call-spacing': ['error'],
-      '@/keyword-spacing': ['error'],
-      '@/object-curly-spacing': ['error', 'always'],
-      '@/quotes': [
+      '@stylistic/func-call-spacing': ['error'],
+      '@stylistic/keyword-spacing': ['error'],
+      '@stylistic/object-curly-spacing': ['error', 'always'],
+      '@stylistic/quotes': [
         'error',
         'single',
         {
           avoidEscape: true,
         },
       ],
-      '@/space-before-function-paren': [
+      '@stylistic/space-before-function-paren': [
         'error',
         {
           anonymous: 'always',
@@ -129,7 +129,7 @@ export default tseslint.config(
           asyncArrow: 'always',
         },
       ],
-      '@/space-infix-ops': [
+      '@stylistic/space-infix-ops': [
         'error',
         {
           int32Hint: false,
