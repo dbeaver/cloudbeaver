@@ -87,7 +87,7 @@
     ],
     "@typescript-eslint/comma-spacing": ["error"],
     "@typescript-eslint/default-param-last": ["error"],
-    "@typescript-eslint/func-call-spacing": ["error"],
+    "@typescript-eslint/@/func-call-spacing": ["error"],
     "@typescript-eslint/keyword-spacing": ["error"],
     "@typescript-eslint/object-curly-spacing": ["error", "always"],
     "@typescript-eslint/quotes": [
