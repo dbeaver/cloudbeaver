@@ -30,6 +30,10 @@ export default [
   ['plugin_connections_settings_hide_connections_view_description', 'Подменю выбора отображения подключения будет скрыто для всех пользователей, кроме администраторов'],
 
   ['plugin_connections_connection_ssl_enable', 'Включить SSL'],
+  ['plugin_connections_connection_ssl_optional', 'Все параметры SSL являются необязательными.'],
+  ['plugin_connections_connection_ssl_description', 'Вы должны указать SSL сертификаты, если они требуются для конфигурации вашего сервера. Настройки на этой странице переопределяют свойства драйвера'],
+  ['plugin_connections_connection_ssl_note', '{arg:productName} не проверяет конфигурацию SSL и полагается на реализацию драйвера. Пожалуйста, обратитесь к документации драйвера для получения дополнительной информации.'],
+  ['plugin_connections_connection_ssl_docs', 'Документация по настройке SSL'],
 
   ['plugin_connections_connection_form_shared_credentials_manage_info', 'Вы можете указать учетные данные в '],
   ['plugin_connections_connection_form_shared_credentials_manage_info_tab_link', 'во вкладке "Учетные данные"'],
