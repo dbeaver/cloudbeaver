@@ -1,6 +1,6 @@
 {
   "name": "vscode-java-configs",
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "yarn@4.9.2",
   "devDependencies": {
     "typescript": "^5.8.3"
   }
