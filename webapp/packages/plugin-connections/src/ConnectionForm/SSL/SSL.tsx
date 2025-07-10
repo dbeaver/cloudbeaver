@@ -15,6 +15,7 @@ import {
   Form,
   Group,
   GroupTitle,
+  IconOrImage,
   ObjectPropertyInfoForm,
   s,
   Switch,
@@ -31,12 +32,14 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { NetworkHandlerConfigInput, NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { isSafari } from '@cloudbeaver/core-utils';
+import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 
 import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR.js';
 import styles from './SSL.module.css';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
 import { ConnectionInfoNetworkHandlersResource } from '@cloudbeaver/core-connections';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
+import { SSLDescription } from './SSLDescription.js';
 
 interface Props extends IConnectionFormProps {
   handler: NetworkHandlerDescriptor;
@@ -71,7 +74,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
     <Form className={s(style, { form: true })}>
       <ColoredContainer parent>
         <Group gap form large vertical>
-          <Switch id="ssl-enable-switch" name="enabled" state={handlerState} description={handler.description} mod={['primary']} disabled={disabled}>
+          <Switch id="ssl-enable-switch" name="enabled" state={handlerState} description={<SSLDescription />} mod={['primary']} disabled={disabled}>
             {translate('plugin_connections_connection_ssl_enable')}
           </Switch>
           {isUncategorizedExists && (
@@ -87,7 +90,6 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
               small
             />
           )}
-
           {categories.map(category => (
             <React.Fragment key={category}>
               <GroupTitle keepSize>{category}</GroupTitle>
@@ -104,7 +106,6 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
               />
             </React.Fragment>
           ))}
-
           {credentialsSavingEnabled && !optionsPart.state.sharedCredentials && (
             <FieldCheckbox
               id={handler.id + '_savePassword'}
@@ -124,6 +125,15 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
               )}
             </FieldCheckbox>
           )}
+
+          <a
+            className="tw:flex tw:items-center tw:gap-2 tw:text-balance"
+            href={WEBSITE_LINKS.SSL_CONFIGURATION_DOCUMENTATION_PAGE}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <IconOrImage width={16} icon="/icons/documentation_link_sm.svg" /> {translate('plugin_connections_connection_ssl_docs')}
+          </a>
         </Group>
       </ColoredContainer>
     </Form>

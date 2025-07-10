@@ -38,7 +38,7 @@
     "@wroud/vite-plugin-tsc": "^0",
     "fs-extra": "^11",
     "tslib": "^2",
-    "vite": "^6",
+    "vite": "^7",
     "vite-multiple-assets": "^2",
     "vite-plugin-pwa": "^1"
   }
