@@ -5,6 +5,9 @@ output: false
 pre-commit:
   commands:
     check-license:
+      skip:
+        - merge
+        - rebase
       root: webapp
       glob: "*.{ts,tsx}"
       exclude:

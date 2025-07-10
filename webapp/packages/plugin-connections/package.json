@@ -27,6 +27,7 @@
     "@cloudbeaver/core-dialogs": "workspace:*",
     "@cloudbeaver/core-events": "workspace:*",
     "@cloudbeaver/core-executor": "workspace:*",
+    "@cloudbeaver/core-links": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
     "@cloudbeaver/core-navigation-tree": "workspace:*",
     "@cloudbeaver/core-projects": "workspace:*",
