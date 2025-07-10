@@ -47,7 +47,7 @@ export default tseslint.config(
       'no-undef': 'off',
       'comma-spacing': 'off',
       'default-param-last': 'off',
-      'func-call-spacing': 'off',
+      '@/func-call-spacing': 'off',
       'keyword-spacing': 'off',
       'no-duplicate-imports': 'error',
       'object-curly-spacing': 'off',
