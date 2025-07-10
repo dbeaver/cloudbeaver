@@ -11,7 +11,7 @@ export default [
     'Включите HTTPS режим для безопасной связи между сервером и клиентами. Рекомендуется для рабочих окружений.',
   ],
   ['administration_configuration_wizard_configuration_secure_cookies_warning', 'Данные не будут зашифрованы. Это делает их уязвимыми'],
-  ['administration_configuration_wizard_configuration_available_hosts', 'Доступные хосты'],
+  ['administration_configuration_wizard_configuration_available_hosts', 'Разрешённые URL сервера'],
   [
     'administration_configuration_wizard_configuration_available_hosts_description',
     'Вы можете указать несколько URL серверов. Разделите их запятыми',
