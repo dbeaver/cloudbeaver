@@ -2,7 +2,6 @@ fragment ServerConfig on ServerConfig {
   name
   version
   workspaceId
-  serverURL
   rootURI
   containerId
   defaultAuthRole
@@ -33,4 +32,6 @@ fragment ServerConfig on ServerConfig {
     nativeName
   }
   disabledDrivers
+  secureCookies
+  availableHosts
 }

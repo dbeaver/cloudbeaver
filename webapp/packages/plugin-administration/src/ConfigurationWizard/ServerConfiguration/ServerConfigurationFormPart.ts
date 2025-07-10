@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,9 @@ function DEFAULT_STATE_GETTER(): IServerConfigurationFormPartState {
       resourceManagerEnabled: false,
       secretManagerEnabled: false,
       serverName: '',
-      serverURL: '',
       sessionExpireTime: MIN_SESSION_EXPIRE_TIME * 1000 * 60,
+      secureCookies: true,
+      availableHosts: [],
     },
     navigatorConfig: { ...DEFAULT_NAVIGATOR_VIEW_SETTINGS },
   };
@@ -93,8 +94,10 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
       this.state.serverConfig.serverName = this.state.serverConfig.serverName.trim();
     }
 
-    if (this.state.serverConfig.serverURL) {
-      this.state.serverConfig.serverURL = this.state.serverConfig.serverURL.trim();
+    if (this.state.serverConfig.availableHosts.length) {
+      this.state.serverConfig.availableHosts = Array.from(
+        new Set(this.state.serverConfig.availableHosts.map(host => host.trim()).filter(host => host.length)),
+      );
     }
   }
 
@@ -138,7 +141,6 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
         adminName,
         adminPassword,
         serverName: config?.name || productInfo?.name,
-        serverURL: this.administrationScreenService.isConfigurationMode && !config?.distributed ? window.location.origin : (config?.serverURL ?? ''),
         sessionExpireTime: config?.sessionExpireTime ?? MIN_SESSION_EXPIRE_TIME * 1000 * 60,
         adminCredentialsSaveEnabled: config?.adminCredentialsSaveEnabled ?? false,
         publicCredentialsSaveEnabled: config?.publicCredentialsSaveEnabled ?? false,
@@ -149,6 +151,8 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
         enabledFeatures: config?.enabledFeatures ? [...config.enabledFeatures] : [],
         resourceManagerEnabled: config?.resourceManagerEnabled ?? false,
         secretManagerEnabled: config?.secretManagerEnabled ?? false,
+        availableHosts: config?.availableHosts ?? [],
+        secureCookies: config?.secureCookies ?? true,
       },
       navigatorConfig: { ...this.state.navigatorConfig, ...defaultNavigatorSettings },
     });

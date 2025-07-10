@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,13 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
     name: 'CloudBeaver CE Server',
     version: '22.1.2.202207140640',
     workspaceId: 'D14DGNGYNPI71M',
-    serverURL: 'https://test.ce.cloudbeaver.io',
     rootURI: '/',
     containerId: '931cdabfc0b3',
     productConfiguration: productConfiguration,
     supportsCustomConnections: true,
     supportsConnectionBrowser: false,
+    secureCookies: true,
+    availableHosts: ['https://test.ce.cloudbeaver.io'],
     supportsWorkspaces: false,
     sessionExpireTime: 6000000,
     anonymousAccessEnabled: true,

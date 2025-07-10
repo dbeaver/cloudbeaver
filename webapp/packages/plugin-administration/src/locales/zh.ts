@@ -23,6 +23,17 @@ export default [
   ['administration_configuration_tools_save_tooltip', '保存配置'],
   ['administration_configuration_tools_cancel_tooltip', '重置更改'],
 
+  ['administration_configuration_wizard_configuration_secure_cookies', 'Enable HTTPS mode'],
+  [
+    'administration_configuration_wizard_configuration_secure_cookies_description',
+    'Enable HTTPS mode to secure communication between the server and clients. This is recommended for production environments.',
+  ],
+  ['administration_configuration_wizard_configuration_available_hosts', 'Available hosts'],
+  [
+    'administration_configuration_wizard_configuration_available_hosts_description',
+    'You can specify multiple server URLs. Separate them with commas',
+  ],
+
   ['administration_configuration_wizard_configuration_server_info', '服务器信息'],
   ['administration_configuration_wizard_configuration_server_name', '服务器名称'],
   ['administration_configuration_wizard_configuration_server_url', '服务器URL'],

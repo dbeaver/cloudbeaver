@@ -17,6 +17,16 @@ export default [
     'administration_configuration_wizard_configuration_message',
     'Bạn sẽ có thể thêm các dịch vụ bổ sung sau khi cấu hình server.\n\rQuản trị viên là siêu người dùng có thể cấu hình server, thiết lập kết nối cơ sở dữ liệu, quản lý người dùng khác và nhiều hơn nữa. Vui lòng ghi nhớ mật khẩu đã nhập. Không thể khôi phục mật khẩu quản trị viên tự động.',
   ],
+  ['administration_configuration_wizard_configuration_secure_cookies', 'Enable HTTPS mode'],
+  [
+    'administration_configuration_wizard_configuration_secure_cookies_description',
+    'Enable HTTPS mode to secure communication between the server and clients. This is recommended for production environments.',
+  ],
+  ['administration_configuration_wizard_configuration_available_hosts', 'Available hosts'],
+  [
+    'administration_configuration_wizard_configuration_available_hosts_description',
+    'You can specify multiple server URLs. Separate them with commas',
+  ],
   ['administration_configuration_tools_save_tooltip', 'Lưu cấu hình'],
   ['administration_configuration_tools_cancel_tooltip', 'Đặt lại thay đổi'],
   ['administration_configuration_wizard_configuration_server_info', 'Thông tin Server'],
