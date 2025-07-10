@@ -47,7 +47,7 @@ export default tseslint.config(
       'no-undef': 'off',
       'comma-spacing': 'off',
       'default-param-last': 'off',
-      '@/func-call-spacing': 'off',
+      'func-call-spacing': 'off',
       'keyword-spacing': 'off',
       'no-duplicate-imports': 'error',
       'object-curly-spacing': 'off',
@@ -88,7 +88,7 @@ export default tseslint.config(
       '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-empty-function': 'off',
-      '@stylistic/semi': ['error', 'always'],
+      '@/semi': ['error', 'always'],
       '@typescript-eslint/consistent-type-assertions': [
         'error',
         {
@@ -96,7 +96,7 @@ export default tseslint.config(
           objectLiteralTypeAssertions: 'allow',
         },
       ],
-      '@stylistic/member-delimiter-style': [
+      '@/member-delimiter-style': [
         'warn',
         {
           multiline: {
@@ -109,19 +109,19 @@ export default tseslint.config(
           },
         },
       ],
-      '@stylistic/comma-spacing': ['error'],
+      '@/comma-spacing': ['error'],
       '@typescript-eslint/default-param-last': ['error'],
-      '@stylistic/@/func-call-spacing': ['error'],
-      '@stylistic/keyword-spacing': ['error'],
-      '@stylistic/object-curly-spacing': ['error', 'always'],
-      '@stylistic/quotes': [
+      '@/func-call-spacing': ['error'],
+      '@/keyword-spacing': ['error'],
+      '@/object-curly-spacing': ['error', 'always'],
+      '@/quotes': [
         'error',
         'single',
         {
           avoidEscape: true,
         },
       ],
-      '@stylistic/space-before-function-paren': [
+      '@/space-before-function-paren': [
         'error',
         {
           anonymous: 'always',
@@ -129,7 +129,7 @@ export default tseslint.config(
           asyncArrow: 'always',
         },
       ],
-      '@stylistic/space-infix-ops': [
+      '@/space-infix-ops': [
         'error',
         {
           int32Hint: false,
