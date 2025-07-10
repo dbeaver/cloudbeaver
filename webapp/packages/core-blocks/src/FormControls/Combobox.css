@@ -5,7 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 @layer components {
+  .dbv-kit-select {
+    --dbv-kit-select-padding-inline: 12px;
+  }
+
   .dbv-kit-select__item {
     overflow: hidden;
     white-space: nowrap;

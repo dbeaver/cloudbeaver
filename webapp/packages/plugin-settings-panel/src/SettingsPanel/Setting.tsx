@@ -27,13 +27,16 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
   }
 
   return (
-    <div className='tw:flex tw:relative tw:gap-2'>
+    <div className="tw:flex tw:relative tw:gap-2 tw:w-1/3">
       <div className="tw:w-1 tw:h-full" hidden>
         {isOverride && (
-          <div className={clsx('tw:h-full tw:w-full tw:bg-zinc-100 tw:dark:bg-zinc-700')} title={translate('plugin_settings_panel_setting_set_in_scope')} />
+          <div
+            className={clsx('tw:h-full tw:w-full tw:bg-zinc-100 tw:dark:bg-zinc-700')}
+            title={translate('plugin_settings_panel_setting_set_in_scope')}
+          />
         )}
       </div>
-      <div>
+      <div className="tw:w-full">
         <SettingField setting={setting} source={source} />
         {isOverride && (
           <Link className="theme-typography--caption" title={translate('plugin_settings_panel_setting_reset_tooltip')} onClick={handleRestore}>
