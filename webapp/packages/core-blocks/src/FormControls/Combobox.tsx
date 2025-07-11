@@ -32,6 +32,7 @@ export type ComboboxBaseProps<TKey, TValue> = Omit<
     defaultValue?: TKey;
     loading?: boolean;
     description?: string;
+    placeholder?: string;
     keySelector?: (item: TValue, index: number) => TKey;
     valueSelector?: (item: TValue) => string;
     titleSelector?: (item: TValue) => string | undefined;
@@ -77,6 +78,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   disabled,
   inline,
   description,
+  placeholder,
   keySelector = v => v,
   valueSelector = v => v,
   iconSelector,
@@ -246,7 +248,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   function itemRender(item: (typeof items)[number]): React.ReactNode {
     return (
-      <div className="combobox__item" title={titleSelector?.(item)}>
+      <div className="combobox__item" title={item ? titleSelector?.(item) : undefined}>
         {renderIcon(item)}
         <span>{valueSelector(item)}</span>
       </div>
@@ -268,6 +270,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
             autoComplete="off"
             name={name}
             title={title}
+            placeholder={placeholder}
             value={inputValue}
             disabled={disabled || hideMenu}
             readOnly={readOnly || select}
@@ -282,7 +285,9 @@ export const Combobox: ComboboxType = observer(function Combobox({
     }
 
     if (!item) {
-      return <div className="combobox__item" title={titleSelector?.(item)} />;
+      return <div className="combobox__item combobox__item--placeholder" title={item ? titleSelector?.(item) : undefined}>
+        {placeholder || translate('combobox_select_placeholder')}
+      </div>;
     }
 
     return itemRender(item);

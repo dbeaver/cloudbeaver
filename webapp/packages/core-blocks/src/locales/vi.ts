@@ -9,6 +9,7 @@ export default [
   ['core_blocks_object_property_info_password_saved', 'Giá trị trường đã lưu'],
   ['core_blocks_properties_table_item_remove', 'Xóa thuộc tính'],
   ['combobox_no_results_placeholder', 'Không có kết quả'],
+  ['combobox_select_placeholder', 'Select an option'],
   ['core_blocks_exception_message_error_title', 'Không thể hiển thị nội dung'],
   ['core_blocks_exception_message_error_message', 'Đã xảy ra lỗi.'],
   ['core_blocks_custom_input_validation_error', 'Giá trị trường không hợp lệ'],

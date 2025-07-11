@@ -39,7 +39,7 @@
     --dbv-kit-select-item-foreground: var(--theme-secondary);
     --dbv-kit-select-item-hover-background: var(--theme-background);
     --dbv-kit-select-item-hover-foreground: var(--theme-input-color);
-    --dbv-kit-select-item-selected-background: var(--theme-input-border);
+    --dbv-kit-select-item-selected-background: none;
 
     --dbv-kit-control-disabled-opacity: 1;
     --dbv-kit-select-disabled-background: var(--theme-input-background-disabled);
@@ -71,7 +71,12 @@
   .combobox__item {
     display: inline-flex;
     gap: 8px;
+    letter-spacing: normal;
     align-items: center;
+  }
+
+  .combobox__item--placeholder {
+    color: var(--theme-input-color-placeholder);
   }
 
   .combobox__search-container__input {

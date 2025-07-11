@@ -76,6 +76,8 @@
   .dbv-kit-select__item {
     display: block;
     width: 100%;
+    font-weight: var(--dbv-kit-select-font-weight);
+    font-size: var(--dbv-kit-select-font-size);
     padding-inline: var(--dbv-kit-select-item-padding-inline);
     padding-block: var(--dbv-kit-select-item-padding-block);
     text-align: left;
