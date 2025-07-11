@@ -74,7 +74,7 @@ import java.util.stream.Collectors;
 public class WebServiceSQL implements DBWServiceSQL {
 
     private static final Log log = Log.getLog(WebServiceSQL.class);
-    public static final String NEW_ENGINE_COMPLETION = "NEW";
+    public static final String DEFAULT_ENGINE_COMPLETION = "DEFAULT";
 
     @Override
     public WebSQLContextInfo[] listContexts(
@@ -169,10 +169,10 @@ public class WebServiceSQL implements DBWServiceSQL {
 
             List<CompletionProposalBase> proposals = new ArrayList<>();
             WebSession webSession = sqlContext.getWebSession();
-            boolean useNewCompletionEngine = NEW_ENGINE_COMPLETION.equalsIgnoreCase(webSession.getUserPreferenceStore()
+            boolean useDefaultCompletionEngine = DEFAULT_ENGINE_COMPLETION.equalsIgnoreCase(webSession.getUserPreferenceStore()
                 .getString(SQLModelPreferences.AUTOCOMPLETION_MODE));
 
-            if (useNewCompletionEngine) {
+            if (!useDefaultCompletionEngine) {
                 SQLQueryCompletionAnalyzer analyzer = new SQLQueryCompletionAnalyzer(
                     m -> WebSQLCompletionContextScriptParser.obtainCompletionContext(
                         webSession.getProgressMonitor(), query, position, request),
