@@ -42,6 +42,7 @@ import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContextDefaults;
+import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.navigator.meta.DBXTreeItem;
 import org.jkiss.dbeaver.model.rm.RMControllerProvider;
@@ -272,7 +273,24 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 // Otherwise refresh may fail if navigator settings were changed.
                 DBPDataSource dataSource = dbnDataSource.getDataSource();
                 if (dataSource instanceof DBPRefreshableObject refreshableObject) {
+                    // During of refreshing datasource can create new default execution context and overwrite the old one.
+                    // It's not good for cloudbeaver because we use default execution context one for all script of the datasource
+                    // in that way all related scripts will use the same context and overwrite the user's define context
+                    // So why we need restore the default execution context after refreshing datasource
+                    DBCExecutionContext defaultContext = DBUtils.getDefaultContext(refreshableObject, false);
+                    DBCExecutionContextDefaults contextDefaults = defaultContext.getContextDefaults();
                     refreshableObject.refreshObject(monitor);
+                    if (contextDefaults != null && contextDefaults.getDefaultSchema() != null
+                        && contextDefaults.getDefaultCatalog() != null) {
+                        DBExecUtils.setExecutionContextDefaults(
+                            session.getProgressMonitor(),
+                            dataSource,
+                            defaultContext,
+                            contextDefaults.getDefaultCatalog().getName(),
+                            contextDefaults.getDefaultSchema().getName(),
+                            contextDefaults.getDefaultSchema().getName()
+                        );
+                    }
                 }
                 dbnDataSource.cleanupNode();
             } else if (node instanceof DBNLocalFolder) {
