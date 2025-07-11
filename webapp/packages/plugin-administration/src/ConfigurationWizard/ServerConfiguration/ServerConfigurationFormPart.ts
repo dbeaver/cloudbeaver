@@ -31,6 +31,7 @@ function DEFAULT_STATE_GETTER(): IServerConfigurationFormPartState {
       resourceManagerEnabled: false,
       secretManagerEnabled: false,
       serverName: '',
+      serverURL: '',
       sessionExpireTime: MIN_SESSION_EXPIRE_TIME * 1000 * 60,
       secureCookies: true,
       availableHosts: [],
@@ -94,6 +95,10 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
       this.state.serverConfig.serverName = this.state.serverConfig.serverName.trim();
     }
 
+    if (this.state.serverConfig.serverURL) {
+      this.state.serverConfig.serverURL = this.state.serverConfig.serverURL.trim();
+    }
+
     if (this.state.serverConfig.availableHosts.length) {
       this.state.serverConfig.availableHosts = Array.from(
         new Set(this.state.serverConfig.availableHosts.map(host => host.trim()).filter(host => host.length)),
@@ -141,6 +146,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
         adminName,
         adminPassword,
         serverName: config?.name || productInfo?.name,
+        serverURL: this.administrationScreenService.isConfigurationMode && !config?.distributed ? window.location.origin : (config?.serverURL ?? ''),
         sessionExpireTime: config?.sessionExpireTime ?? MIN_SESSION_EXPIRE_TIME * 1000 * 60,
         adminCredentialsSaveEnabled: config?.adminCredentialsSaveEnabled ?? false,
         publicCredentialsSaveEnabled: config?.publicCredentialsSaveEnabled ?? false,

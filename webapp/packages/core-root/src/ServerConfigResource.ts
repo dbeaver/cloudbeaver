@@ -104,14 +104,6 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     return this.data?.secretManagerEnabled ?? false;
   }
 
-  get defaultHost(): string | null {
-    if (this.data?.configurationMode && !this.distributed) {
-      return window.location.origin;
-    }
-
-    return this.data?.availableHosts[0] ?? null;
-  }
-
   isBetaFeatureDisabled(feature: string): boolean {
     return this.data?.disabledBetaFeatures?.includes(feature) || false;
   }
