@@ -26,7 +26,7 @@ export default [
   ['administration_configuration_wizard_configuration_available_hosts', 'Allowed Server URLs'],
   [
     'administration_configuration_wizard_configuration_available_hosts_description',
-    'You can specify multiple server URLs. Separate them with commas',
+    'You can specify multiple server URLs. Separate them with commas. Empty value means that all URLs are allowed',
   ],
   ['administration_configuration_tools_save_tooltip', 'Lưu cấu hình'],
   ['administration_configuration_tools_cancel_tooltip', 'Đặt lại thay đổi'],

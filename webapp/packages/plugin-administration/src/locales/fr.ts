@@ -35,7 +35,7 @@ export default [
   ['administration_configuration_wizard_configuration_available_hosts', 'Allowed Server URLs'],
   [
     'administration_configuration_wizard_configuration_available_hosts_description',
-    'You can specify multiple server URLs. Separate them with commas',
+    'You can specify multiple server URLs. Separate them with commas. Empty value means that all URLs are allowed',
   ],
 
   ['administration_configuration_wizard_configuration_server_info', 'Informations sur le serveur'],
