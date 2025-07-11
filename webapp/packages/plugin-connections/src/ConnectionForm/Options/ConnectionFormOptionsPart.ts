@@ -49,7 +49,6 @@ const defaultStateGetter = (connectionId?: string, credentials?: Record<string, 
     credentials: credentials ?? {},
     mainPropertyValues: {},
     networkHandlersConfig: [],
-    properties: {},
     providerProperties: {},
   }) as IConnectionFormOptionsState;
 
@@ -313,9 +312,8 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       this.state.credentials = {};
       this.state.providerProperties = {};
       await this.setAuthModelId(driver?.defaultAuthModel);
+      await this.onDriverIdChange.execute(this.state.driverId);
     }
-
-    await this.onDriverIdChange.execute(this.state.driverId);
   }
 
   async setAuthModelId(modelId: string | undefined): Promise<void> {
