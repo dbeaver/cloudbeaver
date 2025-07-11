@@ -8,7 +8,7 @@ export default [
   ['administration_configuration_wizard_configuration_secure_cookies', 'Включить HTTPS режим'],
   [
     'administration_configuration_wizard_configuration_secure_cookies_description',
-    'Включите HTTPS режим для безопасной связи между сервером и клиентами. Рекомендуется для рабочих окружений.',
+    'Включите HTTPS режим для безопасной связи между сервером и клиентами. Рекомендуется для рабочих окружений',
   ],
   ['administration_configuration_wizard_configuration_secure_cookies_warning', 'Данные не будут зашифрованы. Это делает их уязвимыми'],
   ['administration_configuration_wizard_configuration_available_hosts', 'Разрешённые URL сервера'],
