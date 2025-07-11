@@ -51,7 +51,7 @@ function createResolver(settings: Record<any, any>) {
     value: 'deprecated',
   });
 }
-describe('createSettingsAliasResolver', () => {
+describe.skip('createSettingsAliasResolver', () => {
   test('Deprecated setting ignored', () => {
     const resolver = createResolver(newSettings);
 

@@ -30,6 +30,10 @@ export default [
   ['plugin_connections_settings_hide_connections_view_description', 'Kết nối sẽ được ẩn đối với tất cả người dùng, trừ quản trị viên'],
 
   ['plugin_connections_connection_ssl_enable', 'Bật SSL'],
+  ['plugin_connections_connection_ssl_optional', 'All SSL parameters are optional.'],
+  ['plugin_connections_connection_ssl_description', 'You must specify SSL certificates if they are required by your server configuration. Settings on this page override Driver properties'],
+  ['plugin_connections_connection_ssl_note', '{arg:productName} does not verify SSL configuration and relies on the driver implementation. Please refer to the driver documentation for more information.'],
+  ['plugin_connections_connection_ssl_docs', 'SSL configuration documentation'],
 
   ['plugin_connections_connection_form_shared_credentials_manage_info', 'Bạn có thể quản lý thông tin xác thực trong '],
   ['plugin_connections_connection_form_shared_credentials_manage_info_tab_link', 'Tab Thông tin xác thực'],

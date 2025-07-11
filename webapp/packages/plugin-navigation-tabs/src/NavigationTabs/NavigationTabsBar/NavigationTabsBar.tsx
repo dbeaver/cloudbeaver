@@ -20,6 +20,7 @@ import NavigationTabsBarTab from './shared/NavigationTabsBarTab.module.css';
 import { TabHandlerPanel } from './Tabs/TabHandlerPanel.js';
 import { TabHandlerTab } from './Tabs/TabHandlerTab.js';
 import { NavigationWelcomeScreen } from './NavigationWelcomeScreen.js';
+import { NavigationTabsSettingsService } from '../NavigationTabsSettingsService.js';
 
 interface Props {
   className?: string;
@@ -38,6 +39,7 @@ const tabsRegistry: StyleRegistry = [
 export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ className }) {
   const userInfoResource = useService(UserInfoResource);
   const navigation = useService(NavigationTabsService);
+  const navigationSettings = useService(NavigationTabsSettingsService);
   // TODO: we get exception when after closing the restored page trying to open another
   //       it's related to hooks order and state restoration
   const [restoring, setRestoring] = useState(false);
@@ -97,6 +99,7 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
             </SContext>
           }
           tabList={navigation.tabIdList}
+          multipleRows={navigationSettings.hasMultipleRows}
           autoSelect
           enabledBaseActions
           onChange={handleTabChange}
