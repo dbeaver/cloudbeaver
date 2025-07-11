@@ -11,10 +11,10 @@ import type { ServerConfigurationFormState } from '../ServerConfigurationFormSta
 import { action, observable } from 'mobx';
 import { getServerConfigurationFormPart } from '../getServerConfigurationFormPart.js';
 
-const AVAILABLE_HOSTS_SEPARATOR = ',';
+const AVAILABLE_HOSTS_SEPARATOR = '\n';
 
 function joinAvailableHosts(availableHosts: string[]): string {
-  return availableHosts.join(AVAILABLE_HOSTS_SEPARATOR + '\n');
+  return availableHosts.join(AVAILABLE_HOSTS_SEPARATOR);
 }
 
 function splitAvailableHosts(availableHosts: string): string[] {
