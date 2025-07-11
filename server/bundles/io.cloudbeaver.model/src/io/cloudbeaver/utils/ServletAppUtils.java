@@ -42,6 +42,7 @@ import java.util.*;
 
 public class ServletAppUtils {
     private static final String HEADER_ORIGIN = "Origin";
+    private static final String HEADER_X_ORIGIN = "X-Origin";
     private static final String HEADER_REFERER = "Referer";
 
     private static final String HEADER_FORWARDED_SCHEME = "X-Forwarded-Scheme";
@@ -287,6 +288,9 @@ public class ServletAppUtils {
     @NotNull
     public static String getOriginFromRequestOrThrow(HttpServletRequest request) throws DBWebException {
         String origin = request.getHeader(HEADER_ORIGIN);
+        if (CommonUtils.isEmpty(origin)) {
+            origin = request.getHeader(HEADER_X_ORIGIN);
+        }
         if (CommonUtils.isEmpty(origin)) {
             origin = request.getHeader(HEADER_REFERER);
         }

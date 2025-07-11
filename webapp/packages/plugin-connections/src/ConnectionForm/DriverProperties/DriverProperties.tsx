@@ -9,7 +9,7 @@ import { computed, observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 
-import { ColoredContainer, Group, type IProperty, PropertiesTable, s, useAutoLoad, useResource, useS } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Group, type IProperty, PropertiesTable, s, useAutoLoad, useExecutor, useResource, useS } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
@@ -24,6 +24,7 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
   const style = useS(styles);
   const driverPropertiesPart = getConnectionFormDriverPropertiesPart(formState);
   const optionsPart = getConnectionFormOptionsPart(formState);
+
   const [state] = useState(() => {
     const propertiesList: IProperty[] = observable([]);
 
@@ -41,7 +42,20 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
       propertiesList.splice(propertiesList.indexOf(property), 1);
     }
 
-    return { propertiesList, add, remove };
+    function reset() {
+      propertiesList.splice(0, propertiesList.length);
+    }
+
+    return { propertiesList, add, remove, reset };
+  });
+
+  useExecutor({
+    executor: optionsPart.onDriverIdChange,
+    handlers: [
+      function handleDriverChange() {
+        state.reset();
+      },
+    ],
   });
 
   const driver = useResource(DriverProperties, DBDriverResource, {
