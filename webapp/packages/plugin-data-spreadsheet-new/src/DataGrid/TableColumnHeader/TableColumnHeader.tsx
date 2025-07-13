@@ -82,7 +82,7 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
         )}
         <div className="tw:grid tw:grid-cols-[auto_1fr] tw:grid-rows-[auto_auto] tw:h-full tw:w-full">
           <div
-            style={{ height: HEADER_HEIGHT }}
+            style={{ height: !tableDataContext.hasDescription ? HEADER_HEIGHT : 'auto' }}
             className="tw:gap-1 tw:col-start-1 tw:col-end-2 tw:row-start-1 tw:row-end-2 tw:flex tw:items-center tw:justify-center tw:truncate"
           >
             {icon && (
@@ -96,7 +96,10 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
             <div className={s(styles, { name: true }, 'tw:truncate')}>{columnName}</div>
           </div>
           {tableDataContext.hasDescription && columnDescription && (
-            <div title={columnDescription} className={s(styles, { description: true }, 'tw:col-start-1 tw:col-end-3 tw:row-start-2 tw:row-end-3 tw:truncate')}>
+            <div
+              title={columnDescription}
+              className={s(styles, { description: true }, 'tw:col-start-1 tw:col-end-3 tw:row-start-2 tw:row-end-3 tw:truncate')}
+            >
               {columnDescription}
             </div>
           )}

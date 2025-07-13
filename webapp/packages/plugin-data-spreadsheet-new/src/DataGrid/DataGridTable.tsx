@@ -58,7 +58,7 @@ import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHead
 
 const ROW_HEIGHT = 24;
 export const HEADER_HEIGHT = 32;
-export const HEADER_WITH_DESC_HEIGHT = 59;
+export const HEADER_WITH_DESC_HEIGHT = 42;
 
 export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({
   model,
