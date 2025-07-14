@@ -154,7 +154,6 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
   setScript(script: string, source?: string, cursor?: ISqlEditorCursor): void {
     if (cursor) {
-      // TODO: should we call update?
       this.setInnerCursorState(cursor);
     }
     this.onSetScript.execute({ script, source, cursor });
