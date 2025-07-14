@@ -285,9 +285,11 @@ export const Combobox: ComboboxType = observer(function Combobox({
     }
 
     if (!item) {
-      return <div className="combobox__item combobox__item--placeholder" title={item ? titleSelector?.(item) : undefined}>
-        {placeholder || translate('combobox_select_placeholder')}
-      </div>;
+      return (
+        <div className="combobox__item combobox__item--placeholder" title={item ? titleSelector?.(item) : undefined}>
+          {placeholder || translate('combobox_select_placeholder')}
+        </div>
+      );
     }
 
     return itemRender(item);
