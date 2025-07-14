@@ -155,8 +155,11 @@ public class CBSessionManager implements WebAppSessionManager {
                 webSession = (WebSession) baseWebSession;
             }
         }
+
         String currentRemote = request.getRemoteAddr();
-        if (CommonUtils.isEmpty(currentRemote) || !currentRemote.equals(webSession.getLastRemoteAddr())) {
+        if (application.getServerConfiguration().isBindSessionToIp()
+            && (CommonUtils.isEmpty(currentRemote) || !currentRemote.equals(webSession.getLastRemoteAddr()))
+        ) {
             var error = new DBWebException(
                 "Session remote address mismatch. Expected: " + webSession.getLastRemoteAddr() +
                     ", actual: " + currentRemote,
