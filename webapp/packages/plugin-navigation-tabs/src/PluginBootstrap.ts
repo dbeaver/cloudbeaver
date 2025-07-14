@@ -8,7 +8,7 @@
 
 import { AppScreenService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import type { NavigationTabsSettingsService } from './NavigationTabs/NavigationTabsSettingsService.js';
+import { NavigationTabsSettingsService } from './NavigationTabs/NavigationTabsSettingsService.js';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 const NavigationTabsBar = importLazyComponent(() => import('./NavigationTabs/NavigationTabsBar/index.js').then(m => m.NavigationTabsBar));
