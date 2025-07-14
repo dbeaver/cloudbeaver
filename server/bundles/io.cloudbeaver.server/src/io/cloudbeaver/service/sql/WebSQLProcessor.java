@@ -340,7 +340,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                         resultSet.getResultsInfo().setQueryText(statistics.getQueryText());
                         executeInfo.setStatusMessage(resultSet.getRows().length + " row(s) fetched");
                     }
-                    //fixme maybe cover under configuration
+                    //fixme maybe cover under configuration. Also need to check for size before put it into cache
                     if (resultSet.getId() != null) {
                         webResultSetCache.put(resultSet.getId(), results);
                     }
@@ -1251,7 +1251,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         int result = 0;
         for (DBDAttributeConstraint co : orderConstraints) {
             int colIndex = co.getAttribute() != null ? co.getAttribute().getOrdinalPosition() : -1;
-            if (colIndex < 0) continue;
+            if (colIndex < 0) {
+                continue;
+            }
             Object cell1 = r1.getData()[colIndex];
             Object cell2 = r2.getData()[colIndex];
             Comparator<Object> comparator = null;
