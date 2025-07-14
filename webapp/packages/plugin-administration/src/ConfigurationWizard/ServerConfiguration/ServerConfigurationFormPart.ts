@@ -12,7 +12,7 @@ import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeave
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { DefaultNavigatorSettingsResource, PasswordPolicyResource, ProductInfoResource, ServerConfigResource } from '@cloudbeaver/core-root';
 import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
-import { isObjectsEqual } from '@cloudbeaver/core-utils';
+import { isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 
 import { MIN_SESSION_EXPIRE_TIME } from './Form/MIN_SESSION_EXPIRE_TIME.js';
 import type { IServerConfigurationFormPartState } from './IServerConfigurationFormPartState.js';
@@ -74,8 +74,9 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
 
         const isNameValid = this.state.serverConfig.adminName && this.state.serverConfig.adminName.length >= ADMIN_USERNAME_MIN_LENGTH;
         const isPasswordValid = this.passwordPolicyService.validatePassword(this.state.serverConfig.adminPassword ?? '');
+        const isPasswordRepeated = isValuesEqual(this.state.serverConfig.adminPassword, this.state.serverConfig.adminPasswordRepeat, null);
 
-        if (!isNameValid || !isPasswordValid.isValid) {
+        if (!isNameValid || !isPasswordValid.isValid || !isPasswordRepeated) {
           ExecutorInterrupter.interrupt(contexts);
         }
       }
@@ -119,7 +120,9 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
       await this.defaultNavigatorSettingsResource.save(this.state.navigatorConfig);
     }
 
-    await this.serverConfigResource.save(this.state.serverConfig);
+    // Exclude adminPasswordRepeat from server payload as it's only for client-side validation
+    const { adminPasswordRepeat, ...serverConfigToSave } = this.state.serverConfig;
+    await this.serverConfigResource.save(serverConfigToSave);
   }
 
   protected override async loader() {

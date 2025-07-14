@@ -11,6 +11,7 @@ const ServerConfigurationFormPartStateConfigSchema = schema.object({
   adminCredentialsSaveEnabled: schema.boolean().optional(),
   adminName: schema.string().optional(),
   adminPassword: schema.string().optional(),
+  adminPasswordRepeat: schema.string().optional(),
   anonymousAccessEnabled: schema.boolean().optional(),
   authenticationEnabled: schema.boolean().optional(),
   customConnectionsEnabled: schema.boolean().optional(),

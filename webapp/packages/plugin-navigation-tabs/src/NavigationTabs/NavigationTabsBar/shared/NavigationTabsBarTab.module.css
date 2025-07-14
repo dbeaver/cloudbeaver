@@ -9,4 +9,7 @@
 .tab {
   composes: theme-ripple theme-background-background theme-text-text-primary-on-light from global;
   height: 38px !important;
+  border: 1px solid color-mix(in srgb, transparent, var(--theme-on-secondary) 10%);
+  border-top: none;
+  border-left: none;
 }
