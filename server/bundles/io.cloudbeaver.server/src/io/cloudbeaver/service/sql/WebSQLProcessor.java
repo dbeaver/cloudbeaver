@@ -301,6 +301,21 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
         DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
+            Map<String, Object> webResultSetCache = webSession.getAttribute("webResultSetCache", cache -> new HashMap<>(), null);
+            if (resultId!=null && webResultSetCache.get(resultId) != null) {
+                // Result set already cached, no need to read it again
+                WebSQLQueryResults cachedResults = (WebSQLQueryResults) webResultSetCache.get(resultId);
+                filterCachedResults(
+                    cachedResults,
+                    dataFilter,
+                    filter.getOffset(),
+                    filter.getLimit(),
+                    dataFormat);
+                executeInfo.setResults(new WebSQLQueryResults[]{cachedResults});
+                executeInfo.setDuration(0);
+                executeInfo.setStatusMessage("Cached result set");
+                return;
+            }
             try (DBCSession session = executionContext.openSession(monitor, resolveQueryPurpose(dataFilter), "Read data from container")) {
                 try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
                     DBCStatistics statistics = dataContainer.readData(
@@ -325,12 +340,148 @@ public class WebSQLProcessor implements WebSessionProvider {
                         resultSet.getResultsInfo().setQueryText(statistics.getQueryText());
                         executeInfo.setStatusMessage(resultSet.getRows().length + " row(s) fetched");
                     }
+                    //fixme maybe cover under configuration
+                    if (resultSet.getId() != null) {
+                        webResultSetCache.put(resultSet.getId(), results);
+                    }
                 } catch (DBException e) {
                     throw new InvocationTargetException(e);
                 }
             }
         });
         return executeInfo;
+    }
+
+    private void filterCachedResults(
+        WebSQLQueryResults cachedResults,
+        DBDDataFilter dataFilter,
+        int offset,
+        int limit,
+        WebDataFormat dataFormat
+    ) {
+        WebSQLQueryResultSet resultSet = cachedResults.getResultSet();
+        if (resultSet == null) {
+            return;
+        }
+        List<WebSQLQueryResultSetRow> allRows = resultSet.getRowsWithMetaData();
+        if (allRows == null || allRows.isEmpty()) {
+            return;
+        }
+        // Filter rows by dataFilter constraints and where
+        List<WebSQLQueryResultSetRow> filteredRows = new ArrayList<>();
+        for (WebSQLQueryResultSetRow row : allRows) {
+            if (matchesFilter(row, resultSet, dataFilter)) {
+                filteredRows.add(row);
+            }
+        }
+        // Sort rows if ordering is specified
+        List<DBDAttributeConstraint> orderConstraints = dataFilter.getOrderConstraints();
+        if (!orderConstraints.isEmpty()) {
+            filteredRows.sort((r1, r2) -> compareRowsByOrder(r1, r2, resultSet, orderConstraints));
+        }
+        // Apply offset and limit
+        int fromIndex = Math.max(0, offset);
+        int toIndex = limit > 0 ? Math.min(filteredRows.size(), fromIndex + limit) : filteredRows.size();
+        List<WebSQLQueryResultSetRow> pagedRows = fromIndex < toIndex ? filteredRows.subList(fromIndex, toIndex) : Collections.emptyList();
+        resultSet.setRows(pagedRows);
+        resultSet.setHasMoreData(toIndex < filteredRows.size());
+    }
+
+    // Checks if a row matches the filter constraints and where
+    private boolean matchesFilter(WebSQLQueryResultSetRow row, WebSQLQueryResultSet resultSet, DBDDataFilter dataFilter) {
+        // Only basic constraint filtering (equality, null, etc.)
+        for (DBDAttributeConstraint constraint : dataFilter.getConstraints()) {
+            if (!constraint.hasFilter()) continue;
+            int colIndex = constraint.getAttribute() != null ? constraint.getAttribute().getOrdinalPosition() : -1;
+            if (colIndex < 0 || colIndex >= row.getData().length) continue;
+            Object value = row.getData()[colIndex];
+            Object filterValue = constraint.getValue();
+            if (filterValue == null) {
+                continue;
+//                if (value != null) return false;
+            } else {
+                if (value == null || !filterValue.equals(value)) return false;
+            }
+        }
+        // Evaluate 'where' expression if present
+        String where = dataFilter.getWhere();
+        if (!CommonUtils.isEmpty(where)) {
+            // Very basic support: only expressions like "col = value" joined by AND/OR
+            // This is NOT a SQL parser, just a simple evaluator for basic cases
+            String[] andParts = where.split("(?i)\\s+AND\\s+");
+            for (String andPart : andParts) {
+                String[] orParts = andPart.split("(?i)\\s+OR\\s+");
+                boolean orResult = false;
+                for (String expr : orParts) {
+                    expr = expr.trim();
+                    // Support: col = value, col != value, col IS NULL, col IS NOT NULL
+                    if (expr.matches(".+\\s+IS\\s+NULL")) {
+                        String col = expr.replaceAll("\\s+IS\\s+NULL", "").trim();
+                        int colIdx = getColumnIndexByName(resultSet, col);
+                        if (colIdx >= 0 && row.getData()[colIdx] == null) {
+                            orResult = true;
+                            break;
+                        }
+                    } else if (expr.matches(".+\\s+IS\\s+NOT\\s+NULL")) {
+                        String col = expr.replaceAll("\\s+IS\\s+NOT\\s+NULL", "").trim();
+                        int colIdx = getColumnIndexByName(resultSet, col);
+                        if (colIdx >= 0 && row.getData()[colIdx] != null) {
+                            orResult = true;
+                            break;
+                        }
+                    } else if (expr.contains("!=")) {
+                        String[] parts = expr.split("!=");
+                        if (parts.length == 2) {
+                            String col = parts[0].trim();
+                            String val = unquote(parts[1].trim());
+                            int colIdx = getColumnIndexByName(resultSet, col);
+                            Object cell = colIdx >= 0 ? row.getData()[colIdx] : null;
+                            if (cell != null && !cell.toString().equals(val)) {
+                                orResult = true;
+                                break;
+                            }
+                        }
+                    } else if (expr.contains("=")) {
+                        String[] parts = expr.split("=");
+                        if (parts.length == 2) {
+                            String col = parts[0].trim();
+                            String val = unquote(parts[1].trim());
+                            int colIdx = getColumnIndexByName(resultSet, col);
+                            Object cell = colIdx >= 0 ? row.getData()[colIdx] : null;
+                            if (cell != null && cell.toString().equals(val)) {
+                                orResult = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (!orResult) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // Helper: get column index by name (case-insensitive)
+    private int getColumnIndexByName(WebSQLQueryResultSet resultSet, String colName) {
+        WebSQLQueryResultColumn[] columns = resultSet.getColumns();
+        if (columns == null) return -1;
+        for (int i = 0; i < columns.length; i++) {
+            if (columns[i].getLabel().equalsIgnoreCase(colName) ||
+                (columns[i].getAttribute() != null && columns[i].getAttribute().getName().equalsIgnoreCase(colName))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // Helper: remove quotes from string value if present
+    private String unquote(String s) {
+        if ((s.startsWith("'") && s.endsWith("'")) || (s.startsWith("\"") && s.endsWith("\""))) {
+            return s.substring(1, s.length() - 1);
+        }
+        return s;
     }
 
     public WebSQLExecuteInfo updateResultsDataBatch(
@@ -1093,6 +1244,35 @@ public class WebSQLProcessor implements WebSessionProvider {
             rowCount++;
         }
         dataReceiver.fetchEnd(session, dbResult);
+    }
+
+    // Compares two rows by order constraints (like ResultSetModel.resetOrdering)
+    private int compareRowsByOrder(WebSQLQueryResultSetRow r1, WebSQLQueryResultSetRow r2, WebSQLQueryResultSet resultSet, List<DBDAttributeConstraint> orderConstraints) {
+        int result = 0;
+        for (DBDAttributeConstraint co : orderConstraints) {
+            int colIndex = co.getAttribute() != null ? co.getAttribute().getOrdinalPosition() : -1;
+            if (colIndex < 0) continue;
+            Object cell1 = r1.getData()[colIndex];
+            Object cell2 = r2.getData()[colIndex];
+            Comparator<Object> comparator = null;
+            if (co.getAttribute() != null && co.getAttribute() instanceof DBDAttributeBinding binding) {
+                comparator = binding.getValueHandler() != null ? binding.getValueHandler().getComparator() : null;
+            }
+            if (comparator != null) {
+                result = comparator.compare(cell1, cell2);
+            } else if (cell1 instanceof String && cell2 instanceof String) {
+                result = ((String) cell1).compareToIgnoreCase((String) cell2);
+            } else {
+                result = DBUtils.compareDataValues(cell1, cell2);
+            }
+            if (co.isOrderDescending()) {
+                result = -result;
+            }
+            if (result != 0) {
+                break;
+            }
+        }
+        return result;
     }
 
     /**
