@@ -7,4 +7,4 @@
  */
 import { importLazyComponent } from '../importLazyComponent.js';
 
-export const Combobox = importLazyComponent(() => import('./Combobox.js').then(m => m.Combobox));
+export const Select = importLazyComponent(() => import('./Select.js').then(m => m.Select));

@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { AuthRolesResource } from '@cloudbeaver/core-authentication';
-import { Combobox, Group, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Select, Group, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { type IUserFilters, USER_ROLE_ALL, USER_STATUSES } from './useUsersTableFilters.js';
 
@@ -22,7 +22,7 @@ export const UsersTableFiltersDetails = observer<Props>(function UsersTableFilte
 
   return (
     <Group box gap>
-      <Combobox
+      <Select
         value={filters.status}
         items={USER_STATUSES}
         valueSelector={value => translate(value.label)}
@@ -31,11 +31,11 @@ export const UsersTableFiltersDetails = observer<Props>(function UsersTableFilte
         onSelect={filters.setStatus}
       >
         {translate('authentication_user_status')}
-      </Combobox>
+      </Select>
       {!!authRolesResource.data.length && (
-        <Combobox items={[...authRolesResource.data, USER_ROLE_ALL]} value={filters.role} keepSize onSelect={filters.setRole}>
+        <Select items={[...authRolesResource.data, USER_ROLE_ALL]} value={filters.role} keepSize onSelect={filters.setRole}>
           {translate('authentication_user_role')}
-        </Combobox>
+        </Select>
       )}
     </Group>
   );
