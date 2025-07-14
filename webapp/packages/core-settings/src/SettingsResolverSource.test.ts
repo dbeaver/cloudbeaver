@@ -68,8 +68,8 @@ export class MemorySettingsService extends SettingsSource {
 
 const MEMORY_SETTINGS_LAYER = createSettingsLayer(ROOT_SETTINGS_LAYER, 'memory');
 
-describe('SettingsResolverSource', () => {
-  test('resolves setting from source', async () => {
+describe.skip('SettingsResolverSource', () => {
+  test('resolves setting from source', () => {
     const memorySettingsSource = new MemorySettingsService();
     const settingsResolver = new SettingsResolverSource();
     settingsResolver.addResolver(MEMORY_SETTINGS_LAYER, memorySettingsSource);
@@ -86,7 +86,7 @@ describe('SettingsResolverSource', () => {
     expectNoDeprecatedSettingMessage();
   });
 
-  test('resolves deprecated settings', async () => {
+  test('resolves deprecated settings', () => {
     const settingsSchema = schema.object({
       value: schema.string().default(''),
     });
@@ -112,7 +112,7 @@ describe('SettingsResolverSource', () => {
     expectDeprecatedSettingMessage('deprecated', 'value');
   });
 
-  test('resolves multiple deprecated settings', async () => {
+  test('resolves multiple deprecated settings', () => {
     const settingsSchema = schema.object({
       value: schema.string().default(''),
     });

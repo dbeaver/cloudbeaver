@@ -130,17 +130,26 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         boolean enabled,
         @Nullable String defaultAuthRole
     ) throws DBException {
+        userId = userId.toLowerCase(); // creating new users only with lowercase
+        validateAndCreateUser(userId, metaParameters, enabled, defaultAuthRole);
+    }
+
+    protected void validateAndCreateUser(
+        @NotNull String userId,
+        @Nullable Map<String, String> metaParameters,
+        boolean enabled,
+        @Nullable String defaultAuthRole
+    ) throws DBException {
         if (CommonUtils.isEmpty(userId)) {
             throw new DBCException("Empty user name is not allowed");
         }
-        userId = userId.toLowerCase(); // creating new users only with lowercase
         if (isSubjectExists(userId)) {
             throw new DBCException("User or team '" + userId + "' already exists");
         }
         log.debug("Create user: " + userId);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                createUser(dbCon, userId, metaParameters, enabled, defaultAuthRole);
+                insertUser(dbCon, userId, metaParameters, enabled, defaultAuthRole);
                 txn.commit();
             }
         } catch (SQLException e) {
@@ -151,7 +160,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     /**
      * Creates user. Saves user id in database as it is.
      */
-    public void createUser(
+    protected void insertUser(
         @NotNull Connection dbCon,
         @NotNull String userId,
         @Nullable Map<String, String> metaParameters,
@@ -208,7 +217,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                     continue outer;
                 }
             }
-            createUser(connection, userId.toLowerCase(), metaParameters, true, authRole);
+            insertUser(connection, userId.toLowerCase(), metaParameters, true, authRole);
         }
     }
 
@@ -2574,7 +2583,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull DBRProgressMonitor progressMonitor,
         @Nullable String activeUserId,
         boolean createNewUserIfNotExist,
-        String authRole,
+        @Nullable String authRole,
         SMAuthProviderCustomConfiguration providerConfig
     ) throws DBException {
         SMAuthProvider<?> smAuthProviderInstance = authProvider.getInstance();
@@ -2600,17 +2609,12 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             userId = authProvider.isCaseInsensitive() ? userIdFromCredentials.toLowerCase() : userIdFromCredentials;
             if (!isSubjectExists(userId)) {
                 log.debug("Create user: " + userId);
-                try (Connection dbCon = database.openConnection()) {
-                    createUser(
-                        dbCon,
-                        userId,
-                        (Map<String, String>) userCredentials.get(SMStandardMeta.KEY_META_PARAMS),
-                        true,
-                        resolveUserAuthRole(null, authRole)
-                    );
-                } catch (SQLException e) {
-                    throw new DBException("Error saving user in database", e);
-                }
+                validateAndCreateUser(
+                    userId,
+                    (Map<String, String>) userCredentials.get(SMStandardMeta.KEY_META_PARAMS),
+                    true,
+                    resolveUserAuthRole(null, authRole)
+                );
             }
             setUserCredentials(userId, authProvider.getId(), userCredentials);
         } else if (userId == null) {
