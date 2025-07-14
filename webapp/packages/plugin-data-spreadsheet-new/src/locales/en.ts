@@ -24,4 +24,6 @@ export default [
   ['data_grid_table_readonly_tooltip', 'Read-only'],
   ['plugin_data_spreadsheet_new_settings_disable', 'Disable Table presentation'],
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Disable table presentation of data for all users'],
+  ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],
+  ['plugin_data_spreadsheet_new_settings_description_label_description', 'Description will be shown under the column names in the table header'],
 ];
