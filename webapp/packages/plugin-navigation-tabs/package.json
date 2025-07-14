@@ -31,6 +31,7 @@
     "@cloudbeaver/core-projects": "workspace:*",
     "@cloudbeaver/core-resource": "workspace:*",
     "@cloudbeaver/core-root": "workspace:*",
+    "@cloudbeaver/core-settings": "workspace:*",
     "@cloudbeaver/core-storage": "workspace:*",
     "@cloudbeaver/core-ui": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
