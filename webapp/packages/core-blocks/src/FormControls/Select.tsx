@@ -6,12 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useEffect, useLayoutEffect, useState } from 'react';
+import { useCallback, useContext, useLayoutEffect } from 'react';
 import { useSelectStore, SelectField, clsx } from '@dbeaver/ui-kit';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
-import { getComputed } from '../getComputed.js';
 import { Icon } from '../Icon.js';
 import { IconOrImage } from '../IconOrImage.js';
 import { Loader } from '../Loader/Loader.js';
@@ -94,18 +93,6 @@ export const Select: SelectType = observer(function Select({
   const menu = useSelectStore();
   const isOpened = menu.getState().open;
 
-  const [searchValue, setSearchValue] = useState<string | null>(null);
-
-  const filteredItems = getComputed(() => {
-    const result = items.filter(item => !searchValue || valueSelector(item).toUpperCase().includes(searchValue.toUpperCase()));
-
-    if (isDisabled) {
-      return result.sort((a, b) => Number(isDisabled(a)) - Number(isDisabled(b)));
-    }
-
-    return result;
-  });
-
   let value: string | number | readonly string[] | undefined = controlledValue ?? defaultValue ?? undefined;
 
   if (state && name !== undefined && name in state) {
@@ -117,7 +104,6 @@ export const Select: SelectType = observer(function Select({
       id = id ?? value ?? '';
       const changed = id !== value;
 
-      menu.hide();
       if (state && changed) {
         state[name] = id;
       }
@@ -127,45 +113,9 @@ export const Select: SelectType = observer(function Select({
       if (context && changed) {
         context.change(id, name);
       }
-      setSearchValue(null);
     },
     [value, state, name, menu, context, onSelect],
   );
-
-  const matchItems = useCallback(
-    (input?: boolean) => {
-      if (searchValue === null) {
-        return;
-      }
-
-      if (filteredItems.length === 0) {
-        setSearchValue(null);
-        return;
-      }
-
-      const filteredItemIndex = items.indexOf(filteredItems[0]);
-
-      if (filteredItems.length === 1) {
-        handleSelect(keySelector(filteredItems[0], filteredItemIndex));
-        return;
-      }
-
-      if (filteredItems.length > 0) {
-        if (input) {
-          handleSelect(keySelector(filteredItems[0], filteredItemIndex));
-        } else {
-          setSearchValue(null);
-        }
-      }
-    },
-    [items, filteredItems, keySelector, handleSelect, searchValue],
-  );
-
-  useEffect(() => {
-    if (!isOpened) {
-      matchItems();
-    }
-  }, [isOpened, matchItems]);
 
   useLayoutEffect(() => {
     onSwitch?.(isOpened);
@@ -230,7 +180,7 @@ export const Select: SelectType = observer(function Select({
         </FieldLabel>
       )}
       <SelectField
-        items={filteredItems}
+        items={items}
         value={value}
         itemValue={itemValue}
         itemRender={itemRender}
