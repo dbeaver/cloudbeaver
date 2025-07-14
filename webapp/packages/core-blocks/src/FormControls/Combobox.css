@@ -12,7 +12,7 @@
     padding-left: 12px;
     padding-right: 4px;
 
-    &:focus {
+    &[aria-expanded='true']:focus {
       outline: none;
     }
 
