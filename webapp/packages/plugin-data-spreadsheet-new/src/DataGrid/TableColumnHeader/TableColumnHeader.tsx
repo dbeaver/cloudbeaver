@@ -15,6 +15,7 @@ import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelection
 import { TableDataContext } from '../TableDataContext.js';
 import style from './TableColumnHeader.module.css';
 import { useTableColumnDnD } from './useTableColumnDnD.js';
+import { HEADER_HEIGHT } from '../DataGridTable.js';
 
 interface Props {
   colIdx: number;
@@ -39,12 +40,14 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
   let columnName: string | undefined;
   let columnReadOnly = false;
   let columnTooltip: string | undefined;
+  let columnDescription: string | undefined;
 
   if (columnInfo.key !== null) {
     const column = tableDataContext.data.getColumn(columnInfo.key);
 
     if (column) {
       columnName = column.label!;
+      columnDescription = column.description;
       icon = column.icon;
       columnReadOnly ||= tableDataContext.format.isReadOnly({ column: columnInfo.key });
 
@@ -70,21 +73,38 @@ export const TableColumnHeader = observer<Props>(function TableColumnHeader({ co
       ref={dnd.setRef}
       title={columnTooltip}
       data-s-rearrange={dnd.side}
-      className={s(styles, { header: true, dragging: dnd.data.state.isDragging })}
+      className={s(styles, { dragging: dnd.data.state.isDragging }, 'tw:h-full')}
       onClick={handleClick}
     >
-      {dataReadonly && colIdx === 0 && (
-        <div className={s(styles, { readonlyStatus: true, independent: true }, 'rdg-table-header__readonly-status')} />
-      )}
-      {icon && (
-        <div className={s(styles, { icon: true })}>
-          <StaticImage icon={icon} className={s(styles, { staticImage: true })} />
-          {columnReadOnly && hasElementIdentifier && !dataReadonly && (
-            <div className={s(styles, { readonlyStatus: true }, 'rdg-table-header__readonly-status')} />
+      <div className={s(styles, { header: true })}>
+        {dataReadonly && colIdx === 0 && (
+          <div className={s(styles, { readonlyStatus: true, independent: true }, 'rdg-table-header__readonly-status')} />
+        )}
+        <div className="tw:grid tw:grid-cols-[auto_1fr] tw:grid-rows-[auto_auto] tw:h-full tw:w-full">
+          <div
+            style={{ height: !tableDataContext.hasDescription ? HEADER_HEIGHT : 'auto' }}
+            className="tw:gap-1 tw:col-start-1 tw:col-end-2 tw:row-start-1 tw:row-end-2 tw:flex tw:items-center tw:justify-center tw:truncate"
+          >
+            {icon && (
+              <div className={s(styles, { icon: true })}>
+                <StaticImage icon={icon} className={s(styles, { staticImage: true })} />
+                {columnReadOnly && hasElementIdentifier && !dataReadonly && (
+                  <div className={s(styles, { readonlyStatus: true }, 'rdg-table-header__readonly-status')} />
+                )}
+              </div>
+            )}
+            <div className={s(styles, { name: true }, 'tw:truncate')}>{columnName}</div>
+          </div>
+          {tableDataContext.hasDescription && columnDescription && (
+            <div
+              title={columnDescription}
+              className={s(styles, { description: true }, 'tw:col-start-1 tw:col-end-3 tw:row-start-2 tw:row-end-3 tw:truncate')}
+            >
+              {columnDescription}
+            </div>
           )}
         </div>
-      )}
-      <div className={s(styles, { name: true })}>{columnName}</div>
+      </div>
     </div>
   );
 });
