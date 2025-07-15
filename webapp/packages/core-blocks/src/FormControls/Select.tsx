@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useLayoutEffect } from 'react';
+import { useCallback, useContext, useId, useLayoutEffect, useMemo } from 'react';
 import { useSelectStore, SelectField, clsx } from '@dbeaver/ui-kit';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
@@ -23,7 +23,7 @@ import { Field } from './Field.js';
 
 export type SelectBaseProps<TKey, TValue> = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
-  'onChange' | 'onSelect' | 'name' | 'value' | 'defaultValue'
+  'onChange' | 'onSelect' | 'name' | 'value' | 'defaultValue' | 'children'
 > &
   ILayoutSizeProps & {
     items: TValue[];
@@ -38,6 +38,7 @@ export type SelectBaseProps<TKey, TValue> = Omit<
     isDisabled?: (item: TValue) => boolean;
     onSwitch?: (state: boolean) => void;
     inline?: boolean;
+    children?: string;
   };
 
 type ControlledProps<TKey, TValue> = SelectBaseProps<TKey, TValue> & {
@@ -92,12 +93,14 @@ export const Select: SelectType = observer(function Select({
   const context = useContext(FormContext);
   const menu = useSelectStore();
   const isOpened = menu.getState().open;
+  const value: string | number | readonly string[] | undefined = useMemo(() => {
+    if (state && name !== undefined && name in state) {
+      return state[name];
+    }
 
-  let value: string | number | readonly string[] | undefined = controlledValue ?? defaultValue ?? undefined;
-
-  if (state && name !== undefined && name in state) {
-    value = state[name];
-  }
+    return controlledValue ?? defaultValue ?? undefined;
+  }, [state, name, controlledValue, defaultValue]);
+  const inputId = useId();
 
   const handleSelect = useCallback(
     (id: any) => {
@@ -122,25 +125,25 @@ export const Select: SelectType = observer(function Select({
   }, [onSwitch, isOpened]);
 
   function renderIcon(item: (typeof items)[number]): React.ReactNode {
-    if (item && iconSelector && iconSelector(item)) {
-      let element: React.ReactElement | string | undefined;
-
-      switch (true) {
-        case loading:
-          element = <Loader small fullSize />;
-          break;
-        case typeof iconSelector(item) === 'string':
-          element = <IconOrImage icon={iconSelector(item) as string} className="select__icon" />;
-          break;
-        default:
-          element = iconSelector(item);
-          break;
-      }
-
-      return <div className="select__input-icon">{element}</div>;
+    if (!item || !iconSelector || !iconSelector(item)) {
+      return null;
     }
 
-    return null;
+    let element: React.ReactElement | string | undefined;
+
+    switch (true) {
+      case loading:
+        element = <Loader small fullSize />;
+        break;
+      case typeof iconSelector(item) === 'string':
+        element = <IconOrImage icon={iconSelector(item) as string} className="select__icon" />;
+        break;
+      default:
+        element = iconSelector(item);
+        break;
+    }
+
+    return <div className="select__input-icon">{element}</div>;
   }
 
   function itemValue(item: (typeof items)[number]): typeof value {
@@ -175,13 +178,15 @@ export const Select: SelectType = observer(function Select({
   return (
     <Field {...layoutProps} className={clsx('select__field', inline && 'select__field--inline', className)}>
       {children && (
-        <FieldLabel required={rest.required} title={title} className="select__field-label">
+        <FieldLabel htmlFor={inputId} required={rest.required} title={title} className="select__field-label">
           {children}
         </FieldLabel>
       )}
       <SelectField
         items={items}
         value={value}
+        id={inputId}
+        aria-label={children || title}
         itemValue={itemValue}
         itemRender={itemRender}
         itemDisabled={itemDisabled}

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import clsx from 'clsx';
 import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel, type SelectProviderProps } from './Select.js';
 import './SelectField.css';
@@ -73,6 +73,10 @@ export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
   store?: SelectProviderProps['store'];
 
   autoFocusItemsOnShow?: boolean;
+
+  'aria-labelledby'?: string, 
+
+  'aria-label'?: string
 }
 
 // Utility function to get value by it's key or using getter function
@@ -98,6 +102,9 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   store,
   autoFocusItemsOnShow,
   name,
+  'aria-labelledby': ariaLabelledBy, 
+  'aria-label': ariaLabel,
+  ...rest
 }: SelectFieldProps<T, ItemType>) {
   const getItemValue = (item: ItemType): T =>
     getValueByPath<ItemType, T>(item, itemValue, i => ('value' in i ? (i as unknown as SelectItem<T>).value : (i as unknown as T)));
@@ -114,6 +121,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
     const firstEnabledItem = items.find(item => !isItemDisabled(item));
     return firstEnabledItem ? getItemValue(firstEnabledItem) : undefined;
   });
+  const labelId = useId();
 
   const handleChange = (newValue: T) => {
     setSelectedValue(newValue);
@@ -129,9 +137,9 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   return (
     <div className={clsx('dbv-kit-select-field', className)}>
       <SelectProvider value={currentValue as any} setValue={val => handleChange(val as T)} store={store}> 
-        {label && <SelectLabel className={clsx(required && 'dbv-kit-select__label--required')}>{label}</SelectLabel>}
+        {label && <SelectLabel id={labelId} className={clsx(required && 'dbv-kit-select__label--required')}>{label}</SelectLabel>}
 
-        <Select name={name} disabled={disabled} required={required}>
+        <Select {...rest} name={name} disabled={disabled} required={required} aria-labelledby={ariaLabelledBy} aria-label={ariaLabel}>
           {displayValue}
           {arrowIcon ?? <Select.Arrow />}
         </Select>
@@ -146,7 +154,6 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
                 key={String(getItemValue(item))}
                 value={getItemValue(item) as any}
                 disabled={isItemDisabled(item)}
-                className="dbv-kit-select__item"
               >
                 {renderItem(item)}
               </SelectItem>
