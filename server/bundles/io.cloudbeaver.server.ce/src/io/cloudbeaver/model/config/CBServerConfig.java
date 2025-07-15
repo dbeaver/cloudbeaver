@@ -52,6 +52,7 @@ public class CBServerConfig implements WebServerConfiguration {
     @SerializedName("database")
     private WebDatabaseConfig databaseConfiguration = new WebDatabaseConfig();
     private String staticContent = "";
+    private boolean bindSessionToIp = true;
 
     public CBServerConfig() {
         this.securityManagerConfiguration = createSecurityManagerConfiguration();
@@ -185,5 +186,9 @@ public class CBServerConfig implements WebServerConfiguration {
 
     public boolean isSecureCookies() {
         return secureCookies;
+    }
+
+    public boolean isBindSessionToIp() {
+        return bindSessionToIp;
     }
 }
