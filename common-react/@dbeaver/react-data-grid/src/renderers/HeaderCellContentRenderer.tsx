@@ -78,7 +78,7 @@ export const HeaderCellContentRenderer = memo(function HeaderCellContentRenderer
       {...drag.props}
       {...drop.props}
     >
-      <span className="tw:overflow-hidden tw:text-ellipsis">{headerElement ?? getHeaderText ?? ''}</span>
+      <span className="tw:overflow-hidden tw:h-full tw:text-ellipsis">{headerElement ?? getHeaderText ?? ''}</span>
       {isColumnSortable && onColumnSort && <OrderButton sortState={sortingState} onClick={handleSort} />}
     </div>
   );

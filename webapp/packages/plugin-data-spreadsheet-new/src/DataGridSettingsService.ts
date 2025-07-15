@@ -20,6 +20,7 @@ import { DATA_EDITOR_SETTINGS_GROUP } from '@cloudbeaver/plugin-data-viewer';
 
 const defaultSettings = schema.object({
   'plugin.data-spreadsheet.hidden': schemaExtra.stringedBoolean().default(false),
+  'plugin.data-spreadsheet.showDescriptionInHeader': schemaExtra.stringedBoolean().default(true),
 });
 
 export type DataGridSettings = schema.infer<typeof defaultSettings>;
@@ -29,6 +30,11 @@ export class DataGridSettingsService extends Dependency {
   get hidden(): boolean {
     return this.settings.getValue('plugin.data-spreadsheet.hidden');
   }
+
+  get description(): boolean {
+    return this.settings.getValue('plugin.data-spreadsheet.showDescriptionInHeader');
+  }
+
   readonly settings: SettingsProvider<typeof defaultSettings>;
 
   constructor(
@@ -60,6 +66,16 @@ export class DataGridSettingsService extends Dependency {
         type: ESettingsValueType.Checkbox,
         name: 'plugin_data_spreadsheet_new_settings_disable',
         description: 'plugin_data_spreadsheet_new_settings_disable_description',
+      },
+      {
+        group: DATA_EDITOR_SETTINGS_GROUP,
+        key: 'plugin.data-spreadsheet.showDescriptionInHeader',
+        access: {
+          scope: ['client'],
+        },
+        type: ESettingsValueType.Checkbox,
+        name: 'plugin_data_spreadsheet_new_settings_description_label',
+        description: 'plugin_data_spreadsheet_new_settings_description_label_description',
       },
     ]);
   }
