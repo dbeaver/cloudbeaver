@@ -6,6 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
+@layer base.components {
+  .dbv-kit-select__arrow-icon svg {
+    fill: none !important;
+  }
+}
+
 @layer components {
   .dbv-kit-select {
     --dbv-kit-select-padding-inline: 0;

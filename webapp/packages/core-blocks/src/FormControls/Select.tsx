@@ -11,7 +11,6 @@ import { useSelectStore, SelectField, clsx } from '@dbeaver/ui-kit';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
-import { Icon } from '../Icon.js';
 import { IconOrImage } from '../IconOrImage.js';
 import { Loader } from '../Loader/Loader.js';
 import { useTranslate } from '../localization/useTranslate.js';
@@ -77,6 +76,7 @@ export const Select: SelectType = observer(function Select({
   inline,
   description,
   placeholder,
+  id,
   keySelector = v => v,
   valueSelector = v => v,
   iconSelector,
@@ -100,7 +100,7 @@ export const Select: SelectType = observer(function Select({
 
     return controlledValue ?? defaultValue ?? undefined;
   }, [state, name, controlledValue, defaultValue]);
-  const inputId = useId();
+  const inputId = id || useId();
 
   const handleSelect = useCallback(
     (id: any) => {
@@ -183,6 +183,7 @@ export const Select: SelectType = observer(function Select({
         </FieldLabel>
       )}
       <SelectField
+        {...rest}
         items={items}
         value={value}
         id={inputId}
@@ -194,10 +195,8 @@ export const Select: SelectType = observer(function Select({
         disabled={disabled || readOnly}
         noItemsPlaceholder={translate('combobox_no_results_placeholder')}
         selectedRender={selectedRender}
-        arrowIcon={<Icon name="arrow" viewBox="0 0 16 16" className="select__icon" />}
         store={menu}
         onChange={handleSelect}
-        {...rest}
       />
       {description && <FieldDescription>{description}</FieldDescription>}
     </Field>

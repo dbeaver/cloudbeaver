@@ -77,6 +77,8 @@ export interface SelectFieldProps<T, ItemType = SelectItem<T>> {
   'aria-labelledby'?: string, 
 
   'aria-label'?: string
+
+  id?: string;
 }
 
 // Utility function to get value by it's key or using getter function
@@ -104,6 +106,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   name,
   'aria-labelledby': ariaLabelledBy, 
   'aria-label': ariaLabel,
+  id,
   ...rest
 }: SelectFieldProps<T, ItemType>) {
   const getItemValue = (item: ItemType): T =>
@@ -121,7 +124,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
     const firstEnabledItem = items.find(item => !isItemDisabled(item));
     return firstEnabledItem ? getItemValue(firstEnabledItem) : undefined;
   });
-  const labelId = useId();
+  const labelId = id || useId();
 
   const handleChange = (newValue: T) => {
     setSelectedValue(newValue);
@@ -139,9 +142,9 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
       <SelectProvider value={currentValue as any} setValue={val => handleChange(val as T)} store={store}> 
         {label && <SelectLabel id={labelId} className={clsx(required && 'dbv-kit-select__label--required')}>{label}</SelectLabel>}
 
-        <Select {...rest} name={name} disabled={disabled} required={required} aria-labelledby={ariaLabelledBy} aria-label={ariaLabel}>
+        <Select {...rest} id={labelId} name={name} disabled={disabled} required={required} aria-labelledby={ariaLabelledBy} aria-label={ariaLabel}>
           {displayValue}
-          {arrowIcon ?? <Select.Arrow />}
+          {arrowIcon ?? <Select.Arrow className='dbv-kit-select__arrow-icon' />}
         </Select>
         {description && <span className="dbv-kit-select__description">{description}</span>}
 
