@@ -24,4 +24,6 @@ export default [
   ['data_grid_table_readonly_tooltip', 'Доступно только для чтения'],
   ['plugin_data_spreadsheet_new_settings_disable', 'Отключить табличное представление'],
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Отключить табличное представление данных для всех пользователей'],
+  ['plugin_data_spreadsheet_new_settings_description_label', 'Показать описание колонки'],
+  ['plugin_data_spreadsheet_new_settings_description_label_description', 'Описание будет показано под именами колонок в заголовке таблицы'],
 ];
