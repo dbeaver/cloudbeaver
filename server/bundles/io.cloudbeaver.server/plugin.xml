@@ -5,10 +5,15 @@
 
     <extension-point id="io.cloudbeaver.driver" name="Web drivers" schema="schema/io.cloudbeaver.driver.exsd"/>
     <extension-point id="io.cloudbeaver.handler" name="Web handlers" schema="schema/io.cloudbeaver.handler.exsd"/>
+    <extension-point id="io.cloudbeaver.object.feature.provider" name="Object feature providers" schema="schema/io.cloudbeaver.object.feature.provider.exsd"/>
 
     <!-- Needed to instantiate connections thru navigator model -->
     <extension point="org.jkiss.dbeaver.service">
         <service name="org.jkiss.dbeaver.runtime.DBServiceConnections" class="io.cloudbeaver.server.WebServiceConnectionsImpl"/>
+    </extension>
+
+    <extension point="io.cloudbeaver.object.feature.provider">
+        <featureProvider id="DefaultObjectFeatureProvider" class="io.cloudbeaver.service.navigator.WebDefaultFeatureProvider"/>
     </extension>
 
     <extension point="io.cloudbeaver.service">

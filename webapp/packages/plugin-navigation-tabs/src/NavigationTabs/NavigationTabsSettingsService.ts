@@ -7,9 +7,14 @@
  */
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
+import {
+  ESettingsValueType,
+  INTERFACE_SETTINGS_GROUP,
+  SettingsManagerService,
+  SettingsProvider,
+  SettingsProviderService,
+} from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
-import { NAVIGATION_TABS_GROUP } from './NAVIGATION_TABS_GROUP.js';
 
 const settings = schema.object({
   'plugin.navigation-tabs.multipleRows': schemaExtra.stringedBoolean().default(false),
@@ -38,7 +43,7 @@ export class NavigationTabsSettingsService extends Dependency {
   private registerSettings() {
     this.settingsManagerService.registerSettings(this.settings, () => [
       {
-        group: NAVIGATION_TABS_GROUP,
+        group: INTERFACE_SETTINGS_GROUP,
         key: 'plugin.navigation-tabs.multipleRows',
         access: {
           scope: ['client'],

@@ -66,6 +66,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     }
 
     @Override
+    @Nullable
     public TypeDefinitionRegistry getTypeDefinition() {
         return loadSchemaDefinition(getClass(), schemaFileName);
     }
@@ -78,7 +79,11 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         return apiInterface.cast(proxyImpl);
     }
 
-    public static TypeDefinitionRegistry loadSchemaDefinition(Class<?> theClass, String schemaPath) {
+    @Nullable
+    public static TypeDefinitionRegistry loadSchemaDefinition(@NotNull Class<?> theClass, @Nullable String schemaPath) {
+        if (schemaPath == null) {
+            return null;
+        }
         try (InputStream schemaStream = theClass.getClassLoader().getResourceAsStream(schemaPath)) {
             if (schemaStream == null) {
                 throw new IOException("Schema file '" + schemaPath + "' not found");
