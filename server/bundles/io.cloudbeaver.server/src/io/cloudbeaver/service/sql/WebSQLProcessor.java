@@ -309,9 +309,10 @@ public class WebSQLProcessor implements WebSessionProvider {
         executeInfo.setDuration(System.currentTimeMillis() - startTime);
         if (executeInfo.getResults().length == 0) {
             executeInfo.setStatusMessage("No Data");
-        } else if (executeInfo.getResults().length == 1) {
-            webResultSetCache.put(resultId, executeInfo.getResults()[0]);
         } else {
+            if (resultId!= null && executeInfo.getResults().length == 1) {
+                webResultSetCache.put(resultId, executeInfo.getResults()[0]);
+            }
             executeInfo.setStatusMessage("Executed");
         }
 
@@ -1120,7 +1121,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             }
             hasResultSet = dbStat.nextResults();
         }
-        if(resultList.size() == 1){
+        if(resultList.size() == 1 && resultId != null){
             Map<String, Object> webResultSetCache = webSession.getAttribute(
                 SQL_CACHE_KEY,
                 cache -> new ConcurrentHashMap<>(),
