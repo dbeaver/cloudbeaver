@@ -17,6 +17,7 @@ mutation getSqlExecuteTaskResults($taskId: ID!) {
           entityName
           fullTypeName
           icon
+          description
           label
           maxLength
           name

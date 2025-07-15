@@ -20,6 +20,10 @@
   overflow: auto;
 }
 
+.tabs.multipleRows {
+  flex-wrap: wrap;
+}
+
 .tabPanels {
   flex: 1;
   display: flex;
