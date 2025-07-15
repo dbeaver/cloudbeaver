@@ -26,6 +26,7 @@ import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
@@ -70,6 +71,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
     private final String id;
     private final String projectId;
     private final Map<String, WebSQLResultsInfo> resultInfoMap = new HashMap<>();
+    private final Map<String, WebSQLQueryResults> queryResultsMap = new HashMap<>();
 
     private final AtomicInteger resultId = new AtomicInteger();
 
@@ -190,8 +192,17 @@ public class WebSQLContextInfo implements WebSessionProvider {
         return resultsInfo;
     }
 
+    @Nullable
+    public WebSQLQueryResults getQueryResults(@NotNull String resultId) throws DBWebException {
+        return queryResultsMap.get(resultId);
+    }
+
+    public void saveQueryResults(@NotNull String resultId, @NotNull WebSQLQueryResults queryResults) {
+        queryResultsMap.put(resultId, queryResults);
+    }
+
     public boolean closeResult(@NotNull String resultId) {
-        return resultInfoMap.remove(resultId) != null;
+        return resultInfoMap.remove(resultId) != null && queryResultsMap.remove(resultId) != null;
     }
 
     ///////////////////////////////////////////////////////
@@ -199,6 +210,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
 
     void dispose() {
         resultInfoMap.clear();
+        queryResultsMap.clear();
     }
 
     @Override

@@ -59,7 +59,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -74,9 +73,6 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     private static final String FILE_ID = "fileId";
     private static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
-    public static final int CACHE_ROW_LIMIT = 300;
-    public static final String SQL_CACHE_KEY = "webResultSetCache";
-
     private final WebSession webSession;
     private final WebConnectionInfo connection;
     private final SQLSyntaxManager syntaxManager;
@@ -178,28 +174,18 @@ public class WebSQLProcessor implements WebSessionProvider {
         }
         long startTime = System.currentTimeMillis();
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
-
         var dataContainer = new WebSQLQueryDataContainer(connection.getDataSource(), syntaxManager, sql);
-
         DBCExecutionContext context = getExecutionContext(dataContainer);
-        Map<String, Object> webResultSetCache = webSession.getAttribute(
-            SQL_CACHE_KEY,
-            cache -> new ConcurrentHashMap<>(),
-            //fixme disposer
-            null
-        );
 
         try {
             final DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
 
             if (CommonUtils.toBoolean(useCache)) {
                 WebSQLResultCacheService webSQLResultCacheService = new WebSQLResultCacheService();
-                WebSQLQueryResults filterCachedResults = webSQLResultCacheService.getCachedResults(
+                WebSQLQueryResults filterCachedResults = webSQLResultCacheService.getCachedSQLQueryResults(
                     resultId,
-                    webResultSetCache,
-                    dataFilter,
-                    filter,
-                    context.getDataSource().getSQLDialect()
+                    contextInfo,
+                    filter
                 );
                 if (filterCachedResults != null) {
                     executeInfo.setResults(new WebSQLQueryResults[]{filterCachedResults});
@@ -289,7 +275,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                             if (sqlOutputLogReaderJob != null) {
                                 sqlOutputLogReaderJob.join();
                             }
-                            fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, webDataFilter, dataFilter, dataFormat, resultId);
+                            fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, webDataFilter, dataFilter, dataFormat);
                         } catch (DBException e) {
                             throw new InvocationTargetException(e);
                         }
@@ -310,8 +296,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         if (executeInfo.getResults().length == 0) {
             executeInfo.setStatusMessage("No Data");
         } else {
-            if (resultId!= null && executeInfo.getResults().length == 1) {
-                webResultSetCache.put(resultId, executeInfo.getResults()[0]);
+            if (executeInfo.getResults().length == 1) {
+                contextInfo.saveQueryResults(executeInfo.getResults()[0].getResultSet().getId(), executeInfo.getResults()[0]);
             }
             executeInfo.setStatusMessage("Executed");
         }
@@ -336,20 +322,12 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
 
-            Map<String, Object> webResultSetCache = webSession.getAttribute(
-                SQL_CACHE_KEY,
-                cache -> new ConcurrentHashMap<>(),
-                //fixme disposer
-                null
-            );
             if (CommonUtils.toBoolean(useCache)) {
                 WebSQLResultCacheService webSQLResultCacheService = new WebSQLResultCacheService();
-                WebSQLQueryResults filterCachedResults = webSQLResultCacheService.getCachedResults(
+                WebSQLQueryResults filterCachedResults = webSQLResultCacheService.getCachedSQLQueryResults(
                     resultId,
-                    webResultSetCache,
-                    dataFilter,
-                    filter,
-                    executionContext.getDataSource().getSQLDialect()
+                    contextInfo,
+                    filter
                 );
                 if (filterCachedResults != null) {
                     executeInfo.setResults(new WebSQLQueryResults[] {filterCachedResults});
@@ -382,9 +360,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     if (resultSet != null && resultSet.getRows() != null && resultSet.getResultsInfo() != null) {
                         resultSet.getResultsInfo().setQueryText(statistics.getQueryText());
                         executeInfo.setStatusMessage(resultSet.getRows().length + " row(s) fetched");
-                        if (resultSet.getId() != null && resultSet.getRows().length < CACHE_ROW_LIMIT) {
-                            webResultSetCache.put(resultSet.getId(), results);
-                        }
+                        contextInfo.saveQueryResults(resultSet.getId(), results);
                     }
                 } catch (DBException e) {
                     throw new InvocationTargetException(e);
@@ -1089,8 +1065,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull WebSQLExecuteInfo executeInfo,
         @NotNull WebSQLDataFilter webDataFilter,
         @NotNull DBDDataFilter dataFilter,
-        @Nullable WebDataFormat dataFormat,
-        @Nullable String resultId
+        @Nullable WebDataFormat dataFormat
     ) throws DBException {
 
         List<WebSQLQueryResults> resultList = new ArrayList<>();
@@ -1120,15 +1095,6 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
             }
             hasResultSet = dbStat.nextResults();
-        }
-        if(resultList.size() == 1 && resultId != null){
-            Map<String, Object> webResultSetCache = webSession.getAttribute(
-                SQL_CACHE_KEY,
-                cache -> new ConcurrentHashMap<>(),
-                //fixme disposer
-                null
-            );
-            webResultSetCache.put(resultId, resultList.getFirst());
         }
         if (resultList.isEmpty()) {
             stats.setUpdateRowCount(rowsUpdated);

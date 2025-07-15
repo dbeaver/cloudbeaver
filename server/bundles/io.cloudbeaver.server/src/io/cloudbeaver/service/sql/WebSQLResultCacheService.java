@@ -2,6 +2,7 @@ package io.cloudbeaver.service.sql;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.data.DBDAttributeConstraint;
@@ -11,38 +12,46 @@ import org.jkiss.dbeaver.model.sql.SQLDialect;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class WebSQLResultCacheService {
 
+    private static final Log log = Log.getLog(WebSQLResultCacheService.class);
     /**
      * Retrieves cached results by result ID and applies data filter and web SQL data filter.
      *
      * @param resultId         the ID of the cached results
-     * @param cache            the cache map containing cached results
-     * @param dataFilter       the data filter to apply
+     * @param contextInfo      the SQL context information
      * @param webSQLDataFilter the web SQL data filter to apply
-     * @param sqlDialect       the SQL dialect to use for filtering
      * @return filtered cached results or null if no results found for the given ID
      */
-    public WebSQLQueryResults getCachedResults(
+    public WebSQLQueryResults getCachedSQLQueryResults(
         @Nullable String resultId,
-        @NotNull Map<String, Object> cache,
-        @NotNull DBDDataFilter dataFilter,
-        @NotNull WebSQLDataFilter webSQLDataFilter,
-        @NotNull SQLDialect sqlDialect
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull WebSQLDataFilter webSQLDataFilter
     ) {
-        if (resultId == null) {
+        WebSQLQueryResults result;
+        try {
+            if (resultId == null) {
+                return null;
+            }
+            WebSQLQueryResults cachedResults = contextInfo.getQueryResults(resultId);
+            if (cachedResults == null) {
+                return null;
+            }
+            // Work with a copy to not change cached results
+            result = new WebSQLQueryResults(cachedResults);
+            SQLDialect sqlDialect = contextInfo.getProcessor().getExecutionContext().getDataSource().getSQLDialect();
+            DBDDataFilter dataFilter = webSQLDataFilter.makeDataFilter(contextInfo.getResults(resultId));
+            filterCachedResults(result, dataFilter, webSQLDataFilter, sqlDialect);
+        } catch (Exception e)  {
+            log.warn("Error retrieving cached results for ID '" + resultId + "'", e);
             return null;
         }
-        Object cached = cache.get(resultId);
-        if (!(cached instanceof WebSQLQueryResults cachedResults)) {
-            return null;
-        }
-        // Work with a copy to not change cached results
-        WebSQLQueryResults result = new WebSQLQueryResults(cachedResults);
-        filterCachedResults(result, dataFilter, webSQLDataFilter, sqlDialect);
         return result;
     }
 
@@ -120,14 +129,14 @@ public class WebSQLResultCacheService {
                 expr = expr.trim();
                 if (expr.matches("(?i).+\\s+IS\\s+NULL")) {
                     String col = expr.replaceAll("(?i)\\s+IS\\s+NULL", "").trim();
-                    int colIdx = getColumnIndexByName(resultSet, col);
+                    int colIdx = getColumnIndexByName(resultSet, col, sqlDialect);
                     if (colIdx >= 0 && row.getData()[colIdx] == null) {
                         orResult = true;
                         break;
                     }
                 } else if (expr.matches("(?i).+\\s+IS\\s+NOT\\s+NULL")) {
                     String col = expr.replaceAll("(?i)\\s+IS\\s+NOT\\s+NULL", "").trim();
-                    int colIdx = getColumnIndexByName(resultSet, col);
+                    int colIdx = getColumnIndexByName(resultSet, col, sqlDialect);
                     if (colIdx >= 0 && row.getData()[colIdx] != null) {
                         orResult = true;
                         break;
@@ -136,7 +145,7 @@ public class WebSQLResultCacheService {
                     int inIdx = expr.toUpperCase().indexOf(" IN ");
                     String col = expr.substring(0, inIdx).trim();
                     String inList = expr.substring(expr.indexOf('(', inIdx) + 1, expr.lastIndexOf(')'));
-                    int colIdx = getColumnIndexByName(resultSet, col);
+                    int colIdx = getColumnIndexByName(resultSet, col, sqlDialect);
                     if (colIdx >= 0) {
                         Object cell = row.getData()[colIdx];
                         String[] vals = inList.split(",");
@@ -154,7 +163,7 @@ public class WebSQLResultCacheService {
                     int likeIdx = expr.toUpperCase().indexOf(" LIKE ");
                     String col = expr.substring(0, likeIdx).trim();
                     String pattern = sqlDialect.getUnquotedString(expr.substring(likeIdx + 6).trim());
-                    int colIdx = getColumnIndexByName(resultSet, col);
+                    int colIdx = getColumnIndexByName(resultSet, col, sqlDialect);
                     if (colIdx >= 0) {
                         Object cell = row.getData()[colIdx];
                         if (cell != null && likeMatch(cell.toString(), pattern, false)) {
@@ -166,7 +175,7 @@ public class WebSQLResultCacheService {
                     int ilikeIdx = expr.toUpperCase().indexOf(" ILIKE ");
                     String col = expr.substring(0, ilikeIdx).trim();
                     String pattern = sqlDialect.getUnquotedString(expr.substring(ilikeIdx + 7).trim());
-                    int colIdx = getColumnIndexByName(resultSet, col);
+                    int colIdx = getColumnIndexByName(resultSet, col, sqlDialect);
                     if (colIdx >= 0) {
                         Object cell = row.getData()[colIdx];
                         if (cell != null && likeMatch(cell.toString(), pattern, true)) {
@@ -179,7 +188,7 @@ public class WebSQLResultCacheService {
                     if (parts.length == 2) {
                         String col = parts[0].trim();
                         String val = sqlDialect.getUnquotedString(parts[1].trim());
-                        int colIdx = getColumnIndexByName(resultSet, col);
+                        int colIdx = getColumnIndexByName(resultSet, col, sqlDialect);
                         Object cell = colIdx >= 0 ? row.getData()[colIdx] : null;
                         if (cell != null && !cell.toString().equals(val)) {
                             orResult = true;
@@ -191,7 +200,7 @@ public class WebSQLResultCacheService {
                     if (parts.length == 2) {
                         String col = parts[0].trim();
                         String val = sqlDialect.getQuotedString(parts[1].trim());
-                        int colIdx = getColumnIndexByName(resultSet, col);
+                        int colIdx = getColumnIndexByName(resultSet, col, sqlDialect);
                         Object cell = colIdx >= 0 ? row.getData()[colIdx] : null;
                         if (cell != null && cell.toString().equals(val)) {
                             orResult = true;
@@ -239,24 +248,14 @@ public class WebSQLResultCacheService {
         return result;
     }
 
-    private int getColumnIndexByName(WebSQLQueryResultSet resultSet, String columnName) {
+    private int getColumnIndexByName(WebSQLQueryResultSet resultSet, String columnName, SQLDialect sqlDialect) {
         if (resultSet == null || columnName == null) {
             return -1;
         }
-        String normalized = columnName.trim();
-        if ((normalized.startsWith("'") && normalized.endsWith("'")) || (normalized.startsWith("\"") && normalized.endsWith("\""))) {
-            normalized = normalized.substring(1, normalized.length() - 1);
-        }
-        normalized = normalized.trim();
+        String normalized = sqlDialect.getUnquotedString(columnName.trim());
         for (int i = 0; i < resultSet.getColumns().length; i++) {
             String colName = resultSet.getColumns()[i].getName();
             if (colName.equalsIgnoreCase(normalized)) {
-                return i;
-            }
-        }
-        for (int i = 0; i < resultSet.getColumns().length; i++) {
-            String colName = resultSet.getColumns()[i].getName();
-            if (colName.replaceAll("\\s+", "").equalsIgnoreCase(normalized.replaceAll("\\s+", ""))) {
                 return i;
             }
         }
