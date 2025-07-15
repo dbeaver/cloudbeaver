@@ -359,7 +359,7 @@ extend type Mutation {
         filter: SQLDataFilter,
         dataFormat: ResultDataFormat,   # requested data format. May be ignored by server
         readLogs: Boolean,               # added 23.2.1
-        useCache: Boolean, @since(version: "25.1.3")
+        useCache: Boolean @since(version: "25.1.3")
     ): AsyncTaskInfo!
 
     "Creates async task for reading data from the container node"
@@ -371,7 +371,7 @@ extend type Mutation {
         resultId: ID,
         filter: SQLDataFilter,
         dataFormat: ResultDataFormat,
-        useCache: Boolean, @since(version: "25.1.3")
+        useCache: Boolean @since(version: "25.1.3")
     ): AsyncTaskInfo!
 
     "Returns transaction log info for the specified project, connection and context"
