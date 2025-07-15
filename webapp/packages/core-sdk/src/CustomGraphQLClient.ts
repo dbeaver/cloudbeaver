@@ -7,6 +7,7 @@
  */
 import axios, { type AxiosProgressEvent, CanceledError, isAxiosError, isCancel } from 'axios';
 import { analyzeDocument, ClientError, GraphQLClient, type RequestDocument, type RequestOptions, type Variables } from 'graphql-request';
+import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 
 import { GQLError } from './GQLError.js';
 import type { IResponseInterceptor } from './IResponseInterceptor.js';
@@ -61,16 +62,18 @@ export class CustomGraphQLClient extends GraphQLClient {
     this.interceptors.push(interceptor);
   }
 
-  override request<T = any, V = Variables>(document: RequestDocument, variables?: V, requestHeaders?: HeadersInit): Promise<T>;
-  override request<T = any, V extends Variables = Variables>(options: RequestOptions<V>): Promise<T>;
-  override request<T = any, V extends Variables = Variables>(
-    document: RequestDocument | RequestOptions<V>,
-    variables?: V,
-    requestHeaders?: HeadersInit,
+  override request<T, V extends Variables = Variables>(
+    document: RequestDocument | TypedDocumentNode<T, V>,
+    ...variablesAndRequestHeaders: VariablesAndRequestHeadersArgs<V>
+  ): Promise<T>;
+  override request<T, V extends Variables = Variables>(options: RequestOptions<V, T>): Promise<T>;
+  override request<T, V extends Variables = Variables>(
+    documentOrOptions: RequestDocument | TypedDocumentNode<T, V> | RequestOptions<V>,
+    ...variablesAndRequestHeaders: VariablesAndRequestHeadersArgs<V>
   ): Promise<T> {
     return this.interceptors.reduce(
       (accumulator, interceptor) => interceptor(accumulator),
-      this.overrideRequest<T, V>(document, variables, requestHeaders),
+      this.overrideRequest<T, V>(documentOrOptions, ...variablesAndRequestHeaders),
     );
   }
 
@@ -95,19 +98,13 @@ export class CustomGraphQLClient extends GraphQLClient {
   }
 
   private async overrideRequest<T, V extends Variables = Variables>(
-    documentOrOptions: RequestDocument | RequestOptions<V>,
-    variables?: V,
-    requestHeaders?: HeadersInit,
+    documentOrOptions: RequestDocument | TypedDocumentNode<T, V> | RequestOptions<V>,
+    ...variablesAndRequestHeaders: VariablesAndRequestHeadersArgs<V>
   ): Promise<T> {
     this.blockRequestsReasonHandler();
     try {
-      const requestOptions = parseRequestArgs(documentOrOptions, variables, requestHeaders);
-      const { expression } = analyzeDocument(requestOptions.document);
-
-      const response = await this.rawRequest<T, V>(expression, variables, requestHeaders);
-
       // TODO: seems here can be undefined
-      return response.data;
+      return await super.request<T, V>(documentOrOptions as any, ...variablesAndRequestHeaders);
     } catch (error: any) {
       if (isClientError(error)) {
         if (isObjectError(error)) {
@@ -189,19 +186,13 @@ function isObjectError(obj: ClientError) {
   return !!obj.response.errors;
 }
 
-function parseRequestArgs<V extends Variables = Variables>(
-  documentOrOptions: RequestDocument | RequestOptions<V>,
-  variables?: V,
-  requestHeaders?: HeadersInit,
-): RequestOptions<V> {
-  if ((documentOrOptions as RequestOptions<V>).document) {
-    return documentOrOptions as RequestOptions<V>;
-  }
+type RemoveIndex<T> = {
+  [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K];
+};
 
-  return {
-    document: documentOrOptions as RequestDocument,
-    variables,
-    requestHeaders,
-    signal: undefined,
-  } as unknown as RequestOptions<V>;
-}
+type VariablesAndRequestHeadersArgs<V extends Variables> =
+  V extends Record<any, never> // do we have explicitly no variables allowed?
+    ? [variables?: V, requestHeaders?: HeadersInit]
+    : keyof RemoveIndex<V> extends never // do we get an empty variables object?
+      ? [variables?: V, requestHeaders?: HeadersInit]
+      : [variables: V, requestHeaders?: HeadersInit];

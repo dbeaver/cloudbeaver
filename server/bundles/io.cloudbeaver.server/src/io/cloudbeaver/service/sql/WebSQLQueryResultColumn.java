@@ -111,6 +111,11 @@ public class WebSQLQueryResultColumn {
     }
 
     @Property
+    public String getDescription() {
+        return attrMeta.getDescription();
+    }
+
+    @Property
     public boolean isReadOnly() {
         return DBExecUtils.isAttributeReadOnly(attrMeta, true);
     }

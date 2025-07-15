@@ -1,6 +1,6 @@
 {
   "name": "common-react",
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "yarn@4.9.2",
   "private": true,
   "workspaces": [
     "@dbeaver/*",
@@ -12,7 +12,7 @@
   "devDependencies": {
     "@dbeaver/prettier-config": "workspace:^",
     "@wroud/ts-template": "^0",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.2",
     "rimraf": "^6"
   }
 }
