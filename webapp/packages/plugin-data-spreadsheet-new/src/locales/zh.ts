@@ -23,4 +23,6 @@ export default [
   ['data_grid_table_index_column_tooltip', '选择整个表'],
   ['data_grid_table_readonly_tooltip', '只读'],
   ['plugin_data_spreadsheet_new_settings_disable', '禁用表显示'],
+  ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],
+  ['plugin_data_spreadsheet_new_settings_description_label_description', 'Description will be shown under the column names in the table header'],
 ];

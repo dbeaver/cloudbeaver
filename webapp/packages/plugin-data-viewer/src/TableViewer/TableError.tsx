@@ -9,11 +9,13 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
-import { Button, IconOrImage, s, useErrorDetails, useObservableRef, useS, useStateDelay, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, IconOrImage, Placeholder, s, useErrorDetails, useObservableRef, useS, useStateDelay, useTranslate } from '@cloudbeaver/core-blocks';
 import { ServerErrorType, ServerInternalError } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
+import { useService } from '@cloudbeaver/core-di';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel.js';
+import { DataViewerService } from '../DataViewerService.js';
 import styles from './TableError.module.css';
 
 interface Props {
@@ -32,6 +34,8 @@ interface ErrorInfo {
 export const TableError = observer<Props>(function TableError({ model, loading, className }) {
   const translate = useTranslate();
   const style = useS(styles);
+  const dataViewerService = useService(DataViewerService);
+
   const errorInfo = useObservableRef<ErrorInfo>(
     () => ({
       error: null,
@@ -94,6 +98,8 @@ export const TableError = observer<Props>(function TableError({ model, loading, 
         <div className={s(style, { errorMessage: true })}>{error.message}</div>
       </div>
       <div className={s(style, { controls: true })}>
+        <Placeholder container={dataViewerService.errorActionsContainer} model={model} />
+
         <Button className={s(style, { button: true })} type="button" variant="secondary" onClick={() => errorInfo.hide()}>
           {translate('ui_error_close')}
         </Button>

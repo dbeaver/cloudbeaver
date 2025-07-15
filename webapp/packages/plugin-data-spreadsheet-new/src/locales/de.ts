@@ -18,4 +18,6 @@ export default [
   ['data_grid_table_readonly_tooltip', 'Schreibgeschützt'],
   ['plugin_data_spreadsheet_new_settings_disable', 'Tabellenpräsentation deaktivieren'],
   ['plugin_data_spreadsheet_new_settings_disable_description', 'Deaktivieren Sie die Tabellenpräsentation von Daten für alle Benutzer'],
+  ['plugin_data_spreadsheet_new_settings_description_label', 'Show columns description'],
+  ['plugin_data_spreadsheet_new_settings_description_label_description', 'Description will be shown under the column names in the table header'],
 ];
