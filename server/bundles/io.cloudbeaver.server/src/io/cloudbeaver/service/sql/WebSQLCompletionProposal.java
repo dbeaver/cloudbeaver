@@ -18,7 +18,8 @@ package io.cloudbeaver.service.sql;
 
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPImage;
-import org.jkiss.dbeaver.model.sql.completion.SQLCompletionProposalBase;
+import org.jkiss.dbeaver.model.DBPKeywordType;
+import org.jkiss.dbeaver.model.sql.completion.CompletionProposalBase;
 
 /**
  * Web SQL dialect.
@@ -27,9 +28,9 @@ public class WebSQLCompletionProposal {
 
     private static final Log log = Log.getLog(WebSQLCompletionProposal.class);
 
-    private SQLCompletionProposalBase proposal;
+    private CompletionProposalBase proposal;
 
-    public WebSQLCompletionProposal(SQLCompletionProposalBase proposal) {
+    public WebSQLCompletionProposal(CompletionProposalBase proposal) {
         this.proposal = proposal;
     }
 
@@ -38,7 +39,7 @@ public class WebSQLCompletionProposal {
     }
 
     public String getType() {
-        return proposal.getProposalType().name();
+        return proposal.getProposalType() != null ? proposal.getProposalType().name() : DBPKeywordType.OTHER.name();
     }
 
     public String getReplacementString() {
