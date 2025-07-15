@@ -93,6 +93,9 @@ type SQLResultColumn {
 
     "Operations supported for this attribute"
     supportedOperations: [DataTypeLogicalOperation!]!
+
+    "Description of the column"
+    description: String @since(version: "25.1.3")
 }
 
 type SQLResultRowMetaData {

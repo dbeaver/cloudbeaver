@@ -8,7 +8,6 @@
 
 .header {
   display: flex;
-  align-items: center;
   align-content: center;
   width: 100%;
   gap: 4px;
@@ -30,8 +29,6 @@
 .name {
   font-weight: 400;
   flex-grow: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .readonlyStatus {
   position: absolute;
@@ -63,4 +60,8 @@
 [data-s-rearrange='right']:before {
   content: '';
   right: 0;
+}
+.description {
+  composes: theme-typography--caption from global;
+  color: var(--theme-on-secondary);
 }
