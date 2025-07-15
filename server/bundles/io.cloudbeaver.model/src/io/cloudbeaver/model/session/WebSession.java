@@ -90,7 +90,7 @@ public class WebSession extends BaseWebSession
     public static String RUNTIME_PARAM_AUTH_INFOS = "auth-infos";
     private final AtomicInteger taskCount = new AtomicInteger();
 
-    private String lastRemoteAddr;
+    private final String lastRemoteAddr;
     private String lastRemoteUserAgent;
 
     private String locale;
@@ -118,7 +118,8 @@ public class WebSession extends BaseWebSession
         this(requestInfo.getId(),
             CommonUtils.toString(requestInfo.getLocale()),
             application,
-            sessionHandlers
+            sessionHandlers,
+            requestInfo.getLastRemoteAddress()
         );
         updateSessionParameters(requestInfo);
     }
@@ -127,9 +128,14 @@ public class WebSession extends BaseWebSession
         @NotNull String id,
         @Nullable String locale,
         @NotNull ServletApplication application,
-        @NotNull Map<String, DBWSessionHandler> sessionHandlers
+        @NotNull Map<String, DBWSessionHandler> sessionHandlers,
+        @NotNull String remoteAddr
     ) throws DBException {
         super(id, application);
+        if (CommonUtils.isEmpty(remoteAddr)) {
+            throw new DBException("Remote address cannot be empty");
+        }
+        this.lastRemoteAddr = remoteAddr;
         this.lastAccessTime = this.createTime;
         this.sessionHandlers = sessionHandlers;
         setLocale(CommonUtils.toString(locale, this.locale));
@@ -458,7 +464,6 @@ public class WebSession extends BaseWebSession
     }
 
     public synchronized void updateSessionParameters(WebHttpRequestInfo requestInfo) {
-        this.lastRemoteAddr = requestInfo.getLastRemoteAddress();
         this.lastRemoteUserAgent = requestInfo.getLastRemoteUserAgent();
         this.cacheExpired = false;
     }
