@@ -174,7 +174,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     return this;
   }
 
-  async request(prevResults: IDatabaseResultSet[], prevOptions: Readonly<TOptions> | null): Promise<IDatabaseResultSet[]> {
+  async request(prevResults: IDatabaseResultSet[], prevOptions: Readonly<TOptions> | null, refresh: boolean): Promise<IDatabaseResultSet[]> {
     const options = this.options;
     const executionContext = this.executionContext;
     const executionContextInfo = this.executionContext?.context;
@@ -189,7 +189,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
 
     if (this.requestInfo.query === this.options?.query) {
       firstResultId = this.getPreviousResultId(prevResults, executionContextInfo);
-      if (firstResultId) {
+      if (firstResultId !== undefined && !refresh) {
         useServerCache = this.canUseCachedResults(prevOptions);
       }
     }

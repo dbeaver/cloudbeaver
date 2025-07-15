@@ -68,11 +68,15 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     await this.currentTask?.cancel();
   }
 
-  async request(prevResults: IDatabaseResultSet[], prevOptions: Readonly<IDataContainerOptions> | null): Promise<IDatabaseResultSet[]> {
+  async request(
+    prevResults: IDatabaseResultSet[],
+    prevOptions: Readonly<IDataContainerOptions> | null,
+    refresh: boolean,
+  ): Promise<IDatabaseResultSet[]> {
     const executionContext = await this.ensureContextCreated();
     const context = executionContext.context!;
     const limit = this.count;
-    const task = await this.getRequestTask(prevResults, prevOptions, context);
+    const task = await this.getRequestTask(prevResults, prevOptions, refresh, context);
 
     this.currentTask = executionContext.run(
       async () => {
@@ -199,6 +203,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
   protected getConfig(
     prevResults: IDatabaseResultSet[],
     prevOptions: Readonly<IDataContainerOptions> | null,
+    refresh: boolean,
     context: IConnectionExecutionContextInfo,
   ) {
     const options = this.options;
@@ -212,7 +217,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     const resultId = this.getPreviousResultId(prevResults, context);
     let useServerCache = false;
 
-    if (resultId !== undefined) {
+    if (resultId !== undefined && !refresh) {
       useServerCache = this.canUseCachedResults(prevOptions);
     }
     return {
@@ -235,10 +240,11 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
   protected async getRequestTask(
     prevResults: IDatabaseResultSet[],
     prevOptions: Readonly<IDataContainerOptions> | null,
+    refresh: boolean,
     context: IConnectionExecutionContextInfo,
   ): Promise<AsyncTask> {
     const task = this.asyncTaskInfoService.create(async () => {
-      const config = this.getConfig(prevResults, prevOptions, context);
+      const config = this.getConfig(prevResults, prevOptions, refresh, context);
       const { taskInfo } = await this.graphQLService.sdk.asyncReadDataFromContainer(config);
       return taskInfo;
     });
