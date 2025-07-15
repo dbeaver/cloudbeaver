@@ -57,7 +57,7 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         state={availableHostsState}
         readOnly={serverConfigLoader.resource.distributed}
         description={translate('administration_configuration_wizard_configuration_available_hosts_description')}
-        placeholder={`https://example.com\nhttps://localhost:5000\nhttp://127.0.0.1`}
+        placeholder={`example.com\nlocalhost:5000\n127.0.0.1`}
         onChange={availableHostsState.onAvailableHostsChange}
       >
         {translate('administration_configuration_wizard_configuration_available_hosts')}
