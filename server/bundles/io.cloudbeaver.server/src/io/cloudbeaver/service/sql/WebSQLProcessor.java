@@ -170,7 +170,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable WebDataFormat dataFormat,
         @NotNull WebSession webSession,
         boolean readLogs,
-        Boolean disableSqlCache
+        Boolean useCache
     ) throws DBWebException, DBCException {
         if (filter == null) {
             // Use default filter
@@ -192,7 +192,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         try {
             final DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
 
-            if (!CommonUtils.toBoolean(disableSqlCache)) {
+            if (CommonUtils.toBoolean(useCache)) {
                 WebSQLResultCacheService webSQLResultCacheService = new WebSQLResultCacheService();
                 WebSQLQueryResults filterCachedResults = webSQLResultCacheService.getCachedResults(
                     resultId,
@@ -326,7 +326,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable String resultId,
         @NotNull WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
-        @Nullable Boolean disableSqlCache
+        @Nullable Boolean useCache
     ) throws DBException {
 
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
@@ -341,7 +341,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                 //fixme disposer
                 null
             );
-            if (!CommonUtils.toBoolean(disableSqlCache)) {
+            if (CommonUtils.toBoolean(useCache)) {
                 WebSQLResultCacheService webSQLResultCacheService = new WebSQLResultCacheService();
                 WebSQLQueryResults filterCachedResults = webSQLResultCacheService.getCachedResults(
                     resultId,

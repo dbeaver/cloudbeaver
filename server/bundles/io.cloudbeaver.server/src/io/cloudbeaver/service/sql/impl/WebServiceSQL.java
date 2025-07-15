@@ -462,7 +462,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         @Nullable WebDataFormat dataFormat,
         boolean readLogs,
         @NotNull WebSession webSession,
-        Boolean disableSqlCache
+        Boolean useCache
     ) {
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
@@ -471,7 +471,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                     monitor.beginTask("Execute query", 1);
                     monitor.subTask("Process query " + sql);
                     WebSQLExecuteInfo executeResults = contextInfo.getProcessor().processQuery(
-                        monitor, contextInfo, sql, resultId, filter, dataFormat, webSession, readLogs, disableSqlCache);
+                        monitor, contextInfo, sql, resultId, filter, dataFormat, webSession, readLogs, useCache);
                     this.result = executeResults.getStatusMessage();
                     this.extendedResults = executeResults;
                 } catch (Throwable e) {
@@ -491,7 +491,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
-        @Nullable Boolean disableSqlCache
+        @Nullable Boolean useCache
     ) throws DBWebException {
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
             @Override
@@ -510,7 +510,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                         resultId,
                         filter != null ? filter : new WebSQLDataFilter(),
                         dataFormat,
-                        disableSqlCache);
+                        useCache);
                     this.result = executeResults.getStatusMessage();
                     this.extendedResults = executeResults;
                 } catch (Throwable e) {

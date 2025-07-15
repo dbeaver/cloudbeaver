@@ -191,7 +191,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                     getDataFormat(env),
                     CommonUtils.toBoolean(env.getArgument("readLogs")),
                     getWebSession(env),
-                    env.getArgument("disableSqlCache")))
+                    env.getArgument("useCache")))
             .dataFetcher("asyncReadDataFromContainer", env ->
                 getService(env).asyncReadDataFromContainer(
                     getSQLContext(env),
@@ -199,7 +199,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
                     env.getArgument("resultId"),
                     getDataFilter(env),
                     getDataFormat(env),
-                    env.getArgument("disableSqlCache")
+                    env.getArgument("useCache")
                 ))
             .dataFetcher("asyncSqlExecuteResults", env ->
                 getService(env).asyncGetQueryResults(

@@ -99,7 +99,7 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable WebDataFormat dataFormat,
         boolean readLogs,
         @NotNull WebSession webSession,
-        Boolean disableSqlCache
+        Boolean useCache
     ) throws DBException;
 
     @WebAction
@@ -109,7 +109,7 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
-        @Nullable Boolean disableSqlCache
+        @Nullable Boolean useCache
     ) throws DBWebException;
 
     /**
