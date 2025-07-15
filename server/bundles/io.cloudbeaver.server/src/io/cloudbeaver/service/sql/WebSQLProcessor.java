@@ -59,6 +59,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -73,6 +74,8 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     private static final String FILE_ID = "fileId";
     private static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
+    public static final int CACHE_ROW_LIMIT = 300;
+    public static final String SQL_CACHE_KEY = "webResultSetCache";
 
     private final WebSession webSession;
     private final WebConnectionInfo connection;
@@ -166,7 +169,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
         @NotNull WebSession webSession,
-        boolean readLogs) throws DBWebException, DBCException {
+        boolean readLogs,
+        Boolean disableSqlCache
+    ) throws DBWebException, DBCException {
         if (filter == null) {
             // Use default filter
             filter = new WebSQLDataFilter();
@@ -177,9 +182,33 @@ public class WebSQLProcessor implements WebSessionProvider {
         var dataContainer = new WebSQLQueryDataContainer(connection.getDataSource(), syntaxManager, sql);
 
         DBCExecutionContext context = getExecutionContext(dataContainer);
+        Map<String, Object> webResultSetCache = webSession.getAttribute(
+            SQL_CACHE_KEY,
+            cache -> new ConcurrentHashMap<>(),
+            //fixme disposer
+            null
+        );
 
         try {
             final DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
+
+            if (!CommonUtils.toBoolean(disableSqlCache)) {
+                WebSQLResultCacheService webSQLResultCacheService = new WebSQLResultCacheService();
+                WebSQLQueryResults filterCachedResults = webSQLResultCacheService.getCachedResults(
+                    resultId,
+                    webResultSetCache,
+                    dataFilter,
+                    filter,
+                    context.getDataSource().getSQLDialect()
+                );
+                if (filterCachedResults != null) {
+                    executeInfo.setResults(new WebSQLQueryResults[]{filterCachedResults});
+                    executeInfo.setDuration(0);
+                    executeInfo.setStatusMessage("Cached result set");
+                    return executeInfo;
+                }
+            }
+
             if (dataFilter.hasFilters()) {
                 sql = context.getDataSource().getSQLDialect().addFiltersToQuery(
                     monitor,
@@ -260,7 +289,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                             if (sqlOutputLogReaderJob != null) {
                                 sqlOutputLogReaderJob.join();
                             }
-                            fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, webDataFilter, dataFilter, dataFormat);
+                            fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, webDataFilter, dataFilter, dataFormat, resultId);
                         } catch (DBException e) {
                             throw new InvocationTargetException(e);
                         }
@@ -280,6 +309,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         executeInfo.setDuration(System.currentTimeMillis() - startTime);
         if (executeInfo.getResults().length == 0) {
             executeInfo.setStatusMessage("No Data");
+        } else if (executeInfo.getResults().length == 1) {
+            webResultSetCache.put(resultId, executeInfo.getResults()[0]);
         } else {
             executeInfo.setStatusMessage("Executed");
         }
@@ -294,28 +325,39 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull DBSDataContainer dataContainer,
         @Nullable String resultId,
         @NotNull WebSQLDataFilter filter,
-        @Nullable WebDataFormat dataFormat) throws DBException {
+        @Nullable WebDataFormat dataFormat,
+        @Nullable Boolean disableSqlCache
+    ) throws DBException {
 
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
         DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
-            Map<String, Object> webResultSetCache = webSession.getAttribute("webResultSetCache", cache -> new HashMap<>(), null);
-            if (resultId!=null && webResultSetCache.get(resultId) != null) {
-                // Result set already cached, no need to read it again
-                WebSQLQueryResults cachedResults = (WebSQLQueryResults) webResultSetCache.get(resultId);
-                filterCachedResults(
-                    cachedResults,
+
+            Map<String, Object> webResultSetCache = webSession.getAttribute(
+                SQL_CACHE_KEY,
+                cache -> new ConcurrentHashMap<>(),
+                //fixme disposer
+                null
+            );
+            if (!CommonUtils.toBoolean(disableSqlCache)) {
+                WebSQLResultCacheService webSQLResultCacheService = new WebSQLResultCacheService();
+                WebSQLQueryResults filterCachedResults = webSQLResultCacheService.getCachedResults(
+                    resultId,
+                    webResultSetCache,
                     dataFilter,
-                    filter.getOffset(),
-                    filter.getLimit(),
-                    dataFormat);
-                executeInfo.setResults(new WebSQLQueryResults[]{cachedResults});
-                executeInfo.setDuration(0);
-                executeInfo.setStatusMessage("Cached result set");
-                return;
+                    filter,
+                    executionContext.getDataSource().getSQLDialect()
+                );
+                if (filterCachedResults != null) {
+                    executeInfo.setResults(new WebSQLQueryResults[] {filterCachedResults});
+                    executeInfo.setDuration(0);
+                    executeInfo.setStatusMessage("Cached result set");
+                    return;
+                }
             }
+
             try (DBCSession session = executionContext.openSession(monitor, resolveQueryPurpose(dataFilter), "Read data from container")) {
                 try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
                     DBCStatistics statistics = dataContainer.readData(
@@ -339,10 +381,9 @@ public class WebSQLProcessor implements WebSessionProvider {
                     if (resultSet != null && resultSet.getRows() != null && resultSet.getResultsInfo() != null) {
                         resultSet.getResultsInfo().setQueryText(statistics.getQueryText());
                         executeInfo.setStatusMessage(resultSet.getRows().length + " row(s) fetched");
-                    }
-                    //fixme maybe cover under configuration. Also need to check for size before put it into cache
-                    if (resultSet.getId() != null) {
-                        webResultSetCache.put(resultSet.getId(), results);
+                        if (resultSet.getId() != null && resultSet.getRows().length < CACHE_ROW_LIMIT) {
+                            webResultSetCache.put(resultSet.getId(), results);
+                        }
                     }
                 } catch (DBException e) {
                     throw new InvocationTargetException(e);
@@ -350,138 +391,6 @@ public class WebSQLProcessor implements WebSessionProvider {
             }
         });
         return executeInfo;
-    }
-
-    private void filterCachedResults(
-        WebSQLQueryResults cachedResults,
-        DBDDataFilter dataFilter,
-        int offset,
-        int limit,
-        WebDataFormat dataFormat
-    ) {
-        WebSQLQueryResultSet resultSet = cachedResults.getResultSet();
-        if (resultSet == null) {
-            return;
-        }
-        List<WebSQLQueryResultSetRow> allRows = resultSet.getRowsWithMetaData();
-        if (allRows == null || allRows.isEmpty()) {
-            return;
-        }
-        // Filter rows by dataFilter constraints and where
-        List<WebSQLQueryResultSetRow> filteredRows = new ArrayList<>();
-        for (WebSQLQueryResultSetRow row : allRows) {
-            if (matchesFilter(row, resultSet, dataFilter)) {
-                filteredRows.add(row);
-            }
-        }
-        // Sort rows if ordering is specified
-        List<DBDAttributeConstraint> orderConstraints = dataFilter.getOrderConstraints();
-        if (!orderConstraints.isEmpty()) {
-            filteredRows.sort((r1, r2) -> compareRowsByOrder(r1, r2, resultSet, orderConstraints));
-        }
-        // Apply offset and limit
-        int fromIndex = Math.max(0, offset);
-        int toIndex = limit > 0 ? Math.min(filteredRows.size(), fromIndex + limit) : filteredRows.size();
-        List<WebSQLQueryResultSetRow> pagedRows = fromIndex < toIndex ? filteredRows.subList(fromIndex, toIndex) : Collections.emptyList();
-        resultSet.setRows(pagedRows);
-        resultSet.setHasMoreData(toIndex < filteredRows.size());
-    }
-
-    // Checks if a row matches the filter constraints and where
-    private boolean matchesFilter(WebSQLQueryResultSetRow row, WebSQLQueryResultSet resultSet, DBDDataFilter dataFilter) {
-        // Only basic constraint filtering (equality, null, etc.)
-        for (DBDAttributeConstraint constraint : dataFilter.getConstraints()) {
-            if (!constraint.hasFilter()) continue;
-            int colIndex = constraint.getAttribute() != null ? constraint.getAttribute().getOrdinalPosition() : -1;
-            if (colIndex < 0 || colIndex >= row.getData().length) continue;
-            Object value = row.getData()[colIndex];
-            Object filterValue = constraint.getValue();
-            if (filterValue == null) {
-                continue;
-//                if (value != null) return false;
-            } else {
-                if (value == null || !filterValue.equals(value)) return false;
-            }
-        }
-        // Evaluate 'where' expression if present
-        String where = dataFilter.getWhere();
-        if (!CommonUtils.isEmpty(where)) {
-            // Very basic support: only expressions like "col = value" joined by AND/OR
-            // This is NOT a SQL parser, just a simple evaluator for basic cases
-            String[] andParts = where.split("(?i)\\s+AND\\s+");
-            for (String andPart : andParts) {
-                String[] orParts = andPart.split("(?i)\\s+OR\\s+");
-                boolean orResult = false;
-                for (String expr : orParts) {
-                    expr = expr.trim();
-                    // Support: col = value, col != value, col IS NULL, col IS NOT NULL
-                    if (expr.matches(".+\\s+IS\\s+NULL")) {
-                        String col = expr.replaceAll("\\s+IS\\s+NULL", "").trim();
-                        int colIdx = getColumnIndexByName(resultSet, col);
-                        if (colIdx >= 0 && row.getData()[colIdx] == null) {
-                            orResult = true;
-                            break;
-                        }
-                    } else if (expr.matches(".+\\s+IS\\s+NOT\\s+NULL")) {
-                        String col = expr.replaceAll("\\s+IS\\s+NOT\\s+NULL", "").trim();
-                        int colIdx = getColumnIndexByName(resultSet, col);
-                        if (colIdx >= 0 && row.getData()[colIdx] != null) {
-                            orResult = true;
-                            break;
-                        }
-                    } else if (expr.contains("!=")) {
-                        String[] parts = expr.split("!=");
-                        if (parts.length == 2) {
-                            String col = parts[0].trim();
-                            String val = unquote(parts[1].trim());
-                            int colIdx = getColumnIndexByName(resultSet, col);
-                            Object cell = colIdx >= 0 ? row.getData()[colIdx] : null;
-                            if (cell != null && !cell.toString().equals(val)) {
-                                orResult = true;
-                                break;
-                            }
-                        }
-                    } else if (expr.contains("=")) {
-                        String[] parts = expr.split("=");
-                        if (parts.length == 2) {
-                            String col = parts[0].trim();
-                            String val = unquote(parts[1].trim());
-                            int colIdx = getColumnIndexByName(resultSet, col);
-                            Object cell = colIdx >= 0 ? row.getData()[colIdx] : null;
-                            if (cell != null && cell.toString().equals(val)) {
-                                orResult = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (!orResult) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    // Helper: get column index by name (case-insensitive)
-    private int getColumnIndexByName(WebSQLQueryResultSet resultSet, String colName) {
-        WebSQLQueryResultColumn[] columns = resultSet.getColumns();
-        if (columns == null) return -1;
-        for (int i = 0; i < columns.length; i++) {
-            if (columns[i].getLabel().equalsIgnoreCase(colName) ||
-                (columns[i].getAttribute() != null && columns[i].getAttribute().getName().equalsIgnoreCase(colName))) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    // Helper: remove quotes from string value if present
-    private String unquote(String s) {
-        if ((s.startsWith("'") && s.endsWith("'")) || (s.startsWith("\"") && s.endsWith("\""))) {
-            return s.substring(1, s.length() - 1);
-        }
-        return s;
     }
 
     public WebSQLExecuteInfo updateResultsDataBatch(
@@ -964,7 +873,7 @@ public class WebSQLProcessor implements WebSessionProvider {
     }
 
     @Nullable
-    public Object convertInputCellValue(DBCSession session, DBDAttributeBinding updateAttribute, Object cellRawValue, boolean justGenerateScript) throws DBCException {
+    public Object convertInputCellValue(DBCSession session, DBDAttributeBinding updateAttribute, Object cellRawValue, boolean justGenerateScript) throws DBException {
         cellRawValue = WebSQLUtils.makePlainCellValue(session, updateAttribute, cellRawValue);
         Object realCellValue = cellRawValue;
         // In some cases we already have final value here
@@ -1179,7 +1088,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull WebSQLExecuteInfo executeInfo,
         @NotNull WebSQLDataFilter webDataFilter,
         @NotNull DBDDataFilter dataFilter,
-        @Nullable WebDataFormat dataFormat) throws DBException {
+        @Nullable WebDataFormat dataFormat,
+        @Nullable String resultId
+    ) throws DBException {
 
         List<WebSQLQueryResults> resultList = new ArrayList<>();
         int maxResultsCount = resolveMaxResultsCount(dataContainer.getDataSource());
@@ -1208,6 +1119,15 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
             }
             hasResultSet = dbStat.nextResults();
+        }
+        if(resultList.size() == 1){
+            Map<String, Object> webResultSetCache = webSession.getAttribute(
+                SQL_CACHE_KEY,
+                cache -> new ConcurrentHashMap<>(),
+                //fixme disposer
+                null
+            );
+            webResultSetCache.put(resultId, resultList.getFirst());
         }
         if (resultList.isEmpty()) {
             stats.setUpdateRowCount(rowsUpdated);
@@ -1275,6 +1195,31 @@ public class WebSQLProcessor implements WebSessionProvider {
             }
         }
         return result;
+    }
+
+    // Returns the column index by name (case-insensitive, trims spaces and quotes)
+    private int getColumnIndexByName(WebSQLQueryResultSet resultSet, String columnName) {
+        if (resultSet == null || columnName == null) return -1;
+        String normalized = columnName.trim();
+        // Remove quotes if present
+        if ((normalized.startsWith("'") && normalized.endsWith("'")) || (normalized.startsWith("\"") && normalized.endsWith("\""))) {
+            normalized = normalized.substring(1, normalized.length() - 1);
+        }
+        normalized = normalized.trim();
+        for (int i = 0; i < resultSet.getColumns().length; i++) {
+            String colName = resultSet.getColumns()[i].getName();
+            if (colName.equalsIgnoreCase(normalized)) {
+                return i;
+            }
+        }
+        // Try to match ignoring case and spaces
+        for (int i = 0; i < resultSet.getColumns().length; i++) {
+            String colName = resultSet.getColumns()[i].getName();
+            if (colName.replaceAll("\\s+", "").equalsIgnoreCase(normalized.replaceAll("\\s+", ""))) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**

@@ -23,6 +23,7 @@ import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.meta.Property;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,6 +48,21 @@ public class WebSQLQueryResultSet {
     private String readOnlyStatus;
 
     public WebSQLQueryResultSet() {
+    }
+
+    public WebSQLQueryResultSet(WebSQLQueryResultSet webSQLQueryResultSet) {
+        this.columns = new WebSQLQueryResultColumn[webSQLQueryResultSet.columns.length];
+        System.arraycopy(webSQLQueryResultSet.columns, 0, this.columns, 0, webSQLQueryResultSet.columns.length);
+        this.rows = new ArrayList<>(webSQLQueryResultSet.rows);
+        this.hasMoreData = webSQLQueryResultSet.hasMoreData;
+        this.resultsInfo = webSQLQueryResultSet.resultsInfo;
+        this.singleEntity = webSQLQueryResultSet.singleEntity;
+        this.hasRowIdentifier = webSQLQueryResultSet.hasRowIdentifier;
+        this.hasChildrenCollection = webSQLQueryResultSet.hasChildrenCollection;
+        this.isSupportsDataFilter = webSQLQueryResultSet.isSupportsDataFilter;
+        this.hasDynamicTrace = webSQLQueryResultSet.hasDynamicTrace;
+        this.readOnly = webSQLQueryResultSet.readOnly;
+        this.readOnlyStatus = webSQLQueryResultSet.readOnlyStatus;
     }
 
     @Property

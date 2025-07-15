@@ -98,7 +98,9 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
         boolean readLogs,
-        @NotNull WebSession webSession) throws DBException;
+        @NotNull WebSession webSession,
+        Boolean disableSqlCache
+    ) throws DBException;
 
     @WebAction
     WebAsyncTaskInfo asyncReadDataFromContainer(
@@ -106,7 +108,9 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull String nodePath,
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
-        @Nullable WebDataFormat dataFormat) throws DBWebException;
+        @Nullable WebDataFormat dataFormat,
+        @Nullable Boolean disableSqlCache
+    ) throws DBWebException;
 
     /**
      * Reads dynamic trace from provided database results.

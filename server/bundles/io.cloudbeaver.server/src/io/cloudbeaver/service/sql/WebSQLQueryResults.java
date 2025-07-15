@@ -46,6 +46,13 @@ public class WebSQLQueryResults {
         this.dataFormat = dataFormat == null ? WebDataFormat.resultset : dataFormat;
     }
 
+    public WebSQLQueryResults(WebSQLQueryResults webSQLQueryResults) {
+        this.webSession = webSQLQueryResults.webSession;
+        this.dataFormat = webSQLQueryResults.dataFormat;
+        this.updateRowCount = webSQLQueryResults.updateRowCount;
+        this.resultSet = webSQLQueryResults.resultSet == null ? null : new WebSQLQueryResultSet(webSQLQueryResults.resultSet);
+    }
+
     @Property
     public WebDataFormat getDataFormat() {
         return dataFormat;
