@@ -44,7 +44,7 @@ public class GraphQLLoggerUtil {
         return userId;
     }
 
-    public static String getSessionId(HttpServletRequest request) {
+    public static String getSmSessionId(HttpServletRequest request) {
         WebSession session = getWebSession(request);
         if (session == null) {
             return null;
@@ -53,7 +53,7 @@ public class GraphQLLoggerUtil {
     }
 
     @Nullable
-    private static WebSession getWebSession(HttpServletRequest request) {
+    public static WebSession getWebSession(HttpServletRequest request) {
         if (request.getSession() == null) {
             return null;
         }

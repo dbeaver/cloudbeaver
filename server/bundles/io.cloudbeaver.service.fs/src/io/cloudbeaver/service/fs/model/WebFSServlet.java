@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import org.eclipse.jetty.ee10.servlet.ServletContextRequest;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.utils.CommonUtils;
@@ -42,6 +43,8 @@ import java.util.Map;
 
 @MultipartConfig()
 public class WebFSServlet extends WebServiceServletBase {
+
+    private static final Log log = Log.getLog(WebFSServlet.class);
     private static final String PARAM_PROJECT_ID = "projectId";
     private final DBWServiceFS fs;
 
@@ -101,5 +104,21 @@ public class WebFSServlet extends WebServiceServletBase {
             throw new DBWebException("File Upload Failed: Unable to Save File to the File System",
                 CommonUtils.getRootCause(e));
         }
+    }
+
+    @Override
+    protected Map<String, Object> getVariables(HttpServletRequest request) {
+        Map<String, Object> variables = super.getVariables(request);
+        try {
+            for (Part part : request.getParts()) {
+                if (part.getSubmittedFileName()!= null && !part.getSubmittedFileName().isEmpty()) {
+                    variables.put("fileName", part.getSubmittedFileName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            log.debug("Failed to get fileName from request for logging", e);
+        }
+        return variables;
     }
 }
