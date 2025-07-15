@@ -17,9 +17,13 @@ export interface IDataGroupingOptions extends IDataQueryOptions {
 }
 
 export class GroupingDataSource extends QueryDataSource<IDataGroupingOptions> {
-  override async request(prevResults: IDatabaseResultSet[], prevOptions: Readonly<IDataGroupingOptions> | null): Promise<IDatabaseResultSet[]> {
+  override async request(
+    prevResults: IDatabaseResultSet[],
+    prevOptions: Readonly<IDataGroupingOptions> | null,
+    refresh: boolean,
+  ): Promise<IDatabaseResultSet[]> {
     await this.generateQuery();
-    return await super.request(prevResults, prevOptions);
+    return await super.request(prevResults, prevOptions, refresh);
   }
 
   private async generateQuery(): Promise<void> {
