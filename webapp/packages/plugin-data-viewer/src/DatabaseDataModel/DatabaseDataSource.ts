@@ -345,12 +345,13 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     await this.cancel();
   }
 
-  abstract request(prevResults: TResult[]): Promise<TResult[]>;
+  abstract request(prevResults: TResult[], prevOptions: Readonly<TOptions> | null): Promise<TResult[]>;
   abstract save(prevResults: TResult[]): Promise<TResult[]>;
 
   private async requestDataAction(): Promise<TResult[]> {
+    const prevOptions = this.prevOptions;
     this.prevOptions = toJS(this.options);
-    return this.request(this.results)
+    return this.request(this.results, prevOptions)
       .finally(() => {
         this.outdated = false;
       })

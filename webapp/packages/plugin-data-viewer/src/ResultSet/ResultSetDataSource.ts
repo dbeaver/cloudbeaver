@@ -7,7 +7,7 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import type { IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import { isConnectionInfoParamEqual, type IConnectionExecutionContext, type IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { AsyncTaskInfoService } from '@cloudbeaver/core-root';
@@ -17,7 +17,10 @@ import { DatabaseDataSource } from '../DatabaseDataModel/DatabaseDataSource.js';
 import { type IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions.js';
 import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet.js';
 
-export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
+export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions = IDatabaseDataOptions> extends DatabaseDataSource<
+  TOptions,
+  IDatabaseResultSet
+> {
   executionContext: IConnectionExecutionContext | null;
   totalCountRequestTask: ITask<number> | null;
   private keepExecutionContextOnDispose: boolean;
@@ -138,6 +141,39 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
     return resultId;
   }
 
+  protected canUseCachedResults(prevOptions: Readonly<TOptions> | null): boolean {
+    if (
+      !prevOptions ||
+      this.results.some(result => !result.loadedFully) ||
+      (this.options?.connectionKey === undefined && this.options?.connectionKey !== prevOptions.connectionKey) ||
+      (this.options?.connectionKey !== undefined &&
+        prevOptions.connectionKey !== undefined &&
+        !isConnectionInfoParamEqual(this.options.connectionKey, prevOptions.connectionKey)) ||
+      this.options?.catalog !== prevOptions.catalog ||
+      this.options?.schema !== prevOptions.schema ||
+      this.options?.readLogs !== prevOptions.readLogs ||
+      this.options?.whereFilter !== prevOptions.whereFilter
+    ) {
+      return false;
+    }
+
+    for (const constraint of prevOptions.constraints || []) {
+      if (constraint.criteria !== undefined || constraint.operator !== undefined) {
+        const prevConstraint = this.options?.constraints.find(c => c.attributePosition === constraint.attributePosition);
+
+        if (
+          !prevConstraint ||
+          prevConstraint.criteria !== constraint.criteria ||
+          prevConstraint.operator !== constraint.operator ||
+          prevConstraint.value !== constraint.value
+        ) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
   private setTotalCount(resultIndex: number, count: number): this {
     const result = this.getResult(resultIndex);
 
@@ -171,6 +207,6 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
   }
 }
 
-export function isResultSetDataSource<T = IDatabaseDataOptions>(dataSource: any): dataSource is ResultSetDataSource<T> {
+export function isResultSetDataSource<T extends IDatabaseDataOptions = IDatabaseDataOptions>(dataSource: any): dataSource is ResultSetDataSource<T> {
   return dataSource instanceof ResultSetDataSource;
 }

@@ -1,22 +1,23 @@
-
 mutation asyncReadDataFromContainer(
-    $projectId: ID!
-    $connectionId: ID!
-    $contextId: ID!
-    $containerNodePath: ID!
-    $resultId: ID
-    $filter: SQLDataFilter
-    $dataFormat: ResultDataFormat
+  $projectId: ID!
+  $connectionId: ID!
+  $contextId: ID!
+  $containerNodePath: ID!
+  $resultId: ID
+  $filter: SQLDataFilter
+  $dataFormat: ResultDataFormat
+  $useCache: Boolean
 ) {
-    taskInfo: asyncReadDataFromContainer(
-        projectId: $projectId
-        connectionId: $connectionId
-        contextId: $contextId
-        containerNodePath: $containerNodePath
-        resultId: $resultId
-        filter: $filter
-        dataFormat: $dataFormat
-    ) {
-       ...AsyncTaskInfo
-    }
+  taskInfo: asyncReadDataFromContainer(
+    projectId: $projectId
+    connectionId: $connectionId
+    contextId: $contextId
+    containerNodePath: $containerNodePath
+    resultId: $resultId
+    filter: $filter
+    dataFormat: $dataFormat
+    useCache: $useCache
+  ) {
+    ...AsyncTaskInfo
+  }
 }

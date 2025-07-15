@@ -174,7 +174,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     return this;
   }
 
-  async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
+  async request(prevResults: IDatabaseResultSet[], prevOptions: Readonly<TOptions> | null): Promise<IDatabaseResultSet[]> {
     const options = this.options;
     const executionContext = this.executionContext;
     const executionContextInfo = this.executionContext?.context;
@@ -185,9 +185,13 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     const limit = this.count;
 
     let firstResultId: string | undefined;
+    let useServerCache = false;
 
     if (this.requestInfo.query === this.options?.query) {
       firstResultId = this.getPreviousResultId(prevResults, executionContextInfo);
+      if (firstResultId) {
+        useServerCache = this.canUseCachedResults(prevOptions);
+      }
     }
 
     const task = this.asyncTaskInfoService.create(async () => {
@@ -205,6 +209,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
         },
         dataFormat: this.dataFormat,
         readLogs: options.readLogs,
+        useCache: useServerCache,
       });
 
       return taskInfo;
@@ -223,6 +228,11 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
 
     try {
       const response = await this.currentTask;
+
+      const whereFilter = response.filterText || '';
+      this.options!.whereFilter = whereFilter || this.options?.whereFilter || '';
+      //@ts-expect-error
+      this.prevOptions!.whereFilter = whereFilter || this.options?.whereFilter || '';
 
       const results = this.innerGetResults(executionContextInfo, response, limit);
       this.clearError();
