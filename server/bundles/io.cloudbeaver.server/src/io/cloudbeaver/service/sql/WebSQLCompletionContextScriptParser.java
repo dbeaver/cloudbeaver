@@ -59,6 +59,7 @@ public class WebSQLCompletionContextScriptParser {
                         monitor,
                         request.getContext().getExecutionContext(),
                         true,
+                        false,
                         request.getContext().getSyntaxManager(),
                         request.getContext().getDataSource().getSQLDialect()
                     ),
