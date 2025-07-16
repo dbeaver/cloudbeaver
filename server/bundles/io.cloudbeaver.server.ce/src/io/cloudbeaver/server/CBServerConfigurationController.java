@@ -93,6 +93,11 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             log.debug("Runtime configuration [" + runtimeConfigPath.toAbsolutePath() + "]");
             loadConfiguration(runtimeConfigPath);
         }
+        CBServerConfig serverConfig = getServerConfiguration();
+        if (CommonUtils.isEmpty(serverConfig.getAvailableHosts())
+            && CommonUtils.isNotEmpty(serverConfig.getServerURL())) {
+            serverConfig.setSecureCookies(serverConfig.getServerURL().startsWith("https://"));
+        }
         // Set default preferences
         PrefUtils.setDefaultPreferenceValue(DBWorkbench.getPlatform().getPreferenceStore(),
             ModelPreferences.UI_DRIVERS_HOME,

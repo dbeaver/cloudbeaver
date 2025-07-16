@@ -195,7 +195,7 @@ public class CBServerConfig implements WebServerConfiguration {
 
     @NotNull
     public Set<String> getAvailableHosts() {
-        return availableHosts;
+        return new LinkedHashSet<>(availableHosts);
     }
 
     public void setAvailableHosts(@NotNull Collection<String> availableHosts) {
