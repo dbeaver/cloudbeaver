@@ -159,18 +159,29 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
 
     for (const constraint of prevOptions.constraints || []) {
       if (constraint.criteria !== undefined || constraint.operator !== undefined) {
-        const prevConstraint = this.options?.constraints.find(c => c.attributePosition === constraint.attributePosition);
+        const currentConstraint = this.options?.constraints.find(c => c.attributePosition === constraint.attributePosition);
 
         if (
-          !prevConstraint ||
-          prevConstraint.criteria !== constraint.criteria ||
-          prevConstraint.operator !== constraint.operator ||
-          prevConstraint.value !== constraint.value
+          !currentConstraint ||
+          currentConstraint.criteria !== constraint.criteria ||
+          currentConstraint.operator !== constraint.operator ||
+          currentConstraint.value !== constraint.value
         ) {
           return false;
         }
       }
     }
+
+    for (const constraint of this.options.constraints || []) {
+      if (constraint.criteria !== undefined || constraint.operator !== undefined) {
+        const prevConstraint = prevOptions.constraints.find(c => c.attributePosition === constraint.attributePosition);
+
+        if (!prevConstraint) {
+          return false;
+        }
+      }
+    }
+
     return true;
   }
 
