@@ -18,6 +18,7 @@ package io.cloudbeaver.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.cloudbeaver.model.apilog.ApiCallInterceptor;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebAppUtils;
@@ -31,6 +32,7 @@ import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 public abstract class WebServiceServletBase extends HttpServlet {
@@ -42,6 +44,7 @@ public abstract class WebServiceServletBase extends HttpServlet {
         .serializeNulls()
         .setPrettyPrinting()
         .create();
+    public static final String API_PROTOCOL = "REST";
 
     private final ServletApplication application;
 
@@ -60,11 +63,21 @@ public abstract class WebServiceServletBase extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Web session not found");
             return;
         }
+
+        LocalDateTime startTime = LocalDateTime.now();
+        String errorMessage = null;
         try {
             processServiceRequest(webSession, request, response);
         } catch (Exception e) {
             log.error(e);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error processing request: " + e.getMessage());
+            errorMessage = e.getMessage();
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error processing request: " + errorMessage);
+        } finally {
+            if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
+                apiCallInterceptor.onApiCallEvent(
+                    request, getVariables(request), request.getRequestURI(), startTime, errorMessage, API_PROTOCOL
+                );
+            }
         }
     }
 

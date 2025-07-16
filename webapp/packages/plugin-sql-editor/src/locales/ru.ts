@@ -1,5 +1,9 @@
 export default [
   ['plugin_sql_editor_sql_editor_settings_group', 'SQL Редактор'],
+  ['sql_editor_settings_content_assistant_experimental_mode_name', 'Режим автодополнения'],
+  ['sql_editor_settings_content_assistant_experimental_mode_desc', 'Режим автодополнения SQL редактора'],
+  ['sql_editor_settings_content_assistant_experimental_mode_default', 'Легаси'],
+  ['sql_editor_settings_content_assistant_experimental_mode_new', 'Семантический'],
   ['sql_editor_settings_insert_table_aliases_name', 'Вставлять алиасы таблиц (в FROM условии)'],
   ['sql_editor_settings_insert_table_aliases_desc', 'Автоматически вставляет алиасы для таблиц'],
   ['sql_editor_menu', 'SQL Редактор'],
