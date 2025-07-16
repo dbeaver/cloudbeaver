@@ -14,6 +14,7 @@ import { createSettingsAliasResolver } from './createSettingsAliasResolver.js';
 import { SettingsProvider } from './SettingsProvider.js';
 import { schema } from '@cloudbeaver/core-utils';
 import { SettingsSource } from './SettingsSource.js';
+import { initKnownConsoleMessages } from '@cloudbeaver/tests-runner';
 
 export class MemorySettingsService extends SettingsSource {
   private readonly settings: Map<string, any>;
@@ -68,7 +69,9 @@ export class MemorySettingsService extends SettingsSource {
 
 const MEMORY_SETTINGS_LAYER = createSettingsLayer(ROOT_SETTINGS_LAYER, 'memory');
 
-describe.skip('SettingsResolverSource', () => {
+describe('SettingsResolverSource', () => {
+  initKnownConsoleMessages();
+
   test('resolves setting from source', () => {
     const memorySettingsSource = new MemorySettingsService();
     const settingsResolver = new SettingsResolverSource();
