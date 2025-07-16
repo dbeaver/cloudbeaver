@@ -166,7 +166,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable WebDataFormat dataFormat,
         @NotNull WebSession webSession,
         boolean readLogs,
-        Boolean useCache
+        @Nullable Boolean useCache
     ) throws DBWebException, DBCException {
         if (filter == null) {
             // Use default filter
@@ -180,19 +180,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         try {
             final DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
 
-            if (CommonUtils.toBoolean(useCache)) {
-                WebSQLResultCacheService webSQLResultCacheService = new WebSQLResultCacheService();
-                WebSQLQueryResults filterCachedResults = webSQLResultCacheService.getCachedSQLQueryResults(
-                    resultId,
-                    contextInfo,
-                    filter
-                );
-                if (filterCachedResults != null) {
-                    executeInfo.setResults(new WebSQLQueryResults[]{filterCachedResults});
-                    executeInfo.setDuration(0);
-                    executeInfo.setStatusMessage("Cached result set");
-                    return executeInfo;
-                }
+            if (trySetCachedResults(useCache, resultId, contextInfo, filter, executeInfo)) {
+                return executeInfo;
             }
 
             if (dataFilter.hasFilters()) {
@@ -320,19 +309,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
 
-            if (CommonUtils.toBoolean(useCache)) {
-                WebSQLResultCacheService webSQLResultCacheService = new WebSQLResultCacheService();
-                WebSQLQueryResults filterCachedResults = webSQLResultCacheService.getCachedSQLQueryResults(
-                    resultId,
-                    contextInfo,
-                    filter
-                );
-                if (filterCachedResults != null) {
-                    executeInfo.setResults(new WebSQLQueryResults[] {filterCachedResults});
-                    executeInfo.setDuration(0);
-                    executeInfo.setStatusMessage("Cached result set");
-                    return;
-                }
+            if (trySetCachedResults(useCache, resultId, contextInfo, filter, executeInfo)) {
+                return;
             }
 
             try (DBCSession session = executionContext.openSession(monitor, resolveQueryPurpose(dataFilter), "Read data from container")) {
@@ -481,6 +459,34 @@ public class WebSQLProcessor implements WebSessionProvider {
         result.setResults(queryResults.toArray(new WebSQLQueryResults[0]));
 
         return result;
+    }
+
+    /**
+     * Checks cache and sets executeInfo if cached results are found.
+     * @return true if cached results were used, false otherwise
+     */
+    private boolean trySetCachedResults(
+        @Nullable Boolean useCache,
+        @Nullable String resultId,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull WebSQLDataFilter filter,
+        @NotNull WebSQLExecuteInfo executeInfo
+    ) {
+        if (CommonUtils.toBoolean(useCache)) {
+            WebSQLResultCacheService webSQLResultCacheService = new WebSQLResultCacheService();
+            WebSQLQueryResults filterCachedResults = webSQLResultCacheService.getCachedSQLQueryResults(
+                resultId,
+                contextInfo,
+                filter
+            );
+            if (filterCachedResults != null) {
+                executeInfo.setResults(new WebSQLQueryResults[] {filterCachedResults});
+                executeInfo.setDuration(0);
+                executeInfo.setStatusMessage("Cached result set");
+                return true;
+            }
+        }
+        return false;
     }
 
     private void sendTransactionalEvent(WebSQLContextInfo contextInfo) {

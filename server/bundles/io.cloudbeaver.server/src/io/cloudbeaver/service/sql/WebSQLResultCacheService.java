@@ -73,20 +73,20 @@ public class WebSQLResultCacheService {
     }
 
     private int compareRowsByOrder(
-        WebSQLQueryResultSetRow r1,
-        WebSQLQueryResultSetRow r2,
-        List<DBDAttributeConstraint> orderConstraints
+        @NotNull WebSQLQueryResultSetRow r1,
+        @NotNull WebSQLQueryResultSetRow r2,
+        @NotNull List<DBDAttributeConstraint> orderConstraints
     ) {
         int result = 0;
-        for (DBDAttributeConstraint o : orderConstraints) {
-            int colIndex = o.getAttribute() != null ? o.getAttribute().getOrdinalPosition() : -1;
+        for (DBDAttributeConstraint attributeConstraint : orderConstraints) {
+            int colIndex = attributeConstraint.getAttribute() != null ? attributeConstraint.getAttribute().getOrdinalPosition() : -1;
             if (colIndex < 0) {
                 continue;
             }
             Object cell1 = r1.getData()[colIndex];
             Object cell2 = r2.getData()[colIndex];
             Comparator<Object> comparator = null;
-            if (o.getAttribute() != null && o.getAttribute() instanceof DBDAttributeBinding binding) {
+            if (attributeConstraint.getAttribute() != null && attributeConstraint.getAttribute() instanceof DBDAttributeBinding binding) {
                 comparator = binding.getValueHandler().getComparator();
             }
             if (comparator != null) {
@@ -94,7 +94,7 @@ public class WebSQLResultCacheService {
             } else {
                 result = DBUtils.compareDataValues(cell1, cell2);
             }
-            if (o.isOrderDescending()) {
+            if (attributeConstraint.isOrderDescending()) {
                 result = -result;
             }
             if (result != 0) {

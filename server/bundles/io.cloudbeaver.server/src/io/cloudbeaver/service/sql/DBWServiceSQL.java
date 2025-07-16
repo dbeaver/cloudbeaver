@@ -99,7 +99,7 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable WebDataFormat dataFormat,
         boolean readLogs,
         @NotNull WebSession webSession,
-        Boolean useCache
+        @Nullable Boolean useCache
     ) throws DBException;
 
     @WebAction
