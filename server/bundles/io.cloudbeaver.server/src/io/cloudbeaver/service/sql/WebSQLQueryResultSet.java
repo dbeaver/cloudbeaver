@@ -16,9 +16,11 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -46,8 +48,10 @@ public class WebSQLQueryResultSet {
     private boolean hasDynamicTrace;
     private boolean readOnly;
     private String readOnlyStatus;
+    private WebSession webSession;
 
-    public WebSQLQueryResultSet() {
+    public WebSQLQueryResultSet(WebSession webSession) {
+        this.webSession = webSession;
     }
 
     public WebSQLQueryResultSet(WebSQLQueryResultSet webSQLQueryResultSet) {
@@ -63,6 +67,7 @@ public class WebSQLQueryResultSet {
         this.hasDynamicTrace = webSQLQueryResultSet.hasDynamicTrace;
         this.readOnly = webSQLQueryResultSet.readOnly;
         this.readOnlyStatus = webSQLQueryResultSet.readOnlyStatus;
+        this.webSession = webSQLQueryResultSet.webSession;
     }
 
     @Property
@@ -87,15 +92,32 @@ public class WebSQLQueryResultSet {
         this.columns = columns;
     }
 
-    @Property
-    @Deprecated
+    /**
+     * Get original rows from result set.
+     */
     public Object[][] getRows() {
         return rows.stream().map(WebSQLQueryResultSetRow::getData).toArray(x -> new Object[x][1]);
     }
 
     @Property
     public List<WebSQLQueryResultSetRow> getRowsWithMetaData() {
-        return rows;
+
+        // Convert row values
+        List<WebSQLQueryResultSetRow> result = new ArrayList<>();
+        for (WebSQLQueryResultSetRow row : rows) {
+            result.add(new WebSQLQueryResultSetRow(row));
+        }
+        try {
+            for (WebSQLQueryResultSetRow row : result) {
+                for (int i = 0; i < columns.length; i++) {
+                    DBDAttributeBinding binding = columns[i].getAttribute();
+                    row.getData()[i] = WebSQLUtils.makeWebCellValue(webSession, binding, row.getData()[i], WebDataFormat.resultset);
+                }
+            }
+        } catch (DBCException e) {
+            log.warn("Error converting row values", e);
+        }
+        return result;
     }
 
     public void setRows(List<WebSQLQueryResultSetRow> rows) {

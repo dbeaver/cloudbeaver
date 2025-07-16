@@ -44,17 +44,18 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     private final WebSQLContextInfo contextInfo;
     private final DBSDataContainer dataContainer;
     private final WebDataFormat dataFormat;
-    private final WebSQLQueryResultSet webResultSet = new WebSQLQueryResultSet();
+    private final WebSQLQueryResultSet webResultSet;
 
     private DBDAttributeBinding[] bindings;
     private DBCTrace trace;
     private List<WebSQLQueryResultSetRow> rows = new ArrayList<>();
     private final Number rowLimit;
 
-    WebSQLQueryDataReceiver(WebSQLContextInfo contextInfo, DBSDataContainer dataContainer, WebDataFormat dataFormat) {
+    WebSQLQueryDataReceiver(WebSQLContextInfo contextInfo, DBSDataContainer dataContainer, WebDataFormat dataFormat, WebSession webSession) {
         this.contextInfo = contextInfo;
         this.dataContainer = dataContainer;
         this.dataFormat = dataFormat;
+        this.webResultSet = new WebSQLQueryResultSet(webSession);
         rowLimit = ServletAppUtils.getServletApplication()
             .getAppConfiguration()
             .getResourceQuota(WebSQLConstants.QUOTA_PROP_ROW_LIMIT);
@@ -143,14 +144,6 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
                 // Their positions are valid only within parent value
                 // In web we make plain list of attributes so we must reorder leaf attributes
                 ((DBDAttributeBindingType) binding).setOrdinalPosition(i);
-            }
-        }
-
-        // Convert row values
-        for (WebSQLQueryResultSetRow row : rows) {
-            for (int i = 0; i < bindings.length; i++) {
-                DBDAttributeBinding binding = bindings[i];
-                row.getData()[i] = WebSQLUtils.makeWebCellValue(webSession, binding, row.getData()[i], dataFormat);
             }
         }
 

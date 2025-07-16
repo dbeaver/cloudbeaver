@@ -8,6 +8,7 @@ import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.data.DBDAttributeConstraint;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class WebSQLResultCacheService {
 
     private static final Log log = Log.getLog(WebSQLResultCacheService.class);
     /**
-     * Retrieves cached results by result ID and applies data filter and web SQL data filter.
+     * Retrieves cached results by result ID and applies sorting.
      *
      * @param resultId         the ID of the cached results
      * @param contextInfo      the SQL context information
@@ -55,15 +56,19 @@ public class WebSQLResultCacheService {
         if (resultSet == null) {
             return;
         }
-        List<WebSQLQueryResultSetRow> allRows = resultSet.getRowsWithMetaData();
-        if (allRows == null || allRows.isEmpty()) {
+        Object[][] allRows = resultSet.getRows();
+        if (allRows.length == 0) {
             return;
+        }
+        List<WebSQLQueryResultSetRow> allRowsList = new ArrayList<>();
+        for (Object[] row : allRows) {
+            allRowsList.add(new WebSQLQueryResultSetRow(row, null));
         }
         List<DBDAttributeConstraint> orderConstraints = dataFilter.getOrderConstraints();
         if (!orderConstraints.isEmpty()) {
-            allRows.sort((r1, r2) -> compareRowsByOrder(r1, r2, orderConstraints));
+            allRowsList.sort((r1, r2) -> compareRowsByOrder(r1, r2, orderConstraints));
         }
-        resultSet.setRows(allRows);
+        resultSet.setRows(allRowsList);
         resultSet.setHasMoreData(resultSet.isHasMoreData());
     }
 

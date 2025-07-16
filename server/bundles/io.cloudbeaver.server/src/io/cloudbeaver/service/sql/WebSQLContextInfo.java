@@ -201,14 +201,15 @@ public class WebSQLContextInfo implements WebSessionProvider {
     public void trySaveQueryResults(@NotNull WebSQLQueryResults[] resultsArray, int requestedLimit) {
 
         boolean isSingleResult = resultsArray.length == 1;
-        int actualRowCount = isSingleResult ? resultsArray[0].getResultSet().getRowsWithMetaData().size() : 0;
+        int actualRowCount = isSingleResult ? resultsArray[0].getResultSet().getRows().length : 0;
         if (isSingleResult && actualRowCount < Math.min(requestedLimit, MAX_RESULT_SET_SIZE)) {
             queryResultsMap.put(resultsArray[0].getResultSet().getId(), resultsArray[0]);
         }
     }
 
     public boolean closeResult(@NotNull String resultId) {
-        return resultInfoMap.remove(resultId) != null && queryResultsMap.remove(resultId) != null;
+        queryResultsMap.remove(resultId);
+        return resultInfoMap.remove(resultId) != null;
     }
 
     ///////////////////////////////////////////////////////

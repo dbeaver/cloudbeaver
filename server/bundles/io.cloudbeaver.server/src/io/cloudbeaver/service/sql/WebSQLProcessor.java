@@ -336,7 +336,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             }
 
             try (DBCSession session = executionContext.openSession(monitor, resolveQueryPurpose(dataFilter), "Read data from container")) {
-                try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
+                try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat, webSession)) {
                     DBCStatistics statistics = dataContainer.readData(
                         new WebExecutionSource(dataContainer, executionContext, this),
                         session,
@@ -467,7 +467,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             sendTransactionalEvent(contextInfo);
         }
 
-        WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
+        WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet(webSession);
         updatedResultSet.setResultsInfo(resultsInfo);
         updatedResultSet.setColumns(resultsInfo.getAttributes());
 
@@ -641,7 +641,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             DBDAttributeBinding[] allAttributes = resultsInfo.getAttributes();
             DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
 
-            WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
+            WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet(webSession);
             updatedResultSet.setResultsInfo(resultsInfo);
             updatedResultSet.setColumns(resultsInfo.getAttributes());
 
@@ -1077,7 +1077,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     if (resultSet == null) {
                         break;
                     }
-                    try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
+                    try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat, webSession)) {
                         readResultSet(dbStat.getSession(), resultSet, webDataFilter, dataReceiver);
                         results.setResultSet(dataReceiver.getResultSet());
                         dataReceiver.getResultSet().getResultsInfo().setQueryText(resultSet.getSourceStatement().getQueryString());
@@ -1129,62 +1129,6 @@ public class WebSQLProcessor implements WebSessionProvider {
             rowCount++;
         }
         dataReceiver.fetchEnd(session, dbResult);
-    }
-
-    // Compares two rows by order constraints (like ResultSetModel.resetOrdering)
-    private int compareRowsByOrder(WebSQLQueryResultSetRow r1, WebSQLQueryResultSetRow r2, WebSQLQueryResultSet resultSet, List<DBDAttributeConstraint> orderConstraints) {
-        int result = 0;
-        for (DBDAttributeConstraint co : orderConstraints) {
-            int colIndex = co.getAttribute() != null ? co.getAttribute().getOrdinalPosition() : -1;
-            if (colIndex < 0) {
-                continue;
-            }
-            Object cell1 = r1.getData()[colIndex];
-            Object cell2 = r2.getData()[colIndex];
-            Comparator<Object> comparator = null;
-            if (co.getAttribute() != null && co.getAttribute() instanceof DBDAttributeBinding binding) {
-                comparator = binding.getValueHandler() != null ? binding.getValueHandler().getComparator() : null;
-            }
-            if (comparator != null) {
-                result = comparator.compare(cell1, cell2);
-            } else if (cell1 instanceof String && cell2 instanceof String) {
-                result = ((String) cell1).compareToIgnoreCase((String) cell2);
-            } else {
-                result = DBUtils.compareDataValues(cell1, cell2);
-            }
-            if (co.isOrderDescending()) {
-                result = -result;
-            }
-            if (result != 0) {
-                break;
-            }
-        }
-        return result;
-    }
-
-    // Returns the column index by name (case-insensitive, trims spaces and quotes)
-    private int getColumnIndexByName(WebSQLQueryResultSet resultSet, String columnName) {
-        if (resultSet == null || columnName == null) return -1;
-        String normalized = columnName.trim();
-        // Remove quotes if present
-        if ((normalized.startsWith("'") && normalized.endsWith("'")) || (normalized.startsWith("\"") && normalized.endsWith("\""))) {
-            normalized = normalized.substring(1, normalized.length() - 1);
-        }
-        normalized = normalized.trim();
-        for (int i = 0; i < resultSet.getColumns().length; i++) {
-            String colName = resultSet.getColumns()[i].getName();
-            if (colName.equalsIgnoreCase(normalized)) {
-                return i;
-            }
-        }
-        // Try to match ignoring case and spaces
-        for (int i = 0; i < resultSet.getColumns().length; i++) {
-            String colName = resultSet.getColumns()[i].getName();
-            if (colName.replaceAll("\\s+", "").equalsIgnoreCase(normalized.replaceAll("\\s+", ""))) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     /**
