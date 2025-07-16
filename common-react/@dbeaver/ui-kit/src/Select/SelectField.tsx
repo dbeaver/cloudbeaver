@@ -8,7 +8,7 @@
 
 import { useId, useState } from 'react';
 import clsx from 'clsx';
-import { SelectProvider, Select, SelectPopover, SelectItem, SelectLabel, type SelectProviderProps } from './Select.js';
+import { SelectProvider, Select, SelectPopover, SelectItem, type SelectProviderProps } from './Select.js';
 import './SelectField.css';
 
 export interface SelectItem<T> {
@@ -107,7 +107,6 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   'aria-labelledby': ariaLabelledBy, 
   'aria-label': ariaLabel,
   id,
-  ...rest
 }: SelectFieldProps<T, ItemType>) {
   const getItemValue = (item: ItemType): T =>
     getValueByPath<ItemType, T>(item, itemValue, i => ('value' in i ? (i as unknown as SelectItem<T>).value : (i as unknown as T)));
@@ -140,9 +139,9 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   return (
     <div className={clsx('dbv-kit-select-field', className)}>
       <SelectProvider value={currentValue as any} setValue={val => handleChange(val as T)} store={store}> 
-        {label && <SelectLabel id={labelId} className={clsx(required && 'dbv-kit-select__label--required')}>{label}</SelectLabel>}
+        {label && <label htmlFor={labelId} className={clsx('dbv-kit-select__label', required && 'dbv-kit-select__label--required')}>{label}</label>}
 
-        <Select {...rest} id={labelId} name={name} disabled={disabled} required={required} aria-labelledby={ariaLabelledBy} aria-label={ariaLabel}>
+        <Select id={labelId} name={name} disabled={disabled} required={required} aria-labelledby={ariaLabelledBy} aria-label={ariaLabel}>
           {displayValue}
           {arrowIcon ?? <Select.Arrow className='dbv-kit-select__arrow-icon' />}
         </Select>
