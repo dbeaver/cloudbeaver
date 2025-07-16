@@ -296,9 +296,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         if (executeInfo.getResults().length == 0) {
             executeInfo.setStatusMessage("No Data");
         } else {
-            if (executeInfo.getResults().length == 1) {
-                contextInfo.saveQueryResults(executeInfo.getResults()[0].getResultSet().getId(), executeInfo.getResults()[0]);
-            }
+            contextInfo.trySaveQueryResults(executeInfo.getResults(), filter.getLimit());
             executeInfo.setStatusMessage("Executed");
         }
 
@@ -360,7 +358,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     if (resultSet != null && resultSet.getRows() != null && resultSet.getResultsInfo() != null) {
                         resultSet.getResultsInfo().setQueryText(statistics.getQueryText());
                         executeInfo.setStatusMessage(resultSet.getRows().length + " row(s) fetched");
-                        contextInfo.saveQueryResults(resultSet.getId(), results);
+                        contextInfo.trySaveQueryResults(executeInfo.getResults(), filter.getLimit());
                     }
                 } catch (DBException e) {
                     throw new InvocationTargetException(e);

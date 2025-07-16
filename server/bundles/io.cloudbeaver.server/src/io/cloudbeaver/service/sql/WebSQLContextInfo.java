@@ -66,6 +66,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class WebSQLContextInfo implements WebSessionProvider {
 
     private static final Log log = Log.getLog(WebSQLContextInfo.class);
+    private static final int MAX_RESULT_SET_SIZE = 300;
 
     private final transient WebSQLProcessor processor;
     private final String id;
@@ -197,8 +198,13 @@ public class WebSQLContextInfo implements WebSessionProvider {
         return queryResultsMap.get(resultId);
     }
 
-    public void saveQueryResults(@NotNull String resultId, @NotNull WebSQLQueryResults queryResults) {
-        queryResultsMap.put(resultId, queryResults);
+    public void trySaveQueryResults(@NotNull WebSQLQueryResults[] resultsArray, int requestedLimit) {
+
+        boolean isSingleResult = resultsArray.length == 1;
+        int actualRowCount = isSingleResult ? resultsArray[0].getResultSet().getRowsWithMetaData().size() : 0;
+        if (isSingleResult && actualRowCount < Math.min(requestedLimit, MAX_RESULT_SET_SIZE)) {
+            queryResultsMap.put(resultsArray[0].getResultSet().getId(), resultsArray[0]);
+        }
     }
 
     public boolean closeResult(@NotNull String resultId) {
