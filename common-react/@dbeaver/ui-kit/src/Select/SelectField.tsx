@@ -107,7 +107,7 @@ export function SelectField<T, ItemType extends {} = SelectItem<T>>({
   });
 
   const handleChange = (newValue: T) => {
-    setSelectedValue (newValue);
+    setSelectedValue(newValue);
     onChange?.(newValue);
   };
 
