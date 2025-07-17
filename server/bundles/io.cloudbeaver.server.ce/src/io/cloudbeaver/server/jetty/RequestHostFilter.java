@@ -27,7 +27,7 @@ import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Set;
+import java.util.List;
 
 public class RequestHostFilter implements Filter {
     private static final Log log = Log.getLog(RequestHostFilter.class);
@@ -42,7 +42,7 @@ public class RequestHostFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         if (request instanceof HttpServletRequest httpRequest) {
-            Set<String> availableHosts = application.getServerConfiguration().getSupportedHosts();
+            List<String> availableHosts = application.getServerConfiguration().getSupportedHosts();
             if (CommonUtils.isEmpty(availableHosts)) {
                 chain.doFilter(request, response);
                 return;
@@ -63,7 +63,7 @@ public class RequestHostFilter implements Filter {
         chain.doFilter(request, response);
     }
 
-    private void redirect(HttpServletResponse response, HttpServletRequest httpRequest, Set<String> availableHosts) throws IOException {
+    private void redirect(HttpServletResponse response, HttpServletRequest httpRequest, List<String> availableHosts) throws IOException {
         boolean https = application.getServerConfiguration().isSecureCookies();
         String redirectUrl = (https ? "https://" : "http://") + getDefaultHost(availableHosts) + httpRequest.getRequestURI();
         if (httpRequest.getQueryString() != null) {
@@ -72,7 +72,7 @@ public class RequestHostFilter implements Filter {
         response.sendRedirect(redirectUrl);
     }
 
-    private String getDefaultHost(@NotNull Set<String> availableHosts) {
-        return availableHosts.iterator().next();
+    private String getDefaultHost(@NotNull List<String> availableHosts) {
+        return availableHosts.getFirst();
     }
 }
