@@ -31,6 +31,7 @@ import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures.j
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
+import { SqlQueryService } from './SqlResultTabs/SqlQueryService.js';
 
 export type SQLProposal = SqlCompletionProposal;
 
@@ -52,6 +53,10 @@ export class SqlEditorService {
     return this.sqlEditorSettingsService.insertTableAlias;
   }
 
+  /**
+   * This executor implemented in the useActiveQuery hook.
+   * It will work only when editor is mounted in the dom.
+   */
   readonly updateActiveQuery: IExecutor<ISqlEditorActiveQueryUpdateData>;
 
   constructor(
@@ -64,8 +69,11 @@ export class SqlEditorService {
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
     private readonly serverConfigResource: ServerConfigResource,
+    private readonly sqlQueryService: SqlQueryService,
   ) {
     this.updateActiveQuery = new Executor();
+
+    this.sqlQueryService.onQueryExecution.addHandler(editorState => this.initEditorConnection(editorState));
   }
 
   getState(editorId: string, datasourceKey: string, order: number, source?: string, metadata?: Record<string, any>): ISqlEditorTabState {
