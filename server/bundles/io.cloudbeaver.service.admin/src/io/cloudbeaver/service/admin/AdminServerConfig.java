@@ -107,8 +107,8 @@ public class AdminServerConfig {
             this.secureCookies = null;
         }
 
-        if (params.containsKey("availableHosts")) {
-            this.supportedHosts = JSONUtils.getStringList(params, "availableHosts");
+        if (params.containsKey("supportedHosts")) {
+            this.supportedHosts = JSONUtils.getStringList(params, "supportedHosts");
         } else {
             this.supportedHosts = null;
         }
