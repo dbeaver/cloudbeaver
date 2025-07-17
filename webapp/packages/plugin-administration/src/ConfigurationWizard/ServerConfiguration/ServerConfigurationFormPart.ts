@@ -101,9 +101,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
     }
 
     if (this.state.serverConfig.supportedHosts.length) {
-      this.state.serverConfig.supportedHosts = Array.from(
-        new Set(this.state.serverConfig.supportedHosts.map(host => host.trim()).filter(host => host.length)),
-      );
+      this.state.serverConfig.supportedHosts = Array.from(new Set(this.state.serverConfig.supportedHosts));
     }
   }
 
