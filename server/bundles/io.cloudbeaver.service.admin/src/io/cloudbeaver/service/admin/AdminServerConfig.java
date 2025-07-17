@@ -21,7 +21,9 @@ import io.cloudbeaver.server.CBApplication;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Server configuration for admin API
@@ -47,7 +49,7 @@ public class AdminServerConfig {
     @Nullable
     private final Boolean secureCookies;
     @Nullable
-    private final Set<String> availableHosts;
+    private final List<String> supportedHosts;
 
     private long sessionExpireTime;
 
@@ -106,9 +108,9 @@ public class AdminServerConfig {
         }
 
         if (params.containsKey("availableHosts")) {
-            this.availableHosts = new HashSet<>(JSONUtils.getStringList(params, "availableHosts"));
+            this.supportedHosts = JSONUtils.getStringList(params, "availableHosts");
         } else {
-            this.availableHosts = null;
+            this.supportedHosts = null;
         }
     }
 
@@ -193,8 +195,8 @@ public class AdminServerConfig {
     }
 
     @Nullable
-    public Set<String> getAvailableHosts() {
-        return availableHosts;
+    public List<String> getSupportedHosts() {
+        return supportedHosts;
     }
 
     @Nullable

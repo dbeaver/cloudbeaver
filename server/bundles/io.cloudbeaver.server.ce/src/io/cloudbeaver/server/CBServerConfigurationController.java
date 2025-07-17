@@ -94,7 +94,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             loadConfiguration(runtimeConfigPath);
         }
         CBServerConfig serverConfig = getServerConfiguration();
-        if (CommonUtils.isEmpty(serverConfig.getAvailableHosts())
+        if (CommonUtils.isEmpty(serverConfig.getSupportedHosts())
             && CommonUtils.isNotEmpty(serverConfig.getServerURL())) {
             serverConfig.setSecureCookies(serverConfig.getServerURL().startsWith("https://"));
         }
@@ -542,8 +542,8 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         copyConfigValue(
             originServerConfig,
             serverConfigProperties,
-            CBConstants.PARAM_AVAILABLE_HOSTS,
-            serverConfig.getAvailableHosts()
+            CBConstants.PARAM_SUPPORTED_HOSTS,
+            serverConfig.getSupportedHosts()
         );
         var productConfigProperties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Map<String, Object> oldProductRuntimeConfig = JSONUtils.getObject(originServerConfig,

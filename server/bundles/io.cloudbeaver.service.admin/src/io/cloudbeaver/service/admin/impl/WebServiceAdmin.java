@@ -608,8 +608,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 if (config.getSecureCookies() != null) {
                     serverConfig.setSecureCookies(config.getSecureCookies());
                 }
-                if (config.getAvailableHosts() != null) {
-                    serverConfig.setAvailableHosts(config.getAvailableHosts());
+                if (config.getSupportedHosts() != null) {
+                    serverConfig.setSupportedHosts(config.getSupportedHosts());
                 }
             }
 

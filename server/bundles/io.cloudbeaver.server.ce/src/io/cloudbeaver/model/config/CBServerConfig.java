@@ -31,7 +31,7 @@ public class CBServerConfig implements WebServerConfiguration {
 
     protected String serverURL;
     @NotNull
-    protected Set<String> availableHosts = new LinkedHashSet<>();
+    protected List<String> supportedHosts = new ArrayList<>();
     protected boolean secureCookies;
     protected int serverPort = CBConstants.DEFAULT_SERVER_PORT;
     private String serverHost = null;
@@ -194,13 +194,13 @@ public class CBServerConfig implements WebServerConfiguration {
     }
 
     @NotNull
-    public Set<String> getAvailableHosts() {
-        return new LinkedHashSet<>(availableHosts);
+    public List<String> getSupportedHosts() {
+        return new ArrayList<>(supportedHosts);
     }
 
-    public void setAvailableHosts(@NotNull Collection<String> availableHosts) {
-        this.availableHosts.clear();
-        this.availableHosts.addAll(availableHosts);
+    public void setSupportedHosts(@NotNull Collection<String> availableHosts) {
+        this.supportedHosts.clear();
+        this.supportedHosts.addAll(availableHosts);
     }
 
     public boolean isBindSessionToIp() {

@@ -22,7 +22,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.Set;
+import java.util.List;
 
 public class CBWebServerConfig extends WebServerConfig {
     private final CBApplication<?> cbApp;
@@ -96,7 +96,7 @@ public class CBWebServerConfig extends WebServerConfig {
 
     @NotNull
     @Property
-    public Set<String> getAvailableHosts() {
-        return cbApp.getServerConfiguration().getAvailableHosts();
+    public List<String> getSupportedHosts() {
+        return cbApp.getServerConfiguration().getSupportedHosts();
     }
 }
