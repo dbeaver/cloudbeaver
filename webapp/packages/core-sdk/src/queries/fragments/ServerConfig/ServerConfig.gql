@@ -34,5 +34,5 @@ fragment ServerConfig on ServerConfig {
   }
   disabledDrivers
   secureCookies
-  availableHosts
+  supportedHosts
 }

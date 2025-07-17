@@ -11,36 +11,36 @@ import type { ServerConfigurationFormState } from '../ServerConfigurationFormSta
 import { action, observable } from 'mobx';
 import { getServerConfigurationFormPart } from '../getServerConfigurationFormPart.js';
 
-const AVAILABLE_HOSTS_SEPARATOR = '\n';
+const SUPPORTED_HOSTS_SEPARATOR = '\n';
 
-function joinAvailableHosts(availableHosts: string[]): string {
-  return availableHosts.join(AVAILABLE_HOSTS_SEPARATOR);
+function joinSupportedHosts(supportedHosts: string[]): string {
+  return supportedHosts.join(SUPPORTED_HOSTS_SEPARATOR);
 }
 
-function splitAvailableHosts(availableHosts: string): string[] {
-  return availableHosts
-    .split(AVAILABLE_HOSTS_SEPARATOR)
+function splitSupportedHosts(supportedHosts: string): string[] {
+  return supportedHosts
+    .split(SUPPORTED_HOSTS_SEPARATOR)
     .map(host => host.trim())
     .filter(host => host.length > 0);
 }
 
-interface AvailableHostsState {
-  availableHosts: string;
-  onAvailableHostsChange: () => void;
+interface SupportedHostsState {
+  supportedHosts: string;
+  onChange: () => void;
 }
 
-export function useAvailableHosts(formState: ServerConfigurationFormState): AvailableHostsState {
+export function useSupportedHosts(formState: ServerConfigurationFormState): SupportedHostsState {
   const part = getServerConfigurationFormPart(formState);
   const state = useObservableRef(
     () => ({
-      availableHosts: joinAvailableHosts(part.state.serverConfig.availableHosts),
-      onAvailableHostsChange: function () {
-        this.serverConfig.availableHosts = splitAvailableHosts(this.availableHosts);
+      supportedHosts: joinSupportedHosts(part.state.serverConfig.supportedHosts),
+      onChange: function () {
+        this.serverConfig.supportedHosts = splitSupportedHosts(this.supportedHosts);
       },
     }),
     {
-      onAvailableHostsChange: action.bound,
-      availableHosts: observable.ref,
+      onChange: action.bound,
+      supportedHosts: observable.ref,
     },
     {
       serverConfig: part.state.serverConfig,
@@ -51,7 +51,7 @@ export function useAvailableHosts(formState: ServerConfigurationFormState): Avai
     executor: formState.loadedTask,
     handlers: [
       function () {
-        state.availableHosts = joinAvailableHosts(part.state.serverConfig.availableHosts);
+        state.supportedHosts = joinSupportedHosts(part.state.serverConfig.supportedHosts);
       },
     ],
   });

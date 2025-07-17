@@ -34,7 +34,7 @@ function DEFAULT_STATE_GETTER(): IServerConfigurationFormPartState {
       serverURL: '',
       sessionExpireTime: MIN_SESSION_EXPIRE_TIME * 1000 * 60,
       secureCookies: true,
-      availableHosts: [],
+      supportedHosts: [],
     },
     navigatorConfig: { ...DEFAULT_NAVIGATOR_VIEW_SETTINGS },
   };
@@ -100,9 +100,9 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
       this.state.serverConfig.serverURL = this.state.serverConfig.serverURL.trim();
     }
 
-    if (this.state.serverConfig.availableHosts.length) {
-      this.state.serverConfig.availableHosts = Array.from(
-        new Set(this.state.serverConfig.availableHosts.map(host => host.trim()).filter(host => host.length)),
+    if (this.state.serverConfig.supportedHosts.length) {
+      this.state.serverConfig.supportedHosts = Array.from(
+        new Set(this.state.serverConfig.supportedHosts.map(host => host.trim()).filter(host => host.length)),
       );
     }
   }
@@ -160,7 +160,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
         enabledFeatures: config?.enabledFeatures ? [...config.enabledFeatures] : [],
         resourceManagerEnabled: config?.resourceManagerEnabled ?? false,
         secretManagerEnabled: config?.secretManagerEnabled ?? false,
-        availableHosts: config?.availableHosts ?? [],
+        supportedHosts: config?.supportedHosts ?? [],
         secureCookies: config?.secureCookies ?? true,
       },
       navigatorConfig: { ...this.state.navigatorConfig, ...defaultNavigatorSettings },

@@ -24,7 +24,7 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
     supportsCustomConnections: true,
     supportsConnectionBrowser: false,
     secureCookies: true,
-    availableHosts: [],
+    supportedHosts: [],
     supportsWorkspaces: false,
     sessionExpireTime: 6000000,
     anonymousAccessEnabled: true,

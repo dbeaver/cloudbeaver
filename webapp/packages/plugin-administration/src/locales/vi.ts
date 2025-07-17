@@ -23,9 +23,9 @@ export default [
     'Enable HTTPS mode to secure communication between the server and clients. This is recommended for production environments',
   ],
   ['administration_configuration_wizard_configuration_secure_cookies_warning', "The data won't be encrypted. This makes it vulnerable"],
-  ['administration_configuration_wizard_configuration_available_hosts', 'Allowed Server URLs'],
+  ['administration_configuration_wizard_configuration_supported_hosts', 'Allowed Server URLs'],
   [
-    'administration_configuration_wizard_configuration_available_hosts_description',
+    'administration_configuration_wizard_configuration_supported_hosts_description',
     'You can specify multiple server URLs separated by a new line. An empty value means that all URLs are allowed',
   ],
   ['administration_configuration_tools_save_tooltip', 'Lưu cấu hình'],
