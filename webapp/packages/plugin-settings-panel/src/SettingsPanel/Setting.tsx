@@ -27,7 +27,7 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
   }
 
   return (
-    <div className="tw:flex tw:relative tw:gap-2 tw:w-1/3">
+    <div className="tw:flex tw:relative tw:gap-2">
       <div className="tw:w-1 tw:h-full" hidden>
         {isOverride && (
           <div
