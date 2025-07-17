@@ -51,7 +51,6 @@ export const ConnectionAuthModelSelector = observer<Props>(function ConnectionAu
       keySelector={model => model.id}
       valueSelector={model => model.displayName}
       titleSelector={model => model.description}
-      searchable={availableAuthModels.length > 10}
       readOnly={readonly || readonlyAuthModelId}
       disabled={disabled}
       tiny

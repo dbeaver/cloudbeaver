@@ -4586,6 +4586,7 @@ __metadata:
     "@wroud/vite-plugin-asset-resolver": "npm:^0"
     "@wroud/vite-plugin-tsc": "npm:^0.11.6"
     clsx: "npm:^2"
+    fuse.js: "npm:^7.1.0"
     react: "npm:^19"
     react-dom: "npm:^19"
     rimraf: "npm:^6"
@@ -11525,6 +11526,13 @@ __metadata:
   version: 1.2.3
   resolution: "functions-have-names@npm:1.2.3"
   checksum: 10c0/33e77fd29bddc2d9bb78ab3eb854c165909201f88c75faa8272e35899e2d35a8a642a15e7420ef945e1f64a9670d6aa3ec744106b2aa42be68ca5114025954ca
+  languageName: node
+  linkType: hard
+
+"fuse.js@npm:^7.1.0":
+  version: 7.1.0
+  resolution: "fuse.js@npm:7.1.0"
+  checksum: 10c0/c0d1b1d192a4bdf3eade897453ddd28aff96b70bf3e49161a45880f9845ebaee97265595db633776700a5bcf8942223c752754a848d70c508c3c9fd997faad1e
   languageName: node
   linkType: hard
 

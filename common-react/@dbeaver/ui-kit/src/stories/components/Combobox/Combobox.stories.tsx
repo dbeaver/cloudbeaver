@@ -1,4 +1,5 @@
 import { Combobox, ComboboxEmpty, ComboboxItem } from '../../../Combobox/Combobox.js';
+import { Icon } from '../../../Icon/Icon.js';
 
 const animals = [
   'Dog',
@@ -39,10 +40,11 @@ const animals = [
 
 export const Example = () => {
   return (
-    <Combobox className="tw:w-[300px]" placeholder="Search an animal">
+    <Combobox defaultValue="Frog" className="tw:w-[300px]" placeholder="Search an animal">
       <ComboboxEmpty>No results found</ComboboxEmpty>
       {animals.map(animal => (
-        <ComboboxItem key={animal} value={animal}>
+        <ComboboxItem className="tw:flex tw:items-center tw:gap-2" key={animal} value={animal}>
+          <Icon name="case" className="tw-mr-2" />
           {animal}
         </ComboboxItem>
       ))}
