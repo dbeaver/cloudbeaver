@@ -16,12 +16,13 @@
  */
 package io.cloudbeaver.server.jetty;
 
+import graphql.GraphQL;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
-import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.filters.ServerConfigurationTimeLimitFilter;
+import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.server.servlets.WebStatusServlet;
@@ -116,10 +117,12 @@ public class CBJettyServer {
 
                 servletContextHandler.addServlet(new ServletHolder("status", new WebStatusServlet()), "/status");
 
+                GraphQLEndpoint endpoint = new GraphQLEndpoint(new ServerConfigurationTimeLimitFilter(application));
+                application.addApplicationContextValue(GraphQL.class.getName(), endpoint.getGraphQL());
                 servletContextHandler.addServlet(
                     new ServletHolder(
                         "graphql",
-                        new GraphQLEndpoint(new ServerConfigurationTimeLimitFilter(application))
+                        endpoint
                     ),
                     serverConfiguration.getServicesURI() + "gql/*"
                 );

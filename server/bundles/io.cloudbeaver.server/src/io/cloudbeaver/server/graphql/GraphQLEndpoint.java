@@ -42,6 +42,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.utils.CommonUtils;
@@ -350,4 +351,8 @@ public class GraphQLEndpoint extends HttpServlet {
         return context.get("bindingContext");
     }
 
+    @NotNull
+    public GraphQL getGraphQL() {
+        return graphQL;
+    }
 }
