@@ -42,5 +42,6 @@ describe('download', () => {
 
     createElementSpy.mockRestore();
     clickSpy.mockRestore();
+    createObjectURLSpy.mockRestore();
   });
 });
