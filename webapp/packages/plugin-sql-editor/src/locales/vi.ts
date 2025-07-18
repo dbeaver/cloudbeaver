@@ -1,5 +1,9 @@
 export default [
   ['plugin_sql_editor_sql_editor_settings_group', 'Trình Soạn Thảo SQL'],
+  ['sql_editor_settings_content_assistant_experimental_mode_name', 'Completion engine'],
+  ['sql_editor_settings_content_assistant_experimental_mode_desc', 'SQL editor content assistant mode'],
+  ['sql_editor_settings_content_assistant_experimental_mode_default', 'Legacy'],
+  ['sql_editor_settings_content_assistant_experimental_mode_new', 'Semantic'],
   ['sql_editor_settings_insert_table_aliases_name', 'Chèn bí danh bảng (trong mệnh đề FROM)'],
   ['sql_editor_settings_insert_table_aliases_desc', 'Tự động chèn bí danh bảng'],
   ['sql_editor_menu', 'Trình Soạn Thảo SQL'],

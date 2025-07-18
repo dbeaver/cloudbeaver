@@ -28,7 +28,7 @@
     "no-undef": "off",
     "comma-spacing": "off",
     "default-param-last": "off",
-    "func-call-spacing": "off",
+    "function-call-spacing": "off",
     "keyword-spacing": "off",
     "no-duplicate-imports": "error",
     "object-curly-spacing": "off",
@@ -87,7 +87,7 @@
     ],
     "@typescript-eslint/comma-spacing": ["error"],
     "@typescript-eslint/default-param-last": ["error"],
-    "@typescript-eslint/func-call-spacing": ["error"],
+    "@typescript-eslint/function-call-spacing": ["error"],
     "@typescript-eslint/keyword-spacing": ["error"],
     "@typescript-eslint/object-curly-spacing": ["error", "always"],
     "@typescript-eslint/quotes": [

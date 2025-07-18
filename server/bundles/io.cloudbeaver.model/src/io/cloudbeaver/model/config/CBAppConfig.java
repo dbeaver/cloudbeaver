@@ -57,6 +57,7 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
     private boolean anonymousAccessEnabled;
     private boolean grantConnectionsAccessToAnonymousTeam;
     private boolean systemVariablesResolvingEnabled;
+    private boolean apiCallLoggingEnabled;
     @Deprecated
     private String anonymousUserRole;
     private String anonymousUserTeam;
@@ -90,6 +91,7 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
         this.linkExternalCredentialsWithUser = true;
         this.grantConnectionsAccessToAnonymousTeam = false;
         this.systemVariablesResolvingEnabled = false;
+        this.apiCallLoggingEnabled = false;
     }
 
     public CBAppConfig(CBAppConfig src) {
@@ -114,6 +116,7 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
         this.linkExternalCredentialsWithUser = src.linkExternalCredentialsWithUser;
         this.grantConnectionsAccessToAnonymousTeam = src.grantConnectionsAccessToAnonymousTeam;
         this.systemVariablesResolvingEnabled = src.systemVariablesResolvingEnabled;
+        this.apiCallLoggingEnabled = src.apiCallLoggingEnabled;
     }
 
     @Override
@@ -353,5 +356,9 @@ public class CBAppConfig extends BaseWebAppConfiguration implements ServletAuthC
             }
             authConfiguration.clear();
         }
+    }
+
+    public boolean isApiCallLoggingEnabled() {
+        return apiCallLoggingEnabled;
     }
 }
