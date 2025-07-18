@@ -8,6 +8,7 @@
 .treeNodeExpand {
   position: relative;
   display: flex;
+  align-items: center;
   box-sizing: border-box;
   flex-shrink: 0;
   opacity: 0.5;

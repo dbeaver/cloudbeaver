@@ -29,9 +29,11 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.model.apilog.ApiCallInterceptor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.HttpConstants;
+import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.service.WebServiceBindingBase;
@@ -40,9 +42,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.ee10.servlet.ServletApiRequest;
-import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.server.Request;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.utils.CommonUtils;
@@ -53,6 +52,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -70,6 +70,7 @@ public class GraphQLEndpoint extends HttpServlet {
     private static final String HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials";
 
     private static final String CORE_SCHEMA_FILE_NAME = "schema/schema.graphqls";
+    public static final String API_PROTOCOL = "GraphQL";
     private final GraphQL graphQL;
 
     private static final Gson gson = new GsonBuilder()
@@ -144,13 +145,6 @@ public class GraphQLEndpoint extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String contentType = request.getContentType();
-        if (request instanceof ServletApiRequest apiRequest) {
-            ServletContextHandler.ServletRequestInfo info = apiRequest.getServletRequestInfo();
-            if (info instanceof Request.Wrapper wrapper) {
-                System.out.println(wrapper);
-            }
-        }
-        System.out.println(request.toString());
         if (CommonUtils.isEmpty(contentType) || !contentType.startsWith(HttpConstants.TYPE_JSON)) {
             String error = "Bad request," + (CommonUtils.isEmpty(contentType)
                 ? " content type is missing"
@@ -251,24 +245,34 @@ public class GraphQLEndpoint extends HttpServlet {
         if (operationName != null) {
             contextBuilder.operationName(operationName);
         }
-        {
-            String apiCall = operationName;
-            //            if (!CommonUtils.isEmpty(apiCall)) {
-            //                if (variables != null) {
-            //                    apiCall += " (" + variables + ")";
-            //                }
-            //            }
-            String sessionId = GraphQLLoggerUtil.getSessionId(request);
-            String userId = GraphQLLoggerUtil.getUserId(request);
-            String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, variables);
-            if (apiCall != null) {
-                log.debug("API > " + apiCall + loggerMessage);
-            } else if (DEBUG) {
-                log.debug("API > " + query + loggerMessage);
+        String sessionId = GraphQLLoggerUtil.getSmSessionId(request);
+        String userId = GraphQLLoggerUtil.getUserId(request);
+        String loggerMessage = GraphQLLoggerUtil.buildLoggerMessage(sessionId, userId, variables);
+        if (operationName != null) {
+            log.debug("API > " + operationName + loggerMessage);
+        } else if (DEBUG) {
+            log.debug("API > " + query + loggerMessage);
+        }
+        LocalDateTime startTime = LocalDateTime.now();
+        ExecutionInput executionInput = contextBuilder.build();
+        ExecutionResult executionResult = null;
+        Exception executionException = null;
+        try {
+            executionResult = graphQL.execute(executionInput);
+        } catch (Exception e) {
+            executionException = e;
+            throw e;
+        } finally {
+            String errorMessage = null;
+            if (executionResult != null && executionResult.getErrors() != null && !executionResult.getErrors().isEmpty()) {
+                errorMessage = executionResult.getErrors().getFirst().getMessage();
+            } else if (executionException != null) {
+                errorMessage = executionException.getMessage();
+            }
+            if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
+                apiCallInterceptor.onApiCallEvent(request, variables, operationName, startTime, errorMessage, API_PROTOCOL);
             }
         }
-        ExecutionInput executionInput = contextBuilder.build();
-        ExecutionResult executionResult = graphQL.execute(executionInput);
 
         Map<String, Object> resJSON = executionResult.toSpecification();
         String resString = gson.toJson(resJSON);
@@ -276,6 +280,7 @@ public class GraphQLEndpoint extends HttpServlet {
         response.setContentType(GraphQLConstants.CONTENT_TYPE_JSON_UTF8);
         response.getWriter().print(resString);
     }
+
 
     private static class WebExecutionStrategy extends AsyncExecutionStrategy {
 

@@ -23,6 +23,7 @@ import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.app.WebAppConfiguration;
+import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebActionParameters;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.utils.ConfigurationUtils;
@@ -47,9 +48,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
-import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
-import org.jkiss.dbeaver.model.navigator.DBNModel;
-import org.jkiss.dbeaver.model.navigator.DBNProject;
+import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
@@ -413,5 +412,11 @@ public class WebServiceUtils extends WebCommonUtils {
             config.getEnabledDrivers(),
             config.getDisabledDrivers()
         );
+    }
+
+    public static boolean isFolder(@NotNull DBNNode node) {
+        return (node instanceof DBNContainer && !(node instanceof DBNDataSource))
+            || (node instanceof DBNResourceManagerResource
+            && ((DBNResourceManagerResource) node).getResource().isFolder());
     }
 }

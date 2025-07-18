@@ -39,6 +39,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPEventListener;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.auth.*;
@@ -48,7 +49,6 @@ import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
-import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
@@ -90,7 +90,7 @@ public class WebSession extends BaseWebSession
     public static String RUNTIME_PARAM_AUTH_INFOS = "auth-infos";
     private final AtomicInteger taskCount = new AtomicInteger();
 
-    private String lastRemoteAddr;
+    private final String lastRemoteAddr;
     private String lastRemoteUserAgent;
 
     private String locale;
@@ -108,6 +108,7 @@ public class WebSession extends BaseWebSession
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private final Map<String, DBWSessionHandler> sessionHandlers;
+    private final WebDataSourceConnectEventListener connectListener = new WebDataSourceConnectEventListener(this);
 
     public WebSession(
         @NotNull WebHttpRequestInfo requestInfo,
@@ -117,7 +118,8 @@ public class WebSession extends BaseWebSession
         this(requestInfo.getId(),
             CommonUtils.toString(requestInfo.getLocale()),
             application,
-            sessionHandlers
+            sessionHandlers,
+            requestInfo.getLastRemoteAddress()
         );
         updateSessionParameters(requestInfo);
     }
@@ -126,9 +128,14 @@ public class WebSession extends BaseWebSession
         @NotNull String id,
         @Nullable String locale,
         @NotNull ServletApplication application,
-        @NotNull Map<String, DBWSessionHandler> sessionHandlers
+        @NotNull Map<String, DBWSessionHandler> sessionHandlers,
+        @NotNull String remoteAddr
     ) throws DBException {
         super(id, application);
+        if (CommonUtils.isEmpty(remoteAddr)) {
+            throw new DBException("Remote address cannot be empty");
+        }
+        this.lastRemoteAddr = remoteAddr;
         this.lastAccessTime = this.createTime;
         this.sessionHandlers = sessionHandlers;
         setLocale(CommonUtils.toString(locale, this.locale));
@@ -260,6 +267,11 @@ public class WebSession extends BaseWebSession
         }
         refreshUserData();
         clearSessionContext();
+    }
+
+    @NotNull
+    public DBPEventListener getDataSourceConnectListener() {
+        return connectListener;
     }
 
     private void initNavigatorModel() {
@@ -452,7 +464,6 @@ public class WebSession extends BaseWebSession
     }
 
     public synchronized void updateSessionParameters(WebHttpRequestInfo requestInfo) {
-        this.lastRemoteAddr = requestInfo.getLastRemoteAddress();
         this.lastRemoteUserAgent = requestInfo.getLastRemoteUserAgent();
         this.cacheExpired = false;
     }
@@ -523,6 +534,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
+    @NotNull
     public WebAsyncTaskInfo asyncTaskStatus(String taskId, boolean removeOnFinish) throws DBWebException {
         synchronized (asyncTasks) {
             WebAsyncTaskInfo taskInfo = asyncTasks.get(taskId);
@@ -989,7 +1001,7 @@ public class WebSession extends BaseWebSession
     }
 
     @NotNull
-    public DBPPreferenceStore getUserPreferenceStore() {
+    public WebSessionPreferenceStore getUserPreferenceStore() {
         return getUserContext().getPreferenceStore();
     }
 

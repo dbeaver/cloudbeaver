@@ -7,7 +7,7 @@
     "public/**/*",
     "src/**/*.css"
   ],
-  "version": "25.1.2",
+  "version": "25.1.4",
   "description": "CloudBeaver Community",
   "license": "DBeaver Corp",
   "exports": {
@@ -34,7 +34,7 @@
     "react-dom": "^19",
     "reflect-metadata": "^0",
     "tslib": "^2",
-    "vite": "^6"
+    "vite": "^7"
   },
   "product": {
     "name": "CloudBeaver Community"

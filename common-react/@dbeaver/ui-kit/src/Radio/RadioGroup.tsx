@@ -48,7 +48,7 @@ export function RadioGroup({ className, children, labelledBy, label, ['aria-labe
           </div>
         )}
         <_RadioGroup
-          aria-labelledby={labelledById}
+          aria-labelledby={ariaLabel ? undefined : labelledById}
           aria-label={ariaLabel}
           className={clsx('dbv-kit-radio-group', className, props.vertical && 'dbv-kit-radio-group--vertical')}
         >

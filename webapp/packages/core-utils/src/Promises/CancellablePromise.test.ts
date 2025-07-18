@@ -9,10 +9,6 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 
 import { CancellablePromise } from './CancellablePromise.js';
 
-vi.mock('./PromiseCancelledError', () => ({
-  PromiseCancelledError: vi.fn(),
-}));
-
 describe('CancellablePromise', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -34,7 +30,7 @@ describe('CancellablePromise', () => {
 
     vi.advanceTimersByTime(1);
 
-    await expect(promise).rejects.toThrowError('');
+    await expect(promise).rejects.toThrow('Promise cancelled');
   });
 
   it('should resolve promise', async () => {

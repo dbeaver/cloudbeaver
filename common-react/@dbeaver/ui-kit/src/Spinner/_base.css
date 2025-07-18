@@ -26,6 +26,7 @@
   :root {
     --dbv-kit-spinner-height: var(--dbv-kit-control-height-medium);
     --dbv-kit-spinner-animation-duration: 1.8s;
+    --dbv-kit-spinner-animation-delay: -0.3s;
 
     --dbv-kit-spinner-stroke-width: 2.5px;
     --dbv-kit-spinner-stroke-color: var(--dbv-kit-color-primary-600);

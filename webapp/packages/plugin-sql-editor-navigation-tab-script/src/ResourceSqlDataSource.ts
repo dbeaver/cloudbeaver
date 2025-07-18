@@ -21,7 +21,7 @@ import type { NetworkStateService } from '@cloudbeaver/core-root';
 import { debounce, getPathName, isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
-import { BaseSqlDataSource, ESqlDataSourceFeatures, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
+import { BaseSqlDataSource, ESqlDataSourceFeatures, SqlEditorService, type ISqlEditorCursor } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState.js';
 
@@ -219,14 +219,14 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     super.setProject(projectId);
   }
 
-  override setScript(script: string): void {
+  override setScript(script: string, source?: string, cursor?: ISqlEditorCursor): void {
     const previous = this.state.script;
     if (previous === script) {
       return;
     }
 
     this.state.script = script;
-    super.setScript(script);
+    super.setScript(script, source, cursor);
 
     if (this.isAutoSaveEnabled) {
       this.debouncedWrite();

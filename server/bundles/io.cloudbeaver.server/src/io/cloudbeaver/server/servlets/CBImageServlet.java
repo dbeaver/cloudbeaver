@@ -31,6 +31,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Locale;
 
 public class CBImageServlet extends HttpServlet {
 
@@ -67,12 +68,21 @@ public class CBImageServlet extends HttpServlet {
             if (iconURL == null) {
                 iconURL = FileLocator.find(new URL(iconId));
             }
+            if (iconURL == null && "png".equalsIgnoreCase(iconExt)) {
+                //try to fall back to SVG
+                iconURL = FileLocator.find(new URL(iconPath + ".svg"));
+                iconExt = "svg";
+            }
             if (iconURL == null) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Image not found");
                 return;
             }
 
-            response.setContentType("image/" + iconExt);
+            String contentType = switch (iconExt.toLowerCase(Locale.ROOT)) {
+                case "svg" -> "image/svg+xml";
+                default -> "image/" + iconExt;
+            };
+            response.setContentType(contentType);
             setExpireTime(response); // 3 days
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             try (InputStream is = new BufferedInputStream(iconURL.openStream())) {

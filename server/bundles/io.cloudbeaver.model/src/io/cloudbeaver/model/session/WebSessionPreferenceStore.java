@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.session;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.impl.preferences.AbstractUserPreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 
@@ -24,10 +25,16 @@ import java.io.IOException;
 import java.util.Map;
 
 public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
+
+    @NotNull
+    private final WebUserContext userContext;
+
     public WebSessionPreferenceStore(
+        @NotNull WebUserContext userContext,
         @NotNull DBPPreferenceStore parentStore
     ) {
         super(parentStore);
+        this.userContext = userContext;
     }
 
     @NotNull
@@ -36,7 +43,10 @@ public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
     }
 
     // to avoid redundant sm api call
-    public void updatePreferenceValues(@NotNull Map<String, Object> newValues) {
+    public void updatePreferenceValues(@NotNull Map<String, Object> newValues) throws DBException {
+        if (userContext.getUser() != null) {
+            userContext.getSecurityController().setCurrentUserParameters(newValues);
+        }
         for (Map.Entry<String, Object> entry : newValues.entrySet()) {
             if (entry.getValue() == null) {
                 userPreferences.remove(entry.getKey());
