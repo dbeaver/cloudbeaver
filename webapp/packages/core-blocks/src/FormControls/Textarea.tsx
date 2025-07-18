@@ -110,7 +110,6 @@ export const Textarea: TextareaType = observer(function Textarea({
         {...rest}
         ref={textareaRef}
         id={inputId}
-        aria-label={children?.toString()}
         required={required}
         className={s(styles, { textarea: true })}
         value={value ?? ''}
