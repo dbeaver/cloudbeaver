@@ -13,7 +13,6 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { MIN_SESSION_EXPIRE_TIME } from './MIN_SESSION_EXPIRE_TIME.js';
 import type { ServerConfigurationFormState } from '../ServerConfigurationFormState.js';
 import { getServerConfigurationFormPart } from '../getServerConfigurationFormPart.js';
-import { useSupportedHosts } from './useSupportedHosts.js';
 
 interface Props {
   formState: ServerConfigurationFormState;
@@ -24,7 +23,6 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
   const part = getServerConfigurationFormPart(formState);
   const state = part.state;
   const translate = useTranslate();
-  const supportedHostsState = useSupportedHosts(formState);
 
   return (
     <Group form gap>
@@ -54,11 +52,10 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         title={translate('administration_configuration_wizard_configuration_server_url_description')}
         name="supportedHosts"
         rows={3}
-        state={supportedHostsState}
+        state={state.serverConfig}
         readOnly={serverConfigLoader.resource.distributed}
         description={translate('administration_configuration_wizard_configuration_supported_hosts_description')}
         placeholder={`example.com\nlocalhost:5000\n127.0.0.1`}
-        onChange={supportedHostsState.onChange}
       >
         {translate('administration_configuration_wizard_configuration_supported_hosts')}
       </Textarea>

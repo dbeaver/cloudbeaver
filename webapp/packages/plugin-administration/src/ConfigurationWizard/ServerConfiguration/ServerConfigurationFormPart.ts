@@ -34,12 +34,13 @@ function DEFAULT_STATE_GETTER(): IServerConfigurationFormPartState {
       serverURL: '',
       sessionExpireTime: MIN_SESSION_EXPIRE_TIME * 1000 * 60,
       secureCookies: true,
-      supportedHosts: [],
+      supportedHosts: '',
     },
     navigatorConfig: { ...DEFAULT_NAVIGATOR_VIEW_SETTINGS },
   };
 }
 
+const SUPPORTED_HOSTS_SPLITTER = '\n';
 export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFormPartState> {
   constructor(
     formState: IFormState<null>,
@@ -99,10 +100,6 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
     if (this.state.serverConfig.serverURL) {
       this.state.serverConfig.serverURL = this.state.serverConfig.serverURL.trim();
     }
-
-    if (this.state.serverConfig.supportedHosts.length) {
-      this.state.serverConfig.supportedHosts = Array.from(new Set(this.state.serverConfig.supportedHosts));
-    }
   }
 
   override get isChanged(): boolean {
@@ -120,7 +117,17 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
 
     // Exclude adminPasswordRepeat from server payload as it's only for client-side validation
     const { adminPasswordRepeat, ...serverConfigToSave } = this.state.serverConfig;
-    await this.serverConfigResource.save(serverConfigToSave);
+    await this.serverConfigResource.save({
+      ...serverConfigToSave,
+      supportedHosts: Array.from(
+        new Set(
+          this.state.serverConfig.supportedHosts
+            .split(SUPPORTED_HOSTS_SPLITTER)
+            .map(host => host.trim())
+            .filter(Boolean),
+        ),
+      ),
+    });
   }
 
   protected override async loader() {
@@ -158,7 +165,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
         enabledFeatures: config?.enabledFeatures ? [...config.enabledFeatures] : [],
         resourceManagerEnabled: config?.resourceManagerEnabled ?? false,
         secretManagerEnabled: config?.secretManagerEnabled ?? false,
-        supportedHosts: config?.supportedHosts ?? [],
+        supportedHosts: config?.supportedHosts.join(SUPPORTED_HOSTS_SPLITTER) ?? '',
         secureCookies: config?.secureCookies ?? true,
       },
       navigatorConfig: { ...this.state.navigatorConfig, ...defaultNavigatorSettings },

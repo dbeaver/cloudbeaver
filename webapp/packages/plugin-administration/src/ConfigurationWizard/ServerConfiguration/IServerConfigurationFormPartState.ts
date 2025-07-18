@@ -25,7 +25,7 @@ const ServerConfigurationFormPartStateConfigSchema = schema.object({
   serverURL: schema.string().optional(),
   sessionExpireTime: schema.number().optional(),
   secureCookies: schema.boolean().optional(),
-  supportedHosts: schema.array(schema.string()),
+  supportedHosts: schema.string(),
 });
 
 const ServerConfigurationFormPartStateNavigatorSchema = schema.object({
@@ -38,7 +38,10 @@ const ServerConfigurationFormPartStateNavigatorSchema = schema.object({
   showUtilityObjects: schema.boolean(),
 });
 
+export type IServerConfig = schema.infer<typeof ServerConfigurationFormPartStateConfigSchema>;
+export type INavigatorConfig = schema.infer<typeof ServerConfigurationFormPartStateNavigatorSchema>;
+
 export type IServerConfigurationFormPartState = {
-  serverConfig: schema.infer<typeof ServerConfigurationFormPartStateConfigSchema>;
-  navigatorConfig: schema.infer<typeof ServerConfigurationFormPartStateNavigatorSchema>;
+  serverConfig: IServerConfig;
+  navigatorConfig: INavigatorConfig;
 };
