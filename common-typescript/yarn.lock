@@ -135,6 +135,7 @@ __metadata:
     "@dbeaver/tsconfig": "workspace:^"
     rimraf: "npm:^6"
     typescript: "npm:^5"
+    vitest: "npm:^3"
   languageName: unknown
   linkType: soft
 
