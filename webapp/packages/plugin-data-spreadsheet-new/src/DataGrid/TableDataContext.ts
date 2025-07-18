@@ -30,6 +30,7 @@ export interface ITableData {
   dataContent: ResultSetDataContentAction;
   data: ResultSetDataAction;
   editor: ResultSetEditAction;
+  hasDescription: boolean;
   view: ResultSetViewAction;
   columns: Array<IColumnInfo>;
   columnKeys: IResultSetColumnKey[];

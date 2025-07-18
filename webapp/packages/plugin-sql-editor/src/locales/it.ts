@@ -1,5 +1,9 @@
 export default [
   ['plugin_sql_editor_sql_editor_settings_group', 'SQL Editor'],
+  ['sql_editor_settings_content_assistant_experimental_mode_name', 'Completion engine'],
+  ['sql_editor_settings_content_assistant_experimental_mode_desc', 'SQL editor content assistant mode'],
+  ['sql_editor_settings_content_assistant_experimental_mode_default', 'Legacy'],
+  ['sql_editor_settings_content_assistant_experimental_mode_new', 'Semantic'],
   ['sql_editor_settings_insert_table_aliases_name', 'Insert table aliases (in FROM clause)'],
   ['sql_editor_settings_insert_table_aliases_desc', 'Automatically inserts table aliases'],
   ['sql_editor_menu', 'SQL Editor'],
