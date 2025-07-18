@@ -11,7 +11,7 @@ import { describe, expect, it, vitest } from 'vitest';
 import { download } from './download.js';
 
 describe('download', () => {
-  it('should not create links after download', async () => {
+  it('should not create links after download', () => {
     const blob = new Blob(['test'], { type: 'text/plain' });
     const linksBefore = document.querySelectorAll('a');
     expect(linksBefore.length).toBe(0);
@@ -22,11 +22,9 @@ describe('download', () => {
     expect(linksAfter.length).toBe(0);
   });
 
-  it('should create a link with url and click it to download file', async () => {
+  it('should create a link with url and click it to download file', () => {
     const element = document.createElement('a');
-    const createElementSpy = vitest.spyOn(document, 'createElement').mockImplementation(() => {
-      return element;
-    });
+    const createElementSpy = vitest.spyOn(document, 'createElement').mockImplementation(() => element);
     const clickSpy = vitest.spyOn(element, 'click');
     const createObjectURLSpy = vitest.spyOn(URL, 'createObjectURL');
     const blob = new Blob(['test'], { type: 'text/plain' });
