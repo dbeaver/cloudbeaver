@@ -24,7 +24,7 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
     supportsCustomConnections: true,
     supportsConnectionBrowser: false,
     secureCookies: true,
-    supportedHosts: [],
+    supportedHosts: ['https://test.ce.cloudbeaver.io'],
     supportsWorkspaces: false,
     sessionExpireTime: 6000000,
     anonymousAccessEnabled: true,

@@ -55,7 +55,7 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         state={state.serverConfig}
         readOnly={serverConfigLoader.resource.distributed}
         description={translate('administration_configuration_wizard_configuration_supported_hosts_description')}
-        placeholder={`example.com\nlocalhost:5000\n127.0.0.1`}
+        placeholder={'example.com\nlocalhost:5000\n127.0.0.1'}
       >
         {translate('administration_configuration_wizard_configuration_supported_hosts')}
       </Textarea>
