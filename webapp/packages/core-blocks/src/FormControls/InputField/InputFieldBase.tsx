@@ -125,7 +125,6 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
             ref={mergedRef}
             {...rest}
             id={inputId}
-            aria-label={children?.toString() || rest['aria-label'] || rest.title}
             type={passwordRevealed ? 'text' : rest.type}
             name={name}
             value={uncontrolled ? undefined : value}
