@@ -158,15 +158,17 @@ export class SqlEditorSettingsService extends Dependency {
           options: [...(setting.options?.filter(option => !TABLE_ALIAS_OPTIONS.includes(option.value as any)) || []), ...TABLE_ALIAS_SETTING_OPTIONS],
         }) as ISettingDescription<SqlEditorSettings>,
     );
-    this.settingsTransformationService.setSettingTransformer('SQLEditor.ContentAssistant.experimental.mode', setting => {
-      return {
-        ...setting,
-        group: SQL_EDITOR_SETTINGS_GROUP,
-        name: 'sql_editor_settings_content_assistant_experimental_mode_name',
-        description: 'sql_editor_settings_content_assistant_experimental_mode_desc',
-        options: ASSISTANT_MODE_OPTIONS_LOCALIZED,
-      } as ISettingDescription<SqlEditorSettings>;
-    });
+    this.settingsTransformationService.setSettingTransformer(
+      'SQLEditor.ContentAssistant.experimental.mode',
+      setting =>
+        ({
+          ...setting,
+          group: SQL_EDITOR_SETTINGS_GROUP,
+          name: 'sql_editor_settings_content_assistant_experimental_mode_name',
+          description: 'sql_editor_settings_content_assistant_experimental_mode_desc',
+          options: ASSISTANT_MODE_OPTIONS_LOCALIZED,
+        }) as ISettingDescription<SqlEditorSettings>,
+    );
 
     this.settingsManagerService.registerSettings<typeof defaultSettings>(() => {
       const settings: ISettingDescription<SqlEditorSettings>[] = [
