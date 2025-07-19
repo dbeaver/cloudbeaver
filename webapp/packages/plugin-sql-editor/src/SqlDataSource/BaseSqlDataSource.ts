@@ -153,6 +153,9 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   setScript(script: string, source?: string, cursor?: ISqlEditorCursor): void {
+    if (cursor) {
+      this.setInnerCursorState(cursor);
+    }
     this.onSetScript.execute({ script, source, cursor });
   }
 
@@ -243,13 +246,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   setCursor(anchor: number, head = anchor): void {
-    const scriptLength = this.script.length;
-
-    this.innerCursorState = Object.freeze({
-      anchor: Math.min(anchor, scriptLength),
-      head: Math.min(head, scriptLength),
+    this.setInnerCursorState({
+      anchor,
+      head,
     });
-
     this.onUpdate.execute();
   }
 
@@ -305,4 +305,12 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
   protected abstract setBaseScript(script: string): void;
   protected abstract setBaseExecutionContext(executionContext: IConnectionExecutionContextInfo | undefined): void;
+  protected setInnerCursorState(cursor: ISqlEditorCursor): void {
+    const scriptLength = this.script.length;
+
+    this.innerCursorState = Object.freeze({
+      anchor: Math.min(cursor.anchor, scriptLength),
+      head: Math.min(cursor.head, scriptLength),
+    });
+  }
 }

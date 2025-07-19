@@ -29,6 +29,7 @@ import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
 import { SqlQueryResultService } from './SqlQueryResultService.js';
 import { SqlEditorSettingsService } from '../SqlEditorSettingsService.js';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures.js';
+import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 
 interface IQueryExecutionOptions {
   onQueryExecutionStart?: (query: string, index: number) => void;
@@ -46,6 +47,7 @@ export interface IQueryExecutionStatistics {
 @injectable()
 export class SqlQueryService {
   private readonly statisticsMap: Map<string, IQueryExecutionStatistics>;
+  readonly onQueryExecution: IExecutor<ISqlEditorTabState>;
 
   constructor(
     private readonly serviceProvider: IServiceProvider,
@@ -63,6 +65,7 @@ export class SqlQueryService {
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
   ) {
     this.statisticsMap = new Map();
+    this.onQueryExecution = new Executor();
 
     makeObservable<this, 'statisticsMap'>(this, {
       statisticsMap: observable,
@@ -114,6 +117,7 @@ export class SqlQueryService {
   }
 
   async executeEditorQuery(editorState: ISqlEditorTabState, query: string, inNewTab: boolean): Promise<void> {
+    await this.onQueryExecution.execute(editorState);
     let source: QueryDataSource | undefined;
     let tabGroup: IResultGroup | null = null;
     let isNewTabCreated = false;
@@ -189,6 +193,7 @@ export class SqlQueryService {
   }
 
   async executeQueries(editorState: ISqlEditorTabState, queries: string[], options?: IQueryExecutionOptions): Promise<void> {
+    await this.onQueryExecution.execute(editorState);
     try {
       const dataSource = this.sqlDataSourceService.get(editorState.editorId);
       if (!this.sqlEditorSettingsService.scriptExecutionEnabled || !dataSource?.hasFeature(ESqlDataSourceFeatures.executable)) {
