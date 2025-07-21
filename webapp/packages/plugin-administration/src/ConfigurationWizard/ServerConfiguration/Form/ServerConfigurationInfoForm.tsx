@@ -10,18 +10,15 @@ import { observer } from 'mobx-react-lite';
 import { Group, GroupTitle, IconOrImage, InputField, Switch, Textarea, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
+import type { IServerConfigurationPageState } from '../IServerConfigurationPageState.js';
 import { MIN_SESSION_EXPIRE_TIME } from './MIN_SESSION_EXPIRE_TIME.js';
-import type { ServerConfigurationFormState } from '../ServerConfigurationFormState.js';
-import { getServerConfigurationFormPart } from '../getServerConfigurationFormPart.js';
 
 interface Props {
-  formState: ServerConfigurationFormState;
+  state: IServerConfigurationPageState;
 }
 
-export const ServerConfigurationInfoForm = observer<Props>(function ServerConfigurationInfoForm({ formState }) {
+export const ServerConfigurationInfoForm = observer<Props>(function ServerConfigurationInfoForm({ state }) {
   const serverConfigLoader = useResource(ServerConfigurationInfoForm, ServerConfigResource, undefined);
-  const part = getServerConfigurationFormPart(formState);
-  const state = part.state;
   const translate = useTranslate();
 
   return (
