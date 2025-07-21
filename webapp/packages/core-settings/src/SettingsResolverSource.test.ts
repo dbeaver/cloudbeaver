@@ -15,6 +15,7 @@ import { SettingsProvider } from './SettingsProvider.js';
 import { schema } from '@cloudbeaver/core-utils';
 import { SettingsSource } from './SettingsSource.js';
 import { initKnownConsoleMessages } from '@cloudbeaver/tests-runner';
+import { resetDeprecatedSettings } from './createSettingsAliasResolver.test.js';
 
 export class MemorySettingsService extends SettingsSource {
   private readonly settings: Map<string, any>;
@@ -71,6 +72,7 @@ const MEMORY_SETTINGS_LAYER = createSettingsLayer(ROOT_SETTINGS_LAYER, 'memory')
 
 describe('SettingsResolverSource', () => {
   initKnownConsoleMessages(addDeprecatedSettingPattern);
+  resetDeprecatedSettings();
 
   test('resolves setting from source', () => {
     const memorySettingsSource = new MemorySettingsService();
