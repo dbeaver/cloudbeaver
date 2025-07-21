@@ -22,6 +22,7 @@ import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { SQL_EDITOR_SETTINGS_GROUP } from './SQL_EDITOR_SETTINGS_GROUP.js';
 
 const TABLE_ALIAS_OPTIONS = ['NONE', 'PLAIN', 'EXTENDED'] as const;
+const ASSISTANT_MODE_OPTIONS = ['DEFAULT', 'NEW', 'COMBINE'] as const;
 
 const TABLE_ALIAS_SETTING_OPTIONS = [
   {
@@ -36,6 +37,11 @@ const TABLE_ALIAS_SETTING_OPTIONS = [
     value: 'EXTENDED',
     name: 'my_table AS mt',
   },
+];
+
+const ASSISTANT_MODE_OPTIONS_LOCALIZED = [
+  { value: 'DEFAULT', name: 'sql_editor_settings_content_assistant_experimental_mode_default' },
+  { value: 'NEW', name: 'sql_editor_settings_content_assistant_experimental_mode_new' },
 ];
 
 const defaultSettings = schema.object({
@@ -57,6 +63,14 @@ const defaultSettings = schema.object({
     .pipe(schema.enum(TABLE_ALIAS_OPTIONS))
     .default('PLAIN'),
   'SQLEditor.ContentAssistant.proposals.long.name': schema.coerce.boolean().default(false),
+  'SQLEditor.ContentAssistant.experimental.mode': schema.coerce.string().transform(value => {
+    switch (value) {
+      case 'DEFAULT':
+        return 'DEFAULT';
+      default:
+        return 'NEW';
+    }
+  }).pipe(schema.enum(ASSISTANT_MODE_OPTIONS).default('NEW')),
 });
 
 export type SqlEditorSettings = schema.infer<typeof defaultSettings>;
@@ -119,6 +133,18 @@ export class SqlEditorSettingsService extends Dependency {
           options: [...(setting.options?.filter(option => !TABLE_ALIAS_OPTIONS.includes(option.value as any)) || []), ...TABLE_ALIAS_SETTING_OPTIONS],
         }) as ISettingDescription<SqlEditorSettings>,
     );
+    this.serverSettingsManagerService.setSettingTransformer(
+      'SQLEditor.ContentAssistant.experimental.mode',
+      setting => {
+        return {
+          ...setting,
+          group: SQL_EDITOR_SETTINGS_GROUP,
+          name: 'sql_editor_settings_content_assistant_experimental_mode_name',
+          description: 'sql_editor_settings_content_assistant_experimental_mode_desc',
+          options: ASSISTANT_MODE_OPTIONS_LOCALIZED,
+        } as ISettingDescription<SqlEditorSettings>;
+      },
+    )
 
     this.settingsManagerService.registerSettings(this.settings, () => {
       const settings: ISettingDescription<SqlEditorSettings>[] = [
@@ -167,6 +193,18 @@ export class SqlEditorSettingsService extends Dependency {
           name: 'sql_editor_settings_insert_table_aliases_name',
           description: 'sql_editor_settings_insert_table_aliases_desc',
           options: TABLE_ALIAS_SETTING_OPTIONS,
+        });
+      }
+      if (!this.serverSettingsManagerService.providedSettings.has('SQLEditor.ContentAssistant.experimental.mode')) {
+        settings.push({
+          key: 'SQLEditor.ContentAssistant.experimental.mode',
+          access: {
+            scope: ['server', 'client'],
+          },
+          group: SQL_EDITOR_SETTINGS_GROUP,
+          type: ESettingsValueType.Select,
+          name: 'sql_editor_settings_content_assistant_experimental_mode_name',
+          options: ASSISTANT_MODE_OPTIONS_LOCALIZED
         });
       }
       return settings;

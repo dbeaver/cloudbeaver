@@ -1,5 +1,9 @@
 export default [
   ['plugin_sql_editor_sql_editor_settings_group', 'SQL编辑器'],
+  ['sql_editor_settings_content_assistant_experimental_mode_name', 'Completion engine'],
+  ['sql_editor_settings_content_assistant_experimental_mode_desc', 'SQL editor content assistant mode'],
+  ['sql_editor_settings_content_assistant_experimental_mode_default', 'Legacy'],
+  ['sql_editor_settings_content_assistant_experimental_mode_new', 'Semantic'],
   ['sql_editor_settings_insert_table_aliases_name', '(在FROM子句中)插入表别名'],
   ['sql_editor_settings_insert_table_aliases_desc', '自动插入表别名'],
   ['sql_editor_menu', 'SQL编辑器'],
