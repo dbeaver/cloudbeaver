@@ -52,9 +52,9 @@ function createResolver(settings: Record<any, any>) {
   });
 }
 
-describe('createSettingsAliasResolver', () => {
-  initKnownConsoleMessages();
+initKnownConsoleMessages();
 
+describe('createSettingsAliasResolver', () => {
   test('Deprecated setting ignored', () => {
     const resolver = createResolver(newSettings);
 
