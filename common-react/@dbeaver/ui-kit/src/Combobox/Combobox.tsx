@@ -51,6 +51,7 @@ export function ComboboxProvider({ children, ...props }: ComboboxProviderProps) 
 export interface ComboboxProps extends AriaComboboxProps {
   children?: ReactNode;
   defaultValue?: string;
+  popoverClassName?: string;
   setValue?: ComboboxProviderProps['setValue'];
 }
 
@@ -59,6 +60,7 @@ const ComboboxInput = ({
   onBlur,
   onKeyDown,
   defaultValue,
+  popoverClassName,
   ref,
   ...props
 }: Omit<ComboboxProps, 'setValue'> & { ref?: React.Ref<HTMLInputElement> }) => {
@@ -98,7 +100,7 @@ const ComboboxInput = ({
   return (
     <>
       <AriaCombobox ref={ref} {...props} onBlur={handleBlur} onKeyDown={onKeyDown} className={clsx('dbv-kit-combobox', props.className)} />
-      <AriaComboboxPopover gutter={8} portal sameWidth unmountOnHide className="dbv-kit-combobox__popover">
+      <AriaComboboxPopover gutter={8} portal sameWidth unmountOnHide className={clsx('dbv-kit-combobox__popover', popoverClassName)}>
         <ComboboxSearchContext.Provider value={contextValue}>{children}</ComboboxSearchContext.Provider>
       </AriaComboboxPopover>
     </>
@@ -109,7 +111,7 @@ export function Combobox({ defaultValue, setValue, ref, ...props }: ComboboxProp
   return (
     <ComboboxProvider defaultValue={defaultValue} setValue={setValue}>
       <ComboboxInput defaultValue={defaultValue} ref={ref} {...props} />
-      <AriakitComboboxDisclosure className="tw:absolute tw:right-2 tw:top-2 tw:*:fill-none! tw:cursor-pointer" />
+      <AriakitComboboxDisclosure className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2 tw:*:fill-none! tw:cursor-pointer" />
     </ComboboxProvider>
   );
 }

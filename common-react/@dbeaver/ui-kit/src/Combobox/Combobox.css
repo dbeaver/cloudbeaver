@@ -70,6 +70,7 @@
       background-color: var(--dbv-kit-combobox-item-selected-background);
     }
 
+    &:hover,
     &[data-focus-visible],
     &[data-active-item] {
       color: var(--dbv-kit-combobox-item-hover-foreground);
