@@ -8,7 +8,7 @@
 import { describe, expect, test } from 'vitest';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 
-import { expectDeprecatedSettingMessage, expectNoDeprecatedSettingMessage } from './__custom_mocks__/expectDeprecatedSettingMessage.js';
+import { expectDeprecatedSettingMessage, expectNoDeprecatedSettingMessage, addDeprecatedSettingPattern } from './__custom_mocks__/expectDeprecatedSettingMessage.js';
 import { createSettingsAliasResolver } from './createSettingsAliasResolver.js';
 import type { ISettingsSource } from './ISettingsSource.js';
 import { initKnownConsoleMessages } from '@cloudbeaver/tests-runner';
@@ -52,7 +52,7 @@ function createResolver(settings: Record<any, any>) {
   });
 }
 
-initKnownConsoleMessages();
+initKnownConsoleMessages(addDeprecatedSettingPattern);
 
 describe('createSettingsAliasResolver', () => {
   test('Deprecated setting ignored', () => {

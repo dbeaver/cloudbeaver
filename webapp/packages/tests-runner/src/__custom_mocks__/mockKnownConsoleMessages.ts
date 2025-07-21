@@ -19,8 +19,10 @@ let errorSpy: MockInstance;
 let infoSpy: MockInstance;
 let debugSpy: MockInstance;
 
-export function initKnownConsoleMessages() {
+export function initKnownConsoleMessages(addKnownPatterns?: () => void) {
   beforeAll(() => {
+    addKnownPatterns?.();
+
     logSpy = vitest.spyOn(console, 'log').mockImplementation((...args) => {
       if (filterPatterns(knownLogPatterns, args)) {
         return;

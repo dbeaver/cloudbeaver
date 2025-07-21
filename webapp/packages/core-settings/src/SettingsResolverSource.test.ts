@@ -7,7 +7,7 @@
  */
 import { describe, expect, test } from 'vitest';
 
-import { expectDeprecatedSettingMessage, expectNoDeprecatedSettingMessage } from './__custom_mocks__/expectDeprecatedSettingMessage.js';
+import { expectDeprecatedSettingMessage, expectNoDeprecatedSettingMessage, addDeprecatedSettingPattern } from './__custom_mocks__/expectDeprecatedSettingMessage.js';
 import { SettingsResolverSource } from './SettingsResolverSource.js';
 import { createSettingsLayer, ROOT_SETTINGS_LAYER } from './SettingsLayer.js';
 import { createSettingsAliasResolver } from './createSettingsAliasResolver.js';
@@ -70,7 +70,7 @@ export class MemorySettingsService extends SettingsSource {
 const MEMORY_SETTINGS_LAYER = createSettingsLayer(ROOT_SETTINGS_LAYER, 'memory');
 
 describe('SettingsResolverSource', () => {
-  initKnownConsoleMessages();
+  initKnownConsoleMessages(addDeprecatedSettingPattern);
 
   test('resolves setting from source', () => {
     const memorySettingsSource = new MemorySettingsService();
