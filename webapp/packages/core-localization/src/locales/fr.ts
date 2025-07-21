@@ -32,6 +32,7 @@ export default [
   ['ui_custom', 'Personnalisé'],
   ['ui_configure', 'Configurer'],
   ['ui_apply', 'Appliquer'],
+  ['ui_replace', 'Remplacer'],
   ['ui_cancel', 'Annuler'],
   ['ui_reject', 'Reject'],
   ['ui_ignore', 'Ignorer'],
