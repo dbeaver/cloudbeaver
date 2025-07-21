@@ -404,7 +404,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         passEmpty?: boolean,
         passDisabled?: boolean,
       ): Promise<T | undefined> {
-        if (!segment || (this.isDisabled && !passDisabled) || (!passEmpty && this.isScriptEmpty)) {
+        if (!segment || segment.end === segment.begin || (this.isDisabled && !passDisabled) || (!passEmpty && this.isScriptEmpty)) {
           return;
         }
 
@@ -435,24 +435,35 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         const projectId = this.dataSource?.executionContext?.projectId;
         const connectionId = this.dataSource?.executionContext?.connectionId;
 
-        await data.updateParserScripts();
+        while (true) {
+          const currentScript = this.parser.actualScript;
+          // TODO: we updating parser scripts
+          //       script may be changed this will lead to temporary wrong segments offsets
+          await data.updateParserScripts();
+          if (currentScript !== this.parser.actualScript) {
+            continue;
+          }
 
-        if (!projectId || !connectionId || this.cursor.anchor !== this.cursor.head) {
-          return this.getSubQuery();
+          if (!projectId || !connectionId || this.cursor.anchor !== this.cursor.head) {
+            return this.getSubQuery();
+          }
+
+          if (this.activeSegmentMode.activeSegmentMode) {
+            return this.activeSegment;
+          }
+
+          const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, currentScript, this.cursor.anchor);
+          if (currentScript !== this.parser.actualScript) {
+            continue;
+          }
+          if (result.end === 0 && result.start === 0) {
+            return this.cursorSegment;
+          }
+
+          // TODO: here we use parser that may be outdated and segment will return wrong value
+          const segment = this.parser.getSegment(result.start, result.end);
+          return segment;
         }
-
-        if (this.activeSegmentMode.activeSegmentMode) {
-          return this.activeSegment;
-        }
-
-        const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, this.value, this.cursor.anchor);
-
-        if (result.end === 0 && result.start === 0) {
-          return;
-        }
-
-        const segment = this.parser.getSegment(result.start, result.end);
-        return segment;
       },
 
       getSubQuery(): ISQLScriptSegment | undefined {
@@ -508,8 +519,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     executor: data.dataSource?.onSetScript,
     handlers: [
       function setScript({ script }) {
-        // ensure that cursor is in script boundaries
-        data.setCursor(data.cursor.anchor, data.cursor.head);
         data.parser.setScript(script);
         data.updateParserScriptsDebounced().catch(() => {});
         data.onUpdate.execute();
