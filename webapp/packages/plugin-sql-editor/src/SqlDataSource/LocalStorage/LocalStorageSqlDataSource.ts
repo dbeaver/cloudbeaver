@@ -38,6 +38,9 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
   }
 
   override get features(): ESqlDataSourceFeatures[] {
+    if (this.state.showOnlyResults) {
+      return [];
+    }
     return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable, ESqlDataSourceFeatures.setName];
   }
 
@@ -74,6 +77,11 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
 
   canRename(name: string | null): boolean {
     return true;
+  }
+
+  // TODO: should we move it to the BaseSqlDataSource?
+  setShowOnlyResults(showOnlyResults: boolean): void {
+    this.state.showOnlyResults = showOnlyResults;
   }
 
   override setScript(script: string, source?: string, cursor?: ISqlEditorCursor): void {

@@ -34,6 +34,7 @@ export default [
   ['ui_custom', 'Tùy chỉnh'],
   ['ui_configure', 'Cấu hình'],
   ['ui_apply', 'Áp dụng'],
+  ['ui_replace', 'Thay thế'],
   ['ui_cancel', 'Hủy'],
   ['ui_reject', 'Từ chối'],
   ['ui_ignore', 'Bỏ qua'],

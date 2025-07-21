@@ -42,6 +42,8 @@ export interface ISQLEditorOptions {
   schemaId?: string;
   source?: string;
   query?: string;
+  dataSourceState?: Record<string, any>;
+  metadata?: Record<string, any>;
 }
 
 export interface SQLCreateAction extends SQLEditorActionContext, ISQLEditorOptions {
@@ -142,6 +144,8 @@ export class SqlEditorNavigatorService {
             data.name,
             data.source,
             data.query,
+            data.dataSourceState,
+            data.metadata,
           );
 
           if (tabOptions) {
