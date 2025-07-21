@@ -25,6 +25,13 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 25.1.3 2025-07-21
+- A password confirmation field has been added for administrators in the Easy Config section to help prevent accidental misconfigurations;
+- Added column descriptions in the Data Editor to provide more metadata context. You can disable this in Preferences > Data Viewer;
+- Added the option to display tabs across multiple rows, allowing you to see all tabs without scrolling. You can enable this in Preferences > Interface;
+- Changed the default engine used for autocompletion in the SQL Editor. This Semantic engine offers improved suggestions for database objects, keywords, and functions. You can switch back to the Legacy engine in Preferences -> SQL Editor;
+- Clickhouse: fixed the presentation of tuples and map data types in the data editor.
+
 ### 25.1.2 2025-07-07
 - The CloudBeaver default theme matches the device theme by default now. You can change this behavior in user preferences under the Theme section;
 - Added a button “Clear” to the Output panel;
