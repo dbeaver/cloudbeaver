@@ -34,6 +34,7 @@ export default [
   ['ui_custom', 'Custom'],
   ['ui_configure', 'Configure'],
   ['ui_apply', 'Apply'],
+  ['ui_replace', 'Replace'],
   ['ui_cancel', 'Cancel'],
   ['ui_reject', 'Reject'],
   ['ui_ignore', 'Ignore'],
