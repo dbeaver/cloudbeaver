@@ -41,7 +41,6 @@ type ControlledProps<TKey, TValue> = ComboboxBaseProps<TKey, TValue> & {
   name?: string;
   value?: TKey;
   onSelect?: (value: TKey, name: string | undefined, prev: TKey) => void;
-  onChange?: (value: string, name: string | undefined) => any;
   state?: never;
 };
 
@@ -49,7 +48,6 @@ type ObjectProps<TValue, TKey extends keyof TState, TState> = ComboboxBaseProps<
   name: TKey;
   state: TState;
   onSelect?: (value: TState[TKey], name: TKey | undefined, prev: TState[TKey]) => void;
-  onChange?: (value: string, name: TKey | undefined) => any;
   value?: never;
 };
 
@@ -81,7 +79,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
   iconSelector,
   titleSelector,
   isDisabled,
-  onChange = () => {},
   onSelect,
   ...rest
 }: ControlledProps<any, any> | ObjectProps<any, any, any>) {
@@ -90,7 +87,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const translate = useTranslate();
   const context = useContext(FormContext);
 
-  // Get current value
   let value: string | number | readonly string[] | undefined = controlledValue ?? defaultValue ?? undefined;
   if (state && name !== undefined && name in state) {
     value = state[name];
@@ -98,25 +94,19 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   const selectedItem = items.find((item, index) => keySelector(item, index) === value);
 
-  // Handle value changes for UIKit Combobox
-  const handleComboboxChange = useCallback(
-    (newValue: string | undefined) => {
-      console.log('Combobox handleComboboxChange', newValue, name);
-      onChange(newValue || '', name);
-    },
-    [name, onChange],
-  );
-
-  // Handle item selection
   const handleSelect = useCallback(
     (selectedValue: string) => {
-      const item = items.find((item, index) => valueSelector(item) === selectedValue);
-      if (!item) return;
+      const item = items.find(item => valueSelector(item) === selectedValue);
+      if (!item) {
+        return;
+      }
 
       const itemIndex = items.indexOf(item);
       const key = keySelector(item, itemIndex);
 
-      if (key === value) return; // No change
+      if (key === value) {
+        return;
+      }
 
       if (state) {
         state[name] = key;
@@ -142,7 +132,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           </FieldLabel>
         )}
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flex: 1 }}>
-          <input value={translate('ui_processing_loading')} disabled readOnly style={{ flex: 1, paddingRight: 24 }} />
+          <input value={translate('ui_processing_loading')} style={{ flex: 1, paddingRight: 24 }} readOnly disabled />
           <div style={{ position: 'absolute', left: 12, width: 16, height: 16 }}>
             <Loader small fullSize />
           </div>
@@ -169,7 +159,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
         <UIKitCombobox
           defaultValue={selectedItem ? valueSelector(selectedItem) : defaultValue ? String(defaultValue) : undefined}
-          setValue={handleComboboxChange}
+          setValue={handleSelect}
           disabled={disabled}
           readOnly={readOnly}
           placeholder={rest.placeholder}
@@ -196,7 +186,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
                 value={itemValue}
                 disabled={itemDisabled}
                 title={itemTitle}
-                onClick={() => handleSelect(itemValue)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
