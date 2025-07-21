@@ -50,6 +50,7 @@ import org.jkiss.dbeaver.model.websocket.event.WSTransactionalCountEvent;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.lang.ref.SoftReference;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -72,7 +73,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
     private final String id;
     private final String projectId;
     private final Map<String, WebSQLResultsInfo> resultInfoMap = new HashMap<>();
-    private final Map<String, WebSQLQueryResults> queryResultsMap = new HashMap<>();
+    private final Map<String, SoftReference<WebSQLQueryResults>> queryResultsMap = new HashMap<>();
 
     private final AtomicInteger resultId = new AtomicInteger();
 
@@ -195,7 +196,8 @@ public class WebSQLContextInfo implements WebSessionProvider {
 
     @Nullable
     public WebSQLQueryResults getQueryResults(@NotNull String resultId) throws DBWebException {
-        return queryResultsMap.get(resultId);
+        SoftReference<WebSQLQueryResults> reference = queryResultsMap.get(resultId);
+        return reference == null ? null : reference.get();
     }
 
     public void trySaveQueryResults(@NotNull WebSQLQueryResults[] resultsArray, int requestedLimit) {
@@ -203,7 +205,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
         boolean isSingleResult = resultsArray.length == 1;
         int actualRowCount = isSingleResult ? resultsArray[0].getResultSet().getRows().length : 0;
         if (isSingleResult && actualRowCount < Math.min(requestedLimit, MAX_RESULT_SET_SIZE)) {
-            queryResultsMap.put(resultsArray[0].getResultSet().getId(), resultsArray[0]);
+            queryResultsMap.put(resultsArray[0].getResultSet().getId(), new SoftReference<>(resultsArray[0]));
         }
     }
 
