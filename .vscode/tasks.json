@@ -20,6 +20,16 @@
       "args": ["test"]
     },
     {
+      "label": "Run Tests Common Typescript",
+      "type": "shell",
+      "command": "yarn",
+      "group": "test",
+      "args": ["test"],
+      "options": {
+        "cwd": "${workspaceFolder}/common-typescript"
+      }
+    },
+    {
       "label": "Run DevServer CE",
       "group": "build",
       "isBackground": true,

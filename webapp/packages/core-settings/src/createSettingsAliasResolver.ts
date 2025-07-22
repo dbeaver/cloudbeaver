@@ -11,7 +11,7 @@ import { invertObject, type schema } from '@cloudbeaver/core-utils';
 import type { ISettingChangeData } from './ISettingsSource.js';
 import type { IEditableSettingsSource } from './IEditableSettingsSource.js';
 
-const DEPRECATED_SETTINGS = new Set();
+export const DEPRECATED_SETTINGS = new Set();
 
 type SettingsMapping<TTarget> = Partial<{
   [key in keyof TTarget]: string;
