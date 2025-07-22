@@ -16,7 +16,7 @@ import { TreeNodeContext } from './TreeNodeContext.js';
 import style from './TreeNodeSelect.module.css';
 
 interface Props {
-  onSelect?: () => Promise<unknown> | undefined;
+  onSelect?: () => Promise<unknown> | void | undefined;
   selected?: boolean;
   indeterminate?: boolean;
   disabled?: boolean;
