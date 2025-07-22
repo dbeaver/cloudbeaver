@@ -5,12 +5,17 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, beforeEach } from 'vitest';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 
-import { expectDeprecatedSettingMessage, expectNoDeprecatedSettingMessage } from './__custom_mocks__/expectDeprecatedSettingMessage.js';
-import { createSettingsAliasResolver } from './createSettingsAliasResolver.js';
+import {
+  expectDeprecatedSettingMessage,
+  expectNoDeprecatedSettingMessage,
+  addDeprecatedSettingPattern,
+} from './__custom_mocks__/expectDeprecatedSettingMessage.js';
+import { createSettingsAliasResolver, DEPRECATED_SETTINGS } from './createSettingsAliasResolver.js';
 import type { ISettingsSource } from './ISettingsSource.js';
+import { initKnownConsoleMessages } from '@cloudbeaver/tests-runner';
 
 const deprecatedSettings = {
   deprecated: 'deprecatedValue',
@@ -50,15 +55,25 @@ function createResolver(settings: Record<any, any>) {
     value: 'deprecated',
   });
 }
-describe.skip('createSettingsAliasResolver', () => {
-  test('Deprecated setting ignored', async () => {
+
+export function resetDeprecatedSettings() {
+  beforeEach(() => {
+    DEPRECATED_SETTINGS.clear();
+  });
+}
+
+describe('createSettingsAliasResolver', () => {
+  initKnownConsoleMessages(addDeprecatedSettingPattern);
+  resetDeprecatedSettings();
+
+  test('Deprecated setting ignored', () => {
     const resolver = createResolver(newSettings);
 
     expect(resolver.has('value')).toBe(false);
     expectNoDeprecatedSettingMessage();
   });
 
-  test.skip('Deprecated setting extracted', async () => {
+  test('Deprecated setting extracted', () => {
     const resolver = createResolver(deprecatedSettings);
 
     expect(resolver.has('value')).toBe(true);

@@ -7,13 +7,15 @@
  */
 import { describe, expect, test } from 'vitest';
 
-import { expectDeprecatedSettingMessage, expectNoDeprecatedSettingMessage } from './__custom_mocks__/expectDeprecatedSettingMessage.js';
+import { expectDeprecatedSettingMessage, expectNoDeprecatedSettingMessage, addDeprecatedSettingPattern } from './__custom_mocks__/expectDeprecatedSettingMessage.js';
 import { SettingsResolverSource } from './SettingsResolverSource.js';
 import { createSettingsLayer, ROOT_SETTINGS_LAYER } from './SettingsLayer.js';
 import { createSettingsAliasResolver } from './createSettingsAliasResolver.js';
 import { SettingsProvider } from './SettingsProvider.js';
 import { schema } from '@cloudbeaver/core-utils';
 import { SettingsSource } from './SettingsSource.js';
+import { initKnownConsoleMessages } from '@cloudbeaver/tests-runner';
+import { resetDeprecatedSettings } from './createSettingsAliasResolver.test.js';
 
 export class MemorySettingsService extends SettingsSource {
   private readonly settings: Map<string, any>;
@@ -68,7 +70,10 @@ export class MemorySettingsService extends SettingsSource {
 
 const MEMORY_SETTINGS_LAYER = createSettingsLayer(ROOT_SETTINGS_LAYER, 'memory');
 
-describe.skip('SettingsResolverSource', () => {
+describe('SettingsResolverSource', () => {
+  initKnownConsoleMessages(addDeprecatedSettingPattern);
+  resetDeprecatedSettings();
+
   test('resolves setting from source', () => {
     const memorySettingsSource = new MemorySettingsService();
     const settingsResolver = new SettingsResolverSource();
