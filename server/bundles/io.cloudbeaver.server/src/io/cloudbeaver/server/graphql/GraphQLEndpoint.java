@@ -74,7 +74,7 @@ public class GraphQLEndpoint extends HttpServlet {
     public static final String API_PROTOCOL = "GraphQL";
     private final GraphQL graphQL;
 
-    private static final Gson gson = new GsonBuilder()
+    public static final Gson gson = new GsonBuilder()
         .serializeNulls()
         .setPrettyPrinting()
         .create();
@@ -327,8 +327,8 @@ public class GraphQLEndpoint extends HttpServlet {
         }
     }
 
-
-    public static HttpServletRequest getServletRequest(DataFetchingEnvironment env) {
+    @NotNull
+    public static HttpServletRequest getServletRequestOrThrow(DataFetchingEnvironment env) {
         GraphQLContext context = env.getGraphQlContext();
         HttpServletRequest request = context.get("request");
         if (request == null) {
