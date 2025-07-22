@@ -39,7 +39,7 @@ import './Combobox.css';
 
 interface SearchContextValue {
   matches: string[];
-  registerItem: (value: string) => void;
+  registerItem: (value: string, searchData?: Record<string, any>) => void;
   unregisterItem: (value: string) => void;
   isItemVisible: (value: string) => boolean;
 }
@@ -53,7 +53,7 @@ const SearchContext = createContext<SearchContextValue>({
 
 interface SearchContextProviderProps {
   children: ReactNode;
-  fuseOptions?: IFuseOptions<string>;
+  searchOptions?: IFuseOptions<any>;
   defaultValue?: string;
 }
 
@@ -62,27 +62,50 @@ interface SearchContextProviderProps {
  */
 export function SearchContextProvider({
   children,
-  fuseOptions = {
+  searchOptions = {
     includeScore: false,
     threshold: 0.3,
   },
   defaultValue,
 }: SearchContextProviderProps) {
   const [registeredItems, setRegisteredItems] = useState<Set<string>>(new Set());
+  const [itemsData, setItemsData] = useState<Map<string, Record<string, any>>>(new Map());
   const store = useComboboxContext();
   const searchValue = useStoreState(store, 'value') || '';
   const deferredValue = useDeferredValue(searchValue);
 
+  const isObjectSearch = useMemo(() => Array.isArray(searchOptions.keys) && searchOptions.keys.length > 0, [searchOptions.keys]);
+
   const itemsList = useMemo(() => Array.from(registeredItems), [registeredItems]);
-  const fuse = useMemo(() => new Fuse(itemsList, fuseOptions), [itemsList, fuseOptions]);
+
+  const searchData = useMemo(() => {
+    if (isObjectSearch) {
+      return itemsList.map(value => {
+        const data = itemsData.get(value) || {};
+        return { value, ...data };
+      });
+    }
+    return itemsList;
+  }, [itemsList, itemsData, isObjectSearch]);
+
+  const fuse = useMemo(() => new Fuse(searchData, searchOptions), [searchData, searchOptions]);
+
   const matches = useMemo(() => {
     if (deferredValue.trim() === '' || deferredValue === defaultValue) return itemsList;
 
-    return fuse.search(deferredValue).map(result => result.item);
-  }, [fuse, deferredValue, itemsList, defaultValue]);
+    const results = fuse.search(deferredValue);
+    if (isObjectSearch) {
+      return results.map(result => (result.item as any).value);
+    }
 
-  const registerItem = useCallback((value: string) => {
+    return results.map(result => result.item as string);
+  }, [fuse, deferredValue, itemsList, defaultValue, isObjectSearch]);
+
+  const registerItem = useCallback((value: string, searchData?: Record<string, any>) => {
     setRegisteredItems(prev => new Set(prev).add(value));
+    if (searchData && Object.keys(searchData).length > 0) {
+      setItemsData(prev => new Map(prev).set(value, searchData));
+    }
   }, []);
 
   const unregisterItem = useCallback((value: string) => {
@@ -90,6 +113,11 @@ export function SearchContextProvider({
       const newSet = new Set(prev);
       newSet.delete(value);
       return newSet;
+    });
+    setItemsData(prev => {
+      const newMap = new Map(prev);
+      newMap.delete(value);
+      return newMap;
     });
   }, []);
 
@@ -166,20 +194,22 @@ export function ComboboxPopover({ children, className, ...props }: ComboboxPopov
   );
 }
 
-export interface ComboboxItemProps extends AriaComboboxItemProps {}
+export interface ComboboxItemProps extends AriaComboboxItemProps {
+  searchData?: Record<string, any>;
+}
 
 /**
  * ComboboxItem - An option in the combobox popover
  * Automatically registers/unregisters itself for search
  */
-export function ComboboxItem({ value, ref, ...props }: ComboboxItemProps & { ref?: React.Ref<HTMLDivElement> }) {
+export function ComboboxItem({ value, searchData, ref, ...props }: ComboboxItemProps & { ref?: React.Ref<HTMLDivElement> }) {
   const { registerItem, unregisterItem, isItemVisible } = use(SearchContext);
 
   useLayoutEffect(() => {
     if (value == null) return;
-    registerItem(value);
+    registerItem(value, searchData);
     return () => unregisterItem(value);
-  }, [registerItem, unregisterItem, value]);
+  }, [registerItem, unregisterItem, value, searchData]);
 
   const isVisible = value != null && isItemVisible(value);
 
@@ -206,7 +236,7 @@ export function ComboboxEmpty(props: ComboboxEmptyProps) {
 export interface ComboboxRootProps {
   children: ReactNode;
   defaultValue?: string;
-  fuseOptions?: IFuseOptions<string>;
+  searchOptions?: IFuseOptions<any>;
   comboboxProps?: ComboboxProviderProps;
   className?: string;
 }
@@ -214,10 +244,10 @@ export interface ComboboxRootProps {
 /**
  * ComboboxRoot - Wrapper that combines all providers
  */
-export function ComboboxRoot({ children, defaultValue, fuseOptions, comboboxProps, className }: ComboboxRootProps) {
+export function ComboboxRoot({ children, defaultValue, searchOptions, comboboxProps, className }: ComboboxRootProps) {
   return (
     <ComboboxProvider defaultValue={defaultValue} {...comboboxProps}>
-      <SearchContextProvider defaultValue={defaultValue} fuseOptions={fuseOptions}>
+      <SearchContextProvider defaultValue={defaultValue} searchOptions={searchOptions}>
         <div className={clsx('dbv-kit-combobox__root', className)}>{children}</div>
       </SearchContextProvider>
     </ComboboxProvider>
