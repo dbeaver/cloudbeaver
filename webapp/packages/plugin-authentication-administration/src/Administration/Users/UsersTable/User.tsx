@@ -20,11 +20,10 @@ import { UsersTableOptionsPanelService } from './UsersTableOptionsPanelService.j
 interface Props {
   user: AdminUser;
   displayAuthRole: boolean;
-  isManageable: boolean;
   selectable?: boolean;
 }
 
-export const User = observer<Props>(function User({ user, displayAuthRole, isManageable, selectable }) {
+export const User = observer<Props>(function User({ user, displayAuthRole, selectable }) {
   const usersAdministrationService = useService(UsersAdministrationService);
   const usersService = useService(UsersResource);
   const notificationService = useService(NotificationService);
@@ -67,7 +66,7 @@ export const User = observer<Props>(function User({ user, displayAuthRole, isMan
         <div className="tw:flex tw:items-center tw:justify-center">
           <Checkbox
             checked={user.enabled}
-            disabled={usersService.isActiveUser(user.userId) || !isManageable}
+            disabled={usersService.isActiveUser(user.userId)}
             title={enabledCheckboxTitle}
             onChange={handleEnabledCheckboxChange}
           />

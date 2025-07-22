@@ -8,10 +8,9 @@
 import { observer } from 'mobx-react-lite';
 
 import { AuthRolesResource } from '@cloudbeaver/core-authentication';
-import { ColoredContainer, Container, Group, Placeholder, useAutoLoad, useResource } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, Placeholder, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService.js';
 import { CreateUser } from './CreateUser.js';
 import { CreateUserService } from './CreateUserService.js';
 import { UsersTableFilters } from './Filters/UsersTableFilters.js';
@@ -27,16 +26,12 @@ interface Props {
 export const UsersPage = observer<Props>(function UsersPage({ param }) {
   const createUserService = useService(CreateUserService);
   const authRolesResource = useResource(UsersPage, AuthRolesResource, undefined);
-  const administrationUsersManagementService = useService(AdministrationUsersManagementService);
-
-  useAutoLoad(UsersPage, administrationUsersManagementService.loaders);
   const filters = useUsersTableFilters();
   const table = useUsersTable(filters);
 
   const create = param === 'create';
   const displayAuthRole = authRolesResource.data.length > 0;
   const loading = authRolesResource.isLoading() || table.loadableState.isLoading();
-  const isManageable = !administrationUsersManagementService.externalUserProviderEnabled;
 
   return (
     <ColoredContainer vertical wrap gap parent maximum>
@@ -49,9 +44,7 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
       </Group>
 
       <Container overflow gap maximum>
-        {create && createUserService.state && isManageable && (
-          <CreateUser state={createUserService.state} onCancel={createUserService.cancelCreate} />
-        )}
+        {create && createUserService.state && <CreateUser state={createUserService.state} onCancel={createUserService.cancelCreate} />}
 
         <Placeholder container={createUserService.toolsContainer} param={param} />
 
@@ -63,7 +56,6 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
             displayAuthRole={displayAuthRole}
             loading={loading}
             hasMore={table.hasMore}
-            isManageable={isManageable}
             onLoadMore={table.loadMore}
           />
         </Group>

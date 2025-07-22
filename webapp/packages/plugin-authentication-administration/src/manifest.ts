@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@ export const manifest: PluginManifest = {
         m => m.UserFormConnectionAccessPartBootstrap,
       ),
     () => import('./Administration/Users/UserForm/Info/UserFormInfoPartService.js').then(m => m.UserFormInfoPartService),
-    () => import('./AdministrationUsersManagementService.js').then(m => m.AdministrationUsersManagementService),
     () => import('./Administration/Users/UsersTable/UsersTableOptionsPanelService.js').then(m => m.UsersTableOptionsPanelService),
     () => import('./Administration/Users/Teams/TeamsTable/TeamsTableOptionsPanelService.js').then(m => m.TeamsTableOptionsPanelService),
   ],

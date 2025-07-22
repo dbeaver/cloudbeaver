@@ -10,7 +10,6 @@ import { Button, type ButtonProps, useTranslate } from '@cloudbeaver/core-blocks
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
-import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService.js';
 import { DeleteUserDialog } from './DeleteUserDialog.js';
 import { DisableUserDialog } from './DisableUserDialog.js';
 
@@ -28,11 +27,9 @@ export const AdministrationUserFormDeleteButton: React.FC<Props> = function Admi
 }) {
   const translate = useTranslate();
   const commonDialogService = useService(CommonDialogService);
-  const administrationUsersManagementService = useService(AdministrationUsersManagementService);
   const usersResource = useService(UsersResource);
 
-  const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
-  const deleteDisabled = usersResource.isActiveUser(userId) || userManagementDisabled;
+  const deleteDisabled = usersResource.isActiveUser(userId);
 
   if (deleteDisabled) {
     return null;

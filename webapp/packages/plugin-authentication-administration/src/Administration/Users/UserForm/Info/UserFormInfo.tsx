@@ -10,8 +10,6 @@ import { observer } from 'mobx-react-lite';
 import { Container, FieldCheckbox, Group, GroupTitle, Placeholder, useAutoLoad, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
-
-import { AdministrationUsersManagementService } from '../../../../AdministrationUsersManagementService.js';
 import type { UserFormProps } from '../AdministrationUserFormService.js';
 import { UserFormInfoCredentials } from './UserFormInfoCredentials.js';
 import { UserFormInfoMetaParameters } from './UserFormInfoMetaParameters.js';
@@ -26,16 +24,14 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
   const tab = useTab(tabId);
   const tabState = useTabState<UserFormInfoPart>();
   const userFormInfoPartService = useService(UserFormInfoPartService);
-  const administrationUsersManagementService = useService(AdministrationUsersManagementService);
   const userId = tabState.state.userId ?? formState.state.userId;
   const user = useResource(UserFormInfo, UsersResource, userId, {
     active: formState.mode === 'edit',
   });
 
-  useAutoLoad(UserFormInfo, [tabState, ...administrationUsersManagementService.loaders], tab.selected);
+  useAutoLoad(UserFormInfo, [tabState], tab.selected);
 
   const disabled = tabState.isLoading();
-  const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
 
   return (
     <Container overflow>
@@ -51,7 +47,7 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
           id={`${formState.id}_user_enabled`}
           name="enabled"
           state={tabState.state}
-          disabled={disabled || userManagementDisabled}
+          disabled={disabled}
         />
         <UserFormInfoTeams formState={formState} tabState={tabState} tabSelected={tab.selected} disabled={disabled} />
       </Group>
