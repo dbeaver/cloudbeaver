@@ -47,7 +47,7 @@ export default tseslint.config(
       'no-undef': 'off',
       'comma-spacing': 'off',
       'default-param-last': 'off',
-      'func-call-spacing': 'off',
+      'function-call-spacing': 'off',
       'keyword-spacing': 'off',
       'no-duplicate-imports': 'error',
       'object-curly-spacing': 'off',
@@ -111,7 +111,7 @@ export default tseslint.config(
       ],
       '@stylistic/comma-spacing': ['error'],
       '@typescript-eslint/default-param-last': ['error'],
-      '@stylistic/func-call-spacing': ['error'],
+      '@stylistic/function-call-spacing': ['error'],
       '@stylistic/keyword-spacing': ['error'],
       '@stylistic/object-curly-spacing': ['error', 'always'],
       '@stylistic/quotes': [
