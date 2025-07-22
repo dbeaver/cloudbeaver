@@ -11,7 +11,7 @@ import {
   Combobox as AriaCombobox,
   ComboboxPopover as AriaComboboxPopover,
   ComboboxItem as AriaComboboxItem,
-  ComboboxDisclosure as AriakitComboboxDisclosure,
+  ComboboxDisclosure,
   type ComboboxProviderProps,
   type ComboboxProps as AriaComboboxProps,
   type ComboboxPopoverProps,
@@ -29,7 +29,7 @@ import {
   type ReactNode,
   type SetStateAction,
   useCallback,
-  useContext,
+  use,
   useDeferredValue,
   useLayoutEffect,
   useMemo,
@@ -55,7 +55,7 @@ export interface ComboboxProps extends AriaComboboxProps {
   setValue?: ComboboxProviderProps['setValue'];
 }
 
-const ComboboxInput = ({
+export const ComboboxInput = ({
   children,
   onBlur,
   onKeyDown,
@@ -107,19 +107,10 @@ const ComboboxInput = ({
   );
 };
 
-export function Combobox({ defaultValue, setValue, ref, ...props }: ComboboxProps & { ref?: React.Ref<HTMLInputElement> }) {
-  return (
-    <ComboboxProvider defaultValue={defaultValue} setValue={setValue}>
-      <ComboboxInput defaultValue={defaultValue} ref={ref} {...props} />
-      <AriakitComboboxDisclosure className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2 tw:*:fill-none! tw:cursor-pointer" />
-    </ComboboxProvider>
-  );
-}
-
 export interface ComboboxItemProps extends AriaComboboxItemProps {}
 
 export function ComboboxItem({ value, ref, ...props }: ComboboxItemProps & { ref?: React.Ref<HTMLDivElement> }) {
-  const { matches, setList } = useContext(ComboboxSearchContext);
+  const { matches, setList } = use(ComboboxSearchContext);
 
   useLayoutEffect(() => {
     if (!setList) return;
@@ -142,11 +133,11 @@ export interface ComboboxEmptyProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export function ComboboxEmpty(props: ComboboxEmptyProps) {
-  const { matches } = useContext(ComboboxSearchContext);
+  const { matches } = use(ComboboxSearchContext);
 
   if (matches?.length) return null;
 
   return <div ref={props.ref} {...props} className={clsx('dbv-kit-combobox__empty', props.className)} />;
 }
 
-export { useComboboxContext, useComboboxStore, useStoreState, type ComboboxProviderProps, type ComboboxPopoverProps };
+export { useComboboxContext, useComboboxStore, useStoreState, type ComboboxProviderProps, type ComboboxPopoverProps, ComboboxDisclosure };

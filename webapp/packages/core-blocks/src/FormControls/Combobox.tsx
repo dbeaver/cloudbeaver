@@ -6,18 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext } from 'react';
-import { Combobox as UIKitCombobox, ComboboxItem, ComboboxEmpty } from '@dbeaver/ui-kit';
+import { useCallback, useContext, useId } from 'react';
+import { ComboboxInput, ComboboxItem, ComboboxEmpty, clsx, Spinner } from '@dbeaver/ui-kit';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
 import { IconOrImage } from '../IconOrImage.js';
-import { Loader } from '../Loader/Loader.js';
 import { useTranslate } from '../localization/useTranslate.js';
 import { Field } from './Field.js';
 import { FieldDescription } from './FieldDescription.js';
 import { FieldLabel } from './FieldLabel.js';
 import { FormContext } from './FormContext.js';
+import { ComboboxDisclosure, ComboboxProvider } from '@dbeaver/ui-kit/Combobox/Combobox';
 
 export type ComboboxBaseProps<TKey, TValue> = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -56,9 +56,6 @@ export interface ComboboxType {
   <TValue, TKey extends keyof TState, TState>(props: ObjectProps<TValue, TKey, TState>): React.JSX.Element;
 }
 
-{
-  /* TODO rewrite whole component to select attribute instead of input type text so it has an okay form validation */
-}
 export const Combobox: ComboboxType = observer(function Combobox({
   value: controlledValue,
   defaultValue,
@@ -83,6 +80,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   ...rest
 }: ControlledProps<any, any> | ObjectProps<any, any, any>) {
   const layoutProps = getLayoutProps(rest);
+  const inputId = useId();
   rest = filterLayoutFakeProps(rest);
   const translate = useTranslate();
   const context = useContext(FormContext);
@@ -122,89 +120,74 @@ export const Combobox: ComboboxType = observer(function Combobox({
   );
 
   const icon = selectedItem && iconSelector?.(selectedItem);
-
-  if (loading && items.length === 0) {
-    return (
-      <Field {...layoutProps} className={className} style={{ display: inline ? 'flex' : 'block', alignItems: inline ? 'center' : undefined }}>
-        {children && (
-          <FieldLabel required={rest.required} title={title} style={{ paddingRight: inline ? 8 : 0, paddingBottom: inline ? 0 : 10 }}>
-            {children}
-          </FieldLabel>
-        )}
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flex: 1 }}>
-          <input value={translate('ui_processing_loading')} style={{ flex: 1, paddingRight: 24 }} readOnly disabled />
-          <div style={{ position: 'absolute', left: 12, width: 16, height: 16 }}>
-            <Loader small fullSize />
-          </div>
-        </div>
-        {description && <FieldDescription>{description}</FieldDescription>}
-      </Field>
-    );
-  }
+  const comboboxDefaultValue = selectedItem ? valueSelector(selectedItem) : defaultValue ? String(defaultValue) : undefined;
 
   return (
     <Field {...layoutProps} className={className} style={{ display: inline ? 'flex' : 'block', alignItems: inline ? 'center' : undefined }}>
       {children && (
-        <FieldLabel required={rest.required} title={title} style={{ paddingRight: inline ? 8 : 0, paddingBottom: inline ? 0 : 10 }}>
+        <FieldLabel
+          required={rest.required}
+          htmlFor={inputId}
+          title={title}
+          className={clsx('theme-typography--body1', 'tw:block tw:font-medium!', inline ? 'tw:mr-2' : 'tw:mb-2.5')}
+        >
           {children}
         </FieldLabel>
       )}
-      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', flex: 1 }}>
-        {/* Icon display */}
-        {(icon || loading) && (
-          <div style={{ position: 'absolute', left: 12, width: 16, height: 16, zIndex: 1 }}>
-            {loading ? <Loader small fullSize /> : typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}
-          </div>
-        )}
 
-        <UIKitCombobox
-          defaultValue={selectedItem ? valueSelector(selectedItem) : defaultValue ? String(defaultValue) : undefined}
-          setValue={handleSelect}
-          disabled={disabled}
-          readOnly={readOnly}
-          placeholder={rest.placeholder}
-          style={{
-            flex: 1,
-            paddingLeft: icon || loading ? 34 : undefined,
-            paddingRight: 24,
-          }}
-          title={title}
-          {...rest}
-        >
-          <ComboboxEmpty>{translate('combobox_no_results_placeholder')}</ComboboxEmpty>
+      <ComboboxProvider defaultValue={comboboxDefaultValue} setValue={handleSelect}>
+        <div className="tw:relative tw:flex tw:flex-1 tw:items-center tw:gap-2">
+          <ComboboxInput
+            defaultValue={comboboxDefaultValue}
+            disabled={disabled || loading || readOnly}
+            readOnly={readOnly}
+            placeholder={rest.placeholder}
+            className={clsx('theme-typography--caption', icon || loading ? 'tw:pl-8!' : '', 'tw:pr-6!')}
+            popoverClassName="theme-text-on-surface theme-background-surface theme-typography--caption"
+            title={title}
+            id={inputId}
+            {...rest}
+          >
+            <ComboboxEmpty>{translate('combobox_no_results_placeholder')}</ComboboxEmpty>
+            {items.map((item, index) => {
+              const itemKey = String(keySelector(item, index));
+              const itemValue = valueSelector(item);
+              const itemTitle = titleSelector?.(item);
+              const itemIcon = iconSelector?.(item);
+              const itemDisabled = isDisabled?.(item);
 
-          {items.map((item, index) => {
-            const itemKey = String(keySelector(item, index));
-            const itemValue = valueSelector(item);
-            const itemTitle = titleSelector?.(item);
-            const itemIcon = iconSelector?.(item);
-            const itemDisabled = isDisabled?.(item);
-
-            return (
-              <ComboboxItem
-                key={itemKey}
-                value={itemValue}
-                disabled={itemDisabled}
-                title={itemTitle}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '8px 12px',
-                  cursor: itemDisabled ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {iconSelector && (
-                  <div style={{ width: 16, height: 16, flexShrink: 0 }}>
-                    {itemIcon && typeof itemIcon === 'string' ? <IconOrImage icon={itemIcon} /> : itemIcon}
-                  </div>
-                )}
-                <div>{itemValue}</div>
-              </ComboboxItem>
-            );
-          })}
-        </UIKitCombobox>
-      </div>
+              return (
+                <ComboboxItem
+                  key={itemKey}
+                  value={itemValue}
+                  disabled={itemDisabled}
+                  title={itemTitle}
+                  className={clsx('tw:flex tw:items-center tw:gap-2 tw:py-2 tw:px-3 tw:leading-none', {
+                    'tw:cursor-pointer': !itemDisabled,
+                    'tw:cursor-not-allowed': itemDisabled,
+                  })}
+                >
+                  {iconSelector && (
+                    <div className="tw:w-4 tw:h-4 tw:shrink-0">
+                      {itemIcon && typeof itemIcon === 'string' ? <IconOrImage icon={itemIcon} /> : itemIcon}
+                    </div>
+                  )}
+                  <div>{itemValue}</div>
+                </ComboboxItem>
+              );
+            })}
+          </ComboboxInput>
+          {loading ? (
+            <Spinner size="small" className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2" />
+          ) : (
+            <ComboboxDisclosure
+              disabled={disabled || loading || readOnly}
+              className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2 tw:*:fill-none! tw:cursor-pointer"
+            />
+          )}
+          {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
+        </div>
+      </ComboboxProvider>
       {description && <FieldDescription>{description}</FieldDescription>}
     </Field>
   );
