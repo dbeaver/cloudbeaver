@@ -94,9 +94,12 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             loadConfiguration(runtimeConfigPath);
         }
         CBServerConfig serverConfig = getServerConfiguration();
+        // enable https for legacy configurations
         if (CommonUtils.isEmpty(serverConfig.getSupportedHosts())
-            && CommonUtils.isNotEmpty(serverConfig.getServerURL())) {
-            serverConfig.setForceHttps(serverConfig.getServerURL().startsWith("https://"));
+            && CommonUtils.isNotEmpty(serverConfig.getServerURL())
+            && serverConfig.getServerURL().startsWith("https://")
+        ) {
+            serverConfig.setForceHttps(true);
         }
         // Set default preferences
         PrefUtils.setDefaultPreferenceValue(DBWorkbench.getPlatform().getPreferenceStore(),
