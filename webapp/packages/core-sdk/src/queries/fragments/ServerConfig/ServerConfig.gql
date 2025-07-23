@@ -33,6 +33,6 @@ fragment ServerConfig on ServerConfig {
     nativeName
   }
   disabledDrivers
-  secureCookies
+  forceHttps
   supportedHosts
 }

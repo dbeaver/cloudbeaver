@@ -24,7 +24,7 @@ const ServerConfigurationFormPartStateConfigSchema = schema.object({
   serverName: schema.string().optional(),
   serverURL: schema.string().optional(),
   sessionExpireTime: schema.number().optional(),
-  secureCookies: schema.boolean().optional(),
+  forceHttps: schema.boolean().optional(),
   supportedHosts: schema.string(),
 });
 

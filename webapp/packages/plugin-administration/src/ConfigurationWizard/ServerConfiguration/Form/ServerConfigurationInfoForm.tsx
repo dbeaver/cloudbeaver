@@ -25,7 +25,7 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
     <Group form gap>
       <GroupTitle>{translate('administration_configuration_wizard_configuration_server_info')}</GroupTitle>
       <Switch
-        name="secureCookies"
+        name="forceHttps"
         state={state.serverConfig}
         description={translate('administration_configuration_wizard_configuration_secure_cookies_description')}
         mod={['primary']}
@@ -33,7 +33,7 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
       >
         <div className="tw:flex tw:items-center tw:gap-1.5">
           {translate('administration_configuration_wizard_configuration_secure_cookies')}
-          {!state.serverConfig.secureCookies && (
+          {!state.serverConfig.forceHttps && (
             <IconOrImage
               title={translate('administration_configuration_wizard_configuration_secure_cookies_warning')}
               icon="/icons/warning_icon.svg"

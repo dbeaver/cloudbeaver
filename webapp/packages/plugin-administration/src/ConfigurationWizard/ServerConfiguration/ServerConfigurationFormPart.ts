@@ -33,7 +33,7 @@ function DEFAULT_STATE_GETTER(): IServerConfigurationFormPartState {
       serverName: '',
       serverURL: '',
       sessionExpireTime: MIN_SESSION_EXPIRE_TIME * 1000 * 60,
-      secureCookies: true,
+      forceHttps: true,
       supportedHosts: '',
     },
     navigatorConfig: { ...DEFAULT_NAVIGATOR_VIEW_SETTINGS },
@@ -166,7 +166,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
         resourceManagerEnabled: config?.resourceManagerEnabled ?? false,
         secretManagerEnabled: config?.secretManagerEnabled ?? false,
         supportedHosts: config?.supportedHosts.join(SUPPORTED_HOSTS_SPLITTER) ?? '',
-        secureCookies: config?.secureCookies ?? true,
+        forceHttps: config?.forceHttps ?? true,
       },
       navigatorConfig: { ...this.state.navigatorConfig, ...defaultNavigatorSettings },
     });

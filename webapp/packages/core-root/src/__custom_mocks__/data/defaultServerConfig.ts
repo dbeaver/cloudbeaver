@@ -23,7 +23,7 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
     productConfiguration: productConfiguration,
     supportsCustomConnections: true,
     supportsConnectionBrowser: false,
-    secureCookies: true,
+    forceHttps: true,
     supportedHosts: ['https://test.ce.cloudbeaver.io'],
     supportsWorkspaces: false,
     sessionExpireTime: 6000000,
