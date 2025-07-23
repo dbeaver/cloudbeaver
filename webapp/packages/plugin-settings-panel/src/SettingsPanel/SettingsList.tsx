@@ -8,7 +8,12 @@
 import { observer } from 'mobx-react-lite';
 
 import { Group, s, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
-import { type ISettingDescription, type ISettingsSource, type SettingsGroup as SettingsGroupType } from '@cloudbeaver/core-settings';
+import {
+  SettingsResolverSource,
+  type IEditableSettingsSource,
+  type ISettingDescription,
+  type SettingsGroup as SettingsGroupType,
+} from '@cloudbeaver/core-settings';
 import type { ITreeData, ITreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
 import { getGroupsFromTree } from './getGroupsFromTree.js';
@@ -21,9 +26,12 @@ interface Props {
   settingsId: string;
   treeData: ITreeData;
   treeFilter: ITreeFilter;
-  source: ISettingsSource;
+  source: IEditableSettingsSource;
+  resolver: SettingsResolverSource;
   settings: Map<SettingsGroupType, ISettingDescription<any>[]>;
   groupSelectExecutor: ISyncExecutor<string>;
+  groupsHidden?: boolean;
+  displayRestore?: boolean;
   onSettingsOpen?: (groupId: string) => void;
 }
 
@@ -31,8 +39,11 @@ export const SettingsList = observer<Props>(function SettingsList({
   settingsId,
   treeData,
   treeFilter,
+  resolver,
   source,
   settings,
+  groupsHidden,
+  displayRestore,
   groupSelectExecutor,
   onSettingsOpen,
 }) {
@@ -47,10 +58,13 @@ export const SettingsList = observer<Props>(function SettingsList({
           key={group.id}
           settingsId={settingsId}
           group={group}
+          resolver={resolver}
           source={source}
           settings={settings}
           treeFilter={treeFilter}
+          groupsHidden={groupsHidden}
           groupSelectExecutor={groupSelectExecutor}
+          displayRestore={displayRestore}
         />
       ))}
       {groups.length === 0 && <TextPlaceholder>{translate('plugin_settings_panel_no_settings')}</TextPlaceholder>}

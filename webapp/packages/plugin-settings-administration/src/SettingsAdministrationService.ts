@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import type { ISettingsSource } from '@cloudbeaver/core-settings';
+import type { IEditableSettingsSource } from '@cloudbeaver/core-settings';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 
 export interface IAdministrationSettingsOptions {
-  source: ISettingsSource;
+  source: IEditableSettingsSource;
   accessor: string[];
 }
 

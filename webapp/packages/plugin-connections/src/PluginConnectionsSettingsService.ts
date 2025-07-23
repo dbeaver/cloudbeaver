@@ -35,7 +35,7 @@ export class PluginConnectionsSettingsService extends Dependency {
 
   private registerSettings() {
     // todo: probably not working as a separate setting
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings<typeof defaultSettings>(() => [
       {
         key: 'plugin.connections.hideConnectionViewForUsers',
         type: ESettingsValueType.Checkbox,

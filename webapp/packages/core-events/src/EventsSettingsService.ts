@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ const settingsSchema = schema.object({
   'plugin.notifications.maxPersistentAllow': schema.coerce.number().default(5),
 });
 
-export type EventsSettings = schema.infer<typeof settingsSchema>;
+export type EventsSettingsSchema = typeof settingsSchema;
+export type EventsSettings = schema.infer<EventsSettingsSchema>;
 
 @injectable()
 export class EventsSettingsService extends Dependency {
@@ -31,7 +32,7 @@ export class EventsSettingsService extends Dependency {
   get notificationsPool(): number {
     return this.settings.getValue('plugin.notifications.notificationsPool');
   }
-  readonly settings: SettingsProvider<typeof settingsSchema>;
+  readonly settings: SettingsProvider<EventsSettingsSchema>;
 
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
@@ -44,7 +45,7 @@ export class EventsSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+      createSettingsAliasResolver<EventsSettingsSchema>(this.settingsResolverService, {
         'plugin.notifications.maxPersistentAllow': 'core_events.maxPersistentAllow',
         'plugin.notifications.notificationsPool': 'core_events.notificationsPool',
       }),
@@ -53,7 +54,7 @@ export class EventsSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings<typeof settingsSchema>(() => [
       // {
       //   group: NOTIFICATIONS_SETTINGS_GROUP,
       //   key: 'plugin.notifications.maxPersistentAllow',

@@ -35,7 +35,7 @@ export class ResourceManagerScriptsSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings<Settings>(() => [
       {
         group: RESOURCE_MANAGER_SETTINGS_GROUP,
         key: 'plugin.resource-manager-scripts.disabled',

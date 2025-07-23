@@ -36,7 +36,7 @@ export class ToolsPanelSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings<Settings>(() => [
       {
         key: 'plugin.tools-panel.disabled',
         access: {

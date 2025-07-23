@@ -29,6 +29,9 @@
       "path": "../core-localization"
     },
     {
+      "path": "../core-settings"
+    },
+    {
       "path": "../core-settings-user"
     },
     {

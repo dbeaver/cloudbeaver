@@ -25,6 +25,7 @@ export * from './WorkspaceConfigEventHandler.js';
 export * from './SessionEventSource.js';
 export * from './QuotasService.js';
 export * from './SessionResource.js';
+export * from './Settings/SettingsTransformationService.js';
 export * from './Settings/ServerSettingsManagerService.js';
 export * from './Settings/ServerSettingsService.js';
 export * from './Settings/SESSION_SETTINGS_LAYER.js';
