@@ -90,8 +90,8 @@ public class CBWebServerConfig extends WebServerConfig {
     }
 
     @Property
-    public boolean isSecureCookies() {
-        return cbApp.getServerConfiguration().isSecureCookies();
+    public boolean isForceHttps() {
+        return cbApp.getServerConfiguration().isForceHttps();
     }
 
     @NotNull

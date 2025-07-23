@@ -64,7 +64,7 @@ public class RequestHostFilter implements Filter {
     }
 
     private void redirect(HttpServletResponse response, HttpServletRequest httpRequest, List<String> availableHosts) throws IOException {
-        boolean https = application.getServerConfiguration().isSecureCookies();
+        boolean https = application.getServerConfiguration().isForceHttps();
         String redirectUrl = (https ? "https://" : "http://") + getDefaultHost(availableHosts) + httpRequest.getRequestURI();
         if (httpRequest.getQueryString() != null) {
             redirectUrl += "?" + httpRequest.getQueryString();

@@ -32,7 +32,7 @@ public class CBServerConfig implements WebServerConfiguration {
     protected String serverURL;
     @NotNull
     protected List<String> supportedHosts = new ArrayList<>();
-    protected boolean secureCookies;
+    protected boolean forceHttps;
     protected int serverPort = CBConstants.DEFAULT_SERVER_PORT;
     private String serverHost = null;
     private String serverName = null;
@@ -185,12 +185,12 @@ public class CBServerConfig implements WebServerConfiguration {
         return new SMControllerConfiguration();
     }
 
-    public boolean isSecureCookies() {
-        return secureCookies;
+    public boolean isForceHttps() {
+        return forceHttps;
     }
 
-    public void setSecureCookies(boolean secureCookies) {
-        this.secureCookies = secureCookies;
+    public void setForceHttps(boolean forceHttps) {
+        this.forceHttps = forceHttps;
     }
 
     @NotNull

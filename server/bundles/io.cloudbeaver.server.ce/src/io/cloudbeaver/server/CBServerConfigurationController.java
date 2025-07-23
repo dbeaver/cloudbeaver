@@ -96,7 +96,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         CBServerConfig serverConfig = getServerConfiguration();
         if (CommonUtils.isEmpty(serverConfig.getSupportedHosts())
             && CommonUtils.isNotEmpty(serverConfig.getServerURL())) {
-            serverConfig.setSecureCookies(serverConfig.getServerURL().startsWith("https://"));
+            serverConfig.setForceHttps(serverConfig.getServerURL().startsWith("https://"));
         }
         // Set default preferences
         PrefUtils.setDefaultPreferenceValue(DBWorkbench.getPlatform().getPreferenceStore(),
@@ -537,7 +537,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             originServerConfig,
             serverConfigProperties,
             CBConstants.PARAM_SECURE_COOKIES,
-            serverConfig.isSecureCookies()
+            serverConfig.isForceHttps()
         );
         copyConfigValue(
             originServerConfig,

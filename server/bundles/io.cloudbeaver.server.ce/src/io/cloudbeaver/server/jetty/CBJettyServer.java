@@ -232,7 +232,7 @@ public class CBJettyServer {
             && servletContextHandler.getSessionHandler() instanceof CBSessionHandler cbSessionHandler
         ) {
             cbSessionHandler.setMaxCookieAge((int) (application.getMaxSessionIdleTime() / 1000));
-            cbSessionHandler.setSecureCookies(application.getServerConfiguration().isSecureCookies());
+            cbSessionHandler.setSecureCookies(application.getServerConfiguration().isForceHttps());
         }
     }
 }

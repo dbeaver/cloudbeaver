@@ -126,7 +126,7 @@ input ServerConfigInput {
     disabledDrivers: [ID!]
 
     sessionExpireTime: Int
-    secureCookies: Boolean @since(version: "25.1.3")
+    forceHttps: Boolean @since(version: "25.1.3")
     supportedHosts: [String!]! @since(version: "25.1.3")
 }
 
