@@ -30,6 +30,7 @@ import { SqlQueryService } from '../SqlResultTabs/SqlQueryService.js';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService.js';
 import type { ISQLEditorData } from './ISQLEditorData.js';
 import { SQLEditorModeContext } from './SQLEditorModeContext.js';
+import { SqlEditorSettingsService } from '../SqlEditorSettingsService.js';
 
 interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly sqlDialectInfoService: SqlDialectInfoService;
@@ -38,6 +39,7 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly sqlEditorService: SqlEditorService;
   readonly notificationService: NotificationService;
   readonly sqlExecutionPlanService: SqlExecutionPlanService;
+  readonly sqlEditorSettingsService: SqlEditorSettingsService;
   readonly commonDialogService: CommonDialogService;
   readonly sqlResultTabsService: SqlResultTabsService;
   readonly dataSource: ISqlDataSource | undefined;
@@ -68,6 +70,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   const sqlResultTabsService = useService(SqlResultTabsService);
   const commonDialogService = useService(CommonDialogService);
   const sqlDataSourceService = useService(SqlDataSourceService);
+  const sqlEditorSettingsService = useService(SqlEditorSettingsService);
 
   const data = useObservableRef<ISQLEditorDataPrivate>(
     () => ({
@@ -132,6 +135,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       get incomingValue(): string | undefined {
         return this.dataSource?.incomingScript;
+      },
+
+      get isExecutionAllowed(): boolean {
+        return !!this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) && this.sqlEditorSettingsService.scriptExecutionEnabled;
       },
 
       onMode: new SyncExecutor(),
@@ -230,9 +237,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       async executeQuery(): Promise<void> {
         const isQuery = this.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
-        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
 
-        if (!isQuery || !isExecutable) {
+        if (!isQuery || !this.isExecutionAllowed) {
           return;
         }
 
@@ -263,9 +269,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       async executeQueryNewTab(): Promise<void> {
         const isQuery = this.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
-        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
 
-        if (!isQuery || !isExecutable) {
+        if (!isQuery || !this.isExecutionAllowed) {
           return;
         }
 
@@ -281,9 +286,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       async showExecutionPlan(): Promise<void> {
         const isQuery = this.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
-        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
 
-        if (!isQuery || !isExecutable || !this.dialect?.supportsExplainExecutionPlan) {
+        if (!isQuery || !this.isExecutionAllowed || !this.dialect?.supportsExplainExecutionPlan) {
           return;
         }
 
@@ -302,9 +306,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       async executeScript(): Promise<void> {
-        const isExecutable = this.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
-
-        if (!isExecutable || this.isDisabled || this.isScriptEmpty) {
+        if (!this.isExecutionAllowed || this.isDisabled || this.isScriptEmpty) {
           return;
         }
 
@@ -404,19 +406,20 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         passEmpty?: boolean,
         passDisabled?: boolean,
       ): Promise<T | undefined> {
-        if (!segment || (this.isDisabled && !passDisabled) || (!passEmpty && this.isScriptEmpty)) {
+        if (!segment || segment.end === segment.begin || (this.isDisabled && !passDisabled) || (!passEmpty && this.isScriptEmpty)) {
           return;
         }
 
         this.onExecute.execute(true);
 
+        const id = setTimeout(() => this.onSegmentExecute.execute({ segment, type: 'start' }), 250);
         try {
-          const id = setTimeout(() => this.onSegmentExecute.execute({ segment, type: 'start' }), 250);
           const result = await action(segment);
           clearTimeout(id);
           this.onSegmentExecute.execute({ segment, type: 'end' });
           return result;
         } catch (exception: any) {
+          clearTimeout(id);
           this.onSegmentExecute.execute({ segment, type: 'end' });
           this.onSegmentExecute.execute({ segment, type: 'error' });
           throw exception;
@@ -435,24 +438,35 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         const projectId = this.dataSource?.executionContext?.projectId;
         const connectionId = this.dataSource?.executionContext?.connectionId;
 
-        await data.updateParserScripts();
+        while (true) {
+          const currentScript = this.parser.actualScript;
+          // TODO: we updating parser scripts
+          //       script may be changed this will lead to temporary wrong segments offsets
+          await data.updateParserScripts();
+          if (currentScript !== this.parser.actualScript) {
+            continue;
+          }
 
-        if (!projectId || !connectionId || this.cursor.anchor !== this.cursor.head) {
-          return this.getSubQuery();
+          if (!projectId || !connectionId || this.cursor.anchor !== this.cursor.head) {
+            return this.getSubQuery();
+          }
+
+          if (this.activeSegmentMode.activeSegmentMode) {
+            return this.activeSegment;
+          }
+
+          const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, currentScript, this.cursor.anchor);
+          if (currentScript !== this.parser.actualScript) {
+            continue;
+          }
+          if (result.end === 0 && result.start === 0) {
+            return this.cursorSegment;
+          }
+
+          // TODO: here we use parser that may be outdated and segment will return wrong value
+          const segment = this.parser.getSegment(result.start, result.end);
+          return segment;
         }
-
-        if (this.activeSegmentMode.activeSegmentMode) {
-          return this.activeSegment;
-        }
-
-        const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, this.value, this.cursor.anchor);
-
-        if (result.end === 0 && result.start === 0) {
-          return;
-        }
-
-        const segment = this.parser.getSegment(result.start, result.end);
-        return segment;
       },
 
       getSubQuery(): ISQLScriptSegment | undefined {
@@ -488,6 +502,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       hintsLimitIsMet: observable.ref,
       readonlyState: observable,
       executingScript: observable,
+      sqlEditorSettingsService: observable.ref,
     },
     {
       state,
@@ -499,6 +514,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       sqlResultTabsService,
       notificationService,
       commonDialogService,
+      sqlEditorSettingsService,
     },
   );
 
@@ -508,8 +524,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     executor: data.dataSource?.onSetScript,
     handlers: [
       function setScript({ script }) {
-        // ensure that cursor is in script boundaries
-        data.setCursor(data.cursor.anchor, data.cursor.head);
         data.parser.setScript(script);
         data.updateParserScriptsDebounced().catch(() => {});
         data.onUpdate.execute();

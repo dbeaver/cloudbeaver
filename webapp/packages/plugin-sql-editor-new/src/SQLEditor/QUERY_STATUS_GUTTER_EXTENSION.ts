@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -31,12 +31,13 @@ const QUERY_GUTTER_EFFECT = StateEffect.define<{ pos: number; on: boolean; type:
   map: (val, mapping) => ({ pos: mapping.mapPos(val.pos), on: val.on, type: val.type }),
 });
 
-const gutterExtension = StateField.define<RangeSet<GutterMarker>>({
+const statusGutterState = StateField.define<RangeSet<GutterMarker>>({
   create() {
     return RangeSet.empty;
   },
   update(set, transaction) {
     set = set.map(transaction.changes);
+
     for (const effect of transaction.effects) {
       if (effect.is(QUERY_GUTTER_EFFECT)) {
         if (effect.value.on) {
@@ -68,10 +69,10 @@ export function setGutter(view: EditorView, pos: number, type: QueryGutterEffect
 }
 
 export const QUERY_STATUS_GUTTER_EXTENSION = [
-  gutterExtension,
+  statusGutterState,
   gutter({
     class: 'query-status',
-    markers: view => view.state.field(gutterExtension),
+    markers: view => view.state.field(statusGutterState),
     initialSpacer: () => QUERY_STATUS_SIZE_MARKER,
   }),
 ];

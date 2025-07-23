@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,7 +10,18 @@ import { observer } from 'mobx-react-lite';
 import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
 import { s, SContext, type StyleRegistry, ToolsPanel, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { type ITabData, Tab, TabList, TabPanel, TabPanelStyles, TabsState, TabStyles, TabTitle, TabTitleStyles } from '@cloudbeaver/core-ui';
+import {
+  type ITabData,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanelList,
+  TabPanelStyles,
+  TabsState,
+  TabStyles,
+  TabTitle,
+  TabTitleStyles,
+} from '@cloudbeaver/core-ui';
 
 import style from './shared/UsersAdministration.module.css';
 import tabStyle from './shared/UsersAdministrationTab.module.css';
@@ -19,6 +30,7 @@ import TabTitleModuleStyles from './shared/UsersAdministrationTabTitle.module.cs
 import { TeamsPage } from './Teams/TeamsTable/TeamsPage.js';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService.js';
 import { UsersPage } from './UsersTable/UsersPage.js';
+import { UsersAdministrationService } from './UsersAdministrationService.js';
 
 const tabPanelRegistry: StyleRegistry = [[TabPanelStyles, { mode: 'append', styles: [tabPanelStyle] }]];
 
@@ -30,6 +42,7 @@ const mainTabsRegistry: StyleRegistry = [
 export const UsersAdministration: AdministrationItemContentComponent = observer(function UsersAdministration({ sub, param }) {
   const translate = useTranslate();
   const usersAdministrationNavigationService = useService(UsersAdministrationNavigationService);
+  const usersAdministrationService = useService(UsersAdministrationService);
   const subName = sub?.name || EUsersAdministrationSub.Users;
   const styles = useS(style, tabStyle);
 
@@ -44,18 +57,23 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
   }
 
   return (
-    <TabsState selectedId={subName} lazy onChange={openSub}>
+    <TabsState selectedId={subName} autoSelect={false} container={usersAdministrationService.tabsContainer} lazy onChange={openSub}>
       <ToolsPanel bottomBorder>
-        <TabList className={s(styles, { tabList: true, administrationTabs: true })} aria-label="User Administration pages" underline>
-          <SContext registry={mainTabsRegistry}>
+        <SContext registry={mainTabsRegistry}>
+          <TabList
+            className={s(styles, { tabList: true, administrationTabs: true })}
+            aria-label={translate('authentication_administration_pages_label')}
+            childrenFirst
+            underline
+          >
             <Tab tabId={EUsersAdministrationSub.Users}>
               <TabTitle>{translate('authentication_administration_item_users')}</TabTitle>
             </Tab>
             <Tab tabId={EUsersAdministrationSub.Teams}>
               <TabTitle>{translate('administration_teams_tab_title')}</TabTitle>
             </Tab>
-          </SContext>
-        </TabList>
+          </TabList>
+        </SContext>
       </ToolsPanel>
       <SContext registry={tabPanelRegistry}>
         <TabPanel tabId={EUsersAdministrationSub.Users}>
@@ -64,6 +82,7 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
         <TabPanel tabId={EUsersAdministrationSub.Teams}>
           <TeamsPage param={param} />
         </TabPanel>
+        <TabPanelList />
       </SContext>
     </TabsState>
   );
