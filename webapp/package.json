@@ -13,7 +13,8 @@
     "react": "^19",
     "react-dom": "^19",
     "mobx": "^6",
-    "mobx-react-lite": "^4"
+    "mobx-react-lite": "^4",
+    "stylus": "0.0.1-security"
   },
   "scripts": {
     "test": "dbeaver-test",
