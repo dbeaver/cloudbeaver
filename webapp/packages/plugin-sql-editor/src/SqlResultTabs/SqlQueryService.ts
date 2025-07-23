@@ -27,6 +27,8 @@ import type { IResultGroup, ISqlEditorTabState } from '../ISqlEditorTabState.js'
 import { QueryDataSource } from '../QueryDataSource.js';
 import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
 import { SqlQueryResultService } from './SqlQueryResultService.js';
+import { SqlEditorSettingsService } from '../SqlEditorSettingsService.js';
+import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures.js';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 
 interface IQueryExecutionOptions {
@@ -60,6 +62,7 @@ export class SqlQueryService {
     private readonly dataViewerService: DataViewerService,
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly dataViewerSettingsService: DataViewerSettingsService,
+    private readonly sqlEditorSettingsService: SqlEditorSettingsService,
   ) {
     this.statisticsMap = new Map();
     this.onQueryExecution = new Executor();
@@ -115,118 +118,43 @@ export class SqlQueryService {
 
   async executeEditorQuery(editorState: ISqlEditorTabState, query: string, inNewTab: boolean): Promise<void> {
     await this.onQueryExecution.execute(editorState);
-    const dataSource = this.sqlDataSourceService.get(editorState.editorId);
-    const contextInfo = dataSource?.executionContext;
-    const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);
-
-    if (!contextInfo || !executionContext) {
-      console.error('executeEditorQuery executionContext is not provided');
-      return;
-    }
-
-    let source: QueryDataSource;
-    let model: IDatabaseDataModel<QueryDataSource>;
+    let source: QueryDataSource | undefined;
+    let tabGroup: IResultGroup | null = null;
     let isNewTabCreated = false;
 
-    const connectionKey = createConnectionParam(contextInfo.projectId, contextInfo.connectionId);
-
-    const connectionInfo = await this.connectionInfoResource.load(connectionKey);
-    let tabGroup = this.sqlQueryResultService.getSelectedGroup(editorState);
-
-    if (inNewTab || !tabGroup) {
-      source = new QueryDataSource(this.serviceProvider, this.graphQLService, this.asyncTaskInfoService);
-      model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
-      this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
-      tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
-      this.switchTabToActiveRequest(editorState, tabGroup, model);
-
-      isNewTabCreated = true;
-    } else {
-      model = this.tableViewerStorageService.get(tabGroup.modelId)!;
-      source = model.source as QueryDataSource;
-      tabGroup.query = query;
-    }
-
-    const editable = this.dataViewerService.isDataEditable(connectionInfo);
-    const isOutputLogsTabOpened = !!editorState.outputLogsTab;
-
-    model
-      .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly)
-      .source.setExecutionContext(executionContext)
-      .setSupportedDataFormats(connectionInfo.supportedDataFormats)
-      .setKeepExecutionContextOnDispose(true)
-      .setOptions({
-        query: query,
-        connectionKey,
-        constraints: [],
-        whereFilter: '',
-        readLogs: isOutputLogsTabOpened,
-      });
-
-    this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, true);
-
     try {
-      await model.setCountGain(this.dataViewerSettingsService.getDefaultRowsCount()).setSlice(0).request();
+      const dataSource = this.sqlDataSourceService.get(editorState.editorId);
+      if (!this.sqlEditorSettingsService.scriptExecutionEnabled || !dataSource?.hasFeature(ESqlDataSourceFeatures.executable)) {
+        throw new Error('Script execution is not allowed');
+      }
+      const contextInfo = dataSource?.executionContext;
+      const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);
 
-      model.setName(this.sqlQueryResultService.getTabNameForOrder(tabGroup.nameOrder, 0, model.source.getResults().length));
-      this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId);
-    } catch (exception: any) {
-      // remove group if execution was cancelled
-      if (source.currentTask?.cancelled && isNewTabCreated) {
-        this.sqlQueryResultService.removeGroup(editorState, tabGroup.groupId);
-        const message = 'Query execution has been canceled';
-        this.notificationService.logException(exception, 'Query execution Error', message);
+      if (!contextInfo || !executionContext) {
+        console.error('executeEditorQuery executionContext is not provided');
         return;
       }
-      throw exception;
-    }
-  }
 
-  async executeQueries(editorState: ISqlEditorTabState, queries: string[], options?: IQueryExecutionOptions): Promise<void> {
-    await this.onQueryExecution.execute(editorState);
-    const dataSource = this.sqlDataSourceService.get(editorState.editorId);
-    const contextInfo = dataSource?.executionContext;
-    const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);
+      let model: IDatabaseDataModel<QueryDataSource>;
 
-    if (!contextInfo || !executionContext) {
-      console.error('executeEditorQuery executionContext is not provided');
-      return;
-    }
+      const connectionKey = createConnectionParam(contextInfo.projectId, contextInfo.connectionId);
 
-    const groupNameOrder = this.sqlQueryResultService.getGroupNameOrder(editorState);
-    const connectionKey = createConnectionParam(contextInfo.projectId, contextInfo.connectionId);
+      const connectionInfo = await this.connectionInfoResource.load(connectionKey);
+      tabGroup = this.sqlQueryResultService.getSelectedGroup(editorState);
 
-    const connectionInfo = await this.connectionInfoResource.load(connectionKey);
-
-    const statisticsTab = this.sqlQueryResultService.createStatisticsTab(editorState);
-
-    this.statisticsMap.set(statisticsTab.tabId, {
-      queries: queries.length,
-      executedQueries: 0,
-      executeTime: 0,
-      updatedRows: 0,
-      modelId: null,
-    });
-
-    editorState.currentTabId = statisticsTab.tabId;
-
-    const statistics = this.getStatistics(statisticsTab.tabId)!;
-
-    let source: QueryDataSource | undefined;
-    let model: IDatabaseDataModel<QueryDataSource> | undefined;
-    let resultCount = 0;
-
-    for (let i = 0; i < queries.length; i++) {
-      const query = queries[i]!;
-
-      options?.onQueryExecutionStart?.(query, i);
-
-      if (!model || !source) {
+      if (inNewTab || !tabGroup) {
         source = new QueryDataSource(this.serviceProvider, this.graphQLService, this.asyncTaskInfoService);
         model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
         this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
+        tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
+        this.switchTabToActiveRequest(editorState, tabGroup, model);
+
+        isNewTabCreated = true;
+      } else {
+        model = this.tableViewerStorageService.get(tabGroup.modelId)!;
+        source = model.source as QueryDataSource;
+        tabGroup.query = query;
       }
-      statistics.modelId = model.id;
 
       const editable = this.dataViewerService.isDataEditable(connectionInfo);
       const isOutputLogsTabOpened = !!editorState.outputLogsTab;
@@ -237,58 +165,148 @@ export class SqlQueryService {
         .setSupportedDataFormats(connectionInfo.supportedDataFormats)
         .setKeepExecutionContextOnDispose(true)
         .setOptions({
-          query,
+          query: query,
           connectionKey,
           constraints: [],
           whereFilter: '',
           readLogs: isOutputLogsTabOpened,
         });
 
-      try {
-        await model.setCountGain(this.dataViewerSettingsService.getDefaultRowsCount()).setSlice(0).request();
+      this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, true);
 
-        const cancelled = model.source.cancelled;
+      await model.setCountGain(this.dataViewerSettingsService.getDefaultRowsCount()).setSlice(0).request();
 
-        statistics.executedQueries++;
-        statistics.executeTime += source.requestInfo.requestDuration;
+      model.setName(this.sqlQueryResultService.getTabNameForOrder(tabGroup.nameOrder, 0, model.source.getResults().length));
+      this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId);
+    } catch (exception: any) {
+      // remove group if execution was cancelled
+      if (source?.currentTask?.cancelled && isNewTabCreated) {
+        this.sqlQueryResultService.removeGroup(editorState, tabGroup!.groupId);
+        const message = 'Query execution has been canceled';
+        this.notificationService.logException(exception, 'Query execution Error', message);
+        return;
+      } else if (!source) {
+        this.notificationService.logException(exception, 'Query execution Error', exception.message);
+      }
+      throw exception;
+    }
+  }
 
-        for (const result of source.results) {
-          statistics.updatedRows += result.updateRowCount;
+  async executeQueries(editorState: ISqlEditorTabState, queries: string[], options?: IQueryExecutionOptions): Promise<void> {
+    await this.onQueryExecution.execute(editorState);
+    try {
+      const dataSource = this.sqlDataSourceService.get(editorState.editorId);
+      if (!this.sqlEditorSettingsService.scriptExecutionEnabled || !dataSource?.hasFeature(ESqlDataSourceFeatures.executable)) {
+        throw new Error('Script execution is not allowed');
+      }
+      const contextInfo = dataSource?.executionContext;
+      const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);
+
+      if (!contextInfo || !executionContext) {
+        console.error('executeEditorQuery executionContext is not provided');
+        return;
+      }
+
+      const groupNameOrder = this.sqlQueryResultService.getGroupNameOrder(editorState);
+      const connectionKey = createConnectionParam(contextInfo.projectId, contextInfo.connectionId);
+
+      const connectionInfo = await this.connectionInfoResource.load(connectionKey);
+
+      const statisticsTab = this.sqlQueryResultService.createStatisticsTab(editorState);
+
+      this.statisticsMap.set(statisticsTab.tabId, {
+        queries: queries.length,
+        executedQueries: 0,
+        executeTime: 0,
+        updatedRows: 0,
+        modelId: null,
+      });
+
+      editorState.currentTabId = statisticsTab.tabId;
+
+      const statistics = this.getStatistics(statisticsTab.tabId)!;
+
+      let source: QueryDataSource | undefined;
+      let model: IDatabaseDataModel<QueryDataSource> | undefined;
+      let resultCount = 0;
+
+      for (let i = 0; i < queries.length; i++) {
+        const query = queries[i]!;
+
+        options?.onQueryExecutionStart?.(query, i);
+
+        if (!model || !source) {
+          source = new QueryDataSource(this.serviceProvider, this.graphQLService, this.asyncTaskInfoService);
+          model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
+          this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
         }
+        statistics.modelId = model.id;
 
-        if (source.results.some(result => result.data)) {
-          resultCount = resultCount + 1;
+        const editable = this.dataViewerService.isDataEditable(connectionInfo);
+        const isOutputLogsTabOpened = !!editorState.outputLogsTab;
 
-          const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query, groupNameOrder);
-          model.setName(this.sqlQueryResultService.getTabNameForOrder(tabGroup.nameOrder, 0, model.source.getResults().length, resultCount));
-          this.switchTabToActiveRequest(editorState, tabGroup, model);
+        model
+          .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly)
+          .source.setExecutionContext(executionContext)
+          .setSupportedDataFormats(connectionInfo.supportedDataFormats)
+          .setKeepExecutionContextOnDispose(true)
+          .setOptions({
+            query,
+            connectionKey,
+            constraints: [],
+            whereFilter: '',
+            readLogs: isOutputLogsTabOpened,
+          });
 
-          this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, false, resultCount);
+        try {
+          await model.setCountGain(this.dataViewerSettingsService.getDefaultRowsCount()).setSlice(0).request();
 
-          model = source = undefined;
-        }
+          const cancelled = model.source.cancelled;
 
-        options?.onQueryExecuted?.(query, i, true);
+          statistics.executedQueries++;
+          statistics.executeTime += source.requestInfo.requestDuration;
 
-        if (cancelled) {
+          for (const result of source.results) {
+            statistics.updatedRows += result.updateRowCount;
+          }
+
+          if (source.results.some(result => result.data)) {
+            resultCount = resultCount + 1;
+
+            const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query, groupNameOrder);
+            model.setName(this.sqlQueryResultService.getTabNameForOrder(tabGroup.nameOrder, 0, model.source.getResults().length, resultCount));
+            this.switchTabToActiveRequest(editorState, tabGroup, model);
+
+            this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, false, resultCount);
+
+            model = source = undefined;
+          }
+
+          options?.onQueryExecuted?.(query, i, true);
+
+          if (cancelled) {
+            break;
+          }
+        } catch (exception: any) {
+          if (model) {
+            const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
+            this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, true, resultCount);
+
+            model = source = undefined;
+          }
+          options?.onQueryExecuted?.(query, i, false);
           break;
         }
-      } catch (exception: any) {
-        if (model) {
-          const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
-          this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, true, resultCount);
-
-          model = source = undefined;
-        }
-        options?.onQueryExecuted?.(query, i, false);
-        break;
       }
-    }
 
-    statistics.modelId = null;
+      statistics.modelId = null;
 
-    if (model) {
-      this.tableViewerStorageService.remove(model.id);
+      if (model) {
+        this.tableViewerStorageService.remove(model.id);
+      }
+    } catch (exception: any) {
+      this.notificationService.logException(exception, 'Query execution Error', exception.message);
+      throw exception;
     }
   }
 

@@ -21,6 +21,7 @@ import { OUTPUT_LOGS_MENU } from './OUTPUT_LOGS_MENU.js';
 import { OUTPUT_LOGS_SETTINGS_MENU } from './OUTPUT_LOGS_SETTINGS_MENU.js';
 import { OutputLogsService } from './OutputLogsService.js';
 import { ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS } from './ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS.js';
+import { DATA_CONTEXT_SQL_EDITOR_DATA } from '../../SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA.js';
 
 @injectable()
 export class OutputMenuBootstrap extends Bootstrap {
@@ -120,13 +121,14 @@ export class OutputMenuBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'output-logs-handler',
       actions: [ACTION_SHOW_OUTPUT_LOGS, ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS],
-      contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
+      contexts: [DATA_CONTEXT_SQL_EDITOR_STATE, DATA_CONTEXT_SQL_EDITOR_DATA],
       isActionApplicable: (context): boolean => {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
+        const sqlEditorData = context.get(DATA_CONTEXT_SQL_EDITOR_DATA);
 
         const sqlDataSource = this.sqlDataSourceService.get(state.editorId);
         const isQuery = sqlDataSource?.hasFeature(ESqlDataSourceFeatures.query);
-        const isExecutable = sqlDataSource?.hasFeature(ESqlDataSourceFeatures.executable);
+        const isExecutable = sqlEditorData?.isExecutionAllowed;
 
         return !!isQuery && !!isExecutable;
       },

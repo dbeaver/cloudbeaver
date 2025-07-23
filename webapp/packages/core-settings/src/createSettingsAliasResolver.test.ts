@@ -7,14 +7,13 @@
  */
 import { describe, expect, test, beforeEach } from 'vitest';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
-
+import type { IEditableSettingsSource } from './IEditableSettingsSource.js';
 import {
   expectDeprecatedSettingMessage,
   expectNoDeprecatedSettingMessage,
   addDeprecatedSettingPattern,
 } from './__custom_mocks__/expectDeprecatedSettingMessage.js';
 import { createSettingsAliasResolver, DEPRECATED_SETTINGS } from './createSettingsAliasResolver.js';
-import type { ISettingsSource } from './ISettingsSource.js';
 import { initKnownConsoleMessages } from '@cloudbeaver/tests-runner';
 
 const deprecatedSettings = {
@@ -26,7 +25,7 @@ const newSettings = {
   value: 'value',
 };
 
-function createSource(settings: Record<any, any>): ISettingsSource {
+function createSource(settings: Record<any, any>): IEditableSettingsSource {
   return {
     onChange: new SyncExecutor(),
     has(key: any): boolean {
@@ -45,13 +44,14 @@ function createSource(settings: Record<any, any>): ISettingsSource {
       return undefined;
     },
     setValue(key: any, value: any): void {},
+    resetValue(key: any): void {},
     async save(): Promise<void> {},
     clear(): void {},
   };
 }
 
 function createResolver(settings: Record<any, any>) {
-  return createSettingsAliasResolver(createSource(settings), null as any, {
+  return createSettingsAliasResolver(createSource(settings), {
     value: 'deprecated',
   });
 }

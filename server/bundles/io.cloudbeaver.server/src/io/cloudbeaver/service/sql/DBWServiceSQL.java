@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
@@ -90,7 +91,7 @@ public interface DBWServiceSQL extends DBWService {
     @WebAction
     void setContextDefaults(@NotNull WebSQLContextInfo sqlContext, String catalogName, String schemaName) throws DBWebException;
 
-    @WebAction
+    @WebAction(requireGlobalPermissions = DBWConstants.GLOBAL_PERMISSION_SCRIPT_EXECUTE)
     WebAsyncTaskInfo asyncExecuteQuery(
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String sql,

@@ -8,7 +8,12 @@
 import { observer } from 'mobx-react-lite';
 
 import { getComputed, Group, GroupTitle, useExecutor, useTranslate } from '@cloudbeaver/core-blocks';
-import type { ISettingDescription, ISettingsSource, SettingsGroup as SettingsGroupType } from '@cloudbeaver/core-settings';
+import type {
+  IEditableSettingsSource,
+  ISettingDescription,
+  SettingsGroup as SettingsGroupType,
+  SettingsResolverSource,
+} from '@cloudbeaver/core-settings';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 import type { ITreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
@@ -22,13 +27,26 @@ import { getSettingGroupId } from './getSettingGroupId.js';
 interface Props {
   settingsId: string;
   group: SettingsGroupType;
-  source: ISettingsSource;
+  resolver: SettingsResolverSource;
+  source: IEditableSettingsSource;
   settings: Map<SettingsGroupType, ISettingDescription<any>[]>;
   treeFilter: ITreeFilter;
+  groupsHidden?: boolean;
+  displayRestore?: boolean;
   groupSelectExecutor: ISyncExecutor<string>;
 }
 
-export const SettingsGroup = observer<Props>(function SettingsGroup({ settingsId, group, source, settings, treeFilter, groupSelectExecutor }) {
+export const SettingsGroup = observer<Props>(function SettingsGroup({
+  settingsId,
+  group,
+  resolver,
+  source,
+  settings,
+  treeFilter,
+  groupsHidden,
+  displayRestore,
+  groupSelectExecutor,
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const translate = useTranslate();
   const groupSettings = getComputed(() => settings.get(group)?.filter(settingsFilter(translate, treeFilter.filter)) || [], isArraysEqual);
@@ -53,12 +71,12 @@ export const SettingsGroup = observer<Props>(function SettingsGroup({ settingsId
   });
 
   return (
-    <Group ref={ref} id={getSettingGroupId(settingsId, group.id)} hidden={hidden} vertical gap compact>
-      <GroupTitle sticky>
+    <Group ref={ref} id={getSettingGroupId(settingsId, group.id)} hidden={hidden} dense={groupsHidden} vertical gap compact>
+      <GroupTitle hidden={groupsHidden} sticky>
         <SettingsGroupTitle group={group} />
       </GroupTitle>
-      {groupSettings.map((setting, i) => (
-        <Setting key={i} source={source} setting={setting} />
+      {groupSettings.map(setting => (
+        <Setting key={setting.key} resolver={resolver} source={source} setting={setting} displayRestore={displayRestore} />
       ))}
     </Group>
   );

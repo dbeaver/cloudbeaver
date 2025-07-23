@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,22 +18,23 @@ package io.cloudbeaver.model;
 
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.dbeaver.model.impl.PropertyGroupDescriptor;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class WebProductSettings {
+public class WebGroupPropertiesInfo<T extends PropertyDescriptor> {
     @NotNull
     private final WebSession webSession;
     @NotNull
-    private final List<PropertyGroupDescriptor<ProductSettingDescriptor>> groups;
+    private final Collection<PropertyGroupDescriptor<T>> groups;
 
-    public WebProductSettings(
+    public WebGroupPropertiesInfo(
         @NotNull WebSession webSession,
-        @NotNull List<PropertyGroupDescriptor<ProductSettingDescriptor>> groups
+        @NotNull Collection<PropertyGroupDescriptor<T>> groups
     ) {
         this.webSession = webSession;
         this.groups = groups;
@@ -41,7 +42,7 @@ public class WebProductSettings {
 
     @NotNull
     @Property
-    public List<WebSettingsGroupInfo> getGroups() {
+    public List<WebSettingsGroupInfo<T>> getGroups() {
         return groups.stream()
             .map(WebSettingsGroupInfo::new)
             .collect(Collectors.toList());
