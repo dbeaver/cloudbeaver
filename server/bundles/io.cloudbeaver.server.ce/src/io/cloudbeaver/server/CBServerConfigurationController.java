@@ -536,7 +536,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         copyConfigValue(
             originServerConfig,
             serverConfigProperties,
-            CBConstants.PARAM_SECURE_COOKIES,
+            CBConstants.PARAM_FORCE_HTTPS,
             serverConfig.isForceHttps()
         );
         copyConfigValue(
