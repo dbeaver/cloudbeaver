@@ -41,7 +41,7 @@ export class NavigationTreeSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings<typeof defaultSettings>(() => [
       {
         group: NAVIGATION_TREE_SETTINGS_GROUP,
         key: 'plugin.navigation-tree.disabled',

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,7 +10,6 @@ import { computed, makeObservable, observable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import type { ILoadableState, schema } from '@cloudbeaver/core-utils';
 
-import type { SettingsProvider } from '../SettingsProvider.js';
 import type { ISettingDescription, SettingsDescriptionGetter } from './ISettingDescription.js';
 
 interface SettingsProviderItem<T extends schema.SomeZodObject = any> {
@@ -41,10 +40,9 @@ export class SettingsManagerService {
   }
 
   registerSettings<TSchema extends schema.SomeZodObject>(
-    provider: SettingsProvider<TSchema>,
     settingsGetter: SettingsDescriptionGetter<schema.infer<TSchema>>,
     loaders?: ReadonlyArray<ILoadableState>,
-  ) {
+  ): void {
     this.settings.push({
       settingsGetter,
       loaders,

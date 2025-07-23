@@ -11,7 +11,6 @@ import { expectDeprecatedSettingMessage, expectNoDeprecatedSettingMessage, addDe
 import { SettingsResolverSource } from './SettingsResolverSource.js';
 import { createSettingsLayer, ROOT_SETTINGS_LAYER } from './SettingsLayer.js';
 import { createSettingsAliasResolver } from './createSettingsAliasResolver.js';
-import { SettingsProvider } from './SettingsProvider.js';
 import { schema } from '@cloudbeaver/core-utils';
 import { SettingsSource } from './SettingsSource.js';
 import { initKnownConsoleMessages } from '@cloudbeaver/tests-runner';
@@ -62,7 +61,7 @@ export class MemorySettingsService extends SettingsSource {
     this.update(() => {
       this.clear();
       for (const key of this.settings.keys()) {
-        this.setValue(key, null);
+        this.resetValue(key);
       }
     });
   }
@@ -100,7 +99,7 @@ describe('SettingsResolverSource', () => {
     settingsResolver.addResolver(MEMORY_SETTINGS_LAYER, memorySettingsSource);
     settingsResolver.addResolver(
       ROOT_SETTINGS_LAYER,
-      createSettingsAliasResolver(settingsResolver, new SettingsProvider(settingsResolver, settingsSchema), {
+      createSettingsAliasResolver<typeof settingsSchema>(settingsResolver, {
         value: 'deprecated',
       }),
     );
@@ -126,10 +125,10 @@ describe('SettingsResolverSource', () => {
     settingsResolver.addResolver(MEMORY_SETTINGS_LAYER, memorySettingsSource);
     settingsResolver.addResolver(
       ROOT_SETTINGS_LAYER,
-      createSettingsAliasResolver(settingsResolver, new SettingsProvider(settingsResolver, settingsSchema), {
+      createSettingsAliasResolver<typeof settingsSchema>(settingsResolver, {
         value: 'deprecated',
       }),
-      createSettingsAliasResolver(settingsResolver, new SettingsProvider(settingsResolver, settingsSchema), {
+      createSettingsAliasResolver<typeof settingsSchema>(settingsResolver, {
         value: 'deprecated2',
       }),
     );

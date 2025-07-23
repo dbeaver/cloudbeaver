@@ -32,6 +32,7 @@ export interface ISQLEditorData {
   readonly isIncomingChanges: boolean;
   readonly value: string;
   readonly incomingValue?: string;
+  readonly isExecutionAllowed: boolean;
   readonly dataSource: ISqlDataSource | undefined;
   readonly onExecute: ISyncExecutor<boolean>;
   readonly onSegmentExecute: ISyncExecutor<ISegmentExecutionData>;
