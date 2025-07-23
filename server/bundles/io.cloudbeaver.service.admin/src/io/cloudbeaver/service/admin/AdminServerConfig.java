@@ -18,6 +18,7 @@ package io.cloudbeaver.service.admin;
 
 import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
@@ -47,7 +48,7 @@ public class AdminServerConfig {
     private final String[] enabledDrivers;
     private final String[] disabledDrivers;
     @Nullable
-    private final Boolean secureCookies;
+    private final Boolean forceHttps;
     @Nullable
     private final List<String> supportedHosts;
 
@@ -101,10 +102,10 @@ public class AdminServerConfig {
             this.disabledDrivers = appConfig.getDisabledDrivers();
         }
 
-        if (params.containsKey("secureCookies")) {
-            this.secureCookies = JSONUtils.getBoolean(params, "secureCookies");
+        if (params.containsKey(CBConstants.PARAM_FORCE_HTTPS)) {
+            this.forceHttps = JSONUtils.getBoolean(params, CBConstants.PARAM_FORCE_HTTPS);
         } else {
-            this.secureCookies = null;
+            this.forceHttps = null;
         }
 
         if (params.containsKey("supportedHosts")) {
@@ -200,7 +201,7 @@ public class AdminServerConfig {
     }
 
     @Nullable
-    public Boolean getSecureCookies() {
-        return secureCookies;
+    public Boolean getForceHttps() {
+        return forceHttps;
     }
 }
