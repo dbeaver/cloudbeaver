@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.model.rm.local;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.model.app.ServletApplication;
@@ -48,6 +50,8 @@ import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.Pair;
 
 import java.io.IOException;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.text.MessageFormat;
 import java.time.OffsetDateTime;
@@ -63,6 +67,10 @@ import java.util.stream.Stream;
 public class LocalResourceController extends BaseLocalResourceController {
 
     private static final Log log = Log.getLog(LocalResourceController.class);
+    private static final Gson GSON = new GsonBuilder()
+        .setPrettyPrinting()
+        .create();
+    private static final String PROJECT_INFO_CONF = ".project-info.conf";
 
     protected final SMCredentialsProvider credentialsProvider;
 
@@ -292,6 +300,29 @@ public class LocalResourceController extends BaseLocalResourceController {
             return project;
         } catch (IOException e) {
             throw new DBException("Error creating project path", e);
+        }
+    }
+
+    @Override
+    public RMProject updateProject(@NotNull String projectId, @NotNull RMProjectInfo projectInfo) throws DBException {
+        try (var projectLock = lockController.lock(projectId, "updateProject")) {
+            RMProject project = getProject(projectId, false, false);
+            Path targetPath = getProjectPath(projectId);
+            if (!Files.exists(targetPath)) {
+                throw new DBException("Project folder '" + projectId + "' not found");
+            }
+            if (CommonUtils.isEmpty(projectInfo.getName())) {
+                throw new DBException("Project name required");
+            }
+            try {
+                String config = GSON.toJson(projectInfo);
+                Files.writeString(targetPath.resolve(PROJECT_INFO_CONF), config);
+                project.setName(projectInfo.getName());
+                project.setDescription(projectInfo.getDescription());
+                return project;
+            } catch (IOException e) {
+                throw new DBException("Error writing project info", e);
+            }
         }
     }
 
@@ -735,8 +766,9 @@ public class LocalResourceController extends BaseLocalResourceController {
             .toArray(String[]::new);
 
         RMProject project = new RMProject();
-        String projectName = path.getFileName().toString();
-        project.setName(projectName);
+        RMProjectInfo projectMetadata = readProjectInfo(path);
+        project.setName(projectMetadata.getName());
+        project.setDescription(projectMetadata.getDescription());
         project.setId(makeProjectIdFromPath(path, type));
         project.setType(type);
         project.setProjectPermissions(allProjectPermissions);
@@ -756,6 +788,19 @@ public class LocalResourceController extends BaseLocalResourceController {
             .toArray(RMResourceType[]::new));
 
         return project;
+    }
+
+    @NotNull
+    private RMProjectInfo readProjectInfo(@NotNull Path projectPath) {
+        Path projectInfoPath = projectPath.resolve(PROJECT_INFO_CONF);
+        if (Files.exists(projectInfoPath)) {
+            try (Reader reader = Files.newBufferedReader(projectInfoPath, StandardCharsets.UTF_8)) {
+                return GSON.fromJson(reader, RMProjectInfo.class);
+            } catch (IOException e) {
+                log.error("Error reading project information from " + projectInfoPath, e);
+            }
+        }
+        return new RMProjectInfo(projectPath.getFileName().toString(), null);
     }
 
     private void createResourceTypeFolders(Path path) {

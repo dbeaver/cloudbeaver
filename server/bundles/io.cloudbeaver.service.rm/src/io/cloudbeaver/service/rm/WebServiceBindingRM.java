@@ -91,6 +91,14 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
                 env.getArgument("projectName"),
                 env.getArgument("description")
             ))
+            .dataFetcher(
+                "rmUpdateProject", env -> getService(env).updateProject(
+                    getWebSession(env),
+                    getProjectReference(env),
+                    env.getArgument("projectName"),
+                    env.getArgument("description")
+                )
+            )
             .dataFetcher("rmDeleteProject", env -> getService(env).deleteProject(
                 getWebSession(env),
                 getProjectReference(env)

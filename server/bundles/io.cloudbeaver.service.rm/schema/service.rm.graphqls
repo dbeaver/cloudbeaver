@@ -109,6 +109,13 @@ extend type Mutation {
         description: String
     ): RMProject!
 
+    "Updates project with the specified projectId. If projectName is not specified then does not change it."
+    rmUpdateProject(
+        projectId: ID!,
+        projectName: String,
+        description: String
+    ): RMProject!
+
     "Deletes project by projectId. Returns true if project was deleted, false if project not found"
     rmDeleteProject(projectId: ID!): Boolean!
 
