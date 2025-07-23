@@ -1,4 +1,5 @@
 export default [
+  ['authentication_administration_pages_label', 'Страницы'],
   ['authentication_administration_user_connections_user_add', 'Создание пользователя'],
   ['authentication_administration_user_connections_user_new', 'Новый пользователь'],
   ['authentication_administration_user_connections_access_load_fail', 'Не удалось загрузить доступные пользователю коннекшены'],

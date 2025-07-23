@@ -9,32 +9,37 @@ import { observer } from 'mobx-react-lite';
 
 import { Link, useTranslate } from '@cloudbeaver/core-blocks';
 import { clsx } from '@dbeaver/ui-kit';
-import { type ISettingDescription, type ISettingsSource } from '@cloudbeaver/core-settings';
+import { SettingsResolverSource, type ISettingDescription, type IEditableSettingsSource } from '@cloudbeaver/core-settings';
 import { SettingField } from './SettingField.js';
 
 interface Props {
-  source: ISettingsSource;
+  resolver: SettingsResolverSource;
+  source: IEditableSettingsSource;
   setting: ISettingDescription;
+  displayRestore?: boolean;
 }
 
-export const Setting = observer<Props>(function Setting({ source, setting }) {
+export const Setting = observer<Props>(function Setting({ resolver, source, setting, displayRestore }) {
   const translate = useTranslate();
   // DODO: hide this logic until we have more than one scope
-  const isOverride = source.has(setting.key) && source.getEditedValue(setting.key) !== null && false;
+  const isOverride = source.has(setting.key) && source.getEditedValue(setting.key) !== null && displayRestore;
 
   function handleRestore() {
-    source.setValue(setting.key, null);
+    source.resetValue(setting.key);
   }
 
   return (
-    <div className='tw:flex tw:relative tw:gap-2'>
-      <div className="tw:w-1 tw:h-full" hidden>
+    <div className="tw:flex tw:relative tw:gap-2">
+      <div className="tw:w-1 tw:h-full" hidden={!displayRestore}>
         {isOverride && (
-          <div className={clsx('tw:h-full tw:w-full tw:bg-zinc-100 tw:dark:bg-zinc-700')} title={translate('plugin_settings_panel_setting_set_in_scope')} />
+          <div
+            className={clsx('tw:h-full tw:w-full tw:bg-zinc-100 tw:dark:bg-zinc-700')}
+            title={translate('plugin_settings_panel_setting_set_in_scope')}
+          />
         )}
       </div>
       <div>
-        <SettingField setting={setting} source={source} />
+        <SettingField resolver={resolver} setting={setting} source={source} />
         {isOverride && (
           <Link className="theme-typography--caption" title={translate('plugin_settings_panel_setting_reset_tooltip')} onClick={handleRestore}>
             {translate('plugin_settings_panel_setting_reset')}

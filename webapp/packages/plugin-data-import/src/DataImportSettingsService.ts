@@ -29,7 +29,7 @@ export class DataImportSettingsService {
   ) {
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
 
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings<typeof defaultSettings>(() => [
       {
         group: DATA_EDITOR_SETTINGS_GROUP,
         key: 'plugin.data-import.disabled',

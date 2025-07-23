@@ -31,6 +31,7 @@ export default [
   ['ui_custom', 'Настроить'],
   ['ui_configure', 'Настроить'],
   ['ui_apply', 'Применить'],
+  ['ui_replace', 'Заменить'],
   ['ui_cancel', 'Отменить'],
   ['ui_reject', 'Отклонить'],
   ['ui_ignore', 'Пропустить'],
