@@ -31,6 +31,7 @@ to: <%= name %>/package.json
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
     "rimraf": "^6",
-    "typescript": "^5"
+    "typescript": "^5",
+    "tslib": "^2"
   }
 }

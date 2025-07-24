@@ -13,5 +13,8 @@ export const pluginDataEditorSettingsManifest: PluginManifest = {
     name: 'Plugin data editor settings',
   },
 
-  providers: [() => import('./PluginDataEditorSettingsServiceBootstrap.js').then(m => m.PluginDataEditorSettingsServiceBootstrap)],
+  providers: [
+    () => import('./PluginDataEditorSettingsServiceBootstrap.js').then(m => m.PluginDataEditorSettingsServiceBootstrap),
+    () => import('./DataEditorSettingsService.js').then(m => m.DataEditorSettingsService),
+  ],
 };
