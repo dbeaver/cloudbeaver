@@ -26,6 +26,9 @@
       "path": "../core-utils"
     },
     {
+      "path": "../plugin-data-import"
+    },
+    {
       "path": "../plugin-data-viewer"
     }
   ],

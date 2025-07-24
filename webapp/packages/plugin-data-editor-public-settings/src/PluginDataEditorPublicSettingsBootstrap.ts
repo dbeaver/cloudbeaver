@@ -9,16 +9,13 @@
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
-  type ISettingDescription,
   ROOT_SETTINGS_LAYER,
   SettingsManagerService,
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DATA_EDITOR_SETTINGS_GROUP, type DataViewerSettingsSchema } from '@cloudbeaver/plugin-data-viewer';
-import type { schema } from '@cloudbeaver/core-utils';
-
-export type DataEditorSettings = schema.infer<DataViewerSettingsSchema>;
+import type { DataImportSettingsSchema } from '@cloudbeaver/plugin-data-import';
 
 @injectable()
 export class PluginDataEditorPublicSettingsBootstrap extends Bootstrap {
@@ -44,41 +41,50 @@ export class PluginDataEditorPublicSettingsBootstrap extends Bootstrap {
       }),
     );
 
-    this.settingsManagerService.registerSettings<DataViewerSettingsSchema>(() => {
-      const settings: ISettingDescription<DataEditorSettings>[] = [
-        {
-          key: 'plugin.data-viewer.disableEdit',
-          access: {
-            scope: ['server', 'role'],
-          },
-          type: ESettingsValueType.Checkbox,
-          name: 'settings_data_editor_disable_edit_name',
-          description: 'settings_data_editor_disable_edit_description',
-          group: DATA_EDITOR_SETTINGS_GROUP,
+    this.settingsManagerService.registerSettings<DataViewerSettingsSchema>(() => [
+      {
+        key: 'plugin.data-viewer.disableEdit',
+        access: {
+          scope: ['server', 'role'],
         },
-        {
-          key: 'plugin.data-viewer.disableCopyData',
-          access: {
-            scope: ['server', 'role'],
-          },
-          type: ESettingsValueType.Checkbox,
-          name: 'settings_data_editor_disable_data_copy_name',
-          description: 'settings_data_editor_disable_data_copy_description',
-          group: DATA_EDITOR_SETTINGS_GROUP,
+        type: ESettingsValueType.Checkbox,
+        name: 'settings_data_editor_disable_edit_name',
+        description: 'settings_data_editor_disable_edit_description',
+        group: DATA_EDITOR_SETTINGS_GROUP,
+      },
+      {
+        key: 'plugin.data-viewer.disableCopyData',
+        access: {
+          scope: ['server', 'role'],
         },
-        {
-          group: DATA_EDITOR_SETTINGS_GROUP,
-          key: 'plugin.data-viewer.export.disabled',
-          type: ESettingsValueType.Checkbox,
-          name: 'settings_data_editor_disable_data_export_name',
-          description: 'settings_data_editor_disable_data_export_description',
-          access: {
-            scope: ['server', 'role'],
-          },
+        type: ESettingsValueType.Checkbox,
+        name: 'settings_data_editor_disable_data_copy_name',
+        description: 'settings_data_editor_disable_data_copy_description',
+        group: DATA_EDITOR_SETTINGS_GROUP,
+      },
+      {
+        group: DATA_EDITOR_SETTINGS_GROUP,
+        key: 'plugin.data-viewer.export.disabled',
+        type: ESettingsValueType.Checkbox,
+        name: 'settings_data_editor_disable_data_export_name',
+        description: 'settings_data_editor_disable_data_export_description',
+        access: {
+          scope: ['server', 'role'],
         },
-      ];
+      },
+    ]);
 
-      return settings;
-    });
+    this.settingsManagerService.registerSettings<DataImportSettingsSchema>(() => [
+      {
+        group: DATA_EDITOR_SETTINGS_GROUP,
+        key: 'plugin.data-import.disabled',
+        type: ESettingsValueType.Checkbox,
+        name: 'plugin_data_import_disable_data_import_name',
+        description: 'plugin_data_import_disable_data_import_description',
+        access: {
+          scope: ['server', 'role'],
+        },
+      },
+    ]);
   }
 }

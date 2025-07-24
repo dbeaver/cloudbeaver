@@ -2691,6 +2691,7 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/plugin-data-import": "workspace:*"
     "@cloudbeaver/plugin-data-viewer": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
