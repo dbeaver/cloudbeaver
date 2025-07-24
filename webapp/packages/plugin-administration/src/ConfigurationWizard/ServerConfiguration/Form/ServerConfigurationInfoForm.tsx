@@ -21,6 +21,12 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
   const serverConfigLoader = useResource(ServerConfigurationInfoForm, ServerConfigResource, undefined);
   const translate = useTranslate();
 
+  function constructSupportedHostsExample() {
+    const exampleWithPort = serverConfigLoader.data?.distributed ? 'localhost' : 'localhost:5000';
+
+    return `example.com\n${exampleWithPort}\n127.0.0.1`;
+  }
+
   return (
     <Group form gap>
       <GroupTitle>{translate('administration_configuration_wizard_configuration_server_info')}</GroupTitle>
@@ -50,9 +56,8 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         name="supportedHosts"
         rows={3}
         state={state.serverConfig}
-        readOnly={serverConfigLoader.resource.distributed}
         description={translate('administration_configuration_wizard_configuration_supported_hosts_description')}
-        placeholder={'example.com\nlocalhost:5000\n127.0.0.1'}
+        placeholder={constructSupportedHostsExample()}
       >
         {translate('administration_configuration_wizard_configuration_supported_hosts')}
       </Textarea>

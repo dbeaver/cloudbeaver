@@ -28,7 +28,7 @@ export default [
     'administration_configuration_wizard_configuration_secure_cookies_description',
     'Enable HTTPS mode to secure communication between the server and clients. This is recommended for production environments',
   ],
-  ['administration_configuration_wizard_configuration_secure_cookies_warning', "The data won't be encrypted. This makes it vulnerable"],
+  ['administration_configuration_wizard_configuration_secure_cookies_warning', "The data won't be encrypted if HTTPS mode is disabled. This makes it vulnerable"],
   ['administration_configuration_wizard_configuration_supported_hosts', 'Allowed Server URLs'],
   [
     'administration_configuration_wizard_configuration_supported_hosts_description',
