@@ -412,6 +412,13 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull String userId,
         @NotNull String[] teamIds
     ) throws SQLException {
+        String defaultTeam = getDefaultUserTeam();
+        if (CommonUtils.isNotEmpty(defaultTeam)) {
+            teamIds = Arrays.stream(teamIds).filter(teamId -> !defaultTeam.equals(teamId)).toArray(String[]::new);
+        }
+        if (ArrayUtils.isEmpty(teamIds)) {
+            return;
+        }
         String deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? " +
                 "AND TEAM_ID IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
 
