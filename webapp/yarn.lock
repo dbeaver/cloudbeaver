@@ -2683,6 +2683,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-data-editor-settings@workspace:packages/plugin-data-editor-settings":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-data-editor-settings@workspace:packages/plugin-data-editor-settings"
+  dependencies:
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-data-export@workspace:*, @cloudbeaver/plugin-data-export@workspace:packages/plugin-data-export":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-data-export@workspace:packages/plugin-data-export"

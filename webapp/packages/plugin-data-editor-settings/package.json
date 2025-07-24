@@ -1,8 +1,5 @@
----
-to: <%= name %>/package.json
----
 {
-  "name": "@cloudbeaver/<%= name %>",
+  "name": "@cloudbeaver/plugin-data-editor-settings",
   "type": "module",
   "sideEffects": [
     "src/**/*.css",
@@ -25,7 +22,6 @@ to: <%= name %>/package.json
   "dependencies": {
     "@cloudbeaver/core-di": "workspace:*"
   },
-  "peerDependencies": {},
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",

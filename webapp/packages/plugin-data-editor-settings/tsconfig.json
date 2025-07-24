@@ -1,7 +1,3 @@
----
-to: <%= name %>/tsconfig.json
----
-
 {
   "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
