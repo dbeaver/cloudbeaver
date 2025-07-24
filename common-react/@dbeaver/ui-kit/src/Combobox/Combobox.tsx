@@ -206,7 +206,7 @@ export function ComboboxItem({ value, searchData, ref, ...props }: ComboboxItemP
   const { registerItem, unregisterItem, isItemVisible } = use(SearchContext);
 
   useLayoutEffect(() => {
-    if (value == null) return;
+    if (value === undefined) return;
     registerItem(value, searchData);
     return () => unregisterItem(value);
   }, [registerItem, unregisterItem, value, searchData]);
