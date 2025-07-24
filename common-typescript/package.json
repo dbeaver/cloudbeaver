@@ -16,5 +16,8 @@
     "@wroud/ts-template": "^0",
     "prettier": "^3.6.2",
     "rimraf": "^6"
+  },
+  "resolutions": {
+    "stylus": "0.0.1-security"
   }
 }

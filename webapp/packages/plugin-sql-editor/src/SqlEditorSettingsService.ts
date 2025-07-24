@@ -6,9 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { FEATURE_GIT_ID, ServerConfigResource, ServerSettingsManagerService } from '@cloudbeaver/core-root';
+import {
+  FEATURE_GIT_ID,
+  HIGHEST_SETTINGS_LAYER,
+  ServerConfigResource,
+  ServerSettingsManagerService,
+  SettingsTransformationService,
+} from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
+  createSettingsOverrideResolver,
   ESettingsValueType,
   type ISettingDescription,
   ROOT_SETTINGS_LAYER,
@@ -45,6 +52,7 @@ const ASSISTANT_MODE_OPTIONS_LOCALIZED = [
 ];
 
 const defaultSettings = schema.object({
+  'plugin.sql-editor.script.executionEnabled': schemaExtra.stringedBoolean().default(true),
   'plugin.sql-editor.maxFileSize': schema.coerce.number().default(10 * 1024), // kilobyte
   'plugin.sql-editor.disabled': schemaExtra.stringedBoolean().default(false),
   'plugin.sql-editor.autoSave': schemaExtra.stringedBoolean().default(true),
@@ -63,20 +71,27 @@ const defaultSettings = schema.object({
     .pipe(schema.enum(TABLE_ALIAS_OPTIONS))
     .default('PLAIN'),
   'SQLEditor.ContentAssistant.proposals.long.name': schema.coerce.boolean().default(false),
-  'SQLEditor.ContentAssistant.experimental.mode': schema.coerce.string().transform(value => {
-    switch (value) {
-      case 'DEFAULT':
-        return 'DEFAULT';
-      default:
-        return 'NEW';
-    }
-  }).pipe(schema.enum(ASSISTANT_MODE_OPTIONS).default('NEW')),
+  'SQLEditor.ContentAssistant.experimental.mode': schema.coerce
+    .string()
+    .transform(value => {
+      switch (value) {
+        case 'DEFAULT':
+          return 'DEFAULT';
+        default:
+          return 'NEW';
+      }
+    })
+    .pipe(schema.enum(ASSISTANT_MODE_OPTIONS).default('NEW')),
 });
 
-export type SqlEditorSettings = schema.infer<typeof defaultSettings>;
+type SqlEditorSettingsSchema = typeof defaultSettings;
+export type SqlEditorSettings = schema.infer<SqlEditorSettingsSchema>;
 
 @injectable()
 export class SqlEditorSettingsService extends Dependency {
+  get scriptExecutionEnabled(): boolean {
+    return this.settings.getValue('plugin.sql-editor.script.executionEnabled');
+  }
   get maxFileSize(): number {
     return this.settings.getValue('plugin.sql-editor.maxFileSize');
   }
@@ -103,6 +118,7 @@ export class SqlEditorSettingsService extends Dependency {
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
     private readonly settingsResolverService: SettingsResolverService,
+    private readonly settingsTransformationService: SettingsTransformationService,
     private readonly serverSettingsManagerService: ServerSettingsManagerService,
     private readonly serverConfigResource: ServerConfigResource,
   ) {
@@ -111,18 +127,27 @@ export class SqlEditorSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+      createSettingsAliasResolver<SqlEditorSettingsSchema>(this.settingsResolverService, {
         'plugin.sql-editor.autoSave': 'core.app.sqlEditor.autoSave',
         'plugin.sql-editor.maxFileSize': 'core.app.sqlEditor.maxFileSize',
         'plugin.sql-editor.disabled': 'core.app.sqlEditor.disabled',
+      }),
+    );
+    this.settingsResolverService.addResolver(
+      HIGHEST_SETTINGS_LAYER,
+      createSettingsOverrideResolver<SqlEditorSettingsSchema>(this.settingsResolverService, {
+        'plugin.sql-editor.script.executionEnabled': {
+          key: 'permission.sql.script.execution',
+          filter: value => !value,
+        },
       }),
     );
     this.registerSettings();
   }
 
   private registerSettings() {
-    this.serverSettingsManagerService.setGroupOverride('editors/sqlEditor', SQL_EDITOR_SETTINGS_GROUP);
-    this.serverSettingsManagerService.setSettingTransformer(
+    this.settingsTransformationService.setGroupOverride('editors/sqlEditor', SQL_EDITOR_SETTINGS_GROUP);
+    this.settingsTransformationService.setSettingTransformer(
       'sql.proposals.insert.table.alias',
       setting =>
         ({
@@ -133,20 +158,19 @@ export class SqlEditorSettingsService extends Dependency {
           options: [...(setting.options?.filter(option => !TABLE_ALIAS_OPTIONS.includes(option.value as any)) || []), ...TABLE_ALIAS_SETTING_OPTIONS],
         }) as ISettingDescription<SqlEditorSettings>,
     );
-    this.serverSettingsManagerService.setSettingTransformer(
+    this.settingsTransformationService.setSettingTransformer(
       'SQLEditor.ContentAssistant.experimental.mode',
-      setting => {
-        return {
+      setting =>
+        ({
           ...setting,
           group: SQL_EDITOR_SETTINGS_GROUP,
           name: 'sql_editor_settings_content_assistant_experimental_mode_name',
           description: 'sql_editor_settings_content_assistant_experimental_mode_desc',
           options: ASSISTANT_MODE_OPTIONS_LOCALIZED,
-        } as ISettingDescription<SqlEditorSettings>;
-      },
-    )
+        }) as ISettingDescription<SqlEditorSettings>,
+    );
 
-    this.settingsManagerService.registerSettings(this.settings, () => {
+    this.settingsManagerService.registerSettings<typeof defaultSettings>(() => {
       const settings: ISettingDescription<SqlEditorSettings>[] = [
         {
           group: SQL_EDITOR_SETTINGS_GROUP,
@@ -204,7 +228,7 @@ export class SqlEditorSettingsService extends Dependency {
           group: SQL_EDITOR_SETTINGS_GROUP,
           type: ESettingsValueType.Select,
           name: 'sql_editor_settings_content_assistant_experimental_mode_name',
-          options: ASSISTANT_MODE_OPTIONS_LOCALIZED
+          options: ASSISTANT_MODE_OPTIONS_LOCALIZED,
         });
       }
       return settings;

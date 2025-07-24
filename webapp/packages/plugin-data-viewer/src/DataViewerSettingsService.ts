@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { ServerSettingsManagerService } from '@cloudbeaver/core-root';
+import { ServerSettingsManagerService, SettingsTransformationService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
@@ -33,7 +33,8 @@ const defaultSettings = schema.object({
   'plugin.data-viewer.export.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
-export type DataViewerSettings = schema.infer<typeof defaultSettings>;
+export type DataViewerSettingsSchema = typeof defaultSettings;
+export type DataViewerSettings = schema.infer<DataViewerSettingsSchema>;
 
 @injectable()
 export class DataViewerSettingsService extends Dependency {
@@ -61,12 +62,13 @@ export class DataViewerSettingsService extends Dependency {
     return this.settings.getValue('resultset.maxrows');
   }
 
-  readonly settings: SettingsProvider<typeof defaultSettings>;
+  readonly settings: SettingsProvider<DataViewerSettingsSchema>;
 
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
     private readonly settingsResolverService: SettingsResolverService,
+    private readonly settingsTransformationService: SettingsTransformationService,
     private readonly serverSettingsManagerService: ServerSettingsManagerService,
   ) {
     super();
@@ -74,7 +76,7 @@ export class DataViewerSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+      createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsResolverService, {
         'plugin.data-viewer.disableEdit': 'core.app.dataViewer.disableEdit',
         'plugin.data-viewer.disableCopyData': 'core.app.dataViewer.disableCopyData',
         'plugin.data-viewer.fetchMax': 'core.app.dataViewer.fetchMax',
@@ -82,11 +84,11 @@ export class DataViewerSettingsService extends Dependency {
         'resultset.maxrows': 'core.app.dataViewer.fetchDefault',
       }),
       /** @deprecated Use settings instead, will be removed in 25.0.0 */
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+      createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsResolverService, {
         'resultset.maxrows': 'plugin.data-viewer.fetchDefault',
       }),
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+      createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsResolverService, {
         'plugin.data-viewer.export.disabled': 'plugin_data_export.disabled',
       }),
     );
@@ -102,7 +104,7 @@ export class DataViewerSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.serverSettingsManagerService.setSettingTransformer(
+    this.settingsTransformationService.setSettingTransformer(
       'resultset.maxrows',
       setting =>
         ({
@@ -113,7 +115,7 @@ export class DataViewerSettingsService extends Dependency {
         }) as ISettingDescription<DataViewerSettings>,
     );
 
-    this.settingsManagerService.registerSettings(this.settings, () => {
+    this.settingsManagerService.registerSettings<typeof defaultSettings>(() => {
       const settings: ISettingDescription<DataViewerSettings>[] = [
         {
           key: 'plugin.data-viewer.disableEdit',
