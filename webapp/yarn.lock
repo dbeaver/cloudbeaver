@@ -2683,9 +2683,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cloudbeaver/plugin-data-editor-settings@workspace:*, @cloudbeaver/plugin-data-editor-settings@workspace:packages/plugin-data-editor-settings":
+"@cloudbeaver/plugin-data-editor-public-settings@workspace:*, @cloudbeaver/plugin-data-editor-public-settings@workspace:packages/plugin-data-editor-public-settings":
   version: 0.0.0-use.local
-  resolution: "@cloudbeaver/plugin-data-editor-settings@workspace:packages/plugin-data-editor-settings"
+  resolution: "@cloudbeaver/plugin-data-editor-public-settings@workspace:packages/plugin-data-editor-public-settings"
   dependencies:
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
@@ -4185,7 +4185,7 @@ __metadata:
     "@cloudbeaver/plugin-connection-search": "workspace:*"
     "@cloudbeaver/plugin-connections": "workspace:*"
     "@cloudbeaver/plugin-connections-administration": "workspace:*"
-    "@cloudbeaver/plugin-data-editor-settings": "workspace:*"
+    "@cloudbeaver/plugin-data-editor-public-settings": "workspace:*"
     "@cloudbeaver/plugin-data-export": "workspace:*"
     "@cloudbeaver/plugin-data-grid": "workspace:*"
     "@cloudbeaver/plugin-data-import": "workspace:*"

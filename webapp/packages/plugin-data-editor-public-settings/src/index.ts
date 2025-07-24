@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { pluginDataEditorSettingsManifest } from './manifest.js';
+import { pluginDataEditorPublicSettingsManifest } from './manifest.js';
 
-export default pluginDataEditorSettingsManifest;
-export { pluginDataEditorSettingsManifest };
+export default pluginDataEditorPublicSettingsManifest;
+export { pluginDataEditorPublicSettingsManifest };

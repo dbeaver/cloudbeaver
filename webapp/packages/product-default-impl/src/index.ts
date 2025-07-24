@@ -76,7 +76,7 @@ import { pluginSettingsDefaultAdministrationManifest } from '@cloudbeaver/plugin
 import { codemirror6Manifest } from '@cloudbeaver/plugin-codemirror6';
 
 import { defaultProductManifest } from './manifest.js';
-import pluginDataEditorSettingsManifest from '@cloudbeaver/plugin-data-editor-settings';
+import pluginDataEditorPublicSettingsManifest from '@cloudbeaver/plugin-data-editor-public-settings';
 
 const PLUGINS: PluginManifest[] = [
   ssoPlugin,
@@ -93,7 +93,7 @@ const PLUGINS: PluginManifest[] = [
   connectionSearch,
   dataExportManifest,
   dataImportPluginManifest,
-  pluginDataEditorSettingsManifest,
+  pluginDataEditorPublicSettingsManifest,
   dataViewerManifest,
   dataViewerResultTraceDetailsPlugin,
   dvResultSetGroupingPlugin,

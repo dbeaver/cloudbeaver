@@ -8,13 +8,10 @@
 
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-export const pluginDataEditorSettingsManifest: PluginManifest = {
+export const pluginDataEditorPublicSettingsManifest: PluginManifest = {
   info: {
     name: 'Plugin data editor settings',
   },
 
-  providers: [
-    () => import('./PluginDataEditorSettingsServiceBootstrap.js').then(m => m.PluginDataEditorSettingsServiceBootstrap),
-    () => import('./DataEditorSettingsService.js').then(m => m.DataEditorSettingsService),
-  ],
+  providers: [() => import('./PluginDataEditorPublicSettingsBootstrap.js').then(m => m.PluginDataEditorPublicSettingsBootstrap)],
 };

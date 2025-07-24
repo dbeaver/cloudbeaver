@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
@@ -14,18 +14,22 @@ import {
   SettingsManagerService,
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
-import { schema } from '@cloudbeaver/core-utils';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DATA_EDITOR_SETTINGS_GROUP, type DataViewerSettingsSchema } from '@cloudbeaver/plugin-data-viewer';
+import type { schema } from '@cloudbeaver/core-utils';
 
 export type DataEditorSettings = schema.infer<DataViewerSettingsSchema>;
 
 @injectable()
-export class DataEditorSettingsService extends Dependency {
+export class PluginDataEditorPublicSettingsBootstrap extends Bootstrap {
   constructor(
     private readonly settingsManagerService: SettingsManagerService,
     private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
+  }
+
+  override register(): void {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
@@ -40,10 +44,6 @@ export class DataEditorSettingsService extends Dependency {
       }),
     );
 
-    this.registerSettings();
-  }
-
-  private registerSettings() {
     this.settingsManagerService.registerSettings<DataViewerSettingsSchema>(() => {
       const settings: ISettingDescription<DataEditorSettings>[] = [
         {

@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-data-editor-settings",
+  "name": "@cloudbeaver/plugin-data-editor-public-settings",
   "type": "module",
   "sideEffects": [
     "src/**/*.css",
