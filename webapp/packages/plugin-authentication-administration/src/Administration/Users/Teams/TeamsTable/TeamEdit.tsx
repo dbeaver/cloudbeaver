@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,8 +8,10 @@
 import { observer } from 'mobx-react-lite';
 
 import { TeamsResource } from '@cloudbeaver/core-authentication';
-import { ColoredContainer, GroupBack, GroupTitle, Text, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, ConfirmationDialog, GroupBack, GroupTitle, Text, useExecutor, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { FormMode } from '@cloudbeaver/core-ui';
 
 import { TeamForm } from '../TeamsForm/TeamForm.js';
@@ -24,9 +26,29 @@ interface Props {
 export const TeamEdit = observer<Props>(function TeamEdit({ item }) {
   const translate = useTranslate();
   const teamsTableOptionsPanelService = useService(TeamsTableOptionsPanelService);
+  const commonDialogService = useService(CommonDialogService);
   const team = useResource(TeamEdit, TeamsResource, item);
 
   const formState = useTeamsAdministrationFormState(item, state => state.setMode(FormMode.Edit))!;
+
+  useExecutor({
+    executor: teamsTableOptionsPanelService.onClose,
+    handlers: [
+      async function closeHandler(event, contexts) {
+        if (formState.isChanged && event === 'before') {
+          const result = await commonDialogService.open(ConfirmationDialog, {
+            title: 'core_blocks_confirmation_dialog_title',
+            message: 'ui_save_reminder',
+            confirmActionText: 'ui_close',
+          });
+
+          if (result === DialogueStateResult.Rejected) {
+            ExecutorInterrupter.interrupt(contexts);
+          }
+        }
+      },
+    ],
+  });
 
   return (
     <ColoredContainer aria-label={translate('plugin_authentication_administration_team_form_edit_label')} parent vertical noWrap surface gap compact>
