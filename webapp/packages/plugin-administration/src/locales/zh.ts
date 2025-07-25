@@ -69,4 +69,12 @@ export default [
     'administration_disabled_drivers_enable_unsafe_driver_message',
     'Enabling this database driver may allow access to files on the server where this application is running. This could potentially expose sensitive system files or other protected data.\n\nOnly proceed if you fully understand the implications and trust the database configuration. Unauthorized or improper use of this driver may lead to security risks.\n\nDo you want to enable the "{arg:driverName}" driver?',
   ],
+  ['administration_configuration_wizard_configuration_security_bind_session_to_ip', 'Bind session to IP'],
+  [
+    'administration_configuration_wizard_configuration_security_bind_session_to_ip_description',
+    'Allows to bind session to IP address. If enabled, the session will be closed if the IP address changes',
+  ],
+  ['administration_configuration_wizard_configuration_security_bind_session_to_ip_enabled', 'Enabled'],
+  ['administration_configuration_wizard_configuration_security_bind_session_to_ip_disabled', 'Disabled'],
+  ['administration_configuration_wizard_configuration_security_bind_session_to_ip_databases_team', 'Enable for databases.team'],
 ];

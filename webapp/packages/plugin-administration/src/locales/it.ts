@@ -61,6 +61,14 @@ export default [
     'administration_configuration_wizard_configuration_security_public_credentials_description',
     'Permetti di salvare le credenziali per gli utenti non amministratori',
   ],
+  ['administration_configuration_wizard_configuration_security_bind_session_to_ip', 'Bind session to IP'],
+  [
+    'administration_configuration_wizard_configuration_security_bind_session_to_ip_description',
+    'Allows to bind session to IP address. If enabled, the session will be closed if the IP address changes',
+  ],
+  ['administration_configuration_wizard_configuration_security_bind_session_to_ip_enabled', 'Enabled'],
+  ['administration_configuration_wizard_configuration_security_bind_session_to_ip_disabled', 'Disabled'],
+  ['administration_configuration_wizard_configuration_security_bind_session_to_ip_databases_team', 'Enable for databases.team'],
 
   ['administration_configuration_wizard_configuration_navigator', 'Navigatore'],
   ['administration_configuration_wizard_configuration_navigator_hide_folders', 'Nascondi le Cartelle'],
