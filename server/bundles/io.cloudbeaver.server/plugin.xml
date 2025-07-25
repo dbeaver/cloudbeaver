@@ -64,9 +64,9 @@
 
     <extension point="org.jkiss.dbeaver.settings">
         <propertyGroup id="log" label="Logger">
-            <property id="log.api.graphql.debug" label="Enable detailed logging"
+            <property id="log.api.graphql.debug" label="%log.api.graphql.debug"
                       type="boolean" scopes="global"
-                      description="Enable detailed logging of GraphQL queries in the server log, including all provided variables"/>
+                      description="%log.api.graphql.debug.description"/>
         </propertyGroup>
     </extension>
 
