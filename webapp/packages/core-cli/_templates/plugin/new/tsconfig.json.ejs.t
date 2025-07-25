@@ -12,7 +12,7 @@ to: <%= name %>/tsconfig.json
   },
   "references": [
     {
-      "path": "../../../common-typescript/@dbeaver/cli"
+      "path": "<%= isEE ? '../../../../cloudbeaver/common-typescript/@dbeaver/cli' : '../../../common-typescript/@dbeaver/cli' %>"
     },
     {
       "path": "../core-cli"
