@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.data.transfer;
 
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
@@ -60,7 +61,7 @@ public interface DBWServiceDataTransfer extends DBWService {
         @NotNull WebSQLResultsInfo webSQLResultsInfo,
         @NotNull WebSession webSession) throws DBWebException;
 
-    @WebAction
+    @WebAction(requireGlobalPermissions = DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_EXPORT)
     WebAsyncTaskInfo dataTransferExportDataFromResults(
         WebSQLContextInfo sqlContextInfo,
         String resultsId,

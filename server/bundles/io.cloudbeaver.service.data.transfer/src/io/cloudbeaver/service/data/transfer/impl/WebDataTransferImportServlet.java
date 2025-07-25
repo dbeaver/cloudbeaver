@@ -67,6 +67,7 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException, DBWebException {
+        //fixme add check for user permissions
         if (!session.isAuthorizedInSecurityManager()) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Import for users only");
             return;
