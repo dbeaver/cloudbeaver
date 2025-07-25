@@ -28,7 +28,6 @@ import { QueryDataSource } from '../QueryDataSource.js';
 import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService.js';
 import { SqlQueryResultService } from './SqlQueryResultService.js';
 import { SqlEditorSettingsService } from '../SqlEditorSettingsService.js';
-import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures.js';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 
 interface IQueryExecutionOptions {
@@ -124,9 +123,11 @@ export class SqlQueryService {
 
     try {
       const dataSource = this.sqlDataSourceService.get(editorState.editorId);
-      if (!this.sqlEditorSettingsService.scriptExecutionEnabled || !dataSource?.hasFeature(ESqlDataSourceFeatures.executable)) {
+
+      if (!this.sqlEditorSettingsService.scriptExecutionEnabled) {
         throw new Error('Script execution is not allowed');
       }
+
       const contextInfo = dataSource?.executionContext;
       const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);
 
@@ -196,9 +197,11 @@ export class SqlQueryService {
     await this.onQueryExecution.execute(editorState);
     try {
       const dataSource = this.sqlDataSourceService.get(editorState.editorId);
-      if (!this.sqlEditorSettingsService.scriptExecutionEnabled || !dataSource?.hasFeature(ESqlDataSourceFeatures.executable)) {
+
+      if (!this.sqlEditorSettingsService.scriptExecutionEnabled) {
         throw new Error('Script execution is not allowed');
       }
+
       const contextInfo = dataSource?.executionContext;
       const executionContext = contextInfo && this.connectionExecutionContextService.get(contextInfo.id);
 
