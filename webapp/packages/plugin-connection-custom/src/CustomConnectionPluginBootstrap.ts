@@ -49,6 +49,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [MENU_TREE_CREATE_CONNECTION],
       getItems: (context, items) => [...items, ACTION_TREE_CREATE_CONNECTION],
+      isApplicable: () => !this.isConnectionFeatureDisabled(true),
     });
 
     this.menuService.addCreator({
