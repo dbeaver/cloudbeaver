@@ -23,6 +23,9 @@
       "path": "../core-localization"
     },
     {
+      "path": "../core-root"
+    },
+    {
       "path": "../core-settings"
     },
     {

@@ -8,6 +8,7 @@
 
 import {
   createSettingsAliasResolver,
+  createSettingsOverrideResolver,
   ESettingsValueType,
   ROOT_SETTINGS_LAYER,
   SettingsManagerService,
@@ -16,6 +17,7 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DATA_EDITOR_SETTINGS_GROUP, type DataViewerSettingsSchema } from '@cloudbeaver/plugin-data-viewer';
 import type { DataImportSettingsSchema } from '@cloudbeaver/plugin-data-import';
+import { HIGHEST_SETTINGS_LAYER } from '@cloudbeaver/core-root';
 
 @injectable()
 export class PluginDataEditorPublicSettingsBootstrap extends Bootstrap {
@@ -73,6 +75,23 @@ export class PluginDataEditorPublicSettingsBootstrap extends Bootstrap {
         },
       },
     ]);
+    this.settingsResolverService.addResolver(
+      HIGHEST_SETTINGS_LAYER,
+      createSettingsOverrideResolver<DataViewerSettingsSchema>(this.settingsResolverService, {
+        'plugin.data-viewer.disableEdit': {
+          key: 'permission.data-editor.editing.enable',
+          filter: value => !value,
+        },
+        'plugin.data-viewer.disableCopyData': {
+          key: 'permission.data-editor.copy.enable',
+          filter: value => !value,
+        },
+        'plugin.data-viewer.export.disabled': {
+          key: 'permission.data-editor.export.enable',
+          filter: value => !value,
+        },
+      }),
+    );
 
     this.settingsManagerService.registerSettings<DataImportSettingsSchema>(() => [
       {
@@ -86,5 +105,14 @@ export class PluginDataEditorPublicSettingsBootstrap extends Bootstrap {
         },
       },
     ]);
+    this.settingsResolverService.addResolver(
+      HIGHEST_SETTINGS_LAYER,
+      createSettingsOverrideResolver<DataImportSettingsSchema>(this.settingsResolverService, {
+        'plugin.data-import.disabled': {
+          key: 'permission.data-editor.import.enable',
+          filter: value => !value,
+        },
+      }),
+    );
   }
 }
