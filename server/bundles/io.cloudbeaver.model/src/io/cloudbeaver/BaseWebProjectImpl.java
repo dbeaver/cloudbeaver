@@ -17,6 +17,8 @@
 package io.cloudbeaver;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
@@ -149,5 +151,17 @@ public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMCo
     @Override
     public boolean isPrivateProject() {
         return RMProjectType.USER.equals(getRMProject().getType());
+    }
+
+    @Override
+    public void updateProject(@Nullable String newName, @Nullable String description) throws DBException {
+        super.updateProject(newName, description);
+        if (CommonUtils.isNotEmpty(newName)) {
+            getRMProject().setName(newName);
+        }
+        if (CommonUtils.isNotEmpty(description)) {
+            getRMProject().setDescription(description);
+        }
+
     }
 }

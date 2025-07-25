@@ -318,6 +318,25 @@ public abstract class BaseLocalResourceController implements RMController {
 
         @NotNull
         @Override
+        public String getName() {
+            Object projectName = this.getProjectProperty(BaseWebProjectImpl.PROP_PROJECT_NAME);
+            if (projectName != null) {
+                return projectName.toString();
+            }
+            return super.getName();
+        }
+
+        @Nullable
+        public String getDescription() {
+            Object projectDescription = this.getProjectProperty(BaseWebProjectImpl.PROP_PROJECT_DESCRIPTION);
+            if (projectDescription != null) {
+                return projectDescription.toString();
+            }
+            return null;
+        }
+
+        @NotNull
+        @Override
         protected DBPDataSourceRegistry createDataSourceRegistry() {
             return new DataSourceRegistry(this);
         }

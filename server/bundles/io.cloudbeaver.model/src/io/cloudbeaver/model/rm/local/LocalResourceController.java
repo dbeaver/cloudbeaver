@@ -306,23 +306,16 @@ public class LocalResourceController extends BaseLocalResourceController {
     @Override
     public RMProject updateProject(@NotNull String projectId, @NotNull RMProjectInfo projectInfo) throws DBException {
         try (var projectLock = lockController.lock(projectId, "updateProject")) {
-            RMProject project = getProject(projectId, false, false);
+            BaseWebProjectImpl project = getWebProject(projectId, false);
             Path targetPath = getProjectPath(projectId);
             if (!Files.exists(targetPath)) {
                 throw new DBException("Project folder '" + projectId + "' not found");
             }
-            if (CommonUtils.isEmpty(projectInfo.getName())) {
-                throw new DBException("Project name required");
+            if (!project.getRMProject().isShared()) {
+                throw new DBException("Project '" + projectId + "' is not shared");
             }
-            try {
-                String config = GSON.toJson(projectInfo);
-                Files.writeString(targetPath.resolve(PROJECT_INFO_CONF), config);
-                project.setName(projectInfo.getName());
-                project.setDescription(projectInfo.getDescription());
-                return project;
-            } catch (IOException e) {
-                throw new DBException("Error writing project info", e);
-            }
+            project.updateProject(projectInfo.getName(), projectInfo.getDescription());
+            return project.getRMProject();
         }
     }
 
@@ -766,12 +759,13 @@ public class LocalResourceController extends BaseLocalResourceController {
             .toArray(String[]::new);
 
         RMProject project = new RMProject();
-        RMProjectInfo projectMetadata = readProjectInfo(path);
-        project.setName(projectMetadata.getName());
-        project.setDescription(projectMetadata.getDescription());
+        project.setName(path.getFileName().toString());
         project.setId(makeProjectIdFromPath(path, type));
         project.setType(type);
         project.setProjectPermissions(allProjectPermissions);
+        InternalWebProjectImpl webProject = new InternalWebProjectImpl(new SessionContextImpl(null), project, path);
+        project.setName(webProject.getName());
+        project.setDescription(webProject.getDescription());
         if (Files.exists(path)) {
             try {
                 project.setCreateTime(
