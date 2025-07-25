@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useId, useLayoutEffect, useMemo } from 'react';
+import { useContext, useId, useLayoutEffect } from 'react';
 import { useSelectStore, SelectField, clsx } from '@dbeaver/ui-kit';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
@@ -44,7 +44,6 @@ type ControlledProps<TKey, TValue> = SelectBaseProps<TKey, TValue> & {
   name?: string;
   value?: TKey;
   onSelect?: (value: TKey, name: string | undefined, prev: TKey) => void;
-  onChange?: (value: string, name: string | undefined) => any;
   state?: never;
 };
 
@@ -52,7 +51,6 @@ type ObjectProps<TValue, TKey extends keyof TState, TState> = SelectBaseProps<TS
   name: TKey;
   state: TState;
   onSelect?: (value: TState[TKey], name: TKey | undefined, prev: TState[TKey]) => void;
-  onChange?: (value: string, name: TKey | undefined) => any;
   value?: never;
 };
 
@@ -82,7 +80,6 @@ export const Select: SelectType = observer(function Select({
   iconSelector,
   titleSelector,
   isDisabled,
-  onChange = () => {},
   onSelect,
   onSwitch,
   ...rest
@@ -93,32 +90,29 @@ export const Select: SelectType = observer(function Select({
   const context = useContext(FormContext);
   const menu = useSelectStore();
   const isOpened = menu.getState().open;
-  const value: string | number | readonly string[] | undefined = useMemo(() => {
-    if (state && name !== undefined && name in state) {
-      return state[name];
+  let value: string | number | readonly string[] | undefined = controlledValue ?? defaultValue ?? undefined;
+
+  if (state && name !== undefined && name in state) {
+    value = state[name];
+  }
+
+  const generatedId = useId();
+  const inputId = id || generatedId;
+
+  const handleSelect = (id: any) => {
+    id = id ?? value ?? '';
+    const changed = id !== value;
+
+    if (state && changed) {
+      state[name] = id;
     }
-
-    return controlledValue ?? defaultValue ?? undefined;
-  }, [state, name, controlledValue, defaultValue]);
-  const inputId = id || useId();
-
-  const handleSelect = useCallback(
-    (id: any) => {
-      id = id ?? value ?? '';
-      const changed = id !== value;
-
-      if (state && changed) {
-        state[name] = id;
-      }
-      if (onSelect && changed) {
-        onSelect(id, name, value);
-      }
-      if (context && changed) {
-        context.change(id, name);
-      }
-    },
-    [value, state, name, menu, context, onSelect],
-  );
+    if (onSelect && changed) {
+      onSelect(id, name, value);
+    }
+    if (context && changed) {
+      context.change(id, name);
+    }
+  };
 
   useLayoutEffect(() => {
     onSwitch?.(isOpened);
