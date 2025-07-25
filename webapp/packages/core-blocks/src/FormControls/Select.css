@@ -17,16 +17,6 @@
     --dbv-kit-select-padding-inline: 0;
     padding-left: 12px;
     padding-right: 4px;
-
-    &[aria-expanded='true']:focus {
-      outline: none;
-    }
-
-    &[aria-expanded='true'],
-    &[aria-controls] {
-      --dbv-kit-select-hover-border-color: var(--theme-primary);
-      --dbv-kit-select-border-color: var(--theme-primary);
-    }
   }
 
   .dbv-kit-select__item {
