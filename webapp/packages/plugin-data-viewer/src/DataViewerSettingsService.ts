@@ -70,6 +70,7 @@ export class DataViewerSettingsService extends Dependency {
     private readonly settingsTransformationService: SettingsTransformationService,
     private readonly serverSettingsManagerService: ServerSettingsManagerService,
   ) {
+    // Some settings registered in plugin-data-editor-public-settings & permissions
     super();
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
     this.settingsResolverService.addResolver(
