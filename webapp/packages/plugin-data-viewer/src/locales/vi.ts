@@ -1,5 +1,5 @@
 export default [
-  ['plugin_data_viewer_data_viewer_settings_group', 'Trình xem dữ liệu'],
+  ['plugin_data_viewer_data_viewer_settings_group', 'Trình chỉnh sửa dữ liệu'],
   ['table_header_sql_expression', 'Nhập biểu thức SQL để lọc kết quả, ví dụ: column_name=10'],
   ['table_header_sql_expression_not_supported', 'Lọc dữ liệu không được hỗ trợ'],
   ['data_viewer_tab_title', 'Dữ liệu'],

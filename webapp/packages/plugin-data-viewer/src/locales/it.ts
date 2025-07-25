@@ -1,5 +1,5 @@
 export default [
-  ['plugin_data_viewer_data_viewer_settings_group', 'Data Viewer'],
+  ['plugin_data_viewer_data_viewer_settings_group', 'Data Editor'],
   ['table_header_sql_expression', 'Digita una espresione SQL per filtrare i risultati'],
   ['table_header_sql_expression_not_supported', 'Data filter is not supported'],
   ['data_viewer_tab_title', 'Dati'],

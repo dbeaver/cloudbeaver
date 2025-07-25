@@ -17,6 +17,6 @@ export default [
   ['data_editor_public_settings_disable_data_import_name', 'Tắt Nhập dữ liệu'],
   [
     'data_editor_public_settings_disable_data_import_description',
-    'Tắt tính năng nhập dữ liệu trong Data Viewer đối với người dùng không phải quản trị viên',
+    'Tắt tính năng nhập dữ liệu trong Data Editor đối với người dùng không phải quản trị viên',
   ],
 ];

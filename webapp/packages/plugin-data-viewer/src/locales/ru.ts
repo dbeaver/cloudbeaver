@@ -1,5 +1,5 @@
 export default [
-  ['plugin_data_viewer_data_viewer_settings_group', 'Просмотр данных'],
+  ['plugin_data_viewer_data_viewer_settings_group', 'Редактор данных'],
   ['table_header_sql_expression', 'Введите SQL выражение чтобы отфильтровать результаты, например, column_name=10'],
   ['table_header_sql_expression_not_supported', 'Фильтрация данных недоступна'],
   ['data_viewer_tab_title', 'Данные'],

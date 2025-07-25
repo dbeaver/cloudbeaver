@@ -1,5 +1,5 @@
 export default [
-  ['plugin_data_viewer_data_viewer_settings_group', '数据查看器'],
+  ['plugin_data_viewer_data_viewer_settings_group', '資料編輯器'],
   ['table_header_sql_expression', '输入SQL表达式以过滤结果'],
   ['table_header_sql_expression_not_supported', '不支持数据过滤器'],
   ['data_viewer_tab_title', '数据'],
