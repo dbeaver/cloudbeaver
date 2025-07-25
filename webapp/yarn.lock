@@ -2689,6 +2689,7 @@ __metadata:
   dependencies:
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/plugin-data-import": "workspace:*"
