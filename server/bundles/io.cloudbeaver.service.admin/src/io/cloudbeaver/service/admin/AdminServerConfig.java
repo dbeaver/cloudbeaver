@@ -20,6 +20,7 @@ import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
 import java.util.Arrays;
@@ -30,6 +31,7 @@ import java.util.Map;
  * Server configuration for admin API
  */
 public class AdminServerConfig {
+    private static final Log log = Log.getLog(AdminServerConfig.class);
 
     private String serverName;
     private String serverURL;
@@ -108,8 +110,8 @@ public class AdminServerConfig {
             this.forceHttps = null;
         }
 
-        if (params.containsKey("supportedHosts")) {
-            this.supportedHosts = JSONUtils.getStringList(params, "supportedHosts");
+        if (params.containsKey(CBConstants.PARAM_SUPPORTED_HOSTS)) {
+            this.supportedHosts = JSONUtils.getStringList(params, CBConstants.PARAM_SUPPORTED_HOSTS);
         } else {
             this.supportedHosts = null;
         }

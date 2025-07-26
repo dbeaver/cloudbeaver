@@ -23,6 +23,7 @@ import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 
+import java.net.URI;
 import java.util.*;
 
 public class CBServerConfig implements WebServerConfiguration {
@@ -199,8 +200,17 @@ public class CBServerConfig implements WebServerConfiguration {
     }
 
     public void setSupportedHosts(@NotNull Collection<String> availableHosts) {
+        LinkedHashSet<String> uniqueHosts = new LinkedHashSet<>();
+        for (String host : availableHosts) {
+            try {
+                URI uri = URI.create(host);
+                uniqueHosts.add(uri.getHost() != null ? uri.getHost() : host);
+            } catch (Exception e) {
+                log.error("Invalid host URI: " + host, e);
+            }
+        }
         this.supportedHosts.clear();
-        this.supportedHosts.addAll(availableHosts);
+        this.supportedHosts.addAll(uniqueHosts);
     }
 
     public boolean isBindSessionToIp() {
