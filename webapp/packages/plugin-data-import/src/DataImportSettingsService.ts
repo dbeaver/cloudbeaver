@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
+import { SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
@@ -24,8 +24,12 @@ export class DataImportSettingsService {
 
   readonly settings: SettingsProvider<typeof defaultSettings>;
 
-  constructor(private readonly settingsProviderService: SettingsProviderService) {
-    // Registered in plugin-data-editor-public-settings & permissions
-    this.settings = this.settingsProviderService.schema.shape;
+  constructor(
+    private readonly settingsProviderService: SettingsProviderService,
+    private readonly settingsManagerService: SettingsManagerService,
+  ) {
+    this.settings = this.settingsProviderService.createSettings(defaultSettings);
+
+    this.settingsManagerService.registerSettings<typeof defaultSettings>(() => []);
   }
 }
