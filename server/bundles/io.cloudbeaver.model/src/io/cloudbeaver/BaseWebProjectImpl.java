@@ -27,10 +27,8 @@ import org.jkiss.dbeaver.model.rm.RMControllerProvider;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.Pair;
 
 import java.nio.file.Path;
-import java.util.Collection;
 
 public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMControllerProvider {
 
@@ -102,50 +100,6 @@ public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMCo
     @Override
     public boolean isUseSecretStorage() {
         return false;
-    }
-
-    /**
-     * Method for Bulk Update of resources properties paths
-     *
-     * @param oldToNewPaths collection of OldPath to NewPath pairs
-     */
-    public void moveResourcePropertiesBatch(@NotNull Collection<Pair<String, String>> oldToNewPaths) {
-        loadMetadata();
-        synchronized (metadataSync) {
-            for (var pathsPair : oldToNewPaths) {
-                final var oldResourcePath = CommonUtils.normalizeResourcePath(pathsPair.getFirst());
-                final var newResourcePath = CommonUtils.normalizeResourcePath(pathsPair.getSecond());
-                final var resProps = resourceProperties.remove(oldResourcePath);
-                if (resProps != null) {
-                    resourceProperties.put(newResourcePath, resProps);
-                }
-            }
-        }
-        flushMetadata();
-    }
-
-    /**
-     * Method for Bulk Remove of resources properties
-     */
-    public boolean resetResourcesPropertiesBatch(@NotNull Collection<String> resourcesPaths) {
-        loadMetadata();
-        boolean propertiesChanged = false;
-        synchronized (metadataSync) {
-            for (var resourcePath : resourcesPaths) {
-                var removedProperties = resourceProperties.remove(CommonUtils.normalizeResourcePath(resourcePath));
-                if (removedProperties != null) {
-                    propertiesChanged = true;
-                }
-            }
-        }
-        if (propertiesChanged) {
-            flushMetadata();
-        }
-        return propertiesChanged;
-    }
-
-    public Path getMetadataFilePath() {
-        return getMetadataPath().resolve(METADATA_STORAGE_FILE);
     }
 
     @Override

@@ -16,9 +16,6 @@
  */
 package io.cloudbeaver.model.rm.local;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.service.security.SMUtils;
@@ -50,8 +47,6 @@ import org.jkiss.utils.IOUtils;
 import org.jkiss.utils.Pair;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.text.MessageFormat;
 import java.time.OffsetDateTime;
@@ -67,10 +62,6 @@ import java.util.stream.Stream;
 public class LocalResourceController extends BaseLocalResourceController {
 
     private static final Log log = Log.getLog(LocalResourceController.class);
-    private static final Gson GSON = new GsonBuilder()
-        .setPrettyPrinting()
-        .create();
-    private static final String PROJECT_INFO_CONF = ".project-info.conf";
 
     protected final SMCredentialsProvider credentialsProvider;
 
@@ -81,7 +72,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     private Supplier<SMController> smControllerSupplier;
     protected final List<RMFileOperationHandler> fileHandlers;
 
-    private final Map<String, BaseWebProjectImpl> projectRegistries = new LinkedHashMap<>();
+    private final Map<String, RMLocalProject> projectRegistries = new LinkedHashMap<>();
 
     public LocalResourceController(
         DBPWorkspace workspace,
@@ -116,13 +107,11 @@ public class LocalResourceController extends BaseLocalResourceController {
         return userId == null ? null : this.userProjectsPath.resolve(userId);
     }
 
-    protected BaseWebProjectImpl getWebProject(String projectId, boolean refresh) throws DBException {
+    protected RMLocalProject getWebProject(String projectId, boolean refresh) throws DBException {
         synchronized (projectRegistries) {
-            BaseWebProjectImpl project = projectRegistries.get(projectId);
+            RMLocalProject project = projectRegistries.get(projectId);
             if (project == null || refresh) {
-                SessionContextImpl sessionContext = new SessionContextImpl(null);
-                RMProject rmProject = makeProjectFromId(projectId, false);
-                project = createWebProjectImpl(projectId, sessionContext, rmProject);
+                project = createWebProjectImpl(projectId, new SessionContextImpl(null));
                 projectRegistries.put(projectId, project);
             }
             return project;
@@ -130,12 +119,11 @@ public class LocalResourceController extends BaseLocalResourceController {
     }
 
     @NotNull
-    protected InternalWebProjectImpl createWebProjectImpl(
-        String projectId,
-        SessionContextImpl sessionContext,
-        RMProject rmProject
+    protected RMLocalProject createWebProjectImpl(
+        @NotNull String projectId,
+        @NotNull SessionContextImpl sessionContext
     ) throws DBException {
-        return new InternalWebProjectImpl(sessionContext, rmProject, getProjectPath(projectId));
+        return new RMLocalProject(workspace, sessionContext, getProjectPath(projectId), parseProjectName(projectId).getType());
     }
 
     @NotNull
@@ -256,7 +244,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                 var allPaths = list.toList();
                 for (Path path : allPaths) {
                     var projectPerms = getProjectPermissions(
-                        makeProjectIdFromPath(path, RMProjectType.SHARED),
+                        RMUtils.makeProjectIdFromPath(path, RMProjectType.SHARED),
                         RMProjectType.SHARED
                     );
                     var rmProject = makeProjectFromPath(path, projectPerms, RMProjectType.SHARED, false);
@@ -306,7 +294,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     @Override
     public RMProject updateProject(@NotNull String projectId, @NotNull RMProjectInfo projectInfo) throws DBException {
         try (var projectLock = lockController.lock(projectId, "updateProject")) {
-            BaseWebProjectImpl project = getWebProject(projectId, false);
+            RMLocalProject project = getWebProject(projectId, false);
             Path targetPath = getProjectPath(projectId);
             if (!Files.exists(targetPath)) {
                 throw new DBException("Project folder '" + projectId + "' not found");
@@ -658,7 +646,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     ) throws DBException {
         try (var ignoredLock = lockController.lock(projectId, "resourcePropertyUpdate")) {
             validateResourcePath(resourcePath);
-            BaseWebProjectImpl webProject = getWebProject(projectId, false);
+            RMLocalProject webProject = getWebProject(projectId, false);
             doFileWriteOperation(projectId, webProject.getMetadataFilePath(),
                 () -> {
                     log.debug("Updating resource property '" + propertyName + "' in project '" + projectId + "'");
@@ -679,7 +667,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     ) throws DBException {
         try (var ignoredLock = lockController.lock(projectId, "resourcePropertyUpdate")) {
             validateResourcePath(resourcePath);
-            BaseWebProjectImpl webProject = getWebProject(projectId, false);
+            RMLocalProject webProject = getWebProject(projectId, false);
             doFileWriteOperation(projectId, webProject.getMetadataFilePath(),
                 () -> {
                     log.debug("Updating resource '" + resourcePath + "' properties in project '" + projectId + "'");
@@ -711,12 +699,6 @@ public class LocalResourceController extends BaseLocalResourceController {
         } catch (InvalidPathException e) {
             throw new DBException("Resource path contains invalid characters");
         }
-    }
-
-
-    private String makeProjectIdFromPath(Path path, RMProjectType type) {
-        String projectName = path.getFileName().toString();
-        return type.getPrefix() + "_" + projectName;
     }
 
     @Nullable
@@ -758,14 +740,9 @@ public class LocalResourceController extends BaseLocalResourceController {
             .flatMap(rmProjectPermission -> rmProjectPermission.getAllPermissions().stream())
             .toArray(String[]::new);
 
-        RMProject project = new RMProject();
-        project.setName(path.getFileName().toString());
-        project.setId(makeProjectIdFromPath(path, type));
-        project.setType(type);
+        RMLocalProject webProject = new RMLocalProject(workspace, new SessionContextImpl(null), path, type);
+        RMProject project = webProject.getRMProject();
         project.setProjectPermissions(allProjectPermissions);
-        InternalWebProjectImpl webProject = new InternalWebProjectImpl(new SessionContextImpl(null), project, path);
-        project.setName(webProject.getName());
-        project.setDescription(webProject.getDescription());
         if (Files.exists(path)) {
             try {
                 project.setCreateTime(
@@ -782,19 +759,6 @@ public class LocalResourceController extends BaseLocalResourceController {
             .toArray(RMResourceType[]::new));
 
         return project;
-    }
-
-    @NotNull
-    private RMProjectInfo readProjectInfo(@NotNull Path projectPath) {
-        Path projectInfoPath = projectPath.resolve(PROJECT_INFO_CONF);
-        if (Files.exists(projectInfoPath)) {
-            try (Reader reader = Files.newBufferedReader(projectInfoPath, StandardCharsets.UTF_8)) {
-                return GSON.fromJson(reader, RMProjectInfo.class);
-            } catch (IOException e) {
-                log.error("Error reading project information from " + projectInfoPath, e);
-            }
-        }
-        return new RMProjectInfo(projectPath.getFileName().toString(), null);
     }
 
     private void createResourceTypeFolders(Path path) {

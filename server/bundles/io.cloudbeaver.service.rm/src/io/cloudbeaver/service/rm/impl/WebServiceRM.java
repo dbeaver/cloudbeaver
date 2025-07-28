@@ -283,12 +283,11 @@ public class WebServiceRM implements DBWServiceRM {
             projectInfo.setName(name == null ? project.getRMProject().getName() : name);
             projectInfo.setDescription(description == null ? project.getRMProject().getDescription() : description);
             RMProject rmProject = getResourceController(session).updateProject(projectId, projectInfo);
-            project.getRMProject().setName(rmProject.getName());
-            project.getRMProject().setDescription(rmProject.getDescription());
+            project.updateProject(name, description);
             ServletAppUtils.getServletApplication().getEventController().addEvent(
-                WSProjectUpdateEvent.update(session.getSessionId(), session.getUserId(), rmProject.getId())
+                WSProjectUpdateEvent.update(session.getSessionId(), session.getUserId(), rmProject.getId(), projectInfo)
             );
-            return rmProject;
+            return project.getRMProject();
         } catch (DBException e) {
             throw new DBWebException("Error creating project", e);
         }

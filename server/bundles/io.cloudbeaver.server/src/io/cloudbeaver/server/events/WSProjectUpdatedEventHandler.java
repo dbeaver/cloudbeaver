@@ -38,6 +38,13 @@ public class WSProjectUpdatedEventHandler extends WSAbstractProjectEventHandler<
             } else if (WSProjectUpdateEvent.REMOVED.equals(eventId)) {
                 activeUserSession.removeSessionProject(projectId);
                 log.info("Project '" + projectId + "' removed from '" + activeUserSession.getSessionId() + "' session");
+            } else if (WSProjectUpdateEvent.UPDATED.equals(eventId)) {
+                if (event.getProjectInfo() == null) {
+                    log.warn("No project info provided for update event: " + event);
+                    return;
+                }
+                activeUserSession.updateSessionProject(projectId, event.getProjectInfo());
+                log.info("Project '" + projectId + "' updated in '" + activeUserSession.getSessionId() + "' session");
             }
             activeUserSession.addSessionEvent(event);
         } catch (DBException e) {

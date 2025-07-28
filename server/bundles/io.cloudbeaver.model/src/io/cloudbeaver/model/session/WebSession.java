@@ -49,10 +49,7 @@ import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
-import org.jkiss.dbeaver.model.rm.RMController;
-import org.jkiss.dbeaver.model.rm.RMProject;
-import org.jkiss.dbeaver.model.rm.RMProjectType;
-import org.jkiss.dbeaver.model.rm.RMUtils;
+import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -979,6 +976,16 @@ public class WebSession extends BaseWebSession
         super.addSessionProject(projectId);
         var rmProject = getRmController().getProject(projectId, false, false);
         createWebProject(rmProject);
+    }
+
+    @Override
+    public void updateSessionProject(@NotNull String projectId, @NotNull RMProjectInfo rmProjectInfo) throws DBException {
+        super.updateSessionProject(projectId, rmProjectInfo);
+        var project = getProjectById(projectId);
+        if (project == null) {
+            throw new DBException("Project not found: " + projectId);
+        }
+        project.updateProject(rmProjectInfo.getName(), rmProjectInfo.getDescription());
     }
 
     @Override
