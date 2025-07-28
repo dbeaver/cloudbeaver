@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.server.jetty;
 
+import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.utils.ServletAppUtils;
 import jakarta.servlet.*;
@@ -42,7 +43,8 @@ public class RequestHostFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         if (request instanceof HttpServletRequest httpRequest) {
-            List<String> availableHosts = application.getServerConfiguration().getSupportedHosts();
+            CBServerConfig serverConfig = application.getServerConfiguration();
+            List<String> availableHosts = serverConfig.getSupportedHosts();
             if (CommonUtils.isEmpty(availableHosts)) {
                 chain.doFilter(request, response);
                 return;
@@ -53,6 +55,9 @@ public class RequestHostFilter implements Filter {
                 String requestHost = uri.getHost();
                 if (!availableHosts.contains(requestHost)) {
                     log.warn("Request host '" + requestHost + "' is not allowed. Redirect to default: " + availableHosts);
+                    redirect((HttpServletResponse) response, httpRequest, availableHosts);
+                } else if ("http".equals(uri.getHost()) && serverConfig.isForceHttps()) {
+                    log.warn("Request host '" + requestHost + "' is not secure. Redirect to HTTPS: " + availableHosts);
                     redirect((HttpServletResponse) response, httpRequest, availableHosts);
                 }
             } catch (Throwable e) {
