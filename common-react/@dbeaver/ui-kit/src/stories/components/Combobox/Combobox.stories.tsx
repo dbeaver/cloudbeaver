@@ -26,7 +26,7 @@ function Simple() {
 function FlexibleLayout() {
   return (
     <ComboboxProvider>
-      <SearchContextProvider searchOptions={{ threshold: 0.2 }}>
+      <SearchContextProvider searchOptions={{ caseSensitive: false }}>
         <div className="search-container">
           {/* Input in header */}
           <header className="search-header">
@@ -222,9 +222,8 @@ function AdvancedSearch() {
     <ComboboxProvider>
       <SearchContextProvider
         searchOptions={{
-          threshold: 0.3,
-          keys: ['name', 'category'],
-          includeScore: true,
+          caseSensitive: false,
+          searchFields: ['name', 'category'],
         }}
       >
         <div className="product-search">

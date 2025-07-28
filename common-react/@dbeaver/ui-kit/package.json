@@ -33,7 +33,6 @@
   "dependencies": {
     "@ariakit/react": "^0",
     "clsx": "^2",
-    "fuse.js": "^7.1.0",
     "react": "^19",
     "react-dom": "^19"
   }

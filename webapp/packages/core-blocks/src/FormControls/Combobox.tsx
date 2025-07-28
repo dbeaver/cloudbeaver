@@ -147,7 +147,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           title={title}
           id={inputId}
           {...rest}
-        ></ComboboxInput>
+        />
         {loading ? (
           <Spinner size="small" className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2" />
         ) : (

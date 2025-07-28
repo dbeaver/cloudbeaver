@@ -21,7 +21,6 @@ import {
   useStoreState,
 } from '@ariakit/react';
 import clsx from 'clsx';
-import Fuse, { type IFuseOptions } from 'fuse.js';
 import {
   createContext,
   type HTMLAttributes,
@@ -51,9 +50,14 @@ const SearchContext = createContext<SearchContextValue>({
   isItemVisible: () => true,
 });
 
+interface SearchOptions {
+  caseSensitive?: boolean;
+  searchFields?: string[];
+}
+
 interface SearchContextProviderProps {
   children: ReactNode;
-  searchOptions?: IFuseOptions<any>;
+  searchOptions?: SearchOptions;
   defaultValue?: string;
 }
 
@@ -63,8 +67,7 @@ interface SearchContextProviderProps {
 export function SearchContextProvider({
   children,
   searchOptions = {
-    includeScore: false,
-    threshold: 0.3,
+    caseSensitive: false,
   },
   defaultValue,
 }: SearchContextProviderProps) {
@@ -74,32 +77,27 @@ export function SearchContextProvider({
   const searchValue = useStoreState(store, 'value') || '';
   const deferredValue = useDeferredValue(searchValue);
 
-  const isObjectSearch = useMemo(() => Array.isArray(searchOptions.keys) && searchOptions.keys.length > 0, [searchOptions.keys]);
+  const isObjectSearch = searchOptions.searchFields && searchOptions.searchFields.length > 0;
 
   const itemsList = useMemo(() => Array.from(registeredItems), [registeredItems]);
-
-  const searchData = useMemo(() => {
-    if (isObjectSearch) {
-      return itemsList.map(value => {
-        const data = itemsData.get(value) || {};
-        return { value, ...data };
-      });
-    }
-    return itemsList;
-  }, [itemsList, itemsData, isObjectSearch]);
-
-  const fuse = useMemo(() => new Fuse(searchData, searchOptions), [searchData, searchOptions]);
 
   const matches = useMemo(() => {
     if (deferredValue.trim() === '' || deferredValue === defaultValue) return itemsList;
 
-    const results = fuse.search(deferredValue);
-    if (isObjectSearch) {
-      return results.map(result => (result.item as any).value);
-    }
+    const searchTerm = searchOptions.caseSensitive ? deferredValue : deferredValue.toLowerCase();
 
-    return results.map(result => result.item as string);
-  }, [fuse, deferredValue, itemsList, defaultValue, isObjectSearch]);
+    return itemsList.filter(value => {
+      if (isObjectSearch) {
+        const data = itemsData.get(value) || {};
+        const searchableValues = searchOptions.searchFields!.map(field => data[field] || '').join(' ');
+        const targetText = searchOptions.caseSensitive ? searchableValues : searchableValues.toLowerCase();
+        return targetText.includes(searchTerm);
+      }
+
+      const targetText = searchOptions.caseSensitive ? value : value.toLowerCase();
+      return targetText.includes(searchTerm);
+    });
+  }, [deferredValue, itemsList, defaultValue, isObjectSearch, itemsData, searchOptions]);
 
   const registerItem = useCallback((value: string, searchData?: Record<string, any>) => {
     setRegisteredItems(prev => new Set(prev).add(value));
@@ -236,7 +234,7 @@ export function ComboboxEmpty(props: ComboboxEmptyProps) {
 export interface ComboboxRootProps {
   children: ReactNode;
   defaultValue?: string;
-  searchOptions?: IFuseOptions<any>;
+  searchOptions?: SearchOptions;
   comboboxProps?: ComboboxProviderProps;
   className?: string;
 }
