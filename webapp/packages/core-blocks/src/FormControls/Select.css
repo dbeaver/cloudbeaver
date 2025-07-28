@@ -14,25 +14,8 @@
 
 @layer components {
   .dbv-kit-select {
-    --dbv-kit-select-padding-inline: 0;
-    padding-left: 12px;
-    padding-right: 4px;
-  }
-
-  .dbv-kit-select__item {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-
-  .dbv-kit-select__popover {
-    overflow-x: hidden;
-  }
-
-  .select__field {
-    width: 100%;
-    --dbv-kit-select-font-size: 12px;
     --dbv-kit-select-border-width: 2px;
+    --dbv-kit-select-font-size: 12px;
     --dbv-kit-select-hover-border-color: var(--theme-background);
 
     --dbv-kit-select-border-color: var(--theme-input-border);
@@ -49,6 +32,27 @@
 
     --dbv-kit-control-disabled-opacity: 1;
     --dbv-kit-select-disabled-background: var(--theme-input-background-disabled);
+
+    --dbv-kit-select-border-radius: 3px;
+
+    outline-offset: calc(-1 * var(--dbv-kit-select-border-width));
+    padding-left: 12px;
+    padding-right: 4px;
+    outline-offset: -2px;
+  }
+
+  .dbv-kit-select__item {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .dbv-kit-select__popover {
+    overflow-x: hidden;
+  }
+
+  .select__field {
+    width: 100%;
   }
 
   .select__field--inline {
