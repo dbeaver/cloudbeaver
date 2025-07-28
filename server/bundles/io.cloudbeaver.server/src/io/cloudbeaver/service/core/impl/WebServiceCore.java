@@ -54,6 +54,7 @@ import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
+import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 import org.jkiss.dbeaver.registry.settings.ProductSettingsRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
@@ -644,8 +645,8 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
-    public WebProductSettings getProductSettings(@NotNull WebSession webSession) {
-        return new WebProductSettings(webSession, ProductSettingsRegistry.getInstance().getSettings());
+    public WebGroupPropertiesInfo<ProductSettingDescriptor> getProductSettings(@NotNull WebSession webSession) {
+        return new WebGroupPropertiesInfo<>(webSession, ProductSettingsRegistry.getInstance().getSettings());
     }
 
     private WebSessionProjectImpl getProjectById(WebSession webSession, String projectId) throws DBWebException {

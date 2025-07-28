@@ -21,7 +21,8 @@ const settingsSchema = schema.object({
   'core.theming.theme': schema.string().default(FALLBACK_THEME_ID),
 });
 
-export type IThemeSettings = schema.infer<typeof settingsSchema>;
+export type IThemeSettingsSchema = typeof settingsSchema;
+export type IThemeSettings = schema.infer<IThemeSettingsSchema>;
 export type IThemeSettingsKey = keyof IThemeSettings;
 
 @injectable()
@@ -29,7 +30,7 @@ export class ThemeSettingsService {
   get theme(): string {
     return this.settings.getValue('core.theming.theme');
   }
-  readonly settings: SettingsProvider<typeof settingsSchema>;
+  readonly settings: SettingsProvider<IThemeSettingsSchema>;
 
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
@@ -40,11 +41,11 @@ export class ThemeSettingsService {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, { 'core.theming.theme': 'core.user.defaultTheme' }),
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+      createSettingsAliasResolver<IThemeSettingsSchema>(this.settingsResolverService, { 'core.theming.theme': 'core.user.defaultTheme' }),
+      createSettingsAliasResolver<IThemeSettingsSchema>(this.settingsResolverService, {
         'core.theming.theme': 'core.localization.defaultTheme',
       }),
-      createSettingsAliasResolver(this.settingsResolverService, this.settings, { 'core.theming.theme': 'app.defaultTheme' }),
+      createSettingsAliasResolver<IThemeSettingsSchema>(this.settingsResolverService, { 'core.theming.theme': 'app.defaultTheme' }),
     );
   }
 }

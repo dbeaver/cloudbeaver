@@ -73,15 +73,15 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     return this.executionContext?.projectId ?? null;
   }
 
-  get features(): ESqlDataSourceFeatures[] {
-    return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable];
-  }
-
   readonly icon: string;
   readonly history: ISqlDataSourceHistory;
   readonly onUpdate: ISyncExecutor;
   readonly onSetScript: ISyncExecutor<ISetScriptData>;
   readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<QueryDataSource>[]>;
+
+  protected get features(): ESqlDataSourceFeatures[] {
+    return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable];
+  }
 
   protected outdated: boolean;
   protected editing: boolean;
@@ -153,6 +153,9 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   setScript(script: string, source?: string, cursor?: ISqlEditorCursor): void {
+    if (cursor) {
+      this.setInnerCursorState(cursor);
+    }
     this.onSetScript.execute({ script, source, cursor });
   }
 
@@ -243,13 +246,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   setCursor(anchor: number, head = anchor): void {
-    const scriptLength = this.script.length;
-
-    this.innerCursorState = Object.freeze({
-      anchor: Math.min(anchor, scriptLength),
-      head: Math.min(head, scriptLength),
+    this.setInnerCursorState({
+      anchor,
+      head,
     });
-
     this.onUpdate.execute();
   }
 
@@ -305,4 +305,12 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
   protected abstract setBaseScript(script: string): void;
   protected abstract setBaseExecutionContext(executionContext: IConnectionExecutionContextInfo | undefined): void;
+  protected setInnerCursorState(cursor: ISqlEditorCursor): void {
+    const scriptLength = this.script.length;
+
+    this.innerCursorState = Object.freeze({
+      anchor: Math.min(cursor.anchor, scriptLength),
+      head: Math.min(cursor.head, scriptLength),
+    });
+  }
 }

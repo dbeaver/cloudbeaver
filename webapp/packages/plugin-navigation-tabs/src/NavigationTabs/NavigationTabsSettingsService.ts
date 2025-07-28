@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import {
   ESettingsValueType,
   INTERFACE_SETTINGS_GROUP,
@@ -23,7 +23,7 @@ const settings = schema.object({
 type Settings = typeof settings;
 
 @injectable()
-export class NavigationTabsSettingsService extends Dependency {
+export class NavigationTabsSettingsService {
   readonly settings: SettingsProvider<Settings>;
 
   get hasMultipleRows(): boolean {
@@ -34,14 +34,11 @@ export class NavigationTabsSettingsService extends Dependency {
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
   ) {
-    super();
     this.settings = this.settingsProviderService.createSettings(settings);
-
-    this.registerSettings();
   }
 
-  private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+  registerSettingsUI() {
+    this.settingsManagerService.registerSettings<Settings>(() => [
       {
         group: INTERFACE_SETTINGS_GROUP,
         key: 'plugin.navigation-tabs.multipleRows',
