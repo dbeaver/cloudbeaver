@@ -53,11 +53,11 @@ public class RequestHostFilter implements Filter {
 
     private void validateSchema(CBServerConfig serverConfig, HttpServletRequest httpRequest, ServletResponse response) throws IOException {
         boolean httpsExpected = serverConfig.isForceHttps();
-        if ("http".equals(httpRequest.getScheme()) && httpsExpected) {
-            try {
+        try {
+            String origin = ServletAppUtils.getOriginFromRequestOrThrow(httpRequest);
+            URI originUri = URI.create(origin);
+            if ("http".equals(originUri.getScheme()) && httpsExpected) {
                 log.warn("Request schema is 'http' but 'forceHttps' is enabled. Redirecting to 'https'.");
-                String origin = ServletAppUtils.getOriginFromRequestOrThrow(httpRequest);
-                URI originUri = URI.create(origin);
                 StringBuilder redirectUrlBuilder = new StringBuilder("https://")
                     .append(originUri.getHost());
                 if (originUri.getPort() > -1) {
@@ -69,9 +69,10 @@ public class RequestHostFilter implements Filter {
                         .append(httpRequest.getQueryString());
                 }
                 ((HttpServletResponse) response).sendRedirect(redirectUrlBuilder.toString());
-            } catch (Exception e) {
-                log.error("Failed to redirect to HTTPS", e);
+
             }
+        } catch (Exception e) {
+            log.error("Failed to redirect to HTTPS", e);
         }
     }
 
