@@ -202,6 +202,9 @@ public class WebSQLContextInfo implements WebSessionProvider {
 
     public void trySaveQueryResults(@NotNull WebSQLQueryResults[] resultsArray, int requestedLimit) {
 
+        if (resultsArray[0].getResultSet() == null) {
+            return;
+        }
         boolean isSingleResult = resultsArray.length == 1;
         int actualRowCount = isSingleResult ? resultsArray[0].getResultSet().getRows().length : 0;
         if (isSingleResult && actualRowCount < Math.min(requestedLimit, MAX_RESULT_SET_SIZE)) {
