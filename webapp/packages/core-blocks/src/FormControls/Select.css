@@ -34,11 +34,10 @@
     --dbv-kit-select-disabled-background: var(--theme-input-background-disabled);
 
     --dbv-kit-select-border-radius: 3px;
+    --dbv-kit-control-outline-offset: -2px;
 
-    outline-offset: calc(-1 * var(--dbv-kit-select-border-width));
     padding-left: 12px;
     padding-right: 4px;
-    outline-offset: -2px;
   }
 
   .dbv-kit-select__item {

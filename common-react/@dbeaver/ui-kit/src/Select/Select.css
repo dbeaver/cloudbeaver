@@ -20,7 +20,6 @@
     font-weight: var(--dbv-kit-select-font-weight);
     font-size: var(--dbv-kit-select-font-size);
     outline-width: var(--dbv-kit-control-outline-width);
-    outline-offset: var(--dbv-kit-control-outline-offset);
     outline-color: var(--dbv-kit-control-outline-color);
 
     &:hover:not(:disabled) {
@@ -34,6 +33,7 @@
     }
     &:focus-visible {
       outline-style: solid;
+      outline-offset: var(--dbv-kit-control-outline-offset);
     }
   }
 
