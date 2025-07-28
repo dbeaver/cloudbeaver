@@ -36,6 +36,7 @@ export class DataImportSettingsService {
     private readonly settingsManagerService: SettingsManagerService,
     private readonly settingsResolverService: SettingsResolverService,
   ) {
+    // Some settings registered in plugin-data-editor-public-settings & permissions
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
 
     this.settingsResolverService.addResolver(
@@ -43,7 +44,7 @@ export class DataImportSettingsService {
       createSettingsOverrideResolver<DataImportSettingsSchema>(this.settingsResolverService, {
         'plugin.data-import.disabled': {
           key: 'permission.data-editor.import.enable',
-          filter: value => !value,
+          map: value => !value,
         },
       }),
     );

@@ -99,15 +99,15 @@ export class DataViewerSettingsService extends Dependency {
       createSettingsOverrideResolver<DataViewerSettingsSchema>(this.settingsResolverService, {
         'plugin.data-viewer.disableEdit': {
           key: 'permission.data-editor.editing.enable',
-          filter: value => !value,
+          map: value => !value,
         },
         'plugin.data-viewer.disableCopyData': {
           key: 'permission.data-editor.copy.enable',
-          filter: value => !value,
+          map: value => !value,
         },
         'plugin.data-viewer.export.disabled': {
           key: 'permission.data-editor.export.enable',
-          filter: value => !value,
+          map: value => !value,
         },
       }),
     );
