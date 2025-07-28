@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Button, Container, Form, s, StatusMessage, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
-import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
+import { FormMode, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
 import style from './TeamForm.module.css';
@@ -44,7 +44,9 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
         notificationService.logSuccess({ title, message });
 
         onSave?.();
-        onCancel?.();
+        if (initialMode === FormMode.Create) {
+          onCancel?.();
+        }
       } else {
         if (exception) {
           const errorKey = state.mode === 'create' ? 'administration_teams_team_create_error' : 'administration_teams_team_save_error';

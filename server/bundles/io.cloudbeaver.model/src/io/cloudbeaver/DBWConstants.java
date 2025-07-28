@@ -30,6 +30,7 @@ public interface DBWConstants {
     String PERMISSION_PRIVATE_PROJECT_ACCESS = "private-project-access";
     String PERMISSION_SECRET_MANAGER = "secret-manager";
 
+    String GLOBAL_PERMISSION_SCRIPT_EXECUTE = "permission.sql.script.execution";
 
     String PERMISSION_EDIT_STRUCTURE = "edit-meta";
     String PERMISSION_EDIT_DATA = "edit-data";

@@ -32,7 +32,7 @@ export class CustomConnectionSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings<typeof settings>(() => [
       {
         key: 'plugin.connection-custom.disabled',
         access: {

@@ -1,4 +1,5 @@
 export default [
+  ['authentication_administration_pages_label', 'Pages'],
   ['authentication_administration_user_connections_user_add', 'Tạo Người dùng'],
   ['authentication_administration_user_connections_user_new', 'Người dùng mới'],
   ['authentication_administration_user_connections_access_load_fail', 'Tải kết nối được cấp cho người dùng thất bại'],
