@@ -6,7 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
+import { HIGHEST_SETTINGS_LAYER } from '@cloudbeaver/core-root';
+import {
+  createSettingsOverrideResolver,
+  SettingsManagerService,
+  SettingsProvider,
+  SettingsProviderService,
+  SettingsResolverService,
+} from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
@@ -27,8 +34,19 @@ export class DataImportSettingsService {
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
+    private readonly settingsResolverService: SettingsResolverService,
   ) {
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
+
+    this.settingsResolverService.addResolver(
+      HIGHEST_SETTINGS_LAYER,
+      createSettingsOverrideResolver<DataImportSettingsSchema>(this.settingsResolverService, {
+        'plugin.data-import.disabled': {
+          key: 'permission.data-editor.import.enable',
+          filter: value => !value,
+        },
+      }),
+    );
 
     this.settingsManagerService.registerSettings<typeof defaultSettings>(() => []);
   }

@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { ServerSettingsManagerService, SettingsTransformationService } from '@cloudbeaver/core-root';
+import { HIGHEST_SETTINGS_LAYER, ServerSettingsManagerService, SettingsTransformationService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
+  createSettingsOverrideResolver,
   ESettingsValueType,
   type ISettingDescription,
   ROOT_SETTINGS_LAYER,
@@ -77,12 +78,37 @@ export class DataViewerSettingsService extends Dependency {
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
       createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsResolverService, {
+        'plugin.data-viewer.disableEdit': 'core.app.dataViewer.disableEdit',
+        'plugin.data-viewer.disableCopyData': 'core.app.dataViewer.disableCopyData',
         'plugin.data-viewer.fetchMax': 'core.app.dataViewer.fetchMax',
+        'plugin.data-viewer.export.disabled': 'plugin.data-export.disabled',
         'resultset.maxrows': 'core.app.dataViewer.fetchDefault',
       }),
       /** @deprecated Use settings instead, will be removed in 25.0.0 */
       createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsResolverService, {
         'resultset.maxrows': 'plugin.data-viewer.fetchDefault',
+      }),
+      /** @deprecated Use settings instead, will be removed in 23.0.0 */
+      createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsResolverService, {
+        'plugin.data-viewer.export.disabled': 'plugin_data_export.disabled',
+      }),
+    );
+
+    this.settingsResolverService.addResolver(
+      HIGHEST_SETTINGS_LAYER,
+      createSettingsOverrideResolver<DataViewerSettingsSchema>(this.settingsResolverService, {
+        'plugin.data-viewer.disableEdit': {
+          key: 'permission.data-editor.editing.enable',
+          filter: value => !value,
+        },
+        'plugin.data-viewer.disableCopyData': {
+          key: 'permission.data-editor.copy.enable',
+          filter: value => !value,
+        },
+        'plugin.data-viewer.export.disabled': {
+          key: 'permission.data-editor.export.enable',
+          filter: value => !value,
+        },
       }),
     );
 
