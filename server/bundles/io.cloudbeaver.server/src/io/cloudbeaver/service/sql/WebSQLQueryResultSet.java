@@ -109,7 +109,7 @@ public class WebSQLQueryResultSet {
         }
         try {
             for (WebSQLQueryResultSetRow row : result) {
-                for (int i = 0; i < columns.length; i++) {
+                for (int i = 0; i < columns.length && row.getData() != null && row.getData().length == columns.length; i++) {
                     DBDAttributeBinding binding = columns[i].getAttribute();
                     row.getData()[i] = WebSQLUtils.makeWebCellValue(webSession, binding, row.getData()[i], WebDataFormat.resultset);
                 }
