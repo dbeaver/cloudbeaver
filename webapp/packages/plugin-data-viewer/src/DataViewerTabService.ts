@@ -109,7 +109,7 @@ export class DataViewerTabService {
     }
   }
 
-  private async handleTabRestore(tab: ITab<IObjectViewerTabState>) {
+  private handleTabRestore(tab: ITab<IObjectViewerTabState>) {
     return true;
   }
 
