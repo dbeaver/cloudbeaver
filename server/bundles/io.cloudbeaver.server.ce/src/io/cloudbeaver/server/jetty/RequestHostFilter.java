@@ -44,31 +44,65 @@ public class RequestHostFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         if (request instanceof HttpServletRequest httpRequest) {
             CBServerConfig serverConfig = application.getServerConfiguration();
-            List<String> availableHosts = serverConfig.getSupportedHosts();
-            if (CommonUtils.isEmpty(availableHosts)) {
-                chain.doFilter(request, response);
-                return;
-            }
-            try {
-                String origin = ServletAppUtils.getOriginFromRequestOrThrow(httpRequest);
-                URI uri = URI.create(origin);
-                String requestHost = uri.getHost();
-                if (!availableHosts.contains(requestHost)) {
-                    log.warn("Request host '" + requestHost + "' is not allowed. Redirect to default: " + availableHosts);
-                    redirect((HttpServletResponse) response, httpRequest, availableHosts);
-                } else if ("http".equals(uri.getHost()) && serverConfig.isForceHttps()) {
-                    log.warn("Request host '" + requestHost + "' is not secure. Redirect to HTTPS: " + availableHosts);
-                    redirect((HttpServletResponse) response, httpRequest, availableHosts);
-                }
-            } catch (Throwable e) {
-                log.error(e.getMessage(), e);
-                redirect((HttpServletResponse) response, httpRequest, availableHosts);
-            }
+            validateHosts(serverConfig, httpRequest, response);
+            validateSchema(serverConfig, httpRequest, response);
+
         }
         chain.doFilter(request, response);
     }
 
-    private void redirect(HttpServletResponse response, HttpServletRequest httpRequest, List<String> availableHosts) throws IOException {
+    private void validateSchema(CBServerConfig serverConfig, HttpServletRequest httpRequest, ServletResponse response) throws IOException {
+        boolean httpsExpected = serverConfig.isForceHttps();
+        if ("http".equals(httpRequest.getScheme()) && httpsExpected) {
+            try {
+                log.warn("Request schema is 'http' but 'forceHttps' is enabled. Redirecting to 'https'.");
+                String origin = ServletAppUtils.getOriginFromRequestOrThrow(httpRequest);
+                URI originUri = URI.create(origin);
+                StringBuilder redirectUrlBuilder = new StringBuilder("https://")
+                    .append(originUri.getHost());
+                if (originUri.getPort() > -1) {
+                    redirectUrlBuilder.append(':').append(originUri.getPort());
+                }
+                redirectUrlBuilder.append(httpRequest.getRequestURI());
+                if (httpRequest.getQueryString() != null) {
+                    redirectUrlBuilder.append("?")
+                        .append(httpRequest.getQueryString());
+                }
+                ((HttpServletResponse) response).sendRedirect(redirectUrlBuilder.toString());
+            } catch (Exception e) {
+                log.error("Failed to redirect to HTTPS", e);
+            }
+        }
+    }
+
+    private void validateHosts(
+        @NotNull CBServerConfig serverConfig,
+        @NotNull HttpServletRequest httpRequest,
+        @NotNull ServletResponse response
+    ) throws IOException {
+        List<String> availableHosts = serverConfig.getSupportedHosts();
+        if (CommonUtils.isEmpty(availableHosts)) {
+            return;
+        }
+        try {
+            String origin = ServletAppUtils.getOriginFromRequestOrThrow(httpRequest);
+            URI originUri = URI.create(origin);
+            String requestHost = originUri.getHost();
+            if (!availableHosts.contains(requestHost)) {
+                log.warn("Request host '" + requestHost + "' is not allowed. Redirect to default: " + availableHosts);
+                redirectToDefaultHost((HttpServletResponse) response, httpRequest, availableHosts);
+            }
+        } catch (Throwable e) {
+            log.error(e.getMessage(), e);
+            redirectToDefaultHost((HttpServletResponse) response, httpRequest, availableHosts);
+        }
+    }
+
+    private void redirectToDefaultHost(
+        @NotNull HttpServletResponse response,
+        @NotNull HttpServletRequest httpRequest,
+        @NotNull List<String> availableHosts
+    ) throws IOException {
         boolean https = application.getServerConfiguration().isForceHttps();
         String redirectUrl = (https ? "https://" : "http://") + getDefaultHost(availableHosts) + httpRequest.getRequestURI();
         if (httpRequest.getQueryString() != null) {
@@ -77,6 +111,7 @@ public class RequestHostFilter implements Filter {
         response.sendRedirect(redirectUrl);
     }
 
+    @NotNull
     private String getDefaultHost(@NotNull List<String> availableHosts) {
         return availableHosts.getFirst();
     }
