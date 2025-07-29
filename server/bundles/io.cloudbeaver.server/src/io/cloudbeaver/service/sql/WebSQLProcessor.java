@@ -550,7 +550,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
                 DBDDataFilter filter = new DBDDataFilter(constraints);
                 DBSDataContainer dataContainer = resultsInfo.getDataContainer();
-                WebRowDataReceiver dataReceiver = new WebRowDataReceiver(resultsInfo.getAttributes(), row.getData(), dataFormat);
+                RowDataReceiver dataReceiver = new RowDataReceiver(resultsInfo.getAttributes());
                 dataContainer.readData(
                     new AbstractExecutionSource(dataContainer, getExecutionContext(dataContainer), this),
                     session,
@@ -1203,30 +1203,6 @@ public class WebSQLProcessor implements WebSessionProvider {
         public void close() {
         }
     }
-
-    public class WebRowDataReceiver extends RowDataReceiver {
-        private final WebDataFormat dataFormat;
-
-        public WebRowDataReceiver(DBDAttributeBinding[] curAttributes, Object[] rowValues, WebDataFormat dataFormat) {
-            super(curAttributes);
-            this.rowValues = rowValues;
-            this.dataFormat = dataFormat;
-        }
-
-        @Override
-        protected void fetchRowValues(DBCSession session, DBCResultSet resultSet) throws DBCException {
-            for (int i = 0; i < curAttributes.length; i++) {
-                final DBDAttributeBinding attr = curAttributes[i];
-                DBDValueHandler valueHandler = attr.getValueHandler();
-                Object attrValue = valueHandler.fetchValueObject(session, resultSet, attr, i);
-
-                // Patch result rows (adapt to web format)
-                rowValues[i] = WebSQLUtils.makeWebCellValue(webSession, attr, attrValue, dataFormat);
-            }
-        }
-
-    }
-
 
     ///////////////////////////////////////////////////////
     // Utils
