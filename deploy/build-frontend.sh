@@ -19,6 +19,8 @@ fi
 
 cd ../../../common-typescript
 yarn test
+cd ../common-react
+yarn test
 cd ../webapp
 yarn test
 

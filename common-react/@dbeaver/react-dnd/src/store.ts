@@ -6,7 +6,7 @@ export interface DnDStoreProvider {
   removeData: () => void;
 }
 
-class DnDStore {
+export class DnDStore {
   private data: Map<string, Record<string, any>> = new Map();
   setData(id: string, key: string, value: any) {
     if (!this.data.has(id)) {
