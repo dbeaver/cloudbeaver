@@ -64,7 +64,7 @@ public class RequestHostFilter implements Filter {
             String servletPath = httpRequest.getServletPath();
             if (CommonUtils.isNotEmpty(servletPath)) {
                 for (String excludedPath : excludedPaths) {
-                    if (servletPath.startsWith(excludedPath)) {
+                    if (servletPath.contains(excludedPath)) {
                         chain.doFilter(request, response);
                         return;
                     }
