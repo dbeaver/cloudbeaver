@@ -89,7 +89,6 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
         isDisabled={item => serverConfig.disabledDrivers?.includes(item.id) ?? false}
         items={drivers}
         placeholder={translate('administration_disabled_drivers_search_placeholder')}
-        searchable
         onSelect={handleSelect}
       />
       <Tags className={s(styles, { wrapper: true })}>

@@ -33,11 +33,6 @@
 
 .input {
   font-size: 12px;
-
-  &.select {
-    cursor: pointer;
-    user-select: none;
-  }
 }
 
 .menuButton {
