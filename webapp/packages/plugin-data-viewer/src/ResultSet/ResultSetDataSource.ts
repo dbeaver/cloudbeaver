@@ -141,7 +141,7 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
     return resultId;
   }
 
-  protected canUseCachedResults(prevOptions: Readonly<TOptions> | null): boolean {
+  protected canUseCachedResults(prevResults: IDatabaseResultSet[], prevOptions: Readonly<TOptions> | null): boolean {
     if (
       !prevOptions ||
       this.results.some(result => !result.loadedFully) ||
@@ -152,7 +152,8 @@ export abstract class ResultSetDataSource<TOptions extends IDatabaseDataOptions 
       this.options?.catalog !== prevOptions.catalog ||
       this.options?.schema !== prevOptions.schema ||
       this.options?.readLogs !== prevOptions.readLogs ||
-      this.options?.whereFilter !== prevOptions.whereFilter
+      this.options?.whereFilter !== prevOptions.whereFilter ||
+      prevResults.some(result => result.dataFormat !== this.dataFormat)
     ) {
       return false;
     }

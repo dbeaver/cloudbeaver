@@ -190,7 +190,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     if (this.requestInfo.query === this.options?.query) {
       firstResultId = this.getPreviousResultId(prevResults, executionContextInfo);
       if (firstResultId !== undefined && !refresh) {
-        useServerCache = this.canUseCachedResults(prevOptions);
+        useServerCache = this.canUseCachedResults(prevResults, prevOptions);
       }
     }
 

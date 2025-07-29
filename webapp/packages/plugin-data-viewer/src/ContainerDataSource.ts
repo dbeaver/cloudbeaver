@@ -218,7 +218,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     let useServerCache = false;
 
     if (resultId !== undefined && !refresh) {
-      useServerCache = this.canUseCachedResults(prevOptions);
+      useServerCache = this.canUseCachedResults(prevResults, prevOptions);
     }
     return {
       projectId: context.projectId,
