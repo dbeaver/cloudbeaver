@@ -53,10 +53,10 @@ public class ConnectionBruteForceConfiguration {
     }
 
     public int getBlockTimeInMinutes() {
-        return errorAttemptsPeriodInMinutes;
+        return blockTimeInMinutes;
     }
 
     public void setBlockTimeInMinutes(int blockTimeInMinutes) {
-        this.errorAttemptsPeriodInMinutes = errorAttemptsPeriodInMinutes;
+        this.blockTimeInMinutes = blockTimeInMinutes;
     }
 }
