@@ -411,10 +411,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull Connection dbCon,
         @NotNull String userId,
         @NotNull String[] teamIds
-    ) throws SQLException {
+    ) throws SQLException, DBCException {
         String defaultTeam = getDefaultUserTeam();
-        if (CommonUtils.isNotEmpty(defaultTeam)) {
-            teamIds = Arrays.stream(teamIds).filter(teamId -> !defaultTeam.equals(teamId)).toArray(String[]::new);
+        if (ArrayUtils.contains(teamIds, defaultTeam)) {
+            throw new SMException("Cannot delete default user team: " + defaultTeam);
         }
         if (ArrayUtils.isEmpty(teamIds)) {
             return;
