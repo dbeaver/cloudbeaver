@@ -11,7 +11,7 @@ import { useCallback, useState } from 'react';
 import {
   Button,
   ColoredContainer,
-  Combobox,
+  Select,
   Container,
   Expandable,
   FieldCheckbox,
@@ -105,7 +105,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
           <Switch id="ssh-enable-switch" name="enabled" state={handlerState} mod={['primary']} disabled={disabled}>
             {translate('connections_network_handler_ssh_tunnel_enable')}
           </Switch>
-          <Combobox
+          <Select
             name="authType"
             state={handlerState}
             items={authTypes}
@@ -116,7 +116,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ fo
             onSelect={authTypeChangeHandler}
           >
             {translate('connections_network_handler_ssh_tunnel_auth_type')}
-          </Combobox>
+          </Select>
           <Container wrap gap>
             <InputField type="text" name="host" state={handlerState.properties} readOnly={disabled || !enabled} required small>
               {translate('connections_network_handler_ssh_tunnel_host')}
