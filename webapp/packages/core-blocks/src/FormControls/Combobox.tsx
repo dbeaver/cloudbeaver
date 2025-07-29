@@ -7,7 +7,17 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useId } from 'react';
-import { ComboboxInput, ComboboxItem, ComboboxEmpty, clsx, Spinner, ComboboxRoot, ComboboxPopover, ComboboxDisclosure } from '@dbeaver/ui-kit';
+import {
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxEmpty,
+  clsx,
+  Spinner,
+  ComboboxRoot,
+  ComboboxPopover,
+  ComboboxDisclosure,
+  type ComboboxProviderProps,
+} from '@dbeaver/ui-kit';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
@@ -91,8 +101,8 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   const selectedItem = items.find((item, index) => keySelector(item, index) === value);
 
-  const handleSelect = useCallback(
-    (selectedValue: string) => {
+  const handleSelect: ComboboxProviderProps['setSelectedValue'] = useCallback(
+    (selectedValue: string | string[]) => {
       const item = items.find(item => valueSelector(item) === selectedValue);
       if (!item) {
         return;
@@ -135,7 +145,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
       )}
       <ComboboxRoot
         defaultValue={comboboxDefaultValue}
-        comboboxProps={{ setValue: handleSelect }}
+        comboboxProps={{ setSelectedValue: handleSelect }}
         className="tw:relative tw:flex tw:flex-1 tw:items-center tw:gap-2"
       >
         <ComboboxInput

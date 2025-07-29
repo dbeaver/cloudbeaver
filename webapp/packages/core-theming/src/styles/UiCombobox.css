@@ -1,0 +1,10 @@
+@layer components {
+  .dbv-kit-combobox__item {
+    --dbv-kit-combobox-item-hover-background: var(--theme-secondary);
+    --dbv-kit-combobox-item-hover-foreground: var(--theme-on-surface);
+  }
+
+  .dbv-kit-combobox__popover {
+    --dbv-kit-combobox-border-color: var(--theme-input-border);
+  }
+}

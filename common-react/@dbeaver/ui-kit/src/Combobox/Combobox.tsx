@@ -7,11 +7,13 @@
  */
 
 import {
-  ComboboxProvider as AriaComboboxProvider,
+  ComboboxProvider,
   Combobox as AriaCombobox,
   ComboboxPopover as AriaComboboxPopover,
   ComboboxItem as AriaComboboxItem,
   ComboboxDisclosure,
+  ComboboxValue,
+  type ComboboxValueProps,
   type ComboboxProviderProps,
   type ComboboxProps as AriaComboboxProps,
   type ComboboxPopoverProps as AriaComboboxPopoverProps,
@@ -21,39 +23,23 @@ import {
   useStoreState,
 } from '@ariakit/react';
 import clsx from 'clsx';
-import {
-  createContext,
-  type HTMLAttributes,
-  type ReactNode,
-  useCallback,
-  use,
-  useDeferredValue,
-  useLayoutEffect,
-  useMemo,
-  useState,
-  type FocusEvent,
-  type Ref,
-} from 'react';
+import { createContext, type HTMLAttributes, type ReactNode, use, useMemo, type FocusEvent, type Ref, useDeferredValue } from 'react';
 import './Combobox.css';
 
+interface SearchOptions {
+  searchFields?: string[];
+}
+
 interface SearchContextValue {
-  matches: string[];
-  registerItem: (value: string, searchData?: Record<string, any>) => void;
-  unregisterItem: (value: string) => void;
-  isItemVisible: (value: string) => boolean;
+  searchValue: string;
+  searchOptions: SearchOptions;
+  defaultValue?: string;
 }
 
 const SearchContext = createContext<SearchContextValue>({
-  matches: [],
-  registerItem: () => {},
-  unregisterItem: () => {},
-  isItemVisible: () => true,
+  searchValue: '',
+  searchOptions: {},
 });
-
-interface SearchOptions {
-  caseSensitive?: boolean;
-  searchFields?: string[];
-}
 
 interface SearchContextProviderProps {
   children: ReactNode;
@@ -62,85 +48,23 @@ interface SearchContextProviderProps {
 }
 
 /**
- * SearchContextProvider - Manages search logic
+ * SearchContextProvider - Provides search context
  */
-export function SearchContextProvider({
-  children,
-  searchOptions = {
-    caseSensitive: false,
-  },
-  defaultValue,
-}: SearchContextProviderProps) {
-  const [registeredItems, setRegisteredItems] = useState<Set<string>>(new Set());
-  const [itemsData, setItemsData] = useState<Map<string, Record<string, any>>>(new Map());
+export function SearchContextProvider({ children, searchOptions = {}, defaultValue }: SearchContextProviderProps) {
   const store = useComboboxContext();
   const searchValue = useStoreState(store, 'value') || '';
   const deferredValue = useDeferredValue(searchValue);
 
-  const isObjectSearch = searchOptions.searchFields && searchOptions.searchFields.length > 0;
-
-  const itemsList = useMemo(() => Array.from(registeredItems), [registeredItems]);
-
-  const matches = useMemo(() => {
-    if (deferredValue.trim() === '' || deferredValue === defaultValue) return itemsList;
-
-    const searchTerm = searchOptions.caseSensitive ? deferredValue : deferredValue.toLowerCase();
-
-    return itemsList.filter(value => {
-      if (isObjectSearch) {
-        const data = itemsData.get(value) || {};
-        const searchableValues = searchOptions.searchFields!.map(field => data[field] || '').join(' ');
-        const targetText = searchOptions.caseSensitive ? searchableValues : searchableValues.toLowerCase();
-        return targetText.includes(searchTerm);
-      }
-
-      const targetText = searchOptions.caseSensitive ? value : value.toLowerCase();
-      return targetText.includes(searchTerm);
-    });
-  }, [deferredValue, itemsList, defaultValue, isObjectSearch, itemsData, searchOptions]);
-
-  const registerItem = useCallback((value: string, searchData?: Record<string, any>) => {
-    setRegisteredItems(prev => new Set(prev).add(value));
-    if (searchData && Object.keys(searchData).length > 0) {
-      setItemsData(prev => new Map(prev).set(value, searchData));
-    }
-  }, []);
-
-  const unregisterItem = useCallback((value: string) => {
-    setRegisteredItems(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(value);
-      return newSet;
-    });
-    setItemsData(prev => {
-      const newMap = new Map(prev);
-      newMap.delete(value);
-      return newMap;
-    });
-  }, []);
-
-  const isItemVisible = useCallback(
-    (value: string) => {
-      return matches.includes(value);
-    },
-    [matches],
-  );
-
   const contextValue = useMemo(
     () => ({
-      matches,
-      registerItem,
-      unregisterItem,
-      isItemVisible,
+      searchValue: deferredValue,
+      searchOptions,
+      defaultValue,
     }),
-    [matches, registerItem, unregisterItem, isItemVisible],
+    [deferredValue, searchOptions, defaultValue],
   );
 
   return <SearchContext.Provider value={contextValue}>{children}</SearchContext.Provider>;
-}
-
-export function ComboboxProvider({ children, ...props }: ComboboxProviderProps) {
-  return <AriaComboboxProvider {...props}>{children}</AriaComboboxProvider>;
 }
 
 export interface ComboboxProps extends AriaComboboxProps {
@@ -149,32 +73,51 @@ export interface ComboboxProps extends AriaComboboxProps {
 
 /**
  * ComboboxInput - Basic input component that handles search value and blur logic
+ * Restores the selected value if the input value is not in the items list
+ * If only one item is available, it selects that item automatically
  */
 export const ComboboxInput = ({ onBlur, onKeyDown, defaultValue, ref, ...props }: ComboboxProps & { ref?: React.Ref<HTMLInputElement> }) => {
   const store = useComboboxContext();
-  const { matches } = use(SearchContext);
 
-  const handleBlur = useCallback(
-    (event: FocusEvent<HTMLInputElement>) => {
-      const selectedValue = store?.getState()?.selectedValue;
-      const value = store?.getState()?.value;
+  function restoreInputValue() {
+    if (!store) {
+      console.error('ComboboxInput: store is not available');
+      return;
+    }
+    const { selectedValue, items, value } = store.getState();
+    if (value && value === selectedValue) {
+      return;
+    }
+    const itemsValues = new Set(items?.map(item => item.value));
 
-      if (value !== undefined && !matches.includes(value)) {
-        if (selectedValue) {
-          store?.setValue(selectedValue as string);
-        } else if (defaultValue) {
-          store?.setValue(defaultValue);
-        }
-      } else if (value && matches.includes(value)) {
-        store?.setSelectedValue?.(value);
+    if (items.length === 1 || itemsValues.has(value)) {
+      const nextValue = items.length === 1 ? items[0]!.value! : value;
+      store.setSelectedValue(nextValue);
+      store.setValue(nextValue);
+      store.setOpen(false);
+    } else {
+      const nextValue = selectedValue || defaultValue;
+      if (nextValue !== undefined) {
+        store.setValue(nextValue as string);
       }
+    }
+  }
 
-      onBlur?.(event);
-    },
-    [store, onBlur, matches, defaultValue],
-  );
+  function handleBlur(event: FocusEvent<HTMLInputElement>) {
+    restoreInputValue();
 
-  return <AriaCombobox ref={ref} {...props} onBlur={handleBlur} onKeyDown={onKeyDown} className={clsx('dbv-kit-combobox', props.className)} />;
+    onBlur?.(event);
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      restoreInputValue();
+    }
+    onKeyDown?.(event);
+  }
+
+  return <AriaCombobox ref={ref} {...props} onBlur={handleBlur} onKeyDown={handleKeyDown} className={clsx('dbv-kit-combobox', props.className)} />;
 };
 
 export interface ComboboxPopoverProps extends AriaComboboxPopoverProps {
@@ -198,18 +141,28 @@ export interface ComboboxItemProps extends AriaComboboxItemProps {
 
 /**
  * ComboboxItem - An option in the combobox popover
- * Automatically registers/unregisters itself for search
+ * Uses the search state to determine visibility
  */
 export function ComboboxItem({ value, searchData, ref, ...props }: ComboboxItemProps & { ref?: React.Ref<HTMLDivElement> }) {
-  const { registerItem, unregisterItem, isItemVisible } = use(SearchContext);
+  const { searchValue, defaultValue, searchOptions } = use(SearchContext);
 
-  useLayoutEffect(() => {
-    if (value === undefined) return;
-    registerItem(value, searchData);
-    return () => unregisterItem(value);
-  }, [registerItem, unregisterItem, value, searchData]);
+  const isVisible = useMemo(() => {
+    if (!searchValue.trim() || searchValue === defaultValue) {
+      return true;
+    }
 
-  const isVisible = value != null && isItemVisible(value);
+    const searchTerm = searchValue.toLowerCase();
+    const isObjectSearch = searchOptions.searchFields && searchOptions.searchFields.length > 0;
+    let targetText = '';
+
+    if (isObjectSearch && searchData) {
+      const searchableValues = searchOptions.searchFields!.map(field => searchData[field] || '').join(' ');
+      targetText = searchableValues.toLowerCase();
+    } else {
+      targetText = value?.toLowerCase() ?? '';
+    }
+    return targetText.includes(searchTerm);
+  }, [searchValue, defaultValue, searchOptions, value, searchData]);
 
   if (!isVisible) return null;
 
@@ -221,14 +174,18 @@ export interface ComboboxEmptyProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * ComboboxEmpty - Shows when no search matches are found
+ * ComboboxEmpty - Shows it's children when there's a search but no visible items
  */
 export function ComboboxEmpty(props: ComboboxEmptyProps) {
-  const { matches } = use(SearchContext);
+  const store = useComboboxContext();
+  const inputValue = useStoreState(store, 'value') || '';
+  const items = useStoreState(store, 'items') || [];
 
-  if (matches && matches.length > 0) return null;
+  if (items.length === 0 && inputValue.trim()) {
+    return <div ref={props.ref} {...props} className={clsx('dbv-kit-combobox__empty', props.className)} />;
+  }
 
-  return <div ref={props.ref} {...props} className={clsx('dbv-kit-combobox__empty', props.className)} />;
+  return null;
 }
 
 export interface ComboboxRootProps {
@@ -240,7 +197,7 @@ export interface ComboboxRootProps {
 }
 
 /**
- * ComboboxRoot - Wrapper that combines all providers
+ * ComboboxRoot - Wrapper that combines combobox and search context and creates a wrapper element
  */
 export function ComboboxRoot({ children, defaultValue, searchOptions, comboboxProps, className }: ComboboxRootProps) {
   return (
@@ -252,4 +209,13 @@ export function ComboboxRoot({ children, defaultValue, searchOptions, comboboxPr
   );
 }
 
-export { useComboboxContext, useComboboxStore, useStoreState, ComboboxDisclosure, type ComboboxProviderProps };
+export {
+  useComboboxContext,
+  useComboboxStore,
+  useStoreState,
+  ComboboxDisclosure,
+  ComboboxValue,
+  ComboboxProvider,
+  type ComboboxProviderProps,
+  type ComboboxValueProps,
+};
