@@ -31,6 +31,7 @@ public interface DBWConstants {
     String PERMISSION_SECRET_MANAGER = "secret-manager";
 
     String GLOBAL_PERMISSION_SCRIPT_EXECUTE = "permission.sql.script.execution";
+    //fixme move it all to ee
     String GLOBAL_PERMISSION_DATA_EDITOR_IMPORT = "permission.data-editor.import.enable";
     String GLOBAL_PERMISSION_DATA_EDITOR_COPY = "permission.data-editor.copy.enable";
     String GLOBAL_PERMISSION_DATA_EDITOR_EXPORT = "permission.data-editor.export.enable";
