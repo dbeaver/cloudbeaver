@@ -45,6 +45,8 @@ import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class CBJettyServer {
 
@@ -97,8 +99,6 @@ public class CBJettyServer {
                 String rootURI = serverConfiguration.getRootURI();
                 servletContextHandler.setContextPath(rootURI);
 
-                FilterHolder hostsFilter = new FilterHolder(new RequestHostFilter(application));
-                servletContextHandler.addFilter(hostsFilter, "/*", null);
 
                 ServletHolder staticServletHolder = new ServletHolder(
                     "static", new CBStaticServlet(Path.of(serverConfiguration.getContentRoot()))
@@ -127,7 +127,7 @@ public class CBJettyServer {
                 servletContextHandler.addEventListener(new CBServerContextListener(application));
 
                 // Add extensions from services
-
+                Set<String> excludedFilterPaths = new HashSet<>();
                 CBJettyServletContext servletContext = new CBJettyServletContext(servletContextHandler);
                 for (DBWServiceBindingServlet wsd : WebServiceRegistry.getInstance()
                     .getWebServices(DBWServiceBindingServlet.class)
@@ -135,6 +135,7 @@ public class CBJettyServer {
                     if (wsd.isApplicable(this.application)) {
                         try {
                             wsd.addServlets(this.application, servletContext);
+                            excludedFilterPaths.addAll(wsd.getExcludedServletPaths(this.application));
                         } catch (DBException e) {
                             log.error(e.getMessage(), e);
                         }
@@ -153,6 +154,9 @@ public class CBJettyServer {
                         }
                     }
                 }
+                FilterHolder hostsFilter = new FilterHolder(new RequestHostFilter(application, excludedFilterPaths));
+                servletContextHandler.addFilter(hostsFilter, "/*", null);
+
 
                 JakartaWebSocketServletContainerInitializer.configure(servletContextHandler, (context, container) -> {
                     // Add echo endpoint to server container
