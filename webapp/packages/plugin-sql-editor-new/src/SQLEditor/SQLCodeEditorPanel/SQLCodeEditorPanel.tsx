@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -54,26 +54,19 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         try {
           const pos = view.posAtCoords({ x: mouse.x, y: mouse.y }) ?? 1;
 
-          await data.executeQueryAction(
-            data.cursorSegment,
-            async () => {
-              const alias: string[] = [];
+          const alias: string[] = [];
 
-              for (const node of nodes) {
-                alias.push(await navNodeManagerService.getNodeDatabaseAlias(node.id));
-              }
+          for (const node of nodes) {
+            alias.push(await navNodeManagerService.getNodeDatabaseAlias(node.id));
+          }
 
-              const replacement = alias.join(', ');
-              if (replacement) {
-                view.dispatch({
-                  changes: { from: pos, to: pos, insert: replacement },
-                  selection: { anchor: pos, head: pos + replacement.length },
-                });
-              }
-            },
-            true,
-            true,
-          );
+          const replacement = alias.join(', ');
+          if (replacement) {
+            view.dispatch({
+              changes: { from: pos, to: pos, insert: replacement },
+              selection: { anchor: pos, head: pos + replacement.length },
+            });
+          }
         } catch (exception: any) {
           notificationService.logException(exception, 'sql_editor_alias_loading_error');
         }

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ export type ComboboxBaseProps<TKey, TValue> = Omit<
   ILayoutSizeProps & {
     propertyName?: string;
     items: TValue[];
-    searchable?: boolean;
     defaultValue?: TKey;
     loading?: boolean;
     description?: string;
@@ -79,7 +78,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
   children,
   title,
   className,
-  searchable,
   readOnly,
   disabled,
   inline,
@@ -108,10 +106,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
     gutter: 4,
     unstable_fixed: true,
   });
-
-  if (readOnly) {
-    searchable = true;
-  }
 
   const [searchValue, setSearchValue] = useState<string | null>(null);
 
@@ -142,12 +136,10 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const hideMenu = items.length === 1 && (!!selectedItem || isDisabled?.(items[0]) === true);
 
   function handleClick() {
-    if (!searchable) {
-      if (menu.visible) {
-        menu.hide();
-      } else {
-        menu.show();
-      }
+    if (menu.visible) {
+      menu.hide();
+    } else {
+      menu.show();
     }
   }
 
@@ -256,7 +248,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   const icon = selectedItem && iconSelector?.(selectedItem);
   const focus = menu.visible;
-  const select = !searchable;
 
   if (loading && items.length === 0) {
     inputValue = translate('ui_processing_loading');
@@ -289,11 +280,10 @@ export const Combobox: ComboboxType = observer(function Combobox({
           name={name}
           title={title}
           value={inputValue}
-          disabled={disabled || hideMenu}
-          readOnly={readOnly || select}
+          disabled={disabled || hideMenu || readOnly}
+          readOnly={readOnly}
           data-focus={focus}
-          data-select={select}
-          className={s(styles, { input: true, select, focus })}
+          className={s(styles, { input: true, focus })}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           onClick={handleClick}
