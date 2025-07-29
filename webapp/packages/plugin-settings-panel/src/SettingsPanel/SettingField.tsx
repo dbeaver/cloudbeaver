@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Combobox, FieldCheckbox, InputField, Textarea, useCustomInputValidation, useTranslate } from '@cloudbeaver/core-blocks';
+import { Select, FieldCheckbox, InputField, Textarea, useCustomInputValidation, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import {
   ESettingsValueType,
@@ -91,7 +91,7 @@ export const SettingField = observer<Props>(function SettingField({ resolver, se
   if (setting.type === ESettingsValueType.Select) {
     const options = setting.options?.map(option => ({ ...option, name: translate(option.name) })) || [];
     return (
-      <Combobox
+      <Select
         id={String(setting.key)}
         items={options}
         keySelector={value => value.value}
@@ -105,7 +105,7 @@ export const SettingField = observer<Props>(function SettingField({ resolver, se
         onSelect={handleChange}
       >
         {name}
-      </Combobox>
+      </Select>
     );
   }
 

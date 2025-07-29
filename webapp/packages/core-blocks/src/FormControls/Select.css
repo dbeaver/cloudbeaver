@@ -1,0 +1,98 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@layer base.components {
+  .dbv-kit-select__arrow-icon svg {
+    fill: none !important;
+  }
+}
+
+@layer components {
+  .select__field {
+    --dbv-kit-select-border-width: 2px;
+    --dbv-kit-select-font-size: 12px;
+    --dbv-kit-select-hover-border-color: var(--theme-background);
+
+    --dbv-kit-select-border-color: var(--theme-input-border);
+    --dbv-kit-select-foreground: var(--theme-input-color);
+    --dbv-kit-select-background: var(--theme-input-background);
+
+    --dbv-kit-select-popover-background: var(--theme-input-background);
+    --dbv-kit-select-popover-foreground: var(--theme-input-color);
+
+    --dbv-kit-select-item-foreground: var(--theme-secondary);
+    --dbv-kit-select-item-hover-background: var(--theme-background);
+    --dbv-kit-select-item-hover-foreground: var(--theme-input-color);
+    --dbv-kit-select-item-selected-background: none;
+
+    --dbv-kit-control-disabled-opacity: 1;
+    --dbv-kit-select-disabled-background: var(--theme-input-background-disabled);
+
+    --dbv-kit-select-border-radius: 3px;
+    --dbv-kit-control-outline-offset: -2px;
+    width: 100%;
+  }
+
+  .dbv-kit-select {
+    padding-left: 12px;
+    padding-right: 4px;
+  }
+
+  .dbv-kit-select__item {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .dbv-kit-select__popover {
+    overflow-x: hidden;
+  }
+
+  .select__field--inline {
+    display: flex;
+    align-items: center;
+
+    & .select__field-label {
+      padding-right: 8px;
+      padding-bottom: 0;
+      width: max-content;
+    }
+  }
+
+  .select__field-label {
+    composes: theme-typography--body1 from global;
+    display: block;
+    padding-bottom: 10px;
+    font-weight: 500 !important;
+  }
+
+  .select__item {
+    display: inline-flex;
+    gap: 8px;
+    letter-spacing: normal;
+    align-items: center;
+  }
+
+  .select__item--placeholder {
+    color: var(--theme-input-color-placeholder);
+  }
+
+  .select__icon {
+    height: 16px;
+    display: block;
+  }
+
+  .select__input-icon {
+    width: 16px;
+
+    & .select__icon {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
