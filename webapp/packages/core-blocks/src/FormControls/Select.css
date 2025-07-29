@@ -13,7 +13,7 @@
 }
 
 @layer components {
-  .dbv-kit-select {
+  .select__field {
     --dbv-kit-select-border-width: 2px;
     --dbv-kit-select-font-size: 12px;
     --dbv-kit-select-hover-border-color: var(--theme-background);
@@ -35,7 +35,10 @@
 
     --dbv-kit-select-border-radius: 3px;
     --dbv-kit-control-outline-offset: -2px;
+    width: 100%;
+  }
 
+  .dbv-kit-select {
     padding-left: 12px;
     padding-right: 4px;
   }
@@ -48,10 +51,6 @@
 
   .dbv-kit-select__popover {
     overflow-x: hidden;
-  }
-
-  .select__field {
-    width: 100%;
   }
 
   .select__field--inline {
