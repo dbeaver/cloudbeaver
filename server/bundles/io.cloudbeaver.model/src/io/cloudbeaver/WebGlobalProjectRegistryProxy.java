@@ -289,6 +289,17 @@ public class WebGlobalProjectRegistryProxy implements DBPDataSourceRegistry, Dat
         dataSourceRegistry.removeAuthProfile(profile);
     }
 
+    @NotNull
+    @Override
+    public String getNavigatorViewPreset() {
+        return dataSourceRegistry.getNavigatorViewPreset();
+    }
+
+    @Override
+    public void setNavigatorViewPreset(@NotNull String presetId) {
+        dataSourceRegistry.setNavigatorViewPreset(presetId);
+    }
+
     @Override
     public void flushConfig() {
         dataSourceRegistry.flushConfig();
