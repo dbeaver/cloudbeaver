@@ -117,6 +117,15 @@
       "options": {
         "cwd": "${workspaceFolder}/webapp/packages"
       }
+    },
+    {
+      "label": "Run Ui Kit Preview",
+      "type": "shell",
+      "command": "yarn",
+      "options": {
+        "cwd": "${workspaceFolder}/common-react/@dbeaver/ui-kit"
+      },
+      "args": ["docs"]
     }
   ],
   "inputs": [

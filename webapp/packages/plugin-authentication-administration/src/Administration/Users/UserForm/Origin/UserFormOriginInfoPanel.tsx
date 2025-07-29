@@ -12,7 +12,7 @@ import { Fragment } from 'react';
 import { type AdminUserOrigin, UsersOriginDetailsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import {
   Button,
-  Combobox,
+  Select,
   ConfirmationDialog,
   Container,
   Group,
@@ -95,7 +95,7 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
   return (
     <Container>
       <Group gap medium overflow>
-        <Combobox
+        <Select
           state={localState}
           name="selectedOrigin"
           items={origins}
@@ -105,7 +105,7 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
           tiny
         >
           {translate('authentication_administration_user_auth_method')}
-        </Combobox>
+        </Select>
         {origins.length === 0 && <GroupItem>{translate('authentication_administration_user_auth_methods_empty')}</GroupItem>}
         {origin && (
           <Fragment>
