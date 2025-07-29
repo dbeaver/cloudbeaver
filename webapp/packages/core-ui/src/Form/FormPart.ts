@@ -43,7 +43,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     this.formState.formatTask.addHandler(executorHandlerFilter(() => this.isLoaded() && this.isChanged, this.format.bind(this)));
     this.formState.validationTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.handleValidation.bind(this)));
 
-    makeObservable<this, 'loaded' | 'loading' | 'setInitialState'>(this, {
+    makeObservable<this, 'loaded' | 'loading' | 'setInitialState' | 'setState'>(this, {
       initialState: observable,
       state: observable,
       exception: observable.ref,
@@ -54,6 +54,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
       setInitialState: action,
       isDisabled: computed,
       isChanged: computed,
+      setState: action,
     });
   }
 

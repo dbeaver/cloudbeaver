@@ -6,26 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Combobox, FieldCheckbox, InputField, Textarea, useCustomInputValidation, useTranslate } from '@cloudbeaver/core-blocks';
+import { Select, FieldCheckbox, InputField, Textarea, useCustomInputValidation, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import {
   ESettingsValueType,
   SettingsProviderService,
-  SettingsResolverService,
+  SettingsResolverSource,
   type ISettingDescription,
-  type ISettingsSource,
+  type IEditableSettingsSource,
 } from '@cloudbeaver/core-settings';
 import { schemaValidationError } from '@cloudbeaver/core-utils';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { observer } from 'mobx-react-lite';
 
 interface Props {
-  source: ISettingsSource;
+  resolver: SettingsResolverSource;
+  source: IEditableSettingsSource;
   setting: ISettingDescription;
 }
 
-export const SettingField = observer<Props>(function SettingField({ setting, source }) {
-  const settingsResolverService = useService(SettingsResolverService);
+export const SettingField = observer<Props>(function SettingField({ resolver, setting, source }) {
   const settingsProviderService = useService(SettingsProviderService);
   const translate = useTranslate();
 
@@ -39,7 +39,7 @@ export const SettingField = observer<Props>(function SettingField({ setting, sou
 
   let value = source.getEditedValue(setting.key);
   if (readOnly || !isNotNullDefined(value)) {
-    value = settingsResolverService.getEditedValue(setting.key);
+    value = resolver.getEditedValue(setting.key);
   }
 
   if (setting.key in settingsProviderService.schema.shape) {
@@ -91,7 +91,7 @@ export const SettingField = observer<Props>(function SettingField({ setting, sou
   if (setting.type === ESettingsValueType.Select) {
     const options = setting.options?.map(option => ({ ...option, name: translate(option.name) })) || [];
     return (
-      <Combobox
+      <Select
         id={String(setting.key)}
         items={options}
         keySelector={value => value.value}
@@ -105,7 +105,7 @@ export const SettingField = observer<Props>(function SettingField({ setting, sou
         onSelect={handleChange}
       >
         {name}
-      </Combobox>
+      </Select>
     );
   }
 

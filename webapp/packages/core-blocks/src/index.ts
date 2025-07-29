@@ -174,6 +174,7 @@ export * from './FolderExplorer/useFolderExplorer.js';
 export * from './Tags/Tag.js';
 export * from './Tags/Tags.js';
 
+export * from './FormControls/SelectLoader.js';
 export * from './FormControls/ComboboxLoader.js';
 export * from './FormControls/FormContext.js';
 export * from './FormControls/FormFieldDescription.js';

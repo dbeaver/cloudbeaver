@@ -7,10 +7,11 @@
  */
 import React from 'react';
 
-import { AdministrationItemService } from '@cloudbeaver/core-administration';
+import { AdministrationItemService, type IAdministrationItem } from '@cloudbeaver/core-administration';
 import { type AdminUser, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { TabsContainer } from '@cloudbeaver/core-ui';
 
 import { CreateTeamService } from './Teams/TeamsTable/CreateTeamService.js';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService.js';
@@ -37,7 +38,9 @@ export interface IUserDetailsInfoProps {
 
 @injectable()
 export class UsersAdministrationService extends Bootstrap {
-  readonly userDetailsInfoPlaceholder = new PlaceholderContainer<IUserDetailsInfoProps>();
+  readonly tabsContainer: TabsContainer;
+  readonly userDetailsInfoPlaceholder: PlaceholderContainer<IUserDetailsInfoProps>;
+  administrationItem!: IAdministrationItem;
 
   constructor(
     private readonly administrationItemService: AdministrationItemService,
@@ -47,10 +50,12 @@ export class UsersAdministrationService extends Bootstrap {
     private readonly usersResource: UsersResource,
   ) {
     super();
+    this.userDetailsInfoPlaceholder = new PlaceholderContainer();
+    this.tabsContainer = new TabsContainer('Access Control');
   }
 
-  override register() {
-    this.administrationItemService.create({
+  override register(): void {
+    this.administrationItem = this.administrationItemService.create({
       name: UsersAdministrationNavigationService.ItemName,
       order: 4,
       sub: [

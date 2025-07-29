@@ -18,7 +18,7 @@ import {
 import { EMPTY_ARRAY, removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 
 import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox.js';
-import { Combobox } from '../../FormControls/Combobox.js';
+import { Select } from '../../FormControls/Select.js';
 import { FormFieldDescription } from '../../FormControls/FormFieldDescription.js';
 import { InputField } from '../../FormControls/InputField/InputField.js';
 import { InputFileTextContent } from '../../FormControls/InputFileTextContent.js';
@@ -146,7 +146,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   if (controlType === 'selector') {
     if (state !== undefined) {
       return (
-        <Combobox
+        <Select
           required={required}
           name={property.id!}
           state={state}
@@ -161,12 +161,12 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           className={className}
         >
           {property.displayName ?? ''}
-        </Combobox>
+        </Select>
       );
     }
 
     return (
-      <Combobox
+      <Select
         required={required}
         name={property.id!}
         items={property.validValues!}
@@ -180,7 +180,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         className={className}
       >
         {property.displayName ?? ''}
-      </Combobox>
+      </Select>
     );
   }
 

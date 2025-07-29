@@ -411,7 +411,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull Connection dbCon,
         @NotNull String userId,
         @NotNull String[] teamIds
-    ) throws SQLException {
+    ) throws SQLException, DBCException {
+        String defaultTeam = getDefaultUserTeam();
+        if (ArrayUtils.contains(teamIds, defaultTeam)) {
+            throw new SMException("Cannot delete default user team: " + defaultTeam);
+        }
+        if (ArrayUtils.isEmpty(teamIds)) {
+            return;
+        }
         String deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? " +
                 "AND TEAM_ID IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
 
@@ -1433,9 +1440,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         addSubjectPermissionsUpdateEvent(subjectId, null);
     }
 
+
+    public void initialize() throws DBException {
+    }
+
     private void insertPermissions(Connection dbCon, String subjectId, String[] permissionIds, String grantorId) throws SQLException {
         if (!ArrayUtils.isEmpty(permissionIds)) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
+            try (
+                PreparedStatement dbStat = dbCon.prepareStatement(
                 "INSERT INTO {table_prefix}CB_AUTH_PERMISSIONS" +
                     "(SUBJECT_ID,PERMISSION_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)")
             ) {
@@ -1502,6 +1514,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             throw new DBCException("Error reading user permissions", e);
         }
     }
+
 
     protected Set<String> getUserPermissions(String userId, String authRole) throws DBException {
         return getUserPermissions(userId);
@@ -1584,7 +1597,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
-    private Set<String> getAnonymousUserPermissions() throws DBException {
+    protected Set<String> getAnonymousUserPermissions() throws DBException {
         var anonymousUserTeam = application.getAppConfiguration().getAnonymousUserTeam();
         return getSubjectPermissions(anonymousUserTeam);
     }
@@ -2994,7 +3007,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
 
-    private void addSubjectPermissionsUpdateEvent(@NotNull String subjectId, @Nullable SMSubjectType subjectType) {
+    protected void addSubjectPermissionsUpdateEvent(@NotNull String subjectId, @Nullable SMSubjectType subjectType) {
         if (subjectType == null) {
             subjectType = getSubjectType(subjectId);
         }
@@ -3408,7 +3421,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         }
     }
 
-    private SMSubjectType getSubjectType(@NotNull String subjectId) {
+    protected SMSubjectType getSubjectType(@NotNull String subjectId) {
         try (Connection dbCon = database.openConnection()) {
             String sqlBuilder = "SELECT SUBJECT_TYPE FROM {table_prefix}CB_AUTH_SUBJECT U WHERE SUBJECT_ID = ?";
             try (var dbStat = dbCon.prepareStatement(sqlBuilder)) {

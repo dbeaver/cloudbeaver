@@ -1,4 +1,5 @@
 export default [
+  ['authentication_administration_pages_label', '页面'],
   ['authentication_administration_user_connections_user_add', '创建用户'],
   ['authentication_administration_user_connections_user_new', '新用户'],
   ['authentication_administration_user_connections_access_load_fail', '用户授予的连接加载失败'],

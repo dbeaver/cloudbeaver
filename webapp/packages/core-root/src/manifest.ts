@@ -21,6 +21,7 @@ export const coreRootManifest: PluginManifest = {
     () => import('./PermissionsService.js').then(m => m.PermissionsService),
     () => import('./ServerConfigResource.js').then(m => m.ServerConfigResource),
     () => import('./Settings/ServerSettingsService.js').then(m => m.ServerSettingsService),
+    () => import('./Settings/SettingsTransformationService.js').then(m => m.SettingsTransformationService),
     () => import('./SessionActionService.js').then(m => m.SessionActionService),
     () => import('./SessionDataResource.js').then(m => m.SessionDataResource),
     () => import('./SessionExpireService.js').then(m => m.SessionExpireService),

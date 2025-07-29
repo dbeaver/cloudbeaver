@@ -19,68 +19,72 @@ let errorSpy: MockInstance;
 let infoSpy: MockInstance;
 let debugSpy: MockInstance;
 
-beforeAll(() => {
-  logSpy = vitest.spyOn(console, 'log').mockImplementation((...args) => {
-    if (filterPatterns(knownLogPatterns, args)) {
-      return;
-    }
-    expect(logSpy).not.toHaveBeenCalledWith(...args);
-  });
-  warnSpy = vitest.spyOn(console, 'warn').mockImplementation((...args) => {
-    if (filterPatterns(knownWarnPatterns, args)) {
-      return;
-    }
-    expect(warnSpy).not.toHaveBeenCalledWith(...args);
-  });
-  errorSpy = vitest.spyOn(console, 'error').mockImplementation((...args) => {
-    if (args[0] && String(args[0]).includes('Expected:')) {
-      // skip exceptions from vitest expect
-      return;
-    }
-    if (args[0] && String(args[0]).includes('Error: Uncaught')) {
-      // skip uncaught exceptions
-      return;
-    }
-    if (filterPatterns(knownErrorPatterns, args)) {
-      return;
-    }
-    expect(errorSpy).not.toHaveBeenCalledWith(...args);
-  });
-  infoSpy = vitest.spyOn(console, 'info').mockImplementation((...args) => {
-    if (filterPatterns(knownInfoPatterns, args)) {
-      return;
-    }
-    expect(infoSpy).not.toHaveBeenCalledWith(...args);
-  });
-  debugSpy = vitest.spyOn(console, 'debug').mockImplementation((...args) => {
-    if (filterPatterns(knownDebugPatterns, args)) {
-      return;
-    }
-    expect(debugSpy).not.toHaveBeenCalledWith(...args);
-  });
-});
+export function initKnownConsoleMessages(addKnownPatterns?: () => void) {
+  beforeAll(() => {
+    addKnownPatterns?.();
 
-beforeEach(() => {
-  logSpy.mockClear();
-  warnSpy.mockClear();
-  errorSpy.mockClear();
-  infoSpy.mockClear();
-  debugSpy.mockClear();
-});
+    logSpy = vitest.spyOn(console, 'log').mockImplementation((...args) => {
+      if (filterPatterns(knownLogPatterns, args)) {
+        return;
+      }
+      expect(logSpy).not.toHaveBeenCalledWith(...args);
+    });
+    warnSpy = vitest.spyOn(console, 'warn').mockImplementation((...args) => {
+      if (filterPatterns(knownWarnPatterns, args)) {
+        return;
+      }
+      expect(warnSpy).not.toHaveBeenCalledWith(...args);
+    });
+    errorSpy = vitest.spyOn(console, 'error').mockImplementation((...args) => {
+      if (args[0] && String(args[0]).includes('Expected:')) {
+        // skip exceptions from vitest expect
+        return;
+      }
+      if (args[0] && String(args[0]).includes('Error: Uncaught')) {
+        // skip uncaught exceptions
+        return;
+      }
+      if (filterPatterns(knownErrorPatterns, args)) {
+        return;
+      }
+      expect(errorSpy).not.toHaveBeenCalledWith(...args);
+    });
+    infoSpy = vitest.spyOn(console, 'info').mockImplementation((...args) => {
+      if (filterPatterns(knownInfoPatterns, args)) {
+        return;
+      }
+      expect(infoSpy).not.toHaveBeenCalledWith(...args);
+    });
+    debugSpy = vitest.spyOn(console, 'debug').mockImplementation((...args) => {
+      if (filterPatterns(knownDebugPatterns, args)) {
+        return;
+      }
+      expect(debugSpy).not.toHaveBeenCalledWith(...args);
+    });
+  });
 
-afterAll(() => {
-  logSpy.mockRestore();
-  warnSpy.mockRestore();
-  errorSpy.mockRestore();
-  infoSpy.mockRestore();
-  debugSpy.mockRestore();
+  beforeEach(() => {
+    logSpy.mockClear();
+    warnSpy.mockClear();
+    errorSpy.mockClear();
+    infoSpy.mockClear();
+    debugSpy.mockClear();
+  });
 
-  knownLogPatterns = [];
-  knownWarnPatterns = [];
-  knownErrorPatterns = [];
-  knownInfoPatterns = [];
-  knownDebugPatterns = [];
-});
+  afterAll(() => {
+    logSpy.mockRestore();
+    warnSpy.mockRestore();
+    errorSpy.mockRestore();
+    infoSpy.mockRestore();
+    debugSpy.mockRestore();
+
+    knownLogPatterns = [];
+    knownWarnPatterns = [];
+    knownErrorPatterns = [];
+    knownInfoPatterns = [];
+    knownDebugPatterns = [];
+  });
+}
 
 function filterPatterns(patterns: any[][], args: any[]) {
   return patterns.some(pattern =>

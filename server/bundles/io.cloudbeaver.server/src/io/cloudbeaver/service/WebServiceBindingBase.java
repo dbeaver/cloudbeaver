@@ -285,7 +285,8 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 throw new DBWebExceptionServerNotInitialized(message);
             }
             String[] reqPermissions = webAction.requirePermissions();
-            if (reqPermissions.length == 0 && !webAction.authRequired()) {
+            String[] reqGlobalPermissions = webAction.requireGlobalPermissions();
+            if (reqPermissions.length == 0 && reqGlobalPermissions.length == 0 && !webAction.authRequired()) {
                 return;
             }
             WebSession session = findWebSession(env);
@@ -313,6 +314,13 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 // Check permissions
                 for (String rp : reqPermissions) {
                     if (!session.hasPermission(rp)) {
+                        log.debug("Access to " + method.getName() + " denied for " + session.getUser());
+                        throw new DBWebExceptionAccessDenied("Access denied");
+                    }
+                }
+                // Check permissions
+                for (String gp : reqGlobalPermissions) {
+                    if (!session.hasGlobalPermission(gp)) {
                         log.debug("Access to " + method.getName() + " denied for " + session.getUser());
                         throw new DBWebExceptionAccessDenied("Access denied");
                     }
