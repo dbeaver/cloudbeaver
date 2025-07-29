@@ -20,6 +20,7 @@ import com.google.gson.annotations.SerializedName;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.model.app.WebServerConfiguration;
 import io.cloudbeaver.server.CBConstants;
+import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 
@@ -204,7 +205,8 @@ public class CBServerConfig implements WebServerConfiguration {
         for (String host : availableHosts) {
             try {
                 URI uri = URI.create(host);
-                uniqueHosts.add(uri.getHost() != null ? uri.getHost() : host);
+                String hostName = ServletAppUtils.removeSideSlashes(uri.getHost() != null ? uri.getHost() : host);
+                uniqueHosts.add(hostName);
             } catch (Exception e) {
                 log.error("Invalid host URI: " + host, e);
             }
