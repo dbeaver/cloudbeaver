@@ -47,7 +47,7 @@ public class RMLocalProject extends BaseProjectImpl {
         super(workspace, sessionContext);
         this.projectPath = projectPath;
         loadProperties();
-        this.rmProject = new RMProject(getName());
+        this.rmProject = new RMProject(getRmProjectName());
         this.rmProject.setId(RMUtils.makeProjectIdFromPath(projectPath, type));
         this.rmProject.setDescription(getDescription());
         this.rmProject.setType(type);
@@ -63,6 +63,12 @@ public class RMLocalProject extends BaseProjectImpl {
     @Override
     public String getId() {
         return rmProject.getId();
+    }
+
+    @NotNull
+    @Override
+    public String getName() {
+        return rmProject.getDisplayName();
     }
 
     @NotNull
@@ -138,5 +144,14 @@ public class RMLocalProject extends BaseProjectImpl {
     @Override
     protected DBPDataSourceRegistry createDataSourceRegistry() {
         return new DataSourceRegistry<>(this);
+    }
+
+    @NotNull
+    private String getRmProjectName() {
+        Object projectName = this.getProjectProperty(PROP_PROJECT_NAME);
+        if (projectName != null) {
+            return projectName.toString();
+        }
+        return projectPath.getFileName().toString();
     }
 }
