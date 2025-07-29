@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -55,10 +55,10 @@ export class AsyncTask {
     this.initPromise = null;
     this.onStatusChange = new SyncExecutor();
 
-    this.innerPromise = new Promise((resolve, reject) => {
-      this.reject = reject;
-      this.resolve = resolve;
-    });
+    const innerPromise = Promise.withResolvers<AsyncTaskInfo>();
+    this.innerPromise = innerPromise.promise;
+    this.resolve = innerPromise.resolve;
+    this.reject = innerPromise.reject;
 
     makeObservable<this, 'pending' | '_cancelled' | 'taskInfo' | 'updatingAsync'>(this, {
       _cancelled: observable,
@@ -78,6 +78,15 @@ export class AsyncTask {
     await this.initPromise;
   }
 
+  /**
+   * Asynchronously updates the task information using the provided getter function.
+   * If the task is already finished, the update is skipped to avoid redundant status updates.
+   * This prevents unnecessary updates in scenarios where the task was already completed
+   * during the initial request, and a subsequent status event is received.
+   *
+   * @param getter - A function that retrieves the latest AsyncTaskInfo for this task.
+   * @returns A promise that resolves when the update is complete.
+   */
   async updateInfoAsync(getter: (task: AsyncTask) => Promise<AsyncTaskInfo>): Promise<void> {
     const init = this.info === null;
 
@@ -88,6 +97,11 @@ export class AsyncTask {
         so we need to wait a bit before retrying */
         setTimeout(() => this.updateInfoAsync.call(this, getter), 100);
       }
+      return;
+    }
+
+    if (this.info?.running === false) {
+      // If the task is finished, we don't need to update it again
       return;
     }
 
