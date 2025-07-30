@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   ComboboxProvider,
-  SearchContextProvider,
+  ComboboxSearchContextProvider,
   ComboboxInput,
   ComboboxPopover,
   ComboboxItem,
@@ -139,7 +139,7 @@ function DynamicItems() {
 
   return (
     <ComboboxProvider>
-      <SearchContextProvider>
+      <ComboboxSearchContextProvider>
         <div className="dynamic-example">
           <div className="controls">
             <ComboboxInput placeholder="Search tasks..." />
@@ -203,7 +203,7 @@ function DynamicItems() {
             </ComboboxEmpty>
           </ComboboxPopover>
         </div>
-      </SearchContextProvider>
+      </ComboboxSearchContextProvider>
     </ComboboxProvider>
   );
 }
@@ -218,14 +218,17 @@ function AdvancedSearch() {
 
   return (
     <ComboboxProvider>
-      <SearchContextProvider
+      <ComboboxSearchContextProvider
         searchOptions={{
           searchFields: ['name', 'category'],
         }}
       >
         <div className="product-search">
           <div className="search-header">
-            <ComboboxInput placeholder="Search products by name or category..." />
+            <ComboboxInput
+              valueFormatter={value => products.find(item => item.value === value)?.name || value}
+              placeholder="Search products by name or category..."
+            />
             <div className="search-tips">Try: "macbook", "laptop", "phone", "audio", etc.</div>
           </div>
 
@@ -250,9 +253,41 @@ function AdvancedSearch() {
             </ComboboxEmpty>
           </ComboboxPopover>
         </div>
-      </SearchContextProvider>
+      </ComboboxSearchContextProvider>
     </ComboboxProvider>
   );
 }
+function MultiSelectExample() {
+  const [selectedValues, setSelectedValues] = useState<string[]>([]);
 
-export { Simple, FlexibleLayout, MultiInput, DynamicItems, AdvancedSearch };
+  const items = [
+    { value: 'apple', label: 'Apple' },
+    { value: 'banana', label: 'Banana' },
+    { value: 'cherry', label: 'Cherry' },
+    { value: 'orange', label: 'Orange' },
+    { value: 'grape', label: 'Grape' },
+  ];
+
+  return (
+    <ComboboxProvider selectedValue={selectedValues} setSelectedValue={setSelectedValues}>
+      <ComboboxSearchContextProvider>
+        <div className="multi-select-example">
+          <div>
+            <strong>Selected:</strong> {selectedValues.join(', ') || 'None'}
+          </div>
+          <ComboboxInput placeholder="Select fruits..." />
+          <ComboboxPopover>
+            {items.map(item => (
+              <ComboboxItem key={item.value} value={item.value}>
+                <input type="checkbox" checked={selectedValues.includes(item.value)} readOnly style={{ marginRight: 8 }} />
+                {item.label}
+              </ComboboxItem>
+            ))}
+            <ComboboxEmpty>No fruits found</ComboboxEmpty>
+          </ComboboxPopover>
+        </div>
+      </ComboboxSearchContextProvider>
+    </ComboboxProvider>
+  );
+}
+export { Simple, FlexibleLayout, MultiInput, DynamicItems, AdvancedSearch, MultiSelectExample };

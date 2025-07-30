@@ -41,7 +41,7 @@ const SearchContext = createContext<SearchContextValue>({
   searchOptions: {},
 });
 
-interface SearchContextProviderProps {
+interface ComboboxSearchContextProviderProps {
   children: ReactNode;
   searchOptions?: SearchOptions;
   defaultValue?: string;
@@ -50,7 +50,7 @@ interface SearchContextProviderProps {
 /**
  * SearchContextProvider - Provides search context
  */
-export function SearchContextProvider({ children, searchOptions = {}, defaultValue }: SearchContextProviderProps) {
+export function ComboboxSearchContextProvider({ children, searchOptions = {}, defaultValue }: ComboboxSearchContextProviderProps) {
   const store = useComboboxContext();
   const searchValue = useStoreState(store, 'value') || '';
   const deferredValue = useDeferredValue(searchValue);
@@ -69,6 +69,7 @@ export function SearchContextProvider({ children, searchOptions = {}, defaultVal
 
 export interface ComboboxProps extends AriaComboboxProps {
   defaultValue?: string;
+  valueFormatter?: (value: string) => string;
 }
 
 /**
@@ -76,7 +77,15 @@ export interface ComboboxProps extends AriaComboboxProps {
  * Restores the selected value if the input value is not in the items list
  * If only one item is available, it selects that item automatically
  */
-export const ComboboxInput = ({ onBlur, onKeyDown, defaultValue, ref, ...props }: ComboboxProps & { ref?: React.Ref<HTMLInputElement> }) => {
+export const ComboboxInput = ({
+  onBlur,
+  onKeyDown,
+  onSelect,
+  defaultValue,
+  ref,
+  valueFormatter,
+  ...props
+}: ComboboxProps & { ref?: React.Ref<HTMLInputElement> }) => {
   const store = useComboboxContext();
 
   function restoreInputValue() {
@@ -85,7 +94,7 @@ export const ComboboxInput = ({ onBlur, onKeyDown, defaultValue, ref, ...props }
       return;
     }
     const { selectedValue, items, value } = store.getState();
-    if (value && value === selectedValue) {
+    if (typeof selectedValue !== 'string' || (value && value === selectedValue)) {
       return;
     }
     const itemsValues = new Set(items?.map(item => item.value));
@@ -93,12 +102,12 @@ export const ComboboxInput = ({ onBlur, onKeyDown, defaultValue, ref, ...props }
     if (items.length === 1 || itemsValues.has(value)) {
       const nextValue = items.length === 1 ? items[0]!.value! : value;
       store.setSelectedValue(nextValue);
-      store.setValue(nextValue);
+      store.setValue(valueFormatter ? valueFormatter(nextValue) : nextValue);
       store.setOpen(false);
     } else {
-      const nextValue = selectedValue || defaultValue;
+      const nextValue = (selectedValue || defaultValue) as string;
       if (nextValue !== undefined) {
-        store.setValue(nextValue as string);
+        store.setValue(valueFormatter ? valueFormatter(nextValue) : nextValue);
       }
     }
   }
@@ -202,9 +211,9 @@ export interface ComboboxRootProps {
 export function ComboboxRoot({ children, defaultValue, searchOptions, comboboxProps, className }: ComboboxRootProps) {
   return (
     <ComboboxProvider defaultValue={defaultValue} {...comboboxProps}>
-      <SearchContextProvider defaultValue={defaultValue} searchOptions={searchOptions}>
+      <ComboboxSearchContextProvider defaultValue={defaultValue} searchOptions={searchOptions}>
         <div className={clsx('dbv-kit-combobox__root', className)}>{children}</div>
-      </SearchContextProvider>
+      </ComboboxSearchContextProvider>
     </ComboboxProvider>
   );
 }
