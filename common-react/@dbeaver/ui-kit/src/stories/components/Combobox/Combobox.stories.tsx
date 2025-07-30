@@ -1,33 +1,25 @@
 import { useState } from 'react';
-import {
-  ComboboxProvider,
-  ComboboxSearchContextProvider,
-  ComboboxInput,
-  ComboboxPopover,
-  ComboboxItem,
-  ComboboxEmpty,
-  ComboboxRoot,
-} from '../../../Combobox/Combobox.js';
+import { ComboboxProvider, ComboboxInput, ComboboxPopover, ComboboxItem, ComboboxEmpty } from '../../../Combobox/Combobox.js';
 
 function Simple() {
   const [value, setValue] = useState('');
   return (
-    <ComboboxRoot comboboxProps={{ setSelectedValue: item => setValue(item as string) }}>
+    <ComboboxProvider setSelectedValue={item => setValue(item as string)}>
       <div>{value}</div>
-      <ComboboxInput valueFormatter={value => value.toUpperCase()} placeholder="Search fruits..." />
+      <ComboboxInput placeholder="Search fruits..." />
       <ComboboxPopover>
         <ComboboxItem value="apple">Apple</ComboboxItem>
         <ComboboxItem value="banana">Banana</ComboboxItem>
         <ComboboxItem value="cherry">Cherry</ComboboxItem>
         <ComboboxEmpty>No fruits found</ComboboxEmpty>
       </ComboboxPopover>
-    </ComboboxRoot>
+    </ComboboxProvider>
   );
 }
 
 function FlexibleLayout() {
   return (
-    <ComboboxRoot>
+    <ComboboxProvider>
       <div className="search-container">
         {/* Input in header */}
         <header className="search-header">
@@ -77,13 +69,13 @@ function FlexibleLayout() {
           </div>
         </aside>
       </div>
-    </ComboboxRoot>
+    </ComboboxProvider>
   );
 }
 
 function MultiInput() {
   return (
-    <ComboboxRoot>
+    <ComboboxProvider>
       <div className="multi-search">
         {/* Primary search */}
         <div className="primary-search">
@@ -106,7 +98,7 @@ function MultiInput() {
           <ComboboxEmpty>No frameworks found</ComboboxEmpty>
         </ComboboxPopover>
       </div>
-    </ComboboxRoot>
+    </ComboboxProvider>
   );
 }
 
@@ -139,71 +131,69 @@ function DynamicItems() {
 
   return (
     <ComboboxProvider>
-      <ComboboxSearchContextProvider>
-        <div className="dynamic-example">
-          <div className="controls">
-            <ComboboxInput placeholder="Search tasks..." />
+      <div className="dynamic-example">
+        <div className="controls">
+          <ComboboxInput placeholder="Search tasks..." />
 
-            <div className="add-item">
-              <input type="text" value={newItemName} onChange={e => setNewItemName(e.target.value)} placeholder="New task name..." />
-              <button onClick={addItem}>Add Task</button>
+          <div className="add-item">
+            <input type="text" value={newItemName} onChange={e => setNewItemName(e.target.value)} placeholder="New task name..." />
+            <button onClick={addItem}>Add Task</button>
+          </div>
+        </div>
+
+        <ComboboxPopover>
+          <div className="task-categories">
+            <div className="category">
+              <h4>Work Tasks</h4>
+              {items
+                .filter(item => item.category === 'work')
+                .map(item => (
+                  <ComboboxItem key={item.id} value={item.name}>
+                    <div className="task-item">
+                      <span>{item.name}</span>
+                      <button
+                        onClick={e => {
+                          e.stopPropagation();
+                          removeItem(item.id);
+                        }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </ComboboxItem>
+                ))}
+            </div>
+
+            <div className="category">
+              <h4>Personal Tasks</h4>
+              {items
+                .filter(item => item.category === 'personal')
+                .map(item => (
+                  <ComboboxItem key={item.id} value={item.name}>
+                    <div className="task-item">
+                      <span>{item.name}</span>
+                      <button
+                        onClick={e => {
+                          e.stopPropagation();
+                          removeItem(item.id);
+                        }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </ComboboxItem>
+                ))}
             </div>
           </div>
 
-          <ComboboxPopover>
-            <div className="task-categories">
-              <div className="category">
-                <h4>Work Tasks</h4>
-                {items
-                  .filter(item => item.category === 'work')
-                  .map(item => (
-                    <ComboboxItem key={item.id} value={item.name}>
-                      <div className="task-item">
-                        <span>{item.name}</span>
-                        <button
-                          onClick={e => {
-                            e.stopPropagation();
-                            removeItem(item.id);
-                          }}
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </ComboboxItem>
-                  ))}
-              </div>
-
-              <div className="category">
-                <h4>Personal Tasks</h4>
-                {items
-                  .filter(item => item.category === 'personal')
-                  .map(item => (
-                    <ComboboxItem key={item.id} value={item.name}>
-                      <div className="task-item">
-                        <span>{item.name}</span>
-                        <button
-                          onClick={e => {
-                            e.stopPropagation();
-                            removeItem(item.id);
-                          }}
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </ComboboxItem>
-                  ))}
-              </div>
+          <ComboboxEmpty>
+            <div className="empty-tasks">
+              <p>No tasks match your search</p>
+              <p>Try a different search term or add a new task</p>
             </div>
-
-            <ComboboxEmpty>
-              <div className="empty-tasks">
-                <p>No tasks match your search</p>
-                <p>Try a different search term or add a new task</p>
-              </div>
-            </ComboboxEmpty>
-          </ComboboxPopover>
-        </div>
-      </ComboboxSearchContextProvider>
+          </ComboboxEmpty>
+        </ComboboxPopover>
+      </div>
     </ComboboxProvider>
   );
 }
@@ -218,42 +208,38 @@ function AdvancedSearch() {
 
   return (
     <ComboboxProvider>
-      <ComboboxSearchContextProvider
-        searchOptions={{
-          searchFields: ['name', 'category'],
-        }}
-      >
-        <div className="product-search">
-          <div className="search-header">
-            <ComboboxInput
-              valueFormatter={value => products.find(item => item.value === value)?.name || value}
-              placeholder="Search products by name or category..."
-            />
-            <div className="search-tips">Try: "macbook", "laptop", "phone", "audio", etc.</div>
-          </div>
-
-          <ComboboxPopover className="product-results">
-            {products.map(product => (
-              <ComboboxItem key={product.id} value={product.value} searchData={{ name: product.name, category: product.category }}>
-                <div className="product-card">
-                  <div className="product-info">
-                    <h4>{product.name}</h4>
-                    <span className="category">{product.category}</span>
-                  </div>
-                  <div className="product-price">${product.price}</div>
-                </div>
-              </ComboboxItem>
-            ))}
-
-            <ComboboxEmpty>
-              <div className="no-products">
-                <h4>No products found</h4>
-                <p>Try searching for: Product names (MacBook, iPhone, etc.) or categories (laptop, phone, etc.)</p>
-              </div>
-            </ComboboxEmpty>
-          </ComboboxPopover>
+      <div className="product-search">
+        <div className="search-header">
+          <ComboboxInput<(typeof products)[number]> getInputFromItem={product => product.name} placeholder="Search products by name or category..." />
+          <div className="search-tips">Try: "macbook", "laptop", "phone", "audio", etc.</div>
         </div>
-      </ComboboxSearchContextProvider>
+
+        <ComboboxPopover className="product-results">
+          {products.map(product => (
+            <ComboboxItem
+              key={product.id}
+              value={product.value}
+              item={{ name: product.name, category: product.category }}
+              getInputFromItem={product => product.name}
+            >
+              <div className="product-card">
+                <div className="product-info">
+                  <h4>{product.name}</h4>
+                  <span className="category">{product.category}</span>
+                </div>
+                <div className="product-price">${product.price}</div>
+              </div>
+            </ComboboxItem>
+          ))}
+
+          <ComboboxEmpty>
+            <div className="no-products">
+              <h4>No products found</h4>
+              <p>Try searching for: Product names (MacBook, iPhone, etc.) or categories (laptop, phone, etc.)</p>
+            </div>
+          </ComboboxEmpty>
+        </ComboboxPopover>
+      </div>
     </ComboboxProvider>
   );
 }
@@ -270,23 +256,21 @@ function MultiSelectExample() {
 
   return (
     <ComboboxProvider selectedValue={selectedValues} setSelectedValue={setSelectedValues}>
-      <ComboboxSearchContextProvider>
-        <div className="multi-select-example">
-          <div>
-            <strong>Selected:</strong> {selectedValues.join(', ') || 'None'}
-          </div>
-          <ComboboxInput placeholder="Select fruits..." />
-          <ComboboxPopover>
-            {items.map(item => (
-              <ComboboxItem key={item.value} value={item.value}>
-                <input type="checkbox" checked={selectedValues.includes(item.value)} readOnly style={{ marginRight: 8 }} />
-                {item.label}
-              </ComboboxItem>
-            ))}
-            <ComboboxEmpty>No fruits found</ComboboxEmpty>
-          </ComboboxPopover>
+      <div className="multi-select-example">
+        <div>
+          <strong>Selected:</strong> {selectedValues.join(', ') || 'None'}
         </div>
-      </ComboboxSearchContextProvider>
+        <ComboboxInput placeholder="Select fruits..." />
+        <ComboboxPopover>
+          {items.map(item => (
+            <ComboboxItem key={item.value} value={item.value}>
+              <input type="checkbox" checked={selectedValues.includes(item.value)} readOnly style={{ marginRight: 8 }} />
+              {item.label}
+            </ComboboxItem>
+          ))}
+          <ComboboxEmpty>No fruits found</ComboboxEmpty>
+        </ComboboxPopover>
+      </div>
     </ComboboxProvider>
   );
 }
