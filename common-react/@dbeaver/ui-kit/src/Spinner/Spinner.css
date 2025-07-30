@@ -39,6 +39,10 @@
 
     animation: var(--dbv-kit-animate-spin);
     animation-delay: var(--dbv-kit-spinner-animation-delay);
+
+    @media screen and (prefers-reduced-motion: reduce) {
+      animation-timing-function: linear;
+    }
   }
 
   .dbv-kit-spinner__circle {

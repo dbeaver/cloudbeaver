@@ -50,18 +50,20 @@
     box-shadow: var(--dbv-kit-combobox-popover-shadow);
     outline: 0;
 
-    opacity: 0;
-    transform-origin: top;
-    transition-property: opacity, scale, translate;
-    transition-timing-function: var(--tw-ease-in-out);
-    transition-duration: 150ms;
-    scale: 0.95;
-    translate: 0 -0.5rem;
+    @media (prefers-reduced-motion: no-preference) {
+      opacity: 0;
+      transform-origin: top;
+      scale: 0.95;
+      translate: 0 -0.5rem;
+      transition-property: opacity, scale, translate;
+      transition-timing-function: var(--tw-ease-in-out);
+      transition-duration: 150ms;
 
-    &[data-enter] {
-      opacity: 1;
-      scale: 1;
-      translate: 0;
+      &[data-enter] {
+        opacity: 1;
+        scale: 1;
+        translate: 0;
+      }
     }
   }
 
