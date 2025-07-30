@@ -14,7 +14,7 @@ function Simple() {
   return (
     <ComboboxRoot comboboxProps={{ setSelectedValue: item => setValue(item as string) }}>
       <div>{value}</div>
-      <ComboboxInput placeholder="Search fruits..." />
+      <ComboboxInput valueFormatter={value => value.toUpperCase()} placeholder="Search fruits..." />
       <ComboboxPopover>
         <ComboboxItem value="apple">Apple</ComboboxItem>
         <ComboboxItem value="banana">Banana</ComboboxItem>

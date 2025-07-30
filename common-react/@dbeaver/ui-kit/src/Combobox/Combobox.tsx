@@ -64,7 +64,7 @@ export function ComboboxSearchContextProvider({ children, searchOptions = {}, de
     [deferredValue, searchOptions, defaultValue],
   );
 
-  return <SearchContext.Provider value={contextValue}>{children}</SearchContext.Provider>;
+  return <SearchContext value={contextValue}>{children}</SearchContext>;
 }
 
 export interface ComboboxProps extends AriaComboboxProps {
@@ -94,7 +94,7 @@ export const ComboboxInput = ({
       return;
     }
     const { selectedValue, items, value } = store.getState();
-    if (typeof selectedValue !== 'string' || (value && value === selectedValue)) {
+    if (typeof selectedValue !== 'string' || (value === selectedValue && !valueFormatter)) {
       return;
     }
     const itemsValues = new Set(items?.map(item => item.value));
