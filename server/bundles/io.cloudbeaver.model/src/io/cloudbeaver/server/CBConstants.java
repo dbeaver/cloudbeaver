@@ -32,7 +32,8 @@ public class CBConstants {
     public static final String PARAM_SERVER_PORT = "serverPort";
     public static final String PARAM_SERVER_HOST = "serverHost";
     public static final String PARAM_SERVER_NAME = "serverName";
-    public static final String PARAM_SECURE_COOKIES = "secureCookies";
+    public static final String PARAM_FORCE_HTTPS = "forceHttps";
+    public static final String PARAM_SUPPORTED_HOSTS = "supportedHosts";
     public static final String PARAM_SSL_CONFIGURATION_PATH = "sslConfigurationPath";
     public static final String PARAM_CONTENT_ROOT = "contentRoot";
     public static final String PARAM_SERVER_URL = "serverURL";

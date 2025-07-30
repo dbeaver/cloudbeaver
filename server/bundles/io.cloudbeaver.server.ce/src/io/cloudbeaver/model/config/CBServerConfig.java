@@ -20,18 +20,21 @@ import com.google.gson.annotations.SerializedName;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.model.app.WebServerConfiguration;
 import io.cloudbeaver.server.CBConstants;
+import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URI;
+import java.util.*;
 
 public class CBServerConfig implements WebServerConfiguration {
 
     private static final Log log = Log.getLog(CBServerConfig.class);
 
     protected String serverURL;
-    protected boolean secureCookies;
+    @NotNull
+    protected List<String> supportedHosts = new ArrayList<>();
+    protected boolean forceHttps;
     protected int serverPort = CBConstants.DEFAULT_SERVER_PORT;
     private String serverHost = null;
     private String serverName = null;
@@ -184,8 +187,32 @@ public class CBServerConfig implements WebServerConfiguration {
         return new SMControllerConfiguration();
     }
 
-    public boolean isSecureCookies() {
-        return secureCookies;
+    public boolean isForceHttps() {
+        return forceHttps;
+    }
+
+    public void setForceHttps(boolean forceHttps) {
+        this.forceHttps = forceHttps;
+    }
+
+    @NotNull
+    public List<String> getSupportedHosts() {
+        return new ArrayList<>(supportedHosts);
+    }
+
+    public void setSupportedHosts(@NotNull Collection<String> availableHosts) {
+        LinkedHashSet<String> uniqueHosts = new LinkedHashSet<>();
+        for (String host : availableHosts) {
+            try {
+                URI uri = URI.create(host);
+                String hostName = ServletAppUtils.removeSideSlashes(uri.getHost() != null ? uri.getHost() : host);
+                uniqueHosts.add(hostName);
+            } catch (Exception e) {
+                log.error("Invalid host URI: " + host, e);
+            }
+        }
+        this.supportedHosts.clear();
+        this.supportedHosts.addAll(uniqueHosts);
     }
 
     public boolean isBindSessionToIp() {
