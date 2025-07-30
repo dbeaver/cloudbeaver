@@ -8,15 +8,27 @@
 import { observer } from 'mobx-react-lite';
 
 import type { AdministrationItemContentProps } from '@cloudbeaver/core-administration';
-import { ColoredContainer, Form, Group, ToolsAction, ToolsPanel, useForm, useTranslate, getComputed, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import {
+  ColoredContainer,
+  Form,
+  Group,
+  ToolsAction,
+  ToolsPanel,
+  useForm,
+  useTranslate,
+  getComputed,
+  TextPlaceholder,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Settings } from '@cloudbeaver/plugin-settings-panel';
 import { TabList, TabsState, type ITabData } from '@cloudbeaver/core-ui';
 import { SettingsAdministrationService } from './SettingsAdministrationService.js';
 import { useState } from 'react';
+import { SettingsResolverService } from '@cloudbeaver/core-settings';
 
 export const SettingsAdministration = observer<AdministrationItemContentProps>(function SettingsAdministration() {
+  const settingsResolverService = useService(SettingsResolverService);
   const settingsAdministrationService = useService(SettingsAdministrationService);
   const notificationService = useService(NotificationService);
   const [tabId, setTabId] = useState<string | null>(null);
@@ -86,7 +98,11 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
           <Group hidden={hideSingleTab} box keepSize hideOverflow>
             <TabList underline />
           </Group>
-          {settingsSource ? <Settings source={settingsSource} accessor={accessor} /> : <TextPlaceholder>{translate('plugin_settings_administration_no_settings')}</TextPlaceholder>}
+          {settingsSource ? (
+            <Settings resolver={settingsResolverService} source={settingsSource} accessor={accessor} />
+          ) : (
+            <TextPlaceholder>{translate('plugin_settings_administration_no_settings')}</TextPlaceholder>
+          )}
         </ColoredContainer>
       </Form>
     </TabsState>

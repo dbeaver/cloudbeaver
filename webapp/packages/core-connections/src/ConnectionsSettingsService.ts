@@ -33,7 +33,7 @@ export class ConnectionsSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings<typeof settingsSchema>(() => [
       {
         group: CONNECTIONS_SETTINGS_GROUP,
         key: 'core.connections.disabled',

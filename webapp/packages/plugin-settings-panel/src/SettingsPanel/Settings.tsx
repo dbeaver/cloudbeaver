@@ -8,8 +8,8 @@
 import { useId, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { Container, Filter, Group, s, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
-import { type ISettingsSource, ROOT_SETTINGS_GROUP, SettingsGroup } from '@cloudbeaver/core-settings';
+import { Container, Filter, getComputed, Group, s, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
+import { type IEditableSettingsSource, ROOT_SETTINGS_GROUP, SettingsGroup, SettingsResolverSource } from '@cloudbeaver/core-settings';
 import { useTreeData, useTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 
@@ -20,11 +20,14 @@ import { SettingsList } from './SettingsList.js';
 import { useSettings } from './useSettings.js';
 
 export interface ISettingsProps {
-  source: ISettingsSource;
+  resolver: SettingsResolverSource;
+  source: IEditableSettingsSource;
   accessor?: string[];
+  hideGroupsSettingsLimit?: number;
+  displayRestore?: boolean;
 }
 
-export const Settings = observer<ISettingsProps>(function Settings({ source, accessor }) {
+export const Settings = observer<ISettingsProps>(function Settings({ resolver, source, accessor, hideGroupsSettingsLimit = 0, displayRestore }) {
   const translate = useTranslate();
   const settingsId = useId();
   const settings = useSettings(accessor);
@@ -78,13 +81,15 @@ export const Settings = observer<ISettingsProps>(function Settings({ source, acc
     groupSelectExecutor.execute(id);
   }
 
+  const isGroupsHidden = getComputed(() => [...settings.settings.values()].flat().length <= hideGroupsSettingsLimit);
+
   return (
     <Container gap overflow noWrap>
-      <Group className={s(classes, { settingsGroups: true })} vertical box keepSize overflow>
+      <Group className={s(classes, { settingsGroups: true })} hidden={isGroupsHidden} vertical box keepSize overflow>
         <SettingsGroups treeData={treeData} onClick={handleClick} />
       </Group>
       <Container className={s(classes, { settingsContainer: true })} overflow vertical gap noWrap>
-        <Container gap keepSize>
+        <Container hidden={isGroupsHidden} gap keepSize>
           <Filter
             state={treeFilter}
             name="filter"
@@ -97,9 +102,12 @@ export const Settings = observer<ISettingsProps>(function Settings({ source, acc
             settingsId={settingsId}
             treeData={treeData}
             treeFilter={treeFilter}
+            resolver={resolver}
             source={source}
             settings={settings.settings}
+            groupsHidden={isGroupsHidden}
             groupSelectExecutor={groupSelectExecutor}
+            displayRestore={displayRestore}
           />
         </Container>
       </Container>

@@ -21,10 +21,12 @@ package io.cloudbeaver.model.config;
  */
 public class ConnectionBruteForceConfiguration {
     private static final int DEFAULT_ERROR_ATTEMPTS_CHECK_MINUTES = 24 * 60;
+    private static final int BLOCK_TIME_IN_MINUTES = 60;
     private static final int DEFAULT_MAX_CONNECT_ATTEMPTS = 5;
     private boolean enabled = false;
     private int maxFailedConnectAttempts = DEFAULT_MAX_CONNECT_ATTEMPTS;
     private int errorAttemptsPeriodInMinutes = DEFAULT_ERROR_ATTEMPTS_CHECK_MINUTES;
+    private int blockTimeInMinutes = BLOCK_TIME_IN_MINUTES;
 
     public boolean isEnabled() {
         return enabled;
@@ -48,5 +50,13 @@ public class ConnectionBruteForceConfiguration {
 
     public void setErrorAttemptsPeriodInMinutes(int errorAttemptsPeriodInMinutes) {
         this.errorAttemptsPeriodInMinutes = errorAttemptsPeriodInMinutes;
+    }
+
+    public int getBlockTimeInMinutes() {
+        return blockTimeInMinutes;
+    }
+
+    public void setBlockTimeInMinutes(int blockTimeInMinutes) {
+        this.blockTimeInMinutes = blockTimeInMinutes;
     }
 }

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -159,7 +159,7 @@ export class MenuBootstrap extends Bootstrap {
         }
 
         if (
-          !sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) &&
+          !sqlEditorData.isExecutionAllowed &&
           [
             ACTION_SQL_EDITOR_EXECUTE,
             ACTION_SQL_EDITOR_EXECUTE_NEW,
@@ -207,7 +207,7 @@ export class MenuBootstrap extends Bootstrap {
       contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       isBindingApplicable: (contexts, action) => {
         const sqlEditorData = contexts.get(DATA_CONTEXT_SQL_EDITOR_DATA);
-        return action === ACTION_SQL_EDITOR_EXECUTE_SCRIPT && sqlEditorData?.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) === true;
+        return action === ACTION_SQL_EDITOR_EXECUTE_SCRIPT && sqlEditorData?.isExecutionAllowed === true;
       },
       handler: this.sqlEditorActionHandler.bind(this),
     });

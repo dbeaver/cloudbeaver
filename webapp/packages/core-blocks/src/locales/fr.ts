@@ -8,6 +8,7 @@ export default [
   ['core_blocks_object_property_info_password_saved', 'La valeur du champ est sauvegardée'],
   ['core_blocks_properties_table_item_remove', 'Supprimer la propriété'],
   ['combobox_no_results_placeholder', 'Aucun résultat'],
+  ['combobox_select_placeholder', 'Select an option'],
   ['core_blocks_exception_message_error_title', "Impossible d'afficher le contenu"],
   ['core_blocks_exception_message_error_message', 'Quelque chose a mal tourné.'],
   ['core_blocks_custom_input_validation_error', "La valeur du champ n'est pas valide"],

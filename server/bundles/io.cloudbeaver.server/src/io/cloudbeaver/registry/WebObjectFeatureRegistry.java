@@ -33,7 +33,7 @@ public class WebObjectFeatureRegistry {
 
     private final List<WebObjectFeatureProviderDescriptor> providers = new ArrayList<>();
 
-    public static WebObjectFeatureRegistry getInstance() {
+    public static synchronized WebObjectFeatureRegistry getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new WebObjectFeatureRegistry();
             INSTANCE.loadExtensions(Platform.getExtensionRegistry());

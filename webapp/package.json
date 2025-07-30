@@ -22,7 +22,8 @@
     "validate-dependencies": "core-cli-validate-dependencies './packages/*/'",
     "add-plugin": "core-cli-add-plugin",
     "check-license": "core-cli-check-license",
-    "version:set": "yarn workspaces foreach -Ap --include '@cloudbeaver/product-*' run version:set"
+    "version:set": "yarn workspaces foreach -Ap --include '@cloudbeaver/product-*' run version:set",
+    "sync-pre-commit-hooks": "yarn dlx --quiet lefthook install"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
@@ -39,7 +40,6 @@
     "concurrently": "^9",
     "eslint": "^9.30.1",
     "happy-dom": "^18",
-    "lefthook": "^1",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "msw": "^2",

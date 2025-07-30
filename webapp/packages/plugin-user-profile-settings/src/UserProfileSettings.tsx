@@ -12,11 +12,13 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { UserSettingsService } from '@cloudbeaver/core-settings-user';
 import { Settings } from '@cloudbeaver/plugin-settings-panel';
+import { SettingsResolverService } from '@cloudbeaver/core-settings';
 
 const clientScope = ['client'];
 
 export const UserProfileSettings = observer(function UserProfileSettings() {
   const translate = useTranslate();
+  const settingsResolverService = useService(SettingsResolverService);
   const userSettingsService = useService(UserSettingsService);
   const notificationService = useService(NotificationService);
 
@@ -70,7 +72,7 @@ export const UserProfileSettings = observer(function UserProfileSettings() {
             </ToolsAction>
           </ToolsPanel>
         </Group>
-        <Settings source={userSettingsService} accessor={clientScope} />
+        <Settings resolver={settingsResolverService} source={userSettingsService} accessor={clientScope} />
       </ColoredContainer>
     </Form>
   );

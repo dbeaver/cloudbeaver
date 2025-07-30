@@ -1,4 +1,5 @@
 export default [
+  ['authentication_administration_pages_label', 'Pages'],
   ['authentication_administration_user_connections_user_add', 'User Creation'],
   ['authentication_administration_user_connections_user_new', 'New user'],
   ['authentication_administration_user_connections_access_load_fail', "User's granted connections loading failed"],

@@ -73,15 +73,15 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     return this.executionContext?.projectId ?? null;
   }
 
-  get features(): ESqlDataSourceFeatures[] {
-    return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable];
-  }
-
   readonly icon: string;
   readonly history: ISqlDataSourceHistory;
   readonly onUpdate: ISyncExecutor;
   readonly onSetScript: ISyncExecutor<ISetScriptData>;
   readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<QueryDataSource>[]>;
+
+  protected get features(): ESqlDataSourceFeatures[] {
+    return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable];
+  }
 
   protected outdated: boolean;
   protected editing: boolean;
