@@ -91,18 +91,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         Path runtimeConfigPath = getRuntimeAppConfigPath();
         if (Files.exists(runtimeConfigPath)) {
             log.debug("Runtime configuration [" + runtimeConfigPath.toAbsolutePath() + "]");
-            Map<String, Object> runtimeConfigMap = loadConfiguration(runtimeConfigPath);
-            Map<String, Object> serverConfigMap = JSONUtils.getObject(runtimeConfigMap, CBConstants.PARAM_SERVER_CONFIGURATION);
-            if (!serverConfigMap.containsKey(CBConstants.PARAM_FORCE_HTTPS)) {
-                CBServerConfig serverConfig = getServerConfiguration();
-                // enable https for legacy configurations
-                if (CommonUtils.isEmpty(serverConfig.getSupportedHosts())
-                    && CommonUtils.isNotEmpty(serverConfig.getServerURL())
-                    && serverConfig.getServerURL().startsWith("https://")
-                ) {
-                    serverConfig.setForceHttps(true);
-                }
-            }
+            loadConfiguration(runtimeConfigPath);
         }
 
         // Set default preferences
