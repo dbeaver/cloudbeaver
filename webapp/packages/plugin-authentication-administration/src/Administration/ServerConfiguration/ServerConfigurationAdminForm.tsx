@@ -9,11 +9,11 @@ import { observer } from 'mobx-react-lite';
 
 import { ADMIN_USERNAME_MIN_LENGTH } from '@cloudbeaver/core-authentication';
 import { Group, GroupTitle, InputField, useCustomInputValidation, usePasswordValidation, useTranslate } from '@cloudbeaver/core-blocks';
-import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 import { isValuesEqual } from '@cloudbeaver/core-utils';
+import type { IServerConfig } from '@cloudbeaver/plugin-administration';
 
 interface Props {
-  serverConfig: ServerConfigInput;
+  serverConfig: IServerConfig;
 }
 
 export const ServerConfigurationAdminForm = observer<Props>(function ServerConfigurationAdminForm({ serverConfig }) {
