@@ -36,6 +36,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSUserDisabledEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSessionStateEvent;
 import org.jkiss.utils.CommonUtils;
 
@@ -411,6 +412,20 @@ public class CBSessionManager implements WebAppSessionManager {
                     if (session instanceof WebHeadlessSession headlessSession) {
                         headlessSession.addSessionEvent(userDeletedEvent);
                     }
+                    iterator.remove();
+                    session.close();
+                }
+            }
+        }
+    }
+
+    public void closeUserSession(@NotNull WSUserDisabledEvent userDisabledEvent) {
+        synchronized (sessionMap) {
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
+                if (CommonUtils.equalObjects(session.getUserContext().getUserId(),
+                    userDisabledEvent.getDisabledUserId())) {
+                    session.addSessionEvent(userDisabledEvent);
                     iterator.remove();
                     session.close();
                 }
