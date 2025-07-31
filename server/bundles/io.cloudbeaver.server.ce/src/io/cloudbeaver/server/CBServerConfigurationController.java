@@ -543,6 +543,12 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             CBConstants.PARAM_SUPPORTED_HOSTS,
             serverConfig.getSupportedHosts()
         );
+        copyConfigValue(
+            originServerConfig,
+            serverConfigProperties,
+            CBConstants.PARAM_BIND_SESSION_TO_IP,
+            serverConfig.getBindSessionToIp()
+        );
         var productConfigProperties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Map<String, Object> oldProductRuntimeConfig = JSONUtils.getObject(originServerConfig,
             CBConstants.PARAM_PRODUCT_SETTINGS);
