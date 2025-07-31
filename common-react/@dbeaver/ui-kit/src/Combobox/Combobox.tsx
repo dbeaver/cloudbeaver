@@ -50,14 +50,25 @@ export function ComboboxInput<T = unknown>({
   function restoreInputValue() {
     const { selectedValue, items, value } = store!.getState();
 
-    if (typeof selectedValue !== 'string' || (value === selectedValue && !getInputFromItem) || items.length === 0) {
+    if (typeof selectedValue !== 'string' || (value === selectedValue && !getInputFromItem)) {
       return;
     }
 
     const nextValue = (selectedValue || defaultValue) as string;
-    const nextItem = (items?.find(item => item.value === nextValue) as ComboboxStoreState['items'][number] & { item: T })?.item;
 
-    store!.setValue(getInputFromItem ? getInputFromItem(nextItem) : nextValue);
+    if (!nextValue) {
+      return;
+    }
+
+    if (getInputFromItem) {
+      const nextItem = (items?.find(item => item.value === nextValue) as ComboboxStoreState['items'][number] & { item: T })?.item;
+      if (nextItem) {
+        store!.setValue(getInputFromItem(nextItem));
+        return;
+      }
+    }
+
+    store!.setValue(nextValue);
   }
 
   function handleBlur(event: React.FocusEvent<HTMLInputElement>) {

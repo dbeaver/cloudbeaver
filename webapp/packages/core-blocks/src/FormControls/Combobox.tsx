@@ -143,7 +143,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           {children}
         </FieldLabel>
       )}
-      <ComboboxProvider defaultValue={comboboxDefaultValue} setSelectedValue={handleSelect}>
+      <ComboboxProvider defaultValue={comboboxDefaultValue} defaultSelectedValue={comboboxDefaultValue} setSelectedValue={handleSelect}>
         <div className="tw:relative tw:flex tw:flex-1 tw:items-center tw:gap-2">
           <ComboboxInput
             defaultValue={comboboxDefaultValue}
