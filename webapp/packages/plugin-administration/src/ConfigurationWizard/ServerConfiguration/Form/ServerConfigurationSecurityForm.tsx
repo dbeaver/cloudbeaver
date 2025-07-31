@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Group, GroupTitle, Switch, useTranslate } from '@cloudbeaver/core-blocks';
+import { Group, GroupTitle, Select, Switch, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IServerConfig } from '../IServerConfigurationFormPartState.js';
 
 interface Props {
@@ -40,6 +40,16 @@ export const ServerConfigurationSecurityForm = observer<Props>(function ServerCo
       >
         {translate('administration_configuration_wizard_configuration_security_public_credentials')}
       </Switch>
+      <Select
+        state={serverConfig}
+        name="bindSessionToIp"
+        items={BIND_SESSION_TO_IP_OPTIONS}
+        keySelector={item => item.value}
+        valueSelector={item => item.label}
+        description={translate('administration_configuration_wizard_configuration_security_bind_session_to_ip_description')}
+      >
+        {translate('administration_configuration_wizard_configuration_security_bind_session_to_ip')}
+      </Select>
     </Group>
   );
 });
