@@ -132,7 +132,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const comboboxDefaultValue = selectedItem ? valueSelector(selectedItem) : defaultValue ? String(defaultValue) : undefined;
 
   return (
-    <Field {...layoutProps} className={className} style={{ display: inline ? 'flex' : 'block', alignItems: inline ? 'center' : undefined }}>
+    <Field {...layoutProps} className={clsx(className, inline && 'tw:flex tw:items-center')}>
       {children && (
         <FieldLabel
           required={rest.required}
