@@ -34,4 +34,6 @@ fragment ServerConfig on ServerConfig {
     nativeName
   }
   disabledDrivers
+  forceHttps
+  supportedHosts
 }

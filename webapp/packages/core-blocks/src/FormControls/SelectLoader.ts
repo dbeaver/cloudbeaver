@@ -5,9 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { INavigatorConfig, IServerConfig } from './IServerConfigurationFormPartState.js';
+import { importLazyComponent } from '../importLazyComponent.js';
 
-export interface IServerConfigurationPageState {
-  serverConfig: IServerConfig;
-  navigatorConfig: INavigatorConfig;
-}
+export const Select = importLazyComponent(() => import('./Select.js').then(m => m.Select));

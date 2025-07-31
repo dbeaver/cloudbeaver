@@ -8,10 +8,10 @@
 import { observer } from 'mobx-react-lite';
 
 import { Switch, useTranslate } from '@cloudbeaver/core-blocks';
-import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
+import type { IServerConfig } from '../IServerConfigurationFormPartState.js';
 
 interface Props {
-  serverConfig: ServerConfigInput;
+  serverConfig: IServerConfig;
 }
 
 export const ServerConfigurationConfigurationForm = observer<Props>(function ServerConfigurationConfigurationForm({ serverConfig }) {

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,6 @@ export class GeneratorMenuBootstrap extends Bootstrap {
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
         return (
           !model.isReadonly(resultIndex) &&
-          model.hasElementIdentifier(resultIndex) &&
           model.source.getResult(resultIndex)?.dataFormat === ResultDataFormat.Resultset &&
           !presentation?.readonly &&
           (!presentation || presentation.type === DataViewerPresentationType.Data)

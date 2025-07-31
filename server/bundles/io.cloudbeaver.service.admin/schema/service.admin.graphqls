@@ -108,7 +108,7 @@ type WebFeatureSet {
 
 input ServerConfigInput {
     serverName: String
-    serverURL: String
+    serverURL: String @deprecated
 
     adminName: String
     adminPassword: String
@@ -126,6 +126,8 @@ input ServerConfigInput {
     disabledDrivers: [ID!]
 
     sessionExpireTime: Int
+    forceHttps: Boolean @since(version: "25.1.3")
+    supportedHosts: [String!]! @since(version: "25.1.3")
 }
 
 input AdminUserFilterInput {

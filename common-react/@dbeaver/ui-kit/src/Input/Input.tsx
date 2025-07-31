@@ -6,23 +6,49 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { type ComponentPropsWithRef } from 'react';
+import { type ComponentPropsWithRef, type ReactElement, useId } from 'react';
 import './Input.css';
 import clsx from 'clsx';
 import { componentProviderWrapper } from '../componentProviderWrapper.js';
 
-export interface InputProps extends Omit<ComponentPropsWithRef<'input'>, 'size'> {
-  size?: 'small' | 'medium' | 'large' | 'xlarge';
-  label?: React.ReactNode;
-}
+export type InputProps = Omit<ComponentPropsWithRef<'input'>, 'size'> & {
+    label?: ReactElement | string;
+    size?: 'small' | 'medium' | 'large' | 'xlarge';
+  };
 
-export const InputBase: React.FC<InputProps> = function Input({ size, className, ...props }) {
+export const InputBase: React.FC<InputProps> = function Input({ 
+  size, 
+  className, 
+  label, 
+  'aria-labelledby': ariaLabelledBy, 
+  'aria-label': ariaLabel,
+  ...props 
+}) {
+  const labelId = useId();
   const classNameToApply = clsx(`dbv-kit-input`, `dbv-kit-input--${size ?? 'medium'}`, className);
+  
+  if (label) {
+    return (
+      <label className="dbv-kit-input-wrapper">
+        <div id={labelId} className={clsx('dbv-kit-input__title', props.required && 'dbv-kit-input__title--required')}>
+          {label}
+        </div>
+        <input 
+          className={classNameToApply} 
+          aria-labelledby={labelId}
+          {...props} 
+        />
+      </label>
+    );
+  }
+  
   return (
-    <label className="dbv-kit-input-wrapper">
-      {props.label && <div className={clsx('dbv-kit-input__title', props.required && 'dbv-kit-input__title--required')}>{props.label}</div>}
-      <input className={classNameToApply} {...props} />
-    </label>
+    <input 
+      className={classNameToApply} 
+      aria-labelledby={ariaLabelledBy}
+      aria-label={ariaLabel}
+      {...props} 
+    />
   );
 };
 

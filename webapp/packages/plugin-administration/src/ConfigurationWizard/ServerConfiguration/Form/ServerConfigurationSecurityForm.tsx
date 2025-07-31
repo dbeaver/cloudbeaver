@@ -8,10 +8,10 @@
 import { observer } from 'mobx-react-lite';
 
 import { Combobox, Group, GroupTitle, Switch, useTranslate } from '@cloudbeaver/core-blocks';
-import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
+import type { IServerConfig } from '../IServerConfigurationFormPartState.js';
 
 interface Props {
-  serverConfig: ServerConfigInput;
+  serverConfig: IServerConfig;
 }
 
 export const ServerConfigurationSecurityForm = observer<Props>(function ServerConfigurationSecurityForm({ serverConfig }) {
@@ -47,7 +47,7 @@ export const ServerConfigurationSecurityForm = observer<Props>(function ServerCo
       >
         {translate('administration_configuration_wizard_configuration_security_public_credentials')}
       </Switch>
-      <Combobox
+      <ComboboxCombobox
         state={serverConfig}
         name="bindSessionToIp"
         items={BIND_SESSION_TO_IP_OPTIONS}
