@@ -383,6 +383,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@dbeaver/react-tests@workspace:@dbeaver/react-tests, @dbeaver/react-tests@workspace:^":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/react-tests@workspace:@dbeaver/react-tests"
+  dependencies:
+    "@dbeaver/cli": "workspace:^"
+    "@dbeaver/tsconfig": "workspace:^"
+    "@types/node": "npm:^22"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+    vitest: "npm:^3"
+  languageName: unknown
+  linkType: soft
+
 "@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api":
   version: 0.0.0-use.local
   resolution: "@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api"
@@ -1841,6 +1854,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^20.0.0":
+  version: 20.19.9
+  resolution: "@types/node@npm:20.19.9"
+  dependencies:
+    undici-types: "npm:~6.21.0"
+  checksum: 10c0/c6738131f1698258a5ac1e0185e4fc56977f7f566cd0ee11167f93f2339478470257bd82c5e1908a936a204e0ad7996d741356a1a07c04997a236161ea23a874
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:^22":
   version: 22.16.5
   resolution: "@types/node@npm:22.16.5"
@@ -1918,6 +1940,13 @@ __metadata:
   version: 2.0.11
   resolution: "@types/unist@npm:2.0.11"
   checksum: 10c0/24dcdf25a168f453bb70298145eb043cfdbb82472db0bc0b56d6d51cd2e484b9ed8271d4ac93000a80da568f2402e9339723db262d0869e2bf13bc58e081768d
+  languageName: node
+  linkType: hard
+
+"@types/whatwg-mimetype@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "@types/whatwg-mimetype@npm:3.0.2"
+  checksum: 10c0/dad39d1e4abe760a0a963c84bbdbd26b1df0eb68aff83bdf6ecbb50ad781ead777f6906d19a87007790b750f7500a12e5624d31fc6a1529d14bd19b5c3a316d1
   languageName: node
   linkType: hard
 
@@ -2556,7 +2585,9 @@ __metadata:
   dependencies:
     "@dbeaver/cli": "workspace:^"
     "@dbeaver/prettier-config": "workspace:^"
+    "@dbeaver/react-tests": "workspace:^"
     "@wroud/ts-template": "npm:^0"
+    happy-dom: "npm:^18"
     prettier: "npm:^3.6.2"
     rimraf: "npm:^6"
   languageName: unknown
@@ -3551,6 +3582,17 @@ __metadata:
   version: 16.11.0
   resolution: "graphql@npm:16.11.0"
   checksum: 10c0/124da7860a2292e9acf2fed0c71fc0f6a9b9ca865d390d112bdd563c1f474357141501c12891f4164fe984315764736ad67f705219c62f7580681d431a85db88
+  languageName: node
+  linkType: hard
+
+"happy-dom@npm:^18":
+  version: 18.0.1
+  resolution: "happy-dom@npm:18.0.1"
+  dependencies:
+    "@types/node": "npm:^20.0.0"
+    "@types/whatwg-mimetype": "npm:^3.0.2"
+    whatwg-mimetype: "npm:^3.0.0"
+  checksum: 10c0/10f2115f5001fdaf1aedcbda89c15248a1c2e43a25d7e774cb641a35bf6763cef9097b438ef3c2248ab59a0ef33b3e88cb94da096f2bb0fc109ba3f43f7c66d4
   languageName: node
   linkType: hard
 
@@ -7405,6 +7447,13 @@ __metadata:
   version: 2.0.1
   resolution: "web-namespaces@npm:2.0.1"
   checksum: 10c0/df245f466ad83bd5cd80bfffc1674c7f64b7b84d1de0e4d2c0934fb0782e0a599164e7197a4bce310ee3342fd61817b8047ff04f076a1ce12dd470584142a4bd
+  languageName: node
+  linkType: hard
+
+"whatwg-mimetype@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "whatwg-mimetype@npm:3.0.0"
+  checksum: 10c0/323895a1cda29a5fb0b9ca82831d2c316309fede0365047c4c323073e3239067a304a09a1f4b123b9532641ab604203f33a1403b5ca6a62ef405bcd7a204080f
   languageName: node
   linkType: hard
 

@@ -4556,6 +4556,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@dbeaver/react-tests@workspace:../common-react/@dbeaver/react-tests, @dbeaver/react-tests@workspace:^":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/react-tests@workspace:../common-react/@dbeaver/react-tests"
+  dependencies:
+    "@dbeaver/cli": "workspace:^"
+    "@dbeaver/tsconfig": "workspace:^"
+    "@types/node": "npm:^22"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+    vitest: "npm:^3"
+  languageName: unknown
+  linkType: soft
+
 "@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api, @dbeaver/result-set-api@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api"
@@ -9477,7 +9490,9 @@ __metadata:
   dependencies:
     "@dbeaver/cli": "workspace:^"
     "@dbeaver/prettier-config": "workspace:^"
+    "@dbeaver/react-tests": "workspace:^"
     "@wroud/ts-template": "npm:^0"
+    happy-dom: "npm:^18"
     prettier: "npm:^3.6.2"
     rimraf: "npm:^6"
   languageName: unknown

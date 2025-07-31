@@ -6,6 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { ReactVitestConfig } from '@dbeaver/react-tests';
-
-export default ReactVitestConfig;
+export default {};
