@@ -18,6 +18,7 @@
     "@wroud/ts-template": "^0",
     "happy-dom": "^18",
     "prettier": "^3.6.2",
-    "rimraf": "^6"
+    "rimraf": "^6",
+    "vitest": "^3"
   }
 }

@@ -27,6 +27,9 @@
   "devDependencies": {
     "@dbeaver/cli": "workspace:^",
     "@dbeaver/tsconfig": "workspace:^",
+    "@testing-library/dom": "^10",
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^16",
     "@types/node": "^22",
     "rimraf": "^6",
     "typescript": "^5",

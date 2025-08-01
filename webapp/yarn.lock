@@ -4563,6 +4563,9 @@ __metadata:
   dependencies:
     "@dbeaver/cli": "workspace:^"
     "@dbeaver/tsconfig": "workspace:^"
+    "@testing-library/dom": "npm:^10"
+    "@testing-library/jest-dom": "npm:^6"
+    "@testing-library/react": "npm:^16"
     "@types/node": "npm:^22"
     rimraf: "npm:^6"
     typescript: "npm:^5"
@@ -9496,6 +9499,7 @@ __metadata:
     happy-dom: "npm:^18"
     prettier: "npm:^3.6.2"
     rimraf: "npm:^6"
+    vitest: "npm:^3"
   languageName: unknown
   linkType: soft
 
