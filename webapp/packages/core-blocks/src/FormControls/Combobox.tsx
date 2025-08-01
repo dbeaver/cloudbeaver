@@ -147,6 +147,54 @@ export const Combobox: ComboboxType = observer(function Combobox({
   //   }
   // }, [selectedItem, valueSelector]);
 
+  function renderComboboxItems() {
+    const filteredItems = items
+      .map((item, index) => {
+        const itemKey = String(keySelector(item, index));
+        const itemValue = valueSelector(item);
+        const itemTitle = titleSelector?.(item);
+        const itemIcon = iconSelector?.(item);
+        const itemDisabled = isDisabled?.(item);
+
+        const isVisible =
+          inputValue === valueSelector(selectedItem) || !inputValue.trim() || itemValue.toLowerCase().includes(inputValue.trim().toLowerCase());
+
+        return {
+          item,
+          index,
+          itemKey,
+          itemValue,
+          itemTitle,
+          itemIcon,
+          itemDisabled,
+          isVisible,
+        };
+      })
+      .filter(({ isVisible }) => isVisible);
+
+    return filteredItems.length > 0 ? (
+      filteredItems.map(({ itemKey, itemValue, itemTitle, itemIcon, itemDisabled }) => (
+        <ComboboxItem
+          key={itemKey}
+          value={itemKey}
+          disabled={itemDisabled}
+          title={itemTitle}
+          className={clsx('tw:flex tw:items-center tw:gap-2 tw:py-2 tw:px-3 tw:leading-none', {
+            'tw:cursor-pointer': !itemDisabled,
+            'tw:cursor-not-allowed': itemDisabled,
+          })}
+        >
+          {iconSelector && (
+            <div className="tw:w-4 tw:h-4 tw:shrink-0">{itemIcon && typeof itemIcon === 'string' ? <IconOrImage icon={itemIcon} /> : itemIcon}</div>
+          )}
+          <div>{itemValue}</div>
+        </ComboboxItem>
+      ))
+    ) : (
+      <div className="tw:p-2">{translate('combobox_no_results_placeholder')}</div>
+    );
+  }
+
   return (
     <Field {...layoutProps} className={clsx(className, inline && 'tw:flex tw:items-center')}>
       {children && (
@@ -190,52 +238,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           )}
           {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
           <ComboboxPopover className="theme-text-on-surface theme-background-surface theme-typography--caption">
-            {items
-              .map((item, index) => {
-                const itemKey = String(keySelector(item, index));
-                const itemValue = valueSelector(item);
-                const itemTitle = titleSelector?.(item);
-                const itemIcon = iconSelector?.(item);
-                const itemDisabled = isDisabled?.(item);
-
-                const isVisible =
-                  inputValue === valueSelector(selectedItem) ||
-                  !inputValue.trim() ||
-                  itemValue.toLowerCase().includes(inputValue.trim().toLowerCase());
-
-                return {
-                  item,
-                  index,
-                  itemKey,
-                  itemValue,
-                  itemTitle,
-                  itemIcon,
-                  itemDisabled,
-                  isVisible,
-                };
-              })
-              .filter(({ isVisible }) => isVisible)
-              .map(({ itemKey, itemValue, itemTitle, itemIcon, itemDisabled }) => (
-                <ComboboxItem
-                  key={itemKey}
-                  value={itemKey}
-                  disabled={itemDisabled}
-                  title={itemTitle}
-                  className={clsx('tw:flex tw:items-center tw:gap-2 tw:py-2 tw:px-3 tw:leading-none', {
-                    'tw:cursor-pointer': !itemDisabled,
-                    'tw:cursor-not-allowed': itemDisabled,
-                  })}
-                >
-                  {iconSelector && (
-                    <div className="tw:w-4 tw:h-4 tw:shrink-0">
-                      {itemIcon && typeof itemIcon === 'string' ? <IconOrImage icon={itemIcon} /> : itemIcon}
-                    </div>
-                  )}
-                  <div>{itemValue}</div>
-                </ComboboxItem>
-              ))}
-            {/*TODO: show only when no items */}
-            <div>{translate('combobox_no_results_placeholder')}</div>
+            {renderComboboxItems()}
           </ComboboxPopover>
         </div>
       </ComboboxProvider>
