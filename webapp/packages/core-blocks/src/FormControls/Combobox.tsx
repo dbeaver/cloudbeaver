@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useId, useRef, useState } from 'react';
+import { useCallback, useContext, useId, useState } from 'react';
 import {
   ComboboxInput,
   ComboboxItem,
@@ -91,7 +91,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
   rest = filterLayoutFakeProps(rest);
   const translate = useTranslate();
   const context = useContext(FormContext);
-  const isSelectingRef = useRef(false);
 
   let selectedKey: string | string[] = controlledValue ?? defaultValue ?? undefined;
   if (state && name !== undefined && name in state) {
@@ -99,7 +98,10 @@ export const Combobox: ComboboxType = observer(function Combobox({
   }
 
   const selectedItem = items.find((item, index) => keySelector(item, index) === selectedKey);
-  const [inputValue, setInputValue] = useState<string>(() => (selectedItem ? valueSelector(selectedItem) : ''));
+  const [inputValue, setInputValue] = useState<string | null>(null);
+
+  const selectedValue = selectedItem ? valueSelector(selectedItem) : '';
+  const displayValue = inputValue ?? selectedValue;
 
   const filteredItems = getComputed(() =>
     items
@@ -110,8 +112,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
         const itemIcon = iconSelector?.(item);
         const itemDisabled = isDisabled?.(item);
 
-        const isVisible =
-          inputValue === valueSelector(selectedItem) || !inputValue.trim() || itemValue.toLowerCase().includes(inputValue.trim().toLowerCase());
+        const isVisible = inputValue === null || !inputValue.trim() || itemValue.toLowerCase().includes(inputValue.trim().toLowerCase());
 
         return {
           item,
@@ -129,10 +130,8 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   const handleSelect: ComboboxProviderProps['setSelectedValue'] = useCallback(
     (selectedValue: string | string[]) => {
-      isSelectingRef.current = true;
       const item = items.find((item, idx) => keySelector(item, idx) === selectedValue);
       if (!item || selectedValue === selectedKey) {
-        isSelectingRef.current = false;
         return;
       }
 
@@ -145,10 +144,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
       if (context) {
         context.change(selectedValue as string, name);
       }
-
-      setTimeout(() => {
-        isSelectingRef.current = false;
-      }, 100);
     },
     [items, selectedKey, state, onSelect, context, keySelector, name],
   );
@@ -167,12 +162,11 @@ export const Combobox: ComboboxType = observer(function Combobox({
   }
 
   const restoreInputValue = useCallback(() => {
-    const needToRestore = !isSelectingRef.current && !items.some(item => valueSelector(item) === inputValue);
-    if (needToRestore && selectedItem) {
-      const humanReadableValue = valueSelector(selectedItem);
-      setInputValue(humanReadableValue);
+    const needToRestore = inputValue !== null && !items.some(item => valueSelector(item) === inputValue);
+    if (needToRestore) {
+      setInputValue(null);
     }
-  }, [items, selectedItem, inputValue, valueSelector]);
+  }, [items, inputValue, valueSelector]);
 
   return (
     <Field {...layoutProps} className={clsx(className, inline && 'tw:flex tw:items-center')}>
@@ -187,7 +181,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
         </FieldLabel>
       )}
       <ComboboxProvider
-        value={inputValue}
+        value={displayValue}
         setValue={value => {
           const newItem = items.find((item, idx) => keySelector(item, idx) === value);
           setInputValue(newItem ? valueSelector(newItem) : value);
