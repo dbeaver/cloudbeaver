@@ -205,8 +205,13 @@ public class CBServerConfig implements WebServerConfiguration {
         for (String host : availableHosts) {
             try {
                 URI uri = URI.create(host);
-                String hostName = ServletAppUtils.removeSideSlashes(uri.getHost() != null ? uri.getHost() : host);
-                uniqueHosts.add(hostName);
+                StringBuilder hostNameBuilder = new StringBuilder();
+                hostNameBuilder.append(ServletAppUtils.removeSideSlashes(uri.getHost() != null ? uri.getHost() : host));
+                if (uri.getPort() > 0) {
+                    hostNameBuilder.append(':')
+                        .append(uri.getPort());
+                }
+                uniqueHosts.add(hostNameBuilder.toString());
             } catch (Exception e) {
                 log.error("Invalid host URI: " + host, e);
             }
