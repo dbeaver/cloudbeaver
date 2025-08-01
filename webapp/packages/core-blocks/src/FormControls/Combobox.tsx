@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useId, useState } from 'react';
+import { useCallback, useContext, useId, useRef, useState } from 'react';
 import {
   ComboboxInput,
   ComboboxItem,
@@ -26,6 +26,7 @@ import { Field } from './Field.js';
 import { FieldDescription } from './FieldDescription.js';
 import { FieldLabel } from './FieldLabel.js';
 import { FormContext } from './FormContext.js';
+import { getComputed } from '../getComputed.js';
 
 export type ComboboxBaseProps<TKey, TValue> = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -90,6 +91,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   rest = filterLayoutFakeProps(rest);
   const translate = useTranslate();
   const context = useContext(FormContext);
+  const isSelectingRef = useRef(false);
 
   let selectedKey: string | string[] = controlledValue ?? defaultValue ?? undefined;
   if (state && name !== undefined && name in state) {
@@ -99,56 +101,8 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const selectedItem = items.find((item, index) => keySelector(item, index) === selectedKey);
   const [inputValue, setInputValue] = useState<string>(() => (selectedItem ? valueSelector(selectedItem) : ''));
 
-  const handleSelect: ComboboxProviderProps['setSelectedValue'] = useCallback(
-    (selectedValue: string | string[]) => {
-      const item = items.find((item, idx) => keySelector(item, idx) === selectedValue);
-      if (!item) {
-        return;
-      }
-      if (selectedValue === selectedKey) {
-        return;
-      }
-
-      setInputValue(valueSelector(item));
-
-      if (state) {
-        state[name] = selectedValue;
-      }
-      if (onSelect) {
-        onSelect(selectedValue, name, selectedKey);
-      }
-      if (context) {
-        context.change(selectedValue as string, name);
-      }
-    },
-    [items, selectedKey, valueSelector, state, onSelect, context, keySelector, name],
-  );
-
-  const icon = selectedItem && iconSelector?.(selectedItem);
-
-  const comboboxDefaultSelectedValue = defaultValue;
-  let comboboxDefaultValue = undefined;
-
-  if (comboboxDefaultSelectedValue !== undefined) {
-    const defaultItem = items.find((item, index) => keySelector(item, index) === comboboxDefaultSelectedValue);
-
-    if (defaultItem) {
-      comboboxDefaultValue = valueSelector(defaultItem);
-    }
-  }
-
-  /* Function to restore the input value to the last valid selected item's display value
-   * This should be called when user changes input value but doesn't select an option
-   * and then leaves the input (e.g., on blur event) */
-  // const restoreInputValue = useCallback(() => {
-  //   if (selectedItem) {
-  //     const humanReadableValue = valueSelector(selectedItem);
-  //     setInputValue(humanReadableValue);
-  //   }
-  // }, [selectedItem, valueSelector]);
-
-  function renderComboboxItems() {
-    const filteredItems = items
+  const filteredItems = getComputed(() =>
+    items
       .map((item, index) => {
         const itemKey = String(keySelector(item, index));
         const itemValue = valueSelector(item);
@@ -170,30 +124,55 @@ export const Combobox: ComboboxType = observer(function Combobox({
           isVisible,
         };
       })
-      .filter(({ isVisible }) => isVisible);
+      .filter(({ isVisible }) => isVisible),
+  );
 
-    return filteredItems.length > 0 ? (
-      filteredItems.map(({ itemKey, itemValue, itemTitle, itemIcon, itemDisabled }) => (
-        <ComboboxItem
-          key={itemKey}
-          value={itemKey}
-          disabled={itemDisabled}
-          title={itemTitle}
-          className={clsx('tw:flex tw:items-center tw:gap-2 tw:py-2 tw:px-3 tw:leading-none', {
-            'tw:cursor-pointer': !itemDisabled,
-            'tw:cursor-not-allowed': itemDisabled,
-          })}
-        >
-          {iconSelector && (
-            <div className="tw:w-4 tw:h-4 tw:shrink-0">{itemIcon && typeof itemIcon === 'string' ? <IconOrImage icon={itemIcon} /> : itemIcon}</div>
-          )}
-          <div>{itemValue}</div>
-        </ComboboxItem>
-      ))
-    ) : (
-      <div className="tw:p-2">{translate('combobox_no_results_placeholder')}</div>
-    );
+  const handleSelect: ComboboxProviderProps['setSelectedValue'] = useCallback(
+    (selectedValue: string | string[]) => {
+      isSelectingRef.current = true;
+      const item = items.find((item, idx) => keySelector(item, idx) === selectedValue);
+      if (!item || selectedValue === selectedKey) {
+        isSelectingRef.current = false;
+        return;
+      }
+
+      if (state) {
+        state[name] = selectedValue;
+      }
+      if (onSelect) {
+        onSelect(selectedValue, name, selectedKey);
+      }
+      if (context) {
+        context.change(selectedValue as string, name);
+      }
+
+      setTimeout(() => {
+        isSelectingRef.current = false;
+      }, 100);
+    },
+    [items, selectedKey, state, onSelect, context, keySelector, name],
+  );
+
+  const icon = selectedItem && iconSelector?.(selectedItem);
+
+  const comboboxDefaultSelectedValue = defaultValue;
+  let comboboxDefaultValue = undefined;
+
+  if (comboboxDefaultSelectedValue !== undefined) {
+    const defaultItem = items.find((item, index) => keySelector(item, index) === comboboxDefaultSelectedValue);
+
+    if (defaultItem) {
+      comboboxDefaultValue = valueSelector(defaultItem);
+    }
   }
+
+  const restoreInputValue = useCallback(() => {
+    const needToRestore = !isSelectingRef.current && !items.some(item => valueSelector(item) === inputValue);
+    if (needToRestore && selectedItem) {
+      const humanReadableValue = valueSelector(selectedItem);
+      setInputValue(humanReadableValue);
+    }
+  }, [items, selectedItem, inputValue, valueSelector]);
 
   return (
     <Field {...layoutProps} className={clsx(className, inline && 'tw:flex tw:items-center')}>
@@ -226,6 +205,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
             className={clsx('theme-typography--caption', icon || loading ? 'tw:pl-8!' : '', 'tw:pr-6!')}
             title={title}
             id={inputId}
+            onBlur={restoreInputValue}
             {...rest}
           />
           {loading ? (
@@ -238,7 +218,29 @@ export const Combobox: ComboboxType = observer(function Combobox({
           )}
           {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
           <ComboboxPopover className="theme-text-on-surface theme-background-surface theme-typography--caption">
-            {renderComboboxItems()}
+            {filteredItems.length > 0 ? (
+              filteredItems.map(({ itemKey, itemValue, itemTitle, itemIcon, itemDisabled }) => (
+                <ComboboxItem
+                  key={itemKey}
+                  value={itemKey}
+                  disabled={itemDisabled}
+                  title={itemTitle}
+                  className={clsx('tw:flex tw:items-center tw:gap-2 tw:py-2 tw:px-3 tw:leading-none', {
+                    'tw:cursor-pointer': !itemDisabled,
+                    'tw:cursor-not-allowed': itemDisabled,
+                  })}
+                >
+                  {iconSelector && (
+                    <div className="tw:w-4 tw:h-4 tw:shrink-0">
+                      {itemIcon && typeof itemIcon === 'string' ? <IconOrImage icon={itemIcon} /> : itemIcon}
+                    </div>
+                  )}
+                  <div>{itemValue}</div>
+                </ComboboxItem>
+              ))
+            ) : (
+              <div className="tw:p-2">{translate('combobox_no_results_placeholder')}</div>
+            )}
           </ComboboxPopover>
         </div>
       </ComboboxProvider>
