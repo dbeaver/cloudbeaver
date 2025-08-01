@@ -175,10 +175,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
       )}
       <ComboboxProvider
         value={displayValue}
-        setValue={value => {
-          const newItem = items.find((item, idx) => keySelector(item, idx) === value);
-          setInputValue(newItem ? valueSelector(newItem) : value);
-        }}
+        setValue={setInputValue}
         defaultValue={comboboxDefaultValue}
         defaultSelectedValue={comboboxDefaultSelectedValue}
         setSelectedValue={handleSelect}
@@ -212,6 +209,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
                   value={itemKey}
                   disabled={itemDisabled}
                   title={itemTitle}
+                  setValueOnClick={false}
                   className={clsx('tw:flex tw:items-center tw:gap-2 tw:py-2 tw:px-3 tw:leading-none', {
                     'tw:cursor-pointer': !itemDisabled,
                     'tw:cursor-not-allowed': itemDisabled,
