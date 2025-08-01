@@ -161,13 +161,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
     }
   }
 
-  const restoreInputValue = useCallback(() => {
-    const needToRestore = inputValue !== null && !items.some(item => valueSelector(item) === inputValue);
-    if (needToRestore) {
-      setInputValue(null);
-    }
-  }, [items, inputValue, valueSelector]);
-
   return (
     <Field {...layoutProps} className={clsx(className, inline && 'tw:flex tw:items-center')}>
       {children && (
@@ -199,7 +192,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
             className={clsx('theme-typography--caption', icon || loading ? 'tw:pl-8!' : '', 'tw:pr-6!')}
             title={title}
             id={inputId}
-            onBlur={restoreInputValue}
+            onBlur={() => setInputValue(null)}
             {...rest}
           />
           {loading ? (
