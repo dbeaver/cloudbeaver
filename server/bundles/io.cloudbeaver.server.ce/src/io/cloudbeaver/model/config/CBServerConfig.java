@@ -204,6 +204,9 @@ public class CBServerConfig implements WebServerConfiguration {
         LinkedHashSet<String> uniqueHosts = new LinkedHashSet<>();
         for (String host : availableHosts) {
             try {
+                if (!host.startsWith("http://") && !host.startsWith("https://")) {
+                    host = "http://" + host; // Default to HTTP if no scheme is provided to avoid uri parse exception
+                }
                 URI uri = URI.create(host);
                 StringBuilder hostNameBuilder = new StringBuilder();
                 hostNameBuilder.append(ServletAppUtils.removeSideSlashes(uri.getHost() != null ? uri.getHost() : host));
