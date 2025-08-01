@@ -9,8 +9,6 @@ import { mergeConfig, defineConfig } from 'vitest/config';
 import { DefaultVitestConfig } from '@dbeaver/cli';
 import { posix } from 'node:path';
 
-// TODO it is not used cause lib folder is not created during build.
-// it build only when something of the package is used somewhere
 export default mergeConfig(
   DefaultVitestConfig,
   defineConfig({
@@ -25,7 +23,6 @@ export default mergeConfig(
       ],
       css: false,
     },
-
     plugins: [
       {
         name: 'vitest-setup',
@@ -37,7 +34,6 @@ export default mergeConfig(
         },
         load(id) {
           if (id === '\0internal:vitest-setup') {
-            // return "import '@cloudbeaver/tests-runner/vitest.setup';";
             return "import '@dbeaver/react-tests/vitest.setup';";
           }
           return null;
