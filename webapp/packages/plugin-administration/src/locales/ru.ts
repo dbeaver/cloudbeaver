@@ -59,12 +59,4 @@ export default [
     'administration_disabled_drivers_enable_unsafe_driver_message',
     'Включение этого драйвера базы данных может позволить доступ к файлам на сервере, где работает это приложение. Это может привести к потенциальному раскрытию конфиденциальных системных файлов или другой защищённой информации.\n\nПродолжайте только в том случае, если вы полностью понимаете последствия и уверены в безопасности использования этого драйвера. Неавторизованное или ненадлежащее использование может привести к проблемам с безопасностью.\n\nВы действительно хотите включить "{arg:driverName}" драйвер?',
   ],
-  ['administration_configuration_wizard_configuration_security_bind_session_to_ip', 'Привязать сессию к IP'],
-  [
-    'administration_configuration_wizard_configuration_security_bind_session_to_ip_description',
-    'Позволяет привязать сессию к IP адресу. Если включено, сессия будет закрыта при изменении IP адреса',
-  ],
-  ['administration_configuration_wizard_configuration_security_bind_session_to_ip_enabled', 'Включено'],
-  ['administration_configuration_wizard_configuration_security_bind_session_to_ip_disabled', 'Отключено'],
-  ['administration_configuration_wizard_configuration_security_bind_session_to_ip_databases_team', 'Включить для databases.team'],
 ];

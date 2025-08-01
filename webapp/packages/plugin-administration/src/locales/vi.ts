@@ -83,12 +83,4 @@ export default [
     'administration_disabled_drivers_enable_unsafe_driver_message',
     'Việc bật trình điều khiển (driver) cơ sở dữ liệu này có thể cho phép truy cập vào các tệp trên server nơi ứng dụng này đang chạy. Điều này có thể làm lộ các tệp hệ thống nhạy cảm hoặc dữ liệu được bảo vệ khác.\n\nChỉ tiếp tục nếu bạn hiểu đầy đủ các rủi ro và tin tưởng vào cấu hình cơ sở dữ liệu. Việc sử dụng trình điều khiển này không được phép hoặc không đúng cách có thể dẫn đến rủi ro bảo mật.\n\nBạn có muốn bật trình điều khiển "{arg:driverName}" không?',
   ],
-  ['administration_configuration_wizard_configuration_security_bind_session_to_ip', 'Bind session to IP'],
-  [
-    'administration_configuration_wizard_configuration_security_bind_session_to_ip_description',
-    'Allows to bind session to IP address. If enabled, the session will be closed if the IP address changes',
-  ],
-  ['administration_configuration_wizard_configuration_security_bind_session_to_ip_enabled', 'Enabled'],
-  ['administration_configuration_wizard_configuration_security_bind_session_to_ip_disabled', 'Disabled'],
-  ['administration_configuration_wizard_configuration_security_bind_session_to_ip_databases_team', 'Enable for databases.team'],
 ];

@@ -74,15 +74,6 @@ export default [
     'administration_configuration_wizard_configuration_security_public_credentials_description',
     "Permet d'enregistrer les identifiants pour les utilisateurs non administrateurs",
   ],
-  ['administration_configuration_wizard_configuration_security_bind_session_to_ip', 'Bind session to IP'],
-  [
-    'administration_configuration_wizard_configuration_security_bind_session_to_ip_description',
-    'Allows to bind session to IP address. If enabled, the session will be closed if the IP address changes',
-  ],
-  ['administration_configuration_wizard_configuration_security_bind_session_to_ip_enabled', 'Enabled'],
-  ['administration_configuration_wizard_configuration_security_bind_session_to_ip_disabled', 'Disabled'],
-  ['administration_configuration_wizard_configuration_security_bind_session_to_ip_databases_team', 'Enable for databases.team'],
-
   ['administration_configuration_wizard_configuration_navigator', 'Navigateur'],
   ['administration_configuration_wizard_configuration_navigator_hide_folders', 'Masquer les dossiers'],
   ['administration_configuration_wizard_configuration_navigator_hide_schemas', 'Masquer les schémas'],
