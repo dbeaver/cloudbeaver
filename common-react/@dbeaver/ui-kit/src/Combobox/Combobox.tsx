@@ -8,7 +8,7 @@
 
 import {
   ComboboxProvider,
-  Combobox as AriaCombobox,
+  Combobox,
   ComboboxPopover as AriaComboboxPopover,
   ComboboxItem as AriaComboboxItem,
   ComboboxDisclosure,
@@ -17,84 +17,16 @@ import {
   type ComboboxProviderProps,
   type ComboboxProps as AriaComboboxProps,
   type ComboboxPopoverProps as AriaComboboxPopoverProps,
-  type ComboboxItemProps as AriaComboboxItemProps,
+  type ComboboxItemProps,
   useComboboxContext,
   useComboboxStore,
   useStoreState,
-  type ComboboxStoreState,
 } from '@ariakit/react';
 import clsx from 'clsx';
-import { type HTMLAttributes, type Ref, useCallback } from 'react';
 import './Combobox.css';
 
-export interface ComboboxInputProps<T> extends AriaComboboxProps {
-  defaultValue?: string;
-  getInputFromItem?: (value: T) => string;
-}
-
-/**
- * ComboboxInput - Basic input component that handles search value and blur logic
- * Restores the selected value if the input value is not in the items list
- * If only one item is available, it selects that item automatically
- */
-export function ComboboxInput<T = unknown>({
-  onBlur,
-  onKeyDown,
-  defaultValue,
-  ref,
-  getInputFromItem,
-  ...props
-}: ComboboxInputProps<T> & { ref?: React.Ref<HTMLInputElement> }) {
-  const store = useComboboxContext();
-
-  function restoreInputValue() {
-    const { selectedValue, items, value } = store!.getState();
-
-    if (typeof selectedValue !== 'string' || (value === selectedValue && !getInputFromItem)) {
-      return;
-    }
-
-    const nextValue = (selectedValue || defaultValue) as string;
-
-    if (!nextValue) {
-      return;
-    }
-
-    if (getInputFromItem) {
-      const nextItem = (items?.find(item => item.value === nextValue) as ComboboxStoreState['items'][number] & { item: T })?.item;
-      if (nextItem) {
-        store!.setValue(getInputFromItem(nextItem));
-        return;
-      }
-    }
-
-    store!.setValue(nextValue);
-  }
-
-  function handleBlur(event: React.FocusEvent<HTMLInputElement>) {
-    restoreInputValue();
-
-    onBlur?.(event);
-  }
-
-  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      restoreInputValue();
-    }
-    onKeyDown?.(event);
-  }
-
-  return (
-    <AriaCombobox
-      ref={ref}
-      {...props}
-      onBlur={handleBlur}
-      onKeyDown={handleKeyDown}
-      className={clsx('dbv-kit-combobox', props.className)}
-      autoSelect
-    />
-  );
+export function ComboboxInput(props: AriaComboboxProps) {
+  return <Combobox {...props} className={clsx('dbv-kit-combobox', props.className)} autoSelect />;
 }
 
 export interface ComboboxPopoverProps extends AriaComboboxPopoverProps {
@@ -112,71 +44,8 @@ export function ComboboxPopover({ children, className, ...props }: ComboboxPopov
   );
 }
 
-export interface ComboboxItemProps<T> extends AriaComboboxItemProps {
-  item?: T;
-  getInputFromItem?: (value: T) => string;
-}
-
-/**
- * ComboboxItem - An option in the combobox popover
- * Uses the search state to determine visibility
- */
-export function ComboboxItem<T = unknown>({
-  value,
-  item,
-  ref,
-  getInputFromItem,
-  ...props
-}: ComboboxItemProps<T> & { ref?: React.Ref<HTMLDivElement> }) {
-  const store = useComboboxContext();
-  const searchValue = useStoreState(store, 'value') || '';
-  const selectedValue = useStoreState(store, 'selectedValue') || '';
-
-  const targetText = [value ?? '', item && getInputFromItem ? getInputFromItem(item) : ''].filter(Boolean).join(' ');
-  const isVisible = searchValue === selectedValue || !searchValue.trim() || targetText.toLowerCase().includes(searchValue.trim().toLowerCase());
-  const getItem = useCallback((data: any) => ({ ...data, item }), []);
-
-  function setValueOnClick(event: React.MouseEvent<HTMLDivElement>) {
-    if (getInputFromItem && item) {
-      const nextValue = getInputFromItem(item);
-      store!.setValue(nextValue);
-      store!.setSelectedValue(nextValue);
-      return false;
-    }
-    return true;
-  }
-
-  if (!isVisible) return null;
-
-  return (
-    <AriaComboboxItem
-      setValueOnClick={setValueOnClick}
-      getItem={getItem}
-      ref={ref}
-      {...props}
-      value={value}
-      className={clsx('dbv-kit-combobox__item', props.className)}
-    />
-  );
-}
-
-export interface ComboboxEmptyProps extends HTMLAttributes<HTMLDivElement> {
-  ref?: Ref<HTMLDivElement>;
-}
-
-/**
- * ComboboxEmpty - Shows it's children when there's a search but no visible items
- */
-export function ComboboxEmpty(props: ComboboxEmptyProps) {
-  const store = useComboboxContext();
-  const inputValue = useStoreState(store, 'value') || '';
-  const items = useStoreState(store, 'items') || [];
-
-  if (items.length === 0 && inputValue.trim()) {
-    return <div ref={props.ref} {...props} className={clsx('dbv-kit-combobox__empty', props.className)} />;
-  }
-
-  return null;
+export function ComboboxItem(props: ComboboxItemProps) {
+  return <AriaComboboxItem {...props} className={clsx('dbv-kit-combobox__item', props.className)} />;
 }
 
 export {

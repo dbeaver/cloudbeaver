@@ -6,11 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useId } from 'react';
+import { useCallback, useContext, useId, useState } from 'react';
 import {
   ComboboxInput,
   ComboboxItem,
-  ComboboxEmpty,
   clsx,
   Spinner,
   ComboboxPopover,
@@ -33,7 +32,6 @@ export type ComboboxBaseProps<TKey, TValue> = Omit<
   'onChange' | 'onSelect' | 'name' | 'value' | 'defaultValue'
 > &
   ILayoutSizeProps & {
-    propertyName?: string;
     items: TValue[];
     defaultValue?: TKey;
     loading?: boolean;
@@ -70,7 +68,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
   defaultValue,
   name,
   state,
-  propertyName,
   items,
   loading,
   children,
@@ -94,42 +91,61 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const translate = useTranslate();
   const context = useContext(FormContext);
 
-  let value: string | number | readonly string[] | undefined = controlledValue ?? defaultValue ?? undefined;
+  let selectedKey: string | string[] = controlledValue ?? defaultValue ?? undefined;
   if (state && name !== undefined && name in state) {
-    value = state[name];
+    selectedKey = state[name];
   }
 
-  const selectedItem = items.find((item, index) => keySelector(item, index) === value);
+  const selectedItem = items.find((item, index) => keySelector(item, index) === selectedKey);
+  const [inputValue, setInputValue] = useState<string>(() => (selectedItem ? valueSelector(selectedItem) : ''));
 
   const handleSelect: ComboboxProviderProps['setSelectedValue'] = useCallback(
     (selectedValue: string | string[]) => {
-      const item = items.find(item => valueSelector(item) === selectedValue);
+      const item = items.find((item, idx) => keySelector(item, idx) === selectedValue);
       if (!item) {
         return;
       }
-
-      const itemIndex = items.indexOf(item);
-      const key = keySelector(item, itemIndex);
-
-      if (key === value) {
+      if (selectedValue === selectedKey) {
         return;
       }
 
+      setInputValue(valueSelector(item));
+
       if (state) {
-        state[name] = key;
+        state[name] = selectedValue;
       }
       if (onSelect) {
-        onSelect(key, name, value);
+        onSelect(selectedValue, name, selectedKey);
       }
       if (context) {
-        context.change(key, name);
+        context.change(selectedValue as string, name);
       }
     },
-    [items, keySelector, valueSelector, value, state, name, onSelect, context],
+    [items, selectedKey, valueSelector, state, onSelect, context, keySelector, name],
   );
 
   const icon = selectedItem && iconSelector?.(selectedItem);
-  const comboboxDefaultValue = selectedItem ? valueSelector(selectedItem) : defaultValue ? String(defaultValue) : undefined;
+
+  const comboboxDefaultSelectedValue = defaultValue;
+  let comboboxDefaultValue = undefined;
+
+  if (comboboxDefaultSelectedValue !== undefined) {
+    const defaultItem = items.find((item, index) => keySelector(item, index) === comboboxDefaultSelectedValue);
+
+    if (defaultItem) {
+      comboboxDefaultValue = valueSelector(defaultItem);
+    }
+  }
+
+  /* Function to restore the input value to the last valid selected item's display value
+   * This should be called when user changes input value but doesn't select an option
+   * and then leaves the input (e.g., on blur event) */
+  // const restoreInputValue = useCallback(() => {
+  //   if (selectedItem) {
+  //     const humanReadableValue = valueSelector(selectedItem);
+  //     setInputValue(humanReadableValue);
+  //   }
+  // }, [selectedItem, valueSelector]);
 
   return (
     <Field {...layoutProps} className={clsx(className, inline && 'tw:flex tw:items-center')}>
@@ -143,7 +159,16 @@ export const Combobox: ComboboxType = observer(function Combobox({
           {children}
         </FieldLabel>
       )}
-      <ComboboxProvider defaultValue={comboboxDefaultValue} defaultSelectedValue={comboboxDefaultValue} setSelectedValue={handleSelect}>
+      <ComboboxProvider
+        value={inputValue}
+        setValue={value => {
+          const newItem = items.find((item, idx) => keySelector(item, idx) === value);
+          setInputValue(newItem ? valueSelector(newItem) : value);
+        }}
+        defaultValue={comboboxDefaultValue}
+        defaultSelectedValue={comboboxDefaultSelectedValue}
+        setSelectedValue={handleSelect}
+      >
         <div className="tw:relative tw:flex tw:flex-1 tw:items-center tw:gap-2">
           <ComboboxInput
             defaultValue={comboboxDefaultValue}
@@ -165,18 +190,35 @@ export const Combobox: ComboboxType = observer(function Combobox({
           )}
           {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
           <ComboboxPopover className="theme-text-on-surface theme-background-surface theme-typography--caption">
-            <ComboboxEmpty>{translate('combobox_no_results_placeholder')}</ComboboxEmpty>
-            {items.map((item, index) => {
-              const itemKey = String(keySelector(item, index));
-              const itemValue = valueSelector(item);
-              const itemTitle = titleSelector?.(item);
-              const itemIcon = iconSelector?.(item);
-              const itemDisabled = isDisabled?.(item);
+            {items
+              .map((item, index) => {
+                const itemKey = String(keySelector(item, index));
+                const itemValue = valueSelector(item);
+                const itemTitle = titleSelector?.(item);
+                const itemIcon = iconSelector?.(item);
+                const itemDisabled = isDisabled?.(item);
 
-              return (
+                const isVisible =
+                  inputValue === valueSelector(selectedItem) ||
+                  !inputValue.trim() ||
+                  itemValue.toLowerCase().includes(inputValue.trim().toLowerCase());
+
+                return {
+                  item,
+                  index,
+                  itemKey,
+                  itemValue,
+                  itemTitle,
+                  itemIcon,
+                  itemDisabled,
+                  isVisible,
+                };
+              })
+              .filter(({ isVisible }) => isVisible)
+              .map(({ itemKey, itemValue, itemTitle, itemIcon, itemDisabled }) => (
                 <ComboboxItem
                   key={itemKey}
-                  value={itemValue}
+                  value={itemKey}
                   disabled={itemDisabled}
                   title={itemTitle}
                   className={clsx('tw:flex tw:items-center tw:gap-2 tw:py-2 tw:px-3 tw:leading-none', {
@@ -191,8 +233,9 @@ export const Combobox: ComboboxType = observer(function Combobox({
                   )}
                   <div>{itemValue}</div>
                 </ComboboxItem>
-              );
-            })}
+              ))}
+            {/*TODO: show only when no items */}
+            <div>{translate('combobox_no_results_placeholder')}</div>
           </ComboboxPopover>
         </div>
       </ComboboxProvider>

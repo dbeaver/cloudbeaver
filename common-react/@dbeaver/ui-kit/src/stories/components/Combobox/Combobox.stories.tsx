@@ -1,17 +1,14 @@
 import { useState } from 'react';
-import { ComboboxProvider, ComboboxInput, ComboboxPopover, ComboboxItem, ComboboxEmpty } from '../../../Combobox/Combobox.js';
+import { ComboboxProvider, ComboboxInput, ComboboxPopover, ComboboxItem } from '../../../Combobox/Combobox.js';
 
 function Simple() {
   const [value, setValue] = useState('');
   return (
-    <ComboboxProvider setSelectedValue={item => setValue(item as string)}>
-      <div>{value}</div>
-      <ComboboxInput placeholder="Search fruits..." />
+    <ComboboxProvider value={value} setSelectedValue={item => setValue(item as string)}>
       <ComboboxPopover>
         <ComboboxItem value="apple">Apple</ComboboxItem>
         <ComboboxItem value="banana">Banana</ComboboxItem>
         <ComboboxItem value="cherry">Cherry</ComboboxItem>
-        <ComboboxEmpty>No fruits found</ComboboxEmpty>
       </ComboboxPopover>
     </ComboboxProvider>
   );
@@ -43,13 +40,6 @@ function FlexibleLayout() {
               <ComboboxItem value="broccoli">Broccoli</ComboboxItem>
               <ComboboxItem value="spinach">Spinach</ComboboxItem>
             </div>
-
-            <ComboboxEmpty>
-              <div className="empty-state">
-                <p>No food items match your search</p>
-                <button>Suggest new item</button>
-              </div>
-            </ComboboxEmpty>
           </ComboboxPopover>
         </main>
 
@@ -95,7 +85,6 @@ function MultiInput() {
           <ComboboxItem value="vue">Vue</ComboboxItem>
           <ComboboxItem value="angular">Angular</ComboboxItem>
           <ComboboxItem value="svelte">Svelte</ComboboxItem>
-          <ComboboxEmpty>No frameworks found</ComboboxEmpty>
         </ComboboxPopover>
       </div>
     </ComboboxProvider>
@@ -185,64 +174,12 @@ function DynamicItems() {
                 ))}
             </div>
           </div>
-
-          <ComboboxEmpty>
-            <div className="empty-tasks">
-              <p>No tasks match your search</p>
-              <p>Try a different search term or add a new task</p>
-            </div>
-          </ComboboxEmpty>
         </ComboboxPopover>
       </div>
     </ComboboxProvider>
   );
 }
 
-function AdvancedSearch() {
-  const products = [
-    { id: 1, value: 'macbook_pro', name: 'MacBook Pro', category: 'laptop', price: 2000 },
-    { id: 2, value: 'iphone_15', name: 'iPhone 15', category: 'phone', price: 1000 },
-    { id: 3, value: 'ipad_air', name: 'iPad Air', category: 'tablet', price: 600 },
-    { id: 4, value: 'airpods_pro', name: 'AirPods Pro', category: 'audio', price: 250 },
-  ];
-
-  return (
-    <ComboboxProvider>
-      <div className="product-search">
-        <div className="search-header">
-          <ComboboxInput<(typeof products)[number]> getInputFromItem={product => product.name} placeholder="Search products by name or category..." />
-          <div className="search-tips">Try: "macbook", "laptop", "phone", "audio", etc.</div>
-        </div>
-
-        <ComboboxPopover className="product-results">
-          {products.map(product => (
-            <ComboboxItem
-              key={product.id}
-              value={product.value}
-              item={{ name: product.name, category: product.category }}
-              getInputFromItem={product => product.name}
-            >
-              <div className="product-card">
-                <div className="product-info">
-                  <h4>{product.name}</h4>
-                  <span className="category">{product.category}</span>
-                </div>
-                <div className="product-price">${product.price}</div>
-              </div>
-            </ComboboxItem>
-          ))}
-
-          <ComboboxEmpty>
-            <div className="no-products">
-              <h4>No products found</h4>
-              <p>Try searching for: Product names (MacBook, iPhone, etc.) or categories (laptop, phone, etc.)</p>
-            </div>
-          </ComboboxEmpty>
-        </ComboboxPopover>
-      </div>
-    </ComboboxProvider>
-  );
-}
 function MultiSelectExample() {
   const [selectedValues, setSelectedValues] = useState<string[]>([]);
 
@@ -268,10 +205,9 @@ function MultiSelectExample() {
               {item.label}
             </ComboboxItem>
           ))}
-          <ComboboxEmpty>No fruits found</ComboboxEmpty>
         </ComboboxPopover>
       </div>
     </ComboboxProvider>
   );
 }
-export { Simple, FlexibleLayout, MultiInput, DynamicItems, AdvancedSearch, MultiSelectExample };
+export { Simple, FlexibleLayout, MultiInput, DynamicItems, MultiSelectExample };
