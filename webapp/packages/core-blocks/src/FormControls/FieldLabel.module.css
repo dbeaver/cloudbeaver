@@ -12,3 +12,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+.required {
+  color: var(--theme-negative);
+}
