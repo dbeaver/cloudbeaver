@@ -300,7 +300,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 }
                 // Check permissions
                 for (String gp : reqGlobalPermissions) {
-                    if (!session.hasPermission(gp)) {
+                    if (!session.hasGlobalPermission(gp)) {
                         log.debug("Access to " + method.getName() + " denied for " + session.getUser());
                         throw new DBWebExceptionAccessDenied("Access denied");
                     }
