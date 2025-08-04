@@ -99,4 +99,10 @@ public class CBWebServerConfig extends WebServerConfig {
     public List<String> getSupportedHosts() {
         return cbApp.getServerConfiguration().getSupportedHosts();
     }
+
+    @NotNull
+    @Property
+    public String getBindSessionToIp() {
+        return cbApp.getServerConfiguration().getBindSessionToIp();
+    }
 }

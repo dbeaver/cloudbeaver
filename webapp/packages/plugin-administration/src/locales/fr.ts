@@ -74,7 +74,6 @@ export default [
     'administration_configuration_wizard_configuration_security_public_credentials_description',
     "Permet d'enregistrer les identifiants pour les utilisateurs non administrateurs",
   ],
-
   ['administration_configuration_wizard_configuration_navigator', 'Navigateur'],
   ['administration_configuration_wizard_configuration_navigator_hide_folders', 'Masquer les dossiers'],
   ['administration_configuration_wizard_configuration_navigator_hide_schemas', 'Masquer les schémas'],
