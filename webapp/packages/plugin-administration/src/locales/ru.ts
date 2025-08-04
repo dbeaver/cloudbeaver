@@ -12,7 +12,7 @@ export default [
   ],
   [
     'administration_configuration_wizard_configuration_secure_cookies_warning',
-    'Данные не будут зашифрованы если принудительный HTTPS режим выключен. Это делает их уязвимыми',
+    'Данные не будут зашифрованы, если принудительный HTTPS режим выключен. Это делает их уязвимыми',
   ],
   ['administration_configuration_wizard_configuration_supported_hosts', 'Разрешённые URL сервера'],
   [
