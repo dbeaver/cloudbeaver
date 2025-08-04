@@ -30,6 +30,16 @@
       }
     },
     {
+      "label": "Run Tests Common React",
+      "type": "shell",
+      "command": "yarn",
+      "group": "test",
+      "args": ["test"],
+      "options": {
+        "cwd": "${workspaceFolder}/common-react"
+      }
+    },
+    {
       "label": "Run DevServer CE",
       "group": "build",
       "isBackground": true,

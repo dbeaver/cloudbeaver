@@ -31,6 +31,7 @@
     "@cloudbeaver/tests-runner": "workspace:*",
     "@dbeaver/cli": "workspace:^",
     "@dbeaver/prettier-config": "workspace:*",
+    "@dbeaver/react-tests": "workspace:^",
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
