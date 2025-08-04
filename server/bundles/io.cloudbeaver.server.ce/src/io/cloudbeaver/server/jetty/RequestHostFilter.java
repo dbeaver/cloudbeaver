@@ -80,7 +80,6 @@ public class RequestHostFilter implements Filter {
     private void validateSchema(CBServerConfig serverConfig, HttpServletRequest httpRequest, ServletResponse response, URI originUri) {
         boolean httpsExpected = serverConfig.isForceHttps();
         try {
-            log.debug("User's origin: " + originUri.toString());
             if ("http".equals(originUri.getScheme()) && httpsExpected) {
                 log.warn("Request schema is 'http' but 'forceHttps' is enabled. Redirecting to 'https'.");
                 StringBuilder redirectUrlBuilder = new StringBuilder("https://")
