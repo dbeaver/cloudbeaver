@@ -16,5 +16,7 @@ extend type ServerConfig {
     forceHttps: Boolean! @since(version: "25.1.3")
     "List of allowed hosts to use the application - if empty, all hosts are allowed"
     supportedHosts: [String!]! @since(version: "25.1.3")
+    "Indicates whether the session should be linked to the user's IP address"
+    bindSessionToIp: String! @since(version: "25.1.4")
 }
 

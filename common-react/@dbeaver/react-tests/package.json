@@ -1,5 +1,5 @@
 {
-  "name": "@dbeaver/react-dnd",
+  "name": "@dbeaver/react-tests",
   "type": "module",
   "sideEffects": [],
   "exports": {
@@ -25,13 +25,14 @@
   ],
   "packageManager": "yarn@4.9.2",
   "devDependencies": {
+    "@dbeaver/cli": "workspace:^",
     "@dbeaver/tsconfig": "workspace:^",
-    "@types/react": "^19",
+    "@testing-library/dom": "^10",
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^16",
+    "@types/node": "^22",
     "rimraf": "^6",
     "typescript": "^5",
     "vitest": "^3"
-  },
-  "dependencies": {
-    "react": "^19"
   }
 }
