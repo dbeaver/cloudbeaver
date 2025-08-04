@@ -111,7 +111,11 @@ public class RequestHostFilter implements Filter {
             return;
         }
         try {
-            String requestHost = originUri.getHost();
+            var requestHostBuilder = new StringBuilder(originUri.getHost());
+            if (originUri.getPort() > -1) {
+                requestHostBuilder.append(':').append(originUri.getPort());
+            }
+            String requestHost = requestHostBuilder.toString();
             if (!availableHosts.contains(requestHost)) {
                 log.warn("Request host '" + requestHost + "' is not allowed. Redirect to default: " + availableHosts);
                 redirectToDefaultHost((HttpServletResponse) response, httpRequest, availableHosts);
