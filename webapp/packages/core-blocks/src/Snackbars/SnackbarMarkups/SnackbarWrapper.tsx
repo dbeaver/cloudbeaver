@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,13 @@ export const SnackbarWrapper: React.FC<React.PropsWithChildren<Props>> = functio
   }, []);
 
   return (
-    <div tabIndex={0} role="status" aria-live="polite" aria-atomic="true" className={s(styles, { notification: true, mounted, closing }, className)}>
+    <div
+      tabIndex={0}
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+      className={s(styles, { notification: true, mounted, closing }, className)}
+    >
       {children}
       {!persistent && onClose && (
         <div className={s(styles, { iconButton: true })}>

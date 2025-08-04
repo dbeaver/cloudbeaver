@@ -1,6 +1,6 @@
 lefthook: |
   cd webapp
-  yarn lefthook
+  yarn dlx --quiet lefthook
 output: false
 pre-commit:
   commands:

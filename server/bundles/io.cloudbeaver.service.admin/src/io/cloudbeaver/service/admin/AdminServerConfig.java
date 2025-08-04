@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2024 DBeaver Corp and others
+ * Copyright (C) 2010-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@ package io.cloudbeaver.service.admin;
 
 import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBConstants;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
 import java.util.Arrays;
@@ -28,6 +31,7 @@ import java.util.Map;
  * Server configuration for admin API
  */
 public class AdminServerConfig {
+    private static final Log log = Log.getLog(AdminServerConfig.class);
 
     private String serverName;
     private String serverURL;
@@ -45,6 +49,10 @@ public class AdminServerConfig {
     private final List<String> enabledAuthProviders;
     private final String[] enabledDrivers;
     private final String[] disabledDrivers;
+    @Nullable
+    private final Boolean forceHttps;
+    @Nullable
+    private final List<String> supportedHosts;
 
     private long sessionExpireTime;
 
@@ -57,8 +65,16 @@ public class AdminServerConfig {
         CBAppConfig appConfig = CBApplication.getInstance().getAppConfiguration();
         this.anonymousAccessEnabled = JSONUtils.getBoolean(params, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
         this.customConnectionsEnabled = JSONUtils.getBoolean(params, "customConnectionsEnabled", appConfig.isSupportsCustomConnections());
-        this.publicCredentialsSaveEnabled = JSONUtils.getBoolean(params, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
-        this.adminCredentialsSaveEnabled = JSONUtils.getBoolean(params, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
+        this.publicCredentialsSaveEnabled = JSONUtils.getBoolean(
+            params,
+            "publicCredentialsSaveEnabled",
+            appConfig.isPublicCredentialsSaveEnabled()
+        );
+        this.adminCredentialsSaveEnabled = JSONUtils.getBoolean(
+            params,
+            "adminCredentialsSaveEnabled",
+            appConfig.isAdminCredentialsSaveEnabled()
+        );
         this.resourceManagerEnabled = JSONUtils.getBoolean(params, "resourceManagerEnabled", appConfig.isResourceManagerEnabled());
         this.secretManagerEnabled = JSONUtils.getBoolean(params, "secretManagerEnabled", appConfig.isSecretManagerEnabled());
 
@@ -86,6 +102,18 @@ public class AdminServerConfig {
             this.disabledDrivers = JSONUtils.getStringList(params, "disabledDrivers").toArray(new String[0]);
         } else {
             this.disabledDrivers = appConfig.getDisabledDrivers();
+        }
+
+        if (params.containsKey(CBConstants.PARAM_FORCE_HTTPS)) {
+            this.forceHttps = JSONUtils.getBoolean(params, CBConstants.PARAM_FORCE_HTTPS);
+        } else {
+            this.forceHttps = null;
+        }
+
+        if (params.containsKey(CBConstants.PARAM_SUPPORTED_HOSTS)) {
+            this.supportedHosts = JSONUtils.getStringList(params, CBConstants.PARAM_SUPPORTED_HOSTS);
+        } else {
+            this.supportedHosts = null;
         }
     }
 
@@ -167,5 +195,15 @@ public class AdminServerConfig {
 
     public boolean isSecretManagerEnabled() {
         return secretManagerEnabled;
+    }
+
+    @Nullable
+    public List<String> getSupportedHosts() {
+        return supportedHosts;
+    }
+
+    @Nullable
+    public Boolean getForceHttps() {
+        return forceHttps;
     }
 }

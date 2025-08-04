@@ -13,6 +13,7 @@
 
 .tabOuter {
   border: 1px solid color-mix(in srgb, transparent, var(--theme-on-secondary) 10%);
+  border-radius: 0 0 2px 2px;
   border-top: none;
   border-left: none;
 }

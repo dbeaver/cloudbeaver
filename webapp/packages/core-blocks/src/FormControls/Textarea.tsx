@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
+import { useCallback, useContext, useId, useLayoutEffect, useRef } from 'react';
 
 import { getTextFileReadingProcess } from '@cloudbeaver/core-utils';
 
@@ -69,6 +69,7 @@ export const Textarea: TextareaType = observer(function Textarea({
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
   const translate = useTranslate();
+  const inputId = useId();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
@@ -102,12 +103,13 @@ export const Textarea: TextareaType = observer(function Textarea({
 
   return (
     <Field {...layoutProps} className={s(styles, { field: true, embedded }, className)}>
-      <FieldLabel className={s(styles, { fieldLabel: true })} title={labelTooltip || rest.title} required={required}>
+      <FieldLabel htmlFor={inputId} className={s(styles, { fieldLabel: true })} title={labelTooltip || rest.title} required={required}>
         {children}
       </FieldLabel>
       <textarea
         {...rest}
         ref={textareaRef}
+        id={inputId}
         required={required}
         className={s(styles, { textarea: true })}
         value={value ?? ''}

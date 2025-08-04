@@ -5,11 +5,14 @@
 
     --dbv-kit-select-foreground: var(--dbv-kit-color-foreground);
     --dbv-kit-select-background: var(--dbv-kit-color-background);
+    --dbv-kit-select-disabled-foreground: var(--dbv-kit-control-disabled-foreground);
+    --dbv-kit-select-disabled-background: var(--dbv-kit-control-disabled-background);
 
     --dbv-kit-select-border-width: var(--dbv-kit-control-border-width);
     --dbv-kit-select-border-color: var(--dbv-kit-color-control-inactive);
     --dbv-kit-select-border-style: solid;
     --dbv-kit-select-border-radius: var(--dbv-kit-control-border-radius);
+    --dbv-kit-select-hover-border-color: var(--dbv-kit-color-control-hover);
 
     --dbv-kit-select-font-weight: var(--tw-font-weight-normal);
     --dbv-kit-select-font-size: calc(var(--dbv-kit-font-size-base) * 0.875);
