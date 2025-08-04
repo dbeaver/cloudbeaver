@@ -199,7 +199,7 @@ public class WebEventUtils {
     }
 
     public static void addSubjectPermissionsUpdateEvent(
-        @Nullable String subjectId,
+        @NotNull String subjectId,
         @NotNull SMSubjectType subjectType,
         @Nullable String smSessionId,
         @Nullable String userId

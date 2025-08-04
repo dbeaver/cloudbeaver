@@ -72,7 +72,7 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Import for users only");
             return;
         }
-        if (!session.hasGlobalPermission(DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_IMPORT)) {
+        if (!session.hasPermission(DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_IMPORT)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Import is not allowed for this user");
             return;
         }

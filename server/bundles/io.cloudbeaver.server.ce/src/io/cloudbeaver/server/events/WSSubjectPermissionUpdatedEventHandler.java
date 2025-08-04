@@ -59,9 +59,6 @@ public class WSSubjectPermissionUpdatedEventHandler extends WSDefaultEventHandle
             return false;
         }
         var subjectId = event.getSubjectId();
-        if (subjectId == null) {
-            return true; // No subjectId means all subjects are affected
-        }
         return switch (event.getSubjectType()) {
             case user -> CommonUtils.equalObjects(user.getUserId(), subjectId);
             case team -> ArrayUtils.containsIgnoreCase(user.getTeams(), subjectId);

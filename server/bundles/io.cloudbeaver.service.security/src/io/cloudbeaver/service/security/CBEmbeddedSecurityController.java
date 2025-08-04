@@ -3008,8 +3008,8 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     }
 
 
-    protected void addSubjectPermissionsUpdateEvent(@Nullable String subjectId, @Nullable SMSubjectType subjectType) {
-        if (subjectType == null && subjectId != null) {
+    protected void addSubjectPermissionsUpdateEvent(@NotNull String subjectId, @Nullable SMSubjectType subjectType) {
+        if (subjectType == null) {
             subjectType = getSubjectType(subjectId);
         }
         if (subjectType == null) {
