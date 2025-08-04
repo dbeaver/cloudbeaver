@@ -28,6 +28,20 @@ public class WSUserEventHandler<EVENT extends WSAbstractEvent> implements WSEven
     @Override
     public void handleEvent(@NotNull EVENT event) {
         var sessionManager = CBApplication.getInstance().getSessionManager();
+
+        switch (event) {
+            case WSUserCloseSessionsEvent closeSessionsEvent -> {
+                if (closeSessionsEvent.getSessionIds().isEmpty()) {
+                    sessionManager.closeAllSessions(closeSessionsEvent.getSessionId());
+                } else {
+                    sessionManager.closeSessions(closeSessionsEvent.getSessionIds());
+                }
+            }
+            case WSUserDeletedEvent e -> sessionManager.closeUserSession(e);
+            case WSUserDisabledEvent e -> sessionManager.closeUserSession(e);
+            default -> { }
+        }
+
         switch (event.getId()) {
             case WSUserCloseSessionsEvent.ID:
                 if (event instanceof WSUserCloseSessionsEvent closeSessionsEvent) {
