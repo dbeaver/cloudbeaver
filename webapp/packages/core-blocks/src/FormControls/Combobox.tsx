@@ -103,30 +103,28 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const selectedValue = selectedItem ? valueSelector(selectedItem) : '';
   const displayValue = inputValue ?? selectedValue;
 
-  const filteredItems = getComputed(() =>
-    items
-      .map((item, index) => {
-        const itemKey = String(keySelector(item, index));
-        const itemValue = valueSelector(item);
-        const itemTitle = titleSelector?.(item);
-        const itemIcon = iconSelector?.(item);
-        const itemDisabled = isDisabled?.(item);
+  const filteredItems = items
+    .map((item, index) => {
+      const itemKey = String(keySelector(item, index));
+      const itemValue = valueSelector(item);
+      const itemTitle = titleSelector?.(item);
+      const itemIcon = iconSelector?.(item);
+      const itemDisabled = isDisabled?.(item);
 
-        const isVisible = inputValue === null || !inputValue.trim() || itemValue.toLowerCase().includes(inputValue.trim().toLowerCase());
+      const isVisible = inputValue === null || !inputValue.trim() || itemValue.toLowerCase().includes(inputValue.trim().toLowerCase());
 
-        return {
-          item,
-          index,
-          itemKey,
-          itemValue,
-          itemTitle,
-          itemIcon,
-          itemDisabled,
-          isVisible,
-        };
-      })
-      .filter(({ isVisible }) => isVisible),
-  );
+      return {
+        item,
+        index,
+        itemKey,
+        itemValue,
+        itemTitle,
+        itemIcon,
+        itemDisabled,
+        isVisible,
+      };
+    })
+    .filter(({ isVisible }) => isVisible);
 
   const handleSelect: ComboboxProviderProps['setSelectedValue'] = useCallback(
     (selectedValue: string | string[]) => {
