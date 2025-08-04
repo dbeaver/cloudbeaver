@@ -7,11 +7,12 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Group, GroupTitle, IconOrImage, InputField, Switch, Textarea, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Group, GroupTitle, Link, IconOrImage, InputField, Switch, Textarea, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState.js';
 import { MIN_SESSION_EXPIRE_TIME } from './MIN_SESSION_EXPIRE_TIME.js';
+import { GITHUB_LINKS } from '@cloudbeaver/core-links';
 
 interface Props {
   state: IServerConfigurationPageState;
@@ -59,7 +60,15 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
       <Switch
         name="forceHttps"
         state={state.serverConfig}
-        description={translate('administration_configuration_wizard_configuration_secure_cookies_description')}
+        description={
+          <div className="tw-flex tw:gap-1">
+            {translate('administration_configuration_wizard_configuration_secure_cookies_description')}.
+            <Link className="tw:inline tw:whitespace-nowrap" title="test" href={GITHUB_LINKS.PROXY_CONFIGURATION_PAGE} target="_blank" indicator>
+              {' '}
+              {translate('ui_more_here')}
+            </Link>
+          </div>
+        }
         mod={['primary']}
         small
       >

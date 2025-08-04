@@ -144,6 +144,7 @@ export default [
   ['ui_type', 'Loại'],
   ['ui_field_is_required', 'Please fill in this field'],
   ['ui_delete_confirmation_message', 'You are about to delete "{arg:item}". Are you sure?'],
+  ['ui_more_here', 'More here'],
 
   ['root_permission_denied', 'Bạn không có quyền'],
   ['root_permission_no_permission', 'Bạn không có quyền thực hiện hành động này'],
