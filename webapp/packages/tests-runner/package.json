@@ -31,13 +31,12 @@
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:^",
+    "@dbeaver/react-tests": "workspace:^",
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
     "@types/node": "^22",
     "@types/react": "^19",
-    "fake-indexeddb": "^6",
-    "happy-dom": "^18",
     "typescript": "^5",
     "vitest": "^3"
   }
