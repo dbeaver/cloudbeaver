@@ -1319,7 +1319,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.26.10, @babel/runtime@npm:^7.27.6, @babel/runtime@npm:^7.7.6, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.26.10, @babel/runtime@npm:^7.7.6, @babel/runtime@npm:^7.9.2":
   version: 7.28.2
   resolution: "@babel/runtime@npm:7.28.2"
   checksum: 10c0/c20afe253629d53a405a610b12a62ac74d341a2c1e0fb202bbef0c118f6b5c84f94bf16039f58fd0483dd256901259930a43976845bdeb180cab1f882c21b6e0
@@ -1363,9 +1363,9 @@ __metadata:
   linkType: hard
 
 "@bufbuild/protobuf@npm:^2.5.0":
-  version: 2.6.2
-  resolution: "@bufbuild/protobuf@npm:2.6.2"
-  checksum: 10c0/e191fa17ae253eeb65671a2e0b8efb205772937a21906724bb4d362681a2105e81a5c1b0bf9170cbb500d1db62e8becd16bc125a0516880e3abbc16ae8336e21
+  version: 2.6.3
+  resolution: "@bufbuild/protobuf@npm:2.6.3"
+  checksum: 10c0/edbb89698f713f691f2807fdf8c2ef804a98a593e50c6c8d441dd36c35a2ac82d4da1bcfb15a93fbf8122a1fbba0e8414ae47c31c21dad74cad1fc5f0e1eb3d9
   languageName: node
   linkType: hard
 
@@ -1645,7 +1645,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@swc/core": "npm:^1"
     "@types/js-yaml": "npm:^4"
-    "@types/node": "npm:^22"
+    "@types/node": "npm:^24"
     enquirer: "npm:^2"
     execa: "npm:^9"
     glob: "npm:^11"
@@ -2223,7 +2223,6 @@ __metadata:
     "@types/uuid": "npm:^10"
     "@types/whatwg-mimetype": "npm:^3"
     fast-deep-equal: "npm:^3"
-    i18next: "npm:^25"
     md5: "npm:^2"
     mobx: "npm:^6"
     tslib: "npm:^2"
@@ -2232,9 +2231,8 @@ __metadata:
     uuid: "npm:^11"
     vitest: "npm:^3"
     whatwg-mimetype: "npm:^4"
-    zod: "npm:^3"
-    zod-i18n-map: "npm:^2"
-    zod-validation-error: "npm:^3"
+    zod: "npm:^4"
+    zod-validation-error: "npm:^4"
   languageName: unknown
   linkType: soft
 
@@ -4134,7 +4132,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@tailwindcss/vite": "npm:4.0.7"
     "@types/fs-extra": "npm:^11"
-    "@types/node": "npm:^22"
+    "@types/node": "npm:^24"
     "@vitejs/plugin-react": "npm:^4"
     "@wroud/vite-plugin-asset-resolver": "npm:^0"
     "@wroud/vite-plugin-tsc": "npm:^0"
@@ -4270,7 +4268,7 @@ __metadata:
     "@testing-library/dom": "npm:^10"
     "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
-    "@types/node": "npm:^22"
+    "@types/node": "npm:^24"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     react: "npm:^19"
@@ -4471,7 +4469,7 @@ __metadata:
   resolution: "@dbeaver/cli@workspace:../common-typescript/@dbeaver/cli"
   dependencies:
     "@dbeaver/tsconfig": "workspace:^"
-    "@types/node": "npm:^22"
+    "@types/node": "npm:^24"
     rimraf: "npm:^6"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -4564,7 +4562,7 @@ __metadata:
     "@testing-library/dom": "npm:^10"
     "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
-    "@types/node": "npm:^22"
+    "@types/node": "npm:^24"
     rimraf: "npm:^6"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -7860,7 +7858,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*":
+"@types/node@npm:*, @types/node@npm:^24":
   version: 24.2.0
   resolution: "@types/node@npm:24.2.0"
   dependencies:
@@ -7882,15 +7880,6 @@ __metadata:
   dependencies:
     undici-types: "npm:~6.21.0"
   checksum: 10c0/c6738131f1698258a5ac1e0185e4fc56977f7f566cd0ee11167f93f2339478470257bd82c5e1908a936a204e0ad7996d741356a1a07c04997a236161ea23a874
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^22":
-  version: 22.17.0
-  resolution: "@types/node@npm:22.17.0"
-  dependencies:
-    undici-types: "npm:~6.21.0"
-  checksum: 10c0/e1c603b660d3de3243dfc02ded5d40623ff3f36315ffbdd8cdc81bc2c5a8da172035879d437b72e9fa61ca01827f28e9c2b0c32898f411a8e9ba0a5efac0b4ca
   languageName: node
   linkType: hard
 
@@ -12281,20 +12270,6 @@ __metadata:
   bin:
     hygen: dist/bin.js
   checksum: 10c0/0e53fee64a52e555497113b352ec83714f6044841e46daf206267c8a940e71a95b9e2fea06c72348b5835e4f71ead9b5d6d428a11c256f3b54334e99e55013e6
-  languageName: node
-  linkType: hard
-
-"i18next@npm:^25":
-  version: 25.3.2
-  resolution: "i18next@npm:25.3.2"
-  dependencies:
-    "@babel/runtime": "npm:^7.27.6"
-  peerDependencies:
-    typescript: ^5
-  peerDependenciesMeta:
-    typescript:
-      optional: true
-  checksum: 10c0/2ac3eaaf7eb0f713094265733f2371fd2631e8a0247049f2c5608d5f5b0a33720d90179de8bd4fb23e00e9b037fd548aa36e2f234bea9753061c51d87a0895bc
   languageName: node
   linkType: hard
 
@@ -19383,29 +19358,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod-i18n-map@npm:^2":
-  version: 2.27.0
-  resolution: "zod-i18n-map@npm:2.27.0"
-  peerDependencies:
-    i18next: ">=21.3.0"
-    zod: ">=3.17.0"
-  checksum: 10c0/ecaa2df6489a3349d12cc5401c844b3b5a1f2aab0ee696f29fec54c9708cf31a8584a17769edb360d2f8f47ee7683c38c932774d6bd9522e6ba4f147a23bae02
-  languageName: node
-  linkType: hard
-
-"zod-validation-error@npm:^3":
-  version: 3.5.3
-  resolution: "zod-validation-error@npm:3.5.3"
+"zod-validation-error@npm:^4":
+  version: 4.0.1
+  resolution: "zod-validation-error@npm:4.0.1"
   peerDependencies:
     zod: ^3.25.0 || ^4.0.0
-  checksum: 10c0/4a1054f49049a5414857a4a85ae7b853d59be83dedb89942d4966345a58bd26d939beb574f0f5592fe4cc9963b26ac306d5b0950f6905651569059ef3517c803
+  checksum: 10c0/cd0402a609b2625eb017328712be8a423e0d681ca51d9345900c935f9fdfb7bc85566160d90ae83dd16f5c5d95921e2c3b8a5527c3bfe756ab01e564e036a971
   languageName: node
   linkType: hard
 
-"zod@npm:^3":
-  version: 3.25.76
-  resolution: "zod@npm:3.25.76"
-  checksum: 10c0/5718ec35e3c40b600316c5b4c5e4976f7fee68151bc8f8d90ec18a469be9571f072e1bbaace10f1e85cf8892ea12d90821b200e980ab46916a6166a4260a983c
+"zod@npm:^4":
+  version: 4.0.14
+  resolution: "zod@npm:4.0.14"
+  checksum: 10c0/ec8681050d393f3be1c2c8f30d7dd4f56bec3746855fb17288be856185a0fe65e68d1b24aec657bbf956f64c05e69332d3751eafd6c103d19385bcc46075612b
   languageName: node
   linkType: hard
 

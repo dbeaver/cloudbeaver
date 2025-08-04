@@ -7,11 +7,11 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
-import { schema, schemaExtra } from '@cloudbeaver/core-utils';
+import { schema } from '@cloudbeaver/core-utils';
 import { DATA_EDITOR_SETTINGS_GROUP } from '@cloudbeaver/plugin-data-viewer';
 
 const defaultSettings = schema.object({
-  'plugin.data-import.disabled': schemaExtra.stringedBoolean().default(false),
+  'plugin.data-import.disabled': schema.stringbool().default(false),
 });
 
 export type DataImportSettings = schema.infer<typeof defaultSettings>;

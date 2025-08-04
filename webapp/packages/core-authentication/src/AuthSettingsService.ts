@@ -7,10 +7,10 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
-import { schema, schemaExtra } from '@cloudbeaver/core-utils';
+import { schema } from '@cloudbeaver/core-utils';
 
 const settingsSchema = schema.object({
-  'core.authentication.disableAnonymousAccess': schemaExtra.stringedBoolean().default(false),
+  'core.authentication.disableAnonymousAccess': schema.stringbool().default(false),
 });
 
 export type AuthSettings = schema.infer<typeof settingsSchema>;

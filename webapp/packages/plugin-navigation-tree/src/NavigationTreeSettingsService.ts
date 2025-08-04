@@ -9,11 +9,11 @@ import { computed, makeObservable } from 'mobx';
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
-import { schema, schemaExtra } from '@cloudbeaver/core-utils';
+import { schema } from '@cloudbeaver/core-utils';
 import { NAVIGATION_TREE_SETTINGS_GROUP } from '@cloudbeaver/core-navigation-tree';
 
 const defaultSettings = schema.object({
-  'plugin.navigation-tree.disabled': schemaExtra.stringedBoolean().default(false),
+  'plugin.navigation-tree.disabled': schema.stringbool().default(false),
 });
 
 export type NavigationTreeSettings = schema.infer<typeof defaultSettings>;

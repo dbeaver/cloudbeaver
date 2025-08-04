@@ -24,7 +24,7 @@ import {
   SettingsProviderService,
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
-import { schema, schemaExtra } from '@cloudbeaver/core-utils';
+import { schema } from '@cloudbeaver/core-utils';
 
 import { SQL_EDITOR_SETTINGS_GROUP } from './SQL_EDITOR_SETTINGS_GROUP.js';
 
@@ -52,10 +52,10 @@ const ASSISTANT_MODE_OPTIONS_LOCALIZED = [
 ];
 
 const defaultSettings = schema.object({
-  'plugin.sql-editor.script.executionEnabled': schemaExtra.stringedBoolean().default(true),
+  'plugin.sql-editor.script.executionEnabled': schema.stringbool().default(true),
   'plugin.sql-editor.maxFileSize': schema.coerce.number().default(10 * 1024), // kilobyte
-  'plugin.sql-editor.disabled': schemaExtra.stringedBoolean().default(false),
-  'plugin.sql-editor.autoSave': schemaExtra.stringedBoolean().default(true),
+  'plugin.sql-editor.disabled': schema.stringbool().default(false),
+  'plugin.sql-editor.autoSave': schema.stringbool().default(true),
   'sql.proposals.insert.table.alias': schema.coerce
     .string()
     .transform(value => {
@@ -77,11 +77,15 @@ const defaultSettings = schema.object({
       switch (value) {
         case 'DEFAULT':
           return 'DEFAULT';
+        case 'COMBINE':
+          return 'COMBINE';
+        case 'NEW':
         default:
           return 'NEW';
       }
     })
-    .pipe(schema.enum(ASSISTANT_MODE_OPTIONS).default('NEW')),
+    .pipe(schema.enum(ASSISTANT_MODE_OPTIONS))
+    .default('NEW'),
 });
 
 type SqlEditorSettingsSchema = typeof defaultSettings;

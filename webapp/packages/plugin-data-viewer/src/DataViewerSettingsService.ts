@@ -17,7 +17,7 @@ import {
   SettingsProviderService,
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
-import { schema, schemaExtra } from '@cloudbeaver/core-utils';
+import { schema } from '@cloudbeaver/core-utils';
 
 import { DATA_EDITOR_SETTINGS_GROUP } from './DATA_EDITOR_SETTINGS_GROUP.js';
 
@@ -26,11 +26,11 @@ const FETCH_MAX = 5000;
 const DEFAULT_FETCH_SIZE = 200;
 
 const defaultSettings = schema.object({
-  'plugin.data-viewer.disableEdit': schemaExtra.stringedBoolean().default(false),
-  'plugin.data-viewer.disableCopyData': schemaExtra.stringedBoolean().default(false),
+  'plugin.data-viewer.disableEdit': schema.stringbool().default(false),
+  'plugin.data-viewer.disableCopyData': schema.stringbool().default(false),
   'plugin.data-viewer.fetchMax': schema.coerce.number().min(FETCH_MIN).default(FETCH_MAX),
   'resultset.maxrows': schema.coerce.number().min(FETCH_MIN).max(FETCH_MAX).default(DEFAULT_FETCH_SIZE),
-  'plugin.data-viewer.export.disabled': schemaExtra.stringedBoolean().default(false),
+  'plugin.data-viewer.export.disabled': schema.stringbool().default(false),
 });
 
 export type DataViewerSettingsSchema = typeof defaultSettings;

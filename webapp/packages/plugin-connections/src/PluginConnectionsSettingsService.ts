@@ -8,10 +8,10 @@
 import { CONNECTIONS_SETTINGS_GROUP } from '@cloudbeaver/core-connections';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
-import { schema, schemaExtra } from '@cloudbeaver/core-utils';
+import { schema } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
-  'plugin.connections.hideConnectionViewForUsers': schemaExtra.stringedBoolean().default(false),
+  'plugin.connections.hideConnectionViewForUsers': schema.stringbool().default(false),
 });
 
 export type PluginConnectionsSettings = schema.infer<typeof defaultSettings>;

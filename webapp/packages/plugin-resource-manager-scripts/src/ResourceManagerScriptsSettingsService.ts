@@ -8,10 +8,10 @@
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { RESOURCE_MANAGER_SETTINGS_GROUP } from '@cloudbeaver/core-resource-manager';
 import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
-import { schema, schemaExtra } from '@cloudbeaver/core-utils';
+import { schema } from '@cloudbeaver/core-utils';
 
 const settingsSchema = schema.object({
-  'plugin.resource-manager-scripts.disabled': schemaExtra.stringedBoolean().default(false),
+  'plugin.resource-manager-scripts.disabled': schema.stringbool().default(false),
 });
 
 type Settings = typeof settingsSchema;

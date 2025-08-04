@@ -160,7 +160,7 @@ export class ConnectionSearchService {
       availableDrivers: database.possibleDrivers,
       type: 'public',
       requiredNetworkHandlersIds: [],
-      connectionId: undefined,
+      connectionId: null,
     });
 
     await this.optionsPart?.load();

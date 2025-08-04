@@ -15,13 +15,13 @@ import {
   SettingsProviderService,
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
-import { schema, schemaExtra } from '@cloudbeaver/core-utils';
+import { schema } from '@cloudbeaver/core-utils';
 import { TOOLS_PANEL_SETTINGS_GROUP } from '@cloudbeaver/plugin-tools-panel';
 
 const defaultSettings = schema.object({
   'plugin.log-viewer.maxLogRecords': schema.coerce.number().default(1000),
   'plugin.log-viewer.logBatchSize': schema.coerce.number().default(2000),
-  'plugin.log-viewer.disabled': schemaExtra.stringedBoolean().default(false),
+  'plugin.log-viewer.disabled': schema.stringbool().default(false),
 });
 
 export type LogViewerSettingsSchema = typeof defaultSettings;

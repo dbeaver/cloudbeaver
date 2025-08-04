@@ -30,7 +30,7 @@
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
-    "@types/node": "^22",
+    "@types/node": "^24",
     "rimraf": "^6",
     "typescript": "^5",
     "vitest": "^3"

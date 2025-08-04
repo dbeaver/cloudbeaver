@@ -14,7 +14,7 @@ export const CONNECTION_FORM_STATE_SCHEMA = schema
     projectId: schema.string(),
     availableDrivers: schema.array(schema.string()),
     requiredNetworkHandlersIds: schema.array(schema.string()),
-    connectionId: schema.string().or(schema.undefined()),
+    connectionId: schema.string().or(schema.null()),
     type: schema.enum(['admin', 'public']),
   })
   .required()

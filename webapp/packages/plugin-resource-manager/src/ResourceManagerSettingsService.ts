@@ -13,10 +13,10 @@ import {
   SettingsProviderService,
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
-import { schema, schemaExtra } from '@cloudbeaver/core-utils';
+import { schema } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
-  'plugin.resource-manager.disabled': schemaExtra.stringedBoolean().default(false), //! use resourceManagerEnabled in server config instead
+  'plugin.resource-manager.disabled': schema.stringbool().default(false), //! use resourceManagerEnabled in server config instead
 });
 
 export type ResourceManagerSettingsSchema = typeof defaultSettings;
