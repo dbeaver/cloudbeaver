@@ -267,7 +267,7 @@ export class AdministrationScreenService {
       return true;
     }
 
-    return this.administrationItemService.canDeActivate(screen, toScreen, this.isConfigurationMode, screen.item !== toScreen?.item);
+    return await this.administrationItemService.canDeActivate(screen, toScreen, this.isConfigurationMode, screen.item !== toScreen?.item);
   }
 
   async handleCanActivate(toState: RouterState, fromState: RouterState): Promise<boolean> {
@@ -281,7 +281,7 @@ export class AdministrationScreenService {
       return false;
     }
 
-    return this.administrationItemService.canActivate(screen, this.isConfigurationMode, screen.item !== fromScreen?.item);
+    return await this.administrationItemService.canActivate(screen, this.isConfigurationMode, screen.item !== fromScreen?.item);
   }
 
   async handleActivate(state: RouterState, prevState?: RouterState): Promise<void> {
