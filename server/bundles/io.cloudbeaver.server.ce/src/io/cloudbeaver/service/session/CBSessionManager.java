@@ -165,9 +165,6 @@ public class CBSessionManager implements WebAppSessionManager {
     private void validateSessionIp(@NotNull HttpServletRequest request, WebSession webSession) {
         boolean bindingEnabled = isSessionBindingEnabled(request);
         String currentRemote = request.getRemoteAddr();
-        log.debug("Current user remote address: " + currentRemote +
-            ", session remote address: " + webSession.getLastRemoteAddr() +
-            ", binding enabled: " + bindingEnabled);
         if (bindingEnabled
             && (CommonUtils.isEmpty(currentRemote) || !currentRemote.equals(webSession.getLastRemoteAddr()))
         ) {
