@@ -30,24 +30,6 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
   return (
     <Group form gap>
       <GroupTitle>{translate('administration_configuration_wizard_configuration_server_info')}</GroupTitle>
-      <Switch
-        name="forceHttps"
-        state={state.serverConfig}
-        description={translate('administration_configuration_wizard_configuration_secure_cookies_description')}
-        mod={['primary']}
-        small
-      >
-        <div className="tw:flex tw:items-center tw:gap-1.5">
-          {translate('administration_configuration_wizard_configuration_secure_cookies')}
-          {!state.serverConfig.forceHttps && (
-            <IconOrImage
-              title={translate('administration_configuration_wizard_configuration_secure_cookies_warning')}
-              icon="/icons/warning_icon.svg"
-              width={24}
-            />
-          )}
-        </div>
-      </Switch>
       <InputField type="text" name="serverName" state={state.serverConfig} required medium>
         {translate('administration_configuration_wizard_configuration_server_name')}
       </InputField>
@@ -74,6 +56,24 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
       >
         {translate('administration_configuration_wizard_configuration_server_session_lifetime')}
       </InputField>
+      <Switch
+        name="forceHttps"
+        state={state.serverConfig}
+        description={translate('administration_configuration_wizard_configuration_secure_cookies_description')}
+        mod={['primary']}
+        small
+      >
+        <div className="tw:flex tw:items-center tw:gap-1.5">
+          {translate('administration_configuration_wizard_configuration_secure_cookies')}
+          {!state.serverConfig.forceHttps && (
+            <IconOrImage
+              title={translate('administration_configuration_wizard_configuration_secure_cookies_warning')}
+              icon="/icons/warning_icon.svg"
+              width={24}
+            />
+          )}
+        </div>
+      </Switch>
     </Group>
   );
 });

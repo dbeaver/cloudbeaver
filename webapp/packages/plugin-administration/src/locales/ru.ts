@@ -5,12 +5,15 @@ export default [
   ['administration_configuration_wizard_configuration', 'Настройки сервера'],
   ['administration_configuration_wizard_configuration_save_error', 'Не удалось сохранить конфигурацию сервера'],
 
-  ['administration_configuration_wizard_configuration_secure_cookies', 'Включить HTTPS режим'],
+  ['administration_configuration_wizard_configuration_secure_cookies', 'Принудительный HTTPS режим'],
   [
     'administration_configuration_wizard_configuration_secure_cookies_description',
-    'Включите HTTPS режим для безопасной связи между сервером и клиентами. Рекомендуется для рабочих окружений',
+    'Включите принудительный HTTPS режим для безопасной связи между сервером и клиентами. Рекомендуется для рабочих окружений',
   ],
-  ['administration_configuration_wizard_configuration_secure_cookies_warning', 'Данные не будут зашифрованы если HTTPS режим выключен. Это делает их уязвимыми'],
+  [
+    'administration_configuration_wizard_configuration_secure_cookies_warning',
+    'Данные не будут зашифрованы если принудительный HTTPS режим выключен. Это делает их уязвимыми',
+  ],
   ['administration_configuration_wizard_configuration_supported_hosts', 'Разрешённые URL сервера'],
   [
     'administration_configuration_wizard_configuration_supported_hosts_description',
