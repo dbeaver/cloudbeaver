@@ -8,7 +8,7 @@ export default [
   ['administration_configuration_wizard_configuration_secure_cookies', 'Принудительный HTTPS режим'],
   [
     'administration_configuration_wizard_configuration_secure_cookies_description',
-    'Включите принудительный HTTPS для защиты связи между сервером и клиентами. Рекомендуется для рабочих окружений. Убедитесь, что ваш HTTPS-прокси правильно настроен для корректной работы приложения.',
+    'Включите принудительный HTTPS для защиты связи между сервером и клиентами. Рекомендуется для рабочих окружений. Убедитесь, что ваш HTTPS-прокси правильно настроен для корректной работы приложения',
   ],
   [
     'administration_configuration_wizard_configuration_secure_cookies_warning',
