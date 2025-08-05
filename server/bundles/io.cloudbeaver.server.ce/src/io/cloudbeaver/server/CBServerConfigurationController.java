@@ -93,6 +93,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             log.debug("Runtime configuration [" + runtimeConfigPath.toAbsolutePath() + "]");
             loadConfiguration(runtimeConfigPath);
         }
+
         // Set default preferences
         PrefUtils.setDefaultPreferenceValue(DBWorkbench.getPlatform().getPreferenceStore(),
             ModelPreferences.UI_DRIVERS_HOME,
@@ -107,7 +108,8 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         return CommonUtils.nullIfEmpty(envValue);
     }
 
-    public void loadConfiguration(Path configPath) throws DBException {
+    @NotNull
+    public Map<String, Object> loadConfiguration(Path configPath) throws DBException {
         CBAppConfig prevConfig = new CBAppConfig(appConfiguration);
         Map<String, Object> configProps = readConfiguration(configPath);
         try {
@@ -123,6 +125,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         mergeOldConfiguration(prevConfig);
 
         patchConfigurationWithProperties(getServerConfiguration().getProductSettings());
+        return configProps;
     }
 
     protected void parseConfiguration(Map<String, Object> configProps) throws DBException {
@@ -531,8 +534,20 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         copyConfigValue(
             originServerConfig,
             serverConfigProperties,
-            CBConstants.PARAM_SECURE_COOKIES,
-            serverConfig.isSecureCookies()
+            CBConstants.PARAM_FORCE_HTTPS,
+            serverConfig.isForceHttps()
+        );
+        copyConfigValue(
+            originServerConfig,
+            serverConfigProperties,
+            CBConstants.PARAM_SUPPORTED_HOSTS,
+            serverConfig.getSupportedHosts()
+        );
+        copyConfigValue(
+            originServerConfig,
+            serverConfigProperties,
+            CBConstants.PARAM_BIND_SESSION_TO_IP,
+            serverConfig.getBindSessionToIp()
         );
         var productConfigProperties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Map<String, Object> oldProductRuntimeConfig = JSONUtils.getObject(originServerConfig,

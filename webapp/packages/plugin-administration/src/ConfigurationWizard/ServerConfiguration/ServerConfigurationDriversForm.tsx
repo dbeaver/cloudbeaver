@@ -11,16 +11,16 @@ import { useCallback } from 'react';
 import { Combobox, ConfirmationDialog, Group, GroupTitle, type ITag, s, Tag, Tags, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
-import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 import { isDefined } from '@dbeaver/js-helpers';
 
 import style from './ServerConfigurationDriversForm.module.css';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import type { IServerConfig } from './IServerConfigurationFormPartState.js';
 
 interface Props {
-  serverConfig: ServerConfigInput;
-  initialServerConfig: ServerConfigInput;
+  serverConfig: IServerConfig;
+  initialServerConfig: IServerConfig;
 }
 
 export const ServerConfigurationDriversForm = observer<Props>(function ServerConfigurationDriversForm({ serverConfig, initialServerConfig }) {

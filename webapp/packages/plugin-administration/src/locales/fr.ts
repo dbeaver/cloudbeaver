@@ -26,6 +26,18 @@ export default [
   ['administration_configuration_tools_save_tooltip', 'Enregistrer la configuration'],
   ['administration_configuration_tools_cancel_tooltip', 'Réinitialiser les modifications'],
 
+  ['administration_configuration_wizard_configuration_secure_cookies', 'Enable HTTPS mode'],
+  [
+    'administration_configuration_wizard_configuration_secure_cookies_description',
+    'Enable HTTPS mode to secure communication between the server and clients. This is recommended for production environments',
+  ],
+  ['administration_configuration_wizard_configuration_secure_cookies_warning', "The data won't be encrypted if HTTPS mode is disabled. This makes it vulnerable"],
+  ['administration_configuration_wizard_configuration_supported_hosts', 'Allowed Server URLs'],
+  [
+    'administration_configuration_wizard_configuration_supported_hosts_description',
+    'You can specify multiple server URLs separated by a new line. An empty value means that all URLs are allowed',
+  ],
+
   ['administration_configuration_wizard_configuration_server_info', 'Informations sur le serveur'],
   ['administration_configuration_wizard_configuration_server_name', 'Nom du serveur'],
   ['administration_configuration_wizard_configuration_server_url', 'URL du serveur'],
@@ -62,7 +74,6 @@ export default [
     'administration_configuration_wizard_configuration_security_public_credentials_description',
     "Permet d'enregistrer les identifiants pour les utilisateurs non administrateurs",
   ],
-
   ['administration_configuration_wizard_configuration_navigator', 'Navigateur'],
   ['administration_configuration_wizard_configuration_navigator_hide_folders', 'Masquer les dossiers'],
   ['administration_configuration_wizard_configuration_navigator_hide_schemas', 'Masquer les schémas'],

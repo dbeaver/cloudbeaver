@@ -4266,13 +4266,12 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:^"
+    "@dbeaver/react-tests": "workspace:^"
     "@testing-library/dom": "npm:^10"
     "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
     "@types/node": "npm:^22"
     "@types/react": "npm:^19"
-    fake-indexeddb: "npm:^6"
-    happy-dom: "npm:^18"
     mobx: "npm:^6"
     react: "npm:^19"
     react-dom: "npm:^19"
@@ -4552,6 +4551,23 @@ __metadata:
     react: "npm:^19"
     rimraf: "npm:^6"
     typescript: "npm:^5"
+    vitest: "npm:^3"
+  languageName: unknown
+  linkType: soft
+
+"@dbeaver/react-tests@workspace:../common-react/@dbeaver/react-tests, @dbeaver/react-tests@workspace:^":
+  version: 0.0.0-use.local
+  resolution: "@dbeaver/react-tests@workspace:../common-react/@dbeaver/react-tests"
+  dependencies:
+    "@dbeaver/cli": "workspace:^"
+    "@dbeaver/tsconfig": "workspace:^"
+    "@testing-library/dom": "npm:^10"
+    "@testing-library/jest-dom": "npm:^6"
+    "@testing-library/react": "npm:^16"
+    "@types/node": "npm:^22"
+    rimraf: "npm:^6"
+    typescript: "npm:^5"
+    vitest: "npm:^3"
   languageName: unknown
   linkType: soft
 
@@ -9356,6 +9372,7 @@ __metadata:
     "@cloudbeaver/tests-runner": "workspace:*"
     "@dbeaver/cli": "workspace:^"
     "@dbeaver/prettier-config": "workspace:*"
+    "@dbeaver/react-tests": "workspace:^"
     "@testing-library/dom": "npm:^10"
     "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
@@ -9365,7 +9382,6 @@ __metadata:
     concurrently: "npm:^9"
     eslint: "npm:^9.30.1"
     happy-dom: "npm:^18"
-    lefthook: "npm:^1"
     mobx: "npm:^6"
     mobx-react-lite: "npm:^4"
     msw: "npm:^2"
@@ -9474,10 +9490,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "common-react@workspace:../common-react"
   dependencies:
+    "@dbeaver/cli": "workspace:^"
     "@dbeaver/prettier-config": "workspace:^"
+    "@dbeaver/react-tests": "workspace:^"
     "@wroud/ts-template": "npm:^0"
+    happy-dom: "npm:^18"
     prettier: "npm:^3.6.2"
     rimraf: "npm:^6"
+    vitest: "npm:^3"
   languageName: unknown
   linkType: soft
 
@@ -11176,13 +11196,6 @@ __metadata:
     iconv-lite: "npm:^0.4.24"
     tmp: "npm:^0.0.33"
   checksum: 10c0/c98f1ba3efdfa3c561db4447ff366a6adb5c1e2581462522c56a18bf90dfe4da382f9cd1feee3e330108c3595a854b218272539f311ba1b3298f841eb0fbf339
-  languageName: node
-  linkType: hard
-
-"fake-indexeddb@npm:^6":
-  version: 6.0.1
-  resolution: "fake-indexeddb@npm:6.0.1"
-  checksum: 10c0/60f4ccdfd5ecb37bb98019056c688366847840cce7146e0005c5ca54823238455403b0a8803b898a11cf80f6147b1bb553457c6af427a644a6e64566cdbe42ec
   languageName: node
   linkType: hard
 
@@ -13318,117 +13331,6 @@ __metadata:
   version: 1.9.4
   resolution: "leaflet@npm:1.9.4"
   checksum: 10c0/f639441dbb7eb9ae3fcd29ffd7d3508f6c6106892441634b0232fafb9ffb1588b05a8244ec7085de2c98b5ed703894df246898477836cfd0ce5b96d4717b5ca1
-  languageName: node
-  linkType: hard
-
-"lefthook-darwin-arm64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "lefthook-darwin-arm64@npm:1.12.2"
-  conditions: os=darwin & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"lefthook-darwin-x64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "lefthook-darwin-x64@npm:1.12.2"
-  conditions: os=darwin & cpu=x64
-  languageName: node
-  linkType: hard
-
-"lefthook-freebsd-arm64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "lefthook-freebsd-arm64@npm:1.12.2"
-  conditions: os=freebsd & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"lefthook-freebsd-x64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "lefthook-freebsd-x64@npm:1.12.2"
-  conditions: os=freebsd & cpu=x64
-  languageName: node
-  linkType: hard
-
-"lefthook-linux-arm64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "lefthook-linux-arm64@npm:1.12.2"
-  conditions: os=linux & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"lefthook-linux-x64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "lefthook-linux-x64@npm:1.12.2"
-  conditions: os=linux & cpu=x64
-  languageName: node
-  linkType: hard
-
-"lefthook-openbsd-arm64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "lefthook-openbsd-arm64@npm:1.12.2"
-  conditions: os=openbsd & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"lefthook-openbsd-x64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "lefthook-openbsd-x64@npm:1.12.2"
-  conditions: os=openbsd & cpu=x64
-  languageName: node
-  linkType: hard
-
-"lefthook-windows-arm64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "lefthook-windows-arm64@npm:1.12.2"
-  conditions: os=win32 & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"lefthook-windows-x64@npm:1.12.2":
-  version: 1.12.2
-  resolution: "lefthook-windows-x64@npm:1.12.2"
-  conditions: os=win32 & cpu=x64
-  languageName: node
-  linkType: hard
-
-"lefthook@npm:^1":
-  version: 1.12.2
-  resolution: "lefthook@npm:1.12.2"
-  dependencies:
-    lefthook-darwin-arm64: "npm:1.12.2"
-    lefthook-darwin-x64: "npm:1.12.2"
-    lefthook-freebsd-arm64: "npm:1.12.2"
-    lefthook-freebsd-x64: "npm:1.12.2"
-    lefthook-linux-arm64: "npm:1.12.2"
-    lefthook-linux-x64: "npm:1.12.2"
-    lefthook-openbsd-arm64: "npm:1.12.2"
-    lefthook-openbsd-x64: "npm:1.12.2"
-    lefthook-windows-arm64: "npm:1.12.2"
-    lefthook-windows-x64: "npm:1.12.2"
-  dependenciesMeta:
-    lefthook-darwin-arm64:
-      optional: true
-    lefthook-darwin-x64:
-      optional: true
-    lefthook-freebsd-arm64:
-      optional: true
-    lefthook-freebsd-x64:
-      optional: true
-    lefthook-linux-arm64:
-      optional: true
-    lefthook-linux-x64:
-      optional: true
-    lefthook-openbsd-arm64:
-      optional: true
-    lefthook-openbsd-x64:
-      optional: true
-    lefthook-windows-arm64:
-      optional: true
-    lefthook-windows-x64:
-      optional: true
-  bin:
-    lefthook: bin/index.js
-  checksum: 10c0/7677c0918b352154e436886416ca925357f23a44722efd022aad2a2fff4f8a4160fd2ea85fd7bcfbc6ae4f844f725e5f2e435ed2a7f323e24c7939789a2a02de
   languageName: node
   linkType: hard
 

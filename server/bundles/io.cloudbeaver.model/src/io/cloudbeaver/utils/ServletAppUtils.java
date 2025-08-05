@@ -37,6 +37,7 @@ import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -47,6 +48,11 @@ public class ServletAppUtils {
 
     private static final String HEADER_FORWARDED_SCHEME = "X-Forwarded-Scheme";
     private static final String HEADER_FORWARDED_HOST = "X-Forwarded-Host";
+    private static final Set<Integer> DEFAULT_PORTS = Set.of(
+        80,
+        443
+    );
+
 
     private static final Log log = Log.getLog(ServletAppUtils.class);
 
@@ -309,7 +315,26 @@ public class ServletAppUtils {
         if (!origin.endsWith(rootUri)) {
             origin = origin + "/" + rootUri + "/";
         }
-        return removeSideSlashes(origin);
+
+        origin = removeSideSlashes(origin);
+        URI uri = URI.create(origin);
+        if (DEFAULT_PORTS.contains(uri.getPort())) {
+            try {
+                origin = new URI(
+                    uri.getScheme(),
+                    uri.getUserInfo(),
+                    uri.getHost(),
+                    -1,
+                    uri.getPath(),
+                    uri.getQuery(),
+                    uri.getFragment()
+                ).toString();
+            } catch (URISyntaxException e) {
+                log.error("Failed to create URI without port", e);
+            }
+        }
+
+        return origin;
     }
 
     public static String getRootUrlFromUri(@NotNull URI uri) {

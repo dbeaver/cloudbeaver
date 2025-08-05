@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React, { forwardRef, useCallback, useLayoutEffect, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useId, useLayoutEffect, useRef, useState } from 'react';
 
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
@@ -62,6 +62,7 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
     ref,
   ) {
     const [uncontrolledInputValue, setUncontrolledInputValue] = useState(value);
+    const inputId = useId();
     const inputRef = useRef<HTMLInputElement | null>(null);
     const mergedRef = useCombinedRef(inputRef, ref);
     const capsLock = useCapsLockTracker();
@@ -116,13 +117,14 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
 
     return (
       <Field {...layoutProps} className={s(styles, {}, className)}>
-        <FieldLabel title={labelTooltip || rest.title} className={s(styles, { fieldLabel: true })} required={required}>
+        <FieldLabel htmlFor={inputId} title={labelTooltip || rest.title} className={s(styles, { fieldLabel: true })} required={required}>
           {children}
         </FieldLabel>
         <div className={s(styles, { inputContainer: true })}>
           <Input
             ref={mergedRef}
             {...rest}
+            id={inputId}
             type={passwordRevealed ? 'text' : rest.type}
             name={name}
             value={uncontrolled ? undefined : value}
