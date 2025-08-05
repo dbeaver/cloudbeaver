@@ -167,6 +167,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
         secretManagerEnabled: config?.secretManagerEnabled ?? false,
         supportedHosts: config?.supportedHosts.join(SUPPORTED_HOSTS_SPLITTER) ?? '',
         forceHttps: config?.forceHttps ?? true,
+        bindSessionToIp: config?.bindSessionToIp,
       },
       navigatorConfig: { ...this.state.navigatorConfig, ...defaultNavigatorSettings },
     });

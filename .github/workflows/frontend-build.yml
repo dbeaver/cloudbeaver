@@ -85,8 +85,8 @@ jobs:
       - run: yarn test
         working-directory: ./cloudbeaver/common-typescript
 
-      # - run: yarn test
-      #   working-directory: ./cloudbeaver/common-react
+      - run: yarn test
+        working-directory: ./cloudbeaver/common-react
 
       - run: yarn test
 
