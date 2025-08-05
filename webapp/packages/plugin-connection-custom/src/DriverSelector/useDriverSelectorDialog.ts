@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed } from 'mobx';
+import { action, computed, observable } from 'mobx';
 
 import { useObservableRef, usePermission, useResource } from '@cloudbeaver/core-blocks';
 import { ConnectionsManagerService, DBDriverResource } from '@cloudbeaver/core-connections';
@@ -38,7 +38,7 @@ export function useDriverSelectorDialog({ onSelect, projectId, folderPath }: Dri
   const state: State = useObservableRef(
     () => ({
       get drivers() {
-        return dbDriverResource.resource.enabledDrivers.filter(driver => {
+        return this.dbDriverResource.resource.enabledDrivers.filter(driver => {
           if (this.isAdmin) {
             return true;
           }
@@ -63,7 +63,7 @@ export function useDriverSelectorDialog({ onSelect, projectId, folderPath }: Dri
         }
       },
     }),
-    { select: action.bound, drivers: computed },
+    { select: action.bound, drivers: computed, dbDriverResource: observable.ref },
     { notificationService, connectionsManagerService, publicConnectionFormService, dbDriverResource, isAdmin },
   );
 
