@@ -25,6 +25,11 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 25.1.4 2025-08-04
+- Added an ability to review the script before execution when users edit tables without primary keys in the Data Editor;
+- DuckDB: driver has been updated to version 1.3.2;
+- Databend: driver has been updated to version 0.3.9.
+
 ### 25.1.3 2025-07-21
 - A password confirmation field has been added for administrators in the Easy Config section to help prevent accidental misconfigurations;
 - Added column descriptions in the Data Editor to provide more metadata context. You can disable this in Preferences > Data Viewer;

@@ -73,7 +73,6 @@ export default [
     'administration_configuration_wizard_configuration_security_public_credentials_description',
     'Permetti di salvare le credenziali per gli utenti non amministratori',
   ],
-
   ['administration_configuration_wizard_configuration_navigator', 'Navigatore'],
   ['administration_configuration_wizard_configuration_navigator_hide_folders', 'Nascondi le Cartelle'],
   ['administration_configuration_wizard_configuration_navigator_hide_schemas', 'Nascondi gli Schemi'],
