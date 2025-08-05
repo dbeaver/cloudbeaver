@@ -13,6 +13,7 @@ fragment ServerConfig on ServerConfig {
   licenseUsersModificationEnabled
 
   anonymousAccessEnabled
+  bindSessionToIp
 
   adminCredentialsSaveEnabled
   publicCredentialsSaveEnabled

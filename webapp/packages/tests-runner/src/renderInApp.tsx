@@ -26,6 +26,8 @@ function ApplicationWrapper(serviceInjector: IServiceProvider): React.FC<React.P
     </Suspense>
   );
 }
+
+// TODO move it to the common-react/@dbeaver/react-tests packages
 export function renderInApp<
   Q extends Queries = typeof queries,
   Container extends Element | DocumentFragment = HTMLElement,

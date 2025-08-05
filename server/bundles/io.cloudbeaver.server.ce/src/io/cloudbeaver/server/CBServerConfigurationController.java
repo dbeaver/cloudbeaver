@@ -91,18 +91,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         Path runtimeConfigPath = getRuntimeAppConfigPath();
         if (Files.exists(runtimeConfigPath)) {
             log.debug("Runtime configuration [" + runtimeConfigPath.toAbsolutePath() + "]");
-            Map<String, Object> runtimeConfigMap = loadConfiguration(runtimeConfigPath);
-            Map<String, Object> serverConfigMap = JSONUtils.getObject(runtimeConfigMap, CBConstants.PARAM_SERVER_CONFIGURATION);
-            if (!serverConfigMap.containsKey(CBConstants.PARAM_FORCE_HTTPS)) {
-                CBServerConfig serverConfig = getServerConfiguration();
-                // enable https for legacy configurations
-                if (CommonUtils.isEmpty(serverConfig.getSupportedHosts())
-                    && CommonUtils.isNotEmpty(serverConfig.getServerURL())
-                    && serverConfig.getServerURL().startsWith("https://")
-                ) {
-                    serverConfig.setForceHttps(true);
-                }
-            }
+            loadConfiguration(runtimeConfigPath);
         }
 
         // Set default preferences
@@ -553,6 +542,12 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             serverConfigProperties,
             CBConstants.PARAM_SUPPORTED_HOSTS,
             serverConfig.getSupportedHosts()
+        );
+        copyConfigValue(
+            originServerConfig,
+            serverConfigProperties,
+            CBConstants.PARAM_BIND_SESSION_TO_IP,
+            serverConfig.getBindSessionToIp()
         );
         var productConfigProperties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Map<String, Object> oldProductRuntimeConfig = JSONUtils.getObject(originServerConfig,

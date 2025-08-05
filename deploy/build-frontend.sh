@@ -8,6 +8,8 @@ mkdir -p ./cloudbeaver/web
 cd ../../cloudbeaver/common-typescript
 
 yarn install --immutable
+cd ../common-react
+yarn install --immutable
 cd ../webapp
 yarn install --immutable
 cd ./packages/product-default
@@ -18,6 +20,8 @@ if [[ "$?" -ne 0 ]] ; then
 fi
 
 cd ../../../common-typescript
+yarn test
+cd ../common-react
 yarn test
 cd ../webapp
 yarn test

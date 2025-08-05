@@ -22,6 +22,7 @@ import io.cloudbeaver.model.session.*;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.events.WSWebUtils;
 import io.cloudbeaver.service.DBWSessionHandler;
@@ -156,8 +157,15 @@ public class CBSessionManager implements WebAppSessionManager {
             }
         }
 
+        validateSessionIp(request, webSession);
+
+        return webSession;
+    }
+
+    private void validateSessionIp(@NotNull HttpServletRequest request, WebSession webSession) {
+        boolean bindingEnabled = isSessionBindingEnabled(request);
         String currentRemote = request.getRemoteAddr();
-        if (application.getServerConfiguration().isBindSessionToIp()
+        if (bindingEnabled
             && (CommonUtils.isEmpty(currentRemote) || !currentRemote.equals(webSession.getLastRemoteAddr()))
         ) {
             var error = new DBWebException(
@@ -169,8 +177,11 @@ public class CBSessionManager implements WebAppSessionManager {
             webSession.addSessionError(error);
             closeSession(webSession.getSessionId());
         }
+    }
 
-        return webSession;
+    protected boolean isSessionBindingEnabled(@NotNull HttpServletRequest request) {
+        String bindingState = application.getServerConfiguration().getBindSessionToIp();
+        return CBConstants.BIND_SESSION_ENABLE.equalsIgnoreCase(bindingState) || Boolean.parseBoolean(bindingState);
     }
 
     @NotNull
