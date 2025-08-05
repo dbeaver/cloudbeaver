@@ -26,7 +26,6 @@ import { Field } from './Field.js';
 import { FieldDescription } from './FieldDescription.js';
 import { FieldLabel } from './FieldLabel.js';
 import { FormContext } from './FormContext.js';
-import { getComputed } from '../getComputed.js';
 
 export type ComboboxBaseProps<TKey, TValue> = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
