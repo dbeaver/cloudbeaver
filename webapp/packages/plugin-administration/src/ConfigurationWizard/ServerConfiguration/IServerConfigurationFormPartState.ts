@@ -26,6 +26,7 @@ const ServerConfigurationFormPartStateConfigSchema = schema.object({
   sessionExpireTime: schema.number().optional(),
   forceHttps: schema.boolean().optional(),
   supportedHosts: schema.string(),
+  bindSessionToIp: schema.string().optional(),
 });
 
 const ServerConfigurationFormPartStateNavigatorSchema = schema.object({

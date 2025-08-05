@@ -28,6 +28,7 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
     supportsWorkspaces: false,
     sessionExpireTime: 6000000,
     anonymousAccessEnabled: true,
+    bindSessionToIp: 'disable',
     adminCredentialsSaveEnabled: true,
     publicCredentialsSaveEnabled: true,
     secretManagerEnabled: true,
