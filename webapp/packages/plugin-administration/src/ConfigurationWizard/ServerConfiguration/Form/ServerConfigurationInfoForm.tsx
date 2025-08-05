@@ -12,7 +12,7 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState.js';
 import { MIN_SESSION_EXPIRE_TIME } from './MIN_SESSION_EXPIRE_TIME.js';
-import { GITHUB_LINKS } from '@cloudbeaver/core-links';
+import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 
 interface Props {
   state: IServerConfigurationPageState;
@@ -61,11 +61,18 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         name="forceHttps"
         state={state.serverConfig}
         description={
-          <div className="tw-flex tw:gap-1">
-            {translate('administration_configuration_wizard_configuration_secure_cookies_description')}.
-            <Link className="tw:inline tw:whitespace-nowrap" title="test" href={GITHUB_LINKS.PROXY_CONFIGURATION_PAGE} target="_blank" indicator>
-              {' '}
-              {translate('ui_more_here')}
+          <div className="tw:flex-col tw:gap-1 tw:flex tw:items-start">
+            <span>{translate('administration_configuration_wizard_configuration_secure_cookies_description')}</span>
+            <Link
+              className="tw:flex tw:items-center tw:gap-2 tw:text-balance"
+              href={WEBSITE_LINKS.PROXY_CONFIGURATION_DOCUMENTATION_PAGE}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <div className="tw:flex tw:items-center tw:gap-1">
+                <IconOrImage width={16} icon="/icons/documentation_link_sm.svg" />{' '}
+                {translate('administration_configuration_wizard_configuration_secure_cookies_docs')}
+              </div>
             </Link>
           </div>
         }

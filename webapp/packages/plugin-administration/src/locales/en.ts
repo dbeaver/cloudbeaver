@@ -35,6 +35,7 @@ export default [
     'administration_configuration_wizard_configuration_secure_cookies_warning',
     "The data won't be encrypted if forced HTTPS mode is disabled. This makes it vulnerable",
   ],
+  ['administration_configuration_wizard_configuration_secure_cookies_docs', 'Server proxy configuration documentation'],
   ['administration_configuration_wizard_configuration_supported_hosts', 'Allowed Server URLs'],
   [
     'administration_configuration_wizard_configuration_supported_hosts_description',
