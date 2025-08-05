@@ -7,8 +7,9 @@
  */
 import * as z from 'zod';
 
+const locales = new Map<string, any>([]);
+
 export const schemaExtra = {
-  locales: new Map<string, any>([]),
   async loadLocale(code: string): Promise<any | undefined> {
     let locale: any | undefined;
 
@@ -37,12 +38,12 @@ export const schemaExtra = {
     }
 
     if (locale) {
-      this.locales.set(code, locale.default);
+      locales.set(code, locale.default);
       return locale.default;
     }
   },
   async setLocale(code: string): Promise<void> {
-    const locale = this.locales.get(code) ?? (await this.loadLocale(code));
+    const locale = locales.get(code) ?? (await this.loadLocale(code));
 
     if (locale) {
       z.config(locale());

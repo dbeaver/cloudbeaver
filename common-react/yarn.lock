@@ -306,7 +306,7 @@ __metadata:
   resolution: "@dbeaver/cli@workspace:../common-typescript/@dbeaver/cli"
   dependencies:
     "@dbeaver/tsconfig": "workspace:^"
-    "@types/node": "npm:^24"
+    "@types/node": "npm:^22"
     rimraf: "npm:^6"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -399,7 +399,7 @@ __metadata:
     "@testing-library/dom": "npm:^10"
     "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
-    "@types/node": "npm:^24"
+    "@types/node": "npm:^22"
     rimraf: "npm:^6"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -1931,12 +1931,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^24":
-  version: 24.2.0
-  resolution: "@types/node@npm:24.2.0"
+"@types/node@npm:^22":
+  version: 22.17.0
+  resolution: "@types/node@npm:22.17.0"
   dependencies:
-    undici-types: "npm:~7.10.0"
-  checksum: 10c0/0b55af4d7b37fea47bbeffffaff908462fa19ea9b1a18f92d9ed6d8415d97971b254f8cb3f629cd238916e94711fdb6ac939aa750cb353dfd6df6c0339435740
+    undici-types: "npm:~6.21.0"
+  checksum: 10c0/e1c603b660d3de3243dfc02ded5d40623ff3f36315ffbdd8cdc81bc2c5a8da172035879d437b72e9fa61ca01827f28e9c2b0c32898f411a8e9ba0a5efac0b4ca
   languageName: node
   linkType: hard
 
@@ -7224,13 +7224,6 @@ __metadata:
   version: 6.21.0
   resolution: "undici-types@npm:6.21.0"
   checksum: 10c0/c01ed51829b10aa72fc3ce64b747f8e74ae9b60eafa19a7b46ef624403508a54c526ffab06a14a26b3120d055e1104d7abe7c9017e83ced038ea5cf52f8d5e04
-  languageName: node
-  linkType: hard
-
-"undici-types@npm:~7.10.0":
-  version: 7.10.0
-  resolution: "undici-types@npm:7.10.0"
-  checksum: 10c0/8b00ce50e235fe3cc601307f148b5e8fb427092ee3b23e8118ec0a5d7f68eca8cee468c8fc9f15cbb2cf2a3797945ebceb1cbd9732306a1d00e0a9b6afa0f635
   languageName: node
   linkType: hard
 

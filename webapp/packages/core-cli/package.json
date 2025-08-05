@@ -44,7 +44,7 @@
     "@cloudbeaver/tsconfig": "workspace:*",
     "@swc/core": "^1",
     "@types/js-yaml": "^4",
-    "@types/node": "^24",
+    "@types/node": "^22",
     "enquirer": "^2",
     "execa": "^9",
     "glob": "^11",

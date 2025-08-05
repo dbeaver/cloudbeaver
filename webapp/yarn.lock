@@ -1645,7 +1645,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@swc/core": "npm:^1"
     "@types/js-yaml": "npm:^4"
-    "@types/node": "npm:^24"
+    "@types/node": "npm:^22"
     enquirer: "npm:^2"
     execa: "npm:^9"
     glob: "npm:^11"
@@ -4132,7 +4132,7 @@ __metadata:
     "@cloudbeaver/tsconfig": "workspace:*"
     "@tailwindcss/vite": "npm:4.0.7"
     "@types/fs-extra": "npm:^11"
-    "@types/node": "npm:^24"
+    "@types/node": "npm:^22"
     "@vitejs/plugin-react": "npm:^4"
     "@wroud/vite-plugin-asset-resolver": "npm:^0"
     "@wroud/vite-plugin-tsc": "npm:^0"
@@ -4268,7 +4268,7 @@ __metadata:
     "@testing-library/dom": "npm:^10"
     "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
-    "@types/node": "npm:^24"
+    "@types/node": "npm:^22"
     "@types/react": "npm:^19"
     mobx: "npm:^6"
     react: "npm:^19"
@@ -4469,7 +4469,7 @@ __metadata:
   resolution: "@dbeaver/cli@workspace:../common-typescript/@dbeaver/cli"
   dependencies:
     "@dbeaver/tsconfig": "workspace:^"
-    "@types/node": "npm:^24"
+    "@types/node": "npm:^22"
     rimraf: "npm:^6"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -4562,7 +4562,7 @@ __metadata:
     "@testing-library/dom": "npm:^10"
     "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
-    "@types/node": "npm:^24"
+    "@types/node": "npm:^22"
     rimraf: "npm:^6"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -7858,7 +7858,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^24":
+"@types/node@npm:*":
   version: 24.2.0
   resolution: "@types/node@npm:24.2.0"
   dependencies:
@@ -7880,6 +7880,15 @@ __metadata:
   dependencies:
     undici-types: "npm:~6.21.0"
   checksum: 10c0/c6738131f1698258a5ac1e0185e4fc56977f7f566cd0ee11167f93f2339478470257bd82c5e1908a936a204e0ad7996d741356a1a07c04997a236161ea23a874
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^22":
+  version: 22.17.0
+  resolution: "@types/node@npm:22.17.0"
+  dependencies:
+    undici-types: "npm:~6.21.0"
+  checksum: 10c0/e1c603b660d3de3243dfc02ded5d40623ff3f36315ffbdd8cdc81bc2c5a8da172035879d437b72e9fa61ca01827f28e9c2b0c32898f411a8e9ba0a5efac0b4ca
   languageName: node
   linkType: hard
 
