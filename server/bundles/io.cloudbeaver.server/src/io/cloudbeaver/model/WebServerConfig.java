@@ -98,6 +98,11 @@ public class WebServerConfig {
     }
 
     @Property
+    Boolean isLicenseUsersModificationEnabled() {
+        return provideSensitiveInformation ? application.getServerConfiguration().isLicenseUsersModificationEnabled() : null;
+    }
+
+    @Property
     public boolean isConfigurationMode() {
         return application.isConfigurationMode();
     }

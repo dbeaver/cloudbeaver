@@ -25,4 +25,6 @@ import org.jkiss.code.Nullable;
 public interface WebServerConfiguration extends ServletServerConfiguration {
     @Nullable
     String getServerName();
+
+    boolean isLicenseUsersModificationEnabled();
 }
