@@ -37,6 +37,7 @@ export const manifest: PluginManifest = {
         m => m.UserFormConnectionAccessPartBootstrap,
       ),
     () => import('./Administration/Users/UserForm/Info/UserFormInfoPartService.js').then(m => m.UserFormInfoPartService),
+    () => import('./AdministrationUsersManagementService.js').then(m => m.AdministrationUsersManagementService),
     () => import('./Administration/Users/UsersTable/UsersTableOptionsPanelService.js').then(m => m.UsersTableOptionsPanelService),
     () => import('./Administration/Users/Teams/TeamsTable/TeamsTableOptionsPanelService.js').then(m => m.TeamsTableOptionsPanelService),
   ],
