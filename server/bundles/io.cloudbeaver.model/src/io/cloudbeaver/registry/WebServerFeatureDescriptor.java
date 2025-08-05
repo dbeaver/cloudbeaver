@@ -68,4 +68,9 @@ public class WebServerFeatureDescriptor extends AbstractContextDescriptor implem
         return true;
     }
 
+    @Override
+    public boolean isEnabledByDefault() {
+        return false;
+    }
+
 }
