@@ -346,8 +346,8 @@ public abstract class CBApplication<T extends CBServerConfig>
     }
 
     private void refreshEnabledFeatures() {
-        List<String> enabledFeatures = new ArrayList<>(List.of(getAppConfiguration().getEnabledFeatures()));
-        List<String> disabledFeatures = new ArrayList<>(List.of(getAppConfiguration().getDisabledFeatures()));
+        Set<String> enabledFeatures = new LinkedHashSet<>(Arrays.asList(getAppConfiguration().getEnabledFeatures()));
+        Set<String> disabledFeatures = new LinkedHashSet<>(Arrays.asList(getAppConfiguration().getDisabledFeatures()));
 
         WebFeatureRegistry.getInstance().getWebFeatures().stream()
             .filter(f -> f.isEnabledByDefault() && !disabledFeatures.contains(f.getId()))
