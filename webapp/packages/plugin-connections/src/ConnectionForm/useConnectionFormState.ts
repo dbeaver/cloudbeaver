@@ -17,7 +17,7 @@ const EMPTY_CONNECTION_INFO_PARAMS: IConnectionFormState = {
   availableDrivers: [],
   type: 'admin',
   requiredNetworkHandlersIds: [],
-  connectionId: null,
+  connectionId: undefined,
 };
 
 export function useConnectionFormState(params: IConnectionInfoParams, configure?: (state: ConnectionFormState) => any): ConnectionFormState {

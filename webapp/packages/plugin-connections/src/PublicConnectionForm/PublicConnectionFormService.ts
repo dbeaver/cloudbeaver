@@ -78,7 +78,7 @@ export class PublicConnectionFormService {
       availableDrivers: availableDrivers ?? [],
       type: 'public',
       requiredNetworkHandlersIds: [],
-      connectionId: config.connectionId ?? null,
+      connectionId: config.connectionId,
     }).setMode(config.connectionId ? FormMode.Edit : FormMode.Create);
 
     await this.optionsPart?.load();
