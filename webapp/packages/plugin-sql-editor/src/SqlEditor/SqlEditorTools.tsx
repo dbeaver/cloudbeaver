@@ -45,7 +45,7 @@ export const SqlEditorTools = observer<Props>(function SqlEditorTools({ data, st
     }
   }
 
-  async function downloadScriptHandler() {
+  function downloadScriptHandler() {
     tools.downloadScript(data.value.trim());
   }
 

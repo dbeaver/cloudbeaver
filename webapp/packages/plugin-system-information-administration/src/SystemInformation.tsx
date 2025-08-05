@@ -22,6 +22,7 @@ import {
   useObjectPropertyCategories,
   GroupTitle,
   Container,
+  TextPlaceholder,
 } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { SystemInformationResource } from './SystemInformationResource.js';
@@ -42,6 +43,10 @@ export const SystemInformation: TabContainerPanelComponent<AdministrationItemCon
         true,
       );
     }
+  }
+
+  if (!properties.length) {
+    return <TextPlaceholder>{translate('ui_no_items_placeholder')}</TextPlaceholder>;
   }
 
   return (
