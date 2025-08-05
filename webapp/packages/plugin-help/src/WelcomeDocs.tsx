@@ -9,16 +9,21 @@
 import { Cell, IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
 import { observer } from 'mobx-react-lite';
 import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { useService } from '@cloudbeaver/core-di';
 
 export const WelcomeDocs = observer(function WelcomeDocs() {
   const translate = useTranslate();
+  const serverConfigResource = useService(ServerConfigResource);
   return (
     <Cell
       before={<IconOrImage icon="/icons/documentation_link.svg" />}
-      description={translate('plugin_help_welcome_docs_description')}
+      description={translate('plugin_help_welcome_docs_description', undefined, {
+        product: serverConfigResource.distributed ? 'DBeaver Team Edition' : 'CloudBeaver',
+      })}
       className="tw:decoration-transparent!"
       as="a"
-      href={WEBSITE_LINKS.DOCS_PAGE}
+      href={WEBSITE_LINKS.getDocumentationPage(serverConfigResource.distributed)}
       target="_blank"
       big
     >

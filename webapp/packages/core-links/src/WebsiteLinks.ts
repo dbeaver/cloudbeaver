@@ -8,6 +8,7 @@
 export const WEBSITE_LINKS = {
   ROOT_PAGE: 'https://dbeaver.com/',
   DOCS_PAGE: 'https://dbeaver.com/docs/cloudbeaver/',
+  TEAM_EDITION_DOCS_PAGE: 'https://dbeaver.com/docs/team-edition/',
   DATA_EDITOR_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/Data-editor/',
   SQL_EDITOR_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/SQL-Editor/',
   SSL_CONFIGURATION_DOCUMENTATION_PAGE: 'https://dbeaver.com/docs/cloudbeaver/SSL-Configuration/',
@@ -21,15 +22,23 @@ export const WEBSITE_LINKS = {
   TEAM_ARCHIVE: 'https://dbeaver.com/downloads-team',
   CONTACT_PAGE: 'https://dbeaver.com/contact/',
 
-  getTeamArchiveById(id: string) {
+  getTeamArchiveById(id: string): string {
     return `${WEBSITE_LINKS.TEAM_ARCHIVE}/${id}`;
   },
 
-  getProductBuyPage(distributed: boolean) {
+  getProductBuyPage(distributed: boolean): string {
     if (distributed) {
       return WEBSITE_LINKS.TEAM_EDITION_BUY_PRODUCT_PAGE;
     }
 
     return WEBSITE_LINKS.ENTERPRISE_BUY_PRODUCT_PAGE;
+  },
+
+  getDocumentationPage(distributed: boolean): string {
+    if (distributed) {
+      return WEBSITE_LINKS.TEAM_EDITION_DOCS_PAGE;
+    }
+
+    return WEBSITE_LINKS.DOCS_PAGE;
   },
 };
