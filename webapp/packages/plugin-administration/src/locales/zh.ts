@@ -26,7 +26,7 @@ export default [
   ['administration_configuration_wizard_configuration_secure_cookies', 'Force HTTPS mode'],
   [
     'administration_configuration_wizard_configuration_secure_cookies_description',
-    'Enable forced HTTPS mode to secure communication between the server and clients. This is recommended for production environments',
+    'Enable force HTTPS to secure server-client communication. Recommended for production. Ensure your HTTPS proxy is properly configured for correct app functionality',
   ],
   [
     'administration_configuration_wizard_configuration_secure_cookies_warning',
