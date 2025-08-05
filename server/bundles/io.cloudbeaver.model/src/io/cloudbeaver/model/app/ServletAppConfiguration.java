@@ -51,6 +51,16 @@ public interface ServletAppConfiguration {
         return new String[0];
     }
 
+    /**
+     * Returns disabled features.
+     *
+     * @return array of disabled feature IDs
+     */
+    @NotNull
+    default String[] getDisabledFeatures() {
+        return new String[0];
+    }
+
     default boolean isSupportsCustomConnections() {
         return true;
     }
