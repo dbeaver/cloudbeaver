@@ -41,7 +41,7 @@ const MAIN_PROPERTY_HOST_KEY = 'host';
 const MAIN_PROPERTY_PORT_KEY = 'port';
 const MAIN_PROPERTY_SERVER_KEY = 'server';
 
-const defaultStateGetter = (connectionId?: string | null, credentials?: Record<string, any>) =>
+const defaultStateGetter = (connectionId?: string, credentials?: Record<string, any>) =>
   ({
     connectionId,
     configurationType: DriverConfigurationType.Manual,
