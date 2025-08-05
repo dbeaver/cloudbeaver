@@ -43,7 +43,7 @@ export class DataImportSettingsService {
       HIGHEST_SETTINGS_LAYER,
       createSettingsOverrideResolver<DataImportSettingsSchema>(this.settingsResolverService, {
         'plugin.data-import.disabled': {
-          key: 'permission.data-editor.import.enable',
+          key: 'permission.data-editor.import',
           map: value => !value,
         },
       }),
