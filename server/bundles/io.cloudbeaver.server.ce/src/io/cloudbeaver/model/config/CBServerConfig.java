@@ -78,11 +78,6 @@ public class CBServerConfig implements WebServerConfiguration {
         return serverName;
     }
 
-    @Override
-    public boolean isLicenseUsersModificationEnabled() {
-        return false;
-    }
-
     public String getSslConfigurationPath() {
         return sslConfigurationPath;
     }

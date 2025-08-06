@@ -189,8 +189,6 @@ type ServerConfig {
     licenseValid: Boolean!
     "Returns information about the server license status"
     licenseStatus: String @since(version: "24.1.5")
-    "Defines if the server can modify license users"
-    licenseUsersModificationEnabled: Boolean @since(version: "25.1.5")
 
     "Defines if the server is in configuration mode"
     configurationMode: Boolean!
