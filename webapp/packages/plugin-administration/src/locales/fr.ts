@@ -26,12 +26,16 @@ export default [
   ['administration_configuration_tools_save_tooltip', 'Enregistrer la configuration'],
   ['administration_configuration_tools_cancel_tooltip', 'Réinitialiser les modifications'],
 
-  ['administration_configuration_wizard_configuration_secure_cookies', 'Enable HTTPS mode'],
+  ['administration_configuration_wizard_configuration_secure_cookies', 'Force HTTPS mode'],
   [
     'administration_configuration_wizard_configuration_secure_cookies_description',
-    'Enable HTTPS mode to secure communication between the server and clients. This is recommended for production environments',
+    'Enable force HTTPS to secure server-client communication. Recommended for production. Ensure your HTTPS proxy is properly configured for correct app functionality',
   ],
-  ['administration_configuration_wizard_configuration_secure_cookies_warning', "The data won't be encrypted if HTTPS mode is disabled. This makes it vulnerable"],
+  [
+    'administration_configuration_wizard_configuration_secure_cookies_warning',
+    "The data won't be encrypted if forced HTTPS mode is disabled. This makes it vulnerable",
+  ],
+  ['administration_configuration_wizard_configuration_secure_cookies_docs', 'Server proxy configuration documentation'],
   ['administration_configuration_wizard_configuration_supported_hosts', 'Allowed Server URLs'],
   [
     'administration_configuration_wizard_configuration_supported_hosts_description',
