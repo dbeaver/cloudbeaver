@@ -2340,6 +2340,7 @@ __metadata:
     "@cloudbeaver/core-dialogs": "workspace:*"
     "@cloudbeaver/core-events": "workspace:*"
     "@cloudbeaver/core-executor": "workspace:*"
+    "@cloudbeaver/core-links": "workspace:*"
     "@cloudbeaver/core-localization": "workspace:*"
     "@cloudbeaver/core-resource": "workspace:*"
     "@cloudbeaver/core-root": "workspace:*"
