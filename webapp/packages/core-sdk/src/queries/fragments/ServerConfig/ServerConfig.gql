@@ -10,7 +10,6 @@ fragment ServerConfig on ServerConfig {
   productConfiguration
   supportsCustomConnections
   sessionExpireTime
-  licenseUsersModificationEnabled
 
   anonymousAccessEnabled
   bindSessionToIp
