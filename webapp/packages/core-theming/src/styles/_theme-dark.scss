@@ -14,7 +14,7 @@ $mdc-theme-on-secondary: #cbcbcb;
 $mdc-theme-sub-secondary: hsl(240deg, 10%, 20%);
 $mdc-theme-on-sub-secondary: #cbcbcb;
 
-$mdc-theme-surface: hsl(240deg, 10%, 18%);
+$mdc-theme-surface: hsl(240deg, 8%, 16%);
 $mdc-theme-on-surface: #ffffff;
 $mdc-theme-background: hsl(240deg, 10%, 26%);
 $mdc-theme-error: #e94948;
@@ -25,7 +25,7 @@ $color-on-positive: #fff;
 $color-negative: #e73e52;
 $color-status: #a08600;
 
-$link-color: $mdc-theme-primary;
+$link-color: lighten($mdc-theme-primary, 10%);
 $link-color-focus: #3f96d1;
 
 $input-color: $mdc-theme-on-secondary;
