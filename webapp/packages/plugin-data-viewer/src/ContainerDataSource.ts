@@ -92,7 +92,6 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
         originalQuery: response.fullQuery || '',
         requestDuration: response.duration || 0,
         requestMessage: response.statusMessage || '',
-        requestFilter: response.filterText || '',
         source: null,
       };
 

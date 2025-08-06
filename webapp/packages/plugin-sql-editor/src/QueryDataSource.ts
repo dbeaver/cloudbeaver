@@ -61,7 +61,6 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       originalQuery: '',
       requestDuration: 0,
       requestMessage: '',
-      requestFilter: '',
       source: null,
       query: '',
     };
@@ -247,7 +246,6 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       originalQuery: response.fullQuery || this.options?.query || '',
       requestDuration: response.duration || 0,
       requestMessage: response.statusMessage || '',
-      requestFilter: response.filterText || '',
       source: this.options?.query || null,
       query: this.options?.query || '',
     };

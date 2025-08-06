@@ -10,7 +10,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 import { replaceMiddle } from '@cloudbeaver/core-utils';
-import { isNotNullDefined } from '@dbeaver/js-helpers';
 import { ACTION_DELETE, ActionService, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
@@ -69,12 +68,6 @@ export class DataGridContextMenuFilterService {
     await model.request(() => {
       constraints.setFilter(resultColumn.position, operator, filterValue);
     });
-
-    const whereFilter = model.requestInfo.requestFilter || model.source.options?.whereFilter;
-
-    if (isNotNullDefined(whereFilter)) {
-      constraints.setWhereFilter(whereFilter);
-    }
   }
 
   register(): void {
@@ -175,7 +168,7 @@ export class DataGridContextMenuFilterService {
 
         if (action === ACTION_DATA_GRID_FILTERS_RESET_ALL) {
           const constraints = source.getAction(resultIndex, DatabaseDataConstraintAction);
-          return constraints.filterConstraints.length === 0 && !model.requestInfo.requestFilter;
+          return constraints.filterConstraints.length === 0;
         }
 
         return true;

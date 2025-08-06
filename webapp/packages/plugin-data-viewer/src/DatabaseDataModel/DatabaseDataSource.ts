@@ -84,7 +84,6 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       originalQuery: '',
       requestDuration: 0,
       requestMessage: '',
-      requestFilter: '',
       source: null,
     };
     this.error = null;
