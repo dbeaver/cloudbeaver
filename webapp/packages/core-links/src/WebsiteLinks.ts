@@ -35,11 +35,14 @@ export const WEBSITE_LINKS = {
     return WEBSITE_LINKS.ENTERPRISE_BUY_PRODUCT_PAGE;
   },
 
-  getDocumentationPage(distributed: boolean): string {
-    if (distributed) {
-      return WEBSITE_LINKS.TEAM_EDITION_DOCS_PAGE;
+  getDocumentationPage(distributed: boolean, version: string | undefined): string {
+    let url = distributed ? WEBSITE_LINKS.TEAM_EDITION_DOCS_PAGE : WEBSITE_LINKS.DOCS_PAGE;
+
+    const versionPattern = /(\d+)\.(\d+)\.(\d+)/;
+    if (version && versionPattern.test(version)) {
+      url += `${version.replace(versionPattern, '$1.$2')}/`;
     }
 
-    return WEBSITE_LINKS.DOCS_PAGE;
+    return url;
   },
 };

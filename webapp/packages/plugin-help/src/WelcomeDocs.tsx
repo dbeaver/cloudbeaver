@@ -9,6 +9,7 @@
 import { Cell, IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
 import { observer } from 'mobx-react-lite';
 import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
+import { GlobalConstants } from '@cloudbeaver/core-utils';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { useService } from '@cloudbeaver/core-di';
 
@@ -17,7 +18,7 @@ export const WelcomeDocs = observer(function WelcomeDocs() {
   const serverConfigResource = useService(ServerConfigResource);
   return (
     <a
-      href={WEBSITE_LINKS.getDocumentationPage(serverConfigResource.distributed)}
+      href={WEBSITE_LINKS.getDocumentationPage(serverConfigResource.distributed, GlobalConstants.version)}
       target="_blank"
       rel="noreferrer"
       className="tw:text-inherit! tw:no-underline!"
