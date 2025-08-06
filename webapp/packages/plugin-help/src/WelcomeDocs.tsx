@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-import { Cell, IconOrImage, Link, useTranslate } from '@cloudbeaver/core-blocks';
+import { Cell, IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
 import { observer } from 'mobx-react-lite';
 import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
@@ -16,17 +16,21 @@ export const WelcomeDocs = observer(function WelcomeDocs() {
   const translate = useTranslate();
   const serverConfigResource = useService(ServerConfigResource);
   return (
-    <Link href={WEBSITE_LINKS.getDocumentationPage(serverConfigResource.distributed)} target="_blank" wrapper>
+    <a
+      href={WEBSITE_LINKS.getDocumentationPage(serverConfigResource.distributed)}
+      target="_blank"
+      rel="noreferrer"
+      className="tw:text-inherit! tw:no-underline!"
+    >
       <Cell
         before={<IconOrImage icon="/icons/documentation_link.svg" />}
         description={translate('plugin_help_welcome_docs_description', undefined, {
           product: serverConfigResource.distributed ? 'DBeaver Team Edition' : 'CloudBeaver',
         })}
-        className="tw:cursor-pointer tw:rounded-sm tw:overflow-hidden"
         big
       >
         {translate('plugin_help_welcome_docs_label')}
       </Cell>
-    </Link>
+    </a>
   );
 });
