@@ -351,8 +351,10 @@ export abstract class CachedResource<
       }
     }
 
+    // TODO: this.metadata.size for some reason returns 0 when there is values
+    const size = [...this.metadata.values()].length;
     return (
-      this.metadata.size === 0 ||
+      size === 0 ||
       this.metadata.some(
         param,
         metadata => !metadata.loaded || metadata.outdated || !!includes?.some(include => metadata.outdatedIncludes.includes(include)),

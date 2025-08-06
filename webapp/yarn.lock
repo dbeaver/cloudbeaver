@@ -1950,6 +1950,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
+    "@dbeaver/react-tests": "workspace:^"
     mobx: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
