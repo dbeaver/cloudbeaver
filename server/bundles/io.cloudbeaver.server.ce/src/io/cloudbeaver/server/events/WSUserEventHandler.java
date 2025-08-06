@@ -22,11 +22,26 @@ import org.jkiss.dbeaver.model.websocket.WSEventHandler;
 import org.jkiss.dbeaver.model.websocket.event.WSAbstractEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSUserDisabledEvent;
 
 public class WSUserEventHandler<EVENT extends WSAbstractEvent> implements WSEventHandler<EVENT> {
     @Override
     public void handleEvent(@NotNull EVENT event) {
         var sessionManager = CBApplication.getInstance().getSessionManager();
+
+        switch (event) {
+            case WSUserCloseSessionsEvent closeSessionsEvent -> {
+                if (closeSessionsEvent.getSessionIds().isEmpty()) {
+                    sessionManager.closeAllSessions(closeSessionsEvent.getSessionId());
+                } else {
+                    sessionManager.closeSessions(closeSessionsEvent.getSessionIds());
+                }
+            }
+            case WSUserDeletedEvent e -> sessionManager.closeUserSession(e);
+            case WSUserDisabledEvent e -> sessionManager.closeUserSession(e);
+            default -> { }
+        }
+
         switch (event.getId()) {
             case WSUserCloseSessionsEvent.ID:
                 if (event instanceof WSUserCloseSessionsEvent closeSessionsEvent) {
@@ -40,6 +55,11 @@ public class WSUserEventHandler<EVENT extends WSAbstractEvent> implements WSEven
             case WSUserDeletedEvent.ID:
                 if (event instanceof WSUserDeletedEvent userDeletedEvent) {
                     sessionManager.closeUserSession(userDeletedEvent);
+                }
+                break;
+            case WSUserDisabledEvent.ID:
+                if (event instanceof WSUserDisabledEvent userDisabledEvent) {
+                    sessionManager.closeUserSession(userDisabledEvent);
                 }
                 break;
             default:
