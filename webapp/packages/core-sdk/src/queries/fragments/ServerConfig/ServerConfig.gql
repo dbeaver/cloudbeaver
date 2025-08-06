@@ -12,6 +12,7 @@ fragment ServerConfig on ServerConfig {
   sessionExpireTime
 
   anonymousAccessEnabled
+  bindSessionToIp
 
   adminCredentialsSaveEnabled
   publicCredentialsSaveEnabled

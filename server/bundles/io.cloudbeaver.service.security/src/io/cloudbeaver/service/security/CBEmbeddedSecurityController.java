@@ -54,6 +54,7 @@ import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSUserDisabledEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSAuthEvent;
@@ -825,6 +826,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             JDBCUtils.setStringOrNull(dbStat, 4, enabled ? null : disableReason);
             dbStat.setString(5, userId);
             dbStat.executeUpdate();
+        }
+        if (!enabled) {
+            var event = new WSUserDisabledEvent(userId);
+            application.getEventController().addEvent(event);
         }
         log.info(String.format("User updated: [userId=%s, isActive=%s, reason=%s]", userId, enabled, disableReason));
     }
