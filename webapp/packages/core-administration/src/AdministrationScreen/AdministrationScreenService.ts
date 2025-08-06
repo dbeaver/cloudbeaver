@@ -255,7 +255,7 @@ export class AdministrationScreenService {
     }
   }
 
-  handleCanDeActivate(fromState: RouterState, toState: RouterState): Promise<boolean> | boolean {
+  async handleCanDeActivate(fromState: RouterState, toState: RouterState): Promise<boolean> {
     if (!fromState.params['item']) {
       return true;
     }
@@ -270,7 +270,7 @@ export class AdministrationScreenService {
     return this.administrationItemService.canDeActivate(screen, toScreen, this.isConfigurationMode, screen.item !== toScreen?.item);
   }
 
-  handleCanActivate(toState: RouterState, fromState: RouterState): Promise<boolean> | boolean {
+  async handleCanActivate(toState: RouterState, fromState: RouterState): Promise<boolean> {
     if (!toState.params['item']) {
       return false;
     }
