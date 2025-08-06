@@ -36,6 +36,7 @@ public abstract class BaseWebAppConfiguration implements ServletAppConfiguration
     protected boolean secretManagerEnabled;
     protected boolean showReadOnlyConnectionInfo;
     protected String[] enabledFeatures;
+    protected String[] disabledFeatures;
     protected String[] disabledBetaFeatures;
 
 
@@ -43,6 +44,7 @@ public abstract class BaseWebAppConfiguration implements ServletAppConfiguration
         this.plugins = new LinkedHashMap<>();
         this.resourceManagerEnabled = true;
         this.enabledFeatures = null;
+        this.disabledFeatures = new String[0];
         this.disabledBetaFeatures = new String[0];
         this.showReadOnlyConnectionInfo = false;
         this.secretManagerEnabled = false;
@@ -53,6 +55,7 @@ public abstract class BaseWebAppConfiguration implements ServletAppConfiguration
         this.defaultUserTeam = src.defaultUserTeam;
         this.resourceManagerEnabled = src.resourceManagerEnabled;
         this.enabledFeatures = src.enabledFeatures;
+        this.disabledFeatures = src.disabledFeatures;
         this.disabledBetaFeatures = src.disabledBetaFeatures;
         this.showReadOnlyConnectionInfo = src.showReadOnlyConnectionInfo;
         this.secretManagerEnabled = src.secretManagerEnabled;
@@ -120,6 +123,16 @@ public abstract class BaseWebAppConfiguration implements ServletAppConfiguration
 
     public void setEnabledFeatures(String[] enabledFeatures) {
         this.enabledFeatures = enabledFeatures;
+    }
+
+    @NotNull
+    @Override
+    public String[] getDisabledFeatures() {
+        return disabledFeatures;
+    }
+
+    public void setDisabledFeatures(@NotNull String[] disabledFeatures) {
+        this.disabledFeatures = disabledFeatures;
     }
 
     public boolean isShowReadOnlyConnectionInfo() {
