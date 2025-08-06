@@ -11,7 +11,6 @@ import style from './Cell.module.css';
 import { Container } from './Containers/Container.js';
 import { s } from './s.js';
 import { useS } from './useS.js';
-import { useId } from 'react';
 
 interface Props {
   description?: React.ReactElement | string;
@@ -21,31 +20,14 @@ interface Props {
   big?: boolean;
   className?: string;
   children?: React.ReactNode;
-  onClick?: (event: React.MouseEvent<HTMLElement>) => void;
-  href?: string;
-  target?: string;
-  as?: 'button' | 'div' | 'a';
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-export const Cell = observer<Props>(function Cell({
-  before,
-  after,
-  description,
-  className,
-  ripple = true,
-  big,
-  as = 'button',
-  href,
-  target,
-  children,
-  onClick,
-}) {
+export const Cell = observer<Props>(function Cell({ before, after, description, className, ripple = true, big, children, onClick }) {
   const styles = useS(style);
-  const Tag = as;
-  const descriptionId = useId();
 
   return (
-    <Tag aria-labelledby={descriptionId} href={href} target={target} className={s(styles, { ripple, big, full: true }, className)} onClick={onClick}>
+    <div className={s(styles, { ripple, big }, className)} onClick={onClick}>
       <Container className={s(styles, { main: true })} gap parent center dense>
         {before && (
           <Container className={s(styles, { before: true })} keepSize>
@@ -54,11 +36,7 @@ export const Cell = observer<Props>(function Cell({
         )}
         <Container className={s(styles, { info: true })} zeroBasis>
           {children}
-          {description && (
-            <Container id={descriptionId} className={s(styles, { description: true })}>
-              {description}
-            </Container>
-          )}
+          {description && <Container className={s(styles, { description: true })}>{description}</Container>}
         </Container>
         {after && (
           <Container className={s(styles, { after: true })} keepSize>
@@ -66,6 +44,6 @@ export const Cell = observer<Props>(function Cell({
           </Container>
         )}
       </Container>
-    </Tag>
+    </div>
   );
 });

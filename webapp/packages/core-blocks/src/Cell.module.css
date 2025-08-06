@@ -7,7 +7,6 @@
  */
 .main {
   position: relative;
-  color: var(--theme-on-surface);
 
   & .before {
     width: 24px;
@@ -26,10 +25,6 @@
   & .description {
     line-height: 1.2;
   }
-}
-
-.full {
-  width: 100%;
 }
 
 .big {
