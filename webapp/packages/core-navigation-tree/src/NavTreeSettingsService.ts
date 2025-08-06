@@ -15,13 +15,13 @@ import {
   SettingsProviderService,
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
-import { schema } from '@cloudbeaver/core-utils';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { NAVIGATION_TREE_SETTINGS_GROUP } from './NAVIGATION_TREE_SETTINGS_GROUP.js';
 
 const settingsSchema = schema.object({
   'core.navigation-tree.childrenLimit': schema.coerce.number().min(10).max(1000).default(100),
-  'core.navigation-tree.editing': schema.stringbool().default(true),
-  'core.navigation-tree.deleting': schema.stringbool().default(true),
+  'core.navigation-tree.editing': schemaExtra.stringedBoolean().default(true),
+  'core.navigation-tree.deleting': schemaExtra.stringedBoolean().default(true),
 });
 
 export type NavTreeSettingsSchema = typeof settingsSchema;

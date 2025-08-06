@@ -8,10 +8,10 @@
 import { CONNECTIONS_SETTINGS_GROUP } from '@cloudbeaver/core-connections';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
-import { schema } from '@cloudbeaver/core-utils';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const settings = schema.object({
-  'plugin.connection-search.disabled': schema.stringbool().default(false),
+  'plugin.connection-search.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 @injectable()

@@ -14,10 +14,10 @@ import {
   SettingsProviderService,
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
-import { schema } from '@cloudbeaver/core-utils';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const settingsSchema = schema.object({
-  'core.browser.cookies.disabled': schema.stringbool().default(false),
+  'core.browser.cookies.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 export type BrowserSettingsSchema = typeof settingsSchema;

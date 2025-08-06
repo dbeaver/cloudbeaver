@@ -15,12 +15,12 @@ import {
   SettingsProviderService,
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
-import { schema } from '@cloudbeaver/core-utils';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { DATA_EDITOR_SETTINGS_GROUP } from '@cloudbeaver/plugin-data-viewer';
 
 const defaultSettings = schema.object({
-  'plugin.data-spreadsheet.hidden': schema.stringbool().default(false),
-  'plugin.data-spreadsheet.showDescriptionInHeader': schema.stringbool().default(true),
+  'plugin.data-spreadsheet.hidden': schemaExtra.stringedBoolean().default(false),
+  'plugin.data-spreadsheet.showDescriptionInHeader': schemaExtra.stringedBoolean().default(true),
 });
 
 export type DataGridSettingsSchema = typeof defaultSettings;

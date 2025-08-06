@@ -10,6 +10,9 @@ import * as z from 'zod';
 const locales = new Map<string, any>([]);
 
 export const schemaExtra = {
+  stringedBoolean() {
+    return z.union([z.enum(['false', '0']).transform(() => false), z.boolean(), z.string(), z.number()]).pipe(z.coerce.boolean());
+  },
   async loadLocale(code: string): Promise<any | undefined> {
     let locale: any | undefined;
 

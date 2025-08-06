@@ -14,10 +14,10 @@ import {
   SettingsProvider,
   SettingsProviderService,
 } from '@cloudbeaver/core-settings';
-import { schema } from '@cloudbeaver/core-utils';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const settings = schema.object({
-  'plugin.navigation-tabs.multipleRows': schema.stringbool().default(false),
+  'plugin.navigation-tabs.multipleRows': schemaExtra.stringedBoolean().default(false),
 });
 
 type Settings = typeof settings;

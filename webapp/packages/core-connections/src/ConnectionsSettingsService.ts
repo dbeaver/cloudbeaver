@@ -7,11 +7,11 @@
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
-import { schema } from '@cloudbeaver/core-utils';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { CONNECTIONS_SETTINGS_GROUP } from './CONNECTIONS_SETTINGS_GROUP.js';
 
 const settingsSchema = schema.object({
-  'core.connections.disabled': schema.stringbool().default(false),
+  'core.connections.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 export type ConnectionsSettings = schema.infer<typeof settingsSchema>;

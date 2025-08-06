@@ -7,11 +7,11 @@
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
-import { schema } from '@cloudbeaver/core-utils';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
-  'plugin.datasource-transaction-manager.disabled': schema.stringbool().default(false),
-  'plugin.datasource-transaction-manager.allowCommitModeSwitch': schema.stringbool().default(true),
+  'plugin.datasource-transaction-manager.disabled': schemaExtra.stringedBoolean().default(false),
+  'plugin.datasource-transaction-manager.allowCommitModeSwitch': schemaExtra.stringedBoolean().default(true),
 });
 
 @injectable()
