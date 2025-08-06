@@ -584,7 +584,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 appConfig.setSupportsCustomConnections(config.isCustomConnectionsEnabled());
                 appConfig.setPublicCredentialsSaveEnabled(config.isPublicCredentialsSaveEnabled());
                 appConfig.setAdminCredentialsSaveEnabled(config.isAdminCredentialsSaveEnabled());
-                appConfig.setEnabledFeatures(config.getEnabledFeatures().toArray(new String[0]));
+                updateDisabledFeaturesConfig(appConfig, config.getEnabledFeatures());
                 // custom logic for enabling embedded drivers
                 updateDisabledDriversConfig(appConfig, config.getDisabledDrivers());
                 appConfig.setResourceManagerEnabled(config.isResourceManagerEnabled());
@@ -672,6 +672,15 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Error configuring server", e);
         }
         return true;
+    }
+
+    private void updateDisabledFeaturesConfig(CBAppConfig appConfig, List<String> enabledFeatures) {
+        Set<String> enabledIds = new LinkedHashSet<>(enabledFeatures);
+        appConfig.setEnabledFeatures(enabledFeatures.toArray(new String[0]));
+        String[] disabledFeatures = WebFeatureRegistry.getInstance().getWebFeatures().stream().map(DBWFeatureSet::getId)
+            .filter(id -> !enabledIds.contains(id))
+            .toArray(String[]::new);
+        appConfig.setDisabledFeatures(disabledFeatures);
     }
 
     // we disable embedded drivers by default and enable it in enabled drivers list
