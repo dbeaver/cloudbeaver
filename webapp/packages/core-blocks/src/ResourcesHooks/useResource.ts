@@ -26,17 +26,14 @@ import {
   ResourceKeyList,
   ResourceKeyListAlias,
 } from '@cloudbeaver/core-resource';
-import { type ILoadableState, isArraysEqual, isContainsException, LoadingError } from '@cloudbeaver/core-utils';
+import { type ILoadableState, isContainsException, LoadingError } from '@cloudbeaver/core-utils';
 import { mutex } from '@dbeaver/js-helpers';
 
 import { ErrorContext } from '../ErrorContext.js';
 import { useObjectRef } from '../useObjectRef.js';
 import { useResourceTracker } from './useResourceTracker.js';
-
-export interface ResourceKeyWithIncludes<TKey, TIncludes> {
-  readonly key: TKey | null;
-  readonly includes: TIncludes;
-}
+import { useResourceStableKey, type ResourceKeyWithIncludes } from './useResourceStableKey.js';
+import { getComputed } from '../getComputed.js';
 
 interface IActions {
   active?: boolean;
@@ -118,42 +115,11 @@ export function useResource<
   const unmountedRef = useObjectRef({ unmounted: false });
   const errorContext = useContext(ErrorContext);
   const [loadingException, setLoadingException] = useState<Error | null>(null);
-  let key: ResourceKey<TKeyArg> | null = keyObj as ResourceKey<TKeyArg>;
-  let includes: TIncludes = [] as unknown as TIncludes;
   const [loadFunctionName] = useState(`${component.name}.useResource(${resource.getName()}).load` as const);
-
-  if (isKeyWithIncludes<TKeyArg, TIncludes>(keyObj)) {
-    key = keyObj.key;
-    includes = keyObj.includes;
-  }
 
   actions = useObjectRef(actions ?? ({} as any));
 
-  const propertiesRef = useObjectRef(
-    () => ({
-      key,
-      includes,
-      resource,
-      errorContext,
-    }),
-    { resource },
-  );
-
-  let isChanged = false;
-  if (!isArraysEqual(includes, propertiesRef.includes)) {
-    propertiesRef.includes = includes;
-    isChanged = true;
-  }
-
-  if (key === null || propertiesRef.key === null || !resource.isEqual(key, propertiesRef.key)) {
-    if (propertiesRef.key !== key) {
-      propertiesRef.key = key;
-      isChanged = true;
-    }
-  }
-
-  key = propertiesRef.key;
-  includes = propertiesRef.includes;
+  const { key, includes, isChanged } = useResourceStableKey(resource, keyObj);
 
   if (isChanged) {
     setLoadingException(null);
@@ -202,14 +168,14 @@ export function useResource<
             setLoadingException(null);
           } catch (exception: any) {
             console.error(exception);
-            if (actions?.silent !== true && propertiesRef.errorContext) {
+            if (actions?.silent !== true && this.errorContext) {
               const resourceException: Error | Error[] | null = resource.getException(key);
               if (isContainsException(resourceException)) {
                 const errors = Array.isArray(resourceException) ? resourceException : [resourceException];
 
                 for (const error of errors) {
                   if (error) {
-                    propertiesRef.errorContext.catch(error);
+                    this.errorContext.catch(error);
                   }
                 }
               } else {
@@ -222,19 +188,19 @@ export function useResource<
                   { cause: exception },
                 );
                 setLoadingException(loadingError);
-                propertiesRef.errorContext.catch(loadingError);
+                this.errorContext.catch(loadingError);
               }
             }
           }
         });
       },
     }),
-    false,
+    { errorContext },
   );
 
-  const loading = key !== null && resource.isLoading(key);
-  const loaded = key === null || resource.isLoaded(key, includes);
-  const outdated = key === null || resource.isOutdated(key, includes);
+  const loading = getComputed(() => key !== null && resource.isLoading(key));
+  const loaded = getComputed(() => key === null || resource.isLoaded(key, includes));
+  const outdated = getComputed(() => key === null || resource.isOutdated(key, includes));
   const canLoad = key !== null && actions?.freeze !== true && preloaded && outdated && !loading;
 
   const result = useMemo<IMapResourceResult<TResource, TIncludes> | IMapResourceListResult<TResource, TIncludes>>(
@@ -298,28 +264,28 @@ export function useResource<
         return loading;
       },
     }),
-    [outdated, loaded, loading, loadingException, resource, canLoad, key, includes, loadingException],
+    [outdated, loaded, loading, loadingException, resource, canLoad, key, includes],
   );
 
   useEffect(() => {
     if (!result.isError()) {
       return;
     }
-    if (actions?.silent !== true && propertiesRef.errorContext) {
+    if (actions?.silent !== true && errorContext) {
       const errors = Array.isArray(result.exception) ? result.exception : [result.exception];
       for (const error of errors) {
         if (error) {
-          propertiesRef.errorContext.catch(error);
+          errorContext.catch(error);
         }
       }
     }
-  }, [result.exception, result.isError()]);
+  }, [errorContext, actions?.silent, result.exception, result.isError()]);
 
   useEffect(() => {
     if (canLoad) {
       result.load();
     }
-  });
+  }, [result]);
 
   useEffect(
     () => () => {
@@ -333,8 +299,4 @@ export function useResource<
   }
 
   return result;
-}
-
-function isKeyWithIncludes<TKey, TIncludes>(obj: any): obj is ResourceKeyWithIncludes<TKey, TIncludes> {
-  return obj && typeof obj === 'object' && 'includes' in obj && 'key' in obj;
 }
