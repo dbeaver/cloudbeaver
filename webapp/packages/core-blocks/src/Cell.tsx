@@ -13,7 +13,7 @@ import { s } from './s.js';
 import { useS } from './useS.js';
 import { useId } from 'react';
 
-interface Props {
+interface BaseProps {
   description?: React.ReactElement | string;
   before?: React.ReactElement;
   after?: React.ReactElement;
@@ -21,11 +21,30 @@ interface Props {
   big?: boolean;
   className?: string;
   children?: React.ReactNode;
-  onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+}
+
+interface ButtonProps extends BaseProps {
+  as?: 'button';
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  href?: never;
+  target?: never;
+}
+
+interface DivProps extends BaseProps {
+  as: 'div';
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  href?: never;
+  target?: never;
+}
+
+interface LinkProps extends BaseProps {
+  as: 'a';
   href?: string;
   target?: string;
-  as?: 'button' | 'div' | 'a';
+  onClick?: never;
 }
+
+type Props = ButtonProps | DivProps | LinkProps;
 
 export const Cell = observer<Props>(function Cell({
   before,
@@ -37,15 +56,21 @@ export const Cell = observer<Props>(function Cell({
   as = 'button',
   href,
   target,
-  children,
   onClick,
+  children,
 }) {
   const styles = useS(style);
   const Tag = as;
   const descriptionId = useId();
 
   return (
-    <Tag aria-labelledby={descriptionId} href={href} target={target} className={s(styles, { ripple, big, full: true }, className)} onClick={onClick}>
+    <Tag
+      aria-labelledby={descriptionId}
+      href={href}
+      target={target}
+      className={s(styles, { ripple, big, full: true }, className)}
+      onClick={onClick as any}
+    >
       <Container className={s(styles, { main: true })} gap parent center dense>
         {before && (
           <Container className={s(styles, { before: true })} keepSize>
