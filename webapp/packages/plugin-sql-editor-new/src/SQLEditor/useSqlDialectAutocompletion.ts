@@ -35,20 +35,10 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
         ({ replacementString, displayString }) =>
           sanitizeProposal(displayString) === wordLowerCase || replacementString.toLocaleLowerCase() === wordLowerCase,
       );
-      const filteredProposals = proposals
-        .filter(
-          ({ replacementString, displayString }) => {
-            const display = sanitizeProposal(displayString);
-            const replacement = replacementString.toLocaleLowerCase();
 
-            return word === '*' ||
-              (display !== wordLowerCase && display.startsWith(wordLowerCase)) ||
-              (replacement !== wordLowerCase && replacement.startsWith(wordLowerCase));
-          }
-        )
-        .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+      const orderedProposals = proposals.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
-      if (filteredProposals.length === 0 && !hasSameName && explicit) {
+      if (orderedProposals.length === 0 && !hasSameName && explicit) {
         return [
           {
             apply: closeCompletion,
@@ -58,7 +48,7 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
       }
 
       return [
-        ...filteredProposals.map<SqlCompletion>(proposal => ({
+        ...orderedProposals.map<SqlCompletion>(proposal => ({
           label: proposal.displayString,
           apply: (view, completion, from, to) => {
             view.dispatch(insertCompletionText(view.state, proposal.replacementString, proposal.replacementOffset, to));
