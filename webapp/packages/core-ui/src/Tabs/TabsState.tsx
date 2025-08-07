@@ -167,13 +167,13 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       getTabInfo(tabId: string) {
         return dynamic.container?.getDisplayedTabInfo(tabId, dynamic.props);
       },
-      getTabState(tabId: string, valueGetter?: MetadataValueGetter<string, any>, schema?: schema.AnyZodObject) {
+      getTabState(tabId: string, valueGetter?: MetadataValueGetter<string, any>, schema?: schema.ZodObject) {
         return dynamic.container?.getTabState(dynamic.tabsState, tabId, dynamic.props, valueGetter, schema);
       },
       setTabState(tabId: string, value: any) {
         return dynamic.container?.setTabState(dynamic.tabsState, tabId, value);
       },
-      getLocalState(tabId: string, valueGetter?: MetadataValueGetter<string, any>, schema?: schema.AnyZodObject) {
+      getLocalState(tabId: string, valueGetter?: MetadataValueGetter<string, any>, schema?: schema.ZodObject) {
         return dynamic.tabsState.get(tabId, valueGetter, schema);
       },
       async open(tabId: string) {

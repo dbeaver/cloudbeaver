@@ -41,7 +41,7 @@ function withLock<T>(fn: (locked: boolean) => T): T {
   }
 }
 
-export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject>(
+export function createSettingsAliasResolver<TTarget extends schema.ZodObject>(
   source: IEditableSettingsSource,
   mappings: SettingsMapping<schema.infer<TTarget>>,
 ): IEditableSettingsSource {

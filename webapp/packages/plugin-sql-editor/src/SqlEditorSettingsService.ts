@@ -73,6 +73,7 @@ const defaultSettings = schema.object({
   'SQLEditor.ContentAssistant.proposals.long.name': schema.coerce.boolean().default(false),
   'SQLEditor.ContentAssistant.experimental.mode': schema.coerce
     .string()
+    .pipe(schema.enum(ASSISTANT_MODE_OPTIONS))
     .transform(value => {
       switch (value) {
         case 'DEFAULT':
@@ -81,7 +82,7 @@ const defaultSettings = schema.object({
           return 'NEW';
       }
     })
-    .pipe(schema.enum(ASSISTANT_MODE_OPTIONS).default('NEW')),
+    .default('NEW'),
 });
 
 type SqlEditorSettingsSchema = typeof defaultSettings;

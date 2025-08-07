@@ -218,8 +218,8 @@ export class AdministrationScreenService {
   }
 
   getItemState<T>(name: string): T | undefined;
-  getItemState<T>(name: string, defaultState: DefaultValueGetter<string, T>, schema?: schema.AnyZodObject): T;
-  getItemState<T>(name: string, defaultState?: DefaultValueGetter<string, T>, schema?: schema.AnyZodObject): T | undefined {
+  getItemState<T>(name: string, defaultState: DefaultValueGetter<string, T>, schema?: schema.ZodObject): T;
+  getItemState<T>(name: string, defaultState?: DefaultValueGetter<string, T>, schema?: schema.ZodObject): T | undefined {
     if (!this.serverConfigResource.isLoaded()) {
       throw new Error('Administration screen getItemState can be used only after server configuration loaded');
     }
