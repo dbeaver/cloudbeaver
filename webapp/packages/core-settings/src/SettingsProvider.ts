@@ -11,7 +11,7 @@ import type { schema } from '@cloudbeaver/core-utils';
 import type { ISettingChangeData } from './ISettingsSource.js';
 import type { IEditableSettingsSource } from './IEditableSettingsSource.js';
 
-export class SettingsProvider<TSchema extends schema.SomeZodObject = any> implements IEditableSettingsSource {
+export class SettingsProvider<TSchema extends schema.ZodObject = any> implements IEditableSettingsSource {
   readonly onChange: ISyncExecutor<ISettingChangeData<keyof schema.infer<TSchema>>>;
   constructor(
     protected readonly source: IEditableSettingsSource,
