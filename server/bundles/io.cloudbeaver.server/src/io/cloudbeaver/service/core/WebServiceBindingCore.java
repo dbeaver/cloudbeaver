@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
 
         model.getMutationType()
             .dataFetcher("openSession", env -> {
-                HttpServletRequest servletRequest = GraphQLEndpoint.getServletRequestOrThrow(env);
+                HttpServletRequest servletRequest = GraphQLEndpoint.getServletRequest(env);
                 HttpServletResponse servletResponse = GraphQLEndpoint.getServletResponse(env);
                 return getService(env).openSession(
                     sessionManager.getWebSession(servletRequest, servletResponse, false),
@@ -95,13 +95,13 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                     servletRequest,
                     servletResponse);
             })
-            .dataFetcher("closeSession", env -> getService(env).closeSession(GraphQLEndpoint.getServletRequestOrThrow(env)))
+            .dataFetcher("closeSession", env -> getService(env).closeSession(GraphQLEndpoint.getServletRequest(env)))
             .dataFetcher("touchSession", env -> getService(env).touchSession(
-                GraphQLEndpoint.getServletRequestOrThrow(env), GraphQLEndpoint.getServletResponse(env)))
+                GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
             .dataFetcher("updateSession", env -> getService(env).updateSession(
-                GraphQLEndpoint.getServletRequestOrThrow(env), GraphQLEndpoint.getServletResponse(env)))
+                GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
             .dataFetcher("refreshSessionConnections", env -> getService(env).refreshSessionConnections(
-                GraphQLEndpoint.getServletRequestOrThrow(env), GraphQLEndpoint.getServletResponse(env)))
+                GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
             .dataFetcher("changeSessionLanguage", env -> getService(env).changeSessionLanguage(getWebSession(env), env.getArgument("locale")))
 
             .dataFetcher("createConnection", env -> getService(env).createConnection(

@@ -42,7 +42,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.utils.CommonUtils;
@@ -74,7 +73,7 @@ public class GraphQLEndpoint extends HttpServlet {
     public static final String API_PROTOCOL = "GraphQL";
     private final GraphQL graphQL;
 
-    public static final Gson gson = new GsonBuilder()
+    private static final Gson gson = new GsonBuilder()
         .serializeNulls()
         .setPrettyPrinting()
         .create();
@@ -327,8 +326,8 @@ public class GraphQLEndpoint extends HttpServlet {
         }
     }
 
-    @NotNull
-    public static HttpServletRequest getServletRequestOrThrow(DataFetchingEnvironment env) {
+
+    public static HttpServletRequest getServletRequest(DataFetchingEnvironment env) {
         GraphQLContext context = env.getGraphQlContext();
         HttpServletRequest request = context.get("request");
         if (request == null) {
@@ -351,8 +350,4 @@ public class GraphQLEndpoint extends HttpServlet {
         return context.get("bindingContext");
     }
 
-    @NotNull
-    public GraphQL getGraphQL() {
-        return graphQL;
-    }
 }

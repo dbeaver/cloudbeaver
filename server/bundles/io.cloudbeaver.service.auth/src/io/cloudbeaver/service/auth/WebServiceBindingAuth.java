@@ -50,14 +50,14 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 env.getArgument("taskId")
             ))
             .dataFetcher("authLogoutExtended", env -> getService(env).authLogout(
-                GraphQLEndpoint.getServletRequestOrThrow(env),
+                GraphQLEndpoint.getServletRequest(env),
                 getWebSession(env, false),
                 env.getArgument("provider"),
                 env.getArgument("configuration")
             ))
             .dataFetcher("authLogout", env -> {
                 getService(env).authLogout(
-                    GraphQLEndpoint.getServletRequestOrThrow(env),
+                    GraphQLEndpoint.getServletRequest(env),
                     getWebSession(env, false),
                     env.getArgument("provider"),
                     env.getArgument("configuration"));
@@ -69,7 +69,7 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 CommonUtils.toBoolean(env.getArgument("linkUser"))
             ))
             .dataFetcher("activeUser", env -> getService(env).activeUser(getWebSession(env, false)))
-            .dataFetcher("authProviders", env -> getService(env).getAuthProviders(GraphQLEndpoint.getServletRequestOrThrow(env)))
+            .dataFetcher("authProviders", env -> getService(env).getAuthProviders(GraphQLEndpoint.getServletRequest(env)))
             .dataFetcher("authChangeLocalPassword", env -> getService(env).changeLocalPassword(
                 getWebSession(env),
                 env.getArgument("oldPassword"),
@@ -87,7 +87,7 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 env -> getService(env).setUserConfigurationParameters(getWebSession(env),
                     env.getArgument("preferences")))
             .dataFetcher("federatedLogin", env -> getService(env).federatedLogin(
-                GraphQLEndpoint.getServletRequestOrThrow(env),
+                GraphQLEndpoint.getServletRequest(env),
                 getWebSession(env, false),
                 env.getArgument("provider"),
                 env.getArgument("configuration"),

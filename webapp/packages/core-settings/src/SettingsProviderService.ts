@@ -15,10 +15,10 @@ import { SettingsResolverService } from './SettingsResolverService.js';
 
 @injectable()
 export class SettingsProviderService {
-  get schema(): schema.AnyZodObject {
+  get schema(): schema.ZodObject {
     return this.mergedSchema;
   }
-  private mergedSchema: schema.AnyZodObject;
+  private mergedSchema: schema.ZodObject;
   constructor(private readonly settingsResolverService: SettingsResolverService) {
     this.mergedSchema = schema.object({});
 
@@ -27,7 +27,7 @@ export class SettingsProviderService {
     });
   }
 
-  createSettings<TSchema extends schema.SomeZodObject = schema.AnyZodObject>(schema: TSchema): SettingsProvider<TSchema> {
+  createSettings<TSchema extends schema.ZodObject = schema.ZodObject>(schema: TSchema): SettingsProvider<TSchema> {
     this.mergedSchema = this.mergedSchema.merge(schema);
     const settings = new SettingsProvider(this.settingsResolverService, schema);
     return settings;
