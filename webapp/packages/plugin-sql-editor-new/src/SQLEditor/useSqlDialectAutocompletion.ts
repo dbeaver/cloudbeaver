@@ -29,16 +29,10 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
   const optionsRef = useObjectRef({ data });
 
   const [config] = useState<CompletionConfig>(() => {
-    function getOptionsFromProposals(explicit: boolean, word: string, proposals: SQLProposal[]): SqlCompletion[] {
-      const wordLowerCase = word.toLocaleLowerCase();
-      const hasSameName = proposals.some(
-        ({ replacementString, displayString }) =>
-          sanitizeProposal(displayString) === wordLowerCase || replacementString.toLocaleLowerCase() === wordLowerCase,
-      );
-
+    function getOptionsFromProposals(explicit: boolean, proposals: SQLProposal[]): SqlCompletion[] {
       const orderedProposals = proposals.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
-      if (orderedProposals.length === 0 && !hasSameName && explicit) {
+      if (orderedProposals.length === 0 && explicit) {
         return [
           {
             apply: closeCompletion,
@@ -77,7 +71,7 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
 
         const result: CompletionResult = {
           from: word.from,
-          options: getOptionsFromProposals(context.explicit, word.text, proposals),
+          options: getOptionsFromProposals(context.explicit, proposals),
           update(current, from, to, context) {
             if (startPos > context.pos) {
               return null;
@@ -103,7 +97,7 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
 
             return {
               ...current,
-              options: getOptionsFromProposals(context.explicit, word.text, proposals),
+              options: getOptionsFromProposals(context.explicit, proposals),
             };
           },
           filter: false,
@@ -142,8 +136,4 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
   });
 
   return useEditorAutocompletion(config);
-}
-
-function sanitizeProposal(value: string): string {
-  return value.replace(/^"|"$/g, '').toLocaleLowerCase();
 }
