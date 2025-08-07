@@ -166,7 +166,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
         @NotNull WebSession webSession,
-        boolean readLogs) throws DBWebException, DBCException {
+        boolean readLogs
+    ) throws DBWebException, DBCException {
         if (filter == null) {
             // Use default filter
             filter = new WebSQLDataFilter();
@@ -210,64 +211,72 @@ public class WebSQLProcessor implements WebSessionProvider {
                     executeInfo.setResults(new WebSQLQueryResults[]{stats});
                 }
             }
-            if (element instanceof SQLQuery sqlQuery) {
+            if (element instanceof SQLQuery mainQuery) {
                 DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
                     try (DBCSession session = context.openSession(monitor, resolveQueryPurpose(dataFilter), "Execute SQL")) {
-                        AbstractExecutionSource source = new AbstractExecutionSource(
-                            dataContainer,
-                            session.getExecutionContext(),
-                            WebSQLProcessor.this,
-                            sqlQuery);
+                        List<SQLScriptElement> sqlQueries = mainQuery.getScriptElements();
+                        for (SQLScriptElement sqlElement : sqlQueries) {
+                            if (!(sqlElement instanceof SQLQuery sqlQuery)) {
+                                log.error("Non-query script elements are not allowed: " + sqlElement);
+                                continue;
+                            }
 
-                        try (DBCStatement dbStat = DBUtils.makeStatement(
-                            source,
-                            session,
-                            DBCStatementType.SCRIPT,
-                            sqlQuery,
-                            webDataFilter.getOffset(),
-                            webDataFilter.getLimit()))
-                        {
-                            SqlOutputLogReaderJob sqlOutputLogReaderJob = null;
-                            if (readLogs) {
-                                DBPDataSource dataSource = context.getDataSource();
-                                DBCServerOutputReader dbcServerOutputReader = DBUtils.getAdapter(DBCServerOutputReader.class, dataSource);
-                                if (dbcServerOutputReader == null) {
-                                    dbcServerOutputReader = new DefaultServerOutputReader();
+                            AbstractExecutionSource source = new AbstractExecutionSource(
+                                dataContainer,
+                                session.getExecutionContext(),
+                                WebSQLProcessor.this,
+                                sqlQuery);
+
+                            try (DBCStatement dbStat = DBUtils.makeStatement(
+                                source,
+                                session,
+                                DBCStatementType.SCRIPT,
+                                sqlQuery,
+                                webDataFilter.getOffset(),
+                                webDataFilter.getLimit()))
+                            {
+                                SqlOutputLogReaderJob sqlOutputLogReaderJob = null;
+                                if (readLogs) {
+                                    DBPDataSource dataSource = context.getDataSource();
+                                    DBCServerOutputReader dbcServerOutputReader = DBUtils.getAdapter(DBCServerOutputReader.class, dataSource);
+                                    if (dbcServerOutputReader == null) {
+                                        dbcServerOutputReader = new DefaultServerOutputReader();
+                                    }
+                                    sqlOutputLogReaderJob = new SqlOutputLogReaderJob(
+                                        webSession, context, dbStat, dbcServerOutputReader, contextInfo.getId());
+                                    sqlOutputLogReaderJob.schedule();
                                 }
-                                sqlOutputLogReaderJob = new SqlOutputLogReaderJob(
-                                    webSession, context, dbStat, dbcServerOutputReader, contextInfo.getId());
-                                sqlOutputLogReaderJob.schedule();
-                            }
-                            // Set query timeout
-                            int queryTimeout = (int) session.getDataSource().getContainer().getPreferenceStore()
-                                .getDouble(WebSQLConstants.QUOTA_PROP_SQL_QUERY_TIMEOUT);
-                            if (queryTimeout <= 0) {
-                                queryTimeout = CommonUtils.toInt(
-                                    getWebSession().getApplication().getAppConfiguration()
-                                        .getResourceQuota(WebSQLConstants.QUOTA_PROP_SQL_QUERY_TIMEOUT));
-                            }
-                            if (queryTimeout > 0) {
-                                try {
-                                    dbStat.setStatementTimeout(queryTimeout);
-                                } catch (Throwable e) {
-                                    log.debug("Can't set statement timeout:" + e.getMessage());
+                                // Set query timeout
+                                int queryTimeout = session.getDataSource().getContainer().getPreferenceStore()
+                                    .getInt(WebSQLConstants.QUOTA_PROP_SQL_QUERY_TIMEOUT);
+                                if (queryTimeout <= 0) {
+                                    queryTimeout = CommonUtils.toInt(
+                                        getWebSession().getApplication().getAppConfiguration()
+                                            .getResourceQuota(WebSQLConstants.QUOTA_PROP_SQL_QUERY_TIMEOUT));
                                 }
-                            }
+                                if (queryTimeout > 0) {
+                                    try {
+                                        dbStat.setStatementTimeout(queryTimeout);
+                                    } catch (Throwable e) {
+                                        log.debug("Can't set statement timeout:" + e.getMessage());
+                                    }
+                                }
 
-                            boolean hasResultSet = dbStat.executeStatement();
+                                boolean hasResultSet = dbStat.executeStatement();
 
-                            // Wait SqlLogStateJob, if its starts
-                            if (sqlOutputLogReaderJob != null) {
-                                sqlOutputLogReaderJob.join();
+                                // Wait SqlLogStateJob, if its starts
+                                if (sqlOutputLogReaderJob != null) {
+                                    sqlOutputLogReaderJob.join();
+                                }
+                                fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, webDataFilter, dataFilter, dataFormat);
+                            } catch (DBException e) {
+                                throw new InvocationTargetException(e);
                             }
-                            fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, webDataFilter, dataFilter, dataFormat);
-                        } catch (DBException e) {
-                            throw new InvocationTargetException(e);
                         }
                     }
                 });
             } else {
-                executeInfo.setResults(new WebSQLQueryResults[0]);
+                throw new DBException("SQL elements of type '" + element.getClass().getSimpleName() + "' are nto supported");
             }
         } catch (DBException e) {
             throw new DBWebException("Error executing query", e);
@@ -294,7 +303,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull DBSDataContainer dataContainer,
         @Nullable String resultId,
         @NotNull WebSQLDataFilter filter,
-        @Nullable WebDataFormat dataFormat) throws DBException {
+        @Nullable WebDataFormat dataFormat
+    ) throws DBException {
 
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
