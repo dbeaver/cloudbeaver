@@ -38,7 +38,7 @@ export function Select({ className, ...props }: SelectProps) {
 
 export function SelectPopover({ children, className, ...props }: SelectPopoverProps) {
   return (
-    <AriaSelectPopover className={clsx('dbv-kit-select__popover', className)} sameWidth={props.sameWidth ?? true} {...props}>
+    <AriaSelectPopover className={clsx('dbv-kit-select__popover', className)} sameWidth={props.sameWidth ?? true} portal={props.portal ?? true} {...props}>
       {children}
     </AriaSelectPopover>
   );

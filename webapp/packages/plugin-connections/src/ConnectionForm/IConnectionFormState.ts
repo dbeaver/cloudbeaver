@@ -17,7 +17,6 @@ export const CONNECTION_FORM_STATE_SCHEMA = schema
     connectionId: schema.string().or(schema.undefined()),
     type: schema.enum(['admin', 'public']),
   })
-  .required()
   .strict();
 
 export type IConnectionFormState = schema.infer<typeof CONNECTION_FORM_STATE_SCHEMA>;
