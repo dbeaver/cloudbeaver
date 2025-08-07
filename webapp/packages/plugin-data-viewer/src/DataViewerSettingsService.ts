@@ -102,11 +102,11 @@ export class DataViewerSettingsService extends Dependency {
           map: value => !value,
         },
         'plugin.data-viewer.disableCopyData': {
-          key: 'permission.data-editor.copy.enable',
+          key: 'permission.data-editor.copy',
           map: value => !value,
         },
         'plugin.data-viewer.export.disabled': {
-          key: 'permission.data-editor.export.enable',
+          key: 'permission.data-editor.export',
           map: value => !value,
         },
       }),
