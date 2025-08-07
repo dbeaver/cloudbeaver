@@ -55,6 +55,8 @@ public class AdminServerConfig {
     private final List<String> supportedHosts;
 
     private long sessionExpireTime;
+    @Nullable
+    private String bindSessionToIp;
 
     public AdminServerConfig(Map<String, Object> params) {
         this.serverName = JSONUtils.getString(params, "serverName");
@@ -114,6 +116,12 @@ public class AdminServerConfig {
             this.supportedHosts = JSONUtils.getStringList(params, CBConstants.PARAM_SUPPORTED_HOSTS);
         } else {
             this.supportedHosts = null;
+        }
+
+        if (params.containsKey("bindSessionToIp")) {
+            this.bindSessionToIp = JSONUtils.getString(params, "bindSessionToIp");
+        } else {
+            this.bindSessionToIp = CBConstants.BIND_SESSION_DISABLE;
         }
     }
 
@@ -205,5 +213,10 @@ public class AdminServerConfig {
     @Nullable
     public Boolean getForceHttps() {
         return forceHttps;
+    }
+
+    @Nullable
+    public String getBindSessionToIp() {
+        return bindSessionToIp;
     }
 }

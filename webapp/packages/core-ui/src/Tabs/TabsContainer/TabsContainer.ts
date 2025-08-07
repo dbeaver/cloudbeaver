@@ -69,7 +69,7 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
     tabId: string,
     props: TProps,
     valueGetter?: MetadataValueGetter<string, T>,
-    schema?: schema.AnyZodObject,
+    schema?: schema.ZodObject,
   ): T {
     const tabInfo = this.getDisplayedTabInfo(tabId, props);
 

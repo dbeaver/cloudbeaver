@@ -127,7 +127,8 @@ input ServerConfigInput {
 
     sessionExpireTime: Int
     forceHttps: Boolean @since(version: "25.1.3")
-    supportedHosts: [String!]! @since(version: "25.1.3")
+    supportedHosts: [String!] @since(version: "25.1.3")
+    bindSessionToIp: String @since(version: "25.1.4")
 }
 
 input AdminUserFilterInput {

@@ -12,7 +12,7 @@ import type { ILoadableState, schema } from '@cloudbeaver/core-utils';
 
 import type { ISettingDescription, SettingsDescriptionGetter } from './ISettingDescription.js';
 
-interface SettingsProviderItem<T extends schema.SomeZodObject = any> {
+interface SettingsProviderItem<T extends schema.ZodObject = any> {
   settingsGetter: SettingsDescriptionGetter<schema.infer<T>>;
   loaders?: ReadonlyArray<ILoadableState>;
 }
@@ -39,7 +39,7 @@ export class SettingsManagerService {
     });
   }
 
-  registerSettings<TSchema extends schema.SomeZodObject>(
+  registerSettings<TSchema extends schema.ZodObject>(
     settingsGetter: SettingsDescriptionGetter<schema.infer<TSchema>>,
     loaders?: ReadonlyArray<ILoadableState>,
   ): void {

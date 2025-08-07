@@ -55,7 +55,8 @@ public class CBServerConfig implements WebServerConfiguration {
     @SerializedName("database")
     private WebDatabaseConfig databaseConfiguration = new WebDatabaseConfig();
     private String staticContent = "";
-    private boolean bindSessionToIp = true;
+    @NotNull
+    private String bindSessionToIp = CBConstants.BIND_SESSION_DISABLE;
 
     public CBServerConfig() {
         this.securityManagerConfiguration = createSecurityManagerConfiguration();
@@ -223,7 +224,12 @@ public class CBServerConfig implements WebServerConfiguration {
         this.supportedHosts.addAll(uniqueHosts);
     }
 
-    public boolean isBindSessionToIp() {
+    @NotNull
+    public String getBindSessionToIp() {
         return bindSessionToIp;
+    }
+
+    public void setBindSessionToIp(@NotNull String bindSessionToIp) {
+        this.bindSessionToIp = bindSessionToIp;
     }
 }
