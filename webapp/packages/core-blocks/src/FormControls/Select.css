@@ -13,7 +13,8 @@
 }
 
 @layer components {
-  .select__field {
+  .dbv-kit-select,
+  .dbv-kit-select__popover {
     --dbv-kit-select-border-width: 2px;
     --dbv-kit-select-font-size: 12px;
     --dbv-kit-select-hover-border-color: var(--theme-background);
