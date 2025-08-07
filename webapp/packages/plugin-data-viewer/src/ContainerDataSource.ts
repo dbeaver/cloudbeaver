@@ -68,11 +68,15 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     await this.currentTask?.cancel();
   }
 
-  async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
+  async request(
+    prevResults: IDatabaseResultSet[],
+    prevOptions: Readonly<IDataContainerOptions> | null,
+    refresh: boolean,
+  ): Promise<IDatabaseResultSet[]> {
     const executionContext = await this.ensureContextCreated();
     const context = executionContext.context!;
     const limit = this.count;
-    const task = await this.getRequestTask(prevResults, context);
+    const task = await this.getRequestTask(prevResults, prevOptions, refresh, context);
 
     this.currentTask = executionContext.run(
       async () => {
@@ -88,11 +92,16 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     try {
       const response = await this.currentTask;
 
+      const whereFilter = response.filterText || '';
+      this.options!.whereFilter = whereFilter || this.options?.whereFilter || '';
+      //@ts-expect-error
+      this.prevOptions!.whereFilter = whereFilter || this.options?.whereFilter || '';
+
       this.requestInfo = {
         originalQuery: response.fullQuery || '',
         requestDuration: response.duration || 0,
         requestMessage: response.statusMessage || '',
-        requestFilter: response.filterText || '',
+        requestFilter: whereFilter,
         source: null,
       };
 
@@ -191,7 +200,12 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     return prevResults;
   }
 
-  protected getConfig(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
+  protected getConfig(
+    prevResults: IDatabaseResultSet[],
+    prevOptions: Readonly<IDataContainerOptions> | null,
+    refresh: boolean,
+    context: IConnectionExecutionContextInfo,
+  ) {
     const options = this.options;
 
     if (!options) {
@@ -201,7 +215,11 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     const offset = this.offset;
     const limit = this.count;
     const resultId = this.getPreviousResultId(prevResults, context);
+    let useServerCache = false;
 
+    if (resultId !== undefined && !refresh) {
+      useServerCache = this.canUseCachedResults(prevResults, prevOptions);
+    }
     return {
       projectId: context.projectId,
       connectionId: context.connectionId,
@@ -215,12 +233,18 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
         where: options.whereFilter || undefined,
       },
       dataFormat: this.dataFormat,
+      useCache: useServerCache,
     };
   }
 
-  protected async getRequestTask(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo): Promise<AsyncTask> {
+  protected async getRequestTask(
+    prevResults: IDatabaseResultSet[],
+    prevOptions: Readonly<IDataContainerOptions> | null,
+    refresh: boolean,
+    context: IConnectionExecutionContextInfo,
+  ): Promise<AsyncTask> {
     const task = this.asyncTaskInfoService.create(async () => {
-      const config = this.getConfig(prevResults, context);
+      const config = this.getConfig(prevResults, prevOptions, refresh, context);
       const { taskInfo } = await this.graphQLService.sdk.asyncReadDataFromContainer(config);
       return taskInfo;
     });

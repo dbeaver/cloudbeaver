@@ -1,5 +1,6 @@
 package io.cloudbeaver.service.sql;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class WebSQLQueryResultSetRow {
@@ -11,6 +12,13 @@ public class WebSQLQueryResultSetRow {
     public WebSQLQueryResultSetRow(Object[] data, Map<String, Object> metaData) {
         this.data = data;
         this.metaData = metaData;
+    }
+
+    public WebSQLQueryResultSetRow(WebSQLQueryResultSetRow webSQLQueryResultSetRow) {
+        this.data = new Object[webSQLQueryResultSetRow.data.length];
+        //fixme it is probably a issue with mutable objects in data array
+        System.arraycopy(webSQLQueryResultSetRow.data, 0, this.data, 0, webSQLQueryResultSetRow.data.length);
+        this.metaData = webSQLQueryResultSetRow.metaData == null ? null : new HashMap<>(webSQLQueryResultSetRow.metaData);
     }
 
     public Object[] getData() {

@@ -73,7 +73,6 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     private static final String FILE_ID = "fileId";
     private static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
-
     private final WebSession webSession;
     private final WebConnectionInfo connection;
     private final SQLSyntaxManager syntaxManager;
@@ -166,20 +165,25 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
         @NotNull WebSession webSession,
-        boolean readLogs) throws DBWebException, DBCException {
+        boolean readLogs,
+        @Nullable Boolean useCache
+    ) throws DBWebException, DBCException {
         if (filter == null) {
             // Use default filter
             filter = new WebSQLDataFilter();
         }
         long startTime = System.currentTimeMillis();
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
-
         var dataContainer = new WebSQLQueryDataContainer(connection.getDataSource(), syntaxManager, sql);
-
         DBCExecutionContext context = getExecutionContext(dataContainer);
 
         try {
             final DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
+
+            if (trySetCachedResults(useCache, resultId, contextInfo, filter, executeInfo)) {
+                return executeInfo;
+            }
+
             if (dataFilter.hasFilters()) {
                 sql = context.getDataSource().getSQLDialect().addFiltersToQuery(
                     monitor,
@@ -281,6 +285,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         if (executeInfo.getResults().length == 0) {
             executeInfo.setStatusMessage("No Data");
         } else {
+            contextInfo.trySaveQueryResults(executeInfo.getResults(), filter.getLimit());
             executeInfo.setStatusMessage("Executed");
         }
 
@@ -294,15 +299,22 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull DBSDataContainer dataContainer,
         @Nullable String resultId,
         @NotNull WebSQLDataFilter filter,
-        @Nullable WebDataFormat dataFormat) throws DBException {
+        @Nullable WebDataFormat dataFormat,
+        @Nullable Boolean useCache
+    ) throws DBException {
 
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
         DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
+
+            if (trySetCachedResults(useCache, resultId, contextInfo, filter, executeInfo)) {
+                return;
+            }
+
             try (DBCSession session = executionContext.openSession(monitor, resolveQueryPurpose(dataFilter), "Read data from container")) {
-                try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
+                try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat, webSession)) {
                     DBCStatistics statistics = dataContainer.readData(
                         new WebExecutionSource(dataContainer, executionContext, this),
                         session,
@@ -324,6 +336,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     if (resultSet != null && resultSet.getRows() != null && resultSet.getResultsInfo() != null) {
                         resultSet.getResultsInfo().setQueryText(statistics.getQueryText());
                         executeInfo.setStatusMessage(resultSet.getRows().length + " row(s) fetched");
+                        contextInfo.trySaveQueryResults(executeInfo.getResults(), filter.getLimit());
                     }
                 } catch (DBException e) {
                     throw new InvocationTargetException(e);
@@ -432,7 +445,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             sendTransactionalEvent(contextInfo);
         }
 
-        WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
+        WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet(webSession);
         updatedResultSet.setResultsInfo(resultsInfo);
         updatedResultSet.setColumns(resultsInfo.getAttributes());
 
@@ -446,6 +459,34 @@ public class WebSQLProcessor implements WebSessionProvider {
         result.setResults(queryResults.toArray(new WebSQLQueryResults[0]));
 
         return result;
+    }
+
+    /**
+     * Checks cache and sets executeInfo if cached results are found.
+     * @return true if cached results were used, false otherwise
+     */
+    private boolean trySetCachedResults(
+        @Nullable Boolean useCache,
+        @Nullable String resultId,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull WebSQLDataFilter filter,
+        @NotNull WebSQLExecuteInfo executeInfo
+    ) {
+        if (CommonUtils.toBoolean(useCache)) {
+            WebSQLResultCacheService webSQLResultCacheService = new WebSQLResultCacheService();
+            WebSQLQueryResults filterCachedResults = webSQLResultCacheService.getCachedSQLQueryResults(
+                resultId,
+                contextInfo,
+                filter
+            );
+            if (filterCachedResults != null) {
+                executeInfo.setResults(new WebSQLQueryResults[] {filterCachedResults});
+                executeInfo.setDuration(0);
+                executeInfo.setStatusMessage("Cached result set");
+                return true;
+            }
+        }
+        return false;
     }
 
     private void sendTransactionalEvent(WebSQLContextInfo contextInfo) {
@@ -509,7 +550,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
                 DBDDataFilter filter = new DBDDataFilter(constraints);
                 DBSDataContainer dataContainer = resultsInfo.getDataContainer();
-                WebRowDataReceiver dataReceiver = new WebRowDataReceiver(resultsInfo.getAttributes(), row.getData(), dataFormat);
+                RowDataReceiver dataReceiver = new RowDataReceiver(resultsInfo.getAttributes());
                 dataContainer.readData(
                     new AbstractExecutionSource(dataContainer, getExecutionContext(dataContainer), this),
                     session,
@@ -606,7 +647,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             DBDAttributeBinding[] allAttributes = resultsInfo.getAttributes();
             DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
 
-            WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
+            WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet(webSession);
             updatedResultSet.setResultsInfo(resultsInfo);
             updatedResultSet.setColumns(resultsInfo.getAttributes());
 
@@ -813,7 +854,7 @@ public class WebSQLProcessor implements WebSessionProvider {
     }
 
     @Nullable
-    public Object convertInputCellValue(DBCSession session, DBDAttributeBinding updateAttribute, Object cellRawValue, boolean justGenerateScript) throws DBCException {
+    public Object convertInputCellValue(DBCSession session, DBDAttributeBinding updateAttribute, Object cellRawValue, boolean justGenerateScript) throws DBException {
         cellRawValue = WebSQLUtils.makePlainCellValue(session, updateAttribute, cellRawValue);
         Object realCellValue = cellRawValue;
         // In some cases we already have final value here
@@ -1028,7 +1069,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull WebSQLExecuteInfo executeInfo,
         @NotNull WebSQLDataFilter webDataFilter,
         @NotNull DBDDataFilter dataFilter,
-        @Nullable WebDataFormat dataFormat) throws DBException {
+        @Nullable WebDataFormat dataFormat
+    ) throws DBException {
 
         List<WebSQLQueryResults> resultList = new ArrayList<>();
         int maxResultsCount = resolveMaxResultsCount(dataContainer.getDataSource());
@@ -1041,7 +1083,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     if (resultSet == null) {
                         break;
                     }
-                    try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat)) {
+                    try (WebSQLQueryDataReceiver dataReceiver = new WebSQLQueryDataReceiver(contextInfo, dataContainer, dataFormat, webSession)) {
                         readResultSet(dbStat.getSession(), resultSet, webDataFilter, dataReceiver);
                         results.setResultSet(dataReceiver.getResultSet());
                         dataReceiver.getResultSet().getResultsInfo().setQueryText(resultSet.getSourceStatement().getQueryString());
@@ -1161,30 +1203,6 @@ public class WebSQLProcessor implements WebSessionProvider {
         public void close() {
         }
     }
-
-    public class WebRowDataReceiver extends RowDataReceiver {
-        private final WebDataFormat dataFormat;
-
-        public WebRowDataReceiver(DBDAttributeBinding[] curAttributes, Object[] rowValues, WebDataFormat dataFormat) {
-            super(curAttributes);
-            this.rowValues = rowValues;
-            this.dataFormat = dataFormat;
-        }
-
-        @Override
-        protected void fetchRowValues(DBCSession session, DBCResultSet resultSet) throws DBCException {
-            for (int i = 0; i < curAttributes.length; i++) {
-                final DBDAttributeBinding attr = curAttributes[i];
-                DBDValueHandler valueHandler = attr.getValueHandler();
-                Object attrValue = valueHandler.fetchValueObject(session, resultSet, attr, i);
-
-                // Patch result rows (adapt to web format)
-                rowValues[i] = WebSQLUtils.makeWebCellValue(webSession, attr, attrValue, dataFormat);
-            }
-        }
-
-    }
-
 
     ///////////////////////////////////////////////////////
     // Utils

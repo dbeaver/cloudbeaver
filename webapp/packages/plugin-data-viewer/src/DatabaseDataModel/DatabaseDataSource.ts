@@ -302,7 +302,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
         this.options = toJS(this.prevOptions);
       }
 
-      return this.requestDataAction();
+      return this.requestDataAction(true);
     });
   }
 
@@ -345,12 +345,13 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     await this.cancel();
   }
 
-  abstract request(prevResults: TResult[]): Promise<TResult[]>;
+  abstract request(prevResults: TResult[], prevOptions: Readonly<TOptions> | null, refresh: boolean): Promise<TResult[]>;
   abstract save(prevResults: TResult[]): Promise<TResult[]>;
 
-  private async requestDataAction(): Promise<TResult[]> {
+  private async requestDataAction(refresh = false): Promise<TResult[]> {
+    const prevOptions = this.prevOptions;
     this.prevOptions = toJS(this.options);
-    return this.request(this.results)
+    return this.request(this.results, prevOptions, refresh)
       .finally(() => {
         this.outdated = false;
       })
