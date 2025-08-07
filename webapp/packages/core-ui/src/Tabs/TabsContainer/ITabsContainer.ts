@@ -57,7 +57,7 @@ export interface ITabsContainer<TProps = void, TOptions extends Record<string, a
     tabId: string,
     props: TProps,
     valueGetter?: MetadataValueGetter<string, T>,
-    schema?: schema.AnyZodObject,
+    schema?: schema.ZodObject,
   ) => T;
   setTabState: <T>(state: MetadataMap<string, any>, tabId: string, value: T) => T;
   getDisplayed: (props?: TProps) => Array<ITabInfo<TProps, TOptions>>;
