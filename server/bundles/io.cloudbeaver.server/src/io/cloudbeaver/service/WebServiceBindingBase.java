@@ -22,6 +22,7 @@ import graphql.schema.idl.TypeDefinitionRegistry;
 import io.cloudbeaver.*;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.app.ServletApplication;
+import io.cloudbeaver.model.cli.CloudbeaverCliConstants;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
 import io.cloudbeaver.server.WebAppUtils;
@@ -29,7 +30,6 @@ import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -96,10 +96,6 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         }
     }
 
-    protected static HttpServletRequest getServletRequest(DataFetchingEnvironment env) {
-        return GraphQLEndpoint.getServletRequest(env);
-    }
-
     protected static HttpServletResponse getServletResponse(DataFetchingEnvironment env) {
         return GraphQLEndpoint.getServletResponse(env);
     }
@@ -109,13 +105,34 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
     }
 
     protected static WebSession getWebSession(DataFetchingEnvironment env) throws DBWebException {
+        if (env.getGraphQlContext().getBoolean(CloudbeaverCliConstants.CLI_MODE)) {
+            return getSessionFromContextOrThrow(env);
+        }
         return WebAppUtils.getWebApplication().getSessionManager().getWebSession(
-            getServletRequest(env), getServletResponse(env));
+            GraphQLEndpoint.getServletRequestOrThrow(env), getServletResponse(env));
+    }
+
+    @Nullable
+    protected static WebSession getSessionFromContext(DataFetchingEnvironment env) {
+        WebSession webSession = env.getGraphQlContext().get(WebSession.class.getName());
+        return webSession;
+    }
+
+    @NotNull
+    protected static WebSession getSessionFromContextOrThrow(DataFetchingEnvironment env) throws DBWebException {
+        WebSession webSession = env.getGraphQlContext().get(WebSession.class.getName());
+        if (webSession == null) {
+            throw new DBWebException("Web session not found in GraphQL context");
+        }
+        return webSession;
     }
 
     protected static WebSession getWebSession(DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
+        if (env.getGraphQlContext().getBoolean(CloudbeaverCliConstants.CLI_MODE)) {
+            return getSessionFromContextOrThrow(env);
+        }
         return WebAppUtils.getWebApplication().getSessionManager().getWebSession(
-            getServletRequest(env), getServletResponse(env), errorOnNotFound);
+            GraphQLEndpoint.getServletRequestOrThrow(env), getServletResponse(env), errorOnNotFound);
     }
 
     protected static String getProjectReference(DataFetchingEnvironment env) {
@@ -132,13 +149,16 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
      */
     @Nullable
     public static WebSession findWebSession(DataFetchingEnvironment env) {
+        if (env.getGraphQlContext().getBoolean(CloudbeaverCliConstants.CLI_MODE)) {
+            return getSessionFromContext(env);
+        }
         return WebAppUtils.getWebApplication().getSessionManager().findWebSession(
-            getServletRequest(env));
+            GraphQLEndpoint.getServletRequestOrThrow(env));
     }
 
     public static WebSession findWebSession(DataFetchingEnvironment env, boolean errorOnNotFound) throws DBWebException {
         return WebAppUtils.getWebApplication().getSessionManager().findWebSession(
-            getServletRequest(env), errorOnNotFound);
+            GraphQLEndpoint.getServletRequestOrThrow(env), errorOnNotFound);
     }
 
     @NotNull
