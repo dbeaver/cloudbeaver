@@ -191,10 +191,13 @@ export class ConnectionNavNodeService extends Dependency {
 
       const node = this.navNodeInfoResource.get(nodePath);
       const folder = node?.parentId ?? getProjectNodeId(key.projectId);
+      const parents = this.navNodeInfoResource.getParents(folder);
 
       if (nodePath) {
         this.navTreeResource.deleteInNode(folder, [nodePath]);
       }
+
+      this.navTreeResource.markOutdated(resourceKeyList(parents));
     });
   }
 
