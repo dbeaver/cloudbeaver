@@ -5,6 +5,20 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+function extractDocsVersion(version: string | undefined): string | null {
+  if (!version) {
+    return null;
+  }
+  const parts = version.split('.');
+  const major = parts[0];
+  const minor = parts[1];
+  if (!major || !minor) {
+    return null;
+  }
+
+  return `${major}.${minor}`;
+}
+
 export const WEBSITE_LINKS = {
   ROOT_PAGE: 'https://dbeaver.com/',
   DOCS_PAGE: 'https://dbeaver.com/docs/cloudbeaver/',
@@ -38,9 +52,9 @@ export const WEBSITE_LINKS = {
   getDocumentationPage(distributed: boolean, version: string | undefined): string {
     let url = distributed ? WEBSITE_LINKS.TEAM_EDITION_DOCS_PAGE : WEBSITE_LINKS.DOCS_PAGE;
 
-    const versionPattern = /(\d+)\.(\d+)\.(\d+)/;
-    if (version && versionPattern.test(version)) {
-      url += `${version.replace(versionPattern, '$1.$2')}/`;
+    const majorMinor = extractDocsVersion(version);
+    if (majorMinor) {
+      url += `${majorMinor}/`;
     }
 
     return url;
