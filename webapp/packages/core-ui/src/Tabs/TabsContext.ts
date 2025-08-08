@@ -30,9 +30,9 @@ export interface ITabsContext<T = Record<string, any>> {
   context: IDataContext;
   canClose: (tabId: string) => boolean;
   getTabInfo: (tabId: string) => ITabInfo<T> | undefined;
-  getTabState: <T>(tabId: string, valueGetter?: MetadataValueGetter<string, T>, schema?: schema.AnyZodObject) => T;
+  getTabState: <T>(tabId: string, valueGetter?: MetadataValueGetter<string, T>, schema?: schema.ZodObject) => T;
   setTabState: <T>(tabId: string, value: T) => T;
-  getLocalState: <T>(tabId: string, valueGetter?: MetadataValueGetter<string, T>, schema?: schema.AnyZodObject) => T;
+  getLocalState: <T>(tabId: string, valueGetter?: MetadataValueGetter<string, T>, schema?: schema.ZodObject) => T;
   open: (tabId: string) => Promise<void>;
   close: (tabId: string) => Promise<void>;
   closeAll: () => Promise<void>;
