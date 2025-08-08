@@ -13,6 +13,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 import type { Compartment, Completion, CompletionConfig, CompletionContext, CompletionResult, Extension } from '@cloudbeaver/plugin-codemirror6';
 import { type ISQLEditorData, type SQLProposal } from '@cloudbeaver/plugin-sql-editor';
+import type { SqlCompletionProposal } from '@cloudbeaver/core-sdk';
 
 const codemirrorComplexLoader = createComplexLoader(() => import('@cloudbeaver/plugin-codemirror6'));
 
@@ -31,18 +32,11 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
   const [config] = useState<CompletionConfig>(() => {
     function getOptionsFromProposals(explicit: boolean, word: string, proposals: SQLProposal[]): SqlCompletion[] {
       const wordLowerCase = word.toLocaleLowerCase();
-      const hasSameName = proposals.some(
-        ({ replacementString, displayString }) =>
-          sanitizeProposal(displayString) === wordLowerCase || replacementString.toLocaleLowerCase() === wordLowerCase,
-      );
-      const filteredProposals = proposals
-        .filter(({ replacementString, displayString }) => {
-          const display = sanitizeProposal(displayString);
-          const replacement = replacementString.toLocaleLowerCase();
-
-          return word === '*' || display !== wordLowerCase || replacement !== wordLowerCase;
-        })
-        .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+      function isSameName(proposal: SqlCompletionProposal) {
+        return sanitizeProposal(proposal.displayString) === wordLowerCase || proposal.replacementString.toLocaleLowerCase() === wordLowerCase;
+      }
+      const hasSameName = proposals.some(isSameName);
+      const filteredProposals = proposals.filter(proposal => !isSameName(proposal)).sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
       if (filteredProposals.length === 0 && !hasSameName && explicit) {
         return [
