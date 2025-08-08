@@ -208,16 +208,19 @@ export class ConnectionNavNodeService extends Dependency {
 
       await this.navTreeResource.waitLoad();
 
-      if (!this.navTreeResource.has(parentId)) {
-        await this.navNodeInfoResource.loadNodeParents(parentId);
-        const parents = this.navNodeInfoResource.getParents(parentId);
+      await this.navNodeInfoResource.loadNodeParents(parentId);
+      const parents = this.navNodeInfoResource.getParents(parentId);
 
-        this.navTreeResource.markOutdated(parents[parents.length - 1]);
-        const preloaded = await this.navTreeResource.preloadNodeParents(parents, parentId);
+      for (let i = 0; i < parents.length; i++) {
+        const currentParentId = parents[i]!;
+        const nextNodeId = parents[i + 1] ?? parentId;
+        const currentChildren = this.navTreeResource.get(currentParentId) || [];
 
-        if (!preloaded) {
-          return;
+        if (!currentChildren.includes(nextNodeId)) {
+          this.navTreeResource.markOutdated(currentParentId);
         }
+
+        await this.navTreeResource.load(currentParentId);
       }
 
       let children = this.navTreeResource.get(parentId);
