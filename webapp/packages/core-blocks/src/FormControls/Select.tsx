@@ -170,7 +170,7 @@ export const Select: SelectType = observer(function Select({
   }
 
   return (
-    <Field {...layoutProps} className={clsx('select__field', inline && 'select__field--inline', className)}>
+    <Field {...layoutProps} className={clsx(inline && 'select__field--inline', className)}>
       {children && (
         <FieldLabel htmlFor={inputId} required={rest.required} title={title} className="select__field-label">
           {children}
