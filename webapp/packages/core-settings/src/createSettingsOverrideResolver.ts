@@ -22,7 +22,7 @@ type SettingsMapping<TTarget> = Partial<{
   [key in keyof TTarget]: string | ISettingsOverride<TTarget, key>;
 }>;
 
-export function createSettingsOverrideResolver<TTarget extends schema.SomeZodObject>(
+export function createSettingsOverrideResolver<TTarget extends schema.ZodObject>(
   source: ISettingsSource | IEditableSettingsSource,
   mappings: SettingsMapping<schema.infer<TTarget>>,
 ): ISettingsSource {
