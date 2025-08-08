@@ -22,16 +22,14 @@
   "dependencies": {
     "@timohausmann/quadtree-ts": "^2",
     "fast-deep-equal": "^3",
-    "i18next": "^25",
     "md5": "^2",
     "mobx": "^6",
     "tslib": "^2",
     "underscore": "^1",
     "uuid": "^11",
     "whatwg-mimetype": "^4",
-    "zod": "^3",
-    "zod-i18n-map": "^2",
-    "zod-validation-error": "^3"
+    "zod": "^4",
+    "zod-validation-error": "^4"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
@@ -44,6 +42,6 @@
     "@types/whatwg-mimetype": "^3",
     "typescript": "^5",
     "vitest": "^3",
-    "zod": "^3"
+    "zod": "^4"
   }
 }
