@@ -27,6 +27,7 @@
     "@cloudbeaver/core-events": "workspace:*",
     "@cloudbeaver/core-links": "workspace:*",
     "@cloudbeaver/core-localization": "workspace:*",
+    "@cloudbeaver/core-root": "workspace:*",
     "@cloudbeaver/core-routing": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
     "@cloudbeaver/core-view": "workspace:*",
