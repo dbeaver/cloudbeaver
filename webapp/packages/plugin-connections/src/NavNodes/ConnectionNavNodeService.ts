@@ -33,7 +33,6 @@ import {
   type IConnectionFolderEvent,
 } from '@cloudbeaver/core-connections';
 import { NavigationTreeService } from '@cloudbeaver/plugin-navigation-tree';
-import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 @injectable()
 export class ConnectionNavNodeService extends Dependency {
