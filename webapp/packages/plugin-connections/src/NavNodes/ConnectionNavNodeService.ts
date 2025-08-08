@@ -212,12 +212,15 @@ export class ConnectionNavNodeService extends Dependency {
         await this.navNodeInfoResource.loadNodeParents(parentId);
         const parents = this.navNodeInfoResource.getParents(parentId);
 
+        // allows to preload missing folders if the did not load
         for (let i = 0; i < parents.length; i++) {
           const parent = parents[i]!;
           const nextParent = parents[i + 1];
           const children = this.navTreeResource.get(parent) ?? [];
+          const isEmptyRoot = parents.length <= 2 && !children.length; // for case ['', 'g_GlobalConfiguration']
+          const hasNoChildren = nextParent && !children.includes(nextParent);
 
-          if (!children.length || (nextParent && !children.includes(nextParent))) {
+          if (isEmptyRoot || hasNoChildren) {
             this.navTreeResource.markOutdated(parent);
             break;
           }
