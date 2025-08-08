@@ -2,7 +2,7 @@ export default [
   ['shortcuts_title', 'Shortcuts'],
 
   ['plugin_help_welcome_docs_label', 'Documentation'],
-  ['plugin_help_welcome_docs_description', 'Learn how to use CloudBeaver'],
+  ['plugin_help_welcome_docs_description', 'Learn how to use {arg:product}'],
 
   ['data_viewer_shortcut_start_inline_editing', 'Open Inline Editor for the selected Cell'],
   ['data_viewer_shortcut_add_new_row', 'Add a new Row'],

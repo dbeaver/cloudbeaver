@@ -116,6 +116,8 @@ public abstract class CBApplication<T extends CBServerConfig>
 
     private CBJettyServer jettyServer;
 
+    private final Map<String, Object> applicationContext = new ConcurrentHashMap<>();
+
     public CBApplication() {
         this.homeDirectory = new File(initHomeFolder());
     }
@@ -801,5 +803,14 @@ public abstract class CBApplication<T extends CBServerConfig>
     @Override
     public ServletSystemInformationCollector<?> getSystemInformationCollector() {
         return systemInformationCollector;
+    }
+
+    public void addApplicationContextValue(@NotNull String key, @NotNull Object value) {
+        applicationContext.put(key, value);
+    }
+
+    @Nullable
+    public <T> T getApplicationContextValue(@NotNull String key) {
+        return (T) applicationContext.get(key);
     }
 }
