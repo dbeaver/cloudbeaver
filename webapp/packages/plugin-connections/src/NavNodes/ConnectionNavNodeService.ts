@@ -33,6 +33,7 @@ import {
   type IConnectionFolderEvent,
 } from '@cloudbeaver/core-connections';
 import { NavigationTreeService } from '@cloudbeaver/plugin-navigation-tree';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 @injectable()
 export class ConnectionNavNodeService extends Dependency {
@@ -212,7 +213,17 @@ export class ConnectionNavNodeService extends Dependency {
         await this.navNodeInfoResource.loadNodeParents(parentId);
         const parents = this.navNodeInfoResource.getParents(parentId);
 
-        this.navTreeResource.markOutdated(parents[parents.length - 1]);
+        for (let i = 0; i < parents.length; i++) {
+          const parent = parents[i]!;
+          const nextParent = parents[i + 1];
+          const children = this.navTreeResource.get(parent) ?? [];
+
+          if (!children.length || (nextParent && !children.includes(nextParent))) {
+            this.navTreeResource.markOutdated(parent);
+            break;
+          }
+        }
+
         const preloaded = await this.navTreeResource.preloadNodeParents(parents, parentId);
 
         if (!preloaded) {
