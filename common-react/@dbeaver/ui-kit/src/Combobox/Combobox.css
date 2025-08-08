@@ -37,7 +37,7 @@
   }
 
   .dbv-kit-combobox__popover {
-    z-index: 1;
+    z-index: 1000;
     min-width: 100%;
     max-height: var(--dbv-kit-combobox-popover-height);
     overflow-y: auto;
