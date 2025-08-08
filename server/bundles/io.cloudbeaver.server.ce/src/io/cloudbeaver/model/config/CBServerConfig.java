@@ -16,11 +16,11 @@
  */
 package io.cloudbeaver.model.config;
 
+import com.google.common.net.InetAddresses;
 import com.google.gson.annotations.SerializedName;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.model.app.WebServerConfiguration;
 import io.cloudbeaver.server.CBConstants;
-import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 
@@ -209,12 +209,18 @@ public class CBServerConfig implements WebServerConfiguration {
                     host = "http://" + host; // Default to HTTP if no scheme is provided to avoid uri parse exception
                 }
                 URI uri = URI.create(host);
-                StringBuilder hostNameBuilder = new StringBuilder();
-                hostNameBuilder.append(ServletAppUtils.removeSideSlashes(uri.getHost() != null ? uri.getHost() : host));
+                String hostName = uri.getHost() != null ? uri.getHost() : host;
+                if (InetAddresses.isInetAddress(hostName)) {
+                    log.warn("Host URI contains an IP address: " + hostName + ", skipped.");
+                    continue;
+                }
+                StringBuilder hostNameBuilder = new StringBuilder(hostName);
+
                 if (uri.getPort() > 0) {
                     hostNameBuilder.append(':')
                         .append(uri.getPort());
                 }
+
                 uniqueHosts.add(hostNameBuilder.toString());
             } catch (Exception e) {
                 log.error("Invalid host URI: " + host, e);
