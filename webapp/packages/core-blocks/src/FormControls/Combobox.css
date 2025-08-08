@@ -1,5 +1,6 @@
 @layer components {
-  .dbv-kit-combobox {
+  .dbv-kit-combobox,
+  .dbv-kit-combobox__popover {
     --dbv-kit-combobox-border-width: 2px;
     --dbv-kit-combobox-hover-border-color: var(--theme-background);
 
@@ -9,13 +10,7 @@
 
     --dbv-kit-combobox-disabled-background: var(--theme-input-background-disabled);
 
-    --dbv-kit-combobox-border-radius: 3px;
     --dbv-kit-control-outline-offset: -2px;
-  }
-
-  .dbv-kit-combobox__popover {
-    --dbv-kit-combobox-border-width: 2px;
-    --dbv-kit-combobox-border-color: var(--theme-input-border);
 
     --dbv-kit-combobox-popover-background: var(--theme-input-background);
     --dbv-kit-combobox-popover-foreground: var(--theme-input-color);

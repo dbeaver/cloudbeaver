@@ -22,7 +22,6 @@ import './styles/main/typography.pure.scss';
 import './styles/UiIconButton.css';
 import './styles/UiSpinner.css';
 import './styles/UiInput.css';
-import './styles/UiCombobox.css';
 import { FALLBACK_THEME_ID, themes } from './themes.js';
 import { ThemeSettingsService } from './ThemeSettingsService.js';
 

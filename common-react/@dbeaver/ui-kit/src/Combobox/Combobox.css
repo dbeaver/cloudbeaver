@@ -1,6 +1,6 @@
 @import './_base.css';
 
-@layer base.components {
+@layer base.base {
   .dbv-kit-combobox {
     display: flex;
     align-items: center;
