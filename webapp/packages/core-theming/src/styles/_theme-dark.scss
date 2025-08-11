@@ -22,7 +22,7 @@ $mdc-theme-error: #e94948;
 $color-scheme: dark;
 $color-positive: #52c41a;
 $color-on-positive: #fff;
-$color-negative: #e73e52;
+$color-negative: hsl(0, 85%, 45%);
 $color-status: #a08600;
 
 $link-color: lighten($mdc-theme-primary, 10%);
