@@ -19,6 +19,7 @@ package io.cloudbeaver.service.sql;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
+import io.cloudbeaver.WebObjectId;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebTransactionLogInfo;
@@ -93,13 +94,15 @@ public interface DBWServiceSQL extends DBWService {
 
     @WebAction(requireGlobalPermissions = DBWConstants.GLOBAL_PERMISSION_SCRIPT_EXECUTE)
     WebAsyncTaskInfo asyncExecuteQuery(
+        @NotNull WebSession webSession,
+        @WebObjectId @NotNull String projectId,
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String sql,
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
-        boolean readLogs,
-        @NotNull WebSession webSession) throws DBException;
+        boolean readLogs
+    ) throws DBException;
 
     @WebAction
     WebAsyncTaskInfo asyncReadDataFromContainer(

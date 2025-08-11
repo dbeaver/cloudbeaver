@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.sql.impl;
 
 
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
@@ -58,6 +59,7 @@ import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionAnalyz
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSWrapper;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -321,6 +323,9 @@ public class WebServiceSQL implements DBWServiceSQL {
         @Nullable List<WebSQLResultsRow> addedRows,
         @Nullable WebDataFormat dataFormat
     ) throws DBWebException {
+        if (DBWorkbench.isDistributed() && !webSession.hasPermission(DBWConstants.PERMISSION_SQL_RESULT_UPDATE)) {
+            throw new DBWebException("Permission denied");
+        }
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
@@ -357,6 +362,9 @@ public class WebServiceSQL implements DBWServiceSQL {
         @Nullable List<WebSQLResultsRow> addedRows,
         @Nullable WebDataFormat dataFormat
     ) throws DBWebException {
+        if (DBWorkbench.isDistributed() && !contextInfo.getWebSession().hasPermission(DBWConstants.PERMISSION_SQL_RESULT_UPDATE)) {
+            throw new DBWebException("Permission denied");
+        }
         try {
             return updateResultsDataBatch(
                 contextInfo.getWebSession().getProgressMonitor(),
@@ -469,33 +477,29 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @NotNull
+    @Override
     public WebAsyncTaskInfo asyncExecuteQuery(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String sql,
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
-        boolean readLogs,
-        @NotNull WebSession webSession)
-    {
-        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
-            @Override
-            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
-                try {
-                    monitor.beginTask("Execute query", 1);
-                    monitor.subTask("Process query " + sql);
-                    WebSQLExecuteInfo executeResults = contextInfo.getProcessor().processQuery(
-                        monitor, contextInfo, sql, resultId, filter, dataFormat, webSession, readLogs);
-                    this.result = executeResults.getStatusMessage();
-                    this.extendedResults = executeResults;
-                } catch (Throwable e) {
-                    throw new InvocationTargetException(e);
-                } finally {
-                    monitor.done();
-                }
-            }
-        };
-        return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("SQL execute", runnable);
+        boolean readLogs
+    ) throws DBException {
+        if (DBWorkbench.isDistributed() && !webSession.hasPermission(DBWConstants.PERMISSION_SQL_EXECUTE_QUERY)) {
+            throw new DBWebException("Permission denied");
+        }
+        return WebSQLUtils.createAsyncTaskExecuteSqlQuery(
+            webSession,
+            contextInfo,
+            sql,
+            resultId,
+            filter,
+            dataFormat,
+            readLogs
+        );
     }
 
     @Override
