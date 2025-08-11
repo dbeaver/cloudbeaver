@@ -184,7 +184,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
             disabled={disabled || loading || readOnly}
             readOnly={readOnly}
             placeholder={rest.placeholder}
-            className={clsx('theme-typography--caption', icon || loading ? 'tw:pl-8!' : '', 'tw:pr-6!')}
+            className={clsx('theme-typography--caption  tw:tracking-normal!', icon || loading ? 'tw:pl-8!' : '', 'tw:pr-6!')}
             title={title}
             id={inputId}
             onBlur={() => setInputValue(null)}
