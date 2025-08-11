@@ -16,12 +16,15 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.app.ServletAppConfiguration;
+import io.cloudbeaver.model.session.WebAsyncTaskProcessor;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.ServletAppUtils;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPEvaluationContext;
 import org.jkiss.dbeaver.model.data.*;
@@ -30,6 +33,7 @@ import org.jkiss.dbeaver.model.exec.DBCSession;
 import org.jkiss.dbeaver.model.gis.DBGeometry;
 import org.jkiss.dbeaver.model.gis.GisConstants;
 import org.jkiss.dbeaver.model.gis.GisTransformUtils;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 import org.jkiss.dbeaver.utils.ContentUtils;
@@ -38,6 +42,7 @@ import org.jkiss.utils.Base64;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -262,5 +267,35 @@ public class WebSQLUtils {
     @NotNull
     public static String getColumnName(@NotNull DBDAttributeBinding binding) {
         return binding.getFullyQualifiedName(DBPEvaluationContext.UI);
+    }
+
+    @NotNull
+    public static WebAsyncTaskInfo createAsyncTaskExecuteSqlQuery(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String sql,
+        @Nullable String resultId,
+        @Nullable WebSQLDataFilter filter,
+        @Nullable WebDataFormat dataFormat,
+        boolean readLogs
+    ) {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
+            @Override
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
+                try {
+                    monitor.beginTask("Execute query", 1);
+                    monitor.subTask("Process query " + sql);
+                    WebSQLExecuteInfo executeResults = contextInfo.getProcessor().processQuery(
+                        monitor, contextInfo, sql, resultId, filter, dataFormat, webSession, readLogs);
+                    this.result = executeResults.getStatusMessage();
+                    this.extendedResults = executeResults;
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        return webSession.createAndRunAsyncTask("SQL execute", runnable);
     }
 }

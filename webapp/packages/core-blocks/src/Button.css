@@ -24,10 +24,10 @@
     --dbv-kit-btn-secondary-background: transparent;
     --dbv-kit-btn-secondary-background-hover: color-mix(in srgb, transparent, var(--theme-primary) 5%);
     --dbv-kit-btn-secondary-background-active: color-mix(in srgb, transparent, var(--theme-primary) 20%);
-    --dbv-kit-btn-secondary-foreground: var(--theme-primary);
-    --dbv-kit-btn-secondary-foreground-hover: var(--theme-primary);
-    --dbv-kit-btn-secondary-foreground-active: var(--theme-primary);
-    --dbv-kit-btn-secondary-border-color: var(--theme-primary);
+    --dbv-kit-btn-secondary-foreground: var(--theme-link-color);
+    --dbv-kit-btn-secondary-foreground-hover: var(--theme-link-color);
+    --dbv-kit-btn-secondary-foreground-active: var(--theme-link-color);
+    --dbv-kit-btn-secondary-border-color: var(--theme-link-color);
 
     --dbv-kit-btn-danger-background: var(--theme-negative);
     --dbv-kit-btn-danger-background-hover: color-mix(in srgb, var(--theme-negative), white 10%);
