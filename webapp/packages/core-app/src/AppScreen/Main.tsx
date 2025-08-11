@@ -41,7 +41,7 @@ export const Main = observer(function Main() {
                 <RightArea />
               </Pane>
               <ResizerControls />
-              <Pane className={s(styles, { pane: true })} basis="250px" main>
+              <Pane className={s(styles, { pane: true })} basis="400px" main>
                 <Loader className={s(styles, { loader: true })} suspense>
                   <SideBarPanel container={sideBarPanelService.tabsContainer} />
                 </Loader>

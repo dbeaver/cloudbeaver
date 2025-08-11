@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, Form, Loader, Placeholder, s, StatusMessage, useForm, useObjectRef, useResource, useS } from '@cloudbeaver/core-blocks';
+import { Container, Form, Loader, Placeholder, s, StatusMessage, useForm, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
@@ -18,7 +18,6 @@ import style from './ConnectionForm.module.css';
 import type { ConnectionFormState } from './ConnectionFormState.js';
 import { getFirstException } from '@cloudbeaver/core-utils';
 import { ConnectionFormService } from './ConnectionFormService.js';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { getConnectionFormOptionsPart } from './Options/getConnectionFormOptionsPart.js';
 import { ExecutionContext } from '@cloudbeaver/core-executor';
 import type { IConnectionFormState } from './IConnectionFormState.js';
@@ -35,9 +34,6 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   const styles = useS(style);
   const notificationService = useService(NotificationService);
   const optionsPart = getConnectionFormOptionsPart(formState);
-  const connectionInfoResource = useResource(ConnectionForm, ConnectionInfoResource, optionsPart.connectionKey, {
-    active: !!optionsPart.connectionKey,
-  });
   const exception = getFirstException(formState.exception);
 
   const form = useForm({
@@ -58,7 +54,7 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
           notificationService.notify(
             {
               title: initialMode === 'create' ? 'core_connections_connection_create_success' : 'core_connections_connection_update_success',
-              message: connectionInfoResource.data?.name,
+              message: optionsPart.state?.name,
             },
             ENotificationType.Success,
           );
