@@ -175,7 +175,7 @@ public class WebServiceSQL implements DBWServiceSQL {
             if (!useDefaultCompletionEngine) {
                 SQLQueryCompletionAnalyzer analyzer = new SQLQueryCompletionAnalyzer(
                     m -> WebSQLCompletionContextScriptParser.obtainCompletionContext(
-                        webSession.getProgressMonitor(), query, position, request),
+                        webSession, query, position, request),
                     request,
                     request::getDocumentOffset
                 );

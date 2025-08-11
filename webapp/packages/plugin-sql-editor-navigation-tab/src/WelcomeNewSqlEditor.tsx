@@ -16,14 +16,15 @@ export const WelcomeNewSqlEditor = observer(function WelcomeNewSqlEditor() {
   const sqlEditorBootstrap = useService(SqlEditorBootstrap);
   const translate = useTranslate();
   return (
-    <Cell
-      before={<IconOrImage icon="/icons/sql_script.svg" />}
-      description={translate(ACTION_SQL_EDITOR_NEW.info.tooltip)}
-      className="tw:cursor-pointer tw:rounded-sm tw:overflow-hidden"
-      big
-      onClick={() => sqlEditorBootstrap.openSQLEditor()}
-    >
-      {translate(ACTION_SQL_EDITOR_NEW.info.label)}
-    </Cell>
+    <button aria-label={translate(ACTION_SQL_EDITOR_NEW.info.tooltip)} onClick={() => sqlEditorBootstrap.openSQLEditor()}>
+      <Cell
+        before={<IconOrImage icon="/icons/sql_script.svg" />}
+        description={translate(ACTION_SQL_EDITOR_NEW.info.tooltip)}
+        className="tw:cursor-pointer tw:rounded-sm tw:overflow-hidden"
+        big
+      >
+        {translate(ACTION_SQL_EDITOR_NEW.info.label)}
+      </Cell>
+    </button>
   );
 });

@@ -8,8 +8,13 @@
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
 
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { DriverConfigurationType, NetworkHandlerAuthType, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
-import { ConnectionInfoNetworkHandlersResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
+import {
+  DriverConfigurationType,
+  NetworkHandlerAuthType,
+  type NetworkHandlerConfigInput,
+  type NetworkHandlerDescriptor,
+} from '@cloudbeaver/core-sdk';
+import { ConnectionInfoNetworkHandlersResource, NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { toJS } from 'mobx';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { INetworkHandlerConfig } from '../Options/IConnectionNetworkHanler.js';
@@ -37,6 +42,7 @@ const getDefaultState = () =>
 export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConnectionFormState> {
   constructor(
     formState: IFormState<IConnectionFormState>,
+    private readonly networkHandlerResource: NetworkHandlerResource,
     private readonly connectionInfoNetworkHandlersResource: ConnectionInfoNetworkHandlersResource,
     private readonly optionsPart: ConnectionFormOptionsPart,
   ) {
@@ -44,6 +50,9 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   override isOutdated(): boolean {
+    if (this.networkHandlerResource.isOutdated(SSH_TUNNEL_ID)) {
+      return true;
+    }
     if (!this.optionsPart.connectionKey) {
       return false;
     }
@@ -52,15 +61,36 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
   }
 
   protected override async loader(): Promise<void> {
+    const handler = await this.networkHandlerResource.load(SSH_TUNNEL_ID);
     if (!this.optionsPart.connectionKey) {
-      this.setInitialState(getDefaultState());
+      const state = getDefaultState();
+      this.copyInitialHandlerProperties(handler, state);
+      this.setInitialState(state);
       return;
     }
 
     const connection = await this.connectionInfoNetworkHandlersResource.load(this.optionsPart.connectionKey);
     const sshHandler = connection?.networkHandlersConfig?.find(h => h.id === SSH_TUNNEL_ID);
 
-    this.setInitialState(sshHandler ?? getDefaultState());
+    const state = toJS(sshHandler ?? getDefaultState());
+    this.copyInitialHandlerProperties(handler, state);
+    this.setInitialState(state);
+  }
+
+  private copyInitialHandlerProperties(handlerDescriptor: NetworkHandlerDescriptor, state: INetworkHandlerConfig): void {
+    const properties: Record<string, any> = {};
+    if (handlerDescriptor) {
+      for (const property of handlerDescriptor.properties) {
+        if (!property.features.includes('password')) {
+          properties[property.id!] = property.value;
+        }
+      }
+    }
+
+    state.properties = {
+      ...properties,
+      ...state.properties,
+    };
   }
 
   protected override async saveChanges(
