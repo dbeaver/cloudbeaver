@@ -15,9 +15,7 @@ import { ConnectionInfoOriginResource } from '@cloudbeaver/core-connections';
 import { getConnectionFormOptionsPart } from '../Options/getConnectionFormOptionsPart.js';
 export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = observer(function OriginInfoTab({ formState, ...rest }) {
   const optionsPart = getConnectionFormOptionsPart(formState);
-  const connectionInfoOriginResource = useResource(OriginInfoTab, ConnectionInfoOriginResource, optionsPart.connectionKey, {
-    active: !!optionsPart.connectionKey,
-  });
+  const connectionInfoOriginResource = useResource(OriginInfoTab, ConnectionInfoOriginResource, optionsPart.connectionKey);
 
   return (
     <Tab {...rest}>
