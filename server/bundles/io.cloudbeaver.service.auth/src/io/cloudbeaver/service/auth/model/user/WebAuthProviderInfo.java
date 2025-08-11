@@ -127,7 +127,7 @@ public class WebAuthProviderInfo {
     }
 
     public WebAuthProviderConfiguration getTemplateConfiguration() {
-        return new WebAuthProviderConfiguration(descriptor, TEMPLATE_CONFIG, "{origin}");
+        return new WebAuthProviderConfiguration(descriptor, TEMPLATE_CONFIG, origin);
     }
 
     @Override

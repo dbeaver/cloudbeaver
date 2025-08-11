@@ -8,24 +8,24 @@
 
 $mdc-theme-primary: #2a7cb4;
 $mdc-theme-on-primary: #ffffff;
-$mdc-theme-secondary: hsl(240deg, 10%, 15%);
+$mdc-theme-secondary: hsl(240deg, 10%, 13%);
 $mdc-theme-on-secondary: #cbcbcb;
 
-$mdc-theme-sub-secondary: hsl(240deg, 10%, 20%);
+$mdc-theme-sub-secondary: hsl(240deg, 10%, 18%);
 $mdc-theme-on-sub-secondary: #cbcbcb;
 
-$mdc-theme-surface: hsl(240deg, 10%, 18%);
+$mdc-theme-surface: hsl(240deg, 10%, 16%);
 $mdc-theme-on-surface: #ffffff;
-$mdc-theme-background: hsl(240deg, 10%, 26%);
+$mdc-theme-background: hsl(240deg, 10%, 25%);
 $mdc-theme-error: #e94948;
 
 $color-scheme: dark;
 $color-positive: #52c41a;
 $color-on-positive: #fff;
-$color-negative: #e73e52;
+$color-negative: hsl(0, 95%, 65%);
 $color-status: #a08600;
 
-$link-color: $mdc-theme-primary;
+$link-color: lighten($mdc-theme-primary, 10%);
 $link-color-focus: #3f96d1;
 
 $input-color: $mdc-theme-on-secondary;

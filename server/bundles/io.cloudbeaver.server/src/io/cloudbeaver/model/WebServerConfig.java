@@ -136,7 +136,7 @@ public class WebServerConfig {
 
     @Property
     public WebServerLanguage[] getSupportedLanguages() {
-        List<PlatformLanguageDescriptor> langs = PlatformLanguageRegistry.getInstance().getLanguages();
+        List<PlatformLanguageDescriptor> langs = new ArrayList<>(PlatformLanguageRegistry.getInstance().getLanguages());
         // FIXME: remove hardcoded ordering
         langs.sort(Comparator.comparingInt(x -> x.getCode().equals("vi") ? 1 : -1));
         WebServerLanguage[] webLangs = new WebServerLanguage[langs.size()];
