@@ -331,9 +331,9 @@ public class WebSQLProcessor implements WebSessionProvider {
                     executeInfo.setResults(new WebSQLQueryResults[]{results});
                     setResultFilterText(dataContainer, session.getDataSource(), executeInfo, dataFilter);
                     executeInfo.setFullQuery(statistics.getQueryText());
-                    if (resultSet != null && resultSet.getRows() != null && resultSet.getResultsInfo() != null) {
+                    if (resultSet != null && resultSet.getRowsWithMetaData() != null && resultSet.getResultsInfo() != null) {
                         resultSet.getResultsInfo().setQueryText(statistics.getQueryText());
-                        executeInfo.setStatusMessage(resultSet.getRows().length + " row(s) fetched");
+                        executeInfo.setStatusMessage(resultSet.getRowsWithMetaData().size() + " row(s) fetched");
                     }
                 } catch (DBException e) {
                     throw new InvocationTargetException(e);
