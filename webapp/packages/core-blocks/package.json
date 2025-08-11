@@ -31,8 +31,8 @@
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/core-theming": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
-    "@dbeaver/js-helpers": "workspace:^",
-    "@dbeaver/ui-kit": "workspace:^",
+    "@dbeaver/js-helpers": "workspace:*",
+    "@dbeaver/ui-kit": "workspace:*",
     "go-split": "^3",
     "minisearch": "^7",
     "mobx": "^6",
@@ -49,6 +49,7 @@
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
+    "@cloudbeaver/core-events": "workspace:*",
     "@cloudbeaver/core-executor": "workspace:*",
     "@cloudbeaver/core-utils": "workspace:*",
     "@cloudbeaver/tests-runner": "workspace:*",

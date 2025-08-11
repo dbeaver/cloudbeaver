@@ -740,9 +740,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     [],
   );
 
-  useResource(useElementsTree, navTreeResource, options.baseRoot, {
-    onData: () => loadTreeThreshold(),
-  });
+  useResource(useElementsTree, navTreeResource, options.baseRoot);
 
   useExecutor({
     executor: navNodeInfoResource.onDataOutdated,
