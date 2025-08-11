@@ -8,7 +8,7 @@
 import { action, computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
-import { selectFiles } from '@cloudbeaver/core-browser';
+import { promptForFiles } from '@cloudbeaver/core-browser';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
@@ -130,8 +130,8 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
           this.notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
         }
       },
-      async upload() {
-        selectFiles(files => {
+      upload() {
+        promptForFiles().then(files => {
           const file = files?.[0];
           if (file && this.selectedCell) {
             this.editAction.set(this.selectedCell, createResultSetBlobValue(file));

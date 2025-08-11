@@ -3816,6 +3816,7 @@ __metadata:
   dependencies:
     "@cloudbeaver/core-authentication": "workspace:*"
     "@cloudbeaver/core-blocks": "workspace:*"
+    "@cloudbeaver/core-browser": "workspace:*"
     "@cloudbeaver/core-cli": "workspace:*"
     "@cloudbeaver/core-connections": "workspace:*"
     "@cloudbeaver/core-data-context": "workspace:*"
