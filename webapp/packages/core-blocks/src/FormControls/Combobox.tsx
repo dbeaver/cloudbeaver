@@ -207,7 +207,10 @@ export const Combobox: ComboboxType = observer(function Combobox({
                   value={itemKey}
                   disabled={itemDisabled}
                   title={itemTitle}
-                  setValueOnClick={false}
+                  setValueOnClick={() => {
+                    setInputValue(null);
+                    return false;
+                  }}
                   className={clsx({
                     'tw:cursor-pointer': !itemDisabled,
                     'tw:cursor-not-allowed': itemDisabled,
