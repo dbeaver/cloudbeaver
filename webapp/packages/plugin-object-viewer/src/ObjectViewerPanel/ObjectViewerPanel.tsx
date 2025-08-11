@@ -1,10 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { useEffect } from 'react';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
@@ -47,14 +48,17 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   const connection = useResource(ObjectViewerPanel, ConnectionInfoResource, connectionKey);
 
   const node = useResource(ObjectViewerPanel, navNodeInfoResource, objectId, {
-    onData(data) {
-      runInAction(() => {
-        tab.handlerState.tabIcon = data.icon;
-        tab.handlerState.tabTitle = data.name;
-      });
-    },
-    active: getComputed(() => !!connection.tryGetData?.connected && !connection.outdated),
+    active: getComputed(() => !!connection.tryGetData?.connected && !connection.isOutdated()),
   });
+
+  useEffect(() => {
+    runInAction(() => {
+      if (node.tryGetData) {
+        tab.handlerState.tabIcon = node.tryGetData.icon;
+        tab.handlerState.tabTitle = node.tryGetData.name;
+      }
+    });
+  }, [node.tryGetData, tab.handlerState]);
 
   const pages = dbObjectPagesService.orderedPages;
 

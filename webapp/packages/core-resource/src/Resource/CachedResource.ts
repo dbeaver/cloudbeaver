@@ -351,9 +351,14 @@ export abstract class CachedResource<
       }
     }
 
-    return this.metadata.some(
-      param,
-      metadata => !metadata.loaded || metadata.outdated || !!includes?.some(include => metadata.outdatedIncludes.includes(include)),
+    // TODO: this.metadata.size for some reason returns 0 when there is values
+    const size = [...this.metadata.values()].length;
+    return (
+      size === 0 ||
+      this.metadata.some(
+        param,
+        metadata => !metadata.loaded || metadata.outdated || !!includes?.some(include => metadata.outdatedIncludes.includes(include)),
+      )
     );
   }
 

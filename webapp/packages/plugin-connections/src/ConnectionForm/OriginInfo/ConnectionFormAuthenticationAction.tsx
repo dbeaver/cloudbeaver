@@ -22,9 +22,6 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
     ConnectionFormAuthenticationAction,
     ConnectionInfoAuthPropertiesResource,
     optionsPart.connectionKey,
-    {
-      active: !!optionsPart.connectionKey,
-    },
   );
   const info = connectionInfoAuthPropertiesService.data;
   const driver = driverMap.data;
@@ -61,9 +58,7 @@ export const ConnectionFormAuthenticationAction: PlaceholderComponent<IConnectio
 }) {
   const optionsPart = getConnectionFormOptionsPart(formState);
   const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, optionsPart.state.driverId || null);
-  const connectionInfoService = useResource(ConnectionFormAuthenticationAction, ConnectionInfoAuthPropertiesResource, optionsPart.connectionKey, {
-    active: !!optionsPart.connectionKey,
-  });
+  const connectionInfoService = useResource(ConnectionFormAuthenticationAction, ConnectionInfoAuthPropertiesResource, optionsPart.connectionKey);
   const driver = driverMap.data;
   const { data: authModel } = useResource(
     ConnectionFormAuthenticationAction,
