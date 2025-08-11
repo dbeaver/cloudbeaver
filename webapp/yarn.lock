@@ -1507,8 +1507,8 @@ __metadata:
     "@cloudbeaver/tests-runner": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
-    "@dbeaver/js-helpers": "workspace:^"
-    "@dbeaver/ui-kit": "workspace:^"
+    "@dbeaver/js-helpers": "workspace:*"
+    "@dbeaver/ui-kit": "workspace:*"
     "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
     "@types/react": "npm:^19"
@@ -1950,6 +1950,7 @@ __metadata:
     "@cloudbeaver/core-utils": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
+    "@dbeaver/react-tests": "workspace:^"
     mobx: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
@@ -4501,7 +4502,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/js-helpers@workspace:../common-typescript/@dbeaver/js-helpers, @dbeaver/js-helpers@workspace:^":
+"@dbeaver/js-helpers@workspace:*, @dbeaver/js-helpers@workspace:../common-typescript/@dbeaver/js-helpers, @dbeaver/js-helpers@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/js-helpers@workspace:../common-typescript/@dbeaver/js-helpers"
   dependencies:
@@ -4592,7 +4593,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/ui-kit@workspace:../common-react/@dbeaver/ui-kit, @dbeaver/ui-kit@workspace:^":
+"@dbeaver/ui-kit@workspace:*, @dbeaver/ui-kit@workspace:../common-react/@dbeaver/ui-kit, @dbeaver/ui-kit@workspace:^":
   version: 0.0.0-use.local
   resolution: "@dbeaver/ui-kit@workspace:../common-react/@dbeaver/ui-kit"
   dependencies:
