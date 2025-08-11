@@ -1,6 +1,6 @@
 @import './_base.css';
 
-@layer base.base {
+@layer base {
   .dbv-kit-combobox {
     display: flex;
     align-items: center;
@@ -19,21 +19,19 @@
     border-style: var(--dbv-kit-combobox-border-style);
     font-weight: var(--dbv-kit-combobox-font-weight);
     font-size: var(--dbv-kit-combobox-font-size);
-    outline-width: var(--dbv-kit-control-outline-width);
-    outline-offset: var(--dbv-kit-control-outline-offset);
-    outline-color: var(--dbv-kit-control-outline-color);
-  }
 
-  &:hover {
-    border-color: var(--dbv-kit-color-control-hover);
-  }
+    &:not(:disabled):hover {
+      border-color: var(--dbv-kit-combobox-hover-border-color);
+    }
 
-  &[aria-disabled='true'] {
-    opacity: var(--dbv-kit-control-disabled-opacity);
-  }
-  &[data-focus-visible],
-  &:focus-visible {
-    outline-style: solid;
+    &[aria-disabled='true'] {
+      opacity: var(--dbv-kit-control-disabled-opacity);
+    }
+    &[data-focus-visible],
+    &:focus-visible {
+      outline-offset: var(--dbv-kit-control-outline-offset);
+      outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-control-outline-color);
+    }
   }
 
   .dbv-kit-combobox__popover {

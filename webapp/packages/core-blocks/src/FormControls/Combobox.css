@@ -20,4 +20,15 @@
     --dbv-kit-combobox-item-hover-foreground: var(--theme-input-color);
     --dbv-kit-combobox-item-selected-background: none;
   }
+
+  .dbv-kit-combobox__item {
+    --tw-leading: 1;
+
+    display: flex;
+    align-items: center;
+    padding-inline: calc(var(--tw-spacing) * 3);
+    padding-block: calc(var(--tw-spacing) * 2);
+    gap: calc(var(--tw-spacing) * 2);
+    line-height: 1;
+  }
 }

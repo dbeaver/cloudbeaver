@@ -208,7 +208,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
                   disabled={itemDisabled}
                   title={itemTitle}
                   setValueOnClick={false}
-                  className={clsx('tw:flex tw:items-center tw:gap-2 tw:py-2 tw:px-3 tw:leading-none', {
+                  className={clsx({
                     'tw:cursor-pointer': !itemDisabled,
                     'tw:cursor-not-allowed': itemDisabled,
                   })}
