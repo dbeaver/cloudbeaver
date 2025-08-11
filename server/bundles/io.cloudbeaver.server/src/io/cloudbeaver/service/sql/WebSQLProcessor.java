@@ -276,7 +276,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     }
                 });
             } else {
-                throw new DBException("SQL elements of type '" + element.getClass().getSimpleName() + "' are nto supported");
+                executeInfo.setResults(new WebSQLQueryResults[0]);
             }
         } catch (DBException e) {
             throw new DBWebException("Error executing query", e);
