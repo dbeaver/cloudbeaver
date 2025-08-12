@@ -17,9 +17,10 @@
 package io.cloudbeaver.service.sql;
 
 
+import io.cloudbeaver.model.session.WebSession;
 import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.sql.SQLModelPreferences;
 import org.jkiss.dbeaver.model.sql.completion.SQLCompletionRequest;
 import org.jkiss.dbeaver.model.sql.parser.SQLParserContext;
 import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
@@ -33,7 +34,7 @@ public class WebSQLCompletionContextScriptParser {
 
     @NotNull
     public static SQLQueryCompletionContext obtainCompletionContext(
-        DBRProgressMonitor monitor,
+        WebSession webSession,
         @NotNull String query,
         int position,
         SQLCompletionRequest request
@@ -56,10 +57,10 @@ public class WebSQLCompletionContextScriptParser {
             for (var item : scriptItems) {
                 var model = SQLQueryModelRecognizer.recognizeQuery(
                     new SQLQueryRecognitionContext(
-                        monitor,
+                        webSession.getProgressMonitor(),
                         request.getContext().getExecutionContext(),
                         true,
-                        false,
+                        webSession.getUserPreferenceStore().getBoolean(SQLModelPreferences.VALIDATE_FUNCTIONS),
                         request.getContext().getSyntaxManager(),
                         request.getContext().getDataSource().getSQLDialect()
                     ),

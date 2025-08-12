@@ -60,7 +60,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ fo
   const enabled = handlerState.enabled || false;
   const optionsPart = getConnectionFormOptionsPart(formState);
   const connectionInfoNetworkHandlersService = useResource(SSL, ConnectionInfoNetworkHandlersResource, optionsPart.connectionKey, {
-    active: selected && !!optionsPart.connectionKey,
+    active: selected,
   });
   const handlersInfo = connectionInfoNetworkHandlersService.data;
   const initialHandler = handlersInfo?.networkHandlersConfig?.find(h => h.id === handler.id);

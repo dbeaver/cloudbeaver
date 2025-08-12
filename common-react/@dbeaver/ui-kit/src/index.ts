@@ -35,6 +35,7 @@ export {
   type SelectPopoverProps,
   type SelectItemProps,
 } from './Select/Select.js';
+export * from './Combobox/Combobox.js';
 export { SelectField, type SelectFieldProps, type SelectItem } from './Select/SelectField.js';
 export { Spinner, type SpinnerProps } from './Spinner/Spinner.js';
 export { Radio, RadioGroup, useRadioContext, useRadioStore, type RadioProviderProps, type RadioProps, type RadioGroupProps } from './Radio/index.js';

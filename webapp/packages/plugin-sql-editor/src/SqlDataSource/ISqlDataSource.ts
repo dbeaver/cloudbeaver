@@ -29,7 +29,7 @@ export interface ISqlEditorCursor {
   readonly head: number;
 }
 
-export interface ISqlDataSource extends ILoadableState {
+export interface ISqlDataSource<TDataSource extends QueryDataSource = QueryDataSource> extends ILoadableState {
   readonly name: string | null;
   readonly icon?: string;
   readonly emptyPlaceholder?: string;
@@ -43,7 +43,7 @@ export interface ISqlDataSource extends ILoadableState {
   readonly incomingScript?: string;
   readonly history: ISqlDataSourceHistory;
 
-  readonly databaseModels: IDatabaseDataModel<QueryDataSource>[];
+  readonly databaseModels: IDatabaseDataModel<TDataSource>[];
   readonly executionContext?: IConnectionExecutionContextInfo;
 
   readonly isAutoSaveEnabled: boolean;
@@ -54,7 +54,7 @@ export interface ISqlDataSource extends ILoadableState {
 
   readonly onUpdate: ISyncExecutor;
   readonly onSetScript: ISyncExecutor<ISetScriptData>;
-  readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<QueryDataSource>[]>;
+  readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<TDataSource>[]>;
 
   isOpened(): boolean;
   isReadonly(): boolean;

@@ -29,6 +29,8 @@ public interface DBWConstants {
     String PERMISSION_CONFIGURATION_MANAGER = RMConstants.PERMISSION_CONFIGURATION_MANAGER;
     String PERMISSION_PRIVATE_PROJECT_ACCESS = "private-project-access";
     String PERMISSION_SECRET_MANAGER = "secret-manager";
+    String PERMISSION_SQL_RESULT_UPDATE = "sql-result-update";
+    String PERMISSION_SQL_EXECUTE_QUERY = "sql-execute-query";
 
     String GLOBAL_PERMISSION_SCRIPT_EXECUTE = "permission.sql.script.execution";
 

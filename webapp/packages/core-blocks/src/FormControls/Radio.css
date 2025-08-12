@@ -26,9 +26,9 @@
 
     --dbv-kit-radio-inactive-border: color-mix(in srgb, var(--theme-on-secondary), white 30%);
     --dbv-kit-radio-hover-shadow-color: color-mix(in srgb, var(--theme-on-secondary), white 80%);
+  }
 
-    &__title {
-      white-space: nowrap;
-    }
+  .dbv-kit-radio__title {
+    white-space: nowrap;
   }
 }
