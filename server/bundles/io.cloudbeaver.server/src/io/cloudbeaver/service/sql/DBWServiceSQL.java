@@ -129,7 +129,7 @@ public interface DBWServiceSQL extends DBWService {
     /**
      * Updates result set data (sync function).
      */
-    @WebAction
+    @WebAction(requireGlobalPermissions = DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_EDITING)
     @Deprecated // use async function
     WebSQLExecuteInfo updateResultsDataBatch(
         @NotNull WebSQLContextInfo contextInfo,
@@ -143,7 +143,7 @@ public interface DBWServiceSQL extends DBWService {
     /**
      * Creates async task for updating results data.
      */
-    @WebAction
+    @WebAction(requireGlobalPermissions = DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_EDITING)
     WebAsyncTaskInfo asyncUpdateResultsDataBatch(
         @NotNull WebSession webSession,
         @NotNull WebSQLContextInfo contextInfo,
@@ -172,7 +172,7 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull Integer lobColumnIndex,
         @NotNull WebSQLResultsRow row) throws DBWebException;
 
-    @WebAction
+    @WebAction(requireGlobalPermissions = DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_EDITING)
     String updateResultsDataBatchScript(
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,

@@ -31,7 +31,7 @@ export const Driver = observer<Props>(function Driver({ driver, onSelect }) {
   const styles = useS(style);
 
   return (
-    <ListItem onClick={select}>
+    <ListItem title={driver.description} onClick={select}>
       <ListItemIcon className={s(styles, { icon: true })}>
         <StaticImage icon={driver.icon} className={s(styles, { staticImage: true })} />
         {!driver.driverInstalled && (
@@ -41,7 +41,7 @@ export const Driver = observer<Props>(function Driver({ driver, onSelect }) {
         )}
       </ListItemIcon>
       <ListItemName>{driver.name}</ListItemName>
-      <ListItemDescription title={driver.description}>{driver.description}</ListItemDescription>
+      <ListItemDescription>{driver.description}</ListItemDescription>
     </ListItem>
   );
 });

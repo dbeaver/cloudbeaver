@@ -1,8 +1,5 @@
----
-to: <%= name %>/package.json
----
 {
-  "name": "@cloudbeaver/<%= name %>",
+  "name": "@cloudbeaver/plugin-data-editor-public-settings",
   "type": "module",
   "sideEffects": [
     "src/**/*.css",
@@ -23,15 +20,20 @@ to: <%= name %>/package.json
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*",
+    "@cloudbeaver/core-localization": "workspace:*",
+    "@cloudbeaver/core-root": "workspace:*",
+    "@cloudbeaver/core-settings": "workspace:*",
+    "@cloudbeaver/core-utils": "workspace:*",
+    "@cloudbeaver/plugin-data-import": "workspace:*",
+    "@cloudbeaver/plugin-data-viewer": "workspace:*"
   },
-  "peerDependencies": {},
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
     "rimraf": "^6",
-    "typescript": "^5",
-    "tslib": "^2"
+    "tslib": "^2",
+    "typescript": "^5"
   }
 }

@@ -5,16 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-export const dataViewerResultTraceDetailsPlugin: PluginManifest = {
+export const pluginDataEditorPublicSettingsManifest: PluginManifest = {
   info: {
-    name: 'Result trace details Data Editor plugin',
+    name: 'Plugin data editor settings',
   },
 
   providers: [
-    () => import('./DVResultTraceDetailsBootstrap.js').then(m => m.DVResultTraceDetailsBootstrap),
-    () => import('./DVResultTraceDetailsService.js').then(m => m.DVResultTraceDetailsService),
+    () => import('./PluginDataEditorPublicSettingsBootstrap.js').then(m => m.PluginDataEditorPublicSettingsBootstrap),
     () => import('./LocaleService.js').then(m => m.LocaleService),
   ],
 };

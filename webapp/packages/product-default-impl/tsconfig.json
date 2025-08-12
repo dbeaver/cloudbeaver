@@ -59,6 +59,9 @@
       "path": "../plugin-connections-administration"
     },
     {
+      "path": "../plugin-data-editor-public-settings"
+    },
+    {
       "path": "../plugin-data-export"
     },
     {

@@ -1,7 +1,3 @@
----
-to: <%= name %>/tsconfig.json
----
-
 {
   "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
@@ -12,7 +8,7 @@ to: <%= name %>/tsconfig.json
   },
   "references": [
     {
-      "path": "<%= isEE ? '../../../../cloudbeaver/common-typescript/@dbeaver/cli' : '../../../common-typescript/@dbeaver/cli' %>"
+      "path": "../../../common-typescript/@dbeaver/cli"
     },
     {
       "path": "../core-cli"
@@ -22,6 +18,24 @@ to: <%= name %>/tsconfig.json
     },
     {
       "path": "../core-di/tsconfig.json"
+    },
+    {
+      "path": "../core-localization"
+    },
+    {
+      "path": "../core-root"
+    },
+    {
+      "path": "../core-settings"
+    },
+    {
+      "path": "../core-utils"
+    },
+    {
+      "path": "../plugin-data-import"
+    },
+    {
+      "path": "../plugin-data-viewer"
     }
   ],
   "include": [

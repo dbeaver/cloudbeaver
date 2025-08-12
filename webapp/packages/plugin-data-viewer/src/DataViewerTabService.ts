@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -105,11 +105,11 @@ export class DataViewerTabService {
         trySwitchPage(this.page);
       }
     } catch (exception: any) {
-      this.notificationService.logException(exception, 'Data Viewer Error', 'Error in Data Viewer while processing action with database node');
+      this.notificationService.logException(exception, 'Data Editor Error', 'Error in Data Editor while processing action with database node');
     }
   }
 
-  private async handleTabRestore(tab: ITab<IObjectViewerTabState>) {
+  private handleTabRestore(tab: ITab<IObjectViewerTabState>) {
     return true;
   }
 
