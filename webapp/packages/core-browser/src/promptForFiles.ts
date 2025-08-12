@@ -31,13 +31,13 @@ export function promptForFiles({ multiple = false, accept }: { multiple?: boolea
 
     let settled = false;
 
-    const cleanup = () => {
+    function cleanup() {
       window.removeEventListener('focus', onWindowFocus, true);
       document.removeEventListener('visibilitychange', onVisibilityChange, true);
       if (input.isConnected) {
         document.body.removeChild(input);
       }
-    };
+    }
 
     function settleOk(files: File[]) {
       if (!settled) {
@@ -63,20 +63,22 @@ export function promptForFiles({ multiple = false, accept }: { multiple?: boolea
       }
     });
 
-    const afterPickerClosedCheck = () => {
+    function afterPickerClosedCheck() {
       setTimeout(() => {
         if (!settled) {
           settleErr(new Error('No files selected'));
         }
       }, 1000);
-    };
+    }
 
-    const onWindowFocus = () => afterPickerClosedCheck();
-    const onVisibilityChange = () => {
+    function onWindowFocus() {
+      afterPickerClosedCheck();
+    }
+    function onVisibilityChange() {
       if (document.visibilityState === 'visible') {
         afterPickerClosedCheck();
       }
-    };
+    }
 
     window.addEventListener('focus', onWindowFocus, true);
     document.addEventListener('visibilitychange', onVisibilityChange, true);
