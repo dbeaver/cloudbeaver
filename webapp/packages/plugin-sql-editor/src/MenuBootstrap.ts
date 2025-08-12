@@ -169,6 +169,7 @@ export class MenuBootstrap extends Bootstrap {
               ...action.info,
               icon: '/icons/export.svg',
               label: 'sql_editor_download_script_tooltip',
+              tooltip: 'sql_editor_download_script_tooltip',
             };
 
           case ACTION_UPLOAD:
@@ -176,6 +177,7 @@ export class MenuBootstrap extends Bootstrap {
               ...action.info,
               icon: '/icons/import.svg',
               label: 'sql_editor_upload_script_tooltip',
+              tooltip: 'sql_editor_upload_script_tooltip',
             };
         }
         return action.info;
