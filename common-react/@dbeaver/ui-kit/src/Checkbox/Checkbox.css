@@ -47,11 +47,14 @@
     outline-offset: var(--dbv-kit-control-outline-offset);
     outline-width: var(--dbv-kit-control-outline-width);
     outline-color: var(--dbv-kit-control-outline-color);
-    transition-property: stroke-dashoffset;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
     stroke-dasharray: 20;
     stroke-dashoffset: 20;
+
+    @media (prefers-reduced-motion: no-preference) {
+      transition-property: stroke-dashoffset;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-duration: 150ms;
+    }
 
     &[data-focus-visible] {
       outline-style: solid;
