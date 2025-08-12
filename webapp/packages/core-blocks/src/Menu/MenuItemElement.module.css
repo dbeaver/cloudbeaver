@@ -28,6 +28,7 @@
     max-width: 160px;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: var(--theme-text-hint-on-light);
 
     &:empty {
       padding: 0;
