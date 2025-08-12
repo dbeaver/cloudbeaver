@@ -24,7 +24,8 @@
     flex: 1;
     text-align: right;
     padding-left: 32px;
-    width: 130px;
+    min-width: 80px;
+    max-width: 130px;
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -57,7 +58,8 @@
 }
 
 .menuBox:not([data-s-has-bindings='true']) .menuItemBinding {
-  width: 0;
+  min-width: 0;
+  max-width: 0;
 }
 
 .menuBox[dir='rtl'] {
