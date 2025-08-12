@@ -17,6 +17,7 @@
 
 package io.cloudbeaver;
 
+import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -37,9 +38,7 @@ import org.jkiss.dbeaver.registry.DataSourceConfigurationManager;
 import org.jkiss.dbeaver.registry.DataSourcePersistentRegistry;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -49,11 +48,18 @@ import java.util.stream.Collectors;
  */
 public class WebGlobalProjectRegistryProxy implements DBPDataSourceRegistry, DataSourcePersistentRegistry, DBPDataSourceRegistryCache {
     @NotNull
+    private final WebSession webSession;
+    @NotNull
     private final DataSourceFilter dataSourceFilter;
     @NotNull
     private final DataSourceRegistry<?> dataSourceRegistry;
 
-    public WebGlobalProjectRegistryProxy(@NotNull DataSourceRegistry<?> dataSourceRegistry, @NotNull DataSourceFilter filter) {
+    public WebGlobalProjectRegistryProxy(
+        @NotNull WebSession webSession,
+        @NotNull DataSourceRegistry<?> dataSourceRegistry,
+        @NotNull DataSourceFilter filter
+    ) {
+        this.webSession = webSession;
         this.dataSourceRegistry = dataSourceRegistry;
         this.dataSourceFilter = filter;
     }
@@ -181,13 +187,30 @@ public class WebGlobalProjectRegistryProxy implements DBPDataSourceRegistry, Dat
     @NotNull
     @Override
     public List<? extends DBPDataSourceFolder> getAllFolders() {
-        return dataSourceRegistry.getAllFolders();
+        if (webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
+            return dataSourceRegistry.getAllFolders();
+        }
+        Set<DBPDataSourceFolder> set = new LinkedHashSet<>();
+        for (DBPDataSourceContainer container : getDataSources()) {
+            DBPDataSourceFolder folder = container.getFolder();
+            while (folder != null) {
+                set.add(folder);
+                folder = folder.getParent();
+            }
+        }
+        return new ArrayList<>(set);
     }
 
     @NotNull
     @Override
     public List<? extends DBPDataSourceFolder> getRootFolders() {
-        return dataSourceRegistry.getRootFolders();
+        if (webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
+            return dataSourceRegistry.getRootFolders();
+        }
+        return getDataSources().stream()
+            .map(DBPDataSourceContainer::getFolder)
+            .filter(folder -> folder != null && folder.getParent() == null)
+            .toList();
     }
 
     @NotNull
