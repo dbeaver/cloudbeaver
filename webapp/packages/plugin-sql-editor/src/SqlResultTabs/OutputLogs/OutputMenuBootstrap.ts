@@ -20,7 +20,7 @@ import { OUTPUT_LOGS_SETTINGS_MENU } from './OUTPUT_LOGS_SETTINGS_MENU.js';
 import { OutputLogsService } from './OutputLogsService.js';
 import { ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS } from './ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS.js';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from '../../SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA.js';
-import { SQL_EDITOR_TOOLS_MORE_MENU } from '../../SqlEditor/SQL_EDITOR_TOOLS_MORE_MENU.js';
+import { SQL_EDITOR_ACTIONS_MENU } from '../../SqlEditor/SQL_EDITOR_ACTIONS_MENU.js';
 
 @injectable()
 export class OutputMenuBootstrap extends Bootstrap {
@@ -146,7 +146,7 @@ export class OutputMenuBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      menus: [SQL_EDITOR_TOOLS_MORE_MENU],
+      menus: [SQL_EDITOR_ACTIONS_MENU],
       getItems: (context, items) => [...items, ACTION_SQL_EDITOR_SHOW_OUTPUT],
     });
 

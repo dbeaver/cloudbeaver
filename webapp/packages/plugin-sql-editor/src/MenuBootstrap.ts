@@ -136,7 +136,7 @@ export class MenuBootstrap extends Bootstrap {
       },
     });
     this.menuService.addCreator({
-      menus: [SQL_EDITOR_TOOLS_MORE_MENU],
+      menus: [SQL_EDITOR_TOOLS_MENU],
       contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
       getItems: (context, items) => [...items, ACTION_DOWNLOAD, ACTION_UPLOAD],
     });
