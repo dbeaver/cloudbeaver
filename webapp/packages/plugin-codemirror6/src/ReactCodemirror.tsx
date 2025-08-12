@@ -226,7 +226,10 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
         }
 
         if (transaction.selection) {
-          view.dispatch({ selection: transaction.selection });
+          view.dispatch({ selection: transaction.selection, scrollIntoView: true });
+          if (!view.hasFocus) {
+            view.focus();
+          }
         }
       }
     });
