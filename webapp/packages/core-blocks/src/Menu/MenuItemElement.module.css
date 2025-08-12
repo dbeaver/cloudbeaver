@@ -64,7 +64,6 @@
 
 .menuBox[data-s-has-bindings='false'] .menuItemBinding {
   min-width: 0;
-  max-width: 0;
 }
 
 .menuBox[dir='rtl'] {
