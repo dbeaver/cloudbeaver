@@ -30,6 +30,7 @@ import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.sql.WebSQLResultsInfo;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 import java.io.OutputStream;
@@ -60,7 +61,7 @@ public interface DBWServiceDataTransfer extends DBWService {
         @NotNull WebSQLResultsInfo webSQLResultsInfo,
         @NotNull WebSession webSession) throws DBWebException;
 
-    @WebAction
+    @WebAction(requireGlobalPermissions = RMConstants.GLOBAL_PERMISSION_DATA_EDITOR_EXPORT)
     WebAsyncTaskInfo dataTransferExportDataFromResults(
         WebSQLContextInfo sqlContextInfo,
         String resultsId,

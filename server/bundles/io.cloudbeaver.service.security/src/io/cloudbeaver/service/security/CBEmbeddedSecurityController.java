@@ -31,7 +31,9 @@ import io.cloudbeaver.service.security.bruteforce.BruteForceUtils;
 import io.cloudbeaver.service.security.bruteforce.UserLoginRecord;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
+import io.cloudbeaver.service.security.internal.CBAuthSubjectRepo;
 import io.cloudbeaver.service.security.internal.SMTokenInfo;
+import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -56,7 +58,6 @@ import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDisabledEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
-import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSAuthEvent;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -3020,13 +3021,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             log.error("Subject type is not found for subject '" + subjectId + "'");
             return;
         }
-        var event = WSSubjectPermissionEvent.update(
-            getSmSessionId(),
-            getUserId(),
-            subjectType,
-            subjectId
-        );
-        application.getEventController().addEvent(event);
+        WebEventUtils.addSubjectPermissionsUpdateEvent(subjectId, subjectType, getSmSessionId(), getUserId());
     }
 
     private void addObjectPermissionsUpdateEvent(@NotNull Set<String> objectIds, @NotNull SMObjectType objectType) {
@@ -3428,16 +3423,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     protected SMSubjectType getSubjectType(@NotNull String subjectId) {
         try (Connection dbCon = database.openConnection()) {
-            String sqlBuilder = "SELECT SUBJECT_TYPE FROM {table_prefix}CB_AUTH_SUBJECT U WHERE SUBJECT_ID = ?";
-            try (var dbStat = dbCon.prepareStatement(sqlBuilder)) {
-                dbStat.setString(1, subjectId);
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    if (dbResult.next()) {
-                        return SMSubjectType.fromCode(dbResult.getString(1));
-                    }
-                }
-            }
-            return null;
+            return CBAuthSubjectRepo.getInstance().getSubjectType(dbCon, subjectId);
         } catch (SQLException e) {
             log.error("Error getting all subject ids from database", e);
             return null;
