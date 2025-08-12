@@ -35,7 +35,6 @@ import { ACTION_SQL_EDITOR_EXECUTE_NEW } from './actions/ACTION_SQL_EDITOR_EXECU
 import { ACTION_SQL_EDITOR_EXECUTE_SCRIPT } from './actions/ACTION_SQL_EDITOR_EXECUTE_SCRIPT.js';
 import { ACTION_SQL_EDITOR_FORMAT } from './actions/ACTION_SQL_EDITOR_FORMAT.js';
 import { ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN } from './actions/ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN.js';
-import { ACTION_SQL_EDITOR_SHOW_OUTPUT } from './actions/ACTION_SQL_EDITOR_SHOW_OUTPUT.js';
 import { KEY_BINDING_SQL_EDITOR_EXECUTE } from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE.js';
 import { KEY_BINDING_SQL_EDITOR_EXECUTE_NEW } from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_NEW.js';
 import { KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT.js';
@@ -223,7 +222,6 @@ export class MenuBootstrap extends Bootstrap {
         ACTION_REDO,
         ACTION_UNDO,
         ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
-        ACTION_SQL_EDITOR_SHOW_OUTPUT,
       ],
       contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       isActionApplicable: (contexts, action): boolean => {
@@ -240,7 +238,6 @@ export class MenuBootstrap extends Bootstrap {
             ACTION_SQL_EDITOR_EXECUTE_NEW,
             ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
             ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
-            ACTION_SQL_EDITOR_SHOW_OUTPUT,
           ].includes(action)
         ) {
           return false;

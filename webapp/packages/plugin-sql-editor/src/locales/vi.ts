@@ -15,7 +15,7 @@ export default [
   ['sql_editor_hint_empty', 'Không có đề xuất nào...'],
   ['sql_editor_tools_more_menu_tooltip', 'Nhiều công cụ hơn'],
   ['sql_editor_execution_plan_button_tooltip', 'Giải thích kế hoạch thực thi (Shift + Ctrl + E)'],
-  ['sql_editor_output_logs_button_tooltip', 'Hiển thị đầu ra máy chủ'],
+  ['sql_editor_output_logs_button_tooltip', 'Hiển thị đầu ra máy chủ (Shift + Ctrl + O)'],
   ['sql_editor_output_logs_tab_title', 'Đầu ra'],
   ['sql_editor_output_logs_input_placeholder', 'Nhập một phần của tin nhắn để tìm kiếm tại đây'],
   ['sql_editor_output_logs_wrap_mode', 'Chế độ wrap'],

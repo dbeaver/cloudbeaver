@@ -14,7 +14,7 @@ export default [
   ['sql_editor_hint_empty', "Il n'y a aucune proposition..."],
   ['sql_editor_tools_more_menu_tooltip', "Plus d'outils"],
   ['sql_editor_execution_plan_button', "Afficher le plan d'exécution (Shift + Ctrl + E)"],
-  ['sql_editor_output_logs_button_tooltip', 'Afficher la sortie du serveur'],
+  ['sql_editor_output_logs_button_tooltip', 'Afficher la sortie du serveur (Shift + Ctrl + O)'],
   ['sql_editor_output_logs_tab_title', 'Journaux'],
   ['sql_editor_output_logs_hint', 'Aucun message du serveur'],
   ['sql_editor_output_logs_wrap_mode', 'Mode Wrap'],
