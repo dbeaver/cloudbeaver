@@ -1,0 +1,35 @@
+@layer base {
+  :root {
+    --dbv-kit-combobox-height: var(--dbv-kit-control-height-medium);
+    --dbv-kit-combobox-padding-inline: calc(var(--tw-spacing) * 2.5);
+
+    --dbv-kit-combobox-foreground: var(--dbv-kit-color-foreground);
+    --dbv-kit-combobox-background: var(--dbv-kit-color-background);
+    --dbv-kit-combobox-disabled-foreground: var(--dbv-kit-control-disabled-foreground);
+    --dbv-kit-combobox-disabled-background: var(--dbv-kit-control-disabled-background);
+
+    --dbv-kit-combobox-border-width: var(--dbv-kit-control-border-width);
+    --dbv-kit-combobox-border-color: var(--dbv-kit-color-control-inactive);
+    --dbv-kit-combobox-border-style: solid;
+    --dbv-kit-combobox-border-radius: var(--dbv-kit-control-border-radius);
+    --dbv-kit-combobox-hover-border-color: var(--dbv-kit-color-control-hover);
+
+    --dbv-kit-combobox-font-weight: var(--tw-font-weight-normal);
+    --dbv-kit-combobox-font-size: calc(var(--dbv-kit-font-size-base) * 0.875);
+
+    --dbv-kit-combobox-label-foreground: var(--dbv-kit-color-control-label);
+    --dbv-kit-combobox-label-padding-inline: var(--tw-spacing);
+
+    --dbv-kit-combobox-popover-background: var(--dbv-kit-color-background);
+    --dbv-kit-combobox-popover-foreground: var(--dbv-kit-color-foreground);
+    --dbv-kit-combobox-popover-shadow: var(--tw-shadow-md);
+    --dbv-kit-combobox-popover-height: calc(var(--tw-spacing) * 80);
+
+    --dbv-kit-combobox-item-foreground: var(--tw-color-gray-500);
+    --dbv-kit-combobox-item-padding-inline: calc(var(--tw-spacing) * 3);
+    --dbv-kit-combobox-item-padding-block: var(--tw-spacing);
+    --dbv-kit-combobox-item-hover-background: var(--tw-color-gray-200);
+    --dbv-kit-combobox-item-hover-foreground: var(--dbv-kit-combobox-foreground);
+    --dbv-kit-combobox-item-selected-background: var(--dbv-kit-color-primary-100);
+  }
+}

@@ -30,8 +30,8 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
   abstract get script(): string;
   abstract get baseScript(): string;
 
-  abstract get baseExecutionContext(): IConnectionExecutionContextInfo | undefined;
   abstract get executionContext(): IConnectionExecutionContextInfo | undefined;
+  abstract get baseExecutionContext(): IConnectionExecutionContextInfo | undefined;
   databaseModels: IDatabaseDataModel<TDataSource>[];
   incomingScript: string | undefined;
   incomingExecutionContext: IConnectionExecutionContextInfo | undefined | null;
@@ -161,13 +161,9 @@ export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = Qu
 
   setIncomingScript(script: string): void {
     if (script !== this.baseScript) {
-      if (this.script === this.baseScript) {
-        this.setBaseScript(script);
-        this.setScript(script);
-      } else {
-        this.incomingScript = script;
-      }
+      this.incomingScript = script;
     } else {
+      this.setBaseScript(script);
       this.incomingScript = undefined;
     }
   }
