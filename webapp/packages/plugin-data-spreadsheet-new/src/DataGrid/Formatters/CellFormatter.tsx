@@ -10,7 +10,7 @@ import { use, useContext } from 'react';
 import { DataGridCellInnerContext } from '@cloudbeaver/plugin-data-grid';
 
 import { getComputed, s, useObjectRef, useS } from '@cloudbeaver/core-blocks';
-import { DatabaseEditChangeType, type IDataPresentationActions, type IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
+import type { IDataPresentationActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellContext } from '../CellRenderer/CellContext.js';
 import { DataGridContext } from '../DataGridContext.js';
@@ -44,26 +44,6 @@ export const CellFormatter = observer<Props>(function CellFormatter({ rowIdx, co
       if (colIdx !== -1) {
         context.getDataGridApi()?.openEditor({ colIdx, rowIdx });
       }
-    },
-    deleteRow(position) {
-      const colIdx = tableDataContext.getColumnIndexFromColumnKey(position.column);
-      const rowIdx = tableDataContext.getRowIndexFromKey(position.row);
-      const editingState = tableDataContext.getEditionState(position);
-
-      tableDataContext.editor.deleteRow(position.row);
-
-      if (editingState === DatabaseEditChangeType.add) {
-        if (rowIdx - 1 > 0) {
-          context.getDataGridApi()?.selectCell({ colIdx, rowIdx: rowIdx - 1 });
-        }
-      } else {
-        if (rowIdx + 1 < tableDataContext.rows.length) {
-          setTimeout(() => context.getDataGridApi()?.selectCell({ colIdx, rowIdx: rowIdx + 1 }), 1);
-        }
-      }
-    },
-    focus() {
-      context.focus();
     },
   });
 

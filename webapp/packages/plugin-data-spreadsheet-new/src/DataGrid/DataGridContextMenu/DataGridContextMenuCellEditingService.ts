@@ -69,7 +69,6 @@ export class DataGridContextMenuCellEditingService {
     this.actionService.addHandler({
       id: 'data-grid-editing-base-handler',
       menus: [MENU_DATA_GRID_EDITING],
-      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
       isActionApplicable(context, action) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
@@ -166,7 +165,6 @@ export class DataGridContextMenuCellEditingService {
             break;
           case ACTION_DATA_GRID_EDITING_SET_TO_NULL:
             editor.set(key, null);
-            actions.focus();
             break;
           case ACTION_DATA_GRID_EDITING_ADD_ROW:
             editor.addRow(key.row);
@@ -175,14 +173,13 @@ export class DataGridContextMenuCellEditingService {
             editor.duplicateRow(key);
             break;
           case ACTION_DATA_GRID_EDITING_DELETE_ROW:
-            actions.deleteRow(key);
+            editor.deleteRow(key.row);
             break;
           case ACTION_DATA_GRID_EDITING_DELETE_SELECTED_ROW:
             editor.delete(...selectedElements);
             break;
           case ACTION_DATA_GRID_EDITING_REVERT_ROW:
             editor.revert(key);
-            actions.focus();
             break;
           case ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW:
             editor.revert(...selectedElements);

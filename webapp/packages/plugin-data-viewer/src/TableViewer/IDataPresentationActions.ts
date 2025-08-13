@@ -8,6 +8,4 @@
 
 export interface IDataPresentationActions<TKey> {
   edit: (key: TKey) => void;
-  deleteRow: (key: TKey) => void;
-  focus: () => void;
 }
