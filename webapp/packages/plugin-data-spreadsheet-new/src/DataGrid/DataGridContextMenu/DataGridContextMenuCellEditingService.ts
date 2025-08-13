@@ -30,7 +30,6 @@ import { ACTION_DATA_GRID_EDITING_DUPLICATE_ROW } from '../Actions/Editing/ACTIO
 import { ACTION_DATA_GRID_EDITING_REVERT_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_REVERT_ROW.js';
 import { ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW.js';
 import { ACTION_DATA_GRID_EDITING_SET_TO_NULL } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_SET_TO_NULL.js';
-import { DATA_CONTEXT_DATA_GRID } from '../DATA_CONTEXT_DATA_GRID.js';
 import { MENU_DATA_GRID_EDITING } from './MENU_DATA_GRID_EDITING.js';
 
 @injectable()
@@ -43,7 +42,7 @@ export class DataGridContextMenuCellEditingService {
   register(): void {
     this.menuService.addCreator({
       root: true,
-      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY, DATA_CONTEXT_DATA_GRID],
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
       isApplicable: context => {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
@@ -70,7 +69,7 @@ export class DataGridContextMenuCellEditingService {
     this.actionService.addHandler({
       id: 'data-grid-editing-base-handler',
       menus: [MENU_DATA_GRID_EDITING],
-      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY, DATA_CONTEXT_DATA_GRID],
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX, DATA_CONTEXT_DV_RESULT_KEY],
       isActionApplicable(context, action) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
@@ -186,15 +185,6 @@ export class DataGridContextMenuCellEditingService {
           case ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW:
             editor.revert(...selectedElements);
             break;
-        }
-
-        if (action === ACTION_DATA_GRID_EDITING_SET_TO_NULL ||
-          action === ACTION_DATA_GRID_EDITING_REVERT_ROW) {
-          const gridContext = context.get(DATA_CONTEXT_DATA_GRID);
-          setTimeout(() => {
-            // select.focus() doesn't work because the cell is already focused(but not really, it's active in grid, but not in DOM)
-            gridContext?.focus();
-          }, 1);
         }
       },
     });
