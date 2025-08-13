@@ -44,6 +44,7 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellRenderer } from './CellRenderer/CellRenderer.js';
+import { DATA_CONTEXT_DATA_GRID } from './DATA_CONTEXT_DATA_GRID.js';
 import { DataGridContext, type IDataGridContext } from './DataGridContext.js';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext.js';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext.js';
@@ -169,10 +170,6 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     },
   });
 
-  useCaptureViewContext((context, id) => {
-    context.set(DATA_CONTEXT_DV_PRESENTATION, { type: DataViewerPresentationType.Data }, id);
-  });
-
   useLayoutEffect(() => {
     function syncEditor(data: IResultSetEditActionData) {
       const editor = tableData.editor;
@@ -200,6 +197,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         // TODO: we need this delay to update focus after render rows update
         setTimeout(() => {
           handlers.focusCell(data.key);
+          setTimeout(() => restoreFocus(), 1);
         }, 1);
       }
     }
@@ -210,7 +208,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return () => {
       tableData.editor.action.removeHandler(syncEditor);
     };
-  }, [tableData.editor, selectionAction, handlers, tableData]);
+  }, [tableData.editor, selectionAction, handlers, tableData, restoreFocus]);
 
   const handleFocusChange = (position: ICellPosition) => {
     focusedCell.current = position;
@@ -256,6 +254,11 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     }),
     [model, actions, resultIndex, simple, dataGridRef, restoreFocus],
   );
+
+  useCaptureViewContext((context, id) => {
+    context.set(DATA_CONTEXT_DV_PRESENTATION, { type: DataViewerPresentationType.Data }, id);
+    context.set(DATA_CONTEXT_DATA_GRID, { focus: gridContext.focus }, id);
+  });
 
   const columnsCount = useCreateGridReactiveValue(
     () => tableData.columns.length,
