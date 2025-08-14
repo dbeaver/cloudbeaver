@@ -1,18 +1,27 @@
 ---
 to: <%= name %>/tsconfig.json
 ---
-<% isEE = cwd.includes('cloudbeaver-ee'); %>
+
 {
-  "extends": "<%= isEE ? '../../../../cloudbeaver/webapp/tsconfig.base.json' : '../../tsconfig.base.json' %>",
+  "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib",
     "tsBuildInfoFile": "lib/tsconfig.tsbuildinfo",
-    "composite": true,
+    "composite": true
   },
   "references": [
     {
-      "path": "<%= isEE ? '../../../../cloudbeaver/webapp/packages/core-di/tsconfig.json' : '../core-di/tsconfig.json' %>"
+      "path": "<%= isEE ? '../../../../cloudbeaver/common-typescript/@dbeaver/cli' : '../../../common-typescript/@dbeaver/cli' %>"
+    },
+    {
+      "path": "../core-cli"
+    },
+    {
+      "path": "../core-di"
+    },
+    {
+      "path": "../core-di/tsconfig.json"
     }
   ],
   "include": [

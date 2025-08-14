@@ -50,6 +50,7 @@ public class WebSessionGlobalProjectImpl extends WebSessionProjectImpl {
     @Override
     protected DBPDataSourceRegistry createDataSourceRegistry() {
         return new WebGlobalProjectRegistryProxy(
+            webSession,
             createRegistryWithCredentialsProvider(),
             this::isDataSourceAccessible
         );

@@ -32,7 +32,13 @@
       "path": "../core-resource"
     },
     {
+      "path": "../core-root"
+    },
+    {
       "path": "../core-routing"
+    },
+    {
+      "path": "../core-settings"
     },
     {
       "path": "../core-ui"

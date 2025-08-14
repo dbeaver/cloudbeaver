@@ -13,8 +13,6 @@ import { KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT } from '../../actions/bindings/KEY_B
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../../DATA_CONTEXT_SQL_EDITOR_STATE.js';
 import { ESqlDataSourceFeatures } from '../../SqlDataSource/ESqlDataSourceFeatures.js';
 import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService.js';
-import { SQL_EDITOR_ACTIONS_MENU } from '../../SqlEditor/SQL_EDITOR_ACTIONS_MENU.js';
-import { ACTION_SHOW_OUTPUT_LOGS } from './ACTION_SHOW_OUTPUT_LOGS.js';
 import { OUTPUT_LOG_TYPES } from './IOutputLogTypes.js';
 import { OUTPUT_LOGS_FILTER_MENU } from './OUTPUT_LOGS_FILTER_MENU.js';
 import { OUTPUT_LOGS_MENU } from './OUTPUT_LOGS_MENU.js';
@@ -22,6 +20,7 @@ import { OUTPUT_LOGS_SETTINGS_MENU } from './OUTPUT_LOGS_SETTINGS_MENU.js';
 import { OutputLogsService } from './OutputLogsService.js';
 import { ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS } from './ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS.js';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from '../../SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA.js';
+import { SQL_EDITOR_ACTIONS_MENU } from '../../SqlEditor/SQL_EDITOR_ACTIONS_MENU.js';
 
 @injectable()
 export class OutputMenuBootstrap extends Bootstrap {
@@ -120,7 +119,7 @@ export class OutputMenuBootstrap extends Bootstrap {
   private registerOutputLogsAction() {
     this.actionService.addHandler({
       id: 'output-logs-handler',
-      actions: [ACTION_SHOW_OUTPUT_LOGS, ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS],
+      actions: [ACTION_SQL_EDITOR_SHOW_OUTPUT, ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS],
       contexts: [DATA_CONTEXT_SQL_EDITOR_STATE, DATA_CONTEXT_SQL_EDITOR_DATA],
       isActionApplicable: (context): boolean => {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
@@ -136,7 +135,7 @@ export class OutputMenuBootstrap extends Bootstrap {
       handler: (context, action) => {
         const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
-        if (action === ACTION_SHOW_OUTPUT_LOGS) {
+        if (action === ACTION_SQL_EDITOR_SHOW_OUTPUT) {
           this.outputLogsService.showOutputLogs(state);
         }
 
@@ -148,7 +147,7 @@ export class OutputMenuBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [SQL_EDITOR_ACTIONS_MENU],
-      getItems: (context, items) => [...items, ACTION_SHOW_OUTPUT_LOGS],
+      getItems: (context, items) => [...items, ACTION_SQL_EDITOR_SHOW_OUTPUT],
     });
 
     this.keyBindingService.addKeyBindingHandler({

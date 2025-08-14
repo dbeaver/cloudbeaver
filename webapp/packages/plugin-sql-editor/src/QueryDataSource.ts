@@ -17,6 +17,7 @@ import {
   type SqlExecuteInfo,
   type SqlQueryResults,
   type AsyncUpdateResultsDataBatchMutationVariables,
+  type AsyncTaskInfo,
 } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 import {
@@ -190,25 +191,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       firstResultId = this.getPreviousResultId(prevResults, executionContextInfo);
     }
 
-    const task = this.asyncTaskInfoService.create(async () => {
-      const { taskInfo } = await this.graphQLService.sdk.asyncSqlExecuteQuery({
-        projectId: executionContextInfo.projectId,
-        connectionId: executionContextInfo.connectionId,
-        contextId: executionContextInfo.id,
-        query: options.query,
-        resultId: firstResultId,
-        filter: {
-          offset: this.offset,
-          limit,
-          constraints: options.constraints,
-          where: options.whereFilter || undefined,
-        },
-        dataFormat: this.dataFormat,
-        readLogs: options.readLogs,
-      });
-
-      return taskInfo;
-    });
+    const task = this.asyncTaskInfoService.create(() => this.executeQuery(executionContextInfo, options, firstResultId, limit));
 
     this.currentTask = executionContext.run(
       async () => {
@@ -236,6 +219,31 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       this.error = exception;
       throw exception;
     }
+  }
+
+  protected async executeQuery(
+    executionContextInfo: IConnectionExecutionContextInfo,
+    options: TOptions,
+    firstResultId: string | undefined,
+    limit: number,
+  ): Promise<AsyncTaskInfo> {
+    const { taskInfo } = await this.graphQLService.sdk.asyncSqlExecuteQuery({
+      projectId: executionContextInfo.projectId,
+      connectionId: executionContextInfo.connectionId,
+      contextId: executionContextInfo.id,
+      query: options.query,
+      resultId: firstResultId,
+      filter: {
+        offset: this.offset,
+        limit,
+        constraints: options.constraints,
+        where: options.whereFilter || undefined,
+      },
+      dataFormat: this.dataFormat,
+      readLogs: options.readLogs,
+    });
+
+    return taskInfo;
   }
 
   private innerGetResults(
