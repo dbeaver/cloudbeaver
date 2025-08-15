@@ -11,7 +11,7 @@ import { useObjectRef } from '../useObjectRef.js';
 import { toJS } from 'mobx';
 import { useEffect } from 'react';
 
-export function useResourceTracker<TKey>(resource: Resource<any, TKey, any, any>, key: ResourceKey<TKey> | null = null): void {
+export function useResourceTracker<TKey>(resource: Resource<any, TKey, any, any>, key: ResourceKey<TKey> | null): void {
   const state = useObjectRef(
     () => ({
       key: null as ResourceKey<TKey> | null,
