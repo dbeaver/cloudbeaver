@@ -40,8 +40,8 @@ export function useResourceTracker<TKey>(resource: Resource<any, TKey, any, any>
         }
       },
       free() {
+        this.sub?.();
         if (this.key !== null && this.id !== null && this.resource.useTracker.hasUseId(this.id)) {
-          this.sub?.();
           this.resource.useTracker.free(this.key, this.id);
           this.key = null;
           this.id = null;
