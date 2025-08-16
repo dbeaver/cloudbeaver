@@ -8,25 +8,39 @@
 
 import type { Resource, ResourceKey } from '@cloudbeaver/core-resource';
 import { useObjectRef } from '../useObjectRef.js';
-import { toJS } from 'mobx';
+import { reaction, toJS } from 'mobx';
 import { useEffect } from 'react';
 
-export function useResourceTracker<TKey>(resource: Resource<any, TKey, any, any>, key: ResourceKey<TKey> | null = null): void {
+export function useResourceTracker<TKey>(resource: Resource<any, TKey, any, any>, key: ResourceKey<TKey> | null): void {
   const state = useObjectRef(
     () => ({
       key: null as ResourceKey<TKey> | null,
       id: null as string | null,
-      use(key: ResourceKey<TKey> | null): void {
+      sub: null as (() => void) | null,
+      use(key: ResourceKey<TKey> | null, resub = false): void {
         key = toJS(key);
-        if (key !== null && this.key !== null && this.resource.isEqual(key, this.key)) {
+        if (!resub && key !== null && this.key !== null && this.resource.isEqual(key, this.key)) {
           return;
         }
 
         this.free();
-        this.id = key === null ? null : this.resource.useTracker.use(key);
+        const id = key === null ? null : this.resource.useTracker.use(key);
+        this.id = id;
         this.key = key;
+
+        if (id) {
+          this.sub = reaction(
+            () => this.resource.useTracker.hasUseId(id),
+            value => {
+              if (!value) {
+                this.use(key, true);
+              }
+            },
+          );
+        }
       },
       free() {
+        this.sub?.();
         if (this.key !== null && this.id !== null && this.resource.useTracker.hasUseId(this.id)) {
           this.resource.useTracker.free(this.key, this.id);
           this.key = null;
