@@ -32,6 +32,7 @@ import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
+import org.jkiss.utils.CommonUtils;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -201,7 +202,7 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         var sendDataSourceUpdatedEvent = false;
         DBPDataSourceRegistry registry = getDataSourceRegistry();
         // save old connections
-        var oldDataSources = dataSourceIds.stream()
+        Map<String, DataSourceDescriptor> oldDataSources = dataSourceIds.stream()
             .map(registry::getDataSource)
             .filter(Objects::nonNull)
             .collect(Collectors.toMap(
@@ -222,12 +223,18 @@ public class WebSessionProjectImpl extends WebProjectImpl {
                     sendDataSourceUpdatedEvent = true;
                 }
                 case WSDataSourceEvent.UPDATED ->  {
-                    boolean connectionUpdated = !ds.equalSettings(oldDataSources.get(dsId));
-                    if (connectionUpdated) {
+                    DataSourceDescriptor oldDs = oldDataSources.get(dsId);
+                    boolean configurationUpdated = !ds.equalConfiguration(oldDs);
+                    if (configurationUpdated) {
                         sendDataSourceUpdatedEvent = true;
                         WebDataSourceUtils.disconnectDataSource(webSession, ds);
+                    } else if (
+                        !CommonUtils.equalOrEmptyStrings(ds.getName(), oldDs.getName()) ||
+                            !CommonUtils.equalOrEmptyStrings(ds.getName(), oldDs.getDescription())
+                    ) {
+                        // if name or description were changed we need to send an event without disconnecting data source
+                        sendDataSourceUpdatedEvent = true;
                     }
-                    // if settings were changed we need to send event
                 }
                 case WSDataSourceEvent.DELETED -> {
                     WebDataSourceUtils.disconnectDataSource(webSession, ds);
