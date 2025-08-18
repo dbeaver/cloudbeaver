@@ -336,9 +336,14 @@ export abstract class CachedResource<
     return this.scheduler.wait();
   }
 
+  // TODO: this method repeats isLoaded checks, maybe we can call just `this.isLoaded`
   isOutdated(param?: ResourceKey<TKey>, includes?: TInclude): boolean {
     if (param === undefined) {
       param = CachedResourceParamKey;
+    }
+
+    if (!this.metadata.has(param)) {
+      return true;
     }
 
     const pageKey = this.aliases.isAlias(param, CachedResourceOffsetPageKey) || this.aliases.isAlias(param, CachedResourceOffsetPageListKey);
@@ -346,19 +351,18 @@ export abstract class CachedResource<
     if (pageKey) {
       const pageInfo = this.offsetPagination.getPageInfo(pageKey);
 
-      if (isOffsetPageOutdated(pageInfo?.pages || [], pageKey.options)) {
+      if (!pageInfo || !isOffsetPageInRange(pageInfo, pageKey.options) || isOffsetPageOutdated(pageInfo.pages, pageKey.options)) {
         return true;
       }
     }
 
-    // TODO: this.metadata.size for some reason returns 0 when there is values
-    const size = [...this.metadata.values()].length;
-    return (
-      size === 0 ||
-      this.metadata.some(
-        param,
-        metadata => !metadata.loaded || metadata.outdated || !!includes?.some(include => metadata.outdatedIncludes.includes(include)),
-      )
+    return this.metadata.some(
+      param,
+      metadata =>
+        !metadata.loaded ||
+        metadata.outdated ||
+        !!includes?.some(include => metadata.outdatedIncludes.includes(include)) ||
+        !(!includes || includes.every(include => metadata.includes.includes(include))),
     );
   }
 
