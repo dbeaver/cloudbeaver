@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { ServerSettingsManagerService, SettingsTransformationService } from '@cloudbeaver/core-root';
+import { HIGHEST_SETTINGS_LAYER, ServerSettingsManagerService, SettingsTransformationService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
+  createSettingsOverrideResolver,
   ESettingsValueType,
   type ISettingDescription,
   ROOT_SETTINGS_LAYER,
@@ -18,7 +19,6 @@ import {
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
-
 import { DATA_EDITOR_SETTINGS_GROUP } from './DATA_EDITOR_SETTINGS_GROUP.js';
 
 const FETCH_MIN = 10;
@@ -71,6 +71,7 @@ export class DataViewerSettingsService extends Dependency {
     private readonly settingsTransformationService: SettingsTransformationService,
     private readonly serverSettingsManagerService: ServerSettingsManagerService,
   ) {
+    // Some settings registered in plugin-data-editor-public-settings & permissions
     super();
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
     this.settingsResolverService.addResolver(
@@ -90,6 +91,24 @@ export class DataViewerSettingsService extends Dependency {
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
       createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsResolverService, {
         'plugin.data-viewer.export.disabled': 'plugin_data_export.disabled',
+      }),
+    );
+
+    this.settingsResolverService.addResolver(
+      HIGHEST_SETTINGS_LAYER,
+      createSettingsOverrideResolver<DataViewerSettingsSchema>(this.settingsResolverService, {
+        'plugin.data-viewer.disableEdit': {
+          key: 'permission.data-editor.editing',
+          map: value => !value,
+        },
+        'plugin.data-viewer.disableCopyData': {
+          key: 'permission.data-editor.copy',
+          map: value => !value,
+        },
+        'plugin.data-viewer.export.disabled': {
+          key: 'permission.data-editor.export',
+          map: value => !value,
+        },
       }),
     );
 
@@ -118,26 +137,6 @@ export class DataViewerSettingsService extends Dependency {
     this.settingsManagerService.registerSettings<typeof defaultSettings>(() => {
       const settings: ISettingDescription<DataViewerSettings>[] = [
         {
-          key: 'plugin.data-viewer.disableEdit',
-          access: {
-            scope: ['server', 'role'],
-          },
-          type: ESettingsValueType.Checkbox,
-          name: 'settings_data_editor_disable_edit_name',
-          description: 'settings_data_editor_disable_edit_description',
-          group: DATA_EDITOR_SETTINGS_GROUP,
-        },
-        {
-          key: 'plugin.data-viewer.disableCopyData',
-          access: {
-            scope: ['server', 'role'],
-          },
-          type: ESettingsValueType.Checkbox,
-          name: 'settings_data_editor_disable_data_copy_name',
-          description: 'settings_data_editor_disable_data_copy_description',
-          group: DATA_EDITOR_SETTINGS_GROUP,
-        },
-        {
           key: 'plugin.data-viewer.fetchMax',
           access: {
             scope: ['server', 'role'],
@@ -146,16 +145,6 @@ export class DataViewerSettingsService extends Dependency {
           name: 'settings_data_editor_fetch_max_name',
           description: 'settings_data_editor_fetch_max_description',
           group: DATA_EDITOR_SETTINGS_GROUP,
-        },
-        {
-          group: DATA_EDITOR_SETTINGS_GROUP,
-          key: 'plugin.data-viewer.export.disabled',
-          type: ESettingsValueType.Checkbox,
-          name: 'settings_data_editor_disable_data_export_name',
-          description: 'settings_data_editor_disable_data_export_description',
-          access: {
-            scope: ['server', 'role'],
-          },
         },
       ];
 

@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.data.transfer.impl;
 
 import com.google.gson.stream.JsonWriter;
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
@@ -69,6 +70,10 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
     ) throws IOException, DBWebException {
         if (!session.isAuthorizedInSecurityManager()) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Import for users only");
+            return;
+        }
+        if (!session.hasPermission(DBWConstants.GLOBAL_PERMISSION_DATA_EDITOR_IMPORT)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Import is not allowed for this user");
             return;
         }
         if ("POST".equalsIgnoreCase(request.getMethod())) {

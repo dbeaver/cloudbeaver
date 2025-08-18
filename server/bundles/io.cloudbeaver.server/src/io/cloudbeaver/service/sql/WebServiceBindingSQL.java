@@ -184,13 +184,16 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
 
             .dataFetcher("asyncSqlExecuteQuery", env ->
                 getService(env).asyncExecuteQuery(
+                    getWebSession(env),
+                    getProjectReference(env),
                     getSQLContext(env),
                     env.getArgument("sql"),
                     env.getArgument("resultId"),
                     getDataFilter(env),
                     getDataFormat(env),
-                    CommonUtils.toBoolean(env.getArgument("readLogs")),
-                    getWebSession(env)))
+                    CommonUtils.toBoolean(env.getArgument("readLogs"))
+                )
+            )
             .dataFetcher("asyncReadDataFromContainer", env ->
                 getService(env).asyncReadDataFromContainer(
                     getSQLContext(env),
@@ -248,7 +251,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
     }
 
     @NotNull
-    private WebDataFormat getDataFormat(DataFetchingEnvironment env) {
+    public static WebDataFormat getDataFormat(DataFetchingEnvironment env) {
         String dataFormat = env.getArgument("dataFormat");
         return CommonUtils.valueOf(WebDataFormat.class, dataFormat, WebDataFormat.resultset);
     }
@@ -370,8 +373,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL>
 
     ///////////////////////////////////////
     // Helpers
-
-    private static WebSQLDataFilter getDataFilter(DataFetchingEnvironment env) {
+    public static WebSQLDataFilter getDataFilter(DataFetchingEnvironment env) {
         Map<String, Object> filterProps = env.getArgument("filter");
         return filterProps == null ? null : new WebSQLDataFilter(filterProps);
     }

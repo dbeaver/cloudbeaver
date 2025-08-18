@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable } from 'mobx';
+import { action, makeObservable, runInAction } from 'mobx';
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, type IAsyncContextLoader, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -136,65 +136,80 @@ export class ConnectionNavNodeService extends Dependency {
   }
 
   private connectionUpdateHandler(key: ResourceKey<IConnectionInfoParams>) {
-    let connectionInfos = this.connectionInfoResource.get(key);
-    const outdatedTrees: string[] = [];
-    const closedConnections: string[] = [];
+    runInAction(() => {
+      let connectionInfos = this.connectionInfoResource.get(key);
+      const outdatedTrees: string[] = [];
+      const closedConnections: string[] = [];
 
-    connectionInfos = Array.isArray(connectionInfos) ? connectionInfos : [connectionInfos];
-    for (const connectionInfo of connectionInfos) {
-      if (!connectionInfo?.nodePath) {
-        return;
+      connectionInfos = Array.isArray(connectionInfos) ? connectionInfos : [connectionInfos];
+      for (const connectionInfo of connectionInfos) {
+        if (!connectionInfo?.nodePath) {
+          return;
+        }
+
+        const node = this.navNodeInfoResource.get(connectionInfo.nodePath);
+        const parentId = getConnectionParentId(connectionInfo.projectId, connectionInfo.folder); // new parent
+
+        if (!connectionInfo.connected) {
+          closedConnections.push(connectionInfo.nodePath);
+          outdatedTrees.push(connectionInfo.nodePath);
+        }
+
+        const folderId = node?.parentId; // current parent
+
+        if (folderId && !outdatedTrees.includes(folderId)) {
+          outdatedTrees.push(folderId);
+        }
+
+        if (!outdatedTrees.includes(parentId)) {
+          outdatedTrees.push(parentId);
+        }
       }
 
-      const node = this.navNodeInfoResource.get(connectionInfo.nodePath);
-      const parentId = getConnectionParentId(connectionInfo.projectId, connectionInfo.folder); // new parent
+      if (closedConnections.length > 0) {
+        const key = resourceKeyList(closedConnections);
 
-      if (!connectionInfo.connected) {
-        closedConnections.push(connectionInfo.nodePath);
-        outdatedTrees.push(connectionInfo.nodePath);
+        if (this.navTreeResource.has(key)) {
+          this.navTreeResource.delete(key);
+        }
       }
 
-      const folderId = node?.parentId; // current parent
-
-      if (folderId && !outdatedTrees.includes(folderId)) {
-        outdatedTrees.push(folderId);
+      if (outdatedTrees.length > 0) {
+        const key = resourceKeyList(outdatedTrees);
+        this.navTreeResource.markOutdated(key);
       }
-
-      if (!outdatedTrees.includes(parentId)) {
-        outdatedTrees.push(parentId);
-      }
-    }
-
-    if (closedConnections.length > 0) {
-      const key = resourceKeyList(closedConnections);
-
-      if (this.navTreeResource.has(key)) {
-        this.navTreeResource.delete(key);
-      }
-    }
-
-    if (outdatedTrees.length > 0) {
-      const key = resourceKeyList(outdatedTrees);
-      this.navTreeResource.markOutdated(key);
-    }
+    });
   }
 
   private connectionRemoveHandler(key: ResourceKeySimple<IConnectionInfoParams>) {
-    ResourceKeyUtils.forEach(key, key => {
-      const connectionInfo = this.connectionInfoResource.get(key);
+    runInAction(() => {
+      ResourceKeyUtils.forEach(key, key => {
+        const connectionInfo = this.connectionInfoResource.get(key);
 
-      if (!connectionInfo) {
-        return;
-      }
+        if (!connectionInfo) {
+          return;
+        }
 
-      const nodePath = connectionInfo.nodePath ?? NodeManagerUtils.connectionIdToConnectionNodeId(key.connectionId);
+        const nodePath = connectionInfo.nodePath ?? NodeManagerUtils.connectionIdToConnectionNodeId(key.connectionId);
 
-      const node = this.navNodeInfoResource.get(nodePath);
-      const folder = node?.parentId ?? getProjectNodeId(key.projectId);
+        const node = this.navNodeInfoResource.get(nodePath);
+        const folder = node?.parentId ?? getProjectNodeId(key.projectId);
+        const parents = this.navNodeInfoResource.getParents(folder);
 
-      if (nodePath) {
-        this.navTreeResource.deleteInNode(folder, [nodePath]);
-      }
+        for (let i = parents.length - 1; i >= 0; i--) {
+          const parent = parents[i]!;
+          const children = this.navTreeResource.get(parent) ?? [];
+
+          if (children.length > 1) {
+            this.navTreeResource.markOutdated(parent);
+            break;
+          }
+        }
+
+        if (nodePath) {
+          this.navTreeResource.deleteInNode(folder, [nodePath]);
+        }
+      });
     });
   }
 
@@ -212,7 +227,20 @@ export class ConnectionNavNodeService extends Dependency {
         await this.navNodeInfoResource.loadNodeParents(parentId);
         const parents = this.navNodeInfoResource.getParents(parentId);
 
-        this.navTreeResource.markOutdated(parents[parents.length - 1]);
+        // allows to preload missing folders if the did not load
+        for (let i = 0; i < parents.length; i++) {
+          const parent = parents[i]!;
+          const nextParent = parents[i + 1];
+          const children = this.navTreeResource.get(parent) ?? [];
+          const isEmptyRoot = parents.length <= 2 && !children.length; // for case ['', 'g_GlobalConfiguration']
+          const hasNoChildren = nextParent && !children.includes(nextParent);
+
+          if (isEmptyRoot || hasNoChildren) {
+            this.navTreeResource.markOutdated(parent);
+            break;
+          }
+        }
+
         const preloaded = await this.navTreeResource.preloadNodeParents(parents, parentId);
 
         if (!preloaded) {

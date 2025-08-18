@@ -100,7 +100,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       get readonly(): boolean {
-        return this.executingScript || this.readonlyState || !!this.dataSource?.isOutdated() || !!this.dataSource?.isReadonly() || !this.editing;
+        return this.executingScript || this.readonlyState || !!this.dataSource?.isReadonly() || !this.editing;
       },
 
       get editing(): boolean {

@@ -36,6 +36,7 @@
     "@cloudbeaver/plugin-connection-search": "workspace:*",
     "@cloudbeaver/plugin-connections": "workspace:*",
     "@cloudbeaver/plugin-connections-administration": "workspace:*",
+    "@cloudbeaver/plugin-data-editor-public-settings": "workspace:*",
     "@cloudbeaver/plugin-data-export": "workspace:*",
     "@cloudbeaver/plugin-data-grid": "workspace:*",
     "@cloudbeaver/plugin-data-import": "workspace:*",

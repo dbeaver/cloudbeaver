@@ -12,6 +12,7 @@ export default [
   ['sql_editor_restore', 'Restaurer'],
   ['sql_editor_placeholder', 'Exécuter une requête (appuyez sur Ctrl+Entrée pour voir les résultats)'],
   ['sql_editor_hint_empty', "Il n'y a aucune proposition..."],
+  ['sql_editor_tools_more_menu_tooltip', "Plus d'outils"],
   ['sql_editor_execution_plan_button', "Afficher le plan d'exécution (Shift + Ctrl + E)"],
   ['sql_editor_output_logs_button_tooltip', 'Afficher la sortie du serveur (Shift + Ctrl + O)'],
   ['sql_editor_output_logs_tab_title', 'Journaux'],

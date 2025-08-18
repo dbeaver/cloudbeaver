@@ -14,6 +14,7 @@ export enum EUsersAdministrationSub {
   Users = 'users',
   Teams = 'teams',
   MetaProperties = 'metaProperties',
+  Permissions = 'permissions',
 }
 
 @injectable()
