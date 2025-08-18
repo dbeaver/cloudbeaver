@@ -6,30 +6,33 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Menu, MenuButton, MenuItem, useMenuState } from 'reakit';
+import { useCallback, useContext, useId, useState } from 'react';
+import {
+  ComboboxInput,
+  ComboboxItem,
+  clsx,
+  Spinner,
+  ComboboxPopover,
+  ComboboxDisclosure,
+  ComboboxProvider,
+  type ComboboxProviderProps,
+} from '@dbeaver/ui-kit';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps.js';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps.js';
-import { getComputed } from '../getComputed.js';
-import { Icon } from '../Icon.js';
 import { IconOrImage } from '../IconOrImage.js';
-import { Loader } from '../Loader/Loader.js';
 import { useTranslate } from '../localization/useTranslate.js';
-import { s } from '../s.js';
-import { useS } from '../useS.js';
-import comboboxStyles from './Combobox.module.css';
 import { Field } from './Field.js';
 import { FieldDescription } from './FieldDescription.js';
 import { FieldLabel } from './FieldLabel.js';
 import { FormContext } from './FormContext.js';
+import './Combobox.css';
 
 export type ComboboxBaseProps<TKey, TValue> = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   'onChange' | 'onSelect' | 'name' | 'value' | 'defaultValue'
 > &
   ILayoutSizeProps & {
-    propertyName?: string;
     items: TValue[];
     defaultValue?: TKey;
     loading?: boolean;
@@ -39,7 +42,6 @@ export type ComboboxBaseProps<TKey, TValue> = Omit<
     titleSelector?: (item: TValue) => string | undefined;
     iconSelector?: (item: TValue) => string | React.ReactElement | undefined;
     isDisabled?: (item: TValue) => boolean;
-    onSwitch?: (state: boolean) => void;
     inline?: boolean;
   };
 
@@ -47,7 +49,6 @@ type ControlledProps<TKey, TValue> = ComboboxBaseProps<TKey, TValue> & {
   name?: string;
   value?: TKey;
   onSelect?: (value: TKey, name: string | undefined, prev: TKey) => void;
-  onChange?: (value: string, name: string | undefined) => any;
   state?: never;
 };
 
@@ -55,7 +56,6 @@ type ObjectProps<TValue, TKey extends keyof TState, TState> = ComboboxBaseProps<
   name: TKey;
   state: TState;
   onSelect?: (value: TState[TKey], name: TKey | undefined, prev: TState[TKey]) => void;
-  onChange?: (value: string, name: TKey | undefined) => any;
   value?: never;
 };
 
@@ -64,15 +64,11 @@ export interface ComboboxType {
   <TValue, TKey extends keyof TState, TState>(props: ObjectProps<TValue, TKey, TState>): React.JSX.Element;
 }
 
-{
-  /* TODO rewrite whole component to select attribute instead of input type text so it has an okay form validation */
-}
 export const Combobox: ComboboxType = observer(function Combobox({
   value: controlledValue,
   defaultValue,
   name,
   state,
-  propertyName,
   items,
   loading,
   children,
@@ -87,245 +83,153 @@ export const Combobox: ComboboxType = observer(function Combobox({
   iconSelector,
   titleSelector,
   isDisabled,
-  onChange = () => {},
   onSelect,
-  onSwitch,
   ...rest
 }: ControlledProps<any, any> | ObjectProps<any, any, any>) {
   const layoutProps = getLayoutProps(rest);
+  const inputId = useId();
   rest = filterLayoutFakeProps(rest);
   const translate = useTranslate();
   const context = useContext(FormContext);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
-  const styles = useS(comboboxStyles);
 
-  const menu = useMenuState({
-    placement: 'bottom-end',
-    currentId: null,
-    gutter: 4,
-    unstable_fixed: true,
-  });
-
-  const [searchValue, setSearchValue] = useState<string | null>(null);
-
-  const filteredItems = getComputed(() => {
-    const result = items.filter(item => !searchValue || valueSelector(item).toUpperCase().includes(searchValue.toUpperCase()));
-
-    if (isDisabled) {
-      return result.sort((a, b) => Number(isDisabled(a)) - Number(isDisabled(b)));
-    }
-
-    return result;
-  });
-
-  let value: string | number | readonly string[] | undefined = controlledValue ?? defaultValue ?? undefined;
-
+  let selectedKey: string | string[] = controlledValue ?? defaultValue ?? undefined;
   if (state && name !== undefined && name in state) {
-    value = state[name];
+    selectedKey = state[name];
   }
 
-  const selectedItem = items.find((item, index) => keySelector(item, index) === value);
+  const selectedItem = items.find((item, index) => keySelector(item, index) === selectedKey);
+  const [inputValue, setInputValue] = useState<string | null>(null);
 
-  let inputValue = (selectedItem ? valueSelector(selectedItem) : searchValue) ?? '';
+  const selectedValue = selectedItem ? valueSelector(selectedItem) : '';
+  const displayValue = inputValue ?? selectedValue;
 
-  if (searchValue !== null && selectedItem && valueSelector(selectedItem) !== searchValue) {
-    inputValue = searchValue;
-  }
+  const filteredItems = items
+    .map((item, index) => {
+      const itemKey = String(keySelector(item, index));
+      const itemValue = valueSelector(item);
+      const itemTitle = titleSelector?.(item);
+      const itemIcon = iconSelector?.(item);
+      const itemDisabled = isDisabled?.(item);
 
-  const hideMenu = items.length === 1 && (!!selectedItem || isDisabled?.(items[0]) === true);
+      const isVisible = inputValue === null || !inputValue.trim() || itemValue.toLowerCase().includes(inputValue.trim().toLowerCase());
 
-  function handleClick() {
-    if (menu.visible) {
-      menu.hide();
-    } else {
-      menu.show();
-    }
-  }
+      return {
+        item,
+        index,
+        itemKey,
+        itemValue,
+        itemTitle,
+        itemIcon,
+        itemDisabled,
+        isVisible,
+      };
+    })
+    .filter(({ isVisible }) => isVisible);
 
-  const handleChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const value = event.target.value;
-      onChange(value, name);
-      setSearchValue(value);
-    },
-    [name, onChange],
-  );
-
-  const handleSelect = useCallback(
-    (id: any) => {
-      id = id ?? value ?? '';
-      const changed = id !== value;
-
-      menu.hide();
-      if (state && changed) {
-        state[name] = id;
-      }
-      if (onSelect && changed) {
-        onSelect(id, name, value);
-      }
-      if (context && changed) {
-        context.change(id, name);
-      }
-      setSearchValue(null);
-    },
-    [value, state, name, menu, context, onSelect],
-  );
-
-  const matchItems = useCallback(
-    (input?: boolean) => {
-      if (searchValue === null) {
+  const handleSelect: ComboboxProviderProps['setSelectedValue'] = useCallback(
+    (selectedValue: string | string[]) => {
+      const item = items.find((item, idx) => keySelector(item, idx) === selectedValue);
+      if (!item || selectedValue === selectedKey) {
         return;
       }
 
-      if (filteredItems.length === 0) {
-        setSearchValue(null);
-        return;
+      if (state) {
+        state[name] = selectedValue;
       }
-
-      const filteredItemIndex = items.indexOf(filteredItems[0]);
-
-      if (filteredItems.length === 1) {
-        handleSelect(keySelector(filteredItems[0], filteredItemIndex));
-        return;
+      if (onSelect) {
+        onSelect(selectedValue, name, selectedKey);
       }
-
-      if (filteredItems.length > 0) {
-        if (input) {
-          handleSelect(keySelector(filteredItems[0], filteredItemIndex));
-        } else {
-          setSearchValue(null);
-        }
+      if (context) {
+        context.change(selectedValue as string, name);
       }
     },
-    [items, filteredItems, keySelector, handleSelect, searchValue],
+    [items, selectedKey, state, onSelect, context, keySelector, name],
   );
-
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        matchItems(true);
-      }
-    },
-    [matchItems],
-  );
-
-  useEffect(() => {
-    if (inputRef === document.activeElement) {
-      if (inputValue === searchValue) {
-        menu.show();
-      }
-    } else {
-      if (!menu.visible) {
-        matchItems();
-      }
-    }
-  }, [inputValue, searchValue, matchItems, menu]);
-
-  useLayoutEffect(() => {
-    onSwitch?.(menu.visible);
-  }, [onSwitch, menu.visible]);
-
-  useEffect(() => {
-    if (!inputRef) {
-      return;
-    }
-
-    const resizeObserver = new ResizeObserver(() => {
-      if (menuRef.current) {
-        const size = inputRef.getBoundingClientRect();
-        menuRef.current.style.width = size.width + 'px';
-      }
-    });
-
-    resizeObserver.observe(inputRef);
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [inputRef]);
 
   const icon = selectedItem && iconSelector?.(selectedItem);
-  const focus = menu.visible;
 
-  if (loading && items.length === 0) {
-    inputValue = translate('ui_processing_loading');
+  const comboboxDefaultSelectedValue = defaultValue;
+  let comboboxDefaultValue = undefined;
+
+  if (comboboxDefaultSelectedValue !== undefined) {
+    const defaultItem = items.find((item, index) => keySelector(item, index) === comboboxDefaultSelectedValue);
+
+    if (defaultItem) {
+      comboboxDefaultValue = valueSelector(defaultItem);
+    }
   }
 
   return (
-    <Field {...layoutProps} className={s(styles, { field: true, inline }, className)}>
+    <Field {...layoutProps} className={clsx(className, inline && 'tw:flex tw:items-center')}>
       {children && (
-        <FieldLabel required={rest.required} title={title} className={s(styles, { fieldLabel: true })}>
+        <FieldLabel
+          required={rest.required}
+          htmlFor={inputId}
+          title={title}
+          className={clsx('theme-typography--body1', 'tw:block tw:font-medium!', inline ? 'tw:mr-2' : 'tw:mb-2.5')}
+        >
           {children}
         </FieldLabel>
       )}
-      <div className={s(styles, { inputBox: true })}>
-        <input className={s(styles, { validationInput: true })} value={inputValue} required={rest.required} readOnly />
-        {(icon || loading) && (
-          <div className={s(styles, { inputIcon: true })}>
-            {loading ? (
-              <Loader small fullSize />
-            ) : typeof icon === 'string' ? (
-              <IconOrImage icon={icon} className={s(styles, { iconOrImage: true })} />
-            ) : (
-              icon
-            )}
-          </div>
-        )}
-        <input
-          ref={setInputRef}
-          required={rest.required}
-          autoComplete="off"
-          name={name}
-          title={title}
-          value={inputValue}
-          disabled={disabled || hideMenu || readOnly}
-          readOnly={readOnly}
-          data-focus={focus}
-          className={s(styles, { input: true, focus })}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          onClick={handleClick}
-          {...rest}
-        />
-        <MenuButton {...menu} disabled={readOnly || disabled || hideMenu} className={styles['menuButton']}>
-          <Icon name="arrow" viewBox="0 0 16 16" className={s(styles, { icon: true, focus })} />
-        </MenuButton>
-        <Menu {...menu} ref={menuRef} aria-label={propertyName} className={s(styles, { menu: true })} modal>
-          {!filteredItems.length ? (
-            <MenuItem id="placeholder" disabled {...menu} className={s(styles, { menuItem: true })}>
-              {translate('combobox_no_results_placeholder')}
-            </MenuItem>
+      <ComboboxProvider
+        value={displayValue}
+        setValue={setInputValue}
+        defaultValue={comboboxDefaultValue}
+        defaultSelectedValue={comboboxDefaultSelectedValue}
+        setSelectedValue={handleSelect}
+      >
+        <div className="tw:relative tw:flex tw:flex-1 tw:items-center tw:gap-2">
+          <ComboboxInput
+            defaultValue={comboboxDefaultValue}
+            disabled={disabled || loading || readOnly}
+            readOnly={readOnly}
+            placeholder={rest.placeholder}
+            className={clsx('theme-typography--caption  tw:tracking-normal!', icon || loading ? 'tw:pl-8!' : '', 'tw:pr-6!')}
+            title={title}
+            id={inputId}
+            onBlur={() => setInputValue(null)}
+            {...rest}
+          />
+          {loading ? (
+            <Spinner size="small" className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2" />
           ) : (
-            filteredItems.map((item, index) => {
-              const icon = iconSelector?.(item);
-              const title = titleSelector?.(item);
-              const disabled = isDisabled?.(item);
-
-              return (
-                <MenuItem
-                  key={keySelector(item, index)}
-                  id={keySelector(item, index)}
-                  type="button"
-                  title={title}
-                  {...menu}
-                  disabled={disabled}
-                  className={s(styles, { menuItem: true })}
-                  onClick={event => handleSelect(event.currentTarget.id)}
+            <ComboboxDisclosure
+              disabled={disabled || loading || readOnly}
+              className="tw:absolute tw:right-2 tw:top-[50%] tw:-translate-y-1/2 tw:*:fill-none! tw:cursor-pointer"
+            />
+          )}
+          {icon && <div className="tw:absolute tw:left-3 tw:w-4 tw:h-4">{typeof icon === 'string' ? <IconOrImage icon={icon} /> : icon}</div>}
+          <ComboboxPopover className="theme-text-on-surface theme-background-surface theme-typography--caption">
+            {filteredItems.length > 0 ? (
+              filteredItems.map(({ itemKey, itemValue, itemTitle, itemIcon, itemDisabled }) => (
+                <ComboboxItem
+                  key={itemKey}
+                  value={itemKey}
+                  disabled={itemDisabled}
+                  title={itemTitle}
+                  setValueOnClick={() => {
+                    setInputValue(null);
+                    return false;
+                  }}
+                  className={clsx({
+                    'tw:cursor-pointer': !itemDisabled,
+                    'tw:cursor-not-allowed': itemDisabled,
+                  })}
                 >
                   {iconSelector && (
-                    <div className={s(styles, { itemIcon: true })}>
-                      {icon && typeof icon === 'string' ? <IconOrImage icon={icon} className={s(styles, { iconOrImage: true })} /> : icon}
+                    <div className="tw:w-4 tw:h-4 tw:shrink-0">
+                      {itemIcon && typeof itemIcon === 'string' ? <IconOrImage icon={itemIcon} /> : itemIcon}
                     </div>
                   )}
-                  <div>{valueSelector(item)}</div>
-                </MenuItem>
-              );
-            })
-          )}
-        </Menu>
-      </div>
+                  <div>{itemValue}</div>
+                </ComboboxItem>
+              ))
+            ) : (
+              <div className="tw:p-2">{translate('combobox_no_results_placeholder')}</div>
+            )}
+          </ComboboxPopover>
+        </div>
+      </ComboboxProvider>
       {description && <FieldDescription>{description}</FieldDescription>}
     </Field>
   );

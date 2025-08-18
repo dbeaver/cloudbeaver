@@ -88,9 +88,12 @@
     border-radius: 50%;
     border: 2px solid var(--dbv-kit-radio-inactive-border);
     background-color: var(--dbv-kit-radio-inactive-background);
-    transition:
-      background-color 0.3s,
-      border-color 0.3s;
+
+    @media (prefers-reduced-motion: no-preference) {
+      transition:
+        background-color 0.3s,
+        border-color 0.3s;
+    }
 
     &::after {
       content: '';
@@ -100,9 +103,11 @@
       background-color: var(--dbv-kit-radio-active-foreground);
       scale: 0;
 
-      transition-property: scale;
-      transition-timing-function: var(--tw-ease-in-out);
-      transition-duration: 0.2s;
+      @media (prefers-reduced-motion: no-preference) {
+        transition-property: scale;
+        transition-timing-function: var(--tw-ease-in-out);
+        transition-duration: 0.2s;
+      }
     }
   }
 

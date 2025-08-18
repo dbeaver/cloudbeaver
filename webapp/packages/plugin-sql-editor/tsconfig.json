@@ -17,6 +17,9 @@
       "path": "../core-blocks"
     },
     {
+      "path": "../core-browser"
+    },
+    {
       "path": "../core-cli"
     },
     {

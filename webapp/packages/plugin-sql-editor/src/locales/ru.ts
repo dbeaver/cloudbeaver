@@ -13,6 +13,7 @@ export default [
   ['sql_editor_restore', 'Восстановить'],
   ['sql_editor_placeholder', 'Нажмите Ctrl+Enter, чтобы выполнить запрос и увидеть результат'],
   ['sql_editor_hint_empty', 'Нет авто-дополнений...'],
+  ['sql_editor_tools_more_menu_tooltip', 'Больше инструментов'],
   ['sql_editor_execution_plan_button_tooltip', 'Посмотреть информацию о плане выполнения запроса (Shift + Ctrl + E)'],
   ['sql_editor_output_logs_button_tooltip', 'Показать вывод сервера (Shift + Ctrl + O)'],
   ['sql_editor_output_logs_tab_title', 'Вывод логов'],

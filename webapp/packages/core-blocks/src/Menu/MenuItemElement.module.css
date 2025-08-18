@@ -24,9 +24,15 @@
     flex: 1;
     text-align: right;
     padding-left: 32px;
-    width: 80px;
+    min-width: 80px;
+    max-width: 160px;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: var(--theme-text-hint-on-light);
+
+    &:empty {
+      padding: 0;
+    }
   }
   & .menuItemIcon,
   & .menuItemContent {
@@ -56,8 +62,8 @@
   composes: theme-typography--caption from global;
 }
 
-.menuBox:not([data-s-has-bindings='true']) .menuItemBinding {
-  width: 0;
+.menuBox[data-s-has-bindings='false'] .menuItemBinding {
+  min-width: 0;
 }
 
 .menuBox[dir='rtl'] {
