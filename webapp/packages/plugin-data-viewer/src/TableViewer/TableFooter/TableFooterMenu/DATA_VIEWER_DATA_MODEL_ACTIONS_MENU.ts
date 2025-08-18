@@ -7,4 +7,4 @@
  */
 import { createMenu } from '@cloudbeaver/core-view';
 
-export const DATA_VIEWER_DATA_MODEL_ACTIONS_MENU = createMenu('data-viewer-data-model-actions', { label: 'Data viewer data model actions menu' });
+export const DATA_VIEWER_DATA_MODEL_ACTIONS_MENU = createMenu('data-viewer-data-model-actions', { label: 'Data Editor data model actions menu' });

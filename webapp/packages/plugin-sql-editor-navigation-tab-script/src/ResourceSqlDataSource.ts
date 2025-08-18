@@ -411,8 +411,9 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
         if (!this.isIncomingChanges) {
           this.message = 'plugin_sql_editor_navigation_tab_script_state_saving';
-          await this.actions.write(this, this.resourceKey, this.script);
-          this.setBaseScript(this.script);
+          const script = this.script;
+          await this.actions.write(this, this.resourceKey, script);
+          this.setBaseScript(script);
         }
       } finally {
         this.message = undefined;

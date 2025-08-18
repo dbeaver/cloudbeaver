@@ -25,6 +25,12 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 25.1.5 2025-08-18
+- Added support for multiple server URLs to accommodate different access policies for internal and external users, improving flexibility in network-restricted environments. Use the Allowed Server URLs field in the Server configuration within the Administration section to set it up;
+- Added the Force HTTPS mode setting in Server Configuration to enforce secure communication between the server and clients, recommended for production environments. This ensures all connections use HTTPS, improving security when the proxy is correctly configured. This setting is disabled by default;
+- Added the CLOUDBEAVER_BIND_SESSION_TO_IP option to improve session security by linking user sessions to their IP address. It is disabled by default. When enabled, this helps protect against certain types of session hijacking attacks, where an attacker could try to take over a user’s session. Note: If a user’s internet connection changes (e.g., switching networks or using mobile data), they will be automatically - Improved dark theme accessibility by enhancing color contrast across the app for better readability and compliance with accessibility standards;
+- The database navigator now automatically hides empty folders in shared projects, reducing visual clutter and speeding up the process of finding active connections.
+
 ### 25.1.4 2025-08-04
 - Added an ability to review the script before execution when users edit tables without primary keys in the Data Editor;
 - DuckDB: driver has been updated to version 1.3.2;
@@ -32,7 +38,7 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ### 25.1.3 2025-07-21
 - A password confirmation field has been added for administrators in the Easy Config section to help prevent accidental misconfigurations;
-- Added column descriptions in the Data Editor to provide more metadata context. You can disable this in Preferences > Data Viewer;
+- Added column descriptions in the Data Editor to provide more metadata context. You can disable this in Preferences > Data Editor;
 - Added the option to display tabs across multiple rows, allowing you to see all tabs without scrolling. You can enable this in Preferences > Interface;
 - Changed the default engine used for autocompletion in the SQL Editor. This Semantic engine offers improved suggestions for database objects, keywords, and functions. You can switch back to the Legacy engine in Preferences -> SQL Editor;
 - Clickhouse: fixed the presentation of tuples and map data types in the data editor.

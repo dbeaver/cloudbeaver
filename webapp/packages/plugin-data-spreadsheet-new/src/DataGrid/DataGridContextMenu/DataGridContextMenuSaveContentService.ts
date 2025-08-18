@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { selectFiles } from '@cloudbeaver/core-browser';
+import { promptForFiles } from '@cloudbeaver/core-browser';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ACTION_DOWNLOAD, ACTION_UPLOAD, ActionService, MenuService } from '@cloudbeaver/core-view';
@@ -103,7 +103,7 @@ export class DataGridContextMenuSaveContentService {
         }
 
         if (action === ACTION_UPLOAD) {
-          selectFiles(files => {
+          promptForFiles().then(files => {
             const file = files?.[0] ?? undefined;
             if (file) {
               edit.set(key, createResultSetBlobValue(file));

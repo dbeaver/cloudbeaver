@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.server.jetty;
 
+import com.google.common.net.InetAddresses;
 import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.utils.ServletAppUtils;
@@ -61,23 +62,30 @@ public class RequestHostFilter implements Filter {
                 chain.doFilter(request, response);
                 return;
             }
+            boolean isIpAddress = InetAddresses.isInetAddress(originUri.getHost());
             String servletPath = httpRequest.getServletPath();
-            if (CommonUtils.isNotEmpty(servletPath)) {
-                for (String excludedPath : excludedPaths) {
-                    if (servletPath.contains(excludedPath)) {
-                        chain.doFilter(request, response);
-                        return;
+            if (!isIpAddress) {
+                if (CommonUtils.isNotEmpty(servletPath)) {
+                    for (String excludedPath : excludedPaths) {
+                        if (servletPath.contains(excludedPath)) {
+                            chain.doFilter(request, response);
+                            return;
+                        }
                     }
                 }
+                validateHosts(serverConfig, httpRequest, response, originUri);
             }
-            validateHosts(serverConfig, httpRequest, response, originUri);
             validateSchema(serverConfig, httpRequest, response, originUri);
-
         }
         chain.doFilter(request, response);
     }
 
-    private void validateSchema(CBServerConfig serverConfig, HttpServletRequest httpRequest, ServletResponse response, URI originUri) {
+    private void validateSchema(
+        @NotNull CBServerConfig serverConfig,
+        @NotNull HttpServletRequest httpRequest,
+        @NotNull ServletResponse response,
+        @NotNull URI originUri
+    ) {
         boolean httpsExpected = serverConfig.isForceHttps();
         try {
             if ("http".equals(originUri.getScheme()) && httpsExpected) {
@@ -93,7 +101,6 @@ public class RequestHostFilter implements Filter {
                         .append(httpRequest.getQueryString());
                 }
                 ((HttpServletResponse) response).sendRedirect(redirectUrlBuilder.toString());
-
             }
         } catch (Exception e) {
             log.error("Failed to redirect to HTTPS", e);
