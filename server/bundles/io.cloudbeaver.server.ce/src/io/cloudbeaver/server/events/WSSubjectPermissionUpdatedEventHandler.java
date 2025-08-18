@@ -40,7 +40,6 @@ public class WSSubjectPermissionUpdatedEventHandler extends WSDefaultEventHandle
             activeUserSession.addSessionError(e);
             log.error("Error refreshing session", e);
         }
-        activeUserSession.refreshUserData();
         var newUserPermissions = activeUserSession.getUserContext().getUserPermissions();
         boolean shouldUpdateData = activeUserSession instanceof WebHeadlessSession
             || !(SMUtils.isRMAdmin(oldUserPermissions) && SMUtils.isRMAdmin(newUserPermissions));
@@ -54,6 +53,7 @@ public class WSSubjectPermissionUpdatedEventHandler extends WSDefaultEventHandle
         if (!super.isAcceptableInSession(activeUserSession, event)) {
             return false;
         }
+        activeUserSession.refreshUserData();
         var user = activeUserSession.getUserContext().getUser();
         if (user == null) {
             return false;
