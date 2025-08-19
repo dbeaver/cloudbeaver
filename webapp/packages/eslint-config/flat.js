@@ -86,6 +86,7 @@ export default tseslint.config(
       '@typescript-eslint/no-use-before-define': 'off',
       '@typescript-eslint/no-unused-vars': ['warn', { destructuredArrayIgnorePattern: '^_' }],
       '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-this-alias': 'warn',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-empty-function': 'off',
       '@stylistic/semi': ['error', 'always'],
