@@ -74,6 +74,9 @@
       "path": "../core-view"
     },
     {
+      "path": "../plugin-authentication"
+    },
+    {
       "path": "../plugin-codemirror6"
     },
     {
