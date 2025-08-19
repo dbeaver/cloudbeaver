@@ -11,7 +11,7 @@ import { makeObservable, observable } from 'mobx';
 import { ThemeService, type ITheme } from './ThemeService.js';
 import { ROOT_SETTINGS_LAYER, SettingsResolverService } from '@cloudbeaver/core-settings';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
-import type { IThemeSettingsKey } from './ThemeSettingsService.js';
+import { type IThemeSettingsKey, DEFAULT_THEME_ID } from './ThemeSettingsService.js';
 
 const DARK_QUERY = '(prefers-color-scheme: dark)';
 
@@ -37,7 +37,7 @@ export class SystemThemeService extends Bootstrap {
   override register(): void | Promise<void> {
     const systemThemeService = this;
     this.themeService.addTheme({
-      id: 'system',
+      id: DEFAULT_THEME_ID,
       name: 'ui_system_theme',
       get class(): string {
         return systemThemeService.dynamicTheme!.class;
@@ -57,7 +57,7 @@ export class SystemThemeService extends Bootstrap {
       },
       getValue: function (key: IThemeSettingsKey) {
         if (key === 'core.theming.theme') {
-          return 'system';
+          return DEFAULT_THEME_ID;
         }
         return undefined;
       },

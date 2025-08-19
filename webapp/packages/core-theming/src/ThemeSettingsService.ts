@@ -15,10 +15,10 @@ import {
 } from '@cloudbeaver/core-settings';
 import { schema } from '@cloudbeaver/core-utils';
 
-import { FALLBACK_THEME_ID } from './themes.js';
+export const DEFAULT_THEME_ID = 'system';
 
 const settingsSchema = schema.object({
-  'core.theming.theme': schema.string().default(FALLBACK_THEME_ID),
+  'core.theming.theme': schema.string().default(DEFAULT_THEME_ID),
 });
 
 export type IThemeSettingsSchema = typeof settingsSchema;
