@@ -200,6 +200,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         // TODO: we need this delay to update focus after render rows update
         setTimeout(() => {
           handlers.focusCell(data.key);
+          setTimeout(() => restoreFocus(), 1);
         }, 1);
       }
     }
@@ -210,7 +211,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     return () => {
       tableData.editor.action.removeHandler(syncEditor);
     };
-  }, [tableData.editor, selectionAction, handlers, tableData]);
+  }, [tableData.editor, selectionAction, handlers, tableData, restoreFocus]);
 
   const handleFocusChange = (position: ICellPosition) => {
     focusedCell.current = position;

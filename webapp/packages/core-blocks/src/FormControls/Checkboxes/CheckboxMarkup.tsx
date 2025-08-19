@@ -36,13 +36,14 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
   title,
   readOnly,
   children,
+  disabled,
   ...rest
 }) {
   const styles = useS(CheckboxMarkupStyles);
 
   return (
     <div className={s(styles, { container: true }, 'checkbox-markup', `checkbox-markup-theme--${theme}`, className)} title={title}>
-      <UiKitCheckbox id={id || rest.name} indeterminate={indeterminate} disabled={rest.disabled || readOnly} size={size} {...rest}>
+      <UiKitCheckbox id={id || rest.name} indeterminate={indeterminate} disabled={disabled || readOnly} size={size} {...rest}>
         {label && <span className={s(styles, { label: true }, 'checkbox-markup__label')}>{label}</span>}
         {caption && <span className={s(styles, { caption: true }, 'checkbox-markup__caption')}>{caption}</span>}
       </UiKitCheckbox>
