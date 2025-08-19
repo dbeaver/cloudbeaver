@@ -9,7 +9,7 @@ import { useId, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { Container, Filter, getComputed, Group, s, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
-import { type IEditableSettingsSource, ROOT_SETTINGS_GROUP, SettingsGroup, SettingsResolverSource } from '@cloudbeaver/core-settings';
+import { type IEditableSettingsSource, type ISettingsResolverSource, ROOT_SETTINGS_GROUP, SettingsGroup } from '@cloudbeaver/core-settings';
 import { useTreeData, useTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 
@@ -20,7 +20,7 @@ import { SettingsList } from './SettingsList.js';
 import { useSettings } from './useSettings.js';
 
 export interface ISettingsProps {
-  resolver: SettingsResolverSource;
+  resolver: ISettingsResolverSource;
   source: IEditableSettingsSource;
   accessor?: string[];
   hideGroupsSettingsLimit?: number;
