@@ -1658,7 +1658,7 @@ __metadata:
     core-cli-analyzer: ./bin/analyzer.js
     core-cli-check-license: ./lib/cli/license-check.js
     core-cli-dependency-graph: ./bin/dependency-graph.js
-    core-cli-set-version: ./bin/set-version.mjs
+    core-cli-set-version: ./bin/set-version.js
     core-cli-validate-dependencies: ./lib/cli/validate-dependencies.js
   languageName: unknown
   linkType: soft
