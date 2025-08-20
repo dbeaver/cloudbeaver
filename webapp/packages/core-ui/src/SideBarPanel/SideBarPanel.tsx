@@ -42,10 +42,9 @@ const sideBarPanelRegistry: StyleRegistry = [
 
 export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ container }) {
   const style = useS(styles);
-
   return (
     <SContext registry={sideBarPanelRegistry}>
-      <TabsState container={container} lazy>
+      <TabsState container={container} currentTabId={container.selectedId} lazy onChange={tab => container.select(tab.tabId, tab.props)}>
         <div className={s(style, { box: true })}>
           <TabList className={s(style, { tabList: true })} underline />
           <div className={s(style, { contentBox: true })}>
