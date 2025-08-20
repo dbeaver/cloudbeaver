@@ -271,7 +271,7 @@ public class GraphQLEndpoint extends HttpServlet {
                 errorMessage = executionException.getMessage();
             }
             if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
-                apiCallInterceptor.onApiCallEvent(request, variables, operationName, userId, startTime, errorMessage, API_PROTOCOL);
+                apiCallInterceptor.onApiCallEvent(request, variables, operationName, startTime, errorMessage, API_PROTOCOL);
             }
         }
 
