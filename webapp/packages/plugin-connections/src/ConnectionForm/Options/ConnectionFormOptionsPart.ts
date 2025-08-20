@@ -326,7 +326,6 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     this.state.authModelId = modelId;
   }
-
   protected override async format(
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
@@ -335,37 +334,34 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
       return;
     }
 
+    super.format(data, contexts);
+
     const driver = await this.dbDriverResource.load(this.state.driverId, ['includeProviderProperties', 'includeMainProperties']);
 
     this.formState.state.requiredNetworkHandlersIds = observable([]);
     this.state.networkHandlersConfig = observable([]);
     this.state.keepAliveInterval = this.state.keepAliveInterval ? Number(this.state.keepAliveInterval) : undefined;
 
-    this.state.name = this.state.name?.trim();
-    this.state.description = this.state.description?.trim();
-
     if (!this.state.folder) {
       delete this.state.folder;
     }
 
-    if (this.state.configurationType === DriverConfigurationType.Url) {
-      this.state.url = this.state.url?.trim();
-    } else {
+    if (this.state.configurationType !== DriverConfigurationType.Url) {
       // if manual type configuration set, it helps to keep host, port, etc. properties (not saved on backend)
       delete this.state.url;
     }
 
     // databaseName, host, port, serverName only saves on backend like this
     if (this.state.configurationType === DriverConfigurationType.Manual && !driver.useCustomPage) {
-      this.state.mainPropertyValues![MAIN_PROPERTY_DATABASE_KEY] = this.state.databaseName?.trim();
+      this.state.mainPropertyValues![MAIN_PROPERTY_DATABASE_KEY] = this.state.databaseName;
 
       if (!driver.embedded) {
-        this.state.mainPropertyValues![MAIN_PROPERTY_HOST_KEY] = this.state.host?.trim();
-        this.state.mainPropertyValues![MAIN_PROPERTY_PORT_KEY] = this.state.port?.trim();
+        this.state.mainPropertyValues![MAIN_PROPERTY_HOST_KEY] = this.state.host;
+        this.state.mainPropertyValues![MAIN_PROPERTY_PORT_KEY] = this.state.port;
       }
 
       if (driver.requiresServerName) {
-        this.state.mainPropertyValues![MAIN_PROPERTY_SERVER_KEY] = this.state.serverName?.trim();
+        this.state.mainPropertyValues![MAIN_PROPERTY_SERVER_KEY] = this.state.serverName;
       }
     }
 

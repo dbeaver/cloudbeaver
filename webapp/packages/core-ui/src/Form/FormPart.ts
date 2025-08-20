@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, makeObservable, observable, toJS } from 'mobx';
+import { action, computed, makeObservable, observable, runInAction, toJS } from 'mobx';
 
 import { executorHandlerFilter, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
@@ -13,6 +13,7 @@ import { isObjectsEqual } from '@cloudbeaver/core-utils';
 import type { IFormPart } from './IFormPart.js';
 import type { IFormState } from './IFormState.js';
 import { formSubmitContext } from './formSubmitContext.js';
+import { propagateTrim } from '@dbeaver/js-helpers';
 
 export abstract class FormPart<TPartState, TFormState = any> implements IFormPart<TPartState> {
   state: TPartState;
@@ -174,7 +175,11 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     this.state = state;
   }
 
-  protected format(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
+  protected format(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {
+    runInAction(() => {
+      propagateTrim(this.state);
+    });
+  }
   protected validate(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
 
   protected abstract loader(): Promise<void>;

@@ -10,7 +10,7 @@ import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { ConnectionInfoPropertiesResource } from '@cloudbeaver/core-connections';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import type { IConnectionProperties } from '../Options/IConnectionConfig.js';
-import { runInAction, toJS } from 'mobx';
+import { toJS } from 'mobx';
 import type { ConnectionFormOptionsPart } from '../Options/ConnectionFormOptionsPart.js';
 
 function getDefaultState(): IConnectionProperties {
@@ -66,17 +66,4 @@ export class ConnectionFormDriverPropertiesPart extends FormPart<IConnectionProp
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {}
-
-  protected override format(
-    data: IFormState<IConnectionFormState>,
-    contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
-  ): void | Promise<void> {
-    runInAction(() => {
-      for (const key of Object.keys(this.state!)) {
-        if (typeof this.state[key] === 'string') {
-          this.state[key] = this.state[key].trim();
-        }
-      }
-    });
-  }
 }

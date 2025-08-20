@@ -101,6 +101,8 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {
+    super.format(data, contexts);
+
     if (!this.optionsPart.state.driverId) {
       return;
     }
@@ -159,8 +161,6 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     }
 
     if (handlerConfig) {
-      trimSSLConfig(handlerConfig);
-
       this.optionsPart.state.networkHandlersConfig!.push(handlerConfig);
     }
   }
@@ -169,24 +169,4 @@ export class ConnectionFormSSLPart extends FormPart<INetworkHandlerConfig, IConn
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): Promise<void> {}
-}
-
-function trimSSLConfig(input: INetworkHandlerConfig): INetworkHandlerConfig {
-  const { secureProperties } = input;
-
-  if (!secureProperties) {
-    return input;
-  }
-
-  if (!Object.keys(secureProperties).length) {
-    return input;
-  }
-
-  for (const key in secureProperties) {
-    if (typeof secureProperties[key] === 'string') {
-      secureProperties[key] = secureProperties[key]?.trim();
-    }
-  }
-
-  return input;
 }

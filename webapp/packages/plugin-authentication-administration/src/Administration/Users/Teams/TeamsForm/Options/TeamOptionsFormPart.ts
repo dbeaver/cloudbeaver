@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -77,27 +77,11 @@ export class TeamOptionsFormPart extends FormPart<ITeamOptionsState, ITeamFormSt
   }
 
   protected override format(data: IFormState<ITeamFormState>, contexts: IExecutionContextProvider<IFormState<ITeamFormState>>): void | Promise<void> {
-    this.state.teamId = this.state.teamId.trim();
+    super.format(data, contexts);
 
-    if (this.state.teamName) {
-      this.state.teamName = this.state.teamName.trim();
-
-      if (this.formState.mode === 'create') {
-        const teamNames = this.teamResource.values.map(team => team.teamName).filter(Boolean) as string[];
-        this.state.teamName = getUniqueName(this.state.teamName, teamNames);
-      }
-    }
-
-    if (this.state.description) {
-      this.state.description = this.state.description.trim();
-    }
-
-    if (this.state.metaParameters) {
-      for (const key of Object.keys(this.state.metaParameters)) {
-        if (typeof this.state.metaParameters[key] === 'string') {
-          this.state.metaParameters[key] = (this.state.metaParameters[key] as any).trim();
-        }
-      }
+    if (this.state.teamName && this.formState.mode === 'create') {
+      const teamNames = this.teamResource.values.map(team => team.teamName).filter(Boolean) as string[];
+      this.state.teamName = getUniqueName(this.state.teamName, teamNames);
     }
   }
 

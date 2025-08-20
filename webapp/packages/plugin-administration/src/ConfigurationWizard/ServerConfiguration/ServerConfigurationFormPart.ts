@@ -84,24 +84,6 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
     }
   }
 
-  protected override format() {
-    if (this.state.serverConfig.adminName) {
-      this.state.serverConfig.adminName = this.state.serverConfig.adminName.trim();
-    }
-
-    if (this.state.serverConfig.adminPassword) {
-      this.state.serverConfig.adminPassword = this.state.serverConfig.adminPassword.trim();
-    }
-
-    if (this.state.serverConfig.serverName) {
-      this.state.serverConfig.serverName = this.state.serverConfig.serverName.trim();
-    }
-
-    if (this.state.serverConfig.serverURL) {
-      this.state.serverConfig.serverURL = this.state.serverConfig.serverURL.trim();
-    }
-  }
-
   override get isChanged(): boolean {
     if (this.loaded && this.administrationScreenService.isConfigurationMode) {
       return true;

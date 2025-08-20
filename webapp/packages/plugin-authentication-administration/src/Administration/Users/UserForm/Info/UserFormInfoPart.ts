@@ -39,23 +39,6 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     this.disableUser = this.disableUser.bind(this);
   }
 
-  protected override format(data: IFormState<IUserFormState>, contexts: IExecutionContextProvider<IFormState<IUserFormState>>): void | Promise<void> {
-    this.state.password = this.state.password.trim();
-    const metaParameters = this.state.metaParameters;
-
-    if (this.formState.mode === FormMode.Create) {
-      this.state.userId = this.state.userId.trim();
-    }
-
-    for (const key in metaParameters) {
-      const value = metaParameters[key];
-
-      if (typeof value === 'string') {
-        metaParameters[key] = value.trim();
-      }
-    }
-  }
-
   override isOutdated(): boolean {
     if (this.formState.mode === FormMode.Edit && this.initialState.userId) {
       return this.usersResource.isOutdated(this.initialState.userId) || this.usersMetaParametersResource.isOutdated(this.initialState.userId);

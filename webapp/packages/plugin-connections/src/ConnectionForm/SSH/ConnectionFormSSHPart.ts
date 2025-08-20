@@ -102,6 +102,8 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     data: IFormState<IConnectionFormState>,
     contexts: IExecutionContextProvider<IFormState<IConnectionFormState>>,
   ): void | Promise<void> {
+    super.format(data, contexts);
+
     const urlType = this.optionsPart.state.configurationType === DriverConfigurationType.Url;
 
     if (urlType) {
@@ -111,7 +113,7 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     const passwordChanged = isPasswordChanged(this.state, this.initialState);
     const keyChanged = isKeyChanged(this.state, this.initialState);
 
-    let handlerConfig: NetworkHandlerConfigInput = {
+    const handlerConfig: NetworkHandlerConfigInput = {
       ...this.state,
       savePassword: this.state.savePassword || this.optionsPart.state.sharedCredentials,
       key: this.state.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? this.state.key : undefined,
@@ -127,7 +129,6 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
     }
 
     if (handlerConfig) {
-      handlerConfig = getTrimmedSSHConfig(handlerConfig);
       this.optionsPart.state.networkHandlersConfig!.push(handlerConfig);
     }
   }
@@ -167,25 +168,6 @@ export class ConnectionFormSSHPart extends FormPart<INetworkHandlerConfig, IConn
       validation.error("Field SSH 'Password' can't be empty");
     }
   }
-}
-
-function getTrimmedSSHConfig(input: NetworkHandlerConfigInput): NetworkHandlerConfigInput {
-  const trimmedInput = toJS(input);
-  const attributesToTrim = Object.keys(input) as (keyof NetworkHandlerConfigInput)[];
-
-  for (const key of attributesToTrim) {
-    if (typeof trimmedInput[key] === 'string') {
-      trimmedInput[key] = trimmedInput[key]?.trim();
-    }
-  }
-
-  for (const key in trimmedInput.properties) {
-    if (typeof trimmedInput.properties[key] === 'string') {
-      trimmedInput.properties[key] = trimmedInput.properties[key]?.trim();
-    }
-  }
-
-  return trimmedInput;
 }
 
 function isPasswordChanged(handler: NetworkHandlerConfigInput, initial?: NetworkHandlerConfigInput) {
