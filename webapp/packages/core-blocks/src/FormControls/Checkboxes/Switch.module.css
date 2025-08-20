@@ -8,7 +8,7 @@
 
 @layer components {
   .field {
-    --dbv-kit-control-outline-offset: 8px;
+    --dbv-kit-control-outline-offset: 2px;
 
     &:focus-within {
       outline-offset: var(--dbv-kit-control-outline-offset);
