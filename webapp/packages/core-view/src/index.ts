@@ -37,6 +37,7 @@ export * from './Action/KeyBinding/Bindings/KEY_BINDING_UNDO.js';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_SAVE.js';
 export * from './Action/KeyBinding/KeyBindingService.js';
 export * from './Action/KeyBinding/createKeyBinding.js';
+export * from './Action/KeyBinding/shortcutUtils.js';
 export * from './Action/ActionService.js';
 export * from './Action/createAction.js';
 export * from './Action/IAction.js';
