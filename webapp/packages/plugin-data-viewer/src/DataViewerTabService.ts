@@ -20,7 +20,6 @@ import {
   ObjectPage,
   ObjectViewerTabService,
 } from '@cloudbeaver/plugin-object-viewer';
-import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 import type { IDataViewerPageState } from './IDataViewerPageState.js';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService.js';
@@ -41,7 +40,6 @@ export class DataViewerTabService {
     private readonly navigationTabsService: NavigationTabsService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly tableViewerStorageService: TableViewerStorageService,
-    private readonly authService: AuthenticationService,
   ) {
     this.page = this.dbObjectPageService.register({
       key: 'data_viewer_data',
@@ -56,9 +54,8 @@ export class DataViewerTabService {
     });
   }
 
-  register(): void {
+  register() {
     this.connectionsManagerService.onDisconnect.addHandler(this.disconnectHandler.bind(this));
-    this.authService.onLogout.addHandler(this.logoutHandler.bind(this));
   }
 
   registerTabHandler(): void {
@@ -78,35 +75,12 @@ export class DataViewerTabService {
       ),
     );
 
-    await this.handleTabsCleanup(tabs, {
-      canInterrupt: data.state === 'before',
-      contexts,
-    });
-  }
-
-  private async logoutHandler() {
-    const tabs = Array.from(
-      this.navigationTabsService.findTabs(tab => isObjectViewerTab(tab)),
-    );
-
-    await this.handleTabsCleanup(tabs, {
-      canInterrupt: false,
-    });
-  }
-
-  private async handleTabsCleanup(
-    tabs: ITab<IObjectViewerTabState>[],
-    options: {
-      canInterrupt: boolean;
-      contexts?: IExecutionContextProvider<any>;
-    }
-  ) {
     for (const tab of tabs) {
-      if (options.canInterrupt) {
+      if (data.state === 'before') {
         const canDisconnect = await this.handleTabCanClose(tab);
 
-        if (!canDisconnect && options.contexts) {
-          ExecutorInterrupter.interrupt(options.contexts);
+        if (!canDisconnect) {
+          ExecutorInterrupter.interrupt(contexts);
           return;
         }
       } else if (isObjectViewerTab(tab) && tab.handlerState.tableId) {
@@ -135,7 +109,7 @@ export class DataViewerTabService {
     }
   }
 
-  private handleTabRestore(): boolean {
+  private handleTabRestore(tab: ITab<IObjectViewerTabState>) {
     return true;
   }
 
