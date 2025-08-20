@@ -106,6 +106,7 @@ export class ObjectViewerTabService {
   }
 
   private async unloadObjectTab(tab: ITab<IObjectViewerTabState>) {
+    // TODO: we need to call unloadPages, but it's not implemented in the DBObjectPageService
     await this.dbObjectPageService.closePages(tab);
   }
 
