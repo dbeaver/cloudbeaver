@@ -14,6 +14,7 @@
   align-items: center;
   height: 28px;
   padding: 0 4px;
+  max-width: 420px;
 
   & .menuItemText,
   & .menuItemBinding {
@@ -80,4 +81,14 @@
   & .menuItemContent .icon {
     opacity: 1;
   }
+}
+
+.menuItemText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menuItemIcon {
+  flex-shrink: 0;
 }
