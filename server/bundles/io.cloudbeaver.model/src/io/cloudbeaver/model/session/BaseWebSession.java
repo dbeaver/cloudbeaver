@@ -29,7 +29,6 @@ import org.jkiss.dbeaver.model.auth.SMAuthSpace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSEventDeleteTempFile;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSessionExpiredEvent;
@@ -37,7 +36,6 @@ import org.jkiss.dbeaver.model.websocket.event.session.WSSessionExpiredEvent;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -124,12 +122,6 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
             userContext.refreshPermissions();
             if (userContext.isAuthorizedInSecurityManager()) {
                 userContext.refreshAccessibleProjects();
-                if (userContext.getUser() != null) {
-                    List<String> userTeamIds = Arrays.stream(userContext.getSecurityController().getCurrentUserTeams())
-                        .map(SMTeam::getTeamId)
-                        .toList();
-                    userContext.getUser().setTeams(userTeamIds.toArray(new String[0]));
-                }
             }
         } catch (DBException e) {
             addSessionError(e);
