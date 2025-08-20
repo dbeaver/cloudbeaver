@@ -8,12 +8,14 @@
 import { makeObservable, observable } from 'mobx';
 
 import type { MetadataMap, MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
+import { SyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { ITabInfo, ITabInfoOptions, ITabsContainer } from './ITabsContainer.js';
 
 export class TabsContainer<TProps = void, TOptions extends Record<string, any> | unknown = unknown> implements ITabsContainer<TProps, TOptions> {
   readonly areaLabel: string;
   readonly tabInfoMap: Map<string, ITabInfo<TProps, TOptions>>;
+  readonly onTabSelect: SyncExecutor<string>;
 
   get tabInfoList(): Array<ITabInfo<TProps, TOptions>> {
     return Array.from(this.tabInfoMap.values()).sort((a, b) => a.order - b.order);
@@ -29,6 +31,7 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
     this.tabInfoMap = new Map();
     this.currentTabId = null;
     this.areaLabel = areaLabel;
+    this.onTabSelect = new SyncExecutor();
 
     makeObservable<TabsContainer<TProps, TOptions>, 'currentTabId'>(this, {
       tabInfoMap: observable.shallow,
@@ -58,6 +61,7 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> |
     });
 
     this.currentTabId = tabId;
+    this.onTabSelect.execute(tabId);
   }
 
   getTabInfo(tabId: string): ITabInfo<TProps, TOptions> | undefined {

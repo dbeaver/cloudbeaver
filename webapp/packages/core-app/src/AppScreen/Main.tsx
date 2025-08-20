@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { getComputed, Loader, Pane, ResizerControls, s, Split, useS, useSplitUserState } from '@cloudbeaver/core-blocks';
+import { getComputed, Loader, Pane, ResizerControls, s, Split, useExecutor, useS, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { LeftBarPanelService, SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
 
@@ -24,6 +24,17 @@ export const Main = observer(function Main() {
 
   const sideBarDisabled = getComputed(() => sideBarPanelService.tabsContainer.getDisplayed().length === 0);
   const leftBarDisabled = getComputed(() => leftBarPanelService.tabsContainer.getDisplayed().length === 0);
+
+  useExecutor({
+    executor: sideBarPanelService.tabsContainer.onTabSelect,
+    handlers: [
+      function showPanel() {
+        if (splitRightState.mode === 'minimize' && !sideBarDisabled) {
+          splitRightState.onModeChange?.('resize');
+        }
+      },
+    ],
+  });
 
   return (
     <Loader className={s(styles, { loader: true })} suspense>
