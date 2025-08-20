@@ -12,7 +12,7 @@
 
     &:focus-within {
       outline-offset: var(--dbv-kit-control-outline-offset);
-      border-radius: var(--dbv-kit-combobox-border-radius);
+      border-radius: var(--dbv-kit-control-border-radius);
       outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-control-outline-color);
     }
   }
