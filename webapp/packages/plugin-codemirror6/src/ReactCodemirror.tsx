@@ -42,6 +42,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
     ref,
   ) {
     value = value ?? getValue?.();
+    const isInitialScriptOpening = useRef(true);
     const currentExtensions = useRef<Map<Compartment, Extension>>(new Map());
     const readOnlyFacet = useMemo(() => {
       if (readonly) {
@@ -214,7 +215,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
           }
         }
 
-        if (hasInsertProperty(transaction.changes) && !transaction.selection) {
+        if (hasInsertProperty(transaction.changes) && !transaction.selection && !isInitialScriptOpening.current) {
           transaction.selection = {
             anchor: transaction.changes.insert?.length ?? 0,
             head: transaction.changes.insert?.length ?? 0,
@@ -223,6 +224,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
 
         if (transaction.changes) {
           view.dispatch({ changes: transaction.changes });
+          isInitialScriptOpening.current = false;
         }
 
         if (transaction.selection) {
