@@ -5,10 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { schema } from '@cloudbeaver/core-utils';
+import { schema, RecordKeySchema } from '@cloudbeaver/core-utils';
 
 const CONNECTION_FORM_ORIGIN_INFO_SCHEMA = schema.record(
-  schema.string(),
+  RecordKeySchema,
   schema.object({
     id: schema.string().optional(),
     required: schema.boolean(),
