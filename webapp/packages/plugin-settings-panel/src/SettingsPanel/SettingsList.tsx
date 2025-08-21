@@ -9,9 +9,9 @@ import { observer } from 'mobx-react-lite';
 
 import { Group, s, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import {
-  SettingsResolverSource,
   type IEditableSettingsSource,
   type ISettingDescription,
+  type ISettingsResolverSource,
   type SettingsGroup as SettingsGroupType,
 } from '@cloudbeaver/core-settings';
 import type { ITreeData, ITreeFilter } from '@cloudbeaver/plugin-navigation-tree';
@@ -27,7 +27,7 @@ interface Props {
   treeData: ITreeData;
   treeFilter: ITreeFilter;
   source: IEditableSettingsSource;
-  resolver: SettingsResolverSource;
+  resolver: ISettingsResolverSource;
   settings: Map<SettingsGroupType, ISettingDescription<any>[]>;
   groupSelectExecutor: ISyncExecutor<string>;
   groupsHidden?: boolean;

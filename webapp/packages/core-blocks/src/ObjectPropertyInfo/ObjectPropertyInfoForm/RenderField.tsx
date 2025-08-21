@@ -153,6 +153,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           items={property.validValues!}
           keySelector={value => value}
           valueSelector={value => value}
+          titleSelector={value => value}
           defaultValue={defaultValue}
           title={property.description}
           disabled={disabled}
@@ -172,6 +173,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         items={property.validValues!}
         keySelector={value => value}
         valueSelector={value => value}
+        titleSelector={value => value}
         defaultValue={defaultValue}
         title={property.description}
         disabled={disabled}

@@ -14,6 +14,7 @@ export * from './ISettingsResolverSource.js';
 export * from './IEditableSettingsSource.js';
 export * from './ISettingsSource.js';
 export * from './SettingsLayer.js';
+export * from './UserSettingsResolverService.js';
 export * from './SettingsResolverService.js';
 export * from './SettingsProvider.js';
 export * from './SettingsProviderService.js';
