@@ -9,11 +9,25 @@
 @layer components {
   .field {
     --dbv-kit-control-outline-offset: 2px;
+    --border-offset: -8px;
+    position: relative;
 
-    &:focus-within {
-      outline-offset: var(--dbv-kit-control-outline-offset);
+    &::before {
+      content: '';
+      position: absolute;
+      top: var(--border-offset);
+      left: var(--border-offset);
+      right: var(--border-offset);
+      bottom: var(--border-offset);
       border-radius: var(--dbv-kit-control-border-radius);
-      outline: var(--dbv-kit-control-outline-width) solid var(--dbv-kit-control-outline-color);
+      border: var(--dbv-kit-control-outline-width) solid transparent;
+
+      pointer-events: none;
+    }
+
+    &:focus-within::before {
+      border-color: var(--dbv-kit-control-outline-color);
+      border-width: var(--dbv-kit-control-outline-width);
     }
   }
 
