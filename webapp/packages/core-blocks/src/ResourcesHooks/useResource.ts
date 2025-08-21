@@ -28,6 +28,7 @@ import {
 } from '@cloudbeaver/core-resource';
 import { type ILoadableState, isContainsException, LoadingError } from '@cloudbeaver/core-utils';
 import { mutex } from '@dbeaver/js-helpers';
+import { SessionExpireService } from '@cloudbeaver/core-root';
 
 import { ErrorContext } from '../ErrorContext.js';
 import { useObjectRef } from '../useObjectRef.js';
@@ -112,6 +113,7 @@ export function useResource<
 ): IMapResourceResult<TResource, TIncludes> | IMapResourceListResult<TResource, TIncludes> | IDataResourceResult<TResource, TIncludes> {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const resource = ctor instanceof Resource ? ctor : useService(ctor);
+  const sessionExpireService = useService(SessionExpireService);
   const unmountedRef = useObjectRef({ unmounted: false });
   const errorContext = useContext(ErrorContext);
   const [loadingException, setLoadingException] = useState<Error | null>(null);
@@ -201,7 +203,7 @@ export function useResource<
   const loading = getComputed(() => key !== null && resource.isLoading(key));
   const loaded = getComputed(() => key === null || resource.isLoaded(key, includes));
   const outdated = getComputed(() => key === null || resource.isOutdated(key, includes));
-  const canLoad = key !== null && actions?.freeze !== true && preloaded && outdated && !loading;
+  const canLoad = key !== null && actions?.freeze !== true && preloaded && outdated && !loading && !sessionExpireService.expired;
 
   const result = useMemo<IMapResourceResult<TResource, TIncludes> | IMapResourceListResult<TResource, TIncludes>>(
     () => ({
