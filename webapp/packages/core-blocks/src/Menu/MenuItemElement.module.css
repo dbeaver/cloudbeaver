@@ -57,6 +57,16 @@
   & .loader {
     width: 16px;
   }
+
+  & .menuItemText {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  & .menuItemIcon {
+    flex-shrink: 0;
+  }
 }
 
 .menuItemBinding {
@@ -81,14 +91,4 @@
   & .menuItemContent .icon {
     opacity: 1;
   }
-}
-
-.menuItemText {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.menuItemIcon {
-  flex-shrink: 0;
 }
