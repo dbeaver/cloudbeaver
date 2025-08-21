@@ -208,7 +208,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     config.host = customOptionsInfo.host || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_HOST_KEY];
     config.port = customOptionsInfo.port || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_PORT_KEY];
-    config.serverName = customOptionsInfo.serverName || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_SERVER_KEY];
+    config.serverName = customOptionsInfo.serverName || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_SERVER_KEY] || undefined;
     config.databaseName = customOptionsInfo.databaseName || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_DATABASE_KEY];
 
     config.url = customOptionsInfo.url;
