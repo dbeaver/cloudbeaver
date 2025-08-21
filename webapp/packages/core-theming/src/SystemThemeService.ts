@@ -61,6 +61,15 @@ export class SystemThemeService extends Bootstrap {
         }
         return undefined;
       },
+      getEditedValue(key) {
+        if (key === 'core.theming.theme') {
+          return 'system';
+        }
+        return undefined;
+      },
+      isEdited(key) {
+        return false;
+      },
     });
   }
 
