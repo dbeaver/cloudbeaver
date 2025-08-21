@@ -67,6 +67,7 @@ export class ObjectViewerTabService {
       onSelect: this.selectObjectTab.bind(this),
       onClose: this.closeObjectTab.bind(this),
       canClose: this.canCloseObjectTab.bind(this),
+      onUnload: this.unloadObjectTab.bind(this),
 
       extensions: [
         projectProvider(this.getProject.bind(this)),
@@ -102,6 +103,11 @@ export class ObjectViewerTabService {
         context.tab.handlerState.objectId = data.newNodeId;
       }
     });
+  }
+
+  private async unloadObjectTab(tab: ITab<IObjectViewerTabState>) {
+    // TODO: we need to call unloadPages, but it's not implemented in the DBObjectPageService
+    await this.dbObjectPageService.closePages(tab);
   }
 
   isPageActive(tab: ITab<IObjectViewerTabState>, page: ObjectPage): boolean {

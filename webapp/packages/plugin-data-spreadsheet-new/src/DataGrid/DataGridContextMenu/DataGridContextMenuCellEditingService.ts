@@ -37,7 +37,7 @@ export class DataGridContextMenuCellEditingService {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-  ) {}
+  ) { }
 
   register(): void {
     this.menuService.addCreator({

@@ -11,6 +11,8 @@ import { type ILoadableState, isContainsException } from '@cloudbeaver/core-util
 
 import { getComputed } from '../getComputed.js';
 import { useObjectRef } from '../useObjectRef.js';
+import { useService } from '@cloudbeaver/core-di';
+import { SessionExpireService } from '@cloudbeaver/core-root';
 
 export function useAutoLoad(
   component: { name: string },
@@ -18,7 +20,8 @@ export function useAutoLoad(
   enabled = true,
   lazy = false,
   throwExceptions = false,
-) {
+): void {
+  const sessionExpireService = useService(SessionExpireService);
   const unmountedRef = useObjectRef({ unmounted: false });
   const [loadFunctionName] = useState(`${component.name}.useAutoLoad(...)` as const);
   if (!Array.isArray(state)) {
@@ -34,7 +37,7 @@ export function useAutoLoad(
 
   const obj = {
     [loadFunctionName]: async () => {
-      if (!enabled || unmountedRef.unmounted) {
+      if (!enabled || unmountedRef.unmounted || sessionExpireService.expired) {
         return;
       }
 

@@ -36,16 +36,19 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
           sanitizeProposal(displayString) === wordLowerCase || replacementString.toLocaleLowerCase() === wordLowerCase,
       );
       const filteredProposals = proposals
-        .filter(
-          ({ replacementString, displayString }) => {
-            const display = sanitizeProposal(displayString);
-            const replacement = replacementString.toLocaleLowerCase();
-
-            return word === '*' ||
-              (display !== wordLowerCase && display.startsWith(wordLowerCase)) ||
-              (replacement !== wordLowerCase && replacement.startsWith(wordLowerCase));
+        .filter(({ replacementString, displayString }) => {
+          if (word === '*') {
+            return true;
           }
-        )
+
+          const display = sanitizeProposal(displayString);
+          const replacement = replacementString.toLocaleLowerCase();
+
+          const displayMatch = display !== wordLowerCase && (display.startsWith(wordLowerCase) || display.includes(wordLowerCase));
+          const replacementMatch = replacement !== wordLowerCase && (replacement.startsWith(wordLowerCase) || replacement.includes(wordLowerCase));
+
+          return displayMatch || replacementMatch;
+        })
         .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
       if (filteredProposals.length === 0 && !hasSameName && explicit) {
