@@ -9,9 +9,9 @@ import { schema } from '@cloudbeaver/core-utils';
 
 const ServerConfigurationFormPartStateConfigSchema = schema.object({
   adminCredentialsSaveEnabled: schema.boolean().optional(),
-  adminName: schema.string().optional(),
-  adminPassword: schema.string().optional(),
-  adminPasswordRepeat: schema.string().optional(),
+  adminName: schema.string().trim().optional(),
+  adminPassword: schema.string().trim().optional(),
+  adminPasswordRepeat: schema.string().trim().optional(),
   anonymousAccessEnabled: schema.boolean().optional(),
   authenticationEnabled: schema.boolean().optional(),
   customConnectionsEnabled: schema.boolean().optional(),
@@ -21,8 +21,8 @@ const ServerConfigurationFormPartStateConfigSchema = schema.object({
   publicCredentialsSaveEnabled: schema.boolean().optional(),
   resourceManagerEnabled: schema.boolean().optional(),
   secretManagerEnabled: schema.boolean().optional(),
-  serverName: schema.string().optional(),
-  serverURL: schema.string().optional(),
+  serverName: schema.string().trim().optional(),
+  serverURL: schema.string().trim().optional(),
   sessionExpireTime: schema.number().optional(),
   forceHttps: schema.boolean().optional(),
   supportedHosts: schema.string(),
@@ -39,10 +39,11 @@ const ServerConfigurationFormPartStateNavigatorSchema = schema.object({
   showUtilityObjects: schema.boolean(),
 });
 
+export const ServerConfigStateSchema = schema.object({
+  serverConfig: ServerConfigurationFormPartStateConfigSchema,
+  navigatorConfig: ServerConfigurationFormPartStateNavigatorSchema,
+});
+
 export type IServerConfig = schema.infer<typeof ServerConfigurationFormPartStateConfigSchema>;
 export type INavigatorConfig = schema.infer<typeof ServerConfigurationFormPartStateNavigatorSchema>;
-
-export type IServerConfigurationFormPartState = {
-  serverConfig: IServerConfig;
-  navigatorConfig: INavigatorConfig;
-};
+export type IServerConfigurationFormPartState = schema.infer<typeof ServerConfigStateSchema>;

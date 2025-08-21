@@ -8,7 +8,7 @@
 import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
 import { executorHandlerFilter, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { isObjectsEqual } from '@cloudbeaver/core-utils';
+import { isObjectsEqual, schema } from '@cloudbeaver/core-utils';
 
 import type { IFormPart } from './IFormPart.js';
 import type { IFormState } from './IFormState.js';
@@ -24,10 +24,12 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
 
   protected loaded: boolean;
   protected loading: boolean;
+  readonly schema: schema.ZodObject | null;
 
   constructor(
     protected readonly formState: IFormState<TFormState>,
     initialState: TPartState,
+    schema: schema.ZodObject | null = null,
   ) {
     this.initialState = initialState;
     this.state = toJS(this.initialState);
@@ -38,14 +40,16 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
 
     this.loaded = false;
     this.loading = false;
+    this.schema = schema;
 
     this.formState.submitTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.save.bind(this)));
     this.formState.formatTask.addHandler(executorHandlerFilter(() => this.isLoaded() && this.isChanged, this.format.bind(this)));
     this.formState.validationTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.handleValidation.bind(this)));
 
-    makeObservable<this, 'loaded' | 'loading' | 'setInitialState' | 'setState'>(this, {
+    makeObservable<this, 'loaded' | 'loading' | 'setInitialState' | 'setState' | 'schema'>(this, {
       initialState: observable,
       state: observable,
+      schema: observable.ref,
       exception: observable.ref,
       promise: observable.ref,
       isSaving: observable.ref,
@@ -152,6 +156,12 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
   private async handleValidation(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<void> {
     try {
       this.exception = null;
+
+      if (this.schema) {
+        const parsedState = this.schema.parse(this.state) as TPartState;
+        this.setState(parsedState);
+      }
+
       await this.validate(data, contexts);
     } catch (exception: any) {
       this.exception = exception;

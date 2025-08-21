@@ -15,7 +15,7 @@ import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
 import { isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 
 import { MIN_SESSION_EXPIRE_TIME } from './Form/MIN_SESSION_EXPIRE_TIME.js';
-import type { IServerConfigurationFormPartState } from './IServerConfigurationFormPartState.js';
+import { ServerConfigStateSchema, type IServerConfigurationFormPartState } from './IServerConfigurationFormPartState.js';
 
 function DEFAULT_STATE_GETTER(): IServerConfigurationFormPartState {
   return {
@@ -52,7 +52,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
     private readonly passwordPolicyResource: PasswordPolicyResource,
     private readonly passwordPolicyService: PasswordPolicyService,
   ) {
-    super(formState, DEFAULT_STATE_GETTER());
+    super(formState, DEFAULT_STATE_GETTER(), ServerConfigStateSchema);
   }
 
   override isOutdated(): boolean {
@@ -81,24 +81,6 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
           ExecutorInterrupter.interrupt(contexts);
         }
       }
-    }
-  }
-
-  protected override format() {
-    if (this.state.serverConfig.adminName) {
-      this.state.serverConfig.adminName = this.state.serverConfig.adminName.trim();
-    }
-
-    if (this.state.serverConfig.adminPassword) {
-      this.state.serverConfig.adminPassword = this.state.serverConfig.adminPassword.trim();
-    }
-
-    if (this.state.serverConfig.serverName) {
-      this.state.serverConfig.serverName = this.state.serverConfig.serverName.trim();
-    }
-
-    if (this.state.serverConfig.serverURL) {
-      this.state.serverConfig.serverURL = this.state.serverConfig.serverURL.trim();
     }
   }
 
