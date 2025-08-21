@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { AuthRolesResource } from '@cloudbeaver/core-authentication';
-import { Select, Group, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Select, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { type IUserFilters, USER_ROLE_ALL, USER_STATUSES } from './useUsersTableFilters.js';
 
@@ -21,22 +21,22 @@ export const UsersTableFiltersDetails = observer<Props>(function UsersTableFilte
   const authRolesResource = useResource(UsersTableFiltersDetails, AuthRolesResource, undefined);
 
   return (
-    <Group box gap>
+    <div className="tw:flex tw:gap-4">
       <Select
         value={filters.status}
         items={USER_STATUSES}
         valueSelector={value => translate(value.label)}
         keySelector={value => value.value}
-        keepSize
+        className="tw:min-w-[172px]"
         onSelect={filters.setStatus}
       >
         {translate('authentication_user_status')}
       </Select>
       {!!authRolesResource.data.length && (
-        <Select items={[...authRolesResource.data, USER_ROLE_ALL]} value={filters.role} keepSize onSelect={filters.setRole}>
+        <Select items={[...authRolesResource.data, USER_ROLE_ALL]} value={filters.role} className="tw:min-w-[172px]" onSelect={filters.setRole}>
           {translate('authentication_user_role')}
         </Select>
       )}
-    </Group>
+    </div>
   );
 });
