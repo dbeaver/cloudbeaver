@@ -32,7 +32,7 @@ import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
 
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import { getConnectionName } from './getConnectionName.js';
-import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
+import { CONNECTION_FORM_OPTIONS_SCHEMA, type IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
 
@@ -70,7 +70,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
   ) {
-    super(formState, defaultStateGetter(formState.state.connectionId));
+    super(formState, defaultStateGetter(formState.state.connectionId), CONNECTION_FORM_OPTIONS_SCHEMA);
 
     this.onDriverIdChange = new Executor();
 
@@ -341,16 +341,11 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     this.state.networkHandlersConfig = observable([]);
     this.state.keepAliveInterval = this.state.keepAliveInterval ? Number(this.state.keepAliveInterval) : undefined;
 
-    this.state.name = this.state.name?.trim();
-    this.state.description = this.state.description?.trim();
-
     if (!this.state.folder) {
       delete this.state.folder;
     }
 
-    if (this.state.configurationType === DriverConfigurationType.Url) {
-      this.state.url = this.state.url?.trim();
-    } else {
+    if (this.state.configurationType !== DriverConfigurationType.Url) {
       // if manual type configuration set, it helps to keep host, port, etc. properties (not saved on backend)
       delete this.state.url;
     }

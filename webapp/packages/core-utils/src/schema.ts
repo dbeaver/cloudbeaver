@@ -57,4 +57,6 @@ export const schemaExtra = {
   },
 };
 
-export { z as schema };
+const RecordKeySchema = z.union([z.string(), z.number(), z.symbol()]);
+
+export { z as schema, RecordKeySchema };
