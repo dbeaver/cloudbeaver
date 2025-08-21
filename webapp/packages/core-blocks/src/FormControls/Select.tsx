@@ -146,9 +146,9 @@ export const Select: SelectType = observer(function Select({
 
   function itemRender(item: (typeof items)[number]): React.ReactNode {
     return (
-      <div className="select__item" title={item ? titleSelector?.(item) : undefined}>
+      <div className="select__item tw:truncate" title={item ? titleSelector?.(item) : undefined}>
         {renderIcon(item)}
-        <span>{valueSelector(item)}</span>
+        {valueSelector(item)}
       </div>
     );
   }
