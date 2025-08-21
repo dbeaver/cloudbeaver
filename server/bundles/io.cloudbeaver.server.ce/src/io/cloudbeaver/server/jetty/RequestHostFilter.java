@@ -39,11 +39,21 @@ public class RequestHostFilter implements Filter {
     @NotNull
     private final CBApplication<?> application;
     private final Set<String> excludedPaths = new HashSet<>();
+    private final Set<String> errorPaths = new HashSet<>();
 
-    public RequestHostFilter(@NotNull CBApplication<?> application, @NotNull Set<String> excludedPaths) {
+    public RequestHostFilter(
+        @NotNull CBApplication<?> application,
+        @NotNull Set<String> excludedPaths,
+        @NotNull Set<String> errorPaths
+    ) {
         this.application = application;
         this.excludedPaths.addAll(
             excludedPaths.stream()
+                .map(path -> ServletAppUtils.removeSideSlashes(path.replace("*", "")))
+                .toList()
+        );
+        this.errorPaths.addAll(
+            errorPaths.stream()
                 .map(path -> ServletAppUtils.removeSideSlashes(path.replace("*", "")))
                 .toList()
         );
@@ -51,6 +61,8 @@ public class RequestHostFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        boolean requestAllowed = true;
+
         if (request instanceof HttpServletRequest httpRequest) {
             CBServerConfig serverConfig = application.getServerConfiguration();
             URI originUri;
@@ -64,7 +76,8 @@ public class RequestHostFilter implements Filter {
             }
             boolean isIpAddress = InetAddresses.isInetAddress(originUri.getHost());
             String servletPath = httpRequest.getServletPath();
-            if (!isIpAddress) {
+            requestAllowed = isIpAddress;
+            if (!requestAllowed) {
                 if (CommonUtils.isNotEmpty(servletPath)) {
                     for (String excludedPath : excludedPaths) {
                         if (servletPath.contains(excludedPath)) {
@@ -73,17 +86,21 @@ public class RequestHostFilter implements Filter {
                         }
                     }
                 }
-                validateHosts(serverConfig, httpRequest, response, originUri);
+                requestAllowed = validateHosts(serverConfig, httpRequest, (HttpServletResponse) response, originUri);
             }
-            validateSchema(serverConfig, httpRequest, response, originUri);
+            if (requestAllowed) {
+                requestAllowed = validateSchema(serverConfig, httpRequest, (HttpServletResponse) response, originUri);
+            }
         }
-        chain.doFilter(request, response);
+        if (requestAllowed) {
+            chain.doFilter(request, response);
+        }
     }
 
-    private void validateSchema(
+    private boolean validateSchema(
         @NotNull CBServerConfig serverConfig,
         @NotNull HttpServletRequest httpRequest,
-        @NotNull ServletResponse response,
+        @NotNull HttpServletResponse response,
         @NotNull URI originUri
     ) {
         boolean httpsExpected = serverConfig.isForceHttps();
@@ -100,22 +117,24 @@ public class RequestHostFilter implements Filter {
                     redirectUrlBuilder.append("?")
                         .append(httpRequest.getQueryString());
                 }
-                ((HttpServletResponse) response).sendRedirect(redirectUrlBuilder.toString());
+                response.sendRedirect(redirectUrlBuilder.toString());
+                return false;
             }
         } catch (Exception e) {
             log.error("Failed to redirect to HTTPS", e);
         }
+        return true;
     }
 
-    private void validateHosts(
+    private boolean validateHosts(
         @NotNull CBServerConfig serverConfig,
         @NotNull HttpServletRequest httpRequest,
-        @NotNull ServletResponse response,
+        @NotNull HttpServletResponse response,
         URI originUri
     ) throws IOException {
         List<String> availableHosts = serverConfig.getSupportedHosts();
         if (CommonUtils.isEmpty(availableHosts)) {
-            return;
+            return true;
         }
         try {
             var requestHostBuilder = new StringBuilder(originUri.getHost());
@@ -124,13 +143,25 @@ public class RequestHostFilter implements Filter {
             }
             String requestHost = requestHostBuilder.toString();
             if (!availableHosts.contains(requestHost)) {
+                for (String errorPath : errorPaths) {
+                    if (httpRequest.getServletPath().contains(errorPath)) {
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.getWriter().write(
+                            "Request host '" + requestHost + "' is not allowed. Available hosts: " + availableHosts
+                        );
+                        return false;
+                    }
+                }
                 log.warn("Request host '" + requestHost + "' is not allowed. Redirect to default: " + availableHosts);
-                redirectToDefaultHost((HttpServletResponse) response, httpRequest, availableHosts);
+                redirectToDefaultHost(response, httpRequest, availableHosts);
+                return false;
             }
         } catch (Throwable e) {
             log.error(e.getMessage(), e);
-            redirectToDefaultHost((HttpServletResponse) response, httpRequest, availableHosts);
+            redirectToDefaultHost(response, httpRequest, availableHosts);
+            return false;
         }
+        return true;
     }
 
     private void redirectToDefaultHost(
