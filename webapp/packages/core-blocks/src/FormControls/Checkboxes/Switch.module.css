@@ -8,17 +8,16 @@
 
 @layer components {
   .field {
-    --dbv-kit-control-outline-offset: 2px;
-    --border-offset: -8px;
+    --dbv-kit-control-outline-offset: -8px;
     position: relative;
 
     &::before {
       content: '';
       position: absolute;
-      top: var(--border-offset);
-      left: var(--border-offset);
-      right: var(--border-offset);
-      bottom: var(--border-offset);
+      top: var(--dbv-kit-control-outline-offset);
+      left: var(--dbv-kit-control-outline-offset);
+      right: var(--dbv-kit-control-outline-offset);
+      bottom: var(--dbv-kit-control-outline-offset);
       border-radius: var(--dbv-kit-control-border-radius);
       border: var(--dbv-kit-control-outline-width) solid transparent;
 
