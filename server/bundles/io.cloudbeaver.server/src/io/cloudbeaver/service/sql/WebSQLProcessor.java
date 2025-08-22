@@ -308,7 +308,7 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
-        DBCExecutionContext executionContext = getExecutionContext(dataContainer);
+        DBCExecutionContext executionContext = DBUtils.getOrOpenDefaultContext(dataContainer, false);
         DBDDataFilter dataFilter = filter.makeDataFilter((resultId == null ? null : contextInfo.getResults(resultId)));
         DBExecUtils.tryExecuteRecover(monitor, connection.getDataSource(), param -> {
             try (DBCSession session = executionContext.openSession(monitor, resolveQueryPurpose(dataFilter), "Read data from container")) {
