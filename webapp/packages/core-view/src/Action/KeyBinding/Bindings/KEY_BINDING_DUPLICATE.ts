@@ -5,9 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { TLocalizationToken } from '@cloudbeaver/core-localization';
+import { createKeyBinding } from '../createKeyBinding.js';
 
-export interface IShortcut {
-  label: TLocalizationToken;
-  code: string[];
-}
+export const KEY_BINDING_DUPLICATE = createKeyBinding({
+  id: 'duplicate',
+  keys: ['alt+shift+r'],
+  preventDefault: true,
+});

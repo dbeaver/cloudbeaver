@@ -7,7 +7,7 @@
  */
 
 import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
-import { getCommonAndOSSpecificKeys, type IKeyBinding } from '@cloudbeaver/core-view';
+import { getCommonAndOSSpecificKeys, type IKeyBinding, type IKeyBindingOptions } from '@cloudbeaver/core-view';
 
 const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
     comma: ',',
@@ -33,8 +33,7 @@ const FORMAT_SHORTCUT_KEYS_MAP: Record<string, string> = {
 const SOURCE_DIVIDER_REGEXP = /\+/gi;
 const APPLIED_DIVIDER = ' + ';
 
-
-export function transformKeys(keyBinding: IKeyBinding): string[] {
+export function transformKeys(keyBinding: IKeyBinding | IKeyBindingOptions): string[] {
     return getCommonAndOSSpecificKeys(keyBinding).map(shortcut =>
         shortcut.split(SOURCE_DIVIDER_REGEXP).map(formatKeyToDisplayKey).join(APPLIED_DIVIDER).toLocaleUpperCase(),
     );

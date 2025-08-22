@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,8 +8,9 @@
 import { getOS, OperatingSystem } from '@cloudbeaver/core-utils';
 
 import type { IKeyBinding } from './IKeyBinding.js';
+import type { IKeyBindingOptions } from './createKeyBinding.js';
 
-export function getCommonAndOSSpecificKeys(keyBinding: IKeyBinding | undefined): string[] {
+export function getCommonAndOSSpecificKeys(keyBinding: IKeyBinding | IKeyBindingOptions | undefined): string[] {
   if (keyBinding === undefined) {
     return [];
   }
@@ -31,7 +32,7 @@ export function getCommonAndOSSpecificKeys(keyBinding: IKeyBinding | undefined):
   return keys;
 }
 
-export function getOSSpecificKeys(keyBinding: IKeyBinding): string | string[] | undefined {
+export function getOSSpecificKeys(keyBinding: IKeyBinding | IKeyBindingOptions): string | string[] | undefined {
   const OS = getOS();
   if (OS === OperatingSystem.windowsOS) {
     return keyBinding.keysWin;

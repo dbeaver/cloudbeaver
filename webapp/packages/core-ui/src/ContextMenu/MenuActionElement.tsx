@@ -25,12 +25,13 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
     binding = getBindingLabel(item.action.binding.binding);
   }
 
+  const title = actionInfo.tooltip ?? actionInfo.label;
+  const tooltip = actionInfo.shortcuts ? `${translate(title || '')} (${actionInfo.shortcuts.join(', ')})` : title;
+
   function handleClick() {
     onClick();
     item.action.activate();
   }
-
-  const label = translate(actionInfo.label);
 
   if (actionInfo.type === 'select') {
     const checked = item.action.isChecked();
@@ -38,21 +39,16 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
       <MenuItemRadio
         hidden={item.hidden}
         id={item.id}
-        aria-label={label}
+        aria-label={actionInfo.label}
         disabled={item.disabled}
         name={item.id}
-        value={label}
+        value={actionInfo.label}
         checked={checked}
         style={{ pointerEvents: 'auto' }}
         focusable
         onClick={handleClick}
       >
-        <MenuItemElement
-          label={actionInfo.label}
-          icon={<Radio checked={checked} size="small" />}
-          tooltip={actionInfo.tooltip}
-          loading={loading}
-        />
+        <MenuItemElement label={actionInfo.label} icon={<Radio checked={checked} size="small" />} tooltip={tooltip} loading={loading} />
       </MenuItemRadio>
     );
   }
@@ -63,16 +59,16 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
       <MenuItemCheckbox
         hidden={item.hidden}
         id={item.id}
-        aria-label={label}
+        aria-label={actionInfo.label}
         disabled={item.disabled}
         name={item.id}
-        value={label}
+        value={actionInfo.label}
         checked={checked}
         style={{ pointerEvents: 'auto' }}
         focusable
         onClick={handleClick}
       >
-        <MenuItemElement label={actionInfo.label} icon={<Checkbox checked={checked} size="small" />} tooltip={actionInfo.tooltip} loading={loading} />
+        <MenuItemElement label={actionInfo.label} icon={<Checkbox checked={checked} size="small" />} tooltip={tooltip} loading={loading} />
       </MenuItemCheckbox>
     );
   }
@@ -81,13 +77,13 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
     <MenuItem
       hidden={item.hidden}
       id={item.id}
-      aria-label={label}
+      aria-label={actionInfo.label}
       disabled={item.disabled}
       style={{ pointerEvents: 'auto' }}
       focusable
       onClick={handleClick}
     >
-      <MenuItemElement label={actionInfo.label} icon={actionInfo.icon} binding={binding} tooltip={actionInfo.tooltip} loading={loading} />
+      <MenuItemElement label={actionInfo.label} icon={actionInfo.icon} binding={binding} tooltip={tooltip} loading={loading} />
     </MenuItem>
   );
 });

@@ -8,7 +8,6 @@
 import { observer } from 'mobx-react-lite';
 
 import { ActionIconButton, getComputed, preventFocusHandler, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { transformKeys } from '@cloudbeaver/core-view';
 
 import { KEY_BINDING_SQL_EDITOR_EXECUTE } from '../actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE.js';
 import { KEY_BINDING_SQL_EDITOR_EXECUTE_NEW } from '../actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_NEW.js';
@@ -45,14 +44,14 @@ export const SQLEditorActions = observer<Props>(function SQLEditorActions({ data
                 <ActionIconButton
                   name="/icons/sql_exec.svg"
                   disabled={disabled}
-                  title={`${translate('sql_editor_sql_execution_button_tooltip')} (${transformKeys(KEY_BINDING_SQL_EDITOR_EXECUTE)})`}
+                  title={`${translate('sql_editor_sql_execution_button_tooltip')} (${KEY_BINDING_SQL_EDITOR_EXECUTE.transformedKeys.join(', ')})`}
                   img
                   onClick={data.executeQuery}
                 />
                 <ActionIconButton
                   name="/icons/sql_exec_new.svg"
                   disabled={disabled}
-                  title={`${translate('sql_editor_sql_execution_new_tab_button_tooltip')} (${transformKeys(KEY_BINDING_SQL_EDITOR_EXECUTE_NEW)})`}
+                  title={`${translate('sql_editor_sql_execution_new_tab_button_tooltip')} (${KEY_BINDING_SQL_EDITOR_EXECUTE_NEW.transformedKeys.join(', ')})`}
                   img
                   onClick={data.executeQueryNewTab}
                 />
@@ -62,7 +61,7 @@ export const SQLEditorActions = observer<Props>(function SQLEditorActions({ data
               name="/icons/sql_script_exec.svg"
               disabled={disabled}
               hidden={isActiveSegmentMode}
-              title={`${translate('sql_editor_sql_execution_script_button_tooltip')} (${transformKeys(KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT)})`}
+              title={`${translate('sql_editor_sql_execution_script_button_tooltip')} (${KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT.transformedKeys.join(', ')})`}
               img
               onClick={data.executeScript}
             />
@@ -71,7 +70,7 @@ export const SQLEditorActions = observer<Props>(function SQLEditorActions({ data
                 name="/icons/sql_execution_plan.svg"
                 disabled={disabled}
                 hidden={isActiveSegmentMode}
-                title={`${translate('sql_editor_execution_plan_button_tooltip')} (${transformKeys(KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN)})`}
+                title={`${translate('sql_editor_execution_plan_button_tooltip')} (${KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN.transformedKeys.join(', ')})`}
                 img
                 onClick={data.showExecutionPlan}
               />

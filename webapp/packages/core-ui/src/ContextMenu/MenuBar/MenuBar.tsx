@@ -21,6 +21,7 @@ import {
   useListKeyboardNavigation,
   useMergeRefs,
   useS,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { type IDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import {
@@ -146,11 +147,16 @@ export interface IMenuBarActionProps {
 
 export const MenuBarAction = registry(
   observer<IMenuBarActionProps>(function MenuBarAction({ item, parentMenuInfo, submenu, className }) {
+    const translate = useTranslate();
     const actionInfo = item.action.actionInfo;
     const loading = item.action.isLoading();
 
     /** @deprecated must be refactored (#1)*/
     const displayLabel = item.action.isLabelVisible();
+
+    const tooltip = actionInfo.shortcuts
+      ? `${translate(actionInfo.tooltip || '')} (${actionInfo.shortcuts.join(', ')})`
+      : translate(actionInfo.tooltip ?? parentMenuInfo?.tooltip);
 
     function handleClick() {
       item.events?.onSelect?.();
@@ -165,7 +171,7 @@ export const MenuBarAction = registry(
         label={actionInfo.label}
         displayLabel={displayLabel}
         icon={actionInfo.icon ?? parentMenuInfo?.icon}
-        title={actionInfo.tooltip ?? parentMenuInfo?.tooltip}
+        title={tooltip}
         disabled={item.disabled}
         loading={loading}
         submenu={submenu}
