@@ -15,41 +15,49 @@ import type { ISettingChangeData, ISettingsSource } from './ISettingsSource.js';
 import type { ISettingsLayer } from './SettingsLayer.js';
 import { isEditableSettingsSource, type IEditableSettingsSource } from './IEditableSettingsSource.js';
 
-type SettingsSource = ISettingsSource | IEditableSettingsSource;
+type SettingsSourceUnion = ISettingsSource | IEditableSettingsSource;
 
 interface ISettingsSourcesLayer {
   layer: ISettingsLayer;
-  sources: SettingsSource[];
+  sources: SettingsSourceUnion[];
 }
 
 export class SettingsResolverSource implements ISettingsResolverSource {
   readonly onChange: ISyncExecutor<ISettingChangeData>;
-  protected get sources(): SettingsSource[] {
-    return this.layers
+  protected get sources(): SettingsSourceUnion[] {
+    return [...this.layers, ...this.resolvers.map(r => r.layers).flat()]
       .slice()
       .sort((a, b) => a.layer.level - b.layer.level)
       .flatMap(layer => layer.sources)
       .reverse();
   }
   protected layers: ISettingsSourcesLayer[];
+  protected resolvers: SettingsResolverSource[];
   private updating: boolean;
 
   constructor() {
     this.onChange = new SyncExecutor();
     this.layers = [];
+    this.resolvers = [];
     this.updating = false;
-    makeObservable<this, 'layers' | 'sources' | 'update'>(this, {
+    makeObservable<this, 'layers' | 'sources' | 'update' | 'resolvers'>(this, {
       layers: observable.shallow,
       sources: computed,
       update: action,
+      resolvers: observable.shallow,
     });
   }
 
-  hasResolver(layer: ISettingsLayer, resolver: SettingsSource): boolean {
+  add(...resolvers: SettingsResolverSource[]): this {
+    this.resolvers.push(...resolvers);
+    return this;
+  }
+
+  hasResolver(layer: ISettingsLayer, resolver: SettingsSourceUnion): boolean {
     return this.tryGetLayerSources(layer)?.sources.includes(resolver) || false;
   }
 
-  removeResolver(layer: ISettingsLayer, resolver: SettingsSource): void {
+  removeResolver(layer: ISettingsLayer, resolver: SettingsSourceUnion): void {
     const layerSources = this.getLayerSources(layer);
 
     const index = layerSources.sources.indexOf(resolver);
@@ -60,7 +68,7 @@ export class SettingsResolverSource implements ISettingsResolverSource {
     }
   }
 
-  addResolver(layer: ISettingsLayer, ...resolvers: SettingsSource[]): void {
+  addResolver(layer: ISettingsLayer, ...resolvers: SettingsSourceUnion[]): void {
     if (resolvers.some(this.hasResolver.bind(this, layer))) {
       return;
     }
