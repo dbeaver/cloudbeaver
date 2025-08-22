@@ -25,7 +25,7 @@ export const ElementsTreeContentLoader = observer<React.PropsWithChildren<Props>
   children,
 }) {
   const hasChildren = getComputed(() => context.tree.getNodeChildren(context.tree.root).length > 0);
-  const loading = getComputed(() => childrenState.isLoading() || context.tree.isLoading() || context.tree.isOutdated?.());
+  const loading = getComputed(() => (childrenState.isLoading() || context.tree.isLoading()) && !context.tree.isLoaded());
 
   if (!hasChildren) {
     if (loading) {

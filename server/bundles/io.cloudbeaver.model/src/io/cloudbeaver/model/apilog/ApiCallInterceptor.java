@@ -37,6 +37,7 @@ public interface ApiCallInterceptor {
         @NotNull HttpServletRequest request,
         @Nullable Map<String, Object> variables,
         @NotNull String apiCall,
+        @Nullable String userId,
         @NotNull LocalDateTime startTime,
         @Nullable String errorMessage,
         @NotNull String apiProtocol
