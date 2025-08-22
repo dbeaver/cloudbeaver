@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,6 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Container, Expandable, FieldCheckbox, Flex, Group, InputField, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
+import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
 
 const MAX_KEEP_ALIVE_INTERVAL = 32767;
 const DEFAULT_CONFIG: ConnectionConfig = {
@@ -20,7 +21,7 @@ const DEFAULT_CONFIG: ConnectionConfig = {
 };
 
 interface Props {
-  config: ConnectionConfig;
+  config: IConnectionFormOptionsState;
   disabled?: boolean;
   readonly?: boolean;
 }

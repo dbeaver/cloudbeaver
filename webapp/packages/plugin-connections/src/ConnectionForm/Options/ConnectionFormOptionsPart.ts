@@ -41,16 +41,15 @@ const MAIN_PROPERTY_HOST_KEY = 'host';
 const MAIN_PROPERTY_PORT_KEY = 'port';
 const MAIN_PROPERTY_SERVER_KEY = 'server';
 
-const defaultStateGetter = (connectionId?: string, credentials?: Record<string, any>) =>
-  ({
-    connectionId,
-    configurationType: DriverConfigurationType.Manual,
-    keepAliveInterval: 0,
-    credentials: credentials ?? {},
-    mainPropertyValues: {},
-    networkHandlersConfig: [],
-    providerProperties: {},
-  }) as IConnectionFormOptionsState;
+const defaultStateGetter = (connectionId?: string, credentials?: Record<string, any>) => ({
+  connectionId,
+  configurationType: DriverConfigurationType.Manual,
+  keepAliveInterval: 0,
+  credentials: credentials ?? {},
+  mainPropertyValues: {},
+  networkHandlersConfig: [],
+  providerProperties: {},
+});
 
 export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsState, IConnectionFormState> {
   private disposeReaction: () => void;
@@ -124,7 +123,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     const result = await this.commonDialogService.open(ConnectionAuthenticationDialogLoader, {
-      config: state,
+      config: normalizeStateToConnectionConfig(state),
       authModelId: state.authModelId ?? null,
       networkHandlers: this.formState.state.requiredNetworkHandlersIds,
       projectId: this.formState.state.projectId,
@@ -208,7 +207,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
 
     config.host = customOptionsInfo.host || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_HOST_KEY];
     config.port = customOptionsInfo.port || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_PORT_KEY];
-    config.serverName = customOptionsInfo.serverName || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_SERVER_KEY] || undefined;
+    config.serverName = customOptionsInfo.serverName || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_SERVER_KEY];
     config.databaseName = customOptionsInfo.databaseName || customOptionsInfo.mainPropertyValues?.[MAIN_PROPERTY_DATABASE_KEY];
 
     config.url = customOptionsInfo.url;
@@ -478,13 +477,16 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     const submitType = contexts.getContext(formSubmitContext);
     if (submitType.type === 'submit') {
       if (this.formState.mode === 'edit') {
-        await this.connectionInfoResource.update(this.connectionKey!, this.state);
+        await this.connectionInfoResource.update(this.connectionKey!, normalizeStateToConnectionConfig(this.state));
       } else {
         const connections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(this.formState.state.projectId));
         const connectionNames = connections.map(connection => connection.name);
 
         const uniqueName = getUniqueName(this.state.name || '', connectionNames);
-        const connection = await this.connectionInfoResource.create(this.formState.state.projectId, { ...this.state, name: uniqueName });
+        const connection = await this.connectionInfoResource.create(
+          this.formState.state.projectId,
+          normalizeStateToConnectionConfig({ ...this.state, name: uniqueName }),
+        );
         this.state.connectionId = connection.id;
         this.initialState.connectionId = connection.id;
         this.formState.setMode(FormMode.Edit);
@@ -497,7 +499,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
           return;
         }
 
-        const info = await this.connectionInfoResource.test(this.formState.state.projectId, stateCopy);
+        const info = await this.connectionInfoResource.test(this.formState.state.projectId, normalizeStateToConnectionConfig(stateCopy));
 
         this.notificationService.logSuccess({
           title: 'plugin_connections_connection_established',
@@ -563,4 +565,16 @@ function isCredentialsChanged(authProperties: ObjectPropertyInfo[], credentials:
     }
   }
   return false;
+}
+
+function normalizeStateToConnectionConfig(state: IConnectionFormOptionsState): ConnectionConfig {
+  return {
+    ...state,
+    databaseName: state.databaseName || undefined,
+    description: state.description || undefined,
+    defaultCatalogName: state.defaultCatalogName || undefined,
+    defaultSchemaName: state.defaultSchemaName || undefined,
+    serverName: state.serverName || undefined,
+    port: state.port || undefined,
+  };
 }

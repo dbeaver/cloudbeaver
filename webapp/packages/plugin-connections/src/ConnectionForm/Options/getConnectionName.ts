@@ -9,9 +9,9 @@ const MAX_HOST_LENGTH = 20;
 
 interface IConnectionNameOptions {
   driverName: string;
-  host?: string;
-  port?: string;
-  defaultPort?: string;
+  host?: string | null;
+  port?: string | null;
+  defaultPort?: string | null;
 }
 
 export function getConnectionName({ driverName, host, port, defaultPort }: IConnectionNameOptions): string {
