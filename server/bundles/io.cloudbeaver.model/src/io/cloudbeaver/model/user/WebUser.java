@@ -77,6 +77,10 @@ public class WebUser {
         return user.getUserTeams();
     }
 
+    public void setTeams(@NotNull String[] teams) {
+        user.setUserTeams(teams);
+    }
+
     @Override
     public int hashCode() {
         return user.getUserId().hashCode();
