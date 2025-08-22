@@ -104,7 +104,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         this.smConfig = smConfig;
     }
 
-    private boolean isSubjectExists(String subjectId) throws DBCException {
+    protected boolean isSubjectExists(String subjectId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT 1 FROM {table_prefix}CB_AUTH_SUBJECT WHERE SUBJECT_ID=?")
