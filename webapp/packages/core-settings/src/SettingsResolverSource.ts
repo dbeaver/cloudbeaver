@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
@@ -50,6 +50,18 @@ export class SettingsResolverSource implements ISettingsResolverSource {
 
   add(...resolvers: SettingsResolverSource[]): this {
     this.resolvers.push(...resolvers);
+    for (const resolver of resolvers) {
+      resolver.onChange.next(
+        this.onChange,
+        data => {
+          if (resolver.has(data.key)) {
+            return data;
+          }
+          return { ...data, value: this.getValue(data.key) };
+        },
+        data => !resolver.has(data.key) || this.sources.find(r => r.has(data.key)) === resolver,
+      );
+    }
     return this;
   }
 

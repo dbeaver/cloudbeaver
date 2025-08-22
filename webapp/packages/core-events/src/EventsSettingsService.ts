@@ -45,7 +45,7 @@ export class EventsSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<EventsSettingsSchema>(this.settingsResolverService, {
+      createSettingsAliasResolver<EventsSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'plugin.notifications.maxPersistentAllow': 'core_events.maxPersistentAllow',
         'plugin.notifications.notificationsPool': 'core_events.notificationsPool',
       }),
