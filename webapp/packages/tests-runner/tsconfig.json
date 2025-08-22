@@ -8,9 +8,6 @@
   },
   "references": [
     {
-      "path": "../../../common-react/@dbeaver/react-tests"
-    },
-    {
       "path": "../../../common-typescript/@dbeaver/cli"
     },
     {
