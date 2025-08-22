@@ -5,14 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { RecordKeySchema, schema } from '@cloudbeaver/core-utils';
+import { schema } from '@cloudbeaver/core-utils';
 
 export const USER_PROFILE_FORM_INFO_PART_STATE_SCHEMA = schema
   .object({
     userId: schema.string(),
     displayName: schema.string().trim(),
     authRole: schema.string().optional(),
-    metaParameters: schema.record(RecordKeySchema, schema.union([schema.string().trim(), schema.any()])).optional(),
+    metaParameters: schema.record(schema.string(), schema.union([schema.string().trim(), schema.any()])).optional(),
   })
   .required();
 

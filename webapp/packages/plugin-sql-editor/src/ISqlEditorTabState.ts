@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { RecordKeySchema, schema } from '@cloudbeaver/core-utils';
+import { schema } from '@cloudbeaver/core-utils';
 
 import { OUTPUT_LOG_TYPES } from './SqlResultTabs/OutputLogs/IOutputLogTypes.js';
 
@@ -49,7 +49,7 @@ export const EXECUTION_PLAN_TAB_SCHEMA = schema.object({
   tabId: schema.string(),
   order: schema.number(),
   query: schema.string(),
-  options: schema.record(RecordKeySchema, schema.any()).optional(),
+  options: schema.record(schema.string(), schema.any()).optional(),
 });
 
 export type IExecutionPlanTab = schema.infer<typeof EXECUTION_PLAN_TAB_SCHEMA>;
@@ -74,7 +74,7 @@ export const SQL_EDITOR_TAB_STATE_SCHEMA = schema.object({
   outputLogsTab: OUTPUT_LOGS_TAB_SCHEMA.optional(),
   currentModeId: schema.string().optional(),
   modeState: schema.array(schema.tuple([schema.string(), schema.any()])),
-  metadata: schema.record(RecordKeySchema, schema.any()).optional(),
+  metadata: schema.record(schema.string(), schema.any()).optional(),
 });
 
 export type ISqlEditorTabState = schema.infer<typeof SQL_EDITOR_TAB_STATE_SCHEMA>;

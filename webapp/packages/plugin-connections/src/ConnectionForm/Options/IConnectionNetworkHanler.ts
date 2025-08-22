@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
-import { RecordKeySchema, schema } from '@cloudbeaver/core-utils';
+import { schema } from '@cloudbeaver/core-utils';
 
 export const CONNECTION_NETWORK_HANDLER_SCHEMA = schema.object({
   id: schema.string(),
@@ -14,9 +14,9 @@ export const CONNECTION_NETWORK_HANDLER_SCHEMA = schema.object({
   enabled: schema.boolean().optional(),
   key: schema.string().optional(),
   password: schema.string().optional(),
-  properties: schema.record(RecordKeySchema, schema.any()).optional(),
+  properties: schema.record(schema.string(), schema.any()).optional(),
   savePassword: schema.boolean().optional(),
-  secureProperties: schema.record(RecordKeySchema, schema.any()).optional(),
+  secureProperties: schema.record(schema.string(), schema.any()).optional(),
   userName: schema.string().optional(),
 });
 
