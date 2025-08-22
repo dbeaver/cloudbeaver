@@ -35,6 +35,7 @@ import {
   useTranslate,
   useAuthenticationAction,
   useAutoLoad,
+  Text,
 } from '@cloudbeaver/core-blocks';
 import {
   ConnectionInfoAuthPropertiesResource,
@@ -177,10 +178,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
         <Container medium gap>
           <Group gap>
             {isAdmin && !driver?.driverInstalled && (
-              <Alert
-                title={translate('core_connections_connection_driver_not_installed')}
-                message={translate('plugin_connections_connection_driver_not_installed_message')}
-              />
+              <Alert title={translate('core_connections_connection_driver_not_installed')}>
+                <Text>{translate('plugin_connections_connection_driver_not_installed_message')}</Text>
+              </Alert>
             )}
             <Group form box gap>
               <Container wrap gap>

@@ -38,11 +38,11 @@ import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.utils.ServletAppUtils;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.utils.CommonUtils;
@@ -144,7 +144,7 @@ public class GraphQLEndpoint extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String contentType = request.getContentType();
         if (CommonUtils.isEmpty(contentType) || !contentType.startsWith(HttpConstants.TYPE_JSON)) {
             String error = "Bad request," + (CommonUtils.isEmpty(contentType)
@@ -225,11 +225,11 @@ public class GraphQLEndpoint extends HttpServlet {
     }
 
     private void executeQuery(
-        HttpServletRequest request,
-        HttpServletResponse response,
-        String query,
-        Map<String, Object> variables,
-        String operationName
+        @NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response,
+        @NotNull String query,
+        @Nullable Map<String, Object> variables,
+        @Nullable String operationName
     ) throws IOException {
         Map<String, Object> mapOfContext =
             Map.of(
@@ -271,15 +271,24 @@ public class GraphQLEndpoint extends HttpServlet {
                 errorMessage = executionException.getMessage();
             }
             if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
-                apiCallInterceptor.onApiCallEvent(request, variables, operationName, startTime, errorMessage, API_PROTOCOL);
+                apiCallInterceptor.onApiCallEvent(
+                    request,
+                    variables,
+                    CommonUtils.notEmpty(operationName),
+                    startTime,
+                    errorMessage,
+                    API_PROTOCOL
+                );
             }
         }
 
-        Map<String, Object> resJSON = executionResult.toSpecification();
-        String resString = gson.toJson(resJSON);
-        setDevelHeaders(request, response);
-        response.setContentType(GraphQLConstants.CONTENT_TYPE_JSON_UTF8);
-        response.getWriter().print(resString);
+        if (executionResult != null) {
+            Map<String, Object> resJSON = executionResult.toSpecification();
+            String resString = gson.toJson(resJSON);
+            setDevelHeaders(request, response);
+            response.setContentType(GraphQLConstants.CONTENT_TYPE_JSON_UTF8);
+            response.getWriter().print(resString);
+        }
     }
 
 
@@ -297,8 +306,8 @@ public class GraphQLEndpoint extends HttpServlet {
             if (exception instanceof GraphQLException && exception.getCause() != null) {
                 exception = exception.getCause();
             }
-            if (exception instanceof InvocationTargetException) {
-                exception = ((InvocationTargetException) exception).getTargetException();
+            if (exception instanceof InvocationTargetException ite) {
+                exception = ite.getTargetException();
             }
             log.debug(
                 "GraphQL call failed at '" + handlerParameters.getPath() + "'" /*+ ", " + handlerParameters.getArgumentValues()*/,
@@ -318,9 +327,9 @@ public class GraphQLEndpoint extends HttpServlet {
             if (!(exception instanceof GraphQLError)) {
                 exception = new DBWebException(exception.getMessage(), exception);
             }
-            if (exception instanceof DBWebException) {
-                ((DBWebException) exception).setPath(path.toList());
-                ((DBWebException) exception).setLocations(Collections.singletonList(sourceLocation));
+            if (exception instanceof DBWebException webException) {
+                webException.setPath(path.toList());
+                webException.setLocations(Collections.singletonList(sourceLocation));
             }
             var result = handlerResult.error((GraphQLError) exception).build();
             return CompletableFuture.completedFuture(result);
