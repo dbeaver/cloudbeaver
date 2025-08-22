@@ -26,7 +26,7 @@ import textareaStyle from './Textarea.module.css';
 
 type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'style'> &
   ILayoutSizeProps & {
-    description?: string;
+    description?: React.ReactNode;
     labelTooltip?: string;
     embedded?: boolean;
     cursorInitiallyAtEnd?: boolean;

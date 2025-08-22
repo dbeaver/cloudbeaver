@@ -28,6 +28,21 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
     return `example.com\n${exampleWithPort}\n127.0.0.1`;
   }
 
+  function validateSupportedHosts(): React.ReactNode {
+    const supportedHosts = state.serverConfig.supportedHosts;
+    const currentHost = window.location.host;
+
+    if (supportedHosts.trim() && !supportedHosts.includes(currentHost)) {
+      return (
+        <div className="theme-text-negative">
+          {translate('administration_configuration_wizard_configuration_supported_hosts_warning', undefined, { host: currentHost })}
+        </div>
+      );
+    }
+
+    return null;
+  }
+
   return (
     <Group form gap>
       <GroupTitle>{translate('administration_configuration_wizard_configuration_server_info')}</GroupTitle>
@@ -39,7 +54,12 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         name="supportedHosts"
         rows={3}
         state={state.serverConfig}
-        description={translate('administration_configuration_wizard_configuration_supported_hosts_description')}
+        description={
+          <>
+            {translate('administration_configuration_wizard_configuration_supported_hosts_description')}
+            {validateSupportedHosts()}
+          </>
+        }
         placeholder={constructSupportedHostsExample()}
       >
         {translate('administration_configuration_wizard_configuration_supported_hosts')}

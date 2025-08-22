@@ -38,6 +38,10 @@ export default [
     'administration_configuration_wizard_configuration_supported_hosts_description',
     'You can specify multiple server URLs separated by a new line. An empty value means that all URLs are allowed',
   ],
+  [
+    'administration_configuration_wizard_configuration_supported_hosts_warning',
+    "You are currently using this host ({arg:host}). To avoid losing access, it's recommended to remove this host from another allowed host, rather than from your current one.",
+  ],
 
   ['administration_configuration_wizard_configuration_server_info', '服务器信息'],
   ['administration_configuration_wizard_configuration_server_name', '服务器名称'],
