@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Container, Form, Loader, Placeholder, s, StatusMessage, useForm, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
+import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { formSubmitContext, TabList, TabPanelList, TabsState, type IFormState } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormActionsContext, type IConnectionFormActionsContext } from './ConnectFormActionsContext.js';
@@ -20,12 +21,11 @@ import { ConnectionFormService } from './ConnectionFormService.js';
 import { getConnectionFormOptionsPart } from './Options/getConnectionFormOptionsPart.js';
 import { ExecutionContext } from '@cloudbeaver/core-executor';
 import type { IConnectionFormState } from './IConnectionFormState.js';
-import type { IConnectionFormOptionsState } from './Options/IConnectionFormOptionsState.js';
 
 export interface ConnectionFormProps {
   formState: ConnectionFormState;
   onCancel?: () => void;
-  onSave?: (config: IConnectionFormOptionsState) => void;
+  onSave?: (config: ConnectionConfig) => void;
   className?: string;
 }
 

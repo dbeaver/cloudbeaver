@@ -8,10 +8,10 @@
 import { observer } from 'mobx-react-lite';
 
 import { Container, InputField, useTranslate } from '@cloudbeaver/core-blocks';
-import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
+import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 interface Props {
-  config: IConnectionFormOptionsState;
+  config: ConnectionConfig;
   disabled?: boolean;
   embedded?: boolean;
   requiresServerName?: boolean;

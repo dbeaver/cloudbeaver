@@ -32,7 +32,7 @@ import { parseJdbcUri } from '@dbeaver/jdbc-uri-parser';
 
 import { getDefaultConfigurationType } from './getDefaultConfigurationType.js';
 import { getConnectionName } from './getConnectionName.js';
-import { CONNECTION_FORM_OPTIONS_SCHEMA, type IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
+import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { ConnectionAuthenticationDialogLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationDialogLoader.js';
 
@@ -41,15 +41,16 @@ const MAIN_PROPERTY_HOST_KEY = 'host';
 const MAIN_PROPERTY_PORT_KEY = 'port';
 const MAIN_PROPERTY_SERVER_KEY = 'server';
 
-const defaultStateGetter = (connectionId?: string, credentials?: Record<string, any>) => ({
-  connectionId,
-  configurationType: DriverConfigurationType.Manual,
-  keepAliveInterval: 0,
-  credentials: credentials ?? {},
-  mainPropertyValues: {},
-  networkHandlersConfig: [],
-  providerProperties: {},
-});
+const defaultStateGetter = (connectionId?: string, credentials?: Record<string, any>) =>
+  ({
+    connectionId,
+    configurationType: DriverConfigurationType.Manual,
+    keepAliveInterval: 0,
+    credentials: credentials ?? {},
+    mainPropertyValues: {},
+    networkHandlersConfig: [],
+    providerProperties: {},
+  }) as IConnectionFormOptionsState;
 
 export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsState, IConnectionFormState> {
   private disposeReaction: () => void;
@@ -69,7 +70,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     private readonly commonDialogService: CommonDialogService,
     private readonly notificationService: NotificationService,
   ) {
-    super(formState, defaultStateGetter(formState.state.connectionId), CONNECTION_FORM_OPTIONS_SCHEMA);
+    super(formState, defaultStateGetter(formState.state.connectionId));
 
     this.onDriverIdChange = new Executor();
 
@@ -123,7 +124,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     const result = await this.commonDialogService.open(ConnectionAuthenticationDialogLoader, {
-      config: normalizeStateToConnectionConfig(state),
+      config: state,
       authModelId: state.authModelId ?? null,
       networkHandlers: this.formState.state.requiredNetworkHandlersIds,
       projectId: this.formState.state.projectId,
@@ -340,11 +341,16 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     this.state.networkHandlersConfig = observable([]);
     this.state.keepAliveInterval = this.state.keepAliveInterval ? Number(this.state.keepAliveInterval) : undefined;
 
+    this.state.name = this.state.name?.trim();
+    this.state.description = this.state.description?.trim();
+
     if (!this.state.folder) {
       delete this.state.folder;
     }
 
-    if (this.state.configurationType !== DriverConfigurationType.Url) {
+    if (this.state.configurationType === DriverConfigurationType.Url) {
+      this.state.url = this.state.url?.trim();
+    } else {
       // if manual type configuration set, it helps to keep host, port, etc. properties (not saved on backend)
       delete this.state.url;
     }
@@ -477,16 +483,13 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     const submitType = contexts.getContext(formSubmitContext);
     if (submitType.type === 'submit') {
       if (this.formState.mode === 'edit') {
-        await this.connectionInfoResource.update(this.connectionKey!, normalizeStateToConnectionConfig(this.state));
+        await this.connectionInfoResource.update(this.connectionKey!, this.state);
       } else {
         const connections = await this.connectionInfoResource.load(ConnectionInfoProjectKey(this.formState.state.projectId));
         const connectionNames = connections.map(connection => connection.name);
 
         const uniqueName = getUniqueName(this.state.name || '', connectionNames);
-        const connection = await this.connectionInfoResource.create(
-          this.formState.state.projectId,
-          normalizeStateToConnectionConfig({ ...this.state, name: uniqueName }),
-        );
+        const connection = await this.connectionInfoResource.create(this.formState.state.projectId, { ...this.state, name: uniqueName });
         this.state.connectionId = connection.id;
         this.initialState.connectionId = connection.id;
         this.formState.setMode(FormMode.Edit);
@@ -499,7 +502,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
           return;
         }
 
-        const info = await this.connectionInfoResource.test(this.formState.state.projectId, normalizeStateToConnectionConfig(stateCopy));
+        const info = await this.connectionInfoResource.test(this.formState.state.projectId, stateCopy);
 
         this.notificationService.logSuccess({
           title: 'plugin_connections_connection_established',
@@ -565,16 +568,4 @@ function isCredentialsChanged(authProperties: ObjectPropertyInfo[], credentials:
     }
   }
   return false;
-}
-
-function normalizeStateToConnectionConfig(state: IConnectionFormOptionsState): ConnectionConfig {
-  return {
-    ...state,
-    databaseName: state.databaseName || undefined,
-    description: state.description || undefined,
-    defaultCatalogName: state.defaultCatalogName || undefined,
-    defaultSchemaName: state.defaultSchemaName || undefined,
-    serverName: state.serverName || undefined,
-    port: state.port || undefined,
-  };
 }

@@ -9,7 +9,6 @@ import { observer } from 'mobx-react-lite';
 
 import { Container, Expandable, FieldCheckbox, Flex, Group, InputField, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import type { IConnectionFormOptionsState } from './IConnectionFormOptionsState.js';
 
 const MAX_KEEP_ALIVE_INTERVAL = 32767;
 const DEFAULT_CONFIG: ConnectionConfig = {
@@ -21,7 +20,7 @@ const DEFAULT_CONFIG: ConnectionConfig = {
 };
 
 interface Props {
-  config: IConnectionFormOptionsState;
+  config: ConnectionConfig;
   disabled?: boolean;
   readonly?: boolean;
 }
