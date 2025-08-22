@@ -274,8 +274,7 @@ public class GraphQLEndpoint extends HttpServlet {
                 apiCallInterceptor.onApiCallEvent(
                     request,
                     variables,
-                    CommonUtils.notEmpty(operationName),
-                    startTime,
+                    CommonUtils.notEmpty(operationName), userId, startTime,
                     errorMessage,
                     API_PROTOCOL
                 );
