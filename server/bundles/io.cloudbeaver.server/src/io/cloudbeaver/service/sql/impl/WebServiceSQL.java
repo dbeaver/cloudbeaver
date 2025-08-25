@@ -55,7 +55,7 @@ import org.jkiss.dbeaver.model.sql.parser.SQLParserContext;
 import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorConfigurationRegistry;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
-import org.jkiss.dbeaver.model.sql.semantics.completion.SQLCompletionSorter;
+import org.jkiss.dbeaver.model.sql.semantics.completion.SQLCompletionProposalComparator;
 import org.jkiss.dbeaver.model.sql.semantics.completion.SQLQueryCompletionAnalyzer;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSObject;
@@ -201,11 +201,11 @@ public class WebServiceSQL implements DBWServiceSQL {
             for (int i = 0; i < proposals.size(); i++) {
                 result[i] = new WebSQLCompletionProposal(proposals.get(i));
             }
-            SQLCompletionSorter sqlCompletionSorter = new SQLCompletionSorter(
+            SQLCompletionProposalComparator sqlCompletionProposalComparator = new SQLCompletionProposalComparator(
                 completionContext.isSortAlphabetically(),
                 completionContext.isSearchInsideNames()
             );
-            Arrays.sort(result, (o1, o2) -> sqlCompletionSorter.compare(o1.getProposal(), o2.getProposal()));
+            Arrays.sort(result, (o1, o2) -> sqlCompletionProposalComparator.compare(o1.getProposal(), o2.getProposal()));
             return result;
         } catch (Exception e) {
             throw new DBWebException("Error processing SQL proposals", e);
