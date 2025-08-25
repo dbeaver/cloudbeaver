@@ -25,6 +25,7 @@ import jakarta.websocket.HandshakeResponse;
 import jakarta.websocket.server.HandshakeRequest;
 import jakarta.websocket.server.ServerEndpointConfig;
 import org.eclipse.jetty.ee10.websocket.jakarta.server.internal.JakartaWebSocketCreator;
+import org.eclipse.jetty.http.BadMessageException;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -88,7 +89,7 @@ public class CBWebSocketServerConfigurator extends ServerEndpointConfig.Configur
             throw new RuntimeException(e.getMessage(), e);
         }
         if (sec.getUserProperties().get(PROP_WEB_SESSION) == null) {
-            throw new RuntimeException("No web session found for websocket request");
+            throw new BadMessageException("No web session found for websocket request");
         }
     }
 

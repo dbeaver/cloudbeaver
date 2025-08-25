@@ -50,10 +50,10 @@ export class NavTreeSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<NavTreeSettingsSchema>(this.settingsResolverService, {
+      createSettingsAliasResolver<NavTreeSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'core.navigation-tree.childrenLimit': 'core.app.navigationTree.childrenLimit',
       }),
-      createSettingsAliasResolver<NavTreeSettingsSchema>(this.settingsResolverService, {
+      createSettingsAliasResolver<NavTreeSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'core.navigation-tree.deleting': 'core.app.metadata.deleting',
         'core.navigation-tree.editing': 'core.app.metadata.editing',
       }),

@@ -41,6 +41,7 @@
     "@cloudbeaver/core-sdk": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
+    "@dbeaver/react-tests": "workspace:^",
     "msw": "^2",
     "typescript": "^5",
     "vitest": "^3"

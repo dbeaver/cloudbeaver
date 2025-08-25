@@ -48,7 +48,7 @@ export class DataGridSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<DataGridSettingsSchema>(this.settingsResolverService, {
+      createSettingsAliasResolver<DataGridSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'plugin.data-spreadsheet.hidden': 'plugin_data_spreadsheet_new.hidden',
       }),
     );
