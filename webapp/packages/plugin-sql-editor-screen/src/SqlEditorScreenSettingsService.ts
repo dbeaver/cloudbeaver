@@ -33,7 +33,7 @@ export class SqlEditorScreenSettingsService extends Dependency {
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
     this.settingsResolverService.addResolver(
       HIGHEST_SETTINGS_LAYER,
-      createSettingsOverrideResolver<SqlEditorScreenSettingsSchema>(this.settingsResolverService, {
+      createSettingsOverrideResolver<SqlEditorScreenSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'plugin.sql-editor-screen.enabled': {
           key: 'permission.sql.script.execution',
           filter: value => !value,

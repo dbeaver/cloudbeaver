@@ -53,7 +53,7 @@ export class LogViewerSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<LogViewerSettingsSchema>(this.settingsResolverService, {
+      createSettingsAliasResolver<LogViewerSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'plugin.log-viewer.disabled': 'core.app.logViewer.disabled',
         'plugin.log-viewer.logBatchSize': 'core.app.logViewer.logBatchSize',
         'plugin.log-viewer.maxLogRecords': 'core.app.logViewer.maxLogRecords',
