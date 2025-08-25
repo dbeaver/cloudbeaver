@@ -209,7 +209,7 @@ export class MenuBootstrap extends Bootstrap {
       contexts: [DATA_CONTEXT_SQL_EDITOR_DATA, DATA_CONTEXT_SQL_EDITOR_STATE],
       getItems: (context, items) => [
         ...items,
-
+        ...EXECUTIONS_ACTIONS,
       ],
     });
 
