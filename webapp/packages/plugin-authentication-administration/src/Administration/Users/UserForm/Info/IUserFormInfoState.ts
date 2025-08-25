@@ -13,7 +13,7 @@ export const USER_FORM_INFO_PART_SCHEMA = schema.object({
   enabled: schema.boolean(),
   password: schema.string().trim(),
   metaParameters: schema.record(schema.string(), schema.string().trim().or(schema.any())),
-  teams: schema.array(),
+  teams: schema.array(schema.string()),
   authRole: schema.string(),
 });
 
