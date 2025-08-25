@@ -8,7 +8,8 @@
 import { observer } from 'mobx-react-lite';
 
 import { preventFocusHandler, s, useS } from '@cloudbeaver/core-blocks';
-import { useDataContext } from '@cloudbeaver/core-data-context';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
+import { useMenu } from '@cloudbeaver/core-view';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA.js';
@@ -17,6 +18,7 @@ import type { ISQLEditorData } from './ISQLEditorData.js';
 import style from './SQLEditorActions.module.css';
 import { SqlEditorActionsMenu } from './SqlEditorActionsMenu.js';
 import { SqlEditorTools } from './SqlEditorTools.js';
+import { SQL_EDITOR_ACTIONS_MENU } from './SQL_EDITOR_ACTIONS_MENU.js';
 
 interface Props {
   data: ISQLEditorData;
@@ -26,15 +28,19 @@ interface Props {
 
 export const SQLEditorActions = observer<Props>(function SQLEditorActions({ data, state, className }) {
   const styles = useS(style);
+  const menu = useMenu({ menu: SQL_EDITOR_ACTIONS_MENU });
 
-  const menuContext = useDataContext();
-  menuContext.set(DATA_CONTEXT_SQL_EDITOR_DATA, data, 'sql-editor-data');
-  menuContext.set(DATA_CONTEXT_SQL_EDITOR_STATE, state, 'sql-editor-state');
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_SQL_EDITOR_STATE, state, id);
+  });
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_SQL_EDITOR_DATA, data, id);
+  });
 
   return (
     <div className={s(styles, { container: true }, className)}>
       <div className={s(styles, { actions: true })} onMouseDown={preventFocusHandler}>
-        <SqlEditorActionsMenu state={state} context={menuContext} />
+        <SqlEditorActionsMenu state={state} context={menu.context} />
       </div>
       <SqlEditorTools data={data} state={state} />
     </div>
