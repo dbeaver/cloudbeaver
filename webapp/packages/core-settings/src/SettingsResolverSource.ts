@@ -50,6 +50,18 @@ export class SettingsResolverSource implements ISettingsResolverSource {
 
   add(...resolvers: SettingsResolverSource[]): this {
     this.resolvers.push(...resolvers);
+    for (const resolver of resolvers) {
+      resolver.onChange.next(
+        this.onChange,
+        data => {
+          if (resolver.has(data.key)) {
+            return data;
+          }
+          return { ...data, value: this.getValue(data.key) };
+        },
+        data => !resolver.has(data.key) || this.sources.find(r => r.has(data.key)) === resolver,
+      );
+    }
     return this;
   }
 

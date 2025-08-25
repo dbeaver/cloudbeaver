@@ -221,7 +221,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
                       {itemIcon && typeof itemIcon === 'string' ? <IconOrImage icon={itemIcon} /> : itemIcon}
                     </div>
                   )}
-                  <div>{itemValue}</div>
+                  <div className="tw:truncate">{itemValue}</div>
                 </ComboboxItem>
               ))
             ) : (

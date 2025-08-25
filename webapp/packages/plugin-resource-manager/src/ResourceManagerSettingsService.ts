@@ -38,7 +38,7 @@ export class ResourceManagerSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<ResourceManagerSettingsSchema>(this.settingsResolverService, {
+      createSettingsAliasResolver<ResourceManagerSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'plugin.resource-manager.disabled': 'plugin_resource_manager.disabled',
       }),
     );
