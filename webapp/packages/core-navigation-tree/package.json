@@ -42,6 +42,7 @@
     "@cloudbeaver/tests-runner": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
+    "@dbeaver/react-tests": "workspace:^",
     "typescript": "^5",
     "vitest": "^3"
   }
