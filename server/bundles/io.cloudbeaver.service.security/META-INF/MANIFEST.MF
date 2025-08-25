@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Cloudbeaver Web Service - Security
 Bundle-Vendor: DBeaver Corp
 Bundle-SymbolicName: io.cloudbeaver.service.security;singleton:=true
-Bundle-Version: 1.0.84.qualifier
-Bundle-Release-Date: 20250901
+Bundle-Version: 1.0.85.qualifier
+Bundle-Release-Date: 20250922
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,

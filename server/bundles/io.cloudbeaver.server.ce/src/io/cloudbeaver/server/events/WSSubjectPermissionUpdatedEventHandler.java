@@ -54,6 +54,7 @@ public class WSSubjectPermissionUpdatedEventHandler extends WSDefaultEventHandle
         if (!super.isAcceptableInSession(activeUserSession, event)) {
             return false;
         }
+
         var user = activeUserSession.getUserContext().getUser();
         if (user == null) {
             return false;
