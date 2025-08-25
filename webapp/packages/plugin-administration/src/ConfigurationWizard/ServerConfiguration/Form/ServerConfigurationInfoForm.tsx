@@ -7,7 +7,18 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Group, GroupTitle, Link, IconOrImage, InputField, Switch, Textarea, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Group,
+  GroupTitle,
+  Link,
+  IconOrImage,
+  InputField,
+  Switch,
+  Textarea,
+  useResource,
+  useTranslate,
+  useCustomInputValidation,
+} from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState.js';
@@ -21,26 +32,20 @@ interface Props {
 export const ServerConfigurationInfoForm = observer<Props>(function ServerConfigurationInfoForm({ state }) {
   const serverConfigLoader = useResource(ServerConfigurationInfoForm, ServerConfigResource, undefined);
   const translate = useTranslate();
+  const validation = useCustomInputValidation<string, HTMLTextAreaElement>(value => {
+    const currentHost = window.location.host;
+
+    if (value.trim() && !value.includes(currentHost)) {
+      return translate('administration_configuration_wizard_configuration_supported_hosts_warning', undefined, { host: currentHost });
+    }
+
+    return null;
+  });
 
   function constructSupportedHostsExample() {
     const exampleWithPort = serverConfigLoader.data?.distributed ? 'localhost' : 'localhost:5000';
 
     return `example.com\n${exampleWithPort}\n127.0.0.1`;
-  }
-
-  function validateSupportedHosts(): React.ReactNode {
-    const supportedHosts = state.serverConfig.supportedHosts;
-    const currentHost = window.location.host;
-
-    if (supportedHosts.trim() && !supportedHosts.includes(currentHost)) {
-      return (
-        <div className="theme-text-negative">
-          {translate('administration_configuration_wizard_configuration_supported_hosts_warning', undefined, { host: currentHost })}
-        </div>
-      );
-    }
-
-    return null;
   }
 
   return (
@@ -50,16 +55,12 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         {translate('administration_configuration_wizard_configuration_server_name')}
       </InputField>
       <Textarea
+        ref={validation}
         title={translate('administration_configuration_wizard_configuration_server_url_description')}
         name="supportedHosts"
         rows={3}
         state={state.serverConfig}
-        description={
-          <>
-            {translate('administration_configuration_wizard_configuration_supported_hosts_description')}
-            {validateSupportedHosts()}
-          </>
-        }
+        description={translate('administration_configuration_wizard_configuration_supported_hosts_description')}
         placeholder={constructSupportedHostsExample()}
       >
         {translate('administration_configuration_wizard_configuration_supported_hosts')}
