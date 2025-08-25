@@ -118,7 +118,7 @@ export class ElementsTreeToolsMenuService {
     state.filter = !state.filter;
   }
 
-  private async elementsTreeActionHandler(contexts: IDataContextProvider, action: IAction) {
+  private elementsTreeActionHandler(contexts: IDataContextProvider, action: IAction) {
     const tree = contexts.get(DATA_CONTEXT_ELEMENTS_TREE);
 
     if (tree === undefined) {
