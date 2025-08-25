@@ -42,21 +42,7 @@ export class DataGridContextMenuCellEditingService {
     private readonly menuService: MenuService,
   ) { }
 
-  private getActionInfo(context: IDataContextProvider, action: IAction) {
-    const t = this.localizationService.translate;
-    if (action === ACTION_DATA_GRID_EDITING_ADD_ROW) {
-      return { ...action.info, label: 'data_grid_table_editing_row_add', icon: 'add', tooltip: t('data_grid_table_editing_row_add') + ' (' + getBindingLabel(KEY_BINDING_ADD) + ')' };
-    }
-    if (action === ACTION_DATA_GRID_EDITING_DUPLICATE_ROW) {
-      return { ...action.info, label: 'data_grid_table_editing_row_add_copy', icon: 'copy', tooltip: t('data_grid_table_editing_row_add_copy') + ' (' + getBindingLabel(KEY_BINDING_DUPLICATE) + ')' };
-    }
 
-    if (action === ACTION_EDIT) {
-      return { ...action.info, label: t('data_grid_table_editing_open_inline_editor'), icon: 'edit' };
-    }
-
-    return action.info;
-  }
 
   register(): void {
     this.menuService.addCreator({
@@ -200,5 +186,21 @@ export class DataGridContextMenuCellEditingService {
         }
       },
     });
+  }
+
+  private getActionInfo(context: IDataContextProvider, action: IAction) {
+    const t = this.localizationService.translate;
+    if (action === ACTION_DATA_GRID_EDITING_ADD_ROW) {
+      return { ...action.info, label: 'data_grid_table_editing_row_add', tooltip: t('data_grid_table_editing_row_add') + ' (' + getBindingLabel(KEY_BINDING_ADD) + ')' };
+    }
+    if (action === ACTION_DATA_GRID_EDITING_DUPLICATE_ROW) {
+      return { ...action.info, label: 'data_grid_table_editing_row_add_copy', tooltip: t('data_grid_table_editing_row_add_copy') + ' (' + getBindingLabel(KEY_BINDING_DUPLICATE) + ')' };
+    }
+
+    if (action === ACTION_EDIT) {
+      return { ...action.info, label: t('data_grid_table_editing_open_inline_editor'), icon: 'edit' };
+    }
+
+    return action.info;
   }
 }
