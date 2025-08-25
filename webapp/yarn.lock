@@ -4293,6 +4293,7 @@ __metadata:
     "@cloudbeaver/core-di": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:^"
+    "@dbeaver/react-tests": "workspace:^"
     "@testing-library/dom": "npm:^10"
     "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
