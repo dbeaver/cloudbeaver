@@ -13,8 +13,8 @@ export const USER_FORM_INFO_PART_SCHEMA = schema.object({
   enabled: schema.boolean(),
   password: schema.string().trim(),
   metaParameters: schema.record(schema.string(), schema.string().trim().or(schema.any())),
-  teams: schema.array(schema.string().trim()),
-  authRole: schema.string().trim(),
+  teams: schema.array(),
+  authRole: schema.string(),
 });
 
 export type IUserFormInfoState = schema.infer<typeof USER_FORM_INFO_PART_SCHEMA>;
