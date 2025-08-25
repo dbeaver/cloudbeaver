@@ -7,10 +7,12 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ActionIconButton, getComputed, preventFocusHandler, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { preventFocusHandler, s, useS } from '@cloudbeaver/core-blocks';
+import { useDataContext } from '@cloudbeaver/core-data-context';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState.js';
-import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures.js';
+import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA.js';
+import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../DATA_CONTEXT_SQL_EDITOR_STATE.js';
 import type { ISQLEditorData } from './ISQLEditorData.js';
 import style from './SQLEditorActions.module.css';
 import { SqlEditorActionsMenu } from './SqlEditorActionsMenu.js';
@@ -22,58 +24,17 @@ interface Props {
   className?: string;
 }
 
-export const SQLEditorActions = observer<Props>(function SQLEditorActions({ data, state }) {
+export const SQLEditorActions = observer<Props>(function SQLEditorActions({ data, state, className }) {
   const styles = useS(style);
-  const translate = useTranslate();
-  const isActiveSegmentMode = getComputed(() => data.activeSegmentMode.activeSegmentMode);
-  const disabled = getComputed(() => data.isScriptEmpty || data.isDisabled);
-  const isQuery = data.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
-  const isExecutable = data.isExecutionAllowed;
+
+  const menuContext = useDataContext();
+  menuContext.set(DATA_CONTEXT_SQL_EDITOR_DATA, data, 'sql-editor-data');
+  menuContext.set(DATA_CONTEXT_SQL_EDITOR_STATE, state, 'sql-editor-state');
 
   return (
-    <div className={s(styles, { container: true })}>
+    <div className={s(styles, { container: true }, className)}>
       <div className={s(styles, { actions: true })} onMouseDown={preventFocusHandler}>
-        {isExecutable && (
-          <>
-            {isQuery && (
-              <>
-                <ActionIconButton
-                  name="/icons/sql_exec.svg"
-                  disabled={disabled}
-                  title={translate('sql_editor_sql_execution_button_tooltip')}
-                  img
-                  onClick={data.executeQuery}
-                />
-                <ActionIconButton
-                  name="/icons/sql_exec_new.svg"
-                  disabled={disabled}
-                  title={translate('sql_editor_sql_execution_new_tab_button_tooltip')}
-                  img
-                  onClick={data.executeQueryNewTab}
-                />
-              </>
-            )}
-            <ActionIconButton
-              name="/icons/sql_script_exec.svg"
-              disabled={disabled}
-              hidden={isActiveSegmentMode}
-              title={translate('sql_editor_sql_execution_script_button_tooltip')}
-              img
-              onClick={data.executeScript}
-            />
-            {isQuery && data.dialect?.supportsExplainExecutionPlan && (
-              <ActionIconButton
-                name="/icons/sql_execution_plan.svg"
-                disabled={disabled}
-                hidden={isActiveSegmentMode}
-                title={translate('sql_editor_execution_plan_button_tooltip')}
-                img
-                onClick={data.showExecutionPlan}
-              />
-            )}
-          </>
-        )}
-        <SqlEditorActionsMenu state={state} />
+        <SqlEditorActionsMenu state={state} context={menuContext} />
       </div>
       <SqlEditorTools data={data} state={state} />
     </div>

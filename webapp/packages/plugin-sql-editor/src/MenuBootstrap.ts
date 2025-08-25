@@ -46,6 +46,7 @@ import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA.js';
 import { SQL_EDITOR_TOOLS_MENU } from './SqlEditor/SQL_EDITOR_TOOLS_MENU.js';
 import { SQL_EDITOR_TOOLS_MORE_MENU } from './SqlEditor/SQL_EDITOR_TOOLS_MORE_MENU.js';
+import { SQL_EDITOR_ACTIONS_MENU } from './SqlEditor/SQL_EDITOR_ACTIONS_MENU.js';
 import { getSqlEditorName } from './getSqlEditorName.js';
 import type { ISqlEditorTabState } from './ISqlEditorTabState.js';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
@@ -197,6 +198,18 @@ export class MenuBootstrap extends Bootstrap {
       getItems: (context, items) => [...items, ACTION_SAVE],
     });
 
+    this.menuService.addCreator({
+      menus: [SQL_EDITOR_ACTIONS_MENU],
+      contexts: [DATA_CONTEXT_SQL_EDITOR_DATA, DATA_CONTEXT_SQL_EDITOR_STATE],
+      getItems: (context, items) => [
+        ...items,
+        ACTION_SQL_EDITOR_EXECUTE,
+        ACTION_SQL_EDITOR_EXECUTE_NEW,
+        ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
+        ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
+      ],
+    });
+
     this.keyBindingService.addKeyBindingHandler({
       id: 'sql-editor-save',
       binding: KEY_BINDING_SAVE,
@@ -249,6 +262,11 @@ export class MenuBootstrap extends Bootstrap {
           return !!sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.script) && !sqlEditorData.activeSegmentMode.activeSegmentMode;
         }
 
+        if (action === ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN) {
+          return !!sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.query) &&
+            !!sqlEditorData.dialect?.supportsExplainExecutionPlan;
+        }
+
         // TODO we have to add check for output action ?
         if (
           !sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.query) &&
@@ -261,12 +279,36 @@ export class MenuBootstrap extends Bootstrap {
       },
       isDisabled: (context, action) => {
         const data = context.get(DATA_CONTEXT_SQL_EDITOR_DATA)!;
+
+        if ([
+          ACTION_SQL_EDITOR_EXECUTE,
+          ACTION_SQL_EDITOR_EXECUTE_NEW,
+          ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
+          ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
+        ].includes(action)) {
+          return data.isDisabled || data.isScriptEmpty;
+        }
+
         switch (action) {
           case ACTION_SQL_EDITOR_FORMAT:
             return data.isDisabled || data.isScriptEmpty || data.readonly;
         }
 
         return false;
+      },
+      getActionInfo: (context, action) => {
+        if ([
+          ACTION_SQL_EDITOR_EXECUTE,
+          ACTION_SQL_EDITOR_EXECUTE_NEW,
+          ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
+          ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
+        ].includes(action)) {
+          return {
+            ...action.info,
+            label: '',
+          };
+        }
+        return action.info;
       },
       handler: this.sqlEditorActionHandler.bind(this),
     });
