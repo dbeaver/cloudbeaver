@@ -8,6 +8,9 @@
   },
   "references": [
     {
+      "path": "../../../common-react/@dbeaver/react-tests"
+    },
+    {
       "path": "../../../common-react/@dbeaver/ui-kit"
     },
     {
