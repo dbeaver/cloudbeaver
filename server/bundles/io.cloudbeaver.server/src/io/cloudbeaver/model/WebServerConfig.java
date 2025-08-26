@@ -41,7 +41,7 @@ import java.util.Map;
 public class WebServerConfig {
 
     private final WebApplication application;
-    private boolean provideSensitiveInformation = true;
+    protected boolean provideSensitiveInformation = true;
 
     public WebServerConfig(@NotNull WebApplication application) {
         this.application = application;

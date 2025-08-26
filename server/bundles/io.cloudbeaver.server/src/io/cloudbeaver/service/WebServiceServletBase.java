@@ -75,7 +75,7 @@ public abstract class WebServiceServletBase extends HttpServlet {
         } finally {
             if (WebAppUtils.getWebApplication() instanceof ApiCallInterceptor apiCallInterceptor) {
                 apiCallInterceptor.onApiCallEvent(
-                    request, getVariables(request), request.getRequestURI(), startTime, errorMessage, API_PROTOCOL
+                    request, getVariables(request), request.getRequestURI(), null, startTime, errorMessage, API_PROTOCOL
                 );
             }
         }
