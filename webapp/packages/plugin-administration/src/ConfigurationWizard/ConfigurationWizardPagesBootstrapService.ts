@@ -74,7 +74,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
         onConfigurationFinish: async () => {
           const state = this.serverConfigurationFormStateManager.formState;
           if (state) {
-            const saved = await state.save();
+            const saved = await this.serverConfigurationFormStateManager.save();
 
             if (!saved) {
               const error = getFirstException(state.exception);

@@ -31,6 +31,7 @@ export * from './getPathName.js';
 export * from './getPathParent.js';
 export * from './getPathParents.js';
 export * from './getPathParts.js';
+export * from './isIp.js';
 export * from './GlobalConstants.js';
 export * from './ILoadableState.js';
 export * from './errorOf.js';

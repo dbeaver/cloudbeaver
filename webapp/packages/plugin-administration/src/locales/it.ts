@@ -41,6 +41,10 @@ export default [
     'administration_configuration_wizard_configuration_supported_hosts_description',
     'You can specify multiple server URLs separated by a new line. An empty value means that all URLs are allowed',
   ],
+  [
+    'administration_configuration_wizard_configuration_supported_hosts_warning',
+    'You cannot remove your current domain ({arg:host}). Open the server configuration from another allowed domain or IP-address to remove this domain.',
+  ],
 
   ['administration_configuration_wizard_configuration_server_info', 'Informazioni sul Server'],
   ['administration_configuration_wizard_configuration_server_name', 'Nome del Server'],
