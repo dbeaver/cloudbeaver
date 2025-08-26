@@ -62,6 +62,7 @@ import { ParametersForm } from './ParametersForm.js';
 import { ProviderPropertiesForm } from './ProviderPropertiesForm.js';
 import { getConnectionFormOptionsPart } from './getConnectionFormOptionsPart.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
+import { OptionsExtendedForm } from './OptionsExtendedForm/OptionsExtendedForm.js';
 
 const PROFILE_AUTH_MODEL_ID = 'profile';
 
@@ -342,6 +343,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               )}
             </Group>
           )}
+          <OptionsExtendedForm formState={formState} />
           {driver?.providerProperties && (
             <ProviderPropertiesForm
               config={optionsPart.state}
