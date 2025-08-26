@@ -29,14 +29,16 @@ import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
-import org.jkiss.utils.CommonUtils;
 
 import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WebSessionProjectImpl extends WebProjectImpl {
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
@@ -195,44 +197,29 @@ public class WebSessionProjectImpl extends WebProjectImpl {
     /**
      * updates data sources based on event in web session
      *
-     * @param dataSourceIds list of updated connections
-     * @param eventId  id of event
+     * @param event data source updated event
      */
-    public synchronized boolean updateProjectDataSources(@NotNull List<String> dataSourceIds, @NotNull String eventId) {
+    public synchronized boolean updateProjectDataSources(@NotNull WSDataSourceEvent event) {
         var sendDataSourceUpdatedEvent = false;
         DBPDataSourceRegistry registry = getDataSourceRegistry();
-        // save old connections
-        Map<String, DataSourceDescriptor> oldDataSources = dataSourceIds.stream()
-            .map(registry::getDataSource)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toMap(
-                DBPDataSourceContainer::getId,
-                registry::createDataSource)
-            );
-        if (WSDataSourceEvent.CREATED.equals(eventId) || WSDataSourceEvent.UPDATED.equals(eventId)) {
-            registry.refreshConfig(dataSourceIds);
+        if (WSDataSourceEvent.CREATED.equals(event.getId()) || WSDataSourceEvent.UPDATED.equals(event.getId())) {
+            registry.refreshConfig(event.getDataSourceIds());
         }
-        for (String dsId : dataSourceIds) {
+        for (String dsId : event.getDataSourceIds()) {
             DataSourceDescriptor ds = (DataSourceDescriptor) registry.getDataSource(dsId);
             if (ds == null) {
                 continue;
             }
-            switch (eventId) {
+            switch (event.getId()) {
                 case WSDataSourceEvent.CREATED -> {
                     addConnection(ds);
                     sendDataSourceUpdatedEvent = true;
                 }
                 case WSDataSourceEvent.UPDATED ->  {
-                    DataSourceDescriptor oldDs = oldDataSources.get(dsId);
-                    boolean configurationUpdated = !ds.equalConfiguration(oldDs);
-                    if (configurationUpdated) {
-                        sendDataSourceUpdatedEvent = true;
+                    if (event.getProperty() == WSDataSourceProperty.CONFIGURATION) {
                         WebDataSourceUtils.disconnectDataSource(webSession, ds);
-                    } else if (
-                        !CommonUtils.equalOrEmptyStrings(ds.getName(), oldDs.getName()) ||
-                            !CommonUtils.equalOrEmptyStrings(ds.getName(), oldDs.getDescription())
-                    ) {
-                        // if name or description were changed we need to send an event without disconnecting data source
+                    }
+                    if (event.getProperty() != WSDataSourceProperty.INTERNAL) {
                         sendDataSourceUpdatedEvent = true;
                     }
                 }
