@@ -22,7 +22,7 @@ export default [
   ],
   [
     'administration_configuration_wizard_configuration_supported_hosts_warning',
-    'Вы в настоящее время используете этот хост ({arg:host}). Чтобы избежать потери доступа, рекомендуется удалить этот хост из другого разрешенного хоста, а не из текущего.',
+    'You cannot remove your current domain ({arg:host}). Open the server configuration from another allowed domain or IP-address to remove this domain.',
   ],
 
   ['administration_configuration_wizard_configuration_server_info', 'Информация о сервере'],

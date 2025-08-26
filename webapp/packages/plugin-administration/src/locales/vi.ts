@@ -34,7 +34,7 @@ export default [
   ],
   [
     'administration_configuration_wizard_configuration_supported_hosts_warning',
-    "You are currently using this host ({arg:host}). To avoid losing access, it's recommended to remove this host from another allowed host, rather than from your current one.",
+    'You cannot remove your current domain ({arg:host}). Open the server configuration from another allowed domain or IP-address to remove this domain.',
   ],
   ['administration_configuration_tools_save_tooltip', 'Lưu cấu hình'],
   ['administration_configuration_tools_cancel_tooltip', 'Đặt lại thay đổi'],

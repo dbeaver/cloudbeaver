@@ -24,6 +24,7 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState.js';
 import { MIN_SESSION_EXPIRE_TIME } from './MIN_SESSION_EXPIRE_TIME.js';
 import { WEBSITE_LINKS } from '@cloudbeaver/core-links';
+import { isIp } from '@cloudbeaver/core-utils';
 
 interface Props {
   state: IServerConfigurationPageState;
@@ -35,7 +36,7 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
   const validation = useCustomInputValidation<string, HTMLTextAreaElement>(value => {
     const currentHost = window.location.host;
 
-    if (value.trim() && !value.includes(currentHost)) {
+    if (!isIp(window.location.hostname) && value.trim() && !value.includes(currentHost)) {
       return translate('administration_configuration_wizard_configuration_supported_hosts_warning', undefined, { host: currentHost });
     }
 
