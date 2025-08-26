@@ -12,7 +12,7 @@ import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeave
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { DefaultNavigatorSettingsResource, PasswordPolicyResource, ProductInfoResource, ServerConfigResource } from '@cloudbeaver/core-root';
 import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
-import { isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
+import { isIp, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 
 import { MIN_SESSION_EXPIRE_TIME } from './Form/MIN_SESSION_EXPIRE_TIME.js';
@@ -74,7 +74,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
     const supportedHosts = this.state.serverConfig.supportedHosts;
     const currentHost = window.location.host;
 
-    if (supportedHosts.trim() && !supportedHosts.includes(currentHost)) {
+    if (!isIp(window.location.hostname) && supportedHosts.trim() && !supportedHosts.includes(currentHost)) {
       validation.error(
         this.localizationService.translate('administration_configuration_wizard_configuration_supported_hosts_warning', undefined, {
           host: currentHost,
