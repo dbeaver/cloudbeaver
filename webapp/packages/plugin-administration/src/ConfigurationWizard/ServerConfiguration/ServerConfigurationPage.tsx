@@ -88,7 +88,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
       }
     }
 
-    const saved = await formState.save();
+    const saved = await serverConfigurationFormStateManager.save();
 
     if (!saved) {
       const error = getFirstException(part.exception);
