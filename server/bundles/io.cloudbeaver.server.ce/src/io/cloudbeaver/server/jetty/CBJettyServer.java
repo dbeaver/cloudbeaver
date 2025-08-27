@@ -120,12 +120,13 @@ public class CBJettyServer {
 
                 GraphQLEndpoint endpoint = new GraphQLEndpoint(new ServerConfigurationTimeLimitFilter(application));
                 application.addApplicationContextValue(GraphQL.class.getName(), endpoint.getGraphQL());
+                String gqlServletPath = serverConfiguration.getServicesURI() + "gql/*";
                 servletContextHandler.addServlet(
                     new ServletHolder(
                         "graphql",
                         endpoint
                     ),
-                    serverConfiguration.getServicesURI() + "gql/*"
+                    gqlServletPath
                 );
                 servletContextHandler.addEventListener(new CBServerContextListener(application));
 
@@ -157,7 +158,11 @@ public class CBJettyServer {
                         }
                     }
                 }
-                FilterHolder hostsFilter = new FilterHolder(new RequestHostFilter(application, excludedFilterPaths));
+                FilterHolder hostsFilter = new FilterHolder(new RequestHostFilter(
+                    application,
+                    excludedFilterPaths,
+                    Set.of(gqlServletPath)
+                ));
                 servletContextHandler.addFilter(hostsFilter, "/*", null);
 
 

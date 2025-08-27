@@ -36,6 +36,7 @@
     "@cloudbeaver/tests-runner": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
+    "@dbeaver/react-tests": "workspace:^",
     "@types/md5": "^2",
     "@types/underscore": "^1",
     "@types/uuid": "^10",

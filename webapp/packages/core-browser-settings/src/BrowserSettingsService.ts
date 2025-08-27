@@ -41,7 +41,7 @@ export class BrowserSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<BrowserSettingsSchema>(this.settingsResolverService, {
+      createSettingsAliasResolver<BrowserSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'core.browser.cookies.disabled': 'core.cookies.disabled',
       }),
     );

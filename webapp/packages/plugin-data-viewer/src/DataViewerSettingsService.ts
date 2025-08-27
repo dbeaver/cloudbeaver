@@ -77,7 +77,7 @@ export class DataViewerSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsResolverService, {
+      createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'plugin.data-viewer.disableEdit': 'core.app.dataViewer.disableEdit',
         'plugin.data-viewer.disableCopyData': 'core.app.dataViewer.disableCopyData',
         'plugin.data-viewer.fetchMax': 'core.app.dataViewer.fetchMax',
@@ -85,18 +85,18 @@ export class DataViewerSettingsService extends Dependency {
         'resultset.maxrows': 'core.app.dataViewer.fetchDefault',
       }),
       /** @deprecated Use settings instead, will be removed in 25.0.0 */
-      createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsResolverService, {
+      createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'resultset.maxrows': 'plugin.data-viewer.fetchDefault',
       }),
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsResolverService, {
+      createSettingsAliasResolver<DataViewerSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'plugin.data-viewer.export.disabled': 'plugin_data_export.disabled',
       }),
     );
 
     this.settingsResolverService.addResolver(
       HIGHEST_SETTINGS_LAYER,
-      createSettingsOverrideResolver<DataViewerSettingsSchema>(this.settingsResolverService, {
+      createSettingsOverrideResolver<DataViewerSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'plugin.data-viewer.disableEdit': {
           key: 'permission.data-editor.editing',
           map: value => !value,

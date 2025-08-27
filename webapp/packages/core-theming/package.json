@@ -35,6 +35,7 @@
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
+    "@dbeaver/react-tests": "workspace:^",
     "@fontsource/roboto": "^5",
     "@material/button": "^4",
     "@material/checkbox": "^4",
