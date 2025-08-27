@@ -494,7 +494,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         @NotNull WebSession webSession,
         @Nullable String providerId
     ) throws DBWebException {
-        String origin = ServletAppUtils.getOriginFromRequestOrThrow(request);
+        String origin = ServletAppUtils.getOriginFromRequest(request);
         List<WebAuthProviderConfiguration> result = new ArrayList<>();
         for (SMAuthProviderCustomConfiguration cfg : CBApplication.getInstance().getAppConfiguration().getAuthCustomConfigurations()) {
             if (providerId != null && !providerId.equals(cfg.getProvider())) {
@@ -544,7 +544,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             providerConfig.getProvider(),
             webSession.getUserId()
         ));
-        return new WebAuthProviderConfiguration(authProvider, providerConfig, ServletAppUtils.getOriginFromRequestOrThrow(request));
+        return new WebAuthProviderConfiguration(authProvider, providerConfig, ServletAppUtils.getOriginFromRequest(request));
     }
 
     @Override

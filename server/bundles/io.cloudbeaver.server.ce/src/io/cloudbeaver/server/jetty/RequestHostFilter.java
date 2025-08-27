@@ -67,7 +67,7 @@ public class RequestHostFilter implements Filter {
             CBServerConfig serverConfig = application.getServerConfiguration();
             URI originUri;
             try {
-                String origin = ServletAppUtils.getOriginFromRequestOrThrow(httpRequest);
+                String origin = ServletAppUtils.getOriginFromRequest(httpRequest);
                 originUri = URI.create(origin);
             } catch (Exception e) {
                 log.error("Failed to get origin from request", e);

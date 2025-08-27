@@ -292,7 +292,7 @@ public class ServletAppUtils {
     }
 
     @NotNull
-    public static String getOriginFromRequestOrThrow(HttpServletRequest request) throws DBWebException {
+    public static String getOriginFromRequest(@NotNull HttpServletRequest request) {
         String origin = request.getHeader(HEADER_ORIGIN);
         if (CommonUtils.isEmpty(origin)) {
             origin = request.getHeader(HEADER_X_ORIGIN);
