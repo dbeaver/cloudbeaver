@@ -9,7 +9,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { AdministrationTopAppBarService } from '@cloudbeaver/plugin-administration';
 import { UserMenu } from '@cloudbeaver/plugin-user-profile';
 
-@injectable()
+@injectable(() => [AdministrationTopAppBarService])
 export class PluginBootstrap extends Bootstrap {
   constructor(private readonly administrationTopAppBarService: AdministrationTopAppBarService) {
     super();

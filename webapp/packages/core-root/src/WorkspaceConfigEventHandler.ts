@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { type ISessionEvent, SessionEventSource, SessionEventTopic, TopicEventHandler } from '@cloudbeaver/core-root';
 import type { CbServerEvent } from '@cloudbeaver/core-sdk';
 
-@injectable()
+@injectable(() => [SessionEventSource])
 export class WorkspaceConfigEventHandler extends TopicEventHandler<CbServerEvent, ISessionEvent> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbWorkspaceConfiguration, sessionEventSource);

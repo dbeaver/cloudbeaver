@@ -12,7 +12,7 @@ import { BaseOptionsPanelService, OptionsPanelService } from '@cloudbeaver/core-
 const TeamsTableOptionsPanel = importLazyComponent(() => import('./TeamsTableOptionsPanel.js').then(m => m.TeamsTableOptionsPanel));
 const panelGetter = () => TeamsTableOptionsPanel;
 
-@injectable()
+@injectable(() => [OptionsPanelService])
 export class TeamsTableOptionsPanelService extends BaseOptionsPanelService<string> {
   constructor(optionsPanelService: OptionsPanelService) {
     super(optionsPanelService, panelGetter);

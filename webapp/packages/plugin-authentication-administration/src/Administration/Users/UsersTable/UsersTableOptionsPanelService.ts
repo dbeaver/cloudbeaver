@@ -13,7 +13,7 @@ import { BaseOptionsPanelService, OptionsPanelService } from '@cloudbeaver/core-
 const UsersTableOptionsPanel = importLazyComponent(() => import('./UsersTableOptionsPanel.js').then(m => m.UsersTableOptionsPanel));
 const panelGetter = () => UsersTableOptionsPanel;
 
-@injectable()
+@injectable(() => [OptionsPanelService, UsersResource])
 export class UsersTableOptionsPanelService extends BaseOptionsPanelService<string> {
   constructor(
     optionsPanelService: OptionsPanelService,

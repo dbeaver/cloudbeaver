@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import {
   createSettingsAliasResolver,
   ROOT_SETTINGS_LAYER,
@@ -22,8 +22,8 @@ const defaultSettings = schema.object({
 export type ResourceManagerSettingsSchema = typeof defaultSettings;
 export type ResourceManagerSettings = schema.infer<ResourceManagerSettingsSchema>;
 
-@injectable()
-export class ResourceManagerSettingsService extends Dependency {
+@injectable(() => [SettingsProviderService, SettingsResolverService])
+export class ResourceManagerSettingsService {
   get disabled(): boolean {
     return this.settings.getValue('plugin.resource-manager.disabled');
   }
@@ -33,7 +33,6 @@ export class ResourceManagerSettingsService extends Dependency {
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsResolverService: SettingsResolverService,
   ) {
-    super();
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,

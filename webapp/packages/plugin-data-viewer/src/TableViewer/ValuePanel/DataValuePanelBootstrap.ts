@@ -18,7 +18,7 @@ export const ValuePanel = React.lazy(async () => {
   return { default: ValuePanel };
 });
 
-@injectable()
+@injectable(() => [DataPresentationService, DataValuePanelService])
 export class DataValuePanelBootstrap extends Bootstrap {
   constructor(
     private readonly dataPresentationService: DataPresentationService,

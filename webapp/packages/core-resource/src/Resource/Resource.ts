@@ -7,7 +7,6 @@
  */
 import { makeObservable, observable, toJS } from 'mobx';
 
-import { Dependency } from '@cloudbeaver/core-di';
 import { isContainsException, isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
 
 import { CachedResourceParamKey } from './CachedResource.js';
@@ -21,6 +20,7 @@ import { ResourceKeyUtils } from './ResourceKeyUtils.js';
 import { ResourceLogger } from './ResourceLogger.js';
 import { ResourceMetadata } from './ResourceMetadata.js';
 import { ResourceUseTracker } from './ResourceUseTracker.js';
+import { Dependency } from '@cloudbeaver/core-di';
 
 export abstract class Resource<
     TData,

@@ -15,7 +15,7 @@ import { SettingsResolverService } from './SettingsResolverService.js';
 import { UserSettingsResolverService } from './UserSettingsResolverService.js';
 import { SettingsResolverSource } from './SettingsResolverSource.js';
 
-@injectable()
+@injectable(() => [SettingsResolverService, UserSettingsResolverService])
 export class SettingsProviderService {
   get schema(): schema.ZodObject {
     return this.mergedSchema;

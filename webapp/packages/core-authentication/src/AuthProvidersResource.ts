@@ -26,7 +26,7 @@ import { AuthConfigurationsResource } from './AuthConfigurationsResource.js';
 export type AuthProvider = NonNullable<AuthProviderInfoFragment>;
 export type AuthProviderConfiguration = NonNullable<AuthProviderConfigurationInfoFragment>;
 
-@injectable()
+@injectable(() => [GraphQLService, ServerConfigResource, AuthConfigurationsResource])
 export class AuthProvidersResource extends CachedMapResource<string, AuthProvider> {
   get configurable(): AuthProvider[] {
     return this.values.filter(provider => provider.configurable);

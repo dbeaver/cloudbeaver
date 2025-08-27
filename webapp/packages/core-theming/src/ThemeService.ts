@@ -39,7 +39,7 @@ export interface IStyleRegistry {
   styles: Style[];
 }
 
-@injectable()
+@injectable(() => [ThemeSettingsService])
 export class ThemeService extends Bootstrap {
   get themes(): ITheme[] {
     return Array.from(this.themeMap.values());

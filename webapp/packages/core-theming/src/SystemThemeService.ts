@@ -15,7 +15,7 @@ import type { IThemeSettingsKey } from './ThemeSettingsService.js';
 
 const DARK_QUERY = '(prefers-color-scheme: dark)';
 
-@injectable()
+@injectable(() => [ThemeService, SettingsResolverService])
 export class SystemThemeService extends Bootstrap {
   private dynamicTheme: ITheme;
   private readonly mediaQueryList: MediaQueryList;

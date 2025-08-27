@@ -11,7 +11,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { schemaExtra } from '@cloudbeaver/core-utils';
 
-@injectable()
+@injectable(() => [LocalizationService])
 export class PluginBootstrap extends Bootstrap {
   private reactionDisposer: IReactionDisposer | null;
   constructor(private readonly localizationService: LocalizationService) {

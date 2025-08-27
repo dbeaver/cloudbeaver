@@ -17,7 +17,7 @@ const GrantedUsers = React.lazy(async () => {
   return { default: GrantedUsers };
 });
 
-@injectable()
+@injectable(() => [TeamsAdministrationFormService])
 export class GrantedUsersTabService extends Bootstrap {
   private readonly key: string;
 

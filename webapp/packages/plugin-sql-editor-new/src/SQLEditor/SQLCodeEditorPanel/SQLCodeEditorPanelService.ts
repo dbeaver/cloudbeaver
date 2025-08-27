@@ -11,7 +11,7 @@ import { ESqlDataSourceFeatures, SqlEditorModeService } from '@cloudbeaver/plugi
 
 const SQLCodeEditorPanel = importLazyComponent(() => import('./SQLCodeEditorPanel.js').then(module => module.SQLCodeEditorPanel));
 
-@injectable()
+@injectable(() => [SqlEditorModeService])
 export class SQLCodeEditorPanelService {
   constructor(private readonly sqlEditorModeService: SqlEditorModeService) {}
 

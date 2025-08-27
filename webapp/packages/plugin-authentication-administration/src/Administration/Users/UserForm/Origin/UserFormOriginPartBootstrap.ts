@@ -22,7 +22,7 @@ const UserFormOriginInfoTab = React.lazy(async () => {
   return { default: UserFormOriginInfoTab };
 });
 
-@injectable()
+@injectable(() => [AdministrationUserFormService])
 export class UserFormOriginPartBootstrap extends Bootstrap {
   constructor(private readonly administrationUserFormService: AdministrationUserFormService) {
     super();

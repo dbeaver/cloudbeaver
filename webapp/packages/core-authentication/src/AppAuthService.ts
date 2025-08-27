@@ -13,7 +13,7 @@ import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import { UserInfoResource } from './UserInfoResource.js';
 
-@injectable()
+@injectable(() => [ServerConfigResource, UserInfoResource])
 export class AppAuthService extends Bootstrap {
   get authenticated(): boolean {
     return this.serverConfigResource.configurationMode || this.userInfoResource.hasAccess();

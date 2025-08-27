@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,11 +11,11 @@ import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 
 import { Bootstrap } from './Bootstrap.js';
 import { Dependency } from './Dependency.js';
-import type { DIContainer } from './DIContainer.js';
-import type { IServiceCollection, IServiceConstructor } from './IApp.js';
-import { type IDiWrapper, inversifyWrapper } from './inversifyWrapper.js';
+import type { IServiceConstructor } from './IApp.js';
 import { IServiceProvider } from './IServiceProvider.js';
 import type { PluginManifest } from './PluginManifest.js';
+import { ModuleRegistry, ServiceContainerBuilder } from '@wroud/di';
+import { IPreloadService } from './IPreloadService.js';
 
 export interface IStartData {
   restart: boolean;
@@ -26,20 +26,22 @@ export class App {
   readonly onStart: IExecutor<IStartData>;
   private readonly plugins: PluginManifest[];
   private readonly loadedServices: Map<PluginManifest, Set<IServiceConstructor<any>>>;
-  private readonly diWrapper: IDiWrapper = inversifyWrapper;
-  private isAppServiceBound: boolean;
+
+  private builder: ServiceContainerBuilder | null;
+  private serviceProvider: IServiceProvider | null;
 
   constructor(plugins: PluginManifest[] = []) {
     this.plugins = plugins;
     this.onStart = new Executor<IStartData>(undefined, () => true);
     this.loadedServices = new Map();
-    this.isAppServiceBound = false;
+    this.serviceProvider = null;
+    this.builder = null;
 
     this.onStart.addHandler(async ({ restart, preload }) => {
       if (preload && restart) {
-        this.dispose();
+        this.unload();
       }
-      await this.registerServices(preload);
+      await this.registerServices();
       await this.initializeServices(preload);
       await this.loadServices(preload);
     });
@@ -58,9 +60,10 @@ export class App {
     await this.start(true);
   }
 
-  dispose(): void {
-    this.diWrapper.collection.unbindAll();
-    this.isAppServiceBound = false;
+  unload(): void {
+    this.serviceProvider?.[Symbol.dispose]?.();
+    this.serviceProvider = null;
+    this.builder = null;
   }
 
   getPlugins(): PluginManifest[] {
@@ -76,107 +79,63 @@ export class App {
       .flat();
   }
 
-  registerChildContainer(container: DIContainer): void {
-    this.diWrapper.registerChildContainer(container);
-  }
-
   addPlugin(manifest: PluginManifest): void {
     this.plugins.push(manifest);
   }
 
-  getServiceProvider(): IServiceProvider {
-    return this.diWrapper.injector.resolveServiceByClass(IServiceProvider);
-  }
-
-  getServiceCollection(): IServiceCollection {
-    return this.diWrapper.collection;
+  getServiceProvider(): IServiceProvider | null {
+    return this.serviceProvider;
   }
 
   // first phase register all dependencies
-  private async registerServices(preload?: boolean): Promise<void> {
-    if (!this.isAppServiceBound) {
-      this.getServiceCollection().addServiceByClass(App, this);
-      this.getServiceCollection().addServiceByClass(IServiceProvider, new IServiceProvider(this.diWrapper.injector));
-      this.isAppServiceBound = true;
-    }
+  private async registerServices(): Promise<void> {
+    if (!this.builder) {
+      this.builder = new ServiceContainerBuilder();
+      this.builder.addSingleton(App, this);
 
-    for await (const service of this.getServicesAsync(preload)) {
-      this.diWrapper.collection.addServiceByClass(service);
+      for (const module of ModuleRegistry) {
+        await module.configure(this.builder);
+      }
+
+      await this.builder.validate();
+      this.serviceProvider = this.builder.build();
     }
   }
 
-  private async initializeServices(preload?: boolean): Promise<void> {
-    for await (const service of this.getServicesAsync(preload)) {
-      if (service.prototype instanceof Bootstrap) {
-        const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
+  private async initializeServices(preload: boolean): Promise<void> {
+    if (!this.serviceProvider) {
+      throw new Error('Service provider is not initialized');
+    }
 
-        if ('register' in serviceInstance) {
-          await serviceInstance.register();
-        }
-      } else if (service.prototype instanceof Dependency) {
-        this.diWrapper.injector.getServiceByClass<Dependency>(service);
+    if (preload) {
+      for (const service of this.serviceProvider.getServices(IPreloadService)) {
+        await service.register?.();
       }
+    } else {
+      for (const service of this.serviceProvider.getServices(Bootstrap)) {
+        if ('register' in service) {
+          await service.register();
+        }
+      }
+
+      this.serviceProvider.getServices(Dependency);
     }
   }
 
-  private async loadServices(preload?: boolean): Promise<void> {
-    for await (const service of this.getServicesAsync(preload)) {
-      if (service.prototype instanceof Bootstrap) {
-        const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
-
-        if ('load' in serviceInstance) {
-          await serviceInstance.load();
-        }
-      }
-    }
-  }
-
-  private async *getServicesAsync(preload?: boolean, concurrency = 20): AsyncGenerator<IServiceConstructor<any>> {
-    let i = 0;
-    let queue: Array<Promise<Array<IServiceConstructor<any>>>> = [];
-
-    for (const plugin of this.plugins) {
-      let servicesLoaders: Array<() => Promise<IServiceConstructor<any>>> = [];
-
-      if (preload) {
-        servicesLoaders = plugin.preload || [];
-      } else {
-        servicesLoaders = plugin.providers;
-      }
-
-      const loadedServices = this.loadedServices.get(plugin) || (observable(new Set(), { deep: false }) as Set<IServiceConstructor<any>>);
-      this.loadedServices.set(plugin, loadedServices);
-
-      queue.push(
-        (async function loader() {
-          const services = (await Promise.all(servicesLoaders.map(serviceLoader => serviceLoader()))).flat();
-
-          for (const service of services) {
-            loadedServices.add(service);
-          }
-
-          return services;
-        })(),
-      );
-      i++;
-
-      if (i >= concurrency) {
-        const services = (await Promise.all(queue)).flat();
-
-        for (const service of services) {
-          yield service;
-        }
-
-        queue = [];
-        i = 0;
-      }
+  private async loadServices(preload: boolean): Promise<void> {
+    if (!this.serviceProvider) {
+      throw new Error('Service provider is not initialized');
     }
 
-    if (queue.length > 0) {
-      const services = (await Promise.all(queue)).flat();
-
-      for (const service of services) {
-        yield service;
+    if (preload) {
+      for (const service of this.serviceProvider.getServices(IPreloadService)) {
+        await service.load?.();
+      }
+    } else {
+      for (const service of this.serviceProvider.getServices(Bootstrap)) {
+        if ('load' in service) {
+          await service.load();
+        }
       }
     }
   }

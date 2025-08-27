@@ -12,9 +12,4 @@ export const pluginSettingsDefaultAdministrationManifest: PluginManifest = {
   info: {
     name: 'Plugin Default Settings Administration',
   },
-
-  providers: [
-    () => import('./SettingsDefaultBootstrap.js').then(m => m.SettingsDefaultAdministrationBootstrap),
-    () => import('./LocaleService.js').then(m => m.LocaleService),
-  ],
 };

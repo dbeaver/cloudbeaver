@@ -61,7 +61,7 @@ export interface ITopicSubEvent extends ISessionEvent {
 const RETRY_INTERVALS = [1000, 5000, 30000, 60000]; // 1s, 5s, 30s, 1m
 const MAX_RETRY_ATTEMPTS = 4;
 
-@injectable()
+@injectable(() => [NetworkStateService, SessionExpireService, EnvironmentService])
 export class SessionEventSource implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   readonly eventsSubject: Observable<ISessionEvent>;
   readonly onActivate: IExecutor;

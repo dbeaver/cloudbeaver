@@ -30,19 +30,19 @@ export function createApp(...plugins: PluginManifest[]): IApplication {
     await app.start();
   });
   afterAll(() => {
-    app.dispose();
+    app.unload();
   });
 
   return {
     app,
     get serviceProvider() {
-      return app.getServiceProvider();
+      return app.getServiceProvider()!;
     },
     async init() {
       await app.start();
     },
     dispose() {
-      app.dispose();
+      app.unload();
     },
   };
 }

@@ -16,7 +16,7 @@ test('App Initialization', async () => {
   const app = new App([manifest]);
 
   await (app as any).registerServices();
-  const serviceProvider = app.getServiceProvider();
+  const serviceProvider = app.getServiceProvider()!;
 
   const service = serviceProvider.getService(TestService);
   const bootstrap = serviceProvider.getService(TestBootstrap);

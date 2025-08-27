@@ -10,7 +10,7 @@ import { CachedMapAllKey, CachedMapResource, resourceKeyList } from '@cloudbeave
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { type DataTransferProcessorInfo, GraphQLService } from '@cloudbeaver/core-sdk';
 
-@injectable()
+@injectable(() => [GraphQLService, ServerConfigResource])
 export class DataTransferProcessorsResource extends CachedMapResource<string, DataTransferProcessorInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,

@@ -20,7 +20,7 @@ const ToolsPanel = React.lazy(async () => {
   return { default: ToolsPanel };
 });
 
-@injectable()
+@injectable(() => [AppScreenService, MenuService, ToolsPanelService])
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly appScreenService: AppScreenService,

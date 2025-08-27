@@ -13,7 +13,7 @@ import { type ISessionEvent, SessionEventSource, SessionEventTopic } from './Ses
 
 export { type IServerConfigEvent };
 
-@injectable()
+@injectable(() => [SessionEventSource])
 export class ServerConfigEventHandler extends TopicEventHandler<IServerConfigEvent, ISessionEvent> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbConfig, sessionEventSource);

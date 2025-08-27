@@ -24,7 +24,16 @@ import { CustomConnectionSettingsService } from './CustomConnectionSettingsServi
 const DriverSelectorDialog = importLazyComponent(() => import('./DriverSelector/DriverSelectorDialog.js').then(m => m.DriverSelectorDialog));
 const WelcomeNewConnection = importLazyComponent(() => import('./WelcomeNewConnection.js').then(m => m.WelcomeNewConnection));
 
-@injectable()
+@injectable(() => [
+  CommonDialogService,
+  ProjectInfoResource,
+  MenuService,
+  ActionService,
+  ConnectionsManagerService,
+  CustomConnectionSettingsService,
+  TreeSelectionService,
+  NavigationTabsService,
+])
 export class CustomConnectionPluginBootstrap extends Bootstrap {
   constructor(
     private readonly commonDialogService: CommonDialogService,

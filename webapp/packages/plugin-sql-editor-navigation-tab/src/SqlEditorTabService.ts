@@ -54,7 +54,20 @@ import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey.js';
 const SqlEditorPanel = importLazyComponent(() => import('./SqlEditorPanel.js').then(m => m.SqlEditorPanel));
 const SqlEditorTab = importLazyComponent(() => import('./SqlEditorTab.js').then(m => m.SqlEditorTab));
 
-@injectable()
+@injectable(() => [
+  NavigationTabsService,
+  NotificationService,
+  SqlEditorService,
+  SqlResultTabsService,
+  ConnectionExecutionContextService,
+  ConnectionExecutionContextResource,
+  ConnectionInfoResource,
+  NavNodeInfoResource,
+  SqlDataSourceService,
+  ConnectionsManagerService,
+  ContainerResource,
+  CommonDialogService,
+])
 export class SqlEditorTabService extends Bootstrap {
   get sqlEditorTabs(): ITab<ISqlEditorTabState>[] {
     return Array.from(this.navigationTabsService.findTabs<ISqlEditorTabState>(isSQLEditorTab));

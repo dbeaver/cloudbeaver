@@ -13,7 +13,7 @@ import { GraphQLService, type NetworkHandlerConfigInput, type NetworkHandlerDesc
 
 export const SSH_TUNNEL_ID = 'ssh_tunnel';
 
-@injectable()
+@injectable(() => [GraphQLService, NotificationService, ServerConfigResource])
 export class NetworkHandlerResource extends CachedMapResource<string, NetworkHandlerDescriptor> {
   constructor(
     private readonly graphQLService: GraphQLService,

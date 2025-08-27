@@ -11,7 +11,7 @@ import type { WsAsyncTaskInfo } from '@cloudbeaver/core-sdk';
 import { TopicEventHandler } from '../ServerEventEmitter/TopicEventHandler.js';
 import { type ISessionEvent, type SessionEventId, SessionEventSource, SessionEventTopic } from '../SessionEventSource.js';
 
-@injectable()
+@injectable(() => [SessionEventSource])
 export class AsyncTaskInfoEventHandler extends TopicEventHandler<WsAsyncTaskInfo, ISessionEvent, SessionEventId, SessionEventTopic> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbSessionTask, sessionEventSource);
