@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { expect, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/__custom_mocks__/createGQLEndpoint.js';
@@ -21,25 +21,27 @@ import { mockAuthentication } from './__custom_mocks__/mockAuthentication.js';
 import { AuthSettingsService } from './AuthSettingsService.js';
 import './module.js';
 
-const endpoint = createGQLEndpoint();
-const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
-const app = createApp();
+describe.skip(() => {
+  const endpoint = createGQLEndpoint();
+  const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
+  const app = createApp();
 
-const equalConfig = {
-  'core.authentication.disableAnonymousAccess': true,
-};
+  const equalConfig = {
+    'core.authentication.disableAnonymousAccess': true,
+  };
 
-initKnownConsoleMessages();
-resetDeprecatedSettings();
+  initKnownConsoleMessages();
+  resetDeprecatedSettings();
 
-test.skip('Read settings', async () => {
-  const settings = app.serviceProvider.getService(AuthSettingsService);
-  const config = app.serviceProvider.getService(ServerConfigResource);
+  test('Read settings', async () => {
+    const settings = app.serviceProvider.getService(AuthSettingsService);
+    const config = app.serviceProvider.getService(ServerConfigResource);
 
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfig)));
+    server.use(endpoint.query('serverConfig', mockServerConfig(equalConfig)));
 
-  await config.refresh();
+    await config.refresh();
 
-  expect(settings.disableAnonymousAccess).toBe(true);
-  expectNoDeprecatedSettingMessage();
+    expect(settings.disableAnonymousAccess).toBe(true);
+    expectNoDeprecatedSettingMessage();
+  });
 });
