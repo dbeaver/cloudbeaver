@@ -46,9 +46,10 @@ export function useS<T extends ComponentStyle[]>(...componentStyles: [...T]): Ex
   const stylesRef = useRef<ComponentStyle[]>([]);
   const [patch, forceUpdate] = useState(0);
   const loadedStyles = useRef<BaseStyles[]>([]);
+  const themeServiceOptional = useService(optional(ThemeService));
   let themeService: ThemeService | null = null;
   try {
-    themeService = useService(optional(ThemeService)).resolve();
+    themeService = themeServiceOptional.resolve();
   } catch {}
   const [currentThemeId, setCurrentThemeId] = useState(() => themeService?.themeId);
   const lastThemeRef = useRef<string | undefined>(currentThemeId);
