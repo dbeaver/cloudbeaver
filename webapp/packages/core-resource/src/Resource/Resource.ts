@@ -20,17 +20,14 @@ import { ResourceKeyUtils } from './ResourceKeyUtils.js';
 import { ResourceLogger } from './ResourceLogger.js';
 import { ResourceMetadata } from './ResourceMetadata.js';
 import { ResourceUseTracker } from './ResourceUseTracker.js';
-import { Dependency } from '@cloudbeaver/core-di';
 
 export abstract class Resource<
-    TData,
-    TKey,
-    TInclude extends ReadonlyArray<string>,
-    TValue = TData,
-    TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata,
-  >
-  extends Dependency
-  implements IResource<TData, TKey, TInclude, TValue, TMetadata>
+  TData,
+  TKey,
+  TInclude extends ReadonlyArray<string>,
+  TValue = TData,
+  TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata,
+> implements IResource<TData, TKey, TInclude, TValue, TMetadata>
 {
   data: TData;
 
@@ -44,7 +41,6 @@ export abstract class Resource<
     protected readonly defaultValue: () => TData,
     protected defaultIncludes: TInclude = [] as any,
   ) {
-    super();
     this.isKeyEqual = this.isKeyEqual.bind(this);
     this.isIntersect = this.isIntersect.bind(this);
     this.isEqual = this.isEqual.bind(this);

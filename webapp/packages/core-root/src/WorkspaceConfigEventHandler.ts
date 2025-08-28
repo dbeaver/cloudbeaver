@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { type ISessionEvent, SessionEventSource, SessionEventTopic, TopicEventHandler } from '@cloudbeaver/core-root';
 import type { CbServerEvent } from '@cloudbeaver/core-sdk';
+import { SessionEventSource, SessionEventTopic, type ISessionEvent } from './SessionEventSource.js';
+import { TopicEventHandler } from './ServerEventEmitter/TopicEventHandler.js';
 
 @injectable(() => [SessionEventSource])
 export class WorkspaceConfigEventHandler extends TopicEventHandler<CbServerEvent, ISessionEvent> {

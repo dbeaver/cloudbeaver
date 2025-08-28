@@ -5,13 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { makeObservable, observable } from 'mobx';
 
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 
 import { Bootstrap } from './Bootstrap.js';
 import { Dependency } from './Dependency.js';
-import type { IServiceConstructor } from './IApp.js';
 import { IServiceProvider } from './IServiceProvider.js';
 import type { PluginManifest } from './PluginManifest.js';
 import { ModuleRegistry, ServiceContainerBuilder } from '@wroud/di';
@@ -25,7 +23,6 @@ export interface IStartData {
 export class App {
   readonly onStart: IExecutor<IStartData>;
   private readonly plugins: PluginManifest[];
-  private readonly loadedServices: Map<PluginManifest, Set<IServiceConstructor<any>>>;
 
   private builder: ServiceContainerBuilder | null;
   private serviceProvider: IServiceProvider | null;
@@ -33,7 +30,6 @@ export class App {
   constructor(plugins: PluginManifest[] = []) {
     this.plugins = plugins;
     this.onStart = new Executor<IStartData>(undefined, () => true);
-    this.loadedServices = new Map();
     this.serviceProvider = null;
     this.builder = null;
 
@@ -44,10 +40,6 @@ export class App {
       await this.registerServices();
       await this.initializeServices(preload);
       await this.loadServices(preload);
-    });
-
-    makeObservable<this, 'loadedServices'>(this, {
-      loadedServices: observable.shallow,
     });
   }
 
@@ -64,19 +56,6 @@ export class App {
     this.serviceProvider?.[Symbol.dispose]?.();
     this.serviceProvider = null;
     this.builder = null;
-  }
-
-  getPlugins(): PluginManifest[] {
-    return [...this.plugins];
-  }
-
-  getServices(plugin?: PluginManifest): Array<IServiceConstructor<any>> {
-    if (plugin) {
-      return [...(this.loadedServices.get(plugin) || [])];
-    }
-    return Array.from(this.loadedServices.values())
-      .map(set => [...set])
-      .flat();
   }
 
   addPlugin(manifest: PluginManifest): void {
@@ -113,9 +92,7 @@ export class App {
       }
     } else {
       for (const service of this.serviceProvider.getServices(Bootstrap)) {
-        if ('register' in service) {
-          await service.register();
-        }
+        await service.register();
       }
 
       this.serviceProvider.getServices(Dependency);
@@ -133,9 +110,7 @@ export class App {
       }
     } else {
       for (const service of this.serviceProvider.getServices(Bootstrap)) {
-        if ('load' in service) {
-          await service.load();
-        }
+        await service.load();
       }
     }
   }

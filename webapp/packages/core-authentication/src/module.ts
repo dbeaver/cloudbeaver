@@ -36,9 +36,9 @@ ModuleRegistry.add({
 
   configure: serviceCollection => {
     serviceCollection
-      .addSingleton(Bootstrap, proxy(AppAuthService))
       .addSingleton(Bootstrap, LocaleService)
       .addSingleton(Bootstrap, UserConfigurationBootstrap)
+      .addSingleton(Dependency, proxy(AppAuthService))
       .addSingleton(Dependency, proxy(UsersResource))
       .addSingleton(Dependency, proxy(UsersOriginDetailsResource))
       .addSingleton(Dependency, proxy(UsersMetaParametersResource))

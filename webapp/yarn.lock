@@ -1477,12 +1477,14 @@ __metadata:
     "@cloudbeaver/core-settings": "workspace:*"
     "@cloudbeaver/core-storage": "workspace:*"
     "@cloudbeaver/core-utils": "workspace:*"
+    "@cloudbeaver/tests-runner": "workspace:*"
     "@cloudbeaver/tsconfig": "workspace:*"
     "@dbeaver/cli": "workspace:*"
     "@dbeaver/js-helpers": "workspace:^"
     "@dbeaver/react-tests": "workspace:^"
     mobx: "npm:^6"
     msw: "npm:^2"
+    rimraf: "npm:^6"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vitest: "npm:^3"
@@ -4607,9 +4609,11 @@ __metadata:
     "@testing-library/jest-dom": "npm:^6"
     "@testing-library/react": "npm:^16"
     "@types/node": "npm:^22"
+    "@types/ws": "npm:^8"
     rimraf: "npm:^6"
     typescript: "npm:^5"
     vitest: "npm:^3"
+    ws: "npm:^8"
   languageName: unknown
   linkType: soft
 
@@ -8039,7 +8043,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ws@npm:^8.0.0":
+"@types/ws@npm:^8, @types/ws@npm:^8.0.0":
   version: 8.18.1
   resolution: "@types/ws@npm:8.18.1"
   dependencies:
@@ -19230,7 +19234,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:^8.17.1, ws@npm:^8.18.3":
+"ws@npm:^8, ws@npm:^8.17.1, ws@npm:^8.18.3":
   version: 8.18.3
   resolution: "ws@npm:8.18.3"
   peerDependencies:
