@@ -61,8 +61,8 @@ export class ThemeService extends Bootstrap {
 
   readonly onChange: ISyncExecutor<ITheme>;
 
-  private readonly stylesRegistry: Map<Style, IStyleRegistry[]> = new Map();
-  private readonly themeMap: Map<string, ITheme> = new Map();
+  private readonly stylesRegistry: Map<Style, IStyleRegistry[]>;
+  private readonly themeMap: Map<string, ITheme>;
   private reactionDisposer: IReactionDisposer | null;
 
   constructor(private readonly themeSettingsService: ThemeSettingsService) {
@@ -70,6 +70,8 @@ export class ThemeService extends Bootstrap {
 
     this.reactionDisposer = null;
     this.onChange = new SyncExecutor();
+    this.stylesRegistry = new Map();
+    this.themeMap = new Map();
 
     makeObservable<ThemeService, 'themeMap'>(this, {
       themes: computed,

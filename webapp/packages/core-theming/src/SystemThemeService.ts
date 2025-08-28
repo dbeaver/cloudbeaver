@@ -17,7 +17,7 @@ const DARK_QUERY = '(prefers-color-scheme: dark)';
 
 @injectable(() => [ThemeService, SettingsResolverService])
 export class SystemThemeService extends Bootstrap {
-  private dynamicTheme: ITheme;
+  private dynamicTheme: ITheme | null;
   private readonly mediaQueryList: MediaQueryList;
 
   constructor(
@@ -25,7 +25,7 @@ export class SystemThemeService extends Bootstrap {
     private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
-    this.dynamicTheme = this.getDynamicTheme();
+    this.dynamicTheme = null;
     this.handleSystemThemeChange = this.handleSystemThemeChange.bind(this);
     this.mediaQueryList = window.matchMedia(DARK_QUERY);
 
@@ -40,11 +40,13 @@ export class SystemThemeService extends Bootstrap {
       id: 'system',
       name: 'ui_system_theme',
       get class(): string {
-        return systemThemeService.dynamicTheme!.class;
+        return systemThemeService.dynamicTheme?.class || '';
       },
       loaded: false,
       async loader() {
-        await systemThemeService.themeService.loadTheme(systemThemeService.dynamicTheme.id);
+        if (systemThemeService.dynamicTheme) {
+          await systemThemeService.themeService.loadTheme(systemThemeService.dynamicTheme.id);
+        }
       },
     });
 
@@ -73,6 +75,10 @@ export class SystemThemeService extends Bootstrap {
     });
   }
 
+  override load(): void {
+    this.dynamicTheme = this.getDynamicTheme();
+  }
+
   override dispose(): void {
     this.unsubscribeSystemThemeChange();
   }
@@ -87,16 +93,18 @@ export class SystemThemeService extends Bootstrap {
 
   private handleSystemThemeChange(): void {
     this.dynamicTheme = this.getDynamicTheme();
-    this.themeService.loadTheme(this.dynamicTheme.id);
+    if (this.dynamicTheme) {
+      this.themeService.loadTheme(this.dynamicTheme.id);
+    }
   }
 
-  private getDynamicTheme(): ITheme {
+  private getDynamicTheme(): ITheme | null {
     const isDark = window.matchMedia(DARK_QUERY).matches;
 
     if (isDark) {
-      return this.themeService.themes.find(theme => theme.id === 'dark') || this.themeService.themes[0]!;
+      return this.themeService.themes.find(theme => theme.id === 'dark') || this.themeService.themes[0] || null;
     }
 
-    return this.themeService.themes.find(theme => theme.id === 'light') || this.themeService.themes[0]!;
+    return this.themeService.themes.find(theme => theme.id === 'light') || this.themeService.themes[0] || null;
   }
 }
