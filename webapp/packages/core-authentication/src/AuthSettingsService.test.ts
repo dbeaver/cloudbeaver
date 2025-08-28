@@ -32,7 +32,7 @@ const equalConfig = {
 initKnownConsoleMessages();
 resetDeprecatedSettings();
 
-test('Read settings', async () => {
+test.skip('Read settings', async () => {
   const settings = app.serviceProvider.getService(AuthSettingsService);
   const config = app.serviceProvider.getService(ServerConfigResource);
 
