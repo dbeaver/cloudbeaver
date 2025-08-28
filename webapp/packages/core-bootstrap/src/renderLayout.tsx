@@ -16,12 +16,12 @@ import styles from './renderLayout.module.css';
 
 interface IRender {
   initRoot(): Root;
-  renderApp(): void;
-  renderError(exception?: any): void;
+  renderApp(serviceProvider: IServiceProvider | null): void;
+  renderError(serviceProvider: IServiceProvider | null, exception?: any): void;
   unmount(): void;
 }
 
-export function renderLayout(serviceProvider: IServiceProvider): IRender {
+export function renderLayout(): IRender {
   let root: Root | undefined;
 
   return {
@@ -45,10 +45,10 @@ export function renderLayout(serviceProvider: IServiceProvider): IRender {
         root = undefined;
       }
     },
-    renderApp() {
+    renderApp(serviceProvider: IServiceProvider | null) {
       this.initRoot().render(
         <ErrorBoundary fallback={<HideAppLoadingScreen />} simple>
-          <ServiceProvider provider={serviceProvider}>
+          <ServiceProvider provider={serviceProvider!}>
             <ErrorBoundary fallback={<HideAppLoadingScreen />} root>
               <Suspense fallback={<Loader className={s(styles, { loader: true })} />}>
                 <BodyLazy />
@@ -59,13 +59,13 @@ export function renderLayout(serviceProvider: IServiceProvider): IRender {
         </ErrorBoundary>,
       );
     },
-    renderError(exception?: any) {
+    renderError(serviceProvider: IServiceProvider | null, exception?: any) {
       if (exception) {
         console.error(exception);
       }
       this.initRoot().render(
         <ErrorBoundary fallback={<HideAppLoadingScreen />} simple>
-          <ServiceProvider provider={serviceProvider}>
+          <ServiceProvider provider={serviceProvider!}>
             <DisplayError error={exception} root />
             <HideAppLoadingScreen />
           </ServiceProvider>

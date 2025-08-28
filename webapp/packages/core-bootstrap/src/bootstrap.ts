@@ -26,28 +26,28 @@ export async function bootstrap(plugins: PluginManifest[]): Promise<App> {
   }
 
   const { renderLayout } = await import('./renderLayout.js');
-  const render = renderLayout(app.getServiceProvider()!);
+  const render = renderLayout();
   const unmountExecutor = new SyncExecutor();
 
   unmountExecutor.addHandler(() => render.unmount());
   app.onStart.before(unmountExecutor, undefined, data => data.preload);
   app.onStart.addHandler(({ preload }) => {
     if (!preload) {
-      render.renderApp();
+      render.renderApp(app.getServiceProvider());
     }
   });
   app.onStart.addPostHandler((_, context) => {
     const exception = context.getContext(executionExceptionContext);
 
     if (exception.exception) {
-      render.renderError(exception.exception);
+      render.renderError(app.getServiceProvider(), exception.exception);
     }
   });
 
   if (exception) {
-    render.renderError(exception);
+    render.renderError(app.getServiceProvider(), exception);
   } else {
-    render.renderApp();
+    render.renderApp(app.getServiceProvider());
   }
 
   return app;
