@@ -62,7 +62,6 @@ import { ParametersForm } from './ParametersForm.js';
 import { ProviderPropertiesForm } from './ProviderPropertiesForm.js';
 import { getConnectionFormOptionsPart } from './getConnectionFormOptionsPart.js';
 import type { IConnectionFormProps } from '../IConnectionFormState.js';
-import { OptionsExtendedForm } from './OptionsExtendedForm/OptionsExtendedForm.js';
 
 const PROFILE_AUTH_MODEL_ID = 'profile';
 
@@ -343,15 +342,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               )}
             </Group>
           )}
-          <OptionsExtendedForm formState={formState} />
-          {driver?.providerProperties && (
-            <ProviderPropertiesForm
-              config={optionsPart.state}
-              properties={driver.providerProperties}
-              disabled={formState.isDisabled}
-              readonly={readonly}
-            />
-          )}
+          {driver?.providerProperties && <ProviderPropertiesForm formState={formState} properties={driver.providerProperties} readonly={readonly} />}
 
           <AdvancedPropertiesForm config={optionsPart.state} disabled={formState.isDisabled} readonly={readonly} />
         </Container>
