@@ -49,11 +49,11 @@ export class ThemeService extends Bootstrap {
     return this.themeSettingsService.theme;
   }
 
-  get currentTheme(): ITheme {
-    let theme = this.themeMap.get(this.themeId);
+  get currentTheme(): ITheme | null {
+    let theme = this.themeMap.get(this.themeId) || null;
 
     if (!theme) {
-      theme = this.themeMap.get(FALLBACK_THEME_ID)!;
+      theme = this.themeMap.get(FALLBACK_THEME_ID) || null;
     }
 
     return theme;
@@ -92,7 +92,7 @@ export class ThemeService extends Bootstrap {
     this.loadAllThemes();
     this.reactionDisposer = reaction(
       () => this.currentTheme,
-      theme => this.loadTheme(theme.id),
+      theme => theme && this.loadTheme(theme.id),
       {
         fireImmediately: true,
       },
@@ -145,7 +145,9 @@ export class ThemeService extends Bootstrap {
       return;
     }
     await this.setTheme(themeId);
-    this.onChange.execute(this.currentTheme);
+    if (this.currentTheme) {
+      this.onChange.execute(this.currentTheme);
+    }
   }
 
   private async setTheme(themeId: string): Promise<void> {
