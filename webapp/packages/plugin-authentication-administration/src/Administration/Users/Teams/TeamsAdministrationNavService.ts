@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from '../UsersAdministrationNavigationService.js';
 
-@injectable()
+@injectable(() => [UsersAdministrationNavigationService])
 export class TeamsAdministrationNavService {
   constructor(private readonly usersAdministrationNavigationService: UsersAdministrationNavigationService) {}
 

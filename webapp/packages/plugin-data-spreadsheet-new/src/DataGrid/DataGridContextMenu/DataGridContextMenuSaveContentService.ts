@@ -23,7 +23,7 @@ import {
   ResultSetFormatAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-@injectable()
+@injectable(() => [NotificationService, DataViewerService, ActionService, MenuService])
 export class DataGridContextMenuSaveContentService {
   constructor(
     private readonly notificationService: NotificationService,

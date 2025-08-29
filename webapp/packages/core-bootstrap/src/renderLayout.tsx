@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,18 +10,18 @@ import { createRoot, type Root } from 'react-dom/client';
 
 import { BodyLazy } from '@cloudbeaver/core-app';
 import { DisplayError, ErrorBoundary, Loader, s } from '@cloudbeaver/core-blocks';
-import { HideAppLoadingScreen, IServiceProvider, ServiceProviderContext } from '@cloudbeaver/core-di';
+import { HideAppLoadingScreen, IServiceProvider, ServiceProvider } from '@cloudbeaver/core-di';
 
 import styles from './renderLayout.module.css';
 
 interface IRender {
   initRoot(): Root;
-  renderApp(): void;
-  renderError(exception?: any): void;
+  renderApp(serviceProvider: IServiceProvider | null): void;
+  renderError(serviceProvider: IServiceProvider | null, exception?: any): void;
   unmount(): void;
 }
 
-export function renderLayout(serviceProvider: IServiceProvider): IRender {
+export function renderLayout(): IRender {
   let root: Root | undefined;
 
   return {
@@ -45,30 +45,30 @@ export function renderLayout(serviceProvider: IServiceProvider): IRender {
         root = undefined;
       }
     },
-    renderApp() {
+    renderApp(serviceProvider: IServiceProvider | null) {
       this.initRoot().render(
         <ErrorBoundary fallback={<HideAppLoadingScreen />} simple>
-          <ServiceProviderContext serviceProvider={serviceProvider}>
+          <ServiceProvider provider={serviceProvider!}>
             <ErrorBoundary fallback={<HideAppLoadingScreen />} root>
               <Suspense fallback={<Loader className={s(styles, { loader: true })} />}>
                 <BodyLazy />
                 <HideAppLoadingScreen />
               </Suspense>
             </ErrorBoundary>
-          </ServiceProviderContext>
+          </ServiceProvider>
         </ErrorBoundary>,
       );
     },
-    renderError(exception?: any) {
+    renderError(serviceProvider: IServiceProvider | null, exception?: any) {
       if (exception) {
         console.error(exception);
       }
       this.initRoot().render(
         <ErrorBoundary fallback={<HideAppLoadingScreen />} simple>
-          <ServiceProviderContext serviceProvider={serviceProvider}>
+          <ServiceProvider provider={serviceProvider!}>
             <DisplayError error={exception} root />
             <HideAppLoadingScreen />
-          </ServiceProviderContext>
+          </ServiceProvider>
         </ErrorBoundary>,
       );
     },

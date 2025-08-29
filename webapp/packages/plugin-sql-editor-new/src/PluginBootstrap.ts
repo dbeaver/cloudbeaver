@@ -9,7 +9,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { SQLCodeEditorPanelService } from './SQLEditor/SQLCodeEditorPanel/SQLCodeEditorPanelService.js';
 
-@injectable()
+@injectable(() => [SQLCodeEditorPanelService])
 export class PluginBootstrap extends Bootstrap {
   constructor(private readonly sqlCodeEditorPanelService: SQLCodeEditorPanelService) {
     super();

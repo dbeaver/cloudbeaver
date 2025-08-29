@@ -2,6 +2,8 @@
   "name": "@cloudbeaver/plugin-resource-manager",
   "type": "module",
   "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"

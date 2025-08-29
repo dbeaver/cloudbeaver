@@ -13,7 +13,7 @@ import { ServerConfigResource } from './ServerConfigResource.js';
 
 export type DefaultNavigatorSettings = DefaultNavigatorSettingsFragment['defaultNavigatorSettings'];
 
-@injectable()
+@injectable(() => [GraphQLService, ServerConfigResource])
 export class DefaultNavigatorSettingsResource extends CachedDataResource<DefaultNavigatorSettings | null> {
   constructor(
     private readonly graphQLService: GraphQLService,

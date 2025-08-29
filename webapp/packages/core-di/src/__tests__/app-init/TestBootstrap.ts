@@ -9,7 +9,7 @@ import { Bootstrap } from '../../Bootstrap.js';
 import { injectable } from '../../injectable.js';
 import { TestService } from './TestService.js';
 
-@injectable()
+@injectable(() => [TestService])
 export class TestBootstrap extends Bootstrap {
   loaded: boolean;
   registered: boolean;

@@ -9,7 +9,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { AdministrationTopAppBarService } from '@cloudbeaver/plugin-administration';
 import { HolidayActionButtonLazy } from '@cloudbeaver/plugin-holidays';
 
-@injectable()
+@injectable(() => [AdministrationTopAppBarService])
 export class HolidayAdministrationBootstrap extends Bootstrap {
   constructor(private readonly administrationTopAppBarService: AdministrationTopAppBarService) {
     super();

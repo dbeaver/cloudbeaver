@@ -52,7 +52,22 @@ import { getResourceKeyFromNodeId } from './getResourceKeyFromNodeId.js';
 import { getResourceNodeId } from './getResourceNodeId.js';
 import { getRmProjectNodeId } from './getRmProjectNodeId.js';
 
-@injectable()
+@injectable(() => [
+  LocalizationService,
+  NavTreeResource,
+  NotificationService,
+  UserInfoResource,
+  NavNodeManagerService,
+  ResourceManagerResource,
+  ResourceManagerService,
+  ProjectInfoResource,
+  CommonDialogService,
+  ActionService,
+  MenuService,
+  NavResourceNodeService,
+  TreeSelectionService,
+  ProjectsNavNodeService,
+])
 export class ResourceFoldersBootstrap extends Bootstrap {
   constructor(
     private readonly localizationService: LocalizationService,

@@ -9,7 +9,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { UserInfoResource } from './UserInfoResource.js';
 
-@injectable()
+@injectable(() => [UserInfoResource])
 export class UserConfigurationBootstrap extends Bootstrap {
   constructor(private readonly userInfoResource: UserInfoResource) {
     super();

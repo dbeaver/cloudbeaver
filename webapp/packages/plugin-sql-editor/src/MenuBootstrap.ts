@@ -54,7 +54,17 @@ const SYNC_DELAY = 5 * 60 * 1000;
 
 const ScriptImportDialog = importLazyComponent(() => import('./SqlEditor/ScriptImportDialog.js').then(m => m.ScriptImportDialog));
 
-@injectable()
+@injectable(() => [
+  MenuService,
+  ActionService,
+  KeyBindingService,
+  SqlDataSourceService,
+  WindowEventsService,
+  ConnectionInfoResource,
+  SqlEditorSettingsService,
+  NotificationService,
+  CommonDialogService,
+])
 export class MenuBootstrap extends Bootstrap {
   constructor(
     private readonly menuService: MenuService,

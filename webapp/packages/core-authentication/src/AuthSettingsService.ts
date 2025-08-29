@@ -15,7 +15,7 @@ const settingsSchema = schema.object({
 
 export type AuthSettings = schema.infer<typeof settingsSchema>;
 
-@injectable()
+@injectable(() => [SettingsProviderService, SettingsManagerService])
 export class AuthSettingsService {
   get disableAnonymousAccess(): boolean {
     return this.settings.getValue('core.authentication.disableAnonymousAccess');

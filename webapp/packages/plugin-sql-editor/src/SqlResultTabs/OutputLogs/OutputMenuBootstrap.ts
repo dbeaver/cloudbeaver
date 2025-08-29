@@ -22,7 +22,7 @@ import { ACTION_SQL_EDITOR_CLEAR_OUTPUT_LOGS } from './ACTION_SQL_EDITOR_CLEAR_O
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from '../../SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA.js';
 import { SQL_EDITOR_ACTIONS_MENU } from '../../SqlEditor/SQL_EDITOR_ACTIONS_MENU.js';
 
-@injectable()
+@injectable(() => [ActionService, MenuService, OutputLogsService, SqlDataSourceService, KeyBindingService])
 export class OutputMenuBootstrap extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,

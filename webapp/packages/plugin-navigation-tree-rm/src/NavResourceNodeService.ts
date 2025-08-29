@@ -14,7 +14,7 @@ import { getPathName } from '@cloudbeaver/core-utils';
 
 import { getResourceNodeId } from './NavNodes/getResourceNodeId.js';
 
-@injectable()
+@injectable(() => [ResourceManagerResource, CommonDialogService, LocalizationService])
 export class NavResourceNodeService {
   constructor(
     private readonly resourceManagerResource: ResourceManagerResource,

@@ -39,7 +39,14 @@ interface INavigationNodeShowData {
   path: string[];
 }
 
-@injectable()
+@injectable(() => [
+  NavNodeManagerService,
+  ConnectionsManagerService,
+  ConnectionInfoResource,
+  NavNodeExtensionsService,
+  NavNodeInfoResource,
+  NavTreeResource,
+])
 export class NavigationTreeService extends View<string> {
   readonly treeState: MetadataMap<string, ITreeNodeState>;
   readonly nodeSelectionTask: ISyncExecutor<INavigationNodeSelectionData>;

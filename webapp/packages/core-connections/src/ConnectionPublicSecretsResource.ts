@@ -24,7 +24,7 @@ import {
 
 export type PublicSecretInfo = SecretInfo;
 
-@injectable()
+@injectable(() => [GraphQLService, ConnectionInfoResource])
 export class ConnectionPublicSecretsResource extends CachedMapResource<IConnectionInfoParams, PublicSecretInfo[]> {
   constructor(
     private readonly graphQLService: GraphQLService,

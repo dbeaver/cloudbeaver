@@ -11,7 +11,7 @@ import type { CbDatasourceFolderEvent as IConnectionFolderEvent } from '@cloudbe
 
 export type { IConnectionFolderEvent };
 
-@injectable()
+@injectable(() => [SessionEventSource])
 export class ConnectionFolderEventHandler extends TopicEventHandler<IConnectionFolderEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbDatasourceFolder, sessionEventSource);

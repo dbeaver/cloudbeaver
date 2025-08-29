@@ -11,7 +11,7 @@ import { MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
 import { MENU_TREE_CREATE_CONNECTION } from '../Actions/MENU_TREE_CREATE_CONNECTION.js';
 
-@injectable()
+@injectable(() => [MenuService])
 export class ConnectionsExplorerBootstrap extends Bootstrap {
   constructor(private readonly menuService: MenuService) {
     super();

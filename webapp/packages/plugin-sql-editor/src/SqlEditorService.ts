@@ -43,7 +43,18 @@ export interface ISqlEditorActiveQueryUpdateData {
   };
 }
 
-@injectable()
+@injectable(() => [
+  GraphQLService,
+  ConnectionsManagerService,
+  NotificationService,
+  ConnectionExecutionContextService,
+  ConnectionExecutionContextResource,
+  ConnectionInfoResource,
+  SqlDataSourceService,
+  SqlEditorSettingsService,
+  ServerConfigResource,
+  SqlQueryService,
+])
 export class SqlEditorService {
   get autoSave(): boolean {
     return this.sqlEditorSettingsService.autoSave && !this.serverConfigResource.isFeatureEnabled(FEATURE_GIT_ID, true);

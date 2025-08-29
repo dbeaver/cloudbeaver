@@ -23,6 +23,8 @@
     "tslib": "^2"
   },
   "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"

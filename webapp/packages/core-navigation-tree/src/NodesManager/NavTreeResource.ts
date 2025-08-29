@@ -59,7 +59,15 @@ export interface INavNodeRenameData {
   newNodeId: string;
 }
 
-@injectable()
+@injectable(() => [
+  GraphQLService,
+  NavNodeInfoResource,
+  NavTreeSettingsService,
+  SessionDataResource,
+  UserInfoResource,
+  ProjectInfoResource,
+  AppAuthService,
+])
 export class NavTreeResource extends CachedMapResource<string, string[], Record<string, unknown>, INodeMetadata> {
   readonly beforeNodeDelete: IExecutor<ResourceKeySimple<string>>;
   readonly onNodeRefresh: IExecutor<string>;

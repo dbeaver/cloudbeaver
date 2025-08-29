@@ -1,6 +1,8 @@
 {
   "name": "@cloudbeaver/eslint-plugin",
   "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"

@@ -45,7 +45,16 @@ import { objectViewerTabHandlerKey } from './objectViewerTabHandlerKey.js';
 const ObjectViewerPanel = importLazyComponent(() => import('./ObjectViewerPanel/ObjectViewerPanel.js').then(m => m.ObjectViewerPanel));
 const ObjectViewerTab = importLazyComponent(() => import('./ObjectViewerTab.js').then(m => m.ObjectViewerTab));
 
-@injectable()
+@injectable(() => [
+  NavNodeManagerService,
+  DBObjectPageService,
+  NotificationService,
+  NavigationTabsService,
+  ConnectionInfoResource,
+  ConnectionNavNodeService,
+  NavTreeResource,
+  ConnectionExecutionContextResource,
+])
 export class ObjectViewerTabService {
   readonly tabHandler: TabHandler<IObjectViewerTabState>;
 

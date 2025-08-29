@@ -14,7 +14,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 const AppScreen = importLazyComponent(() => import('./AppScreen.js').then(m => m.AppScreen));
 
-@injectable()
+@injectable(() => [ScreenService])
 export class AppScreenBootstrap extends Bootstrap {
   readonly activation: IExecutor;
 

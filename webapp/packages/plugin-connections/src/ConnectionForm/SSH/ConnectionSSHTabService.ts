@@ -24,7 +24,7 @@ const SSHPanel = React.lazy(async () => {
   return { default: SSHPanel };
 });
 
-@injectable()
+@injectable(() => [DBDriverResource, ConnectionFormService])
 export class ConnectionSSHTabService extends Bootstrap {
   constructor(
     private readonly dbDriverResource: DBDriverResource,

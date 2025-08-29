@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@ import { ObjectPropertiesPageService } from './ObjectPropertiesPage/ObjectProper
 import { ObjectPropertyTableFooterService } from './ObjectPropertiesPage/ObjectPropertyTable/ObjectPropertyTableFooterService.js';
 import { ObjectViewerTabService } from './ObjectViewerTabService.js';
 
-@injectable()
+@injectable(() => [ObjectViewerTabService, ObjectPropertiesPageService, ObjectPropertyTableFooterService])
 export class ObjectViewerBootstrap extends Bootstrap {
   constructor(
     private readonly objectViewerTabService: ObjectViewerTabService,

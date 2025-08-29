@@ -14,7 +14,7 @@ import { errorOf } from '@cloudbeaver/core-utils';
 
 import { NetworkError } from './NetworkError.js';
 
-@injectable()
+@injectable(() => [GraphQLService])
 export class NetworkStateService extends Bootstrap {
   get state(): boolean {
     return this.networkState;

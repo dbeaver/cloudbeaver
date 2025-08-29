@@ -11,10 +11,4 @@ export const dataViewerResultTraceDetailsPlugin: PluginManifest = {
   info: {
     name: 'Result trace details Data Editor plugin',
   },
-
-  providers: [
-    () => import('./DVResultTraceDetailsBootstrap.js').then(m => m.DVResultTraceDetailsBootstrap),
-    () => import('./DVResultTraceDetailsService.js').then(m => m.DVResultTraceDetailsService),
-    () => import('./LocaleService.js').then(m => m.LocaleService),
-  ],
 };

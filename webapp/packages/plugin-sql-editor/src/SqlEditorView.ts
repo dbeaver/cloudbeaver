@@ -16,7 +16,7 @@ import { ACTION_SQL_EDITOR_FORMAT } from './actions/ACTION_SQL_EDITOR_FORMAT.js'
 import { ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN } from './actions/ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN.js';
 import { ACTION_SQL_EDITOR_SHOW_OUTPUT } from './actions/ACTION_SQL_EDITOR_SHOW_OUTPUT.js';
 
-@injectable()
+@injectable(() => [NavigationTabsService])
 export class SqlEditorView extends View<ITab> {
   constructor(private readonly navigationTabsService: NavigationTabsService) {
     super();

@@ -11,7 +11,7 @@ import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
 const UpdateInstruction = importLazyComponent(() => import('./UpdateInstruction.js').then(m => m.UpdateInstruction));
 
-@injectable()
+@injectable(() => [VersionUpdateService])
 export class ProductBootstrap extends Bootstrap {
   constructor(private readonly versionUpdateService: VersionUpdateService) {
     super();
