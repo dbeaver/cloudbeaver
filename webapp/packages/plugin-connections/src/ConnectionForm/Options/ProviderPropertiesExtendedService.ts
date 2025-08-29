@@ -14,7 +14,7 @@ export type ProviderPropertiesExtendedFormProps = {
   formState: IFormState<IConnectionFormState>;
 };
 
-@injectable()
+@injectable(() => [])
 export class ProviderPropertiesExtendedService {
   readonly container: PlaceholderContainer<ProviderPropertiesExtendedFormProps>;
 
