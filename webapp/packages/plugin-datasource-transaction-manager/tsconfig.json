@@ -68,6 +68,9 @@
       "path": "../plugin-sql-editor-new"
     },
     {
+      "path": "../plugin-tools-panel"
+    },
+    {
       "path": "../plugin-top-app-bar"
     }
   ],
