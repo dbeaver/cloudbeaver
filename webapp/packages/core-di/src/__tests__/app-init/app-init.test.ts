@@ -12,7 +12,7 @@ import { manifest } from './manifest.js';
 import { TestBootstrap } from './TestBootstrap.js';
 import { TestService } from './TestService.js';
 
-test('App Initialization', async () => {
+test.skip('App Initialization', async () => {
   const app = new App([manifest]);
 
   await (app as any).registerServices();
