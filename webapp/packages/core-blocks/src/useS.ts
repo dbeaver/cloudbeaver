@@ -7,7 +7,7 @@
  */
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-import { optional, useService } from '@cloudbeaver/core-di';
+import { useService } from '@cloudbeaver/core-di';
 import { type BaseStyles, type ClassCollection, type ComponentStyle, type Style, type ThemeSelector, ThemeService } from '@cloudbeaver/core-theming';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -46,11 +46,7 @@ export function useS<T extends ComponentStyle[]>(...componentStyles: [...T]): Ex
   const stylesRef = useRef<ComponentStyle[]>([]);
   const [patch, forceUpdate] = useState(0);
   const loadedStyles = useRef<BaseStyles[]>([]);
-  const themeServiceOptional = useService(optional(ThemeService));
-  let themeService: ThemeService | null = null;
-  try {
-    themeService = themeServiceOptional.resolve();
-  } catch {}
+  const themeService = useService(ThemeService);
   const [currentThemeId, setCurrentThemeId] = useState(() => themeService?.themeId);
   const lastThemeRef = useRef<string | undefined>(currentThemeId);
   const filteredStyles = themeService
