@@ -8,17 +8,17 @@
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import type { IFormState } from '@cloudbeaver/core-ui';
-import type { IConnectionFormState } from '../../IConnectionFormState.js';
+import type { IConnectionFormState } from '../IConnectionFormState.js';
 
-export type ConnectionOptionsExtendedProps = {
+export type ProviderPropertiesExtendedFormProps = {
   formState: IFormState<IConnectionFormState>;
 };
 
 @injectable()
-export class OptionsExtendedService {
-  readonly container: PlaceholderContainer<ConnectionOptionsExtendedProps>;
+export class ProviderPropertiesExtendedService {
+  readonly container: PlaceholderContainer<ProviderPropertiesExtendedFormProps>;
 
   constructor() {
-    this.container = new PlaceholderContainer<ConnectionOptionsExtendedProps>();
+    this.container = new PlaceholderContainer<ProviderPropertiesExtendedFormProps>();
   }
 }

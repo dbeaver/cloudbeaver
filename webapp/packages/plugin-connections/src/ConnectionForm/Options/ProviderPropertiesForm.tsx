@@ -17,7 +17,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { type DriverPropertyInfoFragment, getObjectPropertyType } from '@cloudbeaver/core-sdk';
-import { OptionsExtendedForm } from './OptionsExtendedForm/OptionsExtendedForm.js';
+import { ProviderPropertiesExtendedForm } from './ProviderPropertiesExtendedForm.js';
 import type { IFormState } from '@cloudbeaver/core-ui';
 import type { IConnectionFormState } from '../IConnectionFormState.js';
 import { getConnectionFormOptionsPart } from './getConnectionFormOptionsPart.js';
@@ -47,7 +47,7 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
 
   return (
     <Group form gap>
-      <OptionsExtendedForm formState={formState} />
+      <ProviderPropertiesExtendedForm formState={formState} />
       {isUncategorizedExists && (
         <>
           <GroupTitle>{translate('ui_settings')}</GroupTitle>

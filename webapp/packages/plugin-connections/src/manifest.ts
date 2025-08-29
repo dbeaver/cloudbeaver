@@ -20,7 +20,7 @@ export const connectionPlugin: PluginManifest = {
     () => import('./ConnectionAuthService.js').then(m => m.ConnectionAuthService),
     () => import('./ConnectionForm/ConnectionFormService.js').then(m => m.ConnectionFormService),
     () => import('./ConnectionForm/Options/ConnectionOptionsTabService.js').then(m => m.ConnectionOptionsTabService),
-    () => import('./ConnectionForm/Options/OptionsExtendedForm/OptionsExtendedService.js').then(m => m.OptionsExtendedService),
+    () => import('./ConnectionForm/Options/ProviderPropertiesExtendedService.js').then(m => m.ProviderPropertiesExtendedService),
     () => import('./ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService.js').then(m => m.ConnectionDriverPropertiesTabService),
     () => import('./ConnectionForm/SSH/ConnectionSSHTabService.js').then(m => m.ConnectionSSHTabService),
     () => import('./ConnectionForm/OriginInfo/ConnectionOriginInfoTabService.js').then(m => m.ConnectionOriginInfoTabService),
