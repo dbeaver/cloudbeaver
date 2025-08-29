@@ -44,6 +44,7 @@ export class SystemThemeService extends Bootstrap {
       },
       loaded: false,
       async loader() {
+        await systemThemeService.updateSystemTheme();
         if (systemThemeService.dynamicTheme) {
           await systemThemeService.themeService.loadTheme(systemThemeService.dynamicTheme.id);
         }
@@ -75,10 +76,6 @@ export class SystemThemeService extends Bootstrap {
     });
   }
 
-  override async load(): Promise<void> {
-    await this.updateSystemTheme();
-  }
-
   override dispose(): void {
     this.unsubscribeSystemThemeChange();
   }
@@ -93,7 +90,7 @@ export class SystemThemeService extends Bootstrap {
 
   private async updateSystemTheme(): Promise<void> {
     this.dynamicTheme = this.getDynamicTheme();
-    if (this.dynamicTheme) {
+    if (this.dynamicTheme && this.themeService.themeId === 'system') {
       await this.themeService.loadTheme(this.dynamicTheme.id);
     }
   }
