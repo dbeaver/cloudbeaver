@@ -26,7 +26,7 @@ export class SystemThemeService extends Bootstrap {
   ) {
     super();
     this.dynamicTheme = null;
-    this.handleSystemThemeChange = this.handleSystemThemeChange.bind(this);
+    this.updateSystemTheme = this.updateSystemTheme.bind(this);
     this.mediaQueryList = window.matchMedia(DARK_QUERY);
 
     makeObservable<this, 'dynamicTheme'>(this, {
@@ -69,14 +69,14 @@ export class SystemThemeService extends Bootstrap {
         }
         return undefined;
       },
-      isEdited(key) {
+      isEdited() {
         return false;
       },
     });
   }
 
-  override load(): void {
-    this.dynamicTheme = this.getDynamicTheme();
+  override async load(): Promise<void> {
+    await this.updateSystemTheme();
   }
 
   override dispose(): void {
@@ -84,17 +84,17 @@ export class SystemThemeService extends Bootstrap {
   }
 
   private unsubscribeSystemThemeChange(): void {
-    this.mediaQueryList.removeEventListener('change', this.handleSystemThemeChange);
+    this.mediaQueryList.removeEventListener('change', this.updateSystemTheme);
   }
 
   private subscribeSystemThemeChange(): void {
-    this.mediaQueryList.addEventListener('change', this.handleSystemThemeChange);
+    this.mediaQueryList.addEventListener('change', this.updateSystemTheme);
   }
 
-  private handleSystemThemeChange(): void {
+  private async updateSystemTheme(): Promise<void> {
     this.dynamicTheme = this.getDynamicTheme();
     if (this.dynamicTheme) {
-      this.themeService.loadTheme(this.dynamicTheme.id);
+      await this.themeService.loadTheme(this.dynamicTheme.id);
     }
   }
 

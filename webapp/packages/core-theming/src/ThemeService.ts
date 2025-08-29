@@ -89,7 +89,7 @@ export class ThemeService extends Bootstrap {
   }
 
   override register(): void {
-    this.loadAllThemes();
+    this.registerDefaultThemes();
     this.reactionDisposer = reaction(
       () => this.currentTheme,
       theme => theme && this.loadTheme(theme.id),
@@ -169,7 +169,7 @@ export class ThemeService extends Bootstrap {
     }
   }
 
-  private loadAllThemes(): void {
+  private registerDefaultThemes(): void {
     for (const theme of themes) {
       this.themeMap.set(theme.id, theme);
     }
