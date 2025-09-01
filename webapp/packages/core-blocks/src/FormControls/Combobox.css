@@ -29,6 +29,6 @@
     padding-inline: calc(var(--tw-spacing) * 3);
     padding-block: calc(var(--tw-spacing) * 2);
     gap: calc(var(--tw-spacing) * 2);
-    line-height: 1;
+    line-height: 1.25;
   }
 }
