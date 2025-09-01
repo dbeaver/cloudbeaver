@@ -57,5 +57,5 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 As a community-driven open-source project, we warmly welcome contributions through GitHub pull requests. 
 
 [We are happy to reward](https://dbeaver.com/help-dbeaver/) our most active contributors every major sprint.
-The most significant contribution to our code for the major release 25.1.0 was made by:
-1. [0xhanh](https://github.com/0xhanh) - for Vietnamese localization.
+The most significant contribution to our code for the major release 25.2.0 was made by:
+1. [rad-pat](https://github.com/rad-pat) - added support for Databend in CloudBeaver Community Edition.
