@@ -16,7 +16,7 @@ import type { IActionHandler, IActionHandlerOptions } from './IActionHandler.js'
 import type { IActionItem } from './IActionItem.js';
 import { KeyBindingService } from './KeyBinding/KeyBindingService.js';
 
-@injectable()
+@injectable(() => [KeyBindingService])
 export class ActionService {
   private readonly handlers: Map<string, IActionHandler>;
 

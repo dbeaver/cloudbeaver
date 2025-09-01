@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,17 @@ const VALUE_TEXT_PRESENTATION_ID = 'value-text-presentation';
 
 const SpreadsheetGrid = importLazyComponent(() => import('./SpreadsheetGrid.js').then(m => m.SpreadsheetGrid));
 
-@injectable()
+@injectable(() => [
+  DataPresentationService,
+  DataGridSettingsService,
+  DataGridContextMenuOrderService,
+  DataGridContextMenuFilterService,
+  DataGridContextMenuCellEditingService,
+  DataGridContextMenuSaveContentService,
+  ActionService,
+  MenuService,
+  ExceptionsCatcherService,
+])
 export class SpreadsheetBootstrap extends Bootstrap {
   constructor(
     private readonly dataPresentationService: DataPresentationService,
@@ -52,6 +62,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
   override register(): void | Promise<void> {
     this.dataPresentationService.add({
       id: 'spreadsheet_grid',
+      order: 0,
       dataFormat: ResultDataFormat.Resultset,
       getPresentationComponent: () => SpreadsheetGrid,
       hidden: () => this.dataGridSettingsService.hidden,

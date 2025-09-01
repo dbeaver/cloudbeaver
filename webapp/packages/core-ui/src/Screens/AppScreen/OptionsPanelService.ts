@@ -14,7 +14,7 @@ import { NavigationService } from './NavigationService.js';
 
 export type OptionsPanelCloseEventData = 'before' | 'after';
 
-@injectable()
+@injectable(() => [NavigationService])
 export class OptionsPanelService {
   active: boolean;
   readonly closeTask: IExecutor<OptionsPanelCloseEventData>;

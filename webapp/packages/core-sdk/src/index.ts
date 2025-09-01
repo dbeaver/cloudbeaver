@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
+import './module.js';
 export * from './Extensions/uploadBlobResultSetExtension.js';
 export * from './CustomGraphQLClient.js';
 export * from './DetailsError.js';

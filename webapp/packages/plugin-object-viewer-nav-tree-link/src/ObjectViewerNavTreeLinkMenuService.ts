@@ -14,7 +14,7 @@ import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-c
 import { ACTION_LINK_OBJECT } from './ACTION_LINK_OBJECT.js';
 import { KEY_BINDING_LINK_OBJECT } from './KEY_BINDING_LINK_OBJECT.js';
 
-@injectable()
+@injectable(() => [ActionService, KeyBindingService, NavigationTreeService, ConnectionSchemaManagerService, MenuService, LocalizationService])
 export class ObjectViewerNavTreeLinkMenuService extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,

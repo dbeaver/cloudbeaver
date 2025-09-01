@@ -16,7 +16,7 @@ export interface IUserFormState {
 
 export type UserFormProps = IFormProps<IUserFormState>;
 
-@injectable()
+@injectable(() => [LocalizationService, NotificationService])
 export class AdministrationUserFormService extends FormBaseService<IUserFormState, UserFormProps> {
   constructor(localizationService: LocalizationService, notificationService: NotificationService) {
     super(localizationService, notificationService, 'Administration User form');

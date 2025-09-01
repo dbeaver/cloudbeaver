@@ -11,6 +11,4 @@ export const connectionPlugin: PluginManifest = {
   info: {
     name: 'Connections Administration plugin',
   },
-
-  providers: [() => import('./ConnectionFormAccess/ConnectionFormAccessTabService.js').then(m => m.ConnectionFormAccessTabService)],
 };

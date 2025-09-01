@@ -43,7 +43,21 @@ const TransactionLogDialog = importLazyComponent(() =>
   import('./TransactionLog/TransactionLogDialog.js').then(module => module.TransactionLogDialog),
 );
 
-@injectable()
+@injectable(() => [
+  MenuService,
+  ActionService,
+  ConnectionSchemaManagerService,
+  ConnectionExecutionContextService,
+  ConnectionExecutionContextResource,
+  ConnectionInfoResource,
+  ConnectionsManagerService,
+  OptionsPanelService,
+  NotificationService,
+  CommonDialogService,
+  LocalizationService,
+  TransactionManagerSettingsService,
+  TransactionLogCountResource,
+])
 export class TransactionManagerBootstrap extends Bootstrap {
   constructor(
     private readonly menuService: MenuService,

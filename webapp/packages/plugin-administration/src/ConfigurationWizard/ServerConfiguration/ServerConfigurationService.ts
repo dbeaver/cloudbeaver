@@ -19,7 +19,7 @@ export interface IConfigurationPlaceholderProps {
   state: IServerConfigurationFormPartState;
 }
 
-@injectable()
+@injectable(() => [ServerConfigurationFormService])
 export class ServerConfigurationService {
   isDone: boolean;
 

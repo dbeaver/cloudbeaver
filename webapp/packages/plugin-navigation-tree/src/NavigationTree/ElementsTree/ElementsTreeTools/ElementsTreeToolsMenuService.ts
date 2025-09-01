@@ -25,7 +25,7 @@ import { createElementsTreeSettings, validateElementsTreeSettings } from './Navi
 import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT.js';
 import { KEY_BINDING_ENABLE_FILTER } from './NavigationTreeSettings/KEY_BINDING_ENABLE_FILTER.js';
 
-@injectable()
+@injectable(() => [ActionService, KeyBindingService, UserDataService, MenuService, LocalizationService])
 export class ElementsTreeToolsMenuService {
   constructor(
     private readonly actionService: ActionService,

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { HIGHEST_SETTINGS_LAYER, ServerSettingsManagerService, SettingsTransformationService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
@@ -36,8 +36,14 @@ const defaultSettings = schema.object({
 export type DataViewerSettingsSchema = typeof defaultSettings;
 export type DataViewerSettings = schema.infer<DataViewerSettingsSchema>;
 
-@injectable()
-export class DataViewerSettingsService extends Dependency {
+@injectable(() => [
+  SettingsProviderService,
+  SettingsManagerService,
+  SettingsResolverService,
+  SettingsTransformationService,
+  ServerSettingsManagerService,
+])
+export class DataViewerSettingsService {
   get disableEdit(): boolean {
     return this.settings.getValue('plugin.data-viewer.disableEdit');
   }
@@ -72,7 +78,6 @@ export class DataViewerSettingsService extends Dependency {
     private readonly serverSettingsManagerService: ServerSettingsManagerService,
   ) {
     // Some settings registered in plugin-data-editor-public-settings & permissions
-    super();
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,

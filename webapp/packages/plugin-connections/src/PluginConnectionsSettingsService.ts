@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { CONNECTIONS_SETTINGS_GROUP } from '@cloudbeaver/core-connections';
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
@@ -16,8 +16,8 @@ const defaultSettings = schema.object({
 
 export type PluginConnectionsSettings = schema.infer<typeof defaultSettings>;
 
-@injectable()
-export class PluginConnectionsSettingsService extends Dependency {
+@injectable(() => [SettingsProviderService, SettingsManagerService])
+export class PluginConnectionsSettingsService {
   get hideConnectionViewForUsers(): boolean {
     return this.settings.getValue('plugin.connections.hideConnectionViewForUsers');
   }
@@ -27,7 +27,6 @@ export class PluginConnectionsSettingsService extends Dependency {
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
   ) {
-    super();
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
 
     this.registerSettings();

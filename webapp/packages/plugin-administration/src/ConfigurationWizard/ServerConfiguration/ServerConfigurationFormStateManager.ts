@@ -8,11 +8,12 @@
 import { makeObservable, observable } from 'mobx';
 
 import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
+import type { IFormState } from '@cloudbeaver/core-ui';
 
 import { ServerConfigurationFormService } from './ServerConfigurationFormService.js';
 import { ServerConfigurationFormState } from './ServerConfigurationFormState.js';
 
-@injectable()
+@injectable(() => [IServiceProvider, ServerConfigurationFormService])
 export class ServerConfigurationFormStateManager {
   formState: ServerConfigurationFormState | null;
 
@@ -27,7 +28,7 @@ export class ServerConfigurationFormStateManager {
     });
   }
 
-  create() {
+  create(): IFormState<null> {
     if (this.formState) {
       return this.formState;
     }
@@ -36,7 +37,15 @@ export class ServerConfigurationFormStateManager {
     return this.formState;
   }
 
-  destroy() {
+  async save(): Promise<boolean> {
+    if (!this.formState) {
+      return false;
+    }
+
+    return await this.formState.save();
+  }
+
+  destroy(): void {
     if (this.formState) {
       this.formState?.dispose();
       this.formState = null;

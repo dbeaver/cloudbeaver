@@ -61,7 +61,17 @@ const EXECUTIONS_ACTIONS = [
   ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
 ];
 
-@injectable()
+@injectable(() => [
+  MenuService,
+  ActionService,
+  KeyBindingService,
+  SqlDataSourceService,
+  WindowEventsService,
+  ConnectionInfoResource,
+  SqlEditorSettingsService,
+  NotificationService,
+  CommonDialogService,
+])
 export class MenuBootstrap extends Bootstrap {
   constructor(
     private readonly menuService: MenuService,

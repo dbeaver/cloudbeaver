@@ -11,7 +11,7 @@ import { TopNavService } from '@cloudbeaver/plugin-top-app-bar';
 import { HolidayActionButtonLazy } from './HolidayActionButtonLazy.js';
 import type { IHoliday } from './IHoliday.js';
 
-@injectable()
+@injectable(() => [TopNavService])
 export class HolidaysService extends Bootstrap {
   private readonly holidays: IHoliday[] = [];
 

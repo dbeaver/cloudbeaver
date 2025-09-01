@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
+import './module.js';
 export * from './IndexedDB/IndexedDBService.js';
 export * from './IndexedDB/IndexedDB.js';
 export * from './LocalStorageSaveService.js';

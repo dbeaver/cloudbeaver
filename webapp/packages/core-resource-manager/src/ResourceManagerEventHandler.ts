@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { type ISessionEvent, type SessionEventId, SessionEventSource, SessionEventTopic, TopicEventHandler } from '@cloudbeaver/core-root';
 import type { CbrmEvent as IResourceManagerEvent } from '@cloudbeaver/core-sdk';
 
-@injectable()
+@injectable(() => [SessionEventSource])
 export class ResourceManagerEventHandler extends TopicEventHandler<IResourceManagerEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbScripts, sessionEventSource);

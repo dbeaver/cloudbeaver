@@ -12,7 +12,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 const SettingsAdministration = importLazyComponent(() => import('./SettingsAdministration.js').then(module => module.SettingsAdministration));
 const SettingsDrawerItem = importLazyComponent(() => import('./SettingsDrawerItem.js').then(module => module.SettingsDrawerItem));
 
-@injectable()
+@injectable(() => [AdministrationItemService])
 export class SettingsAdministrationPluginBootstrap extends Bootstrap {
   constructor(private readonly administrationItemService: AdministrationItemService) {
     super();

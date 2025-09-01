@@ -32,7 +32,7 @@ export interface RequestedProvider {
   configurationId?: string;
 }
 
-@injectable()
+@injectable(() => [AuthProvidersResource])
 export class AuthProviderService {
   readonly requestAuthProvider: IExecutor<RequestedProvider>;
 

@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { App, Bootstrap, injectable, type IServiceConstructor, IServiceProvider } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { CachedResource } from '@cloudbeaver/core-resource';
 import { EAdminPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { ActionService, DATA_CONTEXT_SUBMENU_ITEM, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
@@ -16,21 +16,15 @@ import { ACTION_DEVTOOLS } from './actions/ACTION_DEVTOOLS.js';
 import { ACTION_DEVTOOLS_MODE_CONFIGURATION } from './actions/ACTION_DEVTOOLS_MODE_CONFIGURATION.js';
 import { ACTION_DEVTOOLS_MODE_DISTRIBUTED } from './actions/ACTION_DEVTOOLS_MODE_DISTRIBUTED.js';
 import { ACTION_DEVTOOLS_OVERRIDE } from './actions/ACTION_DEVTOOLS_OVERRIDE.js';
-import { DATA_CONTEXT_MENU_SEARCH } from './ContextMenu/DATA_CONTEXT_MENU_SEARCH.js';
-import { SearchResourceMenuItem } from './ContextMenu/SearchResourceMenuItem.js';
 import { DevToolsService } from './DevToolsService.js';
 import { MENU_DEVTOOLS } from './menu/MENU_DEVTOOLS.js';
-import { MENU_PLUGIN } from './menu/MENU_PLUGIN.js';
 import { MENU_PLUGINS } from './menu/MENU_PLUGINS.js';
 import { MENU_RESOURCE } from './menu/MENU_RESOURCE.js';
-import { MENU_RESOURCES } from './menu/MENU_RESOURCES.js';
-import { PluginSubMenuItem } from './menu/PluginSubMenuItem.js';
 import { ResourceSubMenuItem } from './menu/ResourceSubMenuItem.js';
 
-@injectable()
+@injectable(() => [IServiceProvider, MenuService, ActionService, DevToolsService, PermissionsService])
 export class PluginBootstrap extends Bootstrap {
   constructor(
-    private readonly app: App,
     private readonly serviceProvider: IServiceProvider,
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
@@ -81,17 +75,17 @@ export class PluginBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [MENU_DEVTOOLS],
       getItems: (context, items) => {
-        const search = context.get(DATA_CONTEXT_MENU_SEARCH);
+        // const search = context.get(DATA_CONTEXT_MENU_SEARCH);
 
-        if (search) {
-          return [
-            new SearchResourceMenuItem(),
-            ...this.getResources(this.app.getServices().filter(service => service.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()))),
-          ];
-        }
+        // if (search) {
+        //   return [
+        //     new SearchResourceMenuItem(),
+        //     ...this.getResources(this.app.getServices().filter(service => service.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()))),
+        //   ];
+        // }
 
         return [
-          new SearchResourceMenuItem(),
+          // new SearchResourceMenuItem(),
           ACTION_DEVTOOLS_OVERRIDE,
           ACTION_DEVTOOLS_MODE_DISTRIBUTED,
           ACTION_DEVTOOLS_MODE_CONFIGURATION,
@@ -130,50 +124,50 @@ export class PluginBootstrap extends Bootstrap {
       },
     });
 
-    this.menuService.addCreator({
-      menus: [MENU_PLUGINS],
-      getItems: (context, items) => [
-        ...this.app
-          .getPlugins()
-          .sort((a, b) => a.info.name.localeCompare(b.info.name))
-          .map(plugin => new PluginSubMenuItem(plugin)),
-        ...items,
-      ],
-    });
+    // this.menuService.addCreator({
+    //   menus: [MENU_PLUGINS],
+    //   getItems: (context, items) => [
+    //     ...this.app
+    //       .getPlugins()
+    //       .sort((a, b) => a.info.name.localeCompare(b.info.name))
+    //       .map(plugin => new PluginSubMenuItem(plugin)),
+    //     ...items,
+    //   ],
+    // });
 
-    this.menuService.addCreator({
-      menus: [MENU_PLUGIN],
-      isApplicable: context => {
-        const item = context.get(DATA_CONTEXT_SUBMENU_ITEM);
+    // this.menuService.addCreator({
+    //   menus: [MENU_PLUGIN],
+    //   isApplicable: context => {
+    //     const item = context.get(DATA_CONTEXT_SUBMENU_ITEM);
 
-        if (item instanceof PluginSubMenuItem) {
-          return this.app.getServices(item.plugin).some(service => service.prototype instanceof CachedResource);
-        }
+    //     if (item instanceof PluginSubMenuItem) {
+    //       return this.app.getServices(item.plugin).some(service => service.prototype instanceof CachedResource);
+    //     }
 
-        return false;
-      },
-      getItems: (_, items) => [MENU_RESOURCES, ...items],
-    });
+    //     return false;
+    //   },
+    //   getItems: (_, items) => [MENU_RESOURCES, ...items],
+    // });
 
-    this.menuService.addCreator({
-      menus: [MENU_RESOURCES],
-      contexts: [DATA_CONTEXT_SUBMENU_ITEM],
-      getItems: (context, items) => {
-        const item = context.find(DATA_CONTEXT_SUBMENU_ITEM, item => item instanceof PluginSubMenuItem);
+    // this.menuService.addCreator({
+    //   menus: [MENU_RESOURCES],
+    //   contexts: [DATA_CONTEXT_SUBMENU_ITEM],
+    //   getItems: (context, items) => {
+    //     const item = context.find(DATA_CONTEXT_SUBMENU_ITEM, item => item instanceof PluginSubMenuItem);
 
-        if (!item) {
-          return items;
-        }
+    //     if (!item) {
+    //       return items;
+    //     }
 
-        const plugin = this.app.getPlugins().find(plugin => plugin.info.name === item.id);
+    //     const plugin = this.app.getPlugins().find(plugin => plugin.info.name === item.id);
 
-        if (!plugin) {
-          return items;
-        }
+    //     if (!plugin) {
+    //       return items;
+    //     }
 
-        return [...this.getResources(this.app.getServices(plugin)), ...items];
-      },
-    });
+    //     return [...this.getResources(this.app.getServices(plugin)), ...items];
+    //   },
+    // });
 
     this.menuService.addCreator({
       menus: [MENU_RESOURCE],
@@ -201,10 +195,10 @@ export class PluginBootstrap extends Bootstrap {
     });
   }
 
-  private getResources(providers: IServiceConstructor<any>[]): ResourceSubMenuItem[] {
-    return providers
-      .filter(service => service.prototype instanceof CachedResource)
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map(resource => new ResourceSubMenuItem(resource));
-  }
+  // private getResources(providers: IServiceConstructor<any>[]): ResourceSubMenuItem[] {
+  //   return providers
+  //     .filter(service => service.prototype instanceof CachedResource)
+  //     .sort((a, b) => a.name.localeCompare(b.name))
+  //     .map(resource => new ResourceSubMenuItem(resource));
+  // }
 }

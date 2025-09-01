@@ -13,7 +13,7 @@ import { ServerConfigResource } from './ServerConfigResource.js';
 
 export type ServerLicenseStatus = ServerLicenseStatusFragment;
 
-@injectable()
+@injectable(() => [GraphQLService, ServerConfigResource])
 export class ServerLicenseStatusResource extends CachedDataResource<ServerLicenseStatus | null> {
   constructor(
     private readonly graphQLService: GraphQLService,
