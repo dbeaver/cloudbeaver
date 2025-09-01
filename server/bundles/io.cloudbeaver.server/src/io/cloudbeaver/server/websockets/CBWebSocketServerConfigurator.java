@@ -18,7 +18,6 @@ package io.cloudbeaver.server.websockets;
 
 import io.cloudbeaver.model.session.WebHeadlessSession;
 import io.cloudbeaver.model.session.WebHttpRequestInfo;
-import io.cloudbeaver.server.HttpConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
 import jakarta.servlet.http.HttpSession;
 import jakarta.websocket.HandshakeResponse;
@@ -33,6 +32,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.HttpConstants;
 import org.jkiss.utils.WSClientUtils;
 
 import java.util.List;
