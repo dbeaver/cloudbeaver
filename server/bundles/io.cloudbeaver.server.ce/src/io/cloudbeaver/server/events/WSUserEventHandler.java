@@ -17,6 +17,7 @@
 package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
 import org.jkiss.dbeaver.model.websocket.event.WSAbstractEvent;
@@ -37,34 +38,15 @@ public class WSUserEventHandler<EVENT extends WSAbstractEvent> implements WSEven
                     sessionManager.closeSessions(closeSessionsEvent.getSessionIds());
                 }
             }
-            case WSUserDeletedEvent e -> sessionManager.closeUserSession(e);
-            case WSUserDisabledEvent e -> sessionManager.closeUserSession(e);
+            case WSUserDeletedEvent e -> {
+                sessionManager.closeUserSession(e);
+                WebAppUtils.getWebApplication().validateLicenseByUserQuota();
+            }
+            case WSUserDisabledEvent e -> {
+                sessionManager.closeUserSession(e);
+                WebAppUtils.getWebApplication().validateLicenseByUserQuota();
+            }
             default -> { }
         }
-
-        switch (event.getId()) {
-            case WSUserCloseSessionsEvent.ID:
-                if (event instanceof WSUserCloseSessionsEvent closeSessionsEvent) {
-                    if (closeSessionsEvent.getSessionIds().isEmpty()) {
-                        sessionManager.closeAllSessions(closeSessionsEvent.getSessionId());
-                    } else {
-                        sessionManager.closeSessions(closeSessionsEvent.getSessionIds());
-                    }
-                }
-                break;
-            case WSUserDeletedEvent.ID:
-                if (event instanceof WSUserDeletedEvent userDeletedEvent) {
-                    sessionManager.closeUserSession(userDeletedEvent);
-                }
-                break;
-            case WSUserDisabledEvent.ID:
-                if (event instanceof WSUserDisabledEvent userDisabledEvent) {
-                    sessionManager.closeUserSession(userDisabledEvent);
-                }
-                break;
-            default:
-                break;
-        }
-
     }
 }

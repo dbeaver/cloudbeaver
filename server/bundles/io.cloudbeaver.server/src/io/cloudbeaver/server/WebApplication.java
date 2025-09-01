@@ -55,4 +55,6 @@ public interface WebApplication extends ServletApplication {
 
     ConnectionController getConnectionController();
 
+    void validateLicenseByUserQuota();
+
 }
