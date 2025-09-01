@@ -25,63 +25,33 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
-### 25.1.5 2025-08-18
-- Added support for multiple server URLs to accommodate different access policies for internal and external users, improving flexibility in network-restricted environments. Use the Allowed Server URLs field in the Server configuration within the Administration section to set it up;
-- Added the Force HTTPS mode setting in Server Configuration to enforce secure communication between the server and clients, recommended for production environments. This ensures all connections use HTTPS, improving security when the proxy is correctly configured. This setting is disabled by default;
-- Added the CLOUDBEAVER_BIND_SESSION_TO_IP option to improve session security by linking user sessions to their IP address. It is disabled by default. When enabled, this helps protect against certain types of session hijacking attacks, where an attacker could try to take over a user’s session. Note: If a user’s internet connection changes (e.g., switching networks or using mobile data), they will be automatically - Improved dark theme accessibility by enhancing color contrast across the app for better readability and compliance with accessibility standards;
-- The database navigator now automatically hides empty folders in shared projects, reducing visual clutter and speeding up the process of finding active connections.
-
-### 25.1.4 2025-08-04
-- Added an ability to review the script before execution when users edit tables without primary keys in the Data Editor;
-- DuckDB: driver has been updated to version 1.3.2;
-- Databend: driver has been updated to version 0.3.9.
-
-### 25.1.3 2025-07-21
-- A password confirmation field has been added for administrators in the Easy Config section to help prevent accidental misconfigurations;
-- Added column descriptions in the Data Editor to provide more metadata context. You can disable this in Preferences > Data Editor;
-- Added the option to display tabs across multiple rows, allowing you to see all tabs without scrolling. You can enable this in Preferences > Interface;
-- Changed the default engine used for autocompletion in the SQL Editor. This Semantic engine offers improved suggestions for database objects, keywords, and functions. You can switch back to the Legacy engine in Preferences -> SQL Editor;
-- Clickhouse: fixed the presentation of tuples and map data types in the data editor.
-
-### 25.1.2 2025-07-07
-- The CloudBeaver default theme matches the device theme by default now. You can change this behavior in user preferences under the Theme section;
-- Added a button “Clear” to the Output panel;
-- Changed the data transfer mechanism to avoid intermediate file creation. The parameter dataExportFileSizeLimit was removed from the server configuration as deprecated;
-- PostgresSQL: fixed misplaced comment for table DDL generation.
-
-### 25.1.1 2025-06-23
+### 25.2.0 2025-09-01
 ### Changes since 25.1.0:
-- Added a search panel for SQL Editor and Value panel: press Ctrl+F to open a panel that allows searching and replacing by keyword or regular expression.
-- Added a new welcome screen for a freshly opened application. This screen contains shortcuts to create a new connection, open SQL editor or documentation.
-- Databend database support has been added.
-
-### 25.1.0 2025-06-02
-### Changes since 25.0.0:
-- Important:
-  -    Connection templates were removed from the application. You can use the Connection Editor to create new connections.
 - Administration:
-  -    Log records now capture create, update, and delete actions for users, teams, and connections for improved tracking and transparency.
-- LDAP authorization:
-  -    Added support for secure [LDAP authentication over SSL](https://github.com/dbeaver/cloudbeaver/wiki/LDAP-Authentication);
-  -    Brute force protection is now supported for LDAP authentication. All authentication methods on the application level have this security mechanism.
+  -    Added support for multiple server URLs to accommodate different access policies for internal and external users, improving flexibility in network-restricted environments. To set it up, use the Allowed Server URLs field in the Server configuration within the Administration section;
+  -    Added the Force HTTPS mode setting in Server Configuration to enforce redirecting from HTTP to HTTPS. This setting helps avoid a potential man-in-the-middle attack. This setting is turned off by default. Please remember to configure your proxy before enabling;
+  -    Added the CLOUDBEAVER_BIND_SESSION_TO_IP option to improve session security by linking user sessions to their IP address. It is disabled by default. When enabled, this helps protect against certain types of session hijacking attacks, where an attacker could try to take over a user’s session. Note: Users will be logged out automatically on the IP address change (switching networks or using mobile data);
+  -    A password confirmation field has been added for administrators in the Easy Config section to prevent accidental misconfigurations.
 - SQL Editor:
-  -    A new setting to autosave scripts in the SQL editor appeared in global and users' preferences;
-  -    Auto-completion has been improved for aliases and camelCase entities.
+  -    Changed the default engine used for autocompletion in the SQL Editor. This Semantic engine offers improved suggestions for database objects, keywords, and functions. You can switch back to the Legacy engine in Preferences > SQL Editor;
+  -    A “Clear” button was added to the output panel.
 - Data Editor:
-  -    Improved table rendering to scale column width depending on the content;
-  -    Accessibility: improved keyboard navigation by sorting buttons in column headers.
+  -    Column descriptions were added in the Data Editor under column names to provide more metadata context. You can disable this in Preferences > Data Viewer;
+  -    Added an ability to review the script before execution when users edit tables without primary keys.
 - General:
-  -    Added the ability to configure the default database or schema in the connection configuration;
-  -    Enhanced initial configuration stage security: a server needs to be restarted if the initial setup time exceeds 1 hour;
-  -    Improved Navigation tree performance: lost connection does not lead to the application freezing anymore;
-  -    Data transfer: Improved export/import functionality performance by optimizing disk memory consumption;
-  -    Vietnamese localization has been added (thanks to [0xhanh](https://github.com/0xhanh)).
+  -    Added a new welcome screen for a freshly opened application. This screen contains shortcuts to create a new connection, open SQL Editor, or documentation;
+  -    Added a search panel for SQL Editor and Value panel: press Ctrl/Cmd + F to open a panel that allows searching and replacing by keyword or regular expression;
+  -    Changed the data transfer mechanism to avoid intermediate file creation. The parameter dataExportFileSizeLimit was removed from the server configuration as deprecated;
+  -    The CloudBeaver default theme matches the device theme by default now. You can change this behavior in user preferences under the Theme section;
+  -    Added the option to display tabs across multiple rows, allowing you to see all tabs without scrolling. You can enable this in Preferences > Interface;
+  -    Improved dark theme accessibility by enhancing color contrast across the app for better readability and compliance with accessibility standards;
+  -    The database navigator now automatically hides empty folders in shared projects, reducing visual clutter and speeding up the process of finding active connections.
 - Databases and drivers:
-  -    Clickhouse: driver has been updated to version 0.8.5;
-  -    DuckDB: expanded the list of system objects that can be hidden in the Navigation tree;
-  -    LibSQL: added the ability to connect using token authentication;
-  -    Oracle: users' DDL in Oracle is displayed in the metadata editor on the corresponding tab for users with Oracle administration permissions;
-  -    SQLite: added information about a table's Strict mode to the table metadata section (thanks to [eusebe-cda](https://github.com/eusebe-cda)).
+  -    Clickhouse: fixed the presentation of tuples and map data types in the Data Editor;
+  -    Databend database support has been added;
+  -    DuckDB: driver has been updated to version 1.3;
+  -    MySQL: Improved performance when retrieving foreign keys metadata;
+  -    PostgreSQL: fixed misplaced comment for table DDL generation.
 
 ## Contribution
 As a community-driven open-source project, we warmly welcome contributions through GitHub pull requests. 
