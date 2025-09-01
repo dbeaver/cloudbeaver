@@ -10,7 +10,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { SettingsAdministrationService } from '@cloudbeaver/plugin-settings-administration';
 import { ServerSettingsService } from '@cloudbeaver/core-root';
 
-@injectable()
+@injectable(() => [SettingsAdministrationService, ServerSettingsService])
 export class SettingsDefaultAdministrationBootstrap extends Bootstrap {
   constructor(
     private readonly settingsAdministrationService: SettingsAdministrationService,

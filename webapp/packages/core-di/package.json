@@ -2,6 +2,8 @@
   "name": "@cloudbeaver/core-di",
   "type": "module",
   "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"
@@ -21,10 +23,10 @@
   },
   "dependencies": {
     "@cloudbeaver/core-executor": "workspace:*",
-    "inversify": "^6",
+    "@wroud/di": "^0",
+    "@wroud/di-react": "^0",
     "mobx": "^6",
     "react": "^19",
-    "reflect-metadata": "^0",
     "tslib": "^2"
   },
   "devDependencies": {

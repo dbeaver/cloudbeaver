@@ -27,7 +27,16 @@ import { TableViewerStorageService } from './TableViewer/TableViewerStorageServi
 const DataViewerTab = importLazyComponent(() => import('./DataViewerPage/DataViewerTab.js').then(module => module.DataViewerTab));
 const DataViewerPanel = importLazyComponent(() => import('./DataViewerPage/DataViewerPanel.js').then(module => module.DataViewerPanel));
 
-@injectable()
+@injectable(() => [
+  NavNodeManagerService,
+  ObjectViewerTabService,
+  DBObjectPageService,
+  NotificationService,
+  ConnectionsManagerService,
+  NavigationTabsService,
+  ConnectionInfoResource,
+  TableViewerStorageService,
+])
 export class DataViewerTabService {
   readonly page: ObjectPage<IDataViewerPageState>;
 

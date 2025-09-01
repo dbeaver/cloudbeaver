@@ -78,7 +78,19 @@ export interface IConnectionInfoMetadata extends ICachedResourceMetadata {
   connecting?: boolean;
 }
 
-@injectable()
+@injectable(() => [
+  GraphQLService,
+  ProjectsService,
+  ProjectInfoResource,
+  DataSynchronizationService,
+  WorkspaceConfigEventHandler,
+  DBDriverResource,
+  SessionDataResource,
+  AppAuthService,
+  ConnectionInfoEventHandler,
+  ConnectionStateEventHandler,
+  UserInfoResource,
+])
 export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoParams, Connection, ConnectionInfoIncludes, IConnectionInfoMetadata> {
   readonly onConnectionCreate: Executor<Connection>;
   readonly onConnectionClose: ISyncExecutor<IConnectionInfoParams>;

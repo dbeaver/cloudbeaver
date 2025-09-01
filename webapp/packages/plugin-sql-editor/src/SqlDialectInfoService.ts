@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
-@injectable()
+@injectable(() => [ConnectionDialectResource, NotificationService])
 export class SqlDialectInfoService {
   constructor(
     private readonly connectionDialectResource: ConnectionDialectResource,

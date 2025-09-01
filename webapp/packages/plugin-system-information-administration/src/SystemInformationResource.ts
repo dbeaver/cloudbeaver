@@ -11,7 +11,7 @@ import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { GraphQLService, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { SessionPermissionsResource, EAdminPermission } from '@cloudbeaver/core-root';
 
-@injectable()
+@injectable(() => [GraphQLService, SessionPermissionsResource])
 export class SystemInformationResource extends CachedDataResource<ObjectPropertyInfo[]> {
   constructor(
     private readonly graphQLService: GraphQLService,

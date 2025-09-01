@@ -18,15 +18,24 @@ import {
   type IConnectionInfoParams,
   type IRequireConnectionExecutorData,
 } from '@cloudbeaver/core-connections';
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 const DatabaseAuthDialog = importLazyComponent(() => import('./DatabaseAuthDialog/DatabaseAuthDialog.js').then(m => m.DatabaseAuthDialog));
 
-@injectable()
-export class ConnectionAuthService extends Dependency {
+@injectable(() => [
+  ConnectionInfoResource,
+  ConnectionInfoNetworkHandlersResource,
+  ConnectionInfoAuthPropertiesResource,
+  CommonDialogService,
+  AuthProviderService,
+  UserInfoResource,
+  ConnectionsManagerService,
+  AuthenticationService,
+])
+export class ConnectionAuthService {
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionInfoNetworkHandlersResource: ConnectionInfoNetworkHandlersResource,
@@ -37,8 +46,6 @@ export class ConnectionAuthService extends Dependency {
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly authenticationService: AuthenticationService,
   ) {
-    super();
-
     connectionsManagerService.connectionExecutor.addHandler(this.connectionDialog.bind(this));
     this.authenticationService.onLogin.before(
       connectionsManagerService.onDisconnect,

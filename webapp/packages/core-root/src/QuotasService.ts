@@ -31,7 +31,7 @@ function isNumber(value: any): value is number {
   return typeof value === 'number';
 }
 
-@injectable()
+@injectable(() => [ServerResourceQuotasResource])
 export class QuotasService {
   get quotas(): IQuotas {
     return {

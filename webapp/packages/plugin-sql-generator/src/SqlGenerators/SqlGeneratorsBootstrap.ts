@@ -17,7 +17,7 @@ import { SqlGeneratorsResource } from './SqlGeneratorsResource.js';
 
 const GeneratedSqlDialog = importLazyComponent(() => import('./GeneratedSqlDialog.js').then(m => m.GeneratedSqlDialog));
 
-@injectable()
+@injectable(() => [SqlGeneratorsResource, CommonDialogService, MenuService])
 export class SqlGeneratorsBootstrap extends Bootstrap {
   constructor(
     private readonly sqlGeneratorsResource: SqlGeneratorsResource,

@@ -17,7 +17,7 @@ import { isBooleanValuePresentationAvailable } from './isBooleanValuePresentatio
 
 const BooleanValuePresentation = importLazyComponent(() => import('./BooleanValuePresentation.js').then(module => module.BooleanValuePresentation));
 
-@injectable()
+@injectable(() => [DataValuePanelService])
 export class BooleanValuePresentationBootstrap extends Bootstrap {
   constructor(private readonly dataValuePanelService: DataValuePanelService) {
     super();

@@ -10,7 +10,7 @@ import { ServerConfigurationService } from '@cloudbeaver/plugin-administration';
 
 import { ResourceManagerSettings } from './ResourceManagerSettings.js';
 
-@injectable()
+@injectable(() => [ServerConfigurationService])
 export class PluginBootstrap extends Bootstrap {
   constructor(private readonly serverConfigurationService: ServerConfigurationService) {
     super();

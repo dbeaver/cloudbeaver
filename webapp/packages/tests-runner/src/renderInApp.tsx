@@ -9,7 +9,7 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup, queries, type Queries, render, type RenderOptions, type RenderResult } from '@testing-library/react';
 import { Suspense } from 'react';
 
-import { type IServiceProvider, ServiceProviderContext } from '@cloudbeaver/core-di';
+import { type IServiceProvider, ServiceProvider } from '@cloudbeaver/core-di';
 
 import type { IApplication } from './createApp.js';
 
@@ -22,7 +22,7 @@ function resetDocument() {
 function ApplicationWrapper(serviceInjector: IServiceProvider): React.FC<React.PropsWithChildren> {
   return ({ children }) => (
     <Suspense fallback={null}>
-      <ServiceProviderContext serviceProvider={serviceInjector}>{children}</ServiceProviderContext>
+      <ServiceProvider provider={serviceInjector}>{children}</ServiceProvider>
     </Suspense>
   );
 }

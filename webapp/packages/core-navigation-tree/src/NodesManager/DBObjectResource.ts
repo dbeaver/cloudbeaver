@@ -30,7 +30,7 @@ import { NavTreeResource } from './NavTreeResource.js';
 
 export const DBObjectParentKey = resourceKeyListAliasFactory('@db-object/parent', (parentId: string) => ({ parentId }));
 
-@injectable()
+@injectable(() => [GraphQLService, NavNodeInfoResource, NavTreeResource])
 export class DBObjectResource extends CachedMapResource<string, DBObject> {
   constructor(
     private readonly graphQLService: GraphQLService,

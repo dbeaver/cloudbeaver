@@ -23,7 +23,7 @@ const defaultSettings = schema.object({
 export type DataImportSettings = schema.infer<typeof defaultSettings>;
 export type DataImportSettingsSchema = typeof defaultSettings;
 
-@injectable()
+@injectable(() => [SettingsProviderService, SettingsManagerService, SettingsResolverService])
 export class DataImportSettingsService {
   get disabled(): boolean {
     return this.settings.getValue('plugin.data-import.disabled');

@@ -11,12 +11,4 @@ export const sqlEditorPagePluginManifest: PluginManifest = {
   info: {
     name: 'Sql Editor Page plugin',
   },
-
-  providers: [
-    () => import('./PluginBootstrap.js').then(m => m.PluginBootstrap),
-    () => import('./LocaleService.js').then(m => m.LocaleService),
-    () => import('./Screen/SqlEditorScreenBootstrap.js').then(m => m.SqlEditorScreenBootstrap),
-    () => import('./Screen/SqlEditorScreenService.js').then(m => m.SqlEditorScreenService),
-    () => import('./SqlEditorScreenSettingsService.js').then(m => m.SqlEditorScreenSettingsService),
-  ],
 };
