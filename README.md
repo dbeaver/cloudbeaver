@@ -48,7 +48,7 @@ You can see a live demo of CloudBeaver here: https://demo.cloudbeaver.io
   -    The database navigator now automatically hides empty folders in shared projects, reducing visual clutter and speeding up the process of finding active connections.
 - Databases and drivers:
   -    Clickhouse: fixed the presentation of tuples and map data types in the Data Editor;
-  -    Databend database support has been added;
+  -    Databend database support has been added(thanks to @hantmac);
   -    DuckDB: driver has been updated to version 1.3;
   -    MySQL: Improved performance when retrieving foreign keys metadata;
   -    PostgreSQL: fixed misplaced comment for table DDL generation.
