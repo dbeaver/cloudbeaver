@@ -13,7 +13,7 @@ import { UserProfileTabsService } from '../../UserProfileTabsService.js';
 
 const UserProfileFormInfo = importLazyComponent(() => import('./UserProfileFormInfo.js').then(m => m.UserProfileFormInfo));
 
-@injectable()
+@injectable(() => [UserProfileTabsService, UserInfoResource])
 export class UserProfileFormInfoPartBootstrap extends Bootstrap {
   constructor(
     private readonly userProfileTabsService: UserProfileTabsService,

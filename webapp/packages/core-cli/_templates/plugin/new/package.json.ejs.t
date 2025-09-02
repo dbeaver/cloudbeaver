@@ -5,6 +5,8 @@ to: <%= name %>/package.json
   "name": "@cloudbeaver/<%= name %>",
   "type": "module",
   "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"

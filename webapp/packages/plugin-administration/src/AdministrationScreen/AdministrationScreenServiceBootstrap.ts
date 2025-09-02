@@ -16,7 +16,7 @@ const ConfigurationWizardScreen = importLazyComponent(() =>
   import('./ConfigurationWizard/ConfigurationWizardScreen.js').then(m => m.ConfigurationWizardScreen),
 );
 
-@injectable()
+@injectable(() => [ScreenService, AdministrationScreenService, ServerConfigResource])
 export class AdministrationScreenServiceBootstrap extends Bootstrap {
   constructor(
     private readonly screenService: ScreenService,

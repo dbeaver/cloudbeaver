@@ -11,7 +11,7 @@ import type { CbDatasourceEvent as IConnectionInfoEvent } from '@cloudbeaver/cor
 
 export type { IConnectionInfoEvent };
 
-@injectable()
+@injectable(() => [SessionEventSource])
 export class ConnectionInfoEventHandler extends TopicEventHandler<IConnectionInfoEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbDatasource, sessionEventSource);

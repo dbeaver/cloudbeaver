@@ -13,7 +13,7 @@ import { ServerConfigResource } from './ServerConfigResource.js';
 
 export type PasswordPolicy = PasswordPolicyFragment['passwordPolicyConfiguration'];
 
-@injectable()
+@injectable(() => [GraphQLService, ServerConfigResource])
 export class PasswordPolicyResource extends CachedDataResource<PasswordPolicy | null> {
   constructor(
     private readonly graphQLService: GraphQLService,

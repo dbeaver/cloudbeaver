@@ -12,7 +12,7 @@ import { afterAll, afterEach, beforeAll } from 'vitest';
 import { createWebsocketEndpoint } from './createWebsocketEndpoint.js';
 
 export function mockGraphQL(...requestHandlers: GraphQLHandler[]) {
-  const server = setupServer(...requestHandlers, createWebsocketEndpoint());
+  const server = setupServer(...requestHandlers, ...createWebsocketEndpoint());
 
   beforeAll(() => server.listen());
   afterEach(() => server.resetHandlers());

@@ -6,9 +6,8 @@
         <authProvider id="ldap" label="LDAP" description="LDAP authentication provider"
                       configurable="true"
                       class="io.cloudbeaver.service.ldap.auth.LdapAuthProvider"
-                      icon="platform:/plugin/org.jkiss.dbeaver.model/icons/idp/ldap.png"
-                      caseInsensitive="true"
-        >
+                      icon="icons/ldap.svg"
+                      caseInsensitive="true">
             <configuration>
                 <propertyGroup label="LDAP" description="LDAP authentication">
                     <property id="ldap-host" label="%ldap-host" type="string" description="%ldap-host.description" required="true"/>

@@ -13,7 +13,7 @@ import { UserProfileTabsService } from '../../UserProfileTabsService.js';
 
 const ChangePassword = importLazyComponent(() => import('./ChangePassword.js').then(m => m.ChangePassword));
 
-@injectable()
+@injectable(() => [UserProfileTabsService, UserInfoResource])
 export class UserProfileFormAuthenticationPartBootstrap extends Bootstrap {
   constructor(
     private readonly userProfileTabsService: UserProfileTabsService,

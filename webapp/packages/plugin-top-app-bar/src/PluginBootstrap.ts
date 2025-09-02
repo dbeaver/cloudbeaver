@@ -10,7 +10,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { PublicTopNavBar } from './TopNavBar/PublicTopNavBar.js';
 
-@injectable()
+@injectable(() => [AppScreenService])
 export class PluginBootstrap extends Bootstrap {
   constructor(private readonly appScreenService: AppScreenService) {
     super();

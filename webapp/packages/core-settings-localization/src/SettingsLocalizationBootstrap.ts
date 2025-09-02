@@ -12,7 +12,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 
 import { SettingsLocalizationService } from './SettingsLocalizationService.js';
 
-@injectable()
+@injectable(() => [SettingsLocalizationService, LocalizationService])
 export class SettingsLocalizationBootstrap extends Bootstrap {
   private reactionDisposer: IReactionDisposer | null;
   constructor(

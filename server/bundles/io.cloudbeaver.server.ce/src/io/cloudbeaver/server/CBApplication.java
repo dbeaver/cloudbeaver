@@ -103,7 +103,6 @@ public abstract class CBApplication<T extends CBServerConfig>
     // Persistence
     protected SMAdminController securityController;
     private boolean configurationMode = false;
-    private String localHostAddress;
     protected String containerId;
     private final List<InetAddress> localInetAddresses = new ArrayList<>();
 
@@ -226,15 +225,6 @@ public abstract class CBApplication<T extends CBServerConfig>
 
         eventController.setForceSkipEvents(isConfigurationMode()); // do not send events if configuration mode is on
 
-        // Determine address for local host
-        localHostAddress = System.getenv(CBConstants.VAR_CB_LOCAL_HOST_ADDR);
-        if (CommonUtils.isEmpty(localHostAddress)) {
-            localHostAddress = System.getProperty(CBConstants.VAR_CB_LOCAL_HOST_ADDR);
-        }
-        if (CommonUtils.isEmpty(localHostAddress) || CBConstants.HOST_127_0_0_1.equals(localHostAddress) || "::0".equals(
-            localHostAddress)) {
-            localHostAddress = CBConstants.HOST_LOCALHOST;
-        }
 
         Location instanceLoc = Platform.getInstanceLocation();
         try {
@@ -529,7 +519,7 @@ public abstract class CBApplication<T extends CBServerConfig>
     }
 
     public String getLocalHostAddress() {
-        return localHostAddress;
+        return getServerConfigurationController().getLocalHostAddress();
     }
 
     public List<InetAddress> getLocalInetAddresses() {

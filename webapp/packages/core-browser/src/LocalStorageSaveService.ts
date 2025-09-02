@@ -28,7 +28,7 @@ interface IMessage {
   type: 'init' | 'respond';
 }
 
-@injectable()
+@injectable(() => [IndexedDBService])
 export class LocalStorageSaveService {
   get storage(): LocalStorageType {
     return this.storageType;

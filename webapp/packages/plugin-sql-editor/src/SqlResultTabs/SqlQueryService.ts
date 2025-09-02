@@ -43,7 +43,21 @@ export interface IQueryExecutionStatistics {
   modelId: string | null;
 }
 
-@injectable()
+@injectable(() => [
+  IServiceProvider,
+  TableViewerStorageService,
+  GraphQLService,
+  NotificationService,
+  ConnectionInfoResource,
+  ConnectionExecutionContextService,
+  SqlQueryResultService,
+  AsyncTaskInfoService,
+  DataViewerDataChangeConfirmationService,
+  DataViewerService,
+  SqlDataSourceService,
+  DataViewerSettingsService,
+  SqlEditorSettingsService,
+])
 export class SqlQueryService {
   private readonly statisticsMap: Map<string, IQueryExecutionStatistics>;
   readonly onQueryExecution: IExecutor<ISqlEditorTabState>;

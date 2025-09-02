@@ -12,7 +12,7 @@ import { GraphQLService, type ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 export type TeamMetaParameter = ObjectPropertyInfo;
 
-@injectable()
+@injectable(() => [GraphQLService, SessionResource])
 export class TeamMetaParametersResource extends CachedDataResource<TeamMetaParameter[]> {
   constructor(
     private readonly graphQLService: GraphQLService,

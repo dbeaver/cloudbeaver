@@ -41,7 +41,20 @@ import { ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS } from './Actions/ACTION_CONNECTI
 import { MENU_CONNECTION_VIEW } from './MENU_CONNECTION_VIEW.js';
 import { MENU_CONNECTIONS } from './MENU_CONNECTIONS.js';
 
-@injectable()
+@injectable(() => [
+  NotificationService,
+  ConnectionInfoResource,
+  ConnectionInfoAuthPropertiesResource,
+  NavNodeManagerService,
+  ConnectionsManagerService,
+  ActionService,
+  MenuService,
+  PublicConnectionFormService,
+  ConnectionsSettingsService,
+  PluginConnectionsSettingsService,
+  PermissionsService,
+  ServerConfigResource,
+])
 export class ConnectionMenuBootstrap extends Bootstrap {
   constructor(
     private readonly notificationService: NotificationService,

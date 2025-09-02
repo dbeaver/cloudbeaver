@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
@@ -27,8 +27,8 @@ const settingsSchema = schema.object({
 export type NavTreeSettingsSchema = typeof settingsSchema;
 export type NavTreeSettings = schema.infer<NavTreeSettingsSchema>;
 
-@injectable()
-export class NavTreeSettingsService extends Dependency {
+@injectable(() => [SettingsProviderService, SettingsResolverService, SettingsManagerService])
+export class NavTreeSettingsService {
   get childrenLimit(): number {
     return this.settings.getValue('core.navigation-tree.childrenLimit');
   }
@@ -45,15 +45,14 @@ export class NavTreeSettingsService extends Dependency {
     private readonly settingsResolverService: SettingsResolverService,
     private readonly settingsManagerService: SettingsManagerService,
   ) {
-    super();
     this.settings = this.settingsProviderService.createSettings(settingsSchema);
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<NavTreeSettingsSchema>(this.settingsResolverService, {
+      createSettingsAliasResolver<NavTreeSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'core.navigation-tree.childrenLimit': 'core.app.navigationTree.childrenLimit',
       }),
-      createSettingsAliasResolver<NavTreeSettingsSchema>(this.settingsResolverService, {
+      createSettingsAliasResolver<NavTreeSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'core.navigation-tree.deleting': 'core.app.metadata.deleting',
         'core.navigation-tree.editing': 'core.app.metadata.editing',
       }),

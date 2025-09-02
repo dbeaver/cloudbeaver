@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@ import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-c
 import { ACTION_LINK_OBJECT } from './ACTION_LINK_OBJECT.js';
 import { KEY_BINDING_LINK_OBJECT } from './KEY_BINDING_LINK_OBJECT.js';
 
-@injectable()
+@injectable(() => [ActionService, KeyBindingService, NavigationTreeService, ConnectionSchemaManagerService, MenuService, LocalizationService])
 export class ObjectViewerNavTreeLinkMenuService extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,

@@ -15,9 +15,9 @@ import type { IThemeSettingsKey } from './ThemeSettingsService.js';
 
 const DARK_QUERY = '(prefers-color-scheme: dark)';
 
-@injectable()
+@injectable(() => [ThemeService, SettingsResolverService])
 export class SystemThemeService extends Bootstrap {
-  private dynamicTheme: ITheme;
+  private dynamicTheme: ITheme | null;
   private readonly mediaQueryList: MediaQueryList;
 
   constructor(
@@ -25,8 +25,8 @@ export class SystemThemeService extends Bootstrap {
     private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
-    this.dynamicTheme = this.getDynamicTheme();
-    this.handleSystemThemeChange = this.handleSystemThemeChange.bind(this);
+    this.dynamicTheme = null;
+    this.updateSystemTheme = this.updateSystemTheme.bind(this);
     this.mediaQueryList = window.matchMedia(DARK_QUERY);
 
     makeObservable<this, 'dynamicTheme'>(this, {
@@ -40,11 +40,14 @@ export class SystemThemeService extends Bootstrap {
       id: 'system',
       name: 'ui_system_theme',
       get class(): string {
-        return systemThemeService.dynamicTheme!.class;
+        return systemThemeService.dynamicTheme?.class || '';
       },
       loaded: false,
       async loader() {
-        await systemThemeService.themeService.loadTheme(systemThemeService.dynamicTheme.id);
+        await systemThemeService.updateSystemTheme();
+        if (systemThemeService.dynamicTheme) {
+          await systemThemeService.themeService.loadTheme(systemThemeService.dynamicTheme.id);
+        }
       },
     });
 
@@ -67,7 +70,7 @@ export class SystemThemeService extends Bootstrap {
         }
         return undefined;
       },
-      isEdited(key) {
+      isEdited() {
         return false;
       },
     });
@@ -78,25 +81,27 @@ export class SystemThemeService extends Bootstrap {
   }
 
   private unsubscribeSystemThemeChange(): void {
-    this.mediaQueryList.removeEventListener('change', this.handleSystemThemeChange);
+    this.mediaQueryList.removeEventListener('change', this.updateSystemTheme);
   }
 
   private subscribeSystemThemeChange(): void {
-    this.mediaQueryList.addEventListener('change', this.handleSystemThemeChange);
+    this.mediaQueryList.addEventListener('change', this.updateSystemTheme);
   }
 
-  private handleSystemThemeChange(): void {
+  private async updateSystemTheme(): Promise<void> {
     this.dynamicTheme = this.getDynamicTheme();
-    this.themeService.loadTheme(this.dynamicTheme.id);
+    if (this.dynamicTheme && this.themeService.themeId === 'system') {
+      await this.themeService.loadTheme(this.dynamicTheme.id);
+    }
   }
 
-  private getDynamicTheme(): ITheme {
+  private getDynamicTheme(): ITheme | null {
     const isDark = window.matchMedia(DARK_QUERY).matches;
 
     if (isDark) {
-      return this.themeService.themes.find(theme => theme.id === 'dark') || this.themeService.themes[0]!;
+      return this.themeService.themes.find(theme => theme.id === 'dark') || this.themeService.themes[0] || null;
     }
 
-    return this.themeService.themes.find(theme => theme.id === 'light') || this.themeService.themes[0]!;
+    return this.themeService.themes.find(theme => theme.id === 'light') || this.themeService.themes[0] || null;
   }
 }

@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable } from 'mobx';
 
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { DEFAULT_LOCALE } from '@cloudbeaver/core-localization';
 import {
   createSettingsAliasResolver,
@@ -25,8 +25,8 @@ const settingsSchema = schema.object({
 export type ILocalizationSettingsSchema = typeof settingsSchema;
 export type ILocalizationSettings = schema.infer<ILocalizationSettingsSchema>;
 
-@injectable()
-export class SettingsLocalizationService extends Dependency {
+@injectable(() => [SettingsProviderService, SettingsResolverService])
+export class SettingsLocalizationService {
   get language(): string {
     return this.settingsProvider.getValue('core.localization.language');
   }
@@ -36,20 +36,20 @@ export class SettingsLocalizationService extends Dependency {
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsResolverService: SettingsResolverService,
   ) {
-    super();
-
     this.settingsProvider = this.settingsProviderService.createSettings(settingsSchema);
 
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<ILocalizationSettingsSchema>(this.settingsResolverService, {
+      createSettingsAliasResolver<ILocalizationSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'core.localization.language': 'core.user.defaultLanguage',
       }),
-      createSettingsAliasResolver<ILocalizationSettingsSchema>(this.settingsResolverService, {
+      createSettingsAliasResolver<ILocalizationSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'core.localization.language': 'core.localization.defaultLanguage',
       }),
-      createSettingsAliasResolver<ILocalizationSettingsSchema>(this.settingsResolverService, { 'core.localization.language': 'app.defaultLanguage' }),
+      createSettingsAliasResolver<ILocalizationSettingsSchema>(this.settingsProviderService.settingsResolver, {
+        'core.localization.language': 'app.defaultLanguage',
+      }),
     );
 
     makeObservable(this, {

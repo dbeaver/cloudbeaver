@@ -2,6 +2,8 @@
   "name": "@cloudbeaver/plugin-data-spreadsheet-new",
   "type": "module",
   "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"
@@ -50,6 +52,7 @@
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
+    "@dbeaver/react-tests": "workspace:^",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "typescript": "^5",

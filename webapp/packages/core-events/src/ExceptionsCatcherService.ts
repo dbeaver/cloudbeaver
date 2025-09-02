@@ -9,7 +9,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { NotificationService } from './NotificationService.js';
 
-@injectable()
+@injectable(() => [NotificationService])
 export class ExceptionsCatcherService extends Bootstrap {
   baseCatcher: OnErrorEventHandler | null = null;
 

@@ -23,7 +23,7 @@ const defaultSettings = schema.object({
 export type DataImportSettings = schema.infer<typeof defaultSettings>;
 export type DataImportSettingsSchema = typeof defaultSettings;
 
-@injectable()
+@injectable(() => [SettingsProviderService, SettingsManagerService, SettingsResolverService])
 export class DataImportSettingsService {
   get disabled(): boolean {
     return this.settings.getValue('plugin.data-import.disabled');
@@ -41,7 +41,7 @@ export class DataImportSettingsService {
 
     this.settingsResolverService.addResolver(
       HIGHEST_SETTINGS_LAYER,
-      createSettingsOverrideResolver<DataImportSettingsSchema>(this.settingsResolverService, {
+      createSettingsOverrideResolver<DataImportSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'plugin.data-import.disabled': {
           key: 'permission.data-editor.import',
           map: value => !value,

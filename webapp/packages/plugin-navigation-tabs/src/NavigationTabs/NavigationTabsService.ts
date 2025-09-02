@@ -36,7 +36,7 @@ const MULTI_PROJECTS = '@://multi_projects//';
 
 const NAVIGATION_TABS_BASE_KEY = 'navigation_tabs';
 
-@injectable()
+@injectable(() => [NotificationService, StorageService, UserInfoResource, ProjectsService, AdministrationScreenService, AppAuthService])
 export class NavigationTabsService extends View<ITab> {
   get currentTab(): ITab | undefined {
     if (this.currentTabId) {

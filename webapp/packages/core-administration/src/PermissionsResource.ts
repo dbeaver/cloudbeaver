@@ -13,7 +13,7 @@ import { type AdminObjectGrantInfoFragment, type AdminPermissionInfoFragment, Gr
 export type PermissionInfo = AdminPermissionInfoFragment;
 export type AdminObjectGrantInfo = AdminObjectGrantInfoFragment;
 
-@injectable()
+@injectable(() => [GraphQLService, SessionDataResource])
 export class PermissionsResource extends CachedMapResource<string, PermissionInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,

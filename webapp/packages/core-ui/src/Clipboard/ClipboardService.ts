@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { copyToClipboard } from '@cloudbeaver/core-utils';
 
-@injectable()
+@injectable(() => [NotificationService])
 export class ClipboardService {
   private readPermission: PermissionStatus | null;
   private permissionUpdate: number;

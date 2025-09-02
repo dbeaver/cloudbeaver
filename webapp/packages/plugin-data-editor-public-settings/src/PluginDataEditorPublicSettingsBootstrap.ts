@@ -11,7 +11,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DATA_EDITOR_SETTINGS_GROUP, type DataViewerSettingsSchema } from '@cloudbeaver/plugin-data-viewer';
 import type { DataImportSettingsSchema } from '@cloudbeaver/plugin-data-import';
 
-@injectable()
+@injectable(() => [SettingsManagerService])
 export class PluginDataEditorPublicSettingsBootstrap extends Bootstrap {
   constructor(private readonly settingsManagerService: SettingsManagerService) {
     super();

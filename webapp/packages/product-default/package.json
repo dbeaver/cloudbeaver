@@ -2,12 +2,14 @@
   "name": "@cloudbeaver/product-default",
   "type": "module",
   "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
     "src/**/*.ts",
     "src/**/*.scss",
     "public/**/*",
     "src/**/*.css"
   ],
-  "version": "25.2.0",
+  "version": "25.2.1",
   "description": "CloudBeaver Community",
   "license": "DBeaver Corp",
   "exports": {
@@ -32,7 +34,6 @@
     "@cloudbeaver/product-default-impl": "workspace:*",
     "react": "^19",
     "react-dom": "^19",
-    "reflect-metadata": "^0",
     "tslib": "^2",
     "vite": "^7"
   },

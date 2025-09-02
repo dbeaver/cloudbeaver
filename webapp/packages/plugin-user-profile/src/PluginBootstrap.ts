@@ -11,7 +11,7 @@ import { TopNavService } from '@cloudbeaver/plugin-top-app-bar';
 
 const UserMenu = importLazyComponent(() => import('./UserMenu/UserMenu.js').then(m => m.UserMenu));
 
-@injectable()
+@injectable(() => [TopNavService])
 export class PluginBootstrap extends Bootstrap {
   constructor(private readonly topNavService: TopNavService) {
     super();
