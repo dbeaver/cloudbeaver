@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { type DataTransferDefaultExportSettings, GraphQLService } from '@cloudbeaver/core-sdk';
 
-@injectable()
+@injectable(() => [GraphQLService])
 export class DefaultExportOutputSettingsResource extends CachedDataResource<DataTransferDefaultExportSettings | null> {
   constructor(private readonly graphQLService: GraphQLService) {
     super(() => null);

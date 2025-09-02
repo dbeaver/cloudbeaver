@@ -29,7 +29,7 @@ export interface IConnectionExecutorData {
   state: 'before' | 'after';
 }
 
-@injectable()
+@injectable(() => [ConnectionInfoResource, ContainerResource, NotificationService, CommonDialogService, ProjectsService])
 export class ConnectionsManagerService {
   get projectConnections(): Connection[] {
     return this.connectionInfoResource.values.filter(connection =>

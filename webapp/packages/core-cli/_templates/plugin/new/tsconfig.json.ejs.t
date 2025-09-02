@@ -1,7 +1,7 @@
 ---
 to: <%= name %>/tsconfig.json
 ---
-
+<% isEE = cwd.includes('cloudbeaver-ee'); %>
 {
   "extends": "@cloudbeaver/tsconfig/tsconfig.json",
   "compilerOptions": {

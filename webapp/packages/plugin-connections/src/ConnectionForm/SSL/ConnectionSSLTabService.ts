@@ -23,7 +23,7 @@ const SSLPanel = React.lazy(async () => {
   return { default: SSLPanel };
 });
 
-@injectable()
+@injectable(() => [DBDriverResource, NetworkHandlerResource, ConnectionFormService])
 export class ConnectionSSLTabService extends Bootstrap {
   constructor(
     private readonly dbDriverResource: DBDriverResource,

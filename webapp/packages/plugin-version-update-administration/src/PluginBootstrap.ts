@@ -13,7 +13,7 @@ import { ProductInfoService } from '@cloudbeaver/plugin-product-information-admi
 const DockerUpdateInstructions = importLazyComponent(() => import('./DockerUpdateInstructions.js').then(m => m.DockerUpdateInstructions));
 const VersionUpdate = importLazyComponent(() => import('./VersionUpdate.js').then(m => m.VersionUpdate));
 
-@injectable()
+@injectable(() => [VersionUpdateService, ProductInfoService])
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly versionUpdateService: VersionUpdateService,

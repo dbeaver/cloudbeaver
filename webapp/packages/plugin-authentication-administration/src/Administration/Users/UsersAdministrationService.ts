@@ -36,7 +36,7 @@ export interface IUserDetailsInfoProps {
   user: AdminUser;
 }
 
-@injectable()
+@injectable(() => [AdministrationItemService, CreateUserService, TeamsResource, CreateTeamService, UsersResource])
 export class UsersAdministrationService extends Bootstrap {
   readonly tabsContainer: TabsContainer;
   readonly userDetailsInfoPlaceholder: PlaceholderContainer<IUserDetailsInfoProps>;

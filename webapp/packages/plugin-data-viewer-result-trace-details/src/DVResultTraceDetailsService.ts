@@ -8,7 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-@injectable()
+@injectable(() => [GraphQLService])
 export class DVResultTraceDetailsService {
   constructor(private readonly graphQLService: GraphQLService) {}
 

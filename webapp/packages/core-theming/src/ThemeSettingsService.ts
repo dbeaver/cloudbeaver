@@ -25,7 +25,7 @@ export type IThemeSettingsSchema = typeof settingsSchema;
 export type IThemeSettings = schema.infer<IThemeSettingsSchema>;
 export type IThemeSettingsKey = keyof IThemeSettings;
 
-@injectable()
+@injectable(() => [SettingsProviderService, SettingsResolverService])
 export class ThemeSettingsService {
   get theme(): string {
     return this.settings.getValue('core.theming.theme');

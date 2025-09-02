@@ -17,7 +17,15 @@ import { ACTION_CONNECTION_SEARCH } from './Actions/ACTION_CONNECTION_SEARCH.js'
 import { ConnectionSearchSettingsService } from './ConnectionSearchSettingsService.js';
 import { ConnectionSearchService } from './Search/ConnectionSearchService.js';
 
-@injectable()
+@injectable(() => [
+  PermissionsService,
+  ProjectInfoResource,
+  ConnectionSearchService,
+  ConnectionsManagerService,
+  MenuService,
+  ActionService,
+  ConnectionSearchSettingsService,
+])
 export class SearchConnectionPluginBootstrap extends Bootstrap {
   constructor(
     private readonly permissionsService: PermissionsService,

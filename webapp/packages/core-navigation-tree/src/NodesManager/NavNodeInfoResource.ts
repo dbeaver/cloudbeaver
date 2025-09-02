@@ -32,7 +32,7 @@ interface INodeMetadata extends ICachedResourceMetadata {
   withDetails: boolean;
 }
 
-@injectable()
+@injectable(() => [GraphQLService, AppAuthService])
 export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Record<string, unknown>, INodeMetadata> {
   constructor(
     private readonly graphQLService: GraphQLService,

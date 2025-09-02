@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 
 import { TeamsResource } from './TeamsResource.js';
 
-@injectable()
+@injectable(() => [TeamsResource])
 export class TeamsManagerService {
   constructor(readonly teams: TeamsResource) {}
 }

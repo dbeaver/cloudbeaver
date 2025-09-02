@@ -5,16 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { ESettingsValueType, INTERFACE_SETTINGS_GROUP, SettingsManagerService } from '@cloudbeaver/core-settings';
 
 import { ThemeService } from './ThemeService.js';
 import type { IThemeSettingsSchema } from './ThemeSettingsService.js';
 
-@injectable()
-export class ThemeSettingsManagementService extends Dependency {
+@injectable(() => [ThemeService, SettingsManagerService])
+export class ThemeSettingsManagementService {
   constructor(themeService: ThemeService, settingsManagerService: SettingsManagerService) {
-    super();
     settingsManagerService.registerSettings<IThemeSettingsSchema>(() => [
       {
         key: 'core.theming.theme',

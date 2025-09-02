@@ -11,7 +11,7 @@ import { MENU_APP_STATE } from '@cloudbeaver/plugin-top-app-bar';
 
 import { TOP_NAV_BAR_SETTINGS_MENU } from './SettingsMenu/TOP_NAV_BAR_SETTINGS_MENU.js';
 
-@injectable()
+@injectable(() => [MenuService])
 export class PluginBootstrap extends Bootstrap {
   constructor(private readonly menuService: MenuService) {
     super();

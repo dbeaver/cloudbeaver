@@ -39,7 +39,26 @@ import { KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT } from './KEY_BINDING_SQL_EDITOR_
 import { ResourceSqlDataSource } from './ResourceSqlDataSource.js';
 import { SqlEditorTabResourceService } from './SqlEditorTabResourceService.js';
 
-@injectable()
+@injectable(() => [
+  NavNodeManagerService,
+  NavNodeInfoResource,
+  NavigationTabsService,
+  NotificationService,
+  SqlEditorNavigatorService,
+  ResourceManagerService,
+  ProjectsService,
+  ProjectInfoResource,
+  SqlEditorTabResourceService,
+  CommonDialogService,
+  ActionService,
+  MenuService,
+  SqlDataSourceService,
+  SqlEditorSettingsService,
+  ResourceManagerResource,
+  ResourceManagerScriptsService,
+  KeyBindingService,
+  SqlEditorView,
+])
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,

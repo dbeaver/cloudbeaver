@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ import { ServerEventId } from './SessionEventSource.js';
 import { type ISessionPermissionEvent, SessionPermissionEventHandler } from './SessionPermissionEventHandler.js';
 import { SessionResource } from './SessionResource.js';
 
-@injectable()
+@injectable(() => [GraphQLService, DataSynchronizationService, SessionDataResource, SessionResource, SessionPermissionEventHandler])
 export class SessionPermissionsResource extends CachedDataResource<Set<string>> {
   constructor(
     private readonly graphQLService: GraphQLService,

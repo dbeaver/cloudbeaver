@@ -2,6 +2,8 @@
   "name": "@cloudbeaver/plugin-top-app-bar-administration",
   "type": "module",
   "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"
@@ -19,6 +21,7 @@
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
+    "@cloudbeaver/core-blocks": "workspace:*",
     "@cloudbeaver/core-di": "workspace:*",
     "@cloudbeaver/plugin-administration": "workspace:*",
     "@cloudbeaver/plugin-top-app-bar": "workspace:*",

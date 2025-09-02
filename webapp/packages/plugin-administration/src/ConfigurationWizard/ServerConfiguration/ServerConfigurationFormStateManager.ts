@@ -13,7 +13,7 @@ import type { IFormState } from '@cloudbeaver/core-ui';
 import { ServerConfigurationFormService } from './ServerConfigurationFormService.js';
 import { ServerConfigurationFormState } from './ServerConfigurationFormState.js';
 
-@injectable()
+@injectable(() => [IServiceProvider, ServerConfigurationFormService])
 export class ServerConfigurationFormStateManager {
   formState: ServerConfigurationFormState | null;
 

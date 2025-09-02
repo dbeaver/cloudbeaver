@@ -21,7 +21,7 @@ import {
 import { DataImportDialogLazy } from './DataImportDialog/DataImportDialogLazy.js';
 import { DataImportService } from './DataImportService.js';
 
-@injectable()
+@injectable(() => [MenuService, ActionService, CommonDialogService, DataImportService])
 export class DataImportBootstrap extends Bootstrap {
   constructor(
     private readonly menuService: MenuService,

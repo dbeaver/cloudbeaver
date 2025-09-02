@@ -3,6 +3,7 @@
   "type": "module",
   "sideEffects": [
     "./lib/index.js",
+    "./lib/module.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"

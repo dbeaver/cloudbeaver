@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,14 +9,16 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { type INodeNavigationData, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 import { DBObjectPageService } from '../ObjectPage/DBObjectPageService.js';
 import type { ObjectPage } from '../ObjectPage/ObjectPage.js';
 import { ObjectViewerTabService } from '../ObjectViewerTabService.js';
-import { ObjectPropertiesPagePanel } from './ObjectPropertiesPagePanel.js';
-import { ObjectPropertiesPageTab } from './ObjectPropertiesPageTab.js';
 
-@injectable()
+const ObjectPropertiesPagePanel = importLazyComponent(() => import('./ObjectPropertiesPagePanel.js').then(m => m.ObjectPropertiesPagePanel));
+const ObjectPropertiesPageTab = importLazyComponent(() => import('./ObjectPropertiesPageTab.js').then(m => m.ObjectPropertiesPageTab));
+
+@injectable(() => [NavNodeManagerService, NotificationService, ObjectViewerTabService, DBObjectPageService])
 export class ObjectPropertiesPageService {
   page?: ObjectPage;
 
