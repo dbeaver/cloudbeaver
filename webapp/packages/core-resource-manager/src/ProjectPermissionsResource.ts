@@ -11,7 +11,7 @@ import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-@injectable()
+@injectable(() => [GraphQLService, SessionPermissionsResource])
 export class ProjectPermissionsResource extends CachedDataResource<PermissionInfo[]> {
   constructor(
     private readonly graphQLService: GraphQLService,

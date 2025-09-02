@@ -9,7 +9,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { TopNavService } from '@cloudbeaver/plugin-top-app-bar';
 import { LogoLazy } from './LogoLazy.js';
 
-@injectable()
+@injectable(() => [TopNavService])
 export class AppLogoPluginBootstrap extends Bootstrap {
   constructor(private readonly topNavService: TopNavService) {
     super();

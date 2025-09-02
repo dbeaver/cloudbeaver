@@ -17,7 +17,7 @@ import { SessionPermissionsResource } from '../SessionPermissionsResource.js';
 
 export const SERVER_SETTINGS_LAYER = createSettingsLayer(PRODUCT_SETTINGS_LAYER, 'server');
 
-@injectable()
+@injectable(() => [ServerConfigResource, SessionPermissionsResource])
 export class ServerSettingsService extends SettingsSource {
   private readonly settings: Map<string, any>;
   private lastConfig: any;

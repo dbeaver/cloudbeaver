@@ -13,7 +13,7 @@ import { ServerConfigResource } from './ServerConfigResource.js';
 
 export type ServerResourceQuotas = ResourceQuotasFragment['resourceQuotas'];
 
-@injectable()
+@injectable(() => [GraphQLService, ServerConfigResource])
 export class ServerResourceQuotasResource extends CachedDataResource<ServerResourceQuotas | null> {
   constructor(
     private readonly graphQLService: GraphQLService,

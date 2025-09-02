@@ -15,7 +15,7 @@ import { DocumentEditAction, type IDatabaseDataModel, ResultSetDataSource, Resul
 
 const ScriptPreviewDialog = importLazyComponent(() => import('./ScriptPreviewDialog.js').then(m => m.ScriptPreviewDialog));
 
-@injectable()
+@injectable(() => [GraphQLService, CommonDialogService, NotificationService])
 export class ScriptPreviewService {
   constructor(
     private readonly graphQLService: GraphQLService,

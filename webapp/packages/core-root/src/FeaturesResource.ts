@@ -16,7 +16,7 @@ import { SessionPermissionsResource } from './SessionPermissionsResource.js';
 
 export type ApplicationFeature = WebFeatureSet;
 
-@injectable()
+@injectable(() => [GraphQLService, SessionPermissionsResource])
 export class FeaturesResource extends CachedDataResource<ApplicationFeature[]> {
   private baseFeatures: string[];
 

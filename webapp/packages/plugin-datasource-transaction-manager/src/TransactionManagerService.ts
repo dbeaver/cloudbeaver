@@ -9,7 +9,7 @@ import { ConnectionExecutionContextService } from '@cloudbeaver/core-connections
 import { injectable } from '@cloudbeaver/core-di';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 
-@injectable()
+@injectable(() => [ConnectionSchemaManagerService, ConnectionExecutionContextService])
 export class TransactionManagerService {
   constructor(
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,

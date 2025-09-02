@@ -13,7 +13,7 @@ import { TeamsAdministrationNavService } from '../TeamsAdministrationNavService.
 import { TeamsAdministrationFormService } from '../TeamsForm/TeamsAdministrationFormService.js';
 import { TeamsAdministrationFormState } from '../TeamsForm/TeamsAdministrationFormState.js';
 
-@injectable()
+@injectable(() => [TeamsAdministrationNavService, IServiceProvider, TeamsAdministrationFormService])
 export class CreateTeamService {
   disabled = false;
   data: TeamsAdministrationFormState | null;

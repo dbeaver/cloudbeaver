@@ -36,7 +36,18 @@ const ConnectionIconSmall = importLazyComponent(() =>
   import('./ConnectionSelector/ConnectionIconSmall.js').then(module => module.ConnectionIconSmall),
 );
 
-@injectable()
+@injectable(() => [
+  ConnectionInfoResource,
+  ConnectionSchemaManagerService,
+  ConnectionsManagerService,
+  OptionsPanelService,
+  AppAuthService,
+  ContainerResource,
+  MenuService,
+  ConnectionsSettingsService,
+  LocalizationService,
+  ProjectsService,
+])
 export class ConnectionSchemaManagerBootstrap extends Bootstrap {
   get connectionSelectorLoading(): boolean {
     return this.connectionSchemaManagerService.isChangingConnection || this.connectionsManagerService.containerContainers.isLoading();

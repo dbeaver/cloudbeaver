@@ -11,7 +11,7 @@ import type { CbDatabaseOutputLogEvent, CbSessionLogEvent as ISessionLogEvent } 
 
 export { type ISessionLogEvent };
 
-@injectable()
+@injectable(() => [SessionEventSource])
 export class OutputLogsEventHandler extends TopicEventHandler<ISessionLogEvent, ISessionEvent> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbDatabaseOutputLog, sessionEventSource);

@@ -9,7 +9,7 @@ import { LocalStorageSaveService, type LocalStorageType } from '@cloudbeaver/cor
 import { injectable } from '@cloudbeaver/core-di';
 import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 
-@injectable()
+@injectable(() => [LocalStorageSaveService])
 export class StorageService {
   readonly onStorageChange: ISyncExecutor<LocalStorageType>;
   constructor(private readonly localStorageSaveService: LocalStorageSaveService) {

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
 import { computed, makeObservable } from 'mobx';
 
 import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, type IExecutor, type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { DataSynchronizationService, ServerConfigResource, ServerEventId } from '@cloudbeaver/core-root';
@@ -28,8 +28,16 @@ interface IProjectsUserSettings {
   activeProjectIds: string[];
 }
 
-@injectable()
-export class ProjectsService extends Dependency {
+@injectable(() => [
+  ServerConfigResource,
+  ProjectInfoResource,
+  UserInfoResource,
+  UserDataService,
+  ProjectInfoEventHandler,
+  DataSynchronizationService,
+  NavigationService,
+])
+export class ProjectsService {
   get userProject(): ProjectInfo | undefined {
     let project: ProjectInfo | undefined;
 
@@ -103,7 +111,6 @@ export class ProjectsService extends Dependency {
     private readonly dataSynchronizationService: DataSynchronizationService,
     navigationService: NavigationService,
   ) {
-    super();
     this.getActiveProjectTask = new SyncExecutor();
     this.onActiveProjectChange = new Executor();
 

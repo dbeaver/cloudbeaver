@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ACTION_REDO, ACTION_SAVE, ACTION_UNDO, type IActiveView, View } from '@cloudbeaver/core-view';
 import { type ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
-@injectable()
+@injectable(() => [NavigationTabsService])
 export class DataViewerViewService extends View<ITab> {
   constructor(private readonly navigationTabsService: NavigationTabsService) {
     super();

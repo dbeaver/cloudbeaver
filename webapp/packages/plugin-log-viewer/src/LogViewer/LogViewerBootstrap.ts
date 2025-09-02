@@ -15,7 +15,7 @@ import { LogViewerService } from './LogViewerService.js';
 
 const LogViewer = importLazyComponent(() => import('./LogViewer.js').then(m => m.LogViewer));
 
-@injectable()
+@injectable(() => [ToolsPanelService, MenuService, ActionService, LogViewerService])
 export class LogViewerBootstrap extends Bootstrap {
   constructor(
     private readonly toolsPanelService: ToolsPanelService,

@@ -12,7 +12,7 @@ import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 export const USER_TEAM_ROLE_SUPERVISOR = 'Supervisor';
 
-@injectable()
+@injectable(() => [GraphQLService, SessionPermissionsResource])
 export class TeamRolesResource extends CachedDataResource<string[]> {
   constructor(
     private readonly graphQLService: GraphQLService,

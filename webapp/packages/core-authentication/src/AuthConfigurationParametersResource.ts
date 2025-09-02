@@ -14,7 +14,7 @@ import {
   GraphQLService,
 } from '@cloudbeaver/core-sdk';
 
-@injectable()
+@injectable(() => [GraphQLService, SessionDataResource, SessionPermissionsResource])
 export class AuthConfigurationParametersResource extends CachedMapResource<
   string,
   AuthProviderConfigurationParametersFragment[],

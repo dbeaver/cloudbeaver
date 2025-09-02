@@ -2,6 +2,8 @@
   "name": "@cloudbeaver/product-default",
   "type": "module",
   "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
     "src/**/*.ts",
     "src/**/*.scss",
     "public/**/*",
@@ -32,7 +34,6 @@
     "@cloudbeaver/product-default-impl": "workspace:*",
     "react": "^19",
     "react-dom": "^19",
-    "reflect-metadata": "^0",
     "tslib": "^2",
     "vite": "^7"
   },

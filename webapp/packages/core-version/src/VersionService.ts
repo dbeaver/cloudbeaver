@@ -19,7 +19,7 @@ export interface IProductVersion {
   backendVersion: string;
 }
 
-@injectable()
+@injectable(() => [ServerConfigResource])
 export class VersionService {
   get current(): string {
     return this.getProductVersion(true).frontendVersion;

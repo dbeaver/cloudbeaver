@@ -8,10 +8,10 @@
   },
   "references": [
     {
-      "path": "../../../common-typescript/@dbeaver/cli"
+      "path": "../../common-typescript/@dbeaver/cli"
     },
     {
-      "path": "../../../common-typescript/@dbeaver/js-helpers"
+      "path": "../../common-typescript/@dbeaver/js-helpers"
     },
     {
       "path": "../core-cli"

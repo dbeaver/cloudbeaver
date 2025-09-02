@@ -18,7 +18,7 @@ import { LocalStorageSqlDataSource } from './LocalStorageSqlDataSource.js';
 
 const localStorageKey = 'local-storage-sql-data-source';
 
-@injectable()
+@injectable(() => [SqlDataSourceService, StorageService])
 export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
   private readonly dataSourceStateState = new Map<string, ILocalStorageSqlDataSourceState>();
 

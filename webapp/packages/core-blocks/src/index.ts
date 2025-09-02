@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+import './module.js';
+
 export * from './AuthenticationProviderLoader.js';
 export * from './useAuthenticationAction.js';
 export * from './CommonDialog/CommonDialog/CommonDialogBody.js';

@@ -20,7 +20,7 @@ export interface IOutputLog extends WsOutputLogInfo {
   timestamp: number;
 }
 
-@injectable()
+@injectable(() => [OutputLogsEventHandler, ConnectionExecutionContextResource])
 export class OutputLogsResource extends CachedDataResource<IOutputLog[]> {
   constructor(
     sqlOutputLogsEventHandler: OutputLogsEventHandler,

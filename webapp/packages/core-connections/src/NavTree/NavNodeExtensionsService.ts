@@ -16,7 +16,7 @@ import { connectionProvider } from '../extensions/IConnectionProvider.js';
 import { objectCatalogProvider } from '../extensions/IObjectCatalogProvider.js';
 import { objectSchemaProvider } from '../extensions/IObjectSchemaProvider.js';
 
-@injectable()
+@injectable(() => [NavNodeInfoResource, NavNodeManagerService, ConnectionInfoResource])
 export class NavNodeExtensionsService {
   readonly extensions: Array<IExtension<string>>;
 

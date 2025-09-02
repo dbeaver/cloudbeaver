@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import {
   createSettingsAliasResolver,
   ROOT_SETTINGS_LAYER,
@@ -24,8 +24,8 @@ const settingsSchema = schema.object({
 export type EventsSettingsSchema = typeof settingsSchema;
 export type EventsSettings = schema.infer<EventsSettingsSchema>;
 
-@injectable()
-export class EventsSettingsService extends Dependency {
+@injectable(() => [SettingsProviderService, SettingsManagerService, SettingsResolverService])
+export class EventsSettingsService {
   get maxPersistentAllow(): number {
     return this.settings.getValue('plugin.notifications.maxPersistentAllow');
   }
@@ -39,7 +39,6 @@ export class EventsSettingsService extends Dependency {
     private readonly settingsManagerService: SettingsManagerService,
     private readonly settingsResolverService: SettingsResolverService,
   ) {
-    super();
     this.settings = this.settingsProviderService.createSettings(settingsSchema);
 
     this.settingsResolverService.addResolver(

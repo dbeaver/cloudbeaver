@@ -11,7 +11,7 @@ import { HolidaysService } from '../HolidaysService.js';
 import type { IHoliday } from '../IHoliday.js';
 import { Christmas } from './Christmas.js';
 
-@injectable()
+@injectable(() => [HolidaysService])
 export class ChristmasService extends Bootstrap implements IHoliday {
   private readonly christmas: Christmas;
   public name = 'Merry Christmas';

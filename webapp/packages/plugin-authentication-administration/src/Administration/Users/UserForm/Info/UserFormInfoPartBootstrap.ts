@@ -1,23 +1,20 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import React from 'react';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { AdministrationUserFormService } from '../AdministrationUserFormService.js';
 import { getUserFormInfoPart } from './getUserFormInfoPart.js';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-const UserFormInfo = React.lazy(async () => {
-  const { UserFormInfo } = await import('./UserFormInfo.js');
-  return { default: UserFormInfo };
-});
+const UserFormInfo = importLazyComponent(() => import('./UserFormInfo.js').then(m => m.UserFormInfo));
 
-@injectable()
+@injectable(() => [AdministrationUserFormService])
 export class UserFormInfoPartBootstrap extends Bootstrap {
   constructor(private readonly administrationUserFormService: AdministrationUserFormService) {
     super();

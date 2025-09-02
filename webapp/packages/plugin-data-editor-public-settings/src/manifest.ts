@@ -12,9 +12,4 @@ export const pluginDataEditorPublicSettingsManifest: PluginManifest = {
   info: {
     name: 'Plugin data editor settings',
   },
-
-  providers: [
-    () => import('./PluginDataEditorPublicSettingsBootstrap.js').then(m => m.PluginDataEditorPublicSettingsBootstrap),
-    () => import('./LocaleService.js').then(m => m.LocaleService),
-  ],
 };

@@ -27,7 +27,7 @@ import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
 
 const DataExportDialog = importLazyComponent(() => import('./Dialog/DataExportDialog.js').then(module => module.DataExportDialog));
 
-@injectable()
+@injectable(() => [CommonDialogService, ActionService, MenuService, LocalizationService, DataViewerService, ConnectionInfoResource])
 export class DataExportMenuService {
   constructor(
     private readonly commonDialogService: CommonDialogService,

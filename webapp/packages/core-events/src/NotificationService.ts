@@ -27,7 +27,7 @@ import { ProcessNotificationController } from './ProcessNotificationController.j
 export const DELAY_DELETING = 1000;
 const TIMESTAMP_DIFFERENCE_THRESHOLD = 100;
 
-@injectable()
+@injectable(() => [EventsSettingsService])
 export class NotificationService {
   // todo change to common new Map()
 

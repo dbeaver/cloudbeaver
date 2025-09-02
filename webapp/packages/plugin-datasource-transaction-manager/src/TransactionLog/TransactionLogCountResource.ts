@@ -16,7 +16,7 @@ import { schemaValidationError } from '@cloudbeaver/core-utils';
 import { createTransactionInfoParam, type ITransactionInfoParam, TRANSACTION_INFO_PARAM_SCHEMA } from './TRANSACTION_INFO_PARAM_SCHEMA.js';
 import { type IWsTransactionCountEvent, TransactionLogCountEventHandler } from './TransactionLogCountEventHandler.js';
 
-@injectable()
+@injectable(() => [GraphQLService, TransactionLogCountEventHandler])
 export class TransactionLogCountResource extends CachedMapResource<ITransactionInfoParam, number> {
   constructor(
     private readonly graphQLService: GraphQLService,
