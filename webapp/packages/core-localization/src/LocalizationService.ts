@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,8 @@ export class LocalizationService extends Bootstrap {
     this.onChange = new Executor();
     this.localeMap = new Map();
     this.localeProviders = [];
+
+    this.onCurrentLanguageChange = this.onCurrentLanguageChange.bind(this);
 
     makeObservable<LocalizationService, 'localeMap' | 'supportedLanguages' | 'language'>(this, {
       language: observable,
@@ -142,20 +144,18 @@ export class LocalizationService extends Bootstrap {
         name: 'Vietnamese',
         nativeName: 'Tiếng Việt',
       },
-
     ]);
     this.addProvider(this.coreProvider.bind(this));
   }
 
   override async load(): Promise<void> {
-    this.reactionDisposer = reaction(
-      () => this.currentLanguage,
-      lang => {
-        this.loadLocale(lang);
-      },
-    );
+    this.reactionDisposer = reaction(() => this.currentLanguage, this.onCurrentLanguageChange);
     await this.loadLocale(DEFAULT_LOCALE.isoCode);
     await this.loadLocale(this.currentLanguage);
+  }
+
+  async onCurrentLanguageChange(lang: string): Promise<void> {
+    await this.loadLocale(lang);
   }
 
   override dispose(): void {

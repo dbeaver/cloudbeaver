@@ -7,14 +7,16 @@
  */
 import { clsx } from '@dbeaver/ui-kit';
 import { observer } from 'mobx-react-lite';
-import { forwardRef } from 'react';
+import { forwardRef, memo } from 'react';
 
 import { DataGrid as BaseDataGrid } from '@dbeaver/react-data-grid';
 
 import classes from './DataGrid.module.css';
 
-export const DataGrid = observer(
-  forwardRef(function DataGrid(props, ref) {
-    return <BaseDataGrid {...props} ref={ref} className={clsx(classes['dataGrid'], props.className)} />;
-  }),
-) as typeof BaseDataGrid;
+export const DataGrid = memo(
+  observer(
+    forwardRef(function DataGrid(props, ref) {
+      return <BaseDataGrid {...props} ref={ref} className={clsx(classes['dataGrid'], props.className)} />;
+    }),
+  ) as typeof BaseDataGrid,
+);

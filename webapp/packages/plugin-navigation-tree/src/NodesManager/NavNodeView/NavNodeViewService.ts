@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import type { INavNodeFolderTransform, NavNodeFolderTransformFn, NavNodeTransformView } from './IFolderTransform.js';
 
 export interface INodeDuplicateList {
-  nodes: string[];
-  duplicates: string[];
+  nodes: Set<string>;
+  duplicates: Set<string>;
 }
 
 export interface INodeLimitedList {
@@ -59,10 +59,10 @@ export class NavNodeViewService {
         const { nodes, duplicates } = this.filterDuplicates(children);
 
         untracked(() => {
-          this.logDuplicates(nodeId, duplicates);
+          this.logDuplicates(nodeId, Array.from(duplicates));
         });
 
-        return nodes;
+        return Array.from(nodes);
       },
     });
   }
@@ -80,19 +80,21 @@ export class NavNodeViewService {
   }
 
   filterDuplicates(nodes: string[]): INodeDuplicateList {
-    const nextChildren: string[] = [];
-    const duplicates: string[] = [];
+    const nextChildren = new Set<string>();
+    const duplicates = new Set<string>();
 
     for (const child of nodes) {
-      const isDuplicate = duplicates.includes(child);
+      const isDuplicate = duplicates.has(child);
 
-      if (nextChildren.includes(child) || isDuplicate) {
-        if (!isDuplicate) {
-          duplicates.push(child);
-          nextChildren.splice(nextChildren.indexOf(child), 1);
-        }
+      if (isDuplicate) {
+        continue;
+      }
+
+      if (nextChildren.has(child)) {
+        duplicates.add(child);
+        nextChildren.delete(child);
       } else {
-        nextChildren.push(child);
+        nextChildren.add(child);
       }
     }
 

@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { computed, makeObservable } from 'mobx';
 
-import { type DataTypeLogicalOperation, ResultDataFormat, type SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
+import { type DataTypeLogicalOperation, ResultDataFormat, type SqlDataFilterConstraint, type SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataAction } from '../DatabaseDataAction.js';
 import type { IDatabaseDataOptions } from '../IDatabaseDataOptions.js';
@@ -16,6 +16,7 @@ import type { IDatabaseResultSet } from '../IDatabaseResultSet.js';
 import { EOrder, type Order } from '../Order.js';
 import { databaseDataAction } from './DatabaseDataActionDecorator.js';
 import type { IDatabaseDataConstraintAction } from './IDatabaseDataConstraintAction.js';
+import { isNotNullDefined } from '@dbeaver/js-helpers';
 
 export const IS_NULL_ID = 'IS_NULL';
 export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
@@ -258,23 +259,27 @@ export class DatabaseDataConstraintAction
       return;
     }
 
-    for (const constraint of this.source.options.constraints) {
-      const prevColumn = this.result.data?.columns?.find(column => column.position === constraint.attributePosition);
+    const resultColumnsByPosition = new Map((this.result.data?.columns ?? []).map(col => [col.position, col]));
+    const nextColumns = nextResult.data?.columns ?? [];
+    const nextColumnsByPosition = new Map<number, SqlResultColumn>(nextColumns.map(col => [col.position, col]));
+    const nextColumnsByLabel = new Map<string, SqlResultColumn>(nextColumns.filter(col => col.label !== undefined).map(col => [col.label!, col]));
+    const prevOptionsConstraints = new Map(
+      (this.source.prevOptions?.constraints ?? []).map(constraint => [constraint.attributePosition, constraint]),
+    );
 
+    for (const constraint of this.source.options.constraints) {
+      const prevColumn = resultColumnsByPosition.get(constraint.attributePosition);
       if (!prevColumn) {
         return;
       }
 
-      let column = nextResult.data?.columns?.find(column => column.position === prevColumn.position);
-
-      if (!column || column.label !== prevColumn.label) {
-        column = nextResult.data?.columns?.find(column => column.label === prevColumn.label);
+      let column = nextColumnsByPosition.get(prevColumn.position);
+      if (isNotNullDefined(prevColumn.label) && (!column || column.label !== prevColumn.label)) {
+        column = nextColumnsByLabel.get(prevColumn.label);
       }
 
       if (column && prevColumn.position !== column.position) {
-        const prevConstraint = this.source.prevOptions?.constraints.find(
-          prevConstraint => prevConstraint.attributePosition === constraint.attributePosition,
-        );
+        const prevConstraint = prevOptionsConstraints.get(constraint.attributePosition);
 
         constraint.attributePosition = column.position;
 
