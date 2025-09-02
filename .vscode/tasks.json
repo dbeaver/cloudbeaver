@@ -26,7 +26,7 @@
       "group": "test",
       "args": ["test"],
       "options": {
-        "cwd": "${workspaceFolder}/common-typescript"
+        "cwd": "${workspaceFolder}/webapp/common-typescript"
       }
     },
     {
@@ -36,7 +36,7 @@
       "group": "test",
       "args": ["test"],
       "options": {
-        "cwd": "${workspaceFolder}/common-react"
+        "cwd": "${workspaceFolder}/webapp/common-react"
       }
     },
     {
@@ -133,7 +133,7 @@
       "type": "shell",
       "command": "yarn",
       "options": {
-        "cwd": "${workspaceFolder}/common-react/@dbeaver/ui-kit"
+        "cwd": "${workspaceFolder}/webapp/common-react/@dbeaver/ui-kit"
       },
       "args": ["docs"]
     }

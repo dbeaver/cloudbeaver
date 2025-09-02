@@ -4510,9 +4510,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dbeaver/cli@workspace:*, @dbeaver/cli@workspace:../common-typescript/@dbeaver/cli, @dbeaver/cli@workspace:^":
+"@dbeaver/cli@workspace:*, @dbeaver/cli@workspace:^, @dbeaver/cli@workspace:common-typescript/@dbeaver/cli":
   version: 0.0.0-use.local
-  resolution: "@dbeaver/cli@workspace:../common-typescript/@dbeaver/cli"
+  resolution: "@dbeaver/cli@workspace:common-typescript/@dbeaver/cli"
   dependencies:
     "@dbeaver/tsconfig": "workspace:^"
     "@types/node": "npm:^22"
@@ -4524,9 +4524,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/database-commons@workspace:../common-typescript/@dbeaver/database-commons, @dbeaver/database-commons@workspace:^":
+"@dbeaver/database-commons@workspace:^, @dbeaver/database-commons@workspace:common-typescript/@dbeaver/database-commons":
   version: 0.0.0-use.local
-  resolution: "@dbeaver/database-commons@workspace:../common-typescript/@dbeaver/database-commons"
+  resolution: "@dbeaver/database-commons@workspace:common-typescript/@dbeaver/database-commons"
   dependencies:
     "@dbeaver/tsconfig": "workspace:^"
     rimraf: "npm:^6"
@@ -4534,9 +4534,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/jdbc-uri-parser@workspace:../common-typescript/@dbeaver/jdbc-uri-parser, @dbeaver/jdbc-uri-parser@workspace:^":
+"@dbeaver/jdbc-uri-parser@workspace:^, @dbeaver/jdbc-uri-parser@workspace:common-typescript/@dbeaver/jdbc-uri-parser":
   version: 0.0.0-use.local
-  resolution: "@dbeaver/jdbc-uri-parser@workspace:../common-typescript/@dbeaver/jdbc-uri-parser"
+  resolution: "@dbeaver/jdbc-uri-parser@workspace:common-typescript/@dbeaver/jdbc-uri-parser"
   dependencies:
     "@dbeaver/tsconfig": "workspace:^"
     rimraf: "npm:^6"
@@ -4545,9 +4545,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/js-helpers@workspace:*, @dbeaver/js-helpers@workspace:../common-typescript/@dbeaver/js-helpers, @dbeaver/js-helpers@workspace:^":
+"@dbeaver/js-helpers@workspace:*, @dbeaver/js-helpers@workspace:^, @dbeaver/js-helpers@workspace:common-typescript/@dbeaver/js-helpers":
   version: 0.0.0-use.local
-  resolution: "@dbeaver/js-helpers@workspace:../common-typescript/@dbeaver/js-helpers"
+  resolution: "@dbeaver/js-helpers@workspace:common-typescript/@dbeaver/js-helpers"
   dependencies:
     "@dbeaver/cli": "workspace:^"
     "@dbeaver/tsconfig": "workspace:^"
@@ -4558,9 +4558,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/prettier-config@workspace:*, @dbeaver/prettier-config@workspace:../common-typescript/@dbeaver/prettier-config, @dbeaver/prettier-config@workspace:^":
+"@dbeaver/prettier-config@workspace:*, @dbeaver/prettier-config@workspace:^, @dbeaver/prettier-config@workspace:common-typescript/@dbeaver/prettier-config":
   version: 0.0.0-use.local
-  resolution: "@dbeaver/prettier-config@workspace:../common-typescript/@dbeaver/prettier-config"
+  resolution: "@dbeaver/prettier-config@workspace:common-typescript/@dbeaver/prettier-config"
   dependencies:
     "@trivago/prettier-plugin-sort-imports": "npm:^5"
     prettier: "npm:^3"
@@ -4569,9 +4569,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/react-data-grid@workspace:*, @dbeaver/react-data-grid@workspace:../common-react/@dbeaver/react-data-grid":
+"@dbeaver/react-data-grid@workspace:*, @dbeaver/react-data-grid@workspace:common-react/@dbeaver/react-data-grid":
   version: 0.0.0-use.local
-  resolution: "@dbeaver/react-data-grid@workspace:../common-react/@dbeaver/react-data-grid"
+  resolution: "@dbeaver/react-data-grid@workspace:common-react/@dbeaver/react-data-grid"
   dependencies:
     "@dbeaver/react-dnd": "workspace:^"
     "@dbeaver/tsconfig": "workspace:^"
@@ -4586,9 +4586,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/react-dnd@workspace:../common-react/@dbeaver/react-dnd, @dbeaver/react-dnd@workspace:^":
+"@dbeaver/react-dnd@workspace:^, @dbeaver/react-dnd@workspace:common-react/@dbeaver/react-dnd":
   version: 0.0.0-use.local
-  resolution: "@dbeaver/react-dnd@workspace:../common-react/@dbeaver/react-dnd"
+  resolution: "@dbeaver/react-dnd@workspace:common-react/@dbeaver/react-dnd"
   dependencies:
     "@dbeaver/tsconfig": "workspace:^"
     "@types/react": "npm:^19"
@@ -4599,9 +4599,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/react-tests@workspace:../common-react/@dbeaver/react-tests, @dbeaver/react-tests@workspace:^":
+"@dbeaver/react-tests@workspace:^, @dbeaver/react-tests@workspace:common-react/@dbeaver/react-tests":
   version: 0.0.0-use.local
-  resolution: "@dbeaver/react-tests@workspace:../common-react/@dbeaver/react-tests"
+  resolution: "@dbeaver/react-tests@workspace:common-react/@dbeaver/react-tests"
   dependencies:
     "@dbeaver/cli": "workspace:^"
     "@dbeaver/tsconfig": "workspace:^"
@@ -4617,9 +4617,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api, @dbeaver/result-set-api@workspace:^":
+"@dbeaver/result-set-api@workspace:^, @dbeaver/result-set-api@workspace:common-typescript/@dbeaver/result-set-api":
   version: 0.0.0-use.local
-  resolution: "@dbeaver/result-set-api@workspace:../common-typescript/@dbeaver/result-set-api"
+  resolution: "@dbeaver/result-set-api@workspace:common-typescript/@dbeaver/result-set-api"
   dependencies:
     "@dbeaver/database-commons": "workspace:^"
     "@dbeaver/tsconfig": "workspace:^"
@@ -4628,9 +4628,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/tsconfig@workspace:*, @dbeaver/tsconfig@workspace:../common-typescript/@dbeaver/tsconfig, @dbeaver/tsconfig@workspace:^":
+"@dbeaver/tsconfig@workspace:*, @dbeaver/tsconfig@workspace:^, @dbeaver/tsconfig@workspace:common-typescript/@dbeaver/tsconfig":
   version: 0.0.0-use.local
-  resolution: "@dbeaver/tsconfig@workspace:../common-typescript/@dbeaver/tsconfig"
+  resolution: "@dbeaver/tsconfig@workspace:common-typescript/@dbeaver/tsconfig"
   dependencies:
     typescript: "npm:^5"
     typescript-plugin-css-modules: "npm:^5"
@@ -4638,9 +4638,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dbeaver/ui-kit@workspace:*, @dbeaver/ui-kit@workspace:../common-react/@dbeaver/ui-kit, @dbeaver/ui-kit@workspace:^":
+"@dbeaver/ui-kit@workspace:*, @dbeaver/ui-kit@workspace:^, @dbeaver/ui-kit@workspace:common-react/@dbeaver/ui-kit":
   version: 0.0.0-use.local
-  resolution: "@dbeaver/ui-kit@workspace:../common-react/@dbeaver/ui-kit"
+  resolution: "@dbeaver/ui-kit@workspace:common-react/@dbeaver/ui-kit"
   dependencies:
     "@ariakit/react": "npm:^0"
     "@dbeaver/tsconfig": "workspace:^"
@@ -9524,9 +9524,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"common-react@workspace:../common-react":
+"common-react@workspace:common-react":
   version: 0.0.0-use.local
-  resolution: "common-react@workspace:../common-react"
+  resolution: "common-react@workspace:common-react"
   dependencies:
     "@dbeaver/cli": "workspace:^"
     "@dbeaver/prettier-config": "workspace:^"
@@ -9546,9 +9546,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"common-typescript@workspace:../common-typescript":
+"common-typescript@workspace:common-typescript":
   version: 0.0.0-use.local
-  resolution: "common-typescript@workspace:../common-typescript"
+  resolution: "common-typescript@workspace:common-typescript"
   dependencies:
     "@dbeaver/cli": "workspace:^"
     "@dbeaver/prettier-config": "workspace:^"
@@ -15768,9 +15768,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-data-grid@file:./artifacts::locator=%40dbeaver%2Freact-data-grid%40workspace%3A..%2Fcommon-react%2F%40dbeaver%2Freact-data-grid":
+"react-data-grid@file:./artifacts::locator=%40dbeaver%2Freact-data-grid%40workspace%3Acommon-react%2F%40dbeaver%2Freact-data-grid":
   version: 7.0.0-beta.55
-  resolution: "react-data-grid@file:./artifacts#./artifacts::hash=2f312f&locator=%40dbeaver%2Freact-data-grid%40workspace%3A..%2Fcommon-react%2F%40dbeaver%2Freact-data-grid"
+  resolution: "react-data-grid@file:./artifacts#./artifacts::hash=2f312f&locator=%40dbeaver%2Freact-data-grid%40workspace%3Acommon-react%2F%40dbeaver%2Freact-data-grid"
   dependencies:
     clsx: "npm:^2.0.0"
   peerDependencies:
