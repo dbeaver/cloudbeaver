@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "workspaces": [
-    "../common-react",
+    "./common-react",
     "packages/*"
   ],
   "resolutions": {
