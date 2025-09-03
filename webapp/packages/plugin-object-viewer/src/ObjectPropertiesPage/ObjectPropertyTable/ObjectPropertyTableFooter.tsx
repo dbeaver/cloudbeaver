@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useMemo, useCallback, memo } from 'react';
 
 import { s, type TableState, useS } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
@@ -23,21 +22,18 @@ interface Props {
   className?: string;
 }
 
-export const ObjectPropertyTableFooter = memo(
-  observer<Props>(function ObjectPropertyTableFooter({ state, className }) {
-    const styles = useS(MenuBarStyles, MenuBarItemStyles);
-    const navNodeInfoResource = useService(NavNodeInfoResource);
-    const menu = useMenu({ menu: MENU_OBJECT_VIEWER_FOOTER });
+export const ObjectPropertyTableFooter = observer<Props>(function ObjectPropertyTableFooter({ state, className }) {
+  const styles = useS(MenuBarStyles, MenuBarItemStyles);
+  const navNodeInfoResource = useService(NavNodeInfoResource);
+  const menu = useMenu({ menu: MENU_OBJECT_VIEWER_FOOTER });
 
-    const getSelected = useCallback(
-      () => navNodeInfoResource.get(resourceKeyList(state.selectedList)).filter(Boolean) as NavNode[],
-      [navNodeInfoResource, state.selectedList],
-    );
+  function getSelected() {
+    return navNodeInfoResource.get(resourceKeyList(state.selectedList)).filter(Boolean) as NavNode[];
+  }
 
-    const contextLink = useMemo(() => (context: any, id: string) => context.set(DATA_CONTEXT_NAV_NODES, getSelected, id), [getSelected]);
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_NAV_NODES, getSelected, id);
+  });
 
-    useDataContextLink(menu.context, contextLink);
-
-    return <MenuBar className={s(styles, { floating: true, withLabel: true }, className)} menu={menu} />;
-  }),
-);
+  return <MenuBar className={s(styles, { floating: true, withLabel: true }, className)} menu={menu} />;
+});

@@ -6,8 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-
-import { memo, use } from 'react';
+import { use } from 'react';
 import { DataGridCellContext } from '../DataGridCellContext.js';
 import { useGridReactiveValue } from '../useGridReactiveValue.js';
 
@@ -16,7 +15,7 @@ export interface Props {
   colIdx: number;
 }
 
-export const CellContentRenderer = memo(function CellContentRenderer({ rowIdx, colIdx }: Props) {
+export function CellContentRenderer({ rowIdx, colIdx }: Props) {
   const cellContext = use(DataGridCellContext);
   return useGridReactiveValue(cellContext?.cell, rowIdx, colIdx);
-});
+}

@@ -80,27 +80,24 @@ export class NavNodeViewService {
   }
 
   filterDuplicates(nodes: string[]): INodeDuplicateList {
-    const nextChildren = new Set<string>();
-    const duplicates = new Set<string>();
+    const seen = new Set<string>();
+    const duplicatesSet = new Set<string>();
+    const nextChildren: string[] = [];
 
     for (const child of nodes) {
-      const isDuplicate = duplicates.has(child);
-
-      if (isDuplicate) {
-        continue;
-      }
-
-      if (nextChildren.has(child)) {
-        duplicates.add(child);
-        nextChildren.delete(child);
+      if (seen.has(child)) {
+        duplicatesSet.add(child);
       } else {
-        nextChildren.add(child);
+        seen.add(child);
+        nextChildren.push(child);
       }
     }
 
+    const uniqueChildren = new Set(nextChildren.filter(child => !duplicatesSet.has(child)));
+
     return {
-      nodes: nextChildren,
-      duplicates,
+      nodes: uniqueChildren,
+      duplicates: duplicatesSet,
     };
   }
 

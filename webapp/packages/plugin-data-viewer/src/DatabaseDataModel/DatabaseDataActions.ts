@@ -90,12 +90,8 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
 
   updateResults(results: TResult[]): void {
     let actionsMap = Array.from(this.actions.entries());
-    const resultMap = new Map<string, TResult>();
-    const resultIndexMap = new Map<string, number>();
-    results.forEach((result, idx) => {
-      resultMap.set(result.uniqueResultId, result);
-      resultIndexMap.set(result.uniqueResultId, idx);
-    });
+    const resultMap = new Map<string, TResult>(results.map(result => [result.uniqueResultId, result]));
+    const resultIndexMap = new Map<string, number>(results.map((result, i) => [result.uniqueResultId, i]));
 
     for (const [key, actions] of actionsMap) {
       const result = resultMap.get(key);

@@ -56,8 +56,6 @@ export class LocalizationService extends Bootstrap {
     this.localeMap = new Map();
     this.localeProviders = [];
 
-    this.onCurrentLanguageChange = this.onCurrentLanguageChange.bind(this);
-
     makeObservable<LocalizationService, 'localeMap' | 'supportedLanguages' | 'language'>(this, {
       language: observable,
       supportedLanguages: observable,
@@ -149,13 +147,14 @@ export class LocalizationService extends Bootstrap {
   }
 
   override async load(): Promise<void> {
-    this.reactionDisposer = reaction(() => this.currentLanguage, this.onCurrentLanguageChange);
+    this.reactionDisposer = reaction(
+      () => this.currentLanguage,
+      lang => {
+        this.loadLocale(lang);
+      },
+    );
     await this.loadLocale(DEFAULT_LOCALE.isoCode);
     await this.loadLocale(this.currentLanguage);
-  }
-
-  async onCurrentLanguageChange(lang: string): Promise<void> {
-    await this.loadLocale(lang);
   }
 
   override dispose(): void {

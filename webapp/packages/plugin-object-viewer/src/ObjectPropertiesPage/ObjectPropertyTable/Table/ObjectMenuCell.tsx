@@ -7,13 +7,13 @@
  */
 import { getComputed, Icon, Link, Loader, s, StaticImage, useContextMenuPosition, useMouse, useS, useStateDelay } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
-import { useDataContextLink, type IDataContext } from '@cloudbeaver/core-data-context';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, NavNodeManagerService, type DBObject } from '@cloudbeaver/core-navigation-tree';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { MENU_NAV_TREE, useNode } from '@cloudbeaver/plugin-navigation-tree';
 import { observer } from 'mobx-react-lite';
-import { useState, useMemo, useCallback } from 'react';
+import { useState } from 'react';
 import classes from './ObjectMenuCell.module.css';
 import { useMenu } from '@cloudbeaver/core-view';
 import { getObjectPropertyDisplayValue } from '@cloudbeaver/core-sdk';
@@ -35,27 +35,21 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
   const menu = useMenu({ menu: MENU_NAV_TREE });
   const mouse = useMouse<HTMLDivElement>();
   const [menuOpened, switchState] = useState(false);
-
-  const connection = useMemo(() => connectionsInfoResource.getConnectionForNode(node.id), [connectionsInfoResource.data, node.id]);
+  const connection = connectionsInfoResource.getConnectionForNode(node.id);
   const contextMenuPosition = useContextMenuPosition();
-  const connectionKey = useMemo(() => connectionsInfoResource.getConnectionIdForNodeId(node.projectId!, node.id), [node.projectId, node.id]);
+  const connectionKey = connectionsInfoResource.getConnectionIdForNodeId(node.projectId!, node.id);
 
-  const updateContext = useCallback(
-    (context: IDataContext, id: string) => {
-      context.set(DATA_CONTEXT_NAV_NODE, node, id);
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_NAV_NODE, node, id);
 
-      if (connection) {
-        context.set(DATA_CONTEXT_CONNECTION, connectionKey, id);
-      }
-    },
-    [connection, connectionKey],
-  );
+    if (connection) {
+      context.set(DATA_CONTEXT_CONNECTION, connectionKey, id);
+    }
+  });
 
-  useDataContextLink(menu.context, updateContext);
-
-  const openNode = useCallback(() => {
+  function openNode() {
     navNodeManagerService.navToNode(node!.id, node!.parentId);
-  }, [navNodeManagerService, node]);
+  }
 
   const mouseEnter = useStateDelay(mouse.state.mouseEnter, 33); // track mouse update only 30 times per second
 
