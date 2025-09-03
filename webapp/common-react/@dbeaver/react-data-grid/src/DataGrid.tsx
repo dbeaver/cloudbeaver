@@ -1,3 +1,11 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
 import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { DataGrid as DataGridBase, type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle, type ColumnWidth, type ColumnWidths } from 'react-data-grid';
 import { rowRenderer } from './renderers/rowRenderer.js';
@@ -142,12 +150,6 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     onCellKeyDown?.({ colIdx: dndHeaderContext.getDataColIdx(args.column.idx), rowIdx: args.rowIdx }, event);
   }
 
-  const isMeasurementRender = columnWidths.size === 0 && columnCount.get() > 0;
-
-  if (isMeasurementRender) {
-    rows = rows.slice(0, 100);
-  }
-
   return (
     <HeaderDnDContext value={dndHeaderContext}>
       <DataGridRowContext value={{ rowCount, onScrollToBottom }}>
@@ -156,7 +158,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
             <DataGridBase
               ref={innerGridRef}
               columns={dndHeaderContext.columns}
-              enableVirtualization={!isMeasurementRender}
+              enableVirtualization
               rows={rows}
               className={className}
               headerRowHeight={getHeaderHeight?.()}
