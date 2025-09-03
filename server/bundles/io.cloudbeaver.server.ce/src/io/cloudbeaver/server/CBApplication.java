@@ -803,9 +803,4 @@ public abstract class CBApplication<T extends CBServerConfig>
     public <T> T getApplicationContextValue(@NotNull String key) {
         return (T) applicationContext.get(key);
     }
-
-    @Override
-    public void validateLicenseByUserQuota() {
-
-    }
 }

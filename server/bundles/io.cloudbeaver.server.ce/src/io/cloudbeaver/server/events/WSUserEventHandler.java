@@ -17,7 +17,6 @@
 package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
 import org.jkiss.dbeaver.model.websocket.event.WSAbstractEvent;
@@ -40,11 +39,9 @@ public class WSUserEventHandler<EVENT extends WSAbstractEvent> implements WSEven
             }
             case WSUserDeletedEvent e -> {
                 sessionManager.closeUserSession(e);
-                WebAppUtils.getWebApplication().validateLicenseByUserQuota();
             }
             case WSUserDisabledEvent e -> {
                 sessionManager.closeUserSession(e);
-                WebAppUtils.getWebApplication().validateLicenseByUserQuota();
             }
             default -> { }
         }
