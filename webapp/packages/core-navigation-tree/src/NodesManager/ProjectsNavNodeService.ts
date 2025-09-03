@@ -11,7 +11,7 @@ import { resourceKeyList } from '@cloudbeaver/core-resource';
 
 import { NavNodeInfoResource } from './NavNodeInfoResource.js';
 
-@injectable()
+@injectable(() => [NavNodeInfoResource, ProjectInfoResource])
 export class ProjectsNavNodeService {
   projectTypes: string[];
   projectPrefixes: string[];

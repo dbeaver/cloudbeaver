@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
@@ -26,8 +26,8 @@ const defaultSettings = schema.object({
 export type DataGridSettingsSchema = typeof defaultSettings;
 export type DataGridSettings = schema.infer<DataGridSettingsSchema>;
 
-@injectable()
-export class DataGridSettingsService extends Dependency {
+@injectable(() => [SettingsProviderService, SettingsManagerService, SettingsResolverService])
+export class DataGridSettingsService {
   get hidden(): boolean {
     return this.settings.getValue('plugin.data-spreadsheet.hidden');
   }
@@ -43,7 +43,6 @@ export class DataGridSettingsService extends Dependency {
     private readonly settingsManagerService: SettingsManagerService,
     private readonly settingsResolverService: SettingsResolverService,
   ) {
-    super();
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,

@@ -21,7 +21,7 @@ const DEFAULT_PASSWORD_POLICY: PasswordPolicyConfig = {
 
 type ValidationResult = { isValid: true; errorMessage: null } | { isValid: false; errorMessage: string };
 
-@injectable()
+@injectable(() => [PasswordPolicyResource, LocalizationService])
 export class PasswordPolicyService {
   get config(): PasswordPolicyConfig {
     return {

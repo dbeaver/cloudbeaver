@@ -39,7 +39,6 @@ import {
   CbEventTopic as SessionEventTopic,
 } from '@cloudbeaver/core-sdk';
 
-import { NetworkStateService } from './NetworkStateService.js';
 import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Unsubscribe } from './ServerEventEmitter/IServerEventEmitter.js';
 import { SessionExpireService } from './SessionExpireService.js';
 
@@ -61,7 +60,7 @@ export interface ITopicSubEvent extends ISessionEvent {
 const RETRY_INTERVALS = [1000, 5000, 30000, 60000]; // 1s, 5s, 30s, 1m
 const MAX_RETRY_ATTEMPTS = 4;
 
-@injectable()
+@injectable(() => [SessionExpireService, EnvironmentService])
 export class SessionEventSource implements IServerEventEmitter<ISessionEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   readonly eventsSubject: Observable<ISessionEvent>;
   readonly onActivate: IExecutor;
@@ -77,7 +76,6 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
   private disconnected: boolean;
 
   constructor(
-    networkStateService: NetworkStateService,
     private readonly sessionExpireService: SessionExpireService,
     environmentService: EnvironmentService,
   ) {

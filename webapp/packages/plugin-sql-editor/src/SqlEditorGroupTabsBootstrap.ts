@@ -15,7 +15,7 @@ import { DATA_CONTEXT_SQL_EDITOR_STATE } from './DATA_CONTEXT_SQL_EDITOR_STATE.j
 import { DATA_CONTEXT_SQL_EDITOR_RESULT_ID } from './SqlResultTabs/DATA_CONTEXT_SQL_EDITOR_RESULT_ID.js';
 import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService.js';
 
-@injectable()
+@injectable(() => [ActionService, MenuService, SqlResultTabsService])
 export class SqlEditorGroupTabsBootstrap extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,

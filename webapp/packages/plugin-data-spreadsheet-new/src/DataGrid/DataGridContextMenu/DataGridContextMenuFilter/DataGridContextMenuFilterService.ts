@@ -38,7 +38,7 @@ import { MENU_DATA_GRID_FILTERS_CUSTOM } from './MENU_DATA_GRID_FILTERS_CUSTOM.j
 
 const FilterCustomValueDialog = importLazyComponent(() => import('./FilterCustomValueDialog.js').then(m => m.FilterCustomValueDialog));
 
-@injectable()
+@injectable(() => [CommonDialogService, ClipboardService, ActionService, MenuService])
 export class DataGridContextMenuFilterService {
   constructor(
     private readonly commonDialogService: CommonDialogService,

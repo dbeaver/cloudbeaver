@@ -11,7 +11,7 @@ import { type AdminOriginDetailsFragment, GraphQLService } from '@cloudbeaver/co
 
 import { UsersResource } from './UsersResource.js';
 
-@injectable()
+@injectable(() => [GraphQLService, UsersResource])
 export class UsersOriginDetailsResource extends CachedMapResource<string, AdminOriginDetailsFragment> {
   constructor(
     private readonly graphQLService: GraphQLService,

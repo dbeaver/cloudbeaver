@@ -11,7 +11,7 @@ import { ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_RM_PROJECT } from './NAV_NODE_TYPE_RM_PROJECT.js';
 import { RESOURCES_NODE_PATH } from './RESOURCES_NODE_PATH.js';
 
-@injectable()
+@injectable(() => [ProjectsNavNodeService])
 export class PluginBootstrap extends Bootstrap {
   constructor(private readonly projectsNavNodeService: ProjectsNavNodeService) {
     super();

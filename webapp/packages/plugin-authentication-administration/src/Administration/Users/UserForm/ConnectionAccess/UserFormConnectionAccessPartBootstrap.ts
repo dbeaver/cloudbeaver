@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import React from 'react';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
@@ -13,13 +12,13 @@ import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/c
 
 import { AdministrationUserFormService } from '../AdministrationUserFormService.js';
 import { getUserFormConnectionAccessPart } from './getUserFormConnectionAccessPart.js';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-const UserFormConnectionAccessPanel = React.lazy(async () => {
-  const { UserFormConnectionAccessPanel } = await import('./UserFormConnectionAccessPanel.js');
-  return { default: UserFormConnectionAccessPanel };
-});
+const UserFormConnectionAccessPanel = importLazyComponent(() =>
+  import('./UserFormConnectionAccessPanel.js').then(m => m.UserFormConnectionAccessPanel),
+);
 
-@injectable()
+@injectable(() => [AdministrationUserFormService, ProjectInfoResource])
 export class UserFormConnectionAccessPartBootstrap extends Bootstrap {
   constructor(
     private readonly administrationUserFormService: AdministrationUserFormService,

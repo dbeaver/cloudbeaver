@@ -19,7 +19,7 @@ interface ISettings {
   active: boolean;
 }
 
-@injectable()
+@injectable(() => [UserDataService, ToolsPanelService, LogViewerSettingsService])
 export class LogViewerService {
   get settings() {
     return this.userDataService.getUserData(logViewerSettingsKey, getLogViewerDefaultSettings);

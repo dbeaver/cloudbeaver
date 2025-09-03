@@ -57,7 +57,16 @@ export interface SQLEditorAction extends SQLEditorActionContext {
   resultId: string;
 }
 
-@injectable()
+@injectable(() => [
+  NavigationTabsService,
+  NotificationService,
+  SqlEditorTabService,
+  SqlResultTabsService,
+  ConnectionInfoResource,
+  NavigationService,
+  SqlDataSourceService,
+  SqlQueryService,
+])
 export class SqlEditorNavigatorService {
   private readonly navigator: IExecutor<SQLCreateAction | SQLEditorAction>;
 

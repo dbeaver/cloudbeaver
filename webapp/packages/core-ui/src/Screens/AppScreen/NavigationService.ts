@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { Executor, type IExecutor } from '@cloudbeaver/core-executor';
 import { RouterService } from '@cloudbeaver/core-routing';
 
-@injectable()
+@injectable(() => [RouterService])
 export class NavigationService {
   readonly navigationTask: IExecutor<any>;
 

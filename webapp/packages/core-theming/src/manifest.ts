@@ -11,12 +11,4 @@ export const coreThemingManifest: PluginManifest = {
   info: {
     name: 'Core Theming',
   },
-
-  providers: [
-    () => import('./ThemeService.js').then(m => m.ThemeService),
-    () => import('./ThemeSettingsService.js').then(m => m.ThemeSettingsService),
-    () => import('./LocaleService.js').then(m => m.LocaleService),
-    () => import('./ThemeSettingsManagementService.js').then(m => m.ThemeSettingsManagementService),
-    () => import('./SystemThemeService.js').then(m => m.SystemThemeService),
-  ],
 };

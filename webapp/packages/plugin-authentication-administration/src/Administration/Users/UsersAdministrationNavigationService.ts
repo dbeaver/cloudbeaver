@@ -17,7 +17,7 @@ export enum EUsersAdministrationSub {
   Permissions = 'permissions',
 }
 
-@injectable()
+@injectable(() => [AdministrationScreenService])
 export class UsersAdministrationNavigationService {
   static ItemName = 'users';
 

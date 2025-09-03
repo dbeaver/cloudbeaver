@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,12 +9,14 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ENodeFeature, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
-import { NavNodeMetadataPanel } from './NavNodeMetadataPanel.js';
-import { NavNodeMetadataTab } from './NavNodeMetadataTab.js';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+
+const NavNodeMetadataPanel = importLazyComponent(() => import('./NavNodeMetadataPanel.js').then(m => m.NavNodeMetadataPanel));
+const NavNodeMetadataTab = importLazyComponent(() => import('./NavNodeMetadataTab.js').then(m => m.NavNodeMetadataTab));
 
 const navNodeMetadataId = 'object-viewer://metadata';
 
-@injectable()
+@injectable(() => [NavNodeViewService, NavNodeInfoResource])
 export class NavNodeMetadataViewBootstrap extends Bootstrap {
   constructor(
     private readonly navNodeViewService: NavNodeViewService,

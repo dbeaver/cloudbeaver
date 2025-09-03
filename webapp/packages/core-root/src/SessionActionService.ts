@@ -15,7 +15,7 @@ interface ISessionActionContext {
   process(): void;
 }
 
-@injectable()
+@injectable(() => [SessionResource])
 export class SessionActionService {
   private actionToProcess: ISessionAction | null;
   readonly onAction: IExecutor<ISessionAction | null>;

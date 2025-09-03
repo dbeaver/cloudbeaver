@@ -10,7 +10,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { type IProcessNotificationContainer, NotificationService } from '@cloudbeaver/core-events';
 import { type ITaskDescriptor, TaskManagerService } from '@cloudbeaver/core-task-manager';
 
-@injectable()
+@injectable(() => [TaskManagerService, NotificationService])
 export class TaskManagerPluginBootstrap extends Bootstrap {
   private notification: IProcessNotificationContainer<ProcessSnackbarProps> | null;
   constructor(

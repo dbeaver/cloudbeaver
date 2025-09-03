@@ -12,10 +12,10 @@
   },
   "references": [
     {
-      "path": "../../../common-react/@dbeaver/react-tests"
+      "path": "../../common-react/@dbeaver/react-tests"
     },
     {
-      "path": "../../../common-typescript/@dbeaver/cli"
+      "path": "../../common-typescript/@dbeaver/cli"
     },
     {
       "path": "../core-cli"

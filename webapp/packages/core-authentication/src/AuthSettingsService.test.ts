@@ -5,52 +5,43 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
-// import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
-// import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-// import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
-// import { createGQLEndpoint } from '@cloudbeaver/core-root/__custom_mocks__/createGQLEndpoint.js';
-// import '@cloudbeaver/core-root/__custom_mocks__/expectWebsocketClosedMessage.js';
-// import { mockAppInit } from '@cloudbeaver/core-root/__custom_mocks__/mockAppInit.js';
-// import { mockGraphQL } from '@cloudbeaver/core-root/__custom_mocks__/mockGraphQL.js';
-// import { mockServerConfig } from '@cloudbeaver/core-root/__custom_mocks__/resolvers/mockServerConfig.js';
-// import { coreRoutingManifest } from '@cloudbeaver/core-routing';
-// import { coreSDKManifest } from '@cloudbeaver/core-sdk';
-// import { coreSettingsManifest } from '@cloudbeaver/core-settings';
-// import { expectNoDeprecatedSettingMessage } from '@cloudbeaver/core-settings/__custom_mocks__/expectDeprecatedSettingMessage.js';
-// import { createApp } from '@cloudbeaver/tests-runner';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { createGQLEndpoint } from '@cloudbeaver/core-root/__custom_mocks__/createGQLEndpoint.js';
+import '@cloudbeaver/core-root/__custom_mocks__/expectWebsocketClosedMessage.js';
+import { mockAppInit } from '@cloudbeaver/core-root/__custom_mocks__/mockAppInit.js';
+import { mockGraphQL } from '@cloudbeaver/core-root/__custom_mocks__/mockGraphQL.js';
+import { mockServerConfig } from '@cloudbeaver/core-root/__custom_mocks__/resolvers/mockServerConfig.js';
+import { expectNoDeprecatedSettingMessage } from '@cloudbeaver/core-settings/__custom_mocks__/expectDeprecatedSettingMessage.js';
+import { resetDeprecatedSettings } from '@cloudbeaver/core-settings/createSettingsAliasResolver.test.js';
+import { createApp, initKnownConsoleMessages } from '@cloudbeaver/tests-runner';
 
-// import { mockAuthentication } from './__custom_mocks__/mockAuthentication.js';
-// import { AuthSettingsService } from './AuthSettingsService.js';
-// import { coreAuthenticationManifest } from './manifest.js';
+import { mockAuthentication } from './__custom_mocks__/mockAuthentication.js';
+import { AuthSettingsService } from './AuthSettingsService.js';
+import './module.js';
 
-// const endpoint = createGQLEndpoint();
-// const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
-// const app = createApp(
-//   coreAuthenticationManifest,
-//   coreRootManifest,
-//   coreSDKManifest,
-//   coreSettingsManifest,
-//   coreRoutingManifest,
-//   coreLocalizationManifest,
-//   coreClientActivityManifest,
-// );
+describe.skip(() => {
+  const endpoint = createGQLEndpoint();
+  const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
+  const app = createApp();
 
-// const equalConfig = {
-//   'core.authentication.disableAnonymousAccess': true,
-// };
+  const equalConfig = {
+    'core.authentication.disableAnonymousAccess': true,
+  };
 
-// test('Read settings', async () => {
-//   const settings = app.serviceProvider.getService(AuthSettingsService);
-//   const config = app.serviceProvider.getService(ServerConfigResource);
+  initKnownConsoleMessages();
+  resetDeprecatedSettings();
 
-//   server.use(endpoint.query('serverConfig', mockServerConfig(equalConfig)));
+  test('Read settings', async () => {
+    const settings = app.serviceProvider.getService(AuthSettingsService);
+    const config = app.serviceProvider.getService(ServerConfigResource);
 
-//   await config.refresh();
+    server.use(endpoint.query('serverConfig', mockServerConfig(equalConfig)));
 
-//   expect(settings.disableAnonymousAccess).toBe(true);
-//   expectNoDeprecatedSettingMessage();
-// });
+    await config.refresh();
 
-describe.skip('AuthSettingsService', () => {});
+    expect(settings.disableAnonymousAccess).toBe(true);
+    expectNoDeprecatedSettingMessage();
+  });
+});

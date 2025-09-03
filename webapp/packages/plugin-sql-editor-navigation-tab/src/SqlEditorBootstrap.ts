@@ -53,7 +53,21 @@ interface IActiveConnectionContext {
   schemaId?: string;
 }
 
-@injectable()
+@injectable(() => [
+  SqlEditorNavigatorService,
+  NavigationTabsService,
+  ViewService,
+  ActionService,
+  MenuService,
+  SessionActionService,
+  CommonDialogService,
+  SqlEditorTabService,
+  SqlDataSourceService,
+  ConnectionInfoResource,
+  SqlEditorService,
+  LocalizationService,
+  SqlEditorSettingsService,
+])
 export class SqlEditorBootstrap extends Bootstrap {
   constructor(
     private readonly sqlEditorNavigatorService: SqlEditorNavigatorService,

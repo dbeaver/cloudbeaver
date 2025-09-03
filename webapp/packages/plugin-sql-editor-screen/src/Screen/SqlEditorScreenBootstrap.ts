@@ -10,7 +10,7 @@ import { ScreenService } from '@cloudbeaver/core-routing';
 
 import { SqlEditorScreenService } from './SqlEditorScreenService.js';
 
-@injectable()
+@injectable(() => [ScreenService, SqlEditorScreenService])
 export class SqlEditorScreenBootstrap extends Bootstrap {
   constructor(
     private readonly screenService: ScreenService,

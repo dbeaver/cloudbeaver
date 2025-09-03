@@ -16,7 +16,7 @@ import { MENU_USERS_ADMINISTRATION } from '../../../Menus/MENU_USERS_ADMINISTRAT
 import { ADMINISTRATION_ITEM_USER_CREATE_PARAM } from '../ADMINISTRATION_ITEM_USER_CREATE_PARAM.js';
 import { CreateUserService } from './CreateUserService.js';
 
-@injectable()
+@injectable(() => [AuthProvidersResource, CreateUserService, MenuService, ActionService, AdministrationUsersManagementService])
 export class CreateUserBootstrap extends Bootstrap {
   constructor(
     private readonly authProvidersResource: AuthProvidersResource,

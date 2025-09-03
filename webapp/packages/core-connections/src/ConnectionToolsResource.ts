@@ -17,7 +17,7 @@ import { ConnectionInfoResource, createConnectionParam, isConnectionInfoParamEqu
 
 export type ConnectionTools = DatabaseConnectionToolsFragment;
 
-@injectable()
+@injectable(() => [GraphQLService, ConnectionInfoResource])
 export class ConnectionToolsResource extends CachedMapResource<IConnectionInfoParams, ConnectionTools> {
   constructor(
     private readonly graphQLService: GraphQLService,

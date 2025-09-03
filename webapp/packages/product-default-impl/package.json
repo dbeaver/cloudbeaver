@@ -3,6 +3,8 @@
   "type": "module",
   "sideEffects": [
     "./lib/index.js",
+    "./lib/module.js",
+    "./lib/module.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"
@@ -92,7 +94,6 @@
     "@cloudbeaver/plugin-version": "workspace:*",
     "@cloudbeaver/plugin-version-update-administration": "workspace:*",
     "react": "^19",
-    "reflect-metadata": "^0",
     "tslib": "^2"
   },
   "product": {

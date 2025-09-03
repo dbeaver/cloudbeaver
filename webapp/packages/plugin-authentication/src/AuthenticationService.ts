@@ -34,7 +34,21 @@ import { isAutoLoginSessionAction } from './isAutoLoginSessionAction.js';
 
 export type AuthEventType = 'before' | 'after';
 
-@injectable()
+@injectable(() => [
+  ScreenService,
+  AppAuthService,
+  AuthDialogService,
+  UserInfoResource,
+  NotificationService,
+  AdministrationScreenService,
+  AuthProviderService,
+  AuthProvidersResource,
+  SessionDataResource,
+  ServerConfigResource,
+  WindowsService,
+  SessionActionService,
+  NavigationService,
+])
 export class AuthenticationService extends Bootstrap {
   readonly onLogout: Executor<AuthEventType>;
   readonly onLogin: Executor<AuthEventType>;
