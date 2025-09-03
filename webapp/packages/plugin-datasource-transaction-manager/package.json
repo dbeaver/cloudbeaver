@@ -39,6 +39,7 @@
     "@cloudbeaver/plugin-data-grid": "workspace:*",
     "@cloudbeaver/plugin-datasource-context-switch": "workspace:*",
     "@cloudbeaver/plugin-sql-editor-new": "workspace:*",
+    "@cloudbeaver/plugin-tools-panel": "workspace:*",
     "@cloudbeaver/plugin-top-app-bar": "workspace:*",
     "@dbeaver/js-helpers": "workspace:^",
     "mobx": "^6",

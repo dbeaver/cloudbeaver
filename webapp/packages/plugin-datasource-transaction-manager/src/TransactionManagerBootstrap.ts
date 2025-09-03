@@ -24,9 +24,10 @@ import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeave
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
-import { ActionService, MenuCustomItem, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, MenuCustomItem, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
+import { MENU_TOOLS } from '@cloudbeaver/plugin-tools-panel';
 
 import { ACTION_DATASOURCE_TRANSACTION_COMMIT } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT.js';
 import { ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE.js';
@@ -124,6 +125,26 @@ export class TransactionManagerBootstrap extends Bootstrap {
         }
 
         return result;
+      },
+      orderItems: (context, items) => {
+        const actions = menuExtractItems(items, [
+          ACTION_DATASOURCE_TRANSACTION_COMMIT,
+          ACTION_DATASOURCE_TRANSACTION_ROLLBACK,
+          ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE,
+        ]);
+
+        const infoElementIndex = items.findIndex(item => item.id === 'transaction-info');
+
+        if (infoElementIndex !== -1) {
+          actions.push(...items.splice(infoElementIndex, 1));
+        }
+
+        if (actions.length > 0) {
+          const toolsItem = items.indexOf(MENU_TOOLS);
+          items.splice(toolsItem === -1 ? items.length : toolsItem + 1, 0, ...actions);
+        }
+
+        return items;
       },
     });
 
