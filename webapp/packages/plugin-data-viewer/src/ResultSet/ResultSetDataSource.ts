@@ -99,18 +99,7 @@ export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> exten
   }
 
   override setResults(results: IDatabaseResultSet[]): this {
-    const uniqueResultIds = new Set<string>();
-    for (const result of results) {
-      if (result.id) {
-        if (uniqueResultIds.has(result.id)) {
-          uniqueResultIds.delete(result.id);
-          continue;
-        }
-        uniqueResultIds.add(result.id);
-      }
-    }
-
-    this.closeResults(this.results.filter(result => result.id && !uniqueResultIds.has(result.id)));
+    this.closeResults(this.results.filter(result => !results.some(r => r.id === result.id)));
     return super.setResults(results);
   }
 

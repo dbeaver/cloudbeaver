@@ -52,7 +52,6 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
     if (!action) {
       runInAction(() => {
         const allDeps = getDependingDataActions(Action).slice(1); // skip source argument
-        const resultIndexMap = new Map<string, number>(this.source.results.map((r, i) => [r.uniqueResultId, i]));
 
         const depends: any[] = [];
 
@@ -69,7 +68,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
         }
 
         action = new Action(this.source, ...depends);
-        action.updateResult(result, resultIndexMap.get(result.uniqueResultId) ?? -1);
+        action.updateResult(result, this.source.results.indexOf(result));
         action.afterResultUpdate();
         this.actions.set(result.uniqueResultId, [...this.actions.get(result.uniqueResultId), action]);
       });
