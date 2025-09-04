@@ -158,7 +158,6 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
             <DataGridBase
               ref={innerGridRef}
               columns={dndHeaderContext.columns}
-              enableVirtualization
               rows={rows}
               className={className}
               headerRowHeight={getHeaderHeight?.()}
