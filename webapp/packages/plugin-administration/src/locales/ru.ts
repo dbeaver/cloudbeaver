@@ -5,6 +5,26 @@ export default [
   ['administration_configuration_wizard_configuration', 'Настройки сервера'],
   ['administration_configuration_wizard_configuration_save_error', 'Не удалось сохранить конфигурацию сервера'],
 
+  ['administration_configuration_wizard_configuration_secure_cookies', 'Принудительный HTTPS режим'],
+  [
+    'administration_configuration_wizard_configuration_secure_cookies_description',
+    'Включите принудительный HTTPS для защиты связи между сервером и клиентами. Рекомендуется для рабочих окружений. Убедитесь, что ваш HTTPS-прокси правильно настроен для корректной работы приложения',
+  ],
+  [
+    'administration_configuration_wizard_configuration_secure_cookies_warning',
+    'Данные не будут зашифрованы, если принудительный HTTPS режим выключен. Это делает их уязвимыми',
+  ],
+  ['administration_configuration_wizard_configuration_secure_cookies_docs', 'Документация по настройке сервер-прокси'],
+  ['administration_configuration_wizard_configuration_supported_hosts', 'Разрешённые URL сервера'],
+  [
+    'administration_configuration_wizard_configuration_supported_hosts_description',
+    'Вы можете указать несколько URL серверов, разделенных новой строкой. Пустое значение означает, что все URL разрешены',
+  ],
+  [
+    'administration_configuration_wizard_configuration_supported_hosts_warning',
+    'You cannot remove your current domain ({arg:host}). Open the server configuration from another allowed domain or IP-address to remove this domain.',
+  ],
+
   ['administration_configuration_wizard_configuration_server_info', 'Информация о сервере'],
   ['administration_configuration_wizard_configuration_server_name', 'Название сервера'],
   ['administration_configuration_wizard_configuration_server_url', 'URL Сервера'],

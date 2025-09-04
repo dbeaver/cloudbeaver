@@ -9,11 +9,11 @@ import { observer } from 'mobx-react-lite';
 
 import { Link, useTranslate } from '@cloudbeaver/core-blocks';
 import { clsx } from '@dbeaver/ui-kit';
-import { SettingsResolverSource, type ISettingDescription, type IEditableSettingsSource } from '@cloudbeaver/core-settings';
+import { type ISettingDescription, type IEditableSettingsSource, type ISettingsResolverSource } from '@cloudbeaver/core-settings';
 import { SettingField } from './SettingField.js';
 
 interface Props {
-  resolver: SettingsResolverSource;
+  resolver: ISettingsResolverSource;
   source: IEditableSettingsSource;
   setting: ISettingDescription;
   displayRestore?: boolean;

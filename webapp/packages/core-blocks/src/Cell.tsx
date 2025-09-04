@@ -20,14 +20,13 @@ interface Props {
   big?: boolean;
   className?: string;
   children?: React.ReactNode;
-  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-export const Cell = observer<Props>(function Cell({ before, after, description, className, ripple = true, big, children, onClick }) {
+export const Cell = observer<Props>(function Cell({ before, after, description, className, ripple = true, big, children }) {
   const styles = useS(style);
 
   return (
-    <div className={s(styles, { ripple, big }, className)} onClick={onClick}>
+    <div className={s(styles, { ripple, big }, className)}>
       <Container className={s(styles, { main: true })} gap parent center dense>
         {before && (
           <Container className={s(styles, { before: true })} keepSize>

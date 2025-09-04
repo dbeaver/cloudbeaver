@@ -21,7 +21,7 @@ interface IDevToolsSettings {
 
 const DEVTOOLS = 'devtools';
 
-@injectable()
+@injectable(() => [ServerConfigResource, StorageService])
 export class DevToolsService {
   get isEnabled(): boolean {
     return this.settings.enabled;

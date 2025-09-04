@@ -28,9 +28,7 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
   const optionsPart = getConnectionFormOptionsPart(formState);
   const driverMap = useResource(ConnectionFormBaseActions, DBDriverResource, optionsPart.state.driverId || null);
   const driver = driverMap.data;
-  const connectionInfoResource = useResource(ConnectionFormBaseActions, ConnectionInfoAuthPropertiesResource, optionsPart.connectionKey, {
-    active: !!optionsPart.connectionKey,
-  });
+  const connectionInfoResource = useResource(ConnectionFormBaseActions, ConnectionInfoAuthPropertiesResource, optionsPart.connectionKey);
 
   const serverConfigResource = useResource(ConnectionFormBaseActions, ServerConfigResource, undefined);
   const { data: authModel } = useResource(

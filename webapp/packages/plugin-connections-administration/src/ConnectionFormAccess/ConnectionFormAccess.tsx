@@ -75,22 +75,14 @@ export const ConnectionFormAccess: TabContainerPanelComponent<IConnectionFormPro
   );
 
   const optionsPart = getConnectionFormOptionsPart(formState);
-  const connectionInfoResource = useResource(
-    ConnectionFormAccess,
-    ConnectionInfoResource,
-    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
-    {
-      active: selected && !!formState.state.projectId && !!optionsPart.state.connectionId,
-    },
-  );
-  const originInfoResource = useResource(
-    ConnectionFormAccess,
-    ConnectionInfoOriginResource,
-    createConnectionParam(formState.state.projectId, optionsPart.state.connectionId!),
-    {
-      active: selected && !!formState.state.projectId && !!optionsPart.state.connectionId,
-    },
-  );
+  const connectionParam =
+    optionsPart.state.connectionId !== undefined ? createConnectionParam(formState.state.projectId, optionsPart.state.connectionId) : null;
+  const connectionInfoResource = useResource(ConnectionFormAccess, ConnectionInfoResource, connectionParam, {
+    active: selected,
+  });
+  const originInfoResource = useResource(ConnectionFormAccess, ConnectionInfoOriginResource, connectionParam, {
+    active: selected,
+  });
   const connectionInfo = connectionInfoResource.data;
   const originInfo = originInfoResource.data;
   const loading = users.isLoading() || teams.isLoading() || accessPart.isLoading();

@@ -25,7 +25,7 @@ export type IThemeSettingsSchema = typeof settingsSchema;
 export type IThemeSettings = schema.infer<IThemeSettingsSchema>;
 export type IThemeSettingsKey = keyof IThemeSettings;
 
-@injectable()
+@injectable(() => [SettingsProviderService, SettingsResolverService])
 export class ThemeSettingsService {
   get theme(): string {
     return this.settings.getValue('core.theming.theme');
@@ -41,11 +41,13 @@ export class ThemeSettingsService {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver<IThemeSettingsSchema>(this.settingsResolverService, { 'core.theming.theme': 'core.user.defaultTheme' }),
-      createSettingsAliasResolver<IThemeSettingsSchema>(this.settingsResolverService, {
+      createSettingsAliasResolver<IThemeSettingsSchema>(this.settingsProviderService.settingsResolver, {
+        'core.theming.theme': 'core.user.defaultTheme',
+      }),
+      createSettingsAliasResolver<IThemeSettingsSchema>(this.settingsProviderService.settingsResolver, {
         'core.theming.theme': 'core.localization.defaultTheme',
       }),
-      createSettingsAliasResolver<IThemeSettingsSchema>(this.settingsResolverService, { 'core.theming.theme': 'app.defaultTheme' }),
+      createSettingsAliasResolver<IThemeSettingsSchema>(this.settingsProviderService.settingsResolver, { 'core.theming.theme': 'app.defaultTheme' }),
     );
   }
 }

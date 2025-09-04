@@ -21,7 +21,15 @@ import { ACTION_APP_HELP } from './actions/ACTION_APP_HELP.js';
 const ShortcutsDialog = importLazyComponent(() => import('./Shortcuts/ShortcutsDialog.js').then(m => m.ShortcutsDialog));
 const WelcomeDocs = importLazyComponent(() => import('./WelcomeDocs.js').then(m => m.WelcomeDocs));
 
-@injectable()
+@injectable(() => [
+  MenuService,
+  ScreenService,
+  ActionService,
+  CommonDialogService,
+  NotificationService,
+  LocalStorageSaveService,
+  NavigationTabsService,
+])
 export class PluginBootstrap extends Bootstrap {
   private errorNotification: INotification<any> | null;
   constructor(

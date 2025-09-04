@@ -5,7 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import 'reflect-metadata';
+
+import './module.js';
 
 import { bootstrap } from '@cloudbeaver/core-bootstrap';
 import type { PluginManifest } from '@cloudbeaver/core-di';
@@ -76,6 +77,7 @@ import { pluginSettingsDefaultAdministrationManifest } from '@cloudbeaver/plugin
 import { codemirror6Manifest } from '@cloudbeaver/plugin-codemirror6';
 
 import { defaultProductManifest } from './manifest.js';
+import pluginDataEditorPublicSettingsManifest from '@cloudbeaver/plugin-data-editor-public-settings';
 
 const PLUGINS: PluginManifest[] = [
   ssoPlugin,
@@ -92,6 +94,7 @@ const PLUGINS: PluginManifest[] = [
   connectionSearch,
   dataExportManifest,
   dataImportPluginManifest,
+  pluginDataEditorPublicSettingsManifest,
   dataViewerManifest,
   dataViewerResultTraceDetailsPlugin,
   dvResultSetGroupingPlugin,

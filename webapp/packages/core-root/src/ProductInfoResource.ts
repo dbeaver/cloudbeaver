@@ -13,7 +13,7 @@ import { SessionDataResource } from './SessionDataResource.js';
 
 export type ProductInfo = ProductInfoFragment['productInfo'];
 
-@injectable()
+@injectable(() => [GraphQLService, SessionDataResource])
 export class ProductInfoResource extends CachedDataResource<ProductInfo | null> {
   constructor(
     private readonly graphQLService: GraphQLService,

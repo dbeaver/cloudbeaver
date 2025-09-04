@@ -34,7 +34,7 @@ export interface ITableHeaderPlaceholderProps {
   simple: boolean;
 }
 
-@injectable()
+@injectable(() => [MenuService, ActionService])
 export class TableHeaderService extends Bootstrap {
   readonly tableHeaderPlaceholder = new PlaceholderContainer<ITableHeaderPlaceholderProps>();
 

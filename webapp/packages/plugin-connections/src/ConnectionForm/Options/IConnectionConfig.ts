@@ -9,14 +9,14 @@ import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 import { schema } from '@cloudbeaver/core-utils';
 import { CONNECTION_NETWORK_HANDLER_SCHEMA } from './IConnectionNetworkHanler.js';
 
-export const CONNECTION_PROPERTIES_SCHEMA = schema.record(schema.any());
+export const CONNECTION_PROPERTIES_SCHEMA = schema.record(schema.string(), schema.any());
 
 export const CONNECTION_CONFIG_SCHEMA = schema.object({
   authModelId: schema.string().optional(),
   autocommit: schema.boolean().optional(),
   configurationType: schema.enum([DriverConfigurationType.Manual, DriverConfigurationType.Url]).optional(),
   connectionId: schema.string().optional(),
-  credentials: schema.record(schema.any()).optional(),
+  credentials: schema.record(schema.string(), schema.any()).optional(),
   dataSourceId: schema.string().optional(),
   databaseName: schema.string().optional(),
   description: schema.string().optional(),
@@ -26,12 +26,12 @@ export const CONNECTION_CONFIG_SCHEMA = schema.object({
   keepAliveInterval: schema.number().optional(),
   defaultCatalogName: schema.string().optional(),
   defaultSchemaName: schema.string().optional(),
-  mainPropertyValues: schema.record(schema.any()).optional(),
+  mainPropertyValues: schema.record(schema.string(), schema.any()).optional(),
   name: schema.string().optional(),
   networkHandlersConfig: schema.array(CONNECTION_NETWORK_HANDLER_SCHEMA).optional(),
   port: schema.string().optional(),
   properties: CONNECTION_PROPERTIES_SCHEMA.optional(),
-  providerProperties: schema.record(schema.any()).optional(),
+  providerProperties: schema.record(schema.string(), schema.any()).optional(),
   readOnly: schema.boolean().optional(),
   saveCredentials: schema.boolean().optional(),
   selectedSecretId: schema.string().optional(),

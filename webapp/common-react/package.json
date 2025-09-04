@@ -1,0 +1,24 @@
+{
+  "name": "common-react",
+  "type": "module",
+  "packageManager": "yarn@4.9.2",
+  "private": true,
+  "workspaces": [
+    "@dbeaver/*",
+    "../common-typescript"
+  ],
+  "scripts": {
+    "clear": "rimraf -g '@dbeaver/*/{dist,lib}'",
+    "test": "dbeaver-test"
+  },
+  "devDependencies": {
+    "@dbeaver/cli": "workspace:^",
+    "@dbeaver/prettier-config": "workspace:^",
+    "@dbeaver/react-tests": "workspace:^",
+    "@wroud/ts-template": "^0",
+    "happy-dom": "^18",
+    "prettier": "^3.6.2",
+    "rimraf": "^6",
+    "vitest": "^3"
+  }
+}

@@ -38,7 +38,7 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
           <Group box gap dense overflow>
             <GroupTitle header>
               <Link href={WEBSITE_LINKS.DATA_EDITOR_DOCUMENTATION_PAGE} target="_blank" wrapper indicator>
-                Data Viewer
+                Data Editor
               </Link>
             </GroupTitle>
             {DATA_VIEWER_SHORTCUTS.map(shortcut => (

@@ -35,6 +35,7 @@ import {
   useTranslate,
   useAuthenticationAction,
   useAutoLoad,
+  Text,
 } from '@cloudbeaver/core-blocks';
 import {
   ConnectionInfoAuthPropertiesResource,
@@ -177,10 +178,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
         <Container medium gap>
           <Group gap>
             {isAdmin && !driver?.driverInstalled && (
-              <Alert
-                title={translate('core_connections_connection_driver_not_installed')}
-                message={translate('plugin_connections_connection_driver_not_installed_message')}
-              />
+              <Alert title={translate('core_connections_connection_driver_not_installed')}>
+                <Text>{translate('plugin_connections_connection_driver_not_installed_message')}</Text>
+              </Alert>
             )}
             <Group form box gap>
               <Container wrap gap>
@@ -192,7 +192,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   valueSelector={driver => driver.name ?? ''}
                   titleSelector={driver => driver.description}
                   iconSelector={driver => driver.icon}
-                  searchable={drivers.length > 10}
                   readOnly={readonly || edit || drivers.length < 2}
                   disabled={formState.isDisabled}
                   loading={driverMap.isLoading()}
@@ -207,15 +206,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                     <Container gap>
                       <RadioGroup aria-label={configurationTypeLabel} name="configurationType" state={optionsPart.state}>
                         {configurationTypes.map(conf => (
-                          <Radio
-                            key={conf.value}
-                            id={conf.value}
-                            value={conf.value}
-                            readOnly={readonly || configurationTypes.length < 2}
-                            disabled={readonly}
-                            small
-                            keepSize
-                          >
+                          <Radio key={conf.value} id={conf.value} value={conf.value} disabled={readonly} small keepSize>
                             {conf.name}
                           </Radio>
                         ))}

@@ -16,7 +16,7 @@ import type { IAdministrationItem } from '../../AdministrationItem/IAdministrati
 import { orderAdministrationItems } from '../../AdministrationItem/orderAdministrationItems.js';
 import { AdministrationScreenService } from '../AdministrationScreenService.js';
 
-@injectable()
+@injectable(() => [AdministrationItemService, AdministrationScreenService, NotificationService])
 export class ConfigurationWizardService {
   get steps(): IAdministrationItem[] {
     return this.administrationItemService

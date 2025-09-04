@@ -13,6 +13,7 @@ export default [
   ['sql_editor_restore', '恢复'],
   ['sql_editor_placeholder', '使用Ctrl + Enter执行查询以查看结果'],
   ['sql_editor_hint_empty', '无提示信息...'],
+  ['sql_editor_tools_more_menu_tooltip', '更多工具'],
   ['sql_editor_execution_plan_button_tooltip', '解释执行计划（Shift + Ctrl + E）'],
   ['sql_editor_output_logs_button_tooltip', '显示服务端输出 (Shift + Ctrl + O)'],
   ['sql_editor_output_logs_tab_title', '输出'],

@@ -1,5 +1,5 @@
 export default [
-  ['plugin_data_viewer_data_viewer_settings_group', 'Affichage des données'],
+  ['plugin_data_viewer_data_viewer_settings_group', 'Editeur de données'],
   ['table_header_sql_expression', 'Entrez une expression SQL pour filtrer les résultats, par exemple column_name=10'],
   ['table_header_sql_expression_not_supported', "Le filtrage des données n'est pas supporté"],
   ['data_viewer_tab_title', 'Données'],
@@ -56,15 +56,6 @@ export default [
   ['data_viewer_copy_not_allowed', 'An ability to copy data is disabled'],
   ['data_viewer_copy_not_allowed_message', 'If this was unexpected, contact the administrator'],
   ['settings_data_editor', 'Éditeur de données'],
-  ['settings_data_editor_disable_edit_name', "Désactiver l'édition"],
-  ['settings_data_editor_disable_edit_description', "Désactiver l'édition des données dans le Data Viewer pour les utilisateurs non administrateurs"],
-  ['settings_data_editor_disable_data_copy_name', 'Désactiver la copie'],
-  ['settings_data_editor_disable_data_export_name', 'Disable Export'],
-  ['settings_data_editor_disable_data_export_description', 'Disable exporting of data in Data Viewer for non-admin users'],
-  [
-    'settings_data_editor_disable_data_copy_description',
-    'Désactiver la copie des données dans le Data Viewer pour les utilisateurs non administrateurs',
-  ],
   ['settings_data_editor_fetch_max_name', 'Taille de récupération maximale'],
   ['settings_data_editor_fetch_max_description', 'Nombre maximal de lignes à récupérer'],
   ['settings_data_editor_fetch_default_name', 'Taille de récupération par défaut'],

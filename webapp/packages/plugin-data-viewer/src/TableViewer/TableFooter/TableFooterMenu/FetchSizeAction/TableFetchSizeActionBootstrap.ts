@@ -15,7 +15,7 @@ import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from '../DATA_VIEWER_DATA_MODEL_A
 
 const FetchSizeAction = importLazyComponent(() => import('./FetchSizeAction.js').then(module => module.FetchSizeAction));
 
-@injectable()
+@injectable(() => [MenuService])
 export class TableFetchSizeActionBootstrap extends Bootstrap {
   constructor(private readonly menuService: MenuService) {
     super();

@@ -21,7 +21,7 @@ import { SqlDataSourceHistory } from './SqlDataSourceHistory/SqlDataSourceHistor
 const SOURCE_HISTORY = 'history';
 
 @staticImplements<ISqlDataSourceKey>()
-export abstract class BaseSqlDataSource implements ISqlDataSource {
+export abstract class BaseSqlDataSource<TDataSource extends QueryDataSource = QueryDataSource> implements ISqlDataSource<TDataSource> {
   static key = 'base';
 
   abstract get name(): string | null;
@@ -30,9 +30,9 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   abstract get script(): string;
   abstract get baseScript(): string;
 
-  abstract get baseExecutionContext(): IConnectionExecutionContextInfo | undefined;
   abstract get executionContext(): IConnectionExecutionContextInfo | undefined;
-  databaseModels: IDatabaseDataModel<QueryDataSource>[];
+  abstract get baseExecutionContext(): IConnectionExecutionContextInfo | undefined;
+  databaseModels: IDatabaseDataModel<TDataSource>[];
   incomingScript: string | undefined;
   incomingExecutionContext: IConnectionExecutionContextInfo | undefined | null;
   exception?: Error | Error[] | null | undefined;
@@ -77,7 +77,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   readonly history: ISqlDataSourceHistory;
   readonly onUpdate: ISyncExecutor;
   readonly onSetScript: ISyncExecutor<ISetScriptData>;
-  readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<QueryDataSource>[]>;
+  readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<TDataSource>[]>;
 
   protected get features(): ESqlDataSourceFeatures[] {
     return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable];
@@ -161,13 +161,9 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
   setIncomingScript(script: string): void {
     if (script !== this.baseScript) {
-      if (this.script === this.baseScript) {
-        this.setBaseScript(script);
-        this.setScript(script);
-      } else {
-        this.incomingScript = script;
-      }
+      this.incomingScript = script;
     } else {
+      this.setBaseScript(script);
       this.incomingScript = undefined;
     }
   }

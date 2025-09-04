@@ -6,11 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useMemo, useState } from 'react';
+import { useCallback, useContext, useState } from 'react';
 
 import { FormContext } from './FormContext.js';
 import { RadioGroup as UiKitRadioGroup } from '@dbeaver/ui-kit';
-import { type IRadioGroupContext, RadioGroupContext } from './RadioGroupContext.js';
 
 type BaseProps = React.PropsWithChildren<React.ComponentProps<typeof UiKitRadioGroup>> & {
   name: string;
@@ -48,7 +47,11 @@ export const RadioGroup: RadioGroupType = observer(function RadioGroup({
   const [selfValue, setValue] = useState<string | number>();
 
   const handleChange = useCallback(
-    (value: string | number) => {
+    (value: string | number | null) => {
+      if (value === null) {
+        return;
+      }
+
       if (state) {
         state[name] = value;
       } else {
@@ -68,20 +71,9 @@ export const RadioGroup: RadioGroupType = observer(function RadioGroup({
 
   const value = state ? state[name] : (controlledValue ?? selfValue);
 
-  const context: IRadioGroupContext = useMemo(
-    () => ({
-      name,
-      value,
-      onChange: handleChange,
-    }),
-    [value, handleChange],
-  );
-
   return (
-    <RadioGroupContext.Provider value={context}>
-      <UiKitRadioGroup {...rest}>
-        {children}
-      </UiKitRadioGroup>
-    </RadioGroupContext.Provider>
+    <UiKitRadioGroup value={value} setValue={handleChange} {...rest}>
+      {children}
+    </UiKitRadioGroup>
   );
 });

@@ -153,12 +153,13 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
         .dataFetcher("listAuthProviderConfigurationParameters",
             env -> getService(env).listAuthProviderConfigurationParameters(getWebSession(env), env.getArgument("providerId")))
         .dataFetcher("listAuthProviderConfigurations",
-            env -> getService(env).listAuthProviderConfigurations(GraphQLEndpoint.getServletRequest(env),
+            env -> getService(env).listAuthProviderConfigurations(
+                GraphQLEndpoint.getServletRequestOrThrow(env),
                 getWebSession(env), env.getArgument("providerId"))
         )
         .dataFetcher("saveAuthProviderConfiguration",
             env -> getService(env).saveAuthProviderConfiguration(
-                GraphQLEndpoint.getServletRequest(env),
+                GraphQLEndpoint.getServletRequestOrThrow(env),
                 getWebSession(env),
                 env.getArgument("providerId"),
                 env.getArgument("id"),

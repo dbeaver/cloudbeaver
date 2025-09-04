@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,26 @@ import { KEY_BINDING_SQL_EDITOR_SAVE_AS_SCRIPT } from './KEY_BINDING_SQL_EDITOR_
 import { ResourceSqlDataSource } from './ResourceSqlDataSource.js';
 import { SqlEditorTabResourceService } from './SqlEditorTabResourceService.js';
 
-@injectable()
+@injectable(() => [
+  NavNodeManagerService,
+  NavNodeInfoResource,
+  NavigationTabsService,
+  NotificationService,
+  SqlEditorNavigatorService,
+  ResourceManagerService,
+  ProjectsService,
+  ProjectInfoResource,
+  SqlEditorTabResourceService,
+  CommonDialogService,
+  ActionService,
+  MenuService,
+  SqlDataSourceService,
+  SqlEditorSettingsService,
+  ResourceManagerResource,
+  ResourceManagerScriptsService,
+  KeyBindingService,
+  SqlEditorView,
+])
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,
@@ -113,7 +132,7 @@ export class PluginBootstrap extends Bootstrap {
 
         return this.resourceManagerService.enabled && !!dataSource?.hasFeature(ESqlDataSourceFeatures.script);
       },
-      getItems: (context, items) => [...items, ACTION_SAVE_AS_SCRIPT],
+      getItems: (context, items) => [ACTION_SAVE_AS_SCRIPT, ...items],
     });
 
     this.keyBindingService.addKeyBindingHandler({

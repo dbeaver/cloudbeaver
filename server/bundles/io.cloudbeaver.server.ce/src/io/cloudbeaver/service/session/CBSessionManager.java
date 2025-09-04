@@ -22,6 +22,7 @@ import io.cloudbeaver.model.session.*;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.WebAppSessionManager;
 import io.cloudbeaver.server.events.WSWebUtils;
 import io.cloudbeaver.service.DBWSessionHandler;
@@ -34,7 +35,9 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
+import org.jkiss.dbeaver.model.websocket.event.WSAbstractEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSUserDisabledEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSessionStateEvent;
 import org.jkiss.utils.CommonUtils;
 
@@ -156,8 +159,15 @@ public class CBSessionManager implements WebAppSessionManager {
             }
         }
 
+        validateSessionIp(request, webSession);
+
+        return webSession;
+    }
+
+    private void validateSessionIp(@NotNull HttpServletRequest request, WebSession webSession) {
+        boolean bindingEnabled = isSessionBindingEnabled(request);
         String currentRemote = request.getRemoteAddr();
-        if (application.getServerConfiguration().isBindSessionToIp()
+        if (bindingEnabled
             && (CommonUtils.isEmpty(currentRemote) || !currentRemote.equals(webSession.getLastRemoteAddr()))
         ) {
             var error = new DBWebException(
@@ -169,8 +179,11 @@ public class CBSessionManager implements WebAppSessionManager {
             webSession.addSessionError(error);
             closeSession(webSession.getSessionId());
         }
+    }
 
-        return webSession;
+    protected boolean isSessionBindingEnabled(@NotNull HttpServletRequest request) {
+        String bindingState = application.getServerConfiguration().getBindSessionToIp();
+        return CBConstants.BIND_SESSION_ENABLE.equalsIgnoreCase(bindingState) || Boolean.parseBoolean(bindingState);
     }
 
     @NotNull
@@ -391,14 +404,14 @@ public class CBSessionManager implements WebAppSessionManager {
         }
     }
 
-    public void closeUserSession(@NotNull WSUserDeletedEvent userDeletedEvent) {
+    public void closeUserSession(@NotNull WSAbstractEvent event) {
         synchronized (sessionMap) {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
                 if (CommonUtils.equalObjects(session.getUserContext().getUserId(),
-                    userDeletedEvent.getDeletedUserId())) {
+                    event.getUserId())) {
                     if (session instanceof WebHeadlessSession headlessSession) {
-                        headlessSession.addSessionEvent(userDeletedEvent);
+                        headlessSession.addSessionEvent(event);
                     }
                     iterator.remove();
                     session.close();

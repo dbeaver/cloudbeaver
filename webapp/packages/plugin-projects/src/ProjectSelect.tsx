@@ -1,10 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { Combobox, useResource, useTranslate } from '@cloudbeaver/core-blocks';
@@ -41,13 +42,14 @@ export const ProjectSelect = observer(function ProjectSelect({
 
   const possibleOptions = projects.filter(filter).map(project => project.id);
 
-  const projectsLoader = useResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey, {
-    onData: () => {
-      if ((!value && possibleOptions.length > 0) || (value && !possibleOptions.includes(value))) {
-        onChange(possibleOptions[0]!);
-      }
-    },
-  });
+  const projectsLoader = useResource(ProjectSelect, ProjectInfoResource, CachedMapAllKey);
+  const shouldResetProject = (!value && possibleOptions.length > 0) || (value && !possibleOptions.includes(value));
+
+  useEffect(() => {
+    if (shouldResetProject) {
+      onChange(possibleOptions[0]!);
+    }
+  }, [shouldResetProject]);
 
   function handleProjectSelect(projectId: string) {
     if (possibleOptions.includes(projectId)) {
@@ -71,7 +73,6 @@ export const ProjectSelect = observer(function ProjectSelect({
       titleSelector={project => project.description}
       isDisabled={project => !filter(project)}
       readOnly={readOnly || possibleOptions.length <= 1}
-      searchable={projects.length > 10}
       disabled={disabled}
       loading={projectsLoader.isLoading()}
       inline={inline}

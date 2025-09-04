@@ -12,7 +12,7 @@ import { ProductInfoService } from '@cloudbeaver/plugin-product-information-admi
 
 const SystemInformation = importLazyComponent(() => import('./SystemInformation.js').then(m => m.SystemInformation));
 
-@injectable()
+@injectable(() => [ProductInfoService])
 export class SystemInformationBootstrap extends Bootstrap {
   constructor(private readonly productInfoService: ProductInfoService) {
     super();

@@ -9,7 +9,7 @@ import { AdministrationScreenService, type IAdministrationItemRoute } from '@clo
 import { injectable } from '@cloudbeaver/core-di';
 import { type IActiveView, View } from '@cloudbeaver/core-view';
 
-@injectable()
+@injectable(() => [AdministrationScreenService])
 export class AdministrationViewService extends View<IAdministrationItemRoute | null> {
   constructor(private readonly administrationScreenService: AdministrationScreenService) {
     super();

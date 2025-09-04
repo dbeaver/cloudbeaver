@@ -32,12 +32,12 @@ import { ACTION_DATA_GRID_EDITING_REVERT_SELECTED_ROW } from '../Actions/Editing
 import { ACTION_DATA_GRID_EDITING_SET_TO_NULL } from '../Actions/Editing/ACTION_DATA_GRID_EDITING_SET_TO_NULL.js';
 import { MENU_DATA_GRID_EDITING } from './MENU_DATA_GRID_EDITING.js';
 
-@injectable()
+@injectable(() => [ActionService, MenuService])
 export class DataGridContextMenuCellEditingService {
   constructor(
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-  ) {}
+  ) { }
 
   register(): void {
     this.menuService.addCreator({

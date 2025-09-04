@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "workspaces": [
-    "../common-react",
+    "./common-react",
     "packages/*"
   ],
   "resolutions": {
@@ -13,8 +13,7 @@
     "react": "^19",
     "react-dom": "^19",
     "mobx": "^6",
-    "mobx-react-lite": "^4",
-    "stylus": "0.0.1-security"
+    "mobx-react-lite": "^4"
   },
   "scripts": {
     "test": "dbeaver-test",
@@ -23,7 +22,8 @@
     "validate-dependencies": "core-cli-validate-dependencies './packages/*/'",
     "add-plugin": "core-cli-add-plugin",
     "check-license": "core-cli-check-license",
-    "version:set": "yarn workspaces foreach -Ap --include '@cloudbeaver/product-*' run version:set"
+    "version:set": "yarn workspaces foreach -Ap --include '@cloudbeaver/product-*' run version:set",
+    "sync-pre-commit-hooks": "yarn dlx --quiet lefthook install"
   },
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
@@ -31,6 +31,7 @@
     "@cloudbeaver/tests-runner": "workspace:*",
     "@dbeaver/cli": "workspace:^",
     "@dbeaver/prettier-config": "workspace:*",
+    "@dbeaver/react-tests": "workspace:^",
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
@@ -40,7 +41,6 @@
     "concurrently": "^9",
     "eslint": "^9.30.1",
     "happy-dom": "^18",
-    "lefthook": "^1",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "msw": "^2",
@@ -49,7 +49,6 @@
     "react": "^19",
     "react-dom": "^19",
     "reakit": "^1",
-    "reflect-metadata": "^0",
     "rimraf": "^6",
     "typescript": "^5.8.3",
     "typescript-plugin-css-modules": "^5",

@@ -23,7 +23,7 @@ import type { IMenuItem } from './MenuItem/IMenuItem.js';
 import { MenuActionItem } from './MenuItem/MenuActionItem.js';
 import { MenuSubMenuItem } from './MenuItem/MenuSubMenuItem.js';
 
-@injectable()
+@injectable(() => [ActionService])
 export class MenuService {
   private readonly handlers: Map<string, IMenuHandler<any>>;
   private readonly creators: IMenuItemsCreator[];

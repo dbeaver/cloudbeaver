@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.config;
 
+import com.google.common.net.InetAddresses;
 import com.google.gson.annotations.SerializedName;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.model.app.WebServerConfiguration;
@@ -23,15 +24,17 @@ import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URI;
+import java.util.*;
 
 public class CBServerConfig implements WebServerConfiguration {
 
     private static final Log log = Log.getLog(CBServerConfig.class);
 
     protected String serverURL;
-    protected boolean secureCookies;
+    @NotNull
+    protected List<String> supportedHosts = new ArrayList<>();
+    protected boolean forceHttps;
     protected int serverPort = CBConstants.DEFAULT_SERVER_PORT;
     private String serverHost = null;
     private String serverName = null;
@@ -52,7 +55,8 @@ public class CBServerConfig implements WebServerConfiguration {
     @SerializedName("database")
     private WebDatabaseConfig databaseConfiguration = new WebDatabaseConfig();
     private String staticContent = "";
-    private boolean bindSessionToIp = true;
+    @NotNull
+    private String bindSessionToIp = CBConstants.BIND_SESSION_DISABLE;
 
     public CBServerConfig() {
         this.securityManagerConfiguration = createSecurityManagerConfiguration();
@@ -184,11 +188,54 @@ public class CBServerConfig implements WebServerConfiguration {
         return new SMControllerConfiguration();
     }
 
-    public boolean isSecureCookies() {
-        return secureCookies;
+    public boolean isForceHttps() {
+        return forceHttps;
     }
 
-    public boolean isBindSessionToIp() {
+    public void setForceHttps(boolean forceHttps) {
+        this.forceHttps = forceHttps;
+    }
+
+    @NotNull
+    public List<String> getSupportedHosts() {
+        return new ArrayList<>(supportedHosts);
+    }
+
+    public void setSupportedHosts(@NotNull Collection<String> availableHosts) {
+        LinkedHashSet<String> uniqueHosts = new LinkedHashSet<>();
+        for (String host : availableHosts) {
+            try {
+                if (!host.startsWith("http://") && !host.startsWith("https://")) {
+                    host = "http://" + host; // Default to HTTP if no scheme is provided to avoid uri parse exception
+                }
+                URI uri = URI.create(host);
+                String hostName = uri.getHost() != null ? uri.getHost() : host;
+                if (InetAddresses.isInetAddress(hostName)) {
+                    log.warn("Host URI contains an IP address: " + hostName + ", skipped.");
+                    continue;
+                }
+                StringBuilder hostNameBuilder = new StringBuilder(hostName);
+
+                if (uri.getPort() > 0) {
+                    hostNameBuilder.append(':')
+                        .append(uri.getPort());
+                }
+
+                uniqueHosts.add(hostNameBuilder.toString());
+            } catch (Exception e) {
+                log.error("Invalid host URI: " + host, e);
+            }
+        }
+        this.supportedHosts.clear();
+        this.supportedHosts.addAll(uniqueHosts);
+    }
+
+    @NotNull
+    public String getBindSessionToIp() {
         return bindSessionToIp;
+    }
+
+    public void setBindSessionToIp(@NotNull String bindSessionToIp) {
+        this.bindSessionToIp = bindSessionToIp;
     }
 }

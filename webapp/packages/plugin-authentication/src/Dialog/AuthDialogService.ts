@@ -11,7 +11,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import type { IAuthOptions } from '../IAuthOptions.js';
 import { AuthDialog } from './AuthDialog.js';
 
-@injectable()
+@injectable(() => [CommonDialogService])
 export class AuthDialogService {
   get isPersistent(): boolean {
     return this.persistent;

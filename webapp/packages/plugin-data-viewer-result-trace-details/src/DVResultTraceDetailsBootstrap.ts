@@ -14,7 +14,7 @@ const DVResultTraceDetailsPresentation = importLazyComponent(() =>
   import('./DVResultTraceDetailsPresentation.js').then(module => module.DVResultTraceDetailsPresentation),
 );
 
-@injectable()
+@injectable(() => [DataPresentationService])
 export class DVResultTraceDetailsBootstrap extends Bootstrap {
   constructor(private readonly dataPresentationService: DataPresentationService) {
     super();

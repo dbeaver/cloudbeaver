@@ -1,0 +1,18 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2025 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+import { ModuleRegistry, Bootstrap } from '@cloudbeaver/core-di';
+import { HolidayAdministrationBootstrap } from './PluginBootstrap.js';
+
+ModuleRegistry.add({
+  name: '@cloudbeaver/plugin-holidays-administration',
+
+  configure: serviceCollection => {
+    serviceCollection.addSingleton(Bootstrap, HolidayAdministrationBootstrap);
+  },
+});

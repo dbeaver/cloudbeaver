@@ -13,6 +13,7 @@ export default [
   ['sql_editor_restore', 'Restore'],
   ['sql_editor_placeholder', 'Execute query with Ctrl+Enter to see results'],
   ['sql_editor_hint_empty', 'There is no proposals...'],
+  ['sql_editor_tools_more_menu_tooltip', 'More tools'],
   ['sql_editor_execution_plan_button_tooltip', 'Explain execution plan (Shift + Ctrl + E)'],
   ['sql_editor_output_logs_button_tooltip', 'Show server output (Shift + Ctrl + O)'],
   ['sql_editor_output_logs_tab_title', 'Output'],

@@ -35,7 +35,7 @@ interface IProjectConfig {
   description?: string;
 }
 
-@injectable()
+@injectable(() => [GraphQLService, ProjectInfoResource, SessionPermissionsResource])
 export class SharedProjectsResource extends CachedMapResource<string, SharedProject> {
   constructor(
     private readonly graphQLService: GraphQLService,

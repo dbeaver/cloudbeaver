@@ -12,7 +12,7 @@ import { GraphQLService } from '@cloudbeaver/core-sdk';
 import type { UserMetaParameter } from './UserMetaParametersResource.js';
 import { UsersResource } from './UsersResource.js';
 
-@injectable()
+@injectable(() => [GraphQLService, UsersResource])
 export class UsersMetaParametersResource extends CachedMapResource<string, UserMetaParameter> {
   constructor(
     private readonly graphQLService: GraphQLService,

@@ -5,6 +5,8 @@ to: <%= name %>/package.json
   "name": "@cloudbeaver/<%= name %>",
   "type": "module",
   "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"
@@ -23,13 +25,15 @@ to: <%= name %>/package.json
     "validate-dependencies": "core-cli-validate-dependencies"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "^0"
+    "@cloudbeaver/core-di": "workspace:*"
   },
   "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/core-cli": "workspace:*",
+    "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
     "rimraf": "^6",
-    "@cloudbeaver/core-cli": "^0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "tslib": "^2"
   }
 }

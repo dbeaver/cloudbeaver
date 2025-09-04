@@ -31,7 +31,9 @@ import io.cloudbeaver.service.security.bruteforce.BruteForceUtils;
 import io.cloudbeaver.service.security.bruteforce.UserLoginRecord;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
+import io.cloudbeaver.service.security.internal.CBAuthSubjectRepo;
 import io.cloudbeaver.service.security.internal.SMTokenInfo;
+import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -54,8 +56,8 @@ import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSUserDisabledEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
-import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSAuthEvent;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -102,7 +104,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         this.smConfig = smConfig;
     }
 
-    private boolean isSubjectExists(String subjectId) throws DBCException {
+    protected boolean isSubjectExists(String subjectId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 "SELECT 1 FROM {table_prefix}CB_AUTH_SUBJECT WHERE SUBJECT_ID=?")
@@ -411,7 +413,14 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
         @NotNull Connection dbCon,
         @NotNull String userId,
         @NotNull String[] teamIds
-    ) throws SQLException {
+    ) throws SQLException, DBCException {
+        String defaultTeam = getDefaultUserTeam();
+        if (ArrayUtils.contains(teamIds, defaultTeam)) {
+            throw new SMException("Cannot delete default user team: " + defaultTeam);
+        }
+        if (ArrayUtils.isEmpty(teamIds)) {
+            return;
+        }
         String deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? " +
                 "AND TEAM_ID IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
 
@@ -818,6 +827,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             JDBCUtils.setStringOrNull(dbStat, 4, enabled ? null : disableReason);
             dbStat.setString(5, userId);
             dbStat.executeUpdate();
+        }
+        if (!enabled) {
+            var event = new WSUserDisabledEvent(userId);
+            application.getEventController().addEvent(event);
         }
         log.info(String.format("User updated: [userId=%s, isActive=%s, reason=%s]", userId, enabled, disableReason));
     }
@@ -3008,13 +3021,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
             log.error("Subject type is not found for subject '" + subjectId + "'");
             return;
         }
-        var event = WSSubjectPermissionEvent.update(
-            getSmSessionId(),
-            getUserId(),
-            subjectType,
-            subjectId
-        );
-        application.getEventController().addEvent(event);
+        WebEventUtils.addSubjectPermissionsUpdateEvent(subjectId, subjectType, getSmSessionId(), getUserId());
     }
 
     private void addObjectPermissionsUpdateEvent(@NotNull Set<String> objectIds, @NotNull SMObjectType objectType) {
@@ -3416,16 +3423,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
 
     protected SMSubjectType getSubjectType(@NotNull String subjectId) {
         try (Connection dbCon = database.openConnection()) {
-            String sqlBuilder = "SELECT SUBJECT_TYPE FROM {table_prefix}CB_AUTH_SUBJECT U WHERE SUBJECT_ID = ?";
-            try (var dbStat = dbCon.prepareStatement(sqlBuilder)) {
-                dbStat.setString(1, subjectId);
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    if (dbResult.next()) {
-                        return SMSubjectType.fromCode(dbResult.getString(1));
-                    }
-                }
-            }
-            return null;
+            return CBAuthSubjectRepo.getInstance().getSubjectType(dbCon, subjectId);
         } catch (SQLException e) {
             log.error("Error getting all subject ids from database", e);
             return null;

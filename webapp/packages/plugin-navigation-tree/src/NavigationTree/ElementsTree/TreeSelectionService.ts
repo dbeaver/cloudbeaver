@@ -22,7 +22,7 @@ interface ISelectedNode {
 
 type NodeIdGetter = (projectId: string) => string;
 
-@injectable()
+@injectable(() => [NavNodeInfoResource, ProjectsService, ProjectsNavNodeService])
 export class TreeSelectionService {
   constructor(
     private readonly navNodeInfoResource: NavNodeInfoResource,

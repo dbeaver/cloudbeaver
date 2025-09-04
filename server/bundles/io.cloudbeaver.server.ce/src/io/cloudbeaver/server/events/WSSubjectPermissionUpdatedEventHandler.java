@@ -54,18 +54,15 @@ public class WSSubjectPermissionUpdatedEventHandler extends WSDefaultEventHandle
         if (!super.isAcceptableInSession(activeUserSession, event)) {
             return false;
         }
+
         var user = activeUserSession.getUserContext().getUser();
         if (user == null) {
             return false;
         }
         var subjectId = event.getSubjectId();
-        switch (event.getSubjectType()) {
-            case user:
-                return CommonUtils.equalObjects(user.getUserId(), subjectId);
-            case team:
-                return ArrayUtils.containsIgnoreCase(user.getTeams(), subjectId);
-            default:
-                return false;
-        }
+        return switch (event.getSubjectType()) {
+            case user -> CommonUtils.equalObjects(user.getUserId(), subjectId);
+            case team -> ArrayUtils.containsIgnoreCase(user.getTeams(), subjectId);
+        };
     }
 }

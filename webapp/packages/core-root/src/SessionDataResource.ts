@@ -10,7 +10,7 @@ import { CachedDataResource } from '@cloudbeaver/core-resource';
 
 import { SessionResource } from './SessionResource.js';
 
-@injectable()
+@injectable(() => [SessionResource])
 export class SessionDataResource extends CachedDataResource<null> {
   constructor(sessionResource: SessionResource) {
     super(() => null);

@@ -375,6 +375,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
         if (isNotNullDefined(projectId) && resourceProjectId !== projectId && resourceProjectId !== userProjectId) {
           this.message = 'plugin_sql_editor_navigation_tab_script_state_different_project';
 
+          // TODO: this leads to long delay before saving, fast logout/login will lead to broken state
           await new Promise(resolve => setTimeout(resolve, MESSAGE_DISPLAY_DELAY));
           return;
         }
@@ -387,6 +388,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
           this.setBaseExecutionContext(this.executionContext);
         } else {
           this.message = 'plugin_sql_editor_navigation_tab_script_state_readonly';
+          // TODO: this leads to long delay before saving, fast logout/login will lead to broken state
           await new Promise(resolve => setTimeout(resolve, MESSAGE_DISPLAY_DELAY));
         }
       } finally {
@@ -409,8 +411,9 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
         if (!this.isIncomingChanges) {
           this.message = 'plugin_sql_editor_navigation_tab_script_state_saving';
-          await this.actions.write(this, this.resourceKey, this.script);
-          this.setBaseScript(this.script);
+          const script = this.script;
+          await this.actions.write(this, this.resourceKey, script);
+          this.setBaseScript(script);
         }
       } finally {
         this.message = undefined;

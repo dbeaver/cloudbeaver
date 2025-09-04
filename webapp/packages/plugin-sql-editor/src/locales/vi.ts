@@ -13,6 +13,7 @@ export default [
   ['sql_editor_restore', 'Khôi phục'],
   ['sql_editor_placeholder', 'Thực thi truy vấn với Ctrl+Enter để xem kết quả'],
   ['sql_editor_hint_empty', 'Không có đề xuất nào...'],
+  ['sql_editor_tools_more_menu_tooltip', 'Nhiều công cụ hơn'],
   ['sql_editor_execution_plan_button_tooltip', 'Giải thích kế hoạch thực thi (Shift + Ctrl + E)'],
   ['sql_editor_output_logs_button_tooltip', 'Hiển thị đầu ra máy chủ (Shift + Ctrl + O)'],
   ['sql_editor_output_logs_tab_title', 'Đầu ra'],

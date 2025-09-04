@@ -20,7 +20,7 @@ export interface IUserAuthConfiguration {
   configuration: AuthProviderConfiguration;
 }
 
-@injectable()
+@injectable(() => [UserInfoResource, WindowsService, AsyncTaskInfoService])
 export class AuthInfoService {
   get userInfo(): UserInfo | null {
     return this.userInfoResource.data;

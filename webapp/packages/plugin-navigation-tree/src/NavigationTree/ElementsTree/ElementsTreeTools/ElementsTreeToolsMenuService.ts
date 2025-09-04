@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import { createElementsTreeSettings, validateElementsTreeSettings } from './Navi
 import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT.js';
 import { KEY_BINDING_ENABLE_FILTER } from './NavigationTreeSettings/KEY_BINDING_ENABLE_FILTER.js';
 
-@injectable()
+@injectable(() => [ActionService, KeyBindingService, UserDataService, MenuService, LocalizationService])
 export class ElementsTreeToolsMenuService {
   constructor(
     private readonly actionService: ActionService,

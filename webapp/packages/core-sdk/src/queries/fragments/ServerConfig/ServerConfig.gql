@@ -12,6 +12,7 @@ fragment ServerConfig on ServerConfig {
   sessionExpireTime
 
   anonymousAccessEnabled
+  bindSessionToIp
 
   adminCredentialsSaveEnabled
   publicCredentialsSaveEnabled
@@ -33,4 +34,6 @@ fragment ServerConfig on ServerConfig {
     nativeName
   }
   disabledDrivers
+  forceHttps
+  supportedHosts
 }

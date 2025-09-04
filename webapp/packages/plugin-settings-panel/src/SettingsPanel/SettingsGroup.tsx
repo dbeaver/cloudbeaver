@@ -11,8 +11,8 @@ import { getComputed, Group, GroupTitle, useExecutor, useTranslate } from '@clou
 import type {
   IEditableSettingsSource,
   ISettingDescription,
+  ISettingsResolverSource,
   SettingsGroup as SettingsGroupType,
-  SettingsResolverSource,
 } from '@cloudbeaver/core-settings';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 import type { ITreeFilter } from '@cloudbeaver/plugin-navigation-tree';
@@ -27,7 +27,7 @@ import { getSettingGroupId } from './getSettingGroupId.js';
 interface Props {
   settingsId: string;
   group: SettingsGroupType;
-  resolver: SettingsResolverSource;
+  resolver: ISettingsResolverSource;
   source: IEditableSettingsSource;
   settings: Map<SettingsGroupType, ISettingDescription<any>[]>;
   treeFilter: ITreeFilter;
