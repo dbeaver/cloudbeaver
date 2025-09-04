@@ -31,6 +31,7 @@ import org.jkiss.dbeaver.model.rm.RMResource;
 import org.jkiss.dbeaver.model.security.SMObjectPermissionsGrant;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Web service API
@@ -182,5 +183,26 @@ public interface DBWServiceRM extends DBWService {
     List<SMObjectPermissionsGrant> listSubjectProjectsPermissionGrants(
         @NotNull WebSession webSession,
         @NotNull String subjectId
+    ) throws DBWebException;
+
+
+    @WebProjectAction(requireProjectPermissions = RMConstants.PERMISSION_PROJECT_ADMIN)
+    Map<String, Object> getProjectSettings(
+        @NotNull WebSession webSession,
+        @NotNull @WebObjectId String projectId
+    ) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    boolean addProjectSettings(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull Map<String, Object> settings
+    ) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    boolean deleteProjectSettings(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull List<String> settings
     ) throws DBWebException;
 }

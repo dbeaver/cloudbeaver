@@ -443,6 +443,71 @@ public class WebServiceRM implements DBWServiceRM {
         }
     }
 
+    @Override
+    public Map<String, Object> getProjectSettings(@NotNull WebSession webSession, @NotNull String projectId) throws DBWebException {
+        try {
+            var project = webSession.getProjectById(projectId);
+            if (project == null) {
+                throw new DBWebException("Project '" + projectId + "' not found");
+            }
+            return webSession.getAdminSecurityController().getObjectSettings(
+                projectId,
+                SMObjectType.project,
+                null,
+                null
+            );
+        } catch (DBException e) {
+            throw new DBWebException("Error getting project settings", e);
+        }
+    }
+
+    @Override
+    public boolean addProjectSettings(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull Map<String, Object> settings
+    ) throws DBWebException {
+        try {
+            var project = webSession.getProjectById(projectId);
+            if (project == null) {
+                throw new DBWebException("Project '" + projectId + "' not found");
+            }
+            webSession.getAdminSecurityController().addObjectSettings(
+                projectId,
+                SMObjectType.project,
+                null,
+                settings,
+                webSession.getUserId()
+            );
+            return true;
+        } catch (DBException e) {
+            throw new DBWebException("Error adding object settings", e);
+        }
+    }
+
+    @Override
+    public boolean deleteProjectSettings(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull List<String> settings
+    ) throws DBWebException {
+        try {
+            var project = webSession.getProjectById(projectId);
+            if (project == null) {
+                throw new DBWebException("Project '" + projectId + "' not found");
+            }
+            webSession.getAdminSecurityController().deleteObjectSettings(
+                projectId,
+                SMObjectType.project,
+                null,
+                new HashSet<>(settings)
+            );
+            return true;
+        } catch (DBException e) {
+            throw new DBWebException("Error deleting object settings", e);
+        }
+    }
+
     private RMController getResourceController(WebSession webSession) {
         return webSession.getRmController();
     }

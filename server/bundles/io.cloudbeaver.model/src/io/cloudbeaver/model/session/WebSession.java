@@ -327,6 +327,7 @@ public class WebSession extends BaseWebSession
         } else {
             sessionProject = createSessionProject(project);
         }
+        sessionProject.refreshProjectSettings();
         // do not load data sources for anonymous project
         if (project.getType() == RMProjectType.USER && userContext.getUser() == null) {
             sessionProject.setInMemory(true);

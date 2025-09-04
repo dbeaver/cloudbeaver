@@ -21,13 +21,16 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
+import org.jkiss.dbeaver.model.app.DBPProjectSettingsProvider;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMUtils;
+import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
@@ -35,12 +38,14 @@ import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class WebSessionProjectImpl extends WebProjectImpl {
+public class WebSessionProjectImpl extends WebProjectImpl implements DBPProjectSettingsProvider {
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
     protected final WebSession webSession;
     private final Map<String, WebConnectionInfo> connections = new HashMap<>();
+    private final Map<String, Object> projectSettings = new ConcurrentHashMap<>();
     private boolean registryIsLoaded = false;
 
     public WebSessionProjectImpl(
@@ -78,6 +83,16 @@ public class WebSessionProjectImpl extends WebProjectImpl {
     @Override
     public DBNModel getNavigatorModel() {
         return webSession.getNavigatorModel();
+    }
+
+    @Nullable
+    @Override
+    public <T> T getSettingValue(@NotNull String settingId) throws DBException {
+        if (projectSettings.containsKey(settingId)) {
+            // noinspection unchecked
+            return (T) projectSettings.get(settingId);
+        }
+        return null;
     }
 
     @NotNull
@@ -242,5 +257,16 @@ public class WebSessionProjectImpl extends WebProjectImpl {
             }
         }
         return sendDataSourceUpdatedEvent;
+    }
+
+    public void refreshProjectSettings() throws DBException {
+        Map<String, Object> loadedSettings = webSession.getSecurityController().getObjectSettings(
+            getId(),
+            SMObjectType.project,
+            null,
+            null
+        );
+        projectSettings.clear();
+        projectSettings.putAll(loadedSettings);
     }
 }
