@@ -22,7 +22,6 @@ import { ConnectionOptionsTabService } from './ConnectionForm/Options/Connection
 import { ConnectionDriverPropertiesTabService } from './ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService.js';
 import { ConnectionFormService } from './ConnectionForm/ConnectionFormService.js';
 import { ConnectionAuthService } from './ConnectionAuthService.js';
-import { ProviderPropertiesExtendedService } from './ConnectionForm/Options/ProviderPropertiesExtendedService.js';
 
 ModuleRegistry.add({
   name: '@cloudbeaver/plugin-connections',
@@ -54,7 +53,6 @@ ModuleRegistry.add({
       .addSingleton(ConnectionSSHTabService)
       .addSingleton(ConnectionOptionsTabService)
       .addSingleton(ConnectionDriverPropertiesTabService)
-      .addSingleton(ConnectionFormService)
-      .addSingleton(ProviderPropertiesExtendedService);
+      .addSingleton(ConnectionFormService);
   },
 });
