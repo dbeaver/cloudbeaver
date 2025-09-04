@@ -23,7 +23,7 @@ import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { type ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
-import { ACTION_RENAME, ActionService, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
+import { ACTION_OPEN, ACTION_RENAME, ActionService, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import {
@@ -118,6 +118,15 @@ export class SqlEditorBootstrap extends Bootstrap {
         return true;
       },
       getItems: (context, items) => [...items, ACTION_SQL_EDITOR_OPEN],
+      orderItems: (context, items) => {
+        const actions = menuExtractItems(items, [ACTION_OPEN, ACTION_SQL_EDITOR_OPEN]);
+
+        if (actions.length > 0) {
+          items.unshift(...actions);
+        }
+
+        return items;
+      },
     });
 
     this.actionService.addHandler({
