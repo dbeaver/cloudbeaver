@@ -4175,7 +4175,6 @@ __metadata:
     "@wroud/vite-plugin-asset-resolver": "npm:^0"
     "@wroud/vite-plugin-tsc": "npm:^0"
     fs-extra: "npm:^11"
-    sass-embedded: "npm:^1"
     tslib: "npm:^2"
     typescript: "npm:^5"
     vite: "npm:^7"
