@@ -33,10 +33,11 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "^4",
+    "@vitejs/plugin-react": "^5",
     "@wroud/vite-plugin-asset-resolver": "^0",
     "@wroud/vite-plugin-tsc": "^0",
     "fs-extra": "^11",
+    "sass-embedded": "^1",
     "tslib": "^2",
     "vite": "^7",
     "vite-multiple-assets": "^2",
