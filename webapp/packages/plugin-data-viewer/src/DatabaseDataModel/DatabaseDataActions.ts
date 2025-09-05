@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2025 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -89,12 +89,9 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
 
   updateResults(results: TResult[]): void {
     let actionsMap = Array.from(this.actions.entries());
-    const resultMap = new Map<string, TResult>(results.map(result => [result.uniqueResultId, result]));
-    const resultIndexMap = new Map<string, number>(results.map((result, i) => [result.uniqueResultId, i]));
 
     for (const [key, actions] of actionsMap) {
-      const result = resultMap.get(key);
-      const resultIndex = resultIndexMap.get(key) ?? -1;
+      const result = results.find(result => result.uniqueResultId === key);
 
       for (const action of actions) {
         action.updateResults(results);
@@ -102,7 +99,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
         if (!result) {
           action.dispose();
         } else {
-          action.updateResult(result, resultIndex);
+          action.updateResult(result, results.indexOf(result));
         }
       }
 
