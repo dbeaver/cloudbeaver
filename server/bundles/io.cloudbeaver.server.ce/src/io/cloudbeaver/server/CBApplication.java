@@ -30,6 +30,7 @@ import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.registry.WebFeatureRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
+import io.cloudbeaver.server.websockets.CBEventsWebSocket;
 import io.cloudbeaver.service.ConnectionController;
 import io.cloudbeaver.service.ConnectionControllerCE;
 import io.cloudbeaver.service.DBWServiceInitializer;
@@ -802,5 +803,9 @@ public abstract class CBApplication<T extends CBServerConfig>
     @Nullable
     public <T> T getApplicationContextValue(@NotNull String key) {
         return (T) applicationContext.get(key);
+    }
+
+    public Class<?> getEventSocketHandler(){
+        return CBEventsWebSocket.class;
     }
 }

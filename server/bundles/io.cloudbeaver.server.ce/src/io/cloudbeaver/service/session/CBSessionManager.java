@@ -36,8 +36,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.dbeaver.model.websocket.event.WSAbstractEvent;
-import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
-import org.jkiss.dbeaver.model.websocket.event.WSUserDisabledEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSessionStateEvent;
 import org.jkiss.utils.CommonUtils;
 
@@ -79,6 +77,7 @@ public class CBSessionManager implements WebAppSessionManager {
         if (webSession != null) {
             log.debug("> Close session '" + sessionId + "'");
             webSession.close();
+
             return webSession;
         }
         return null;
