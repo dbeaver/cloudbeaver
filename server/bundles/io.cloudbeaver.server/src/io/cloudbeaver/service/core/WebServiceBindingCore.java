@@ -171,6 +171,22 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                 getProjectReference(env),
                 env.getArgument("folderPath")
             ))
+            .dataFetcher(
+                "addConnectionSettings", env -> getService(env).addConnectionSettings(
+                    getWebSession(env),
+                    getProjectReference(env),
+                    env.getArgument("id"),
+                    env.getArgument("settings")
+                )
+            )
+            .dataFetcher(
+                "removeConnectionSettings", env -> getService(env).removeConnectionSettings(
+                    getWebSession(env),
+                    getProjectReference(env),
+                    env.getArgument("id"),
+                    env.getArgument("settingIds")
+                )
+            )
         ;
 
         model.getRuntimeWiring().type(TypeRuntimeWiring.newTypeWiring("AsyncTaskResult").typeResolver(TypeResolutionEnvironment::getObject)

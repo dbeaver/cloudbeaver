@@ -43,6 +43,7 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
 import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.runtime.DBRRunnableParametrized;
+import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -523,6 +524,14 @@ public class WebConnectionInfo {
             tools.add(TOOL_SESSION_MANAGER);
         }
         return tools;
+    }
+
+    public Map<String, Object> getConnectionSettings() throws DBException {
+        return session.getSecurityController().getObjectSettings(
+            dataSourceContainer.getId(),
+            SMObjectType.datasource,
+            null
+        );
     }
 
     /**

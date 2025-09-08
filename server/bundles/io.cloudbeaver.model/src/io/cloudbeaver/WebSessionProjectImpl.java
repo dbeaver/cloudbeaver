@@ -263,7 +263,6 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPProjectS
         Map<String, Object> loadedSettings = webSession.getSecurityController().getObjectSettings(
             getId(),
             SMObjectType.project,
-            null,
             null
         );
         projectSettings.clear();

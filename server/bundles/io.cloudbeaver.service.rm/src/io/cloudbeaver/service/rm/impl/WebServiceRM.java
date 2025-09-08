@@ -443,18 +443,22 @@ public class WebServiceRM implements DBWServiceRM {
         }
     }
 
+    @NotNull
     @Override
-    public Map<String, Object> getProjectSettings(@NotNull WebSession webSession, @NotNull String projectId) throws DBWebException {
+    public Map<String, Object> getProjectSettings(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @Nullable String settingId
+    ) throws DBWebException {
         try {
             var project = webSession.getProjectById(projectId);
             if (project == null) {
                 throw new DBWebException("Project '" + projectId + "' not found");
             }
-            return webSession.getAdminSecurityController().getObjectSettings(
+            return webSession.getSecurityController().getObjectSettings(
                 projectId,
                 SMObjectType.project,
-                null,
-                null
+                settingId
             );
         } catch (DBException e) {
             throw new DBWebException("Error getting project settings", e);
@@ -472,12 +476,10 @@ public class WebServiceRM implements DBWServiceRM {
             if (project == null) {
                 throw new DBWebException("Project '" + projectId + "' not found");
             }
-            webSession.getAdminSecurityController().addObjectSettings(
+            webSession.getSecurityController().addObjectSettings(
                 projectId,
                 SMObjectType.project,
-                null,
-                settings,
-                webSession.getUserId()
+                settings
             );
             return true;
         } catch (DBException e) {
@@ -496,10 +498,9 @@ public class WebServiceRM implements DBWServiceRM {
             if (project == null) {
                 throw new DBWebException("Project '" + projectId + "' not found");
             }
-            webSession.getAdminSecurityController().deleteObjectSettings(
+            webSession.getSecurityController().deleteObjectSettings(
                 projectId,
                 SMObjectType.project,
-                null,
                 new HashSet<>(settings)
             );
             return true;

@@ -558,6 +558,8 @@ type ConnectionInfo {
 
     "List of tools that can be used with this connection. Returns empty list if no tools are available"
     tools: [String!]! @since(version: "24.1.3")
+
+    connectionSettings: Object @since(version: "25.2.1")
 }
 
 type ConnectionFolderInfo {
@@ -834,5 +836,11 @@ extend type Mutation {
 
     "Get async task info by ID"
     asyncTaskInfo(id: String!, removeOnFinish: Boolean!): AsyncTaskInfo!
+
+    "Adds connection settings. Settings - map of setting name to value"
+    addConnectionSettings(projectId: ID!, id: ID!, settings: Object!): ConnectionInfo! @since(version: "25.2.1")
+
+    "Removes connection settings. SettingIds - list of setting names to remove. If empty - all settings will be removed"
+    removeConnectionSettings(projectId: ID!, id: ID!, settingIds: [String]): ConnectionInfo! @since(version: "25.2.1")
 }
 

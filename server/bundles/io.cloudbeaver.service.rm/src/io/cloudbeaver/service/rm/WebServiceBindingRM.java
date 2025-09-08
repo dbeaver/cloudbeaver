@@ -67,7 +67,8 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
             .dataFetcher(
                 "rmProjectSettings", env -> getService(env).getProjectSettings(
                     getWebSession(env),
-                    env.getArgument("projectId")
+                    env.getArgument("projectId"),
+                    env.getArgument("settingId")
                 )
             )
         ;

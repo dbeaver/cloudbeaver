@@ -108,10 +108,9 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     public void addObjectSettings(
         @NotNull String objectId,
         @NotNull SMObjectType objectType,
-        @Nullable String subjectId,
-        @NotNull Map<String, Object> settings,
-        @NotNull String grantor
+        @NotNull Map<String, Object> settings
     ) throws DBException {
+        String userId = getUserIdOrThrow();
         try (Connection dbCon = database.openConnection()) {
             try (
                 PreparedStatement dbStat = dbCon.prepareStatement(
@@ -122,14 +121,10 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 for (Map.Entry<String, Object> entry : settings.entrySet()) {
                     dbStat.setString(1, objectId);
                     dbStat.setString(2, objectType.name());
-                    if (CommonUtils.isEmpty(subjectId)) {
-                        dbStat.setNull(3, Types.VARCHAR);
-                    } else {
-                        dbStat.setString(3, subjectId);
-                    }
+                    dbStat.setString(3, userId);
                     dbStat.setString(4, entry.getKey());
                     dbStat.setString(5, CommonUtils.toString(entry.getValue()));
-                    dbStat.setString(6, grantor);
+                    dbStat.setString(6, userId);
                     dbStat.addBatch();
                 }
                 dbStat.executeBatch();
@@ -144,23 +139,20 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     public Map<String, Object> getObjectSettings(
         @NotNull String objectId,
         @NotNull SMObjectType objectType,
-        @Nullable String subjectId,
         @Nullable String settingId
     ) throws DBException {
+        String userId = getUserIdOrThrow();
         try (Connection dbCon = database.openConnection()) {
             try (
                 PreparedStatement dbStat = dbCon.prepareStatement("SELECT SETTING_ID,SETTING_VALUE " +
                     "FROM {table_prefix}CB_OBJECT_SETTINGS " +
-                    "WHERE OBJECT_ID=? AND OBJECT_TYPE=?" +
-                    (subjectId == null ? "" : " AND SUBJECT_ID=?") +
+                    "WHERE OBJECT_ID=? AND OBJECT_TYPE=? AND SUBJECT_ID=?" +
                     (settingId == null ? "" : " AND SETTING_ID=?"))
             ) {
                 int index = 1;
                 dbStat.setString(index++, objectId);
                 dbStat.setString(index++, objectType.name());
-                if (subjectId != null) {
-                    dbStat.setString(index++, subjectId);
-                }
+                dbStat.setString(index++, userId);
                 if (settingId != null) {
                     dbStat.setString(index++, settingId);
                 }
@@ -184,14 +176,11 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     public void deleteObjectSettings(
         @NotNull String objectId,
         @NotNull SMObjectType objectType,
-        @Nullable String subjectId,
         @Nullable Set<String> settingIds
     ) throws DBException {
-        String sql = "DELETE FROM {table_prefix}CB_OBJECT_SETTINGS WHERE OBJECT_ID=? AND OBJECT_TYPE=?";
-        if (subjectId != null) {
-            sql += " AND SUBJECT_ID=?";
-        }
-        if (settingIds != null) {
+        String userId = getUserIdOrThrow();
+        String sql = "DELETE FROM {table_prefix}CB_OBJECT_SETTINGS WHERE OBJECT_ID=? AND OBJECT_TYPE=? AND SUBJECT_ID=?";
+        if (settingIds != null && !settingIds.isEmpty()) {
             sql += " AND SETTING_ID IN (" + SQLUtils.generateParamList(settingIds.size()) + ")";
         }
         try (Connection dbCon = database.openConnection()) {
@@ -199,9 +188,7 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
                 int index = 1;
                 dbStat.setString(index++, objectId);
                 dbStat.setString(index++, objectType.name());
-                if (subjectId != null) {
-                    dbStat.setString(index++, subjectId);
-                }
+                dbStat.setString(index++, userId);
                 if (settingIds != null) {
                     for (String settingId : settingIds) {
                         dbStat.setString(index++, settingId);
