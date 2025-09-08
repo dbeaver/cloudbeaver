@@ -15,7 +15,7 @@ import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 
 const ProductInfoDialog = importLazyComponent(() => import('./ProductInfoDialog.js').then(m => m.ProductInfoDialog));
 
-@injectable()
+@injectable(() => [ProductInfoResource, UserInfoResource, CommonDialogService, MenuService])
 export class ProductBootstrap extends Bootstrap {
   constructor(
     private readonly productInfoResource: ProductInfoResource,

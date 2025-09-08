@@ -13,7 +13,7 @@ import { TempMap } from '@cloudbeaver/core-utils';
 
 import { UserInfoResource } from './UserInfoResource.js';
 
-@injectable()
+@injectable(() => [UserInfoResource, StorageService])
 export class UserDataService {
   private readonly userData: Map<string, Record<string, any>>;
   private readonly tempData: TempMap<string, Record<string, any>>;

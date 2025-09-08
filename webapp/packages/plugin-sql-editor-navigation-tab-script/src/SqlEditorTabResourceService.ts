@@ -11,7 +11,7 @@ import { SqlEditorTabService } from '@cloudbeaver/plugin-sql-editor-navigation-t
 
 import { ResourceSqlDataSource } from './ResourceSqlDataSource.js';
 
-@injectable()
+@injectable(() => [SqlEditorTabService, SqlDataSourceService])
 export class SqlEditorTabResourceService {
   constructor(
     private readonly sqlEditorTabService: SqlEditorTabService,

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,16 @@ import { DataViewerService } from './DataViewerService.js';
 import { DataViewerSettingsService } from './DataViewerSettingsService.js';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService.js';
 
-@injectable()
+@injectable(() => [
+  IServiceProvider,
+  NavNodeManagerService,
+  TableViewerStorageService,
+  GraphQLService,
+  AsyncTaskInfoService,
+  ConnectionExecutionContextService,
+  DataViewerService,
+  DataViewerSettingsService,
+])
 export class DataViewerTableService {
   constructor(
     private readonly serviceProvider: IServiceProvider,

@@ -7,7 +7,6 @@
  */
 import { makeObservable, observable, toJS } from 'mobx';
 
-import { Dependency } from '@cloudbeaver/core-di';
 import { isContainsException, isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
 
 import { CachedResourceParamKey } from './CachedResource.js';
@@ -23,14 +22,12 @@ import { ResourceMetadata } from './ResourceMetadata.js';
 import { ResourceUseTracker } from './ResourceUseTracker.js';
 
 export abstract class Resource<
-    TData,
-    TKey,
-    TInclude extends ReadonlyArray<string>,
-    TValue = TData,
-    TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata,
-  >
-  extends Dependency
-  implements IResource<TData, TKey, TInclude, TValue, TMetadata>
+  TData,
+  TKey,
+  TInclude extends ReadonlyArray<string>,
+  TValue = TData,
+  TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata,
+> implements IResource<TData, TKey, TInclude, TValue, TMetadata>
 {
   data: TData;
 
@@ -44,7 +41,6 @@ export abstract class Resource<
     protected readonly defaultValue: () => TData,
     protected defaultIncludes: TInclude = [] as any,
   ) {
-    super();
     this.isKeyEqual = this.isKeyEqual.bind(this);
     this.isIntersect = this.isIntersect.bind(this);
     this.isEqual = this.isEqual.bind(this);

@@ -16,7 +16,7 @@ export const Options = React.lazy(async () => {
   return { default: Options };
 });
 
-@injectable()
+@injectable(() => [ConnectionFormService])
 export class ConnectionOptionsTabService extends Bootstrap {
   constructor(private readonly connectionFormService: ConnectionFormService) {
     super();

@@ -23,7 +23,7 @@ import {
 import { ACTION_SQL_GENERATE } from './actions/ACTION_SQL_GENERATE.js';
 import { ScriptPreviewService } from './ScriptPreview/ScriptPreviewService.js';
 
-@injectable()
+@injectable(() => [ScriptPreviewService, ActionService, MenuService])
 export class GeneratorMenuBootstrap extends Bootstrap {
   constructor(
     private readonly scriptPreviewService: ScriptPreviewService,

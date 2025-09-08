@@ -17,7 +17,7 @@ export const FEATURE_GIT_ID = 'git';
 
 export type ServerConfig = ServerConfigFragment;
 
-@injectable()
+@injectable(() => [GraphQLService, DataSynchronizationService, ServerConfigEventHandler])
 export class ServerConfigResource extends CachedDataResource<ServerConfig | null> {
   private readonly syncQueue: DataSynchronizationQueue;
 

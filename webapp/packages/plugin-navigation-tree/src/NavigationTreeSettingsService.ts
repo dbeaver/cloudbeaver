@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable } from 'mobx';
 
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { NAVIGATION_TREE_SETTINGS_GROUP } from '@cloudbeaver/core-navigation-tree';
@@ -18,8 +18,8 @@ const defaultSettings = schema.object({
 
 export type NavigationTreeSettings = schema.infer<typeof defaultSettings>;
 
-@injectable()
-export class NavigationTreeSettingsService extends Dependency {
+@injectable(() => [SettingsProviderService, SettingsManagerService])
+export class NavigationTreeSettingsService {
   get disabled(): boolean {
     return this.settings.getValue('plugin.navigation-tree.disabled');
   }
@@ -30,7 +30,6 @@ export class NavigationTreeSettingsService extends Dependency {
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
   ) {
-    super();
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
 
     this.registerSettings();

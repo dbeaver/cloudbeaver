@@ -15,7 +15,7 @@ import { ServerEventId } from '../SessionEventSource.js';
 import { AsyncTask } from './AsyncTask.js';
 import { AsyncTaskInfoEventHandler } from './AsyncTaskInfoEventHandler.js';
 
-@injectable()
+@injectable(() => [GraphQLService, AsyncTaskInfoEventHandler])
 export class AsyncTaskInfoService extends Disposable {
   private readonly tasks: Map<string, AsyncTask>;
   private readonly taskIdAliases: Map<string, string>;

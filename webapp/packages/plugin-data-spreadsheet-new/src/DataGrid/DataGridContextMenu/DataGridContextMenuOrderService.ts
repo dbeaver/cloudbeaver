@@ -26,7 +26,7 @@ import {
 import { ACTION_DATA_GRID_ORDERING_DISABLE_ALL } from '../Actions/Ordering/ACTION_DATA_GRID_ORDERING_DISABLE_ALL.js';
 import { MENU_DATA_GRID_ORDERING } from './MENU_DATA_GRID_ORDERING.js';
 
-@injectable()
+@injectable(() => [ActionService, MenuService])
 export class DataGridContextMenuOrderService {
   constructor(
     private readonly actionService: ActionService,

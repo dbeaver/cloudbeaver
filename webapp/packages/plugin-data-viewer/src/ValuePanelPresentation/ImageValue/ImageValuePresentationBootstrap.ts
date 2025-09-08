@@ -17,7 +17,7 @@ import { isImageValuePresentationAvailable } from './isImageValuePresentationAva
 
 const ImageValuePresentation = importLazyComponent(() => import('./ImageValuePresentation.js').then(module => module.ImageValuePresentation));
 
-@injectable()
+@injectable(() => [DataValuePanelService])
 export class ImageValuePresentationBootstrap extends Bootstrap {
   constructor(private readonly dataValuePanelService: DataValuePanelService) {
     super();

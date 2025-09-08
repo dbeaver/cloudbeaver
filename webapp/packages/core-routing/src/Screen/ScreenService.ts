@@ -14,7 +14,7 @@ import { Executor, ExecutorInterrupter, type IExecutionContextProvider, type IEx
 import { RouterService, type RouterTransitionData } from '../RouterService.js';
 import type { IScreen, ScreenRoute } from './IScreen.js';
 
-@injectable()
+@injectable(() => [RouterService])
 export class ScreenService {
   get screen(): IScreen<any> | undefined {
     return this.getScreenByRoute(this.routerService.route);

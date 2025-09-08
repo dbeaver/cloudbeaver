@@ -20,7 +20,7 @@ interface ISettings {
   wrapMode: boolean;
 }
 
-@injectable()
+@injectable(() => [SqlDataSourceService, UserDataService, OutputLogsResource])
 export class OutputLogsService {
   get settings(): ISettings {
     return this.userDataService.getUserData(OUTPUT_LOGS_KEY, getOutputLogsDefaultSettings);

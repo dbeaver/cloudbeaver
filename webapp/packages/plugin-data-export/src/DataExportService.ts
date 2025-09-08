@@ -13,7 +13,7 @@ import { DataExportProcessService } from './DataExportProcessService.js';
 import { ExportNotification } from './ExportNotification/ExportNotification.js';
 import type { IExportContext } from './IExportContext.js';
 
-@injectable()
+@injectable(() => [NotificationService, DataExportProcessService])
 export class DataExportService {
   constructor(
     private readonly notificationService: NotificationService,

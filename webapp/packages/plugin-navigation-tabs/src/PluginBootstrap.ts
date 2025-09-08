@@ -13,7 +13,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 const NavigationTabsBar = importLazyComponent(() => import('./NavigationTabs/NavigationTabsBar/index.js').then(m => m.NavigationTabsBar));
 
-@injectable()
+@injectable(() => [AppScreenService, NavigationTabsSettingsService])
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly appScreenService: AppScreenService,

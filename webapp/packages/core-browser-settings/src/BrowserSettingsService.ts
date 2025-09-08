@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import {
   createSettingsAliasResolver,
   ROOT_SETTINGS_LAYER,
@@ -23,8 +23,8 @@ const settingsSchema = schema.object({
 export type BrowserSettingsSchema = typeof settingsSchema;
 export type CookiesSettings = schema.infer<BrowserSettingsSchema>;
 
-@injectable()
-export class BrowserSettingsService extends Dependency {
+@injectable(() => [SettingsProviderService, SettingsManagerService, SettingsResolverService])
+export class BrowserSettingsService {
   get disabled(): boolean {
     return this.settings.getValue('core.browser.cookies.disabled');
   }
@@ -35,7 +35,6 @@ export class BrowserSettingsService extends Dependency {
     private readonly settingsManagerService: SettingsManagerService,
     private readonly settingsResolverService: SettingsResolverService,
   ) {
-    super();
     this.settings = this.settingsProviderService.createSettings(settingsSchema);
 
     this.settingsResolverService.addResolver(

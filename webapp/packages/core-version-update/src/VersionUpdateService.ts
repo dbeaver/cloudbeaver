@@ -19,7 +19,7 @@ interface IInstructionProps {
 
 export type InstructionComponent = React.FunctionComponent<IInstructionProps>;
 
-@injectable()
+@injectable(() => [VersionService, VersionResource])
 export class VersionUpdateService {
   generalInstructionsGetter: (() => React.FC) | null = null;
   versionInstructionGetter: (() => InstructionComponent) | null;

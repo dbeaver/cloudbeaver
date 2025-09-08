@@ -16,7 +16,15 @@ import { DATA_CONTEXT_SQL_EDITOR_TAB } from '@cloudbeaver/plugin-sql-editor-navi
 import { SqlEditorScreenService } from './Screen/SqlEditorScreenService.js';
 import { SqlEditorScreenSettingsService } from './SqlEditorScreenSettingsService.js';
 
-@injectable()
+@injectable(() => [
+  ActionService,
+  KeyBindingService,
+  SqlEditorScreenService,
+  NotificationService,
+  MenuService,
+  SqlDataSourceService,
+  SqlEditorScreenSettingsService,
+])
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,

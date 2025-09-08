@@ -8,7 +8,7 @@
 import { AdministrationScreenService, type IRouteParams } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 
-@injectable()
+@injectable(() => [AdministrationScreenService])
 export class ProductInfoNavigationService {
   static ROOT_ITEM = 'product-info';
 

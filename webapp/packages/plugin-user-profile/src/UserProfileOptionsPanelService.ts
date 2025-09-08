@@ -20,7 +20,7 @@ import { UserProfileTabsService } from './UserProfileTabsService.js';
 const UserProfileOptionsPanel = importLazyComponent(() => import('./UserProfileOptionsPanel.js').then(m => m.UserProfileOptionsPanel));
 const panelGetter = () => UserProfileOptionsPanel;
 
-@injectable()
+@injectable(() => [OptionsPanelService, UserInfoResource, UserProfileTabsService])
 export class UserProfileOptionsPanelService {
   readonly onOpen: ISyncExecutor;
   readonly onClose: IExecutor;

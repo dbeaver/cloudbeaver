@@ -11,6 +11,4 @@ export const manifest: PluginManifest = {
   info: {
     name: 'Codemirror 6 Plugin',
   },
-
-  providers: [() => import('./LocaleService.js').then(m => m.LocaleService)],
 };

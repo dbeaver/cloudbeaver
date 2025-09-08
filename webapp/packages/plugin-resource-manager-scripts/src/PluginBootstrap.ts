@@ -18,7 +18,7 @@ import { ResourceManagerScriptsService } from './ResourceManagerScriptsService.j
 
 const ResourceManagerScripts = importLazyComponent(() => import('./ResourceManagerScripts.js').then(m => m.ResourceManagerScripts));
 
-@injectable()
+@injectable(() => [UserInfoResource, SideBarPanelService, ResourceManagerScriptsService, MenuService, ActionService])
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly userInfoResource: UserInfoResource,

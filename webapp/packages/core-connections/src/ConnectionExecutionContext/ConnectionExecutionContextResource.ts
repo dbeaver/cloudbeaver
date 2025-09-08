@@ -33,7 +33,7 @@ export type IConnectionExecutionContextInfo = SqlContextInfo & {
   defaultSchema?: string | null;
 };
 
-@injectable()
+@injectable(() => [GraphQLService, ConnectionInfoResource, UserInfoResource, AppAuthService])
 export class ConnectionExecutionContextResource extends CachedMapResource<string, IConnectionExecutionContextInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,
