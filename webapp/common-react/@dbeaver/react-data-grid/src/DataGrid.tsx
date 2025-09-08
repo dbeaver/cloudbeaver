@@ -144,7 +144,7 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     }
   }
 
-  let rows = useMemo(
+  const rows = useMemo(
     () =>
       new Array<IInnerRow>(rowsCount).fill({ idx: 0 }).map((_, i) => ({
         idx: i,
