@@ -142,7 +142,6 @@ export class LocalizationService extends Bootstrap {
         name: 'Vietnamese',
         nativeName: 'Tiếng Việt',
       },
-
     ]);
     this.addProvider(this.coreProvider.bind(this));
   }

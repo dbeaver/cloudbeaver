@@ -7,7 +7,14 @@
  */
 
 import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { DataGrid as DataGridBase, type ColumnOrColumnGroup, type CellSelectArgs, type DataGridHandle, type ColumnWidth, type ColumnWidths } from 'react-data-grid';
+import {
+  DataGrid as DataGridBase,
+  type ColumnOrColumnGroup,
+  type CellSelectArgs,
+  type DataGridHandle,
+  type ColumnWidth,
+  type ColumnWidths,
+} from 'react-data-grid';
 import { rowRenderer } from './renderers/rowRenderer.js';
 import { cellRenderer } from './renderers/cellRenderer.js';
 import { DataGridCellHeaderContext, type IDataGridHeaderCellContext } from './DataGridHeaderCellContext.js';
@@ -119,9 +126,12 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
       innerGridRef.current?.scrollToCell({ idx: position.colIdx && dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx });
     },
     openEditor: (position: ICellPosition) => {
-      innerGridRef.current?.selectCell({ idx: dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx }, {
-        enableEditor: true,
-      });
+      innerGridRef.current?.selectCell(
+        { idx: dndHeaderContext.getDataColIdx(position.colIdx), rowIdx: position.rowIdx },
+        {
+          enableEditor: true,
+        },
+      );
     },
   }));
 
@@ -154,7 +164,9 @@ export const DataGrid = forwardRef<DataGridRef, DataGridProps>(function DataGrid
     <HeaderDnDContext value={dndHeaderContext}>
       <DataGridRowContext value={{ rowCount, onScrollToBottom }}>
         <DataGridCellContext value={{ cell, cellText, cellElement, cellTooltip, onCellChange }}>
-          <DataGridCellHeaderContext value={{ headerElement, headerText, getHeaderDnD, columnSortable, onColumnSort, columnSortingState, onHeaderKeyDown }}>
+          <DataGridCellHeaderContext
+            value={{ headerElement, headerText, getHeaderDnD, columnSortable, onColumnSort, columnSortingState, onHeaderKeyDown }}
+          >
             <DataGridBase
               ref={innerGridRef}
               columns={dndHeaderContext.columns}
