@@ -10,7 +10,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { EAdminPermission, PermissionsService } from '@cloudbeaver/core-root';
-import { ActionService, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS, MENU_TREE_CREATE_CONNECTION } from '@cloudbeaver/plugin-connections';
 
 import { ACTION_CONNECTION_SEARCH } from './Actions/ACTION_CONNECTION_SEARCH.js';
@@ -43,6 +43,13 @@ export class SearchConnectionPluginBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [MENU_CONNECTIONS, MENU_TREE_CREATE_CONNECTION],
       getItems: (context, items) => [...items, ACTION_CONNECTION_SEARCH],
+      orderItems: (context, items) => {
+        const actions = menuExtractItems(items, [ACTION_CONNECTION_SEARCH]);
+
+        items.push(...actions);
+
+        return items;
+      },
     });
 
     this.actionService.addHandler({
