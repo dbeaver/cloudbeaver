@@ -1,24 +1,21 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import React from 'react';
 
 import { AppScreenService } from '@cloudbeaver/core-app';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 import { MENU_TOOLS } from './Menu/MENU_TOOLS.js';
 import { ToolsPanelService } from './ToolsPanel/ToolsPanelService.js';
 
-const ToolsPanel = React.lazy(async () => {
-  const { ToolsPanel } = await import('./ToolsPanel/ToolsPanel.js');
-  return { default: ToolsPanel };
-});
+const ToolsPanel = importLazyComponent(() => import('./ToolsPanel/ToolsPanel.js').then(module => module.ToolsPanel));
 
 @injectable(() => [AppScreenService, MenuService, ToolsPanelService])
 export class PluginBootstrap extends Bootstrap {
