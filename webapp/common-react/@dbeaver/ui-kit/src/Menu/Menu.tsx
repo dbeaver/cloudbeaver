@@ -34,6 +34,7 @@ import {
   type MenuItemRadioProps,
   useMenuStore,
   useMenuContext,
+  useStoreState,
   MenuItemCheck,
 } from '@ariakit/react';
 import clsx from 'clsx';
@@ -127,6 +128,7 @@ export const MenuButtonArrow = AriaMenuButtonArrow;
 
 export {
   useMenuStore,
+  useStoreState,
   useMenuContext,
   type MenuProviderProps,
   type MenuProps,
