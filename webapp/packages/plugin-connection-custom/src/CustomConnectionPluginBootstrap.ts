@@ -52,12 +52,12 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
     this.navigationTabsService.welcomeContainer.add(WelcomeNewConnection, undefined, () => this.isConnectionFeatureDisabled(true));
     this.menuService.addCreator({
       menus: [MENU_CONNECTIONS],
-      getItems: (context, items) => [...items, ACTION_CONNECTION_CUSTOM],
+      getItems: (context, items) => [ACTION_CONNECTION_CUSTOM, ...items],
     });
 
     this.menuService.addCreator({
       menus: [MENU_TREE_CREATE_CONNECTION],
-      getItems: (context, items) => [...items, ACTION_TREE_CREATE_CONNECTION],
+      getItems: (context, items) => [ACTION_TREE_CREATE_CONNECTION, ...items],
       isApplicable: () => !this.isConnectionFeatureDisabled(true),
     });
 
@@ -81,7 +81,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
 
         return true;
       },
-      getItems: (context, items) => [...items, ACTION_TREE_CREATE_CONNECTION],
+      getItems: (context, items) => [ACTION_TREE_CREATE_CONNECTION, ...items],
     });
 
     this.actionService.addHandler({
