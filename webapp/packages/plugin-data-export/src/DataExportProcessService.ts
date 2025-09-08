@@ -27,7 +27,7 @@ export interface ExportProcess {
   process: Deferred<string>;
 }
 
-@injectable()
+@injectable(() => [GraphQLService, NotificationService])
 export class DataExportProcessService {
   readonly exportProcesses = new OrderedMap<string, ExportProcess>(value => value.taskId);
 

@@ -10,7 +10,7 @@ import { injectable } from '@cloudbeaver/core-di';
 
 import { ADMINISTRATION_SERVER_CONFIGURATION_ITEM } from './ServerConfiguration/ADMINISTRATION_SERVER_CONFIGURATION_ITEM.js';
 
-@injectable()
+@injectable(() => [AdministrationScreenService])
 export class ServerConfigurationAdministrationNavService {
   constructor(private readonly administrationScreenService: AdministrationScreenService) {}
 

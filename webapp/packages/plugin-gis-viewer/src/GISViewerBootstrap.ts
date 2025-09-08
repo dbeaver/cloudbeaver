@@ -19,7 +19,7 @@ const GISViewer = lazy(async () => {
   return { default: GISViewer };
 });
 
-@injectable()
+@injectable(() => [DataValuePanelService])
 export class GISViewerBootstrap extends Bootstrap {
   constructor(private readonly dataValuePanelService: DataValuePanelService) {
     super();

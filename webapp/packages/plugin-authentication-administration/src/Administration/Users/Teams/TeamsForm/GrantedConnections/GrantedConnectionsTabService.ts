@@ -15,7 +15,7 @@ import { getGrantedConnectionsFormPart } from './getGrantedConnectionsFormPart.j
 
 const GrantedConnections = importLazyComponent(() => import('./GrantedConnections.js').then(module => module.GrantedConnections));
 
-@injectable()
+@injectable(() => [ProjectInfoResource, TeamsAdministrationFormService])
 export class GrantedConnectionsTabService extends Bootstrap {
   private readonly key: string;
 

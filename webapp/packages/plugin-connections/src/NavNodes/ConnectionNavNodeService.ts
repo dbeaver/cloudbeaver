@@ -7,7 +7,7 @@
  */
 import { action, makeObservable, runInAction } from 'mobx';
 
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, type IAsyncContextLoader, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
   type INodeNavigationData,
@@ -34,8 +34,17 @@ import {
 } from '@cloudbeaver/core-connections';
 import { NavigationTreeService } from '@cloudbeaver/plugin-navigation-tree';
 
-@injectable()
-export class ConnectionNavNodeService extends Dependency {
+@injectable(() => [
+  ConnectionInfoResource,
+  NavTreeResource,
+  ContainerResource,
+  NavNodeInfoResource,
+  NavNodeManagerService,
+  NavigationTreeService,
+  ConnectionsManagerService,
+  ConnectionFolderEventHandler,
+])
+export class ConnectionNavNodeService {
   constructor(
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly navTreeResource: NavTreeResource,
@@ -46,8 +55,6 @@ export class ConnectionNavNodeService extends Dependency {
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly connectionFolderEventHandler: ConnectionFolderEventHandler,
   ) {
-    super();
-
     makeObservable<this, 'connectionUpdateHandler' | 'connectionRemoveHandler' | 'connectionCreateHandler'>(this, {
       connectionUpdateHandler: action.bound,
       connectionRemoveHandler: action.bound,

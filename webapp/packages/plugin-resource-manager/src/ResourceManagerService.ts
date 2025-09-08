@@ -12,7 +12,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import type { ProjectInfo } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
-@injectable()
+@injectable(() => [UserInfoResource, ServerConfigResource])
 export class ResourceManagerService {
   get enabled() {
     return !!this.serverConfigResource.data?.resourceManagerEnabled && this.userInfoResource.isAuthenticated();

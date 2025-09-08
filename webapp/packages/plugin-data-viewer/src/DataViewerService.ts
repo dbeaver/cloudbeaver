@@ -17,7 +17,7 @@ export interface IErrorActionsContainerData {
   model: IDatabaseDataModel<any>;
 }
 
-@injectable()
+@injectable(() => [DataViewerSettingsService, SessionPermissionsResource])
 export class DataViewerService {
   readonly errorActionsContainer: PlaceholderContainer<IErrorActionsContainerData>;
 

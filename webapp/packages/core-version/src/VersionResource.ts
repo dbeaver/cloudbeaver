@@ -22,7 +22,7 @@ interface IVersions {
   versions?: IVersion[];
 }
 
-@injectable()
+@injectable(() => [ProductInfoResource])
 export class VersionResource extends CachedMapResource<string, IVersion> {
   private latestVersionNumber: string | null;
 

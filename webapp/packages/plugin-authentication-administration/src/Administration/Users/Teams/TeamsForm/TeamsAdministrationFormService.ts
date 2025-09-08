@@ -16,7 +16,7 @@ export interface ITeamFormState {
 
 export type TeamFormProps = IFormProps<ITeamFormState>;
 
-@injectable()
+@injectable(() => [LocalizationService, NotificationService])
 export class TeamsAdministrationFormService extends FormBaseService<ITeamFormState, TeamFormProps> {
   constructor(localizationService: LocalizationService, notificationService: NotificationService) {
     super(localizationService, notificationService, 'Administration Team form');

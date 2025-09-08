@@ -11,7 +11,7 @@ import { UserSettingsResolverService } from '@cloudbeaver/core-settings';
 
 import { UserSettingsService } from './UserSettingsService.js';
 
-@injectable()
+@injectable(() => [UserSettingsResolverService, UserSettingsService])
 export class SettingsUserBootstrap extends Bootstrap {
   constructor(
     private readonly userSettingsResolverService: UserSettingsResolverService,

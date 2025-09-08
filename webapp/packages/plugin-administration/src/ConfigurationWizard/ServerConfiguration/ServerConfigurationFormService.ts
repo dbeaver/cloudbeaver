@@ -12,7 +12,7 @@ import { FormBaseService, type IFormProps } from '@cloudbeaver/core-ui';
 
 export type ServerConfigurationFormProps = IFormProps<null>;
 
-@injectable()
+@injectable(() => [LocalizationService, NotificationService])
 export class ServerConfigurationFormService extends FormBaseService<null, ServerConfigurationFormProps> {
   constructor(localizationService: LocalizationService, notificationService: NotificationService) {
     super(localizationService, notificationService, 'Server Configuration form');

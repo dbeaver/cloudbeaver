@@ -28,7 +28,7 @@ export type AuthConfiguration = AdminAuthProviderConfiguration;
 
 type NewConfiguration = AuthConfiguration & { [NEW_CONFIGURATION_SYMBOL]: boolean; timestamp: number };
 
-@injectable()
+@injectable(() => [GraphQLService, SessionPermissionsResource])
 export class AuthConfigurationsResource extends CachedMapResource<string, AuthConfiguration, GetAuthProviderConfigurationsQueryVariables> {
   constructor(
     private readonly graphQLService: GraphQLService,

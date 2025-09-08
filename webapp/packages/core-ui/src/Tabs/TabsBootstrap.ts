@@ -17,7 +17,7 @@ import { DATA_CONTEXT_TAB_ID } from './Tab/DATA_CONTEXT_TAB_ID.js';
 import { DATA_CONTEXT_TABS_CONTEXT } from './Tab/DATA_CONTEXT_TABS_CONTEXT.js';
 import { MENU_TAB } from './Tab/MENU_TAB.js';
 
-@injectable()
+@injectable(() => [ActionService, MenuService])
 export class TabsBootstrap extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,

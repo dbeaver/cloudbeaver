@@ -10,7 +10,7 @@ import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { CachedMapResource, isResourceAlias, type ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-@injectable()
+@injectable(() => [GraphQLService, NavNodeInfoResource])
 export class ExtendedDDLResource extends CachedMapResource<string, string> {
   constructor(
     private readonly graphQLService: GraphQLService,

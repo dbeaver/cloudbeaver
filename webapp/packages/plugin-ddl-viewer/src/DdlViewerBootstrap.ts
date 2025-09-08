@@ -20,7 +20,7 @@ const ExtendedDDLViewerTabPanel = importLazyComponent(() =>
   import('./ExtendedDDLViewer/ExtendedDDLViewerTabPanel.js').then(m => m.ExtendedDDLViewerTabPanel),
 );
 
-@injectable()
+@injectable(() => [NavNodeViewService, NavNodeInfoResource, DDLViewerFooterService])
 export class DdlViewerBootstrap extends Bootstrap {
   constructor(
     private readonly navNodeViewService: NavNodeViewService,

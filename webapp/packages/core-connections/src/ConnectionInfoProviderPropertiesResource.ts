@@ -25,7 +25,7 @@ import { parseConnectionKey } from './parseConnectionKey.js';
 
 export type ConnectionInfoProviderProperties = DatabaseConnectionProviderPropertiesFragment;
 
-@injectable()
+@injectable(() => [ProjectsService, GraphQLService, ConnectionInfoResource])
 export class ConnectionInfoProviderPropertiesResource extends CachedMapResource<IConnectionInfoParams, ConnectionInfoProviderProperties> {
   constructor(
     private readonly projectsService: ProjectsService,

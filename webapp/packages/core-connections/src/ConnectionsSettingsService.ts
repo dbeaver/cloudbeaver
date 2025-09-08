@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { CONNECTIONS_SETTINGS_GROUP } from './CONNECTIONS_SETTINGS_GROUP.js';
@@ -16,8 +16,8 @@ const settingsSchema = schema.object({
 
 export type ConnectionsSettings = schema.infer<typeof settingsSchema>;
 
-@injectable()
-export class ConnectionsSettingsService extends Dependency {
+@injectable(() => [SettingsProviderService, SettingsManagerService])
+export class ConnectionsSettingsService {
   get disabled(): boolean {
     return this.settings.getValue('core.connections.disabled');
   }
@@ -27,7 +27,6 @@ export class ConnectionsSettingsService extends Dependency {
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
   ) {
-    super();
     this.settings = this.settingsProviderService.createSettings(settingsSchema);
     this.registerSettings();
   }

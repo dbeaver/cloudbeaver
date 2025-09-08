@@ -12,7 +12,7 @@ import { type IDatabaseDataModel, TableViewerStorageService } from '@cloudbeaver
 import type { IResultGroup, IResultTab, ISqlEditorTabState, IStatisticsTab } from '../ISqlEditorTabState.js';
 import type { QueryDataSource } from '../QueryDataSource.js';
 
-@injectable()
+@injectable(() => [TableViewerStorageService])
 export class SqlQueryResultService {
   constructor(private readonly tableViewerStorageService: TableViewerStorageService) {}
 

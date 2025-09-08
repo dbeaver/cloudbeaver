@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ export interface IDataPresentationOptions {
   type?: DataPresentationType;
   title?: string;
   icon?: string;
+  order?: number;
   hidden?: (dataFormat: ResultDataFormat | null, model: IDatabaseDataModel, resultIndex: number) => boolean;
   getPresentationComponent: () => DataPresentationComponent;
   getTabComponent?: () => PresentationTabComponent;
@@ -51,10 +52,14 @@ export interface IDataPresentationOptions {
 
 export interface IDataPresentation extends IDataPresentationOptions {
   type: DataPresentationType;
+  order: number;
 }
 
 @injectable()
 export class DataPresentationService {
+  private get orderedPresentations(): IDataPresentation[] {
+    return Array.from(this.dataPresentations.values()).sort((a, b) => b.order - a.order);
+  }
   private readonly dataPresentations: Map<string, IDataPresentation>;
 
   constructor() {
@@ -72,7 +77,7 @@ export class DataPresentationService {
     model: IDatabaseDataModel,
     resultIndex: number,
   ): IDataPresentation[] {
-    return Array.from(this.dataPresentations.values()).filter(presentation => {
+    return this.orderedPresentations.filter(presentation => {
       if (presentation.dataFormat !== undefined && !supportedDataFormats.includes(presentation.dataFormat)) {
         return false;
       }
@@ -103,7 +108,7 @@ export class DataPresentationService {
       }
     }
 
-    for (const presentation of this.dataPresentations.values()) {
+    for (const presentation of this.orderedPresentations) {
       if (
         (presentation.dataFormat === undefined || presentation.dataFormat === dataFormat) &&
         presentation.type === type &&
@@ -120,6 +125,7 @@ export class DataPresentationService {
     this.dataPresentations.set(options.id, {
       ...options,
       type: options.type || DataPresentationType.main,
+      order: options.order || Number.MAX_SAFE_INTEGER,
     });
   }
 }

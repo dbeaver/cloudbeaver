@@ -13,7 +13,7 @@ import { makeObservable, observable } from 'mobx';
 
 export const SESSION_EXPIRE_MIN_TIME = 5 * 1000 * 60;
 
-@injectable()
+@injectable(() => [GraphQLService])
 export class SessionExpireService extends Bootstrap {
   private isExpired = false;
 

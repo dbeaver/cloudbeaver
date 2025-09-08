@@ -23,10 +23,12 @@ import { FieldDescription } from './FieldDescription.js';
 import { FieldLabel } from './FieldLabel.js';
 import { FormContext } from './FormContext.js';
 import textareaStyle from './Textarea.module.css';
+import { useMergeRefs } from '../useMergeRefs.js';
 
 type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'style'> &
   ILayoutSizeProps & {
-    description?: string;
+    ref?: React.Ref<HTMLTextAreaElement | null>;
+    description?: React.ReactNode;
     labelTooltip?: string;
     embedded?: boolean;
     cursorInitiallyAtEnd?: boolean;
@@ -53,6 +55,7 @@ interface TextareaType {
 }
 
 export const Textarea: TextareaType = observer(function Textarea({
+  ref,
   name,
   value: controlledValue,
   state,
@@ -71,6 +74,7 @@ export const Textarea: TextareaType = observer(function Textarea({
   const translate = useTranslate();
   const inputId = useId();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const mergedRef = useMergeRefs(...[textareaRef, ref!].filter(Boolean));
   const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
   const styles = useS(textareaStyle);
@@ -108,7 +112,7 @@ export const Textarea: TextareaType = observer(function Textarea({
       </FieldLabel>
       <textarea
         {...rest}
-        ref={textareaRef}
+        ref={mergedRef}
         id={inputId}
         required={required}
         className={s(styles, { textarea: true })}

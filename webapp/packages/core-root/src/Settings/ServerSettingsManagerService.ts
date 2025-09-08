@@ -15,7 +15,7 @@ import { getPathParent, type ILoadableState } from '@cloudbeaver/core-utils';
 import { ServerSettingsResource } from './ServerSettingsResource.js';
 import { SettingsTransformationService } from './SettingsTransformationService.js';
 
-@injectable()
+@injectable(() => [SettingsTransformationService, ServerSettingsResource])
 export class ServerSettingsManagerService {
   readonly loaders: ReadonlyArray<ILoadableState>;
 

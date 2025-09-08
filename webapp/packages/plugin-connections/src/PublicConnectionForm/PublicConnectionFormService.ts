@@ -28,7 +28,17 @@ const PublicConnectionForm = importLazyComponent(() => import('./PublicConnectio
 
 const formGetter = () => PublicConnectionForm;
 
-@injectable()
+@injectable(() => [
+  CommonDialogService,
+  NotificationService,
+  OptionsPanelService,
+  IServiceProvider,
+  ConnectionFormService,
+  ConnectionInfoResource,
+  ConnectionsManagerService,
+  UserInfoResource,
+  AuthenticationService,
+])
 export class PublicConnectionFormService {
   formState: ConnectionFormState | null;
 
