@@ -56,6 +56,7 @@ public class WebConnectionConfig {
     private boolean saveCredentials;
     private boolean sharedCredentials;
     private Map<String, Object> mainPropertyValues;
+    private Map<String, Object> expertSettingsValues;
     private Map<String, Object> providerProperties;
     private List<WebNetworkHandlerConfigInput> networkHandlersConfig;
     private DBPDriverConfigurationType configurationType;
@@ -97,6 +98,7 @@ public class WebConnectionConfig {
             sharedCredentials = JSONUtils.getBoolean(params, "sharedCredentials");
 
             mainPropertyValues = JSONUtils.getObjectOrNull(params, "mainPropertyValues");
+            expertSettingsValues = JSONUtils.getObjectOrNull(params, "expertSettingsValues");
             providerProperties = JSONUtils.getObjectOrNull(params, "providerProperties");
             defaultCatalogName = JSONUtils.getString(params, "defaultCatalogName");
             defaultSchemaName = JSONUtils.getString(params, "defaultSchemaName");
@@ -123,7 +125,7 @@ public class WebConnectionConfig {
 
     @Property
     public boolean isReadOnly() {
-        return readOnly;
+        return CommonUtils.toBoolean(expertSettingsValues.get(WebExpertSettingsProperties.PROP_READ_ONLY), readOnly);
     }
 
     @Property
@@ -217,6 +219,11 @@ public class WebConnectionConfig {
     @Property
     public Map<String, Object> getMainPropertyValues() {
         return mainPropertyValues;
+    }
+
+    @Property
+    public Map<String, Object> getExpertSettingsValues() {
+        return expertSettingsValues;
     }
 
     @Property

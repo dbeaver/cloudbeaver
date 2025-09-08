@@ -19,6 +19,7 @@ package io.cloudbeaver;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cloudbeaver.model.WebConnectionConfig;
+import io.cloudbeaver.model.WebExpertSettingsProperties;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.app.ServletApplication;
@@ -166,14 +167,6 @@ public class WebServiceUtils extends WebCommonUtils {
         if (config.getAuthModelId() != null) {
             dsConfig.setAuthModelId(config.getAuthModelId());
         }
-        if (config.getKeepAliveInterval() >= 0) {
-            dsConfig.setKeepAliveInterval(config.getKeepAliveInterval());
-        }
-        if (config.isDefaultAutoCommit() != null) {
-            dsConfig.getBootstrap().setDefaultAutoCommit(config.isDefaultAutoCommit());
-        }
-        dsConfig.getBootstrap().setDefaultCatalogName(config.getDefaultCatalogName());
-        dsConfig.getBootstrap().setDefaultSchemaName(config.getDefaultSchemaName());
         // Save provider props
         if (config.getProviderProperties() != null) {
             dsConfig.setProviderProperties(new LinkedHashMap<>());
@@ -206,6 +199,36 @@ public class WebServiceUtils extends WebCommonUtils {
                 dsConfig.updateHandler(handlerConfig);
             }
         }
+    }
+
+    private static void setExpertSettingsValues(@NotNull DBPConnectionConfiguration dsConfig, @NotNull WebConnectionConfig config) {
+        if (config.getExpertSettingsValues() != null) {
+            for (Map.Entry<String, Object> e : config.getExpertSettingsValues().entrySet()) {
+                if (e.getValue() == null) {
+                    continue;
+                }
+                switch (e.getKey()) {
+                    case WebExpertSettingsProperties.PROP_AUTO_COMMIT ->
+                        dsConfig.getBootstrap().setDefaultAutoCommit(CommonUtils.toBoolean(e.getValue()));
+                    case WebExpertSettingsProperties.PROP_KEEP_ALIVE_INTERVAL ->
+                        dsConfig.setKeepAliveInterval(CommonUtils.toInt(e.getValue()));
+                    case WebExpertSettingsProperties.PROP_DEFAULT_CATALOG ->
+                        dsConfig.getBootstrap().setDefaultCatalogName(CommonUtils.toString(e.getValue()));
+                    case WebExpertSettingsProperties.PROP_DEFAULT_SCHEMA ->
+                        dsConfig.getBootstrap().setDefaultSchemaName(CommonUtils.toString(e.getValue()));
+                    default -> throw new IllegalStateException("Unexpected value: " + e.getKey());
+                }
+            }
+            return;
+        }
+        if (config.getKeepAliveInterval() >= 0) {
+            dsConfig.setKeepAliveInterval(config.getKeepAliveInterval());
+        }
+        if (config.isDefaultAutoCommit() != null) {
+            dsConfig.getBootstrap().setDefaultAutoCommit(config.isDefaultAutoCommit());
+        }
+        dsConfig.getBootstrap().setDefaultCatalogName(config.getDefaultCatalogName());
+        dsConfig.getBootstrap().setDefaultSchemaName(config.getDefaultSchemaName());
     }
 
     private static void setMainProperties(DBPConnectionConfiguration dsConfig, WebConnectionConfig config) {
