@@ -125,6 +125,9 @@ public class WebConnectionConfig {
 
     @Property
     public boolean isReadOnly() {
+        if (expertSettingsValues == null) {
+            return readOnly;
+        }
         return CommonUtils.toBoolean(expertSettingsValues.get(WebExpertSettingsProperties.PROP_READ_ONLY), readOnly);
     }
 
