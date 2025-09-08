@@ -37,12 +37,8 @@ public class WSUserEventHandler<EVENT extends WSAbstractEvent> implements WSEven
                     sessionManager.closeSessions(closeSessionsEvent.getSessionIds());
                 }
             }
-            case WSUserDeletedEvent e -> {
-                sessionManager.closeUserSession(e);
-            }
-            case WSUserDisabledEvent e -> {
-                sessionManager.closeUserSession(e);
-            }
+            case WSUserDeletedEvent e -> sessionManager.closeUserSession(e);
+            case WSUserDisabledEvent e -> sessionManager.closeUserSession(e);
             default -> { }
         }
     }
