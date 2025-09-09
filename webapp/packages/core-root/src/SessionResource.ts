@@ -40,9 +40,14 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     sessionEventSource.onActivate.addHandler(() => this.load());
     sessionInfoEventHandler.onEvent(ServerEventId.CbSessionState, this.handleSessionStateEvent, undefined, this);
 
-    this.serverStateEventHandler.onEvent(ServerEventId.CbUserSessionLimit, () => {
-      this.markOutdated();
-    });
+    this.serverStateEventHandler.onEvent(
+      ServerEventId.CbUserSessionLimit,
+      () => {
+        this.markOutdated();
+      },
+      undefined,
+      this,
+    );
 
     this.action = null;
     this.sync(
