@@ -24,7 +24,7 @@
       pointer-events: none;
     }
 
-    &:focus-within::before {
+    &:has(.switchInput:focus-visible)::before {
       border-color: var(--dbv-kit-control-outline-color);
       border-width: var(--dbv-kit-control-outline-width);
     }
