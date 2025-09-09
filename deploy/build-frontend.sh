@@ -5,12 +5,8 @@ echo "Build static content"
 
 mkdir -p ./cloudbeaver/web
 
-cd ../../cloudbeaver/common-typescript
+cd ../../cloudbeaver/webapp
 
-yarn install --immutable
-cd ../common-react
-yarn install --immutable
-cd ../webapp
 yarn install --immutable
 cd ./packages/product-default
 yarn run bundle
@@ -19,11 +15,7 @@ if [[ "$?" -ne 0 ]] ; then
   echo 'Application build failed'; exit $rc
 fi
 
-cd ../../../common-typescript
-yarn test
-cd ../common-react
-yarn test
-cd ../webapp
+cd ../../
 yarn test
 
 if [[ "$?" -ne 0 ]] ; then
