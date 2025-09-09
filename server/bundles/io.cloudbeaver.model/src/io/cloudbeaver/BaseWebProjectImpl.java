@@ -22,11 +22,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
-import org.jkiss.dbeaver.model.rm.RMController;
-import org.jkiss.dbeaver.model.rm.RMControllerProvider;
-import org.jkiss.dbeaver.model.rm.RMProject;
-import org.jkiss.dbeaver.model.rm.RMProjectType;
-import org.jkiss.utils.CommonUtils;
+import org.jkiss.dbeaver.model.rm.*;
 
 import java.nio.file.Path;
 
@@ -109,13 +105,12 @@ public abstract class BaseWebProjectImpl extends BaseProjectImpl implements RMCo
 
     @Override
     public void updateProject(@Nullable String newName, @Nullable String description) throws DBException {
-        super.updateProject(newName, description);
-        if (CommonUtils.isNotEmpty(newName)) {
-            getRMProject().setName(newName);
-        }
-        if (CommonUtils.isNotEmpty(description)) {
-            getRMProject().setDescription(description);
-        }
+        RMProject rmProject = getResourceController().updateProject(this.getId(), new RMProjectInfo(newName, description));
+        updateProjectInfo(rmProject.getName(), rmProject.getDescription());
+    }
 
+    public void updateProjectInfo(@Nullable String newName, @Nullable String description) {
+        this.project.setName(newName);
+        this.project.setDescription(description);
     }
 }

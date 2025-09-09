@@ -985,7 +985,7 @@ public class WebSession extends BaseWebSession
         if (project == null) {
             throw new DBException("Project not found: " + projectId);
         }
-        project.updateProject(rmProjectInfo.getName(), rmProjectInfo.getDescription());
+        project.updateProjectInfo(rmProjectInfo.getName(), rmProjectInfo.getDescription());
     }
 
     @Override

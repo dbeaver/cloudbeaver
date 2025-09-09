@@ -279,11 +279,10 @@ public class WebServiceRM implements DBWServiceRM {
             if (project == null) {
                 throw new DBException("Project not found: " + projectId);
             }
-            RMProjectInfo projectInfo = new RMProjectInfo();
-            projectInfo.setName(name == null ? project.getRMProject().getName() : name);
-            projectInfo.setDescription(description == null ? project.getRMProject().getDescription() : description);
+            RMProjectInfo projectInfo = new RMProjectInfo(name, description);
             RMProject rmProject = getResourceController(session).updateProject(projectId, projectInfo);
-            project.updateProject(name, description);
+            project.updateProject(rmProject.getName(), rmProject.getDescription());
+
             ServletAppUtils.getServletApplication().getEventController().addEvent(
                 WSProjectUpdateEvent.update(session.getSessionId(), session.getUserId(), rmProject.getId(), projectInfo)
             );

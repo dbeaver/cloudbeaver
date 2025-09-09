@@ -22,7 +22,6 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
-import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
@@ -36,7 +35,7 @@ public class RMLocalProject extends BaseProjectImpl {
     @NotNull
     private final Path projectPath;
     @NotNull
-    private final RMProject rmProject;
+    private final RMProjectType projectType;
 
     public RMLocalProject(
         @NotNull DBPWorkspace workspace,
@@ -46,11 +45,7 @@ public class RMLocalProject extends BaseProjectImpl {
     ) {
         super(workspace, sessionContext);
         this.projectPath = projectPath;
-        loadProperties();
-        this.rmProject = new RMProject(getRmProjectName());
-        this.rmProject.setId(RMUtils.makeProjectIdFromPath(projectPath, type));
-        this.rmProject.setDescription(getDescription());
-        this.rmProject.setType(type);
+        this.projectType = type;
     }
 
 
@@ -62,13 +57,17 @@ public class RMLocalProject extends BaseProjectImpl {
     @NotNull
     @Override
     public String getId() {
-        return rmProject.getId();
+        return RMUtils.makeProjectIdFromPath(projectPath, projectType);
     }
 
     @NotNull
     @Override
     public String getName() {
-        return rmProject.getDisplayName();
+        Object projectName = this.getProjectProperty(PROP_PROJECT_NAME);
+        if (projectName != null) {
+            return projectName.toString();
+        }
+        return projectPath.getFileName().toString();
     }
 
     @NotNull
@@ -136,22 +135,13 @@ public class RMLocalProject extends BaseProjectImpl {
         return propertiesChanged;
     }
 
-    public RMProject getRMProject() {
-        return rmProject;
+    public boolean canUpdateProjectName() {
+        return RMProjectType.SHARED.equals(projectType);
     }
 
     @NotNull
     @Override
     protected DBPDataSourceRegistry createDataSourceRegistry() {
         return new DataSourceRegistry<>(this);
-    }
-
-    @NotNull
-    private String getRmProjectName() {
-        Object projectName = this.getProjectProperty(PROP_PROJECT_NAME);
-        if (projectName != null) {
-            return projectName.toString();
-        }
-        return projectPath.getFileName().toString();
     }
 }

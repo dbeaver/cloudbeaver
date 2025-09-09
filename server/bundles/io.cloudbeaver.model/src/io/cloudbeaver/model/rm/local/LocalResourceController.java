@@ -21,6 +21,7 @@ import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.ServletAppUtils;
+import io.cloudbeaver.utils.WebRMUtils;
 import io.cloudbeaver.utils.file.UniversalFileVisitor;
 import org.eclipse.core.runtime.IPath;
 import org.jkiss.code.NotNull;
@@ -123,7 +124,7 @@ public class LocalResourceController extends BaseLocalResourceController {
         @NotNull String projectId,
         @NotNull SessionContextImpl sessionContext
     ) throws DBException {
-        return new RMLocalProject(workspace, sessionContext, getProjectPath(projectId), parseProjectName(projectId).getType());
+        return new RMLocalProject(workspace, sessionContext, getProjectPath(projectId), WebRMUtils.parseProjectName(projectId).getType());
     }
 
     @NotNull
@@ -178,7 +179,7 @@ public class LocalResourceController extends BaseLocalResourceController {
             .stream()
             .filter(smObjectPermissions -> CommonUtils.isNotEmpty(smObjectPermissions.getObjectId()))
             .map(projectPermission -> makeProjectFromPath(
-                sharedProjectsPath.resolve(parseProjectNameUnsafe(projectPermission.getObjectId()).getName()),
+                sharedProjectsPath.resolve(WebRMUtils.parseProjectNameUnsafe(projectPermission.getObjectId()).getName()),
                 Arrays.stream(projectPermission.getPermissions()).map(RMProjectPermission::fromPermission).collect(Collectors.toSet()),
                 RMProjectType.SHARED, true)
             )
@@ -299,11 +300,11 @@ public class LocalResourceController extends BaseLocalResourceController {
             if (!Files.exists(targetPath)) {
                 throw new DBException("Project folder '" + projectId + "' not found");
             }
-            if (!project.getRMProject().isShared()) {
+            if (!project.canUpdateProjectName()) {
                 throw new DBException("Project '" + projectId + "' is not shared");
             }
             project.updateProject(projectInfo.getName(), projectInfo.getDescription());
-            return project.getRMProject();
+            return WebRMUtils.createRmProjectFromWebProject(project);
         }
     }
 
@@ -703,7 +704,7 @@ public class LocalResourceController extends BaseLocalResourceController {
 
     @Nullable
     protected RMProject makeProjectFromId(String projectId, boolean loadPermissions) throws DBException {
-        var projectName = parseProjectName(projectId);
+        var projectName = WebRMUtils.parseProjectName(projectId);
         var projectPath = getProjectPath(projectId);
         if (!Files.exists(projectPath)) {
             if (isPrivateProject(projectId) && isProjectOwner(projectId)) {
@@ -741,7 +742,7 @@ public class LocalResourceController extends BaseLocalResourceController {
             .toArray(String[]::new);
 
         RMLocalProject webProject = new RMLocalProject(workspace, new SessionContextImpl(null), path, type);
-        RMProject project = webProject.getRMProject();
+        RMProject project = WebRMUtils.createRmProjectFromWebProject(webProject);
         project.setProjectPermissions(allProjectPermissions);
         if (Files.exists(path)) {
             try {
@@ -837,7 +838,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     }
 
     protected Path getProjectPath(String projectId) throws DBException {
-        RMProjectName project = parseProjectName(projectId);
+        RMProjectName project = WebRMUtils.parseProjectName(projectId);
         RMProjectType type = project.getType();
         String projectName = project.getName();
         switch (type) {
@@ -999,56 +1000,13 @@ public class LocalResourceController extends BaseLocalResourceController {
         }
     }
 
-    public static class RMProjectName {
-        String prefix;
-        String name;
-
-        private RMProjectName(String prefix, String name) {
-            this.prefix = prefix;
-            this.name = name;
-        }
-
-        public String getPrefix() {
-            return prefix;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public RMProjectType getType() {
-            return RMProjectType.getByPrefix(prefix);
-        }
-    }
-
-    public static RMProjectName parseProjectName(String projectId) throws DBException {
-        if (CommonUtils.isEmpty(projectId)) {
-            throw new DBException("Project id is empty");
-        }
-        return parseProjectNameUnsafe(projectId);
-    }
-
-    private static RMProjectName parseProjectNameUnsafe(String projectId) {
-        String prefix;
-        String name;
-        int divPos = projectId.indexOf("_");
-        if (divPos < 0) {
-            prefix = RMProjectType.USER.getPrefix();
-            name = projectId;
-        } else {
-            prefix = projectId.substring(0, divPos);
-            name = projectId.substring(divPos + 1);
-        }
-        return new RMProjectName(prefix, name);
-    }
-
     public static boolean isGlobalProject(String projectId) {
-        RMProjectName rmProjectName = parseProjectNameUnsafe(projectId);
+        RMProjectName rmProjectName = WebRMUtils.parseProjectNameUnsafe(projectId);
         return RMProjectType.GLOBAL.getPrefix().equals(rmProjectName.getPrefix());
     }
 
     public static boolean isPrivateProject(String projectId) {
-        RMProjectName rmProjectName = parseProjectNameUnsafe(projectId);
+        RMProjectName rmProjectName = WebRMUtils.parseProjectNameUnsafe(projectId);
         return RMProjectType.USER.getPrefix().equals(rmProjectName.getPrefix());
     }
 
@@ -1059,7 +1017,7 @@ public class LocalResourceController extends BaseLocalResourceController {
     }
 
     public static boolean isProjectOwner(String projectId, String userId) {
-        RMProjectName rmProjectName = parseProjectNameUnsafe(projectId);
+        RMProjectName rmProjectName = WebRMUtils.parseProjectNameUnsafe(projectId);
         return RMProjectType.USER.getPrefix().equals(rmProjectName.getPrefix()) &&
             rmProjectName.name.equals(userId);
     }
