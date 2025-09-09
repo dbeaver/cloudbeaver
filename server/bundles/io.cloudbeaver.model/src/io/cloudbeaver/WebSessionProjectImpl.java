@@ -26,7 +26,6 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
-import org.jkiss.dbeaver.model.app.DBPProjectSettingsProvider;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMUtils;
@@ -41,7 +40,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class WebSessionProjectImpl extends WebProjectImpl implements DBPProjectSettingsProvider {
+public class WebSessionProjectImpl extends WebProjectImpl {
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
     protected final WebSession webSession;
     private final Map<String, WebConnectionInfo> connections = new HashMap<>();
@@ -83,16 +82,6 @@ public class WebSessionProjectImpl extends WebProjectImpl implements DBPProjectS
     @Override
     public DBNModel getNavigatorModel() {
         return webSession.getNavigatorModel();
-    }
-
-    @Nullable
-    @Override
-    public <T> T getSettingValue(@NotNull String settingId) throws DBException {
-        if (projectSettings.containsKey(settingId)) {
-            // noinspection unchecked
-            return (T) projectSettings.get(settingId);
-        }
-        return null;
     }
 
     @NotNull
