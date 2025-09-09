@@ -9,7 +9,7 @@ import type { MenuCreatorItem } from './IMenuItemsCreator.js';
 import { menuExtractItems, menuFindIndex, type MenuExtractItem } from './menuExtractItems.js';
 
 export function menuItemsPlaceAfter(items: MenuCreatorItem[], actions: MenuExtractItem[], after: MenuExtractItem): void {
-  var anchorItemIndex = menuFindIndex(items, after);
+  let anchorItemIndex = menuFindIndex(items, after);
 
   if (anchorItemIndex !== -1) {
     const extracted = menuExtractItems(items, actions);
