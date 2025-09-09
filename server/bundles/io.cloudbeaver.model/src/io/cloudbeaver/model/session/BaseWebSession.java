@@ -57,6 +57,8 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     protected volatile long lastAccessTime;
 
     private final List<CBWebSessionEventHandler> sessionEventHandlers = new CopyOnWriteArrayList<>();
+    private boolean isSessionEventsHandlersInited = false;
+    private final List<WSEvent> pendingEvents = new CopyOnWriteArrayList<>();
     private WebSessionEventsFilter eventsFilter = new WebSessionEventsFilter();
     private final WebSessionWorkspace workspace;
 
@@ -85,20 +87,11 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     }
 
     public void addSessionEvent(WSEvent event) {
-        boolean eventAllowedByFilter = eventsFilter.isEventAllowed(event);
-        if (!eventAllowedByFilter) {
+        if (!isSessionEventsHandlersInited) {
+            pendingEvents.add(event);
             return;
         }
-        synchronized (sessionEventHandlers) {
-            for (CBWebSessionEventHandler eventHandler : sessionEventHandlers) {
-                try {
-                    eventHandler.handleWebSessionEvent(event);
-                } catch (DBException e) {
-                    log.error(e.getMessage(), e);
-                    addSessionError(e);
-                }
-            }
-        }
+        processEvent(event);
     }
 
     public abstract void addSessionError(Throwable exception);
@@ -106,6 +99,22 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     public void addEventHandler(@NotNull CBWebSessionEventHandler handler) {
         synchronized (sessionEventHandlers) {
             sessionEventHandlers.add(handler);
+        }
+        if (!isSessionEventsHandlersInited) {
+            processPendingEvent();
+        }
+        isSessionEventsHandlersInited = true;
+    }
+
+    private void processPendingEvent() {
+        if (pendingEvents.isEmpty()) {
+            return;
+        }
+        synchronized (pendingEvents) {
+            for (WSEvent event : pendingEvents) {
+                processEvent(event);
+            }
+            pendingEvents.clear();
         }
     }
 
@@ -250,5 +259,22 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
             return authApplication.getMaxSessionIdleTime() + lastAccessTime - System.currentTimeMillis();
         }
         return Integer.MAX_VALUE;
+    }
+
+    private void processEvent(WSEvent event) {
+        boolean eventAllowedByFilter = eventsFilter.isEventAllowed(event);
+        if (!eventAllowedByFilter) {
+            return;
+        }
+        synchronized (sessionEventHandlers) {
+            for (CBWebSessionEventHandler eventHandler : sessionEventHandlers) {
+                try {
+                    eventHandler.handleWebSessionEvent(event);
+                } catch (DBException e) {
+                    log.error(e.getMessage(), e);
+                    addSessionError(e);
+                }
+            }
+        }
     }
 }

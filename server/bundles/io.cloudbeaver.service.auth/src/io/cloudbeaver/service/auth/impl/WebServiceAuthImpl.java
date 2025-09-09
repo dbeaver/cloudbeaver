@@ -23,6 +23,7 @@ import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.app.ServletAppConfiguration;
+import io.cloudbeaver.model.app.ServletApplication;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionAuthProcessor;
@@ -31,6 +32,7 @@ import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebMetaParametersRegistry;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.WebApplication;
 import io.cloudbeaver.service.auth.*;
 import io.cloudbeaver.service.auth.model.user.WebAuthProviderInfo;
 import io.cloudbeaver.service.security.SMUtils;
@@ -264,8 +266,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     @Override
     public WebUserInfo activeUser(@NotNull WebSession webSession) throws DBWebException {
         if (webSession.getUser() == null) {
-            ServletAppConfiguration appConfiguration = webSession.getApplication().getAppConfiguration();
-            if (!appConfiguration.isAnonymousAccessEnabled()) {
+            ServletApplication application = webSession.getApplication();
+            ServletAppConfiguration appConfiguration = application.getAppConfiguration();
+            if (application instanceof WebApplication webApplication && !webApplication.getWebServerConfig().isAnonymousAccessEnabled()
+                || !appConfiguration.isAnonymousAccessEnabled()) {
                 return null;
             }
             SMUser anonymous = new SMUser("anonymous", true, null);

@@ -26,6 +26,7 @@ import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.server.servlets.WebStatusServlet;
+import io.cloudbeaver.server.websockets.CBEventsWebSocket;
 import io.cloudbeaver.server.websockets.CBWebSocketServerConfigurator;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
 import io.cloudbeaver.service.DBWServiceBindingWebSocket;
@@ -169,7 +170,7 @@ public class CBJettyServer {
                     // Add echo endpoint to server container
                     ServerEndpointConfig eventWsEnpoint = ServerEndpointConfig.Builder
                         .create(
-                            application.getEventSocketHandler(),
+                            CBEventsWebSocket.class,
                             serverConfiguration.getServicesURI() + "ws"
                         ).configurator(new CBWebSocketServerConfigurator(application.getSessionManager()))
                         .build();
