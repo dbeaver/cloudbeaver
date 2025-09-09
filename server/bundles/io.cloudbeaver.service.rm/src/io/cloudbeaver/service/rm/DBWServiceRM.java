@@ -204,6 +204,6 @@ public interface DBWServiceRM extends DBWService {
     boolean deleteProjectSettings(
         @NotNull WebSession webSession,
         @NotNull @WebObjectId String projectId,
-        @NotNull List<String> settings
+        @Nullable List<String> settings
     ) throws DBWebException;
 }

@@ -836,11 +836,5 @@ extend type Mutation {
 
     "Get async task info by ID"
     asyncTaskInfo(id: String!, removeOnFinish: Boolean!): AsyncTaskInfo!
-
-    "Adds connection settings. Settings - map of setting name to value"
-    addConnectionSettings(projectId: ID!, id: ID!, settings: Object!): ConnectionInfo! @since(version: "25.2.1")
-
-    "Removes connection settings. SettingIds - list of setting names to remove. If empty - all settings will be removed"
-    removeConnectionSettings(projectId: ID!, id: ID!, settingIds: [String]): ConnectionInfo! @since(version: "25.2.1")
 }
 

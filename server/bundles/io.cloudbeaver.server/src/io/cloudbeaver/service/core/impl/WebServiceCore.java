@@ -48,7 +48,6 @@ import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHSession;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -642,48 +641,6 @@ public class WebServiceCore implements DBWServiceCore {
     @Override
     public boolean cancelAsyncTask(WebSession webSession, String taskId) throws DBWebException {
         return webSession.asyncTaskCancel(taskId);
-    }
-
-    @NotNull
-    @Override
-    public WebConnectionInfo addConnectionSettings(
-        @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @NotNull String connectionId,
-        @NotNull Map<String, Object> settings
-    ) throws DBWebException {
-        WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, connectionId);
-        try {
-            webSession.getSecurityController().addObjectSettings(
-                connectionId,
-                SMObjectType.datasource,
-                settings
-            );
-        } catch (DBException e) {
-            throw new DBWebException("Error adding settings to connection %s".formatted(connectionId), e);
-        }
-        return connectionInfo;
-    }
-
-    @NotNull
-    @Override
-    public WebConnectionInfo removeConnectionSettings(
-        @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @NotNull String connectionId,
-        @Nullable List<String> settingIds
-    ) throws DBWebException {
-        WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, connectionId);
-        try {
-            webSession.getSecurityController().deleteObjectSettings(
-                connectionId,
-                SMObjectType.datasource,
-                settingIds == null ? null : new HashSet<>(settingIds)
-            );
-        } catch (DBException e) {
-            throw new DBWebException("Error adding settings to connection %s".formatted(connectionId), e);
-        }
-        return connectionInfo;
     }
 
     @Override

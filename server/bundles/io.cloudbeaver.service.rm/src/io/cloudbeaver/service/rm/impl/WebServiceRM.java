@@ -491,7 +491,7 @@ public class WebServiceRM implements DBWServiceRM {
     public boolean deleteProjectSettings(
         @NotNull WebSession webSession,
         @NotNull String projectId,
-        @NotNull List<String> settings
+        @Nullable List<String> settings
     ) throws DBWebException {
         try {
             var project = webSession.getProjectById(projectId);
@@ -501,7 +501,7 @@ public class WebServiceRM implements DBWServiceRM {
             webSession.getSecurityController().deleteObjectSettings(
                 projectId,
                 SMObjectType.project,
-                new HashSet<>(settings)
+                settings == null ? null : new HashSet<>(settings)
             );
             return true;
         } catch (DBException e) {

@@ -208,21 +208,4 @@ public interface DBWServiceCore extends DBWService {
     @WebAction(authRequired = false)
     boolean cancelAsyncTask(WebSession webSession, String taskId) throws DBWebException;
 
-    @NotNull
-    WebConnectionInfo addConnectionSettings(
-        @NotNull WebSession webSession,
-        @NotNull @WebObjectId String projectId,
-        @NotNull String connectionId,
-        @NotNull Map<String, Object> settings
-    ) throws DBWebException;
-
-
-    @NotNull
-    WebConnectionInfo removeConnectionSettings(
-        @NotNull WebSession webSession,
-        @NotNull @WebObjectId String projectId,
-        @NotNull String connectionId,
-        @Nullable List<String> settingIds
-    ) throws DBWebException;
-
 }

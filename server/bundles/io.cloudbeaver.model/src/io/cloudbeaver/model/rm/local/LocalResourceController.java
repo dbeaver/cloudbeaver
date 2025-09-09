@@ -308,6 +308,7 @@ public class LocalResourceController extends BaseLocalResourceController {
                 log.debug("Deleting project '" + projectId + "'");
                 IOUtils.deleteDirectory(targetPath);
                 getSecurityController().deleteAllObjectPermissions(projectId, SMObjectType.project);
+                getSecurityController().deleteObjectSettings(projectId, SMObjectType.project, null);
                 synchronized (projectRegistries) {
                     projectRegistries.remove(projectId);
                 }

@@ -75,7 +75,7 @@ import java.util.stream.Collectors;
  * Server controller
  */
 public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
-    implements SMAdminController, SMAuthenticationManager, SMObjectSettingsController {
+    implements SMAdminController, SMAuthenticationManager {
 
     private static final Log log = Log.getLog(CBEmbeddedSecurityController.class);
 
@@ -112,22 +112,26 @@ public class CBEmbeddedSecurityController<T extends ServletAuthApplication>
     ) throws DBException {
         String userId = getUserIdOrThrow();
         try (Connection dbCon = database.openConnection()) {
-            try (
-                PreparedStatement dbStat = dbCon.prepareStatement(
-                    "INSERT INTO {table_prefix}CB_OBJECT_SETTINGS" +
-                        "(OBJECT_ID,OBJECT_TYPE,SUBJECT_ID,SETTING_ID,SETTING_VALUE,UPDATED_BY,UPDATE_TIME) " +
-                        "VALUES(?,?,?,?,?,?,CURRENT_TIMESTAMP)")
-            ) {
-                for (Map.Entry<String, Object> entry : settings.entrySet()) {
-                    dbStat.setString(1, objectId);
-                    dbStat.setString(2, objectType.name());
-                    dbStat.setString(3, userId);
-                    dbStat.setString(4, entry.getKey());
-                    dbStat.setString(5, CommonUtils.toString(entry.getValue()));
-                    dbStat.setString(6, userId);
-                    dbStat.addBatch();
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                deleteObjectSettings(objectId, objectType, settings.keySet());
+                try (
+                    PreparedStatement dbStat = dbCon.prepareStatement(
+                        "INSERT INTO {table_prefix}CB_OBJECT_SETTINGS" +
+                            "(OBJECT_ID,OBJECT_TYPE,SUBJECT_ID,SETTING_ID,SETTING_VALUE,UPDATED_BY,UPDATE_TIME) " +
+                            "VALUES(?,?,?,?,?,?,CURRENT_TIMESTAMP)")
+                ) {
+                    for (Map.Entry<String, Object> entry : settings.entrySet()) {
+                        dbStat.setString(1, objectId);
+                        dbStat.setString(2, objectType.name());
+                        dbStat.setString(3, userId);
+                        dbStat.setString(4, entry.getKey());
+                        dbStat.setString(5, CommonUtils.toString(entry.getValue()));
+                        dbStat.setString(6, userId);
+                        dbStat.addBatch();
+                    }
+                    dbStat.executeBatch();
                 }
-                dbStat.executeBatch();
+                txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error while adding object settings", e);
