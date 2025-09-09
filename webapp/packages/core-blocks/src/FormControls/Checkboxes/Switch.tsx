@@ -72,8 +72,14 @@ export const Switch: SwitchType = observer(function Switch({
     return null;
   }
 
+  function onKeyDown(event: React.KeyboardEvent) {
+    if (event.key === 'Escape' && event.target instanceof HTMLInputElement) {
+      event.target.blur();
+    }
+  }
+
   return (
-    <Field title={rest.title} className={styles['field']}>
+    <Field title={rest.title} className={s(styles, {}, styles['field'], className)}>
       <div className={styles['switchBody']}>
         <div className={s(styles, { switchControl: true, disabled: disabled, checked: checkboxState.checked })}>
           <div className={styles['switchControlTrack']} />
@@ -88,6 +94,7 @@ export const Switch: SwitchType = observer(function Switch({
               checked={checkboxState.checked}
               disabled={disabled}
               className={styles['switchInput']}
+              onKeyDown={onKeyDown}
               onChange={checkboxState.change}
             />
           </div>
