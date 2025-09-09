@@ -12,7 +12,7 @@ import type { ISqlEditorScreenParams } from './ISqlEditorScreenParams.js';
 import { SqlEditorScreen } from './SqlEditorScreen.js';
 import { SqlEditorScreenSettingsService } from '../SqlEditorScreenSettingsService.js';
 
-@injectable()
+@injectable(() => [ScreenService, SqlEditorScreenSettingsService])
 export class SqlEditorScreenService {
   readonly screen: IScreen<ISqlEditorScreenParams>;
   constructor(

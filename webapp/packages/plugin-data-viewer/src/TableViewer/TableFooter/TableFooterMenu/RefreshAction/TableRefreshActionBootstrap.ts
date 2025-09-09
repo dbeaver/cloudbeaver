@@ -28,7 +28,7 @@ const AutoRefreshSettingsDialog = importLazyComponent(() =>
 
 const AUTO_REFRESH_INTERVALS = [5, 10, 15, 30, 60];
 
-@injectable()
+@injectable(() => [ActionService, MenuService, LocalizationService, CommonDialogService])
 export class TableRefreshActionBootstrap extends Bootstrap {
   constructor(
     private readonly actionService: ActionService,

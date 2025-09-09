@@ -11,7 +11,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 
-@injectable()
+@injectable(() => [UserInfoResource, CommonDialogService, NotificationService])
 export class UserLoadingErrorDialogBootstrap extends Bootstrap {
   constructor(
     private readonly userInfoResource: UserInfoResource,

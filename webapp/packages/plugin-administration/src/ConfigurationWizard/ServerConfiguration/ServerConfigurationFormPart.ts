@@ -11,8 +11,9 @@ import { DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { DefaultNavigatorSettingsResource, PasswordPolicyResource, ProductInfoResource, ServerConfigResource } from '@cloudbeaver/core-root';
-import { FormPart, type IFormState } from '@cloudbeaver/core-ui';
-import { isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
+import { FormPart, formValidationContext, type IFormState } from '@cloudbeaver/core-ui';
+import { isIp, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 
 import { MIN_SESSION_EXPIRE_TIME } from './Form/MIN_SESSION_EXPIRE_TIME.js';
 import type { IServerConfigurationFormPartState } from './IServerConfigurationFormPartState.js';
@@ -51,6 +52,7 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly passwordPolicyResource: PasswordPolicyResource,
     private readonly passwordPolicyService: PasswordPolicyService,
+    private readonly localizationService: LocalizationService,
   ) {
     super(formState, DEFAULT_STATE_GETTER());
   }
@@ -67,6 +69,19 @@ export class ServerConfigurationFormPart extends FormPart<IServerConfigurationFo
     data: IFormState<IServerConfigurationFormPartState>,
     contexts: IExecutionContextProvider<IFormState<IServerConfigurationFormPartState>>,
   ) {
+    const validation = contexts.getContext(formValidationContext);
+
+    const supportedHosts = this.state.serverConfig.supportedHosts;
+    const currentHost = window.location.host;
+
+    if (!isIp(window.location.hostname) && supportedHosts.trim() && !supportedHosts.includes(currentHost)) {
+      validation.error(
+        this.localizationService.translate('administration_configuration_wizard_configuration_supported_hosts_warning', undefined, {
+          host: currentHost,
+        }),
+      );
+    }
+
     if (this.administrationScreenService.isConfigurationMode) {
       await this.authProvidersResource.load(CachedMapAllKey);
 

@@ -22,7 +22,7 @@ export interface INodeLimitedList {
   truncated: number;
 }
 
-@injectable()
+@injectable(() => [NotificationService])
 export class NavNodeViewService {
   get tabs(): NavNodeTransformView[] {
     return this.transformers

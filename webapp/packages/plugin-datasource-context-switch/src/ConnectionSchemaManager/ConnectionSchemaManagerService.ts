@@ -71,7 +71,7 @@ interface IActiveItem<T> {
   changeSchemaId?: IObjectSchemaSetter<T>;
 }
 
-@injectable()
+@injectable(() => [NavigationTabsService, ConnectionInfoResource, ConnectionsManagerService, DBDriverResource, NotificationService])
 export class ConnectionSchemaManagerService {
   get activeNavNode(): IDataContextActiveNode | null | undefined {
     if (!this.activeItem?.getCurrentNavNode) {

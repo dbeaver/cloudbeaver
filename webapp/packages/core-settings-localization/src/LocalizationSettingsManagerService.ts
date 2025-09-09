@@ -10,7 +10,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { ESettingsValueType, INTERFACE_SETTINGS_GROUP, SettingsManagerService } from '@cloudbeaver/core-settings';
 import type { ILocalizationSettingsSchema } from './SettingsLocalizationService.js';
 
-@injectable()
+@injectable(() => [LocalizationService, SettingsManagerService])
 export class LocalizationSettingsManagerService extends Bootstrap {
   constructor(
     private readonly localizationService: LocalizationService,

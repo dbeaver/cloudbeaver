@@ -111,7 +111,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         }
         try {
             Map<String, Object> authParameters = new HashMap<>();
-            authParameters.put(SMConstants.USER_ORIGIN, ServletAppUtils.getOriginFromRequestOrThrow(httpRequest));
+            authParameters.put(SMConstants.USER_ORIGIN, ServletAppUtils.getOriginFromRequest(httpRequest));
 
             var smAuthInfo = initiateAuthentication(webSession, providerId, providerConfigurationId, authParameters, forceSessionsLogout);
             if (smAuthInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
@@ -227,7 +227,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             List<WebAuthInfo> removedInfos = webSession.removeAuthInfo(providerId);
             List<String> logoutUrls = new ArrayList<>();
             var cbApp = CBApplication.getInstance();
-            String origin = ServletAppUtils.getOriginFromRequestOrThrow(httpRequest);
+            String origin = ServletAppUtils.getOriginFromRequest(httpRequest);
             for (WebAuthInfo removedInfo : removedInfos) {
                 if (removedInfo.getAuthProviderDescriptor()
                     .getInstance() instanceof SMSignOutLinkProvider provider
@@ -297,7 +297,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
 
     @Override
     public WebAuthProviderInfo[] getAuthProviders(@NotNull HttpServletRequest request) throws DBWebException {
-        String origin = ServletAppUtils.getOriginFromRequestOrThrow(request);
+        String origin = ServletAppUtils.getOriginFromRequest(request);
         return WebAuthProviderRegistry.getInstance().getAuthProviders()
             .stream()
             .map(descriptor -> new WebAuthProviderInfo(descriptor, origin))

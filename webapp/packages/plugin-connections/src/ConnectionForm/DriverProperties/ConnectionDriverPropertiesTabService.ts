@@ -13,7 +13,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 const DriverProperties = importLazyComponent(() => import('./DriverProperties.js').then(m => m.DriverProperties));
 
-@injectable()
+@injectable(() => [ConnectionFormService])
 export class ConnectionDriverPropertiesTabService extends Bootstrap {
   constructor(private readonly connectionFormService: ConnectionFormService) {
     super();

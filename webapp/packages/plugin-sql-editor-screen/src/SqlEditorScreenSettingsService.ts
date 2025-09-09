@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { injectable } from '@cloudbeaver/core-di';
 import { HIGHEST_SETTINGS_LAYER } from '@cloudbeaver/core-root';
 import { createSettingsOverrideResolver, SettingsProvider, SettingsProviderService, SettingsResolverService } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
@@ -17,8 +17,8 @@ const defaultSettings = schema.object({
 type SqlEditorScreenSettingsSchema = typeof defaultSettings;
 export type SqlEditorSettings = schema.infer<SqlEditorScreenSettingsSchema>;
 
-@injectable()
-export class SqlEditorScreenSettingsService extends Dependency {
+@injectable(() => [SettingsProviderService, SettingsResolverService])
+export class SqlEditorScreenSettingsService {
   get enabled(): boolean {
     return this.settings.getValue('plugin.sql-editor-screen.enabled');
   }
@@ -29,7 +29,6 @@ export class SqlEditorScreenSettingsService extends Dependency {
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsResolverService: SettingsResolverService,
   ) {
-    super();
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
     this.settingsResolverService.addResolver(
       HIGHEST_SETTINGS_LAYER,

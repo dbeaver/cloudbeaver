@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,17 @@ import { useTranslate } from '../localization/useTranslate.js';
 import { useExecutor } from '../useExecutor.js';
 import { FormContext } from './FormContext.js';
 
-export function useCustomInputValidation<T = void>(validation: (value: T) => string | null): React.RefObject<HTMLInputElement | null> {
+export function useCustomInputValidation<T = void, TType extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement>(
+  validation: (value: T) => string | null,
+): React.RefObject<TType | null> {
   const context = useContext(FormContext);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<TType | null>(null);
   const translate = useTranslate();
 
-  function validate(element: HTMLInputElement): boolean {
+  function validate(element: TType): boolean {
     let value: T = undefined as unknown as T;
 
-    if (element instanceof HTMLInputElement) {
+    if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
       value = element.value as unknown as T;
     }
 
@@ -64,14 +66,14 @@ export function useCustomInputValidation<T = void>(validation: (value: T) => str
     }
 
     function handleInput(event: Event) {
-      const target = event.target as HTMLInputElement;
+      const target = event.target as TType;
       if (target.validity.valid === false) {
         validate(target);
       }
     }
 
     function handleBlur(event: Event) {
-      const target = event.target as HTMLInputElement;
+      const target = event.target as TType;
       if (target.validity.valid === true) {
         validate(target);
       }

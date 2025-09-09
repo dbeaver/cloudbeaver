@@ -12,7 +12,7 @@ import { GraphQLService } from '@cloudbeaver/core-sdk';
 import type { TeamMetaParameter } from './TeamMetaParametersResource.js';
 import { TeamsResource } from './TeamsResource.js';
 
-@injectable()
+@injectable(() => [GraphQLService, TeamsResource])
 export class TeamInfoMetaParametersResource extends CachedMapResource<string, TeamMetaParameter> {
   constructor(
     private readonly graphQLService: GraphQLService,

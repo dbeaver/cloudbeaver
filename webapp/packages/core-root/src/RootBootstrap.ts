@@ -11,7 +11,7 @@ import { SettingsManagerService, SettingsResolverService } from '@cloudbeaver/co
 import { ServerSettingsManagerService } from './Settings/ServerSettingsManagerService.js';
 import { SERVER_SETTINGS_LAYER, ServerSettingsService } from './Settings/ServerSettingsService.js';
 
-@injectable()
+@injectable(() => [SettingsResolverService, ServerSettingsService, SettingsManagerService, ServerSettingsManagerService])
 export class RootBootstrap extends Bootstrap {
   constructor(
     private readonly settingsResolverService: SettingsResolverService,

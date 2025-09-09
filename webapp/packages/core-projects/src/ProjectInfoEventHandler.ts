@@ -19,7 +19,7 @@ import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 export type { IProjectInfoEvent };
 
-@injectable()
+@injectable(() => [SessionEventSource])
 export class ProjectInfoEventHandler extends TopicEventHandler<IProjectInfoEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   private lastActiveProjects: string[];
 

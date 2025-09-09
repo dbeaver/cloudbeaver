@@ -13,7 +13,7 @@ import { GraphQLService, type RmProject } from '@cloudbeaver/core-sdk';
 
 export type Project = Omit<RmProject, 'creator' | 'createTime' | 'canEditConnection' | 'canEditResource'>;
 
-@injectable()
+@injectable(() => [GraphQLService, UserInfoResource, SharedProjectsResource])
 export class ResourceProjectsResource extends CachedDataResource<Project[]> {
   constructor(
     private readonly graphQLService: GraphQLService,

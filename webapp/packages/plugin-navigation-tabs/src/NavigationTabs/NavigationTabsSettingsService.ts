@@ -22,7 +22,7 @@ const settings = schema.object({
 
 type Settings = typeof settings;
 
-@injectable()
+@injectable(() => [SettingsProviderService, SettingsManagerService])
 export class NavigationTabsSettingsService {
   readonly settings: SettingsProvider<Settings>;
 

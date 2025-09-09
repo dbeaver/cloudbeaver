@@ -13,7 +13,7 @@ import { SessionDataResource } from '../SessionDataResource.js';
 
 export type ServerSettings = ProductSettings;
 
-@injectable()
+@injectable(() => [GraphQLService, SessionDataResource])
 export class ServerSettingsResource extends CachedDataResource<ServerSettings | null> {
   constructor(
     private readonly graphQLService: GraphQLService,

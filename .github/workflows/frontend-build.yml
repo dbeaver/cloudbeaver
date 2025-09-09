@@ -49,21 +49,14 @@ jobs:
           node-version: "lts/*"
           cache: "yarn"
           cache-dependency-path: |
-            cloudbeaver/common-*/yarn.lock
             cloudbeaver/webapp/yarn.lock
-
-      - name: restore cloudbeaver-common typescript cache
-        uses: actions/cache@v4
-        with:
-          path: "cloudbeaver/common-*/**/*/lib"
-          key: ${{ runner.os }}-common-dist-${{ hashFiles('cloudbeaver/common-*/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-common-dist-
 
       - name: restore typescript cache
         uses: actions/cache@v4
         with:
-          path: "cloudbeaver/webapp/**/packages/*/dist"
+          path: |
+            "cloudbeaver/webapp/common-*/**/*/lib"
+            "cloudbeaver/webapp/**/packages/*/dist"
           key: ${{ runner.os }}-dist-${{ hashFiles('cloudbeaver/webapp/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-dist-
@@ -72,21 +65,9 @@ jobs:
         run: yarn clear
 
       - run: yarn install --immutable
-        working-directory: ./cloudbeaver/common-typescript
-
-      - run: yarn install --immutable
-        working-directory: ./cloudbeaver/common-react
-
-      - run: yarn install --immutable
 
       - run: yarn bundle
         working-directory: ./cloudbeaver/webapp/packages/product-default
-
-      - run: yarn test
-        working-directory: ./cloudbeaver/common-typescript
-
-      - run: yarn test
-        working-directory: ./cloudbeaver/common-react
 
       - run: yarn test
 

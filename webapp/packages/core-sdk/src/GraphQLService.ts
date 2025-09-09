@@ -31,7 +31,7 @@ function extendedSDK(
   };
 }
 
-@injectable()
+@injectable(() => [EnvironmentService])
 export class GraphQLService {
   sdk: ReturnType<typeof extendedSDK>;
 

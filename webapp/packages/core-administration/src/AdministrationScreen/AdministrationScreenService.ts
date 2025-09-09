@@ -23,7 +23,15 @@ import { ADMINISTRATION_SCREEN_STATE_SCHEMA, type IAdministrationScreenInfo } fr
 
 const ADMINISTRATION_INFO = 'administration_info';
 
-@injectable()
+@injectable(() => [
+  SessionPermissionsResource,
+  PermissionsService,
+  ScreenService,
+  AdministrationItemService,
+  StorageService,
+  ServerConfigResource,
+  NotificationService,
+])
 export class AdministrationScreenService {
   static screenName = 'administration';
   static itemRouteName = 'administration.item';

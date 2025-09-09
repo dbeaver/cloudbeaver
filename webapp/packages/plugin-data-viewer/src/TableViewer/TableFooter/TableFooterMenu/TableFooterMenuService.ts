@@ -26,7 +26,7 @@ import { DATA_CONTEXT_DV_PRESENTATION, DataViewerPresentationType } from '../../
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel.js';
 import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from './DATA_VIEWER_DATA_MODEL_ACTIONS_MENU.js';
 
-@injectable()
+@injectable(() => [ActionService, MenuService])
 export class TableFooterMenuService {
   constructor(
     private readonly actionService: ActionService,

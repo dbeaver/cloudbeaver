@@ -9,9 +9,4 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 export const settingsAdministrationPlugin: PluginManifest = {
   info: { name: 'Settings Administration plugin' },
-  providers: [
-    () => import('./SettingsAdministrationPluginBootstrap.js').then(m => m.SettingsAdministrationPluginBootstrap),
-    () => import('./LocaleService.js').then(m => m.LocaleService),
-    () => import('./SettingsAdministrationService.js').then(m => m.SettingsAdministrationService),
-  ],
 };

@@ -32,7 +32,7 @@ export type IFederatedLoginOptions = Omit<ILoginOptions, 'credentials'>;
 export const ANONYMOUS_USER_ID = 'anonymous';
 export const UNAUTHORIZED_ID = 'unauthorized';
 
-@injectable()
+@injectable(() => [GraphQLService, AuthProviderService, SessionResource])
 export class UserInfoResource extends CachedDataResource<UserInfo | null, void> {
   readonly onUserChange: ISyncExecutor<string>;
   readonly onException: ISyncExecutor<Error>;

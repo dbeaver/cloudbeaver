@@ -2,6 +2,8 @@
   "name": "@cloudbeaver/core-authentication",
   "type": "module",
   "sideEffects": [
+    "./lib/module.js",
+    "./lib/index.js",
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"
@@ -39,10 +41,12 @@
   "devDependencies": {
     "@cloudbeaver/core-cli": "workspace:*",
     "@cloudbeaver/core-sdk": "workspace:*",
+    "@cloudbeaver/tests-runner": "workspace:*",
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
     "@dbeaver/react-tests": "workspace:^",
     "msw": "^2",
+    "rimraf": "^6",
     "typescript": "^5",
     "vitest": "^3"
   }

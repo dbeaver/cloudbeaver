@@ -18,7 +18,7 @@ import { TextValuePresentationService } from './TextValuePresentationService.js'
 
 const TextValuePresentation = importLazyComponent(() => import('./TextValuePresentation.js').then(module => module.TextValuePresentation));
 
-@injectable()
+@injectable(() => [TextValuePresentationService, DataValuePanelService])
 export class TextValuePresentationBootstrap extends Bootstrap {
   constructor(
     private readonly textValuePresentationService: TextValuePresentationService,

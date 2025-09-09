@@ -15,7 +15,7 @@ import { VirtualFolderUtils } from './VirtualFolderUtils.js';
 const VirtualFolderTab = importLazyComponent(() => import('./VirtualFolderTab.js').then(m => m.VirtualFolderTab));
 const VirtualFolderPanel = importLazyComponent(() => import('./VirtualFolderPanel.js').then(m => m.VirtualFolderPanel));
 
-@injectable()
+@injectable(() => [NavNodeViewService, NavNodeInfoResource])
 export class VirtualFolderViewBootstrap extends Bootstrap {
   constructor(
     private readonly navNodeViewService: NavNodeViewService,

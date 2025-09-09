@@ -12,7 +12,7 @@ import { GraphQLService, type SqlQueryGenerator } from '@cloudbeaver/core-sdk';
 
 export const MAX_GENERATORS_LENGTH = 15;
 
-@injectable()
+@injectable(() => [GraphQLService, NavNodeInfoResource])
 export class SqlGeneratorsResource extends CachedMapResource<string, SqlQueryGenerator[]> {
   constructor(
     private readonly graphQLService: GraphQLService,

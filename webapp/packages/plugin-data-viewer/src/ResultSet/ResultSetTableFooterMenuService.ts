@@ -27,7 +27,7 @@ interface IResultSetActionsMetadata {
   };
 }
 
-@injectable()
+@injectable(() => [ActionService, MenuService, NotificationService])
 export class ResultSetTableFooterMenuService {
   constructor(
     private readonly actionService: ActionService,
