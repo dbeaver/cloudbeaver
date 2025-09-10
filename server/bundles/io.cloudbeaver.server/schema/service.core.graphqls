@@ -688,13 +688,13 @@ input ConnectionConfig {
     properties: Object
 
     "Set keep-alive interval"
-    keepAliveInterval: Int
+    keepAliveInterval: Int @deprecated(reason: "25.2.1 use expertPropertyValues instead")
 
     "Sets auto-commit connection state"
-    autocommit: Boolean
+    autocommit: Boolean @deprecated(reason: "25.2.1 use expertPropertyValues instead")
 
     "Sets read-only connection state"
-    readOnly: Boolean
+    readOnly: Boolean @deprecated(reason: "25.2.1 use expertPropertyValues instead")
 
     # User credentials
 
@@ -730,9 +730,9 @@ input ConnectionConfig {
     "Configuration type (MANUAL, URL)"
     configurationType: DriverConfigurationType
     "Sets catalog name for the connection"
-    defaultCatalogName: String @since(version: "25.0.5")
+    defaultCatalogName: String @since(version: "25.0.5") @deprecated(reason: "25.2.1 use expertPropertyValues instead")
     "Sets schema name for the connection"
-    defaultSchemaName: String @since(version: "25.0.5")
+    defaultSchemaName: String @since(version: "25.0.5") @deprecated(reason: "25.2.1 use expertPropertyValues instead")
 }
 
 ####################################################

@@ -13,10 +13,10 @@ import org.jkiss.utils.CommonUtils;
  */
 public class WebExpertSettingsProperties implements DBPObject {
     public static final String PROP_READ_ONLY = "readOnly";
-    public static final String PROP_AUTO_COMMIT = "autoCommit";
+    public static final String PROP_AUTO_COMMIT = "autocommit";
     public static final String PROP_KEEP_ALIVE_INTERVAL = "keepAliveInterval";
-    public static final String PROP_DEFAULT_CATALOG = "defaultCatalog";
-    public static final String PROP_DEFAULT_SCHEMA = "defaultSchema";
+    public static final String PROP_DEFAULT_CATALOG = "defaultCatalogName";
+    public static final String PROP_DEFAULT_SCHEMA = "defaultSchemaName";
 
     private final DBPDriver driver;
 
@@ -24,27 +24,27 @@ public class WebExpertSettingsProperties implements DBPObject {
         this.driver = driver;
     }
 
-    @Property(viewable = true, order = 1, visibleIf = KeepAliveIntervalFieldValidator.class)
+    @Property(order = 1, id = PROP_KEEP_ALIVE_INTERVAL, visibleIf = KeepAliveIntervalFieldValidator.class)
     public int getKeepAliveInterval() {
         return 0;
     }
 
-    @Property(viewable = true, order = 2, visibleIf = AutoCommitFieldValidator.class)
+    @Property(order = 2, id = PROP_AUTO_COMMIT, visibleIf = AutoCommitFieldValidator.class)
     public boolean isAutoCommit() {
         return true;
     }
 
-    @Property(viewable = true, order = 3, visibleIf = ReadOnlyFieldValidator.class)
+    @Property(order = 3, id = PROP_READ_ONLY, visibleIf = ReadOnlyFieldValidator.class)
     public boolean isReadOnly() {
         return false;
     }
 
-    @Property(viewable = true, order = 4, visibleIf = DefaultCatalogFieldVisibleValidator.class)
+    @Property(order = 4, id = PROP_DEFAULT_CATALOG, visibleIf = DefaultCatalogFieldVisibleValidator.class)
     public String getDefaultCatalog() {
         return null;
     }
 
-    @Property(viewable = true, order = 5, visibleIf = DefaultSchemaFieldVisibleValidator.class)
+    @Property(order = 5, id = PROP_DEFAULT_SCHEMA, visibleIf = DefaultSchemaFieldVisibleValidator.class)
     public String getDefaultSchema() {
         return null;
     }
