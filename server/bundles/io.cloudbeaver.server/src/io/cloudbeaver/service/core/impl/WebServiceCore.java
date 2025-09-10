@@ -27,7 +27,10 @@ import io.cloudbeaver.server.WebAppUtils;
 import io.cloudbeaver.server.WebApplication;
 import io.cloudbeaver.service.core.DBWServiceCore;
 import io.cloudbeaver.service.security.SMUtils;
-import io.cloudbeaver.utils.*;
+import io.cloudbeaver.utils.ServletAppUtils;
+import io.cloudbeaver.utils.WebCommonUtils;
+import io.cloudbeaver.utils.WebConnectionFolderUtils;
+import io.cloudbeaver.utils.WebDataSourceUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
@@ -41,14 +44,16 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
-import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
+import org.jkiss.dbeaver.model.navigator.DBNDataSource;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWNetworkHandler;
 import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHSession;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
@@ -56,7 +61,6 @@ import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 import org.jkiss.dbeaver.registry.settings.ProductSettingsRegistry;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.*;
@@ -393,15 +397,7 @@ public class WebServiceCore implements DBWServiceCore {
             dataSourceRegistry.addDataSource(newDataSource);
 
             dataSourceRegistry.checkForErrors();
-            WebConnectionInfo connectionInfo = project.addConnection(newDataSource);
-            WebEventUtils.addDataSourceUpdatedEvent(
-                webSession.getProjectById(projectId),
-                webSession,
-                connectionInfo.getId(),
-                WSConstants.EventAction.CREATE,
-                WSDataSourceProperty.CONFIGURATION
-            );
-            return connectionInfo;
+            return project.addConnection(newDataSource);
         } catch (DBException e) {
             throw new DBWebException("Error copying connection", e);
         }
@@ -536,25 +532,18 @@ public class WebServiceCore implements DBWServiceCore {
     ) throws DBWebException {
         WebConnectionFolderUtils.validateConnectionFolder(folderName);
         session.addInfoMessage("Create new folder");
-        WebConnectionFolderInfo parentNode = null;
+        WebConnectionFolderInfo parentFolder = null;
         try {
             if (parentPath != null) {
-                parentNode = WebConnectionFolderUtils.getFolderInfo(session, projectId, parentPath);
+                parentFolder = WebConnectionFolderUtils.getFolderInfo(session, projectId, parentPath);
             }
             WebProjectImpl project = getProjectById(session, projectId);
-            DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
-            DBPDataSourceFolder newFolder = WebConnectionFolderUtils.createFolder(parentNode,
-                folderName,
-                sessionRegistry);
-            WebConnectionFolderInfo folderInfo = new WebConnectionFolderInfo(session, newFolder);
-            WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
-            WebEventUtils.addNavigatorNodeUpdatedEvent(
-                session.getProjectById(projectId),
-                session,
-                DBNLocalFolder.makeLocalFolderItemPath(newFolder),
-                WSConstants.EventAction.CREATE
+            DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+            DBPDataSourceFolder newFolder = registry.addFolder(
+                parentFolder == null ? null : parentFolder.getDataSourceFolder(), folderName
             );
-            return folderInfo;
+            WebServiceUtils.refreshDatabases(session, projectId);
+            return new WebConnectionFolderInfo(session, newFolder);
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
         }
@@ -565,26 +554,12 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull WebSession session,
         @Nullable String projectId,
         @NotNull String folderPath,
-        @NotNull String newName
+        @NotNull String newPath
     ) throws DBWebException {
-        WebConnectionFolderUtils.validateConnectionFolder(newName);
+        WebConnectionFolderUtils.validateConnectionFolder(newPath);
         WebConnectionFolderInfo folderInfo = WebConnectionFolderUtils.getFolderInfo(session, projectId, folderPath);
-        var oldFolderNode = DBNLocalFolder.makeLocalFolderItemPath(folderInfo.getDataSourceFolder());
-        folderInfo.getDataSourceFolder().setName(newName);
-        var newFolderNode = DBNLocalFolder.makeLocalFolderItemPath(folderInfo.getDataSourceFolder());
-        WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
-        WebEventUtils.addNavigatorNodeUpdatedEvent(
-            session.getProjectById(projectId),
-            session,
-            oldFolderNode,
-            WSConstants.EventAction.DELETE
-        );
-        WebEventUtils.addNavigatorNodeUpdatedEvent(
-            session.getProjectById(projectId),
-            session,
-            newFolderNode,
-            WSConstants.EventAction.CREATE
-        );
+        folderInfo.getDataSourceFolder().setName(newPath);
+        WebServiceUtils.refreshDatabases(session, projectId);
         return folderInfo;
     }
 
@@ -599,17 +574,10 @@ public class WebServiceCore implements DBWServiceCore {
             if (folder.getDataSourceRegistry().getProject() != project) {
                 throw new DBWebException("Global folder '" + folderInfo.getId() + "' cannot be deleted");
             }
-            var folderNode = DBNLocalFolder.makeLocalFolderItemPath(folderInfo.getDataSourceFolder());
             session.addInfoMessage("Delete folder");
             DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
             sessionRegistry.removeFolder(folderInfo.getDataSourceFolder(), false);
-            WebServiceUtils.updateConfigAndRefreshDatabases(session, projectId);
-            WebEventUtils.addNavigatorNodeUpdatedEvent(
-                session.getProjectById(projectId),
-                session,
-                folderNode,
-                WSConstants.EventAction.DELETE
-            );
+            WebServiceUtils.refreshDatabases(session, projectId);
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
         }
@@ -624,12 +592,6 @@ public class WebServiceCore implements DBWServiceCore {
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
         dataSourceDescriptor.setNavigatorSettings(settings);
         dataSourceDescriptor.persistConfiguration();
-        WebEventUtils.addDataSourceUpdatedEvent(
-            webSession.getProjectById(projectId),
-            webSession,
-            id,
-            WSConstants.EventAction.UPDATE,
-            WSDataSourceProperty.CONFIGURATION);
         return connectionInfo;
     }
 
@@ -655,17 +617,5 @@ public class WebServiceCore implements DBWServiceCore {
             throw new DBWebException("Project '" + projectId + "' not found");
         }
         return project;
-    }
-
-    private void validateDriverLibrariesPresence(@NotNull DBPDataSourceContainer container) throws DBWebException {
-        if (!DBWorkbench.isDistributed() && container.getDriver().getDriverLoader(container).needsExternalDependencies()) {
-            throwDriverNotFoundException(container);
-        }
-    }
-
-    @NotNull
-    private static String throwDriverNotFoundException(@NotNull DBPDataSourceContainer container) throws DBWebException {
-        throw new DBWebException("Driver files for %s are not found. Please ask the administrator to download it."
-            .formatted(container.getDriver().getName()));
     }
 }

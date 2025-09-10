@@ -318,9 +318,11 @@ public class WebServiceUtils extends WebCommonUtils {
         return container.getName() + " [" + container.getId() + "]";
     }
 
-    public static void updateConfigAndRefreshDatabases(WebSession session, String projectId) throws DBWebException {
+    public static void refreshDatabases(WebSession session, String projectId) throws DBWebException {
         DBNProject projectNode = session.getNavigatorModelOrThrow().getRoot().getProjectNode(session.getProjectById(projectId));
-        DBNModel.updateConfigAndRefreshDatabases(projectNode.getDatabases());
+        if (projectNode != null) {
+            projectNode.getDatabases().refreshChildren();
+        }
     }
 
     public static boolean isGlobalProject(DBPProject project) {
