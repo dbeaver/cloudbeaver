@@ -73,7 +73,7 @@ export const Switch: SwitchType = observer(function Switch({
   }
 
   return (
-    <Field title={rest.title} className={s(styles, {}, styles['field'], className)}>
+    <Field title={rest.title} className={s(styles, { field: true }, className)}>
       <div className={styles['switchBody']}>
         <div className={s(styles, { switchControl: true, disabled: disabled, checked: checkboxState.checked })}>
           <div className={styles['switchControlTrack']} />
