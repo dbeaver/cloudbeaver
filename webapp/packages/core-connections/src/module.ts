@@ -32,6 +32,7 @@ import { ConnectionExecutionContextService } from './ConnectionExecutionContext/
 import { ConnectionFolderEventHandler } from './ConnectionFolderEventHandler.js';
 import { ConnectionExecutionContextResource } from './ConnectionExecutionContext/ConnectionExecutionContextResource.js';
 import { ConnectionDialectResource } from './ConnectionDialectResource.js';
+import { DBDriverExpertSettingsResource } from './DBDriverExpertSettingsResource.js';
 
 ModuleRegistry.add({
   name: '@cloudbeaver/core-connections',
@@ -61,6 +62,7 @@ ModuleRegistry.add({
       .addSingleton(NetworkHandlerResource)
       .addSingleton(NavNodeExtensionsService)
       .addSingleton(DBDriverResource)
+      .addSingleton(DBDriverExpertSettingsResource)
       .addSingleton(DatabaseAuthModelsResource)
       .addSingleton(ContainerResource)
       .addSingleton(ConnectionToolsResource)

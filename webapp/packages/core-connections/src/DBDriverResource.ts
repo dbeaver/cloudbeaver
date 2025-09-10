@@ -10,12 +10,13 @@ import { computed, makeObservable } from 'mobx';
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { ServerConfigResource, WorkspaceConfigEventHandler } from '@cloudbeaver/core-root';
+import { SessionDataResource, WorkspaceConfigEventHandler } from '@cloudbeaver/core-root';
 import {
   CbServerEventId,
   type DatabaseDriverFragment,
   DriverConfigurationType,
   type DriverListQueryVariables,
+  type DriverPropertyInfoFragment,
   GraphQLService,
 } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
@@ -27,22 +28,25 @@ export const NEW_DRIVER_SYMBOL = Symbol('new-driver');
 export type NewDBDriver = DBDriver & { [NEW_DRIVER_SYMBOL]: boolean; timestamp: number };
 export type DBDriverResourceIncludes = Omit<DriverListQueryVariables, 'driverId'>;
 
-@injectable(() => [ServerConfigResource, GraphQLService, WorkspaceConfigEventHandler, AppAuthService])
+export type DriverPropertyInfo = DriverPropertyInfoFragment;
+
+@injectable(() => [SessionDataResource, GraphQLService, WorkspaceConfigEventHandler, AppAuthService])
 export class DBDriverResource extends CachedMapResource<string, DBDriver, DBDriverResourceIncludes> {
   get enabledDrivers() {
     return this.values.filter(driver => driver.enabled).sort(this.compare);
   }
 
   constructor(
-    private readonly serverConfigResource: ServerConfigResource,
+    private readonly sessionDataResource: SessionDataResource,
     private readonly graphQLService: GraphQLService,
     private readonly workspaceConfigEventHandler: WorkspaceConfigEventHandler,
     appAuthService: AppAuthService,
   ) {
     super();
     appAuthService.requireAuthentication(this);
+
     this.sync(
-      this.serverConfigResource,
+      this.sessionDataResource,
       () => {},
       () => CachedMapAllKey,
     );

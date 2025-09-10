@@ -12,10 +12,6 @@ fragment DatabaseConnectionCustomOptions on ConnectionInfo {
   description
   folder
   driverId
-  keepAliveInterval
-  autocommit
-  defaultCatalogName
-  defaultSchemaName
-  readOnly
   mainPropertyValues
+  expertSettingsValues
 }
