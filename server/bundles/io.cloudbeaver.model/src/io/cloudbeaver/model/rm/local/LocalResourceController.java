@@ -28,18 +28,26 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.fs.lock.FileLockController;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
+import org.jkiss.dbeaver.model.navigator.DBNLocalFolder;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDatasourceFolderEvent;
+import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceParseResults;
 import org.jkiss.dbeaver.registry.ResourceTypeDescriptor;
 import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -332,6 +340,239 @@ public class LocalResourceController extends BaseLocalResourceController {
             });
         }
         return project;
+    }
+
+    @Override
+    public void createProjectDataSources(
+        @NotNull String projectId,
+        @NotNull String configuration,
+        @Nullable List<String> dataSourceIds
+    ) throws DBException {
+        super.createProjectDataSources(projectId, configuration, dataSourceIds);
+        if (credentialsProvider.getActiveUserCredentials() != null && dataSourceIds != null) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSDataSourceEvent.create(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    projectId,
+                    dataSourceIds,
+                    WSDataSourceProperty.CONFIGURATION
+                )
+            );
+        }
+    }
+
+    @Override
+    public boolean updateProjectDataSources(
+        @NotNull String projectId,
+        @NotNull String configuration,
+        @Nullable List<String> dataSourceIds
+    ) throws DBException {
+        DBPDataSourceRegistry registry = getWebProject(projectId, false).getDataSourceRegistry();
+        Map<String, DataSourceDescriptor> oldDataSources = registry.getDataSources().stream()
+            .filter(ds -> dataSourceIds == null || dataSourceIds.contains(ds.getId()))
+            .collect(Collectors.toMap(
+                    DBPDataSourceContainer::getId,
+                    registry::createDataSource
+                )
+            );
+        DataSourceParseResults parseResults = super.updateProjectDataSourcesConfig(projectId, configuration, dataSourceIds);
+        sendDataSourcesConfigUpdatedEvent(registry, oldDataSources, parseResults);
+        return parseResults != null;
+    }
+
+    @Override
+    public void deleteProjectDataSources(@NotNull String projectId, @NotNull String[] dataSourceIds) throws DBException {
+        super.deleteProjectDataSources(projectId, dataSourceIds);
+        if (credentialsProvider.getActiveUserCredentials() != null && dataSourceIds.length > 0) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSDataSourceEvent.delete(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    projectId,
+                    Arrays.asList(dataSourceIds),
+                    WSDataSourceProperty.CONFIGURATION
+                )
+            );
+        }
+    }
+
+    @Override
+    public void createProjectDataSourceFolder(@NotNull String projectId, @NotNull String folderPath) throws DBException {
+        super.createProjectDataSourceFolder(projectId, folderPath);
+        if (credentialsProvider.getActiveUserCredentials() != null) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSDatasourceFolderEvent.create(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    projectId,
+                    List.of(createNodePathFromFolderPath(projectId, folderPath))
+                )
+            );
+        }
+    }
+
+    @Override
+    public void moveProjectDataSourceFolder(
+        @NotNull String projectId,
+        @NotNull String oldPath,
+        @NotNull String newPath
+    ) throws DBException {
+        super.moveProjectDataSourceFolder(projectId, oldPath, newPath);
+        if (credentialsProvider.getActiveUserCredentials() != null) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSDatasourceFolderEvent.delete(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    projectId,
+                    List.of(createNodePathFromFolderPath(projectId, oldPath))
+                )
+            );
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSDatasourceFolderEvent.create(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    projectId,
+                    List.of(createNodePathFromFolderPath(projectId, newPath))
+                )
+            );
+        }
+    }
+
+    @Override
+    public void deleteProjectDataSourceFolders(@NotNull String projectId, @NotNull String[] folderPaths, boolean dropContents)
+    throws DBException {
+        super.deleteProjectDataSourceFolders(projectId, folderPaths, dropContents);
+        if (credentialsProvider.getActiveUserCredentials() != null) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSDatasourceFolderEvent.create(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    projectId,
+                    Arrays.stream(folderPaths).map(
+                        p -> createNodePathFromFolderPath(projectId, p)
+                    ).collect(Collectors.toList())
+                )
+            );
+        }
+    }
+
+    private String createNodePathFromFolderPath(String projectId, String folderPath) {
+        return DBNLocalFolder.makeLocalFolderItemPath(projectId, folderPath);
+    }
+
+    private void sendDataSourcesConfigUpdatedEvent(
+        @NotNull DBPDataSourceRegistry registry,
+        @NotNull Map<String, DataSourceDescriptor> oldDataSources,
+        @Nullable DataSourceParseResults parseResults
+    ) {
+        if (parseResults == null || credentialsProvider.getActiveUserCredentials() == null || oldDataSources.isEmpty()) {
+            return;
+        }
+        List<String> updatedConfigurationDataSourceIds = new ArrayList<>();
+        List<String> updatedNameDataSourceIds = new ArrayList<>();
+        List<String> updatedInternalConfigurationDataSourceIds = new ArrayList<>();
+
+        for (Map.Entry<String, DataSourceDescriptor> entry : oldDataSources.entrySet()) {
+            String dsId = entry.getKey();
+            DataSourceDescriptor oldDs = entry.getValue();
+            DataSourceDescriptor newDs = (DataSourceDescriptor) registry.getDataSource(dsId);
+            if (newDs == null) {
+                continue;
+            }
+            if (!oldDs.equalConfiguration(newDs)) {
+                updatedConfigurationDataSourceIds.add(dsId);
+            } else if (!oldDs.isLooselyEqualTo(newDs)) {
+                updatedNameDataSourceIds.add(dsId);
+            } else if (!oldDs.equalInternalConfiguration(newDs)) {
+                updatedInternalConfigurationDataSourceIds.add(dsId);
+            }
+        }
+
+        if (!updatedConfigurationDataSourceIds.isEmpty()) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSDataSourceEvent.update(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    registry.getProject().getId(),
+                    updatedConfigurationDataSourceIds,
+                    WSDataSourceProperty.CONFIGURATION
+                )
+            );
+        }
+        if (!updatedNameDataSourceIds.isEmpty()) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSDataSourceEvent.update(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    registry.getProject().getId(),
+                    updatedNameDataSourceIds,
+                    WSDataSourceProperty.NAME
+                )
+            );
+        }
+        if (!updatedInternalConfigurationDataSourceIds.isEmpty()) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSDataSourceEvent.update(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    registry.getProject().getId(),
+                    updatedInternalConfigurationDataSourceIds,
+                    WSDataSourceProperty.INTERNAL
+                )
+            );
+        }
+
+        if (!parseResults.addedDataSources.isEmpty()) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSDataSourceEvent.create(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    registry.getProject().getId(),
+                    updatedNameDataSourceIds,
+                    WSDataSourceProperty.CONFIGURATION
+                )
+            );
+        }
+
+        if (!parseResults.removedDataSources.isEmpty()) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSDataSourceEvent.delete(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    registry.getProject().getId(),
+                    updatedNameDataSourceIds,
+                    WSDataSourceProperty.CONFIGURATION
+                )
+            );
+        }
+
+        if (!parseResults.addedFolders.isEmpty()) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSDatasourceFolderEvent.create(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    registry.getProject().getId(),
+                    parseResults.addedFolders.stream().map(
+                        f -> createNodePathFromFolderPath(registry.getProject().getId(), f.getFolderPath())
+                    ).toList()
+                )
+            );
+        }
+
+        if (!parseResults.removedFolders.isEmpty()) {
+            ServletAppUtils.getServletApplication().getEventController().addEvent(
+                WSDatasourceFolderEvent.delete(
+                    credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                    credentialsProvider.getActiveUserCredentials().getUserId(),
+                    registry.getProject().getId(),
+                    parseResults.removedFolders.stream().map(
+                        f -> createNodePathFromFolderPath(registry.getProject().getId(), f.getFolderPath())
+                    ).toList()
+                )
+            );
+        }
+
     }
 
     @NotNull
