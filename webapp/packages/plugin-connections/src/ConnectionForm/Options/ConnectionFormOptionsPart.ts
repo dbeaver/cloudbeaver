@@ -237,7 +237,7 @@ export class ConnectionFormOptionsPart extends FormPart<IConnectionFormOptionsSt
     }
 
     if (customOptionsInfo.expertSettingsValues) {
-      config.expertSettingsValues = { ...toJS(customOptionsInfo.expertSettingsValues) };
+      config.expertSettingsValues = toJS(customOptionsInfo.expertSettingsValues);
     }
 
     this.formState.state.availableDrivers = [customOptionsInfo.driverId];
