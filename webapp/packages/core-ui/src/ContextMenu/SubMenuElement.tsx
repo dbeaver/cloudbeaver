@@ -30,7 +30,7 @@ interface ISubMenuElementProps extends Omit<React.ButtonHTMLAttributes<any>, 'st
   onItemClose?: () => void;
 }
 
-export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
+export const SubMenuElement = observer<ISubMenuElementProps, HTMLDivElement>(
   forwardRef(function SubMenuElement({ menuData, subMenu, itemRenderer, menuModal: modal, menuRtl: rtl, onItemClose, ...rest }, ref) {
     const menu = useRef<IMenuState>(null);
     const subMenuData = useMenu({ menu: subMenu.menu, context: menuData.context });

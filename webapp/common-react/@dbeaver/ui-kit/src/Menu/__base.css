@@ -1,7 +1,7 @@
 @layer base {
   :root {
     --dbv-kit-menu-button-height: var(--dbv-kit-control-height-medium);
-    --dbv-kit-menu-button-padding-inline: calc(var(--tw-spacing) * 2.5);
+    --dbv-kit-menu-button-padding-inline: 0;
 
     --dbv-kit-menu-foreground: var(--dbv-kit-color-foreground);
     --dbv-kit-menu-background: inherit;

@@ -58,6 +58,7 @@
     "@cloudbeaver/tsconfig": "workspace:*",
     "@dbeaver/cli": "workspace:*",
     "@dbeaver/react-tests": "workspace:^",
+    "@dbeaver/ui-kit": "workspace:*",
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
     "@types/react": "^19",

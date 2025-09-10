@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 import { Children, forwardRef } from 'react';
-import { Menu, type MenuStateReturn } from 'reakit';
+import { Menu as UIKitMenu, useMenuStore, useStoreState } from '@dbeaver/ui-kit';
 
 import { ErrorBoundary } from '../ErrorBoundary.js';
 import { getComputed } from '../getComputed.js';
@@ -20,7 +20,7 @@ import styleMenuItemElement from './MenuItemElement.module.css';
 
 export interface IMenuPanelProps {
   label: string;
-  menu: MenuStateReturn; // from reakit useMenuState
+  menu: ReturnType<typeof useMenuStore>;
   panelAvailable?: boolean;
   hasBindings?: boolean;
   getHasBindings?: () => boolean;
@@ -34,7 +34,8 @@ export const MenuPanel = observer<IMenuPanelProps, HTMLDivElement>(
   forwardRef(function MenuPanel({ label, menu, submenu, panelAvailable = true, rtl, getHasBindings, hasBindings, children, className }, ref) {
     const translate = useTranslate();
     const styles = useS(style, styleMenuItemElement);
-    const visible = menu.visible;
+    const menuState = useStoreState(menu);
+    const visible = !!menuState.open;
 
     if (!visible) {
       return null;
@@ -50,18 +51,15 @@ export const MenuPanel = observer<IMenuPanelProps, HTMLDivElement>(
 
     return (
       <ErrorBoundary>
-        <Menu
-          ref={ref}
-          className={s(styles, { menu: true, modal: menu.modal, submenu }, className)}
-          {...menu}
-          aria-label={translate(label)}
-          visible={panelAvailable}
-        >
-          <div dir={rtl ? 'rtl' : undefined} data-s-has-bindings={hasBindings} className={s(styles, { menuBox: true })}>
-            {Children.count(renderedChildren) === 0 && <MenuEmptyItem />}
-            {renderedChildren}
-          </div>
-        </Menu>
+        <UIKitMenu.Provider store={menu}>
+          {/* TODO remove modal? */}
+          <UIKitMenu className={s(styles, { menu: true, modal: false, submenu }, className)} aria-label={translate(label)}>
+            <div dir={rtl ? 'rtl' : undefined} data-s-has-bindings={hasBindings} className={s(styles, { menuBox: true })}>
+              {Children.count(renderedChildren) === 0 && <MenuEmptyItem />}
+              {renderedChildren}
+            </div>
+          </UIKitMenu>
+        </UIKitMenu.Provider>
       </ErrorBoundary>
     );
   }),

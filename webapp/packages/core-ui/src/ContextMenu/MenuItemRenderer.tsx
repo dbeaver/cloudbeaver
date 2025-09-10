@@ -53,8 +53,7 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
 
   if (item instanceof MenuSubMenuItem) {
     return (
-      <MenuItem
-        {...{ as: SubMenuElement }}
+      <SubMenuElement
         id={item.id}
         aria-label={translate(item.menu.info.label)}
         hidden={item.hidden}

@@ -85,7 +85,7 @@ export const ObjectMenuCell = observer<Props>(function ObjectMenuCell({ object }
               <ContextMenu
                 contextMenuPosition={contextMenuPosition}
                 menu={menu}
-                placement="auto-end"
+                placement="bottom-end"
                 hidden={menuEmpty}
                 modal
                 disclosure

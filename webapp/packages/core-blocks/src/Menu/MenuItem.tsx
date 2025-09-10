@@ -6,47 +6,28 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React, { useContext } from 'react';
-import { MenuItem as ReakitMenuItem, type CompositeItemOptions } from 'reakit';
+import React from 'react';
+import { Menu as UIKitMenu, type MenuItemProps as UIKitMenuItemProps } from '@dbeaver/ui-kit';
 
 import { s } from '../s.js';
-import { useCombinedHandler } from '../useCombinedHandler.js';
 import { useS } from '../useS.js';
 import style from './MenuItem.module.css';
-import { MenuStateContext } from './MenuStateContext.js';
-import type { ReakitProxyComponent, ReakitProxyComponentOptions } from './ReakitProxyComponent.js';
 
-export type MenuItemOptions = CompositeItemOptions & {
+export type MenuItemOptions = {
   selected?: boolean;
   close?: boolean;
 };
 
-export const MenuItem: ReakitProxyComponent<'button', MenuItemOptions> = observer<ReakitProxyComponentOptions<'button', MenuItemOptions>>(
-  function MenuItem({ children, hidden, selected, close, onClick, className, ...rest }) {
-    const menu = useContext(MenuStateContext);
-    const styles = useS(style);
+export interface IMenuItemProps extends Omit<UIKitMenuItemProps, 'children' | 'className'>, React.HTMLAttributes<HTMLDivElement> {
+  selected?: boolean;
+}
 
-    const handleClick = useCombinedHandler<[React.MouseEvent<HTMLButtonElement>]>(onClick, function handleClick() {
-      if (close) {
-        menu?.hide();
-      }
-    });
+export const MenuItem = observer(function MenuItem({ children, selected, className, ...rest }: IMenuItemProps) {
+  const styles = useS(style);
 
-    const MenuItem = ReakitMenuItem;
-
-    return (
-      <MenuItem
-        {...menu}
-        aria-selected={selected}
-        {...rest}
-        className={s(styles, { menuItem: true, hidden }, className)}
-        disabled={selected || rest.disabled}
-        style={{ pointerEvents: 'auto' }}
-        focusable
-        onClick={handleClick}
-      >
-        {children}
-      </MenuItem>
-    );
-  },
-) as ReakitProxyComponent<'button', MenuItemOptions>;
+  return (
+    <UIKitMenu.Item aria-selected={selected} className={s(styles, { menuItem: true }, className)} {...rest}>
+      {children}
+    </UIKitMenu.Item>
+  );
+});

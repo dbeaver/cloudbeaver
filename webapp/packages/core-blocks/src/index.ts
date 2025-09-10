@@ -55,6 +55,7 @@ export * from './ConnectionImageWithMask/ConnectionImageWithMask.js';
 export { default as ConnectionImageWithMaskSvgStyles } from './ConnectionImageWithMask/ConnectionImageWithMaskSvg.module.css';
 
 export * from './Menu/Menu.js';
+// TODO shod we do something with styles?
 export { default as MenuStyles } from './Menu/Menu.module.css';
 export * from './Menu/MenuBarSmallItem.js';
 export * from './Menu/MenuEmptyItem.js';
