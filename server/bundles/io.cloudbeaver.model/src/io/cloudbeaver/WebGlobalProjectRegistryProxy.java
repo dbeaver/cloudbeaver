@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.struct.DBSObjectFilter;
 import org.jkiss.dbeaver.registry.DataSourceConfigurationManager;
+import org.jkiss.dbeaver.registry.DataSourceParseResults;
 import org.jkiss.dbeaver.registry.DataSourcePersistentRegistry;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 
@@ -377,7 +378,7 @@ public class WebGlobalProjectRegistryProxy implements DBPDataSourceRegistry, Dat
     }
 
     @Override
-    public boolean loadDataSources(
+    public DataSourceParseResults loadDataSources(
         @NotNull List<DBPDataSourceConfigurationStorage> storages,
         @NotNull DataSourceConfigurationManager manager,
         @Nullable Collection<String> dataSourceIds, boolean refresh,
