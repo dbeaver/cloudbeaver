@@ -2,11 +2,7 @@
 
 @layer base {
   .dbv-kit-menu__button {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     width: 100%;
-    height: 100%;
     height: var(--dbv-kit-menu-button-height);
     padding-inline: var(--dbv-kit-menu-button-padding-inline);
     background-color: var(--dbv-kit-menu-background);
@@ -42,6 +38,7 @@
     min-width: max-content;
     max-height: var(--dbv-kit-menu-popover-max-height);
     overflow-y: auto;
+    overflow-x: hidden;
     background-color: var(--dbv-kit-menu-popover-background);
     color: var(--dbv-kit-menu-popover-foreground);
     border-color: var(--dbv-kit-menu-border-color);

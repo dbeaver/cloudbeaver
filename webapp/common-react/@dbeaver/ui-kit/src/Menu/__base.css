@@ -1,9 +1,9 @@
 @layer base {
   :root {
-    --dbv-kit-menu-button-height: var(--dbv-kit-control-height-medium);
+    --dbv-kit-menu-button-height: 100%;
     --dbv-kit-menu-button-padding-inline: 0;
 
-    --dbv-kit-menu-foreground: var(--dbv-kit-color-foreground);
+    --dbv-kit-menu-foreground: inherit;
     --dbv-kit-menu-background: inherit;
     --dbv-kit-menu-disabled-foreground: var(--dbv-kit-control-disabled-foreground);
     --dbv-kit-menu-disabled-background: var(--dbv-kit-control-disabled-background);
@@ -17,8 +17,8 @@
     --dbv-kit-menu-font-weight: var(--tw-font-weight-normal);
     --dbv-kit-menu-font-size: calc(var(--dbv-kit-font-size-base) * 0.875);
 
-    --dbv-kit-menu-popover-background: var(--dbv-kit-color-background);
-    --dbv-kit-menu-popover-foreground: var(--dbv-kit-color-foreground);
+    --dbv-kit-menu-popover-background: inherit;
+    --dbv-kit-menu-popover-foreground: inherit;
     --dbv-kit-menu-popover-shadow: var(--tw-shadow-md);
     --dbv-kit-menu-popover-max-height: 18rem;
 
