@@ -78,6 +78,7 @@ import { codemirror6Manifest } from '@cloudbeaver/plugin-codemirror6';
 
 import { defaultProductManifest } from './manifest.js';
 import pluginDataEditorPublicSettingsManifest from '@cloudbeaver/plugin-data-editor-public-settings';
+import pluginServerNotificationsManifest from '@cloudbeaver/plugin-server-notifications';
 
 const PLUGINS: PluginManifest[] = [
   ssoPlugin,
@@ -145,6 +146,7 @@ const PLUGINS: PluginManifest[] = [
   appLogoPluginAdministration,
   pluginSystemInformationAdministrationManifest,
   pluginSettingsDefaultAdministrationManifest,
+  pluginServerNotificationsManifest,
   codemirror6Manifest,
   // must be las one to override all
   defaultProductManifest,

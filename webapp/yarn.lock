@@ -3587,6 +3587,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@cloudbeaver/plugin-server-notifications@workspace:*, @cloudbeaver/plugin-server-notifications@workspace:packages/plugin-server-notifications":
+  version: 0.0.0-use.local
+  resolution: "@cloudbeaver/plugin-server-notifications@workspace:packages/plugin-server-notifications"
+  dependencies:
+    "@cloudbeaver/core-cli": "workspace:*"
+    "@cloudbeaver/core-di": "workspace:*"
+    "@cloudbeaver/core-events": "workspace:*"
+    "@cloudbeaver/core-root": "workspace:*"
+    "@cloudbeaver/core-sdk": "workspace:*"
+    "@cloudbeaver/tsconfig": "workspace:*"
+    "@dbeaver/cli": "workspace:*"
+    rimraf: "npm:^6"
+    tslib: "npm:^2"
+    typescript: "npm:^5"
+  languageName: unknown
+  linkType: soft
+
 "@cloudbeaver/plugin-session-expiration@workspace:*, @cloudbeaver/plugin-session-expiration@workspace:packages/plugin-session-expiration":
   version: 0.0.0-use.local
   resolution: "@cloudbeaver/plugin-session-expiration@workspace:packages/plugin-session-expiration"
@@ -4245,6 +4262,7 @@ __metadata:
     "@cloudbeaver/plugin-resource-manager-administration": "workspace:*"
     "@cloudbeaver/plugin-resource-manager-scripts": "workspace:*"
     "@cloudbeaver/plugin-root": "workspace:*"
+    "@cloudbeaver/plugin-server-notifications": "workspace:*"
     "@cloudbeaver/plugin-session-expiration": "workspace:*"
     "@cloudbeaver/plugin-settings-administration": "workspace:*"
     "@cloudbeaver/plugin-settings-default-administration": "workspace:^"
