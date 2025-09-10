@@ -24,7 +24,6 @@ import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.utils.ServletAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
-import io.cloudbeaver.utils.WebEventUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -38,8 +37,6 @@ import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
-import org.jkiss.dbeaver.model.websocket.WSConstants;
-import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
@@ -100,13 +97,6 @@ public class ConnectionControllerCE implements ConnectionController {
         WebConnectionInfo connectionInfo = project.addConnection(newDataSource);
         webSession.addInfoMessage("New connection was created - " + WebServiceUtils.getConnectionContainerInfo(
             newDataSource));
-        WebEventUtils.addDataSourceUpdatedEvent(
-            webSession.getProjectById(projectId),
-            webSession,
-            connectionInfo.getId(),
-            WSConstants.EventAction.CREATE,
-            WSDataSourceProperty.CONFIGURATION
-        );
         log.info(String.format(
             "New connection was created: [info=%s, user=%s]",
             WebServiceUtils.getConnectionContainerInfo(newDataSource),
@@ -190,7 +180,6 @@ public class ConnectionControllerCE implements ConnectionController {
         DBPDataSourceRegistry sessionRegistry
     ) throws DBWebException {
         WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, config.getConnectionId());
-        boolean sendEvent = !((DataSourceDescriptor) dataSource).equalSettings(getOldDataSource(dataSource));
         if (!isSharedCredentials(dataSource)) {
             // secret controller is responsible for notification, password changes applied after checks
             WebServiceUtils.saveAuthProperties(
@@ -201,23 +190,11 @@ public class ConnectionControllerCE implements ConnectionController {
                 config.isSharedCredentials()
             );
         }
-
-        WSDataSourceProperty property = getDatasourceEventProperty(getOldDataSource(dataSource), dataSource);
-
         try {
             sessionRegistry.updateDataSource(dataSource);
             sessionRegistry.checkForErrors();
         } catch (DBException e) {
             throw new DBWebException("Failed to update connection", e);
-        }
-        if (sendEvent) {
-            WebEventUtils.addDataSourceUpdatedEvent(
-                webSession.getProjectById(projectId),
-                webSession,
-                connectionInfo.getId(),
-                WSConstants.EventAction.UPDATE,
-                property
-            );
         }
         log.info(String.format(
             "Connection updated: [info=%s, userId=%s]",
@@ -238,13 +215,6 @@ public class ConnectionControllerCE implements ConnectionController {
         webSession.addInfoMessage("Delete connection - " +
             WebServiceUtils.getConnectionContainerInfo(connectionInfo.getDataSourceContainer()));
         closeAndDeleteConnection(webSession, projectId, connectionId, true);
-        WebEventUtils.addDataSourceUpdatedEvent(
-            webSession.getProjectById(projectId),
-            webSession,
-            connectionId,
-            WSConstants.EventAction.DELETE,
-            WSDataSourceProperty.CONFIGURATION
-        );
 
         log.info(String.format(
             "Connection deleted: [info=%s, userId=%s]",
@@ -359,23 +329,6 @@ public class ConnectionControllerCE implements ConnectionController {
             throw new DBWebException("Project '" + projectId + "' not found");
         }
         return project;
-    }
-
-    private WSDataSourceProperty getDatasourceEventProperty(
-        DataSourceDescriptor oldDataSource,
-        DBPDataSourceContainer dataSource
-    ) {
-        if (!oldDataSource.equalConfiguration((DataSourceDescriptor) dataSource)) {
-            return WSDataSourceProperty.CONFIGURATION;
-        }
-
-        var nameChanged = !CommonUtils.equalObjects(oldDataSource.getName(), dataSource.getName());
-        var descriptionChanged = !CommonUtils.equalObjects(oldDataSource.getDescription(), dataSource.getDescription());
-        if (nameChanged && descriptionChanged) {
-            return WSDataSourceProperty.CONFIGURATION;
-        }
-
-        return nameChanged ? WSDataSourceProperty.NAME : WSDataSourceProperty.CONFIGURATION;
     }
 
     @NotNull

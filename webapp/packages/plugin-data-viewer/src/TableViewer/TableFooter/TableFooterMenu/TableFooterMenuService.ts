@@ -14,8 +14,14 @@ import {
   ACTION_REVERT,
   ACTION_SAVE,
   ActionService,
+  getBindingLabel,
+  KEY_BINDING_ADD,
+  KEY_BINDING_DUPLICATE,
   MenuService,
+  type IAction,
 } from '@cloudbeaver/core-view';
+import { LocalizationService } from '@cloudbeaver/core-localization';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 
 import { DatabaseEditAction } from '../../../DatabaseDataModel/Actions/DatabaseEditAction.js';
 import { DatabaseSelectAction } from '../../../DatabaseDataModel/Actions/DatabaseSelectAction.js';
@@ -26,14 +32,15 @@ import { DATA_CONTEXT_DV_PRESENTATION, DataViewerPresentationType } from '../../
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel.js';
 import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from './DATA_VIEWER_DATA_MODEL_ACTIONS_MENU.js';
 
-@injectable(() => [ActionService, MenuService])
+@injectable(() => [ActionService, LocalizationService, MenuService])
 export class TableFooterMenuService {
   constructor(
     private readonly actionService: ActionService,
+    private readonly localizationService: LocalizationService,
     private readonly menuService: MenuService,
-  ) {}
+  ) { }
 
-  register() {
+  register(): void {
     this.registerEditingActions();
   }
 
@@ -144,62 +151,68 @@ export class TableFooterMenuService {
 
         return false;
       },
-      getActionInfo(context, action) {
-        switch (action) {
-          case ACTION_ADD:
-            return { ...action.info, label: '', icon: '/icons/data_add_sm.svg', tooltip: 'data_viewer_action_edit_add' };
-          case ACTION_DUPLICATE:
-            return { ...action.info, label: '', icon: '/icons/data_add_copy_sm.svg', tooltip: 'data_viewer_action_edit_add_copy' };
-          case ACTION_DELETE:
-            return { ...action.info, label: '', icon: '/icons/data_delete_sm.svg', tooltip: 'data_viewer_action_edit_delete' };
-          case ACTION_REVERT:
-            return { ...action.info, label: '', icon: '/icons/data_revert_sm.svg', tooltip: 'data_viewer_action_edit_revert' };
-          case ACTION_SAVE:
-            return { ...action.info, icon: 'table-save' };
-          case ACTION_CANCEL:
-            return { ...action.info, icon: '/icons/data_revert_all_sm.svg', tooltip: 'data_viewer_value_revert_title' };
-        }
-
-        return action.info;
-      },
-      handler: (context, action) => {
-        const model = context.get(DATA_CONTEXT_DV_DDM)!;
-        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-        const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
-
-        if (!editor) {
-          return;
-        }
-        const select = model.source.getActionImplementation(resultIndex, DatabaseSelectAction);
-        const selectedElements = getActiveElements(model, resultIndex);
-
-        switch (action) {
-          case ACTION_ADD: {
-            editor.add(select?.getFocusedElement());
-            break;
-          }
-          case ACTION_DUPLICATE: {
-            editor.duplicate(...selectedElements);
-            break;
-          }
-          case ACTION_DELETE: {
-            editor.delete(...selectedElements);
-            break;
-          }
-          case ACTION_REVERT: {
-            editor.revert(...selectedElements);
-            break;
-          }
-          case ACTION_SAVE:
-            model.save().catch(() => {});
-            break;
-          case ACTION_CANCEL: {
-            editor.clear();
-            break;
-          }
-        }
-      },
+      getActionInfo: this.tableFooterMenuGetActionInfo.bind(this),
+      handler: this.tableFooterMenuActionHandler.bind(this),
     });
+  }
+
+  private tableFooterMenuActionHandler(context: IDataContextProvider, action: IAction) {
+    const model = context.get(DATA_CONTEXT_DV_DDM)!;
+    const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+    const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
+
+    if (!editor) {
+      return;
+    }
+    const select = model.source.getActionImplementation(resultIndex, DatabaseSelectAction);
+    const selectedElements = getActiveElements(model, resultIndex);
+
+    switch (action) {
+      case ACTION_ADD: {
+        editor.add(select?.getFocusedElement());
+        break;
+      }
+      case ACTION_DUPLICATE: {
+        editor.duplicate(...selectedElements);
+        break;
+      }
+      case ACTION_DELETE: {
+        editor.delete(...selectedElements);
+        break;
+      }
+      case ACTION_REVERT: {
+        editor.revert(...selectedElements);
+        break;
+      }
+      case ACTION_SAVE:
+        model.save().catch(() => { });
+        break;
+      case ACTION_CANCEL: {
+        editor.clear();
+        break;
+      }
+    }
+
+  }
+
+  private tableFooterMenuGetActionInfo(context: IDataContextProvider, action: IAction) {
+    const t = this.localizationService.translate;
+    switch (action) {
+      case ACTION_ADD:
+        return { ...action.info, label: '', icon: '/icons/data_add_sm.svg', tooltip: t('data_viewer_action_edit_add') + ' (' + getBindingLabel(KEY_BINDING_ADD) + ')' };
+      case ACTION_DUPLICATE:
+        return { ...action.info, label: '', icon: '/icons/data_add_copy_sm.svg', tooltip: t('data_viewer_action_edit_add_copy') + ' (' + getBindingLabel(KEY_BINDING_DUPLICATE) + ')' };
+      case ACTION_DELETE:
+        return { ...action.info, label: '', icon: '/icons/data_delete_sm.svg', tooltip: t('data_viewer_action_edit_delete') };
+      case ACTION_REVERT:
+        return { ...action.info, label: '', icon: '/icons/data_revert_sm.svg', tooltip: t('data_viewer_action_edit_revert') };
+      case ACTION_SAVE:
+        return { ...action.info, icon: 'table-save' };
+      case ACTION_CANCEL:
+        return { ...action.info, icon: '/icons/data_revert_all_sm.svg', tooltip: t('data_viewer_value_revert_title') };
+    }
+
+    return action.info;
   }
 }
 
