@@ -13,7 +13,6 @@ import { GraphQLService, type SessionStateFragment } from '@cloudbeaver/core-sdk
 import { ServerConfigResource } from './ServerConfigResource.js';
 import { ServerEventId, SessionEventSource } from './SessionEventSource.js';
 import { type ISessionStateEvent, SessionInfoEventHandler } from './SessionInfoEventHandler.js';
-import { ServerStateEventHandler } from './ServerStateEventHandler.js';
 
 export type SessionState = SessionStateFragment;
 export interface ISessionAction {
@@ -21,7 +20,7 @@ export interface ISessionAction {
   [key: string]: any;
 }
 
-@injectable(() => [GraphQLService, SessionEventSource, SessionInfoEventHandler, ServerConfigResource, LocalizationService, ServerStateEventHandler])
+@injectable(() => [GraphQLService, SessionEventSource, SessionInfoEventHandler, ServerConfigResource, LocalizationService])
 export class SessionResource extends CachedDataResource<SessionState | null> {
   private action: ISessionAction | null;
 
@@ -31,7 +30,6 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     private readonly sessionInfoEventHandler: SessionInfoEventHandler,
     serverConfigResource: ServerConfigResource,
     private readonly localizationService: LocalizationService,
-    private readonly serverStateEventHandler: ServerStateEventHandler,
   ) {
     super(() => null);
 
@@ -39,15 +37,6 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
 
     sessionEventSource.onActivate.addHandler(() => this.load());
     sessionInfoEventHandler.onEvent(ServerEventId.CbSessionState, this.handleSessionStateEvent, undefined, this);
-
-    this.serverStateEventHandler.onEvent(
-      ServerEventId.CbUserSessionLimit,
-      () => {
-        this.markOutdated();
-      },
-      undefined,
-      this,
-    );
 
     this.action = null;
     this.sync(
