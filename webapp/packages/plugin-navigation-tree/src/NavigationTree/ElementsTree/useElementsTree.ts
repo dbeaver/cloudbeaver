@@ -24,7 +24,7 @@ import { type NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedResourceOffsetPageKey, CachedResourceOffsetPageTargetKey, getNextPageOffset, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import type { IDNDData } from '@cloudbeaver/core-ui';
-import { type ILoadableState, MetadataMap, throttle } from '@cloudbeaver/core-utils';
+import { type ILoadableState, MetadataMap, debounce } from '@cloudbeaver/core-utils';
 
 import { ElementsTreeService } from './ElementsTreeService.js';
 import type { IElementsTreeAction } from './IElementsTreeAction.js';
@@ -734,9 +734,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
   }, [options.root]);
 
   const loadTreeThreshold = useCallback(
-    throttle(function refreshRoot() {
+    debounce(function refreshRoot() {
       functionsRef.loadTree(options.root).catch(() => ({}));
-    }, 100),
+    }, 500),
     [],
   );
 
