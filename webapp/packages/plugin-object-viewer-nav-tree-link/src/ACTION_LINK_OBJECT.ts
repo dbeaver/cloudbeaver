@@ -8,6 +8,6 @@
 import { createAction } from '@cloudbeaver/core-view';
 
 export const ACTION_LINK_OBJECT = createAction('link-object', {
-  label: 'link-object',
+  label: 'app_navigationTree_action_link_with_editor',
   icon: '/icons/reveal_in_explorer_view_sm.svg',
 });

@@ -21,7 +21,6 @@ import io.cloudbeaver.model.WebConnectionFolderInfo;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPDataSourceFolder;
-import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.utils.CommonUtils;
 
 public class WebConnectionFolderUtils {
@@ -44,10 +43,5 @@ public class WebConnectionFolderUtils {
         if (folderName.contains("/")) {
             throw new DBWebException("Folder name '" + folderName + "' contains illegal characters: /");
         }
-    }
-
-    public static DBPDataSourceFolder createFolder(WebConnectionFolderInfo parentFolder, String newName, DBPDataSourceRegistry registry) throws DBWebException {
-        DBPDataSourceFolder folder = registry.addFolder(parentFolder == null ? null : parentFolder.getDataSourceFolder(), newName);
-        return folder;
     }
 }
