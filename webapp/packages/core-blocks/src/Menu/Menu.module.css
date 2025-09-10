@@ -13,7 +13,7 @@
   border: none;
   color: inherit;
   cursor: pointer;
-  // TODO still has bug with separator in topbar (it should be centered)
+  /* TODO still has bug with separator in topbar (it should be centered) */
   display: flex;
   align-items: center;
 
