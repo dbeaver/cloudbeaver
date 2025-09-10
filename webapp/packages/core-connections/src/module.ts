@@ -58,6 +58,7 @@ ModuleRegistry.add({
       .addSingleton(Dependency, proxy(ConnectionInfoCustomOptionsResource))
       .addSingleton(Dependency, proxy(ConnectionFolderResource))
       .addSingleton(Dependency, proxy(ConnectionExecutionContextResource))
+      .addSingleton(Dependency, proxy(DBDriverExpertSettingsResource))
       .addSingleton(ConnectionDialectResource)
       .addSingleton(NetworkHandlerResource)
       .addSingleton(NavNodeExtensionsService)

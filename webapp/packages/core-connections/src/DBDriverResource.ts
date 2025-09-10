@@ -10,7 +10,7 @@ import { computed, makeObservable } from 'mobx';
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { SessionDataResource, WorkspaceConfigEventHandler } from '@cloudbeaver/core-root';
+import { ServerConfigResource, WorkspaceConfigEventHandler } from '@cloudbeaver/core-root';
 import {
   CbServerEventId,
   type DatabaseDriverFragment,
@@ -30,14 +30,14 @@ export type DBDriverResourceIncludes = Omit<DriverListQueryVariables, 'driverId'
 
 export type DriverPropertyInfo = DriverPropertyInfoFragment;
 
-@injectable(() => [SessionDataResource, GraphQLService, WorkspaceConfigEventHandler, AppAuthService])
+@injectable(() => [ServerConfigResource, GraphQLService, WorkspaceConfigEventHandler, AppAuthService])
 export class DBDriverResource extends CachedMapResource<string, DBDriver, DBDriverResourceIncludes> {
   get enabledDrivers() {
     return this.values.filter(driver => driver.enabled).sort(this.compare);
   }
 
   constructor(
-    private readonly sessionDataResource: SessionDataResource,
+    private readonly serverConfigResource: ServerConfigResource,
     private readonly graphQLService: GraphQLService,
     private readonly workspaceConfigEventHandler: WorkspaceConfigEventHandler,
     appAuthService: AppAuthService,
@@ -46,7 +46,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, DBDriv
     appAuthService.requireAuthentication(this);
 
     this.sync(
-      this.sessionDataResource,
+      this.serverConfigResource,
       () => {},
       () => CachedMapAllKey,
     );

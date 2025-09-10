@@ -9,17 +9,20 @@
 import { CachedMapResource, isResourceAlias, ResourceKeyUtils, type ResourceKey } from '@cloudbeaver/core-resource';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { injectable } from '@cloudbeaver/core-di';
+import { SessionDataResource } from '@cloudbeaver/core-root';
 
 import { DBDriverResource, type DriverPropertyInfo } from './DBDriverResource.js';
 
-@injectable(() => [GraphQLService, DBDriverResource])
+@injectable(() => [GraphQLService, DBDriverResource, SessionDataResource])
 export class DBDriverExpertSettingsResource extends CachedMapResource<string, DriverPropertyInfo[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly dbDriverResource: DBDriverResource,
+    private readonly sessionDataResource: SessionDataResource,
   ) {
     super();
 
+    this.sessionDataResource.outdateResource(this);
     this.sync(this.dbDriverResource);
     this.dbDriverResource.onItemDelete.addHandler(this.delete.bind(this));
   }
