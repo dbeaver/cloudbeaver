@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useRef, useState } from 'react';
+import { forwardRef, useState } from 'react';
 
-import { getComputed, type IMenuState, Menu, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, Menu, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { MenuActionItem } from '@cloudbeaver/core-view';
 
 import type { IContextMenuProps } from './IContextMenuProps.js';
@@ -29,15 +29,11 @@ export const ContextMenu = observer<IContextMenuProps, HTMLDivElement>(
     const disabled = getComputed(() => loading || handler?.isDisabled?.(menuData.context) || false);
     const lazy = getComputed(() => !menuData.available || hidden);
 
-    const menu = useRef<IMenuState>(null);
-
     useAutoLoad({ name: `${ContextMenu.name}(${menuData.menu.id})` }, menuData.loaders, !lazy, menuVisible, true);
 
     const handlers = useObjectRef(
       () => ({
-        handleItemClose() {
-          menu.current?.setOpen(false);
-        },
+        handleItemClose() {},
         hasBindings() {
           return this.menuData.items.some(item => item instanceof MenuActionItem && item.action.binding !== null);
         },
@@ -67,15 +63,11 @@ export const ContextMenu = observer<IContextMenuProps, HTMLDivElement>(
         label={translate(menuData.menu.info.label)}
         title={translate(menuData.menu.info.tooltip)}
         items={() =>
-          menuData.items.map(
-            item =>
-              menu.current && (
-                <MenuItemRenderer key={item.id} item={item} menuData={menuData} rtl={rtl} modal={modal} onItemClose={handlers.handleItemClose} />
-              ),
-          )
+          menuData.items.map(item => (
+            <MenuItemRenderer key={item.id} item={item} menuData={menuData} rtl={rtl} modal={modal} onItemClose={handlers.handleItemClose} />
+          ))
         }
         rtl={rtl}
-        menuRef={menu}
         modal={modal}
         visible={visible}
         contextMenuPosition={contextMenuPosition}

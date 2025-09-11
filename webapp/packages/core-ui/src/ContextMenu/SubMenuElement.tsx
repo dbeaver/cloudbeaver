@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useRef, useState } from 'react';
+import { forwardRef, useState } from 'react';
 
-import { getComputed, type IMenuState, Menu, MenuItemElement, useAutoLoad, useObjectRef } from '@cloudbeaver/core-blocks';
+import { getComputed, Menu, MenuItemElement, useAutoLoad, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import {
   DATA_CONTEXT_MENU_NESTED,
@@ -32,7 +32,6 @@ interface ISubMenuElementProps extends Omit<React.ButtonHTMLAttributes<any>, 'st
 
 export const SubMenuElement = observer<ISubMenuElementProps, HTMLDivElement>(
   forwardRef(function SubMenuElement({ menuData, subMenu, itemRenderer, menuModal: modal, menuRtl: rtl, onItemClose, ...rest }, ref) {
-    const menu = useRef<IMenuState>(null);
     const subMenuData = useMenu({ menu: subMenu.menu, context: menuData.context });
     const [visible, setVisible] = useState(false);
 
@@ -48,7 +47,6 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLDivElement>(
     const handlers = useObjectRef(
       () => ({
         handleItemClose() {
-          menu.current?.hide();
           this.onItemClose?.();
         },
         hasBindings() {
@@ -89,15 +87,11 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLDivElement>(
       <Menu
         {...rest}
         ref={ref}
-        menuRef={menu}
         label={subMenuData.menu.info.label}
         items={() =>
-          subMenuData.items.map(
-            item =>
-              menu.current && (
-                <MenuItemRenderer key={item.id} item={item} menuData={subMenuData} rtl={rtl} modal={modal} onItemClose={handlers.handleItemClose} />
-              ),
-          )
+          subMenuData.items.map(item => (
+            <MenuItemRenderer key={item.id} item={item} menuData={subMenuData} rtl={rtl} modal={modal} onItemClose={handlers.handleItemClose} />
+          ))
         }
         rtl={rtl}
         modal={modal}

@@ -6,12 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { action, computed, observable } from 'mobx';
-import { type RefObject, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { type RefObject, useEffect, useLayoutEffect, useMemo } from 'react';
 
 import { debounce } from '@cloudbeaver/core-utils';
 import { isNotNullDefined } from '@dbeaver/js-helpers';
 
-import type { IMenuState } from '../Menu/MenuStateContext.js';
 import type { IContextMenuPositionCoords } from '../Menu/useContextMenuPosition.js';
 import { useObservableRef } from '../useObservableRef.js';
 import { type SearchStrategy, useSearch } from '../useSearch.js';
@@ -38,7 +37,6 @@ interface State {
   proposals: InputAutocompleteProposal[];
   position: IContextMenuPositionCoords;
   inputValue: string;
-  menuRef: RefObject<IMenuState>;
 }
 
 const DEFAULT_SEPARATOR = ' ';
@@ -56,7 +54,6 @@ export const useInputAutocomplete = (
     matchStrategy,
     predicate,
   });
-  const menuRef = useRef<IMenuState>(null);
   const state = useObservableRef(
     () => ({
       position: { x: 0, y: 0 } as IContextMenuPositionCoords,
@@ -126,7 +123,7 @@ export const useInputAutocomplete = (
       position: observable.ref,
       inputValue: observable.ref,
     },
-    { inputRef, search, menuRef },
+    { inputRef, search },
   );
 
   const handleInput = useMemo(
@@ -145,12 +142,7 @@ export const useInputAutocomplete = (
   function handleKeyDown(event: any) {
     switch (event.key) {
       case 'Escape':
-        state.menuRef.current?.hide();
         state.resetState();
-        break;
-      case 'ArrowDown':
-      case 'ArrowUp':
-        state.menuRef.current?.first();
         break;
       case 'Tab':
         state.resetState();

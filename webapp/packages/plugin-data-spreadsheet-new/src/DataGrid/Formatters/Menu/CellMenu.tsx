@@ -81,9 +81,7 @@ export const CellMenu = observer<Props>(function CellMenu({ model, actions, spre
           disclosure
           onVisibleSwitch={onStateSwitch}
         >
-          <div role="button" className={s(style, { trigger: true })}>
-            <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
-          </div>
+          <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
         </ContextMenu>
       </div>
     </SContext>
