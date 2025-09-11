@@ -33,6 +33,7 @@ public class WebSessionEventsFilter {
     private final Set<String> subscribedEventTopics = new CopyOnWriteArraySet<>();
     private final Set<String> subscribedProjectIds = new CopyOnWriteArraySet<>();
     private final Map<String, List<WebTopicActivityListener>> topicActivityListeners = new ConcurrentHashMap<>();
+    private final Set<String> handledStartTopics = new CopyOnWriteArraySet<>();
 
     public WebSessionEventsFilter(BaseWebSession session) {
         this.session = session;
@@ -45,8 +46,12 @@ public class WebSessionEventsFilter {
         subscribedEventTopics.add(topic);
 
         topicActivityListeners
-            .getOrDefault(topic, List.of())
-            .forEach(listener -> listener.handelStartSubscriptionTopic(session));
+            .getOrDefault(topic, List.of()).stream()
+            .filter(listener -> !handledStartTopics.contains(listener.getTopicName()))
+            .forEach(listener -> {
+                listener.handelStartSubscriptionTopic(session);
+                handledStartTopics.add(topic);
+            });
     }
 
     public void unsubscribeFromEventTopic(@Nullable String topic) {
