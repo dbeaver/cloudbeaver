@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2024 DBeaver Corp and others
+ * Copyright (C) 2020-2025 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -71,14 +71,14 @@ export class LocalizationService extends Bootstrap {
     this.localeProviders.push(provider);
   }
 
-  setSupportedLanguages(locales: ILocale[]) {
+  setSupportedLanguages(locales: ILocale[]): void {
     this.supportedLanguages = locales;
     if (this.supportedLanguages.length === 0) {
       this.supportedLanguages = [DEFAULT_LOCALE];
     }
   }
 
-  setLanguage(lang: string) {
+  setLanguage(lang: string): void {
     this.language = lang;
   }
 
@@ -142,7 +142,6 @@ export class LocalizationService extends Bootstrap {
         name: 'Vietnamese',
         nativeName: 'Tiếng Việt',
       },
-
     ]);
     this.addProvider(this.coreProvider.bind(this));
   }

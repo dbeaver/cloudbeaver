@@ -46,6 +46,7 @@ import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService.js';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA.js';
 import { SQL_EDITOR_TOOLS_MENU } from './SqlEditor/SQL_EDITOR_TOOLS_MENU.js';
 import { SQL_EDITOR_TOOLS_MORE_MENU } from './SqlEditor/SQL_EDITOR_TOOLS_MORE_MENU.js';
+import { SQL_EDITOR_ACTIONS_MENU } from './SqlEditor/SQL_EDITOR_ACTIONS_MENU.js';
 import { getSqlEditorName } from './getSqlEditorName.js';
 import type { ISqlEditorTabState } from './ISqlEditorTabState.js';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
@@ -53,6 +54,12 @@ import { SqlEditorSettingsService } from './SqlEditorSettingsService.js';
 const SYNC_DELAY = 5 * 60 * 1000;
 
 const ScriptImportDialog = importLazyComponent(() => import('./SqlEditor/ScriptImportDialog.js').then(m => m.ScriptImportDialog));
+const EXECUTIONS_ACTIONS = [
+  ACTION_SQL_EDITOR_EXECUTE,
+  ACTION_SQL_EDITOR_EXECUTE_NEW,
+  ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
+  ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
+];
 
 @injectable(() => [
   MenuService,
@@ -207,6 +214,15 @@ export class MenuBootstrap extends Bootstrap {
       getItems: (context, items) => [...items, ACTION_SAVE],
     });
 
+    this.menuService.addCreator({
+      menus: [SQL_EDITOR_ACTIONS_MENU],
+      contexts: [DATA_CONTEXT_SQL_EDITOR_DATA, DATA_CONTEXT_SQL_EDITOR_STATE],
+      getItems: (context, items) => [
+        ...items,
+        ...EXECUTIONS_ACTIONS,
+      ],
+    });
+
     this.keyBindingService.addKeyBindingHandler({
       id: 'sql-editor-save',
       binding: KEY_BINDING_SAVE,
@@ -227,13 +243,10 @@ export class MenuBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'sql-editor-actions',
       actions: [
-        ACTION_SQL_EDITOR_EXECUTE,
-        ACTION_SQL_EDITOR_EXECUTE_NEW,
-        ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
+        ...EXECUTIONS_ACTIONS,
         ACTION_SQL_EDITOR_FORMAT,
         ACTION_REDO,
         ACTION_UNDO,
-        ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
       ],
       contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       isActionApplicable: (contexts, action): boolean => {
@@ -245,18 +258,18 @@ export class MenuBootstrap extends Bootstrap {
 
         if (
           !sqlEditorData.isExecutionAllowed &&
-          [
-            ACTION_SQL_EDITOR_EXECUTE,
-            ACTION_SQL_EDITOR_EXECUTE_NEW,
-            ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
-            ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
-          ].includes(action)
+          EXECUTIONS_ACTIONS.includes(action)
         ) {
           return false;
         }
 
         if (action === ACTION_SQL_EDITOR_FORMAT) {
           return !!sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.script) && !sqlEditorData.activeSegmentMode.activeSegmentMode;
+        }
+
+        if (action === ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN) {
+          return !!sqlEditorData.dataSource?.hasFeature(ESqlDataSourceFeatures.query) &&
+            !!sqlEditorData.dialect?.supportsExplainExecutionPlan;
         }
 
         // TODO we have to add check for output action ?
@@ -271,12 +284,26 @@ export class MenuBootstrap extends Bootstrap {
       },
       isDisabled: (context, action) => {
         const data = context.get(DATA_CONTEXT_SQL_EDITOR_DATA)!;
+
+        if (EXECUTIONS_ACTIONS.includes(action)) {
+          return data.isDisabled || data.isScriptEmpty;
+        }
+
         switch (action) {
           case ACTION_SQL_EDITOR_FORMAT:
             return data.isDisabled || data.isScriptEmpty || data.readonly;
         }
 
         return false;
+      },
+      getActionInfo: (context, action) => {
+        if (EXECUTIONS_ACTIONS.includes(action)) {
+          return {
+            ...action.info,
+            label: '',
+          };
+        }
+        return action.info;
       },
       handler: this.sqlEditorActionHandler.bind(this),
     });

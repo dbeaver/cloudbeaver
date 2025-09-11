@@ -47,12 +47,7 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
         focusable
         onClick={handleClick}
       >
-        <MenuItemElement
-          label={actionInfo.label}
-          icon={<Radio checked={checked} size="small" />}
-          tooltip={actionInfo.tooltip}
-          loading={loading}
-        />
+        <MenuItemElement label={actionInfo.label} icon={<Radio checked={checked} size="small" />} tooltip={actionInfo.tooltip} loading={loading} />
       </MenuItemRadio>
     );
   }
@@ -72,7 +67,13 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
         focusable
         onClick={handleClick}
       >
-        <MenuItemElement label={actionInfo.label} icon={<Checkbox checked={checked} size="small" />} tooltip={actionInfo.tooltip} loading={loading} />
+        <MenuItemElement
+          label={actionInfo.label}
+          binding={binding}
+          icon={<Checkbox checked={checked} size="small" />}
+          tooltip={actionInfo.tooltip}
+          loading={loading}
+        />
       </MenuItemCheckbox>
     );
   }

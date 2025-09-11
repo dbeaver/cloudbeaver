@@ -103,7 +103,7 @@ public class WebSQLCompletionContext implements SQLCompletionContext {
 
     @Override
     public boolean isSortAlphabetically() {
-        return false;
+        return true;
     }
 
     @Override
