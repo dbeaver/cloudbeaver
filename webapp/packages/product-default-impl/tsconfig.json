@@ -152,9 +152,6 @@
       "path": "../plugin-root"
     },
     {
-      "path": "../plugin-server-notifications"
-    },
-    {
       "path": "../plugin-session-expiration"
     },
     {
