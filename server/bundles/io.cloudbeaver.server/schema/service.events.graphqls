@@ -277,6 +277,21 @@ type WSAIChatMessageErrorEvent implements CBServerEvent @since(version: "25.1.1"
     errorMessage: String
 }
 
+enum WSUserNotificationEventType {
+    INFO
+    ERROR
+    LOADING
+    CUSTOM
+}
+"General event for showing user notification"
+type WSUserNotificationEvent implements CBServerEvent @since(version: "25.2.1") {
+    id: CBServerEventId!
+    topicId: CBEventTopic!
+    title: String
+    message: String
+    eventNotificationType: WSUserNotificationEventType!
+}
+
 extend type Query {
     emptyEvent: Boolean
 }
