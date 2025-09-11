@@ -41,30 +41,5 @@ public class WSUserEventHandler<EVENT extends WSAbstractEvent> implements WSEven
             case WSUserDisabledEvent e -> sessionManager.closeUserSession(e);
             default -> { }
         }
-
-        switch (event.getId()) {
-            case WSUserCloseSessionsEvent.ID:
-                if (event instanceof WSUserCloseSessionsEvent closeSessionsEvent) {
-                    if (closeSessionsEvent.getSessionIds().isEmpty()) {
-                        sessionManager.closeAllSessions(closeSessionsEvent.getSessionId());
-                    } else {
-                        sessionManager.closeSessions(closeSessionsEvent.getSessionIds());
-                    }
-                }
-                break;
-            case WSUserDeletedEvent.ID:
-                if (event instanceof WSUserDeletedEvent userDeletedEvent) {
-                    sessionManager.closeUserSession(userDeletedEvent);
-                }
-                break;
-            case WSUserDisabledEvent.ID:
-                if (event instanceof WSUserDisabledEvent userDisabledEvent) {
-                    sessionManager.closeUserSession(userDisabledEvent);
-                }
-                break;
-            default:
-                break;
-        }
-
     }
 }
