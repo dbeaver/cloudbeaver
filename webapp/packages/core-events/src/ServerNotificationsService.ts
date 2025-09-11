@@ -21,7 +21,6 @@ export class ServerNotificationsService extends Bootstrap {
     private readonly sessionResource: SessionResource,
   ) {
     super();
-    console.log('ServerNotificationsService#constructor');
     this.serverNotificationsEventHandler.onEvent(
       CbServerEventId.CbUserSessionLimit,
       event => {
