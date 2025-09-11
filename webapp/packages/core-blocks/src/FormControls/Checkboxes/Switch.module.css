@@ -5,46 +5,72 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.switchControl {
-  composes: theme-switch from global;
-}
 
-.disabled {
-  composes: theme-switch--disabled mdc-switch--disabled from global;
-}
+@layer components {
+  .field {
+    --dbv-kit-control-outline-offset: -8px;
+    position: relative;
 
-.checked {
-  composes: theme-switch--checked mdc-switch--checked from global;
-}
+    &::before {
+      content: '';
+      position: absolute;
+      top: var(--dbv-kit-control-outline-offset);
+      left: var(--dbv-kit-control-outline-offset);
+      right: var(--dbv-kit-control-outline-offset);
+      bottom: var(--dbv-kit-control-outline-offset);
+      border-radius: var(--dbv-kit-control-border-radius);
+      border: var(--dbv-kit-control-outline-width) solid transparent;
 
-.switchControlTrack {
-  composes: theme-switch__track from global;
-}
+      pointer-events: none;
+    }
 
-.switchInput {
-  composes: theme-switch_native-control from global;
-}
+    &:has(.switchInput:focus-visible)::before {
+      border-color: var(--dbv-kit-control-outline-color);
+      border-width: var(--dbv-kit-control-outline-width);
+    }
+  }
 
-.switchControlUnderlay {
-  composes: theme-switch__thumb-underlay from global;
-}
+  .switchControl {
+    composes: theme-switch from global;
+  }
 
-.switchControlThumb {
-  composes: theme-switch__thumb from global;
-}
+  .disabled {
+    composes: theme-switch--disabled mdc-switch--disabled from global;
+  }
 
-.switchBody {
-  display: flex;
-  align-items: center;
-  composes: theme-typography--body1 from global;
+  .checked {
+    composes: theme-switch--checked mdc-switch--checked from global;
+  }
 
-  & .fieldLabel {
-    cursor: pointer;
-    user-select: none;
-    display: block;
-    padding-left: 18px;
-    min-width: 50px;
-    white-space: pre-wrap;
-    font-weight: 500;
+  .switchControlTrack {
+    composes: theme-switch__track from global;
+  }
+
+  .switchInput {
+    composes: theme-switch_native-control from global;
+  }
+
+  .switchControlUnderlay {
+    composes: theme-switch__thumb-underlay from global;
+  }
+
+  .switchControlThumb {
+    composes: theme-switch__thumb from global;
+  }
+
+  .switchBody {
+    display: flex;
+    align-items: center;
+    composes: theme-typography--body1 from global;
+
+    & .fieldLabel {
+      cursor: pointer;
+      user-select: none;
+      display: block;
+      padding-left: 18px;
+      min-width: 50px;
+      white-space: pre-wrap;
+      font-weight: 500;
+    }
   }
 }
